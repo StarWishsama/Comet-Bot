@@ -133,30 +133,34 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // 解析消息中的图片
         //CQImage image = CC.getCQImage(msg);// 此方法为简便方法，获取第一个CQ:image里的图片数据，错误时打印异常到控制台，返回 null
         //List<CQImage> images = CC.getCQImages(msg);// 此方法为获取消息中所有的CQ图片数据，错误时打印异常到控制台，返回 已解析的数据
+       String msg_to_send = "";
        if (fromGroup != 779672339L) {
            if (msg.startsWith("!")) {
                if (msg.equalsIgnoreCase("!help")) {
-                   CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) + "\n-Nameless Bot 帮助-\n!version 查看版本号\n!likeme[ADMIN] 给你点10个赞\n!repeat [内容] 复读你要说的话");
+                   msg_to_send = CC.at(fromQQ) + "\n-Nameless Bot 帮助-\n!version 查看版本号\n!likeme[ADMIN] 给你点10个赞\n!repeat [内容] 复读你要说的话";
                } else if (msg.equalsIgnoreCase("!version")) {
-                   CQ.sendGroupMsg(fromGroup, "版本号: 0.0.2-SNAPSHOT");
+                   msg_to_send = "版本号: 0.0.2-SNAPSHOT";
                } else if (msg.equalsIgnoreCase("!likeme")) {
                    if (fromQQ == 1552409060L || fromQQ == 1448839220L) {
                        CQ.sendLikeV2(fromQQ, 10);
-                       CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) + " 成功为你点了10个赞");
-                   } else CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) + "你没有点赞权限!");
+                       msg_to_send = " 成功为你点了10个赞";
+                   } else msg_to_send = CC.at(fromQQ) + "你没有点赞权限!";
                } else if (msg.startsWith("!repeat")) {
                    if (msg.equalsIgnoreCase("!repeat")||msg.equalsIgnoreCase("!repeat ")) {
-                       CQ.sendGroupMsg(fromGroup, "请输入需要复读的话!");
+                       msg_to_send = "请输入需要复读的话!";
                    } else {
-                       String need2repeat = msg.replaceAll("!repeat ", "");
-                       CQ.sendGroupMsg(fromGroup, need2repeat);
+                       msg_to_send = msg.replaceAll("!repeat ", "");
                    }
-               } else CQ.sendGroupMsg(fromGroup, "命令不存在哟");
+               } else msg_to_send "命令不存在哟";
            }
        }
        if (fromGroup == 779672339L){
-           if (!msg.contains("中国公司")|| !msg.contains("被用于间谍")|| !msg.contains("Devotion") || !msg.contains("还愿") || !msg.contains("GFW")) {
-               CQ.sendGroupMsg(111852382L, msg);
+           if (!(msg_to_send.contains("中国公司")|| 
+                 msg_to_send.contains("被用于间谍")||
+                 msg_to_send.contains("Devotion") || 
+                 msg_to_send.contains("还愿") || 
+                 msg_to_send.contains("GFW"))) {
+               CQ.sendGroupMsg(111852382L, msg_to_send);
            }
        }
         // 这里处理消息
