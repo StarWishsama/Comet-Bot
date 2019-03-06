@@ -1,0 +1,51 @@
+package top.starwish.namelessbot;
+
+import com.rometools.rome.feed.synd.*;
+import com.rometools.rome.io.SyndFeedInput;
+import com.rometools.rome.io.XmlReader;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+public class RSSPusher {
+
+    public static void main(String[] args) {
+        process();
+    }
+
+    public static void process() {
+        String jikeDaily = "https://rsshub.app/jike/daily";
+        String jikeWakeup = "https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68";
+        String jikeTechNews = "https://rsshub.app/jike/topic/597ae4ac096cde0012cf6c06";
+
+        List<String> l = new ArrayList<String>();
+        l.add(jikeDaily);
+        l.add(jikeWakeup);
+        l.add(jikeTechNews);
+
+            try {
+                URL url = new URL(l.get(1));
+                // 读取Rss源
+                XmlReader reader = new XmlReader(url);
+                SyndFeedInput input = new SyndFeedInput();
+                // 得到SyndFeed对象，即得到Rss源里的所有信息
+                SyndFeed feed = input.build(reader);
+                //System.out.println(feed);
+                // 得到Rss新闻中子项列表
+                List entries = feed.getEntries();
+                // 循环得到每个子项信息
+                for (int j = 0; j <= 0; j++) {
+                    SyndEntry entry = (SyndEntry) entries.get(j);
+                    SyndContent description = entry.getDescription();
+                    System.err.println("====================");
+                    System.err.println(entry.getTitle() + "\n" + entry.getContents());
+                    System.err.println("SyndContent对象：");
+                    System.err.println(description.toString());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }

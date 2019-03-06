@@ -6,26 +6,12 @@ import com.sobte.cqp.jcq.event.JcqAppAbstract;
 import javax.swing.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
+    public boolean BotStatus = true;
+    public boolean SolidotSub = true;
+    String rss = "https://rsshub.app/jike/topic/597ae4ac096cde0012cf6c06";
 
-    /**
-     * 用main方法调试可以最大化的加快开发效率，检测和定位错误位置<br/>
-     * 以下就是使用Main方法进行测试的一个简易案例
-     *
-     * @param args 系统参数
-     */
-
-    /**
-     * 打包后将不会调用 请不要在此事件中写其他代码
-     *
-     * @return 返回应用的ApiVer、Appid
-     */
     public String appInfo() {
-        // 应用AppID,规则见 http://d.cqp.me/Pro/开发/基础信息#appid
-        String AppID = "top.starwish.namelessbot";// 记住编译后的文件和json也要使用appid做文件名
-        /**
-         * 本函数【禁止】处理其他任何代码，以免发生异常情况。
-         * 如需执行初始化代码请在 startup 事件中执行（Type=1001）。
-         */
+        String AppID = "top.starwish.namelessbot";
         return CQAPIVER + "," + AppID;
     }
 
@@ -46,38 +32,15 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         return 0;
     }
 
-    /**
-     * 酷Q退出 (Type=1002)<br>
-     * 本方法会在酷Q【主线程】中被调用。<br>
-     * 无论本应用是否被启用，本函数都会在酷Q退出前执行一次，请在这里执行插件关闭代码。
-     *
-     * @return 请固定返回0，返回后酷Q将很快关闭，请不要再通过线程等方式执行其他代码。
-     */
     public int exit() {
         return 0;
     }
 
-    /**
-     * 应用已被启用 (Type=1003)<br>
-     * 当应用被启用后，将收到此事件。<br>
-     * 如果酷Q载入时应用已被启用，则在 {@link #startup startup}(Type=1001,酷Q启动) 被调用后，本函数也将被调用一次。<br>
-     * 如非必要，不建议在这里加载窗口。
-     *
-     * @return 请固定返回0。
-     */
     public int enable() {
         enable = true;
         return 0;
     }
 
-    /**
-     * 应用将被停用 (Type=1004)<br>
-     * 当应用被停用前，将收到此事件。<br>
-     * 如果酷Q载入时应用已被停用，则本函数【不会】被调用。<br>
-     * 无论本应用是否被启用，酷Q关闭前本函数都【不会】被调用。
-     *
-     * @return 请固定返回0。
-     */
     public int disable() {
         enable = false;
         return 0;
@@ -99,7 +62,12 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
      */
     public int privateMsg(int subType, int msgId, long fromQQ, String msg, int font) {
         // 这里处理消息
-        //CQ.sendPrivateMsg(fromQQ, "你发送了这样的消息：" + msg + "\n来自Java插件");
+        if (fromQQ == 1552409060L|| fromQQ == 1442988390L){
+            if (msg.startsWith("!bc")){
+                String text = msg.replaceAll("!bc ", "");
+                CQ.sendGroupMsg(111852382L, text);
+            }
+        }
         return MSG_IGNORE;
     }
 
@@ -133,32 +101,59 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // 解析消息中的图片
         //CQImage image = CC.getCQImage(msg);// 此方法为简便方法，获取第一个CQ:image里的图片数据，错误时打印异常到控制台，返回 null
         //List<CQImage> images = CC.getCQImages(msg);// 此方法为获取消息中所有的CQ图片数据，错误时打印异常到控制台，返回 已解析的数据
-       if (fromGroup != 779672339L) {
-           if (msg.startsWith("!")) {
-               if (msg.equalsIgnoreCase("!help")) {
-                   CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) + "\n-Nameless Bot 帮助-\n!version 查看版本号\n!likeme[ADMIN] 给你点10个赞\n!repeat [内容] 复读你要说的话");
-               } else if (msg.equalsIgnoreCase("!version")) {
-                   CQ.sendGroupMsg(fromGroup, "版本号: 0.0.2-SNAPSHOT");
-               } else if (msg.equalsIgnoreCase("!likeme")) {
-                   if (fromQQ == 1552409060L || fromQQ == 1448839220L) {
-                       CQ.sendLikeV2(fromQQ, 10);
-                       CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) + " 成功为你点了10个赞");
-                   } else CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) + "你没有点赞权限!");
-               } else if (msg.startsWith("!repeat")) {
-                   if (msg.equalsIgnoreCase("!repeat")||msg.equalsIgnoreCase("!repeat ")) {
-                       CQ.sendGroupMsg(fromGroup, "请输入需要复读的话!");
-                   } else {
-                       String need2repeat = msg.replaceAll("!repeat ", "");
-                       CQ.sendGroupMsg(fromGroup, need2repeat);
-                   }
-               } else CQ.sendGroupMsg(fromGroup, "命令不存在哟");
-           }
-       }
-       if (fromGroup == 779672339L){
-           if (!msg.contains("中国公司")|| !msg.contains("被用于间谍")|| !msg.contains("Devotion") || !msg.contains("还愿") || !msg.contains("GFW")) {
-               CQ.sendGroupMsg(111852382L, msg);
-           }
-       }
+
+     if (fromQQ == 1552409060L){
+         if (msg.equalsIgnoreCase("!mute off")){
+             CQ.sendGroupMsg(fromGroup, "[Bot]已开启所有功能.");
+             BotStatus = true;
+         }
+     }
+
+     if (BotStatus) {
+         if (fromGroup != 779672339L) {
+             if (msg.startsWith("!")) {
+                 if (msg.equalsIgnoreCase("!help")) {
+                     CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) + "\n-Nameless Bot 帮助-\n!version 查看版本号\n!repeat [内容] 复读你要说的话");
+                 } else if (msg.equalsIgnoreCase("!version")) {
+                     CQ.sendGroupMsg(fromGroup, "版本号: 0.0.3-SNAPSHOT");
+                 } else if (msg.startsWith("!repeat")) {
+                     if (fromQQ == 1552409060L || fromQQ == 1448839220L) {
+                         if (msg.equalsIgnoreCase("!repeat") || msg.equalsIgnoreCase("!repeat ")) {
+                             CQ.sendGroupMsg(fromGroup, "请输入需要复读的话!");
+                         } else {
+                             String need2repeat = msg.replaceAll("!repeat ", "");
+                             CQ.sendGroupMsg(fromGroup, need2repeat);
+                         }
+                     }
+                 } else if (msg.startsWith("!mute")) {
+                     if (fromQQ == 1552409060L) {
+                         if (msg.equalsIgnoreCase("!mute on")) {
+                             CQ.sendGroupMsg(fromGroup, "[Bot]已关闭所有功能.");
+                             BotStatus = false;
+                         }
+                     } else CQ.sendGroupMsg(fromGroup, "你没有权限");
+                 } else if (msg.startsWith("!sub")){
+                     if (msg.equalsIgnoreCase("!sub Solidot")){
+                         SolidotSub = true;
+                         CQ.sendGroupMsg(fromGroup, "[Bot] 已订阅 Solidot.");
+                     } else CQ.sendGroupMsg(fromGroup, "[Bot] 未知订阅频道.");
+                 } else if (msg.startsWith("!unsub")){
+                     if (msg.equalsIgnoreCase("!unsub Solidot")){
+                         SolidotSub = false;
+                         CQ.sendGroupMsg(fromGroup, "[Bot] 取消订阅 Solidot 成功.");
+                     } else CQ.sendGroupMsg(fromGroup, "[Bot] 未知订阅频道.");
+                 }
+                 else CQ.sendGroupMsg(fromGroup, "命令不存在哟");
+             }
+         }
+         if (fromGroup == 779672339L) {
+             if (SolidotSub){
+             if (!msg.contains("中国") || !msg.contains("警察") || !msg.contains("侵入") || !msg.contains("华为")) {
+                 CQ.sendGroupMsg(111852382L, msg);
+             }
+                 }
+         }
+     }
         // 这里处理消息
         return MSG_IGNORE;
     }
@@ -247,7 +242,11 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
      */
     public int groupMemberIncrease(int subtype, int sendTime, long fromGroup, long fromQQ, long beingOperateQQ) {
         // 这里处理消息
-
+        if (BotStatus) {
+            if (fromGroup == 111852382L){
+            CQ.sendGroupMsg(fromGroup, "欢迎 " + CC.at(beingOperateQQ) + "加入时光隧道!\n【进群请修改群名片为游戏ID】\n【建议使用群文件中的官方客户端!】\n\n服务器IP地址:bgp.sgsd.pw:25846\n赞助网址:http://www.mcrmb.com/cz/13153");
+        }
+            }
         return MSG_IGNORE;
     }
 
@@ -327,7 +326,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
      * @return 固定返回0
      */
     public int menu() {
-        JOptionPane.showMessageDialog(null, "这是测试菜单A，可以在这里加载窗口");
+        JOptionPane.showMessageDialog(null, "暂时没有菜单哟");
         return 0;
     }
 
