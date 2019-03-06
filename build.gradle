@@ -1,0 +1,27 @@
+group 'top.starwish'
+version '0.0.4-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile files("libs/commons-codec-1.9.jar")
+    compile files("libs/commons-logging-1.2.jar")
+    compile files("libs/httpclient-4.5.2.jar")
+    compile files("libs/httpcore-4.4.4.jar")
+    compile files("libs/jcq-coolq-1.2.7.jar")
+    compile files("libs/jdom-1.0.jar")
+    compile files("libs/jdom2-2.0.6.jar")
+    compile files("libs/rome-1.0.jar")
+    compile files("libs/rome-1.8.0.jar")
+    compile files("libs/rome-1.12.0.jar")
+    compile files("libs/rome-utils-1.8.0.jar")
+    compile files("libs/rome-utils-1.12.0.jar")
+    compile files("libs/slf4j-api-1.7.16.jar")
+}
