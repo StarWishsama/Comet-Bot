@@ -3,11 +3,14 @@ package top.starwish.namelessbot;
 import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
 
+import java.sql.Struct;
+
 import javax.swing.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
-    public boolean BotStatus = true;
-    public boolean SolidotSub = true;
+    public boolean botStatus = true;
+    public boolean subSolidot = true;
+
     String rss = "https://rsshub.app/jike/topic/597ae4ac096cde0012cf6c06";
 
     public String appInfo() {
@@ -25,7 +28,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
      */
     public int startup() {
         // 获取应用数据目录(无需储存数据时，请将此行注释)
-        //String appDirectory = CQ.getAppDirectory();
+        // String appDirectory = CQ.getAppDirectory();
         CQ.logInfo("NamelessBot", "初始化完成, 欢迎使用!");
         // 返回如：D:\CoolQ\app\com.sobte.cqp.jcq\app\com.example.demo\
         // 应用的所有数据、配置【必须】存放于此目录，避免给用户带来困扰。
@@ -56,14 +59,15 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
      * @param msg     消息内容
      * @param font    字体
      * @return 返回值*不能*直接返回文本 如果要回复消息，请调用api发送<br>
-     * 这里 返回  {@link IMsg#MSG_INTERCEPT MSG_INTERCEPT} - 截断本条消息，不再继续处理<br>
-     * 注意：应用优先级设置为"最高"(10000)时，不得使用本返回值<br>
-     * 如果不回复消息，交由之后的应用/过滤器处理，这里 返回  {@link IMsg#MSG_IGNORE MSG_IGNORE} - 忽略本条消息
+     *         这里 返回 {@link IMsg#MSG_INTERCEPT MSG_INTERCEPT} - 截断本条消息，不再继续处理<br>
+     *         注意：应用优先级设置为"最高"(10000)时，不得使用本返回值<br>
+     *         如果不回复消息，交由之后的应用/过滤器处理，这里 返回 {@link IMsg#MSG_IGNORE MSG_IGNORE} -
+     *         忽略本条消息
      */
     public int privateMsg(int subType, int msgId, long fromQQ, String msg, int font) {
         // 这里处理消息
-        if (fromQQ == 1552409060L|| fromQQ == 1442988390L){
-            if (msg.startsWith("!bc")){
+        if (fromQQ == 1552409060L || fromQQ == 1442988390L) {
+            if (msg.startsWith("!bc")) {
                 String text = msg.replaceAll("!bc ", "");
                 CQ.sendGroupMsg(111852382L, text);
             }
@@ -85,75 +89,96 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
      * @return 关于返回值说明, 见 {@link #privateMsg 私聊消息} 的方法
      */
     public int groupMsg(int subType, int msgId, long fromGroup, long fromQQ, String fromAnonymous, String msg,
-                        int font) {
+            int font) {
         // 如果消息来自匿名者
-        if (fromQQ == 80000000L && !fromAnonymous.equals("")) {
-            // 将匿名用户信息放到 anonymous 变量中
-            Anonymous anonymous = CQ.getAnonymous(fromAnonymous);
-        }
+        // if (fromQQ == 80000000L && !fromAnonymous.equals("")) {
+        // 将匿名用户信息放到 anonymous 变量中
+        // Anonymous anonymous = CQ.getAnonymous(fromAnonymous);
+        // }
+
+        // 解析是否为管理员
+        boolean isAdmin = CQ.getGroupMemberInfoV2(fromGroup, fromQQ).getAuthority() > 1;
 
         // 解析CQ码案例 如：[CQ:at,qq=100000]
         // 解析CQ码 常用变量为 CC(CQCode) 此变量专为CQ码这种特定格式做了解析和封装
         // CC.analysis();// 此方法将CQ码解析为可直接读取的对象
         // 解析消息中的QQID
-        //long qqId = CC.getAt(msg);// 此方法为简便方法，获取第一个CQ:at里的QQ号，错误时为：-1000
-        //List<Long> qqIds = CC.getAts(msg); // 此方法为获取消息中所有的CQ码对象，错误时返回 已解析的数据
+        // long qqId = CC.getAt(msg);// 此方法为简便方法，获取第一个CQ:at里的QQ号，错误时为：-1000
+        // List<Long> qqIds = CC.getAts(msg); // 此方法为获取消息中所有的CQ码对象，错误时返回 已解析的数据
         // 解析消息中的图片
-        //CQImage image = CC.getCQImage(msg);// 此方法为简便方法，获取第一个CQ:image里的图片数据，错误时打印异常到控制台，返回 null
-        //List<CQImage> images = CC.getCQImages(msg);// 此方法为获取消息中所有的CQ图片数据，错误时打印异常到控制台，返回 已解析的数据
+        // CQImage image = CC.getCQImage(msg);//
+        // 此方法为简便方法，获取第一个CQ:image里的图片数据，错误时打印异常到控制台，返回 null
+        // List<CQImage> images = CC.getCQImages(msg);//
+        // 此方法为获取消息中所有的CQ图片数据，错误时打印异常到控制台，返回 已解析的数据
 
-     if (fromQQ == 1552409060L){
-         if (msg.equalsIgnoreCase("!mute off")){
-             CQ.sendGroupMsg(fromGroup, "[Bot]已开启所有功能.");
-             BotStatus = true;
-         }
-     }
+        if (isAdmin) {
+            if (msg.trim().equalsIgnoreCase("!mute off")) {
+                CQ.sendGroupMsg(fromGroup, "[Bot]已开启所有功能.");
+                botStatus = true;
+            }
+        }
 
-     if (BotStatus) {
-         if (fromGroup != 779672339L) {
-             if (msg.startsWith("!")) {
-                 if (msg.equalsIgnoreCase("!help")) {
-                     CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) + "\n-Nameless Bot 帮助-\n!version 查看版本号\n!repeat [内容] 复读你要说的话");
-                 } else if (msg.equalsIgnoreCase("!version")) {
-                     CQ.sendGroupMsg(fromGroup, "版本号: 0.0.3-SNAPSHOT");
-                 } else if (msg.startsWith("!repeat")) {
-                     if (fromQQ == 1552409060L || fromQQ == 1448839220L) {
-                         if (msg.equalsIgnoreCase("!repeat") || msg.equalsIgnoreCase("!repeat ")) {
-                             CQ.sendGroupMsg(fromGroup, "请输入需要复读的话!");
-                         } else {
-                             String need2repeat = msg.replaceAll("!repeat ", "");
-                             CQ.sendGroupMsg(fromGroup, need2repeat);
-                         }
-                     }
-                 } else if (msg.startsWith("!mute")) {
-                     if (fromQQ == 1552409060L) {
-                         if (msg.equalsIgnoreCase("!mute on")) {
-                             CQ.sendGroupMsg(fromGroup, "[Bot]已关闭所有功能.");
-                             BotStatus = false;
-                         }
-                     } else CQ.sendGroupMsg(fromGroup, "你没有权限");
-                 } else if (msg.startsWith("!sub")){
-                     if (msg.equalsIgnoreCase("!sub Solidot")){
-                         SolidotSub = true;
-                         CQ.sendGroupMsg(fromGroup, "[Bot] 已订阅 Solidot.");
-                     } else CQ.sendGroupMsg(fromGroup, "[Bot] 未知订阅频道.");
-                 } else if (msg.startsWith("!unsub")){
-                     if (msg.equalsIgnoreCase("!unsub Solidot")){
-                         SolidotSub = false;
-                         CQ.sendGroupMsg(fromGroup, "[Bot] 取消订阅 Solidot 成功.");
-                     } else CQ.sendGroupMsg(fromGroup, "[Bot] 未知订阅频道.");
-                 }
-                 else CQ.sendGroupMsg(fromGroup, "命令不存在哟");
-             }
-         }
-         if (fromGroup == 779672339L) {
-             if (SolidotSub){
-             if (!msg.contains("中国") || !msg.contains("警察") || !msg.contains("侵入") || !msg.contains("华为")) {
-                 CQ.sendGroupMsg(111852382L, msg);
-             }
-                 }
-         }
-     }
+        // 机器人功能处理
+        if (botStatus == true) {
+            // 指令处理
+            if (fromGroup != 779672339L) {
+                if (msg.startsWith("!")) {
+                    if (msg.trim().equalsIgnoreCase("!help")) {
+                        CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) + "\n- Nameless Bot 帮助 -" + "\n !version 查看版本号"
+                                + "\n !repeat(1-9) [内容] 复读你要说的话");
+                    } else if (msg.trim().equalsIgnoreCase("!version")) {
+                        CQ.sendGroupMsg(fromGroup, "版本号: 0.0.3-SNAPSHOT");
+                    } else if (msg.startsWith("!repeat")) {
+                        if (isAdmin) {
+                            if (msg.trim().equalsIgnoreCase("!repeat")) {
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 请输入需要复读的话!");
+                            } else {
+                                int times = Integer.parseInt(String.valueOf(msg.replaceAll("!repeat ", "").charAt(0)));
+                                for (int i = 0; i < times; i++)
+                                    CQ.sendGroupMsg(fromGroup, msg.replaceAll("!repeat ", "").substring(2));
+                            }
+                        } else
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限");
+                    } else if (msg.startsWith("!mute")) {
+                        if (isAdmin) {
+                            if (msg.trim().equalsIgnoreCase("!mute on")) {
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 已关闭所有功能.");
+                                botStatus = false;
+                            }
+                        } else
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限");
+                    } else if (msg.startsWith("!sub")) {
+                        if (isAdmin) {
+                            if (msg.trim().equalsIgnoreCase("!sub Solidot")) {
+                                subSolidot = true;
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 已订阅 Solidot.");
+                            } else
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 未知订阅频道.");
+                        } else
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限");
+                    } else if (msg.startsWith("!unsub")) {
+                        if (isAdmin) {
+                            if (msg.trim().equalsIgnoreCase("!unsub Solidot")) {
+                                subSolidot = false;
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 取消订阅 Solidot 成功.");
+                            } else
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 未知订阅频道.");
+                        } else
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限");
+                    } else
+                        CQ.sendGroupMsg(fromGroup, "[Bot] 命令不存在哟");
+                }
+            }
+
+            // Solidot 推送转发
+            if (fromGroup == 779672339L) {
+                if (subSolidot) {
+                    if (!msg.contains("中国") || !msg.contains("警察") || !msg.contains("侵入") || !msg.contains("华为")) {
+                        CQ.sendGroupMsg(111852382L, msg);
+                    }
+                }
+            }
+        }
         // 这里处理消息
         return MSG_IGNORE;
     }
@@ -242,11 +267,12 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
      */
     public int groupMemberIncrease(int subtype, int sendTime, long fromGroup, long fromQQ, long beingOperateQQ) {
         // 这里处理消息
-        if (BotStatus) {
-            if (fromGroup == 111852382L){
-            CQ.sendGroupMsg(fromGroup, "欢迎 " + CC.at(beingOperateQQ) + "加入时光隧道!\n【进群请修改群名片为游戏ID】\n【建议使用群文件中的官方客户端!】\n\n服务器IP地址:bgp.sgsd.pw:25846\n赞助网址:http://www.mcrmb.com/cz/13153");
-        }
+        if (botStatus) {
+            if (fromGroup == 111852382L) {
+                CQ.sendGroupMsg(fromGroup, "欢迎 " + CC.at(beingOperateQQ)
+                        + "加入时光隧道!\n【进群请修改群名片为游戏ID】\n【建议使用群文件中的官方客户端!】\n\n服务器IP地址:bgp.sgsd.pw:25846\n赞助网址:http://www.mcrmb.com/cz/13153");
             }
+        }
         return MSG_IGNORE;
     }
 
@@ -280,8 +306,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // 这里处理消息
 
         /**
-         * REQUEST_ADOPT 通过
-         * REQUEST_REFUSE 拒绝
+         * REQUEST_ADOPT 通过 REQUEST_REFUSE 拒绝
          */
 
         // CQ.setFriendAddRequest(responseFlag, REQUEST_ADOPT, null); // 同意好友添加请求
@@ -301,21 +326,19 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
      * @return 关于返回值说明, 见 {@link #privateMsg 私聊消息} 的方法
      */
     public int requestAddGroup(int subtype, int sendTime, long fromGroup, long fromQQ, String msg,
-                               String responseFlag) {
+            String responseFlag) {
         // 这里处理消息
 
         /**
-         * REQUEST_ADOPT 通过
-         * REQUEST_REFUSE 拒绝
-         * REQUEST_GROUP_ADD 群添加
-         * REQUEST_GROUP_INVITE 群邀请
+         * REQUEST_ADOPT 通过 REQUEST_REFUSE 拒绝 REQUEST_GROUP_ADD 群添加 REQUEST_GROUP_INVITE
+         * 群邀请
          */
-		/*if(subtype == 1){ // 本号为群管理，判断是否为他人申请入群
-			CQ.setGroupAddRequest(responseFlag, REQUEST_GROUP_ADD, REQUEST_ADOPT, null);// 同意入群
-		}
-		if(subtype == 2){
-			CQ.setGroupAddRequest(responseFlag, REQUEST_GROUP_INVITE, REQUEST_ADOPT, null);// 同意进受邀群
-		}*/
+        /*
+         * if(subtype == 1){ // 本号为群管理，判断是否为他人申请入群 CQ.setGroupAddRequest(responseFlag,
+         * REQUEST_GROUP_ADD, REQUEST_ADOPT, null);// 同意入群 } if(subtype == 2){
+         * CQ.setGroupAddRequest(responseFlag, REQUEST_GROUP_INVITE, REQUEST_ADOPT,
+         * null);// 同意进受邀群 }
+         */
 
         return MSG_IGNORE;
     }
@@ -331,4 +354,3 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     }
 
 }
-
