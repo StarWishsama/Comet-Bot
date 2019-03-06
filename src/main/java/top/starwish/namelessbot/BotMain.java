@@ -125,20 +125,23 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                 if (msg.startsWith("!")) {
                     if (msg.trim().equalsIgnoreCase("!help")) {
                         CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) + "\n- Nameless Bot 帮助 -" + "\n !version 查看版本号"
-                                + "\n !repeat(1-9) [内容] 复读你要说的话");
+                                + "\n !repeat (1-9) [内容] 复读你要说的话");
                     } else if (msg.trim().equalsIgnoreCase("!version")) {
-                        CQ.sendGroupMsg(fromGroup, "版本号: 0.0.3-SNAPSHOT");
+                        CQ.sendGroupMsg(fromGroup, "版本号: 0.0.5-SNAPSHOT");
                     } else if (msg.startsWith("!repeat")) {
                         if (isAdmin) {
                             if (msg.trim().equalsIgnoreCase("!repeat")) {
                                 CQ.sendGroupMsg(fromGroup, "[Bot] 请输入需要复读的话!");
                             } else {
-                                int times = Integer.parseInt(String.valueOf(msg.replaceAll("!repeat ", "").charAt(0)));
-                                for (int i = 0; i < times; i++)
-                                    CQ.sendGroupMsg(fromGroup, msg.replaceAll("!repeat ", "").substring(2));
+                                if (msg.replaceAll("!repeat ", "").charAt(0) >= '1' && msg.replaceAll("!repeat ", "").charAt(0) < '9' && msg.replaceAll("!repeat ", "").charAt(1) == ' ') {
+                                    int times = Integer.parseInt(String.valueOf(msg.replaceAll("!repeat ", "").charAt(0)));
+                                    for (int i = 0; i < times; i++)
+                                        CQ.sendGroupMsg(fromGroup, msg.replaceAll("!repeat ", "").substring(2));
+                                }
+                                else CQ.sendGroupMsg(fromGroup, "[Bot] 输入格式错误或次数太多!");
                             }
                         } else
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限");
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     } else if (msg.startsWith("!mute")) {
                         if (isAdmin) {
                             if (msg.trim().equalsIgnoreCase("!mute on")) {
@@ -146,7 +149,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 botStatus = false;
                             }
                         } else
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限");
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     } else if (msg.startsWith("!sub")) {
                         if (isAdmin) {
                             if (msg.trim().equalsIgnoreCase("!sub Solidot")) {
@@ -155,7 +158,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             } else
                                 CQ.sendGroupMsg(fromGroup, "[Bot] 未知订阅频道.");
                         } else
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限");
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     } else if (msg.startsWith("!unsub")) {
                         if (isAdmin) {
                             if (msg.trim().equalsIgnoreCase("!unsub Solidot")) {
@@ -164,9 +167,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             } else
                                 CQ.sendGroupMsg(fromGroup, "[Bot] 未知订阅频道.");
                         } else
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限");
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     } else
-                        CQ.sendGroupMsg(fromGroup, "[Bot] 命令不存在哟");
+                        CQ.sendGroupMsg(fromGroup, "[Bot] 命令不存在哟~");
                 }
             }
 
