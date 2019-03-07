@@ -3,8 +3,6 @@ package top.starwish.namelessbot;
 import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
 
-import java.sql.Struct;
-
 import javax.swing.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
@@ -111,72 +109,134 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // List<CQImage> images = CC.getCQImages(msg);//
         // 此方法为获取消息中所有的CQ图片数据，错误时打印异常到控制台，返回 已解析的数据
 
+        // 机器人功能开启
         if (isAdmin) {
             if (msg.trim().equalsIgnoreCase("!mute off")) {
-                CQ.sendGroupMsg(fromGroup, "[Bot]已开启所有功能.");
+                CQ.sendGroupMsg(fromGroup, "[Bot] 已关闭对机器人的禁言.");
                 botStatus = true;
             }
         }
 
         // 机器人功能处理
         if (botStatus == true) {
-            // 指令处理
             if (fromGroup != 779672339L) {
                 if (msg.startsWith("!")) {
-                    if (msg.trim().equalsIgnoreCase("!help")) {
-                        CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) + "\n- Nameless Bot 帮助 -" + "\n !version 查看版本号"
-                                + "\n !repeat (1-9) [内容] 复读你要说的话");
-                    } else if (msg.trim().equalsIgnoreCase("!version")) {
-                        CQ.sendGroupMsg(fromGroup, "版本号: 0.0.5-SNAPSHOT");
-                    } else if (msg.startsWith("!repeat")) {
+                    // process only after there's a command, in order to get rid of memory trash
+                    String temp = msg.trim();
+                    String cmd[] = new String[4];
+
+                    /**
+                     * @brief   Processing msg into cmd & params
+                     * @param   cmd[0] << cmd after !, e.g. "help" cmd[1] << first param etc.
+                     * @author  Stiven.ding
+                     */
+
+                    cmd[1] = "";
+                    cmd[2] = ""; // at most 3 paras are supported
+                    cmd[3] = ""; // init objects, or null pointers appear
+
+                    for (int i = 0; i < 4; i++) {
+                        temp = temp.trim();
+                        if (temp.indexOf(' ') > 0) {
+                            cmd[i] = temp.substring(0, temp.indexOf(' '));
+                            temp = temp.substring(temp.indexOf(' ') + 1);
+                        } else {
+                            cmd[i] = temp.trim();
+                            break;
+                        }
+                    }
+                    cmd[0] = cmd[0].substring(1); // del '!' at the beginning of cmd
+
+                    /**
+                     * @brief   Run commands here
+                     * @author  Stiven.ding
+                     */
+                    
+                    switch (cmd[0]) { // 无视这里的报错，用 JDK >= 1.7 编译即可
+                    // 帮助命令
+                    case "help":
+                        CQ.sendGroupMsg(fromGroup,
+                                CC.at(fromQQ) + "\n= Nameless Bot 帮助 =" + "\n !version 查看版本号"
+                                        + "\n !repeat [内容] (次数) 复读你要说的话" + "\n !sub/unsub [频道] 订阅/退订指定媒体"
+                                        + "\n !mute on/off 开/关机器人");
+                        break;
+                    // 版本命令
+                    case "version":
+                        CQ.sendGroupMsg(fromGroup, "版本号: 0.0.6-SNAPSHOT");
+                        break;
+                    // 复读命令
+                    case "repeat":
                         if (isAdmin) {
-                            if (msg.trim().equalsIgnoreCase("!repeat")) {
+                            if (cmd[1].equals("")) {
                                 CQ.sendGroupMsg(fromGroup, "[Bot] 请输入需要复读的话!");
                             } else {
-                                if (msg.replaceAll("!repeat ", "").charAt(0) >= '1' && msg.replaceAll("!repeat ", "").charAt(0) < '9' && msg.replaceAll("!repeat ", "").charAt(1) == ' ') {
-                                    int times = Integer.parseInt(String.valueOf(msg.replaceAll("!repeat ", "").charAt(0)));
+                                try {
+                                    int times = Integer.parseInt(cmd[2]);
+                                    if (times < 1 || times > 20)
+                                        CQ.sendGroupMsg(fromGroup, "[Bot] 次数太多了! 想刷爆嘛");
                                     for (int i = 0; i < times; i++)
-                                        CQ.sendGroupMsg(fromGroup, msg.replaceAll("!repeat ", "").substring(2));
+                                        CQ.sendGroupMsg(fromGroup, cmd[1]);
+                                } catch (Exception e) { // 没有识别到次数就只复读一次
+                                    CQ.sendGroupMsg(fromGroup, cmd[1]);
                                 }
-                                else CQ.sendGroupMsg(fromGroup, "[Bot] 输入格式错误或次数太多!");
                             }
                         } else
                             CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
-                    } else if (msg.startsWith("!mute")) {
+                        break;
+                    // 关闭命令
+                    case "mute":
                         if (isAdmin) {
-                            if (msg.trim().equalsIgnoreCase("!mute on")) {
-                                CQ.sendGroupMsg(fromGroup, "[Bot] 已关闭所有功能.");
+                            if (cmd[1].equals("on")) {
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 已将机器人禁言.");
                                 botStatus = false;
-                            }
+                            } else
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 机器人早已处于开启状态.");
                         } else
                             CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
-                    } else if (msg.startsWith("!sub")) {
+                        break;
+                    // 订阅命令
+                    case "sub":
                         if (isAdmin) {
-                            if (msg.trim().equalsIgnoreCase("!sub Solidot")) {
+                            switch (cmd[1].toLowerCase()) { // 无视此处报错，仅需在 JDK >= 1.7 编译即可
+                            case "solidot": // 代码中务必只用小写，确保大小写不敏感
                                 subSolidot = true;
                                 CQ.sendGroupMsg(fromGroup, "[Bot] 已订阅 Solidot.");
-                            } else
-                                CQ.sendGroupMsg(fromGroup, "[Bot] 未知订阅频道.");
+                                break;
+                            default:
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 未知频道.");
+                                break;
+                            }
                         } else
                             CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
-                    } else if (msg.startsWith("!unsub")) {
+                        break;
+                    // 退订命令
+                    case "unsub":
                         if (isAdmin) {
-                            if (msg.trim().equalsIgnoreCase("!unsub Solidot")) {
+                            switch (cmd[1].toLowerCase()) { // 无视此处报错，仅需在 JDK >= 1.7 编译即可
+                            case "solidot": // 代码中务必只用小写，确保大小写不敏感
                                 subSolidot = false;
-                                CQ.sendGroupMsg(fromGroup, "[Bot] 取消订阅 Solidot 成功.");
-                            } else
-                                CQ.sendGroupMsg(fromGroup, "[Bot] 未知订阅频道.");
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 已退订 Solidot.");
+                                break;
+                            default:
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 未知频道.");
+                                break;
+                            }
                         } else
                             CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
-                    } else
+                        break;
+                    // 未知命令
+                    default:
                         CQ.sendGroupMsg(fromGroup, "[Bot] 命令不存在哟~");
+                        break;
+
+                    }
                 }
             }
 
             // Solidot 推送转发
             if (fromGroup == 779672339L) {
                 if (subSolidot) {
-                    if (!msg.contains("中国") || !msg.contains("警察") || !msg.contains("侵入") || !msg.contains("华为")) {
+                    if (!(msg.contains("中国") || msg.contains("警察") || msg.contains("侵入") || msg.contains("华为"))) {
                         CQ.sendGroupMsg(111852382L, msg);
                     }
                 }
