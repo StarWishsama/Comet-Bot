@@ -126,9 +126,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     String cmd[] = new String[4];
 
                     /**
-                     * @brief   Processing msg into cmd & params
-                     * @param   cmd[0] << cmd after !, e.g. "help" cmd[1] << first param etc.
-                     * @author  Stiven.ding
+                     * @brief Processing msg into cmd & params
+                     * @param cmd[0] << cmd after !, e.g. "help" cmd[1] << first param etc.
+                     * @author Stiven.ding
                      */
 
                     cmd[1] = "";
@@ -148,10 +148,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     cmd[0] = cmd[0].substring(1); // del '!' at the beginning of cmd
 
                     /**
-                     * @brief   Run commands here
-                     * @author  Stiven.ding
+                     * @brief Run commands here
+                     * @author Stiven.ding
                      */
-                    
+
                     switch (cmd[0]) { // 无视这里的报错，用 JDK >= 1.7 编译即可
                     // 帮助命令
                     case "help":
@@ -162,7 +162,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         break;
                     // 版本命令
                     case "version":
-                        CQ.sendGroupMsg(fromGroup, "版本号: 0.0.6-SNAPSHOT");
+                        CQ.sendGroupMsg(fromGroup, "版本号: 1.0.0-RELEASE");
                         break;
                     // 复读命令
                     case "repeat":
@@ -174,8 +174,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     int times = Integer.parseInt(cmd[2]);
                                     if (times < 1 || times > 20)
                                         CQ.sendGroupMsg(fromGroup, "[Bot] 次数太多了! 想刷爆嘛");
-                                    for (int i = 0; i < times; i++)
-                                        CQ.sendGroupMsg(fromGroup, cmd[1]);
+                                    else
+                                        for (int i = 0; i < times; i++)
+                                            CQ.sendGroupMsg(fromGroup, cmd[1]);
                                 } catch (Exception e) { // 没有识别到次数就只复读一次
                                     CQ.sendGroupMsg(fromGroup, cmd[1]);
                                 }
