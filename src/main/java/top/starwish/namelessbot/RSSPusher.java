@@ -35,13 +35,11 @@ public class RSSPusher {
                 // 得到Rss新闻中子项列表
                 List entries = feed.getEntries();
                 // 循环得到每个子项信息
-                for (int j = 0; j <= 0; j++) {
+                for (int j = 0; j < 1; j++) {
                     SyndEntry entry = (SyndEntry) entries.get(j);
                     SyndContent description = entry.getDescription();
                     System.err.println("====================");
-                    System.err.println(entry.getTitle() + "\n" + entry.getContents());
-                    System.err.println("SyndContent对象：");
-                    System.err.println(description.toString());
+                    System.err.println(entry.getTitle() + "\n" + description.getValue());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
