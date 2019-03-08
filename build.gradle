@@ -12,13 +12,13 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-	compile '(com.rometools:rome:1.12.0)'
-	compile '(com.rometools.rome-utils:1.12.0)'
-	compile '(com.sobte.cqp:jcq-coolq:1.2.7)'
-	compile '(commons-codec:commons-codec:1.9)'
-	compile '(commons-logging:commons-logging:1.2)'
-	compile '(org.apache.httpcomponents:httpclient:4.5.2)'
-	compile '(org.apache.httpcomponents:httpcore:4.4.4)'
-	compile '(org.jdom:jdom2:2.0.6)'
-	compile '(org.slf4j:slf4j-api:1.7.16)'
+	compile 'com.rometools:rome:1.12.0'
+	compile 'com.rometools.rome-utils:1.12.0'
+	compile 'com.sobte.cqp:jcq-coolq:1.2.7'
+	compile 'commons-codec:commons-codec:1.9'
+	compile 'commons-logging:commons-logging:1.2'
+	compile 'org.apache.httpcomponents:httpclient:4.5.2'
+	compile 'org.apache.httpcomponents:httpcore:4.4.4'
+	compile 'org.jdom:jdom2:2.0.6'
+	compile 'org.slf4j:slf4j-api:1.7.16'
 }
