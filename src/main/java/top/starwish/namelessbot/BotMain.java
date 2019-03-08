@@ -1,15 +1,36 @@
 package top.starwish.namelessbot;
 
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.io.SyndFeedInput;
+import com.rometools.rome.io.XmlReader;
 import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
 
 import javax.swing.*;
+import java.io.File;
+import java.net.URL;
+import java.nio.file.Files;
+import java.util.List;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     public boolean botStatus = true;
     public boolean subSolidot = true;
 
-    String rss = "https://rsshub.app/jike/topic/597ae4ac096cde0012cf6c06";
+    String jikeDaily = "https://rsshub.app/jike/daily";
+
+    public boolean setupConfig(){
+        File cfg = new File(CQ.getAppDirectory() + "config.yml");
+        if (!cfg.exists()){
+            try {
+                Files.copy(getClass().getClassLoader().getResourceAsStream("config.yml"), cfg.toPath());
+            } catch (Exception e){
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
+    }
 
     public String appInfo() {
         String AppID = "top.starwish.namelessbot";
@@ -26,7 +47,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
      */
     public int startup() {
         // 获取应用数据目录(无需储存数据时，请将此行注释)
-        // String appDirectory = CQ.getAppDirectory();
+        setupConfig();
+        String appDirectory = CQ.getAppDirectory();
         CQ.logInfo("NamelessBot", "初始化完成, 欢迎使用!");
         // 返回如：D:\CoolQ\app\com.sobte.cqp.jcq\app\com.example.demo\
         // 应用的所有数据、配置【必须】存放于此目录，避免给用户带来困扰。
@@ -88,26 +110,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
      */
     public int groupMsg(int subType, int msgId, long fromGroup, long fromQQ, String fromAnonymous, String msg,
             int font) {
-        // 如果消息来自匿名者
-        // if (fromQQ == 80000000L && !fromAnonymous.equals("")) {
-        // 将匿名用户信息放到 anonymous 变量中
-        // Anonymous anonymous = CQ.getAnonymous(fromAnonymous);
-        // }
 
         // 解析是否为管理员
         boolean isAdmin = CQ.getGroupMemberInfoV2(fromGroup, fromQQ).getAuthority() > 1;
-
-        // 解析CQ码案例 如：[CQ:at,qq=100000]
-        // 解析CQ码 常用变量为 CC(CQCode) 此变量专为CQ码这种特定格式做了解析和封装
-        // CC.analysis();// 此方法将CQ码解析为可直接读取的对象
-        // 解析消息中的QQID
-        // long qqId = CC.getAt(msg);// 此方法为简便方法，获取第一个CQ:at里的QQ号，错误时为：-1000
-        // List<Long> qqIds = CC.getAts(msg); // 此方法为获取消息中所有的CQ码对象，错误时返回 已解析的数据
-        // 解析消息中的图片
-        // CQImage image = CC.getCQImage(msg);//
-        // 此方法为简便方法，获取第一个CQ:image里的图片数据，错误时打印异常到控制台，返回 null
-        // List<CQImage> images = CC.getCQImages(msg);//
-        // 此方法为获取消息中所有的CQ图片数据，错误时打印异常到控制台，返回 已解析的数据
 
         // 机器人功能开启
         if (isAdmin) {
@@ -118,7 +123,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         }
 
         // 机器人功能处理
-        if (botStatus == true) {
+        if (botStatus) {
             if (fromGroup != 779672339L) {
                 if (msg.startsWith("!")) {
                     // process only after there's a command, in order to get rid of memory trash
@@ -226,6 +231,28 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                         break;
                     // 未知命令
+                    case "jikedaily":
+                            if (isAdmin){
+                                try {
+                                    URL url = new URL(jikeDaily);
+                                    // 读取RSS源
+                                    XmlReader reader = new XmlReader(url);
+                                    SyndFeedInput input = new SyndFeedInput();
+                                    // 得到SyndFeed对象，即得到RSS源里的所有信息
+                                    SyndFeed feed = input.build(reader);
+                                    // 得到Rss新闻中子项列表
+                                    List entries = feed.getEntries();
+                                    SyndEntry entry = (SyndEntry) entries.get(0);
+                                    String title = entry.getTitle();
+                                    String value = entry.getDescription().getValue().replaceAll("<br />","\n");
+                                    System.out.println(title + "\n" + value);
+                                } catch (Exception e){
+                                    e.printStackTrace();
+                                    CQ.sendGroupMsg(fromGroup, "[Bot] 发生了意料之外的错误, 请查看后台.");
+                                }
+                                break;
+                            } else
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     default:
                         CQ.sendGroupMsg(fromGroup, "[Bot] 命令不存在哟~");
                         break;

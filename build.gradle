@@ -21,4 +21,5 @@ dependencies {
 	compile 'org.apache.httpcomponents:httpcore:4.4.4'
 	compile 'org.jdom:jdom2:2.0.6'
 	compile 'org.slf4j:slf4j-api:1.7.16'
+    compile 'org.yaml:snakeyaml:1.24'
 }
