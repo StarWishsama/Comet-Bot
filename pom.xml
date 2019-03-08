@@ -6,7 +6,7 @@
 
     <groupId>top.starwish</groupId>
     <artifactId>namelessbot</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <dependencies>
         <dependency>
