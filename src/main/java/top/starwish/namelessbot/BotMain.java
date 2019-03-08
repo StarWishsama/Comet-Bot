@@ -120,7 +120,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // 机器人功能处理
         if (botStatus == true) {
             if (fromGroup != 779672339L) {
-                if (msg.startsWith("!")) {
+                if (msg.startsWith("!" || msg.startsWith("/"))) {
                     // process only after there's a command, in order to get rid of memory trash
                     String temp = msg.trim();
                     String cmd[] = new String[4];
@@ -145,7 +145,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             break;
                         }
                     }
-                    cmd[0] = cmd[0].substring(1); // del '!' at the beginning of cmd
+                    cmd[0] = cmd[0].substring(1); // del '!'/'/' at the beginning of cmd
 
                     /**
                      * @brief Run commands here
@@ -156,9 +156,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     // 帮助命令
                     case "help":
                         CQ.sendGroupMsg(fromGroup,
-                                CC.at(fromQQ) + "\n= Nameless Bot 帮助 =" + "\n !version 查看版本号"
-                                        + "\n !repeat [内容] (次数) 复读你要说的话" + "\n !sub/unsub [频道] 订阅/退订指定媒体"
-                                        + "\n !mute on/off 开/关机器人");
+                                CC.at(fromQQ) + "\n= Nameless Bot 帮助 =" + "\n /version 查看版本号"
+                                        + "\n /repeat [内容] (次数) 复读你要说的话" + "\n /(un)sub [频道] 订阅/退订指定媒体"
+                                        + "\n /mute [on/off] 开/关机器人");
                         break;
                     // 版本命令
                     case "version":
