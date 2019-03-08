@@ -8,29 +8,14 @@ import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
 
 import javax.swing.*;
-import java.io.File;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.List;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     public boolean botStatus = true;
     public boolean subSolidot = true;
 
-    String jikeDaily = "https://rsshub.app/jike/daily";
-
-    public boolean setupConfig(){
-        File cfg = new File(CQ.getAppDirectory() + "config.yml");
-        if (!cfg.exists()){
-            try {
-                Files.copy(getClass().getClassLoader().getResourceAsStream("config.yml"), cfg.toPath());
-            } catch (Exception e){
-                e.printStackTrace();
-                return false;
-            }
-        }
-        return true;
-    }
+    String jikeWakeup = "https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68";
 
     public String appInfo() {
         String AppID = "top.starwish.namelessbot";
@@ -47,8 +32,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
      */
     public int startup() {
         // 获取应用数据目录(无需储存数据时，请将此行注释)
-        setupConfig();
-        String appDirectory = CQ.getAppDirectory();
+        //String appDirectory = CQ.getAppDirectory();
         CQ.logInfo("NamelessBot", "初始化完成, 欢迎使用!");
         // 返回如：D:\CoolQ\app\com.sobte.cqp.jcq\app\com.example.demo\
         // 应用的所有数据、配置【必须】存放于此目录，避免给用户带来困扰。
@@ -88,7 +72,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // 这里处理消息
         if (fromQQ == 1552409060L || fromQQ == 1442988390L) {
             if (msg.startsWith("!bc")) {
-                String text = msg.replaceAll("!bc ", "");
+                String text = msg.replaceAll("!bc", "");
                 CQ.sendGroupMsg(111852382L, text);
             }
         }
@@ -230,11 +214,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         } else
                             CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                         break;
-                    // 未知命令
                     case "jikedaily":
                             if (isAdmin){
                                 try {
-                                    URL url = new URL(jikeDaily);
+                                    URL url = new URL(jikeWakeup);
                                     // 读取RSS源
                                     XmlReader reader = new XmlReader(url);
                                     SyndFeedInput input = new SyndFeedInput();
@@ -243,16 +226,17 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     // 得到Rss新闻中子项列表
                                     List entries = feed.getEntries();
                                     SyndEntry entry = (SyndEntry) entries.get(0);
-                                    String title = entry.getTitle();
                                     String value = entry.getDescription().getValue().replaceAll("<br />","\n");
-                                    System.out.println(title + "\n" + value);
+                                    CQ.sendGroupMsg(fromGroup, entry.getTitle() + "\n" + value);
+                                    System.out.println(entry.getTitle() + "\n" + value);
                                 } catch (Exception e){
                                     e.printStackTrace();
                                     CQ.sendGroupMsg(fromGroup, "[Bot] 发生了意料之外的错误, 请查看后台.");
                                 }
-                                break;
                             } else
                                 CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                            break;
+                        // 未知命令
                     default:
                         CQ.sendGroupMsg(fromGroup, "[Bot] 命令不存在哟~");
                         break;

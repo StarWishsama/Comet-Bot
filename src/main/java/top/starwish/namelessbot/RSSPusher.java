@@ -10,7 +10,7 @@ import java.util.List;
 
 public class RSSPusher {
 
-    public static void getRSS(String[] args) {
+    public static void main(String[] args) {
         process();
     }
 
@@ -35,7 +35,7 @@ public class RSSPusher {
                 List entries = feed.getEntries();
                 SyndEntry entry = (SyndEntry) entries.get(0);
                 String value = entry.getDescription().getValue().replaceAll("<br />","\n");
-                System.out.println(entry.getTitle() + "\n" + value);
+                System.out.println(entry.getTitle() + "\n" + entry.getContents());
             } catch (Exception e) {
                 e.printStackTrace();
             }
