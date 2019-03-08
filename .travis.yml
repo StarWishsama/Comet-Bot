@@ -3,9 +3,11 @@ install: true
 language: java
 jdk: [oraclejdk8]
 
+before_script:
+  - chmod +x gradlew
+script: ./gradlew clean build
+
 cache:
   directories:
-  - '$HOME/.m2/repository'
-
-script:
-  - mvn clean package -DskipTests=true
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
