@@ -3,6 +3,10 @@ version '1.0.0-RELEASE'
 
 apply plugin: 'java'
 
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
