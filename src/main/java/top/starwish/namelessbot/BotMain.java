@@ -120,7 +120,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // 机器人功能处理
         if (botStatus == true) {
             if (fromGroup != 779672339L) {
-                if (msg.startsWith("!" || msg.startsWith("/"))) {
+                if (msg.startsWith("!") || msg.startsWith("/")) {
                     // process only after there's a command, in order to get rid of memory trash
                     String temp = msg.trim();
                     String cmd[] = new String[4];
