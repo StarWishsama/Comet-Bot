@@ -38,7 +38,6 @@ public class RSSPusher {
                 for (int j = 0; j < 1; j++) {
                     SyndEntry entry = (SyndEntry) entries.get(j);
                     SyndContent description = entry.getDescription();
-                    System.err.println("====================");
                     System.err.println(entry.getTitle() + "\n" + description.getValue());
                 }
             } catch (Exception e) {
