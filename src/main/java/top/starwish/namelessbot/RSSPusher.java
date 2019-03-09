@@ -31,18 +31,13 @@ public class RSSPusher {
                 SyndFeedInput input = new SyndFeedInput();
                 // 得到SyndFeed对象，即得到Rss源里的所有信息
                 SyndFeed feed = input.build(reader);
-                //System.out.println(feed);
                 // 得到Rss新闻中子项列表
                 List entries = feed.getEntries();
-                // 循环得到每个子项信息
-                for (int j = 0; j < 1; j++) {
-                    SyndEntry entry = (SyndEntry) entries.get(j);
-                    SyndContent description = entry.getDescription();
-                    System.err.println(entry.getTitle() + "\n" + description.getValue());
-                }
+                SyndEntry entry = (SyndEntry) entries.get(0);
+                String value = entry.getDescription().getValue().replaceAll("<br />","\n");
+                System.out.println(entry.getTitle() + "\n" + entry.getContents());
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
     }

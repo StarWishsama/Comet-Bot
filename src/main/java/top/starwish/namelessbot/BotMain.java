@@ -1,15 +1,21 @@
 package top.starwish.namelessbot;
 
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.io.SyndFeedInput;
+import com.rometools.rome.io.XmlReader;
 import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
 
 import javax.swing.*;
+import java.net.URL;
+import java.util.List;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     public boolean botStatus = true;
     public boolean subSolidot = true;
 
-    String rss = "https://rsshub.app/jike/topic/597ae4ac096cde0012cf6c06";
+    String jikeWakeup = "https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68";
 
     public String appInfo() {
         String AppID = "top.starwish.namelessbot";
@@ -26,7 +32,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
      */
     public int startup() {
         // 获取应用数据目录(无需储存数据时，请将此行注释)
-        // String appDirectory = CQ.getAppDirectory();
+        //String appDirectory = CQ.getAppDirectory();
         CQ.logInfo("NamelessBot", "初始化完成, 欢迎使用!");
         // 返回如：D:\CoolQ\app\com.sobte.cqp.jcq\app\com.example.demo\
         // 应用的所有数据、配置【必须】存放于此目录，避免给用户带来困扰。
@@ -66,7 +72,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // 这里处理消息
         if (fromQQ == 1552409060L || fromQQ == 1442988390L) {
             if (msg.startsWith("!bc")) {
-                String text = msg.replaceAll("!bc ", "");
+                String text = msg.replaceAll("!bc", "");
                 CQ.sendGroupMsg(111852382L, text);
             }
         }
@@ -88,27 +94,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
      */
     public int groupMsg(int subType, int msgId, long fromGroup, long fromQQ, String fromAnonymous, String msg,
             int font) {
-        // 如果消息来自匿名者
-        // if (fromQQ == 80000000L && !fromAnonymous.equals("")) {
-        // 将匿名用户信息放到 anonymous 变量中
-        // Anonymous anonymous = CQ.getAnonymous(fromAnonymous);
-        // }
 
-        // 解析CQ码案例 如：[CQ:at,qq=100000]
-        // 解析CQ码 常用变量为 CC(CQCode) 此变量专为CQ码这种特定格式做了解析和封装
-        // CC.analysis();// 此方法将CQ码解析为可直接读取的对象
-        // 解析消息中的QQID
-        // long qqId = CC.getAt(msg);// 此方法为简便方法，获取第一个CQ:at里的QQ号，错误时为：-1000
-        // List<Long> qqIds = CC.getAts(msg); // 此方法为获取消息中所有的CQ码对象，错误时返回 已解析的数据
-        // 解析消息中的图片
-        // CQImage image = CC.getCQImage(msg);//
-        // 此方法为简便方法，获取第一个CQ:image里的图片数据，错误时打印异常到控制台，返回 null
-        // List<CQImage> images = CC.getCQImages(msg);//
-        // 此方法为获取消息中所有的CQ图片数据，错误时打印异常到控制台，返回 已解析的数据
-
-        // 机器人功能开启
-
+      // 机器人功能开启
         if (msg.trim().equalsIgnoreCase("!mute off")) {
+            boolean isAdmin = CQ.getGroupMemberInfoV2(fromGroup, fromQQ).getAuthority() > 1;
             if (isAdmin) {
                 CQ.sendGroupMsg(fromGroup, "[Bot] 已关闭对机器人的禁言.");
                 botStatus = true;
@@ -116,13 +105,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         }
 
         // 机器人功能处理
-        if (botStatus == true)
-
-        {
-            if (fromGroup != 779672339L) {
-                if (msg.startsWith("!") || msg.startsWith("/")) {
-                    // 解析是否为管理员
-                    boolean isAdmin = CQ.getGroupMemberInfoV2(fromGroup, fromQQ).getAuthority() > 1;
+        if (msg.startsWith("!") || msg.startsWith("/")) {
+                // 解析是否为管理员
+                boolean isAdmin = CQ.getGroupMemberInfoV2(fromGroup, fromQQ).getAuthority() > 1;
+                if (botStatus) {
                     // process only after there's a command, in order to get rid of memory trash
                     String temp = msg.trim();
                     String cmd[] = new String[4];
@@ -227,13 +213,43 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         } else
                             CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                         break;
+                    case "jikedaily":
+                            if (isAdmin){
+                                try {
+                                    URL url = new URL(jikeWakeup);
+                                    // 读取RSS源
+                                    XmlReader reader = new XmlReader(url);
+                                    SyndFeedInput input = new SyndFeedInput();
+                                    // 得到SyndFeed对象，即得到RSS源里的所有信息
+                                    SyndFeed feed = input.build(reader);
+                                    // 得到Rss新闻中子项列表
+                                    List entries = feed.getEntries();
+                                    SyndEntry entry = (SyndEntry) entries.get(0);
+                                    String value = entry.getDescription().getValue().replaceAll("<br />","\n");
+                                    CQ.sendGroupMsg(fromGroup, entry.getTitle() + "\n" + value);
+                                    System.out.println(entry.getTitle() + "\n" + value);
+                                } catch (Exception e){
+                                    e.printStackTrace();
+                                    CQ.sendGroupMsg(fromGroup, "[Bot] 发生了意料之外的错误, 请查看后台.");
+                                }
+                            } else
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                            break;
                     // 未知命令
                     default:
                         CQ.sendGroupMsg(fromGroup, "[Bot] 命令不存在哟~");
                         break;
 
                     }
-                }
+                else 
+      // 机器人功能开启
+        if (msg.trim().equalsIgnoreCase("!mute off")) {
+            boolean isAdmin = CQ.getGroupMemberInfoV2(fromGroup, fromQQ).getAuthority() > 1;
+            if (isAdmin) {
+                CQ.sendGroupMsg(fromGroup, "[Bot] 已关闭对机器人的禁言.");
+                botStatus = true;
+            }
+        }
             }
 
             // Solidot 推送转发
