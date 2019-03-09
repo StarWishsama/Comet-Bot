@@ -235,6 +235,38 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     } else
                         CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     break;
+                    // 禁言
+                    case "ban":
+                        if (isAdmin) {
+                            if (cmd[1].equals("")) {
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 用法: /ban [at需要禁言的人] [时间(秒)]");
+                            } else {
+                                try {
+                                    long times = Integer.parseInt(cmd[2]);
+                                    long banQQ = CC.getAt(cmd[1]);
+                                    if (times > 0 && times <= 2592000) {
+                                        CQ.setGroupBan(fromGroup, banQQ, times);
+                                    } else CQ.sendGroupMsg(fromGroup, "[Bot] 你输入的时间有误!");
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    CQ.sendGroupMsg(fromGroup, "[Bot] 请检查你输入的命令!");
+                                }
+                            }
+                        } else
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                        break;
+                    // 解除禁言
+                    case "unban":
+                        if (isAdmin) {
+                            if (cmd[1].equals("")) {
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 用法: /unban [at需要解禁的人]");
+                            } else {
+                                long bannedQQ = CC.getAt(cmd[1]);
+                                CQ.setGroupBan(fromGroup, bannedQQ, 0);
+                            }
+                        } else
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                        break;
                 // 未知命令
                 default:
                     CQ.sendGroupMsg(fromGroup, "[Bot] 命令不存在哟~");

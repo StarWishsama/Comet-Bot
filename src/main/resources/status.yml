@@ -1,0 +1,8 @@
+SubStatus:
+  Solidot:
+    isSub: true
+  JikeDaily:
+    isSub: true
+    rssUrl: "https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68"
+BotStatus:
+  isEnable: true
