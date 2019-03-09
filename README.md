@@ -24,4 +24,4 @@ Both configurations for Gradle and Maven are well done (when consider Gradle fir
 Specifically for Gradle running on Windows, double-click `gradlew.bat` in the root directory to compile a jar file in folder `/build/libs`.
 
 ## 📜 License 
-[MIT](https://opensource.org/licenses/MIT) Copyright (c) 2018-present Dr_rOot
+[GPL v3.0](https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE)
