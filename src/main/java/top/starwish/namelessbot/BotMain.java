@@ -94,9 +94,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // Anonymous anonymous = CQ.getAnonymous(fromAnonymous);
         // }
 
-        // 解析是否为管理员
-        boolean isAdmin = CQ.getGroupMemberInfoV2(fromGroup, fromQQ).getAuthority() > 1;
-
         // 解析CQ码案例 如：[CQ:at,qq=100000]
         // 解析CQ码 常用变量为 CC(CQCode) 此变量专为CQ码这种特定格式做了解析和封装
         // CC.analysis();// 此方法将CQ码解析为可直接读取的对象
@@ -110,17 +107,22 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // 此方法为获取消息中所有的CQ图片数据，错误时打印异常到控制台，返回 已解析的数据
 
         // 机器人功能开启
-        if (isAdmin) {
-            if (msg.trim().equalsIgnoreCase("!mute off")) {
+
+        if (msg.trim().equalsIgnoreCase("!mute off")) {
+            if (isAdmin) {
                 CQ.sendGroupMsg(fromGroup, "[Bot] 已关闭对机器人的禁言.");
                 botStatus = true;
             }
         }
 
         // 机器人功能处理
-        if (botStatus == true) {
+        if (botStatus == true)
+
+        {
             if (fromGroup != 779672339L) {
                 if (msg.startsWith("!") || msg.startsWith("/")) {
+                    // 解析是否为管理员
+                    boolean isAdmin = CQ.getGroupMemberInfoV2(fromGroup, fromQQ).getAuthority() > 1;
                     // process only after there's a command, in order to get rid of memory trash
                     String temp = msg.trim();
                     String cmd[] = new String[4];
