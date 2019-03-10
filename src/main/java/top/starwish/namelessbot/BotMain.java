@@ -12,7 +12,7 @@ import java.util.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
-    Yaml yaml = new Yaml();
+    //Yaml yaml = new Yaml();
     boolean botStatus = true;
 
     RssItem solidot = new RssItem(); // 仅供统一代码格式，实际上 solidot 并非 RSS 源
