@@ -25,7 +25,7 @@ public class RSSPushDemo {
         l.add(jikeTechNews);
 
             try {
-                URL url = new URL(l.get(1));
+                URL url = new URL(l.get(2));
                 // 读取Rss源
                 XmlReader reader = new XmlReader(url);
                 SyndFeedInput input = new SyndFeedInput();
@@ -34,8 +34,8 @@ public class RSSPushDemo {
                 // 得到Rss新闻中子项列表
                 List entries = feed.getEntries();
                 SyndEntry entry = (SyndEntry) entries.get(0);
-                String value = entry.getDescription().getValue().replaceAll("<br />","\n");
-                System.out.println(entry.getTitle() + "\n" + entry.getContents());
+                String value = entry.getDescription().getValue().replaceAll("<br/>","\n");
+                System.out.println(entry.getTitle() + "\n" + value);
             } catch (Exception e) {
                 e.printStackTrace();
             }

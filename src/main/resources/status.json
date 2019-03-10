@@ -1,0 +1,18 @@
+{
+  "subStatus": [
+    {
+      "Solidot": {
+        "isSub": true
+      },
+      "jikeDaily": {
+        "isSub": true,
+        "rssUrl": "https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68"
+      }
+    }
+  ],
+  "botStatus": [
+    {
+      "switch": true
+    }
+  ]
+}
