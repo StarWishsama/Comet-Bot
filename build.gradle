@@ -29,3 +29,9 @@ dependencies {
     compile 'org.slf4j:slf4j-nop:1.7.9'
     compile 'org.yaml:snakeyaml:1.24'
 }
+
+task copyJars(type:Copy) {
+  	from configurations.runtime
+  	into 'dependencies'
+}
+

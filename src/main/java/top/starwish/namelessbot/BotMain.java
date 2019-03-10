@@ -12,7 +12,7 @@ import java.util.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
-    //Yaml yaml = new Yaml();
+    // Yaml yaml = new Yaml();
     boolean botStatus = true;
 
     RssItem solidot = new RssItem(); // 仅供统一代码格式，实际上 solidot 并非 RSS 源
@@ -189,19 +189,22 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 else {
                                     String tempTime = cmd[2];
                                     if (tempTime.indexOf('d') != -1) {
-                                        banTime += Integer.parseInt(cmd[2].substring(0, tempTime.indexOf('d'))) * 24
+                                        banTime += Integer.parseInt(tempTime.substring(0, tempTime.indexOf('d'))) * 24
                                                 * 60 * 60;
                                         tempTime = tempTime.substring(tempTime.indexOf('d') + 1);
                                     }
                                     if (tempTime.indexOf('h') != -1) {
-                                        banTime += Integer.parseInt(cmd[2].substring(0, tempTime.indexOf('h'))) * 60
+                                        banTime += Integer.parseInt(tempTime.substring(0, tempTime.indexOf('h'))) * 60
                                                 * 60;
                                         tempTime = tempTime.substring(tempTime.indexOf('h') + 1);
                                     }
                                     if (tempTime.indexOf('m') != -1)
-                                        banTime += Integer.parseInt(cmd[2].substring(0, tempTime.indexOf('m'))) * 60;
+                                        banTime += Integer.parseInt(tempTime.substring(0, tempTime.indexOf('m'))) * 60;
                                 }
-                                CQ.setGroupBan(fromGroup, banQQ, banTime);
+                                if (banTime <= 30 * 24 * 60 * 60)
+                                    CQ.setGroupBan(fromGroup, banQQ, banTime);
+                                else
+                                    CQ.sendGroupMsg(fromGroup, "[Bot] 时间长度太大了！");
                             } catch (Exception e) {
                                 CQ.sendGroupMsg(fromGroup, "[Bot] 命令格式有误! 用法: /mute [@/QQ号] [dhm]");
                             }
@@ -265,12 +268,15 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         enable = true;
         if (jikeWakeUp.getStatus() && botStatus) {
             Calendar c = Calendar.getInstance();
+            boolean toSend = (c.get(Calendar.HOUR_OF_DAY) == 7);
+
             c.set(Calendar.HOUR_OF_DAY, 7); // 控制时
 
             Timer timer = new Timer();
             timer.scheduleAtFixedRate(new TimerTask() {
                 public void run() {
-                    CQ.sendGroupMsg(111852382L, jikeWakeUp.getContext());
+                    if (toSend)
+                        CQ.sendGroupMsg(111852382L, jikeWakeUp.getContext());
                 }
             }, c.getTime(), 1000 * 60 * 60 * 24); // 这里设定将延时每天固定执行
         }
