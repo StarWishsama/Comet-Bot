@@ -2,6 +2,8 @@
 .gradle/
 .settings/
 .vscode/
+bin/
+build/
 *.war
 *.nar
 *.ear

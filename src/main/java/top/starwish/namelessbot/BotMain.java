@@ -1,9 +1,5 @@
 package top.starwish.namelessbot;
 
-import com.rometools.rome.feed.synd.SyndEntry;
-import com.rometools.rome.feed.synd.SyndFeed;
-import com.rometools.rome.io.SyndFeedInput;
-import com.rometools.rome.io.XmlReader;
 import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
 import org.apache.commons.lang3.StringUtils;
@@ -11,72 +7,40 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.util.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
-    public boolean botStatus = true;
-    public boolean subSolidot = true;
-    public boolean subJikeWakeup = true;
 
-    File status = new File(CQ.getAppDirectory(), "status.yml");
+    Yaml yaml = new Yaml();
+    boolean botStatus = true;
 
-    String jikeWakeup = "https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68";
+    RssItem solidot = new RssItem(); // 仅供统一代码格式，实际上 solidot 并非 RSS 源
+    RssItem jikeWakeUp = new RssItem("https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68");
 
-    public boolean statusSetup(){
-        if (!status.exists()){
-            try {
-                Files.copy(getClass().getResourceAsStream("status.yml"), status.toPath());
-            } catch (IOException e){
-                e.printStackTrace();
-                return false;
-            }
-        }
-        Yaml yaml = new Yaml();
-        return true;
-    }
-
-    public String appInfo() {
-        String AppID = "top.starwish.namelessbot";
-        return CQAPIVER + "," + AppID;
-    }
+    File configFile = new File(CQ.getAppDirectory(), "status.yml");
 
     /**
-     * 酷Q启动 (Type=1001)<br>
-     * 本方法会在酷Q【主线程】中被调用。<br>
-     * 请在这里执行插件初始化代码。<br>
-     * 请务必尽快返回本子程序，否则会卡住其他插件以及主程序的加载。
-     *
-     * @return 请固定返回0
+     * @brief Init plugin
+     * @return always 0
      */
+
     public int startup() {
-        // 获取应用数据目录(无需储存数据时，请将此行注释)
-        statusSetup();
-        String appDirectory = CQ.getAppDirectory();
+        if (!configFile.exists()) {
+            try {
+                Files.copy(getClass().getResourceAsStream("status.yml"), configFile.toPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         CQ.logInfo("NamelessBot", "初始化完成, 欢迎使用!");
-        // 返回如：D:\CoolQ\app\com.sobte.cqp.jcq\app\com.example.demo\
-        // 应用的所有数据、配置【必须】存放于此目录，避免给用户带来困扰。
-        return 0;
-    }
-
-    public int exit() {
-        return 0;
-    }
-
-    public int enable() {
-        enable = true;
-        return 0;
-    }
-
-    public int disable() {
-        enable = false;
         return 0;
     }
 
     public int privateMsg(int subType, int msgId, long fromQQ, String msg, int font) {
         // 这里处理消息
-        if (fromQQ == 1552409060L || fromQQ == 1442988390L) {
+        if (fromQQ == 1552409060L || fromQQ == 1448839220L) {
             if (msg.startsWith("!bc")) {
                 String text = msg.replaceAll("!bc", "");
                 CQ.sendGroupMsg(111852382L, text);
@@ -90,7 +54,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
         // Solidot 推送转发
         if (fromGroup == 779672339L && botStatus) {
-            if (subSolidot) {
+            if (solidot.getStatus()) {
                 if (!(msg.contains("中国") || msg.contains("警察") || msg.contains("侵入") || msg.contains("华为"))) {
                     CQ.sendGroupMsg(111852382L, msg);
                 }
@@ -103,17 +67,13 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             boolean isAdmin = CQ.getGroupMemberInfoV2(fromGroup, fromQQ).getAuthority() > 1;
             // process only after there's a command, in order to get rid of memory trash
             String temp = msg.trim();
-            String cmd[] = new String[4];
+            String cmd[] = { "", "", "", "" };
 
             /**
              * @brief Processing msg into cmd & params
              * @param cmd[0] << cmd after !, e.g. "help" cmd[1] << first param etc.
              * @author Stiven.ding
              */
-
-            cmd[1] = "";
-            cmd[2] = ""; // at most 3 paras are supported
-            cmd[3] = ""; // init objects, or null pointers appear
 
             for (int i = 0; i < 4; i++) {
                 temp = temp.trim();
@@ -133,207 +93,189 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
              */
 
             if (botStatus) {
-                switch (cmd[0]) { // 无视这里的报错，用 JDK >= 1.7 编译即可
-                    // 帮助命令
-                    case "help":
+                switch (cmd[0]) {
+                // 帮助命令
+                case "help":
+                    if (cmd[1].equals("debug"))
+                        CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) + "Version: 1.1.0-DEV\n" + "\nDebug Menu:"
+                                + "\n /debugRSS [URL] Get context manually");
+                    else
                         CQ.sendGroupMsg(fromGroup,
-                                CC.at(fromQQ) + "\n= Nameless Bot 帮助 =" + "\n /version 查看版本号"
-                                        + "\n /repeat [内容] (次数) 复读你要说的话" + "\n /(un)sub [频道] 订阅/退订指定媒体"
-                                        + "\n /switch [on/off] 开/关机器人");
-                        break;
-                    // 版本命令
-                    case "version":
-                        CQ.sendGroupMsg(fromGroup, "版本号: 1.0.1-dev");
-                        break;
-                    // 复读命令
-                    case "repeat":
-                        if (isAdmin) {
-                            if (cmd[1].equals("")) {
-                                CQ.sendGroupMsg(fromGroup, "[Bot] 请输入需要复读的话!");
-                            } else {
-                                try {
-                                    int times = Integer.parseInt(cmd[2]);
-                                    if (times < 1 || times > 20)
-                                        CQ.sendGroupMsg(fromGroup, "[Bot] 次数太多了! 想刷爆嘛");
-                                    else
-                                        for (int i = 0; i < times; i++)
-                                            CQ.sendGroupMsg(fromGroup, cmd[1]);
-                                } catch (Exception e) { // 没有识别到次数就只复读一次
-                                    CQ.sendGroupMsg(fromGroup, cmd[1]);
-                                }
+                                CC.at(fromQQ) + "\n= Nameless Bot 帮助 =" + "\n /repeat [内容] (次数) 复读你要说的话"
+                                        + "\n /(un)sub [频道] 订阅/退订指定媒体" + "\n /switch [on/off] 开/关机器人"
+                                        + "\n /(un)mute [@或QQ号] (dhm)  禁言/解禁某人，默认 10m");
+                    break;
+                // 复读命令
+                case "repeat":
+                    if (isAdmin) {
+                        if (cmd[1].equals("")) {
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 请输入需要复读的话!");
+                        } else {
+                            try {
+                                int times = Integer.parseInt(cmd[2]);
+                                if (times < 1 || times > 20)
+                                    CQ.sendGroupMsg(fromGroup, "[Bot] 次数太多了! 想刷爆嘛");
+                                else
+                                    for (int i = 0; i < times; i++)
+                                        CQ.sendGroupMsg(fromGroup, cmd[1]);
+                            } catch (Exception e) { // 没有识别到次数就只复读一次
+                                CQ.sendGroupMsg(fromGroup, cmd[1]);
                             }
+                        }
+                    } else
+                        CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                    break;
+                // 关闭命令
+                case "switch":
+                    if (isAdmin) {
+                        if (cmd[1].equals("off")) {
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 已将机器人禁言.");
+                            botStatus = false;
                         } else
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
-                        break;
-                    // 关闭命令
-                    case "switch":
-                        if (isAdmin) {
-                            if (cmd[1].equals("on")) {
-                                CQ.sendGroupMsg(fromGroup, "[Bot] 已将机器人禁言.");
-                                botStatus = false;
-                            } else
-                                CQ.sendGroupMsg(fromGroup, "[Bot] 机器人早已处于开启状态.");
-                        } else
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
-                        break;
-                    // 订阅命令
-                    case "sub":
-                        if (isAdmin) {
-                            switch (cmd[1].toLowerCase()) { // 无视此处报错，仅需在 JDK >= 1.7 编译即可
-                                case "solidot": // 代码中务必只用小写，确保大小写不敏感
-                                    subSolidot = true;
-                                    CQ.sendGroupMsg(fromGroup, "[Bot] 已订阅 Solidot.");
-                                    break;
-                                case "jikewakeup":
-                                    subJikeWakeup = true;
-                                    CQ.sendGroupMsg(fromGroup, "[Bot] 已订阅 即刻 - 一觉醒来世界发生了什么.");
-                                    break;
-                                default:
-                                    CQ.sendGroupMsg(fromGroup, "[Bot] 未知频道.");
-                                    break;
-                            }
-                        } else
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
-                        break;
-                    // 退订命令
-                    case "unsub":
-                        if (isAdmin) {
-                            switch (cmd[1].toLowerCase()) { // 无视此处报错，仅需在 JDK >= 1.7 编译即可
-                                case "solidot": // 代码中务必只用小写，确保大小写不敏感
-                                    subSolidot = false;
-                                    CQ.sendGroupMsg(fromGroup, "[Bot] 已退订 Solidot.");
-                                    break;
-                                case "jikewakeup":
-                                    subJikeWakeup = false;
-                                    CQ.sendGroupMsg(fromGroup, "[Bot] 已退订 即刻 - 一觉醒来世界发生了什么.");
-                                    break;
-                                default:
-                                    CQ.sendGroupMsg(fromGroup, "[Bot] 未知频道.");
-                                    break;
-                            }
-                        } else
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
-                        break;
-                    case "debug":
-                        if (isAdmin) {
-                            switch (cmd[1].toLowerCase()) {
-                                case "jikepush":
-                                    try {
-                                        URL url = new URL(jikeWakeup);
-                                        // 读取RSS源
-                                        XmlReader reader = new XmlReader(url);
-                                        SyndFeedInput input = new SyndFeedInput();
-                                        // 得到SyndFeed对象，即得到RSS源里的所有信息
-                                        SyndFeed feed = input.build(reader);
-                                        // 得到Rss新闻中子项列表
-                                        List entries = feed.getEntries();
-                                        SyndEntry entry = (SyndEntry) entries.get(0);
-                                        String value = entry.getDescription().getValue().replaceAll("<br />", "\n");
-                                        CQ.sendGroupMsg(fromGroup, entry.getTitle() + "\n" + value);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                        CQ.sendGroupMsg(fromGroup, "[Bot] 发生了意料之外的错误, 请查看后台.");
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 机器人早已处于开启状态.");
+                    } else
+                        CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                    break;
+                // 订阅命令
+                case "sub":
+                    if (isAdmin) {
+                        switch (cmd[1].toLowerCase()) {
+                        case "solidot": // 代码中务必只用小写，确保大小写不敏感
+                            solidot.enable();
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 已订阅 Solidot.");
+                            break;
+                        case "jikeWakeUp":
+                            jikeWakeUp.enable();
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 已订阅 即刻 - 一觉醒来世界发生了什么.");
+                            break;
+                        default:
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 未知频道.");
+                            break;
+                        }
+                    } else
+                        CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                    break;
+                // 退订命令
+                case "unsub":
+                    if (isAdmin) {
+                        switch (cmd[1].toLowerCase()) { // 无视此处报错，仅需在 JDK >= 1.7 编译即可
+                        case "solidot": // 代码中务必只用小写，确保大小写不敏感
+                            solidot.disable();
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 已退订 Solidot.");
+                            break;
+                        case "jikeWakeUp":
+                            jikeWakeUp.disable();
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 已退订 即刻 - 一觉醒来世界发生了什么.");
+                            break;
+                        default:
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 未知频道.");
+                            break;
+                        }
+                    } else
+                        CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                    break;
+                // 禁言
+                case "mute":
+                    if (isAdmin) {
+                        if (cmd[1].equals("")) {
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 用法: /mute [@/QQ号] [时间(秒)]");
+                        } else {
+                            try {
+                                long banQQ = StringUtils.isNumeric(cmd[1]) ? Integer.parseInt(cmd[1])
+                                        : CC.getAt(cmd[1]);
+                                long banTime = 0; // 此处单位为秒
+                                if (cmd[2].equals(""))
+                                    banTime = 10 * 60;
+                                else {
+                                    String tempTime = cmd[2];
+                                    if (tempTime.indexOf('d') != -1) {
+                                        banTime += Integer.parseInt(cmd[2].substring(0, tempTime.indexOf('d'))) * 24
+                                                * 60 * 60;
+                                        tempTime = tempTime.substring(tempTime.indexOf('d') + 1);
                                     }
-                                    break;
-                                default:
-                                    CQ.sendGroupMsg(fromGroup, "[Bot] 命令不存在哟~");
-                                    break;
-                            }
-                        } else
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
-                        break;
-                    // 禁言
-                    case "mute":
-                        if (isAdmin) {
-                            if (cmd[1].equals("")) {
-                                CQ.sendGroupMsg(fromGroup, "[Bot] 用法: /ban [at需要禁言的人/QQ号] [时间(秒)]");
-                            } else if (StringUtils.isNumeric(cmd[1]) && StringUtils.isNumeric(cmd[2])) {
-                                long banQQ = Integer.parseInt(cmd[1]);
-                                long bantime = Integer.parseInt(cmd[2]);
-                                if (bantime >= 60 || bantime <= 2592000) {
-                                    CQ.setGroupBan(fromGroup, banQQ, bantime);
-                                } else
-                                    CQ.sendGroupMsg(fromGroup, "[Bot] 时间有误!");
-                            } else if (StringUtils.isNumeric(cmd[2])) {
-                                try {
-                                    long times = Integer.parseInt(cmd[2]);
-                                    long banQQ = CC.getAt(cmd[1]);
-                                    if (times > 0 && times <= 2592000) {
-                                        CQ.setGroupBan(fromGroup, banQQ, times);
-                                    } else CQ.sendGroupMsg(fromGroup, "[Bot] 你输入的时间有误!");
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    CQ.sendGroupMsg(fromGroup, "[Bot] 请检查你输入的命令!");
+                                    if (tempTime.indexOf('h') != -1) {
+                                        banTime += Integer.parseInt(cmd[2].substring(0, tempTime.indexOf('h'))) * 60
+                                                * 60;
+                                        tempTime = tempTime.substring(tempTime.indexOf('h') + 1);
+                                    }
+                                    if (tempTime.indexOf('m') != -1)
+                                        banTime += Integer.parseInt(cmd[2].substring(0, tempTime.indexOf('m'))) * 60;
                                 }
+                                CQ.setGroupBan(fromGroup, banQQ, banTime);
+                            } catch (Exception e) {
+                                CQ.sendGroupMsg(fromGroup, "[Bot] 命令格式有误! 用法: /mute [@/QQ号] [dhm]");
                             }
-                            else if (cmd[2].contains("d")||cmd[2].contains("h")||cmd[2].contains("m")){
-                                // TODO: 实现 D/H/M 转换
-                            } else
+                        }
+                    } else
+                        CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                    break;
+                // 解除禁言
+                case "unmute":
+                    if (isAdmin) {
+                        if (cmd[1].equals("")) {
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 用法: /unmute [at需要解禁的人]");
+                        } else {
+                            try {
+                                long banQQ = StringUtils.isNumeric(cmd[1]) ? Integer.parseInt(cmd[1])
+                                        : CC.getAt(cmd[1]);
+                                CQ.setGroupBan(fromGroup, banQQ, 0);
+                            } catch (Exception e) {
                                 CQ.sendGroupMsg(fromGroup, "[Bot] 请检查你输入的命令!");
-                        } else
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
-                        break;
-                    // 解除禁言
-                    case "unmute":
-                        if (isAdmin) {
-                            if (cmd[1].equals("")) {
-                                CQ.sendGroupMsg(fromGroup, "[Bot] 用法: /unban [at需要解禁的人]");
-                            } else if (!cmd[1].equals("")) {
-                                long bannedQQ = CC.getAt(cmd[1]);
-                                CQ.setGroupBan(fromGroup, bannedQQ, 0);
-                            } else if (StringUtils.isNumeric(cmd[1])) {
-                                long bannedQQ = Integer.parseInt(cmd[1]);
-                                CQ.setGroupBan(fromGroup, bannedQQ, 0);
-                            } else
-                                CQ.sendGroupMsg(fromGroup, "[Bot] 请检查你输入的命令!");
-                        } else
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
-                        break;
+                            }
+                        }
+                    } else
+                        CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                    break;
+                // 调试发送 RSS 订阅
+                case "debugRSS":
+                    if (isAdmin) {
+                        switch (cmd[1].toLowerCase()) {
+                        case "jikeWakeUp":
+                            CQ.sendGroupMsg(fromGroup, jikeWakeUp.getContext());
+                            break;
+                        default:
+                            CQ.sendGroupMsg(fromGroup, "[Bot] 未知频道.");
+                            break;
+                        }
+                    }
+                    break;
                 // 未知命令
                 default:
                     CQ.sendGroupMsg(fromGroup, "[Bot] 命令不存在哟~");
                     break;
 
                 }
-            } else if (cmd[0].equals("switch") && cmd[1].equals("off")) {
+            } else if (cmd[0].equals("switch") && cmd[1].equals("on")) {
                 // 机器人禁言关闭
                 if (isAdmin) {
-                    CQ.sendGroupMsg(fromGroup, "[Bot] 已关闭对机器人的禁言.");
+                    CQ.sendGroupMsg(fromGroup, "[Bot] 已启用机器人.");
                     botStatus = true;
                 }
             }
         }
-        else if (subJikeWakeup && botStatus){
+        return MSG_IGNORE;
+    }
+
+    /**
+     * @brief 启动时计划定时推送
+     * @author Starwish
+     * @return always 0
+     */
+    public int enable() {
+        enable = true;
+        if (jikeWakeUp.getStatus() && botStatus) {
             Calendar c = Calendar.getInstance();
             c.set(Calendar.HOUR_OF_DAY, 7); // 控制时
-            c.set(Calendar.MINUTE, 0); // 控制分
-            c.set(Calendar.SECOND, 0); // 控制秒
 
-            Date time = c.getTime();
             Timer timer = new Timer();
-
             timer.scheduleAtFixedRate(new TimerTask() {
                 public void run() {
-                    try {
-                        URL url = new URL(jikeWakeup);
-                        // 读取RSS源
-                        XmlReader reader = new XmlReader(url);
-                        SyndFeedInput input = new SyndFeedInput();
-                        // 得到SyndFeed对象，即得到RSS源里的所有信息
-                        SyndFeed feed = input.build(reader);
-                        // 得到Rss新闻中子项列表
-                        List entries = feed.getEntries();
-                        SyndEntry entry = (SyndEntry) entries.get(0);
-                        String value = entry.getDescription().getValue().replaceAll("<br />", "\n");
-                        CQ.sendGroupMsg(fromGroup, entry.getTitle() + "\n" + value);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        CQ.sendGroupMsg(fromGroup, "[Bot] 发生了意料之外的错误, 请查看后台.");
-                    }
+                    CQ.sendGroupMsg(111852382L, jikeWakeUp.getContext());
                 }
-            }, time, 1000 * 60 * 60 * 24); // 这里设定将延时每天固定执行
+            }, c.getTime(), 1000 * 60 * 60 * 24); // 这里设定将延时每天固定执行
         }
-        return MSG_IGNORE;
+
+        return 0;
     }
 
     public int discussMsg(int subtype, int msgId, long fromDiscuss, long fromQQ, String msg, int font) {
@@ -349,6 +291,11 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     }
 
     public int groupMemberDecrease(int subtype, int sendTime, long fromGroup, long fromQQ, long beingOperateQQ) {
+        if (botStatus) {
+            if (fromGroup == 111852382L) {
+                CQ.sendGroupMsg(fromGroup, "玩家 " + CC.at(beingOperateQQ) + "退出了本群！");
+            }
+        }
         return MSG_IGNORE;
     }
 
@@ -374,5 +321,19 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     public int requestAddGroup(int subtype, int sendTime, long fromGroup, long fromQQ, String msg,
             String responseFlag) {
         return MSG_IGNORE;
+    }
+
+    public int exit() {
+        return 0;
+    }
+
+    public int disable() {
+        enable = false;
+        return 0;
+    }
+
+    public String appInfo() {
+        String AppID = "top.starwish.namelessbot";
+        return CQAPIVER + "," + AppID;
     }
 }
