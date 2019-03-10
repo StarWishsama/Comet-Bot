@@ -1,5 +1,5 @@
 group 'top.starwish'
-version '1.0.0-RELEASE'
+version '1.0.1-DEV'
 
 apply plugin: 'java'
 
@@ -23,6 +23,7 @@ dependencies {
 	compile 'commons-logging:commons-logging:1.2'
 	compile 'org.apache.httpcomponents:httpclient:4.5.2'
 	compile 'org.apache.httpcomponents:httpcore:4.4.4'
+    compile 'org.apache.commons:commons-lang3:3.8.1'
 	compile 'org.jdom:jdom2:2.0.6'
 	compile 'org.slf4j:slf4j-api:1.7.16'
     compile 'org.slf4j:slf4j-nop:1.7.9'
