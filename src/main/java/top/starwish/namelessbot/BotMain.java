@@ -3,22 +3,16 @@ package top.starwish.namelessbot;
 import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
 import org.apache.commons.lang3.StringUtils;
-import org.yaml.snakeyaml.Yaml;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
+import com.alibaba.fastjson.*;
 import java.util.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
-
-    // Yaml yaml = new Yaml();
-    boolean botStatus = true;
+    boolean botStatus;
 
     RssItem solidot = new RssItem(); // 仅供统一代码格式，实际上 solidot 并非 RSS 源
     RssItem jikeWakeUp = new RssItem("https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68");
 
-    File configFile = new File(CQ.getAppDirectory(), "status.yml");
+    String configPath = CQ.getAppDirectory() + "status.json";
 
     /**
      * @brief Init plugin
@@ -26,25 +20,15 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
      */
 
     public int startup() {
-        if (!configFile.exists()) {
-            try {
-                Files.copy(getClass().getResourceAsStream("status.yml"), configFile.toPath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        CQ.logInfo("NamelessBot", "初始化完成, 欢迎使用!");
+        CQ.logInfoSuccess("NamelessBot", "初始化完成, 欢迎使用!");
         return 0;
     }
 
     public int privateMsg(int subType, int msgId, long fromQQ, String msg, int font) {
         // 这里处理消息
         if (fromQQ == 1552409060L || fromQQ == 1448839220L) {
-            if (msg.startsWith("!bc")) {
-                String text = msg.replaceAll("!bc", "");
-                CQ.sendGroupMsg(111852382L, text);
-            }
+            if (msg.startsWith("!bc") || msg.startsWith("/bc"))
+                CQ.sendGroupMsg(111852382L, msg.replaceAll("!bc", "").replaceAll("/bc", ""));
         }
         return MSG_IGNORE;
     }
@@ -96,14 +80,11 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                 switch (cmd[0]) {
                 // 帮助命令
                 case "help":
-                    if (cmd[1].equals("debug"))
-                        CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) + "Version: 1.1.0-DEV\n" + "\nDebug Menu:"
-                                + "\n /debugRSS [URL] Get context manually");
-                    else
-                        CQ.sendGroupMsg(fromGroup,
-                                CC.at(fromQQ) + "\n= Nameless Bot 帮助 =" + "\n /repeat [内容] (次数) 复读你要说的话"
-                                        + "\n /(un)sub [频道] 订阅/退订指定媒体" + "\n /switch [on/off] 开/关机器人"
-                                        + "\n /(un)mute [@或QQ号] (dhm)  禁言/解禁某人，默认 10m");
+                    CQ.sendGroupMsg(fromGroup,
+                            "\n= 无名Bot " + VerClass.VERSION + " =" + "\n /repeat [内容] (次数) 复读你要说的话"
+                                    + "\n /sub [solidot/jikewakeup] 订阅指定媒体" + "\n /unsub [solidot/jikewakeup] 退订指定媒体"
+                                    + "\n /switch [on/off] 开/关机器人" + "\n /mute [@或QQ号] (dhm) 禁言某人，默认 10m"
+                                    + "\n /unmute [@或QQ号] 解禁某人" + "\n /debug");
                     break;
                 // 复读命令
                 case "repeat":
@@ -144,7 +125,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             solidot.enable();
                             CQ.sendGroupMsg(fromGroup, "[Bot] 已订阅 Solidot.");
                             break;
-                        case "jikeWakeUp":
+                        case "jikewakeup":
                             jikeWakeUp.enable();
                             CQ.sendGroupMsg(fromGroup, "[Bot] 已订阅 即刻 - 一觉醒来世界发生了什么.");
                             break;
@@ -163,7 +144,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             solidot.disable();
                             CQ.sendGroupMsg(fromGroup, "[Bot] 已退订 Solidot.");
                             break;
-                        case "jikeWakeUp":
+                        case "jikewakeup":
                             jikeWakeUp.disable();
                             CQ.sendGroupMsg(fromGroup, "[Bot] 已退订 即刻 - 一觉醒来世界发生了什么.");
                             break;
@@ -201,6 +182,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     if (tempTime.indexOf('m') != -1)
                                         banTime += Integer.parseInt(tempTime.substring(0, tempTime.indexOf('m'))) * 60;
                                 }
+                                if (banTime < 1)
+                                    throw new NumberFormatException("Equal or less than 0");
                                 if (banTime <= 30 * 24 * 60 * 60)
                                     CQ.setGroupBan(fromGroup, banQQ, banTime);
                                 else
@@ -230,17 +213,27 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     break;
                 // 调试发送 RSS 订阅
-                case "debugRSS":
+                case "debug":
                     if (isAdmin) {
                         switch (cmd[1].toLowerCase()) {
-                        case "jikeWakeUp":
-                            CQ.sendGroupMsg(fromGroup, jikeWakeUp.getContext());
+                        case "rss": // 代码中务必只用小写，确保大小写不敏感
+                            CQ.sendGroupMsg(fromGroup, RssItem.getFromURL(cmd[1]));
+                            break;
+                        case "reload":
+                            readConf();
+                            break;
+                        case "save":
+                            saveConf();
                             break;
                         default:
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 未知频道.");
+                            CQ.sendGroupMsg(fromGroup,
+                                    "Version: " + VerClass.VERSION + "\nDebug Menu:"
+                                            + "\n /debug RSS [URL] Get context manually" + "\n /debug reload"
+                                            + "\n /debug save");
                             break;
                         }
-                    }
+                    } else
+                        CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     break;
                 // 未知命令
                 default:
@@ -257,29 +250,37 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             }
         }
         return MSG_IGNORE;
+
     }
 
     /**
-     * @brief 启动时计划定时推送
-     * @author Starwish
+     * @brief Startup
      * @return always 0
      */
+
     public int enable() {
         enable = true;
-        if (jikeWakeUp.getStatus() && botStatus) {
-            Calendar c = Calendar.getInstance();
-            boolean toSend = (c.get(Calendar.HOUR_OF_DAY) == 7);
 
-            c.set(Calendar.HOUR_OF_DAY, 7); // 控制时
+        readConf();
 
-            Timer timer = new Timer();
-            timer.scheduleAtFixedRate(new TimerTask() {
-                public void run() {
-                    if (toSend)
+        /**
+         * @brief 启动时计划定时推送 & save confirguration
+         * @author Starwish.sama
+         */
+
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.HOUR_OF_DAY, 7);
+        c.set(Calendar.MINUTE, 30);
+
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                saveConf(); // 每小时保存一次
+                if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 7)
+                    if (jikeWakeUp.getStatus() && botStatus)
                         CQ.sendGroupMsg(111852382L, jikeWakeUp.getContext());
-                }
-            }, c.getTime(), 1000 * 60 * 60 * 24); // 这里设定将延时每天固定执行
-        }
+            }
+        }, c.getTime(), 1000 * 60 * 60);
 
         return 0;
     }
@@ -294,6 +295,33 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
     public int groupAdmin(int subtype, int sendTime, long fromGroup, long beingOperateQQ) {
         return MSG_IGNORE;
+    }
+
+    public void readConf() {
+
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(FileProcess.readFile(configPath));
+            botStatus = jsonObject.getBooleanValue("botStatus");
+            solidot.setStatus(jsonObject.getBooleanValue("solidot"));
+            jikeWakeUp.setStatus(jsonObject.getBooleanValue("jikeWakeUp"));
+
+        } catch (Exception e) {
+            botStatus = true;
+            solidot.enable();
+            jikeWakeUp.enable();
+            saveConf();
+        }
+    }
+
+    public void saveConf() {
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("botStatus", botStatus);
+        jsonObject.put("solidot", solidot.getStatus());
+        jsonObject.put("jikeWakeUp", jikeWakeUp.getStatus());
+        if (!FileProcess.createFile(configPath, jsonObject.toJSONString()))
+            CQ.logFatal("ERROR", "Encountered an error when saving configuration!");
+
     }
 
     public int groupMemberDecrease(int subtype, int sendTime, long fromGroup, long fromQQ, long beingOperateQQ) {

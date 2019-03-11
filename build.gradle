@@ -1,5 +1,5 @@
 group 'top.starwish'
-version '1.1.0-DEV'
+version '1.2.0-PRERELEASE'
 
 apply plugin: 'java'
 
@@ -27,11 +27,45 @@ dependencies {
 	compile 'org.jdom:jdom2:2.0.6'
 	compile 'org.slf4j:slf4j-api:1.7.16'
     compile 'org.slf4j:slf4j-nop:1.7.9'
-    compile 'org.yaml:snakeyaml:1.24'
+    compile 'com.alibaba:fastjson:1.2.56'
 }
+
+//preBuild.dependsOn copyJars
 
 task copyJars(type:Copy) {
   	from configurations.runtime
   	into 'dependencies'
 }
+//替换版本号
+task updateVersion {
+    def versionFileDir = projectDir.getAbsolutePath() + '\\src\\main\\java\\top\\starwish\\namelessbot\\VerClass.java';
+    println versionFileDir;
+    def oldVersionStr = findOldVersionStr(versionFileDir);
+    println oldVersionStr;
+    def newVersionValue = getNewVersionValue();
+    println newVersionValue;
+    def newVersionStr = "public static final String VERSION = \"" + newVersionValue + "\";"
+    println newVersionStr;
+    def updatedContent = new File(versionFileDir).getText('UTF-8').replaceAll(oldVersionStr, newVersionStr);
+    new File(versionFileDir).write(updatedContent, 'UTF-8')
+}
 
+def findOldVersionStr(path) {
+    def readerString = "";
+    new File(path).withReader('UTF-8') { reader ->
+        reader.eachLine {
+            if (it.contains("VERSION")) {
+                readerString <<= it
+                return readerString
+            }
+        }
+        return readerString
+    }
+}
+
+def getNewVersionValue() {
+    return version;
+}
+
+jar.dependsOn updateVersion
+jar.dependsOn copyJars

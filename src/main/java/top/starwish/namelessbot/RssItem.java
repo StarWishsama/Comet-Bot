@@ -8,8 +8,8 @@ import java.net.URL;
 import java.util.List;
 
 public class RssItem {
-    private String address = "";
-    private boolean ifEnabled = true;
+    private String address;
+    private boolean ifEnabled;
     
     // main 函数仅供调试使用
     public static void main(String[] args) {
@@ -17,12 +17,10 @@ public class RssItem {
     }
 
     public RssItem() {
-        ifEnabled = true;
     }
 
     public RssItem(String addr) {
         address = addr;
-        ifEnabled = true;
     }
 
     public boolean getStatus() {
@@ -41,6 +39,10 @@ public class RssItem {
         ifEnabled = true;
     }
 
+    public void setStatus(boolean stat){
+        ifEnabled = stat;
+    }
+
     public void setAddress(String addr) {
         address = addr;
     }
@@ -50,7 +52,7 @@ public class RssItem {
     }
 
     // 此函数仅供内部调用，正常情况下不应调用
-    private static String getFromURL(String addr){
+    public static String getFromURL(String addr){
         try {
             URL url = new URL(addr);
             // 读取RSS源
@@ -65,7 +67,7 @@ public class RssItem {
             return(entry.getTitle() + "\n" + value);
         } catch (Exception e) {
             e.printStackTrace();
-            return("error");
+            return("Encountered a wrong URL or a network error.");
         }
     }
     

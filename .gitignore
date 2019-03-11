@@ -4,6 +4,7 @@
 .vscode/
 bin/
 build/
+dependencies/
 *.war
 *.nar
 *.ear
