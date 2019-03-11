@@ -361,6 +361,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     }
 
     public int disable() {
+        saveConf();
         enable = false;
         return 0;
     }
