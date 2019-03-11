@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.UUID;
 
+import com.sobte.cqp.jcq.event.JcqApp;
+
 /**
  * @author 夕橘子-O & Stiven.ding
  * @see https://www.cnblogs.com/XiOrang/p/5652875.html
@@ -21,9 +23,9 @@ public class FileProcess {
     public static void main(String[] args) {
         UUID uuid = UUID.randomUUID();
         try {
+            createFile(System.getProperty("user.dir") + "\\build\\myfile.txt", uuid.toString());
             System.out.println(readFile(System.getProperty("user.dir") + "\\build\\myfile.txt"));
         } catch (Exception e) {
-            createFile(System.getProperty("user.dir") + "\\build\\myfile.txt", uuid.toString());
         }
     }
 
@@ -36,19 +38,23 @@ public class FileProcess {
      */
 
     public static boolean createFile(String path, String filecontent) {
+
         Boolean bool = false;
         File file = new File(path);
+        if(file.exists())
+            delFile(path);
+        if (JcqApp.CQ != null)
+            JcqApp.CQ.logDebug("JSON", "Path is " + path);
         try {
-            // 如果文件不存在，则创建新的文件
-            if (!file.exists()) {
-                file.createNewFile();
-                bool = true;
-                System.out.println("success create file, the file is " + path);
-                // 创建文件成功后，写入内容到文件里
-                writeFileContent(path, filecontent);
-            }
+            file.createNewFile();
+            bool = true;
+            if (JcqApp.CQ != null)
+                JcqApp.CQ.logInfoSuccess("JSON", "Create file successfully at " + path);
+            writeFileContent(path, filecontent);
         } catch (Exception e) {
             e.printStackTrace();
+            if (JcqApp.CQ != null)
+                JcqApp.CQ.logFatal("ERROR", "Encountered an error when saving configuration!");
         }
 
         return bool;

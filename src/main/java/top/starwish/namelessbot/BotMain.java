@@ -81,7 +81,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                 // 帮助命令
                 case "help":
                     CQ.sendGroupMsg(fromGroup,
-                            "\n= 无名Bot " + VerClass.VERSION + " =" + "\n /repeat [内容] (次数) 复读你要说的话"
+                            "= 无名Bot " + VerClass.VERSION + " =" + "\n /repeat [内容] (次数) 复读你要说的话"
                                     + "\n /sub [solidot/jikewakeup] 订阅指定媒体" + "\n /unsub [solidot/jikewakeup] 退订指定媒体"
                                     + "\n /switch [on/off] 开/关机器人" + "\n /mute [@或QQ号] (dhm) 禁言某人，默认 10m"
                                     + "\n /unmute [@或QQ号] 解禁某人" + "\n /debug");
@@ -319,9 +319,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         jsonObject.put("botStatus", botStatus);
         jsonObject.put("solidot", solidot.getStatus());
         jsonObject.put("jikeWakeUp", jikeWakeUp.getStatus());
-        if (!FileProcess.createFile(configPath, jsonObject.toJSONString()))
-            CQ.logFatal("ERROR", "Encountered an error when saving configuration!");
-
+        FileProcess.createFile(configPath, jsonObject.toJSONString());
+        CQ.logDebug("JSON", "配置已保存.");
     }
 
     public int groupMemberDecrease(int subtype, int sendTime, long fromGroup, long fromQQ, long beingOperateQQ) {
