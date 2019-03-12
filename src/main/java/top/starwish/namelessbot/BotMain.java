@@ -217,7 +217,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     if (isAdmin) {
                         switch (cmd[1].toLowerCase()) {
                         case "rss": // 代码中务必只用小写，确保大小写不敏感
-                            CQ.sendGroupMsg(fromGroup, RssItem.getFromURL(cmd[1]));
+                            CQ.sendGroupMsg(fromGroup, new RssItem(cmd[2]).getContext());
                             break;
                         case "reload":
                             readConf();

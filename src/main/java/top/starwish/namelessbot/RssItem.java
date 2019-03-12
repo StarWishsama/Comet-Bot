@@ -4,6 +4,8 @@ import com.rometools.rome.feed.synd.*;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 
+import com.sobte.cqp.jcq.event.JcqApp;
+
 import java.net.URL;
 import java.util.List;
 
@@ -13,7 +15,8 @@ public class RssItem {
     
     // main 函数仅供调试使用
     public static void main(String[] args) {
-        System.out.println(getFromURL("https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68"));
+        //System.out.println(getFromURL("https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68"));
+        System.out.println(getFromURL("https://cn.engadget.com/rss.xml"));
     }
 
     public RssItem() {
@@ -52,7 +55,7 @@ public class RssItem {
     }
 
     // 此函数仅供内部调用，正常情况下不应调用
-    public static String getFromURL(String addr){
+    private static String getFromURL(String addr){
         try {
             URL url = new URL(addr);
             // 读取RSS源
@@ -67,6 +70,8 @@ public class RssItem {
             return(entry.getTitle() + "\n" + value);
         } catch (Exception e) {
             e.printStackTrace();
+            if(JcqApp.CQ != null)
+                JcqApp.CQ.logInfo("RSS", System.err.toString());
             return("Encountered a wrong URL or a network error.");
         }
     }
