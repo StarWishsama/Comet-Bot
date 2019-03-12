@@ -38,7 +38,7 @@ task copyJars(type:Copy) {
 }
 //替换版本号
 task updateVersion {
-    def versionFileDir = projectDir.getAbsolutePath() + '\\src\\main\\java\\top\\starwish\\namelessbot\\VerClass.java';
+    def versionFileDir = projectDir.getAbsolutePath() + File.separatorChar + 'src' + File.separatorChar + 'main' + File.separatorChar + 'java' + File.separatorChar + 'top' + File.separatorChar + 'starwish' + File.separatorChar + 'namelessbot' + File.separatorChar + 'VerClass.java';
     println versionFileDir;
     def oldVersionStr = findOldVersionStr(versionFileDir);
     println oldVersionStr;
@@ -46,7 +46,7 @@ task updateVersion {
     println newVersionValue;
     def newVersionStr = "public static final String VERSION = \"" + newVersionValue + "\";"
     println newVersionStr;
-    def updatedContent = new File(versionFileDir).getText('UTF-8').replaceAll(oldVersionStr, newVersionStr);
+    def updatedContent = new File(versionFileDir).getText('UTF-8').replaceAll(oldVersionStr, newVersionStr); 
     new File(versionFileDir).write(updatedContent, 'UTF-8')
 }
 
