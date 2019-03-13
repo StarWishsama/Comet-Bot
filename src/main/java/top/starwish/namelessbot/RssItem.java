@@ -5,7 +5,7 @@ import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 
 import java.net.URL;
-import java.util.List;
+import java.util.*;
 
 public class RssItem {
     private String address;
@@ -13,8 +13,14 @@ public class RssItem {
 
     // main 函数仅供调试使用
     public static void main(String[] args) {
-        String URL = "https://www.solidot.org/index.rss";
-        System.out.println(new RssItem(URL).getContext());
+        String URL = "http://api.lssdjt.com/?ContentType=xml&appkey=rss.xml";
+        String text = new RssItem(URL).getContext();
+        text = "CC.face(74)" + "各位时光隧道玩家早上好" + "\n今天是" + Calendar.getInstance().get(Calendar.YEAR) + "年"
+        + (Calendar.getInstance().get(Calendar.MONTH) + 1) + "月"
+        + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "日" + "，"
+        + text.substring(0, text.indexOf("\n")).replaceFirst("-", "的今天是")
+        + "的日子，一小时之后我会推送今天的早间新闻\n新的一天开始了！" + "CC.face(190)" + "今天别忘了去服务器领取签到奖励噢~~";
+        System.out.println(text);
     }
 
     public RssItem() {

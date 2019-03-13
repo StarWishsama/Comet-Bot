@@ -7,10 +7,11 @@ import com.alibaba.fastjson.*;
 import java.util.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
-    boolean botStatus;
+    boolean botStatus = true;
 
     RssItem solidot = new RssItem(); // 仅供统一代码格式，实际上 solidot 并非 RSS 源
     RssItem jikeWakeUp = new RssItem("https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68");
+    RssItem todayOnHistory = new RssItem("http://api.lssdjt.com/?ContentType=xml&appkey=rss.xml");
 
     String configPath = CQ.getAppDirectory() + "status.json";
 
@@ -28,7 +29,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // 这里处理消息
         if (fromQQ == 1552409060L || fromQQ == 1448839220L) {
             if (msg.startsWith("!bc") || msg.startsWith("/bc"))
-                CQ.sendGroupMsg(111852382L, msg.replaceAll("!bc", "").replaceAll("/bc", ""));
+                mySendGroupMsg(111852382L, msg.replaceAll("!bc", "").replaceAll("/bc", ""));
         }
         return MSG_IGNORE;
     }
@@ -38,11 +39,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
         // Solidot 推送转发
         if (fromGroup == 779672339L && botStatus) {
-            if (solidot.getStatus()) {
-                if (!(msg.contains("中国") || msg.contains("警察") || msg.contains("侵入") || msg.contains("华为"))) {
-                    CQ.sendGroupMsg(111852382L, msg);
-                }
-            }
+            if (solidot.getStatus())
+                mySendGroupMsg(111852382L, msg);
         }
 
         // 机器人功能处理
@@ -80,86 +78,97 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                 switch (cmd[0]) {
                 // 帮助命令
                 case "help":
-                    CQ.sendGroupMsg(fromGroup,
+                    mySendGroupMsg(fromGroup,
                             "= 无名Bot " + VerClass.VERSION + " =" + "\n /repeat [内容] (次数) 复读你要说的话"
-                                    + "\n /sub [solidot/jikewakeup] 订阅指定媒体" + "\n /unsub [solidot/jikewakeup] 退订指定媒体"
-                                    + "\n /switch [on/off] 开/关机器人" + "\n /mute [@或QQ号] (dhm) 禁言某人，默认 10m"
-                                    + "\n /unmute [@或QQ号] 解禁某人" + "\n /debug");
+                                    + "\n /sub (媒体) 订阅指定媒体" + "\n /unsub [媒体] 退订指定媒体" + "\n /switch [on/off] 开/关机器人"
+                                    + "\n /mute [@/QQ] (dhm) 禁言(默认10m)" + "\n /unmute [@/QQ] 解禁某人" + "\n /debug");
                     break;
                 // 复读命令
                 case "repeat":
                     if (isAdmin) {
                         if (cmd[1].equals("")) {
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 请输入需要复读的话!");
+                            mySendGroupMsg(fromGroup, "[Bot] 请输入需要复读的话!");
                         } else {
                             try {
                                 int times = Integer.parseInt(cmd[2]);
                                 if (times < 1 || times > 20)
-                                    CQ.sendGroupMsg(fromGroup, "[Bot] 次数太多了! 想刷爆嘛");
+                                    mySendGroupMsg(fromGroup, "[Bot] 次数太多了! 想刷爆嘛");
                                 else
                                     for (int i = 0; i < times; i++)
-                                        CQ.sendGroupMsg(fromGroup, cmd[1]);
+                                        mySendGroupMsg(fromGroup, cmd[1]);
                             } catch (Exception e) { // 没有识别到次数就只复读一次
-                                CQ.sendGroupMsg(fromGroup, cmd[1]);
+                                mySendGroupMsg(fromGroup, cmd[1]);
                             }
                         }
                     } else
-                        CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                        mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     break;
                 // 关闭命令
                 case "switch":
                     if (isAdmin) {
                         if (cmd[1].equals("off")) {
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 已将机器人禁言.");
+                            mySendGroupMsg(fromGroup, "[Bot] 已将机器人禁言.");
                             botStatus = false;
                         } else
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 机器人早已处于开启状态.");
+                            mySendGroupMsg(fromGroup, "[Bot] 机器人早已处于开启状态.");
                     } else
-                        CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                        mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     break;
                 // 订阅命令
                 case "sub":
                     if (isAdmin) {
-                        switch (cmd[1].toLowerCase()) {
-                        case "solidot": // 代码中务必只用小写，确保大小写不敏感
-                            solidot.enable();
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 已订阅 Solidot.");
+                        switch (cmd[1]) {
+                        case "":
+                            mySendGroupMsg(fromGroup, "媒体列表: /sub (媒体)" + "\n [SDT] Solidot 奇客资讯"
+                                    + "\n [JWU] 一觉醒来世界发生了什么" + "\n [TOH] 历史上的今天");
                             break;
-                        case "jikewakeup":
+                        case "SDT":
+                            solidot.enable();
+                            mySendGroupMsg(fromGroup, "[Bot] 已订阅 Solidot.");
+                            break;
+                        case "JWU":
                             jikeWakeUp.enable();
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 已订阅 即刻 - 一觉醒来世界发生了什么.");
+                            mySendGroupMsg(fromGroup, "[Bot] 已订阅 即刻 - 一觉醒来世界发生了什么.");
+                            break;
+                        case "TOH":
+                            todayOnHistory.enable();
+                            mySendGroupMsg(fromGroup, "[Bot] 已订阅 历史上的今天.");
                             break;
                         default:
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 未知频道.");
+                            mySendGroupMsg(fromGroup, "[Bot] 未知频道.");
                             break;
                         }
                     } else
-                        CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                        mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     break;
                 // 退订命令
                 case "unsub":
                     if (isAdmin) {
-                        switch (cmd[1].toLowerCase()) { // 无视此处报错，仅需在 JDK >= 1.7 编译即可
-                        case "solidot": // 代码中务必只用小写，确保大小写不敏感
+                        switch (cmd[1]) { // 无视此处报错，仅需在 JDK >= 1.7 编译即可
+                        case "SDT":
                             solidot.disable();
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 已退订 Solidot.");
+                            mySendGroupMsg(fromGroup, "[Bot] 已退订 Solidot.");
                             break;
-                        case "jikewakeup":
+                        case "JWU":
                             jikeWakeUp.disable();
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 已退订 即刻 - 一觉醒来世界发生了什么.");
+                            mySendGroupMsg(fromGroup, "[Bot] 已退订 即刻 - 一觉醒来世界发生了什么.");
+                            break;
+                        case "TOH":
+                            todayOnHistory.disable();
+                            mySendGroupMsg(fromGroup, "[Bot] 已退订 历史上的今天.");
                             break;
                         default:
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 未知频道.");
+                            mySendGroupMsg(fromGroup, "[Bot] 未知频道. 输入 /sub 查看所有媒体.");
                             break;
                         }
                     } else
-                        CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                        mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     break;
                 // 禁言
                 case "mute":
                     if (isAdmin) {
                         if (cmd[1].equals("")) {
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 用法: /mute [@/QQ号] [时间(秒)]");
+                            mySendGroupMsg(fromGroup, "[Bot] 用法: /mute [@/QQ号] [时间(秒)]");
                         } else {
                             try {
                                 long banQQ = StringUtils.isNumeric(cmd[1]) ? Integer.parseInt(cmd[1])
@@ -187,37 +196,37 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 if (banTime <= 30 * 24 * 60 * 60)
                                     CQ.setGroupBan(fromGroup, banQQ, banTime);
                                 else
-                                    CQ.sendGroupMsg(fromGroup, "[Bot] 时间长度太大了！");
+                                    mySendGroupMsg(fromGroup, "[Bot] 时间长度太大了！");
                             } catch (Exception e) {
-                                CQ.sendGroupMsg(fromGroup, "[Bot] 命令格式有误! 用法: /mute [@/QQ号] [dhm]");
+                                mySendGroupMsg(fromGroup, "[Bot] 命令格式有误! 用法: /mute [@/QQ号] [dhm]");
                             }
                         }
                     } else
-                        CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                        mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     break;
                 // 解除禁言
                 case "unmute":
                     if (isAdmin) {
                         if (cmd[1].equals("")) {
-                            CQ.sendGroupMsg(fromGroup, "[Bot] 用法: /unmute [at需要解禁的人]");
+                            mySendGroupMsg(fromGroup, "[Bot] 用法: /unmute [at需要解禁的人]");
                         } else {
                             try {
                                 long banQQ = StringUtils.isNumeric(cmd[1]) ? Integer.parseInt(cmd[1])
                                         : CC.getAt(cmd[1]);
                                 CQ.setGroupBan(fromGroup, banQQ, 0);
                             } catch (Exception e) {
-                                CQ.sendGroupMsg(fromGroup, "[Bot] 请检查你输入的命令!");
+                                mySendGroupMsg(fromGroup, "[Bot] 请检查你输入的命令!");
                             }
                         }
                     } else
-                        CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                        mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     break;
                 // 调试发送 RSS 订阅
                 case "debug":
                     if (isAdmin) {
                         switch (cmd[1].toLowerCase()) {
                         case "rss": // 代码中务必只用小写，确保大小写不敏感
-                            CQ.sendGroupMsg(fromGroup, new RssItem(cmd[2]).getContext());
+                            mySendGroupMsg(fromGroup, new RssItem(cmd[2]).getContext());
                             break;
                         case "reload":
                             readConf();
@@ -225,26 +234,40 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         case "save":
                             saveConf();
                             break;
+                        case "parse":
+                            mySendGroupMsg(fromGroup, saveConf());
+                            break;
+                        case "toh":
+                            String text = todayOnHistory.getContext();
+                            mySendGroupMsg(111852382L,
+                                    CC.face(74) + "各位时光隧道玩家--好" + "\n------------------------\n今天是"
+                                            + Calendar.getInstance().get(Calendar.YEAR) + "年"
+                                            + (Calendar.getInstance().get(Calendar.MONTH) + 1) + "月"
+                                            + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "日" + "，"
+                                            + text.substring(0, text.indexOf("\n")).replaceFirst("-", "的今天是")
+                                            + "的日子\n一小时之后我会推送今天的早间新闻\n新的一天开始了！" + CC.face(190) + "今天别忘了去服务器领取签到奖励噢~~");
+                            break;
                         default:
-                            CQ.sendGroupMsg(fromGroup,
+                            mySendGroupMsg(fromGroup,
                                     "Version: " + VerClass.VERSION + "\nDebug Menu:"
-                                            + "\n /debug RSS [URL] Get context manually" + "\n /debug reload"
-                                            + "\n /debug save");
+                                            + "\n RSS [URL] - Get context manually" + "\n reload - Reload config"
+                                            + "\n save - Save config" + "\n parse - Parse JSON"
+                                            + "\n toh - Get todayOnHistory");
                             break;
                         }
                     } else
-                        CQ.sendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                        mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     break;
                 // 未知命令
                 default:
-                    CQ.sendGroupMsg(fromGroup, "[Bot] 命令不存在哟~");
+                    mySendGroupMsg(fromGroup, "[Bot] 命令不存在哟~");
                     break;
 
                 }
             } else if (cmd[0].equals("switch") && cmd[1].equals("on")) {
                 // 机器人禁言关闭
                 if (isAdmin) {
-                    CQ.sendGroupMsg(fromGroup, "[Bot] 已启用机器人.");
+                    mySendGroupMsg(fromGroup, "[Bot] 已启用机器人.");
                     botStatus = true;
                 }
             }
@@ -254,7 +277,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     }
 
     /**
-     * @brief Startup
+     * @brief Startup & schedule
      * @return always 0
      */
 
@@ -275,10 +298,26 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
-                saveConf(); // 每小时保存一次
+                if (Calendar.getInstance().get(Calendar.MINUTE) == 30)
+                    saveConf(); // 每小时保存一次
+
+                // todayOnHistory @ 7:30 AM
                 if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 7)
+                    if (todayOnHistory.getStatus() && botStatus) {
+                        String text = todayOnHistory.getContext();
+                        mySendGroupMsg(111852382L,
+                                CC.face(74) + "各位时光隧道玩家早上好" + "\n今天是" + Calendar.getInstance().get(Calendar.YEAR) + "年"
+                                        + (Calendar.getInstance().get(Calendar.MONTH) + 1) + "月"
+                                        + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "日" + "，"
+                                        + text.substring(0, text.indexOf("\n")).replaceFirst("-", "的今天是")
+                                        + "的日子，一小时之后我会推送今天的早间新闻\n新的一天开始了！" + CC.face(190) + "今天别忘了去服务器领取签到奖励噢~~");
+                    }
+
+                // jikeWakeUp @ 8:30 AM
+                if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 9)
                     if (jikeWakeUp.getStatus() && botStatus)
-                        CQ.sendGroupMsg(111852382L, jikeWakeUp.getContext());
+                        mySendGroupMsg(111852382L, jikeWakeUp.getContext());
+
             }
         }, c.getTime(), 1000 * 60 * 60);
 
@@ -298,35 +337,31 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     }
 
     public void readConf() {
-
         try {
             JSONObject jsonObject = JSONObject.parseObject(FileProcess.readFile(configPath));
             botStatus = jsonObject.getBooleanValue("botStatus");
             solidot.setStatus(jsonObject.getBooleanValue("solidot"));
             jikeWakeUp.setStatus(jsonObject.getBooleanValue("jikeWakeUp"));
-
+            todayOnHistory.setStatus(jsonObject.getBooleanValue("todayOnHistory"));
         } catch (Exception e) {
-            botStatus = true;
-            solidot.enable();
-            jikeWakeUp.enable();
-            saveConf();
         }
     }
 
-    public void saveConf() {
-
+    public String saveConf() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("botStatus", botStatus);
         jsonObject.put("solidot", solidot.getStatus());
         jsonObject.put("jikeWakeUp", jikeWakeUp.getStatus());
+        jsonObject.put("todayOnHistory", todayOnHistory.getStatus());
         FileProcess.createFile(configPath, jsonObject.toJSONString());
         CQ.logDebug("JSON", "配置已保存.");
+        return jsonObject.toJSONString();
     }
 
     public int groupMemberDecrease(int subtype, int sendTime, long fromGroup, long fromQQ, long beingOperateQQ) {
         if (botStatus) {
             if (fromGroup == 111852382L) {
-                CQ.sendGroupMsg(fromGroup, "玩家 " + CC.at(beingOperateQQ) + "退出了本群！");
+                mySendGroupMsg(fromGroup, "玩家 " + CC.at(beingOperateQQ) + "退出了本群！");
             }
         }
         return MSG_IGNORE;
@@ -336,8 +371,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // 入群欢迎
         if (botStatus) {
             if (fromGroup == 111852382L) {
-                CQ.sendGroupMsg(fromGroup, "欢迎 " + CC.at(beingOperateQQ)
-                        + "加入时光隧道!\n【进群请修改群名片为游戏ID】\n【建议使用群文件中的官方客户端!】\n\n服务器IP地址:bgp.sgsd.pw:25846\n赞助网址:http://www.mcrmb.com/cz/13153");
+                mySendGroupMsg(fromGroup, "欢迎 " + CC.at(beingOperateQQ)
+                        + "加入时光隧道!\n【进群请修改群名片为游戏ID】\n【建议使用群文件中的官方客户端!】\n\n服务器IP地址: bgp.sgsd.pw:25846\n赞助网址: http://www.mcrmb.com/cz/13153");
             }
         }
         return MSG_IGNORE;
@@ -369,5 +404,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     public String appInfo() {
         String AppID = "top.starwish.namelessbot";
         return CQAPIVER + "," + AppID;
+    }
+
+    public void mySendGroupMsg(long groupId, String msg) {
+        if (!(msg.contains("警察") || msg.contains("侵入") || msg.contains("华为")))
+            CQ.sendGroupMsg(groupId, msg);
     }
 }
