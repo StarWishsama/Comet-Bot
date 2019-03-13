@@ -4,19 +4,17 @@ import com.rometools.rome.feed.synd.*;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 
-import com.sobte.cqp.jcq.event.JcqApp;
-
 import java.net.URL;
 import java.util.List;
 
 public class RssItem {
     private String address;
     private boolean ifEnabled;
-    
+
     // main 函数仅供调试使用
     public static void main(String[] args) {
-        //System.out.println(getFromURL("https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68"));
-        System.out.println(getFromURL("https://cn.engadget.com/rss.xml"));
+        String URL = "https://www.solidot.org/index.rss";
+        System.out.println(new RssItem(URL).getContext());
     }
 
     public RssItem() {
@@ -42,7 +40,7 @@ public class RssItem {
         ifEnabled = true;
     }
 
-    public void setStatus(boolean stat){
+    public void setStatus(boolean stat) {
         ifEnabled = stat;
     }
 
@@ -50,12 +48,12 @@ public class RssItem {
         address = addr;
     }
 
-    public String getContext(){
-        return(getFromURL(address));
+    public String getContext() {
+        return (simplifyHTML(getFromURL(address)));
     }
 
     // 此函数仅供内部调用，正常情况下不应调用
-    private static String getFromURL(String addr){
+    private static String getFromURL(String addr) {
         try {
             URL url = new URL(addr);
             // 读取RSS源
@@ -66,14 +64,24 @@ public class RssItem {
             // 得到Rss新闻中子项列表
             List<SyndEntry> entries = feed.getEntries();
             SyndEntry entry = (SyndEntry) entries.get(0);
-            String value = entry.getDescription().getValue().replaceAll("<br />", "\n");
-            return(entry.getTitle() + "\n" + value);
+            return (entry.getTitle() + "\n" + "-------------------------\n" + entry.getDescription().getValue().trim());
         } catch (Exception e) {
             e.printStackTrace();
-            if(JcqApp.CQ != null)
-                JcqApp.CQ.logInfo("RSS", System.err.toString());
-            return("Encountered a wrong URL or a network error.");
+            return ("Encountered a wrong URL or a network error.");
         }
     }
-    
+
+    private static String simplifyHTML(String context) {
+        context = context.replaceAll("<br />", "\n").replaceAll("<br>", "\n").replaceAll("</p><p>", "\n")
+                .replaceAll("	", "");
+        while (context.indexOf('<') != -1) {
+            int l = context.indexOf('<');
+            int r = context.indexOf('>');
+            context = context.substring(0, l) + context.substring(r + 1);
+        }
+        while (context.indexOf("\n\n") != -1) {
+            context = context.replaceAll("\n\n", "\n");
+        }
+        return context;
+    }
 }

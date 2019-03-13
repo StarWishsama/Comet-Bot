@@ -10,8 +10,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.UUID;
 
-import com.sobte.cqp.jcq.event.JcqApp;
-
 /**
  * @author 夕橘子-O & Stiven.ding
  * @see https://www.cnblogs.com/XiOrang/p/5652875.html
@@ -41,20 +39,17 @@ public class FileProcess {
 
         Boolean bool = false;
         File file = new File(path);
-        if(file.exists())
+        if (file.exists())
             delFile(path);
-        if (JcqApp.CQ != null)
-            JcqApp.CQ.logDebug("JSON", "Path is " + path);
+        System.out.print("[JSON] Path is " + path);
         try {
             file.createNewFile();
             bool = true;
-            if (JcqApp.CQ != null)
-                JcqApp.CQ.logInfoSuccess("JSON", "Create file successfully at " + path);
+            System.out.print("[JSON] Create file successfully at " + path);
             writeFileContent(path, filecontent);
         } catch (Exception e) {
             e.printStackTrace();
-            if (JcqApp.CQ != null)
-                JcqApp.CQ.logFatal("ERROR", "Encountered an error when saving configuration!");
+            System.out.print("[JSON] Encountered an error when saving configuration!");
         }
 
         return bool;
@@ -129,7 +124,6 @@ public class FileProcess {
                 buffer = buffer.append(System.getProperty("line.separator"));
             }
             buffer.append(filein);
-
             fos = new FileOutputStream(file);
             pw = new PrintWriter(fos);
             pw.write(buffer.toString().toCharArray());

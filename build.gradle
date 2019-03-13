@@ -1,5 +1,5 @@
 group 'top.starwish'
-version '1.2.5-RELEASE'
+version '1.2.7-DEV'
 
 apply plugin: 'java'
 
