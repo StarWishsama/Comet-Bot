@@ -6,5 +6,5 @@ package top.starwish.namelessbot;
  * @author Stiven.ding
  */
 public class VerClass {
-public static final String VERSION = "1.3.0-RELEASE";
+public static final String VERSION = "1.3.1-DEV";
 }

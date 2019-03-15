@@ -247,12 +247,16 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                             + text.substring(0, text.indexOf("\n")).replaceFirst("-", "的今天是")
                                             + "的日子\n一小时之后我会推送今天的早间新闻\n新的一天开始了！" + CC.face(190) + "今天别忘了去服务器领取签到奖励噢~~");
                             break;
+                        case "wel":
+                            long parseQQ = StringUtils.isNumeric(cmd[2]) ? Integer.parseInt(cmd[2]) : CC.getAt(cmd[2]);
+                            groupMemberIncrease(subType, 100, fromGroup, fromQQ, parseQQ);
+                            break;
                         default:
                             mySendGroupMsg(fromGroup,
                                     "Version: " + VerClass.VERSION + "\nDebug Menu:"
                                             + "\n RSS [URL] - Get context manually" + "\n reload - Reload config"
                                             + "\n save - Save config" + "\n parse - Parse JSON"
-                                            + "\n toh - Get todayOnHistory");
+                                            + "\n toh - Get todayOnHistory" + "\n wel [#/@]- Manually welcome");
                             break;
                         }
                     } else
@@ -359,11 +363,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     }
 
     public int groupMemberDecrease(int subtype, int sendTime, long fromGroup, long fromQQ, long beingOperateQQ) {
-        if (botStatus) {
-            if (fromGroup == 111852382L) {
-                mySendGroupMsg(fromGroup, "玩家 " + CC.at(beingOperateQQ) + "退出了本群！");
-            }
-        }
         return MSG_IGNORE;
     }
 
