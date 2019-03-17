@@ -55,10 +55,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             mySendPrivateMsg(fromQQ, "[Bot] 请输入需要转发的群号!");
                         }
                         else if (cmd[1].equals("acraft")){
-                            mySendGroupMsg(552185847L, msg.replaceAll("!bc", "").replaceAll("/bc", "").replaceAll(cmd[0], ""));
+                            mySendGroupMsg(552185847L, msg.replaceAll("!bc", "").replaceAll("/bc", "").replaceAll(cmd[1], ""));
                         }
                         else if (cmd[1].equals("times")) {
-                            mySendGroupMsg(111852382L, msg.replaceAll("!bc", "").replaceAll("/bc", "").replaceAll(cmd[0], ""));
+                            mySendGroupMsg(111852382L, msg.replaceAll("!bc", "").replaceAll("/bc", "").replaceAll(cmd[1], ""));
                         }
                         else {
                             if (StringUtils.isNumeric(cmd[1])) {
