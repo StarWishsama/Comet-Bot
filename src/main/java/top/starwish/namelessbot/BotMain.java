@@ -26,59 +26,60 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     }
 
     public int privateMsg(int subType, int msgId, long fromQQ, String msg, int font) {
-        // process only after there's a command, in order to get rid of memory trash
-        String temp = msg.trim();
-        String cmd[] = { "", "", "", "" };
+        if (msg.startsWith("!")||msg.startsWith("/")) {
+            // process only after there's a command, in order to get rid of memory trash
+            String temp = msg.trim();
+            String cmd[] = { "", "", "", "" };
 
-        /**
-         * @brief Processing msg into cmd & params
-         * @param cmd[0] << cmd after !, e.g. "help" cmd[1] << first param etc.
-         * @author Stiven.ding
-         */
+            /**
+             * @brief Processing msg into cmd & params
+             * @param cmd[0] << cmd after !, e.g. "help" cmd[1] << first param etc.
+             * @author Stiven.ding
+             */
 
-        for (int i = 0; i < 4; i++) {
-            temp = temp.trim();
-            if (temp.indexOf(' ') > 0) {
-                cmd[i] = temp.substring(0, temp.indexOf(' '));
-                temp = temp.substring(temp.indexOf(' ') + 1);
-            } else {
-                cmd[i] = temp.trim();
-                break;
+            for (int i = 0; i < 4; i++) {
+                temp = temp.trim();
+                if (temp.indexOf(' ') > 0) {
+                    cmd[i] = temp.substring(0, temp.indexOf(' '));
+                    temp = temp.substring(temp.indexOf(' ') + 1);
+                } else {
+                    cmd[i] = temp.trim();
+                    break;
+                }
             }
-        }
-        cmd[0] = cmd[0].substring(1); // del '!'/'/' at the beginning of cmd
-
-        if (fromQQ == 1552409060L || fromQQ == 1448839220L) {
-            if (cmd[0].startsWith("!") || cmd[0].startsWith("/")) {
+            cmd[0] = cmd[0].substring(1); // del '!'/'/' at the beginning of cmd
+            if (fromQQ == 1552409060L || fromQQ == 1448839220L) {
                 switch (cmd[0]) {
                     case "bc":
-                        switch (cmd[1].toLowerCase()) {
-                            case "":
-                                mySendPrivateMsg(fromQQ, "[Bot] 请输入需要转发的群号!");
-                                break;
-                            case "acraft":
-                                mySendGroupMsg(552185847L, msg.replaceAll("!bc", "").replaceAll("/bc", ""));
-                                break;
-                            case "times":
-                                mySendGroupMsg(111852382L, msg.replaceAll("!bc", "").replaceAll("/bc", ""));
-                                break;
-                            default:
-                                if (StringUtils.isNumeric(cmd[1])) {
-                                    long group = Integer.parseInt(cmd[1]);
-                                    mySendGroupMsg(group, msg.replaceAll("!bc", "").replaceAll("/bc", ""));
-                                } else
-                                    mySendPrivateMsg(fromQQ, "[Bot] 请检查群号是否有误!");
-                                break;
+                        if (cmd[1].equals("")) {
+                            mySendPrivateMsg(fromQQ, "[Bot] 请输入需要转发的群号!");
+                        }
+                        else if (cmd[1].equals("acraft")){
+                            mySendGroupMsg(552185847L, msg.replaceAll("!bc", "").replaceAll("/bc", "").replaceAll(cmd[0], ""));
+                        }
+                        else if (cmd[1].equals("times")) {
+                            mySendGroupMsg(111852382L, msg.replaceAll("!bc", "").replaceAll("/bc", "").replaceAll(cmd[0], ""));
+                        }
+                        else {
+                            if (StringUtils.isNumeric(cmd[1])) {
+                                long group = Integer.parseInt(cmd[1]);
+                                mySendGroupMsg(group, msg.replaceAll("!bc", "").replaceAll("/bc", "").replaceAll(cmd[1], ""));
+                            } else
+                                mySendPrivateMsg(fromQQ, "[Bot] 请检查群号是否有误!");
                         }
                         break;
                     case "switch":
-                            if (cmd[1].equals("off")) {
-                                mySendPrivateMsg(fromQQ, "[Bot] 已将机器人禁言.");
-                                botStatus = false;
-                            }
-                            else if (cmd[1].equals("on")) {
-                                mySendPrivateMsg(fromQQ, "[Bot] 已解除机器人的禁言.");
-                            }
+                        if (cmd[1].equals("off")) {
+                            mySendPrivateMsg(fromQQ, "[Bot] 已将机器人禁言.");
+                            botStatus = false;
+                        }
+                        else if (cmd[1].equals("on")) {
+                            mySendPrivateMsg(fromQQ, "[Bot] 已解除机器人的禁言.");
+                            botStatus = true;
+                        }
+                        break;
+                    default:
+                        mySendPrivateMsg(fromQQ, "[Bot] Not a command");
                         break;
                 }
             }
@@ -88,15 +89,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
     public int groupMsg(int subType, int msgId, long fromGroup, long fromQQ, String fromAnonymous, String msg,
             int font) {
-
-        /**
-         * Solidot 不再通过转发形式推送
-         * Solidot 推送转发
-        if (fromGroup == 779672339L && botStatus) {
-            if (solidot.getStatus())
-                mySendGroupMsg(111852382L, msg);
-        }
-         */
 
         // 机器人功能处理
         if ((msg.startsWith("!") || msg.startsWith("/"))) {
@@ -136,7 +128,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     mySendGroupMsg(fromGroup,
                             "= 无名Bot " + VerClass.VERSION + " =" + "\n /repeat [内容] (次数) 复读你要说的话"
                                     + "\n /sub (媒体) 订阅指定媒体" + "\n /unsub [媒体] 退订指定媒体" + "\n /switch [on/off] 开/关机器人"
-                                    + "\n /mute [@/QQ] (dhm) 禁言(默认10m)" + "\n /unmute [@/QQ] 解禁某人" + "\n /debug");
+                                    + "\n /mute [@/QQ] (dhm) 禁言(默认10m)" + "\n/mute all 全群禁言" + "\n /unmute [@/QQ] 解禁某人"
+                                    + "\n/unmute all 解除全群禁言" + "\n/kick [@/QQ] [是否永封(t/f)]" +"\n /debug");
                     break;
                 // 复读命令
                 case "repeat":
@@ -224,6 +217,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     if (isAdmin) {
                         if (cmd[1].equals("")) {
                             mySendGroupMsg(fromGroup, "[Bot] 用法: /mute [@/QQ号] [时间(秒)]");
+                        }
+                        else if (cmd[1].equals("all")){
+                            CQ.setGroupWholeBan(fromGroup, true);
+                            mySendGroupMsg(fromGroup, "[Bot] 已打开全群禁言.");
                         } else {
                             try {
                                 long banQQ = StringUtils.isNumeric(cmd[1]) ? Integer.parseInt(cmd[1])
@@ -264,6 +261,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     if (isAdmin) {
                         if (cmd[1].equals("")) {
                             mySendGroupMsg(fromGroup, "[Bot] 用法: /unmute [at需要解禁的人]");
+                        }
+                        else if (cmd[1].equals("all")) {
+                            CQ.setGroupWholeBan(fromGroup, false);
+                            mySendGroupMsg(fromGroup, "[Bot] 已关闭全群禁言.");
                         } else {
                             try {
                                 long banQQ = StringUtils.isNumeric(cmd[1]) ? Integer.parseInt(cmd[1])
@@ -459,6 +460,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                 mySendGroupMsg(552185847L, CC.at(beingOperateQQ)
                         + "欢迎来到玩家的天堂 怪物的地狱\n在这里 你会体验到最极致的击杀快感~\n不要相信老玩家说的难度高，难度一点也不高~真的");
             }
+            else
+                return MSG_IGNORE;
         }
         return MSG_IGNORE;
     }
