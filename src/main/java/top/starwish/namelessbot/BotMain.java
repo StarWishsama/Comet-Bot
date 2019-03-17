@@ -78,6 +78,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             botStatus = true;
                         }
                         break;
+                    case "emojitest":
+                        int faceid = CC.getEmoji(jikeWakeUp.getContext());
+                        mySendPrivateMsg(fromQQ, CC.emoji(faceid));
+                        break;
                     default:
                         mySendPrivateMsg(fromQQ, "[Bot] Not a command");
                         break;
@@ -402,9 +406,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
                 // jikeWakeUp @ 8:30 AM
                 if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 9)
-                    if (jikeWakeUp.getStatus() && botStatus)
-                        mySendGroupMsg(111852382L, jikeWakeUp.getContext() + "\n即刻推送 - NamelessBot");
-
+                    if (jikeWakeUp.getStatus() && botStatus) {
+                        mySendGroupMsg(111852382L, jikeWakeUp.getContext().replaceAll("\uD83D\uDC49", CC.emoji(128073) ) + "\n即刻推送 - NamelessBot");
+                    }
             }
         }, c.getTime(), 1000 * 60 * 60);
 
