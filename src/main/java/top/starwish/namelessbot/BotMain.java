@@ -9,7 +9,7 @@ import java.util.*;
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     boolean botStatus = true;
 
-    RssItem solidot = new RssItem(); // 仅供统一代码格式，实际上 solidot 并非 RSS 源
+    RssItem solidot = new RssItem("https://www.solidot.org/index.rss");
     RssItem jikeWakeUp = new RssItem("https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68");
     RssItem todayOnHistory = new RssItem("http://api.lssdjt.com/?ContentType=xml&appkey=rss.xml");
 
@@ -26,10 +26,62 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     }
 
     public int privateMsg(int subType, int msgId, long fromQQ, String msg, int font) {
-        // 这里处理消息
+        // process only after there's a command, in order to get rid of memory trash
+        String temp = msg.trim();
+        String cmd[] = { "", "", "", "" };
+
+        /**
+         * @brief Processing msg into cmd & params
+         * @param cmd[0] << cmd after !, e.g. "help" cmd[1] << first param etc.
+         * @author Stiven.ding
+         */
+
+        for (int i = 0; i < 4; i++) {
+            temp = temp.trim();
+            if (temp.indexOf(' ') > 0) {
+                cmd[i] = temp.substring(0, temp.indexOf(' '));
+                temp = temp.substring(temp.indexOf(' ') + 1);
+            } else {
+                cmd[i] = temp.trim();
+                break;
+            }
+        }
+        cmd[0] = cmd[0].substring(1); // del '!'/'/' at the beginning of cmd
+
         if (fromQQ == 1552409060L || fromQQ == 1448839220L) {
-            if (msg.startsWith("!bc") || msg.startsWith("/bc"))
-                mySendGroupMsg(111852382L, msg.replaceAll("!bc", "").replaceAll("/bc", ""));
+            if (cmd[0].startsWith("!") || cmd[0].startsWith("/")) {
+                switch (cmd[0]) {
+                    case "bc":
+                        switch (cmd[1].toLowerCase()) {
+                            case "":
+                                mySendPrivateMsg(fromQQ, "[Bot] 请输入需要转发的群号!");
+                                break;
+                            case "acraft":
+                                mySendGroupMsg(552185847L, msg.replaceAll("!bc", "").replaceAll("/bc", ""));
+                                break;
+                            case "times":
+                                mySendGroupMsg(111852382L, msg.replaceAll("!bc", "").replaceAll("/bc", ""));
+                                break;
+                            default:
+                                if (StringUtils.isNumeric(cmd[1])) {
+                                    long group = Integer.parseInt(cmd[1]);
+                                    mySendGroupMsg(group, msg.replaceAll("!bc", "").replaceAll("/bc", ""));
+                                } else
+                                    mySendPrivateMsg(fromQQ, "[Bot] 请检查群号是否有误!");
+                                break;
+                        }
+                        break;
+                    case "switch":
+                            if (cmd[1].equals("off")) {
+                                mySendPrivateMsg(fromQQ, "[Bot] 已将机器人禁言.");
+                                botStatus = false;
+                            }
+                            else if (cmd[1].equals("on")) {
+                                mySendPrivateMsg(fromQQ, "[Bot] 已解除机器人的禁言.");
+                            }
+                        break;
+                }
+            }
         }
         return MSG_IGNORE;
     }
@@ -37,14 +89,17 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     public int groupMsg(int subType, int msgId, long fromGroup, long fromQQ, String fromAnonymous, String msg,
             int font) {
 
-        // Solidot 推送转发
+        /**
+         * Solidot 不再通过转发形式推送
+         * Solidot 推送转发
         if (fromGroup == 779672339L && botStatus) {
             if (solidot.getStatus())
                 mySendGroupMsg(111852382L, msg);
         }
+         */
 
         // 机器人功能处理
-        else if ((msg.startsWith("!") || msg.startsWith("/"))) {
+        if ((msg.startsWith("!") || msg.startsWith("/"))) {
             // 解析是否为管理员
             boolean isAdmin = CQ.getGroupMemberInfoV2(fromGroup, fromQQ).getAuthority() > 1;
             // process only after there's a command, in order to get rid of memory trash
@@ -221,7 +276,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     } else
                         mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     break;
-                // 调试发送 RSS 订阅
+                // 调试
                 case "debug":
                     if (isAdmin) {
                         switch (cmd[1].toLowerCase()) {
@@ -259,6 +314,33 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                             + "\n toh - Get todayOnHistory" + "\n wel [#/@]- Manually welcome");
                             break;
                         }
+                    } else
+                        mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                    break;
+                case "kick":
+                    if (isAdmin){
+                        long kickQQ = StringUtils.isNumeric(cmd[1]) ? Integer.parseInt(cmd[1])
+                                : CC.getAt(cmd[1]);
+                        if (cmd[2].equals("")) {
+                            switch (cmd[1]) {
+                                case "":
+                                    mySendGroupMsg(fromGroup, "[Bot] 用法: /kick [@/QQ号] [是否永封(t/f)]");
+                                    break;
+                                default:
+                                    CQ.setGroupKick(fromGroup, kickQQ, false);
+                                    break;
+                            }
+                        } else
+                            switch (cmd[2]){
+                                case "t":
+                                    CQ.setGroupKick(fromGroup, kickQQ, true);
+                                    break;
+                                case "f":
+                                    CQ.setGroupKick(fromGroup, kickQQ, false);
+                                    break;
+                                default:
+                                    break;
+                            }
                     } else
                         mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     break;
@@ -320,7 +402,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                 // jikeWakeUp @ 8:30 AM
                 if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 9)
                     if (jikeWakeUp.getStatus() && botStatus)
-                        mySendGroupMsg(111852382L, jikeWakeUp.getContext());
+                        mySendGroupMsg(111852382L, jikeWakeUp.getContext() + "\n即刻推送 - NamelessBot");
 
             }
         }, c.getTime(), 1000 * 60 * 60);
@@ -370,8 +452,12 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // 入群欢迎
         if (botStatus) {
             if (fromGroup == 111852382L) {
-                mySendGroupMsg(fromGroup, "欢迎 " + CC.at(beingOperateQQ)
+                mySendGroupMsg(111852382L, "欢迎 " + CC.at(beingOperateQQ)
                         + "加入时光隧道!\n【进群请修改群名片为游戏ID】\n【建议使用群文件中的官方客户端!】\n\n服务器IP地址: bgp.sgsd.pw:25846\n赞助网址: http://www.mcrmb.com/cz/13153");
+            }
+            else if (fromGroup == 552185847L){
+                mySendGroupMsg(552185847L, CC.at(beingOperateQQ)
+                        + "欢迎来到玩家的天堂 怪物的地狱\n在这里 你会体验到最极致的击杀快感~\n不要相信老玩家说的难度高，难度一点也不高~真的");
             }
         }
         return MSG_IGNORE;
@@ -408,5 +494,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     public void mySendGroupMsg(long groupId, String msg) {
         if (!(msg.contains("警察") || msg.contains("侵入") || msg.contains("华为")))
             CQ.sendGroupMsg(groupId, msg);
+    }
+
+    public void mySendPrivateMsg(long fromQQ, String msg){
+        if (!(msg.contains("警察") || msg.contains("侵入") || msg.contains("华为")))
+            CQ.sendPrivateMsg(fromQQ, msg);
     }
 }
