@@ -128,8 +128,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     mySendGroupMsg(fromGroup,
                             "= 无名Bot " + VerClass.VERSION + " =" + "\n /repeat [内容] (次数) 复读你要说的话"
                                     + "\n /sub (媒体) 订阅指定媒体" + "\n /unsub [媒体] 退订指定媒体" + "\n /switch [on/off] 开/关机器人"
-                                    + "\n /mute [@/QQ] (dhm) 禁言(默认10m)" + "\n/mute all 全群禁言" + "\n /unmute [@/QQ] 解禁某人"
-                                    + "\n/unmute all 解除全群禁言" + "\n/kick [@/QQ] [是否永封(t/f)]" +"\n /debug");
+                                    + "\n /mute [@/QQ] (dhm) 禁言(默认10m)" + "\n /mute all 全群禁言" + "\n /unmute [@/QQ] 解禁某人"
+                                    + "\n /unmute all 解除全群禁言" + "\n /kick [@/QQ] [是否永封(t/f)]" +"\n /debug");
                     break;
                 // 复读命令
                 case "repeat":
