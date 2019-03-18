@@ -26,7 +26,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     }
 
     public int privateMsg(int subType, int msgId, long fromQQ, String msg, int font) {
-        if (msg.startsWith("!")||msg.startsWith("/")) {
+        if (msg.startsWith("!") || msg.startsWith("/")) {
             // process only after there's a command, in order to get rid of memory trash
             String temp = msg.trim();
             String cmd[] = { "", "", "", "" };
@@ -50,41 +50,39 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             cmd[0] = cmd[0].substring(1); // del '!'/'/' at the beginning of cmd
             if (fromQQ == 1552409060L || fromQQ == 1448839220L) {
                 switch (cmd[0]) {
-                    case "bc":
-                        if (cmd[1].equals("")) {
-                            mySendPrivateMsg(fromQQ, "[Bot] 请输入需要转发的群号!");
-                        }
-                        else if (cmd[1].equals("acraft")){
-                            mySendGroupMsg(552185847L, msg.replaceAll("!bc", "").replaceAll("/bc", "").replaceAll(cmd[1], ""));
-                        }
-                        else if (cmd[1].equals("times")) {
-                            mySendGroupMsg(111852382L, msg.replaceAll("!bc", "").replaceAll("/bc", "").replaceAll(cmd[1], ""));
-                        }
-                        else {
-                            if (StringUtils.isNumeric(cmd[1])) {
-                                long group = Integer.parseInt(cmd[1]);
-                                mySendGroupMsg(group, msg.replaceAll("!bc", "").replaceAll("/bc", "").replaceAll(cmd[1], ""));
-                            } else
-                                mySendPrivateMsg(fromQQ, "[Bot] 请检查群号是否有误!");
-                        }
+                case "bc":
+                    switch (cmd[1]) {
+                    case "":
+                        mySendPrivateMsg(fromQQ, "[Bot] 请输入需要转发的群号!");
                         break;
-                    case "switch":
-                        if (cmd[1].equals("off")) {
-                            mySendPrivateMsg(fromQQ, "[Bot] 已将机器人禁言.");
-                            botStatus = false;
-                        }
-                        else if (cmd[1].equals("on")) {
-                            mySendPrivateMsg(fromQQ, "[Bot] 已解除机器人的禁言.");
-                            botStatus = true;
-                        }
+                    case "acraft":
+                        mySendGroupMsg(552185847L, cmd[2] + cmd[3] + cmd[4]);
                         break;
-                    case "emojitest":
-                        int faceid = CC.getEmoji(jikeWakeUp.getContext());
-                        mySendPrivateMsg(fromQQ, CC.emoji(faceid));
+                    case "times":
+                        mySendGroupMsg(111852382L, cmd[2] + cmd[3] + cmd[4]);
                         break;
                     default:
-                        mySendPrivateMsg(fromQQ, "[Bot] Not a command");
-                        break;
+                        if (StringUtils.isNumeric(cmd[1]))
+                            mySendGroupMsg(Integer.parseInt(cmd[1]), cmd[2] + cmd[3] + cmd[4]);
+                        else
+                            mySendPrivateMsg(fromQQ, "[Bot] 请检查群号是否有误!");
+                    }
+                    break;
+                case "switch":
+                    if (cmd[1].equals("off")) {
+                        mySendPrivateMsg(fromQQ, "[Bot] 已将机器人禁言.");
+                        botStatus = false;
+                    } else if (cmd[1].equals("on")) {
+                        mySendPrivateMsg(fromQQ, "[Bot] 已解除机器人的禁言.");
+                        botStatus = true;
+                    }
+                    break;
+                case "emojitest":
+                    mySendPrivateMsg(fromQQ, CC.emoji(CC.getEmoji(jikeWakeUp.getContext())));
+                    break;
+                default:
+                    mySendPrivateMsg(fromQQ, "[Bot] Not a command.");
+                    break;
                 }
             }
         }
@@ -133,7 +131,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             "= 无名Bot " + VerClass.VERSION + " =" + "\n /repeat [内容] (次数) 复读你要说的话"
                                     + "\n /sub (媒体) 订阅指定媒体" + "\n /unsub [媒体] 退订指定媒体" + "\n /switch [on/off] 开/关机器人"
                                     + "\n /mute [@/QQ] (dhm) 禁言(默认10m)" + "\n /mute all 全群禁言" + "\n /unmute [@/QQ] 解禁某人"
-                                    + "\n /unmute all 解除全群禁言" + "\n /kick [@/QQ] [是否永封(t/f)]" +"\n /debug");
+                                    + "\n /unmute all 解除全群禁言" + "\n /kick [@/QQ] [是否永封(t/f)]" + "\n /debug");
                     break;
                 // 复读命令
                 case "repeat":
@@ -221,8 +219,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     if (isAdmin) {
                         if (cmd[1].equals("")) {
                             mySendGroupMsg(fromGroup, "[Bot] 用法: /mute [@/QQ号] [时间(秒)]");
-                        }
-                        else if (cmd[1].equals("all")){
+                        } else if (cmd[1].equals("all")) {
                             CQ.setGroupWholeBan(fromGroup, true);
                             mySendGroupMsg(fromGroup, "[Bot] 已打开全群禁言.");
                         } else {
@@ -265,8 +262,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     if (isAdmin) {
                         if (cmd[1].equals("")) {
                             mySendGroupMsg(fromGroup, "[Bot] 用法: /unmute [at需要解禁的人]");
-                        }
-                        else if (cmd[1].equals("all")) {
+                        } else if (cmd[1].equals("all")) {
                             CQ.setGroupWholeBan(fromGroup, false);
                             mySendGroupMsg(fromGroup, "[Bot] 已关闭全群禁言.");
                         } else {
@@ -323,28 +319,27 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                     break;
                 case "kick":
-                    if (isAdmin){
-                        long kickQQ = StringUtils.isNumeric(cmd[1]) ? Integer.parseInt(cmd[1])
-                                : CC.getAt(cmd[1]);
+                    if (isAdmin) {
+                        long kickQQ = StringUtils.isNumeric(cmd[1]) ? Integer.parseInt(cmd[1]) : CC.getAt(cmd[1]);
                         if (cmd[2].equals("")) {
                             switch (cmd[1]) {
-                                case "":
-                                    mySendGroupMsg(fromGroup, "[Bot] 用法: /kick [@/QQ号] [是否永封(t/f)]");
-                                    break;
-                                default:
-                                    CQ.setGroupKick(fromGroup, kickQQ, false);
-                                    break;
+                            case "":
+                                mySendGroupMsg(fromGroup, "[Bot] 用法: /kick [@/QQ号] [是否永封(t/f)]");
+                                break;
+                            default:
+                                CQ.setGroupKick(fromGroup, kickQQ, false);
+                                break;
                             }
                         } else
-                            switch (cmd[2]){
-                                case "t":
-                                    CQ.setGroupKick(fromGroup, kickQQ, true);
-                                    break;
-                                case "f":
-                                    CQ.setGroupKick(fromGroup, kickQQ, false);
-                                    break;
-                                default:
-                                    break;
+                            switch (cmd[2]) {
+                            case "t":
+                                CQ.setGroupKick(fromGroup, kickQQ, true);
+                                break;
+                            case "f":
+                                CQ.setGroupKick(fromGroup, kickQQ, false);
+                                break;
+                            default:
+                                break;
                             }
                     } else
                         mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
@@ -405,9 +400,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     }
 
                 // jikeWakeUp @ 8:30 AM
-                if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 9)
+                if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 8)
                     if (jikeWakeUp.getStatus() && botStatus) {
-                        mySendGroupMsg(111852382L, jikeWakeUp.getContext().replaceAll("\uD83D\uDC49", CC.emoji(128073) ) + "\n即刻推送 - NamelessBot");
+                        mySendGroupMsg(111852382L, jikeWakeUp.getContext().replaceAll("\uD83D\uDC49", CC.emoji(128073))
+                                + "\n即刻推送 - NamelessBot");
                     }
             }
         }, c.getTime(), 1000 * 60 * 60);
@@ -459,12 +455,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             if (fromGroup == 111852382L) {
                 mySendGroupMsg(111852382L, "欢迎 " + CC.at(beingOperateQQ)
                         + "加入时光隧道!\n【进群请修改群名片为游戏ID】\n【建议使用群文件中的官方客户端!】\n\n服务器IP地址: bgp.sgsd.pw:25846\n赞助网址: http://www.mcrmb.com/cz/13153");
-            }
-            else if (fromGroup == 552185847L){
-                mySendGroupMsg(552185847L, CC.at(beingOperateQQ)
-                        + "欢迎来到玩家的天堂 怪物的地狱\n在这里 你会体验到最极致的击杀快感~\n不要相信老玩家说的难度高，难度一点也不高~真的");
-            }
-            else
+            } else if (fromGroup == 552185847L) {
+                mySendGroupMsg(552185847L,
+                        CC.at(beingOperateQQ) + "欢迎来到玩家的天堂 怪物的地狱\n在这里 你会体验到最极致的击杀快感~\n不要相信老玩家说的难度高，难度一点也不高~真的");
+            } else
                 return MSG_IGNORE;
         }
         return MSG_IGNORE;
@@ -503,7 +497,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             CQ.sendGroupMsg(groupId, msg);
     }
 
-    public void mySendPrivateMsg(long fromQQ, String msg){
+    public void mySendPrivateMsg(long fromQQ, String msg) {
         if (!(msg.contains("警察") || msg.contains("侵入") || msg.contains("华为")))
             CQ.sendPrivateMsg(fromQQ, msg);
     }
