@@ -1,6 +1,7 @@
 # Nameless-Bot
 
 A QQ Group bot developed for CoolQ-Air/Pro.
+Simplified Chinese Edition 中文版本: [README](https://github.com/StarWishsama/Nameless-Bot/blob/master/README_zhCN.md)
 <p align="left">
   <a href="https://travis-ci.org/StarWishsama/Nameless-Bot">
     <img src="https://api.travis-ci.org/StarWishsama/Nameless-Bot.svg?branch=master">
