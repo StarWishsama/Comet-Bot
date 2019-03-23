@@ -5,20 +5,25 @@ import com.sobte.cqp.jcq.event.JcqAppAbstract;
 import me.dilley.MineStat;
 import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.*;
+
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     boolean botStatus = true;
-    boolean isAutoAcceptJoinRequest = true;
 
     RssItem solidot = new RssItem("https://www.solidot.org/index.rss");
     RssItem jikeWakeUp = new RssItem("https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68");
     RssItem todayOnHistory = new RssItem("http://api.lssdjt.com/?ContentType=xml&appkey=rss.xml");
 
     MineStat times = new MineStat("bgp.sgsd.pw", 25846);
+    MineStat acraft = new MineStat("103.91.211.243",13300);
 
     String statusPath = CQ.getAppDirectory() + "status.json";
-    String configPatch = CQ.getAppDirectory() + "config.json";
+    String confPath = CQ.getAppDirectory() + "config.json";
+
+    long lastUseTime = 0L;
+    long currentTime = System.currentTimeMillis();
 
     /**
      * @brief Init plugin
@@ -61,14 +66,14 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 mySendPrivateMsg(fromQQ, "[Bot] 请输入需要转发的群号!");
                                 break;
                             case "acraft":
-                                mySendGroupMsg(552185847L, cmd[2].replaceFirst(" ", "") + cmd[3] + cmd[4]);
+                                mySendGroupMsg(552185847L, cmd[2].replaceFirst(" ", "") + cmd[3]);
                                 break;
                             case "times":
-                                mySendGroupMsg(111852382L, cmd[2].replaceFirst(" ", "") + cmd[3] + cmd[4]);
+                                mySendGroupMsg(111852382L, cmd[2].replaceFirst(" ", "") + cmd[3]);
                                 break;
                             default:
                                 if (StringUtils.isNumeric(cmd[1]))
-                                    mySendGroupMsg(Integer.parseInt(cmd[1]), cmd[2].replaceFirst(" ", "") + cmd[3] + cmd[4]);
+                                    mySendGroupMsg(Integer.parseInt(cmd[1]), cmd[2].replaceFirst(" ", "") + cmd[3]);
                                 else
                                     mySendPrivateMsg(fromQQ, "[Bot] 请检查群号是否有误!");
                         }
@@ -316,16 +321,24 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             groupMemberIncrease(subType, 100, fromGroup, fromQQ, parseQQ);
                             break;
                         case "serverinfo":
-                             mySendGroupMsg(fromGroup,
-                                     "在线玩家: " + times.getCurrentPlayers() + "/" + times.getMaximumPlayers()
-                                     + "\n延迟:" + times.getLatency());
+                            if (StringUtils.isNumeric(cmd[2])) {
+                                MineStat server = new MineStat(cmd[1], Integer.parseInt(cmd[2]));
+                                mySendGroupMsg(fromGroup,
+                                        "在线玩家: " + server.getCurrentPlayers() + "/" + server.getMaximumPlayers()
+                                        + "\n延迟:" + server.getLatency() + "ms"
+                                        + "\nMOTD: " + server.getMotd()
+                                        + "\n版本: " + server.getVersion());
+                            } else
+                                mySendGroupMsg(fromGroup, "[Bot] Please check IP address or Port.");
                              break;
                         default:
                             mySendGroupMsg(fromGroup,
                                     "Version: " + VerClass.VERSION + "\nDebug Menu:"
                                             + "\n RSS [URL] - Get context manually" + "\n reload - Reload config"
                                             + "\n save - Save config" + "\n parse - Parse JSON"
-                                            + "\n toh - Get todayOnHistory" + "\n wel [#/@]- Manually welcome");
+                                            + "\n toh - Get todayOnHistory" + "\n wel [#/@] - Manually welcome"
+                                            + "\n serverinfo [IP/addr] [Port] - Get Minecraft server info"
+                            );
                             break;
                         }
                     } else
@@ -373,16 +386,29 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             }
         }
         else if (msg.equals("服务器信息") || msg.equals("服务器状态") || msg.equals("/info")){
-            if (fromGroup == 111852382L){
-                if (times.isServerUp()){
-                    mySendGroupMsg(fromGroup, "= 时光隧道 - 五周目 =\n在线玩家: "
-                            + times.getCurrentPlayers()
-                            + "/" + times.getMaximumPlayers()
-                            + "\n" + "延迟: " + times.getLatency() + "ms"
-                    );
-                } else
-                    mySendGroupMsg(fromGroup, "[Bot] 无法连接至服务器, 可能正在维护?");
-            }
+            if (currentTime - lastUseTime >= 10000) {
+                lastUseTime = currentTime;
+                if (fromGroup == 111852382L) {
+                    if (times.isServerUp()) {
+                        mySendGroupMsg(fromGroup, "= 时光隧道 - 五周目 =\n在线玩家: "
+                                + times.getCurrentPlayers()
+                                + "/" + times.getMaximumPlayers()
+                                + "\n" + "延迟: " + times.getLatency() + "ms"
+                        );
+                    } else
+                        mySendGroupMsg(fromGroup, "[Bot] 无法连接至服务器, 可能正在维护?");
+                } else if (fromGroup == 552185847L) {
+                    if (acraft.isServerUp()) {
+                        mySendGroupMsg(fromGroup, CC.at(fromQQ) + "\n在线玩家: "
+                                + acraft.getCurrentPlayers()
+                                + "\n延迟: " + acraft.getLatency()
+                                + "ms\n\nACraft - 2019"
+                        );
+                    } else
+                        mySendGroupMsg(fromGroup, "[Bot] ACraft 目前可能正在维护, 稍等一会哟");
+                }
+            } else
+                mySendGroupMsg(fromGroup, "[Bot] 等一下再看服务器状态啦!");
         }
         return MSG_IGNORE;
 
@@ -395,6 +421,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
     public int enable() {
         enable = true;
+
+        HashMap<List, QQGroup> groups = new HashMap<>();
 
         readConf();
 
@@ -455,9 +483,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             solidot.setStatus(statusObject.getBooleanValue("solidot"));
             jikeWakeUp.setStatus(statusObject.getBooleanValue("jikeWakeUp"));
             todayOnHistory.setStatus(statusObject.getBooleanValue("todayOnHistory"));
-
-            JSONObject configObject = JSONObject.parseObject(FileProcess.readFile(configPatch));
-
         } catch (Exception e) {
         }
     }

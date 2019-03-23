@@ -6,6 +6,9 @@ public class QQGroup {
     private String joinMsg;
     private String kickMsg;
 
+    public QQGroup() {
+
+    }
     public boolean isAutoAcceptJoinRequest() {
         return autoAcceptJoinRequest;
     }
