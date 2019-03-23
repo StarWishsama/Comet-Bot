@@ -6,7 +6,6 @@ import me.dilley.MineStat;
 import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.*;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
@@ -22,8 +21,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     String statusPath = CQ.getAppDirectory() + "status.json";
     String confPath = CQ.getAppDirectory() + "config.json";
 
-    long lastUseTime = 0L;
-    long currentTime = System.currentTimeMillis();
+    static long lastUseTime = 0L;
+    static long currentTime = System.currentTimeMillis();
 
     /**
      * @brief Init plugin
@@ -321,8 +320,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             groupMemberIncrease(subType, 100, fromGroup, fromQQ, parseQQ);
                             break;
                         case "serverinfo":
-                            if (StringUtils.isNumeric(cmd[2])) {
-                                MineStat server = new MineStat(cmd[1], Integer.parseInt(cmd[2]));
+                            if (StringUtils.isNumeric(cmd[3])) {
+                                MineStat server = new MineStat(cmd[2], Integer.parseInt(cmd[3]));
                                 mySendGroupMsg(fromGroup,
                                         "在线玩家: " + server.getCurrentPlayers() + "/" + server.getMaximumPlayers()
                                         + "\n延迟:" + server.getLatency() + "ms"
@@ -386,7 +385,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             }
         }
         else if (msg.equals("服务器信息") || msg.equals("服务器状态") || msg.equals("/info")){
-            if (currentTime - lastUseTime >= 10000) {
+            if (currentTime - lastUseTime >= 1000) {
                 lastUseTime = currentTime;
                 if (fromGroup == 111852382L) {
                     if (times.isServerUp()) {
