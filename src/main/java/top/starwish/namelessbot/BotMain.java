@@ -15,7 +15,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     RssItem jikeWakeUp = new RssItem("https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68");
     RssItem todayOnHistory = new RssItem("http://api.lssdjt.com/?ContentType=xml&appkey=rss.xml");
 
-    MineStat ms = new MineStat("bgp.sgsd.pw", 25846);
+    MineStat times = new MineStat("bgp.sgsd.pw", 25846);
+    MineStat acraft = new MineStat("103.91.211.243",13300);
 
     String statusPath = CQ.getAppDirectory() + "status.json";
     String configPatch = CQ.getAppDirectory() + "config.json";
@@ -317,8 +318,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             break;
                         case "serverinfo":
                              mySendGroupMsg(fromGroup,
-                                     "在线玩家: " + ms.getCurrentPlayers() + "/" + ms.getMaximumPlayers()
-                                     + "\n延迟:" + ms.getLatency());
+                                     "在线玩家: " + times.getCurrentPlayers() + "/" + times.getMaximumPlayers()
+                                     + "\n延迟:" + times.getLatency());
                              break;
                         default:
                             mySendGroupMsg(fromGroup,
@@ -370,6 +371,28 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     mySendGroupMsg(fromGroup, "[Bot] 已启用机器人.");
                     botStatus = true;
                 }
+            }
+        }
+        else if (msg.equals("服务器信息") || msg.equals("服务器状态") || msg.equals("/info")){
+            if (fromGroup == 111852382L){
+                if (times.isServerUp()){
+                    mySendGroupMsg(fromGroup, "= 时光隧道 - 五周目 =\n在线玩家: "
+                            + times.getCurrentPlayers()
+                            + "/" + times.getMaximumPlayers()
+                            + "\n" + "延迟: " + times.getLatency() + "ms"
+                    );
+                } else
+                    mySendGroupMsg(fromGroup, "[Bot] 无法连接至服务器, 可能正在维护?");
+            }
+            else if (fromGroup == 552185847L){
+                if (acraft.isServerUp()){
+                    mySendGroupMsg(fromGroup, CC.at(fromQQ) + "在线玩家: "
+                            + acraft.getCurrentPlayers()
+                            + "\n延迟: " + acraft.getLatency()
+                            + "\n\nACraft - 2019"
+                    );
+                } else
+                    mySendGroupMsg(fromGroup, "[Bot] ACraft 目前可能正在维护, 稍等一会哟");
             }
         }
         return MSG_IGNORE;
