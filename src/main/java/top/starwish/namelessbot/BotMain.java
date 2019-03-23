@@ -21,9 +21,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     String statusPath = CQ.getAppDirectory() + "status.json";
     String confPath = CQ.getAppDirectory() + "config.json";
 
-    static long lastUseTime = 0L;
-    static long currentTime = System.currentTimeMillis();
-
+    long lastUseTime = 0L;
+    
     /**
      * @brief Init plugin
      * @return always 0
@@ -385,8 +384,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             }
         }
         else if (msg.equals("服务器信息") || msg.equals("服务器状态") || msg.equals("/info")){
-            if (currentTime - lastUseTime >= 1000) {
-                lastUseTime = currentTime;
+            long currentTime = System.currentTimeMillis();
+           // if (currentTime - lastUseTime >= 1000) {
+              //  lastUseTime = currentTime;
                 if (fromGroup == 111852382L) {
                     if (times.isServerUp()) {
                         mySendGroupMsg(fromGroup, "= 时光隧道 - 五周目 =\n在线玩家: "
@@ -403,11 +403,11 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 + "\n延迟: " + acraft.getLatency()
                                 + "ms\n\nACraft - 2019"
                         );
-                    } else
-                        mySendGroupMsg(fromGroup, "[Bot] ACraft 目前可能正在维护, 稍等一会哟");
+                  } else
+                      mySendGroupMsg(fromGroup, "[Bot] ACraft 目前可能正在维护, 稍等一会哟");
                 }
-            } else
-                mySendGroupMsg(fromGroup, "[Bot] 等一下再看服务器状态啦!");
+          //  } else
+             //   mySendGroupMsg(fromGroup, "[Bot] 等一下再看服务器状态啦!");
         }
         return MSG_IGNORE;
 
