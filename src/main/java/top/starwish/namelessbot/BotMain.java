@@ -16,7 +16,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     RssItem todayOnHistory = new RssItem("http://api.lssdjt.com/?ContentType=xml&appkey=rss.xml");
 
     MineStat times = new MineStat("bgp.sgsd.pw", 25846);
-    MineStat acraft = new MineStat("103.91.211.243",13300);
 
     String statusPath = CQ.getAppDirectory() + "status.json";
     String configPatch = CQ.getAppDirectory() + "config.json";
@@ -383,16 +382,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     );
                 } else
                     mySendGroupMsg(fromGroup, "[Bot] 无法连接至服务器, 可能正在维护?");
-            }
-            else if (fromGroup == 552185847L){
-                if (acraft.isServerUp()){
-                    mySendGroupMsg(fromGroup, CC.at(fromQQ) + "在线玩家: "
-                            + acraft.getCurrentPlayers()
-                            + "\n延迟: " + acraft.getLatency()
-                            + "\n\nACraft - 2019"
-                    );
-                } else
-                    mySendGroupMsg(fromGroup, "[Bot] ACraft 目前可能正在维护, 稍等一会哟");
             }
         }
         return MSG_IGNORE;
