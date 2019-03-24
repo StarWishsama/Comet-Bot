@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 
 // 此 Class 仅供调试使用
 public class TestClass {
-    static RssStatus solidot = new RssStatus();
-    static RssStatus jikeWakeUp = new RssStatus();
+    static RssItem solidot = new RssItem();
+    static RssItem jikeWakeUp = new RssItem();
     static String msg = "!mute 1448839220 1h10m";
     static boolean isAdmin = true;
     static boolean botStatus = false;

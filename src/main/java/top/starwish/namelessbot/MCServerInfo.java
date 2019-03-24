@@ -20,15 +20,12 @@ public class MCServerInfo {
     public void setServerIP(String serverIP){
         this.serverIP = serverIP;
     }
-
     public int getServerPort(){
         return serverPort;
     }
-
     public void setServerPort(int serverPort){
         this.serverPort = serverPort;
     }
-
     public String getServerInfo(){
         return ServerInfo(serverIP, serverPort);
     }
