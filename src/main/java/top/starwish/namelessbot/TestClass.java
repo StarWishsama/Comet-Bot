@@ -4,27 +4,23 @@ import com.alibaba.fastjson.JSONObject;
 
 // 此 Class 仅供调试使用
 public class TestClass {
-    static RssItem solidot = new RssItem();
-    static RssItem jikeWakeUp = new RssItem();
+    static RssStatus solidot = new RssStatus();
+    static RssStatus jikeWakeUp = new RssStatus();
     static String msg = "!mute 1448839220 1h10m";
     static boolean isAdmin = true;
     static boolean botStatus = false;
     static long fromGroup = 0;
     static String configPath= System.getProperty("user.dir") + "\\build\\myfile.json";
 
-    public static void main(String[] args) {
-       
-        try {
-            JSONObject jsonObject = JSONObject.parseObject(FileProcess.readFile(configPath));
-            botStatus = jsonObject.getBooleanValue("botStatus");
-            solidot.setStatus(jsonObject.getBooleanValue("solidot"));
-            jikeWakeUp.setStatus(jsonObject.getBooleanValue("jikeWakeUp"));
+    static long lastUseTime = 0L;
+    static long currentTime = System.currentTimeMillis();
 
-        } catch (Exception e) {
-            botStatus = true;
-            solidot.enable();
-            jikeWakeUp.enable();
-            saveConf();
+    public static void main(String[] args) {
+        if (currentTime - lastUseTime >= 10000) {
+            lastUseTime = currentTime;
+            System.out.println("success");
+        } else {
+            System.out.println("You have to wait: " + (10000 - (currentTime - lastUseTime)) + " more ms!");
         }
     }
 

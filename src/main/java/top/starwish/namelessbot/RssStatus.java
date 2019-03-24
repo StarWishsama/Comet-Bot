@@ -7,14 +7,14 @@ import com.rometools.rome.io.XmlReader;
 import java.net.URL;
 import java.util.*;
 
-public class RssItem {
+public class RssStatus {
     private String address;
     private boolean ifEnabled;
 
     // main 函数仅供调试使用
     public static void main(String[] args) {
         String URL = "http://api.lssdjt.com/?ContentType=xml&appkey=rss.xml";
-        String text = new RssItem(URL).getContext();
+        String text = new RssStatus(URL).getContext();
         text = "CC.face(74)" + "各位时光隧道玩家早上好" + "\n今天是" + Calendar.getInstance().get(Calendar.YEAR) + "年"
         + (Calendar.getInstance().get(Calendar.MONTH) + 1) + "月"
         + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "日" + "，"
@@ -23,10 +23,10 @@ public class RssItem {
         System.out.println(text);
     }
 
-    public RssItem() {
+    public RssStatus() {
     }
 
-    public RssItem(String addr) {
+    public RssStatus(String addr) {
         address = addr;
     }
 
