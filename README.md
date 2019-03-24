@@ -2,11 +2,19 @@
 
 A QQ Group bot developed for CoolQ-Air/Pro.
 
+Need [JCQ-CoolQ](https://github.com/Meowya/JCQ-CoolQ) as dependency!
+
 Simplified Chinese Edition 中文版本: [README](https://github.com/StarWishsama/Nameless-Bot/blob/master/README_zhCN.md)
 <p align="left">
   <a href="https://travis-ci.org/StarWishsama/Nameless-Bot">
     <img src="https://api.travis-ci.org/StarWishsama/Nameless-Bot.svg?branch=master">
   </a>
+  <a href="https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/StarWishsama/Nameless-Bot.svg?style=popout">
+  </a>
+  <a href="https://github.com/StarWishsama/Nameless-Bot/issues">
+    <img src="https://img.shields.io/github/issues/StarWishsama/Nameless-Bot.svg?style=popout">
+  </a> 
 </p>
 
 ## ☑️ To-Do 
