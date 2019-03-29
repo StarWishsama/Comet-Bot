@@ -1,0 +1,15 @@
+{
+  "ServerInfo": {
+    "111852382": {
+      "serverIP": "bgp.sgsd.pw",
+      "serverPort": "25846",
+      "infoMessage": "= 时光隧道五周目 =\\n在线玩家: %在线玩家%\\n延迟: %延迟%"
+    },
+    "QQGroupID": {
+      "serverIP": "",
+      "serverPort": "",
+      "infoMessage": ""
+    }
+  },
+  "CantConnectMessage": "无法连接至服务器 %addr%"
+}

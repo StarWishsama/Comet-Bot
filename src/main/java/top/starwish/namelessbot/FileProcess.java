@@ -12,7 +12,7 @@ import java.util.UUID;
 
 /**
  * @author 夕橘子-O & Stiven.ding
- * @see https://www.cnblogs.com/XiOrang/p/5652875.html
+ * https://www.cnblogs.com/XiOrang/p/5652875.html
  */
 
 public class FileProcess {

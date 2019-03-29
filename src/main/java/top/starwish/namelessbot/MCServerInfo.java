@@ -6,9 +6,6 @@ public class MCServerInfo {
     private String serverIP;
     private int serverPort;
 
-    public MCServerInfo(){
-    }
-
     public MCServerInfo(String addr, int port){
         serverIP = addr;
         serverPort = port;
@@ -20,15 +17,12 @@ public class MCServerInfo {
     public void setServerIP(String serverIP){
         this.serverIP = serverIP;
     }
-
     public int getServerPort(){
         return serverPort;
     }
-
     public void setServerPort(int serverPort){
         this.serverPort = serverPort;
     }
-
     public String getServerInfo(){
         return ServerInfo(serverIP, serverPort);
     }
@@ -41,6 +35,6 @@ public class MCServerInfo {
                     + "\nMOTD: " + server.getMotd()
                     + "\n版本: " + server.getVersion());
         } else
-            return ("[Bot] Couldn't connect to " + addr);
+            return ("[Bot] 无法连接至 " + addr);
     }
 }
