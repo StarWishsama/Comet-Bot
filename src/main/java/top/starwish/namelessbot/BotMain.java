@@ -3,15 +3,16 @@ package top.starwish.namelessbot;
 import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
 import me.dilley.MineStat;
+import net.kronos.rkon.core.Rcon;
 import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.*;
 
-import java.io.File;
 import java.util.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     String statusPath = CQ.getAppDirectory() + "status.json";
     String serverInfoPath = CQ.getAppDirectory() + "serverinfo.json";
+    String rconPath = CQ.getAppDirectory() + "rcon.json";
 
     boolean botStatus = true;
 
@@ -20,6 +21,11 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     int serverPort = 0;
     String cantconnect = null;
     String infoMessage = null;
+
+    String rconIP = "rconIP";
+    int rconPort = 0;
+    String rconPwd = "rconPassword";
+    boolean isRcon = true;
 
     RssItem solidot = new RssItem("https://www.solidot.org/index.rss");
     RssItem jikeWakeUp = new RssItem("https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68");
@@ -43,7 +49,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         if (msg.startsWith("/")) {
             // process only after there's a command, in order to get rid of memory trash
             String temp = msg.trim();
-            String cmd[] = { "", "", "", "" };
+            String cmd[] = { "", "", "", "", "" };
 
             /**
              * @brief Processing msg into cmd & params
@@ -51,7 +57,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
              * @author Stiven.ding
              */
 
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 5; i++) {
                 temp = temp.trim();
                 if (temp.indexOf(' ') > 0) {
                     cmd[i] = temp.substring(0, temp.indexOf(' '));
@@ -62,10 +68,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                 }
             }
             cmd[0] = cmd[0].substring(1); // del '!'/'/' at the beginning of cmd
-            if (fromQQ == 1552409060L || fromQQ == 1448839220L) {
+            if (fromQQ == 1552409060L || fromQQ == 1448839220L || fromQQ == 854742624L) {
                 switch (cmd[0]) {
                     case "say":
-                        String message = msg.replaceAll(cmd[0] + " ", "").replaceAll(cmd[1] + " ", "");
+                        String message = msg.replaceAll("/" + cmd[0] + " ", "").replaceAll(cmd[1] + " ", "");
                         switch (cmd[1]) {
                             case "":
                                 mySendPrivateMsg(fromQQ, "[Bot] 请输入需要转发的群号!");
@@ -93,10 +99,36 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             botStatus = true;
                         }
                         break;
+                    case "rcon":
+                        if (isRcon) {
+                            if (!cmd[1].equals("")) {
+                                if (fromQQ == 854742624L) {
+                                    try {
+                                        Rcon rcon = new Rcon("103.91.211.243", Integer.parseInt(cmd[3]), cmd[4].getBytes());
+                                        String result = rcon.command(cmd[1]);
+                                        mySendPrivateMsg(fromQQ, result);
+                                    } catch (Exception e) {
+                                        mySendPrivateMsg(fromQQ, "[Bot] 无法连接至服务器");
+                                    }
+                                } else {
+                                    try {
+                                        Rcon rcon = new Rcon(rconIP, rconPort, rconPwd.getBytes());
+                                        String result = rcon.command(cmd[1]);
+                                        mySendPrivateMsg(fromQQ, result);
+                                    } catch (Exception e) {
+                                        mySendPrivateMsg(fromQQ, "[Bot] 无法连接至服务器");
+                                    }
+                                }
+                            } else
+                                mySendPrivateMsg(fromQQ, "[Bot] 请输入需要执行的命令! (不需要带\"/\")");
+                        } else
+                            mySendPrivateMsg(fromQQ, "[Bot] 很抱歉, 机器人没有启用 RCON 功能.");
+                        break;
                     case "help":
                         mySendPrivateMsg(fromQQ, "= 无名Bot " + VerClass.VERSION + " ="
                                 + "\n /say [指定群] [内容]"
                                 + "\n /switch [on/off]"
+                                + "\n /rcon [Command] (Nameless's Test Server by default)"
                         );
                         break;
                 }
@@ -114,7 +146,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             boolean isAdmin = CQ.getGroupMemberInfoV2(fromGroup, fromQQ).getAuthority() > 1;
             // process only after there's a command, in order to get rid of memory trash
             String temp = msg.trim();
-            String cmd[] = {"", "", "", ""};
+            String cmd[] = {"", "", "", "", ""};
 
             /**
              * @brief Processing msg into cmd & params
@@ -325,7 +357,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     break;
                                 case "serverinfo":
                                     if (!cmd[2].equals("") && StringUtils.isNumeric(cmd[3])) {
-                                        mySendGroupMsg(fromGroup, new MCServerInfo(cmd[2], Integer.parseInt(cmd[3])).getServerInfo());
+                                        mySendGroupMsg(fromGroup, new MCServer(cmd[2], Integer.parseInt(cmd[3])).getServerInfo());
                                     } else
                                         mySendGroupMsg(fromGroup, "[Bot] Please check IP address or Port.");
                                     break;
@@ -381,7 +413,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                 }
             }
         }
-        else if (msg.equals("服务器信息") || msg.equals("服务器状态") || msg.equals("/info")){
+        else if (msg.equals("服务器信息") || msg.equals("服务器状态")){
             if (botStatus) {
                 if (fromGroup == 111852382L) {
                     // 防止获取的数据永远一样
@@ -445,7 +477,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
-                if (Calendar.getInstance().get(Calendar.MINUTE) == 30)
+                if (Calendar.getInstance().get(Calendar.MINUTE) == 15)
                     saveConf(); // 每小时保存一次
 
                 // todayOnHistory @ 7:30 AM
@@ -489,26 +521,49 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             solidot.setStatus(statusObject.getBooleanValue("solidot"));
             jikeWakeUp.setStatus(statusObject.getBooleanValue("jikeWakeUp"));
             todayOnHistory.setStatus(statusObject.getBooleanValue("todayOnHistory"));
+
+            JSONObject rconObject = JSONObject.parseObject(FileProcess.readFile(rconPath));
+            rconIP = rconObject.getString("rconIP");
+            rconPort = rconObject.getIntValue("rconPort");
+            rconPwd = rconObject.getString("rconPwd");
+            isRcon = rconObject.getBooleanValue("RconFunction");
         } catch (Exception e) {
         }
     }
 
     public String saveConf() {
+        // 状态json
         JSONObject statusObject = new JSONObject();
         statusObject.put("botStatus", botStatus);
         statusObject.put("solidot", solidot.getStatus());
         statusObject.put("jikeWakeUp", jikeWakeUp.getStatus());
         statusObject.put("todayOnHistory", todayOnHistory.getStatus());
         FileProcess.createFile(statusPath, statusObject.toJSONString());
-        JSONObject serverInfoObject = new JSONObject();
-        serverInfoObject.put("groups", "");
+
+        // 服务器信息json (WIP)
+        JSONArray serverInfoArray = new JSONArray();
         List groups = CQ.getGroupList();
-        for (int i = 0; i < groups.size(); i++) {
-            serverInfoObject.put(String.format("%d", groups.get(i)), "test");
+        for (Object group : groups) {
+            try {
+                JSONObject serverInfoObject = new JSONObject();
+                serverInfoObject.put(String.valueOf(group), "key");
+                serverInfoArray.add(serverInfoObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        FileProcess.createFile(serverInfoPath, serverInfoObject.toJSONString());
+        FileProcess.createFile(serverInfoPath, serverInfoArray.toJSONString());
+
+        // Rcon配置json
+        JSONObject rconObject = new JSONObject();
+        rconObject.put("rconIP", rconIP);
+        rconObject.put("rconPort", rconPort);
+        rconObject.put("rconPwd", rconPwd);
+        rconObject.put("RconFunction", isRcon);
+        FileProcess.createFile(rconPath, rconObject.toJSONString());
+
         CQ.logDebug("JSON", "配置已保存.");
-        return statusObject.toJSONString();
+        return statusObject.toJSONString() + "\n" + serverInfoArray.toJSONString() + "\n" + rconObject.toJSONString();
     }
 
     public int groupMemberDecrease(int subtype, int sendTime, long fromGroup, long fromQQ, long beingOperateQQ) {

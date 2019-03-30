@@ -1,6 +1,10 @@
 package top.starwish.namelessbot;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.sobte.cqp.jcq.entity.CoolQ;
+import com.sobte.cqp.jcq.event.JcqAppAbstract;
+
 
 // 此 Class 仅供调试使用
 public class TestClass {
@@ -12,16 +16,8 @@ public class TestClass {
     static long fromGroup = 0;
     static String configPath= System.getProperty("user.dir") + "\\build\\myfile.json";
 
-    static long lastUseTime = 0L;
-    static long currentTime = System.currentTimeMillis();
 
     public static void main(String[] args) {
-        if (currentTime - lastUseTime >= 10000) {
-            lastUseTime = currentTime;
-            System.out.println("success");
-        } else {
-            System.out.println("You have to wait: " + (10000 - (currentTime - lastUseTime)) + " more ms!");
-        }
     }
 
     
