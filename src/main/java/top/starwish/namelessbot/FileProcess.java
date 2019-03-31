@@ -45,7 +45,7 @@ public class FileProcess {
         try {
             file.createNewFile();
             bool = true;
-            System.out.print("[JSON] Create file successfully at " + path);
+            System.out.print("[JSON] Create file successfully at " + path + "\n");
             writeFileContent(path, filecontent);
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,7 +155,7 @@ public class FileProcess {
     /**
      * 删除文件
      * 
-     * @param paht 文件路径
+     * @param path 文件路径
      * @return
      */
     public static boolean delFile(String path) {
