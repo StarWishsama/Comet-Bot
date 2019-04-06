@@ -5,7 +5,7 @@
   "ret": 1, // 返回码，固定为1
   "apiver": 9, // Api版本，本SDK为9
   "name": "Nameless Bot", // 应用名称
-  "version": "1.3.2-DEV", // 应用版本
+  "version": "1.3.6-SNAPSHOT", // 应用版本
   "version_id": 1, // 应用顺序版本（每次发布时至少+1）
   "author": "Stiven.D/Nameless", // 应用作者
   //"path": "lib",// 应用lib加载处，默认插件同名文件夹目录下lib文件夹，此目录可以填相对路径和绝对路径，相对：应用同名文件夹
