@@ -1,9 +1,7 @@
 package top.starwish.namelessbot;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.sobte.cqp.jcq.entity.CoolQ;
-import com.sobte.cqp.jcq.event.JcqAppAbstract;
+import top.starwish.namelessbot.entity.RssItem;
 
 
 // 此 Class 仅供调试使用
@@ -15,6 +13,7 @@ public class TestClass {
     static boolean botStatus = false;
     static long fromGroup = 0;
     static String configPath= System.getProperty("user.dir") + "\\build\\myfile.json";
+
 
 
     public static void main(String[] args) {

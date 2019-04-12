@@ -58,6 +58,10 @@ public class RssItem {
         return (simplifyHTML(getFromURL(address)));
     }
 
+    public String getTitle() {
+        return (simplifyHTML(getTitleFromURL(address)));
+    }
+
     // 此函数仅供内部调用，正常情况下不应调用
     private static String getFromURL(String addr) {
         try {
@@ -73,6 +77,23 @@ public class RssItem {
             return (entry.getTitle() + "\n" + "-------------------------\n" + entry.getDescription().getValue().trim());
         } catch (Exception e) {
             e.printStackTrace();
+            return ("Encountered a wrong URL or a network error.");
+        }
+    }
+
+    private static String getTitleFromURL(String addr){
+        try {
+            URL url = new URL(addr);
+            XmlReader reader = new XmlReader(url);
+            SyndFeedInput input = new SyndFeedInput();
+            // 得到SyndFeed对象，即得到RSS源里的所有信息
+            SyndFeed feed = input.build(reader);
+            // 得到Rss新闻中子项列表
+            List<SyndEntry> entries = feed.getEntries();
+            SyndEntry entry = entries.get(0);
+            return entry.getTitle();
+        } catch (Exception e){
+                e.printStackTrace();
             return ("Encountered a wrong URL or a network error.");
         }
     }
