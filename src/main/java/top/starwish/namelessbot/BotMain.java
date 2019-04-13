@@ -46,6 +46,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     long ownerQQ = 0;
     List<Long> adminIds = new ArrayList();
 
+    // Cooldown system
+    HashMap<Long, Long> cooldown = new HashMap<Long, Long>();
+    int coolDownTime = 30;
+
     // main 函数仅供调试使用
     public static void main (String[] args) {
 
