@@ -17,7 +17,7 @@ import java.util.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     String statusPath = CQ.getAppDirectory() + "status.json";
-    String serverInfoPath = CQ.getAppDirectory() + "serverinfo.json";
+    String groupsPath = CQ.getAppDirectory() + "serverinfo.json";
     String rconPath = CQ.getAppDirectory() + "rcon.json";
 
     boolean botStatus = true;
@@ -45,10 +45,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
     long ownerQQ = 0;
     List<Long> adminIds = new ArrayList();
-
-    // Cooldown system
-    HashMap<Long, Long> cooldown = new HashMap<Long, Long>();
-    int coolDownTime = 30;
 
     // main 函数仅供调试使用
     public static void main (String[] args) {
@@ -702,7 +698,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             /**
              * @TODO 每个群可以获取不同的服务器信息
              */
-            JSONObject serverInfoObject = JSONObject.parseObject(FileProcess.readFile(serverInfoPath));
+            JSONObject groupsObject = JSONObject.parseObject(FileProcess.readFile(groupsPath));
         } catch (Exception e) {
         }
     }
@@ -728,14 +724,14 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
           JSONObject groupObject = new JSONObject();
 
         if (CQ.getGroupList() != null) {
-            groupObject.put("" + groupId, serverInfoPath);
+            groupObject.put("" + groupId, groupsPath);
         } else
             CQ.logError("NamelessBot", "机器人没有加入任何一个QQ群!");
 
         JSONObject settingObject = new JSONObject();
         settingObject.put("groups_settings", groupObject);
 
-        FileProcess.createFile(serverInfoPath, JSONObject.toJSONString(settingObject, WriteMapNullValue));
+        FileProcess.createFile(groupsPath, JSONObject.toJSONString(settingObject, WriteMapNullValue));
          */
 
         // Rcon配置json
@@ -755,7 +751,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
         CQ.logDebug("JSON", "配置已保存.");
 
-        return "status.json:\n" + statusObject.toJSONString() + "\nrcon.json:\n" + rconObject.toJSONString() + "\nadmins.json: " + adminsObject.toJSONString();
+        return "status.json:\n" + statusObject.toJSONString();
     }
 
     public boolean configStartup(){
@@ -791,7 +787,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             else if (fromGroup == 552185847L){
                 mySendGroupMsg(552185847L, CC.at(beingOperateQQ) + " 欢迎加入ACraft!");
             }
-            else return MSG_IGNORE;
         }
         return MSG_IGNORE;
     }
