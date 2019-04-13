@@ -17,7 +17,7 @@
 </p>
 
 ## ☑️ To-Do 列表
-详见 [Trello](https://trello.com/b/cTpUj0s4/nameless-bot)
+详见 [Project Page](https://github.com/StarWishsama/Nameless-Bot/projects/2)
 
 ## 💽 如何构建
 
