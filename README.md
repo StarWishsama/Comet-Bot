@@ -18,7 +18,7 @@ Simplified Chinese Edition 中文版本: [README](https://github.com/StarWishsam
 </p>
 
 ## ☑️ To-Do 
-Development Roadmap: [Trello](https://trello.com/b/cTpUj0s4/nameless-bot)
+Development Roadmap: [Project Page](https://github.com/StarWishsama/Nameless-Bot/projects/2)
 
 ## 💽 How to Build 
 
@@ -30,8 +30,7 @@ git clone https://github.com/StarWishsama/Nameless-Bot.git
 
 2. Compile
 
-Both configurations for Gradle and Maven are well done (when consider Gradle first when conflict.) 
-Specifically for Gradle running on Windows, double-click `gradlew.bat` in the root directory to compile a jar file in folder `/build/libs`.
+Configurations for Gradle is well done. Double-click `gradlew.bat` in the root directory to compile a jar file in folder `/build/libs`.
 
 ## 📜 License 
 [GPL v3.0](https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE)
