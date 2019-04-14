@@ -124,7 +124,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                         try {
                                             String decodedPwd = RSAUtils.privateDecrypt(encodedPwd, RSAUtils.getPrivateKey(privateKey));
                                             Rcon rcon = new Rcon(rconIP, rconPort, decodedPwd.getBytes());
-                                            String result = rcon.command(cmd[2]);
+                                            String result = rcon.command(msg.replace("/rcon cmd ", ""));
                                             mySendPrivateMsg(fromQQ, "[Bot] " + result);
                                         } catch (Exception e) {
                                             mySendPrivateMsg(fromQQ, "[Bot] 无法连接至服务器");
@@ -338,7 +338,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         break;
                     // 禁言
                     case "mute":
-                        if (isGroupAdmin) {
+                        if (isGroupAdmin || isBotAdmin || isOwner) {
                             if (cmd[1].equals("")) {
                                 mySendGroupMsg(fromGroup, "[Bot] 用法: /mute [@/QQ号] [时间(秒)]");
                             } else if (cmd[1].equals("all")) {
@@ -381,7 +381,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         break;
                     // 解除禁言
                     case "unmute":
-                        if (isGroupAdmin) {
+                        if (isGroupAdmin || isBotAdmin || isOwner) {
                             if (cmd[1].equals("")) {
                                 mySendGroupMsg(fromGroup, "[Bot] 用法: /unmute [at需要解禁的人]");
                             } else if (cmd[1].equals("all")) {
