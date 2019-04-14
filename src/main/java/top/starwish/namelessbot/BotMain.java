@@ -46,6 +46,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     long ownerQQ = 0;
     List<Long> adminIds = new ArrayList();
 
+    List<Long> groups = new ArrayList();
+
     // main 函数仅供调试使用
     public static void main (String[] args) {
 
@@ -62,6 +64,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
     public int privateMsg(int subType, int msgId, long fromQQ, String msg, int font) {
         if (msg.startsWith("/")) {
+            boolean isBotAdmin = adminIds.toString().contains(fromQQ + "");
+            boolean isOwner = fromQQ == ownerQQ;
+
             // process only after there's a command, in order to get rid of memory trash
             String temp = msg.trim();
             String cmd[] = { "", "", "", "", ""};
@@ -85,7 +90,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             cmd[0] = cmd[0].substring(1); // del '!'/'/' at the beginning of cmd
 
 
-            if (adminIds.toString().contains(fromQQ + "") || fromQQ == ownerQQ) {
+            if (isBotAdmin || isOwner) {
                 switch (cmd[0]) {
                     case "say":
                         String message = msg.replaceAll("/" + cmd[0] + " ", "").replaceAll(cmd[1] + " ", "");
@@ -177,7 +182,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             mySendPrivateMsg(fromQQ, "[Bot] 已打开 Rcon 功能. ");
                         break;
                     case "admin":
-                        if (fromQQ == ownerQQ){
+                        if (isOwner){
                             switch (cmd[1]) {
                                 case "list":
                                     mySendPrivateMsg(fromQQ, "[Bot] 机器人管理员列表: " + adminIds.toString());
@@ -199,6 +204,37 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             }
                         } else
                             mySendPrivateMsg(fromQQ, "[Bot] 你不是我的主人, 无法设置管理员哟");
+                        break;
+                    case "group":
+                        switch (cmd[1]){
+                            case "list":
+                                mySendPrivateMsg(fromQQ, "群列表: " + groups.toString());
+                                break;
+                            case "add":
+                                if (!cmd[2].equals("") && StringUtils.isNumeric(cmd[2])){
+                                    long groupId = Integer.parseInt(cmd[2]);
+                                    groups.add(groupId);
+                                    mySendPrivateMsg(fromQQ, "[Bot] 已添加群 " + groupId);
+                                }
+                                break;
+                            case "del":
+                                if (!cmd[2].equals("") && StringUtils.isNumeric(cmd[2])){
+                                    long groupId = Integer.parseInt(cmd[2]);
+                                    groups.remove(groupId);
+                                    mySendPrivateMsg(fromQQ, "[Bot] 已删除群 " + groupId);
+                                }
+                                break;
+                            case "set":
+                                break;
+                            default:
+                                mySendPrivateMsg(fromQQ, "= Bot 群组管理 =" +
+                                                " /group list 列出所有已添加的群(需要手动添加!)" +
+                                                " /group add [群号] 新增一个群" +
+                                                " /group del [群号] 删除一个群" +
+                                                " /group set 设置某个群的设置"
+                                        );
+                                break;
+                        }
                         break;
                 }
             }
