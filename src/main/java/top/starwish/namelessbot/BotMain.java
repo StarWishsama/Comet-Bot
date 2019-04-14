@@ -17,7 +17,7 @@ import java.util.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     String statusPath = CQ.getAppDirectory() + "status.json";
-    String groupsPath = CQ.getAppDirectory() + "serverinfo.json";
+    String groupsPath = CQ.getAppDirectory() + "groupsettings.json";
     String rconPath = CQ.getAppDirectory() + "rcon.json";
 
     boolean botStatus = true;
@@ -47,6 +47,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     List<Long> adminIds = new ArrayList();
 
     List<Long> groups = new ArrayList();
+    List<Long> autoaccept = new ArrayList();
 
     // main 函数仅供调试使用
     public static void main (String[] args) {
@@ -225,6 +226,33 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 }
                                 break;
                             case "set":
+                                switch (cmd[2]){
+                                    case "autoaccept":
+                                        if (!cmd[3].equals("") && !cmd[4].equals("")){
+                                            if (StringUtils.isNumeric(cmd[3])){
+                                                if (cmd[4].equals("t")){
+                                                    long groupId = Integer.parseInt(cmd[3]);
+                                                    autoaccept.add(groupId);
+                                                } else if (cmd[4].equals("f")){
+                                                    long groupId = Integer.parseInt(cmd[3]);
+                                                    autoaccept.remove(groupId);
+                                                }
+                                            } else
+                                                mySendPrivateMsg(fromQQ, "[Bot] 群号格式有误");
+                                        } else
+                                            mySendPrivateMsg(fromQQ, "[Bot] /group set autoaccept [群号] [t/f]");
+                                        break;
+                                    case "serverinfo":
+                                        break;
+                                    case "joinmsg":
+                                        break;
+                                    default:
+                                        mySendPrivateMsg(fromQQ, "= 群设置帮助 =\n" +
+                                                "/group set autoaccept [群号] [t/f]\n" +
+                                                "/group set serverinfo [群号] [服务器IP] [端口] [信息样式]\n" +
+                                                "/group set joinmsg [群号] [入群欢迎消息]");
+                                        break;
+                                }
                                 break;
                             default:
                                 mySendPrivateMsg(fromQQ, "= Bot 群组管理 =" +
@@ -686,8 +714,11 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             String title = solidot.getTitle();
                             if (!temptitle.equals("") && !temptitle.equals(title)) {
                                 String context = solidot.getContext() + "\nSolidot 推送\nPowered by NamelessBot";
-                                FileProcess.createFile(temppath, solidot.getTitle());
                                 mySendGroupMsg(111852382L, context);
+                                try {
+                                    FileProcess.createFile(temppath, solidot.getTitle());
+                                } catch (Exception ignored){
+                                }
                             }
                         }
                     }
@@ -723,18 +754,15 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             rconPwd = rconObject.getString("rconPwd");
             isRcon = rconObject.getBooleanValue("RconFunction");
 
-            /**
-             * @TODO 管理机器人的管理员
-             */
             JSONObject adminsObject = JSONObject.parseObject(FileProcess.readFile(CQ.getAppDirectory() + "admins.json"));
             ownerQQ = adminsObject.getLong("owner");
             String testStr = adminsObject.getString("admins");
             adminIds = JSON.parseObject(testStr, new TypeReference<List<Long>>(){});
 
-            /**
-             * @TODO 每个群可以获取不同的服务器信息
-             */
             JSONObject groupsObject = JSONObject.parseObject(FileProcess.readFile(groupsPath));
+            String testStr2 = groupsObject.getString("autoAccept");
+            autoaccept = JSON.parseObject(testStr2, new TypeReference<List<Long>>(){});
+
         } catch (Exception e) {
         }
     }
@@ -785,6 +813,11 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         adminsObject.put("owner", ownerQQ);
         FileProcess.createFile(adminsPath, adminsObject.toJSONString());
 
+        //群设置json (WIP)
+        JSONObject groupSettingObject = new JSONObject();
+        groupSettingObject.put("autoAccept", autoaccept.toString());
+        FileProcess.createFile(groupsPath, groupSettingObject.toJSONString());
+
         CQ.logDebug("JSON", "配置已保存.");
 
         return "status.json:\n" + statusObject.toJSONString();
@@ -828,7 +861,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     }
 
     public int friendAdd(int subtype, int sendTime, long fromQQ) {
-        CQ.sendPrivateMsg(1552409060L, CQ.getStrangerInfo(fromQQ).getNick() + "(" + fromQQ + ") " + "向机器人发送了好友请求");
+        CQ.sendPrivateMsg(ownerQQ, CQ.getStrangerInfo(fromQQ).getNick() + "(" + fromQQ + ") " + "向机器人发送了好友请求");
         return MSG_IGNORE;
     }
 
@@ -838,6 +871,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
     public int requestAddGroup(int subtype, int sendTime, long fromGroup, long fromQQ, String msg,
             String responseFlag) {
+        if (autoaccept.contains(fromGroup) && subtype == 1){
+            CQ.setGroupAddRequest(responseFlag, REQUEST_GROUP_ADD, REQUEST_ADOPT, null);
+        }
         return MSG_IGNORE;
     }
 
