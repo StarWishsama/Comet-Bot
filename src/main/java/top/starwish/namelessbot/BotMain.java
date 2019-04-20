@@ -48,7 +48,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
     // Group settings
     List<Long> autoaccept = new ArrayList();
-    HashMap<Long, String> joinmsg = new HashMap();
+    HashMap<Long, String> joinmsg = new HashMap<>();
 
     // main 函数仅供调试使用
     public static void main (String[] args) {
@@ -221,10 +221,17 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                                     long groupId = Integer.parseInt(cmd[3]);
                                                     if (!autoaccept.contains(groupId)) {
                                                         autoaccept.add(groupId);
-                                                    }
+                                                        mySendPrivateMsg(fromQQ, "[Bot] 已打开 " + groupId + "的自动接受入群请求.");
+                                                    } else
+                                                        mySendPrivateMsg(fromQQ, "[Bot] " + groupId + " 已打开自动接受入群请求了.");
                                                 } else if (cmd[4].equals("f")){
                                                     long groupId = Integer.parseInt(cmd[3]);
-                                                    autoaccept.remove(groupId);
+                                                    if (!autoaccept.contains(groupId)){
+                                                        mySendPrivateMsg(fromQQ, "[Bot] " + groupId + " 已关闭自动接受入群请求了.");
+                                                    } else {
+                                                        autoaccept.remove(groupId);
+                                                        mySendPrivateMsg(fromQQ, "[Bot] 已关闭 " + groupId + "的自动接受入群请求.");
+                                                    }
                                                 }
                                             } else
                                                 mySendPrivateMsg(fromQQ, "[Bot] 群号格式有误");
@@ -239,6 +246,17 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                                 long groupId = Integer.parseInt(cmd[3]);
                                                 if (!joinmsg.containsKey(groupId)){
                                                     joinmsg.put(groupId, cmd[4]);
+                                                    mySendPrivateMsg(fromQQ, "[Bot] 已打开群 " + groupId + " 的加群欢迎功能.");
+                                                } else {
+                                                    mySendPrivateMsg(fromQQ, "[Bot] 该群已经打开加群欢迎功能了!");
+                                                }
+                                            }
+                                            else if (cmd[3].equals("del") && StringUtils.isNumeric(cmd[4])){
+                                                long groupId = Integer.parseInt(cmd[4]);
+                                                if (!joinmsg.containsKey(groupId)){
+                                                    mySendPrivateMsg(fromQQ, "[Bot] 该群没有打开加群欢迎功能!");
+                                                } else {
+                                                    mySendPrivateMsg(fromQQ, "[Bot] 已关闭群 " + groupId + " 的加群欢迎功能.");
                                                 }
                                             } else
                                                 mySendPrivateMsg(fromQQ, "[Bot] 群号格式有误");
@@ -247,7 +265,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     default:
                                         mySendPrivateMsg(fromQQ, "= 群设置帮助 =\n" +
                                                 "/group set autoaccept [群号] [t/f]\n" +
-                                                "/group set serverinfo [群号] [服务器IP] [端口] [信息样式]\n" +
+                                                "[WIP] /group set serverinfo [群号] [服务器IP] [端口] [信息样式]\n" +
                                                 "/group set joinmsg [群号] [入群欢迎消息]");
                                         break;
                                 }
@@ -428,9 +446,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     }
                                     if (banTime < 1)
                                         throw new NumberFormatException("Equal or less than 0");
-                                    if (banTime <= 30 * 24 * 60 * 60)
+                                    if (banTime <= 30 * 24 * 60 * 60) {
                                         CQ.setGroupBan(fromGroup, banQQ, banTime);
-                                    else
+                                        mySendGroupMsg(fromGroup, "[Bot] 已禁言 " + CQ.getStrangerInfo(banQQ).getNick() + "(" + banQQ + ") " + banTime / 60 + "分钟.");
+                                    } else
                                         mySendGroupMsg(fromGroup, "[Bot] 时间长度太大了！");
                                 } catch (Exception e) {
                                     mySendGroupMsg(fromGroup, "[Bot] 命令格式有误! 用法: /mute [@/QQ号] [dhm]");
@@ -511,18 +530,15 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                         break;
                     case "kick":
-                        if (isGroupAdmin) {
+                        if (isGroupAdmin || isBotAdmin || isOwner) {
                             long kickQQ = StringUtils.isNumeric(cmd[1]) ? Integer.parseInt(cmd[1])
                                     : CC.getAt(cmd[1]);
                             if (cmd[2].equals("")) {
-                                switch (cmd[1]) {
-                                    case "":
-                                        mySendGroupMsg(fromGroup, "[Bot] 用法: /kick [@/QQ号] [是否永封(t/f)]");
-                                        break;
-                                    default:
-                                        CQ.setGroupKick(fromGroup, kickQQ, false);
-                                        mySendGroupMsg(fromGroup, "[Bot] 已踢出 " + CQ.getGroupMemberInfo(kickQQ, fromGroup).getNick());
-                                        break;
+                                if ("".equals(cmd[1])) {
+                                    mySendGroupMsg(fromGroup, "[Bot] 用法: /kick [@/QQ号] [是否永封(t/f)]");
+                                } else {
+                                    CQ.setGroupKick(fromGroup, kickQQ, false);
+                                    mySendGroupMsg(fromGroup, "[Bot] 已踢出 " + CQ.getGroupMemberInfo(kickQQ, fromGroup).getNick());
                                 }
                             } else
                                 switch (cmd[2]) {
@@ -662,16 +678,43 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
          * @author NamelessSAMA & Stiven.Ding
          */
 
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, 7);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
+        Calendar.getInstance().set(Calendar.HOUR_OF_DAY, 7);
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 if (Calendar.getInstance().get(Calendar.MINUTE) == 30)
                     saveConf(); // 每小时保存一次
+
+                // Solidot auto push service
+                if (Calendar.getInstance().get(Calendar.MINUTE) == 15) {
+                    if (botStatus && solidot.getStatus()) {
+                        String temppath = CQ.getAppDirectory() + "solidottemp.txt";
+                        File solidottemp = new File(temppath);
+
+                        System.out.println("[SolidotPush] TestMessage");
+
+                        if (!solidottemp.exists()) {
+                            FileProcess.createFile(temppath, solidot.getTitle());
+                        } else {
+                            try {
+                                String temptitle = FileProcess.readFile(temppath);
+                                String title = solidot.getTitle();
+                                if (!temptitle.equals("") && !temptitle.equals(title)) {
+                                    String context = solidot.getContext() + "\nSolidot 推送\nPowered by NamelessBot";
+                                    mySendGroupMsg(111852382L, context);
+                                    FileProcess.createFile(temppath, solidot.getTitle());
+                                } else if (temptitle.isEmpty()){
+                                    String context = solidot.getContext() + "\nSolidot 推送\nPowered by NamelessBot";
+                                    mySendGroupMsg(111852382L, context);
+                                    FileProcess.createFile(temppath, solidot.getTitle());
+                                }
+                            } catch (IOException e) {
+                                FileProcess.createFile(temppath, solidot.getTitle());
+                            }
+                        }
+                    }
+                }
 
                 // todayOnHistory @ 7:00 AM
                 if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 7)
@@ -690,38 +733,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     if (jikeWakeUp.getStatus() && botStatus) {
                         mySendGroupMsg(111852382L, jikeWakeUp.getContext().replaceAll("\uD83D\uDC49", CC.emoji(128073) ) + "\n即刻推送 - NamelessBot");
                     }
-
-                // Solidot auto push service
-                if (Calendar.getInstance().get(Calendar.MINUTE) == 15) {
-                    CQ.logDebug("SolidotPush", "TestMessage");
-                    if (botStatus && solidot.getStatus()) {
-                        String temppath = CQ.getAppDirectory() + "solidottemp.txt";
-                        String temptitle = "";
-                        File solidottemp = new File(temppath);
-
-                        if (!solidottemp.exists()) {
-                            FileProcess.createFile(temppath, solidot.getTitle());
-                        } else {
-                            try {
-                                temptitle = FileProcess.readFile(temppath);
-                            } catch (IOException e) {
-                                FileProcess.createFile(temppath, solidot.getTitle());
-                                e.printStackTrace();
-                            }
-                            String title = solidot.getTitle();
-                            if (!temptitle.equals("") && !temptitle.equals(title)) {
-                                String context = solidot.getContext() + "\nSolidot 推送\nPowered by NamelessBot";
-                                mySendGroupMsg(111852382L, context);
-                                try {
-                                    FileProcess.createFile(temppath, solidot.getTitle());
-                                } catch (Exception ignored){
-                                }
-                            }
-                        }
-                    }
-                }
             }
-        }, c.getTime(), 1000 * 60 * 60);
+        }, Calendar.getInstance().getTime(), 1000 * 60 * 60);
         return 0;
     }
 
