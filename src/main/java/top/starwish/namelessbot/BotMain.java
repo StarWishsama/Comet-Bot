@@ -46,8 +46,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     long ownerQQ = 0;
     List<Long> adminIds = new ArrayList();
 
-    List<Long> groups = new ArrayList();
+    // Group settings
     List<Long> autoaccept = new ArrayList();
+    HashMap<Long, String> joinmsg = new HashMap();
 
     // main 函数仅供调试使用
     public static void main (String[] args) {
@@ -64,7 +65,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     }
 
     public int privateMsg(int subType, int msgId, long fromQQ, String msg, int font) {
-        if (msg.startsWith("/")) {
+        if (msg.startsWith("/") || msg.startsWith("#")) {
             boolean isBotAdmin = adminIds.toString().contains(fromQQ + "");
             boolean isOwner = fromQQ == ownerQQ;
 
@@ -94,7 +95,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             if (isBotAdmin || isOwner) {
                 switch (cmd[0]) {
                     case "say":
-                        String message = msg.replaceAll("/" + cmd[0] + " ", "").replaceAll(cmd[1] + " ", "");
+                        String message = msg.replaceAll("/" + cmd[0] + " ", "").replaceAll(cmd[1] + " ", "").replaceAll("#", "");
                         switch (cmd[1]) {
                             case "":
                                 mySendPrivateMsg(fromQQ, "[Bot] 请输入需要转发的群号!");
@@ -130,7 +131,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                         try {
                                             String decodedPwd = RSAUtils.privateDecrypt(encodedPwd, RSAUtils.getPrivateKey(privateKey));
                                             Rcon rcon = new Rcon(rconIP, rconPort, decodedPwd.getBytes());
-                                            String result = rcon.command(msg.replace("/rcon cmd ", ""));
+                                            String result = rcon.command(msg.replace("/rcon cmd ", "").replace("#rcon cmd", ""));
                                             mySendPrivateMsg(fromQQ, "[Bot] " + result);
                                         } catch (Exception e) {
                                             mySendPrivateMsg(fromQQ, "[Bot] 无法连接至服务器");
@@ -209,21 +210,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     case "group":
                         switch (cmd[1]){
                             case "list":
-                                mySendPrivateMsg(fromQQ, "群列表: " + groups.toString());
-                                break;
-                            case "add":
-                                if (!cmd[2].equals("") && StringUtils.isNumeric(cmd[2])){
-                                    long groupId = Integer.parseInt(cmd[2]);
-                                    groups.add(groupId);
-                                    mySendPrivateMsg(fromQQ, "[Bot] 已添加群 " + groupId);
-                                }
-                                break;
-                            case "del":
-                                if (!cmd[2].equals("") && StringUtils.isNumeric(cmd[2])){
-                                    long groupId = Integer.parseInt(cmd[2]);
-                                    groups.remove(groupId);
-                                    mySendPrivateMsg(fromQQ, "[Bot] 已删除群 " + groupId);
-                                }
+                                mySendPrivateMsg(fromQQ, "自动同意入群的群: " + autoaccept.toString());
                                 break;
                             case "set":
                                 switch (cmd[2]){
@@ -232,7 +219,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                             if (StringUtils.isNumeric(cmd[3])){
                                                 if (cmd[4].equals("t")){
                                                     long groupId = Integer.parseInt(cmd[3]);
-                                                    autoaccept.add(groupId);
+                                                    if (!autoaccept.contains(groupId)) {
+                                                        autoaccept.add(groupId);
+                                                    }
                                                 } else if (cmd[4].equals("f")){
                                                     long groupId = Integer.parseInt(cmd[3]);
                                                     autoaccept.remove(groupId);
@@ -245,6 +234,15 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     case "serverinfo":
                                         break;
                                     case "joinmsg":
+                                        if (!cmd[3].equals("") && !cmd[4].equals("")){
+                                            if (StringUtils.isNumeric(cmd[3])){
+                                                long groupId = Integer.parseInt(cmd[3]);
+                                                if (!joinmsg.containsKey(groupId)){
+                                                    joinmsg.put(groupId, cmd[4]);
+                                                }
+                                            } else
+                                                mySendPrivateMsg(fromQQ, "[Bot] 群号格式有误");
+                                        }
                                         break;
                                     default:
                                         mySendPrivateMsg(fromQQ, "= 群设置帮助 =\n" +
@@ -255,10 +253,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 }
                                 break;
                             default:
-                                mySendPrivateMsg(fromQQ, "= Bot 群组管理 =" +
-                                                " /group list 列出所有已添加的群(需要手动添加!)" +
-                                                " /group add [群号] 新增一个群" +
-                                                " /group del [群号] 删除一个群" +
+                                mySendPrivateMsg(fromQQ, "= Bot 群组管理 =\n" +
+                                                " /group list 列出所有已添加的群(需要手动添加!)\n" +
                                                 " /group set 设置某个群的设置"
                                         );
                                 break;
@@ -669,6 +665,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR_OF_DAY, 7);
         c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -756,14 +753,13 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
             JSONObject adminsObject = JSONObject.parseObject(FileProcess.readFile(CQ.getAppDirectory() + "admins.json"));
             ownerQQ = adminsObject.getLong("owner");
-            String testStr = adminsObject.getString("admins");
-            adminIds = JSON.parseObject(testStr, new TypeReference<List<Long>>(){});
+            adminIds = JSON.parseObject(adminsObject.getString("admins"), new TypeReference<List<Long>>(){});
 
             JSONObject groupsObject = JSONObject.parseObject(FileProcess.readFile(groupsPath));
-            String testStr2 = groupsObject.getString("autoAccept");
-            autoaccept = JSON.parseObject(testStr2, new TypeReference<List<Long>>(){});
+            autoaccept = JSON.parseObject(groupsObject.getString("autoAccept"), new TypeReference<List<Long>>(){});
+            joinmsg = JSON.parseObject(groupsObject.getString("joinmsg"), new TypeReference<HashMap<Long, String>>(){});
 
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -816,6 +812,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         //群设置json (WIP)
         JSONObject groupSettingObject = new JSONObject();
         groupSettingObject.put("autoAccept", autoaccept.toString());
+        groupSettingObject.put("joinmsg", joinmsg.toString());
         FileProcess.createFile(groupsPath, groupSettingObject.toJSONString());
 
         CQ.logDebug("JSON", "配置已保存.");
@@ -855,6 +852,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             }
             else if (fromGroup == 552185847L){
                 mySendGroupMsg(552185847L, CC.at(beingOperateQQ) + " 欢迎加入ACraft!");
+            }
+            else if (joinmsg.containsKey(fromGroup)){
+                mySendGroupMsg(fromGroup, joinmsg.get(fromGroup).replaceAll("@入群的人", CC.at(beingOperateQQ)));
             }
         }
         return MSG_IGNORE;
