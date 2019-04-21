@@ -41,7 +41,7 @@ public class FileProcess {
         File file = new File(path);
         if (file.exists())
             delFile(path);
-        System.out.print("[JSON] Path is " + path);
+        System.out.print("[JSON] Path is " + path + "\n");
         try {
             file.createNewFile();
             bool = true;
@@ -67,7 +67,7 @@ public class FileProcess {
         String tempString = "";
         // 判断文件是否存在
         if (!file.exists()) {
-            System.out.println(path + "  文件不存在。");
+            System.out.println(path + "  文件不存在.");
             throw new IOException("File not exist");
         }
         BufferedReader reader = null;

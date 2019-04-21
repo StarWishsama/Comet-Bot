@@ -29,6 +29,7 @@ dependencies {
 	compile 'org.slf4j:slf4j-api:1.7.16'
     compile 'org.slf4j:slf4j-nop:1.7.9'
     compile 'com.alibaba:fastjson:1.2.56'
+    testCompile 'junit:junit:4.12'
 }
 
 //preBuild.dependsOn copyJars

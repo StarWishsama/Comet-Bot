@@ -44,10 +44,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     private String encodedPwd = "";
 
     long ownerQQ = 0;
-    List<Long> adminIds = new ArrayList();
+    List<Long> adminIds = new ArrayList<>();
 
     // Group settings
-    List<Long> autoaccept = new ArrayList();
+    List<Long> autoaccept = new ArrayList<>();
     HashMap<Long, String> joinmsg = new HashMap<>();
 
     // main 函数仅供调试使用
@@ -678,43 +678,40 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
          * @author NamelessSAMA & Stiven.Ding
          */
 
-        Calendar.getInstance().set(Calendar.HOUR_OF_DAY, 7);
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.HOUR_OF_DAY, 7);
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
-                if (Calendar.getInstance().get(Calendar.MINUTE) == 30)
-                    saveConf(); // 每小时保存一次
-
-                // Solidot auto push service
+                // Solidot Pusher (WIP)
                 if (Calendar.getInstance().get(Calendar.MINUTE) == 15) {
                     if (botStatus && solidot.getStatus()) {
                         String temppath = CQ.getAppDirectory() + "solidottemp.txt";
-                        File solidottemp = new File(temppath);
 
                         System.out.println("[SolidotPush] TestMessage");
 
-                        if (!solidottemp.exists()) {
-                            FileProcess.createFile(temppath, solidot.getTitle());
-                        } else {
-                            try {
-                                String temptitle = FileProcess.readFile(temppath);
-                                String title = solidot.getTitle();
-                                if (!temptitle.equals("") && !temptitle.equals(title)) {
-                                    String context = solidot.getContext() + "\nSolidot 推送\nPowered by NamelessBot";
-                                    mySendGroupMsg(111852382L, context);
-                                    FileProcess.createFile(temppath, solidot.getTitle());
-                                } else if (temptitle.isEmpty()){
-                                    String context = solidot.getContext() + "\nSolidot 推送\nPowered by NamelessBot";
-                                    mySendGroupMsg(111852382L, context);
-                                    FileProcess.createFile(temppath, solidot.getTitle());
-                                }
-                            } catch (IOException e) {
+                        try {
+                            String temptitle = FileProcess.readFile(temppath);
+                            String title = solidot.getTitle();
+                            if (!temptitle.equals("") && !temptitle.equals(title)) {
+                                String context = solidot.getContext() + "\nSolidot 推送\nPowered by NamelessBot";
+                                mySendGroupMsg(111852382L, context);
+                                FileProcess.createFile(temppath, solidot.getTitle());
+                            } else if (temptitle.isEmpty()){
+                                String context = solidot.getContext() + "\nSolidot 推送\nPowered by NamelessBot";
+                                mySendGroupMsg(111852382L, context);
                                 FileProcess.createFile(temppath, solidot.getTitle());
                             }
+                        } catch (IOException e) {
+                            FileProcess.createFile(temppath, solidot.getTitle());
                         }
                     }
                 }
+
+                // Save config
+                if (Calendar.getInstance().get(Calendar.MINUTE) == 30)
+                    saveConf(); // 每小时保存一次
 
                 // todayOnHistory @ 7:00 AM
                 if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 7)
@@ -725,11 +722,11 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                         + (Calendar.getInstance().get(Calendar.MONTH) + 1) + "月"
                                         + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "日" + "，"
                                         + text.substring(0, text.indexOf("\n")).replaceFirst("-", "的今天是")
-                                        + "的日子，一小时之后我会推送今天的早间新闻\n新的一天开始了！" + CC.face(190) + "今天别忘了去服务器领取签到奖励噢~~");
+                                        + "的日子，稍后我会推送今天的早间新闻\n新的一天开始了！" + CC.face(190) + "今天别忘了去服务器领取签到奖励噢~~");
                     }
 
-                // jikeWakeUp @ 8:00 AM
-                if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 8)
+                // jikeWakeUp @ 7:15 AM
+                if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 7 || Calendar.getInstance().get(Calendar.MINUTE) == 15)
                     if (jikeWakeUp.getStatus() && botStatus) {
                         mySendGroupMsg(111852382L, jikeWakeUp.getContext().replaceAll("\uD83D\uDC49", CC.emoji(128073) ) + "\n即刻推送 - NamelessBot");
                     }
