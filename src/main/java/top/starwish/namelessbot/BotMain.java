@@ -680,18 +680,19 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
         Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR_OF_DAY, 7);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
+                if (Calendar.getInstance().get(Calendar.MINUTE) == 30)
+                    saveConf(); // 每小时保存一次
+
                 // Solidot Pusher (WIP)
                 if (Calendar.getInstance().get(Calendar.MINUTE) == 15) {
                     solidotPusher();
                 }
-
-                // Save config
-                if (Calendar.getInstance().get(Calendar.MINUTE) == 30)
-                    saveConf(); // 每小时保存一次
 
                 // todayOnHistory @ 7:00 AM
                 if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 7)
@@ -893,22 +894,26 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     }
 
     private void solidotPusher() {
+        CQ.logDebug("SolidotPush", "TestMessage");
         if (botStatus && solidot.getStatus()) {
-            System.out.println("[SolidotPush] TestMessage");
+            String tempPath = CQ.getAppDirectory() + "solidottemp.txt";
+            String tempTitle = "";
             try {
-                String temppath = CQ.getAppDirectory() + "solidottemp.txt";
-                String tempTitle = FileProcess.readFile(temppath);
+                tempTitle = FileProcess.readFile(tempPath);
+            } catch (IOException e) {
+                FileProcess.createFile(tempPath, solidot.getTitle());
+                e.printStackTrace();
+            }
+            File solidottemp = new File(tempPath);
+            if (!solidottemp.exists()) {
+                FileProcess.createFile(tempPath, solidot.getTitle());
+            } else {
                 String title = solidot.getTitle();
-
                 if (!tempTitle.equals("") && !tempTitle.equals(title)) {
                     String context = solidot.getContext() + "\nSolidot 推送\nPowered by NamelessBot";
                     mySendGroupMsg(111852382L, context);
-                    FileProcess.createFile(temppath, solidot.getTitle());
-                } else
-                    FileProcess.createFile(temppath, solidot.getTitle());
-
-            } catch (Exception e){
-                e.printStackTrace();
+                    FileProcess.createFile(tempPath, solidot.getTitle());
+                }
             }
         }
     }
