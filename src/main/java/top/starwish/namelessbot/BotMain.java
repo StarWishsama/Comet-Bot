@@ -686,27 +686,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             public void run() {
                 // Solidot Pusher (WIP)
                 if (Calendar.getInstance().get(Calendar.MINUTE) == 15) {
-                    if (botStatus && solidot.getStatus()) {
-                        String temppath = CQ.getAppDirectory() + "solidottemp.txt";
-
-                        System.out.println("[SolidotPush] TestMessage");
-
-                        try {
-                            String temptitle = FileProcess.readFile(temppath);
-                            String title = solidot.getTitle();
-                            if (!temptitle.equals("") && !temptitle.equals(title)) {
-                                String context = solidot.getContext() + "\nSolidot 推送\nPowered by NamelessBot";
-                                mySendGroupMsg(111852382L, context);
-                                FileProcess.createFile(temppath, solidot.getTitle());
-                            } else if (temptitle.isEmpty()){
-                                String context = solidot.getContext() + "\nSolidot 推送\nPowered by NamelessBot";
-                                mySendGroupMsg(111852382L, context);
-                                FileProcess.createFile(temppath, solidot.getTitle());
-                            }
-                        } catch (IOException e) {
-                            FileProcess.createFile(temppath, solidot.getTitle());
-                        }
-                    }
+                    solidotPusher();
                 }
 
                 // Save config
@@ -910,5 +890,26 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     public void mySendPrivateMsg(long fromQQ, String msg){
         if (!(msg.contains("警察") || msg.contains("侵入") || msg.contains("华为")|| msg.contains("共产党")))
             CQ.sendPrivateMsg(fromQQ, msg);
+    }
+
+    private void solidotPusher() {
+        if (botStatus && solidot.getStatus()) {
+            System.out.println("[SolidotPush] TestMessage");
+            try {
+                String temppath = CQ.getAppDirectory() + "solidottemp.txt";
+                String tempTitle = FileProcess.readFile(temppath);
+                String title = solidot.getTitle();
+
+                if (!tempTitle.equals("") && !tempTitle.equals(title)) {
+                    String context = solidot.getContext() + "\nSolidot 推送\nPowered by NamelessBot";
+                    mySendGroupMsg(111852382L, context);
+                    FileProcess.createFile(temppath, solidot.getTitle());
+                } else
+                    FileProcess.createFile(temppath, solidot.getTitle());
+
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 }
