@@ -706,7 +706,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     }
 
                 // jikeWakeUp @ 7:15 AM
-                if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 7 || Calendar.getInstance().get(Calendar.MINUTE) == 15)
+                if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 7 && Calendar.getInstance().get(Calendar.MINUTE) == 15)
                     if (jikeWakeUp.getStatus() && botStatus) {
                         mySendGroupMsg(111852382L, jikeWakeUp.getContext().replaceAll("\uD83D\uDC49", CC.emoji(128073) ) + "\n即刻推送 - NamelessBot");
                     }
