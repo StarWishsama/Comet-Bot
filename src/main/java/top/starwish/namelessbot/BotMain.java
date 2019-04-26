@@ -681,18 +681,15 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR_OF_DAY, 7);
         c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
+                if (Calendar.getInstance().get(Calendar.MINUTE) == 15)
+                    solidotPusher();
+
                 if (Calendar.getInstance().get(Calendar.MINUTE) == 30)
                     saveConf(); // 每小时保存一次
-
-                // Solidot Pusher (WIP)
-                if (Calendar.getInstance().get(Calendar.MINUTE) == 15) {
-                    solidotPusher();
-                }
 
                 // todayOnHistory @ 7:00 AM
                 if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 7)
@@ -712,7 +709,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         mySendGroupMsg(111852382L, jikeWakeUp.getContext().replaceAll("\uD83D\uDC49", CC.emoji(128073) ) + "\n即刻推送 - NamelessBot");
                     }
             }
-        }, Calendar.getInstance().getTime(), 1000 * 60 * 60);
+        }, c.getTime(), 1000 * 60 * 60);
         return 0;
     }
 
