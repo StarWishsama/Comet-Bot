@@ -3,22 +3,59 @@ package top.starwish.namelessbot;
 import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
 import me.dilley.MineStat;
+import net.kronos.rkon.core.Rcon;
+import net.kronos.rkon.core.ex.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.*;
+import top.starwish.namelessbot.entity.MCServer;
+import top.starwish.namelessbot.entity.RssItem;
+import top.starwish.namelessbot.utils.RSAUtils;
+import top.starwish.namelessbot.utils.Utils;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
+    String statusPath = CQ.getAppDirectory() + "status.json";
+    String groupsPath = CQ.getAppDirectory() + "groupsettings.json";
+    String rconPath = CQ.getAppDirectory() + "rcon.json";
+
     boolean botStatus = true;
+
+    int groupId = 0;
+    String serverIp = null;
+    int serverPort = 0;
+    String cantconnect = null;
+    String infoMessage = null;
+
+    String rconIP = null;
+    int rconPort = 0;
+    String rconPwd = null;
+    boolean isRcon = true;
 
     RssItem solidot = new RssItem("https://www.solidot.org/index.rss");
     RssItem jikeWakeUp = new RssItem("https://rsshub.app/jike/topic/text/553870e8e4b0cafb0a1bef68");
     RssItem todayOnHistory = new RssItem("http://api.lssdjt.com/?ContentType=xml&appkey=rss.xml");
 
-    String statusPath = CQ.getAppDirectory() + "status.json";
+    // RSA Encrypt&Decrypt
+    private Map<String, String> keyMap = RSAUtils.createKeys(1024);
+    private String publicKey = keyMap.get("publicKey");
+    private String privateKey = keyMap.get("privateKey");
+    private String encodedPwd = "";
 
+    private long ownerQQ = 0;
+    List<Long> adminIds = new ArrayList<>();
+
+    // Group settings
+    List<Long> autoAcceptList = new ArrayList<>();
+    HashMap<Long, String> joinMsg = new HashMap<>();
+
+    // main 函数仅供调试使用
     public static void main (String[] args) {
-        // For debug
     }
     /**
      * @brief Init plugin
@@ -31,10 +68,13 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     }
 
     public int privateMsg(int subType, int msgId, long fromQQ, String msg, int font) {
-        if (msg.startsWith("/")) {
+        if (msg.startsWith("/") || msg.startsWith("#")) {
+            boolean isBotAdmin = adminIds.toString().contains(fromQQ + "");
+            boolean isOwner = fromQQ == ownerQQ;
+
             // process only after there's a command, in order to get rid of memory trash
             String temp = msg.trim();
-            String cmd[] = { "", "", "", "" };
+            String cmd[] = { "", "", "", "", ""};
 
             /**
              * @brief Processing msg into cmd & params
@@ -42,7 +82,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
              * @author Stiven.ding
              */
 
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 5; i++) {
                 temp = temp.trim();
                 if (temp.indexOf(' ') > 0) {
                     cmd[i] = temp.substring(0, temp.indexOf(' '));
@@ -53,22 +93,25 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                 }
             }
             cmd[0] = cmd[0].substring(1); // del '!'/'/' at the beginning of cmd
-            if (fromQQ == 1552409060L || fromQQ == 1448839220L) {
+
+
+            if (isBotAdmin || isOwner) {
                 switch (cmd[0]) {
                     case "say":
+                        String message = msg.replaceAll("/" + cmd[0] + " ", "").replaceAll(cmd[1] + " ", "").replaceAll("#", "");
                         switch (cmd[1]) {
                             case "":
                                 mySendPrivateMsg(fromQQ, "[Bot] 请输入需要转发的群号!");
                                 break;
                             case "acraft":
-                                mySendGroupMsg(552185847L, msg.replaceAll(cmd[0] + " ", "").replaceAll(cmd[1] + " ", ""));
+                                mySendGroupMsg(552185847L, message);
                                 break;
                             case "times":
-                                mySendGroupMsg(111852382L, msg.replaceAll(cmd[0] + " ", "").replaceAll(cmd[1] + " ", ""));
+                                mySendGroupMsg(111852382L, message);
                                 break;
                             default:
                                 if (StringUtils.isNumeric(cmd[1]))
-                                    mySendGroupMsg(Integer.parseInt(cmd[1]), msg.replaceAll(cmd[0] + " ", "").replaceAll(cmd[1] + " ", ""));
+                                    mySendGroupMsg(Integer.parseInt(cmd[1]), message);
                                 else
                                     mySendPrivateMsg(fromQQ, "[Bot] 请检查群号是否有误!");
                         }
@@ -83,12 +126,157 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             botStatus = true;
                         }
                         break;
+                    case "rcon":
+                        if (isRcon) {
+                            switch (cmd[1]){
+                                case "cmd":
+                                    if (!cmd[2].isEmpty()) {
+                                        try {
+                                            String decodedPwd = RSAUtils.privateDecrypt(encodedPwd, RSAUtils.getPrivateKey(privateKey));
+                                            Rcon rcon = new Rcon(rconIP, rconPort, decodedPwd.getBytes());
+                                            String result = rcon.command(msg.replace("/rcon cmd ", "").replace("#rcon cmd", ""));
+                                            mySendPrivateMsg(fromQQ, "[Bot] " + result);
+                                        } catch (Exception e) {
+                                            mySendPrivateMsg(fromQQ, "[Bot] 无法连接至服务器");
+                                        }
+                                    } else
+                                        mySendPrivateMsg(fromQQ, "[Bot] 请输入需要执行的命令! (不需要带\"/\")");
+                                    break;
+                                case "setup":
+                                    if (!cmd[2].isEmpty() && StringUtils.isNumeric(cmd[3]) && !cmd[4].isEmpty()){
+                                        try {
+                                            rconIP = cmd[2];
+                                            rconPort = Integer.parseInt(cmd[3]);
+                                            rconPwd = RSAUtils.publicEncrypt(cmd[4], RSAUtils.getPublicKey(publicKey));
+                                            encodedPwd = rconPwd;
+                                            saveConf();
+                                            mySendPrivateMsg(fromQQ, "[Bot] RCON 设置完成");
+                                        } catch (Exception e){
+                                            mySendPrivateMsg(fromQQ, "[Bot] 发生错误, 详情: \n" + e.getMessage());
+                                            e.printStackTrace();
+                                        }
+                                    } else
+                                        mySendPrivateMsg(fromQQ, "[Bot] 请输入正确的 RCON 地址/端口/密码!");
+                                    break;
+                                default:
+                                    mySendPrivateMsg(fromQQ,
+                                            "= RCON 设置 =\n" +
+                                            "/rcon setup [IP] [Port] [Password] 设置 Rcon 配置\n" +
+                                            "/rcon switch Rcon 开关\n" +
+                                            "/rcon cmd [Command] 使用 Rcon 执行命令");
+                                    break;
+                            }
+                        } else
+                            mySendPrivateMsg(fromQQ, "[Bot] 很抱歉, 机器人没有启用 RCON 功能.");
+                        break;
                     case "help":
                         mySendPrivateMsg(fromQQ, "= 无名Bot " + VerClass.VERSION + " ="
-                                + "\n /say [指定群] [内容]"
-                                + "\n /switch [on/off]"
-                                + "\n"
+                                + "\n /say [指定群] [内容] 以机器人向某个群发送消息"
+                                + "\n /switch [on/off] 开关机器人"
+                                + "\n /rcon 使用 Minecraft 服务器的 Rcon 功能"
+                                + "\n /admin 管理机器人的管理员"
                         );
+                        break;
+                    case "rcon switch":
+                        if (isRcon){
+                            isRcon = false;
+                            mySendPrivateMsg(fromQQ, "[Bot] 已关闭 Rcon 功能");
+                        } else
+                            isRcon = true;
+                            mySendPrivateMsg(fromQQ, "[Bot] 已打开 Rcon 功能. ");
+                        break;
+                    case "admin":
+                        if (isOwner){
+                            switch (cmd[1]) {
+                                case "list":
+                                    mySendPrivateMsg(fromQQ, "[Bot] 机器人管理员列表: " + adminIds.toString());
+                                    break;
+                                case "add":
+                                    if (!cmd[2].equals("") && StringUtils.isNumeric(cmd[2])) {
+                                        long adminQQ = Integer.parseInt(cmd[2]);
+                                        adminIds.add(adminQQ);
+                                        mySendPrivateMsg(fromQQ, "[Bot] 已成功添加管理员 " + CQ.getStrangerInfo(adminQQ).getNick() + "(" + adminQQ + ")");
+                                    }
+                                    break;
+                                case "del":
+                                    if (!cmd[2].equals("") && StringUtils.isNumeric(cmd[2])) {
+                                        long adminQQ = Integer.parseInt(cmd[2]);
+                                        adminIds.remove(adminQQ);
+                                        mySendPrivateMsg(fromQQ, "[Bot] 已成功删除管理员 " + CQ.getStrangerInfo(adminQQ).getNick() + "(" + adminQQ + ")");
+                                        break;
+                                    }
+                            }
+                        } else
+                            mySendPrivateMsg(fromQQ, "[Bot] 你不是我的主人, 无法设置管理员哟");
+                        break;
+                    case "group":
+                        switch (cmd[1]){
+                            case "list":
+                                mySendPrivateMsg(fromQQ, "自动同意入群的群: " + autoAcceptList.toString());
+                                break;
+                            case "set":
+                                switch (cmd[2].toLowerCase()){
+                                    case "autoacceptList":
+                                        if (!cmd[3].equals("") && !cmd[4].equals("")){
+                                            if (StringUtils.isNumeric(cmd[3])){
+                                                if (cmd[4].equals("t")){
+                                                    long groupId = Integer.parseInt(cmd[3]);
+                                                    if (!autoAcceptList.contains(groupId)) {
+                                                        autoAcceptList.add(groupId);
+                                                        mySendPrivateMsg(fromQQ, "[Bot] 已打开 " + groupId + "的自动接受入群请求.");
+                                                    } else
+                                                        mySendPrivateMsg(fromQQ, "[Bot] " + groupId + " 已打开自动接受入群请求了.");
+                                                } else if (cmd[4].equals("f")){
+                                                    long groupId = Integer.parseInt(cmd[3]);
+                                                    if (!autoAcceptList.contains(groupId)){
+                                                        mySendPrivateMsg(fromQQ, "[Bot] " + groupId + " 已关闭自动接受入群请求了.");
+                                                    } else {
+                                                        autoAcceptList.remove(groupId);
+                                                        mySendPrivateMsg(fromQQ, "[Bot] 已关闭 " + groupId + "的自动接受入群请求.");
+                                                    }
+                                                }
+                                            } else
+                                                mySendPrivateMsg(fromQQ, "[Bot] 群号格式有误");
+                                        } else
+                                            mySendPrivateMsg(fromQQ, "[Bot] /group set autoacceptList [群号] [t/f]");
+                                        break;
+                                    case "joinmsg":
+                                        if (!cmd[3].equals("") && !cmd[4].equals("")){
+                                            if (StringUtils.isNumeric(cmd[3])){
+                                                long groupId = Integer.parseInt(cmd[3]);
+                                                if (!joinMsg.containsKey(groupId)){
+                                                    joinMsg.put(groupId, cmd[4]);
+                                                    mySendPrivateMsg(fromQQ, "[Bot] 已打开群 " + groupId + " 的加群欢迎功能.");
+                                                } else {
+                                                    mySendPrivateMsg(fromQQ, "[Bot] 该群已经打开加群欢迎功能了!");
+                                                }
+                                            }
+                                            else if (cmd[3].equals("del") && StringUtils.isNumeric(cmd[4])){
+                                                long groupId = Integer.parseInt(cmd[4]);
+                                                if (!joinMsg.containsKey(groupId)){
+                                                    mySendPrivateMsg(fromQQ, "[Bot] 该群没有打开加群欢迎功能!");
+                                                } else {
+                                                    mySendPrivateMsg(fromQQ, "[Bot] 已关闭群 " + groupId + " 的加群欢迎功能.");
+                                                }
+                                            } else
+                                                mySendPrivateMsg(fromQQ, "[Bot] 群号格式有误");
+                                        }
+                                        break;
+                                    default:
+                                        mySendPrivateMsg(fromQQ, "= 群设置帮助 =\n" +
+                                                "/group set autoAcceptList [群号] [t/f]\n" +
+                                                "[WIP] /group set serverInfo [群号] [服务器IP] [端口] [信息样式]\n" +
+                                                "/group set joinMsg [群号] [入群欢迎消息]");
+                                        break;
+                                }
+                                break;
+                            default:
+                                mySendPrivateMsg(fromQQ, "= Bot 群组管理 =\n" +
+                                                " /group list 列出所有已添加的群(需要手动添加!)\n" +
+                                                " /group set 设置某个群的设置"
+                                        );
+                                break;
+                        }
                         break;
                 }
             }
@@ -102,10 +290,13 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // 机器人功能处理
         if (msg.startsWith("/")) {
             // 解析是否为管理员
-            boolean isAdmin = CQ.getGroupMemberInfoV2(fromGroup, fromQQ).getAuthority() > 1;
+            boolean isGroupAdmin = CQ.getGroupMemberInfoV2(fromGroup, fromQQ).getAuthority() > 1;
+            boolean isBotAdmin = adminIds.toString().contains(fromQQ + "");
+            boolean isOwner = fromQQ == ownerQQ;
+
             // process only after there's a command, in order to get rid of memory trash
             String temp = msg.trim();
-            String cmd[] = {"", "", "", ""};
+            String cmd[] = {"", "", "", "", ""};
 
             /**
              * @brief Processing msg into cmd & params
@@ -138,11 +329,13 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 "= 无名Bot " + VerClass.VERSION + " =" + "\n /repeat [内容] (次数) 复读你要说的话"
                                         + "\n /sub (媒体) 订阅指定媒体" + "\n /unsub [媒体] 退订指定媒体" + "\n /switch [on/off] 开/关机器人"
                                         + "\n /mute [@/QQ] (dhm) 禁言(默认10m)" + "\n /mute all 全群禁言" + "\n /unmute [@/QQ] 解禁某人"
-                                        + "\n /unmute all 解除全群禁言" + "\n /kick [@/QQ] [是否永封(t/f)]" + "\n /debug");
+                                        + "\n /unmute all 解除全群禁言" + "\n /kick [@/QQ] (是否永封(t/f))"
+                                        + "\n /admin 管理机器人的管理员" + "\n/rcon [命令]"
+                        );
                         break;
                     // 复读命令
                     case "repeat":
-                        if (isAdmin) {
+                        if (isGroupAdmin || isBotAdmin || isOwner) {
                             if (cmd[1].equals("")) {
                                 mySendGroupMsg(fromGroup, "[Bot] 请输入需要复读的话!");
                             } else {
@@ -154,7 +347,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                         for (int i = 0; i < times; i++)
                                             mySendGroupMsg(fromGroup, cmd[1]);
                                 } catch (Exception e) { // 没有识别到次数就只复读一次
-                                    mySendGroupMsg(fromGroup, cmd[1]);
+                                    mySendGroupMsg(fromGroup, msg.replaceAll("/repeat ", ""));
                                 }
                             }
                         } else
@@ -162,7 +355,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         break;
                     // 关闭命令
                     case "switch":
-                        if (isAdmin) {
+                        if (isBotAdmin || isOwner) {
                             if (cmd[1].equals("off")) {
                                 mySendGroupMsg(fromGroup, "[Bot] 已将机器人禁言.");
                                 botStatus = false;
@@ -173,21 +366,21 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         break;
                     // 订阅命令
                     case "sub":
-                        if (isAdmin) {
-                            switch (cmd[1]) {
+                        if (isGroupAdmin || isBotAdmin || isOwner) {
+                            switch (cmd[1].toLowerCase()) {
                                 case "":
                                     mySendGroupMsg(fromGroup, "媒体列表: /sub (媒体)" + "\n [SDT] Solidot 奇客资讯"
                                             + "\n [JWU] 一觉醒来世界发生了什么" + "\n [TOH] 历史上的今天");
                                     break;
-                                case "SDT":
+                                case "sdt":
                                     solidot.enable();
                                     mySendGroupMsg(fromGroup, "[Bot] 已订阅 Solidot.");
                                     break;
-                                case "JWU":
+                                case "jwu":
                                     jikeWakeUp.enable();
                                     mySendGroupMsg(fromGroup, "[Bot] 已订阅 即刻 - 一觉醒来世界发生了什么.");
                                     break;
-                                case "TOH":
+                                case "toh":
                                     todayOnHistory.enable();
                                     mySendGroupMsg(fromGroup, "[Bot] 已订阅 历史上的今天.");
                                     break;
@@ -200,17 +393,17 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         break;
                     // 退订命令
                     case "unsub":
-                        if (isAdmin) {
-                            switch (cmd[1]) { // 无视此处报错，仅需在 JDK >= 1.7 编译即可
-                                case "SDT":
+                        if (isGroupAdmin || isBotAdmin || isOwner) {
+                            switch (cmd[1].toLowerCase()) {
+                                case "sdt":
                                     solidot.disable();
                                     mySendGroupMsg(fromGroup, "[Bot] 已退订 Solidot.");
                                     break;
-                                case "JWU":
+                                case "jwu":
                                     jikeWakeUp.disable();
                                     mySendGroupMsg(fromGroup, "[Bot] 已退订 即刻 - 一觉醒来世界发生了什么.");
                                     break;
-                                case "TOH":
+                                case "toh":
                                     todayOnHistory.disable();
                                     mySendGroupMsg(fromGroup, "[Bot] 已退订 历史上的今天.");
                                     break;
@@ -223,7 +416,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         break;
                     // 禁言
                     case "mute":
-                        if (isAdmin) {
+                        if (isGroupAdmin) {
                             if (cmd[1].equals("")) {
                                 mySendGroupMsg(fromGroup, "[Bot] 用法: /mute [@/QQ号] [时间(秒)]");
                             } else if (cmd[1].equals("all")) {
@@ -253,9 +446,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     }
                                     if (banTime < 1)
                                         throw new NumberFormatException("Equal or less than 0");
-                                    if (banTime <= 30 * 24 * 60 * 60)
+                                    if (banTime <= 30 * 24 * 60 * 60) {
                                         CQ.setGroupBan(fromGroup, banQQ, banTime);
-                                    else
+                                        mySendGroupMsg(fromGroup, "[Bot] 已禁言 " + CQ.getStrangerInfo(banQQ).getNick() + "(" + banQQ + ") " + banTime / 60 + "分钟.");
+                                    } else
                                         mySendGroupMsg(fromGroup, "[Bot] 时间长度太大了！");
                                 } catch (Exception e) {
                                     mySendGroupMsg(fromGroup, "[Bot] 命令格式有误! 用法: /mute [@/QQ号] [dhm]");
@@ -266,7 +460,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         break;
                     // 解除禁言
                     case "unmute":
-                        if (isAdmin) {
+                        if (isGroupAdmin) {
                             if (cmd[1].equals("")) {
                                 mySendGroupMsg(fromGroup, "[Bot] 用法: /unmute [at需要解禁的人]");
                             } else if (cmd[1].equals("all")) {
@@ -286,16 +480,18 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         break;
                     // 调试
                     case "debug":
-                        if (isAdmin) {
+                        if (isBotAdmin || isOwner) {
                             switch (cmd[1].toLowerCase()) {
                                 case "rss": // 代码中务必只用小写，确保大小写不敏感
                                     mySendGroupMsg(fromGroup, new RssItem(cmd[2]).getContext());
                                     break;
                                 case "reload":
                                     readConf();
+                                    mySendGroupMsg(fromGroup, "[Bot] Config reloaded.");
                                     break;
                                 case "save":
                                     saveConf();
+                                    mySendGroupMsg(fromGroup, "[Bot] Config saved.");
                                     break;
                                 case "parse":
                                     mySendGroupMsg(fromGroup, saveConf());
@@ -316,7 +512,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     break;
                                 case "serverinfo":
                                     if (!cmd[2].equals("") && StringUtils.isNumeric(cmd[3])) {
-                                        mySendGroupMsg(fromGroup, new MCServerInfo(cmd[2], Integer.parseInt(cmd[3])).getServerInfo());
+                                        mySendGroupMsg(fromGroup, Utils.deColor(new MCServer(cmd[2], Integer.parseInt(cmd[3])).getServerInfo()));
                                     } else
                                         mySendGroupMsg(fromGroup, "[Bot] Please check IP address or Port.");
                                     break;
@@ -334,28 +530,25 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                         break;
                     case "kick":
-                        if (isAdmin) {
+                        if (isGroupAdmin) {
                             long kickQQ = StringUtils.isNumeric(cmd[1]) ? Integer.parseInt(cmd[1])
                                     : CC.getAt(cmd[1]);
                             if (cmd[2].equals("")) {
-                                switch (cmd[1]) {
-                                    case "":
-                                        mySendGroupMsg(fromGroup, "[Bot] 用法: /kick [@/QQ号] [是否永封(t/f)]");
-                                        break;
-                                    default:
-                                        CQ.setGroupKick(fromGroup, kickQQ, false);
-                                        mySendGroupMsg(fromGroup, "[Bot] 已踢出 " + CQ.getStrangerInfo(kickQQ).getNick());
-                                        break;
+                                if ("".equals(cmd[1])) {
+                                    mySendGroupMsg(fromGroup, "[Bot] 用法: /kick [@/QQ号] [是否永封(t/f)]");
+                                } else {
+                                    CQ.setGroupKick(fromGroup, kickQQ, false);
+                                    mySendGroupMsg(fromGroup, "[Bot] 已踢出 " + CQ.getGroupMemberInfo(kickQQ, fromGroup).getNick());
                                 }
                             } else
                                 switch (cmd[2]) {
                                     case "t":
                                         CQ.setGroupKick(fromGroup, kickQQ, true);
-                                        mySendGroupMsg(fromGroup, "[Bot] 已踢出 " + CQ.getStrangerInfo(kickQQ).getNick());
+                                        mySendGroupMsg(fromGroup, "[Bot] 已踢出 " + CQ.getGroupMemberInfo(kickQQ, fromGroup).getNick());
                                         break;
                                     case "f":
                                         CQ.setGroupKick(fromGroup, kickQQ, false);
-                                        mySendGroupMsg(fromGroup, "[Bot] 已踢出 " + CQ.getStrangerInfo(kickQQ).getNick());
+                                        mySendGroupMsg(fromGroup, "[Bot] 已踢出 " + CQ.getGroupMemberInfo(kickQQ, fromGroup).getNick());
                                         break;
                                     default:
                                         break;
@@ -363,21 +556,132 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         } else
                             mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                         break;
-                    // 未知命令
-                    default:
-                        mySendGroupMsg(fromGroup, "[Bot] 命令不存在哟~");
+                    case "rcon":
+                        if (isRcon) {
+                            if (isBotAdmin || isOwner) {
+                                if (!cmd[1].equals("")) {
+                                    try {
+                                        String decodedPwd = RSAUtils.privateDecrypt(encodedPwd, RSAUtils.getPrivateKey(privateKey));
+                                        Rcon rcon = new Rcon(rconIP, rconPort, decodedPwd.getBytes());
+                                        String result = rcon.command(msg.replaceAll("/" + cmd[0] + " ", ""));
+                                        mySendGroupMsg(fromGroup, "[Bot] " + result);
+                                    } catch (IOException e) {
+                                        mySendGroupMsg(fromGroup, "[Bot] 连接至服务器发生了错误");
+                                    } catch (AuthenticationException e){
+                                        mySendGroupMsg(fromGroup, "[Bot] Rcon 密码错误!");
+                                    } catch (NoSuchAlgorithmException | InvalidKeySpecException ignored){
+                                    }
+                                } else
+                                    mySendGroupMsg(fromGroup, "[Bot] 请输入需要执行的命令! (不需要带\"/\")");
+                            } else
+                                mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                        } else
+                            mySendGroupMsg(fromGroup, "[Bot] 很抱歉, 机器人没有启用 RCON 功能.");
                         break;
-
+                    case "admin":
+                        if (isOwner) {
+                            switch (cmd[1]) {
+                                case "list":
+                                    mySendGroupMsg(fromGroup, "[Bot] 机器人管理员列表: " + adminIds.toString());
+                                    break;
+                                case "add":
+                                    if (!cmd[2].equals("")) {
+                                        try {
+                                            long adminQQ = StringUtils.isNumeric(cmd[2]) ? Integer.parseInt(cmd[2]) : CC.getAt(cmd[2]);
+                                            adminIds.add(adminQQ);
+                                            mySendGroupMsg(fromGroup, "[Bot] 已成功添加管理员 " + CQ.getStrangerInfo(adminQQ).getNick() + "(" + adminQQ + ")");
+                                        } catch (Exception e) {
+                                            mySendGroupMsg(fromGroup, "[Bot] 请检查你输入的命令!");
+                                        }
+                                    }
+                                    break;
+                                case "del":
+                                    if (!cmd[2].equals("")) {
+                                        try {
+                                            long adminQQ = StringUtils.isNumeric(cmd[2]) ? Integer.parseInt(cmd[2]) : CC.getAt(cmd[2]);
+                                            adminIds.remove(adminQQ);
+                                            mySendGroupMsg(fromGroup, "[Bot] 已成功删除管理员 " + CQ.getStrangerInfo(adminQQ).getNick() + "(" + adminQQ + ")");
+                                        } catch (Exception e) {
+                                            mySendGroupMsg(fromGroup, "[Bot] 请检查你输入的命令!");
+                                        }
+                                        break;
+                                    }
+                            }
+                        }
+                        break;
+                    case "group":
+                        switch (cmd[1]) {
+                            case "list":
+                                mySendGroupMsg(fromGroup, "自动同意入群的群: " + autoAcceptList.toString());
+                                break;
+                            case "set":
+                                switch (cmd[2]) {
+                                    case "autoAcceptList":
+                                        if (!cmd[3].equals("") && !cmd[4].equals("")) {
+                                            if (StringUtils.isNumeric(cmd[3])) {
+                                                if (cmd[4].equals("t")) {
+                                                    long groupId = Integer.parseInt(cmd[3]);
+                                                    if (!autoAcceptList.contains(groupId)) {
+                                                        autoAcceptList.add(groupId);
+                                                        mySendGroupMsg(fromGroup, "[Bot] 已打开 " + groupId + "的自动接受入群请求.");
+                                                    } else
+                                                        mySendGroupMsg(fromGroup, "[Bot] " + groupId + " 已打开自动接受入群请求了.");
+                                                } else if (cmd[4].equals("f")) {
+                                                    long groupId = Integer.parseInt(cmd[3]);
+                                                    if (!autoAcceptList.contains(groupId)) {
+                                                        mySendGroupMsg(fromGroup, "[Bot] " + groupId + " 已关闭自动接受入群请求了.");
+                                                    } else {
+                                                        autoAcceptList.remove(groupId);
+                                                        mySendGroupMsg(fromGroup, "[Bot] 已关闭 " + groupId + "的自动接受入群请求.");
+                                                    }
+                                                }
+                                            } else
+                                                mySendGroupMsg(fromGroup, "[Bot] 群号格式有误");
+                                        } else
+                                            mySendGroupMsg(fromGroup, "[Bot] /group set autoAcceptList [群号] [t/f]");
+                                        break;
+                                    case "serverinfo":
+                                        break;
+                                    case "joinMsg":
+                                        if (!cmd[3].equals("") && !cmd[4].equals("")) {
+                                            if (StringUtils.isNumeric(cmd[3])) {
+                                                long groupId = Integer.parseInt(cmd[3]);
+                                                if (!joinMsg.containsKey(groupId)) {
+                                                    joinMsg.put(groupId, cmd[4]);
+                                                    mySendGroupMsg(fromGroup, "[Bot] 已打开群 " + groupId + " 的加群欢迎功能.");
+                                                } else {
+                                                    mySendGroupMsg(fromGroup, "[Bot] 该群已经打开加群欢迎功能了!");
+                                                }
+                                            } else if (cmd[3].equals("del") && StringUtils.isNumeric(cmd[4])) {
+                                                long groupId = Integer.parseInt(cmd[4]);
+                                                if (!joinMsg.containsKey(groupId)) {
+                                                    mySendGroupMsg(fromGroup, "[Bot] 该群没有打开加群欢迎功能!");
+                                                } else {
+                                                    mySendGroupMsg(fromGroup, "[Bot] 已关闭群 " + groupId + " 的加群欢迎功能.");
+                                                }
+                                            } else
+                                                mySendGroupMsg(fromGroup, "[Bot] 群号格式有误");
+                                        }
+                                        break;
+                                    default:
+                                        mySendGroupMsg(fromGroup, "= 群设置帮助 =\n" +
+                                                "/group set autoAcceptList [群号] [t/f]\n" +
+                                                "[WIP] /group set serverinfo [群号] [服务器IP] [端口] [信息样式]\n" +
+                                                "/group set joinMsg [群号] [入群欢迎消息]");
+                                        break;
+                                }
+                                break;
+                        }
                 }
             } else if (cmd[0].equals("switch") && cmd[1].equals("on")) {
                 // 机器人禁言关闭
-                if (isAdmin) {
+                if (isBotAdmin || isOwner) {
                     mySendGroupMsg(fromGroup, "[Bot] 已启用机器人.");
                     botStatus = true;
                 }
             }
         }
-        else if (msg.equals("服务器信息") || msg.equals("服务器状态") || msg.equals("/info")){
+        else if (msg.equals("服务器信息") || msg.equals("服务器状态")){
             if (botStatus) {
                 if (fromGroup == 111852382L) {
                     // 防止获取的数据永远一样
@@ -392,7 +696,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         mySendGroupMsg(fromGroup, "[Bot] 无法连接至服务器, 可能正在维护?");
                 } else if (fromGroup == 552185847L) {
                     // 防止获取的数据永远一样
-                    MineStat acraft = new MineStat("103.91.211.243",13300);
+                    MineStat acraft = new MineStat("103.91.211.243",17000);
                     if (acraft.isServerUp()) {
                         mySendGroupMsg(fromGroup, CC.at(fromQQ) + "\n在线玩家: "
                                 + acraft.getCurrentPlayers() + "/" + acraft.getMaximumPlayers()
@@ -401,6 +705,17 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         );
                     } else
                         mySendGroupMsg(fromGroup, "[Bot] ACraft 目前可能正在维护, 稍等一会哟");
+                } else if (fromGroup == groupId){
+                    MineStat server = new MineStat(serverIp, serverPort);
+                    if (server.isServerUp()){
+                        String message = infoMessage.replaceAll("%在线玩家%", server.getCurrentPlayers())
+                                .replaceAll("%最大人数%", server.getMaximumPlayers())
+                                .replaceAll("%延迟%", String.format("%d", server.getLatency()))
+                                .replaceAll("%MOTD%", server.getMotd())
+                                .replaceAll("%版本%", server.getVersion());
+                        mySendGroupMsg(fromGroup, message);
+                    } else
+                        mySendGroupMsg(fromGroup, cantconnect.replaceAll("%addr%", serverIp));
                 }
             }
         }
@@ -416,7 +731,16 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     public int enable() {
         enable = true;
 
+        configStartup();
+        if (!configStartup()){
+            CQ.logError("NamelessBot", "Something is wrong when startup!");
+            enable = false;
+        }
         readConf();
+
+        if (!BotUpdater.isLatest()){
+            CQ.logInfo("Updater", "Nameless Bot 有新版本: " + BotUpdater.getLatestVer());
+        }
 
         /**
          * @brief 启动时计划定时推送 & save confirguration
@@ -426,13 +750,22 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR_OF_DAY, 7);
 
+        Timer solidotPusher = new Timer();
+        solidotPusher.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (Calendar.getInstance().get(Calendar.MINUTE) == 30)
+                    soliDotPusher();
+            }
+        }, c.getTime(), 1000 * 60);
+
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 if (Calendar.getInstance().get(Calendar.MINUTE) == 30)
                     saveConf(); // 每小时保存一次
 
-                // todayOnHistory @ 7:30 AM
+                // todayOnHistory @ 7:00 AM
                 if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 7)
                     if (todayOnHistory.getStatus() && botStatus) {
                         String text = todayOnHistory.getContext();
@@ -444,11 +777,11 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                         + "的日子，一小时之后我会推送今天的早间新闻\n新的一天开始了！" + CC.face(190) + "今天别忘了去服务器领取签到奖励噢~~");
                     }
 
-                // jikeWakeUp @ 8:30 AM
-                if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 8)
-                    if (jikeWakeUp.getStatus() && botStatus) {
+                // jikeWakeUp @ 7:15 AM
+                if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 7 && Calendar.getInstance().get(Calendar.MINUTE) == 15)
+                    if (jikeWakeUp.getStatus() && botStatus)
                         mySendGroupMsg(111852382L, jikeWakeUp.getContext().replaceAll("\uD83D\uDC49", CC.emoji(128073) ) + "\n即刻推送 - NamelessBot");
-                    }
+
             }
         }, c.getTime(), 1000 * 60 * 60);
 
@@ -474,19 +807,99 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             solidot.setStatus(statusObject.getBooleanValue("solidot"));
             jikeWakeUp.setStatus(statusObject.getBooleanValue("jikeWakeUp"));
             todayOnHistory.setStatus(statusObject.getBooleanValue("todayOnHistory"));
-        } catch (Exception e) {
+
+            JSONObject rconObject = JSONObject.parseObject(FileProcess.readFile(rconPath));
+            rconIP = rconObject.getString("rconIP");
+            rconPort = rconObject.getIntValue("rconPort");
+            rconPwd = rconObject.getString("rconPwd");
+            isRcon = rconObject.getBooleanValue("RconFunction");
+
+            JSONObject adminsObject = JSONObject.parseObject(FileProcess.readFile(CQ.getAppDirectory() + "admins.json"));
+            ownerQQ = adminsObject.getLong("owner");
+            adminIds = JSON.parseObject(adminsObject.getString("admins"), new TypeReference<List<Long>>(){});
+
+            JSONObject groupsObject = JSONObject.parseObject(FileProcess.readFile(groupsPath));
+            autoAcceptList = JSON.parseObject(groupsObject.getString("autoAccept"), new TypeReference<List<Long>>(){});
+            joinMsg = JSON.parseObject(groupsObject.getString("joinMsg"), new TypeReference<HashMap<Long, String>>(){});
+
+        } catch (Exception ignored) {
         }
     }
 
     public String saveConf() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("botStatus", botStatus);
-        jsonObject.put("solidot", solidot.getStatus());
-        jsonObject.put("jikeWakeUp", jikeWakeUp.getStatus());
-        jsonObject.put("todayOnHistory", todayOnHistory.getStatus());
-        FileProcess.createFile(statusPath, jsonObject.toJSONString());
+        // 状态json
+        JSONObject statusObject = new JSONObject();
+        statusObject.put("botStatus", botStatus);
+        statusObject.put("solidot", solidot.getStatus());
+        statusObject.put("jikeWakeUp", jikeWakeUp.getStatus());
+        statusObject.put("todayOnHistory", todayOnHistory.getStatus());
+        FileProcess.createFile(statusPath, statusObject.toJSONString());
+
+        /**
+         * @TODO 服务器信息json
+
+        JSONObject serverInfoObject = new JSONObject();
+        serverInfoObject.put("ServerIP", "Your Server IP here");
+        serverInfoObject.put("ServerPort", 25565);
+        serverInfoObject.put("ServerInfoMsg", "服务器信息\n玩家: %在线玩家%/%最大人数%\n延迟: %延迟%");
+
+
+          JSONObject groupObject = new JSONObject();
+
+        if (CQ.getGroupList() != null) {
+            groupObject.put("" + groupId, groupsPath);
+        } else
+            CQ.logError("NamelessBot", "机器人没有加入任何一个QQ群!");
+
+        JSONObject settingObject = new JSONObject();
+        settingObject.put("groups_settings", groupObject);
+
+        FileProcess.createFile(groupsPath, JSONObject.toJSONString(settingObject, WriteMapNullValue));
+         */
+
+        // Rcon配置json
+        JSONObject rconObject = new JSONObject();
+        rconObject.put("rconIP", rconIP);
+        rconObject.put("rconPort", rconPort);
+        rconObject.put("rconPwd", rconPwd);
+        rconObject.put("RconFunction", isRcon);
+        FileProcess.createFile(rconPath, rconObject.toJSONString());
+
+        //机器人管理员json
+        JSONObject adminsObject = new JSONObject();
+        String adminsPath = CQ.getAppDirectory() + "admins.json";
+        adminsObject.put("admins", adminIds.toString());
+        adminsObject.put("owner", ownerQQ);
+        FileProcess.createFile(adminsPath, adminsObject.toJSONString());
+
+        //群设置json (WIP)
+        JSONObject groupSettingObject = new JSONObject();
+        groupSettingObject.put("autoAccept", autoAcceptList.toString());
+        groupSettingObject.put("joinMsg", joinMsg.toString());
+        FileProcess.createFile(groupsPath, groupSettingObject.toJSONString());
+
         CQ.logDebug("JSON", "配置已保存.");
-        return jsonObject.toJSONString();
+
+        return "status.json:\n" + statusObject.toJSONString();
+    }
+
+    public boolean configStartup(){
+        File statusJSON = new File(CQ.getAppDirectory() + "status.json");
+        File rconJSON = new File(CQ.getAppDirectory() + "rcon.json");
+
+        if (!statusJSON.exists() || !rconJSON.exists()){
+            try {
+                CQ.logDebug("ConfigSetup", "Config file isn't exist, Creating...");
+                Files.copy(getClass().getClassLoader().getResourceAsStream("status.json"), statusJSON.toPath());
+                Files.copy(getClass().getClassLoader().getResourceAsStream("rcon.json"), rconJSON.toPath());
+                CQ.logDebug("ConfigSetup", "Created config file successfully.");
+            } catch (Exception e) {
+                CQ.logFatal("ConfigSetup", "An unexpected error occurred.");
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
     }
 
     public int groupMemberDecrease(int subtype, int sendTime, long fromGroup, long fromQQ, long beingOperateQQ) {
@@ -496,22 +909,15 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     public int groupMemberIncrease(int subtype, int sendTime, long fromGroup, long fromQQ, long beingOperateQQ) {
         // 入群欢迎
         if (botStatus) {
-            if (fromGroup == 111852382L) {
-                mySendGroupMsg(111852382L, "欢迎 " + CC.at(beingOperateQQ)
-                        + "加入时光隧道!\n【进群请修改群名片为游戏ID】\n【建议使用群文件中的官方客户端!】\n\n服务器IP地址: bgp.sgsd.pw:25846\n赞助网址: http://www.mcrmb.com/cz/13153");
+            if (joinMsg.containsKey(fromGroup)){
+                mySendGroupMsg(fromGroup, joinMsg.get(fromGroup).replaceAll("@入群的人", CC.at(beingOperateQQ)));
             }
-            else if (fromGroup == 552185847L){
-                mySendGroupMsg(552185847L, CC.at(beingOperateQQ)
-                        + "\n欢迎来到玩家的天堂 怪物的地狱\n在这里 你会体验到最极致的击杀快感~\n不要相信老玩家说的难度高，难度一点也不高~真的");
-            }
-            else
-                return MSG_IGNORE;
         }
         return MSG_IGNORE;
     }
 
     public int friendAdd(int subtype, int sendTime, long fromQQ) {
-        CQ.sendPrivateMsg(1552409060L, CQ.getStrangerInfo(fromQQ).getNick() + "(" + fromQQ + ") " + "向机器人发送了好友请求");
+        CQ.sendPrivateMsg(ownerQQ, CQ.getStrangerInfo(fromQQ).getNick() + "(" + fromQQ + ") " + "向机器人发送了好友请求");
         return MSG_IGNORE;
     }
 
@@ -521,6 +927,12 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
     public int requestAddGroup(int subtype, int sendTime, long fromGroup, long fromQQ, String msg,
             String responseFlag) {
+        if (autoAcceptList.contains(fromGroup) && subtype == 1){
+            CQ.setGroupAddRequest(responseFlag, REQUEST_GROUP_ADD, REQUEST_ADOPT, null);
+        }
+        else if (fromQQ == ownerQQ && subtype == 2){
+            CQ.setGroupAddRequest(responseFlag, REQUEST_GROUP_INVITE, REQUEST_ADOPT, "Invited by bot owner");
+        }
         return MSG_IGNORE;
     }
 
@@ -539,13 +951,37 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         return CQAPIVER + "," + AppID;
     }
 
-    public void mySendGroupMsg(long groupId, String msg) {
+    private void mySendGroupMsg(long groupId, String msg) {
         if (!(msg.contains("警察") || msg.contains("侵入") || msg.contains("华为") || msg.contains("共产党")))
             CQ.sendGroupMsg(groupId, msg);
     }
 
-    public void mySendPrivateMsg(long fromQQ, String msg){
+    private void mySendPrivateMsg(long fromQQ, String msg){
         if (!(msg.contains("警察") || msg.contains("侵入") || msg.contains("华为")|| msg.contains("共产党")))
             CQ.sendPrivateMsg(fromQQ, msg);
+    }
+
+    private void soliDotPusher() {
+        if (botStatus && solidot.getStatus()) {
+            String tempPath = CQ.getAppDirectory() + "solidottemp.txt";
+            String tempTitle = "";
+            try {
+                tempTitle = FileProcess.readFile(tempPath);
+            } catch (IOException e) {
+                FileProcess.createFile(tempPath, solidot.getTitle());
+                e.printStackTrace();
+            }
+            File solidottemp = new File(tempPath);
+            if (!solidottemp.exists()) {
+                FileProcess.createFile(tempPath, solidot.getTitle());
+            } else {
+                String title = solidot.getTitle();
+                if (!tempTitle.equals("") && !tempTitle.equals(title) && !tempTitle.equals("Encountered a wrong URL or a network error.")) {
+                    String context = solidot.getContext() + "\nSolidot 推送\nPowered by NamelessBot";
+                    mySendGroupMsg(111852382L, context);
+                    FileProcess.createFile(tempPath, solidot.getTitle());
+                }
+            }
+        }
     }
 }

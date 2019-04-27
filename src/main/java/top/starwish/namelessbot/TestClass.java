@@ -1,27 +1,28 @@
 package top.starwish.namelessbot;
 
 import com.alibaba.fastjson.JSONObject;
+import top.starwish.namelessbot.entity.RssItem;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 // 此 Class 仅供调试使用
 public class TestClass {
-    static RssItem solidot = new RssItem();
+    static  RssItem solidot = new RssItem("https://www.solidot.org/index.rss");
     static RssItem jikeWakeUp = new RssItem();
     static String msg = "!mute 1448839220 1h10m";
     static boolean isAdmin = true;
-    static boolean botStatus = false;
+    static boolean botStatus = true;
     static long fromGroup = 0;
     static String configPath= System.getProperty("user.dir") + "\\build\\myfile.json";
 
-    static long lastUseTime = 0L;
-    static long currentTime = System.currentTimeMillis();
+
 
     public static void main(String[] args) {
-        if (currentTime - lastUseTime >= 10000) {
-            lastUseTime = currentTime;
-            System.out.println("success");
-        } else {
-            System.out.println("You have to wait: " + (10000 - (currentTime - lastUseTime)) + " more ms!");
-        }
     }
 
     

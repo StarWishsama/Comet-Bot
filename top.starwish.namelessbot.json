@@ -5,9 +5,9 @@
   "ret": 1, // 返回码，固定为1
   "apiver": 9, // Api版本，本SDK为9
   "name": "Nameless Bot", // 应用名称
-  "version": "1.3.2-DEV", // 应用版本
+  "version": "1.3.8-RELEASE", // 应用版本
   "version_id": 1, // 应用顺序版本（每次发布时至少+1）
-  "author": "Stiven.Ding\nNameless", // 应用作者
+  "author": "Nameless", // 应用作者
   //"path": "lib",// 应用lib加载处，默认插件同名文件夹目录下lib文件夹，此目录可以填相对路径和绝对路径，相对：应用同名文件夹
   "class": "top.starwish.namelessbot.BotMain", // 应用加载主类，默认使用appid加载，如需使用则删除前面注释
   "description": "NamelessBot",
@@ -119,7 +119,7 @@
   ],
   "auth": [ // 应用权限（发布前请删除无用权限）
     20,  //[敏感]取Cookies	getCookies / getCsrfToken
-    //30,  //接收语音			getRecord
+    30,  //接收语音			getRecord
     101, //发送群消息			sendGroupMsg
     103, //发送讨论组消息		sendDiscussMsg
     106, //发送私聊消息		sendPrivateMsg
