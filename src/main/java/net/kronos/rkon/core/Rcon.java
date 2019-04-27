@@ -7,6 +7,8 @@ import java.util.Random;
 
 import net.kronos.rkon.core.ex.AuthenticationException;
 
+import top.starwish.namelessbot.utils.Utils;
+
 public class Rcon {
 	
 	private final Object sync = new Object();
@@ -92,13 +94,13 @@ public class Rcon {
 	 * @throws IOException
 	 */
 	public String command(String payload) throws IOException {
-		if(payload == null || payload.trim().isEmpty()) {
+		if (payload == null || payload.trim().isEmpty()) {
 			throw new IllegalArgumentException("Payload can't be null or empty");
 		}
 		
 		RconPacket response = this.send(RconPacket.SERVERDATA_EXECCOMMAND, payload.getBytes());
 		
-		return new String(response.getPayload(), this.getCharset());
+		return Utils.deColor(new String(response.getPayload(), this.getCharset()));
 	}
 	
 	private RconPacket send(int type, byte[] payload) throws IOException {
