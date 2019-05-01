@@ -3,7 +3,6 @@ package top.starwish.namelessbot;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.AttributeSetMethodGenerator;
 import me.dilley.MineStat;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
@@ -13,7 +12,6 @@ import top.starwish.namelessbot.entity.MCServer;
 import top.starwish.namelessbot.entity.QQGroup;
 import top.starwish.namelessbot.entity.RssItem;
 import top.starwish.namelessbot.utils.RSAUtils;
-import top.starwish.namelessbot.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
