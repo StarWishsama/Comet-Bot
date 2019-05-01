@@ -52,6 +52,10 @@ public class MCServer {
         return ServerInfo(serverIP, serverPort);
     }
 
+    public String getCustomServerInfo(){
+        return CustomServerInfo(serverIP, serverPort, infoMessage);
+    }
+
     /**
      * 获取 Minecraft 服务器信息
      * @author NamelessSAMA
@@ -68,5 +72,13 @@ public class MCServer {
                     + "\n版本: " + server.getVersion());
         } else
             return ("[Bot] 无法连接至 " + addr);
+    }
+
+    private static String CustomServerInfo(String addr, int port, String msg){
+        MineStat server = new MineStat(addr, port);
+        if (server.isServerUp()) {
+            return msg;
+        } else
+            return "[Bot] 无法连接至服务器.";
     }
 }

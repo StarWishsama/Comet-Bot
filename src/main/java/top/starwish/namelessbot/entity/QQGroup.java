@@ -5,6 +5,7 @@ public class QQGroup {
     private boolean autoAcceptJoinRequest;
     private String joinMsg;
     private String kickMsg;
+    private String serverInfoMsg;
 
     public QQGroup() {
     }
@@ -29,7 +30,7 @@ public class QQGroup {
         return joinMsg;
     }
 
-    public void setJoinMsg(){
+    public void setJoinMsg(String joinMsg){
         this.joinMsg = joinMsg;
     }
 
@@ -37,7 +38,15 @@ public class QQGroup {
         return kickMsg;
     }
 
-    public void setKickMsg(){
+    public void setKickMsg(String kickMsg){
         this.kickMsg = kickMsg;
+    }
+
+    public void setServerInfoMsg(String serverInfoMsg){
+        this.serverInfoMsg = serverInfoMsg;
+    }
+
+    public String getServerInfoMsg() {
+        return serverInfoMsg;
     }
 }
