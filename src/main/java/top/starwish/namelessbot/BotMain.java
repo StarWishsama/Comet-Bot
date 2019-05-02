@@ -209,6 +209,14 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         } else
                             mySendPrivateMsg(fromQQ, "[Bot] 你不是我的主人, 无法设置管理员哟");
                         break;
+                    case "reload":
+                        readConf();
+                        mySendPrivateMsg(fromQQ, "[Bot] Config reloaded.");
+                        break;
+                    case "save":
+                        saveConf();
+                        mySendPrivateMsg(fromQQ, "[Bot] Config saved.");
+                        break;
                     case "group":
                         switch (cmd[1]) {
                             case "list":
@@ -314,12 +322,14 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                         if (StringUtils.isNumeric(cmd[4]) && !cmd[3].isEmpty()) {
                                             long groupId = Integer.parseInt(cmd[4]);
                                             groupAliases.put(cmd[3], groupId);
+                                            mySendPrivateMsg(fromQQ, "[Bot] 成功添加群别名 " + cmd[3]  + "(" + groupId + ")");
                                         } else
-                                            mySendPrivateMsg(fromQQ, "[Bot] /setting aliases add [群号] [别名]");
+                                            mySendPrivateMsg(fromQQ, "[Bot] /setting aliases add [群别名] [群号]");
                                         break;
                                     case "del":
                                         if (!cmd[3].isEmpty()) {
                                             groupAliases.remove(cmd[3]);
+                                            mySendPrivateMsg(fromQQ, "[Bot] 成功删除群别名 " + cmd[3]);
                                         } else
                                             mySendPrivateMsg(fromQQ, "[Bot] /setting aliases del [群别名]");
                                         break;
