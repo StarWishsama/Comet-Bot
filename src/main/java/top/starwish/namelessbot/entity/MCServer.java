@@ -8,6 +8,9 @@ public class MCServer {
     private String infoMessage;
     private boolean isEnabled;
 
+    public MCServer(){
+    }
+
     public MCServer(String addr, int port){
         serverIP = addr;
         serverPort = port;
@@ -38,10 +41,11 @@ public class MCServer {
     public String getInfoMessage(){
         return infoMessage;
     }
+
     public void setInfoMessage(String infoMessage){
         this.infoMessage = infoMessage;
     }
-    public boolean ifEnabled(){
+    public boolean isEnabled(){
         return isEnabled;
     }
     public void setEnabled(boolean isEnabled){
@@ -77,7 +81,7 @@ public class MCServer {
     private static String CustomServerInfo(String addr, int port, String msg){
         MineStat server = new MineStat(addr, port);
         if (server.isServerUp()) {
-            return msg;
+            return msg.replaceAll("%延迟%", server.getLatency() + "").replaceAll("%在线玩家%", server.getCurrentPlayers()).replaceAll("%换行%", "\n");
         } else
             return "[Bot] 无法连接至服务器.";
     }

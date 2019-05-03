@@ -73,11 +73,11 @@ public class RssItem {
             SyndFeed feed = input.build(reader);
             // 得到Rss新闻中子项列表
             List<SyndEntry> entries = feed.getEntries();
-            SyndEntry entry = (SyndEntry) entries.get(0);
+            SyndEntry entry = entries.get(0);
             return (entry.getTitle() + "\n" + "-------------------------\n" + entry.getDescription().getValue().trim());
         } catch (Exception e) {
             e.printStackTrace();
-            return ("Encountered a wrong URL or a network error.");
+            return "Encountered a wrong URL or a network error.";
         }
     }
 

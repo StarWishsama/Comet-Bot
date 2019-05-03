@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.*;
 
 import top.starwish.namelessbot.entity.MCServer;
-import top.starwish.namelessbot.entity.QQGroup;
 import top.starwish.namelessbot.entity.RssItem;
 import top.starwish.namelessbot.utils.RSAUtils;
 
@@ -26,11 +25,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
     boolean botStatus = true;
     boolean debugMode = false;
-
-    int groupId = 0;
-    String serverIp = null;
-    int serverPort = 0;
-    String infoMessage = null;
 
     String rconIP = null;
     int rconPort = 0;
@@ -55,7 +49,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     List<String> triggerWords = new ArrayList<>();
     HashMap<String, Long> groupAliases = new HashMap<>();
 
-    HashMap<Long, QQGroup> groups = new HashMap<>();
+    HashMap<Long, MCServer> serverInfo = new HashMap<>();
 
     // main 函数仅供调试使用
     public static void main (String[] args) {
@@ -77,7 +71,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
             // process only after there's a command, in order to get rid of memory trash
             String temp = msg.trim();
-            String cmd[] = {"", "", "", "", ""};
+            String cmd[] = {"", "", "", "", "", "", ""};
 
             /**
              * @brief Processing msg into cmd & params
@@ -85,7 +79,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
              * @author Stiven.ding
              */
 
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 7; i++) {
                 temp = temp.trim();
                 if (temp.indexOf(' ') > 0) {
                     cmd[i] = temp.substring(0, temp.indexOf(' '));
@@ -101,7 +95,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             if (isBotAdmin || isOwner) {
                 switch (cmd[0]) {
                     case "say":
-                        String message = msg.replaceAll("/" + cmd[0] + " ", "").replaceAll(cmd[1] + " ", "").replaceAll("#", "");
+                        String message = msg.replaceFirst("/" + cmd[0] + " ", "").replaceFirst(cmd[1] + " ", "").replaceFirst("#", "");
                         if (cmd[1].equals("")) {
                             mySendPrivateMsg(fromQQ, "[Bot] 请输入需要转发的群号!");
                         } else if (groupAliases.containsKey(cmd[1])) {
@@ -224,6 +218,27 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 break;
                             case "set":
                                 switch (cmd[2].toLowerCase()) {
+                                    case "serverinfo":
+                                        if (StringUtils.isNumeric(cmd[3]) && !cmd[4].isEmpty() && StringUtils.isNumeric(cmd[5]) && !cmd[6].isEmpty()){
+                                            long groupId = Integer.parseInt(cmd[3]);
+                                            MCServer group = new MCServer();
+                                            group.setEnabled(true);
+                                            group.setServerIP(cmd[4]);
+                                            group.setServerPort(Integer.parseInt(cmd[5]));
+                                            group.setInfoMessage(msg.replace("/", "")
+                                                    .replace("#", "")
+                                                    .replace(" " + cmd[0] + " ", "")
+                                                    .replace(cmd[1], "")
+                                                    .replace(" " + cmd[2], "")
+                                                    .replace(" " + cmd[3], "")
+                                                    .replace(" " + cmd[4], "")
+                                                    .replace(" " + cmd[5] + " ", "")
+                                                    .replace("group ", "")
+                                            );
+                                            serverInfo.put(groupId, group);
+                                            mySendPrivateMsg(fromQQ, "[Bot] 添加成功, 你将可以在群 " + groupId + " 中获取指定服务器的状态!");
+                                        }
+                                        break;
                                     case "autoacceptList":
                                         if (!cmd[3].equals("") && !cmd[4].equals("")) {
                                             if (StringUtils.isNumeric(cmd[3])) {
@@ -674,11 +689,14 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             }
         }
         else if (msg.equals("服务器信息") || msg.equals("服务器状态")){
-            // Reworking
+            // Reworked
             if (botStatus) {
-                if (fromGroup == groupId){
-                    MCServer server = new MCServer(serverIp, serverPort, infoMessage);
-                    mySendGroupMsg(fromGroup, server.getCustomServerInfo());
+                if (serverInfo.containsKey(fromGroup)){
+                    MCServer group = serverInfo.get(fromGroup);
+                    if (group.isEnabled()) {
+                        MCServer server = new MCServer(group.getServerIP(), group.getServerPort(), group.getInfoMessage());
+                        mySendGroupMsg(fromGroup, server.getCustomServerInfo());
+                    }
                 }
             }
         }
@@ -780,11 +798,14 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
             JSONObject groupsObject = JSONObject.parseObject(FileProcess.readFile(groupsPath));
             autoAcceptList = JSON.parseObject(groupsObject.getString("autoAccept"), new TypeReference<List<Long>>(){});
-            joinMsg = JSON.parseObject(groupsObject.getString("joinMsg"), new TypeReference<HashMap<Long, String>>(){});
+            //joinMsg = JSON.parseObject(groupsObject.getString("joinMsg"), new TypeReference<HashMap<Long, String>>(){});
 
             JSONObject settingObject = JSONObject.parseObject(FileProcess.readFile(CQ.getAppDirectory() + "config.json"));
             triggerWords = JSON.parseObject(settingObject.getString("triggerWords"), new TypeReference<List<String>>(){});
             groupAliases = JSON.parseObject(settingObject.getString("groupAliases"), new TypeReference<HashMap<String, Long>>(){});
+
+            JSONObject serverInfoObject = JSONObject.parseObject(FileProcess.readFile(CQ.getAppDirectory() + "serverinfo.json"));
+            serverInfo = JSON.parseObject(serverInfoObject.getString("serverInfo"), new TypeReference<HashMap<Long, MCServer>>(){});
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -819,7 +840,12 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         JSONObject groupSettingObject = new JSONObject();
         groupSettingObject.put("autoAccept", autoAcceptList.toString());
         //groupSettingObject.put("joinMsg", joinMsg.toString());
-        FileProcess.createFile(groupsPath, JSONObject.toJSONString(groupSettingObject, SerializerFeature.WriteNullListAsEmpty,SerializerFeature.WriteNullStringAsEmpty));
+        FileProcess.createFile(groupsPath, groupSettingObject.toJSONString());
+
+        //服务器信息
+        JSONObject serverInfoObject = new JSONObject();
+        serverInfoObject.put("groups", serverInfo.toString());
+        FileProcess.createFile(CQ.getAppDirectory() + "serverinfo.json", serverInfoObject.toJSONString());
 
         //机器人设置
         JSONObject settingObject = new JSONObject();

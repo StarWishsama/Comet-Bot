@@ -26,9 +26,9 @@ public class BotUpdater {
 
     public static boolean isLatest(){
         boolean isLatest = false;
-        String latestver = getLatestVer();
+        String latestVer = getLatestVer();
         String current = VerClass.VERSION;
-        if (latestver.equalsIgnoreCase(current)){
+        if (latestVer.equalsIgnoreCase(current)){
             isLatest = true;
         }
         return isLatest;
