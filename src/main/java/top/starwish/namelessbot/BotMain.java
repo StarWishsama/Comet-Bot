@@ -266,28 +266,12 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     case "joinmsg":
                                         if (StringUtils.isNumeric(cmd[3]) && !cmd[4].equals("")) {
                                             long groupId = Integer.parseInt(cmd[3]);
-                                            if (!joinMsg.isEmpty()) {
-                                                if (!joinMsg.containsKey(groupId)) {
-                                                    joinMsg.put(groupId, cmd[4]);
-                                                    mySendPrivateMsg(fromQQ, "[Bot] 已打开群 " + groupId + " 的加群欢迎功能.");
-                                                } else {
-                                                    mySendPrivateMsg(fromQQ, "[Bot] 该群已经打开加群欢迎功能了!");
-                                                }
-                                            } else {
-                                                joinMsg.put(groupId, cmd[4]);
-                                                mySendPrivateMsg(fromQQ, "[Bot] 已打开群 " + groupId + " 的加群欢迎功能.");
-                                            }
+                                            joinMsg.put(groupId, cmd[4]);
+                                            mySendPrivateMsg(fromQQ, "[Bot] 已打开群 " + groupId + " 的加群欢迎功能.");
                                         } else if (cmd[3].equals("del") && StringUtils.isNumeric(cmd[4])) {
                                             long groupId = Integer.parseInt(cmd[4]);
-                                            if (!joinMsg.isEmpty()) {
-                                                if (!joinMsg.containsKey(groupId)) {
-                                                    mySendPrivateMsg(fromQQ, "[Bot] 该群没有打开加群欢迎功能!");
-                                                } else {
-                                                    joinMsg.remove(groupId);
-                                                    mySendPrivateMsg(fromQQ, "[Bot] 已关闭群 " + groupId + " 的加群欢迎功能.");
-                                                }
-                                            } else
-                                                mySendPrivateMsg(fromQQ, "[Bot] 没有群打开加群欢迎功能!");
+                                            joinMsg.remove(groupId);
+                                            mySendPrivateMsg(fromQQ, "[Bot] 已关闭群 " + groupId + " 的加群欢迎功能.");
                                         } else
                                             mySendPrivateMsg(fromQQ, "[Bot] 群号格式有误");
                                         break;
@@ -798,7 +782,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
             JSONObject groupsObject = JSONObject.parseObject(FileProcess.readFile(groupsPath));
             autoAcceptList = JSON.parseObject(groupsObject.getString("autoAccept"), new TypeReference<List<Long>>(){});
-            //joinMsg = JSON.parseObject(groupsObject.getString("joinMsg"), new TypeReference<HashMap<Long, String>>(){});
+            joinMsg = JSON.parseObject(groupsObject.getString("joinMsg"), new TypeReference<HashMap<Long, String>>(){});
 
             JSONObject settingObject = JSONObject.parseObject(FileProcess.readFile(CQ.getAppDirectory() + "config.json"));
             triggerWords = JSON.parseObject(settingObject.getString("triggerWords"), new TypeReference<List<String>>(){});
@@ -839,7 +823,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         //群设置json (WIP)
         JSONObject groupSettingObject = new JSONObject();
         groupSettingObject.put("autoAccept", autoAcceptList.toString());
-        //groupSettingObject.put("joinMsg", joinMsg.toString());
+        groupSettingObject.put("joinMsg", joinMsg.toString());
         FileProcess.createFile(groupsPath, groupSettingObject.toJSONString());
 
         //服务器信息
