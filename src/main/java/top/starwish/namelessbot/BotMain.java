@@ -239,7 +239,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                             group.setServerPort(Integer.parseInt(cmd[5]));
                                             group.setInfoMessage(msg.replace("/", "")
                                                     .replace("#", "")
-                                                    .replace(" " + cmd[0] + " ", "")
+                                                    .replace(cmd[0] + " ", "")
                                                     .replace(cmd[1], "")
                                                     .replace(" " + cmd[2], "")
                                                     .replace(" " + cmd[3], "")
@@ -567,7 +567,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     break;
                                 case "serverinfo":
                                     if (!cmd[2].equals("") && StringUtils.isNumeric(cmd[3])) {
-                                        mySendGroupMsg(fromGroup, new MCServer(cmd[2], Integer.parseInt(cmd[3])).getServerInfo());
+                                        MCServer server = new MCServer();
+                                        server.setServerIP(cmd[2]);
+                                        server.setServerPort(Integer.parseInt(cmd[3]));
+                                        mySendGroupMsg(fromGroup, server.getServerInfo());
                                     } else
                                         mySendGroupMsg(fromGroup, "[Bot] Please check IP address or Port.");
                                     break;
@@ -687,9 +690,12 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             // Reworked
             if (botStatus) {
                 if (serverInfo.containsKey(fromGroup)){
-                    MCServer group = new MCServer();
+                    MCServer group = serverInfo.get(fromGroup);
                     if (group.isEnabled()) {
-                        MCServer server = new MCServer(group.getServerIP(), group.getServerPort(), group.getInfoMessage());
+                        MCServer server = new MCServer();
+                        server.setServerIP(group.getServerIP());
+                        server.setServerPort(group.getServerPort());
+                        server.setInfoMessage(group.getInfoMessage());
                         mySendGroupMsg(fromGroup, server.getCustomServerInfo());
                     }
                 }
@@ -728,7 +734,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             @Override
             public void run() {
                 if (Calendar.getInstance().get(Calendar.MINUTE) == 30)
-                    soliDotPusher();
+                    solidotPusher();
             }
         }, c.getTime(), 1000 * 60);
 
@@ -799,8 +805,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             triggerWords = JSON.parseObject(settingObject.getString("triggerWords"), new TypeReference<List<String>>(){});
             groupAliases = JSON.parseObject(settingObject.getString("groupAliases"), new TypeReference<Map<String, Long>>(){});
 
-            //JSONObject serverInfoObject = JSONObject.parseObject(FileProcess.readFile(CQ.getAppDirectory() + "serverinfo.json"));
-            //serverInfo = (Map<Long, MCServer>)serverInfoObject.getString("groups");
+            JSONObject serverInfoObject = JSONObject.parseObject(FileProcess.readFile(CQ.getAppDirectory() + "serverinfo.json"));
+            serverInfo = JSON.parseObject(serverInfoObject.getString("groups"), new TypeReference<Map<Long, MCServer>>(){});
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -915,7 +921,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             CQ.sendPrivateMsg(fromQQ, msg);
     }
 
-    private void soliDotPusher() {
+    private void solidotPusher() {
         if (botStatus && solidot.getStatus()) {
             String tempPath = CQ.getAppDirectory() + "solidottemp.txt";
             String tempTitle = "";
@@ -925,8 +931,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                 FileProcess.createFile(tempPath, solidot.getTitle());
                 e.printStackTrace();
             }
-            File solidottemp = new File(tempPath);
-            if (!solidottemp.exists()) {
+            File solidotTemp = new File(tempPath);
+            if (!solidotTemp.exists()) {
                 FileProcess.createFile(tempPath, solidot.getTitle());
             } else {
                 String title = solidot.getTitle();

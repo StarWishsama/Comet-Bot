@@ -11,17 +11,6 @@ public class MCServer {
     public MCServer(){
     }
 
-    public MCServer(String addr, int port){
-        serverIP = addr;
-        serverPort = port;
-    }
-
-    public MCServer(String addr, int port, String msg){
-        serverIP = addr;
-        serverPort = port;
-        infoMessage = msg;
-    }
-
     public String getServerIP(){
         return serverIP;
     }
