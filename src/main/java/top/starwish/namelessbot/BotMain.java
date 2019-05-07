@@ -9,8 +9,10 @@ import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.*;
 
 import top.starwish.namelessbot.entity.MCServer;
+import top.starwish.namelessbot.entity.QQGroup;
 import top.starwish.namelessbot.entity.RssItem;
 import top.starwish.namelessbot.utils.RSAUtils;
+import top.starwish.namelessbot.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +52,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     Map<String, Long> groupAliases = new HashMap<>();
 
     Map<Long, MCServer> serverInfo = new HashMap<>();
+    Map<Long, QQGroup> groups = new HashMap<>();
 
     // main 函数仅供调试使用
     public static void main (String[] args) {
@@ -248,6 +251,13 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                             );
                                             serverInfo.put((long)Integer.parseInt(cmd[3]), group);
                                             mySendPrivateMsg(fromQQ, "[Bot] 添加成功, 你将可以在群 " + cmd[3] + " 中获取指定服务器的状态!");
+                                        } else if (cmd[3].equalsIgnoreCase("del") && StringUtils.isNumeric(cmd[4])){
+                                            if (serverInfo.containsKey((long)Integer.parseInt(cmd[4]))){
+                                                serverInfo.remove((long)Integer.parseInt(cmd[4]));
+                                                mySendPrivateMsg(fromQQ, "[Bot] 已删除群 " + cmd[4] + " 的服务器信息");
+                                            } else {
+                                                mySendPrivateMsg(fromQQ, "[Bot] " + cmd[4] + " 没有设置服务器信息");
+                                            }
                                         }
                                         break;
                                     case "autoacceptList":
@@ -289,7 +299,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     default:
                                         mySendPrivateMsg(fromQQ, "= 群设置帮助 =\n" +
                                                 "/group set autoAcceptList [群号] [t/f]\n" +
-                                                "/group set joinMsg [群号] [入群欢迎消息]");
+                                                "/group set joinMsg [群号] [入群欢迎消息]\n" +
+                                                "/group set serverinfo [群号] [服务器IP] [服务器端口] [自定义信息]");
                                         break;
                                 }
                                 break;
@@ -332,16 +343,14 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                         if (StringUtils.isNumeric(cmd[4]) && !cmd[3].isEmpty()) {
                                             long groupId = Integer.parseInt(cmd[4]);
                                             groupAliases.put(cmd[3], groupId);
-                                            mySendPrivateMsg(fromQQ, "[Bot] 成功添加群别名 " + cmd[3]  + "(" + groupId + ")");
-                                        } else
-                                            mySendPrivateMsg(fromQQ, "[Bot] /setting aliases add [群别名] [群号]");
+                                            mySendPrivateMsg(fromQQ, "[Bot] 成功添加群别名 " + cmd[3] + "(" + groupId + ")");
+                                        }
                                         break;
                                     case "del":
                                         if (!cmd[3].isEmpty()) {
                                             groupAliases.remove(cmd[3]);
                                             mySendPrivateMsg(fromQQ, "[Bot] 成功删除群别名 " + cmd[3]);
-                                        } else
-                                            mySendPrivateMsg(fromQQ, "[Bot] /setting aliases del [群别名]");
+                                        }
                                         break;
                                 }
                                 break;
@@ -567,10 +576,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     break;
                                 case "serverinfo":
                                     if (!cmd[2].equals("") && StringUtils.isNumeric(cmd[3])) {
-                                        MCServer server = new MCServer();
-                                        server.setServerIP(cmd[2]);
-                                        server.setServerPort(Integer.parseInt(cmd[3]));
-                                        mySendGroupMsg(fromGroup, server.getServerInfo());
+                                        mySendGroupMsg(fromGroup, Utils.getServerInfo(cmd[2], Integer.parseInt(cmd[3])));
                                     } else
                                         mySendGroupMsg(fromGroup, "[Bot] Please check IP address or Port.");
                                     break;
@@ -692,11 +698,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                 if (serverInfo.containsKey(fromGroup)){
                     MCServer group = serverInfo.get(fromGroup);
                     if (group.isEnabled()) {
-                        MCServer server = new MCServer();
-                        server.setServerIP(group.getServerIP());
-                        server.setServerPort(group.getServerPort());
-                        server.setInfoMessage(group.getInfoMessage());
-                        mySendGroupMsg(fromGroup, server.getCustomServerInfo());
+                        String ip = group.getServerIP();
+                        int port = group.getServerPort();
+                        String customMsg = group.getInfoMessage();
+                        mySendGroupMsg(fromGroup, Utils.getCustomServerInfo(ip, port, customMsg));
                     }
                 }
             }
@@ -727,16 +732,16 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
         Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR_OF_DAY, 7);
-        c.set(Calendar.MINUTE, 15);
+        c.set(Calendar.MINUTE, 10);
 
-        Timer solidotPusher = new Timer();
-        solidotPusher.scheduleAtFixedRate(new TimerTask() {
+        Timer soliDotPusher = new Timer();
+        soliDotPusher.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 if (Calendar.getInstance().get(Calendar.MINUTE) == 30)
                     solidotPusher();
             }
-        }, c.getTime(), 1000 * 60);
+        }, c.getTime(), 1000 * 60 * 5);
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
