@@ -2,6 +2,9 @@ package top.starwish.namelessbot.utils;
 
 import me.dilley.MineStat;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Utils {
     public static String deColor(String string){
         return string.replaceAll("§a", "")
@@ -32,7 +35,7 @@ public class Utils {
      * @author NamelessSAMA
      * @param addr
      * @param port
-     * @return
+     * @return serverStatus
      */
     public static String getServerInfo(String addr, int port){
         MineStat server = new MineStat(addr, port);
@@ -56,5 +59,9 @@ public class Utils {
                     .replaceAll("%版本%", server.getVersion());
         } else
             return "[Bot] 无法连接至服务器.";
+    }
+
+    public static boolean isCheckinReset(Date currentTime, Date compareTime){
+        return currentTime.getTime() / 1000 >= compareTime.getTime() / 1000 + 86400;
     }
 }

@@ -1,16 +1,17 @@
 package top.starwish.namelessbot;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
+
 import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
+
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.*;
 
-import top.starwish.namelessbot.entity.Checkin;
+import top.starwish.namelessbot.entity.CheckIn;
 import top.starwish.namelessbot.entity.MCServer;
-import top.starwish.namelessbot.entity.QQGroup;
 import top.starwish.namelessbot.entity.RssItem;
 import top.starwish.namelessbot.utils.RSAUtils;
 import top.starwish.namelessbot.utils.Utils;
@@ -53,7 +54,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     Map<String, Long> groupAliases = new HashMap<>();
 
     Map<Long, MCServer> serverInfo = new HashMap<>();
-    Map<Long, Checkin> checkinUsers = new HashMap<>();
+    Map<Long, CheckIn> checkinUsers = new HashMap<>();
 
     // main 函数仅供调试使用
     public static void main (String[] args) {
@@ -538,17 +539,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 case "rss": // 代码中务必只用小写，确保大小写不敏感
                                     mySendGroupMsg(fromGroup, new RssItem(cmd[2]).getContext());
                                     break;
-                                case "reload":
-                                    readConf();
-                                    mySendGroupMsg(fromGroup, "[Bot] Config reloaded.");
-                                    break;
-                                case "save":
-                                    saveConf();
-                                    mySendGroupMsg(fromGroup, "[Bot] Config saved.");
-                                    break;
-                                case "parse":
-                                    mySendGroupMsg(fromGroup, saveConf());
-                                    break;
                                 case "toh":
                                     String text = todayOnHistory.getContext();
                                     mySendGroupMsg(111852382L,
@@ -577,15 +567,22 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                      * 判定时间
                                      */
                                     if (!checkinUsers.containsKey(fromQQ)) {
-                                        Checkin checkin = new Checkin();
+                                        CheckIn checkin = new CheckIn();
                                         Date currentDate = new Date();
+                                        int point = new Random().nextInt(100);
                                         checkin.setCheckInQQ(fromQQ);
-                                        checkin.setIsSignup(true);
                                         checkin.setLastCheckInTime(currentDate);
+                                        checkin.setCheckInPoint(point);
                                         checkinUsers.put(fromQQ, checkin);
-                                        mySendGroupMsg(fromGroup, "[Bot] 签到成功于 " + currentDate.toString());
-                                    } else if (checkinUsers.containsKey(fromQQ) && !checkinUsers.get(fromQQ).isCheckIn()){
-                                        mySendGroupMsg(fromGroup, "[Bot] 签到成功于 " + new Date().toString());
+                                        mySendGroupMsg(fromGroup, "[Bot] 签到成功!\n" +
+                                                "获得 " + point + "点积分!"
+                                                );
+                                    } else if (checkinUsers.containsKey(fromQQ) && Utils.isCheckinReset(new Date(), checkinUsers.get(fromQQ).getLastCheckInTime())){
+                                        int point = new Random().nextInt(100);
+                                        checkinUsers.get(fromQQ).setCheckInPoint(checkinUsers.get(fromQQ).getCheckInPoint() + point);
+                                        mySendGroupMsg(fromGroup, "[Bot] 签到成功!\n" +
+                                                "获得 " + point + "点积分!"
+                                        );
                                     } else {
                                         mySendGroupMsg(fromGroup, "[Bot] 你今天已经签到过了!");
                                     }
@@ -682,6 +679,17 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                         }
                                         break;
                                     }
+                                case "reload":
+                                    readConf();
+                                    mySendGroupMsg(fromGroup, "[Bot] 配置已重新载入.");
+                                    break;
+                                case "save":
+                                    saveConf();
+                                    mySendGroupMsg(fromGroup, "[Bot] 配置已保存.");
+                                    break;
+                                case "parse":
+                                    mySendGroupMsg(fromGroup, saveConf());
+                                    break;
                                 default:
                                     mySendGroupMsg(fromGroup, "= Bot 管理员控制面板 =\n" +
                                             " /admin list 列出所有无名 Bot 的管理员\n" +
@@ -823,6 +831,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             JSONObject serverInfoObject = JSONObject.parseObject(FileProcess.readFile(CQ.getAppDirectory() + "serverinfo.json"));
             serverInfo = JSON.parseObject(serverInfoObject.getString("groups"), new TypeReference<Map<Long, MCServer>>(){});
 
+            JSONObject checkInObject = JSONObject.parseObject(FileProcess.readFile(CQ.getAppDirectory() + "qiandao.json"));
+            checkinUsers = JSON.parseObject(checkInObject.getString("checkinUsers"), new TypeReference<Map<Long, CheckIn>>(){});
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -868,8 +879,13 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         if (!groupAliases.isEmpty()) {
             settingObject.put("triggerWords", filterWords);
             settingObject.put("groupAliases", groupAliases);
-            FileProcess.createFile(CQ.getAppDirectory() + "config.json", JSONObject.toJSONString(settingObject, SerializerFeature.WriteNullStringAsEmpty));
+            FileProcess.createFile(CQ.getAppDirectory() + "config.json", settingObject.toJSONString());
         }
+
+        //签到
+        JSONObject checkInObject = new JSONObject();
+        checkInObject.put("checkinUsers", checkinUsers);
+        FileProcess.createFile(CQ.getAppDirectory() + "qiandao.json", checkInObject.toJSONString());
 
         CQ.logDebug("JSON", "配置已保存.");
 

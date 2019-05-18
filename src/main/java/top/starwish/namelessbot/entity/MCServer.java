@@ -1,7 +1,5 @@
 package top.starwish.namelessbot.entity;
 
-import me.dilley.MineStat;
-
 public class MCServer {
     private String serverIP;
     private int serverPort;
