@@ -31,7 +31,7 @@ public class Rcon {
 	 */
 	public Rcon(String host, int port, byte[] password) throws IOException, AuthenticationException {
 		// Default charset is utf8
-		this.charset = Charset.forName("UTF-8");
+		this.charset = Charset.forName("GBK");
 		
 		// Connect to host
 		this.connect(host, port, password);
