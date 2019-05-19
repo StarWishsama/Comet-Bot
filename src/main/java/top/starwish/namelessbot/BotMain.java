@@ -725,7 +725,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         break;
                     case "info":
                         if (checkinUsers.containsKey(fromQQ)){
-                            int point = checkinUsers.get(fromQQ).getCheckInPoint();
+                            double point = checkinUsers.get(fromQQ).getCheckInPoint();
                             int day = checkinUsers.get(fromQQ).getCheckInTime();
                             String lastCheckInTime = new SimpleDateFormat("yyyy-MM-dd").format(checkinUsers.get(fromQQ).getLastCheckInTime());
                             mySendGroupMsg(fromGroup, CC.at(fromQQ) + " " + CQ.getStrangerInfo(fromQQ).getNick() + "\n积分: " + point + "  连续签到了" + day + "天\n上次签到于 " + lastCheckInTime);
