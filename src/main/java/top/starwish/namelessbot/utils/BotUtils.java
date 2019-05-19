@@ -74,14 +74,12 @@ public class BotUtils {
 
     public static double checkInPointBonus(int time){
         if (time > 0 && time <= 7){
-            return 1.5;
-        } else if (time > 7 && time <= 15){
-            return 1.8;
-        } else if (time > 15 && time <= 30){
-            return 2;
+            return 1;
+        } else if (time > 7 && time <= 30){
+            return 1.1;
         } else if (time > 30){
-            return 2.2;
+            return 1.2;
         }
-        return 1;
+        return 0;
     }
 }
