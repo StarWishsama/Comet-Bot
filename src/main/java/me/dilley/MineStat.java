@@ -24,7 +24,7 @@
 
 package me.dilley;
 
-import top.starwish.namelessbot.utils.Utils;
+import top.starwish.namelessbot.utils.BotUtils;
 
 import java.io.*;
 import java.net.*;
@@ -131,7 +131,7 @@ public class MineStat
       {
         serverUp = true;
         setVersion(serverData[2].replace("\u0000", ""));
-        setMotd(Utils.deColor(serverData[3].replace("\u0000", "")));
+        setMotd(BotUtils.deColor(serverData[3].replace("\u0000", "")));
         setCurrentPlayers(serverData[4].replace("\u0000", ""));
         setMaximumPlayers(serverData[5].replace("\u0000", ""));
       }

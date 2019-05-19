@@ -14,12 +14,13 @@ import top.starwish.namelessbot.entity.CheckIn;
 import top.starwish.namelessbot.entity.MCServer;
 import top.starwish.namelessbot.entity.RssItem;
 import top.starwish.namelessbot.utils.RSAUtils;
-import top.starwish.namelessbot.utils.Utils;
+import top.starwish.namelessbot.utils.BotUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
@@ -555,43 +556,32 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     break;
                                 case "serverinfo":
                                     if (!cmd[2].equals("") && StringUtils.isNumeric(cmd[3])) {
-                                        mySendGroupMsg(fromGroup, Utils.getServerInfo(cmd[2], Integer.parseInt(cmd[3])));
+                                        mySendGroupMsg(fromGroup, BotUtils.getServerInfo(cmd[2], Integer.parseInt(cmd[3])));
                                     } else
                                         mySendGroupMsg(fromGroup, "[Bot] Please check IP address or Port.");
                                     break;
                                 case "checkin":
-                                    /**
-                                     * @TODO
-                                     * 第二天重置签到状态
-                                     * 积分系统
-                                     * 判定时间
-                                     */
-                                    if (!checkinUsers.containsKey(fromQQ)) {
-                                        CheckIn checkin = new CheckIn();
-                                        Date currentDate = new Date();
-                                        int point = new Random().nextInt(100);
-                                        checkin.setCheckInQQ(fromQQ);
-                                        checkin.setLastCheckInTime(currentDate);
-                                        checkin.setCheckInPoint(point);
-                                        checkinUsers.put(fromQQ, checkin);
-                                        mySendGroupMsg(fromGroup, "[Bot] 签到成功!\n" +
-                                                "获得 " + point + "点积分!"
-                                                );
-                                    } else if (checkinUsers.containsKey(fromQQ) && Utils.isCheckinReset(new Date(), checkinUsers.get(fromQQ).getLastCheckInTime())){
-                                        int point = new Random().nextInt(100);
-                                        checkinUsers.get(fromQQ).setCheckInPoint(checkinUsers.get(fromQQ).getCheckInPoint() + point);
-                                        mySendGroupMsg(fromGroup, "[Bot] 签到成功!\n" +
-                                                "获得 " + point + "点积分!"
-                                        );
-                                    } else {
-                                        mySendGroupMsg(fromGroup, "[Bot] 你今天已经签到过了!");
+                                    if (isOwner){
+                                        switch (cmd[2].toLowerCase()){
+                                            case "set":
+                                                long userQQ = StringUtils.isNumeric(cmd[3]) ? Integer.parseInt(cmd[3]) : CC.getAt(cmd[3]);
+                                                CheckIn user = checkinUsers.get(userQQ);
+                                                user.setCheckInPoint(Integer.parseInt(cmd[4]));
+                                                mySendGroupMsg(fromGroup, "[Bot] 已设置 " + CQ.getStrangerInfo(userQQ).getNick() + " 的积分为 " + cmd[4]);
+                                                break;
+                                            case "reset":
+                                                long userQQ1 = StringUtils.isNumeric(cmd[3]) ? Integer.parseInt(cmd[3]) : CC.getAt(cmd[3]);
+                                                CheckIn user1 = checkinUsers.get(userQQ1);
+                                                user1.setCheckInPoint(0);
+                                                mySendGroupMsg(fromGroup, "[Bot] 已重置 " + CQ.getStrangerInfo(userQQ1).getNick() + " 的签到积分");
+                                                break;
+                                        }
                                     }
                                     break;
                                 default:
                                     mySendGroupMsg(fromGroup,
                                             "Version: " + VerClass.VERSION + "\nDebug Menu:"
-                                                    + "\n rss [URL] - Get context manually" + "\n reload - Reload config"
-                                                    + "\n save - Save config" + "\n parse - Parse JSON"
+                                                    + "\n rss [URL] - Get context manually"
                                                     + "\n toh - Get todayOnHistory" + "\n wel [#/@] - Manually welcome"
                                                     + "\n serverinfo [IP/addr] [Port] - Get minecraft server info"
                                     );
@@ -606,20 +596,20 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     : CC.getAt(cmd[1]);
                             if (cmd[2].equals("")) {
                                 if ("".equals(cmd[1])) {
-                                    mySendGroupMsg(fromGroup, "[Bot] 用法: /kick [@/QQ号] [是否永封(t/f)]");
+                                    mySendGroupMsg(fromGroup, "[Bot] 用法: /kick [@/QQ号] (是否永封(t/f))");
                                 } else {
                                     CQ.setGroupKick(fromGroup, kickQQ, false);
-                                    mySendGroupMsg(fromGroup, "[Bot] 已踢出 " + CQ.getGroupMemberInfo(kickQQ, fromGroup).getNick());
+                                    mySendGroupMsg(fromGroup, "[Bot] 已踢出 " + CC.at(fromQQ));
                                 }
                             } else
                                 switch (cmd[2]) {
                                     case "t":
                                         CQ.setGroupKick(fromGroup, kickQQ, true);
-                                        mySendGroupMsg(fromGroup, "[Bot] 已踢出 " + CQ.getGroupMemberInfo(kickQQ, fromGroup).getNick());
+                                        mySendGroupMsg(fromGroup, "[Bot] 已踢出 " + CC.at(fromQQ));
                                         break;
                                     case "f":
                                         CQ.setGroupKick(fromGroup, kickQQ, false);
-                                        mySendGroupMsg(fromGroup, "[Bot] 已踢出 " + CQ.getGroupMemberInfo(kickQQ, fromGroup).getNick());
+                                        mySendGroupMsg(fromGroup, "[Bot] 已踢出 " + CC.at(fromQQ));
                                         break;
                                     default:
                                         break;
@@ -694,12 +684,53 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     mySendGroupMsg(fromGroup, "= Bot 管理员控制面板 =\n" +
                                             " /admin list 列出所有无名 Bot 的管理员\n" +
                                             " /admin add [@/QQ] 添加管理员\n" +
-                                            " /admin del [@/QQ] 移除管理员"
+                                            " /admin del [@/QQ] 移除管理员\n" +
+                                            " /admin reload 重载配置" +
+                                            " /admin save 保存配置" +
+                                            " /admin parse"
                                     );
                                     break;
                             }
                         } else
                             mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                        break;
+                    case "checkin":
+                        if (!checkinUsers.containsKey(fromQQ)) {
+                            CheckIn checkin = new CheckIn();
+                            Date currentDate = new Date();
+                            int point = new Random().nextInt(100);
+                            checkin.setCheckInQQ(fromQQ);
+                            checkin.setLastCheckInTime(currentDate);
+                            checkin.setCheckInPoint(point);
+                            checkin.setCheckInTime(1);
+                            checkinUsers.put(fromQQ, checkin);
+                            mySendGroupMsg(fromGroup, "[Bot] 签到成功!\n" +
+                                    "获得 " + point + "点积分!"
+                            );
+                        } else if (checkinUsers.containsKey(fromQQ) && BotUtils.isCheckInReset(new Date(), checkinUsers.get(fromQQ).getLastCheckInTime())){
+                            double point = new Random().nextInt(10);
+                            CheckIn user = checkinUsers.get(fromQQ);
+                            if (user.getCheckInTime() > 1){
+                                user.setCheckInPoint(checkinUsers.get(fromQQ).getCheckInPoint() + point * BotUtils.checkInPointBonus(user.getCheckInTime()));
+                            } else
+                                user.setCheckInPoint(checkinUsers.get(fromQQ).getCheckInPoint() + point);
+                            user.setLastCheckInTime(new Date());
+                            user.setCheckInTime(user.getCheckInTime() + 1);
+                            mySendGroupMsg(fromGroup, "[Bot] 签到成功!\n" +
+                                    "获得 " + point + "点积分!"
+                            );
+                        } else {
+                            mySendGroupMsg(fromGroup, "[Bot] 你今天已经签到过了!");
+                        }
+                        break;
+                    case "info":
+                        if (checkinUsers.containsKey(fromQQ)){
+                            int point = checkinUsers.get(fromQQ).getCheckInPoint();
+                            int day = checkinUsers.get(fromQQ).getCheckInTime();
+                            String lastCheckInTime = new SimpleDateFormat("yyyy-MM-dd").format(checkinUsers.get(fromQQ).getLastCheckInTime());
+                            mySendGroupMsg(fromGroup, CC.at(fromQQ) + " " + CQ.getStrangerInfo(fromQQ).getNick() + "\n积分: " + point + "  连续签到了" + day + "天\n上次签到于 " + lastCheckInTime);
+                        } else
+                            mySendGroupMsg(fromGroup, "[Bot] 你还没有签到过哦");
                         break;
                 }
             } else if (cmd[0].equals("switch") && cmd[1].equals("on")) {
@@ -719,7 +750,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         String ip = group.getServerIP();
                         int port = group.getServerPort();
                         String customMsg = group.getInfoMessage();
-                        mySendGroupMsg(fromGroup, Utils.getCustomServerInfo(ip, port, customMsg));
+                        mySendGroupMsg(fromGroup, BotUtils.getCustomServerInfo(ip, port, customMsg));
                     }
                 }
             }
@@ -744,7 +775,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         }
 
         /**
-         * @brief 启动时计划定时推送 & save confirguration
+         * @brief 启动时计划定时推送 & save configuration
          * @author Starwish.sama
          */
 

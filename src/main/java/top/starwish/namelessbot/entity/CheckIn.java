@@ -6,7 +6,8 @@ import java.util.Date;
 public class CheckIn {
     private long checkInQQ = 0;
     private Date lastCheckInTime = new Date();
-    private int checkInPoint = 0;
+    private double checkInPoint = 0;
+    private int checkInTime = 0;
 
     public CheckIn() {
     }
@@ -19,13 +20,19 @@ public class CheckIn {
     public Date getLastCheckInTime(){
         return lastCheckInTime;
     }
-    public void setLastCheckInTime(Date lastCheckInTime){
-        this.lastCheckInTime = lastCheckInTime;
+    public void setLastCheckInTime(Date date){
+        lastCheckInTime = date;
     }
-    public int getCheckInPoint(){
+    public double getCheckInPoint(){
         return checkInPoint;
     }
-    public void setCheckInPoint(int point){
+    public void setCheckInPoint(double point){
         checkInPoint = point;
+    }
+    public int getCheckInTime(){
+        return checkInTime;
+    }
+    public void setCheckInTime(int time){
+        checkInTime = time;
     }
 }

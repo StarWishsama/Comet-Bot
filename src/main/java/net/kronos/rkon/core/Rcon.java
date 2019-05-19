@@ -7,7 +7,7 @@ import java.util.Random;
 
 import net.kronos.rkon.core.ex.AuthenticationException;
 
-import top.starwish.namelessbot.utils.Utils;
+import top.starwish.namelessbot.utils.BotUtils;
 
 public class Rcon {
 	
@@ -100,7 +100,7 @@ public class Rcon {
 		
 		RconPacket response = this.send(RconPacket.SERVERDATA_EXECCOMMAND, payload.getBytes());
 		
-		return Utils.deColor(new String(response.getPayload(), this.getCharset()));
+		return BotUtils.deColor(new String(response.getPayload(), this.getCharset()));
 	}
 	
 	private RconPacket send(int type, byte[] payload) throws IOException {

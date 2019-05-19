@@ -5,7 +5,7 @@ import me.dilley.MineStat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Utils {
+public class BotUtils {
     public static String deColor(String string){
         return string.replaceAll("§a", "")
                 .replaceAll("§b", "")
@@ -61,7 +61,27 @@ public class Utils {
             return "[Bot] 无法连接至服务器.";
     }
 
-    public static boolean isCheckinReset(Date currentTime, Date compareTime){
-        return currentTime.getTime() / 1000 >= compareTime.getTime() / 1000 + 86400;
+    /**
+     * @author NamelessSAMA
+     * @param currentTime 当前时间
+     * @param compareTime 需要比较的时间
+     * @return true / false
+     */
+    public static boolean isCheckInReset(Date currentTime, Date compareTime){
+        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
+        return !sdt.format(currentTime).equals(sdt.format(compareTime));
+    }
+
+    public static double checkInPointBonus(int time){
+        if (time > 0 && time <= 7){
+            return 1.5;
+        } else if (time > 7 && time <= 15){
+            return 1.8;
+        } else if (time > 15 && time <= 30){
+            return 2;
+        } else if (time > 30){
+            return 2.2;
+        }
+        return 1;
     }
 }
