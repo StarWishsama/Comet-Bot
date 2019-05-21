@@ -100,7 +100,7 @@ public class Rcon {
 		
 		RconPacket response = this.send(RconPacket.SERVERDATA_EXECCOMMAND, payload.getBytes());
 		
-		return BotUtils.deColor(new String(response.getPayload(), this.getCharset()));
+		return BotUtils.removeColor(new String(response.getPayload(), this.getCharset()));
 	}
 	
 	private RconPacket send(int type, byte[] payload) throws IOException {

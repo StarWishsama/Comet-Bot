@@ -7,7 +7,6 @@ import com.sobte.cqp.jcq.event.JcqAppAbstract;
 
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.*;
 
@@ -398,7 +397,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
              */
 
             if (botStatus){
-                switch (cmd[0]) {
+                switch (cmd[0].toLowerCase()) {
                     // 帮助命令
                     case "help":
                         mySendGroupMsg(fromGroup,
@@ -568,7 +567,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                                 try {
                                                     long userQQ = StringUtils.isNumeric(cmd[3]) ? Integer.parseInt(cmd[3]) : CC.getAt(cmd[3]);
                                                     CheckIn user = checkinUsers.get(userQQ);
-                                                    double point = Integer.parseInt(cmd[4]);
+                                                    double point = Double.parseDouble(cmd[4]);
                                                     user.setCheckInPoint(point);
                                                     mySendGroupMsg(fromGroup, "[Bot] 已设置 " + CQ.getStrangerInfo(userQQ).getNick() + " 的积分为 " + point);
                                                 } catch (Exception ignored){
@@ -706,6 +705,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
                         break;
                     case "qd":
+                    case "签到":
                     case "checkin":
                         if (!checkinUsers.containsKey(fromQQ)) {
                             CheckIn checkin = new CheckIn();
@@ -720,12 +720,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     "获得 " + point + "点积分!"
                             );
                         } else if (checkinUsers.containsKey(fromQQ) && BotUtils.isCheckInReset(new Date(), checkinUsers.get(fromQQ).getLastCheckInTime())) {
-                            double point = new Random().nextInt(10);
                             CheckIn user = checkinUsers.get(fromQQ);
-                            if (user.getCheckInTime() > 1) {
-                                user.setCheckInPoint(checkinUsers.get(fromQQ).getCheckInPoint() + point * BotUtils.checkInPointBonus(user.getCheckInTime()));
-                            } else
-                                user.setCheckInPoint(checkinUsers.get(fromQQ).getCheckInPoint() + point);
+                            double point = new Random().nextInt(10) * BotUtils.checkInPointBonus(user.getCheckInTime());
+                            user.setCheckInPoint(checkinUsers.get(fromQQ).getCheckInPoint() + point);
                             user.setLastCheckInTime(new Date());
                             user.setCheckInTime(user.getCheckInTime() + 1);
                             mySendGroupMsg(fromGroup, "[Bot] 签到成功!\n" +
@@ -779,9 +776,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
         readConf();
 
-        if (!BotUpdater.isLatest()){
-            CQ.logInfo("Updater", "Nameless Bot 有新版本: " + BotUpdater.getLatestVer());
-            mySendPrivateMsg(ownerQQ, "Nameless Bot 有新版本: " + BotUpdater.getLatestVer());
+        if (!CheckBotUpdate.isLatest()){
+            CQ.logInfo("Updater", "Nameless Bot 有新版本: " + CheckBotUpdate.getLatestVer());
+            mySendPrivateMsg(ownerQQ, "Nameless Bot 有新版本: " + CheckBotUpdate.getLatestVer());
         }
 
         /**

@@ -6,7 +6,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class BotUtils {
-    public static String deColor(String string){
+    /**
+     * @param string 需要去除彩色符号的字符串
+     * @return 去除彩色符号的字符串
+     */
+    public static String removeColor(String string){
         return string.replaceAll("§a", "")
                 .replaceAll("§b", "")
                 .replaceAll("§c", "")
@@ -48,6 +52,13 @@ public class BotUtils {
             return ("[Bot] 无法连接至 " + addr);
     }
 
+    /**
+     * 获取 Minecraft 服务器信息 (自定义消息样式)
+     * @param addr 服务器IP
+     * @param port 端口
+     * @param msg 自定义消息
+     * @return 服务器状态
+     */
     public static String getCustomServerInfo(String addr, int port, String msg){
         MineStat server = new MineStat(addr, port);
         if (server.isServerUp()) {
@@ -62,20 +73,28 @@ public class BotUtils {
     }
 
     /**
+     * 判断是否签到过了
+     *
      * @author NamelessSAMA
      * @param currentTime 当前时间
      * @param compareTime 需要比较的时间
-     * @return true / false
+     * @return true/false
      */
     public static boolean isCheckInReset(Date currentTime, Date compareTime){
         SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
         return !sdt.format(currentTime).equals(sdt.format(compareTime));
     }
 
+    /**
+     * 累计签到获得积分倍数
+     *
+     * @param time 累计签到天数
+     * @return 签到积分倍数
+     */
     public static double checkInPointBonus(int time){
-        if (time > 0 && time <= 7){
+        if (time > 0 && time <= 15){
             return 1;
-        } else if (time > 7 && time <= 30){
+        } else if (time > 15 && time <= 30){
             return 1.1;
         } else if (time > 30){
             return 1.2;
