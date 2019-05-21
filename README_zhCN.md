@@ -15,7 +15,7 @@
 </a> 
 
 
-## ☑️ To-Do 列表
+## ☑ To-Do 列表
 详见 [Project Page](https://github.com/StarWishsama/Nameless-Bot/projects/2)
 
 ## 💽 如何构建
