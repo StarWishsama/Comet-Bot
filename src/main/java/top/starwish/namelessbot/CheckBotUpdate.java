@@ -6,11 +6,11 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public class CheckBotUpdate {
-    public static String getLatestVer() {
+class CheckBotUpdate {
+    static String getLatestVer() {
         String version = "";
         try {
-            URL url = null;
+            URL url;
             if (VerClass.VERSION.toLowerCase().contains("release")){
                url = new URL("https://raw.githubusercontent.com/StarWishsama/Nameless-Bot/master/Version.txt");
             } else
@@ -24,7 +24,7 @@ public class CheckBotUpdate {
         return version;
     }
 
-    public static boolean isLatest(){
+    static boolean isLatest(){
         boolean isLatest = false;
         String latestVer = getLatestVer();
         String current = VerClass.VERSION;

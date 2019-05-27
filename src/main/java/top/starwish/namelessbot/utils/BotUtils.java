@@ -1,9 +1,12 @@
 package top.starwish.namelessbot.utils;
 
 import me.dilley.MineStat;
+import top.starwish.namelessbot.BotMain;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static com.sobte.cqp.jcq.event.JcqApp.CQ;
 
 public class BotUtils {
     /**

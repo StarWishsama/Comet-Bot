@@ -10,6 +10,7 @@ import java.util.*;
 public class RssItem {
     private String address;
     private boolean ifEnabled;
+    private List<Long> subscribers;
 
     // main 函数仅供调试使用
     public static void main(String[] args) {
@@ -38,6 +39,10 @@ public class RssItem {
         return address;
     }
 
+    public List<Long> getSubscribers(){
+        return subscribers;
+    }
+
     public void disable() {
         ifEnabled = false;
     }
@@ -52,6 +57,10 @@ public class RssItem {
 
     public void setAddress(String addr) {
         address = addr;
+    }
+
+    public void setSubscribers(List<Long> subscribers) {
+        this.subscribers = subscribers;
     }
 
     public String getContext() {

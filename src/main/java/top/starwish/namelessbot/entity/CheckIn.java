@@ -1,6 +1,5 @@
 package top.starwish.namelessbot.entity;
 
-
 import java.util.Date;
 
 public class CheckIn {

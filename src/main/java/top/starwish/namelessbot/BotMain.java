@@ -42,10 +42,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     RssItem todayOnHistory = new RssItem("http://api.lssdjt.com/?ContentType=xml&appkey=rss.xml");
 
     // RSA Encrypt&Decrypt
-    private Map<String, String> keyMap = RSAUtils.createKeys(1024);
-    private String publicKey = keyMap.get("publicKey");
-    private String privateKey = keyMap.get("privateKey");
-    private String encodedPwd = "";
+    Map<String, String> keyMap = RSAUtils.createKeys(1024);
+    String publicKey = keyMap.get("publicKey");
+    String privateKey = keyMap.get("privateKey");
+    String encodedPwd = "";
 
     long ownerQQ = 0;
     List<Long> adminIds = new ArrayList<>();
@@ -580,7 +580,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                                     long userQQ1 = StringUtils.isNumeric(cmd[3]) ? Integer.parseInt(cmd[3]) : CC.getAt(cmd[3]);
                                                     CheckIn user1 = checkinUsers.get(userQQ1);
                                                     user1.setCheckInPoint(0d);
-                                                    mySendGroupMsg(fromGroup, "[Bot] 已重置 " + CQ.getStrangerInfo(userQQ1).getNick() + " 的签到积分");
+                                                    user1.setLastCheckInTime(null);
+                                                    user1.setCheckInTime(0);
+                                                    mySendGroupMsg(fromGroup, "[Bot] 已重置 " + CQ.getStrangerInfo(userQQ1).getNick() + " 的签到账号");
                                                     break;
                                                 } catch (Exception ignored){
                                                     mySendGroupMsg(fromGroup, "[Bot] 请检查你输入的命令!");
@@ -718,16 +720,17 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             checkin.setCheckInTime(1);
                             checkinUsers.put(fromQQ, checkin);
                             mySendGroupMsg(fromGroup, "[Bot] 签到成功!\n" +
-                                    "获得 " + point + "点积分!"
+                                    "获得 " + point + " 点积分!"
                             );
                         } else if (checkinUsers.containsKey(fromQQ) && BotUtils.isCheckInReset(new Date(), checkinUsers.get(fromQQ).getLastCheckInTime())) {
                             CheckIn user = checkinUsers.get(fromQQ);
-                            double point = new Random().nextInt(10) * BotUtils.checkInPointBonus(user.getCheckInTime());
+                            // 只取小数点后一位
+                            double point = Double.parseDouble(String.format("%.1f", new Random().nextInt(10) * BotUtils.checkInPointBonus(user.getCheckInTime())));
                             user.setCheckInPoint(checkinUsers.get(fromQQ).getCheckInPoint() + point);
                             user.setLastCheckInTime(new Date());
                             user.setCheckInTime(user.getCheckInTime() + 1);
                             mySendGroupMsg(fromGroup, "[Bot] 签到成功!\n" +
-                                    "获得 " + point + "点积分!"
+                                    "获得 " + point + " 点积分!"
                             );
                         } else {
                             mySendGroupMsg(fromGroup, "[Bot] 你今天已经签到过了!");
@@ -981,12 +984,12 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         return CQAPIVER + "," + AppID;
     }
 
-    private void mySendGroupMsg(long groupId, String msg) {
+    public void mySendGroupMsg(long groupId, String msg) {
         if (!filterWords.contains(msg))
             CQ.sendGroupMsg(groupId, msg);
     }
 
-    private void mySendPrivateMsg(long fromQQ, String msg){
+    public void mySendPrivateMsg(long fromQQ, String msg){
         if (!filterWords.contains(msg))
             CQ.sendPrivateMsg(fromQQ, msg);
     }
