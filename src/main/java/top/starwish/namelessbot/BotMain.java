@@ -10,7 +10,7 @@ import net.kronos.rkon.core.ex.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.*;
 
-import top.starwish.namelessbot.entity.CheckIn;
+import top.starwish.namelessbot.entity.BotUser;
 import top.starwish.namelessbot.entity.MCServer;
 import top.starwish.namelessbot.entity.RssItem;
 import top.starwish.namelessbot.utils.FileProcess;
@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -56,7 +57,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     Map<String, Long> groupAliases = new HashMap<>();
 
     Map<Long, MCServer> serverInfo = new HashMap<>();
-    Map<Long, CheckIn> checkinUsers = new HashMap<>();
+    Map<Long, BotUser> checkinUsers = new HashMap<>();
 
     // main 函数仅供调试使用
     public static void main (String[] args) {
@@ -103,14 +104,16 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                 switch (cmd[0]) {
                     case "debug":
                         switch (cmd[1]){
+                            case "t":
                             case "true":
                                 debugMode = true;
                                 break;
+                            case "f":
                             case "false":
                                 debugMode = false;
                                 break;
                             default:
-                                mySendPrivateMsg(fromQQ, "[Bot] /debug true/false");
+                                mySendPrivateMsg(fromQQ, "[Bot] /debug [t/f]");
                                 break;
                         }
                         break;
@@ -184,12 +187,24 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             mySendPrivateMsg(fromQQ, "[Bot] 很抱歉, 机器人没有启用 RCON 功能.");
                         break;
                     case "help":
-                        mySendPrivateMsg(fromQQ, "= 无名Bot " + VerClass.VERSION + " ="
-                                + "\n /say [指定群] [内容] 以机器人向某个群发送消息"
-                                + "\n /switch [on/off] 开关机器人"
-                                + "\n /rcon 使用 Minecraft 服务器的 Rcon 功能"
-                                + "\n /admin 管理机器人的管理员"
-                        );
+                        switch (cmd[1].toLowerCase()) {
+                            default:
+                            case "1":
+                                mySendPrivateMsg(fromQQ, "= 无名Bot " + VerClass.VERSION + " ="
+                                        + "\n /say [指定群] [内容] 以机器人向某个群发送消息"
+                                        + "\n /switch [on/off] 开关机器人"
+                                        + "\n /rcon 使用 Minecraft 服务器的 Rcon 功能"
+                                        + "\n /admin 管理机器人的管理员"
+                                        + "\n /setting 机器人设置"
+                                        + "\n========== 1/2 ==========");
+                                break;
+                            case "2":
+                                mySendPrivateMsg(fromQQ, "= 无名Bot " + VerClass.VERSION + " ="
+                                        + "\n /reload 重载配置"
+                                        + "\n /save 保存配置"
+                                        + "\n========== 1/2 =========="
+                                        );
+                        }
                         break;
                     case "rcon switch":
                         if (isRcon) {
@@ -313,13 +328,13 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     case "setting":
                         switch (cmd[1].toLowerCase()) {
                             case "word":
-                                if ("add".equals(cmd[2].toLowerCase())) {
+                                if (cmd[2].toLowerCase().equals("add")) {
                                     if (!cmd[3].isEmpty()) {
                                         filterWords.add(cmd[3]);
                                         mySendPrivateMsg(fromQQ, "[Bot] 已添加关键字.");
                                     } else
                                         mySendPrivateMsg(fromQQ, "[Bot] 请输入要添加的关键字!");
-                                } else if ("del".equals(cmd[2].toLowerCase())) {
+                                } else if (cmd[2].toLowerCase().equals("del")) {
                                     if (!cmd[3].isEmpty()) {
                                         if (filterWords.contains(cmd[3])) {
                                             filterWords.remove(cmd[3]);
@@ -333,13 +348,13 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 }
                                 break;
                             case "aliases":
-                                if ("add".equals(cmd[2].toLowerCase())) {
+                                if (cmd[2].toLowerCase().equals("add")) {
                                     if (StringUtils.isNumeric(cmd[4]) && !cmd[3].isEmpty()) {
                                         long groupId = Integer.parseInt(cmd[4]);
                                         groupAliases.put(cmd[3], groupId);
                                         mySendPrivateMsg(fromQQ, "[Bot] 成功添加群别名 " + cmd[3] + "(" + groupId + ")");
                                     }
-                                } else if ("del".equals(cmd[2].toLowerCase())) {
+                                } else if (cmd[2].toLowerCase().equals("del")) {
                                     if (!cmd[3].isEmpty()) {
                                         groupAliases.remove(cmd[3]);
                                         mySendPrivateMsg(fromQQ, "[Bot] 成功删除群别名 " + cmd[3]);
@@ -401,15 +416,49 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                 switch (cmd[0].toLowerCase()) {
                     // 帮助命令
                     case "help":
-                        mySendGroupMsg(fromGroup,
-                                "= 无名Bot " + VerClass.VERSION + " ="
-                                        + "\n /sub (媒体) 订阅指定媒体" + "\n /unsub [媒体] 退订指定媒体" + "\n /switch [on/off] 开/关机器人"
-                                        + "\n /mute [@/QQ] (dhm) 禁言(默认10m)" + "\n /mute all 全群禁言" + "\n /unmute [@/QQ] 解禁某人"
-                                        + "\n /unmute all 解除全群禁言" + "\n /kick [@/QQ] (是否永封(t/f)) 踢出群成员"
-                                        + "\n /admin 管理机器人的管理员" + "\n /rcon [命令] 执行 Minecraft 服务器命令"
-                        );
-                        break;
-                    // 关闭命令
+                        if (isBotAdmin || isGroupAdmin || isOwner) {
+                            switch (cmd[1].toLowerCase()) {
+                                default:
+                                case "1":
+                                    mySendGroupMsg(fromGroup,
+                                            "= 无名Bot " + VerClass.VERSION + " ="
+                                                    + "\n /qd 签到"
+                                                    + "\n /info 查看签到积分"
+                                                    + "\n /sub (媒体) 订阅指定媒体"
+                                                    + "\n /unsub [媒体] 退订指定媒体"
+                                                    + "\n /switch [on/off] 开/关机器人"
+                                                    + "\n /mute [@/QQ] (dhm) 禁言(默认10m)"
+                                                    + "\n========== 1/2 =========="
+                                    );
+                                    break;
+                                case "2":
+                                    mySendGroupMsg(fromGroup,
+                                            "= 无名Bot " + VerClass.VERSION + " ="
+                                                    + "\n /mute all 全群禁言"
+                                                    + "\n /unmute [@/QQ] 解禁某人"
+                                                    + "\n /unmute all 解除全群禁言"
+                                                    + "\n /kick [@/QQ] (是否永封(t/f)) 踢出群成员"
+                                                    + "\n /admin 管理机器人的管理员"
+                                                    + "\n /rcon [命令] 执行 Minecraft 服务器命令"
+                                                    + "\n========== 2/2 =========="
+                                    );
+                                    break;
+                            }
+                            break;
+                        } else {
+                            switch (cmd[1].toLowerCase()) {
+                                default:
+                                case "1":
+                                    mySendGroupMsg(fromGroup,
+                                            "= 无名Bot " + VerClass.VERSION + " ="
+                                                    + "\n /qd 签到"
+                                                    + "\n /info 查看签到积分"
+                                                    + "\n========== 1/1 =========="
+                                    );
+                                    break;
+                            }
+                        }
+                        // 关闭命令
                     case "switch":
                         if (isBotAdmin || isOwner) {
                             if (cmd[1].equals("off")) {
@@ -567,24 +616,24 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                             case "set":
                                                 try {
                                                     long userQQ = StringUtils.isNumeric(cmd[3]) ? Integer.parseInt(cmd[3]) : CC.getAt(cmd[3]);
-                                                    CheckIn user = checkinUsers.get(userQQ);
+                                                    BotUser user = checkinUsers.get(userQQ);
                                                     double point = Double.parseDouble(cmd[4]);
                                                     user.setCheckInPoint(point);
                                                     mySendGroupMsg(fromGroup, "[Bot] 已设置 " + CQ.getStrangerInfo(userQQ).getNick() + " 的积分为 " + point);
-                                                } catch (Exception ignored){
+                                                } catch (Exception ignored) {
                                                     mySendGroupMsg(fromGroup, "[Bot] 请检查你输入的命令!");
                                                 }
                                                 break;
                                             case "reset":
                                                 try {
                                                     long userQQ1 = StringUtils.isNumeric(cmd[3]) ? Integer.parseInt(cmd[3]) : CC.getAt(cmd[3]);
-                                                    CheckIn user1 = checkinUsers.get(userQQ1);
+                                                    BotUser user1 = checkinUsers.get(userQQ1);
                                                     user1.setCheckInPoint(0d);
                                                     user1.setLastCheckInTime(null);
                                                     user1.setCheckInTime(0);
                                                     mySendGroupMsg(fromGroup, "[Bot] 已重置 " + CQ.getStrangerInfo(userQQ1).getNick() + " 的签到账号");
                                                     break;
-                                                } catch (Exception ignored){
+                                                } catch (Exception ignored) {
                                                     mySendGroupMsg(fromGroup, "[Bot] 请检查你输入的命令!");
                                                 }
                                         }
@@ -711,10 +760,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     case "签到":
                     case "checkin":
                         if (!checkinUsers.containsKey(fromQQ)) {
-                            CheckIn checkin = new CheckIn();
+                            BotUser checkin = new BotUser();
                             Date currentDate = new Date();
                             double point = new Random().nextInt(10);
-                            checkin.setCheckInQQ(fromQQ);
+                            checkin.setUserQQ(fromQQ);
                             checkin.setLastCheckInTime(currentDate);
                             checkin.setCheckInPoint(point);
                             checkin.setCheckInTime(1);
@@ -723,7 +772,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     "获得 " + point + " 点积分!"
                             );
                         } else if (checkinUsers.containsKey(fromQQ) && BotUtils.isCheckInReset(new Date(), checkinUsers.get(fromQQ).getLastCheckInTime())) {
-                            CheckIn user = checkinUsers.get(fromQQ);
+                            BotUser user = checkinUsers.get(fromQQ);
                             // 只取小数点后一位
                             double point = Double.parseDouble(String.format("%.1f", new Random().nextInt(10) * BotUtils.checkInPointBonus(user.getCheckInTime())));
                             user.setCheckInPoint(checkinUsers.get(fromQQ).getCheckInPoint() + point);
@@ -874,7 +923,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             serverInfo = JSON.parseObject(serverInfoObject.getString("groups"), new TypeReference<Map<Long, MCServer>>(){});
 
             JSONObject checkInObject = JSONObject.parseObject(FileProcess.readFile(CQ.getAppDirectory() + "qiandao.json"));
-            checkinUsers = JSON.parseObject(checkInObject.getString("checkinUsers"), new TypeReference<Map<Long, CheckIn>>(){});
+            checkinUsers = JSON.parseObject(checkInObject.getString("checkinUsers"), new TypeReference<Map<Long, BotUser>>(){});
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -2,19 +2,20 @@ package top.starwish.namelessbot.entity;
 
 import java.util.Date;
 
-public class CheckIn {
-    private long checkInQQ = 0;
+public class BotUser {
+    private long userQQ = 0;
     private Date lastCheckInTime = new Date();
     private double checkInPoint = 0;
     private int checkInTime = 0;
+    private boolean isBotAdmin = true;
 
-    public CheckIn() {
+    public BotUser() {
     }
-    public long getCheckInQQ(){
-        return checkInQQ;
+    public long getUserQQ(){
+        return userQQ;
     }
-    public void setCheckInQQ(long checkInQQ){
-        this.checkInQQ = checkInQQ;
+    public void setUserQQ(long userQQ){
+        this.userQQ = userQQ;
     }
     public Date getLastCheckInTime(){
         return lastCheckInTime;
@@ -33,5 +34,11 @@ public class CheckIn {
     }
     public void setCheckInTime(int time){
         checkInTime = time;
+    }
+    public boolean isBotAdmin(){
+        return isBotAdmin;
+    }
+    public void setBotAdmin(boolean bool) {
+        isBotAdmin = bool;
     }
 }
