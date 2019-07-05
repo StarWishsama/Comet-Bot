@@ -7,7 +7,7 @@ public class BotUser {
     private Date lastCheckInTime = new Date();
     private double checkInPoint = 0;
     private int checkInTime = 0;
-    private boolean isBotAdmin = true;
+    private String bindServerAccount = "";
 
     public BotUser() {
     }
@@ -35,10 +35,10 @@ public class BotUser {
     public void setCheckInTime(int time){
         checkInTime = time;
     }
-    public boolean isBotAdmin(){
-        return isBotAdmin;
+    public void setBindServerAccount(String name){
+        bindServerAccount = name;
     }
-    public void setBotAdmin(boolean bool) {
-        isBotAdmin = bool;
+    public String getBindServerAccount(){
+        return bindServerAccount;
     }
 }

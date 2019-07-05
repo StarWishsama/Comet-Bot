@@ -11,12 +11,12 @@ import com.alibaba.fastjson.*;
 import top.starwish.namelessbot.entity.BotUser;
 import top.starwish.namelessbot.entity.MCServer;
 import top.starwish.namelessbot.entity.RssItem;
+import top.starwish.namelessbot.entity.Shop;
 import top.starwish.namelessbot.utils.FileProcess;
 import top.starwish.namelessbot.utils.BotUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -47,10 +47,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
     Map<Long, MCServer> serverInfo = new HashMap<>();
     Map<Long, BotUser> checkinUsers = new HashMap<>();
+    Map<String, Shop> shopItems = new HashMap<>();
 
-    // main 函数仅供调试使用
-    public static void main (String[] args) {
-    }
     /**
      * @brief Init plugin
      * @return always 0
@@ -407,7 +405,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                                     + "\n /unsub [媒体] 退订指定媒体"
                                                     + "\n /switch [on/off] 开/关机器人"
                                                     + "\n /mute [@/QQ] (dhm) 禁言(默认10m)"
-                                                    + "\n========== 1/2 =========="
+                                                    + "\n========== 1/3 =========="
                                     );
                                     break;
                                 case "2":
@@ -419,7 +417,14 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                                     + "\n /kick [@/QQ] (是否永封(t/f)) 踢出群成员"
                                                     + "\n /admin 管理机器人的管理员"
                                                     + "\n /rcon [命令] 执行 Minecraft 服务器命令"
-                                                    + "\n========== 2/2 =========="
+                                                    + "\n========== 2/3 =========="
+                                    );
+                                    break;
+                                case "3":
+                                    mySendGroupMsg(fromGroup,
+                                            "= 无名Bot " + VerClass.VERSION + " ="
+                                                    + "\n /shop 积分商店"
+                                                    + "\n========== 3/3 =========="
                                     );
                                     break;
                             }
@@ -432,6 +437,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                             "= 无名Bot " + VerClass.VERSION + " ="
                                                     + "\n /qd 签到"
                                                     + "\n /info 查看签到积分"
+                                                    + "\n /shop 积分商店"
                                                     + "\n========== 1/1 =========="
                                     );
                                     break;
@@ -656,6 +662,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             if (isBotAdmin || isOwner) {
                                 if (!cmd[1].equals("")) {
                                     try {
+                                        CQ.logInfo("RCON", fromQQ + "尝试执行服务器命令: " + msg.replaceAll("/" + cmd[0] + " ", ""));
                                         Rcon rcon = new Rcon(rconIP, rconPort, rconPwd.getBytes());
                                         String result = rcon.command(msg.replaceAll("/" + cmd[0] + " ", ""));
                                         mySendGroupMsg(fromGroup, "[Bot] " + result);
@@ -730,14 +737,14 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     case "签到":
                     case "checkin":
                         if (!checkinUsers.containsKey(fromQQ)) {
-                            BotUser checkin = new BotUser();
+                            BotUser checkIn = new BotUser();
                             Date currentDate = new Date();
                             double point = new Random().nextInt(10);
-                            checkin.setUserQQ(fromQQ);
-                            checkin.setLastCheckInTime(currentDate);
-                            checkin.setCheckInPoint(point);
-                            checkin.setCheckInTime(1);
-                            checkinUsers.put(fromQQ, checkin);
+                            checkIn.setUserQQ(fromQQ);
+                            checkIn.setLastCheckInTime(currentDate);
+                            checkIn.setCheckInPoint(point);
+                            checkIn.setCheckInTime(1);
+                            checkinUsers.put(fromQQ, checkIn);
                             mySendGroupMsg(fromGroup, "[Bot] 签到成功!\n" +
                                     "获得 " + point + " 点积分!"
                             );
@@ -783,6 +790,83 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             mySendGroupMsg(fromGroup, BotUtils.getServerInfo(cmd[1], Integer.parseInt(cmd[2])));
                         } else
                             mySendGroupMsg(fromGroup, "[Bot] Please check IP address or Port.");
+                        break;
+                    case "shop":
+                        switch (cmd[1].toLowerCase()){
+                            case "add":
+                                if (isOwner || isBotAdmin){
+                                    if (!cmd[2].equals("") && StringUtils.isNumeric(cmd[3])&& !cmd[4].equals("")){
+                                        Shop shop = new Shop();
+                                        shop.setItemName(cmd[2]);
+                                        shop.setItemPoint(Integer.parseInt(cmd[3]));
+                                        shop.setItemMineCraftName(cmd[4]);
+                                        shopItems.put(cmd[2], shop);
+                                        mySendGroupMsg(fromGroup, "[Bot] 已添加商品 " + cmd[2] + "!");
+                                    } else
+                                        mySendGroupMsg(fromGroup, "[Bot] /shop add [商品名] [需要积分] [Minecraft物品名]");
+                                } else
+                                    mySendGroupMsg(fromGroup, "[Bot] 你没有权限!");
+                                break;
+                            case "del":
+                                if (isOwner || isBotAdmin){
+                                    if (!cmd[2].isEmpty()){
+                                        shopItems.remove(cmd[2]);
+                                        mySendGroupMsg(fromGroup, "[Bot] 删除商品 " + cmd[2] + " 成功!");
+                                    } else
+                                        mySendGroupMsg(fromGroup, "[Bot] 这个商品不存在!");
+                                }
+                                break;
+                            case "buy":
+                                if (!cmd[2].isEmpty()) {
+                                    if (shopItems.containsKey(cmd[2])) {
+                                        Shop shop = shopItems.get(cmd[2]);
+                                        double point = checkinUsers.get(fromQQ).getCheckInPoint();
+                                        if (point > shop.getItemPoint()){
+                                            try {
+                                                Rcon rcon = new Rcon(rconIP, rconPort, rconPwd.getBytes());
+                                                String playerName = checkinUsers.get(fromQQ).getBindServerAccount();
+                                                if (playerName != null) {
+                                                    String result = rcon.command("/give " + playerName + " " + shop.getItemMineCraftName() + " 1");
+                                                    mySendGroupMsg(fromGroup, "[Bot] " + result);
+                                                    checkinUsers.get(fromQQ).setCheckInPoint(checkinUsers.get(fromQQ).getCheckInPoint() - shop.getItemPoint());
+                                                }
+                                            } catch (IOException e) {
+                                                if (debugMode)
+                                                    e.printStackTrace();
+                                                mySendGroupMsg(fromGroup, "[Bot] 连接至服务器发生了错误");
+                                            } catch (AuthenticationException e) {
+                                                mySendGroupMsg(fromGroup, "[Bot] Rcon 密码错误!");
+                                            }
+                                        } else
+                                            mySendGroupMsg(fromGroup, "[Bot] 你的积分不足.");
+                                    }
+                                } else
+                                    mySendGroupMsg(fromGroup, "[Bot] /shop buy [商品名]");
+                                break;
+                            case "list":
+                                if (shopItems != null){
+                                    StringBuilder sb = new StringBuilder();
+                                    for (Map.Entry<String, Shop> entry: shopItems.entrySet()){
+                                        sb.append(entry.getValue().getItemName() + "\n");
+                                    }
+                                    mySendGroupMsg(fromGroup, sb.toString());
+                                }
+                                break;
+                        } break;
+                    case "bind":
+                        if (!cmd[1].isEmpty()){
+                            if (checkinUsers.containsKey(fromQQ)) {
+                                for (Map.Entry<Long, BotUser> entry : checkinUsers.entrySet()) {
+                                    if (entry.getValue().getBindServerAccount().equals(cmd[1])) {
+                                        mySendGroupMsg(fromGroup, "[Bot] 你已经绑定过账号了! 绑定错误请联系管理员修改.");
+                                    } else {
+                                        checkinUsers.get(fromQQ).setBindServerAccount(cmd[1]);
+                                        mySendGroupMsg(fromGroup, "[Bot] 绑定账号 " + cmd[1] + " 成功!");
+                                    }
+                                }
+                            } else
+                                mySendGroupMsg(fromGroup, "[Bot] 你还没有注册无名 Bot 账号! 请先使用 /qd 签到一下吧~ (签到时会自动注册)");
+                        }
                         break;
                 }
             } else if (cmd[0].equals("switch") && cmd[1].equals("on")) {
@@ -913,6 +997,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
             JSONObject checkInObject = JSONObject.parseObject(FileProcess.readFile(CQ.getAppDirectory() + "qiandao.json"));
             checkinUsers = JSON.parseObject(checkInObject.getString("checkinUsers"), new TypeReference<Map<Long, BotUser>>(){});
+            if (JSON.parseObject(checkInObject.getString("shopItems")).toJSONString() != null) {
+                shopItems = JSON.parseObject(checkInObject.getString("shopItems"), new TypeReference<Map<String, Shop>>() {});
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -961,6 +1048,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
         JSONObject checkInObject = new JSONObject();
         checkInObject.put("checkinUsers", checkinUsers);
+        checkInObject.put("shopItems", shopItems);
         FileProcess.createFile(CQ.getAppDirectory() + "qiandao.json", checkInObject.toJSONString());
 
         CQ.logDebug("JSON", "配置已保存.");
