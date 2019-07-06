@@ -3,7 +3,7 @@ package top.starwish.namelessbot.entity;
 public class Shop {
     private String itemName;
     private int needPoint;
-    private String itemMineCraftName;
+    private String itemCommand;
 
     public Shop(){
     }
@@ -24,11 +24,11 @@ public class Shop {
         return needPoint;
     }
 
-    public void setItemMineCraftName(String name){
-        itemMineCraftName = name;
+    public void setItemCommand(String cmd){
+        itemCommand = cmd;
     }
 
-    public String getItemMineCraftName(){
-        return itemMineCraftName;
+    public String getItemCommand(){
+        return itemCommand;
     }
 }
