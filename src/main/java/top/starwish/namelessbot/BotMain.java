@@ -96,7 +96,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 break;
                             } else {
                                 mySendPrivateMsg(fromQQ, "Bot > 请检查群号是否有误!");
-                                break;
                             }
                         }
                         break;
@@ -208,83 +207,153 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         mySendPrivateMsg(fromQQ, "Bot > Config saved.");
                         break;
                     case "group":
-                        if (cmd[1].equals("set")) {
-                            switch (cmd[2].toLowerCase()) {
-                                case "serverinfo":
-                                    if (cmd[3].equalsIgnoreCase("del")){
-                                        if (!cmd[4].isEmpty()){
-                                            for (QQGroup group : groupSetting){
-                                                if (group.getGroupID() == Long.parseLong(cmd[4]) || group.getGroupAliases().contains(cmd[4])){
-                                                    group.setServerPort(-1);
-                                                    mySendPrivateMsg(fromQQ, "Bot > 删除成功");
-                                                    break;
-                                                } else
-                                                    mySendPrivateMsg(fromQQ, "Bot > 这个群没有设置服务器信息!");
-                                            }
-                                        } else
-                                            mySendPrivateMsg(fromQQ, "Bot > 请输入正确的群号!");
-                                    } else {
-                                        if (!cmd[3].isEmpty() && !cmd[4].isEmpty() && StringUtils.isNumeric(cmd[5])){
-                                            for (QQGroup group : groupSetting){
-                                                if (group.getGroupID() == Long.parseLong(cmd[3]) || group.getGroupAliases().contains(cmd[3])){
-                                                    group.setServerIP(cmd[4]);
-                                                    group.setServerPort(Integer.parseInt(cmd[5]));
-                                                    group.setInfoMessage(cmd[6]);
-                                                    mySendPrivateMsg(fromQQ, "Bot > 设置成功!");
-                                                    break;
+                        switch (cmd[1].toLowerCase()) {
+                            case "set":
+                                switch (cmd[2].toLowerCase()) {
+                                    case "aliases":
+                                        if (StringUtils.isNumeric(cmd[3]) && !cmd[4].isEmpty()) {
+                                            if (groupSetting == null) {
+                                                QQGroup group = new QQGroup();
+                                                List<String> aliases = new ArrayList<>();
+                                                aliases.add(cmd[4]);
+                                                group.setGroupAliases(aliases);
+                                                group.setGroupID(Long.parseLong(cmd[3]));
+                                                mySendPrivateMsg(fromQQ, "Bot > 设置成功!");
+                                                saveConf();
+                                            } else {
+                                                for (QQGroup g : groupSetting) {
+                                                    if (g.getGroupID() == Long.parseLong(cmd[3])) {
+                                                        List<String> aliases = g.getGroupAliases();
+                                                        aliases.add(cmd[4]);
+                                                        g.setGroupAliases(aliases);
+                                                        mySendPrivateMsg(fromQQ, "Bot > 设置成功!");
+                                                        saveConf();
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         } else
-                                            mySendPrivateMsg(fromQQ, "Bot > /group set serverinfo [群号] [服务器IP] [服务器端口] [自定义消息]\n" + "/group set serverinfo del [群号]");
+                                            mySendPrivateMsg(fromQQ, "Bot > /group aliases [群号] [群别名]");
+                                        break;
+                                    case "serverinfo":
+                                        if (cmd[3].equalsIgnoreCase("del")) {
+                                            if (!cmd[4].isEmpty()) {
+                                                if (groupSetting != null) {
+                                                    for (QQGroup group : groupSetting) {
+                                                        if (group.getGroupID() == Long.parseLong(cmd[4]) || group.getGroupAliases().contains(cmd[4])) {
+                                                            group.setServerPort(-1);
+                                                            mySendPrivateMsg(fromQQ, "Bot > 删除成功");
+                                                            break;
+                                                        } else
+                                                            mySendPrivateMsg(fromQQ, "Bot > 这个群没有设置服务器信息!");
+                                                    }
+                                                }
+                                            } else
+                                                mySendPrivateMsg(fromQQ, "Bot > 请输入正确的群号!");
+                                        } else {
+                                            if (!cmd[3].isEmpty() && !cmd[4].isEmpty() && StringUtils.isNumeric(cmd[5])) {
+                                                if (groupSetting != null) {
+                                                    for (QQGroup group : groupSetting) {
+                                                        if (group.getGroupID() == Long.parseLong(cmd[3]) || group.getGroupAliases().contains(cmd[3])) {
+                                                            group.setServerIP(cmd[4]);
+                                                            group.setServerPort(Integer.parseInt(cmd[5]));
+                                                            group.setInfoMessage(msg.replace("/", "")
+                                                                    .replace("#", "")
+                                                                    .replace(cmd[0] + " ", "")
+                                                                    .replace(cmd[1], "")
+                                                                    .replace(" " + cmd[2], "")
+                                                                    .replace(" " + cmd[3], "")
+                                                                    .replace(" " + cmd[4], "")
+                                                                    .replace(" " + cmd[5] + " ", ""));
+                                                            mySendPrivateMsg(fromQQ, "Bot > 设置成功!");
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            } else
+                                                mySendPrivateMsg(fromQQ, "Bot > /group set serverinfo [群号] [服务器IP] [服务器端口] [自定义消息]\n" + "/group set serverinfo del [群号]");
+                                        }
+                                        break;
+                                    case "autoaccept":
+                                        if (!cmd[3].equals("") && !cmd[4].equals("")) {
+                                            if (groupSetting != null) {
+                                                int i = 0, groupSettingSize = groupSetting.size();
+                                                while (i < groupSettingSize) {
+                                                    QQGroup group = groupSetting.get(i);
+                                                    if (group.getGroupID() == Long.parseLong(cmd[3]) || group.getGroupAliases().contains(cmd[3])) {
+                                                        if (cmd[4].equalsIgnoreCase("t")) {
+                                                            group.setAutoAcceptRequest(true);
+                                                            mySendPrivateMsg(fromQQ, "Bot > 设置成功!");
+                                                        } else if (cmd[4].equalsIgnoreCase("f")) {
+                                                            group.setAutoAcceptRequest(false);
+                                                            mySendPrivateMsg(fromQQ, "Bot > 设置成功!");
+                                                        } else
+                                                            mySendPrivateMsg(fromQQ, "Bot > /group set autoaccept [群号] [t/f]");
+                                                    }
+                                                    i++;
+                                                }
+                                            }
+                                        } else
+                                            mySendPrivateMsg(fromQQ, "Bot > /group set autoaccept [群号] [t/f]");
+                                        break;
+                                    case "joinmsg":
+                                        if (!cmd[3].isEmpty() && !cmd[4].isEmpty()) {
+                                            if (groupSetting != null) {
+                                                for (QQGroup group : groupSetting) {
+                                                    if (group.getGroupID() == Long.parseLong(cmd[3]) || group.getGroupAliases().contains(cmd[3])) {
+                                                        group.setJoinMsg(cmd[4]);
+                                                        mySendPrivateMsg(fromQQ, "Bot > 已设置 " + group.getGroupID() + " 的加群欢迎信息.");
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        } else
+                                            mySendPrivateMsg(fromQQ, "/group set joinmsg [群号] [入群欢迎消息]");
+                                        break;
+                                    default:
+                                        mySendPrivateMsg(fromQQ, "= 群设置帮助 =\n" +
+                                                "/group set autoaccept [群号] [t/f]\n" +
+                                                "/group set joinmsg [群号] [入群欢迎消息]\n" +
+                                                "/group set serverinfo [群号] [服务器IP] [服务器端口] [自定义信息]");
+                                        break;
+                                }
+                                break;
+                            case "list":
+                                if (groupSetting != null) {
+                                    StringBuffer sb = new StringBuffer();
+                                    sb.append("所有已设置群设置的群:\n");
+                                    for (QQGroup group : groupSetting) {
+                                        sb.append(group.getGroupID()).append("\n");
                                     }
-                                    break;
-                                case "autoaccept":
-                                    if (!cmd[3].equals("") && !cmd[4].equals("")) {
-                                        for (QQGroup group : groupSetting){
-                                            if (group.getGroupID() == Long.parseLong(cmd[3]) || group.getGroupAliases().contains(cmd[3])){
-                                                if (cmd[4].equalsIgnoreCase("t"))
-                                                    group.setAutoAcceptRequest(true);
-                                                else if (cmd[4].equalsIgnoreCase("f"))
-                                                    group.setAutoAcceptRequest(false);
-                                                else
-                                                    mySendPrivateMsg(fromQQ, "Bot > /group set autoaccept [群号] [t/f]");
-                                                break;
-                                            }
+                                    mySendPrivateMsg(fromQQ, sb.toString().trim());
+                                }
+                                break;
+                            case "add":
+                                if (StringUtils.isNumeric(cmd[2])) {
+                                    QQGroup g = new QQGroup();
+                                    g.setGroupID(Long.parseLong(cmd[2]));
+                                    groupSetting.add(g);
+                                    mySendPrivateMsg(fromQQ, "Success");
+                                }
+                                break;
+                            case "del":
+                                if (groupSetting != null) {
+                                    for (QQGroup g : groupSetting) {
+                                        if (g.getGroupID() == Long.parseLong(cmd[2]) || g.getGroupAliases().contains(cmd[2])) {
+                                            groupSetting.remove(g);
+                                            mySendPrivateMsg(fromQQ, "Success");
                                         }
-                                    } else
-                                        mySendPrivateMsg(fromQQ, "Bot > /group set autoaccept [群号] [t/f]");
-                                    break;
-                                case "joinmsg":
-                                    if (!cmd[3].isEmpty() && !cmd[4].isEmpty()){
-                                        for (QQGroup group : groupSetting){
-                                            if (group.getGroupID() == Long.parseLong(cmd[3]) || group.getGroupAliases().contains(cmd[3])){
-                                                group.setJoinMsg(cmd[4]);
-                                                mySendPrivateMsg(fromQQ, "Bot > 已设置 " + group.getGroupID() + " 的加群欢迎信息.");
-                                                break;
-                                            }
-                                        }
-                                    } else
-                                        mySendPrivateMsg(fromQQ, "/group set joinmsg [群号] [入群欢迎消息]");
-                                    break;
-                                default:
-                                    mySendPrivateMsg(fromQQ, "= 群设置帮助 =\n" +
-                                            "/group set autoaccept [群号] [t/f]\n" +
-                                            "/group set joinmsg [群号] [入群欢迎消息]\n" +
-                                            "/group set serverinfo [群号] [服务器IP] [服务器端口] [自定义信息]");
-                                    break;
-                            }
-                        } else if (cmd[1].equals("list")) {
-                            StringBuffer sb = new StringBuffer();
-                            sb.append("所有已设置群设置的群:\n");
-                            for (QQGroup group : groupSetting){
-                                sb.append(group.getGroupID()).append("\n");
-                            }
-                            mySendPrivateMsg(fromQQ, sb.toString().trim());
-                        } else {
-                            mySendPrivateMsg(fromQQ, "= Bot 群组管理 =\n" +
-                                    " /group list 列出所有已添加的群(需要手动添加!)\n" +
-                                    " /group set 设置某个群的设置"
-                            );
+                                    }
+                                }
+                                break;
+                            default:
+                                mySendPrivateMsg(fromQQ, "= Bot 群组管理 =\n" +
+                                        " /group list 列出所有已添加的群(需要手动添加!)\n" +
+                                        " /group set 设置某个群的设置\n" +
+                                        " /group add 新增一个群\n" +
+                                        " /group del 删除一个群"
+                                );
+                                break;
                         }
                         break;
                 }
@@ -668,7 +737,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         if (!checkinUsers.containsKey(fromQQ)) {
                             BotUser checkIn = new BotUser();
                             Date currentDate = new Date();
-                            double point = new Random().nextInt(10);
+                            double point = new Random(47).nextInt(10);
                             checkIn.setUserQQ(fromQQ);
                             checkIn.setLastCheckInTime(currentDate);
                             checkIn.setCheckInPoint(point);
@@ -677,10 +746,11 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             mySendGroupMsg(fromGroup, "Bot > 签到成功!\n" +
                                     "获得 " + point + " 点积分!"
                             );
+                            saveConf();
                         } else if (checkinUsers.containsKey(fromQQ) && BotUtils.isCheckInReset(new Date(), checkinUsers.get(fromQQ).getLastCheckInTime())) {
                             BotUser user = checkinUsers.get(fromQQ);
                             // 只取小数点后一位
-                            double point = Double.parseDouble(String.format("%.1f", new Random().nextInt(10) * BotUtils.checkInPointBonus(user.getCheckInTime())));
+                            double point = Double.parseDouble(String.format("%.1f", new Random(47).nextInt(10) * BotUtils.checkInPointBonus(user.getCheckInTime())));
                             user.setCheckInPoint(checkinUsers.get(fromQQ).getCheckInPoint() + point);
                             user.setLastCheckInTime(new Date());
                             user.setCheckInTime(user.getCheckInTime() + 1);
@@ -690,6 +760,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 );
                             } else
                                 mySendGroupMsg(fromGroup, "Bot > 签到成功!\n获得 " + point + " 点积分!");
+                            saveConf();
                         } else
                             mySendGroupMsg(fromGroup, "Bot > 你今天已经签到过了!");
                         break;
@@ -773,24 +844,20 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 if (shopItems != null){
                                     StringBuilder sb = new StringBuilder();
                                     for (Map.Entry<String, Shop> entry: shopItems.entrySet()){
-                                        sb.append(entry.getValue().getItemName() + "\n");
+                                        sb.append(entry.getValue().getItemName()).append("\n");
                                     }
-                                    mySendGroupMsg(fromGroup, sb.toString());
+                                    mySendGroupMsg(fromGroup, sb.toString().trim());
                                 }
                                 break;
                         } break;
                     case "bind":
                         if (!cmd[1].isEmpty()){
                             if (checkinUsers.containsKey(fromQQ)) {
-                                for (Map.Entry<Long, BotUser> entry : checkinUsers.entrySet()) {
-                                    if (entry.getValue().getBindServerAccount().equals(cmd[1])) {
-                                        mySendGroupMsg(fromGroup, "Bot > 你已经绑定过账号了! 绑定错误请联系管理员修改.");
-                                        break;
-                                    } else {
-                                        checkinUsers.get(fromQQ).setBindServerAccount(cmd[1]);
-                                        mySendGroupMsg(fromGroup, "Bot > 绑定账号 " + cmd[1] + " 成功!");
-                                    }
-                                }
+                                if (checkinUsers.get(fromQQ).getBindServerAccount().isEmpty()){
+                                    checkinUsers.get(fromQQ).setBindServerAccount(cmd[1]);
+                                    mySendGroupMsg(fromGroup, "Bot > 绑定账号 " + cmd[1] + " 成功!");
+                                } else
+                                    mySendGroupMsg(fromGroup, "Bot > 你已经绑定过账号了! 绑定错误请联系管理员修改.");
                             } else
                                 mySendGroupMsg(fromGroup, "Bot > 你还没有注册无名 Bot 账号! 请先使用 /qd 签到一下吧~ (签到时会自动注册)");
                         }
@@ -909,7 +976,8 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             adminIds = JSON.parseObject(adminsObject.getString("admins"), new TypeReference<List<Long>>(){});
 
             JSONObject groupsObject = JSONObject.parseObject(FileProcess.readFile(groupsPath));
-            groupSetting = JSON.parseObject(groupsObject.getString("groupSetting"), new TypeReference<List<QQGroup>>(){});
+            if (JSON.parseObject(groupsObject.getString("groupSetting"), new TypeReference<List<QQGroup>>(){}) != null)
+                groupSetting = JSON.parseObject(groupsObject.getString("groupSetting"), new TypeReference<List<QQGroup>>(){});
 
             JSONObject settingObject = JSONObject.parseObject(FileProcess.readFile(CQ.getAppDirectory() + "botsettings.json"));
             filterWords = JSON.parseObject(settingObject.getString("triggerWords"), new TypeReference<List<String>>(){});
