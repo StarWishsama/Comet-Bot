@@ -119,7 +119,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                             String result = rcon.command(msg.replace("/rcon cmd ", "").replace("#rcon cmd", ""));
                                             mySendPrivateMsg(fromQQ, "Bot > " + result);
                                         } catch (IOException e) {
-                                                mySendPrivateMsg(fromQQ, "Bot > 无法连接至服务器");
+                                            mySendPrivateMsg(fromQQ, "Bot > 无法连接至服务器");
                                         }
                                     } else
                                         mySendPrivateMsg(fromQQ, "Bot > 请输入需要执行的命令! (不需要带\"/\")");
@@ -970,7 +970,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             rconIP = rconObject.getString("rconIP");
             rconPort = rconObject.getIntValue("rconPort");
             rconPwd = rconObject.getString("rconPwd");
-            isRcon = rconObject.getBooleanValue("rconFunction");
+            isRcon = rconObject.getBooleanValue("RconFunction");
 
             JSONObject adminsObject = JSONObject.parseObject(FileProcess.readFile(CQ.getAppDirectory() + "admins.json"));
             ownerQQ = adminsObject.getLong("owner");
