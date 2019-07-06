@@ -45,6 +45,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     Map<Long, BotUser> checkinUsers = new HashMap<>();
     Map<String, Shop> shopItems = new HashMap<>();
 
+    Rcon rcon;
     /**
      * @brief Init plugin
      * @return always 0
@@ -115,13 +116,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 case "cmd":
                                     if (!cmd[2].isEmpty()) {
                                         try {
-                                            Rcon rcon = new Rcon(rconIP, rconPort, rconPwd.getBytes());
                                             String result = rcon.command(msg.replace("/rcon cmd ", "").replace("#rcon cmd", ""));
                                             mySendPrivateMsg(fromQQ, "Bot > " + result);
                                         } catch (IOException e) {
                                                 mySendPrivateMsg(fromQQ, "Bot > 无法连接至服务器");
-                                        } catch (AuthenticationException ae){
-                                            mySendPrivateMsg(fromQQ, "Bot > RCON 密码有误");
                                         }
                                     } else
                                         mySendPrivateMsg(fromQQ, "Bot > 请输入需要执行的命令! (不需要带\"/\")");
@@ -663,13 +661,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     try {
                                         String command = msg.replaceAll("/" + cmd[0] + " ", "");
                                         CQ.logInfo("RCON", fromQQ + " 尝试执行服务器命令: " + command);
-                                        Rcon rcon = new Rcon(rconIP, rconPort, rconPwd.getBytes());
                                         String result = rcon.command(command);
                                         mySendGroupMsg(fromGroup, "Bot > " + result);
                                     } catch (IOException e) {
                                         mySendGroupMsg(fromGroup, "Bot > 连接至服务器发生了错误");
-                                    } catch (AuthenticationException e) {
-                                        mySendGroupMsg(fromGroup, "Bot > Rcon 密码错误!");
                                     }
                                 } else
                                     mySendGroupMsg(fromGroup, "Bot > 请输入需要执行的命令! (不需要带\"/\")");
@@ -822,7 +817,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                         double point = checkinUsers.get(fromQQ).getCheckInPoint();
                                         if (point > shop.getItemPoint()){
                                             try {
-                                                Rcon rcon = new Rcon(rconIP, rconPort, rconPwd.getBytes());
                                                 String playerName = checkinUsers.get(fromQQ).getBindServerAccount();
                                                 if (playerName != null) {
                                                     String result = rcon.command(shop.getItemCommand());
@@ -831,8 +825,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                                 }
                                             } catch (IOException e) {
                                                 mySendGroupMsg(fromGroup, "Bot > 连接至服务器发生了错误");
-                                            } catch (AuthenticationException e) {
-                                                mySendGroupMsg(fromGroup, "Bot > Rcon 密码错误!");
                                             }
                                         } else
                                             mySendGroupMsg(fromGroup, "Bot > 你的积分不足.");
@@ -892,6 +884,15 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         enable = true;
 
         readConf();
+
+        try {
+            rcon = new Rcon(rconIP, rconPort, rconPwd.getBytes());
+        } catch (IOException e){
+            e.printStackTrace();
+        } catch (AuthenticationException ae){
+            CQ.logInfo("RCon", "RCON 密码错误!");
+            mySendPrivateMsg(ownerQQ, "RCON 密码错误!");
+        }
 
         if (!CheckBotUpdate.isLatest()){
             CQ.logInfo("Updater", "Nameless Bot 有新版本: " + CheckBotUpdate.getLatestVer());
