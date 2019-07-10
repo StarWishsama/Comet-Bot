@@ -740,18 +740,19 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     case "qd":
                     case "签到":
                     case "checkin":
-                        if (!checkinUsers.containsKey(fromQQ)) {
-                            if (cmd[1].equals("")){
-                                mySendGroupMsg(fromGroup, "Bot > 你还没有注册无名 Bot 账号! 请使用 /qd <游戏ID> 注册");
-                            } else {
+                        if (!checkinUsers.containsKey(fromQQ) && cmd[1].equals("")) {
+                                mySendGroupMsg(fromGroup, "Bot > 你还没有注册无名 Bot 账号! 第一次请使用 /qd <游戏ID> 注册～");
+                            } 
+                        else {
+                            if(!checkinUsers.containsKey(fromQQ))
+                            {
                                 BotUser user = new BotUser();
                                 user.setUserQQ(fromQQ);
                                 user.setBindServerAccount(cmd[1]);
                                 checkinUsers.put(fromQQ, user);
-                                mySendGroupMsg(fromGroup, "Bot > 绑定账号 " + cmd[1] + " 成功!");
-                                saveConf();
+                                mySendGroupMsg(fromGroup, "Bot > 已绑定账号 " + cmd[1] + " ，以后可以直接输入 /qd 签到了! ");
                             }
-                        } else {
+                            
                             if (BotUtils.isCheckInReset(new Date(), checkinUsers.get(fromQQ).getLastCheckInTime())) {
                                 BotUser user = checkinUsers.get(fromQQ);
                                 // 只取小数点后一位
@@ -764,10 +765,10 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                             "今天运气不佳, 没有积分"
                                     );
                                 } else
-                                    mySendGroupMsg(fromGroup, "Bot > 签到成功!\n获得 " + point + " 点积分!");
+                                    mySendGroupMsg(fromGroup, "Bot > 签到成功!\n本次获得 " + point + " 点积分!\n您已累计获得 " + checkinUsers.get(fromQQ).getCheckInPoint() + "分.");
                                 saveConf();
                             } else
-                                mySendGroupMsg(fromGroup, "Bot > 你今天已经签到过了!");
+                                mySendGroupMsg(fromGroup, "Bot > 你今天已经签到过了! 输入 /cx 可查询签到信息");
                         }
                         break;
                     case "cx":
