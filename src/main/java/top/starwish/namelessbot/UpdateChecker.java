@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-class CheckBotUpdate {
+class UpdateChecker {
     static String getLatestVer() {
         String version = "";
         try {

@@ -92,7 +92,7 @@ public class BotUtils {
      * @return 签到积分倍数
      */
     public static double checkInPointBonus(int time){
-        if (time > 0 && time <= 15){
+        if (time >= 0 && time <= 15){
             return 1;
         } else if (time > 15 && time <= 30){
             return 1.1;

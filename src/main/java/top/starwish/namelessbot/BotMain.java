@@ -376,7 +376,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
             // process only after there's a command, in order to get rid of memory trash
             String temp = msg.trim();
-            String cmd[] = {"", "", "", "", ""};
+            String cmd[] = {"", "", "", "", "", ""};
 
             /**
              * @brief Processing msg into cmd & params
@@ -384,7 +384,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
              * @author Stiven.ding
              */
 
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 6; i++) {
                 temp = temp.trim();
                 if (temp.indexOf(' ') > 0) {
                     cmd[i] = temp.substring(0, temp.indexOf(' '));
@@ -591,7 +591,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     groupMemberIncrease(subType, 100, fromGroup, fromQQ, parseQQ);
                                     break;
                                 case "checkin":
-                                    if (isOwner) {
                                         switch (cmd[2].toLowerCase()) {
                                             case "set":
                                                 try {
@@ -607,17 +606,13 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                             case "reset":
                                                 try {
                                                     long userQQ1 = StringUtils.isNumeric(cmd[3]) ? Integer.parseInt(cmd[3]) : CC.getAt(cmd[3]);
-                                                    BotUser user1 = checkinUsers.get(userQQ1);
-                                                    user1.setCheckInPoint(0d);
-                                                    user1.setLastCheckInTime(null);
-                                                    user1.setCheckInTime(0);
+                                                    checkinUsers.remove(userQQ1);
                                                     mySendGroupMsg(fromGroup, "Bot > 已重置 " + CQ.getStrangerInfo(userQQ1).getNick() + " 的签到账号");
                                                     break;
                                                 } catch (Exception ignored) {
                                                     mySendGroupMsg(fromGroup, "Bot > 请检查你输入的命令!");
                                                 }
                                                 break;
-                                        }
                                     }
                                     break;
                                 default:
@@ -741,18 +736,16 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                     case "签到":
                     case "checkin":
                         if (!checkinUsers.containsKey(fromQQ) && cmd[1].equals("")) {
-                                mySendGroupMsg(fromGroup, "Bot > 你还没有注册无名 Bot 账号! 第一次请使用 /qd <游戏ID> 注册～");
-                            } 
+                            mySendGroupMsg(fromGroup, "Bot > 你还没有注册无名 Bot 账号! 第一次请使用 /qd <游戏ID> 注册～");
+                        }
                         else {
-                            if(!checkinUsers.containsKey(fromQQ))
-                            {
+                            if (!checkinUsers.containsKey(fromQQ)){
                                 BotUser user = new BotUser();
                                 user.setUserQQ(fromQQ);
                                 user.setBindServerAccount(cmd[1]);
                                 checkinUsers.put(fromQQ, user);
                                 mySendGroupMsg(fromGroup, "Bot > 已绑定账号 " + cmd[1] + " ，以后可以直接输入 /qd 签到了! ");
                             }
-                            
                             if (BotUtils.isCheckInReset(new Date(), checkinUsers.get(fromQQ).getLastCheckInTime())) {
                                 BotUser user = checkinUsers.get(fromQQ);
                                 // 只取小数点后一位
@@ -778,7 +771,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                             double point = checkinUsers.get(fromQQ).getCheckInPoint();
                             int day = checkinUsers.get(fromQQ).getCheckInTime();
                             String lastCheckInTime = new SimpleDateFormat("yyyy-MM-dd").format(checkinUsers.get(fromQQ).getLastCheckInTime());
-                            mySendGroupMsg(fromGroup, CC.at(fromQQ) + " " + CQ.getStrangerInfo(fromQQ).getNick() + "\n积分: " + point + "  连续签到了" + day + "天\n上次签到于 " + lastCheckInTime);
+                            mySendGroupMsg(fromGroup, CC.at(fromQQ) + "\n积分: " + point + "  连续签到了" + day + "天\n上次签到于 " + lastCheckInTime + "\n绑定的账号: " + checkinUsers.get(fromQQ).getBindServerAccount());
                         } else
                             mySendGroupMsg(fromGroup, "Bot > 你还没有签到过哦");
                         break;
@@ -803,15 +796,16 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         switch (cmd[1].toLowerCase()){
                             case "add":
                                 if (isOwner || isBotAdmin){
-                                    if (!cmd[2].equals("") && StringUtils.isNumeric(cmd[3])&& !cmd[4].equals("")){
+                                    if (!cmd[2].equals("") && StringUtils.isNumeric(cmd[3]) && !cmd[5].equals("") && StringUtils.isNumeric(cmd[4])){
                                         Shop shop = new Shop();
                                         shop.setItemName(cmd[2]);
                                         shop.setItemPoint(Integer.parseInt(cmd[3]));
-                                        shop.setItemCommand(cmd[4]);
+                                        shop.setItemCommand(cmd[5]);
+                                        shop.setBuyTime(Integer.parseInt(cmd[4]));
                                         shopItems.put(cmd[2], shop);
                                         mySendGroupMsg(fromGroup, "Bot > 已添加商品 " + cmd[2] + "!");
                                     } else
-                                        mySendGroupMsg(fromGroup, "Bot > /shop add [商品名] [需要积分] [Command]");
+                                        mySendGroupMsg(fromGroup, "Bot > /shop add [商品名] [需要积分] [执行命令] [可购买次数]\n玩家绑定账号可使用 %p%代替!\n可购买次数设为 0 以改为无限购买");
                                 } else
                                     mySendGroupMsg(fromGroup, "Bot > 你没有权限!");
                                 break;
@@ -834,23 +828,29 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                                 if (playerName != null) {
                                                     try {
                                                         Rcon rcon = new Rcon(rconIP, rconPort, rconPwd.getBytes());
-                                                        if (shop.getItemCommand().contains("give")){
+                                                        if (shop.getItemCommand().contains("give")) {
                                                             String status = rcon.command("seen " + playerName);
                                                             if (!status.contains("离线")) {
-                                                                rcon.command(shop.getItemCommand().replaceAll("%玩家ID%", playerName));
+                                                                rcon.command(shop.getItemCommand().replaceAll("%p%", playerName));
                                                                 mySendGroupMsg(fromGroup, "Bot > 购买成功");
                                                                 checkinUsers.get(fromQQ).setCheckInPoint(checkinUsers.get(fromQQ).getCheckInPoint() - shop.getItemPoint());
+                                                                if (shop.getBuyTime() > 0){
+                                                                    shop.setBuyTime(shop.getBuyTime() - 1);
+                                                                }
                                                             } else
                                                                 mySendGroupMsg(fromGroup, "Bot > 这个商品需要你上线才能领取!");
                                                         } else {
-                                                            rcon.command(shop.getItemCommand().replaceAll("%玩家ID%", playerName));
+                                                            rcon.command(shop.getItemCommand().replaceAll("%p%", playerName));
                                                             mySendGroupMsg(fromGroup, "Bot > 购买成功");
                                                             checkinUsers.get(fromQQ).setCheckInPoint(checkinUsers.get(fromQQ).getCheckInPoint() - shop.getItemPoint());
+                                                            if (shop.getBuyTime() > 0){
+                                                                shop.setBuyTime(shop.getBuyTime() - 1);
+                                                            }
                                                         }
-                                                    } catch (IOException e){
+                                                    } catch (IOException e) {
                                                         mySendGroupMsg(fromGroup, "Bot > 连接至服务器发生了错误");
                                                         e.printStackTrace();
-                                                    } catch (AuthenticationException ae){
+                                                    } catch (AuthenticationException ae) {
                                                         mySendPrivateMsg(ownerQQ, "RCON 密码错误!");
                                                     }
                                                 } else
@@ -869,6 +869,13 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     }
                                     mySendGroupMsg(fromGroup, sb.toString().trim());
                                 }
+                                break;
+                            default:
+                                mySendGroupMsg(fromGroup, "Bot > 欢迎来到积分商店!\n"
+                                        + "/shop buy [商品名] 购买指定商品\n"
+                                        + "您可以使用 /shop list 查看所有在售的商品\n"
+                                        + "/shop add/del"
+                                );
                                 break;
                         } break;
                     case "rebind":
@@ -919,9 +926,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
         readConf();
 
-        if (!CheckBotUpdate.isLatest()){
-            CQ.logInfo("Updater", "Nameless Bot 有新版本: " + CheckBotUpdate.getLatestVer());
-            mySendPrivateMsg(ownerQQ, "Nameless Bot 有新版本: " + CheckBotUpdate.getLatestVer());
+        if (!UpdateChecker.isLatest()){
+            CQ.logInfo("Updater", "Nameless Bot 有新版本: " + UpdateChecker.getLatestVer());
+            mySendPrivateMsg(ownerQQ, "Nameless Bot 有新版本: " + UpdateChecker.getLatestVer());
         }
 
         /**
