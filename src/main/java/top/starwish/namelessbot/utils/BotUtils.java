@@ -84,21 +84,4 @@ public class BotUtils {
         SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
         return !sdt.format(currentTime).equals(sdt.format(compareTime));
     }
-
-    /**
-     * 累计签到获得积分倍数
-     *
-     * @param time 累计签到天数
-     * @return 签到积分倍数
-     */
-    public static double checkInPointBonus(int time){
-        if (time >= 0 && time <= 15){
-            return 1;
-        } else if (time > 15 && time <= 30){
-            return 1.1;
-        } else if (time > 30){
-            return 1.2;
-        }
-        return 0;
-    }
 }
