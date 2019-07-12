@@ -14,6 +14,7 @@ public class QQGroup {
     private int serverPort;
     private String infoMessage;
     private boolean isEnabled;
+    private boolean isSRV;
 
     public QQGroup() {
     }
@@ -97,5 +98,11 @@ public class QQGroup {
     }
     public void setEnabled(boolean isEnabled){
         this.isEnabled = isEnabled;
+    }
+    public void setSRVMode(boolean srvMode){
+        isSRV = srvMode;
+    }
+    public boolean getSRVMode(){
+        return isSRV;
     }
 }

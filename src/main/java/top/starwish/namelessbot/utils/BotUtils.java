@@ -1,11 +1,26 @@
 package top.starwish.namelessbot.utils;
 
+import com.spotify.dns.DnsSrvResolvers;
 import me.dilley.MineStat;
 
+import com.spotify.dns.DnsException;
+import com.spotify.dns.DnsSrvResolver;
+import com.spotify.dns.DnsSrvResolvers;
+import com.spotify.dns.LookupResult;
+import com.spotify.dns.statistics.DnsReporter;
+import com.spotify.dns.statistics.DnsTimingContext;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 public class BotUtils {
+    private static final DnsReporter REPORTER = new StdoutReporter();
+
     /**
      * @param string 需要去除彩色符号的字符串
      * @return 去除彩色符号的字符串
@@ -64,4 +79,63 @@ public class BotUtils {
         SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
         return !sdt.format(currentTime).equals(sdt.format(compareTime));
     }
+
+    /**
+     * https://github.com/spotify/dns-java/
+     * @param url
+     * @return List<LookupResult>
+     * @author Spotify
+     */
+
+    public static List<LookupResult> getSRVRecords(String url) {
+        if (url != null) {
+            DnsSrvResolver resolver = DnsSrvResolvers.newBuilder()
+                    .cachingLookups(true)
+                    .retainingDataOnFailures(true)
+                    .metered(REPORTER)
+                    .dnsLookupTimeoutMillis(1000)
+                    .build();
+            try {
+                return resolver.resolve(url);
+            } catch (DnsException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public static class StdoutReporter implements DnsReporter {
+        @Override
+        public DnsTimingContext resolveTimer() {
+            return new DnsTimingContext() {
+                private final long start = System.currentTimeMillis();
+
+                @Override
+                public void stop() {
+                    final long now = System.currentTimeMillis();
+                    final long diff = now - start;
+                    System.out.println("请求耗费了 " + diff + "ms");
+                }
+            };
+        }
+
+        @Override
+        public void reportFailure(Throwable error) {
+            System.err.println("在解析 " + error + " 时发生了错误");
+            error.printStackTrace(System.err);
+        }
+
+        @Override
+        public void reportEmpty() {
+            System.out.println("Empty response from server.");
+        }
+    }
+
+    public static String StringHelper(String s){
+        if (s.endsWith(".")){
+            return s.substring(0, s.length() - 1);
+        }
+        return s;
+    }
 }
+

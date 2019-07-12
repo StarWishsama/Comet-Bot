@@ -3,6 +3,7 @@ package top.starwish.namelessbot;
 import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
 
+import com.spotify.dns.LookupResult;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
@@ -827,13 +828,15 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         if (!cmd[1].equals("") && StringUtils.isNumeric(cmd[2])) {
                             mySendGroupMsg(fromGroup, BotUtils.getServerInfo(cmd[1], Integer.parseInt(cmd[2])));
                         } else if (!cmd[1].equals("")){
-                            mySendGroupMsg(fromGroup, BotUtils.getServerInfo(cmd[1], 25565));
+                            List<LookupResult> nodes = BotUtils.getSRVRecords("_minecraft._tcp." + cmd[1]);
+                            for (LookupResult node : nodes){
+                                mySendGroupMsg(fromGroup, BotUtils.getServerInfo(BotUtils.StringHelper(node.host()), node.port()));
+                            }
                         } else
                             mySendGroupMsg(fromGroup, "Bot > Please check IP address or Port.");
                         break;
                     case "shop":
                         if ("buy".equals(cmd[1].toLowerCase())) {
-                            if (fromGroup == 543809031L) {
                                 if (!cmd[2].isEmpty()) {
                                     if (shopItems.containsKey(cmd[2])) {
                                         Shop shop = shopItems.get(cmd[2]);
@@ -885,8 +888,6 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     }
                                 } else
                                     mySendGroupMsg(fromGroup, "Bot > /shop buy [商品名]");
-                            } else
-                                mySendGroupMsg(fromGroup, "Bot > 兑换功能目前暂对股东开放!\n如您想要尝试, 可以在 http://www.mcrmb.com/fk/13153/cid/9036 支持我们 :)");
                         } else {
                             if (shopItems != null) {
                                 StringBuilder sb = new StringBuilder();
