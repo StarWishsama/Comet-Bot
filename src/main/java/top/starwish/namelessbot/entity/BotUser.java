@@ -3,11 +3,11 @@ package top.starwish.namelessbot.entity;
 import java.util.Date;
 
 public class BotUser {
-    private long userQQ = 0;
-    private Date lastCheckInTime = new Date();
-    private double checkInPoint = 0;
-    private int checkInTime = 0;
-    private String bindServerAccount = "";
+    private long userQQ;
+    private Date lastCheckInTime;
+    private double checkInPoint;
+    private int checkInTime;
+    private String bindServerAccount;
 
     public BotUser() {
     }
