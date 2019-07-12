@@ -11,29 +11,9 @@ public class BotUtils {
      * @return 去除彩色符号的字符串
      */
     public static String removeColor(String string){
-        return string.replaceAll("§a", "")
-                .replaceAll("§b", "")
-                .replaceAll("§c", "")
-                .replaceAll("§d", "")
-                .replaceAll("§e", "")
-                .replaceAll("§f", "")
-                .replaceAll("§n", "")
-                .replaceAll("§m", "")
-                .replaceAll("§r", "")
-                .replaceAll("§k", "")
-                .replaceAll("§o", "")
-                .replaceAll("§l", "")
-                .replaceAll("§1", "")
-                .replaceAll("§2", "")
-                .replaceAll("§3", "")
-                .replaceAll("§4", "")
-                .replaceAll("§5", "")
-                .replaceAll("§6", "")
-                .replaceAll("§7", "")
-                .replaceAll("§8", "")
-                .replaceAll("§9", "")
-                .replaceAll("§0", "");
+        return String.format(string, "§\\S");
     }
+
     /**
      * 获取 Minecraft 服务器信息
      * @author NamelessSAMA
