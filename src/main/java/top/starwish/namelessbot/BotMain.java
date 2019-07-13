@@ -63,7 +63,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
             // process only after there's a command, in order to get rid of memory trash
             String temp = msg.trim();
-            String cmd[] = {"", "", "", "", "", "", ""};
+            String[] cmd = {"", "", "", "", "", "", ""};
 
             /**
              * @brief Processing msg into cmd & params
@@ -305,10 +305,23 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                                                 || group.getGroupAliases().contains(cmd[3])) {
                                                             group.setServerIP(cmd[4]);
                                                             group.setServerPort(Integer.parseInt(cmd[5]));
-                                                            group.setInfoMessage(msg.replace("/", "").replace("#", "")
+                                                            int length = (msg.length() - (cmd[0].length() + cmd[1].length() + cmd[2].length() + cmd[3].length() + cmd[4].length() + cmd[5].length() + 7));
+                                                            group.setInfoMessage(msg.substring(length));
+                                                            /**
+                                                             * group.setInfoMessage(msg.replace("/", "").replace("#", "")
                                                                     .replace(cmd[0] + " ", "").replace(cmd[1], "")
                                                                     .replace(" " + cmd[2], "").replace(" " + cmd[3], "")
                                                                     .replace(" " + cmd[4], "").replace(" " + cmd[5] + " ", ""));
+                                                             */
+                                                            mySendPrivateMsg(fromQQ, "Bot > 设置成功!");
+                                                        } else {
+                                                            List<LookupResult> nodes = BotUtils.getSRVRecords(cmd[4]);
+                                                            for (LookupResult node : nodes){
+                                                                group.setServerIP(node.host());
+                                                                group.setServerPort(node.port());
+                                                            }
+                                                            int length = (msg.length() - (cmd[0].length() + cmd[1].length() + cmd[2].length() + cmd[3].length() + cmd[4].length() + 5));
+                                                            group.setInfoMessage(msg.substring(length));
                                                             mySendPrivateMsg(fromQQ, "Bot > 设置成功!");
                                                             break;
                                                         }
@@ -317,6 +330,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                             } else
                                                 mySendPrivateMsg(fromQQ,
                                                         "Bot > /group set serverinfo [群号] [服务器IP] [服务器端口] [自定义消息]\n"
+                                                                + "/group set serverinfo [群号] [服务器IP] [自定义消息] (这是SRV解析)\n"
                                                                 + "/group set serverinfo del [群号]");
                                         }
                                         break;
@@ -420,7 +434,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
             // process only after there's a command, in order to get rid of memory trash
             String temp = msg.trim();
-            String cmd[] = {"", "", "", "", "", ""};
+            String[] cmd = {"", "", "", "", "", ""};
 
             /**
              * @brief Processing msg into cmd & params
@@ -784,7 +798,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                 // 只取小数点后一位，将最大 awardPoint 限制到 3 倍
                                 double awardProp = 0.15 * (user.getCheckInTime() - 1); // refer to issue #40
                                 int basePoint = new Random(Calendar.getInstance().getTimeInMillis()).nextInt(10);
-                                double awardPoint = awardProp < 3 ? Double.parseDouble(String.format("%.1f", awardProp * basePoint)) : Double.parseDouble(String.format("%.1f", 3 * basePoint));
+                                double awardPoint = awardProp < 3 ? Double.parseDouble(String.format("%.1f", awardProp * basePoint)) : 3 * basePoint;
 
                                 user.setCheckInPoint(checkinUsers.get(fromQQ).getCheckInPoint() + basePoint + awardPoint);
 
@@ -794,7 +808,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                     mySendGroupMsg(fromGroup, "Bot > Hi " + checkinUsers.get(fromQQ).getBindServerAccount()
                                             + ", 签到成功!\n" + "本次签到获得 " + basePoint + " 点积分. \n" + "今天是第 "
                                             + user.getCheckInTime() + " 天连签了, 额外获得 " + awardPoint + " 奖励分~\n截至今天您的账户余额共 "
-                                            + String.format("%.1f", checkinUsers.get(fromQQ).getCheckInPoint()) + "分.\n");
+                                            + String.format("%.1f", checkinUsers.get(fromQQ).getCheckInPoint()) + "分.");
 
                                 saveConf();
                             } else
