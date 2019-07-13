@@ -5,18 +5,13 @@ import me.dilley.MineStat;
 
 import com.spotify.dns.DnsException;
 import com.spotify.dns.DnsSrvResolver;
-import com.spotify.dns.DnsSrvResolvers;
 import com.spotify.dns.LookupResult;
 import com.spotify.dns.statistics.DnsReporter;
 import com.spotify.dns.statistics.DnsTimingContext;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 public class BotUtils {
     private static final DnsReporter REPORTER = new StdoutReporter();
@@ -26,7 +21,7 @@ public class BotUtils {
      * @return 去除彩色符号的字符串
      */
     public static String removeColor(String string){
-        return String.format(string, "§\\S");
+        return string.replaceAll("§\\S", "");
     }
 
     /**
