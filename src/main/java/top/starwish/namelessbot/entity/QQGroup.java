@@ -13,8 +13,6 @@ public class QQGroup {
     private String serverIP;
     private int serverPort;
     private String infoMessage;
-    private boolean isEnabled;
-    private boolean isSRV;
 
     public QQGroup() {
     }
@@ -78,31 +76,24 @@ public class QQGroup {
     public String getServerIP(){
         return serverIP;
     }
+
     public void setServerIP(String serverIP){
         this.serverIP = serverIP;
     }
+
     public int getServerPort(){
         return serverPort;
     }
+
     public void setServerPort(int serverPort){
         this.serverPort = serverPort;
     }
+
     public String getInfoMessage(){
         return infoMessage;
     }
+
     public void setInfoMessage(String infoMessage){
         this.infoMessage = infoMessage;
-    }
-    public boolean isEnabled(){
-        return isEnabled;
-    }
-    public void setEnabled(boolean isEnabled){
-        this.isEnabled = isEnabled;
-    }
-    public void setSRVMode(boolean srvMode){
-        isSRV = srvMode;
-    }
-    public boolean getSRVMode(){
-        return isSRV;
     }
 }

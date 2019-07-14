@@ -39,7 +39,7 @@ public class BotUtils {
                     + "\nMOTD: " + server.getMotd()
                     + "\n版本: " + server.getVersion());
         } else
-            return ("[Bot] 无法连接至 " + addr);
+            return ("Bot > 无法连接至 " + addr);
     }
 
     /**
@@ -59,7 +59,7 @@ public class BotUtils {
                     .replaceAll("%MOTD%", server.getMotd())
                     .replaceAll("%版本%", server.getVersion());
         } else
-            return "[Bot] 无法连接至服务器.";
+            return "Bot > 无法连接至服务器.";
     }
 
     /**

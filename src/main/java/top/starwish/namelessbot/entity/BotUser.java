@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class BotUser {
     private long userQQ;
-    private Date lastCheckInTime;
+    private Date lastCheckInTime = new Date();
     private double checkInPoint;
     private int checkInTime;
     private String bindServerAccount;

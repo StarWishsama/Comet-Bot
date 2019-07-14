@@ -5,6 +5,7 @@ public class Shop {
     private int needPoint;
     private String itemCommand;
     private int buyTime;
+    private int money;
 
     public Shop(){
     }
@@ -39,5 +40,13 @@ public class Shop {
 
     public int getBuyTime(){
         return buyTime;
+    }
+
+    public int getMoney(){
+        return money;
+    }
+
+    public void setMoney(int Money){
+        money = Money;
     }
 }
