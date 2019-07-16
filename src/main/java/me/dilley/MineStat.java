@@ -100,8 +100,7 @@ public class MineStat
   {
     String[] serverData;
     String rawServerData;
-    try
-    {
+    try {
       //Socket clientSocket = new Socket(getAddress(), getPort());
       Socket clientSocket = new Socket();
       long startTime = System.currentTimeMillis();
@@ -114,20 +113,17 @@ public class MineStat
       dos.write(payload, 0, payload.length);
       rawServerData = br.readLine();
       clientSocket.close();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       serverUp = false;
-      //e.printStackTrace();
+      e.printStackTrace();
       return serverUp;
     }
 
     if(rawServerData == null)
       serverUp = false;
-    else
-    {
+    else {
       serverData = rawServerData.split("\u0000\u0000\u0000");
-      if (serverData != null && serverData.length >= NUM_FIELDS)
+      if (serverData.length >= NUM_FIELDS)
       {
         serverUp = true;
         setVersion(serverData[2].replace("\u0000", ""));

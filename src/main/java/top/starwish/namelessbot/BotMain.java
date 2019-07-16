@@ -1143,13 +1143,16 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     public int requestAddGroup(int subtype, int sendTime, long fromGroup, long fromQQ, String msg,
             String responseFlag) {
         if (botStatus){
-            for (QQGroup g : groupSetting){
-                if (g.isAutoAcceptRequest() && subtype == 1){
-                    CQ.setGroupAddRequest(responseFlag, REQUEST_GROUP_ADD, REQUEST_ADOPT, "无名Bot自动放行");
-                    mySendGroupMsg(fromGroup, "Bot > 已自动接受来自 " + CQ.getStrangerInfo(fromQQ).getNick() + "(" + fromQQ + ") 的入群申请.");
-                    break;
-                } else if (fromQQ == ownerQQ && subtype == 2){
-                    CQ.setGroupAddRequest(responseFlag, REQUEST_GROUP_INVITE, REQUEST_ADOPT, "");
+            if (groupSetting != null) {
+                for (QQGroup g : groupSetting) {
+                    if (g.isAutoAcceptRequest() && subtype == 1) {
+                        CQ.setGroupAddRequest(responseFlag, REQUEST_GROUP_ADD, REQUEST_ADOPT, "无名Bot自动放行");
+                        mySendGroupMsg(fromGroup, "Bot > 已自动接受来自 " + CQ.getStrangerInfo(fromQQ).getNick() + "(" + fromQQ + ") 的入群申请.");
+                        break;
+                    } else if (fromQQ == ownerQQ && subtype == 2) {
+                        CQ.setGroupAddRequest(responseFlag, REQUEST_GROUP_INVITE, REQUEST_ADOPT, "");
+                        break;
+                    }
                 }
             }
         }
