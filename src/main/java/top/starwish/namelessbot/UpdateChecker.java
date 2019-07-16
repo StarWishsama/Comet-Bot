@@ -26,7 +26,7 @@ class UpdateChecker {
 
     static boolean isLatest(){
         boolean isLatest = false;
-        String latestVer =getLatestVer();
+        String latestVer = getLatestVer();
         String current = VerClass.VERSION;
         if (latestVer.contains(current)){
             isLatest = true;

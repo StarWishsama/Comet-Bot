@@ -3,9 +3,9 @@ package top.starwish.namelessbot;
 import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
 
-import com.spotify.dns.LookupResult;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
+
 import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.*;
 
@@ -315,11 +315,7 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                                              */
                                                             mySendPrivateMsg(fromQQ, "Bot > 设置成功!");
                                                         } else {
-                                                            List<LookupResult> nodes = BotUtils.getSRVRecords(cmd[4]);
-                                                            for (LookupResult node : nodes){
-                                                                group.setServerIP(node.host());
-                                                                group.setServerPort(node.port());
-                                                            }
+                                                            group.setServerIP(cmd[4]);
                                                             int length = (msg.length() - (cmd[0].length() + cmd[1].length() + cmd[2].length() + cmd[3].length() + cmd[4].length() + 5));
                                                             group.setInfoMessage(msg.substring(length));
                                                             mySendPrivateMsg(fromQQ, "Bot > 设置成功!");
@@ -842,12 +838,9 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                         if (!cmd[1].equals("") && StringUtils.isNumeric(cmd[2])) {
                             mySendGroupMsg(fromGroup, BotUtils.getServerInfo(cmd[1], Integer.parseInt(cmd[2])));
                         } else if (!cmd[1].equals("")){
-                            List<LookupResult> nodes = BotUtils.getSRVRecords("_minecraft._tcp." + cmd[1]);
-                            for (LookupResult node : nodes){
-                                mySendGroupMsg(fromGroup, BotUtils.getServerInfo(BotUtils.StringHelper(node.host()), node.port()));
-                            }
+                            mySendGroupMsg(fromGroup, BotUtils.getServerInfo(cmd[1]));
                         } else
-                            mySendGroupMsg(fromGroup, "Bot > Please check IP address or Port.");
+                            mySendGroupMsg(fromGroup, "Bot > 请检查服务器地址或者端口是否填写正确.");
                         break;
                     case "shop":
                         if ("buy".equals(cmd[1].toLowerCase())) {
@@ -945,18 +938,22 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             }
         } else if (msg.equals("服务器信息") || msg.equals("服务器状态")) {
             if (botStatus) {
-                for (QQGroup group : groupSetting) {
-                    if (group.getGroupID() == fromGroup) {
-                        mySendGroupMsg(fromGroup, BotUtils.getCustomServerInfo(group.getServerIP(),
-                                group.getServerPort(), group.getInfoMessage()));
-                        try {
-                            CQ.logInfo("RCON", fromQQ + " 尝试执行服务器命令: " + "list");
-                            Rcon rcon = new Rcon(rconIP, rconPort, rconPwd.getBytes());
-                            String result = rcon.command("list");
-                            mySendGroupMsg(fromGroup, "Bot > \n" + result.trim());
-                        } catch (Exception ignored) {
+                if (groupSetting != null) {
+                    for (QQGroup group : groupSetting) {
+                        if (group.getGroupID() == fromGroup) {
+                            if (group.getServerPort() != 0) {
+                                mySendGroupMsg(fromGroup, BotUtils.getCustomServerInfo(group.getServerIP(), group.getServerPort(), group.getInfoMessage()));
+                            } else
+                                mySendGroupMsg(fromGroup, BotUtils.getCustomServerInfo(group.getServerIP(), group.getInfoMessage()));
+                            try {
+                                CQ.logInfo("RCON", fromQQ + " 尝试执行服务器命令: " + "list");
+                                Rcon rcon = new Rcon(rconIP, rconPort, rconPwd.getBytes());
+                                String result = rcon.command("list");
+                                mySendGroupMsg(fromGroup, "Bot > \n" + result.trim());
+                            } catch (Exception ignored) {
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
             }
