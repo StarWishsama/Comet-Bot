@@ -11,7 +11,7 @@ public class QQGroup {
     private List<Long> groupBotAdmins;
     private List<String> groupAliases;
     private String serverIP;
-    private int serverPort;
+    private int serverPort = 0;
     private String infoMessage;
 
     public QQGroup() {

@@ -298,28 +298,25 @@ public class BotMain extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
                                             } else
                                                 mySendPrivateMsg(fromQQ, "Bot > 请输入正确的群号!");
                                         } else {
-                                            if (!cmd[3].isEmpty() && !cmd[4].isEmpty() && StringUtils.isNumeric(cmd[5])) {
+                                            if (!cmd[3].isEmpty() && !cmd[4].isEmpty() && !cmd[5].isEmpty()) {
                                                 if (groupSetting != null) {
                                                     for (QQGroup group : groupSetting) {
-                                                        if (group.getGroupID() == Long.parseLong(cmd[3])
-                                                                || group.getGroupAliases().contains(cmd[3])) {
-                                                            group.setServerIP(cmd[4]);
-                                                            group.setServerPort(Integer.parseInt(cmd[5]));
-                                                            int length = (msg.length() - (cmd[0].length() + cmd[1].length() + cmd[2].length() + cmd[3].length() + cmd[4].length() + cmd[5].length() + 7));
-                                                            group.setInfoMessage(msg.substring(length));
-                                                            /**
-                                                             * group.setInfoMessage(msg.replace("/", "").replace("#", "")
-                                                                    .replace(cmd[0] + " ", "").replace(cmd[1], "")
-                                                                    .replace(" " + cmd[2], "").replace(" " + cmd[3], "")
-                                                                    .replace(" " + cmd[4], "").replace(" " + cmd[5] + " ", ""));
-                                                             */
+                                                        if (group.getGroupID() == Long.parseLong(cmd[3]) || group.getGroupAliases().contains(cmd[3])) {
+                                                            if (StringUtils.isNumeric(cmd[5])) {
+                                                                group.setServerIP(cmd[4]);
+                                                                group.setServerPort(Integer.parseInt(cmd[5]));
+                                                                group.setInfoMessage(msg.replace("/", "").replace("#", "")
+                                                                        .replace(cmd[0] + " ", "").replace(cmd[1], "")
+                                                                        .replace(" " + cmd[2], "").replace(" " + cmd[3], "")
+                                                                        .replace(" " + cmd[4], "").replace(" " + cmd[5] + " ", ""));
+                                                            } else {
+                                                                group.setServerIP(cmd[4]);
+                                                                group.setInfoMessage(msg.replace("/", "").replace("#", "")
+                                                                        .replace(cmd[0] + " ", "").replace(cmd[1], "")
+                                                                        .replace(" " + cmd[2], "").replace(" " + cmd[3], "")
+                                                                        .replace(" " + cmd[4], "").replace(" ", ""));
+                                                            }
                                                             mySendPrivateMsg(fromQQ, "Bot > 设置成功!");
-                                                        } else {
-                                                            group.setServerIP(cmd[4]);
-                                                            int length = (msg.length() - (cmd[0].length() + cmd[1].length() + cmd[2].length() + cmd[3].length() + cmd[4].length() + 5));
-                                                            group.setInfoMessage(msg.substring(length));
-                                                            mySendPrivateMsg(fromQQ, "Bot > 设置成功!");
-                                                            break;
                                                         }
                                                     }
                                                 }
