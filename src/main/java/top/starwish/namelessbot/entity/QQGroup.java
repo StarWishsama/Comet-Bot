@@ -13,6 +13,9 @@ public class QQGroup {
     private String serverIP;
     private int serverPort = 0;
     private String infoMessage;
+    private String RConAddress;
+    private int RConPort;
+    private byte[] RConPwd;
 
     public QQGroup() {
     }
@@ -95,5 +98,29 @@ public class QQGroup {
 
     public void setInfoMessage(String infoMessage){
         this.infoMessage = infoMessage;
+    }
+
+    public void setRConAddress(String addr){
+        RConAddress = addr;
+    }
+
+    public String getRConAddress(){
+        return RConAddress;
+    }
+
+    public void setRConPort(int port){
+        RConPort = port;
+    }
+
+    public int getRConPort(){
+        return RConPort;
+    }
+
+    public void setRConPwd(String pwd){
+        RConPwd = pwd.getBytes();
+    }
+
+    public byte[] getRConPwd(){
+        return RConPwd;
     }
 }

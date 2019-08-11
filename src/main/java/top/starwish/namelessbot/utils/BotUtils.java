@@ -67,16 +67,20 @@ public class BotUtils {
      */
 
     public static String getCustomServerInfo(String addr, int port, String msg){
-        try {
-            PingResponse response = MinecraftServerStatus.pingServerStatus(addr, port);
-            return msg.replaceAll("%延迟%", response.getLatency() + "ms")
-                    .replaceAll("%在线玩家%", response.getPlayers().toString())
-                    .replaceAll("%换行%", "\n")
-                    .replaceAll("%MOTD%", removeColor(response.getDescription().toString()))
-                    .replaceAll("%版本%", response.getVersion().toString());
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-            return ("Bot > 无法连接至 " + addr);
+        if (addr.isEmpty() || port < 0 || port > 25565 || msg.isEmpty()){
+            return "Bot > 服务器信息未设置正确";
+        } else {
+            try {
+                PingResponse response = MinecraftServerStatus.pingServerStatus(addr, port);
+                return msg.replaceAll("%延迟%", response.getLatency() + "ms")
+                        .replaceAll("%在线玩家%", response.getPlayers().toString())
+                        .replaceAll("%换行%", "\n")
+                        .replaceAll("%MOTD%", removeColor(response.getDescription().toString()))
+                        .replaceAll("%版本%", response.getVersion().toString());
+            } catch (IOException | URISyntaxException e) {
+                e.printStackTrace();
+                return ("Bot > 无法连接至 " + addr);
+            }
         }
     }
 
@@ -88,16 +92,20 @@ public class BotUtils {
      */
 
     public static String getCustomServerInfo(String addr, String msg){
-        try {
-            PingResponse response = MinecraftServerStatus.pingServerStatus(addr);
-            return msg.replaceAll("%延迟%", response.getLatency() + "ms")
-                    .replaceAll("%在线玩家%", response.getPlayers().toString())
-                    .replaceAll("%换行%", "\n")
-                    .replaceAll("%MOTD%", removeColor(response.getDescription().toString()))
-                    .replaceAll("%版本%", response.getVersion().toString());
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-            return ("Bot > 无法连接至 " + addr);
+        if (addr.isEmpty() || msg.isEmpty()) {
+            return "Bot > 服务器信息未设置正确";
+        } else {
+            try {
+                PingResponse response = MinecraftServerStatus.pingServerStatus(addr);
+                return msg.replaceAll("%延迟%", response.getLatency() + "ms")
+                        .replaceAll("%在线玩家%", response.getPlayers().toString())
+                        .replaceAll("%换行%", "\n")
+                        .replaceAll("%MOTD%", removeColor(response.getDescription().toString()))
+                        .replaceAll("%版本%", response.getVersion().toString());
+            } catch (IOException | URISyntaxException e) {
+                e.printStackTrace();
+                return ("Bot > 无法连接至 " + addr);
+            }
         }
     }
 

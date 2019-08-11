@@ -11,6 +11,7 @@ public class BotUser {
 
     public BotUser() {
     }
+
     public long getUserQQ(){
         return userQQ;
     }
