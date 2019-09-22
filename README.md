@@ -2,7 +2,7 @@
 
 A QQ Group bot developed for CoolQ-Air/Pro.
 
-Need [JCQ-CoolQ](https://github.com/Meowya/JCQ-CoolQ) as dependency!
+Need [CoolQ HTTP API](https://github.com/richardchien/coolq-http-api) as dependency!
 
 Simplified Chinese Edition 中文版本: [README](https://github.com/StarWishsama/Nameless-Bot/blob/master/README_zhCN.md)
 
