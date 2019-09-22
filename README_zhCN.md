@@ -2,11 +2,8 @@
 
 一个可用于 酷Q Air/Pro 的机器人插件.
 
-需要 [JCQ-CoolQ](https://github.com/Meowya/JCQ-CoolQ) 作为前置!
+需要 [CoolQ HTTP API](https://github.com/richardchien/coolq-http-api) 作为前置!
 
-<a href="https://travis-ci.org/StarWishsama/Nameless-Bot">
-  <img src="https://api.travis-ci.org/StarWishsama/Nameless-Bot.svg?branch=master">
-</a>
 <a href="https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE">
   <img src="https://img.shields.io/github/license/StarWishsama/Nameless-Bot.svg?style=popout">
 </a>
@@ -33,4 +30,3 @@ git clone https://github.com/StarWishsama/Nameless-Bot.git
 
 ## 📜 协议 
 [GPL v3.0](https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE)
-
