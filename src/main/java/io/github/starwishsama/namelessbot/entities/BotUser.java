@@ -1,4 +1,4 @@
-package top.starwish.namelessbot.entity;
+package io.github.starwishsama.namelessbot.entities;
 
 import java.util.Date;
 

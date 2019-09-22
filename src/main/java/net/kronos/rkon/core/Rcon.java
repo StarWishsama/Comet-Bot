@@ -5,8 +5,8 @@ import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.Random;
 
+import io.github.starwishsama.namelessbot.utils.BotUtils;
 import net.kronos.rkon.core.ex.AuthenticationException;
-import top.starwish.namelessbot.utils.BotUtils;
 
 public class Rcon {
 	

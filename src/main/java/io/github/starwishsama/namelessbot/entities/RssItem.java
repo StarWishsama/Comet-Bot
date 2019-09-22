@@ -1,4 +1,4 @@
-package top.starwish.namelessbot.entity;
+package io.github.starwishsama.namelessbot.entities;
 
 import com.rometools.rome.feed.synd.*;
 import com.rometools.rome.io.SyndFeedInput;
@@ -11,18 +11,6 @@ public class RssItem {
     private String address;
     private boolean ifEnabled;
     private List<Long> subscribers;
-
-    // main 函数仅供调试使用
-    public static void main(String[] args) {
-        String URL = "http://api.lssdjt.com/?ContentType=xml&appkey=rss.xml";
-        String text = new RssItem(URL).getContext();
-        text = "CC.face(74)" + "各位时光隧道玩家早上好" + "\n今天是" + Calendar.getInstance().get(Calendar.YEAR) + "年"
-        + (Calendar.getInstance().get(Calendar.MONTH) + 1) + "月"
-        + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "日" + "，"
-        + text.substring(0, text.indexOf("\n")).replaceFirst("-", "的今天是")
-        + "的日子，一小时之后我会推送今天的早间新闻\n新的一天开始了！" + "CC.face(190)" + "今天别忘了去服务器领取签到奖励噢~~";
-        System.out.println(text);
-    }
 
     public RssItem() {
     }
@@ -83,7 +71,7 @@ public class RssItem {
             // 得到Rss新闻中子项列表
             List<SyndEntry> entries = feed.getEntries();
             SyndEntry entry = entries.get(0);
-            return (entry.getTitle() + "\n" + "-------------------------\n" + entry.getDescription().getValue().trim());
+            return ("回形针 PaperClip 发布了新视频!\n标题:" + entry.getTitle() + "\n简介:" + entry.getDescription().getValue().trim() + "\n链接:" + entry.getLink());
         } catch (Exception e) {
             e.printStackTrace();
             return "Encountered a wrong URL or a network error.";
@@ -102,7 +90,7 @@ public class RssItem {
             SyndEntry entry = entries.get(0);
             return entry.getTitle();
         } catch (Exception e){
-                e.printStackTrace();
+            e.printStackTrace();
             return ("Encountered a wrong URL or a network error.");
         }
     }
@@ -115,7 +103,7 @@ public class RssItem {
             int r = context.indexOf('>');
             context = context.substring(0, l) + context.substring(r + 1);
         }
-        while (context.indexOf("\n\n") != -1) {
+        while (context.contains("\n\n")) {
             context = context.replaceAll("\n\n", "\n");
         }
         return context;

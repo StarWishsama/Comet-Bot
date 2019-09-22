@@ -1,4 +1,4 @@
-package top.starwish.namelessbot.utils;
+package io.github.starwishsama.namelessbot.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.UUID;
 
 /**
  * @author 夕橘子-O & Stiven.ding
@@ -16,20 +15,9 @@ import java.util.UUID;
  */
 
 public class FileProcess {
-
-    // main 函数仅供调试使用
-    public static void main(String[] args) {
-        UUID uuid = UUID.randomUUID();
-        try {
-            createFile(System.getProperty("user.dir") + "\\build\\myfile.txt", uuid.toString());
-            System.out.println(readFile(System.getProperty("user.dir") + "\\build\\myfile.txt"));
-        } catch (Exception e) {
-        }
-    }
-
     /**
      * 创建文件
-     * 
+     *
      * @param path        文件路径，如 C:\a.txt
      * @param filecontent 文件内容
      * @return 是否创建成功，成功则返回true
@@ -57,7 +45,7 @@ public class FileProcess {
 
     /**
      * 按行读取文件
-     * 
+     *
      * @return 读取到的内容（仅支持单行）
      * @throws IOException
      */
@@ -94,7 +82,7 @@ public class FileProcess {
 
     /**
      * 向文件中写入内容 正常情况不应调用
-     * 
+     *
      * @param filepath 文件路径与名称
      * @param newstr   写入的内容
      * @throws IOException
@@ -154,7 +142,7 @@ public class FileProcess {
 
     /**
      * 删除文件
-     * 
+     *
      * @param path 文件路径
      * @return
      */
