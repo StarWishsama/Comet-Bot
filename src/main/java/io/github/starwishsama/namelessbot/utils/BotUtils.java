@@ -7,8 +7,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BotUtils {
+    public static Map<Long, Date> coolDown = new HashMap<>();
+
     /**
      * @param string 需要去除彩色符号的字符串
      * @return 去除彩色符号的字符串
@@ -112,5 +116,26 @@ public class BotUtils {
     public static boolean isCheckInReset(Date currentTime, Date compareTime){
         SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
         return !sdt.format(currentTime).equals(sdt.format(compareTime));
+    }
+
+    /**
+     * 判断指定QQ号是否仍在冷却中
+     *
+     * @author NamelessSAMA
+     * @param qq 指定的QQ号
+     * @return true/false
+     */
+
+    public static boolean hasCoolDown(long qq){
+        if (coolDown != null){
+            for (Map.Entry e: coolDown.entrySet()){
+                if ((Long)e.getKey() == qq){
+                    if (new Date().getTime() - coolDown.get(qq).getTime() < 10000){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
