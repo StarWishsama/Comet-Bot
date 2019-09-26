@@ -8,6 +8,7 @@ import cc.moecraft.icq.user.GroupUser;
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.config.Config;
 import io.github.starwishsama.namelessbot.config.Message;
+import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
 
@@ -20,18 +21,21 @@ public class RConGroupCommand implements GroupCommand {
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String msg, ArrayList<String> args){
         long fromQQ = sender.getId();
-        if (Config.botAdmins.contains(fromQQ) || Config.ownerID == fromQQ) {
-            try {
-                StringBuilder sb = new StringBuilder();
-                for (String arg : args) {
-                    sb.append(arg).append(" ");
+        if (BotUtils.hasCoolDown(fromQQ)) {
+            if (Config.botAdmins.contains(fromQQ) || Config.ownerID == fromQQ) {
+                try {
+                    StringBuilder sb = new StringBuilder();
+                    for (String arg : args) {
+                        sb.append(arg).append(" ");
+                    }
+                    String result = BotMain.rcon.command(sb.toString().trim());
+                    return Message.botPrefix + result;
+                } catch (Exception e) {
+                    return Message.botPrefix + "在连接至服务器时发生了错误, 错误信息: " + e.getMessage();
                 }
-                String result = BotMain.rcon.command(sb.toString().trim());
-                return Message.botPrefix + result;
-            } catch (Exception e) {
-                return Message.botPrefix + "在连接至服务器时发生了错误, 错误信息: " + e.getMessage();
-            }
+            } else
+                return Message.botPrefix + Message.noPermission;
         } else
-            return Message.botPrefix + Message.noPermission;
+            return null;
     }
 }

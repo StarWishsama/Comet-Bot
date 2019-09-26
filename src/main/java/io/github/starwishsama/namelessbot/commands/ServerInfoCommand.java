@@ -18,14 +18,16 @@ public class ServerInfoCommand implements EverywhereCommand {
 
     @Override
     public String run(EventMessage em, User sender, String msg, ArrayList<String> args){
-        int size = args.size();
-        if (size == 1) {
-            return BotUtils.getServerInfo(args.get(0));
-        } else if (size == 2) {
-            if (StringUtils.isNumeric(args.get(1))) {
-                return BotUtils.getServerInfo(args.get(0), Integer.parseInt(args.get(1)));
-            } else
-                return Message.botPrefix + " 请填写正确的端口!";
+        if (BotUtils.hasCoolDown(sender.getId())) {
+            int size = args.size();
+            if (size == 1) {
+                return BotUtils.getServerInfo(args.get(0));
+            } else if (size == 2) {
+                if (StringUtils.isNumeric(args.get(1))) {
+                    return BotUtils.getServerInfo(args.get(0), Integer.parseInt(args.get(1)));
+                } else
+                    return Message.botPrefix + " 请填写正确的端口!";
+            }
         }
         return null;
     }
