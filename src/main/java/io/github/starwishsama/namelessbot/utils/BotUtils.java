@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BotUtils {
-    public static Map<Long, Date> coolDown = new HashMap<>();
+    public static Map<Long, Long> coolDown = new HashMap<>();
 
     /**
      * @param string 需要去除彩色符号的字符串
@@ -130,7 +130,7 @@ public class BotUtils {
         if (coolDown != null){
             for (Map.Entry e: coolDown.entrySet()){
                 if ((Long)e.getKey() == qq){
-                    if (new Date().getTime() - coolDown.get(qq).getTime() < 10000){
+                    if (new Date().getTime() - coolDown.get(qq) < 10000){
                         return true;
                     }
                 }

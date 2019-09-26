@@ -12,6 +12,7 @@ import io.github.starwishsama.namelessbot.commands.*;
 import io.github.starwishsama.namelessbot.config.Config;
 import io.github.starwishsama.namelessbot.config.Message;
 import io.github.starwishsama.namelessbot.entities.RssItem;
+import io.github.starwishsama.namelessbot.utils.BotUtils;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 
@@ -93,6 +94,12 @@ public class BotMain {
                         lastContext = context;
                     }
                     logger.log("[Bot] 自动保存数据完成");
+                } else if (Calendar.getInstance().get(Calendar.SECOND) == 30){
+                    for (Map.Entry e : BotUtils.coolDown.entrySet()){
+                        if ((Long) e.getValue() <= Long.parseLong(new Date().toString())){
+                            BotUtils.coolDown.remove(e.getKey());
+                        }
+                    }
                 }
             }
         }, c.getTime(), 1000 * 60 * 15);
