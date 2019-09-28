@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class Message {
-    private static HyLogger logger = BotMain.logger;
+    private static HyLogger logger = BotMain.getLogger();
     public static String botPrefix;
     public static String noPermission;
     public static String bindSuccess;

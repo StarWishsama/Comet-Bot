@@ -54,7 +54,6 @@ public class Config {
                     configObject.put("netEaseApi", "http://localhost:3000/");
                     FileProcess.createFile(jarPath + "config.json", configObject.toJSONString());
                     load();
-                    checkInCfg.createNewFile();
                     System.out.println("[配置] 已自动生成新的配置文件.");
                 } catch (Exception e){
                     System.err.println("[配置] 在生成配置文件时发生了错误, 错误信息: " + e.getMessage());
@@ -92,8 +91,10 @@ public class Config {
     private static void load(){
         try {
             JSONObject checkInObject = JSONObject.parseObject(FileProcess.readFile(jarPath + "qiandao.json"));
-            checkinUsers = JSON.parseObject(checkInObject.getString("checkinUsers"), new TypeReference<Map<Long, BotUser>>() {
-            });
+            if (JSON.parseObject(checkInObject.getString("checkinUsers"), new TypeReference<Map<Long, BotUser>>(){}) != null)
+                checkinUsers = JSON.parseObject(checkInObject.getString("checkinUsers"), new TypeReference<Map<Long, BotUser>>() {
+                });
+
             shopItems = JSON.parseObject(checkInObject.getString("shopItems"), new TypeReference<Map<String, Shop>>() {
             });
 

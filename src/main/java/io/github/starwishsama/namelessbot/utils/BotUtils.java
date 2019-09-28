@@ -2,6 +2,8 @@ package io.github.starwishsama.namelessbot.utils;
 
 import com.deadmandungeons.serverstatus.MinecraftServerStatus;
 import com.deadmandungeons.serverstatus.ping.PingResponse;
+import io.github.starwishsama.namelessbot.BotMain;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -128,13 +130,23 @@ public class BotUtils {
 
     public static boolean hasCoolDown(long qq){
         if (coolDown != null){
-            for (Map.Entry e: coolDown.entrySet()){
-                if ((Long)e.getKey() == qq){
-                    if (new Date().getTime() - coolDown.get(qq) < 10000){
-                        return true;
-                    }
+            if (coolDown.containsKey(qq)){
+                if (new Date().getTime() - coolDown.get(qq) > 10 * 1000){
+                    BotMain.getLogger().log(qq + " has cooldown");
+                    return true;
+                } else {
+                    if (StringUtils.isNumeric(String.valueOf(coolDown.get(qq)))){
+                        BotMain.getLogger().log(qq + " hasn't cooldown");
+                        coolDown.remove(qq);
+                        BotMain.getLogger().log(qq + " 's cooldown was removed.");
+                    } else
+                        BotMain.getLogger().log("Value isn't numeric, it's " + coolDown.get(qq));
                 }
-            }
+            } else
+                BotUtils.coolDown.put(qq, new Date().getTime());
+        } else {
+            BotMain.getLogger().log("Map is empty");
+            coolDown.put(qq, new Date().getTime());
         }
         return false;
     }

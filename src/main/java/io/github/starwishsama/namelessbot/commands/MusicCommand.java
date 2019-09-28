@@ -6,10 +6,12 @@ import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.sender.message.MessageBuilder;
 import cc.moecraft.icq.sender.message.components.ComponentMusic;
 import cc.moecraft.icq.user.User;
+import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
-import io.github.starwishsama.namelessbot.utils.SongIDGetter;
+import io.github.starwishsama.namelessbot.utils.MusicID;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MusicCommand implements EverywhereCommand {
     @Override
@@ -26,11 +28,11 @@ public class MusicCommand implements EverywhereCommand {
                     sb.append(args.get(i)).append(" ");
                 }
                 if (args.get(0).equalsIgnoreCase("wy")) {
-                    if (SongIDGetter.getNetEaseSongID(sb.toString().trim()) != -1)
-                        return new MessageBuilder().add(new ComponentMusic(SongIDGetter.getNetEaseSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.netease)).toString();
+                    if (MusicID.getNetEaseSongID(sb.toString().trim()) != -1)
+                        return new MessageBuilder().add(new ComponentMusic(MusicID.getNetEaseSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.netease)).toString();
                 } else if (args.get(0).equalsIgnoreCase("qq")) {
-                    if (SongIDGetter.getQQMusicSongID(sb.toString().trim()) != -1 && SongIDGetter.getQQMusicSongID(sb.toString().trim()) != 0)
-                        return new MessageBuilder().add(new ComponentMusic(SongIDGetter.getQQMusicSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.qq)).toString();
+                    if (MusicID.getQQMusicSongID(sb.toString().trim()) != -1 && MusicID.getQQMusicSongID(sb.toString().trim()) != 0)
+                        return new MessageBuilder().add(new ComponentMusic(MusicID.getQQMusicSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.qq)).toString();
                 }
             }
         }

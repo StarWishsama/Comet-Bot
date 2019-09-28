@@ -9,8 +9,10 @@ import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
 import io.github.starwishsama.namelessbot.config.Config;
 import io.github.starwishsama.namelessbot.config.Message;
+import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import static com.sobte.cqp.jcq.event.JcqApp.CC;
 
@@ -22,9 +24,9 @@ public class DebugCommand implements GroupCommand {
 
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String cmd, ArrayList<String> args){
-        RVersionInfo versionInfo = event.getHttpApi().getVersionInfo().getData();
         switch (args.get(0)) {
             case "recall":
+                RVersionInfo versionInfo = event.getHttpApi().getVersionInfo().getData();
                 if (versionInfo.getCoolqEdition().equalsIgnoreCase("pro")) {
                     if (sender.isAdmin()) return Message.botPrefix + " 不好意思不好意思权限狗打扰了";
                     if (!event.isAdmin()) return Message.botPrefix + " 机器人不是管理员怎么撤回啊kora";
@@ -40,6 +42,11 @@ public class DebugCommand implements GroupCommand {
             case "reload":
                 Config.loadCfg();
                 break;
+            case "cd":
+                if (!BotUtils.hasCoolDown(sender.getId())){
+                    return "Bot > You don't have cooldown";
+                } else
+                    return "Bot > Debug > Has cooldown, Cooldown is: " + BotUtils.coolDown.get(sender.getId() - new Date().getTime());
             default:
                 return "Bot > 命令不存在";
         }

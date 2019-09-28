@@ -16,11 +16,13 @@ import io.github.starwishsama.namelessbot.utils.BotUtils;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class BotMain {
-    public static HyLogger logger;
+    private static HyLogger logger;
     public static Rcon rcon;
 
     private static String lastContext;
@@ -45,16 +47,19 @@ public class BotMain {
     public static void main(String[] args){
         try {
             Config.jarPath = getPath();
-            System.out.println(getPath());
+            System.out.println("[Path] Jar path is at" + getPath());
+            System.out.println("[Path] Config path is at "+ getPath() + "qiandao.json");
         } catch (Exception e) {
             e.printStackTrace();
         }
+
 
         Config.loadCfg();
         Message.loadLang();
 
         PicqConfig cfg = new PicqConfig(Config.botPort).setUseAsyncCommands(true).setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT);
         PicqBotX bot = new PicqBotX(cfg);
+        cfg.setDebug(true);
         logger = bot.getLogger();
         bot.setUniversalHyExpSupport(true);
         bot.addAccount(Config.botName, Config.postUrl, Config.postPort);
@@ -94,12 +99,6 @@ public class BotMain {
                         lastContext = context;
                     }
                     logger.log("[Bot] 自动保存数据完成");
-                } else if (Calendar.getInstance().get(Calendar.SECOND) == 30){
-                    for (Map.Entry e : BotUtils.coolDown.entrySet()){
-                        if ((Long) e.getValue() <= Long.parseLong(new Date().toString())){
-                            BotUtils.coolDown.remove(e.getKey());
-                        }
-                    }
                 }
             }
         }, c.getTime(), 1000 * 60 * 15);
@@ -121,5 +120,9 @@ public class BotMain {
             return path.substring(0, path.lastIndexOf("/"));
         }
         return path.replace("target/classes/", "");
+    }
+
+    public static HyLogger getLogger(){
+        return logger;
     }
 }

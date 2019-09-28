@@ -14,7 +14,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-public class SongIDGetter {
+public class MusicID {
     // 仅供测试
     public static void main(String[] args){
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));

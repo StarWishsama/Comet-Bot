@@ -21,7 +21,7 @@ public class InfoCommand implements EverywhereCommand {
 
     @Override
     public String run(EventMessage e, User user, String msg, ArrayList<String> args){
-        if (BotUtils.hasCoolDown(user.getId())) {
+        if (!BotUtils.hasCoolDown(user.getId())) {
             if (Config.checkinUsers.containsKey(user.getId())) {
                 return new MessageBuilder()
                         .add(new ComponentAt(user.getId())).newLine()

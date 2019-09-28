@@ -11,6 +11,7 @@ import io.github.starwishsama.namelessbot.config.Message;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class RConGroupCommand implements GroupCommand {
     @Override
@@ -21,7 +22,7 @@ public class RConGroupCommand implements GroupCommand {
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String msg, ArrayList<String> args){
         long fromQQ = sender.getId();
-        if (BotUtils.hasCoolDown(fromQQ)) {
+        if (!BotUtils.hasCoolDown(fromQQ)) {
             if (Config.botAdmins.contains(fromQQ) || Config.ownerID == fromQQ) {
                 try {
                     StringBuilder sb = new StringBuilder();
@@ -33,8 +34,9 @@ public class RConGroupCommand implements GroupCommand {
                 } catch (Exception e) {
                     return Message.botPrefix + "在连接至服务器时发生了错误, 错误信息: " + e.getMessage();
                 }
-            } else
+            } else {
                 return Message.botPrefix + Message.noPermission;
+            }
         } else
             return null;
     }
