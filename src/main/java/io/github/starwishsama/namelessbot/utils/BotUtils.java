@@ -131,23 +131,14 @@ public class BotUtils {
     public static boolean hasCoolDown(long qq){
         if (coolDown != null){
             if (coolDown.containsKey(qq)){
-                if (new Date().getTime() - coolDown.get(qq) > 10 * 1000){
-                    BotMain.getLogger().log(qq + " has cooldown");
+                if (new Date().getTime() - coolDown.get(qq) <= 10 * 1000){
                     return true;
-                } else {
-                    if (StringUtils.isNumeric(String.valueOf(coolDown.get(qq)))){
-                        BotMain.getLogger().log(qq + " hasn't cooldown");
-                        coolDown.remove(qq);
-                        BotMain.getLogger().log(qq + " 's cooldown was removed.");
-                    } else
-                        BotMain.getLogger().log("Value isn't numeric, it's " + coolDown.get(qq));
-                }
+                } else
+                    coolDown.remove(qq);
             } else
                 BotUtils.coolDown.put(qq, new Date().getTime());
-        } else {
-            BotMain.getLogger().log("Map is empty");
-            coolDown.put(qq, new Date().getTime());
-        }
+        } else
+            coolDown = new HashMap<>();
         return false;
     }
 }

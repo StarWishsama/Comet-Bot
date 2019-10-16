@@ -3,6 +3,7 @@ package net.kronos.rkon.core;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 import io.github.starwishsama.namelessbot.utils.BotUtils;
@@ -30,7 +31,7 @@ public class Rcon {
 	 */
 	public Rcon(String host, int port, byte[] password) throws IOException, AuthenticationException {
 		// Default charset is utf8
-		this.charset = Charset.forName("UTF-8");
+		this.charset = StandardCharsets.UTF_8;
 		
 		// Connect to host
 		this.connect(host, port, password);

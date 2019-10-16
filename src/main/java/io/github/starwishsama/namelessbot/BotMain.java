@@ -25,9 +25,6 @@ public class BotMain {
     private static HyLogger logger;
     public static Rcon rcon;
 
-    private static String lastContext;
-    private static IcqHttpApi api;
-
     private static IcqCommand[] commands = new IcqCommand[]{
             new VersionCommand(),
             new DebugCommand(),
@@ -37,8 +34,7 @@ public class BotMain {
             new InfoCommand(),
             new RConGroupCommand(),
             new MuteCommand(),
-            new MusicCommand(),
-            new RSSCommand()
+            new MusicCommand()
     };
 
     //private static IcqListener[] listeners = new IcqListener[]{
@@ -47,12 +43,11 @@ public class BotMain {
     public static void main(String[] args){
         try {
             Config.jarPath = getPath();
-            System.out.println("[Path] Jar path is at" + getPath());
-            System.out.println("[Path] Config path is at "+ getPath() + "qiandao.json");
+            System.out.println("[Path] Jar path is at" + Config.jarPath);
+            System.out.println("[Path] Config path is at "+ Config.jarPath + "qiandao.json");
         } catch (Exception e) {
             e.printStackTrace();
         }
-
 
         Config.loadCfg();
         Message.loadLang();
@@ -64,13 +59,12 @@ public class BotMain {
         bot.setUniversalHyExpSupport(true);
         bot.addAccount(Config.botName, Config.postUrl, Config.postPort);
         BotAccount account = new BotAccount(Config.botName, bot, Config.postUrl, Config.postPort);
-        bot.enableCommandManager("/", "#", "~", "!");
+        bot.enableCommandManager(Config.cmdPrefix);
         bot.getCommandManager().registerCommands(commands);
         // bot.getEventManager().registerListeners(listeners);
         bot.startBot();
-        api = new IcqHttpApi(bot, account, Config.postUrl, Config.postPort);
+        IcqHttpApi api = new IcqHttpApi(bot, account, Config.postUrl, Config.postPort);
 
-        lastContext = RSSPusher.getLatestVideo();
 
         if (Config.rconPwd != null) {
             try {
@@ -93,11 +87,6 @@ public class BotMain {
             public void run() {
                 if (Calendar.getInstance().get(Calendar.MINUTE) == Config.autoSaveTime) {
                     Config.saveCfg();
-                    String context = RSSPusher.getLatestVideo();
-                    if (!lastContext.equals(context)) {
-                        api.sendGroupMsg(142928351, context);
-                        lastContext = context;
-                    }
                     logger.log("[Bot] 自动保存数据完成");
                 }
             }
@@ -117,7 +106,7 @@ public class BotMain {
         }
         if (path.contains("jar")) {
             path = path.substring(0, path.lastIndexOf("."));
-            return path.substring(0, path.lastIndexOf("/"));
+            return path;
         }
         return path.replace("target/classes/", "");
     }

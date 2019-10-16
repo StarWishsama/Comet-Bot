@@ -28,6 +28,7 @@ public class Config {
     public static int rconPort;
     public static byte[] rconPwd;
     public static String netEaseApi;
+    public static String[] cmdPrefix;
 
     public static String jarPath;
 
@@ -52,6 +53,7 @@ public class Config {
                     configObject.put("rconPort", "25575");
                     configObject.put("rconPwd", "password");
                     configObject.put("netEaseApi", "http://localhost:3000/");
+                    configObject.put("cmdPrefix", new String[]{"/", "#"});
                     FileProcess.createFile(jarPath + "config.json", configObject.toJSONString());
                     load();
                     System.out.println("[配置] 已自动生成新的配置文件.");
@@ -113,7 +115,7 @@ public class Config {
             netEaseApi = configObject.getString("netEaseApi");
         } catch (Exception e) {
             System.err.println("[配置] 在加载配置文件时发生了问题, 错误信息: ");
-            e.printStackTrace();
+            System.err.println(e);
         }
     }
 }
