@@ -38,7 +38,7 @@ public class BotUtils {
                     + "\nMOTD: " + removeColor(response.getDescription().toString())
                     + "\n版本: " + response.getVersion());
         } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
+            BotMain.getLogger().warning("在获取服务器信息时出现了问题, " + e);
             return ("Bot > 无法连接至 " + addr);
         }
     }
@@ -59,7 +59,7 @@ public class BotUtils {
                     + "\nMOTD: " + removeColor(response.getDescription().toString())
                     + "\n版本: " + response.getVersion());
         } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
+            BotMain.getLogger().warning("在获取服务器信息时出现了问题, " + e);
             return ("Bot > 无法连接至 " + addr);
         }
     }
@@ -81,7 +81,7 @@ public class BotUtils {
                     .replaceAll("%MOTD%", removeColor(response.getDescription().toString()))
                     .replaceAll("%版本%", response.getVersion().toString());
         } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
+            BotMain.getLogger().warning("在获取服务器信息时出现了问题, " + e);
             return ("Bot > 无法连接至 " + addr);
         }
     }
@@ -102,7 +102,7 @@ public class BotUtils {
                     .replaceAll("%MOTD%", removeColor(response.getDescription().toString()))
                     .replaceAll("%版本%", response.getVersion().toString());
         } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
+            BotMain.getLogger().warning("在获取服务器信息时出现了问题, " + e);
             return ("Bot > 无法连接至 " + addr);
         }
     }

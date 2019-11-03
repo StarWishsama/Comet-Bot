@@ -1,4 +1,4 @@
-package io.github.starwishsama.namelessbot.entities;
+package io.github.starwishsama.namelessbot.objects;
 
 import com.rometools.rome.feed.synd.*;
 import com.rometools.rome.io.SyndFeedInput;

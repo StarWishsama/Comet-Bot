@@ -3,8 +3,9 @@ package io.github.starwishsama.namelessbot.config;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import io.github.starwishsama.namelessbot.entities.BotUser;
-import io.github.starwishsama.namelessbot.entities.Shop;
+import io.github.starwishsama.namelessbot.BotMain;
+import io.github.starwishsama.namelessbot.objects.BotUser;
+import io.github.starwishsama.namelessbot.objects.Shop;
 import io.github.starwishsama.namelessbot.utils.FileProcess;
 
 import java.io.File;
@@ -28,15 +29,13 @@ public class Config {
     public static int rconPort;
     public static byte[] rconPwd;
     public static String netEaseApi;
-    public static String[] cmdPrefix;
-
-    public static String jarPath;
-
+    public static String[] cmdPrefix = new String[]{"/", "#"};
+    
+    private static File checkInCfg = new File(BotMain.jarPath + "qiandao.json");
+    private static File cfg = new File(BotMain.jarPath + "config.json");
 
     public static void loadCfg(){
-        if (jarPath != null) {
-            File checkInCfg = new File(jarPath + "qiandao.json");
-            File cfg = new File(jarPath + "config.json");
+        if (BotMain.jarPath != null) {
             if (checkInCfg.exists() && cfg.exists()){
                 load();
             } else {
@@ -54,7 +53,7 @@ public class Config {
                     configObject.put("rconPwd", "password");
                     configObject.put("netEaseApi", "http://localhost:3000/");
                     configObject.put("cmdPrefix", new String[]{"/", "#"});
-                    FileProcess.createFile(jarPath + "config.json", configObject.toJSONString());
+                    FileProcess.createFile(cfg.toString(), configObject.toJSONString());
                     load();
                     System.out.println("[配置] 已自动生成新的配置文件.");
                 } catch (Exception e){
@@ -69,7 +68,7 @@ public class Config {
             JSONObject checkInObject = new JSONObject();
             checkInObject.put("checkinUsers", checkinUsers);
             checkInObject.put("shopItems", shopItems);
-            FileProcess.createFile(jarPath + "qiandao.json", checkInObject.toJSONString());
+            FileProcess.createFile(checkInCfg.toString(), checkInObject.toJSONString());
 
             JSONObject configObject = new JSONObject();
             configObject.put("ownerID", ownerID);
@@ -83,7 +82,7 @@ public class Config {
             configObject.put("rconPort", rconPort);
             configObject.put("rconPwd", rconPwd);
             configObject.put("netEaseApi", netEaseApi);
-            FileProcess.createFile(jarPath + "config.json", configObject.toJSONString());
+            FileProcess.createFile(cfg.toString(), configObject.toJSONString());
         } catch (Exception e){
             System.err.println("[配置] 在保存配置文件时发生了问题, 错误信息: ");
             e.printStackTrace();
@@ -92,7 +91,7 @@ public class Config {
 
     private static void load(){
         try {
-            JSONObject checkInObject = JSONObject.parseObject(FileProcess.readFile(jarPath + "qiandao.json"));
+            JSONObject checkInObject = JSONObject.parseObject(FileProcess.readFile(checkInCfg.toString()));
             if (JSON.parseObject(checkInObject.getString("checkinUsers"), new TypeReference<Map<Long, BotUser>>(){}) != null)
                 checkinUsers = JSON.parseObject(checkInObject.getString("checkinUsers"), new TypeReference<Map<Long, BotUser>>() {
                 });
@@ -100,7 +99,7 @@ public class Config {
             shopItems = JSON.parseObject(checkInObject.getString("shopItems"), new TypeReference<Map<String, Shop>>() {
             });
 
-            JSONObject configObject = JSONObject.parseObject(FileProcess.readFile(jarPath + "config.json"));
+            JSONObject configObject = JSONObject.parseObject(cfg.toString());
             ownerID = configObject.getLong("ownerID");
             autoSaveTime = configObject.getInteger("autoSaveTime");
             botAdmins = JSON.parseObject(configObject.getString("botAdmins"), new TypeReference<List<Long>>(){
@@ -114,8 +113,7 @@ public class Config {
             rconPwd = configObject.getString("rconPwd").getBytes();
             netEaseApi = configObject.getString("netEaseApi");
         } catch (Exception e) {
-            System.err.println("[配置] 在加载配置文件时发生了问题, 错误信息: ");
-            System.err.println(e);
+            System.err.println("[配置] 在加载配置文件时发生了问题, 错误信息: " + e);
         }
     }
 }

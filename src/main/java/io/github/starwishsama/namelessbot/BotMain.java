@@ -11,19 +11,16 @@ import cc.moecraft.logger.environments.ColorSupportLevel;
 import io.github.starwishsama.namelessbot.commands.*;
 import io.github.starwishsama.namelessbot.config.Config;
 import io.github.starwishsama.namelessbot.config.Message;
-import io.github.starwishsama.namelessbot.entities.RssItem;
-import io.github.starwishsama.namelessbot.utils.BotUtils;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 
 public class BotMain {
     private static HyLogger logger;
     public static Rcon rcon;
+    public static String jarPath;
 
     private static IcqCommand[] commands = new IcqCommand[]{
             new VersionCommand(),
@@ -34,7 +31,8 @@ public class BotMain {
             new InfoCommand(),
             new RConGroupCommand(),
             new MuteCommand(),
-            new MusicCommand()
+            new MusicCommand(),
+            new RandomCommand()
     };
 
     //private static IcqListener[] listeners = new IcqListener[]{
@@ -42,9 +40,9 @@ public class BotMain {
 
     public static void main(String[] args){
         try {
-            Config.jarPath = getPath();
-            System.out.println("[Path] Jar path is at" + Config.jarPath);
-            System.out.println("[Path] Config path is at "+ Config.jarPath + "qiandao.json");
+            jarPath = getPath();
+            System.out.println("[Path] Jar path is at " + jarPath);
+            System.out.println("[Path] Config path is at "+ jarPath + "config.json");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -58,13 +56,12 @@ public class BotMain {
         logger = bot.getLogger();
         bot.setUniversalHyExpSupport(true);
         bot.addAccount(Config.botName, Config.postUrl, Config.postPort);
-        BotAccount account = new BotAccount(Config.botName, bot, Config.postUrl, Config.postPort);
         bot.enableCommandManager(Config.cmdPrefix);
         bot.getCommandManager().registerCommands(commands);
         // bot.getEventManager().registerListeners(listeners);
         bot.startBot();
-        IcqHttpApi api = new IcqHttpApi(bot, account, Config.postUrl, Config.postPort);
 
+        logger.log("启动完成! 机器人运行在端口 " + Config.botPort + " 上.");
 
         if (Config.rconPwd != null) {
             try {

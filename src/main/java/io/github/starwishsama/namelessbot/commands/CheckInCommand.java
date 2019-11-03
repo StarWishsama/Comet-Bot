@@ -5,7 +5,7 @@ import cc.moecraft.icq.command.interfaces.EverywhereCommand;
 import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
 import io.github.starwishsama.namelessbot.config.Config;
-import io.github.starwishsama.namelessbot.entities.BotUser;
+import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.*;
@@ -30,8 +30,7 @@ public class CheckInCommand implements EverywhereCommand {
                     newUser.setBindServerAccount(args.get(0));
                     Config.checkinUsers.put(fromQQ, newUser);
                     return "Bot > 已绑定账号 " + args.get(0) + " ，以后可以直接输入 /qd 签到了! ";
-                }
-                if (BotUtils.isCheckInReset(new Date(), Config.checkinUsers.get(fromQQ).getLastCheckInTime()) || Config.checkinUsers.get(fromQQ).getCheckInTime() == 0) {
+                } else if (BotUtils.isCheckInReset(new Date(), Config.checkinUsers.get(fromQQ).getLastCheckInTime()) || Config.checkinUsers.get(fromQQ).getCheckInTime() == 0) {
                     BotUser user = Config.checkinUsers.get(fromQQ);
                     // 计算连续签到次数，此处用了 Date 这个废弃的类，应换为 Calendar，too lazy to do so.
                     if (user.getLastCheckInTime().getMonth() == new Date().getMonth()
