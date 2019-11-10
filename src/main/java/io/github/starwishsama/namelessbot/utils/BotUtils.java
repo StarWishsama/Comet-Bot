@@ -141,4 +141,8 @@ public class BotUtils {
             coolDown = new HashMap<>();
         return false;
     }
+
+    public static boolean isLegitID(String s){
+        return s.matches("^[a-z0-9A-Z]+$");
+    }
 }

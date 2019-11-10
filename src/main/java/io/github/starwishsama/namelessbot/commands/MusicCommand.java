@@ -6,12 +6,10 @@ import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.sender.message.MessageBuilder;
 import cc.moecraft.icq.sender.message.components.ComponentMusic;
 import cc.moecraft.icq.user.User;
-import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import io.github.starwishsama.namelessbot.utils.MusicID;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class MusicCommand implements EverywhereCommand {
     @Override

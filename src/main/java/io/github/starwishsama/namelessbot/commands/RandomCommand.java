@@ -2,15 +2,11 @@ package io.github.starwishsama.namelessbot.commands;
 
 import cc.moecraft.icq.command.CommandProperties;
 import cc.moecraft.icq.command.interfaces.EverywhereCommand;
-import cc.moecraft.icq.command.interfaces.GroupCommand;
-import cc.moecraft.icq.event.events.message.EventGroupMessage;
 import cc.moecraft.icq.event.events.message.EventMessage;
-import cc.moecraft.icq.user.Group;
-import cc.moecraft.icq.user.GroupUser;
 import cc.moecraft.icq.user.User;
+
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
-import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
 import java.util.ArrayList;
 import java.util.Random;
 
