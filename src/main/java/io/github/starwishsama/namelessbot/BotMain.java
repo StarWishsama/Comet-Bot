@@ -61,6 +61,11 @@ public class BotMain {
         // bot.getEventManager().registerListeners(listeners);
         bot.startBot();
 
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Config.saveCfg();
+            Message.saveLang();
+        }));
+
         logger.log("启动完成! 机器人运行在端口 " + Config.botPort + " 上.");
 
         if (Config.rconPwd != null) {
@@ -74,25 +79,16 @@ public class BotMain {
             }
         }
 
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, 7);
-        c.set(Calendar.MINUTE, 5);
+        final Date d = Calendar.getInstance().getTime();
 
         Timer t = new Timer();
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (Calendar.getInstance().get(Calendar.MINUTE) == Config.autoSaveTime) {
-                    Config.saveCfg();
-                    logger.log("[Bot] 自动保存数据完成");
-                }
+                Config.saveCfg();
+                logger.log("[Bot] 自动保存数据完成");
             }
-        }, c.getTime(), 1000 * 60 * 15);
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            Config.saveCfg();
-            Message.saveLang();
-        }));
+        }, d, 1000 * 60 * 15);
     }
 
     // https://blog.csdn.net/df0128/article/details/90484684

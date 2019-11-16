@@ -10,6 +10,8 @@ import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.*;
 
+import static io.github.starwishsama.namelessbot.utils.BotUtils.generateUUID;
+
 public class CheckInCommand implements EverywhereCommand {
     @Override
     public CommandProperties properties(){
@@ -19,21 +21,23 @@ public class CheckInCommand implements EverywhereCommand {
     @Deprecated
     @Override
     public String run(EventMessage em, User sender, String msg, ArrayList<String> args){
-        Long fromQQ = sender.getId();
+        long fromQQ = sender.getId();
         if (!BotUtils.hasCoolDown(fromQQ)) {
-            if (!Config.checkinUsers.containsKey(fromQQ) && args.size() == 0) {
+            if (!BotUtils.isUserExist(fromQQ) && args.size() == 0) {
                 return "Bot > 你还没有注册无名 Bot 账号! 第一次请使用 /qd <游戏ID> 注册～";
             } else {
-                if (!Config.checkinUsers.containsKey(fromQQ) && args.size() == 1) {
+                if (!BotUtils.isUserExist(fromQQ) && args.size() == 1) {
                     BotUser newUser = new BotUser();
                     newUser.setUserQQ(fromQQ);
                     newUser.setBindServerAccount(args.get(0));
-                    Config.checkinUsers.put(fromQQ, newUser);
+                    newUser.setUserUUID(generateUUID(newUser));
+                    Config.botUsers.add(newUser);
                     return "Bot > 已绑定账号 " + args.get(0) + " ，以后可以直接输入 /qd 签到了! ";
-                } else if (BotUtils.isCheckInReset(new Date(), Config.checkinUsers.get(fromQQ).getLastCheckInTime()) || Config.checkinUsers.get(fromQQ).getCheckInTime() == 0) {
-                    BotUser user = Config.checkinUsers.get(fromQQ);
+                }
+                if (BotUtils.isCheckInReset(new Date(), Objects.requireNonNull(BotUtils.getUser(fromQQ)).getLastCheckInTime()) || Objects.requireNonNull(BotUtils.getUser(fromQQ)).getCheckInTime() == 0) {
+                    BotUser user = BotUtils.getUser(fromQQ);
                     // 计算连续签到次数，此处用了 Date 这个废弃的类，应换为 Calendar，too lazy to do so.
-                    if (user.getLastCheckInTime().getMonth() == new Date().getMonth()
+                    if (Objects.requireNonNull(user).getLastCheckInTime().getMonth() == new Date().getMonth()
                             && user.getLastCheckInTime().getDate() == new Date().getDate() - 1)
                         user.setCheckInTime(user.getCheckInTime() + 1);
                     else
@@ -45,15 +49,15 @@ public class CheckInCommand implements EverywhereCommand {
                     int basePoint = new Random(Calendar.getInstance().getTimeInMillis()).nextInt(10);
                     double awardPoint = awardProp < 3 ? Double.parseDouble(String.format("%.1f", awardProp * basePoint)) : 3 * basePoint;
 
-                    user.setCheckInPoint(Config.checkinUsers.get(fromQQ).getCheckInPoint() + basePoint + awardPoint);
+                    user.setCheckInPoint(user.getCheckInPoint() + basePoint + awardPoint);
 
                     if (basePoint + awardPoint == 0.0) {
                         return "Bot > 签到成功!\n" + "今天运气不佳, 没有积分";
                     } else {
-                        return "Bot > Hi " + Config.checkinUsers.get(fromQQ).getBindServerAccount()
+                        return "Bot > Hi " + user.getBindServerAccount()
                                 + ", 签到成功!\n" + "本次签到获得 " + basePoint + " 点积分. \n" + "今天是第 "
                                 + user.getCheckInTime() + " 天连签了, 额外获得 " + awardPoint + " 奖励分~\n截至今天您的账户余额共 "
-                                + String.format("%.1f", Config.checkinUsers.get(fromQQ).getCheckInPoint()) + "分.";
+                                + String.format("%.1f", user.getCheckInPoint()) + "分.";
                     }
                 } else
                     return "Bot > 你今天已经签到过了! 输入 /cx 可查询签到信息";

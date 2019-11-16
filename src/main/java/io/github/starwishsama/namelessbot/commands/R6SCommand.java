@@ -26,14 +26,27 @@ public class R6SCommand implements EverywhereCommand {
         if (args.size() == 1){
             if (!args.get(0).isEmpty() || BotUtils.isLegitID(args.get(0))){
                 Player p = R6SUtils.getR6SInfo(args.get(0));
-                String reply = p.getName() + " [" + p.getLevel() + "]" +
-                        "\n目前段位: " + p.getCurrentRank() + "(" + p.getCurrentMmr() + "/" + p.getMaxMmr() + ")" +
-                        "\nKD: " + p.getKd() +
-                        "\n";
-                return new MessageBuilder().add(new ComponentAt(user.getId())).add(reply).toString();
+                if (p != null) {
+                    String reply = p.getName() + " [" + p.getLevel() + "]" +
+                            "\n目前段位: " + p.getCurrentRank() + "(" + p.getCurrentMmr() + "/" + p.getMaxMmr() + ")" +
+                            "\nKD: " + p.getKd() +
+                            "\n";
+                    return new MessageBuilder().add(new ComponentAt(user.getId())).add(reply).toString();
+                }
             }
         }
-
+        if (args.size() == 2){
+            if (!args.get(0).isEmpty() || BotUtils.isLegitID(args.get(0)) || !args.get(1).isEmpty()){
+                Player p = R6SUtils.getR6SInfo(args.get(0), args.get(1));
+                if (p != null) {
+                    String reply = p.getName() + " [" + p.getLevel() + "]" +
+                            "\n目前段位: " + p.getCurrentRank() + "(" + p.getCurrentMmr() + "/" + p.getMaxMmr() + ")" +
+                            "\nKD: " + p.getKd() +
+                            "\n";
+                    return new MessageBuilder().add(new ComponentAt(user.getId())).add(reply).toString();
+                }
+            }
+        }
         return null;
     }
 }

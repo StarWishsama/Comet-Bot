@@ -3,6 +3,8 @@ package io.github.starwishsama.namelessbot.utils;
 import com.deadmandungeons.serverstatus.MinecraftServerStatus;
 import com.deadmandungeons.serverstatus.ping.PingResponse;
 import io.github.starwishsama.namelessbot.BotMain;
+import io.github.starwishsama.namelessbot.config.Config;
+import io.github.starwishsama.namelessbot.objects.BotUser;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -11,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class BotUtils {
     public static Map<Long, Long> coolDown = new HashMap<>();
@@ -145,4 +148,43 @@ public class BotUtils {
     public static boolean isLegitID(String s){
         return s.matches("^[a-z0-9A-Z]+$");
     }
+
+    public static UUID generateUUID(BotUser user){
+        if (user != null) {
+            if (user.getUserUUID() == null) {
+                UUID uuid = UUID.randomUUID();
+
+                if (Config.botUsers != null) {
+                    for (BotUser botuser : Config.botUsers) {
+                        if (botuser.getUserUUID().equals(uuid)) {
+                            return UUID.randomUUID();
+                        } else
+                            return uuid;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public static boolean isUserExist(Long qq){
+        if (Config.botUsers != null){
+            for (BotUser user : Config.botUsers){
+                if (user.getUserQQ() == qq)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public static BotUser getUser(Long qq){
+        if (Config.botUsers != null){
+            for (BotUser user : Config.botUsers){
+                if (user.getUserQQ() == qq)
+                    return user;
+            }
+        }
+        return null;
+    }
+
 }

@@ -41,12 +41,14 @@ public class R6SUtils {
         }
 
         try {
-            if (BotUtils.isLegitID(player)) {
-                Player searchPlayer = api.getPlayerByUUID(api.searchPlayer(player, p).getResults().get(0).getUserUuid());
-                if (searchPlayer.isPlayerFound()) {
-                    return searchPlayer;
+            if (p == null) {
+                if (BotUtils.isLegitID(player)) {
+                    Player searchPlayer = api.getPlayerByUUID(api.searchPlayer(player, p).getResults().get(0).getUserUuid());
+                    if (searchPlayer.isPlayerFound()) {
+                        return searchPlayer;
+                    }
                 }
-            }
+            } return null;
         } catch (R6TabApiException | R6TabPlayerNotFoundException e){
             BotMain.getLogger().warning("在获取 R6 玩家信息时出现了问题, " + e);
         }

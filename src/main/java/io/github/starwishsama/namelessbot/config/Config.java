@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Config {
-    public static Map<Long, BotUser> checkinUsers = new HashMap<>();
+    public static List<BotUser> botUsers = new ArrayList<>();
     public static Map<String, Shop> shopItems = new HashMap<>();
 
     public static long ownerID;
@@ -31,12 +31,12 @@ public class Config {
     public static String netEaseApi;
     public static String[] cmdPrefix = new String[]{"/", "#"};
     
-    private static File checkInCfg = new File(BotMain.jarPath + "qiandao.json");
+    private static File userCfg = new File(BotMain.jarPath + "users.json");
     private static File cfg = new File(BotMain.jarPath + "config.json");
 
     public static void loadCfg(){
         if (BotMain.jarPath != null) {
-            if (checkInCfg.exists() && cfg.exists()){
+            if (userCfg.exists() && cfg.exists()){
                 load();
             } else {
                 try {
@@ -66,9 +66,9 @@ public class Config {
     public static void saveCfg(){
         try {
             JSONObject checkInObject = new JSONObject();
-            checkInObject.put("checkinUsers", checkinUsers);
+            checkInObject.put("checkinUsers", botUsers);
             checkInObject.put("shopItems", shopItems);
-            FileProcess.createFile(checkInCfg.toString(), checkInObject.toJSONString());
+            FileProcess.createFile(userCfg.toString(), checkInObject.toJSONString());
 
             JSONObject configObject = new JSONObject();
             configObject.put("ownerID", ownerID);
@@ -91,9 +91,9 @@ public class Config {
 
     private static void load(){
         try {
-            JSONObject checkInObject = JSONObject.parseObject(FileProcess.readFile(checkInCfg.toString()));
+            JSONObject checkInObject = JSONObject.parseObject(FileProcess.readFile(userCfg.toString()));
             if (JSON.parseObject(checkInObject.getString("checkinUsers"), new TypeReference<Map<Long, BotUser>>(){}) != null)
-                checkinUsers = JSON.parseObject(checkInObject.getString("checkinUsers"), new TypeReference<Map<Long, BotUser>>() {
+                botUsers = JSON.parseObject(checkInObject.getString("checkinUsers"), new TypeReference<List<BotUser>>() {
                 });
 
             shopItems = JSON.parseObject(checkInObject.getString("shopItems"), new TypeReference<Map<String, Shop>>() {
