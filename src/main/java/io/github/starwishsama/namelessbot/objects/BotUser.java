@@ -3,15 +3,22 @@ package io.github.starwishsama.namelessbot.objects;
 import java.util.Date;
 import java.util.UUID;
 
+import io.github.starwishsama.namelessbot.utils.BotUtils;
+
 public class BotUser {
     private long userQQ;
     private UUID userUUID;
-    private Date lastCheckInTime = new Date();
+    private Calendar lastCheckInTime = new Calendar().getInstance();
     private double checkInPoint;
     private int checkInTime;
     private String bindServerAccount;
 
     public BotUser() {
+    }
+
+    public BotUser(long qq){
+        userQQ = qq;
+        userUUID = BotUtils.generateUUID();
     }
 
     public long getUserQQ(){
@@ -22,11 +29,11 @@ public class BotUser {
         this.userQQ = userQQ;
     }
 
-    public Date getLastCheckInTime(){
+    public Calendar getLastCheckInTime(){
         return lastCheckInTime;
     }
 
-    public void setLastCheckInTime(Date date){
+    public void setLastCheckInTime(Calendar date){
         lastCheckInTime = date;
     }
 

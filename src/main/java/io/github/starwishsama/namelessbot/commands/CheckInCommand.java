@@ -27,17 +27,13 @@ public class CheckInCommand implements EverywhereCommand {
                 return "Bot > 你还没有注册无名 Bot 账号! 第一次请使用 /qd <游戏ID> 注册～";
             } else {
                 if (!BotUtils.isUserExist(fromQQ) && args.size() == 1) {
-                    BotUser newUser = new BotUser();
-                    newUser.setUserQQ(fromQQ);
-                    newUser.setBindServerAccount(args.get(0));
-                    newUser.setUserUUID(generateUUID(newUser));
-                    Config.botUsers.add(newUser);
+                    Config.botUsers.add(new BotUser(fromQQ));
                     return "Bot > 已绑定账号 " + args.get(0) + " ，以后可以直接输入 /qd 签到了! ";
                 }
                 if (BotUtils.isCheckInReset(new Date(), Objects.requireNonNull(BotUtils.getUser(fromQQ)).getLastCheckInTime()) || Objects.requireNonNull(BotUtils.getUser(fromQQ)).getCheckInTime() == 0) {
                     BotUser user = BotUtils.getUser(fromQQ);
                     // 计算连续签到次数，此处用了 Date 这个废弃的类，应换为 Calendar，too lazy to do so.
-                    if (Objects.requireNonNull(user).getLastCheckInTime().getMonth() == new Date().getMonth()
+                    if (Objects.requireNonNull(user).getLastCheckInTime().getMonth() == Calendar.getInstance()
                             && user.getLastCheckInTime().getDate() == new Date().getDate() - 1)
                         user.setCheckInTime(user.getCheckInTime() + 1);
                     else

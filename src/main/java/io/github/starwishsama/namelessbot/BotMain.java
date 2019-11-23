@@ -41,8 +41,8 @@ public class BotMain {
     public static void main(String[] args){
         try {
             jarPath = getPath();
-            System.out.println("[Path] Jar path is at " + jarPath);
-            System.out.println("[Path] Config path is at "+ jarPath + "config.json");
+            System.out.println("[Path] Bot 路径在 " + jarPath);
+            System.out.println("[Path] 配置文件路径在 "+ jarPath + "config.json");
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -149,19 +149,14 @@ public class BotUtils {
         return s.matches("^[a-z0-9A-Z]+$");
     }
 
+    public static UUID generateUUID(){
+        return UUID.randomUUID;
+    }
+
     public static UUID generateUUID(BotUser user){
         if (user != null) {
             if (user.getUserUUID() == null) {
-                UUID uuid = UUID.randomUUID();
-
-                if (Config.botUsers != null) {
-                    for (BotUser botuser : Config.botUsers) {
-                        if (botuser.getUserUUID().equals(uuid)) {
-                            return UUID.randomUUID();
-                        } else
-                            return uuid;
-                    }
-                }
+                return UUID.randomUUID();
             }
         }
         return null;
