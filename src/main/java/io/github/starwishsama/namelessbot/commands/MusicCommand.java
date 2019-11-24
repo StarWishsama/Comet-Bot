@@ -21,7 +21,7 @@ public class MusicCommand implements EverywhereCommand {
     public String run(EventMessage e, User user, String msg, ArrayList<String> args){
         if (!BotUtils.hasCoolDown(user.getId())) {
             if (args.size() > 1) {
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 for (int i = 1; i < args.size(); i++) {
                     sb.append(args.get(i)).append(" ");
                 }

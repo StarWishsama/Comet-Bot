@@ -1,6 +1,6 @@
 package io.github.starwishsama.namelessbot.objects;
 
-import java.util.Date;
+import java.util.Calendar;
 import java.util.UUID;
 
 import io.github.starwishsama.namelessbot.utils.BotUtils;
@@ -8,9 +8,9 @@ import io.github.starwishsama.namelessbot.utils.BotUtils;
 public class BotUser {
     private long userQQ;
     private UUID userUUID;
-    private Calendar lastCheckInTime = new Calendar().getInstance();
+    private Calendar lastCheckInTime = Calendar.getInstance();
     private double checkInPoint;
-    private int checkInTime;
+    private int checkInTime = 0;
     private String bindServerAccount;
 
     public BotUser() {

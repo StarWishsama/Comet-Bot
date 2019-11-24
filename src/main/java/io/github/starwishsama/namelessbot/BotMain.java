@@ -2,7 +2,6 @@ package io.github.starwishsama.namelessbot;
 
 import cc.moecraft.icq.PicqBotX;
 import cc.moecraft.icq.PicqConfig;
-import cc.moecraft.icq.accounts.BotAccount;
 import cc.moecraft.icq.command.interfaces.IcqCommand;
 import cc.moecraft.icq.sender.IcqHttpApi;
 import cc.moecraft.logger.HyLogger;
@@ -14,11 +13,14 @@ import io.github.starwishsama.namelessbot.config.Message;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class BotMain {
     private static HyLogger logger;
+    private static IcqHttpApi api;
     public static Rcon rcon;
     public static String jarPath;
 
@@ -32,7 +34,9 @@ public class BotMain {
             new RConGroupCommand(),
             new MuteCommand(),
             new MusicCommand(),
-            new RandomCommand()
+            new RandomCommand(),
+            new R6SCommand(),
+            new BindCommand()
     };
 
     //private static IcqListener[] listeners = new IcqListener[]{
@@ -60,6 +64,7 @@ public class BotMain {
         bot.getCommandManager().registerCommands(commands);
         // bot.getEventManager().registerListeners(listeners);
         bot.startBot();
+        api = bot.getAccountManager().getAccounts().get(0).getHttpApi();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             Config.saveCfg();
@@ -88,7 +93,25 @@ public class BotMain {
                 Config.saveCfg();
                 logger.log("[Bot] 自动保存数据完成");
             }
-        }, d, 1000 * 60 * 15);
+        }, d, 1000 * 60 * Config.autoSaveTime);
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            String[] line = in.readLine().split(" ");
+            switch (line[0]){
+                case "setowner":
+                    if (line.length > 1) {
+                        Config.ownerID = Long.parseLong(line[1]);
+                        logger.log("已设置 Bot 的所有者账号为 " + line[1]);
+                    }
+                    break;
+                case "stop":
+                    logger.log("正在关闭...");
+                    System.exit(0);
+                    break;
+            }
+        } catch (IOException ignored){
+        }
     }
 
     // https://blog.csdn.net/df0128/article/details/90484684
@@ -106,5 +129,9 @@ public class BotMain {
 
     public static HyLogger getLogger(){
         return logger;
+    }
+
+    public static IcqHttpApi getApi() {
+        return api;
     }
 }

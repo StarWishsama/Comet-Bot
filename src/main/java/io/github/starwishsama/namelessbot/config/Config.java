@@ -3,6 +3,7 @@ package io.github.starwishsama.namelessbot.config;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.google.gson.Gson;
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.objects.Shop;
@@ -30,6 +31,7 @@ public class Config {
     public static byte[] rconPwd;
     public static String netEaseApi;
     public static String[] cmdPrefix = new String[]{"/", "#"};
+    public static boolean isBindMCAccount = false;
     
     private static File userCfg = new File(BotMain.jarPath + "users.json");
     private static File cfg = new File(BotMain.jarPath + "config.json");
@@ -53,6 +55,7 @@ public class Config {
                     configObject.put("rconPwd", "password");
                     configObject.put("netEaseApi", "http://localhost:3000/");
                     configObject.put("cmdPrefix", new String[]{"/", "#"});
+                    configObject.put("isBindMCAccount", false);
                     FileProcess.createFile(cfg.toString(), configObject.toJSONString());
                     load();
                     System.out.println("[配置] 已自动生成新的配置文件.");
@@ -82,6 +85,7 @@ public class Config {
             configObject.put("rconPort", rconPort);
             configObject.put("rconPwd", rconPwd);
             configObject.put("netEaseApi", netEaseApi);
+            configObject.put("isBindMCAccount", isBindMCAccount);
             FileProcess.createFile(cfg.toString(), configObject.toJSONString());
         } catch (Exception e){
             System.err.println("[配置] 在保存配置文件时发生了问题, 错误信息: ");
@@ -112,6 +116,7 @@ public class Config {
             rconPort = configObject.getInteger("rconPort");
             rconPwd = configObject.getString("rconPwd").getBytes();
             netEaseApi = configObject.getString("netEaseApi");
+            isBindMCAccount = configObject.getBoolean("isBindMCAccount");
         } catch (Exception e) {
             System.err.println("[配置] 在加载配置文件时发生了问题, 错误信息: " + e);
         }

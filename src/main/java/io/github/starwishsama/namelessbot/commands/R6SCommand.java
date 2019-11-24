@@ -24,7 +24,7 @@ public class R6SCommand implements EverywhereCommand {
         // /r6s [UplayID]
         // /r6s [ID] [Platform]
         if (args.size() == 1){
-            if (!args.get(0).isEmpty() || BotUtils.isLegitID(args.get(0))){
+            if (!args.get(0).isEmpty()){
                 Player p = R6SUtils.getR6SInfo(args.get(0));
                 if (p != null) {
                     String reply = p.getName() + " [" + p.getLevel() + "]" +

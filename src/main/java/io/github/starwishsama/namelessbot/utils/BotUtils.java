@@ -10,10 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class BotUtils {
     public static Map<Long, Long> coolDown = new HashMap<>();
@@ -150,16 +147,7 @@ public class BotUtils {
     }
 
     public static UUID generateUUID(){
-        return UUID.randomUUID;
-    }
-
-    public static UUID generateUUID(BotUser user){
-        if (user != null) {
-            if (user.getUserUUID() == null) {
-                return UUID.randomUUID();
-            }
-        }
-        return null;
+        return UUID.randomUUID();
     }
 
     public static boolean isUserExist(Long qq){

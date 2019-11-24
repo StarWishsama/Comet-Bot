@@ -46,7 +46,7 @@ public class DebugCommand implements GroupCommand {
                 if (!BotUtils.hasCoolDown(sender.getId())){
                     return "Bot > You don't have cooldown";
                 } else
-                    return "Bot > Debug > Has cooldown, Cooldown is: " + BotUtils.coolDown.get(sender.getId() - new Date().getTime());
+                    return "Bot > Debug > Has cooldown, Cooldown is: " + (new Date().getTime() - BotUtils.coolDown.get(sender.getId()));
             default:
                 return "Bot > 命令不存在";
         }
