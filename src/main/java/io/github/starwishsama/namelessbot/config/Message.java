@@ -1,6 +1,5 @@
 package io.github.starwishsama.namelessbot.config;
 
-import cc.moecraft.logger.HyLogger;
 import com.alibaba.fastjson.JSONObject;
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.utils.FileProcess;
@@ -9,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 
 public class Message {
-    private static HyLogger logger = BotMain.getLogger();
     public static String botPrefix;
     public static String noPermission;
     public static String bindSuccess;
