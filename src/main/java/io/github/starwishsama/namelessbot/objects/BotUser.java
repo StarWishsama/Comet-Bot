@@ -1,6 +1,6 @@
 package io.github.starwishsama.namelessbot.objects;
 
-import java.util.Date;
+import java.util.Calendar;
 import java.util.UUID;
 
 import io.github.starwishsama.namelessbot.utils.BotUtils;
