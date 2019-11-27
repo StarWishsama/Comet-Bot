@@ -37,7 +37,7 @@ public class CheckInCommand implements EverywhereCommand {
     private String checkIn(User sender){
         BotUser user = BotUtils.getUser(sender.getId());
         Calendar c = Calendar.getInstance();
-        // 计算连续签到次数，此处用了 Date 这个废弃的类，应换为 Calendar，too lazy to do so.
+        // 计算连续签到次数
         if (Objects.requireNonNull(user).getLastCheckInTime().get(Calendar.MONTH) == c.get(Calendar.MONTH)
                 && user.getLastCheckInTime().get(Calendar.DATE) == new Date().getDate() - 1)
             user.setCheckInTime(user.getCheckInTime() + 1);

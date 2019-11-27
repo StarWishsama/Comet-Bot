@@ -105,6 +105,15 @@ public class BotMain {
                         logger.log("已设置 Bot 的所有者账号为 " + line[1]);
                     }
                     break;
+                case "config":
+                    if (line.length > 1){
+                        switch (line[1]){
+                            case "reload":
+                                Config.loadCfg();
+                                break;  
+                        }
+                    } else
+                        logger.log("config [reload]");
                 case "stop":
                     logger.log("正在关闭...");
                     System.exit(0);

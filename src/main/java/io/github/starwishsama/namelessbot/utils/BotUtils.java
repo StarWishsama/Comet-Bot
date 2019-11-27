@@ -160,11 +160,32 @@ public class BotUtils {
         return false;
     }
 
+    public static boolean isUserExist(UUID uuid){
+        if (Config.botUsers != null){
+            for (BotUser user : Config.botUsers){
+                if (user.getUserUUID() == uuid)
+                    return true;
+            }
+        }
+        return false;
+    }
+
     public static BotUser getUser(Long qq){
         if (Config.botUsers != null){
             for (BotUser user : Config.botUsers){
                 if (user.getUserQQ() == qq)
                     return user;
+            }
+        }
+        return null;
+    }
+
+    public static BotUser getUserByUUID(UUID uuid){
+        if (Config.botUsers != null){
+            for (BotUser user : Config.botUsers){
+                if (user.getUserUUID() == uuid){
+                    return user;
+                }
             }
         }
         return null;

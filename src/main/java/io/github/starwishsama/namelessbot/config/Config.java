@@ -3,7 +3,7 @@ package io.github.starwishsama.namelessbot.config;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.google.gson.Gson;
+
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.objects.Shop;
