@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.objects.Shop;
@@ -42,21 +45,22 @@ public class Config {
                 load();
             } else {
                 try {
-                    JSONObject configObject = new JSONObject();
-                    configObject.put("ownerID", 0);
-                    configObject.put("autoSaveTime", 15);
-                    configObject.put("botAdmins", new ArrayList<>());
-                    configObject.put("postPort", 5700);
-                    configObject.put("postUrl", "127.0.0.1");
-                    configObject.put("botName", "Bot");
-                    configObject.put("botPort", 5702);
-                    configObject.put("rconUrl", "127.0.0.1");
-                    configObject.put("rconPort", "25575");
-                    configObject.put("rconPwd", "password");
-                    configObject.put("netEaseApi", "http://localhost:3000/");
-                    configObject.put("cmdPrefix", new String[]{"/", "#"});
-                    configObject.put("isBindMCAccount", false);
-                    FileProcess.createFile(cfg.toString(), configObject.toJSONString());
+                    JsonObject configObject = new JsonObject();
+                    Gson gson = new Gson();
+                    configObject.addProperty("ownerID", 0);
+                    configObject.addProperty("autoSaveTime", 15);
+                    configObject.add("botAdmins", gson.toJsonTree(new ArrayList<>(), ArrayList.class));
+                    configObject.addProperty("postPort", 5700);
+                    configObject.addProperty("postUrl", "127.0.0.1");
+                    configObject.addProperty("botName", "Bot");
+                    configObject.addProperty("botPort", 5702);
+                    configObject.addProperty("rconUrl", "127.0.0.1");
+                    configObject.addProperty("rconPort", "25575");
+                    configObject.addProperty("rconPwd", "password");
+                    configObject.addProperty("netEaseApi", "http://localhost:3000/");
+                    configObject.add("cmdPrefix", gson.toJsonTree(new String[]{"/", "#"}));
+                    configObject.addProperty("isBindMCAccount", false);
+                    FileProcess.createFile(cfg.toString(), gson.toJson(configObject));
                     load();
                     System.out.println("[配置] 已自动生成新的配置文件.");
                 } catch (Exception e){
@@ -68,10 +72,15 @@ public class Config {
 
     public static void saveCfg(){
         try {
-            JSONObject checkInObject = new JSONObject();
-            checkInObject.put("checkinUsers", botUsers);
-            checkInObject.put("shopItems", shopItems);
-            FileProcess.createFile(userCfg.toString(), checkInObject.toJSONString());
+            Gson gson = new Gson();
+            JsonObject checkInObject = new JsonObject();
+            checkInObject.add("checkInUsers", gson.toJsonTree(botUsers, new TypeToken<List<BotUser>>(){}.getType()));
+            checkInObject.add("shopItems", gson.toJsonTree(shopItems, new TypeToken<List<Shop>>(){}.getType()));
+
+            //JSONObject checkInObject = new JSONObject();
+            //checkInObject.put("checkinUsers", botUsers);
+            //checkInObject.put("shopItems", shopItems);
+            FileProcess.createFile(userCfg.toString(), gson.toJson(checkInObject));
 
             JSONObject configObject = new JSONObject();
             configObject.put("ownerID", ownerID);
