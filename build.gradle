@@ -15,11 +15,13 @@ plugins {
 group 'io.github.starwishsama.namelessbot'
 version '0.1.2-DEV-191208'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
+
+jar {
+    baseName = 'NamelessBot'
+    version = '0.1.2-DEV-191208'
+}
 
 repositories {
     mavenCentral()
@@ -29,7 +31,6 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
     implementation 'cn.hutool:hutool-all:4.5.10'
     implementation 'com.github.hydevelop:PicqBotX:4.12.0.991.PRE'
     compile 'com.github.hydevelop:HyCommonUtils:1.4.0.207'
