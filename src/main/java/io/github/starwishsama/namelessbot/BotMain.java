@@ -8,8 +8,7 @@ import cc.moecraft.logger.HyLogger;
 import cc.moecraft.logger.environments.ColorSupportLevel;
 
 import io.github.starwishsama.namelessbot.commands.*;
-import io.github.starwishsama.namelessbot.config.Config;
-import io.github.starwishsama.namelessbot.config.Message;
+import io.github.starwishsama.namelessbot.config.*;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 
@@ -51,31 +50,30 @@ public class BotMain {
             e.printStackTrace();
         }
 
-        Config.loadCfg();
-        Message.loadLang();
 
-        PicqConfig cfg = new PicqConfig(Config.botPort).setUseAsyncCommands(true).setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT);
+        PicqConfig cfg = new PicqConfig(BotCfg.cfg.getBotPort()).setUseAsyncCommands(true).setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT);
         PicqBotX bot = new PicqBotX(cfg);
         cfg.setDebug(true);
         logger = bot.getLogger();
         bot.setUniversalHyExpSupport(true);
-        bot.addAccount(Config.botName, Config.postUrl, Config.postPort);
-        bot.enableCommandManager(Config.cmdPrefix);
+        bot.addAccount(BotCfg.cfg.getBotName(), BotCfg.cfg.getPostUrl(), BotCfg.cfg.getPostPort());
+        bot.enableCommandManager(BotCfg.cfg.getCmdPrefix());
         bot.getCommandManager().registerCommands(commands);
         // bot.getEventManager().registerListeners(listeners);
         bot.startBot();
-        api = bot.getAccountManager().getAccounts().get(0).getHttpApi();
+        if (bot.getAccountManager().getAccounts().size() != 0)
+            api = bot.getAccountManager().getAccounts().get(0).getHttpApi();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            Config.saveCfg();
-            Message.saveLang();
+            BotCfg.saveCfg();
+            BotCfg.saveLang();
         }));
 
-        logger.log("启动完成! 机器人运行在端口 " + Config.botPort + " 上.");
+        logger.log("启动完成! 机器人运行在端口 " + BotCfg.cfg.getBotPort() + " 上.");
 
-        if (Config.rconPwd != null) {
+        if (BotCfg.cfg.getRconPwd() != null) {
             try {
-                rcon = new Rcon(Config.rconUrl, Config.rconPort, Config.rconPwd);
+                rcon = new Rcon(BotCfg.cfg.getRconUrl(), BotCfg.cfg.getRconPort(), BotCfg.cfg.getRconPwd());
                 logger.log("[RCON] 已连接至服务器");
             } catch (IOException e) {
                 logger.warning("[RCON] 连接至服务器时发生了错误, 错误信息: " + e.getMessage());
@@ -90,10 +88,10 @@ public class BotMain {
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                Config.saveCfg();
+                BotCfg.saveCfg();
                 logger.log("[Bot] 自动保存数据完成");
             }
-        }, d, 1000 * 60 * Config.autoSaveTime);
+        }, d, 1000 * 60 * BotCfg.cfg.getAutoSaveTime());
 
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         try {
@@ -101,7 +99,7 @@ public class BotMain {
             switch (line[0]){
                 case "setowner":
                     if (line.length > 1) {
-                        Config.ownerID = Long.parseLong(line[1]);
+                        BotCfg.cfg.setOwnerID(Long.parseLong(line[1]));
                         logger.log("已设置 Bot 的所有者账号为 " + line[1]);
                     }
                     break;

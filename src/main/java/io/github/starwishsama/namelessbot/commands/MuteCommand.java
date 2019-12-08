@@ -5,8 +5,8 @@ import cc.moecraft.icq.command.interfaces.GroupCommand;
 import cc.moecraft.icq.event.events.message.EventGroupMessage;
 import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
-import io.github.starwishsama.namelessbot.BotMain;
-import io.github.starwishsama.namelessbot.config.Message;
+
+import io.github.starwishsama.namelessbot.config.BotCfg;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,7 +29,7 @@ public class MuteCommand implements GroupCommand {
                         long banQQ = StringUtils.isNumeric(args.get(0)) ? Integer.parseInt(args.get(0)) : CC.getAt(args.get(0));
                         event.getHttpApi().setGroupBan(group.getId(), banQQ, 600);
                     } catch (Exception ignored) {
-                        return Message.botPrefix + "请@你需要禁言的人或者输入TA的QQ号!";
+                        return BotCfg.msg.getBotPrefix() + "请@你需要禁言的人或者输入TA的QQ号!";
                     }
                 } else if (args.size() == 2) {
                     try {

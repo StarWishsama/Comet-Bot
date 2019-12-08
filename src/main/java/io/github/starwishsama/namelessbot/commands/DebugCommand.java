@@ -7,8 +7,8 @@ import cc.moecraft.icq.sender.returndata.ReturnStatus;
 import cc.moecraft.icq.sender.returndata.returnpojo.get.RVersionInfo;
 import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
-import io.github.starwishsama.namelessbot.config.Config;
-import io.github.starwishsama.namelessbot.config.Message;
+
+import io.github.starwishsama.namelessbot.config.BotCfg;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
@@ -28,10 +28,10 @@ public class DebugCommand implements GroupCommand {
             case "recall":
                 RVersionInfo versionInfo = event.getHttpApi().getVersionInfo().getData();
                 if (versionInfo.getCoolqEdition().equalsIgnoreCase("pro")) {
-                    if (sender.isAdmin()) return Message.botPrefix + " 不好意思不好意思权限狗打扰了";
-                    if (!event.isAdmin()) return Message.botPrefix + " 机器人不是管理员怎么撤回啊kora";
-                    if (event.delete().getStatus() == ReturnStatus.ok) return Message.botPrefix + " 已撤回消息";
-                    else return Message.botPrefix + " 撤回失败!";
+                    if (sender.isAdmin()) return BotCfg.msg.getBotPrefix() + " 不好意思不好意思权限狗打扰了";
+                    if (!event.isAdmin()) return BotCfg.msg.getBotPrefix() + " 机器人不是管理员怎么撤回啊kora";
+                    if (event.delete().getStatus() == ReturnStatus.ok) return BotCfg.msg.getBotPrefix() + " 已撤回消息";
+                    else return BotCfg.msg.getBotPrefix() + " 撤回失败!";
                 }
                 break;
             case "getat":
@@ -40,7 +40,7 @@ public class DebugCommand implements GroupCommand {
                 }
                 break;
             case "reload":
-                Config.loadCfg();
+                BotCfg.loadCfg();
                 break;
             case "cd":
                 if (!BotUtils.hasCoolDown(sender.getId())){

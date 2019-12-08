@@ -5,7 +5,7 @@ import cc.moecraft.icq.command.interfaces.EverywhereCommand;
 import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
 
-import io.github.starwishsama.namelessbot.config.Config;
+import io.github.starwishsama.namelessbot.config.BotCfg;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
@@ -22,7 +22,7 @@ public class CheckInCommand implements EverywhereCommand {
         long fromQQ = sender.getId();
         if (!BotUtils.hasCoolDown(fromQQ)) {
             if (!BotUtils.isUserExist(fromQQ) && args.size() == 0) {
-                Config.botUsers.add(new BotUser(fromQQ));
+                BotCfg.users.getUsers().add(new BotUser(fromQQ));
                 return checkIn(sender);
             } else {
                 if (BotUtils.isCheckInReset(new Date(), Objects.requireNonNull(BotUtils.getUser(fromQQ)).getLastCheckInTime().getTime()) || Objects.requireNonNull(BotUtils.getUser(fromQQ)).getCheckInTime() == 0) {

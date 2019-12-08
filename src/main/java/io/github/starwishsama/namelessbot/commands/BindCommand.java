@@ -4,7 +4,8 @@ import cc.moecraft.icq.command.CommandProperties;
 import cc.moecraft.icq.command.interfaces.EverywhereCommand;
 import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
-import io.github.starwishsama.namelessbot.config.Message;
+
+import io.github.starwishsama.namelessbot.config.BotCfg;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
@@ -18,9 +19,9 @@ public class BindCommand implements EverywhereCommand {
                 Objects.requireNonNull(BotUtils.getUser(sender.getId())).setBindServerAccount(args.get(0));
                 return "Bot > 已绑定账号 " + args.get(0);
             } else
-                return Message.botPrefix + "ID 不符合规范";
+                return BotCfg.msg.getBotPrefix() + "ID 不符合规范";
         } else
-            return Message.botPrefix + "请先使用 /qd 签到一次!";
+            return BotCfg.msg.getBotPrefix() + "请先使用 /qd 签到一次!";
     }
 
     @Override

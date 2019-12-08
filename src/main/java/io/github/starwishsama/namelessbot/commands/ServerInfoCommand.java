@@ -4,12 +4,13 @@ import cc.moecraft.icq.command.CommandProperties;
 import cc.moecraft.icq.command.interfaces.EverywhereCommand;
 import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
-import io.github.starwishsama.namelessbot.config.Message;
+
+import io.github.starwishsama.namelessbot.config.BotCfg;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Date;
+
 
 public class ServerInfoCommand implements EverywhereCommand {
     @Override
@@ -27,7 +28,7 @@ public class ServerInfoCommand implements EverywhereCommand {
                 if (StringUtils.isNumeric(args.get(1))) {
                     return BotUtils.getServerInfo(args.get(0), Integer.parseInt(args.get(1)));
                 } else
-                    return Message.botPrefix + " 请填写正确的端口!";
+                    return BotCfg.msg.getBotPrefix() + " 请填写正确的端口!";
             }
         }
         return null;

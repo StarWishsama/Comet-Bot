@@ -6,10 +6,10 @@ import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.sender.message.MessageBuilder;
 import cc.moecraft.icq.sender.returndata.returnpojo.get.RStatus;
 import cc.moecraft.icq.user.User;
+
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class VersionCommand implements EverywhereCommand {
 

@@ -6,6 +6,7 @@ import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.sender.message.MessageBuilder;
 import cc.moecraft.icq.sender.message.components.ComponentMusic;
 import cc.moecraft.icq.user.User;
+
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import io.github.starwishsama.namelessbot.utils.MusicID;
 

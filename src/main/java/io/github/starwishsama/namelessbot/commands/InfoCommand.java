@@ -6,7 +6,8 @@ import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.sender.message.MessageBuilder;
 import cc.moecraft.icq.sender.message.components.ComponentAt;
 import cc.moecraft.icq.user.User;
-import io.github.starwishsama.namelessbot.config.Message;
+
+import io.github.starwishsama.namelessbot.config.BotCfg;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
@@ -32,7 +33,7 @@ public class InfoCommand implements EverywhereCommand {
                             .add("上次签到于: ").add(new SimpleDateFormat("yyyy-MM-dd").format(botUser.getLastCheckInTime())).newLine()
                             .add("绑定的游戏账号是: " + botUser.getBindServerAccount()).toString();
             } else
-                return Message.botPrefix + "你还没有签到过哦";
+                return BotCfg.msg.getBotPrefix() + "你还没有签到过哦";
         }
         return null;
     }
