@@ -3,12 +3,14 @@ package io.github.starwishsama.namelessbot;
 import cc.moecraft.icq.PicqBotX;
 import cc.moecraft.icq.PicqConfig;
 import cc.moecraft.icq.command.interfaces.IcqCommand;
+import cc.moecraft.icq.event.IcqListener;
 import cc.moecraft.icq.sender.IcqHttpApi;
 import cc.moecraft.logger.HyLogger;
 import cc.moecraft.logger.environments.ColorSupportLevel;
 
 import io.github.starwishsama.namelessbot.commands.*;
 import io.github.starwishsama.namelessbot.config.*;
+import io.github.starwishsama.namelessbot.listeners.SpamListener;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 
@@ -38,8 +40,9 @@ public class BotMain {
             new BindCommand()
     };
 
-    //private static IcqListener[] listeners = new IcqListener[]{
-    //};
+    private static IcqListener[] listeners = new IcqListener[]{
+            new SpamListener()
+    };
 
     public static void main(String[] args){
         try {
@@ -59,7 +62,7 @@ public class BotMain {
         bot.addAccount(BotCfg.cfg.getBotName(), BotCfg.cfg.getPostUrl(), BotCfg.cfg.getPostPort());
         bot.enableCommandManager(BotCfg.cfg.getCmdPrefix());
         bot.getCommandManager().registerCommands(commands);
-        // bot.getEventManager().registerListeners(listeners);
+        bot.getEventManager().registerListeners(listeners);
         bot.startBot();
         if (bot.getAccountManager().getAccounts().size() != 0)
             api = bot.getAccountManager().getAccounts().get(0).getHttpApi();
@@ -84,6 +87,7 @@ public class BotMain {
 
         final Date d = Calendar.getInstance().getTime();
 
+        // Need refactor
         Timer t = new Timer();
         t.scheduleAtFixedRate(new TimerTask() {
             @Override

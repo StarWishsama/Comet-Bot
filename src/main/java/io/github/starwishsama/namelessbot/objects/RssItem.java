@@ -3,52 +3,21 @@ package io.github.starwishsama.namelessbot.objects;
 import com.rometools.rome.feed.synd.*;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
+import lombok.Data;
 
 import java.net.URL;
 import java.util.*;
 
+@Data
 public class RssItem {
     private String address;
     private boolean ifEnabled;
-    private List<Long> subscribers;
 
     public RssItem() {
     }
 
     public RssItem(String addr) {
         address = addr;
-    }
-
-    public boolean getStatus() {
-        return ifEnabled;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public List<Long> getSubscribers(){
-        return subscribers;
-    }
-
-    public void disable() {
-        ifEnabled = false;
-    }
-
-    public void enable() {
-        ifEnabled = true;
-    }
-
-    public void setStatus(boolean stat) {
-        ifEnabled = stat;
-    }
-
-    public void setAddress(String addr) {
-        address = addr;
-    }
-
-    public void setSubscribers(List<Long> subscribers) {
-        this.subscribers = subscribers;
     }
 
     public String getContext() {

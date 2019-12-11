@@ -14,6 +14,7 @@ import java.io.PrintWriter;
  * @see https://www.cnblogs.com/XiOrang/p/5652875.html
  */
 
+@Deprecated
 public class FileProcess {
     /**
      * 创建文件
