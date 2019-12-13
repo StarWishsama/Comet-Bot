@@ -4,7 +4,6 @@ import com.deadmandungeons.serverstatus.MinecraftServerStatus;
 import com.deadmandungeons.serverstatus.ping.PingResponse;
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.config.BotCfg;
-import io.github.starwishsama.namelessbot.config.Users;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 
 import java.io.IOException;
@@ -169,5 +168,4 @@ public class BotUtils {
         }
         return null;
     }
-
 }

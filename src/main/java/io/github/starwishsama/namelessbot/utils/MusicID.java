@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -30,7 +29,7 @@ public class MusicID {
                     quit = true;
                 } else {
                     System.out.println(searchQQMusic(input));
-                    //System.out.println(getNetEaseSongID(input));
+                    System.out.println(getNetEaseSongID(input));
                 }
             } catch (Exception x) {
                 x.printStackTrace(System.out);
@@ -67,8 +66,6 @@ public class MusicID {
     private static String searchNetEaseMusic(String songName) throws IOException {
         if (songName != null){
             URL url = new URL("http://localhost:3000/search?keywords=" + URLEncoder.encode(songName, "UTF-8"));
-            //System.out.println("Encoded url is " + url.toString());
-            //System.out.println("Decoded url is " + URLDecoder.decode(url.toString(), "UTF-8"));
             HttpURLConnection hc = (HttpURLConnection) url.openConnection();
             if (hc.getResponseCode() == 200) {
                 InputStream is = url.openStream();
@@ -88,8 +85,6 @@ public class MusicID {
         if (name != null) {
             try {
                 URL url = new URL("https://c.y.qq.com/soso/fcgi-bin/client_search_cp?g_tk=5381&p=1&n=20&w=" + URLEncoder.encode(name, "UTF-8") + "&format=json&loginUin=0&hostUin=0&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0&remoteplace=txt.yqq.song&t=0&aggr=1&cr=1&catZhida=0&flag_qc=0");
-                //System.out.println("Encoded url is " + url.toString());
-                //System.out.println("Decoded url is " + URLDecoder.decode(url.toString(), "UTF-8"));
                 HttpURLConnection hc = (HttpURLConnection) url.openConnection();
                 if (hc.getResponseCode() == 200) {
                     InputStream is = url.openStream();

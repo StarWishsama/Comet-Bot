@@ -10,14 +10,17 @@ import cc.moecraft.logger.environments.ColorSupportLevel;
 
 import io.github.starwishsama.namelessbot.commands.*;
 import io.github.starwishsama.namelessbot.config.*;
-import io.github.starwishsama.namelessbot.listeners.SpamListener;
+import io.github.starwishsama.namelessbot.listeners.*;
+
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class BotMain {
     private static HyLogger logger;
@@ -67,6 +70,18 @@ public class BotMain {
         if (bot.getAccountManager().getAccounts().size() != 0)
             api = bot.getAccountManager().getAccounts().get(0).getHttpApi();
 
+        // 自动保存
+        try {
+            ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+            service.scheduleWithFixedDelay(() -> {
+                BotCfg.saveCfg();
+                BotCfg.saveLang();
+                BotMain.getLogger().log("[Bot] 自动保存数据完成");
+            }, 0, BotCfg.cfg.getAutoSaveTime() * 60, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            logger.log("[定时任务] 在执行定时任务时发生了问题, 错误信息: " + e);
+        }
+
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             BotCfg.saveCfg();
             BotCfg.saveLang();
@@ -79,23 +94,11 @@ public class BotMain {
                 rcon = new Rcon(BotCfg.cfg.getRconUrl(), BotCfg.cfg.getRconPort(), BotCfg.cfg.getRconPwd());
                 logger.log("[RCON] 已连接至服务器");
             } catch (IOException e) {
-                logger.warning("[RCON] 连接至服务器时发生了错误, 错误信息: " + e.getMessage());
+                logger.warning("[RCON] 连接至服务器时发生了错误, 错误信息: " + e);
             } catch (AuthenticationException ae) {
                 logger.warning("[RCON] RCON 密码有误, 请检查是否输入了正确的密码!");
             }
         }
-
-        final Date d = Calendar.getInstance().getTime();
-
-        // Need refactor
-        Timer t = new Timer();
-        t.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                BotCfg.saveCfg();
-                logger.log("[Bot] 自动保存数据完成");
-            }
-        }, d, 1000 * 60 * BotCfg.cfg.getAutoSaveTime());
 
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         try {
