@@ -19,13 +19,14 @@ public class BotCfg {
     private static File cfgFile = new File(BotMain.jarPath + "config.json");
     private static File langCfg = new File(BotMain.jarPath + "lang.json");
 
+    private static Gson gson = new GsonBuilder().serializeNulls().create();
+
     public static void loadCfg(){
         if (BotMain.jarPath != null) {
             if (userCfg.exists() && cfgFile.exists()){
                 load();
             } else {
                 try {
-                    Gson gson = new Gson();
                     cfg.setOwnerID(0);
                     cfg.setAutoSaveTime(15);
                     cfg.setBotAdmins(new ArrayList<>());
@@ -55,7 +56,6 @@ public class BotCfg {
 
     public static void saveCfg(){
         try {
-            Gson gson = new Gson();
             FileProcess.createFile(userCfg.toString(), gson.toJson(users));
             FileProcess.createFile(shopItemCfg.toString(), gson.toJson(shopItems));
             FileProcess.createFile(cfgFile.toString(), gson.toJson(cfg));
@@ -67,7 +67,6 @@ public class BotCfg {
 
     private static void load(){
         try {
-            Gson gson = new Gson();
             JsonElement checkInParser = new JsonParser().parse(FileProcess.readFile(userCfg.toString()));
             JsonElement configParser = new JsonParser().parse(FileProcess.readFile(cfgFile.toString()));
             if (!checkInParser.isJsonNull() && !configParser.isJsonNull()){
@@ -88,12 +87,12 @@ public class BotCfg {
             msg.setNoPermission("你没有权限!");
             msg.setBindSuccess("绑定账号 %s 成功!");
             msg.setNoCheckInData("你还没有签到过, 使用 /qd <游戏ID> 注册签到系统吧~");
-            FileProcess.createFile(langCfg.toString(), new Gson().toJson(msg));
+            FileProcess.createFile(langCfg.toString(), gson.toJson(msg));
         } else {
             try {
                 JsonElement lang = new JsonParser().parse(FileProcess.readFile(langCfg.toString()));
                 if (!lang.isJsonNull()) {
-                    msg = new Gson().fromJson(FileProcess.readFile(langCfg.toString()), Message.class);
+                    msg = gson.fromJson(FileProcess.readFile(langCfg.toString()), Message.class);
                 } else
                     System.err.println("[配置] 在读取时发生了问题, JSON 文件为空");
             } catch (IOException e) {
@@ -103,7 +102,6 @@ public class BotCfg {
     }
 
     public static void saveLang(){
-        Gson gson = new Gson();
         FileProcess.createFile(langCfg.toString(), gson.toJson(msg));
     }
 }

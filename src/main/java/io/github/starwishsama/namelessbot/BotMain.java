@@ -56,6 +56,8 @@ public class BotMain {
             e.printStackTrace();
         }
 
+        BotCfg.loadCfg();
+        BotCfg.loadLang();
 
         PicqConfig cfg = new PicqConfig(BotCfg.cfg.getBotPort()).setUseAsyncCommands(true).setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT);
         PicqBotX bot = new PicqBotX(cfg);

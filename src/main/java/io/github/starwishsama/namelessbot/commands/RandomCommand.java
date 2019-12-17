@@ -29,17 +29,17 @@ public class RandomCommand implements EverywhereCommand {
                 EventRate rate = getRate(i);
                 switch (rate) {
                     case HIGHEST:
-                        return "结果是" + EventRate.HIGHEST.des + " (" + i + "/255), 今天非常适合" + randomEventName + "哦!";
+                        return "结果是" + EventRate.HIGHEST.event + " (" + i + "/255), 今天非常适合" + randomEventName + "哦!";
                     case HIGH:
-                        return "结果是" + EventRate.HIGH.des + " (" + i + "/255), 今天很适合" + randomEventName + "哦!";
+                        return "结果是" + EventRate.HIGH.event + " (" + i + "/255), 今天很适合" + randomEventName + "哦!";
                     case NORMAL:
-                        return "结果是" + EventRate.NORMAL.des + " (" + i + "/255), 今天适合" + randomEventName + "哦!";
+                        return "结果是" + EventRate.NORMAL.event + " (" + i + "/255), 今天适合" + randomEventName + "哦!";
                     case LOW:
-                        return "结果是" + EventRate.LOW.des + " (" + i + "/255), 今天不太适合" + randomEventName + "...";
+                        return "结果是" + EventRate.LOW.event + " (" + i + "/255), 今天不太适合" + randomEventName + "...";
                     case LOWEST:
-                        return "结果是" + EventRate.LOWEST.des + " (" + i + "/255), 今天最好不要" + randomEventName + "了...";
+                        return "结果是" + EventRate.LOWEST.event + " (" + i + "/255), 今天最好不要" + randomEventName + "了...";
                     case NEVER:
-                        return "结果是" + EventRate.NEVER.des + " (" + i + "/255), 千万别" + randomEventName + "!";
+                        return "结果是" + EventRate.NEVER.event + " (" + i + "/255), 千万别" + randomEventName + "!";
                 }
             }
         }
@@ -55,10 +55,10 @@ public class RandomCommand implements EverywhereCommand {
         NEVER("大凶"),
         UNKNOWN("未知");
 
-        private String des;
+        private String event;
 
-        EventRate(String des) {
-            this.des = des;
+        EventRate(String event) {
+            this.event = event;
         }
     }
 
