@@ -6,7 +6,6 @@ Need [CoolQ HTTP API](https://github.com/richardchien/coolq-http-api) as depende
 
 Simplified Chinese Edition 中文版本: [README](https://github.com/StarWishsama/Nameless-Bot/blob/master/README_zhCN.md)
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d1416f718df943b4bb252e98cbd6604e)](https://www.codacy.com/manual/StarWishsama/Nameless-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Nameless-Bot&amp;utm_campaign=Badge_Grade)
 <a href="https://travis-ci.org/StarWishsama/Nameless-Bot">
   <img src="https://api.travis-ci.org/StarWishsama/Nameless-Bot.svg?branch=master">
 </a>
