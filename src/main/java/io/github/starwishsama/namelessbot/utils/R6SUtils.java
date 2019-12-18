@@ -9,7 +9,7 @@ import com.gitlab.siegeinsights.r6tab.api.impl.R6TabApiImpl;
 import io.github.starwishsama.namelessbot.BotMain;
 
 public class R6SUtils {
-    static R6TabApi api = new R6TabApiImpl();
+    private static R6TabApi api = new R6TabApiImpl();
 
     public static Player getR6SInfo(String player) {
         try {

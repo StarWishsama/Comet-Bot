@@ -114,7 +114,7 @@ public class BotMain {
                     break;
                 case "stop":
                     logger.log("正在关闭...");
-                    System.exit(0);
+                    Runtime.getRuntime().exit(0);
                     break;
             }
         } catch (IOException ignored){
@@ -131,7 +131,7 @@ public class BotMain {
             path = path.substring(0, path.lastIndexOf("."));
             return path;
         }
-        return path.replace("target/classes/", "");
+        return path.replace("target/classes/", "") + "/";
     }
 
     public static HyLogger getLogger(){

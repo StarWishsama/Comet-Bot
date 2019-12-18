@@ -13,9 +13,6 @@ public class RssItem {
     private String address;
     private boolean ifEnabled;
 
-    public RssItem() {
-    }
-
     public RssItem(String addr) {
         address = addr;
     }

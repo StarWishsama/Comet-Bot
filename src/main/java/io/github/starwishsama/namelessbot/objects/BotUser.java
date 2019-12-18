@@ -16,9 +16,6 @@ public class BotUser {
     private String bindServerAccount;
     private int msgVL;
 
-    public BotUser() {
-    }
-
     public BotUser(long qq){
         userQQ = qq;
         userUUID = BotUtils.generateUUID();
