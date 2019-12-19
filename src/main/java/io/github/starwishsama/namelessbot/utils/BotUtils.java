@@ -142,7 +142,7 @@ public class BotUtils {
     }
 
     public static boolean isLegitID(String s){
-        return s.matches("^[a-z0-9A-Z]+$");
+        return s.matches("[a-zA-Z0-9_]*");
     }
 
     public static UUID generateUUID(){
@@ -167,5 +167,9 @@ public class BotUtils {
             }
         }
         return null;
+    }
+    
+    public static boolean isPortUsing(){
+        InetAddress local = InetAddress.getLocalHost();
     }
 }
