@@ -7,6 +7,8 @@ import io.github.starwishsama.namelessbot.config.BotCfg;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -169,7 +171,15 @@ public class BotUtils {
         return null;
     }
     
-    public static boolean isPortUsing(){
+    public static boolean isPortUsing(int port){
         InetAddress local = InetAddress.getLocalHost();
+        if (port != 0){
+            try {
+                Socket socket = new Socket(local, port);
+            } catch (IOException e){
+                return true;
+            }
+        }
+        return false;
     }
 }
