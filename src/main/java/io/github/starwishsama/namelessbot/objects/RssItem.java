@@ -37,7 +37,7 @@ public class RssItem {
             // 得到Rss新闻中子项列表
             List<SyndEntry> entries = feed.getEntries();
             SyndEntry entry = entries.get(0);
-            return ("回形针 PaperClip 发布了新视频!\n标题:" + entry.getTitle() + "\n简介:" + entry.getDescription().getValue().trim() + "\n链接:" + entry.getLink());
+            return (entry.getTitle() + entry.getDescription().getValue().trim() + entry.getLink());
         } catch (Exception e) {
             e.printStackTrace();
             return "Encountered a wrong URL or a network error.";

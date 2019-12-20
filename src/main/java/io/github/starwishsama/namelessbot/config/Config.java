@@ -19,7 +19,4 @@ public class Config {
     private String netEaseApi;
     private String[] cmdPrefix = new String[]{"/", "#"};
     private boolean bindMCAccount = false;
-
-    public Config(){
-    }
 }

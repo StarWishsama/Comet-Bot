@@ -11,6 +11,7 @@ import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.*;
 
+
 public class CheckInCommand implements EverywhereCommand {
     @Override
     public CommandProperties properties(){
@@ -52,19 +53,17 @@ public class CheckInCommand implements EverywhereCommand {
 
         user.setCheckInPoint(user.getCheckInPoint() + basePoint + awardPoint);
 
+        String text = "Bot > Hi %s, 签到成功!\n" + "本次签到获得 " + basePoint + " 点积分. \n" + "今天是第 "
+                + user.getCheckInTime() + " 天连签了, 额外获得 " + awardPoint + " 奖励分~\n截至今天您的账户余额共 "
+                + String.format("%.1f", user.getCheckInPoint()) + " 分.";
+
         if (basePoint + awardPoint == 0.0) {
             return "Bot > 签到成功!\n" + "今天运气不佳, 没有积分";
         } else {
             if (user.getBindServerAccount() != null)
-                return "Bot > Hi " + user.getBindServerAccount()
-                        + ", 签到成功!\n" + "本次签到获得 " + basePoint + " 点积分. \n" + "今天是第 "
-                        + user.getCheckInTime() + " 天连签了, 额外获得 " + awardPoint + " 奖励分~\n截至今天您的账户余额共 "
-                        + String.format("%.1f", user.getCheckInPoint()) + " 分.";
+                return String.format(text, user.getBindServerAccount());
             else
-                return "Bot > Hi " + sender.getInfo().getNickname()
-                        + ", 签到成功!\n" + "本次签到获得 " + basePoint + " 点积分. \n" + "今天是第 "
-                        + user.getCheckInTime() + " 天连签了, 额外获得 " + awardPoint + " 奖励分~\n截至今天您的账户余额共 "
-                        + String.format("%.1f", user.getCheckInPoint()) + " 分.";
+                return String.format(text, sender.getInfo().getNickname());
         }
     }
 }

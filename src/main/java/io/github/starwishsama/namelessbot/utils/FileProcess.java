@@ -1,5 +1,7 @@
 package io.github.starwishsama.namelessbot.utils;
 
+import io.github.starwishsama.namelessbot.BotMain;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,20 +27,21 @@ public class FileProcess {
      */
 
     public static boolean createFile(String path, String filecontent) {
-
-        Boolean bool = false;
+        boolean bool = false;
         File file = new File(path);
         if (file.exists())
             delFile(path);
-        System.out.print("[JSON] Path is " + path + "\n");
+            log("[JSON] Path is " + path + "\n");
         try {
-            file.createNewFile();
-            bool = true;
-            System.out.print("[JSON] Create file successfully at " + path + "\n");
-            writeFileContent(path, filecontent);
+            if (file.createNewFile()) {
+                bool = true;
+                log("[JSON] Create file successfully at " + path + "\n");
+                writeFileContent(path, filecontent);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.print("[JSON] Encountered an error when saving configuration!");
+            if (BotMain.getBotLogger() == null)
+                log("[JSON] Encountered an error when saving configuration!");
         }
 
         return bool;
@@ -56,7 +59,7 @@ public class FileProcess {
         String tempString = "";
         // 判断文件是否存在
         if (!file.exists()) {
-            System.out.println(path + "  文件不存在.");
+            log(path + "  文件不存在.");
             throw new IOException("File not exist");
         }
         BufferedReader reader = null;
@@ -160,4 +163,10 @@ public class FileProcess {
         return bool;
     }
 
+    private static void log(String msg){
+        if (BotMain.getBotLogger() == null){
+            System.out.print(msg);
+        } else
+            BotMain.getBotLogger().debug(msg);
+    }
 }

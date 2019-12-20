@@ -12,10 +12,12 @@ import io.github.starwishsama.namelessbot.commands.*;
 import io.github.starwishsama.namelessbot.config.*;
 import io.github.starwishsama.namelessbot.listeners.*;
 
+import lombok.Getter;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.Executors;
@@ -23,7 +25,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class BotMain {
-    private static HyLogger logger;
+    @Getter
+    private static HyLogger botLogger;
+    @Getter
     private static IcqHttpApi api;
     public static Rcon rcon;
     public static String jarPath;
@@ -62,7 +66,7 @@ public class BotMain {
         PicqConfig cfg = new PicqConfig(BotCfg.cfg.getBotPort()).setUseAsyncCommands(true).setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT);
         PicqBotX bot = new PicqBotX(cfg);
         cfg.setDebug(true);
-        logger = bot.getLogger();
+        botLogger = bot.getLogger();
         bot.setUniversalHyExpSupport(true);
         bot.addAccount(BotCfg.cfg.getBotName(), BotCfg.cfg.getPostUrl(), BotCfg.cfg.getPostPort());
         bot.enableCommandManager(BotCfg.cfg.getCmdPrefix());
@@ -78,10 +82,10 @@ public class BotMain {
             service.scheduleWithFixedDelay(() -> {
                 BotCfg.saveCfg();
                 BotCfg.saveLang();
-                BotMain.getLogger().log("[Bot] 自动保存数据完成");
+                BotMain.getBotLogger().log("[Bot] 自动保存数据完成");
             }, 0, BotCfg.cfg.getAutoSaveTime() * 60, TimeUnit.SECONDS);
         } catch (Exception e) {
-            logger.log("[定时任务] 在执行定时任务时发生了问题, 错误信息: " + e);
+            botLogger.log("[定时任务] 在执行定时任务时发生了问题, 错误信息: " + e);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -89,16 +93,16 @@ public class BotMain {
             BotCfg.saveLang();
         }));
 
-        logger.log("启动完成! 机器人运行在端口 " + BotCfg.cfg.getBotPort() + " 上.");
+        botLogger.log("启动完成! 机器人运行在端口 " + BotCfg.cfg.getBotPort() + " 上.");
 
         if (BotCfg.cfg.getRconPwd() != null) {
             try {
                 rcon = new Rcon(BotCfg.cfg.getRconUrl(), BotCfg.cfg.getRconPort(), BotCfg.cfg.getRconPwd());
-                logger.log("[RCON] 已连接至服务器");
+                botLogger.log("[RCON] 已连接至服务器");
             } catch (IOException e) {
-                logger.warning("[RCON] 连接至服务器时发生了错误, 错误信息: " + e);
+                botLogger.warning("[RCON] 连接至服务器时发生了错误, 错误信息: " + e);
             } catch (AuthenticationException ae) {
-                logger.warning("[RCON] RCON 密码有误, 请检查是否输入了正确的密码!");
+                botLogger.warning("[RCON] RCON 密码有误, 请检查是否输入了正确的密码!");
             }
         }
 
@@ -109,11 +113,11 @@ public class BotMain {
                 case "setowner":
                     if (line.length > 1) {
                         BotCfg.cfg.setOwnerID(Long.parseLong(line[1]));
-                        logger.log("已设置 Bot 的所有者账号为 " + line[1]);
+                        botLogger.log("已设置 Bot 的所有者账号为 " + line[1]);
                     }
                     break;
                 case "stop":
-                    logger.log("正在关闭...");
+                    botLogger.log("正在关闭...");
                     Runtime.getRuntime().exit(0);
                     break;
             }
@@ -128,17 +132,11 @@ public class BotMain {
             path = path.substring(1);
         }
         if (path.contains("jar")) {
-            path = path.substring(0, path.lastIndexOf("."));
+            path = path.substring(0, path.lastIndexOf("/"));
             return path;
         }
-        return path.replace("target/classes/", "") + "/";
-    }
-
-    public static HyLogger getLogger(){
-        return logger;
-    }
-
-    public static IcqHttpApi getApi() {
-        return api;
+        File location = new File(path.replace("target/classes/", "") + "\\BotConfig");
+        location.mkdirs();
+        return location.getPath();
     }
 }

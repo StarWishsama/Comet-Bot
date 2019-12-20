@@ -9,7 +9,4 @@ import java.util.HashSet;
 @Data
 public class Users {
     private Collection<BotUser> users = new HashSet<>();
-
-    public Users(){
-    }
 }

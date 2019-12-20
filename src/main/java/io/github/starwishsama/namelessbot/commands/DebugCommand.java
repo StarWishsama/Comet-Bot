@@ -41,6 +41,7 @@ public class DebugCommand implements GroupCommand {
                 break;
             case "reload":
                 BotCfg.loadCfg();
+                BotCfg.loadLang();
                 break;
             case "cd":
                 if (!BotUtils.hasCoolDown(sender.getId())){

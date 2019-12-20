@@ -23,7 +23,7 @@ public class VersionCommand implements EverywhereCommand {
         if (!BotUtils.hasCoolDown(sender.getId())) {
             RStatus status = event.getHttpApi().getStatus().getData();
             return new MessageBuilder()
-                    .add("无名Bot v1.0.0-HTTPAPI").newLine()
+                    .add("无名Bot v0.1.2-DEV-191220").newLine()
                     .add("运行状态: ").add(status.getGood() ? "√" : "X")
                     .toString();
         } else

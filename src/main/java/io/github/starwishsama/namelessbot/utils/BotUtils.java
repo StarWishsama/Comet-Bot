@@ -39,7 +39,7 @@ public class BotUtils {
                     + "\nMOTD: " + removeColor(response.getDescription().toString())
                     + "\n版本: " + response.getVersion());
         } catch (IOException | URISyntaxException e) {
-            BotMain.getLogger().warning("在获取服务器信息时出现了问题, " + e);
+            BotMain.getBotLogger().warning("在获取服务器信息时出现了问题, " + e);
             return ("Bot > 无法连接至 " + addr);
         }
     }
@@ -60,7 +60,7 @@ public class BotUtils {
                     + "\nMOTD: " + removeColor(response.getDescription().toString())
                     + "\n版本: " + response.getVersion());
         } catch (IOException | URISyntaxException e) {
-            BotMain.getLogger().warning("在获取服务器信息时出现了问题, " + e);
+            BotMain.getBotLogger().warning("在获取服务器信息时出现了问题, " + e);
             return ("Bot > 无法连接至 " + addr);
         }
     }
@@ -82,7 +82,7 @@ public class BotUtils {
                     .replaceAll("%MOTD%", removeColor(response.getDescription().toString()))
                     .replaceAll("%版本%", response.getVersion().toString());
         } catch (IOException | URISyntaxException e) {
-            BotMain.getLogger().warning("在获取服务器信息时出现了问题, " + e);
+            BotMain.getBotLogger().warning("在获取服务器信息时出现了问题, " + e);
             return ("Bot > 无法连接至 " + addr);
         }
     }
@@ -103,7 +103,7 @@ public class BotUtils {
                     .replaceAll("%MOTD%", removeColor(response.getDescription().toString()))
                     .replaceAll("%版本%", response.getVersion().toString());
         } catch (IOException | URISyntaxException e) {
-            BotMain.getLogger().warning("在获取服务器信息时出现了问题, " + e);
+            BotMain.getBotLogger().warning("在获取服务器信息时出现了问题, " + e);
             return ("Bot > 无法连接至 " + addr);
         }
     }
@@ -172,10 +172,11 @@ public class BotUtils {
     }
     
     public static boolean isPortUsing(int port){
-        InetAddress local = InetAddress.getLocalHost();
         if (port != 0){
             try {
+                InetAddress local = InetAddress.getLocalHost();
                 Socket socket = new Socket(local, port);
+                socket.close();
             } catch (IOException e){
                 return true;
             }

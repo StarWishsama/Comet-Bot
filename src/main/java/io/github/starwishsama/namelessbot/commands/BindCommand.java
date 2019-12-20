@@ -15,11 +15,14 @@ public class BindCommand implements EverywhereCommand {
     @Override
     public String run(EventMessage event, User sender, String command, ArrayList<String> args) {
         if (BotUtils.isUserExist(sender.getId())){
-            if (args.size() > 0 && BotUtils.isLegitID(args.get(0))){
-                Objects.requireNonNull(BotUtils.getUser(sender.getId())).setBindServerAccount(args.get(0));
-                return "Bot > 已绑定账号 " + args.get(0);
+            if (args.size() > 0) {
+                if (args.get(0) != null && BotUtils.isLegitID(args.get(0))) {
+                    Objects.requireNonNull(BotUtils.getUser(sender.getId())).setBindServerAccount(args.get(0));
+                    return "Bot > 已绑定账号 " + args.get(0);
+                } else
+                    return BotCfg.msg.getBotPrefix() + "ID 不符合规范";
             } else
-                return BotCfg.msg.getBotPrefix() + "ID 不符合规范";
+                return BotCfg.msg.getBotPrefix() + "ID 不能为空";
         } else
             return BotCfg.msg.getBotPrefix() + "请先使用 /qd 签到一次!";
     }

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class BotCfg {
     public static Users users = new Users();
-    public static Message msg = new Message();
+    public static BotLocalization msg = new BotLocalization();
     public static ShopItems shopItems = new ShopItems();
     public static Config cfg = new Config();
 
@@ -92,7 +92,7 @@ public class BotCfg {
             try {
                 JsonElement lang = new JsonParser().parse(FileProcess.readFile(langCfg.toString()));
                 if (!lang.isJsonNull()) {
-                    msg = gson.fromJson(FileProcess.readFile(langCfg.toString()), Message.class);
+                    msg = gson.fromJson(FileProcess.readFile(langCfg.toString()), BotLocalization.class);
                 } else
                     System.err.println("[配置] 在读取时发生了问题, JSON 文件为空");
             } catch (IOException e) {
