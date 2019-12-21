@@ -34,7 +34,7 @@ repositories {
 
 dependencies {
     implementation 'cn.hutool:hutool-all:4.5.10'
-    implementation 'com.github.hydevelop:PicqBotX:4.12.0.991.PRE'
+    implementation 'com.github.hydevelop:PicqBotX:4.12.0.1015.PRE'
     implementation 'com.alibaba:fastjson:1.2.58'
     implementation 'org.apache.commons:commons-lang3:3.8.1'
     implementation 'org.apache.commons:commons-io:1.3.2'
