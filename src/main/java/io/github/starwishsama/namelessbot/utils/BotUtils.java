@@ -7,8 +7,6 @@ import io.github.starwishsama.namelessbot.config.BotCfg;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -39,7 +37,7 @@ public class BotUtils {
                     + "\nMOTD: " + removeColor(response.getDescription().toString())
                     + "\n版本: " + response.getVersion());
         } catch (IOException | URISyntaxException e) {
-            BotMain.getBotLogger().warning("在获取服务器信息时出现了问题, " + e);
+            BotMain.getLogger().warning("在获取服务器信息时出现了问题, " + e);
             return ("Bot > 无法连接至 " + addr);
         }
     }
@@ -60,7 +58,7 @@ public class BotUtils {
                     + "\nMOTD: " + removeColor(response.getDescription().toString())
                     + "\n版本: " + response.getVersion());
         } catch (IOException | URISyntaxException e) {
-            BotMain.getBotLogger().warning("在获取服务器信息时出现了问题, " + e);
+            BotMain.getLogger().warning("在获取服务器信息时出现了问题, " + e);
             return ("Bot > 无法连接至 " + addr);
         }
     }
@@ -82,7 +80,7 @@ public class BotUtils {
                     .replaceAll("%MOTD%", removeColor(response.getDescription().toString()))
                     .replaceAll("%版本%", response.getVersion().toString());
         } catch (IOException | URISyntaxException e) {
-            BotMain.getBotLogger().warning("在获取服务器信息时出现了问题, " + e);
+            BotMain.getLogger().warning("在获取服务器信息时出现了问题, " + e);
             return ("Bot > 无法连接至 " + addr);
         }
     }
@@ -103,7 +101,7 @@ public class BotUtils {
                     .replaceAll("%MOTD%", removeColor(response.getDescription().toString()))
                     .replaceAll("%版本%", response.getVersion().toString());
         } catch (IOException | URISyntaxException e) {
-            BotMain.getBotLogger().warning("在获取服务器信息时出现了问题, " + e);
+            BotMain.getLogger().warning("在获取服务器信息时出现了问题, " + e);
             return ("Bot > 无法连接至 " + addr);
         }
     }
@@ -143,8 +141,15 @@ public class BotUtils {
         return false;
     }
 
-    public static boolean isLegitID(String s){
-        return s.matches("[a-zA-Z0-9_]*");
+    /**
+     * 判断ID是否符合Minecraft用户名格式
+     *
+     * @author NamelessSAMA
+     * @param id
+     * @return true / false
+     */
+    public static boolean isLegitID(String id){
+        return id.matches("[a-zA-Z0-9_]*");
     }
 
     public static UUID generateUUID(){
@@ -169,18 +174,5 @@ public class BotUtils {
             }
         }
         return null;
-    }
-    
-    public static boolean isPortUsing(int port){
-        if (port != 0){
-            try {
-                InetAddress local = InetAddress.getLocalHost();
-                Socket socket = new Socket(local, port);
-                socket.close();
-            } catch (IOException e){
-                return true;
-            }
-        }
-        return false;
     }
 }

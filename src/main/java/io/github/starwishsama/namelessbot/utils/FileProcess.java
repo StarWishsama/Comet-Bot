@@ -16,7 +16,6 @@ import java.io.PrintWriter;
  * @see https://www.cnblogs.com/XiOrang/p/5652875.html
  */
 
-@Deprecated
 public class FileProcess {
     /**
      * 创建文件
@@ -40,7 +39,7 @@ public class FileProcess {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            if (BotMain.getBotLogger() == null)
+            if (BotMain.getLogger() == null)
                 log("[JSON] Encountered an error when saving configuration!");
         }
 
@@ -164,9 +163,9 @@ public class FileProcess {
     }
 
     private static void log(String msg){
-        if (BotMain.getBotLogger() == null){
+        if (BotMain.getLogger() == null){
             System.out.print(msg);
         } else
-            BotMain.getBotLogger().debug(msg);
+            BotMain.getLogger().debug(msg);
     }
 }

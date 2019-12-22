@@ -26,11 +26,13 @@ import java.util.concurrent.TimeUnit;
 
 public class BotMain {
     @Getter
-    private static HyLogger botLogger;
+    private static HyLogger logger;
     @Getter
     private static IcqHttpApi api;
-    public static Rcon rcon;
-    public static String jarPath;
+    @Getter
+    private static String jarPath;
+    @Getter
+    private static Rcon rcon;
 
     private static IcqCommand[] commands = new IcqCommand[]{
             new VersionCommand(),
@@ -66,7 +68,7 @@ public class BotMain {
         PicqConfig cfg = new PicqConfig(BotCfg.cfg.getBotPort()).setUseAsyncCommands(true).setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT);
         PicqBotX bot = new PicqBotX(cfg);
         cfg.setDebug(true);
-        botLogger = bot.getLogger();
+        logger = bot.getLogger();
         bot.setUniversalHyExpSupport(true);
         bot.addAccount(BotCfg.cfg.getBotName(), BotCfg.cfg.getPostUrl(), BotCfg.cfg.getPostPort());
         bot.enableCommandManager(BotCfg.cfg.getCmdPrefix());
@@ -82,10 +84,10 @@ public class BotMain {
             service.scheduleWithFixedDelay(() -> {
                 BotCfg.saveCfg();
                 BotCfg.saveLang();
-                BotMain.getBotLogger().log("[Bot] 自动保存数据完成");
+                BotMain.getLogger().log("[Bot] 自动保存数据完成");
             }, 0, BotCfg.cfg.getAutoSaveTime() * 60, TimeUnit.SECONDS);
         } catch (Exception e) {
-            botLogger.log("[定时任务] 在执行定时任务时发生了问题, 错误信息: " + e);
+            logger.log("[定时任务] 在执行定时任务时发生了问题, 错误信息: " + e);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -93,16 +95,16 @@ public class BotMain {
             BotCfg.saveLang();
         }));
 
-        botLogger.log("启动完成! 机器人运行在端口 " + BotCfg.cfg.getBotPort() + " 上.");
+        logger.log("启动完成! 机器人运行在端口 " + BotCfg.cfg.getBotPort() + " 上.");
 
-        if (BotCfg.cfg.getRconPwd() != null) {
+        if (BotCfg.cfg.getRconPwd() != null && BotCfg.cfg.getRconPort() != 0) {
             try {
                 rcon = new Rcon(BotCfg.cfg.getRconUrl(), BotCfg.cfg.getRconPort(), BotCfg.cfg.getRconPwd());
-                botLogger.log("[RCON] 已连接至服务器");
+                logger.log("[RCON] 已连接至服务器");
             } catch (IOException e) {
-                botLogger.warning("[RCON] 连接至服务器时发生了错误, 错误信息: " + e);
+                logger.warning("[RCON] 连接至服务器时发生了错误, 错误信息: " + e);
             } catch (AuthenticationException ae) {
-                botLogger.warning("[RCON] RCON 密码有误, 请检查是否输入了正确的密码!");
+                logger.warning("[RCON] RCON 密码有误, 请检查是否输入了正确的密码!");
             }
         }
 
@@ -113,11 +115,11 @@ public class BotMain {
                 case "setowner":
                     if (line.length > 1) {
                         BotCfg.cfg.setOwnerID(Long.parseLong(line[1]));
-                        botLogger.log("已设置 Bot 的所有者账号为 " + line[1]);
+                        logger.log("已设置 Bot 的所有者账号为 " + line[1]);
                     }
                     break;
                 case "stop":
-                    botLogger.log("正在关闭...");
+                    logger.log("正在关闭...");
                     Runtime.getRuntime().exit(0);
                     break;
             }

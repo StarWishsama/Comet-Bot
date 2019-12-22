@@ -3,7 +3,6 @@ package io.github.starwishsama.namelessbot.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import io.github.starwishsama.namelessbot.BotMain;
 
 import java.io.BufferedReader;
 import java.io.IOException;

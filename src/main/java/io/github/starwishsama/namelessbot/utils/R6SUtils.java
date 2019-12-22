@@ -19,7 +19,7 @@ public class R6SUtils {
                     return p;
             }
         } catch (R6TabApiException | R6TabPlayerNotFoundException e){
-            BotMain.getBotLogger().warning("在获取 R6 玩家信息时出现了问题, " + e);
+            BotMain.getLogger().warning("在获取 R6 玩家信息时出现了问题, " + e);
         }
         return null;
     }
@@ -50,7 +50,7 @@ public class R6SUtils {
                 }
             } return null;
         } catch (R6TabApiException | R6TabPlayerNotFoundException e){
-            BotMain.getBotLogger().warning("在获取 R6 玩家信息时出现了问题, " + e);
+            BotMain.getLogger().warning("在获取 R6 玩家信息时出现了问题, " + e);
         }
         return null;
     }

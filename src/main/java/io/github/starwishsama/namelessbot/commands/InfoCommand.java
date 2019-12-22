@@ -25,16 +25,22 @@ public class InfoCommand implements EverywhereCommand {
         if (!BotUtils.hasCoolDown(user.getId())) {
             if (BotUtils.isUserExist(user.getId())) {
                 BotUser botUser = BotUtils.getUser(user.getId());
-                if (botUser != null)
-                    return new MessageBuilder()
+                MessageBuilder mb;
+                if (botUser != null) {
+                    mb = new MessageBuilder()
                             .add(new ComponentAt(user.getId())).newLine()
                             .add("积分: ").add(String.format("%.1f", botUser.getCheckInPoint())).newLine()
                             .add("累计连续签到了 ").add(botUser.getCheckInTime()).add(" 天").newLine()
-                            .add("上次签到于: ").add(new SimpleDateFormat("yyyy-MM-dd").format(botUser.getLastCheckInTime())).newLine()
-                            .add("绑定的游戏账号是: " + botUser.getBindServerAccount()).toString();
+                            .add("上次签到于: ").add(new SimpleDateFormat("yyyy-MM-dd").format(botUser.getLastCheckInTime())).newLine();
+                    if (botUser.getBindServerAccount() != null) {
+                        mb.add("绑定的游戏账号是: " + botUser.getBindServerAccount());
+                    }
+                } else
+                    mb = new MessageBuilder().add(new ComponentAt(user.getId())).newLine().add("你还没有签到过哦");
+                return mb.toString();
             } else
                 return BotCfg.msg.getBotPrefix() + "你还没有签到过哦";
-        }
-        return null;
+        } else
+            return null;
     }
 }

@@ -29,7 +29,7 @@ public class RConGroupCommand implements GroupCommand {
                     for (String arg : args) {
                         sb.append(arg).append(" ");
                     }
-                    String result = BotMain.rcon.command(sb.toString().trim());
+                    String result = BotMain.getRcon().command(sb.toString().trim());
                     return BotCfg.msg.getBotPrefix() + result;
                 } catch (Exception e) {
                     return BotCfg.msg.getBotPrefix() + "在连接至服务器时发生了错误, 错误信息: " + e.getMessage();

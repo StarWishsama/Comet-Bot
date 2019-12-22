@@ -9,6 +9,7 @@ import cc.moecraft.icq.user.GroupUser;
 import io.github.starwishsama.namelessbot.config.BotCfg;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import org.apache.commons.lang3.StringUtils;
+import sun.text.normalizer.Replaceable;
 
 import static com.sobte.cqp.jcq.event.JcqApp.CC;
 
@@ -22,6 +23,7 @@ public class MuteCommand implements GroupCommand {
 
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String msg, ArrayList<String> args){
+        String reply = null;
         if (sender.isAdmin()){
             if (!event.isAdmin()) {
                 if (args.size() == 1) {
@@ -29,7 +31,7 @@ public class MuteCommand implements GroupCommand {
                         long banQQ = StringUtils.isNumeric(args.get(0)) ? Integer.parseInt(args.get(0)) : CC.getAt(args.get(0));
                         event.getHttpApi().setGroupBan(group.getId(), banQQ, 600);
                     } catch (Exception ignored) {
-                        return BotCfg.msg.getBotPrefix() + "请@你需要禁言的人或者输入TA的QQ号!";
+                        reply = BotCfg.msg.getBotPrefix() + "请@你需要禁言的人或者输入TA的QQ号!";
                     }
                 } else if (args.size() == 2) {
                     try {
@@ -56,20 +58,20 @@ public class MuteCommand implements GroupCommand {
                             throw new NumberFormatException("Equal or less than 0");
                         if (banTime <= 30 * 24 * 60 * 60) {
                             event.getHttpApi().setGroupBan(group.getId(), banQQ, banTime);
-                            return "Bot > 已禁言 " + event.getGroupUser(banQQ).getInfo().getNickname() + "(" + banQQ + ") " + banTime / 60 + "分钟.";
+                            reply = BotCfg.msg.getBotPrefix() + "已禁言 " + event.getGroupUser(banQQ).getInfo().getNickname() + "(" + banQQ + ") " + banTime / 60 + "分钟.";
                         } else
-                            return "Bot > 时间长度太大了！";
+                            reply = BotCfg.msg.getBotPrefix() + "时间长度太大了！";
                     } catch (Exception e) {
-                        return "Bot > 命令格式有误! 用法: /mute [@/QQ号] [dhm]";
+                        reply = BotCfg.msg.getBotPrefix() + "命令格式有误! 用法: /mute [@/QQ号] [dhm]";
                     }
                 }
             } else
-                return "Bot > 机器人不是管理员!";
+                reply = BotCfg.msg.getBotPrefix() + "机器人不是管理员!";
         } else {
-            if (BotUtils.hasCoolDown(sender.getId())) {
-                return "Bot > 你没有权限!";
+            if (!BotUtils.hasCoolDown(sender.getId())) {
+                reply = BotCfg.msg.getBotPrefix() + "你没有权限!";
             }
         }
-        return null;
+        return reply;
     }
 }

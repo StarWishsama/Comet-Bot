@@ -19,4 +19,6 @@ public class Config {
     private String netEaseApi;
     private String[] cmdPrefix = new String[]{"/", "#"};
     private boolean bindMCAccount = false;
+    private boolean antiSpam = true;
+    private int spamMuteTime = 60;
 }

@@ -9,12 +9,8 @@ import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
 
 import io.github.starwishsama.namelessbot.config.BotCfg;
-import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
-import java.util.Date;
-
-import static com.sobte.cqp.jcq.event.JcqApp.CC;
 
 public class DebugCommand implements GroupCommand {
     @Override
@@ -24,33 +20,26 @@ public class DebugCommand implements GroupCommand {
 
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String cmd, ArrayList<String> args){
+        String reply = "";
         switch (args.get(0)) {
             case "recall":
                 RVersionInfo versionInfo = event.getHttpApi().getVersionInfo().getData();
                 if (versionInfo.getCoolqEdition().equalsIgnoreCase("pro")) {
-                    if (sender.isAdmin()) return BotCfg.msg.getBotPrefix() + " 不好意思不好意思权限狗打扰了";
-                    if (!event.isAdmin()) return BotCfg.msg.getBotPrefix() + " 机器人不是管理员怎么撤回啊kora";
-                    if (event.delete().getStatus() == ReturnStatus.ok) return BotCfg.msg.getBotPrefix() + " 已撤回消息";
-                    else return BotCfg.msg.getBotPrefix() + " 撤回失败!";
-                }
-                break;
-            case "getat":
-                if (CC.getAt(args.get(1)) != 0){
-                    return "Bot > 你正在尝试 @" + event.getGroupUser(CC.getAt(args.get(1))).getInfo().getNickname();
+                    if (sender.isAdmin()) reply = BotCfg.msg.getBotPrefix() + " 不好意思不好意思权限狗打扰了";
+                    else if (!event.isAdmin()) reply = BotCfg.msg.getBotPrefix() + " 机器人不是管理员怎么撤回啊kora";
+                    else if (event.delete().getStatus() == ReturnStatus.ok) reply = BotCfg.msg.getBotPrefix() + " 已撤回消息";
+                    else reply = BotCfg.msg.getBotPrefix() + " 撤回失败!";
                 }
                 break;
             case "reload":
                 BotCfg.loadCfg();
                 BotCfg.loadLang();
+                reply = BotCfg.msg.getBotPrefix() + " Configuration has been reloaded.";
                 break;
-            case "cd":
-                if (!BotUtils.hasCoolDown(sender.getId())){
-                    return "Bot > You don't have cooldown";
-                } else
-                    return "Bot > Debug > Has cooldown, Cooldown is: " + (new Date().getTime() - BotUtils.coolDown.get(sender.getId()));
             default:
-                return "Bot > 命令不存在";
+                reply = "Bot > 命令不存在";
+                break;
         }
-        return null;
+        return reply;
     }
 }
