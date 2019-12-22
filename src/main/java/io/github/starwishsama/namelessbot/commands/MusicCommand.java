@@ -32,7 +32,7 @@ public class MusicCommand implements EverywhereCommand {
                         return new MessageBuilder().add(new ComponentMusic(MusicID.getNetEaseSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.netease)).toString();
                     else
                         return BotCfg.msg.getBotPrefix() + "找不到歌曲 " + sb.toString().trim();
-                } else if (args.get(0).toLowerCase().equalsIgnoreCase("qq")) {
+                } else if (args.get(0).equalsIgnoreCase("qq")) {
                     if (MusicID.getQQMusicSongID(sb.toString().trim()) != -1 && MusicID.getQQMusicSongID(sb.toString().trim()) != 0)
                         return new MessageBuilder().add(new ComponentMusic(MusicID.getQQMusicSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.qq)).toString();
                     else

@@ -9,7 +9,6 @@ import cc.moecraft.icq.user.GroupUser;
 import io.github.starwishsama.namelessbot.config.BotCfg;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import org.apache.commons.lang3.StringUtils;
-import sun.text.normalizer.Replaceable;
 
 import static com.sobte.cqp.jcq.event.JcqApp.CC;
 

@@ -14,15 +14,15 @@ public class BotCfg {
     public static ShopItems shopItems = new ShopItems();
     public static Config cfg = new Config();
 
-    private static File userCfg = new File(BotMain.jarPath + "users.json");
-    private static File shopItemCfg = new File(BotMain.jarPath + "items.json");
-    private static File cfgFile = new File(BotMain.jarPath + "config.json");
-    private static File langCfg = new File(BotMain.jarPath + "lang.json");
+    private static File userCfg = new File(BotMain.getJarPath() + "users.json");
+    private static File shopItemCfg = new File(BotMain.getJarPath() + "items.json");
+    private static File cfgFile = new File(BotMain.getJarPath() + "config.json");
+    private static File langCfg = new File(BotMain.getJarPath() + "lang.json");
 
     private static Gson gson = new GsonBuilder().serializeNulls().create();
 
     public static void loadCfg(){
-        if (BotMain.jarPath != null) {
+        if (BotMain.getJarPath() != null) {
             if (userCfg.exists() && cfgFile.exists()){
                 load();
             } else {
