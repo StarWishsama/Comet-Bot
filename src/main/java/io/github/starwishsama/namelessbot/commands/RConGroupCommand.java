@@ -11,7 +11,6 @@ import io.github.starwishsama.namelessbot.config.BotCfg;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class RConGroupCommand implements GroupCommand {
     @Override

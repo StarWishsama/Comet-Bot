@@ -3,8 +3,6 @@ package io.github.starwishsama.namelessbot.commands;
 import cc.moecraft.icq.command.CommandProperties;
 import cc.moecraft.icq.command.interfaces.EverywhereCommand;
 import cc.moecraft.icq.event.events.message.EventMessage;
-import cc.moecraft.icq.sender.message.MessageBuilder;
-import cc.moecraft.icq.sender.message.components.ComponentAt;
 import cc.moecraft.icq.user.User;
 
 import io.github.starwishsama.namelessbot.config.BotCfg;
@@ -25,19 +23,17 @@ public class InfoCommand implements EverywhereCommand {
         if (!BotUtils.hasCoolDown(user.getId())) {
             if (BotUtils.isUserExist(user.getId())) {
                 BotUser botUser = BotUtils.getUser(user.getId());
-                MessageBuilder mb;
+                String reply;
                 if (botUser != null) {
-                    mb = new MessageBuilder()
-                            .add(new ComponentAt(user.getId())).newLine()
-                            .add("积分: ").add(String.format("%.1f", botUser.getCheckInPoint())).newLine()
-                            .add("累计连续签到了 ").add(botUser.getCheckInTime()).add(" 天").newLine()
-                            .add("上次签到于: ").add(new SimpleDateFormat("yyyy-MM-dd").format(botUser.getLastCheckInTime())).newLine();
+                    reply = "[CQ:at,qq=" + user.getId() + "]\n积分: " + String.format("%.1f", botUser.getCheckInPoint())
+                            + "\n累计连续签到了 " + botUser.getCheckInTime() + " 天"
+                            + "上次签到于: " + new SimpleDateFormat("yyyy-MM-dd").format(botUser.getLastCheckInTime());
                     if (botUser.getBindServerAccount() != null) {
-                        mb.add("绑定的游戏账号是: " + botUser.getBindServerAccount());
+                        reply = reply + "绑定的游戏账号是: " + botUser.getBindServerAccount();
                     }
                 } else
-                    mb = new MessageBuilder().add(new ComponentAt(user.getId())).newLine().add("你还没有签到过哦");
-                return mb.toString();
+                    reply = BotCfg.msg.getBotPrefix() + "你还没有签到过哦";
+                return reply;
             } else
                 return BotCfg.msg.getBotPrefix() + "你还没有签到过哦";
         } else
