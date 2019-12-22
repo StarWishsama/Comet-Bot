@@ -67,7 +67,7 @@ public class MuteCommand implements GroupCommand {
             } else
                 reply = BotCfg.msg.getBotPrefix() + "机器人不是管理员!";
         } else {
-            if (!BotUtils.hasCoolDown(sender.getId())) {
+            if (!BotUtils.isCoolDown(sender.getId())) {
                 reply = BotCfg.msg.getBotPrefix() + "你没有权限!";
             }
         }

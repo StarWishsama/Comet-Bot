@@ -21,7 +21,7 @@ public class RConGroupCommand implements GroupCommand {
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String msg, ArrayList<String> args){
         long fromQQ = sender.getId();
-        if (!BotUtils.hasCoolDown(fromQQ)) {
+        if (!BotUtils.isCoolDown(fromQQ)) {
             if (BotCfg.cfg.getBotAdmins().contains(fromQQ) || BotCfg.cfg.getOwnerID() == fromQQ) {
                 try {
                     StringBuilder sb = new StringBuilder();

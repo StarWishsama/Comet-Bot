@@ -14,16 +14,19 @@ import java.util.Objects;
 public class BindCommand implements EverywhereCommand {
     @Override
     public String run(EventMessage event, User sender, String command, ArrayList<String> args) {
-        if (!BotUtils.hasCoolDown(sender.getId())) {
+        if (!BotUtils.isCoolDown(sender.getId())) {
             if (BotUtils.isUserExist(sender.getId())) {
-                if (args.size() > 0) {
-                    if (args.get(0) != null && BotUtils.isLegitID(args.get(0))) {
-                        Objects.requireNonNull(BotUtils.getUser(sender.getId())).setBindServerAccount(args.get(0));
-                        return "Bot > 已绑定账号 " + args.get(0);
+                if (Objects.requireNonNull(BotUtils.getUser(sender.getId())).getBindServerAccount() == null) {
+                    if (args.size() > 0) {
+                        if (args.get(0) != null && BotUtils.isLegitID(args.get(0))) {
+                            Objects.requireNonNull(BotUtils.getUser(sender.getId())).setBindServerAccount(args.get(0));
+                            return "Bot > 已绑定账号 " + args.get(0);
+                        } else
+                            return BotCfg.msg.getBotPrefix() + "ID 不符合规范";
                     } else
-                        return BotCfg.msg.getBotPrefix() + "ID 不符合规范";
+                        return BotCfg.msg.getBotPrefix() + "/bind [Minecraft用户名]";
                 } else
-                    return BotCfg.msg.getBotPrefix() + "ID 不能为空";
+                    return BotCfg.msg.getBotPrefix() + "你已经绑定过账号了!";
             } else
                 return BotCfg.msg.getBotPrefix() + "请先使用 /qd 签到一次!";
         } else return null;

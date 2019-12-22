@@ -127,18 +127,15 @@ public class BotUtils {
      * @return true/false
      */
 
-    public static boolean hasCoolDown(long qq){
-        if (coolDown != null){
-            if (coolDown.containsKey(qq)){
-                if (new Date().getTime() - coolDown.get(qq) > 10 * 1000){
-                    return false;
-                } else
-                    coolDown.remove(qq);
+    public static boolean isCoolDown(long qq){
+        if (coolDown.containsKey(qq)){
+            if (new Date().getTime() - coolDown.get(qq) < 10 * 1000){
+                return true;
             } else
-                BotUtils.coolDown.put(qq, new Date().getTime());
+                coolDown.remove(qq);
         } else
-            coolDown = new HashMap<>();
-        return true;
+            BotUtils.coolDown.put(qq, new Date().getTime());
+        return false;
     }
 
     /**

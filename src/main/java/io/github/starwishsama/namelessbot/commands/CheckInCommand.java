@@ -11,7 +11,6 @@ import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.*;
 
-
 public class CheckInCommand implements EverywhereCommand {
     @Override
     public CommandProperties properties(){
@@ -21,7 +20,7 @@ public class CheckInCommand implements EverywhereCommand {
     @Override
     public String run(EventMessage em, User sender, String msg, ArrayList<String> args){
         long fromQQ = sender.getId();
-        if (!BotUtils.hasCoolDown(fromQQ)) {
+        if (!BotUtils.isCoolDown(fromQQ)) {
             if (!BotUtils.isUserExist(fromQQ) && args.size() == 0) {
                 BotCfg.users.getUsers().add(new BotUser(fromQQ));
                 return checkIn(sender);
@@ -40,7 +39,7 @@ public class CheckInCommand implements EverywhereCommand {
         Calendar c = Calendar.getInstance();
         // 计算连续签到次数，此处用了 Date 这个废弃的类，应换为 Calendar，too lazy to do so.
         if (Objects.requireNonNull(user).getLastCheckInTime().get(Calendar.MONTH) == c.get(Calendar.MONTH)
-                && user.getLastCheckInTime().get(Calendar.DATE) == new Date().getDate() - 1)
+                && user.getLastCheckInTime().get(Calendar.DATE) == c.get(Calendar.DATE) - 1)
             user.setCheckInTime(user.getCheckInTime() + 1);
         else
             user.setCheckInTime(1);

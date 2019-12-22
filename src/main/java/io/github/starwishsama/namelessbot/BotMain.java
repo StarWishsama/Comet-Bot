@@ -57,7 +57,7 @@ public class BotMain {
         try {
             jarPath = getPath();
             System.out.println("[Path] Bot 路径在 " + jarPath);
-            System.out.println("[Path] 配置文件路径在 "+ jarPath + "config.json");
+            System.out.println("[Path] 配置文件路径在 "+ jarPath + "/config.json");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -122,6 +122,9 @@ public class BotMain {
                     logger.log("正在关闭...");
                     Runtime.getRuntime().exit(0);
                     break;
+                default:
+                    logger.log("未知指令.");
+                    break;
             }
         } catch (IOException ignored){
         }
@@ -137,8 +140,10 @@ public class BotMain {
             path = path.substring(0, path.lastIndexOf("/"));
             return path;
         }
-        File location = new File(path.replace("target/classes/", "") + "\\BotConfig");
-        location.mkdirs();
+
+        File location = new File(path.replace("target/classes/", "") + "/BotConfig");
+        if (!location.exists())
+            location.mkdirs();
         return location.getPath();
     }
 }

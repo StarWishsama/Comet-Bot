@@ -20,20 +20,19 @@ public class InfoCommand implements EverywhereCommand {
 
     @Override
     public String run(EventMessage e, User user, String msg, ArrayList<String> args){
-        if (!BotUtils.hasCoolDown(user.getId())) {
+        if (!BotUtils.isCoolDown(user.getId())) {
             if (BotUtils.isUserExist(user.getId())) {
                 BotUser botUser = BotUtils.getUser(user.getId());
-                String reply;
                 if (botUser != null) {
-                    reply = "[CQ:at,qq=" + user.getId() + "]\n积分: " + String.format("%.1f", botUser.getCheckInPoint())
+                    String reply = user.getInfo().getNickname() + "\n积分: " + String.format("%.1f", botUser.getCheckInPoint())
                             + "\n累计连续签到了 " + botUser.getCheckInTime() + " 天"
-                            + "上次签到于: " + new SimpleDateFormat("yyyy-MM-dd").format(botUser.getLastCheckInTime());
+                            + "\n上次签到于: " + new SimpleDateFormat("yyyy-MM-dd").format(botUser.getLastCheckInTime());
                     if (botUser.getBindServerAccount() != null) {
-                        reply = reply + "绑定的游戏账号是: " + botUser.getBindServerAccount();
-                    }
+                        return reply + "绑定的游戏账号是: " + botUser.getBindServerAccount();
+                    } else
+                        return reply;
                 } else
-                    reply = BotCfg.msg.getBotPrefix() + "你还没有签到过哦";
-                return reply;
+                    return BotCfg.msg.getBotPrefix() + "你还没有签到过哦";
             } else
                 return BotCfg.msg.getBotPrefix() + "你还没有签到过哦";
         } else

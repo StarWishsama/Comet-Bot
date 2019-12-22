@@ -20,7 +20,7 @@ public class VersionCommand implements EverywhereCommand {
 
     @Override
     public String run(EventMessage event, User sender, String cmd, ArrayList<String> args){
-        if (!BotUtils.hasCoolDown(sender.getId())) {
+        if (!BotUtils.isCoolDown(sender.getId())) {
             RStatus status = event.getHttpApi().getStatus().getData();
             return new MessageBuilder()
                     .add("无名Bot v0.1.2-DEV-191220").newLine()

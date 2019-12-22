@@ -20,7 +20,7 @@ public class ServerInfoCommand implements EverywhereCommand {
 
     @Override
     public String run(EventMessage em, User sender, String msg, ArrayList<String> args){
-        if (!BotUtils.hasCoolDown(sender.getId())) {
+        if (!BotUtils.isCoolDown(sender.getId())) {
             int size = args.size();
             if (size == 1) {
                 return BotUtils.getServerInfo(args.get(0));
