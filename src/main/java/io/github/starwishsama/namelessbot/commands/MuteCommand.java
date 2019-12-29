@@ -3,6 +3,7 @@ package io.github.starwishsama.namelessbot.commands;
 import cc.moecraft.icq.command.CommandProperties;
 import cc.moecraft.icq.command.interfaces.GroupCommand;
 import cc.moecraft.icq.event.events.message.EventGroupMessage;
+
 import cc.moecraft.icq.sender.returndata.RawReturnData;
 import cc.moecraft.icq.sender.returndata.ReturnStatus;
 import cc.moecraft.icq.user.Group;
@@ -10,8 +11,10 @@ import cc.moecraft.icq.user.GroupUser;
 
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import org.apache.commons.lang3.StringUtils;
+import taskeren.extrabot.components.ExComponent;
+import taskeren.extrabot.components.ExComponentAt;
+import taskeren.extrabot.components.ExComponentString;
 
-import static com.sobte.cqp.jcq.event.JcqApp.CC;
 
 import java.util.ArrayList;
 
@@ -28,7 +31,17 @@ public class MuteCommand implements GroupCommand {
             if (event.isAdmin()) {
                 if (args.size() > 0) {
                     try {
-                        long banQQ = StringUtils.isNumeric(args.get(0)) ? Integer.parseInt(args.get(0)) : CC.getAt(args.get(0));
+                        long banQQ;
+                        if (StringUtils.isNumeric(args.get(0))){
+                            banQQ = Long.parseLong(args.get(0));
+                        } else {
+                            ExComponent ec = ExComponent.parseComponent(args.get(0));
+                            if (ec instanceof ExComponentAt) {
+                                banQQ = ((ExComponentAt) ec).getAt();
+                            } else
+                                banQQ = -1000;
+                        }
+
                         if (banQQ != -1000) {
                             long banTime = 0; // 此处单位为秒
                             if (args.size() == 1)
@@ -66,7 +79,7 @@ public class MuteCommand implements GroupCommand {
             } else
                 reply = BotUtils.getLocalMessage("msg.bot-prefix") + "机器人不是管理员!";
         } else {
-            if (BotUtils.isCoolDown(sender.getId())) {
+            if (BotUtils.isNoCoolDown(sender.getId())) {
                 reply = BotUtils.getLocalMessage("msg.bot-prefix") + "你没有权限!";
             }
         }

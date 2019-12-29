@@ -129,7 +129,7 @@ public class BotUtils {
      * @return true/false
      */
 
-    public static boolean isCoolDown(long qq){
+    public static boolean isNoCoolDown(long qq){
         long currentTime = System.currentTimeMillis();
         if (coolDown.containsKey(qq)){
             if (currentTime - coolDown.get(qq) < 10 * 1000){

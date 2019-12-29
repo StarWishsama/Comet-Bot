@@ -8,7 +8,6 @@ import cc.moecraft.icq.user.GroupUser;
 
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.BotMain;
-import io.github.starwishsama.namelessbot.config.FileSetup;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ public class RConGroupCommand implements GroupCommand {
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String msg, ArrayList<String> args){
         long fromQQ = sender.getId();
-        if (BotUtils.isCoolDown(fromQQ)) {
+        if (BotUtils.isNoCoolDown(fromQQ)) {
             if (BotConstants.cfg.getBotAdmins().contains(fromQQ) || BotConstants.cfg.getOwnerID() == fromQQ) {
                 try {
                     StringBuilder sb = new StringBuilder();

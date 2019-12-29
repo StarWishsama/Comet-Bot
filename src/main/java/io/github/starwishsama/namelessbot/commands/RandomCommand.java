@@ -18,7 +18,7 @@ public class RandomCommand implements EverywhereCommand {
 
     @Override
     public String run(EventMessage event, User sender, String command, ArrayList<String> args) {
-        if (BotUtils.isCoolDown(sender.getId())) {
+        if (BotUtils.isNoCoolDown(sender.getId())) {
             if (!args.isEmpty()) {
                 StringBuilder sb = new StringBuilder();
                 for (String arg : args) {

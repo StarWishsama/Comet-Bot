@@ -6,7 +6,6 @@ import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
 
 import io.github.starwishsama.namelessbot.BotConstants;
-import io.github.starwishsama.namelessbot.config.FileSetup;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
@@ -16,7 +15,7 @@ import java.util.Objects;
 public class BindCommand implements EverywhereCommand {
     @Override
     public String run(EventMessage event, User sender, String command, ArrayList<String> args) {
-        if (BotUtils.isCoolDown(sender.getId())) {
+        if (BotUtils.isNoCoolDown(sender.getId())) {
             if (BotConstants.cfg.isBindMCAccount()) {
                 BotUser user = BotUtils.getUser(sender.getId());
                 if (user != null) {
@@ -33,7 +32,8 @@ public class BindCommand implements EverywhereCommand {
                         return BotUtils.getLocalMessage("msg.bot-prefix") + "你已经绑定过账号了!";
                 } else
                     return BotUtils.getLocalMessage("msg.bot-prefix") + "请先使用 /qd 签到一次!";
-            }
+            } else
+                return BotUtils.getLocalMessage("msg.bot-prefix") + "绑定账号暂未开放";
         }
         return null;
     }

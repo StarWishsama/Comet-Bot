@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-import io.github.starwishsama.namelessbot.BotConstants;
+
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.objects.BotLocalization;
 import io.github.starwishsama.namelessbot.objects.BotUser;

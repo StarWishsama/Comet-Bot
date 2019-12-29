@@ -21,7 +21,7 @@ public class CheckInCommand implements EverywhereCommand {
     @Override
     public String run(EventMessage em, User sender, String msg, ArrayList<String> args){
         long id = sender.getId();
-        if (BotUtils.isCoolDown(id)) {
+        if (BotUtils.isNoCoolDown(id)) {
             if (!BotUtils.isUserExist(id) && args.size() == 0) {
                 users.add(new BotUser(id));
                 return checkIn(sender);
