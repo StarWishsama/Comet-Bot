@@ -30,7 +30,6 @@ public class FileProcess {
         File file = new File(path);
         if (file.exists())
             delFile(path);
-            log("[JSON] Path is " + path + "\n");
         try {
             if (file.createNewFile()) {
                 bool = true;
@@ -112,7 +111,7 @@ public class FileProcess {
             for (; (temp = br.readLine()) != null;) {
                 buffer.append(temp);
                 // 行与行之间的分隔符 相当于“\n”
-                buffer = buffer.append(System.getProperty("line.separator"));
+                buffer.append(System.getProperty("line.separator"));
             }
             buffer.append(filein);
             fos = new FileOutputStream(file);
@@ -150,14 +149,13 @@ public class FileProcess {
      * @return
      */
     public static boolean delFile(String path) {
-        Boolean bool = false;
+        boolean bool = false;
         File file = new File(path);
         try {
             if (file.exists()) {
-                file.delete();
-                bool = true;
+                bool = file.delete();
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return bool;
     }

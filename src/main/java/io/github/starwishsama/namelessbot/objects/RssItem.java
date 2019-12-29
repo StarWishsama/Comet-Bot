@@ -33,6 +33,21 @@ public class RssItem {
         return context;
     }
 
+    public static SyndEntry getRSSItem(String address){
+        try {
+            URL url = new URL(address);
+            XmlReader reader = new XmlReader(url);
+            SyndFeedInput input = new SyndFeedInput();
+            // 得到SyndFeed对象，即得到RSS源里的所有信息
+            SyndFeed feed = input.build(reader);
+            // 得到Rss新闻中子项列表
+            return feed.getEntries().get(0);
+        } catch (FeedException | IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static List<SyndEntry> getRSSItems(String address){
         try {
             URL url = new URL(address);

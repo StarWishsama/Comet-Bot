@@ -1,17 +1,27 @@
 package io.github.starwishsama.namelessbot.config;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
+import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.BotMain;
+import io.github.starwishsama.namelessbot.objects.BotLocalization;
+import io.github.starwishsama.namelessbot.objects.Config;
+import io.github.starwishsama.namelessbot.objects.ShopItem;
 import io.github.starwishsama.namelessbot.utils.FileProcess;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-public class BotCfg {
-    public static Users users = new Users();
-    public static BotLocalization msg = new BotLocalization();
-    public static ShopItems shopItems = new ShopItems();
+import static io.github.starwishsama.namelessbot.BotConstants.shopItems;
+import static io.github.starwishsama.namelessbot.BotConstants.users;
+
+public class FileSetup {
     public static Config cfg = new Config();
 
     private static File userCfg = new File(BotMain.getJarPath() + "/users.json");
@@ -36,7 +46,7 @@ public class BotCfg {
                     cfg.setBotPort(5702);
                     cfg.setRconUrl("127.0.0.1");
                     cfg.setRconPort(25575);
-                    cfg.setRconPwd("password".getBytes());
+                    cfg.setRconPwd(null);
                     cfg.setNetEaseApi("http://localhost:3000/");
                     cfg.setCmdPrefix(new String[]{"/", "#"});
                     cfg.setBindMCAccount(false);
@@ -71,8 +81,8 @@ public class BotCfg {
             JsonElement configParser = new JsonParser().parse(FileProcess.readFile(cfgFile.toString()));
             if (!checkInParser.isJsonNull() && !configParser.isJsonNull()){
                 cfg = gson.fromJson(FileProcess.readFile(cfgFile.toString()), Config.class);
-                users = gson.fromJson(FileProcess.readFile(userCfg.toString()), Users.class);
-                shopItems = gson.fromJson(FileProcess.readFile(shopItemCfg.toString()), ShopItems.class);
+                users = gson.fromJson(FileProcess.readFile(userCfg.toString()), new TypeToken<Collection<ShopItem>>(){}.getType());
+                shopItems = gson.fromJson(FileProcess.readFile(shopItemCfg.toString()), new TypeToken<Collection<ShopItem>>(){}.getType());
             } else {
                 System.err.println("[配置] 在加载配置文件时发生了问题, JSON 文件为空.");
             }
@@ -83,16 +93,16 @@ public class BotCfg {
 
     public static void loadLang(){
         if (!langCfg.exists()){
-            msg.setBotPrefix("Bot > ");
-            msg.setNoPermission("你没有权限!");
-            msg.setBindSuccess("绑定账号 %s 成功!");
-            msg.setNoCheckInData("你还没有签到过, 使用 /qd <游戏ID> 注册签到系统吧~");
-            FileProcess.createFile(langCfg.toString(), gson.toJson(msg));
+            BotConstants.msg.add(new BotLocalization("msg.bot-prefix", "Bot > "));
+            BotConstants.msg.add(new BotLocalization("msg.no-permission", "你没有权限"));
+            BotConstants.msg.add(new BotLocalization("msg.bind-success", "绑定账号 %s 成功!"));
+            BotConstants.msg.add(new BotLocalization("checkin.first-time", "你还没有签到过, 先用 /qd 签到一次吧~"));
+            FileProcess.createFile(langCfg.toString(), gson.toJson(BotConstants.msg));
         } else {
             try {
                 JsonElement lang = new JsonParser().parse(FileProcess.readFile(langCfg.toString()));
                 if (!lang.isJsonNull()) {
-                    msg = gson.fromJson(FileProcess.readFile(langCfg.toString()), BotLocalization.class);
+                    BotConstants.msg = gson.fromJson(FileProcess.readFile(langCfg.toString()), new TypeToken<List<BotLocalization>>(){}.getType());
                 } else
                     System.err.println("[配置] 在读取时发生了问题, JSON 文件为空");
             } catch (IOException e) {
@@ -102,6 +112,6 @@ public class BotCfg {
     }
 
     public static void saveLang(){
-        FileProcess.createFile(langCfg.toString(), gson.toJson(msg));
+        FileProcess.createFile(langCfg.toString(), gson.toJson(BotConstants.msg));
     }
 }

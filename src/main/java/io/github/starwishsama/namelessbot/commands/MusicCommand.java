@@ -7,7 +7,6 @@ import cc.moecraft.icq.sender.message.MessageBuilder;
 import cc.moecraft.icq.sender.message.components.ComponentMusic;
 import cc.moecraft.icq.user.User;
 
-import io.github.starwishsama.namelessbot.config.BotCfg;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import io.github.starwishsama.namelessbot.utils.MusicID;
 
@@ -31,18 +30,18 @@ public class MusicCommand implements EverywhereCommand {
                     if (MusicID.getNetEaseSongID(sb.toString().trim()) > -1)
                         return new MessageBuilder().add(new ComponentMusic(MusicID.getNetEaseSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.netease)).toString();
                     else
-                        return BotCfg.msg.getBotPrefix() + "找不到歌曲 " + sb.toString().trim();
+                        return BotUtils.getLocalMessage("msg.bot-prefix") + "找不到歌曲 " + sb.toString().trim();
                 }
                 else if (args.get(0).equalsIgnoreCase("qq")) {
                     if (MusicID.getQQMusicSongID(sb.toString().trim()) > 0)
                         return new MessageBuilder().add(new ComponentMusic(MusicID.getQQMusicSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.qq)).toString();
                     else
-                        return BotCfg.msg.getBotPrefix() + "找不到歌曲 " + sb.toString().trim();
+                        return BotUtils.getLocalMessage("msg.bot-prefix") + "找不到歌曲 " + sb.toString().trim();
                 }
                 else
-                    return BotCfg.msg.getBotPrefix() + "用法: /点歌 [网易/QQ] [歌名]";
+                    return BotUtils.getLocalMessage("msg.bot-prefix") + "用法: /点歌 [网易/QQ] [歌名]";
             } else
-                return BotCfg.msg.getBotPrefix() + "用法: /点歌 [网易/QQ] [歌名]";
+                return BotUtils.getLocalMessage("msg.bot-prefix") + "用法: /点歌 [网易/QQ] [歌名]";
         }
         else
             return null;

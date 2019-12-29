@@ -13,7 +13,7 @@ import java.util.Random;
 public class RandomCommand implements EverywhereCommand {
     @Override
     public CommandProperties properties() {
-        return new CommandProperties("random", "占卜");
+        return new CommandProperties("random", "占卜", "zb");
     }
 
     @Override

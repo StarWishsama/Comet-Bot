@@ -43,11 +43,9 @@ public class MusicID {
             JSONArray songs = JSON.parseArray(searchQQMusic(name));
             if (songs.getJSONObject(0).getInteger("songid") != null){
                 return songs.getJSONObject(0).getInteger("songid");
-            } else
-                return -1;
-        } else {
-            return -1;
+            }
         }
+        return -1;
     }
 
 
@@ -56,11 +54,9 @@ public class MusicID {
             try {
                 JSONObject object = JSON.parseObject(searchNetEaseMusic(name));
                 return object.getJSONObject("result").getJSONArray("songs").getJSONObject(0).getInteger("id");
-            } catch (IOException x) {
-                return -1;
+            } catch (IOException ignored) {
             }
-        else // Name is null
-            return -1;
+        return -1;
     }
 
     private static String searchNetEaseMusic(String songName) throws IOException {
@@ -97,10 +93,10 @@ public class MusicID {
                 } else
                     return "Can't request song(s) from API, Response code is " + hc.getResponseCode();
             } catch (Exception x) {
-                return "An exception occurred, Error message: " + x.getMessage();
+                return "在通过 QQ 音乐搜索歌曲时发生了一个错误, " + x.getMessage();
             }
         } else {
-            return "No name";
+            return "请先指定歌名!";
         }
     }
 }

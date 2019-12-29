@@ -1,4 +1,4 @@
-package io.github.starwishsama.namelessbot.config;
+package io.github.starwishsama.namelessbot.objects;
 
 import lombok.Data;
 

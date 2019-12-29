@@ -1,41 +1,28 @@
 package io.github.starwishsama.namelessbot.commands;
 
 import cc.moecraft.icq.command.CommandProperties;
-import cc.moecraft.icq.command.interfaces.EverywhereCommand;
-import cc.moecraft.icq.event.events.message.EventMessage;
-import cc.moecraft.icq.user.User;
+import cc.moecraft.icq.command.interfaces.GroupCommand;
+import cc.moecraft.icq.event.events.message.EventGroupMessage;
+import cc.moecraft.icq.user.Group;
+import cc.moecraft.icq.user.GroupUser;
 
-import io.github.starwishsama.namelessbot.config.BotCfg;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-public class InfoCommand implements EverywhereCommand {
+public class InfoCommand implements GroupCommand {
     @Override
     public CommandProperties properties(){
         return new CommandProperties("info", "查询", "查", "cx");
     }
 
     @Override
-    public String run(EventMessage e, User user, String msg, ArrayList<String> args){
-        if (!BotUtils.isCoolDown(user.getId())) {
-            if (BotUtils.isUserExist(user.getId())) {
-                BotUser botUser = BotUtils.getUser(user.getId());
-                if (botUser != null) {
-                    String reply = user.getInfo().getNickname() + "\n积分: " + String.format("%.1f", botUser.getCheckInPoint())
-                            + "\n累计连续签到了 " + botUser.getCheckInTime() + " 天"
-                            + "\n上次签到于: " + new SimpleDateFormat("yyyy-MM-dd").format(botUser.getLastCheckInTime());
-                    if (botUser.getBindServerAccount() != null) {
-                        return reply + "绑定的游戏账号是: " + botUser.getBindServerAccount();
-                    } else
-                        return reply;
-                } else
-                    return BotCfg.msg.getBotPrefix() + "你还没有签到过哦";
-            } else
-                return BotCfg.msg.getBotPrefix() + "你还没有签到过哦";
+    public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String command, ArrayList<String> args) {
+        if (BotUtils.getUser(sender.getId()) != null){
+            BotUser user = BotUtils.getUser(sender.getId());
+            return String.valueOf(user.getCheckInPoint());
         } else
-            return null;
+            return BotUtils.getLocalMessage("msg.bot-prefix") + BotUtils.getLocalMessage("checkin.first-time");
     }
 }

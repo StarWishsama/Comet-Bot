@@ -3,7 +3,8 @@ package io.github.starwishsama.namelessbot.utils;
 import com.deadmandungeons.serverstatus.MinecraftServerStatus;
 import com.deadmandungeons.serverstatus.ping.PingResponse;
 import io.github.starwishsama.namelessbot.BotMain;
-import io.github.starwishsama.namelessbot.config.BotCfg;
+import io.github.starwishsama.namelessbot.BotConstants;
+import io.github.starwishsama.namelessbot.objects.BotLocalization;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 
 import java.io.IOException;
@@ -153,22 +154,25 @@ public class BotUtils {
         return UUID.randomUUID();
     }
 
-    public static boolean isUserExist(Long qq){
-        if (BotCfg.users.getUsers() != null){
-            for (BotUser user : BotCfg.users.getUsers()){
-                if (user.getUserQQ() == qq)
-                    return true;
-            }
-        }
-        return false;
-    }
-
     public static BotUser getUser(Long qq){
-        if (BotCfg.users.getUsers() != null){
-            for (BotUser user : BotCfg.users.getUsers()){
+        if (BotConstants.users != null){
+            for (BotUser user : BotConstants.users){
                 if (user.getUserQQ() == qq)
                     return user;
             }
+        }
+        return null;
+    }
+
+    public static String getLocalMessage(String node){
+        if (BotConstants.msg != null){
+            for (BotLocalization local : BotConstants.msg){
+                if (local.getNode().equals(node)){
+                    return local.getText();
+                }
+            }
+        } else {
+            BotMain.getLogger().warning("无法获取本地化文本, 文本节点为: " + node);
         }
         return null;
     }

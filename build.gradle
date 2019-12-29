@@ -14,18 +14,17 @@ plugins {
 }
 
 group 'io.github.starwishsama.namelessbot'
-version '0.1.2-DEV-191220'
+version '0.1.3-DEV-191228'
 
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
 
 jar {
     baseName = 'NamelessBot'
-    version = '0.1.2-DEV-191220'
+    version = '0.1.3-DEV-191228'
 }
 
 repositories {
-    jcenter()
     mavenCentral()
     maven { url 'https://jitpack.io' }
     maven { url 'https://oss.sonatype.org/content/groups/public' }
@@ -48,6 +47,7 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.16'
     implementation 'org.apache.httpcomponents:httpclient:4.5.2'
     implementation 'org.apache.httpcomponents:httpcore:4.4.4'
+    implementation 'org.jetbrains:annotations:15.0'
 }
 
 shadowJar {

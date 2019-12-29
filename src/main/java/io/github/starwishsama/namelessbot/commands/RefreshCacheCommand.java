@@ -5,7 +5,7 @@ import cc.moecraft.icq.command.interfaces.EverywhereCommand;
 import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
 
-import io.github.starwishsama.namelessbot.config.BotCfg;
+import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
 
@@ -18,6 +18,6 @@ public class RefreshCacheCommand implements EverywhereCommand {
     @Override
     public String run(EventMessage e, User sender, String cmd, ArrayList<String> args){
         e.getBot().getAccountManager().refreshCache();
-        return BotCfg.msg.getBotPrefix() + "已手动刷新信息缓存.";
+        return BotUtils.getLocalMessage("msg.bot-prefix") + "已手动刷新信息缓存.";
     }
 }
