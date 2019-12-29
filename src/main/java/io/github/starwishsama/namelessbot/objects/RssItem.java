@@ -4,6 +4,7 @@ import com.rometools.rome.feed.synd.*;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
+
 import lombok.Data;
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class RssItem {
             SyndFeedInput input = new SyndFeedInput();
             // 得到SyndFeed对象，即得到RSS源里的所有信息
             SyndFeed feed = input.build(reader);
-            // 得到Rss新闻中子项列表
+            // 得到RSS源中子项列表
             return feed.getEntries().get(0);
         } catch (FeedException | IOException e) {
             e.printStackTrace();
@@ -55,7 +56,7 @@ public class RssItem {
             SyndFeedInput input = new SyndFeedInput();
             // 得到SyndFeed对象，即得到RSS源里的所有信息
             SyndFeed feed = input.build(reader);
-            // 得到Rss新闻中子项列表
+            // 得到RSS源中子项列表
             return feed.getEntries();
         } catch (FeedException | IOException e) {
             e.printStackTrace();

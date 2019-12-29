@@ -20,18 +20,17 @@ public class CheckInCommand implements EverywhereCommand {
 
     @Override
     public String run(EventMessage em, User sender, String msg, ArrayList<String> args){
-        long fromQQ = sender.getId();
-        if (!BotUtils.isCoolDown(fromQQ)) {
-            BotUser user = BotUtils.getUser(fromQQ);
-            if (user == null && args.size() == 0) {
-                users.add(new BotUser(fromQQ));
+        long id = sender.getId();
+        if (BotUtils.isCoolDown(id)) {
+            if (!BotUtils.isUserExist(id) && args.size() == 0) {
+                users.add(new BotUser(id));
                 return checkIn(sender);
             } else {
-                if (BotUtils.isCheckInReset(new Date(), Objects.requireNonNull(BotUtils.getUser(fromQQ)).getLastCheckInTime().getTime())
-                        || Objects.requireNonNull(BotUtils.getUser(fromQQ)).getCheckInTime() == 0) {
+                if (BotUtils.isCheckInReset(new Date(), Objects.requireNonNull(BotUtils.getUser(id)).getLastCheckInTime().getTime())
+                        || Objects.requireNonNull(BotUtils.getUser(id)).getCheckInTime() == 0) {
                     return checkIn(sender);
                 } else
-                    return BotUtils.getLocalMessage("msg.bot-prefix") + "你今天已经签到过了! 输入 /cx 可查询签到信息";
+                    return "Bot > 你今天已经签到过了! 输入 /cx 可查询签到信息";
             }
         }
         return null;
@@ -45,7 +44,7 @@ public class CheckInCommand implements EverywhereCommand {
             if (user.getLastCheckInTime().get(Calendar.MONTH) == c.get(Calendar.MONTH)
                     && user.getLastCheckInTime().get(Calendar.DATE) == c.get(Calendar.DATE) - 1)
                 user.setCheckInTime(user.getCheckInTime() + 1);
-            if (user.getLastCheckInTime().get(Calendar.MONTH) < c.get(Calendar.MONTH)){
+            else if (user.getLastCheckInTime().get(Calendar.MONTH) < c.get(Calendar.MONTH)){
                 user.setCheckInTime(user.getCheckInTime() + 1);
             }
             else

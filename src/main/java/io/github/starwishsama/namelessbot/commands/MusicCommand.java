@@ -20,7 +20,7 @@ public class MusicCommand implements EverywhereCommand {
 
     @Override
     public String run(EventMessage e, User user, String msg, ArrayList<String> args){
-        if (!BotUtils.isCoolDown(user.getId())) {
+        if (BotUtils.isCoolDown(user.getId())) {
             if (args.size() > 1) {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 1; i < args.size(); i++) {

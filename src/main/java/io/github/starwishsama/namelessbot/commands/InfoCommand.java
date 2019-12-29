@@ -1,28 +1,35 @@
 package io.github.starwishsama.namelessbot.commands;
 
 import cc.moecraft.icq.command.CommandProperties;
-import cc.moecraft.icq.command.interfaces.GroupCommand;
-import cc.moecraft.icq.event.events.message.EventGroupMessage;
-import cc.moecraft.icq.user.Group;
-import cc.moecraft.icq.user.GroupUser;
+import cc.moecraft.icq.command.interfaces.EverywhereCommand;
+import cc.moecraft.icq.event.events.message.EventMessage;
 
+import cc.moecraft.icq.user.User;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-public class InfoCommand implements GroupCommand {
+public class InfoCommand implements EverywhereCommand {
     @Override
     public CommandProperties properties(){
         return new CommandProperties("info", "查询", "查", "cx");
     }
 
     @Override
-    public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String command, ArrayList<String> args) {
-        if (BotUtils.getUser(sender.getId()) != null){
+    public String run(EventMessage event, User sender, String command, ArrayList<String> args) {
+        if (BotUtils.isUserExist(sender.getId())){
             BotUser user = BotUtils.getUser(sender.getId());
-            return String.valueOf(user.getCheckInPoint());
-        } else
-            return BotUtils.getLocalMessage("msg.bot-prefix") + BotUtils.getLocalMessage("checkin.first-time");
+            String reply;
+            reply = "[CQ:at,qq=" + sender.getId() + "]\n积分: " + String.format("%.1f", user.getCheckInPoint())
+                    + "\n累计连续签到了 " + user.getCheckInTime() + " 天"
+                    + "\n上次签到于: " + new SimpleDateFormat("yyyy-MM-dd").format(user.getLastCheckInTime().getTime());
+            if (user.getBindServerAccount() != null) {
+                reply = reply + "绑定的游戏账号是: " + user.getBindServerAccount();
+            }
+            return reply;
+        }
+        return BotUtils.getLocalMessage("msg.bot-prefix") + "你还没有签到过哦, 使用 /qd 签到一下吧~";
     }
 }

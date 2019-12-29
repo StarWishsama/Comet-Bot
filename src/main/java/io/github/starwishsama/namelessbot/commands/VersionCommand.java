@@ -15,12 +15,12 @@ public class VersionCommand implements EverywhereCommand {
 
     @Override
     public CommandProperties properties(){
-        return new CommandProperties("v", "version", "版本");
+        return new CommandProperties("version", "v", "版本");
     }
 
     @Override
     public String run(EventMessage event, User sender, String cmd, ArrayList<String> args){
-        if (!BotUtils.isCoolDown(sender.getId())) {
+        if (BotUtils.isCoolDown(sender.getId())) {
             RStatus status = event.getHttpApi().getStatus().getData();
             return new MessageBuilder()
                     .add("无名Bot v0.1.3-DEV-191228").newLine()

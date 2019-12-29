@@ -6,6 +6,7 @@ import cc.moecraft.icq.event.events.message.EventGroupMessage;
 
 import cc.moecraft.icq.sender.message.MessageBuilder;
 import cc.moecraft.icq.sender.message.components.ComponentAt;
+
 import io.github.starwishsama.namelessbot.config.FileSetup;
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.objects.BotUser;
@@ -15,8 +16,8 @@ import java.util.Collection;
 
 public class SpamListener extends IcqListener {
     @EventHandler
-    public void onGroupChat(EventGroupMessage e){
-        if (FileSetup.cfg.isAntiSpam()) {
+    public void onGroupChat(EventGroupMessage e) {
+        if (BotConstants.cfg.isAntiSpam()) {
             Long id = e.getSenderId();
             if (System.currentTimeMillis() - e.getGroupUser(id).getInfo().getLastSentTime() < 3000) {
                 Collection<BotUser> users = BotConstants.users;
@@ -30,7 +31,7 @@ public class SpamListener extends IcqListener {
                         if (user.getMsgVL() != 5) {
                             user.setMsgVL(user.getMsgVL() + 1);
                         } else {
-                            e.ban(FileSetup.cfg.getSpamMuteTime());
+                            e.ban(BotConstants.cfg.getSpamMuteTime());
                             e.getHttpApi().sendGroupMsg(e.getGroupId(), BotUtils.getLocalMessage("msg.bot-prefix")
                                     + new MessageBuilder().add(new ComponentAt(id)).toString()
                                     + " 因为刷屏被禁言");

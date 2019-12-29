@@ -17,8 +17,8 @@ public class Config {
     private int rconPort;
     private byte[] rconPwd;
     private String netEaseApi;
-    private String[] cmdPrefix = new String[]{"/", "#"};
+    private String[] cmdPrefix = new String[]{"/", "#", "!"};
     private boolean bindMCAccount = false;
-    private boolean antiSpam = true;
+    private boolean antiSpam = false;
     private int spamMuteTime = 60;
 }

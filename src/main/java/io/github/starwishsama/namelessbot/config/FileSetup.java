@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.objects.BotLocalization;
+import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.objects.Config;
 import io.github.starwishsama.namelessbot.objects.ShopItem;
 import io.github.starwishsama.namelessbot.utils.FileProcess;
@@ -20,10 +21,10 @@ import java.util.List;
 
 import static io.github.starwishsama.namelessbot.BotConstants.shopItems;
 import static io.github.starwishsama.namelessbot.BotConstants.users;
+import static io.github.starwishsama.namelessbot.BotConstants.cfg;
+import static io.github.starwishsama.namelessbot.BotConstants.msg;
 
 public class FileSetup {
-    public static Config cfg = new Config();
-
     private static File userCfg = new File(BotMain.getJarPath() + "/users.json");
     private static File shopItemCfg = new File(BotMain.getJarPath() + "/items.json");
     private static File cfgFile = new File(BotMain.getJarPath() + "/config.json");
@@ -81,7 +82,7 @@ public class FileSetup {
             JsonElement configParser = new JsonParser().parse(FileProcess.readFile(cfgFile.toString()));
             if (!checkInParser.isJsonNull() && !configParser.isJsonNull()){
                 cfg = gson.fromJson(FileProcess.readFile(cfgFile.toString()), Config.class);
-                users = gson.fromJson(FileProcess.readFile(userCfg.toString()), new TypeToken<Collection<ShopItem>>(){}.getType());
+                users = gson.fromJson(FileProcess.readFile(userCfg.toString()), new TypeToken<Collection<BotUser>>(){}.getType());
                 shopItems = gson.fromJson(FileProcess.readFile(shopItemCfg.toString()), new TypeToken<Collection<ShopItem>>(){}.getType());
             } else {
                 System.err.println("[配置] 在加载配置文件时发生了问题, JSON 文件为空.");
@@ -93,16 +94,16 @@ public class FileSetup {
 
     public static void loadLang(){
         if (!langCfg.exists()){
-            BotConstants.msg.add(new BotLocalization("msg.bot-prefix", "Bot > "));
-            BotConstants.msg.add(new BotLocalization("msg.no-permission", "你没有权限"));
-            BotConstants.msg.add(new BotLocalization("msg.bind-success", "绑定账号 %s 成功!"));
-            BotConstants.msg.add(new BotLocalization("checkin.first-time", "你还没有签到过, 先用 /qd 签到一次吧~"));
-            FileProcess.createFile(langCfg.toString(), gson.toJson(BotConstants.msg));
+            msg.add(new BotLocalization("msg.bot-prefix", "Bot > "));
+            msg.add(new BotLocalization("msg.no-permission", "你没有权限"));
+            msg.add(new BotLocalization("msg.bind-success", "绑定账号 %s 成功!"));
+            msg.add(new BotLocalization("checkin.first-time", "你还没有签到过, 先用 /qd 签到一次吧~"));
+            FileProcess.createFile(langCfg.toString(), gson.toJson(msg));
         } else {
             try {
                 JsonElement lang = new JsonParser().parse(FileProcess.readFile(langCfg.toString()));
                 if (!lang.isJsonNull()) {
-                    BotConstants.msg = gson.fromJson(FileProcess.readFile(langCfg.toString()), new TypeToken<List<BotLocalization>>(){}.getType());
+                    msg = gson.fromJson(FileProcess.readFile(langCfg.toString()), new TypeToken<List<BotLocalization>>(){}.getType());
                 } else
                     System.err.println("[配置] 在读取时发生了问题, JSON 文件为空");
             } catch (IOException e) {
@@ -112,6 +113,6 @@ public class FileSetup {
     }
 
     public static void saveLang(){
-        FileProcess.createFile(langCfg.toString(), gson.toJson(BotConstants.msg));
+        FileProcess.createFile(langCfg.toString(), gson.toJson(msg));
     }
 }

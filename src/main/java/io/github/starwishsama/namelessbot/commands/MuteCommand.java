@@ -3,6 +3,8 @@ package io.github.starwishsama.namelessbot.commands;
 import cc.moecraft.icq.command.CommandProperties;
 import cc.moecraft.icq.command.interfaces.GroupCommand;
 import cc.moecraft.icq.event.events.message.EventGroupMessage;
+import cc.moecraft.icq.sender.returndata.RawReturnData;
+import cc.moecraft.icq.sender.returndata.ReturnStatus;
 import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
 
@@ -23,13 +25,13 @@ public class MuteCommand implements GroupCommand {
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String msg, ArrayList<String> args){
         String reply = null;
         if (sender.isAdmin()){
-            if (!event.isAdmin()) {
+            if (event.isAdmin()) {
                 if (args.size() > 0) {
                     try {
                         long banQQ = StringUtils.isNumeric(args.get(0)) ? Integer.parseInt(args.get(0)) : CC.getAt(args.get(0));
                         if (banQQ != -1000) {
                             long banTime = 0; // 此处单位为秒
-                            if (args.get(1).equals(""))
+                            if (args.size() == 1)
                                 banTime = 10 * 60;
                             else {
                                 String tempTime = args.get(1);
@@ -46,11 +48,12 @@ public class MuteCommand implements GroupCommand {
                                 if (tempTime.indexOf('m') != -1)
                                     banTime += Integer.parseInt(tempTime.substring(0, tempTime.indexOf('m'))) * 60;
                             }
-                            if (banTime < 1)
+                            if (banTime < 0)
                                 throw new NumberFormatException("Equal or less than 0");
                             if (banTime <= 30 * 24 * 60 * 60) {
-                                event.getHttpApi().setGroupBan(group.getId(), banQQ, banTime);
-                                reply = BotUtils.getLocalMessage("msg.bot-prefix") + "已禁言 " + event.getGroupUser(banQQ).getInfo().getNickname() + "(" + banQQ + ") " + banTime / 60 + "分钟.";
+                                RawReturnData result = event.getHttpApi().setGroupBan(group.getId(), banQQ, banTime);
+                                if (result.getStatus().equals(ReturnStatus.failed))
+                                    reply = BotUtils.getLocalMessage("msg.bot-prefix") + "禁言失败";
                             } else
                                 reply = BotUtils.getLocalMessage("msg.bot-prefix") + "时间长度太大了！";
                         } else
@@ -63,7 +66,7 @@ public class MuteCommand implements GroupCommand {
             } else
                 reply = BotUtils.getLocalMessage("msg.bot-prefix") + "机器人不是管理员!";
         } else {
-            if (!BotUtils.isCoolDown(sender.getId())) {
+            if (BotUtils.isCoolDown(sender.getId())) {
                 reply = BotUtils.getLocalMessage("msg.bot-prefix") + "你没有权限!";
             }
         }

@@ -2,6 +2,7 @@ package io.github.starwishsama.namelessbot.utils;
 
 import com.deadmandungeons.serverstatus.MinecraftServerStatus;
 import com.deadmandungeons.serverstatus.ping.PingResponse;
+
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.objects.BotLocalization;
@@ -129,14 +130,15 @@ public class BotUtils {
      */
 
     public static boolean isCoolDown(long qq){
+        long currentTime = System.currentTimeMillis();
         if (coolDown.containsKey(qq)){
-            if (new Date().getTime() - coolDown.get(qq) < 10 * 1000){
-                return true;
+            if (currentTime - coolDown.get(qq) < 10 * 1000){
+                return false;
             } else
                 coolDown.remove(qq);
         } else
-            BotUtils.coolDown.put(qq, new Date().getTime());
-        return false;
+            BotUtils.coolDown.put(qq, currentTime);
+        return true;
     }
 
     /**
@@ -160,7 +162,8 @@ public class BotUtils {
                 if (user.getUserQQ() == qq)
                     return user;
             }
-        }
+        } else
+            BotMain.getLogger().warning("在获取 QQ 号为 " + qq + " 的签到数据时出现了问题: 用户不存在");
         return null;
     }
 
@@ -175,5 +178,9 @@ public class BotUtils {
             BotMain.getLogger().warning("无法获取本地化文本, 文本节点为: " + node);
         }
         return null;
+    }
+
+    public static boolean isUserExist(long qq) {
+        return getUser(qq) != null;
     }
 }

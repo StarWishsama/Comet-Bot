@@ -49,6 +49,7 @@ public class BotMain {
     };
 
     private static IcqListener[] listeners = new IcqListener[]{
+            new ExceptionListener(),
             new SpamListener()
     };
 
@@ -67,7 +68,7 @@ public class BotMain {
                 FileSetup.saveCfg();
                 FileSetup.saveLang();
                 BotMain.getLogger().log("[Bot] 自动保存数据完成");
-            }, 0, FileSetup.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
+            }, 0, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
 
             /**
              * @TODO: RSS Push
@@ -75,9 +76,9 @@ public class BotMain {
             }, 0, 15, TimeUnit.MINUTES);
              */
 
-            if (FileSetup.cfg.getRconPwd() != null && FileSetup.cfg.getRconPort() != 0) {
+            if (BotConstants.cfg.getRconPwd() != null && BotConstants.cfg.getRconPort() != 0) {
                 try {
-                    rcon = new Rcon(FileSetup.cfg.getRconUrl(), FileSetup.cfg.getRconPort(), FileSetup.cfg.getRconPwd());
+                    rcon = new Rcon(BotConstants.cfg.getRconUrl(), BotConstants.cfg.getRconPort(), BotConstants.cfg.getRconPwd());
                     logger.log("[RCON] 已连接至服务器");
                 } catch (IOException e) {
                     logger.warning("[RCON] 连接至服务器时发生了错误, 错误信息: " + e);
@@ -90,7 +91,7 @@ public class BotMain {
             switch (line[0]){
                 case "setowner":
                     if (line.length > 1) {
-                        FileSetup.cfg.setOwnerID(Long.parseLong(line[1]));
+                        BotConstants.cfg.setOwnerID(Long.parseLong(line[1]));
                         logger.log("已设置 Bot 的所有者账号为 " + line[1]);
                     }
                     break;
@@ -131,18 +132,17 @@ public class BotMain {
             e.printStackTrace();
         }
 
-        PicqConfig cfg = new PicqConfig(FileSetup.cfg.getBotPort()).setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT);
+        PicqConfig cfg = new PicqConfig(BotConstants.cfg.getBotPort()).setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT);
         PicqBotX bot = new PicqBotX(cfg);
-        cfg.setDebug(true);
         logger = bot.getLogger();
         bot.setUniversalHyExpSupport(true);
-        bot.addAccount(FileSetup.cfg.getBotName(), FileSetup.cfg.getPostUrl(), FileSetup.cfg.getPostPort());
+        bot.addAccount(BotConstants.cfg.getBotName(), BotConstants.cfg.getPostUrl(), BotConstants.cfg.getPostPort());
         if (bot.getAccountManager().getAccounts().size() != 0)
             api = bot.getAccountManager().getAccounts().get(0).getHttpApi();
-        bot.enableCommandManager(FileSetup.cfg.getCmdPrefix());
+        bot.enableCommandManager(BotConstants.cfg.getCmdPrefix());
         bot.getCommandManager().registerCommands(commands);
         bot.getEventManager().registerListeners(listeners);
         bot.startBot();
-        logger.log("启动完成! 机器人运行在端口 " + FileSetup.cfg.getBotPort() + " 上.");
+        logger.log("启动完成! 机器人运行在端口 " + BotConstants.cfg.getBotPort() + " 上.");
     }
 }
