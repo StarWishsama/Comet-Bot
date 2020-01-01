@@ -7,6 +7,7 @@ import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.objects.BotLocalization;
 import io.github.starwishsama.namelessbot.objects.BotUser;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -132,7 +133,7 @@ public class BotUtils {
     public static boolean isNoCoolDown(long qq){
         long currentTime = System.currentTimeMillis();
         if (coolDown.containsKey(qq)){
-            if (currentTime - coolDown.get(qq) < 10 * 1000){
+            if (currentTime - coolDown.get(qq) < BotConstants.cfg.getCoolDownTime() * 1000){
                 return false;
             } else
                 coolDown.remove(qq);
@@ -182,5 +183,27 @@ public class BotUtils {
 
     public static boolean isUserExist(long qq) {
         return getUser(qq) != null;
+    }
+
+    public static boolean isBotOwner(long qq){
+        return BotConstants.cfg.getOwnerID() == qq;
+    }
+
+    /**
+     * 判断是否为 Emoji 表情
+     *
+     * @param text
+     * @return boolean
+     */
+    public static boolean isEmojiCharacter(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            char codePoint = text.charAt(i);
+            if (codePoint == 0x0 || codePoint == 0x9 || codePoint == 0xA
+                    || codePoint == 0xD || codePoint >= 0x20 && codePoint <= 0xD7FF
+                    || codePoint >= 0xE000 && codePoint <= 0xFFFD) {
+                return true;
+            }
+        }
+        return false;
     }
 }

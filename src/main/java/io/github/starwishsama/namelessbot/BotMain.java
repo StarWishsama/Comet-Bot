@@ -8,12 +8,10 @@ import cc.moecraft.icq.sender.IcqHttpApi;
 import cc.moecraft.logger.HyLogger;
 import cc.moecraft.logger.environments.ColorSupportLevel;
 
-import com.rometools.rome.feed.synd.SyndEntry;
 import io.github.starwishsama.namelessbot.commands.*;
 import io.github.starwishsama.namelessbot.config.*;
 import io.github.starwishsama.namelessbot.listeners.*;
 
-import io.github.starwishsama.namelessbot.objects.RssItem;
 import lombok.Getter;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
@@ -73,14 +71,15 @@ public class BotMain {
                 BotMain.getLogger().log("[Bot] 自动保存数据完成");
             }, 0, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
 
-            Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
+            /**
+             Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
                 SyndEntry entry = RssItem.getRSSItem("https://rsshub.app/kzfeed/topic/zE5QRX1Ok4vw7");
                 if (entry != null) {
                     if (!entry.getTitle().equals(previousFeed)) {
-                        getApi().sendGroupMsg(142928351, entry.getTitle() + "\n" + RssItem.simplifyHTML(entry.getContents().toString()));
+                        getApi().sendGroupMsg(group, entry.getTitle() + "\n" + RssItem.simplifyHTML(entry.getDescription().getValue().replace("", "").trim()));
                     }
                 }
-            }, 0, 12, TimeUnit.HOURS);
+            }, 0, 12, TimeUnit.HOURS);*/
 
             if (BotConstants.cfg.getRconPwd() != null && BotConstants.cfg.getRconPort() != 0) {
                 try {
@@ -140,6 +139,7 @@ public class BotMain {
 
         PicqConfig cfg = new PicqConfig(BotConstants.cfg.getBotPort())
                 .setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT)
+                .setLogFileName("Nameless-Bot-Log")
                 .setUseAsyncCommands(true);
         PicqBotX bot = new PicqBotX(cfg);
         logger = bot.getLogger();

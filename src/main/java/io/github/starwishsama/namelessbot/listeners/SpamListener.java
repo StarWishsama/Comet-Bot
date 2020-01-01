@@ -23,7 +23,7 @@ public class SpamListener extends IcqListener {
                     newUser.setMsgVL(1);
                     BotConstants.users.add(newUser);
                 } else {
-                    if (!e.isAdmin(id)) {
+                    //if (!e.isAdmin(id)) {
                         if (user.getMsgVL() != 5) {
                             user.setMsgVL(user.getMsgVL() + 1);
                             e.getHttpApi().sendGroupMsg(e.getGroupId(), BotUtils.getLocalMessage("msg.bot-prefix")
@@ -35,7 +35,7 @@ public class SpamListener extends IcqListener {
                                     + new MessageBuilder().add(new ComponentAt(id)).toString()
                                     + " 因为刷屏被禁言");
                         }
-                    }
+                    //}
                 }
             }
         }
