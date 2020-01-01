@@ -8,10 +8,12 @@ import cc.moecraft.icq.sender.IcqHttpApi;
 import cc.moecraft.logger.HyLogger;
 import cc.moecraft.logger.environments.ColorSupportLevel;
 
+import com.rometools.rome.feed.synd.SyndEntry;
 import io.github.starwishsama.namelessbot.commands.*;
 import io.github.starwishsama.namelessbot.config.*;
 import io.github.starwishsama.namelessbot.listeners.*;
 
+import io.github.starwishsama.namelessbot.objects.RssItem;
 import lombok.Getter;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
@@ -49,9 +51,10 @@ public class BotMain {
     };
 
     private static IcqListener[] listeners = new IcqListener[]{
-            new ExceptionListener(),
-            new SpamListener()
+            new ExceptionListener()
     };
+
+    private static String previousFeed = "No feed";
 
     public static void main(String[] args){
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
@@ -70,11 +73,14 @@ public class BotMain {
                 BotMain.getLogger().log("[Bot] 自动保存数据完成");
             }, 0, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
 
-            /**
-             * @TODO: RSS Push
             Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
-            }, 0, 15, TimeUnit.MINUTES);
-             */
+                SyndEntry entry = RssItem.getRSSItem("https://rsshub.app/kzfeed/topic/zE5QRX1Ok4vw7");
+                if (entry != null) {
+                    if (!entry.getTitle().equals(previousFeed)) {
+                        getApi().sendGroupMsg(142928351, entry.getTitle() + "\n" + RssItem.simplifyHTML(entry.getContents().toString()));
+                    }
+                }
+            }, 0, 12, TimeUnit.HOURS);
 
             if (BotConstants.cfg.getRconPwd() != null && BotConstants.cfg.getRconPort() != 0) {
                 try {
@@ -132,16 +138,21 @@ public class BotMain {
             e.printStackTrace();
         }
 
-        PicqConfig cfg = new PicqConfig(BotConstants.cfg.getBotPort()).setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT);
+        PicqConfig cfg = new PicqConfig(BotConstants.cfg.getBotPort())
+                .setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT)
+                .setUseAsyncCommands(true);
         PicqBotX bot = new PicqBotX(cfg);
         logger = bot.getLogger();
         bot.setUniversalHyExpSupport(true);
         bot.addAccount(BotConstants.cfg.getBotName(), BotConstants.cfg.getPostUrl(), BotConstants.cfg.getPostPort());
         if (bot.getAccountManager().getAccounts().size() != 0)
-            api = bot.getAccountManager().getAccounts().get(0).getHttpApi();
+            api = bot.getAccountManager().getNonAccountSpecifiedApi();
         bot.enableCommandManager(BotConstants.cfg.getCmdPrefix());
         bot.getCommandManager().registerCommands(commands);
         bot.getEventManager().registerListeners(listeners);
+        if (BotConstants.cfg.isAntiSpam()){
+            bot.getEventManager().registerListener(new SpamListener());
+        }
         bot.startBot();
         logger.log("启动完成! 机器人运行在端口 " + BotConstants.cfg.getBotPort() + " 上.");
     }

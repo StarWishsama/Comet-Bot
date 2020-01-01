@@ -1,5 +1,7 @@
 package io.github.starwishsama.namelessbot.config;
 
+import cn.hutool.core.io.file.FileReader;
+import cn.hutool.core.io.file.FileWriter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -11,10 +13,8 @@ import io.github.starwishsama.namelessbot.objects.BotLocalization;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.objects.Config;
 import io.github.starwishsama.namelessbot.objects.ShopItem;
-import io.github.starwishsama.namelessbot.utils.FileProcess;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,9 +52,9 @@ public class FileSetup {
                     cfg.setCmdPrefix(new String[]{"/", "#"});
                     cfg.setBindMCAccount(false);
 
-                    FileProcess.createFile(cfgFile.toString(), gson.toJson(cfg));
-                    FileProcess.createFile(userCfg.toString(), gson.toJson(users));
-                    FileProcess.createFile(shopItemCfg.toString(), gson.toJson(shopItems));
+                    FileWriter.create(cfgFile).write(gson.toJson(cfg));
+                    FileWriter.create(userCfg).write(gson.toJson(users));
+                    FileWriter.create(shopItemCfg).write(gson.toJson(shopItems));
 
                     load();
                     System.out.println("[配置] 已自动生成新的配置文件.");
@@ -67,9 +67,9 @@ public class FileSetup {
 
     public static void saveCfg(){
         try {
-            FileProcess.createFile(userCfg.toString(), gson.toJson(users));
-            FileProcess.createFile(shopItemCfg.toString(), gson.toJson(shopItems));
-            FileProcess.createFile(cfgFile.toString(), gson.toJson(cfg));
+            FileWriter.create(cfgFile).write(gson.toJson(cfg));
+            FileWriter.create(userCfg).write(gson.toJson(users));
+            FileWriter.create(shopItemCfg).write(gson.toJson(shopItems));
         } catch (Exception e){
             System.err.println("[配置] 在保存配置文件时发生了问题, 错误信息: ");
             e.printStackTrace();
@@ -78,12 +78,15 @@ public class FileSetup {
 
     private static void load(){
         try {
-            JsonElement checkInParser = new JsonParser().parse(FileProcess.readFile(userCfg.toString()));
-            JsonElement configParser = new JsonParser().parse(FileProcess.readFile(cfgFile.toString()));
+            String userContent = FileReader.create(userCfg).readString();
+            String configContent = FileReader.create(cfgFile).readString();
+
+            JsonElement checkInParser = new JsonParser().parse(userContent);
+            JsonElement configParser = new JsonParser().parse(configContent);
             if (!checkInParser.isJsonNull() && !configParser.isJsonNull()){
-                cfg = gson.fromJson(FileProcess.readFile(cfgFile.toString()), Config.class);
-                users = gson.fromJson(FileProcess.readFile(userCfg.toString()), new TypeToken<Collection<BotUser>>(){}.getType());
-                shopItems = gson.fromJson(FileProcess.readFile(shopItemCfg.toString()), new TypeToken<Collection<ShopItem>>(){}.getType());
+                cfg = gson.fromJson(configContent, Config.class);
+                users = gson.fromJson(userContent, new TypeToken<Collection<BotUser>>(){}.getType());
+                shopItems = gson.fromJson(FileReader.create(shopItemCfg).readString(), new TypeToken<Collection<ShopItem>>(){}.getType());
             } else {
                 System.err.println("[配置] 在加载配置文件时发生了问题, JSON 文件为空.");
             }
@@ -98,21 +101,17 @@ public class FileSetup {
             msg.add(new BotLocalization("msg.no-permission", "你没有权限"));
             msg.add(new BotLocalization("msg.bind-success", "绑定账号 %s 成功!"));
             msg.add(new BotLocalization("checkin.first-time", "你还没有签到过, 先用 /qd 签到一次吧~"));
-            FileProcess.createFile(langCfg.toString(), gson.toJson(msg));
+            FileWriter.create(langCfg).write(gson.toJson(msg));
         } else {
-            try {
-                JsonElement lang = new JsonParser().parse(FileProcess.readFile(langCfg.toString()));
-                if (!lang.isJsonNull()) {
-                    msg = gson.fromJson(FileProcess.readFile(langCfg.toString()), new TypeToken<List<BotLocalization>>(){}.getType());
-                } else
-                    System.err.println("[配置] 在读取时发生了问题, JSON 文件为空");
-            } catch (IOException e) {
-                System.err.println("[配置] 在读取时发生了问题, 错误信息: " + e);
-            }
+            JsonElement lang = new JsonParser().parse(FileReader.create(langCfg).readString());
+            if (!lang.isJsonNull()) {
+                msg = gson.fromJson(FileReader.create(langCfg).readString(), new TypeToken<List<BotLocalization>>(){}.getType());
+            } else
+                System.err.println("[配置] 在读取时发生了问题, JSON 文件为空");
         }
     }
 
     public static void saveLang(){
-        FileProcess.createFile(langCfg.toString(), gson.toJson(msg));
+        FileWriter.create(langCfg).write(gson.toJson(msg));
     }
 }

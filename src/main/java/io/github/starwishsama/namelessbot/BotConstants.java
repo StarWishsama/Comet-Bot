@@ -5,10 +5,7 @@ import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.objects.Config;
 import io.github.starwishsama.namelessbot.objects.ShopItem;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class BotConstants {
     public static Collection<ShopItem> shopItems = new HashSet<>();

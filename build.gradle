@@ -19,11 +19,6 @@ version '0.1.4-DEV-191229'
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
 
-jar {
-    baseName = 'NamelessBot'
-    version = '0.1.4-DEV-191229'
-}
-
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }

@@ -4,7 +4,6 @@ import cc.moecraft.icq.command.CommandProperties;
 import cc.moecraft.icq.command.interfaces.GroupCommand;
 import cc.moecraft.icq.event.events.message.EventGroupMessage;
 
-import cc.moecraft.icq.sender.returndata.RawReturnData;
 import cc.moecraft.icq.sender.returndata.ReturnStatus;
 import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
@@ -13,7 +12,6 @@ import io.github.starwishsama.namelessbot.utils.BotUtils;
 import org.apache.commons.lang3.StringUtils;
 import taskeren.extrabot.components.ExComponent;
 import taskeren.extrabot.components.ExComponentAt;
-import taskeren.extrabot.components.ExComponentString;
 
 
 import java.util.ArrayList;
@@ -64,8 +62,7 @@ public class MuteCommand implements GroupCommand {
                             if (banTime < 0)
                                 throw new NumberFormatException("Equal or less than 0");
                             if (banTime <= 30 * 24 * 60 * 60) {
-                                RawReturnData result = event.getHttpApi().setGroupBan(group.getId(), banQQ, banTime);
-                                if (result.getStatus().equals(ReturnStatus.failed))
+                                if (event.getHttpApi().setGroupBan(group.getId(), banQQ, banTime).getStatus().equals(ReturnStatus.failed))
                                     reply = BotUtils.getLocalMessage("msg.bot-prefix") + "禁言失败";
                             } else
                                 reply = BotUtils.getLocalMessage("msg.bot-prefix") + "时间长度太大了！";

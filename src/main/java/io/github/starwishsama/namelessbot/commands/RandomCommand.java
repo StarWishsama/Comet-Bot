@@ -25,22 +25,25 @@ public class RandomCommand implements EverywhereCommand {
                     sb.append(arg).append(" ");
                 }
                 String randomEventName = sb.toString().trim();
-                int i = new Random().nextInt(245);
-                EventRate rate = getRate(i);
-                switch (rate) {
-                    case HIGHEST:
-                        return "结果是" + EventRate.HIGHEST.event + " (" + i + "/255), 今天非常适合" + randomEventName + "哦!";
-                    case HIGH:
-                        return "结果是" + EventRate.HIGH.event + " (" + i + "/255), 今天很适合" + randomEventName + "哦!";
-                    case NORMAL:
-                        return "结果是" + EventRate.NORMAL.event + " (" + i + "/255), 今天适合" + randomEventName + "哦!";
-                    case LOW:
-                        return "结果是" + EventRate.LOW.event + " (" + i + "/255), 今天不太适合" + randomEventName + "...";
-                    case LOWEST:
-                        return "结果是" + EventRate.LOWEST.event + " (" + i + "/255), 今天最好不要" + randomEventName + "了...";
-                    case NEVER:
-                        return "结果是" + EventRate.NEVER.event + " (" + i + "/255), 千万别" + randomEventName + "!";
-                }
+                if (randomEventName.length() < 32) {
+                    int i = new Random().nextInt(255);
+                    EventRate rate = getRate(i);
+                    switch (rate) {
+                        case HIGHEST:
+                            return "结果是" + EventRate.HIGHEST.event + " (" + i + "/255), 今天非常适合" + randomEventName + "哦!";
+                        case HIGH:
+                            return "结果是" + EventRate.HIGH.event + " (" + i + "/255), 今天很适合" + randomEventName + "哦!";
+                        case NORMAL:
+                            return "结果是" + EventRate.NORMAL.event + " (" + i + "/255), 今天适合" + randomEventName + "哦!";
+                        case LOW:
+                            return "结果是" + EventRate.LOW.event + " (" + i + "/255), 今天不太适合" + randomEventName + "...";
+                        case LOWEST:
+                            return "结果是" + EventRate.LOWEST.event + " (" + i + "/255), 今天最好不要" + randomEventName + "了...";
+                        case NEVER:
+                            return "结果是" + EventRate.NEVER.event + " (" + i + "/255), 千万别" + randomEventName + "!";
+                    }
+                } else
+                    return BotUtils.getLocalMessage("msg.bot-prefix") + "需要占卜的东西太长了!";
             }
         }
         return null;
@@ -63,15 +66,15 @@ public class RandomCommand implements EverywhereCommand {
     }
 
     private EventRate getRate(int chance){
-        if (chance > 200 && chance <= 245){
+        if (chance > 200 && chance <= 255){
             return EventRate.HIGHEST;
-        } else if (chance > 150 && chance <= 200){
+        } else if (chance > 140 && chance <= 200){
             return EventRate.HIGH;
-        } else if (chance > 80 && chance <= 150){
+        } else if (chance > 100 && chance <= 140){
             return EventRate.NORMAL;
-        } else if (chance > 40 && chance <= 80){
+        } else if (chance > 60 && chance <= 100){
             return EventRate.LOW;
-        } else if (chance > 20 && chance <= 40){
+        } else if (chance > 20 && chance <= 60){
             return EventRate.LOWEST;
         } else if (chance <= 20){
             return EventRate.NEVER;
