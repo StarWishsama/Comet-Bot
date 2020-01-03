@@ -7,6 +7,7 @@ import cc.moecraft.icq.sender.message.MessageBuilder;
 import cc.moecraft.icq.sender.returndata.returnpojo.get.RStatus;
 import cc.moecraft.icq.user.User;
 
+import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
@@ -23,7 +24,8 @@ public class VersionCommand implements EverywhereCommand {
         if (BotUtils.isNoCoolDown(sender.getId())) {
             RStatus status = event.getHttpApi().getStatus().getData();
             return new MessageBuilder()
-                    .add("无名Bot v0.1.4-DEV-191229").newLine()
+                    .add("无名Bot v0.1.5-DEV-200103").newLine()
+                    .add("已注册的命令数: " + BotMain.getCommands().length).newLine()
                     .add("运行状态: ").add(status.getGood() ? "√" : "X")
                     .toString();
         } else

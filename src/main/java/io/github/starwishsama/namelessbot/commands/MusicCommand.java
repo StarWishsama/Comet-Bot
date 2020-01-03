@@ -14,10 +14,15 @@ import io.github.starwishsama.namelessbot.utils.MusicID;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.util.ArrayList;
 
 public class MusicCommand implements EverywhereCommand {
+
+    public enum MusicType {
+        QQ,
+        NETEASE_MUSIC;
+    }
+
     @Override
     public CommandProperties properties(){
         return new CommandProperties("music", "点歌");
@@ -27,41 +32,53 @@ public class MusicCommand implements EverywhereCommand {
     public String run(EventMessage e, User user, String msg, ArrayList<String> args){
         if (BotUtils.isNoCoolDown(user.getId())) {
             if (args.size() > 1) {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 1; i < args.size(); i++) {
-                    sb.append(args.get(i)).append(" ");
-                }
-                if (args.get(0).equalsIgnoreCase("wy") || args.get(0).equalsIgnoreCase("网易")) {
-                    if (BotConstants.cfg.getNetEaseApi() != null) {
-                        boolean isAvailable = false;
-                        try {
-                            isAvailable = InetAddress.getByName(BotConstants.cfg.getNetEaseApi()).isReachable(1000);
-                        } catch (IOException ex){
-                            BotMain.getLogger().warning("在获取网易云音乐时发生了一个问题: " + ex.getMessage());
+                if (args.get(0).equalsIgnoreCase("set") || args.get(0).equalsIgnoreCase("设置")) {
+                    if (args.size() == 2) {
+                        switch (args.get(1).toLowerCase()) {
+                            case "网易":
+                            case "wy":
+                            case "netease":
+                                BotConstants.cfg.setApi(MusicType.NETEASE_MUSIC);
+                                break;
+                            case "qq":
+                                BotConstants.cfg.setApi(MusicType.QQ);
+                                break;
                         }
-
-                        if (isAvailable) {
-                            if (MusicID.getNetEaseSongID(sb.toString().trim()) > -1)
-                                return new MessageBuilder().add(new ComponentMusic(MusicID.getNetEaseSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.netease)).toString();
-                            else
-                                return BotUtils.getLocalMessage("msg.bot-prefix") + "找不到歌曲 " + sb.toString().trim();
-                        } else
-                            return BotUtils.getLocalMessage("msg.bot-prefix") + "无法连接至网易云音乐 API";
                     } else
-                        return BotUtils.getLocalMessage("msg.bot-prefix") + "网易云 API 地址还没有设置";
+                        return BotUtils.getLocalMessage("msg.bot-prefix") + "/music set [音乐API]";
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    for (String arg : args) {
+                        sb.append(arg).append(" ");
+                    }
+                    if (BotConstants.cfg.getApi().equals(MusicType.NETEASE_MUSIC)) {
+                        if (BotConstants.cfg.getNetEaseApi() != null) {
+                            boolean isAvailable = false;
+                            try {
+                                isAvailable = InetAddress.getByName(BotConstants.cfg.getNetEaseApi()).isReachable(1000);
+                            } catch (IOException ex) {
+                                BotMain.getLogger().warning("在获取网易云音乐时发生了一个问题: " + ex.getMessage());
+                            }
+
+                            if (isAvailable) {
+                                if (MusicID.getNetEaseSongID(sb.toString().trim()) > -1)
+                                    return new MessageBuilder().add(new ComponentMusic(MusicID.getNetEaseSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.netease)).toString();
+                                else
+                                    return BotUtils.getLocalMessage("msg.bot-prefix") + "找不到歌曲 " + sb.toString().trim();
+                            } else
+                                return BotUtils.getLocalMessage("msg.bot-prefix") + "无法连接至网易云音乐 API";
+                        } else
+                            return BotUtils.getLocalMessage("msg.bot-prefix") + "网易云 API 地址还没有设置";
+                    } else if (BotConstants.cfg.getApi().equals(MusicType.QQ)) {
+                        if (MusicID.getQQMusicSongID(sb.toString().trim()) > 0)
+                            return new MessageBuilder().add(new ComponentMusic(MusicID.getQQMusicSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.qq)).toString();
+                        else
+                            return BotUtils.getLocalMessage("msg.bot-prefix") + "找不到歌曲 " + sb.toString().trim();
+                    } else
+                        return BotUtils.getLocalMessage("msg.bot-prefix") + "用法: /点歌 [网易/QQ] [歌名]";
                 }
-                else if (args.get(0).equalsIgnoreCase("qq")) {
-                    if (MusicID.getQQMusicSongID(sb.toString().trim()) > 0)
-                        return new MessageBuilder().add(new ComponentMusic(MusicID.getQQMusicSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.qq)).toString();
-                    else
-                        return BotUtils.getLocalMessage("msg.bot-prefix") + "找不到歌曲 " + sb.toString().trim();
-                }
-                else
-                    return BotUtils.getLocalMessage("msg.bot-prefix") + "用法: /点歌 [网易/QQ] [歌名]";
-            } else
-                return BotUtils.getLocalMessage("msg.bot-prefix") + "用法: /点歌 [网易/QQ] [歌名]";
+            }
         }
-        else
-            return null;
+        return null;
     }
 }

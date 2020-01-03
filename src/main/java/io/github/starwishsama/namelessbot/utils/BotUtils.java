@@ -150,7 +150,7 @@ public class BotUtils {
      * @return true / false
      */
     public static boolean isLegitID(String id){
-        return id.matches("[a-zA-Z0-9_]*");
+        return id.matches("[a-zA-Z0-9_.-]*");
     }
 
     public static UUID generateUUID(){

@@ -23,16 +23,19 @@ public class RConGroupCommand implements GroupCommand {
         long fromQQ = sender.getId();
         if (BotUtils.isNoCoolDown(fromQQ)) {
             if (BotConstants.cfg.getBotAdmins().contains(fromQQ) || BotConstants.cfg.getOwnerID() == fromQQ) {
-                try {
-                    StringBuilder sb = new StringBuilder();
-                    for (String arg : args) {
-                        sb.append(arg).append(" ");
+                if (BotMain.getRcon() != null) {
+                    try {
+                        StringBuilder sb = new StringBuilder();
+                        for (String arg : args) {
+                            sb.append(arg).append(" ");
+                        }
+                        String result = BotMain.getRcon().command(sb.toString().trim());
+                        return BotUtils.getLocalMessage("msg.bot-prefix") + result;
+                    } catch (Exception e) {
+                        return BotUtils.getLocalMessage("msg.bot-prefix") + "在连接至服务器时发生了错误, 错误信息: " + e.getMessage();
                     }
-                    String result = BotMain.getRcon().command(sb.toString().trim());
-                    return BotUtils.getLocalMessage("msg.bot-prefix") + result;
-                } catch (Exception e) {
-                    return BotUtils.getLocalMessage("msg.bot-prefix") + "在连接至服务器时发生了错误, 错误信息: " + e.getMessage();
-                }
+                } else
+                    return BotUtils.getLocalMessage("msg.bot-prefix") + "RCON 未启用";
             } else {
                 return BotUtils.getLocalMessage("msg.bot-prefix") + BotUtils.getLocalMessage("msg.no-permission");
             }

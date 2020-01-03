@@ -34,6 +34,7 @@ public class BotMain {
     private static Rcon rcon;
     @Getter
     private static IcqCommand[] commands = new IcqCommand[]{
+            new AdminCommand(),
             new BindCommand(),
             new CheckInCommand(),
             new DebugCommand(),
@@ -41,6 +42,7 @@ public class BotMain {
             new InfoCommand(),
             new MusicCommand(),
             new MuteCommand(),
+            new R6SCommand(),
             new RandomCommand(),
             new RConGroupCommand(),
             new RefreshCacheCommand(),

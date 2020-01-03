@@ -1,6 +1,7 @@
 package io.github.starwishsama.namelessbot.objects;
 
 import com.google.gson.annotations.SerializedName;
+import io.github.starwishsama.namelessbot.commands.MusicCommand;
 import lombok.Data;
 
 import java.util.List;
@@ -41,4 +42,6 @@ public class Config {
     private int coolDownTime = 15;
     @SerializedName("filter_words")
     private List<String> filterWords;
+    @SerializedName("default_music_api")
+    private MusicCommand.MusicType api = MusicCommand.MusicType.QQ;
 }
