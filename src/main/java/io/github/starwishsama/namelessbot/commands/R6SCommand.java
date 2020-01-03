@@ -28,8 +28,8 @@ public class R6SCommand implements EverywhereCommand {
             if (!args.get(0).isEmpty() && BotUtils.isLegitID(args.get(0))){
                 Player p = R6SUtils.getR6SInfo(args.get(0));
                 if (p != null) {
-                    String reply = "===   R6S 战绩查询   ===" + p.getName() + " [" + p.getLevel() + "]级" +
-                            "\n目前段位: " + p.getCurrentRank() + "(" + p.getCurrentMmr() + "/" + p.getMaxMmr() + ")" +
+                    String reply = "===   R6S 战绩查询   ===\n" + p.getName() + " [" + p.getLevel() + "]级" +
+                            "\n目前段位: " + p.getCurrentRank().getName() + "(" + p.getCurrentMmr() + "/" + p.getMaxMmr() + ")" +
                             "\nKD: " + p.getKd() +
                             "\n爆头率: " + p.getHeadshotAccuraccy();
 
@@ -42,10 +42,11 @@ public class R6SCommand implements EverywhereCommand {
             if (!args.get(0).isEmpty() || BotUtils.isLegitID(args.get(0)) || !args.get(1).isEmpty()){
                 Player p = R6SUtils.getR6SInfo(args.get(0), args.get(1));
                 if (p != null) {
-                    String reply = "===   R6S 战绩查询   ===" + p.getName() + " [" + p.getLevel() + "级]" +
-                            "\n目前段位: " + p.getCurrentRank() + "(" + p.getCurrentMmr() + "/" + p.getMaxMmr() + ")" +
+                    String reply = "===   R6S 战绩查询   ===\n" + p.getName() + " [" + p.getLevel() + "]级" +
+                            "\n目前段位: " + p.getCurrentRank().getName() + "(" + p.getCurrentMmr() + "/" + p.getMaxMmr() + ")" +
                             "\nKD: " + p.getKd() +
                             "\n爆头率: " + p.getHeadshotAccuraccy();
+
                     return new MessageBuilder().add(new ComponentAt(user.getId())).newLine()
                             .add(reply).toString();
                 }
