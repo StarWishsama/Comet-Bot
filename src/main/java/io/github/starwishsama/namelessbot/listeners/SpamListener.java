@@ -18,6 +18,7 @@ public class SpamListener extends IcqListener {
             Long id = e.getSenderId();
             if (System.currentTimeMillis() - e.getGroupUser(id).getInfo().getLastSentTime() < 3000) {
                 BotUser user = BotUtils.getUser(id);
+                e.respond("test");
                 if (user == null) {
                     BotUser newUser = new BotUser(id);
                     newUser.setMsgVL(1);

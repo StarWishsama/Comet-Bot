@@ -189,6 +189,16 @@ public class BotUtils {
         return BotConstants.cfg.getOwnerID() == qq;
     }
 
+    public static boolean isBotAdmin(long qq){
+        if (BotConstants.cfg.getBotAdmins() != null){
+            for (long v: BotConstants.cfg.getBotAdmins()){
+                if (v == qq)
+                    return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * 判断是否为 Emoji 表情
      *

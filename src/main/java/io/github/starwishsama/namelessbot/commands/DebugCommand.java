@@ -20,13 +20,13 @@ public class DebugCommand implements GroupCommand {
 
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String cmd, ArrayList<String> args){
-        switch (args.get(0)) {
-            case "reload":
-                FileSetup.loadCfg();
-                FileSetup.loadLang();
-                return BotUtils.getLocalMessage("msg.bot-prefix") + " 已重载配置文件";
-            case "unbind":
-                if (sender.isAdmin()) {
+        if (BotUtils.isBotOwner(sender.getId()) || BotUtils.isBotAdmin(sender.getId())) {
+            switch (args.get(0)) {
+                case "reload":
+                    FileSetup.loadCfg();
+                    FileSetup.loadLang();
+                    return BotUtils.getLocalMessage("msg.bot-prefix") + " 已重载配置文件";
+                case "unbind":
                     BotUser user = BotUtils.getUser(sender.getId());
                     if (user != null) {
                         if (user.getBindServerAccount() != null) {
@@ -35,10 +35,10 @@ public class DebugCommand implements GroupCommand {
                         } else
                             return BotUtils.getLocalMessage("msg.bot-prefix") + "你还没绑定过账号";
                     }
-                }
-                break;
-            default:
-                return "Bot > 命令不存在";
+                    break;
+                default:
+                    return "Bot > 命令不存在";
+            }
         }
         return null;
     }

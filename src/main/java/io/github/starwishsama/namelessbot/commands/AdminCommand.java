@@ -34,7 +34,7 @@ public class AdminCommand implements BotGroupCommand {
                                             qq = -1;
                                     }
                                     if (qq != -1) {
-                                        if (BotConstants.cfg.getBotAdmins().contains(sender.getId())) {
+                                        if (BotUtils.isBotAdmin(sender.getId())) {
                                             BotConstants.cfg.getBotAdmins().remove(qq);
                                             return BotUtils.getLocalMessage("msg.bot-prefix") + "删除机器人管理员成功!";
                                         } else {

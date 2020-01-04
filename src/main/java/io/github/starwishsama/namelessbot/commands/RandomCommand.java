@@ -19,34 +19,32 @@ public class RandomCommand implements EverywhereCommand {
 
     @Override
     public String run(EventMessage event, User sender, String command, ArrayList<String> args) {
-        if (BotUtils.isNoCoolDown(sender.getId())) {
-            if (!args.isEmpty()) {
-                StringBuilder sb = new StringBuilder();
-                for (String arg : args) {
-                    sb.append(arg).append(" ");
-                }
-                String randomEventName = sb.toString().trim();
-                if (randomEventName.length() < 16 && BotUtils.isEmojiCharacter(randomEventName)) {
-                    double i = new Random().nextDouble();
-                    EventRate rate = getRate(i);
-                    double finalRate = Double.parseDouble(String.format("%.1f", i)) * 100;
-                    switch (rate) {
-                        case HIGHEST:
-                            return "结果是" + EventRate.HIGHEST.event + " (" + finalRate + "%), 今天非常适合" + randomEventName + "哦!";
-                        case HIGH:
-                            return "结果是" + EventRate.HIGH.event + " (" + finalRate + "%), 今天很适合" + randomEventName + "哦!";
-                        case NORMAL:
-                            return "结果是" + EventRate.NORMAL.event + " (" + finalRate + "%), 今天适合" + randomEventName + "哦!";
-                        case LOW:
-                            return "结果是" + EventRate.LOW.event + " (" + finalRate + "%), 今天不太适合" + randomEventName + "...";
-                        case LOWEST:
-                            return "结果是" + EventRate.LOWEST.event + " (" + finalRate + "%), 今天最好不要" + randomEventName + "了...";
-                        case NEVER:
-                            return "结果是" + EventRate.NEVER.event + " (" + finalRate + "%), 千万别" + randomEventName + "!";
-                    }
-                } else
-                    return BotUtils.getLocalMessage("msg.bot-prefix") + "需要占卜的东西太长了或者含有非法字符!";
+        if (BotUtils.isNoCoolDown(sender.getId()) && !args.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (String arg : args) {
+                sb.append(arg).append(" ");
             }
+            String randomEventName = sb.toString().trim();
+            if (randomEventName.length() < 16 && BotUtils.isEmojiCharacter(randomEventName)) {
+                double i = new Random().nextDouble();
+                EventRate rate = getRate(i);
+                double finalRate = Double.parseDouble(String.format("%.1f", i)) * 100;
+                switch (rate) {
+                    case HIGHEST:
+                        return "结果是" + EventRate.HIGHEST.event + " (" + finalRate + "%), 今天非常适合" + randomEventName + "哦!";
+                    case HIGH:
+                        return "结果是" + EventRate.HIGH.event + " (" + finalRate + "%), 今天很适合" + randomEventName + "哦!";
+                    case NORMAL:
+                        return "结果是" + EventRate.NORMAL.event + " (" + finalRate + "%), 今天适合" + randomEventName + "哦!";
+                    case LOW:
+                        return "结果是" + EventRate.LOW.event + " (" + finalRate + "%), 今天不太适合" + randomEventName + "...";
+                    case LOWEST:
+                        return "结果是" + EventRate.LOWEST.event + " (" + finalRate + "%), 今天最好不要" + randomEventName + "了...";
+                    case NEVER:
+                        return "结果是" + EventRate.NEVER.event + " (" + finalRate + "%), 千万别" + randomEventName + "!";
+                }
+            } else
+                return BotUtils.getLocalMessage("msg.bot-prefix") + "需要占卜的东西太长了或者含有非法字符!";
         }
         return null;
     }

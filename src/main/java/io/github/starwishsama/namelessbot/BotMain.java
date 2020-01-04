@@ -54,7 +54,7 @@ public class BotMain {
             new ExceptionListener()
     };
 
-    private static String previousFeed = "No feed";
+    //private static String previousFeed = "No feed";
 
     public static void main(String[] args){
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
@@ -73,7 +73,8 @@ public class BotMain {
                 BotMain.getLogger().log("[Bot] 自动保存数据完成");
             }, 0, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
 
-            /**
+             /**
+             * @TODO: RSS 自动推送
              Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
                 SyndEntry entry = RssItem.getRSSItem("https://rsshub.app/kzfeed/topic/zE5QRX1Ok4vw7");
                 if (entry != null) {

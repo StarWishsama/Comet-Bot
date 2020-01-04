@@ -1,11 +1,11 @@
 package io.github.starwishsama.namelessbot.utils;
 
 import com.gitlab.siegeinsights.r6tab.api.R6TabApi;
-import com.gitlab.siegeinsights.r6tab.api.R6TabApiException;
-import com.gitlab.siegeinsights.r6tab.api.R6TabPlayerNotFoundException;
 import com.gitlab.siegeinsights.r6tab.api.entity.player.Player;
 import com.gitlab.siegeinsights.r6tab.api.entity.search.Platform;
+import com.gitlab.siegeinsights.r6tab.api.entity.search.SearchResultWrapper;
 import com.gitlab.siegeinsights.r6tab.api.impl.R6TabApiImpl;
+
 import io.github.starwishsama.namelessbot.BotMain;
 
 public class R6SUtils {
@@ -14,11 +14,14 @@ public class R6SUtils {
     public static Player getR6SInfo(String player) {
         try {
             if (BotUtils.isLegitID(player)) {
-                Player p = api.getPlayerByUUID(api.searchPlayer(player, Platform.UPLAY).getResults().get(0).getUserUuid());
-                if (p.isPlayerFound())
-                    return p;
+                SearchResultWrapper result = api.searchPlayer(player, Platform.UPLAY);
+                if (result != null) {
+                    Player p = api.getPlayerByUUID(result.getResults().get(0).getUserUuid());
+                    if (p.isPlayerFound())
+                        return p;
+                }
             }
-        } catch (R6TabApiException | R6TabPlayerNotFoundException e){
+        } catch (Exception e){
             BotMain.getLogger().warning("在获取 R6 玩家信息时出现了问题, " + e);
         }
         return null;
@@ -41,15 +44,15 @@ public class R6SUtils {
         }
 
         try {
-            if (p == null) {
+            if (p != null) {
                 if (BotUtils.isLegitID(player)) {
                     Player searchPlayer = api.getPlayerByUUID(api.searchPlayer(player, p).getResults().get(0).getUserUuid());
                     if (searchPlayer.isPlayerFound()) {
                         return searchPlayer;
                     }
                 }
-            } return null;
-        } catch (R6TabApiException | R6TabPlayerNotFoundException e){
+            }
+        } catch (Exception e){
             BotMain.getLogger().warning("在获取 R6 玩家信息时出现了问题, " + e);
         }
         return null;
