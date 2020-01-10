@@ -30,16 +30,18 @@ public class R6SCommand implements EverywhereCommand {
                         String result = R6SUtils.getR6SInfo(bu.getR6sAccount());
                         return new MessageBuilder().add(new ComponentAt(user.getId())).newLine().add(result).toString();
                     } else {
-                        if (!args.get(0).isEmpty() && BotUtils.isLegitID(args.get(0))) {
-                            String result = R6SUtils.getR6SInfo(args.get(0));
+                        if (!args.get(1).isEmpty() && BotUtils.isLegitID(args.get(1))) {
+                            String result = R6SUtils.getR6SInfo(args.get(1));
                             return new MessageBuilder().add(new ComponentAt(user.getId())).newLine().add(result).toString();
-                        } else if (args.size() == 2 && BotUtils.isLegitID(args.get(1))) {
-                            if (!args.get(0).isEmpty() || BotUtils.isLegitID(args.get(0)) || !args.get(1).isEmpty()) {
-                                String result = R6SUtils.getR6SInfo(args.get(0), args.get(1));
+                        } else if (args.size() == 3 && BotUtils.isLegitID(args.get(1))) {
+                            if (!args.get(0).isEmpty() || BotUtils.isLegitID(args.get(1)) || !args.get(2).isEmpty()) {
+                                String result = R6SUtils.getR6SInfo(args.get(1), args.get(2));
                                 return new MessageBuilder().add(new ComponentAt(user.getId())).newLine().add(result).toString();
                             }
                         } else
-                            return BotUtils.getLocalMessage("msg.bot-prefix") + "/r6s [ID] 或 /r6s [PC/PS4/XBOX] [ID]";
+                            return BotUtils.getLocalMessage("msg.bot-prefix") +
+                                    "/r6s info [ID] 或 /r6s info [PC/PS4/XBOX] [ID]\n"
+                                    + "立即绑定彩虹六号账号 /r6s info 快捷查询游戏数据";
                     }
                 case "stats":
                     break;
