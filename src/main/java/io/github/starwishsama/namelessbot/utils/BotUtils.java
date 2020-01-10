@@ -1,5 +1,6 @@
 package io.github.starwishsama.namelessbot.utils;
 
+import cc.moecraft.icq.user.User;
 import com.deadmandungeons.serverstatus.MinecraftServerStatus;
 import com.deadmandungeons.serverstatus.ping.PingResponse;
 
@@ -7,7 +8,9 @@ import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.objects.BotLocalization;
 import io.github.starwishsama.namelessbot.objects.BotUser;
-import org.apache.commons.lang3.StringUtils;
+
+import taskeren.extrabot.components.ExComponent;
+import taskeren.extrabot.components.ExComponentAt;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -168,6 +171,17 @@ public class BotUtils {
         return null;
     }
 
+    public static BotUser getUser(User sender){
+        if (BotConstants.users != null){
+            for (BotUser user : BotConstants.users){
+                if (user.getUserQQ() == sender.getId())
+                    return user;
+            }
+        } else
+            BotMain.getLogger().warning("在获取 QQ 号为 " + sender.getId() + " 的签到数据时出现了问题: 用户不存在");
+        return null;
+    }
+
     public static String getLocalMessage(String node){
         if (BotConstants.msg != null){
             for (BotLocalization local : BotConstants.msg){
@@ -189,10 +203,24 @@ public class BotUtils {
         return BotConstants.cfg.getOwnerID() == qq;
     }
 
+    public static boolean isBotOwner(User sender){
+        return BotConstants.cfg.getOwnerID() == sender.getId();
+    }
+
     public static boolean isBotAdmin(long qq){
         if (BotConstants.cfg.getBotAdmins() != null){
-            for (long v: BotConstants.cfg.getBotAdmins()){
-                if (v == qq)
+            for (long value: BotConstants.cfg.getBotAdmins()){
+                if (value == qq)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isBotAdmin(User sender){
+        if (BotConstants.cfg.getBotAdmins() != null){
+            for (long qq: BotConstants.cfg.getBotAdmins()){
+                if (qq == sender.getId())
                     return true;
             }
         }
@@ -215,5 +243,29 @@ public class BotUtils {
             }
         }
         return false;
+    }
+
+    public static long parseAt(String msg){
+        if (msg != null){
+            ExComponent component = ExComponent.parseComponent(msg);
+            if (component instanceof ExComponentAt){
+                return ((ExComponentAt) component).getAt();
+            }
+        }
+        return -1000L;
+    }
+
+    public static ArrayList<Long> parseAts(String msg){
+        ArrayList<Long> ats = new ArrayList<>();
+        ats.add(-1000L);
+        if (msg != null){
+            ArrayList<ExComponent> components = ExComponent.parseComponents(msg);
+            for (ExComponent c : components){
+                if (c instanceof ExComponentAt)
+                    ats.add(((ExComponentAt) c).getAt());
+            }
+            ats.remove(-1000L);
+        }
+        return ats;
     }
 }

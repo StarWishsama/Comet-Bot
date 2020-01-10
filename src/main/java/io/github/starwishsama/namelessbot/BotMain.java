@@ -45,7 +45,6 @@ public class BotMain {
             new R6SCommand(),
             new RandomCommand(),
             new RConGroupCommand(),
-            new RefreshCacheCommand(),
             new ServerInfoCommand(),
             new VersionCommand()
     };

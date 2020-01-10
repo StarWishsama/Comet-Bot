@@ -15,14 +15,14 @@ import java.util.ArrayList;
 public class RConGroupCommand implements GroupCommand {
     @Override
     public CommandProperties properties(){
-        return new CommandProperties("rcon");
+        return new CommandProperties("rcon", "rc");
     }
 
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String msg, ArrayList<String> args){
         long fromQQ = sender.getId();
         if (BotUtils.isNoCoolDown(fromQQ)) {
-            if (BotConstants.cfg.getBotAdmins().contains(fromQQ) || BotConstants.cfg.getOwnerID() == fromQQ) {
+            if (BotUtils.isBotOwner(sender.getId()) || BotUtils.isBotAdmin(sender.getId())) {
                 if (BotMain.getRcon() != null) {
                     try {
                         StringBuilder sb = new StringBuilder();

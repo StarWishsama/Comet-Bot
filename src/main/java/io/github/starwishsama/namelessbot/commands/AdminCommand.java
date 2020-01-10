@@ -7,9 +7,8 @@ import cc.moecraft.icq.user.GroupUser;
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.commands.interfaces.BotGroupCommand;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
+
 import org.apache.commons.lang3.StringUtils;
-import taskeren.extrabot.components.ExComponent;
-import taskeren.extrabot.components.ExComponentAt;
 
 import java.util.ArrayList;
 
@@ -23,17 +22,8 @@ public class AdminCommand implements BotGroupCommand {
                         if (args.size() == 2) {
                             if (isOwner(sender.getId())){
                                 if (args.get(0) != null){
-                                    long qq;
-                                    if (StringUtils.isNumeric(args.get(1))){
-                                        qq = Long.parseLong(args.get(1));
-                                    } else {
-                                        ExComponent ec = ExComponent.parseComponent(args.get(1));
-                                        if (ec instanceof ExComponentAt) {
-                                            qq = ((ExComponentAt) ec).getAt();
-                                        } else
-                                            qq = -1;
-                                    }
-                                    if (qq != -1) {
+                                    long qq = StringUtils.isNumeric(args.get(0)) ? Long.parseLong(args.get(0)) : BotUtils.parseAt(args.get(0));
+                                    if (qq != -1000L) {
                                         if (BotUtils.isBotAdmin(sender.getId())) {
                                             BotConstants.cfg.getBotAdmins().remove(qq);
                                             return BotUtils.getLocalMessage("msg.bot-prefix") + "删除机器人管理员成功!";

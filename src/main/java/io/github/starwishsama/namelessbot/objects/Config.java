@@ -39,7 +39,7 @@ public class Config {
     @SerializedName("spam_mute_time")
     private int spamMuteTime = 60;
     @SerializedName("cool_down_time")
-    private int coolDownTime = 15;
+    private int coolDownTime = 6;
     @SerializedName("filter_words")
     private List<String> filterWords;
     @SerializedName("default_music_api")

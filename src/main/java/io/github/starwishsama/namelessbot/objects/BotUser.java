@@ -17,6 +17,7 @@ public class BotUser {
     private int checkInTime = 0;
     private String bindServerAccount;
     private int msgVL;
+    private String r6sAccount;
 
     public BotUser(long qq){
         userQQ = qq;

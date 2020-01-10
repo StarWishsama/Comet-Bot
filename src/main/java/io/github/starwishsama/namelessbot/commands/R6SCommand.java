@@ -7,12 +7,12 @@ import cc.moecraft.icq.sender.message.MessageBuilder;
 import cc.moecraft.icq.sender.message.components.ComponentAt;
 import cc.moecraft.icq.user.User;
 
+import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import io.github.starwishsama.namelessbot.utils.R6SUtils;
 
 import java.util.ArrayList;
 
-import com.gitlab.siegeinsights.r6tab.api.entity.player.Player;
 
 public class R6SCommand implements EverywhereCommand {
     @Override
@@ -22,42 +22,45 @@ public class R6SCommand implements EverywhereCommand {
 
     @Override
     public String run(EventMessage e, User user, String msg, ArrayList<String> args){
-        // /r6s [UplayID]
-        // /r6s [ID] [Platform]
-        if (args.size() == 1){
-            if (!args.get(0).isEmpty() && BotUtils.isLegitID(args.get(0))){
-                Player p = R6SUtils.getR6SInfo(args.get(0));
-                if (p != null) {
-                    String reply = "=== 彩虹六号战绩查询 ===\n"
-                            + p.getName() + " [" + p.getLevel() + "级]" +
-                            "\n目前段位: " + p.getCurrentRank().getName() + "(" + p.getCurrentMmr() + "/" + p.getMaxMmr() + ")" +
-                            "\nKD: " + p.getKd() +
-                            "\n爆头率: " + (double) p.getHeadshotAccuraccy() / 1000000d + "%";
-
-                    return new MessageBuilder().add(new ComponentAt(user.getId())).newLine()
-                            .add(reply).toString();
-                } else
-                    return new MessageBuilder().add(new ComponentAt(user.getId())).newLine()
-                            .add("找不到此账号").toString();
+        if (args.size() > 0){
+            switch (args.get(0).toLowerCase()){
+                case "info":
+                    BotUser bu = BotUtils.getUser(user);
+                    if (bu != null && bu.getR6sAccount() != null){
+                        String result = R6SUtils.getR6SInfo(bu.getR6sAccount());
+                        return new MessageBuilder().add(new ComponentAt(user.getId())).newLine().add(result).toString();
+                    } else {
+                        if (!args.get(0).isEmpty() && BotUtils.isLegitID(args.get(0))) {
+                            String result = R6SUtils.getR6SInfo(args.get(0));
+                            return new MessageBuilder().add(new ComponentAt(user.getId())).newLine().add(result).toString();
+                        } else if (args.size() == 2 && BotUtils.isLegitID(args.get(1))) {
+                            if (!args.get(0).isEmpty() || BotUtils.isLegitID(args.get(0)) || !args.get(1).isEmpty()) {
+                                String result = R6SUtils.getR6SInfo(args.get(0), args.get(1));
+                                return new MessageBuilder().add(new ComponentAt(user.getId())).newLine().add(result).toString();
+                            }
+                        } else
+                            return BotUtils.getLocalMessage("msg.bot-prefix") + "/r6s [ID] 或 /r6s [PC/PS4/XBOX] [ID]";
+                    }
+                case "stats":
+                    break;
+                case "bind":
+                    if (args.size() == 2 && args.get(1) != null){
+                        if (BotUtils.isLegitID(args.get(1))){
+                            if (BotUtils.isUserExist(user.getId())){
+                                BotUser botUser = BotUtils.getUser(user.getId());
+                                if (botUser != null && botUser.getR6sAccount() == null)
+                                    botUser.setR6sAccount(args.get(1));
+                                else
+                                    return BotUtils.getLocalMessage("msg.bot-prefix") + "你已经绑定过账号了!";
+                            } else
+                                return BotUtils.getLocalMessage("msg.bot-prefix") + "使用 /qd 签到自动注册机器人系统";
+                        } else
+                            return BotUtils.getLocalMessage("msg.bot-prefix") + "ID 格式有误!";
+                    }
+                default:
+                    return BotUtils.getLocalMessage("msg.bot-prefix") + "/r6s info [Uplay账号名]";
             }
         }
-        if (args.size() == 2 && BotUtils.isLegitID(args.get(1))){
-            if (!args.get(0).isEmpty() || BotUtils.isLegitID(args.get(0)) || !args.get(1).isEmpty()){
-                Player p = R6SUtils.getR6SInfo(args.get(0), args.get(1));
-                if (p != null) {
-                    String reply = "=== 彩虹六号战绩查询 ===\n" + p.getName() + " [" + p.getLevel() + "级]" +
-                            "\n目前段位: " + p.getCurrentRank().getName() + "(" + p.getCurrentMmr() + "/" + p.getMaxMmr() + ")" +
-                            "\nKD: " + p.getKd() +
-                            "\n爆头率: " + (double) p.getHeadshotAccuraccy() / 1000000d + "%";
-
-                    return new MessageBuilder().add(new ComponentAt(user.getId())).newLine()
-                            .add(reply).toString();
-                } else
-                    return new MessageBuilder().add(new ComponentAt(user.getId())).newLine()
-                            .add("找不到此账号").toString();
-            }
-        } else
-            return BotUtils.getLocalMessage("msg.bot-prefix") + "/r6s [ID] 或 /r6s [PC/PS4/XBOX] [ID]";
         return null;
     }
 }

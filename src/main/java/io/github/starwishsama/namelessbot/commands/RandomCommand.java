@@ -6,8 +6,8 @@ import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
 
 import io.github.starwishsama.namelessbot.utils.BotUtils;
-import org.apache.commons.lang3.StringUtils;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -28,20 +28,23 @@ public class RandomCommand implements EverywhereCommand {
             if (randomEventName.length() < 16 && BotUtils.isEmojiCharacter(randomEventName)) {
                 double i = new Random().nextDouble();
                 EventRate rate = getRate(i);
-                double finalRate = Double.parseDouble(String.format("%.1f", i)) * 100;
+                NumberFormat nf = NumberFormat.getPercentInstance();
+                nf.setMaximumIntegerDigits(3);
+                nf.setMinimumFractionDigits(2);
+                String finalRate = nf.format(i);
                 switch (rate) {
                     case HIGHEST:
-                        return "结果是" + EventRate.HIGHEST.event + " (" + finalRate + "%), 今天非常适合" + randomEventName + "哦!";
+                        return "结果是" + EventRate.HIGHEST.event + " (" + finalRate + "), 今天非常适合" + randomEventName + "哦!";
                     case HIGH:
-                        return "结果是" + EventRate.HIGH.event + " (" + finalRate + "%), 今天很适合" + randomEventName + "哦!";
+                        return "结果是" + EventRate.HIGH.event + " (" + finalRate + "), 今天很适合" + randomEventName + "哦!";
                     case NORMAL:
-                        return "结果是" + EventRate.NORMAL.event + " (" + finalRate + "%), 今天适合" + randomEventName + "哦!";
+                        return "结果是" + EventRate.NORMAL.event + " (" + finalRate + "), 今天适合" + randomEventName + "哦!";
                     case LOW:
-                        return "结果是" + EventRate.LOW.event + " (" + finalRate + "%), 今天不太适合" + randomEventName + "...";
+                        return "结果是" + EventRate.LOW.event + " (" + finalRate + "), 今天不太适合" + randomEventName + "...";
                     case LOWEST:
-                        return "结果是" + EventRate.LOWEST.event + " (" + finalRate + "%), 今天最好不要" + randomEventName + "了...";
+                        return "结果是" + EventRate.LOWEST.event + " (" + finalRate + "), 今天最好不要" + randomEventName + "了...";
                     case NEVER:
-                        return "结果是" + EventRate.NEVER.event + " (" + finalRate + "%), 千万别" + randomEventName + "!";
+                        return "结果是" + EventRate.NEVER.event + " (" + finalRate + "), 千万别" + randomEventName + "!";
                 }
             } else
                 return BotUtils.getLocalMessage("msg.bot-prefix") + "需要占卜的东西太长了或者含有非法字符!";

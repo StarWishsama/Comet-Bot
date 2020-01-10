@@ -36,6 +36,14 @@ public class DebugCommand implements GroupCommand {
                             return BotUtils.getLocalMessage("msg.bot-prefix") + "你还没绑定过账号";
                     }
                     break;
+                case "rc":
+                case "refreshcache":
+                    if (BotUtils.isBotAdmin(sender.getId()) || BotUtils.isBotOwner(sender.getId())) {
+                        event.getBot().getAccountManager().refreshCache();
+                        return BotUtils.getLocalMessage("msg.bot-prefix") + "已手动刷新信息缓存.";
+                    }
+                case "raw":
+                    return args.toString();
                 default:
                     return "Bot > 命令不存在";
             }
