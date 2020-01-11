@@ -10,7 +10,7 @@ import cc.moecraft.icq.user.User;
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
-import io.github.starwishsama.namelessbot.utils.MusicID;
+import io.github.starwishsama.namelessbot.utils.MusicIDUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -61,8 +61,8 @@ public class MusicCommand implements EverywhereCommand {
                             }
 
                             if (isAvailable) {
-                                if (MusicID.getNetEaseSongID(sb.toString().trim()) > -1)
-                                    return new MessageBuilder().add(new ComponentMusic(MusicID.getNetEaseSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.netease)).toString();
+                                if (MusicIDUtils.getNetEaseSongID(sb.toString().trim()) > -1)
+                                    return new MessageBuilder().add(new ComponentMusic(MusicIDUtils.getNetEaseSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.netease)).toString();
                                 else
                                     return BotUtils.getLocalMessage("msg.bot-prefix") + "找不到歌曲 " + sb.toString().trim();
                             } else
@@ -70,8 +70,8 @@ public class MusicCommand implements EverywhereCommand {
                         } else
                             return BotUtils.getLocalMessage("msg.bot-prefix") + "网易云 API 地址还没有设置";
                     } else if (BotConstants.cfg.getApi().equals(MusicType.QQ)) {
-                        if (MusicID.getQQMusicSongID(sb.toString().trim()) > 0)
-                            return new MessageBuilder().add(new ComponentMusic(MusicID.getQQMusicSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.qq)).toString();
+                        if (MusicIDUtils.getQQMusicSongID(sb.toString().trim()) > 0)
+                            return new MessageBuilder().add(new ComponentMusic(MusicIDUtils.getQQMusicSongID(sb.toString().trim()), ComponentMusic.MusicSourceType.qq)).toString();
                         else
                             return BotUtils.getLocalMessage("msg.bot-prefix") + "找不到歌曲 " + sb.toString().trim();
                     } else

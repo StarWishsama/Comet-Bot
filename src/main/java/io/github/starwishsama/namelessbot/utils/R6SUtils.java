@@ -15,7 +15,7 @@ import java.text.NumberFormat;
 public class R6SUtils {
     private static R6TabApi api = new R6TabApiImpl();
     private static String infoText = "=== 彩虹六号战绩查询 ===\n%s [%d级]" +
-            "\n目前段位: %s(%d/%d)" +
+            "\n目前段位: %s(current)" +
             "\nKD: %s" +
             "\n爆头率: %s";
 
@@ -46,7 +46,7 @@ public class R6SUtils {
                         NumberFormat num = NumberFormat.getPercentInstance();
                         num.setMaximumIntegerDigits(3);
                         num.setMaximumFractionDigits(2);
-                        return String.format(infoText, p.getName(), p.getLevel(), p.getCurrentRank().getName(), p.getCurrentMmr(), p.getMaxMmr(), String.format("%.2f", p.getKd()), num.format(p.getHeadshotAccuraccy() / 100000000d));
+                        return String.format(infoText, p.getName(), p.getLevel(), p.getCurrentRank().getName(), String.format("%.2f", p.getKd()), num.format(p.getHeadshotAccuraccy() / 100000000d)).replaceAll("current", p.getCurrentMmr() + "");
                     }
                 }
             }
@@ -57,24 +57,27 @@ public class R6SUtils {
     }
 
     public static String getR6SInfo(String player, String platform) {
-        Platform p;
+        Platform pf;
         switch (platform.toLowerCase()){
             case "ps":
             case "ps4":
-                p = Platform.PLAYSTATION_NETWORK;
+                pf = Platform.PLAYSTATION_NETWORK;
                 break;
             case "xbox":
-                p = Platform.XBOX;
+                pf = Platform.XBOX;
                 break;
             default:
-                p = Platform.UPLAY;
+                pf = Platform.UPLAY;
         }
 
         try {
             if (BotUtils.isLegitID(player)) {
-                Player sp = api.getPlayerByUUID(api.searchPlayer(player, p).getResults().get(0).getUserUuid());
-                if (sp.isPlayerFound()) {
-                    return String.format(infoText, sp.getPlayerId(), sp.getLevel(), sp.getCurrentRank().getName(), sp.getCurrentMmr(), sp.getMaxMmr(), sp.getKd(), (double) sp.getHeadshotAccuraccy() / 1000000d);
+                Player p = api.getPlayerByUUID(api.searchPlayer(player, pf).getResults().get(0).getUserUuid());
+                if (p.isPlayerFound()) {
+                    NumberFormat num = NumberFormat.getPercentInstance();
+                    num.setMaximumIntegerDigits(3);
+                    num.setMaximumFractionDigits(2);
+                    return String.format(infoText, p.getName(), p.getLevel(), p.getCurrentRank().getName(), String.format("%.2f", p.getKd()), num.format(p.getHeadshotAccuraccy() / 100000000d)).replaceAll("current", p.getCurrentMmr() + "");
                 }
             }
         } catch (Exception e){

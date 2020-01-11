@@ -13,7 +13,6 @@ import io.github.starwishsama.namelessbot.utils.R6SUtils;
 
 import java.util.ArrayList;
 
-
 public class R6SCommand implements EverywhereCommand {
     @Override
     public CommandProperties properties(){
@@ -42,17 +41,15 @@ public class R6SCommand implements EverywhereCommand {
                         } else
                             return BotUtils.getLocalMessage("msg.bot-prefix") +
                                     "/r6s info [ID] 或 /r6s info [PC/PS4/XBOX] [ID]\n"
-                                    + "立即绑定彩虹六号账号 /r6s info 快捷查询游戏数据";
+                                    + "立即绑定彩虹六号账号 快捷查询游戏数据";
                     }
-                case "stats":
-                    break;
                 case "bind":
                     if (args.size() == 2 && args.get(1) != null){
                         if (BotUtils.isLegitID(args.get(1))){
                             if (BotUtils.isUserExist(user.getId())){
-                                BotUser botUser = BotUtils.getUser(user.getId());
-                                if (botUser != null && botUser.getR6sAccount() == null)
-                                    botUser.setR6sAccount(args.get(1));
+                                BotUser botUser1 = BotUtils.getUser(user.getId());
+                                if (botUser1 != null && botUser1.getR6sAccount() == null)
+                                    botUser1.setR6sAccount(args.get(1));
                                 else
                                     return BotUtils.getLocalMessage("msg.bot-prefix") + "你已经绑定过账号了!";
                             } else

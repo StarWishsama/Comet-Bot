@@ -53,65 +53,48 @@ public class BotMain {
             new ExceptionListener()
     };
 
-    //private static String previousFeed = "No feed";
-
     public static void main(String[] args){
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        try {
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                FileSetup.saveCfg();
-                FileSetup.saveLang();
-            }));
+        while (true) {
+            try {
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    FileSetup.saveCfg();
+                    FileSetup.saveLang();
+                }));
 
-            startBot();
+                startBot();
 
-            // 自动保存 Timer
-            Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
-                FileSetup.saveCfg();
-                FileSetup.saveLang();
-                BotMain.getLogger().log("[Bot] 自动保存数据完成");
-            }, 0, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
-
-             /**
-             * @TODO: RSS 自动推送
-             Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
-                SyndEntry entry = RssItem.getRSSItem("https://rsshub.app/kzfeed/topic/zE5QRX1Ok4vw7");
-                if (entry != null) {
-                    if (!entry.getTitle().equals(previousFeed)) {
-                        getApi().sendGroupMsg(group, entry.getTitle() + "\n" + RssItem.simplifyHTML(entry.getDescription().getValue().replace("", "").trim()));
-                    }
-                }
-            }, 0, 12, TimeUnit.HOURS);*/
-
-            if (BotConstants.cfg.getRconPwd() != null && BotConstants.cfg.getRconPort() != 0) {
-                try {
-                    rcon = new Rcon(BotConstants.cfg.getRconUrl(), BotConstants.cfg.getRconPort(), BotConstants.cfg.getRconPwd());
-                    logger.log("[RCON] 已连接至服务器");
-                } catch (IOException e) {
-                    logger.warning("[RCON] 连接至服务器时发生了错误, 错误信息: " + e);
-                } catch (AuthenticationException ae) {
-                    logger.warning("[RCON] RCON 密码有误, 请检查是否输入了正确的密码!");
-                }
-            }
-
-            String[] line = in.readLine().split(" ");
-            switch (line[0]){
-                case "setowner":
+                String[] line = in.readLine().split(" ");
+                if (line[0].equalsIgnoreCase("setowner")) {
                     if (line.length > 1) {
                         BotConstants.cfg.setOwnerID(Long.parseLong(line[1]));
                         logger.log("已设置 Bot 的所有者账号为 " + line[1]);
                     }
-                    break;
-                case "stop":
+                } else if (line[0].equalsIgnoreCase("stop")){
                     logger.log("正在关闭...");
-                    Runtime.getRuntime().exit(0);
                     break;
-                default:
-                    logger.log("未知指令.");
-                    break;
+                }
+
+                // 自动保存 Timer
+                Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
+                    FileSetup.saveCfg();
+                    FileSetup.saveLang();
+                    BotMain.getLogger().log("[Bot] 自动保存数据完成");
+                }, 0, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
+
+                if (BotConstants.cfg.getRconPwd() != null && BotConstants.cfg.getRconPort() != 0) {
+                    try {
+                        rcon = new Rcon(BotConstants.cfg.getRconUrl(), BotConstants.cfg.getRconPort(), BotConstants.cfg.getRconPwd());
+                        logger.log("[RCON] 已连接至服务器");
+                    } catch (IOException e) {
+                        logger.warning("[RCON] 连接至服务器时发生了错误, 错误信息: " + e);
+                    } catch (AuthenticationException ae) {
+                        logger.warning("[RCON] RCON 密码有误, 请检查是否输入了正确的密码!");
+                    }
+                }
+            } catch (IOException e) {
+                logger.log("[定时任务] 在执行定时任务时发生了问题, 错误信息: " + e);
             }
-        } catch (IOException e){
-            logger.log("[定时任务] 在执行定时任务时发生了问题, 错误信息: " + e);
         }
     }
 

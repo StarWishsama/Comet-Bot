@@ -1,8 +1,11 @@
 package io.github.starwishsama.namelessbot.utils;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import io.github.starwishsama.namelessbot.BotMain;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +16,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-public class MusicID {
+public class MusicIDUtils {
     // 仅供测试
     public static void main(String[] args){
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
@@ -28,7 +31,7 @@ public class MusicID {
                     System.out.println("Exit!");
                     quit = true;
                 } else {
-                    System.out.println(searchQQMusic(input));
+                    System.out.println(getQQMusicSongID(input));
                     System.out.println(getNetEaseSongID(input));
                 }
             } catch (Exception x) {
@@ -38,11 +41,11 @@ public class MusicID {
         }
     }
 
-    public static Integer getQQMusicSongID(String name){
+    public static int getQQMusicSongID(String name){
         if (name != null) {
-            JSONArray songs = JSON.parseArray(searchQQMusic(name));
-            if (songs.getJSONObject(0).getInteger("songid") != null){
-                return songs.getJSONObject(0).getInteger("songid");
+            JsonArray songs = searchQQMusic(name);
+            if (songs.get(0).getAsJsonObject().get("songid") != null){
+                return songs.get(0).getAsJsonObject().get("songid").getAsInt();
             }
         }
         return -1;
@@ -77,7 +80,7 @@ public class MusicID {
             return "Please assign a song name";
     }
 
-    private static String searchQQMusic(String name){
+    private static JsonArray searchQQMusic(String name){
         if (name != null) {
             try {
                 URL url = new URL("https://c.y.qq.com/soso/fcgi-bin/client_search_cp?g_tk=5381&p=1&n=20&w=" + URLEncoder.encode(name, "UTF-8") + "&format=json&loginUin=0&hostUin=0&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0&remoteplace=txt.yqq.song&t=0&aggr=1&cr=1&catZhida=0&flag_qc=0");
@@ -85,18 +88,19 @@ public class MusicID {
                 if (hc.getResponseCode() == 200) {
                     InputStream is = url.openStream();
                     BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-                    JSONObject songObject = JSONObject.parseObject(br.readLine());
-                    if (songObject.getJSONObject("data").getJSONObject("song").getJSONArray("list") != null) {
-                        return songObject.getJSONObject("data").getJSONObject("song").getJSONArray("list").toJSONString();
-                    } else
-                        return "Can't request song(s) from API, Please wait a moment.";
+                    JsonObject object = (JsonObject) new JsonParser().parse(br.readLine());
+                    if (!object.isJsonNull()){
+                        if (object.getAsJsonObject("data").getAsJsonObject("song").getAsJsonArray("list") != null){
+                            return object.getAsJsonObject("data").getAsJsonObject("song").getAsJsonArray("list");
+                        } else
+                            BotMain.getLogger().debug("Can't request song(s) from API, Please wait a moment.");
+                    }
                 } else
-                    return "Can't request song(s) from API, Response code is " + hc.getResponseCode();
+                    BotMain.getLogger().debug("Can't request song(s) from API, Response code is " + hc.getResponseCode());
             } catch (Exception x) {
-                return "在通过 QQ 音乐搜索歌曲时发生了一个错误, " + x.getMessage();
+                BotMain.getLogger().warning("在通过 QQ 音乐搜索歌曲时发生了一个错误, " + x.getMessage());
             }
-        } else {
-            return "请先指定歌名!";
         }
+        return null;
     }
 }
