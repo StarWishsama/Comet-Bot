@@ -4,16 +4,17 @@ import com.google.gson.annotations.SerializedName;
 import io.github.starwishsama.namelessbot.commands.MusicCommand;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 public class Config {
     @SerializedName("owner_id")
-    private long ownerID;
+    private long ownerID = 0;
     @SerializedName("auto_save_time")
     private int autoSaveTime = 15;
     @SerializedName("bot_admins")
-    private List<Long> botAdmins;
+    private List<Long> botAdmins = new ArrayList<>();
     @SerializedName("post_port")
     private int postPort = 5700;
     @SerializedName("post_url")
@@ -21,7 +22,7 @@ public class Config {
     @SerializedName("bot_name")
     private String botName = "Bot";
     @SerializedName("bot_port")
-    private int botPort = 5703;
+    private int botPort = 5701;
     @SerializedName("rcon_url")
     private String rconUrl;
     @SerializedName("rcon_port")

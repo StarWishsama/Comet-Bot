@@ -167,7 +167,7 @@ public class BotUtils {
                     return user;
             }
         } else
-            BotMain.getLogger().warning("在获取 QQ 号为 " + qq + " 的签到数据时出现了问题: 用户不存在");
+            BotMain.getLogger().warning("在获取 QQ 号为 " + qq + " 的签到数据时出现了问题: 用户列表为空");
         return null;
     }
 
@@ -178,7 +178,7 @@ public class BotUtils {
                     return user;
             }
         } else
-            BotMain.getLogger().warning("在获取 QQ 号为 " + sender.getId() + " 的签到数据时出现了问题: 用户不存在");
+            BotMain.getLogger().warning("在获取 QQ 号为 " + sender.getId() + " 的签到数据时出现了问题: 用户列表为空");
         return null;
     }
 

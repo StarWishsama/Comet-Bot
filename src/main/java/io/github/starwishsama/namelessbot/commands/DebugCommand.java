@@ -44,6 +44,10 @@ public class DebugCommand implements GroupCommand {
                     }
                 case "raw":
                     return args.toString();
+                case "getat":
+                    if (args.size() == 2){
+                        return "" + BotUtils.parseAt(args.get(1));
+                    }
                 default:
                     return "Bot > 命令不存在";
             }

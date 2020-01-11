@@ -25,7 +25,7 @@ public class RandomCommand implements EverywhereCommand {
                 sb.append(arg).append(" ");
             }
             String randomEventName = sb.toString().trim();
-            if (randomEventName.length() < 16 && BotUtils.isEmojiCharacter(randomEventName)) {
+            if (randomEventName.length() < 30 && BotUtils.isEmojiCharacter(randomEventName)) {
                 double i = new Random().nextDouble();
                 EventRate rate = getRate(i);
                 NumberFormat nf = NumberFormat.getPercentInstance();
@@ -45,6 +45,8 @@ public class RandomCommand implements EverywhereCommand {
                         return "结果是" + EventRate.LOWEST.event + " (" + finalRate + "), 今天最好不要" + randomEventName + "了...";
                     case NEVER:
                         return "结果是" + EventRate.NEVER.event + " (" + finalRate + "), 千万别" + randomEventName + "!";
+                    default:
+                        return "你要占卜的东西有点怪呢, 我无法占卜出结果哦.";
                 }
             } else
                 return BotUtils.getLocalMessage("msg.bot-prefix") + "需要占卜的东西太长了或者含有非法字符!";

@@ -20,7 +20,7 @@ public class MusicCommand implements EverywhereCommand {
 
     public enum MusicType {
         QQ,
-        NETEASE_MUSIC;
+        NETEASE
     }
 
     @Override
@@ -38,7 +38,7 @@ public class MusicCommand implements EverywhereCommand {
                             case "网易":
                             case "wy":
                             case "netease":
-                                BotConstants.cfg.setApi(MusicType.NETEASE_MUSIC);
+                                BotConstants.cfg.setApi(MusicType.NETEASE);
                                 break;
                             case "qq":
                                 BotConstants.cfg.setApi(MusicType.QQ);
@@ -51,7 +51,7 @@ public class MusicCommand implements EverywhereCommand {
                     for (String arg : args) {
                         sb.append(arg).append(" ");
                     }
-                    if (BotConstants.cfg.getApi().equals(MusicType.NETEASE_MUSIC)) {
+                    if (BotConstants.cfg.getApi().equals(MusicType.NETEASE)) {
                         if (BotConstants.cfg.getNetEaseApi() != null) {
                             boolean isAvailable = false;
                             try {

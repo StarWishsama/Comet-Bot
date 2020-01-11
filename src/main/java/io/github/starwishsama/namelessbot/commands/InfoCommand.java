@@ -10,6 +10,7 @@ import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class InfoCommand implements EverywhereCommand {
     @Override
@@ -22,7 +23,7 @@ public class InfoCommand implements EverywhereCommand {
         if (BotUtils.isUserExist(sender.getId())){
             BotUser user = BotUtils.getUser(sender.getId());
             String reply;
-            reply = "[CQ:at,qq=" + sender.getId() + "]\n积分: " + String.format("%.1f", user.getCheckInPoint())
+            reply = "[CQ:at,qq=" + sender.getId() + "]\n积分: " + String.format("%.1f", Objects.requireNonNull(user).getCheckInPoint())
                     + "\n累计连续签到了 " + user.getCheckInTime() + " 天"
                     + "\n上次签到于: " + new SimpleDateFormat("yyyy-MM-dd").format(user.getLastCheckInTime().getTime());
             if (user.getBindServerAccount() != null) {

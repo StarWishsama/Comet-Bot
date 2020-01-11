@@ -1,6 +1,8 @@
 package io.github.starwishsama.namelessbot.utils;
 
 import com.gitlab.siegeinsights.r6tab.api.R6TabApi;
+import com.gitlab.siegeinsights.r6tab.api.R6TabApiException;
+import com.gitlab.siegeinsights.r6tab.api.R6TabPlayerNotFoundException;
 import com.gitlab.siegeinsights.r6tab.api.entity.player.Player;
 import com.gitlab.siegeinsights.r6tab.api.entity.search.Platform;
 import com.gitlab.siegeinsights.r6tab.api.entity.search.SearchResultWrapper;
@@ -16,6 +18,22 @@ public class R6SUtils {
             "\n目前段位: %s(%d/%d)" +
             "\nKD: %s" +
             "\n爆头率: %s";
+
+    public static Player getR6SAccount(String player){
+        if (BotUtils.isLegitID(player)){
+            try {
+                SearchResultWrapper result = api.searchPlayer(player, Platform.UPLAY);
+                if (result != null){
+                    Player p = api.getPlayerByUUID(result.getResults().get(0).getUserUuid());
+                    if (p.isPlayerFound())
+                        return p;
+                }
+            } catch (R6TabApiException | R6TabPlayerNotFoundException r6e){
+                BotMain.getLogger().warning("在获取 R6 玩家信息时出现了问题, " + r6e);
+            }
+        }
+        return null;
+    }
 
     public static String getR6SInfo(String player) {
         Player p;
@@ -39,12 +57,8 @@ public class R6SUtils {
     }
 
     public static String getR6SInfo(String player, String platform) {
-        Platform p = null;
+        Platform p;
         switch (platform.toLowerCase()){
-            case "pc":
-            case "uplay":
-                p = Platform.UPLAY;
-                break;
             case "ps":
             case "ps4":
                 p = Platform.PLAYSTATION_NETWORK;
@@ -52,15 +66,15 @@ public class R6SUtils {
             case "xbox":
                 p = Platform.XBOX;
                 break;
+            default:
+                p = Platform.UPLAY;
         }
 
         try {
-            if (p != null) {
-                if (BotUtils.isLegitID(player)) {
-                    Player sp = api.getPlayerByUUID(api.searchPlayer(player, p).getResults().get(0).getUserUuid());
-                    if (sp.isPlayerFound()) {
-                        return String.format(infoText, sp.getPlayerId(), sp.getLevel(), sp.getCurrentRank().getName(), sp.getCurrentMmr(), sp.getMaxMmr(), sp.getKd(), (double) sp.getHeadshotAccuraccy() / 1000000d);
-                    }
+            if (BotUtils.isLegitID(player)) {
+                Player sp = api.getPlayerByUUID(api.searchPlayer(player, p).getResults().get(0).getUserUuid());
+                if (sp.isPlayerFound()) {
+                    return String.format(infoText, sp.getPlayerId(), sp.getLevel(), sp.getCurrentRank().getName(), sp.getCurrentMmr(), sp.getMaxMmr(), sp.getKd(), (double) sp.getHeadshotAccuraccy() / 1000000d);
                 }
             }
         } catch (Exception e){
