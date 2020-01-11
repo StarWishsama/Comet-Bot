@@ -135,7 +135,7 @@ public class BotUtils {
 
     public static boolean isNoCoolDown(long qq){
         long currentTime = System.currentTimeMillis();
-        if (coolDown.containsKey(qq)){
+        if (coolDown.containsKey(qq) && !BotUtils.isBotOwner(qq)){
             if (currentTime - coolDown.get(qq) < BotConstants.cfg.getCoolDownTime() * 1000){
                 return false;
             } else

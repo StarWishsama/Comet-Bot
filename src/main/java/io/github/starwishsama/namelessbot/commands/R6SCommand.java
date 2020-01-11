@@ -22,18 +22,19 @@ public class R6SCommand implements EverywhereCommand {
 
     @Override
     public String run(EventMessage e, User user, String msg, ArrayList<String> args){
-        if (args.size() > 0){
+        if (args.size() > 0 && BotUtils.isNoCoolDown(user.getId())){
             switch (args.get(0).toLowerCase()){
                 case "info":
                     BotUser bu = BotUtils.getUser(user);
-                    if (bu != null && bu.getR6sAccount() != null){
+                    if (bu != null && bu.getR6sAccount() != null && args.size() == 1){
                         String result = R6SUtils.getR6SInfo(bu.getR6sAccount());
                         return new MessageBuilder().add(new ComponentAt(user.getId())).newLine().add(result).toString();
                     } else {
-                        if (!args.get(1).isEmpty() && BotUtils.isLegitID(args.get(1))) {
+                        if (args.size() == 2 && !args.get(1).isEmpty() && BotUtils.isLegitID(args.get(1))) {
                             String result = R6SUtils.getR6SInfo(args.get(1));
                             return new MessageBuilder().add(new ComponentAt(user.getId())).newLine().add(result).toString();
-                        } else if (args.size() == 3 && BotUtils.isLegitID(args.get(1))) {
+                        }
+                        if (args.size() == 3 && BotUtils.isLegitID(args.get(1))) {
                             if (!args.get(0).isEmpty() || BotUtils.isLegitID(args.get(1)) || !args.get(2).isEmpty()) {
                                 String result = R6SUtils.getR6SInfo(args.get(1), args.get(2));
                                 return new MessageBuilder().add(new ComponentAt(user.getId())).newLine().add(result).toString();
