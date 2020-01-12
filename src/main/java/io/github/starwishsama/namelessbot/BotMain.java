@@ -8,18 +8,18 @@ import cc.moecraft.icq.sender.IcqHttpApi;
 import cc.moecraft.logger.HyLogger;
 import cc.moecraft.logger.environments.ColorSupportLevel;
 
+
 import io.github.starwishsama.namelessbot.commands.*;
-import io.github.starwishsama.namelessbot.config.*;
-import io.github.starwishsama.namelessbot.listeners.*;
+import io.github.starwishsama.namelessbot.config.FileSetup;
+import io.github.starwishsama.namelessbot.listeners.ExceptionListener;
+import io.github.starwishsama.namelessbot.listeners.SpamListener;
 
 import lombok.Getter;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -54,46 +54,23 @@ public class BotMain {
     };
 
     public static void main(String[] args){
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        while (true) {
+        startBot();
+
+        // 自动保存 Timer
+        Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
+            FileSetup.saveCfg();
+            FileSetup.saveLang();
+            BotMain.getLogger().log("[Bot] 自动保存数据完成");
+        }, 0, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
+
+        if (BotConstants.cfg.getRconPwd() != null && BotConstants.cfg.getRconPort() != 0) {
             try {
-                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                    FileSetup.saveCfg();
-                    FileSetup.saveLang();
-                }));
-
-                startBot();
-
-                String[] line = in.readLine().split(" ");
-                if (line[0].equalsIgnoreCase("setowner")) {
-                    if (line.length > 1) {
-                        BotConstants.cfg.setOwnerID(Long.parseLong(line[1]));
-                        logger.log("已设置 Bot 的所有者账号为 " + line[1]);
-                    }
-                } else if (line[0].equalsIgnoreCase("stop")){
-                    logger.log("正在关闭...");
-                    break;
-                }
-
-                // 自动保存 Timer
-                Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
-                    FileSetup.saveCfg();
-                    FileSetup.saveLang();
-                    BotMain.getLogger().log("[Bot] 自动保存数据完成");
-                }, 0, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
-
-                if (BotConstants.cfg.getRconPwd() != null && BotConstants.cfg.getRconPort() != 0) {
-                    try {
-                        rcon = new Rcon(BotConstants.cfg.getRconUrl(), BotConstants.cfg.getRconPort(), BotConstants.cfg.getRconPwd());
-                        logger.log("[RCON] 已连接至服务器");
-                    } catch (IOException e) {
-                        logger.warning("[RCON] 连接至服务器时发生了错误, 错误信息: " + e);
-                    } catch (AuthenticationException ae) {
-                        logger.warning("[RCON] RCON 密码有误, 请检查是否输入了正确的密码!");
-                    }
-                }
+                rcon = new Rcon(BotConstants.cfg.getRconUrl(), BotConstants.cfg.getRconPort(), BotConstants.cfg.getRconPwd());
+                logger.log("[RCON] 已连接至服务器");
             } catch (IOException e) {
-                logger.log("[定时任务] 在执行定时任务时发生了问题, 错误信息: " + e);
+                logger.warning("[RCON] 连接至服务器时发生了错误, 错误信息: " + e);
+            } catch (AuthenticationException ae) {
+                logger.warning("[RCON] RCON 密码有误, 请检查是否输入了正确的密码!");
             }
         }
     }
@@ -121,6 +98,11 @@ public class BotMain {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            FileSetup.saveCfg();
+            FileSetup.saveLang();
+        }));
 
         PicqConfig cfg = new PicqConfig(BotConstants.cfg.getBotPort())
                 .setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT)

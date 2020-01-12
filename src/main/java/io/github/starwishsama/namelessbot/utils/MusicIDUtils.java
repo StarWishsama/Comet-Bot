@@ -1,10 +1,9 @@
 package io.github.starwishsama.namelessbot.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 import io.github.starwishsama.namelessbot.BotMain;
 
 import java.io.BufferedReader;
@@ -55,29 +54,28 @@ public class MusicIDUtils {
     public static int getNetEaseSongID(String name){
         if (name != null)
             try {
-                JSONObject object = JSON.parseObject(searchNetEaseMusic(name));
-                return object.getJSONObject("result").getJSONArray("songs").getJSONObject(0).getInteger("id");
+                return searchNetEaseMusic(name).get(0).getAsJsonObject().get("id").getAsInt();
             } catch (IOException ignored) {
             }
         return -1;
     }
 
-    private static String searchNetEaseMusic(String songName) throws IOException {
+    private static JsonArray searchNetEaseMusic(String songName) throws IOException {
         if (songName != null){
             URL url = new URL("http://localhost:3000/search?keywords=" + URLEncoder.encode(songName, "UTF-8"));
             HttpURLConnection hc = (HttpURLConnection) url.openConnection();
             if (hc.getResponseCode() == 200) {
                 InputStream is = url.openStream();
                 BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-                JSONObject songObject = JSONObject.parseObject(br.readLine());
-                if (songObject.getJSONObject("result").getJSONArray("songs") != null) {
-                    return (songObject.toJSONString());
+                JsonObject object = (JsonObject) new JsonParser().parse(br.readLine());
+                if (!object.isJsonNull()){
+                    return object.getAsJsonObject("result").getAsJsonArray("songs");
                 } else
-                    return "Can't request song(s) from API, Please wait a moment.";
+                    BotMain.getLogger().debug("Can't request song(s) from API, Please wait a moment.");
             } else
-                return "Can't request song(s) from API, Response code is " + hc.getResponseCode();
-        } else
-            return "Please assign a song name";
+                BotMain.getLogger().debug("Can't request song(s) from API, Response code is " + hc.getResponseCode());
+        }
+        return null;
     }
 
     private static JsonArray searchQQMusic(String name){
@@ -96,7 +94,7 @@ public class MusicIDUtils {
                             BotMain.getLogger().debug("Can't request song(s) from API, Please wait a moment.");
                     }
                 } else
-                    BotMain.getLogger().debug("Can't request song(s) from API, Response code is " + hc.getResponseCode());
+                    BotMain.getLogger().debug("无法从 API 获取到歌曲信息, 响应码为 " + hc.getResponseCode());
             } catch (Exception x) {
                 BotMain.getLogger().warning("在通过 QQ 音乐搜索歌曲时发生了一个错误, " + x.getMessage());
             }

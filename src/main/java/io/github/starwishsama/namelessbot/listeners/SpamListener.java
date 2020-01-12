@@ -8,6 +8,7 @@ import cc.moecraft.icq.sender.message.MessageBuilder;
 import cc.moecraft.icq.sender.message.components.ComponentAt;
 
 import io.github.starwishsama.namelessbot.BotConstants;
+import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
@@ -18,25 +19,25 @@ public class SpamListener extends IcqListener {
             Long id = e.getSenderId();
             if (System.currentTimeMillis() - e.getGroupUser(id).getInfo().getLastSentTime() < 3000) {
                 BotUser user = BotUtils.getUser(id);
-                e.respond("test");
+                BotMain.getLogger().log("Test SpamListener");
                 if (user == null) {
                     BotUser newUser = new BotUser(id);
                     newUser.setMsgVL(1);
                     BotConstants.users.add(newUser);
                 } else {
-                    //if (!e.isAdmin(id)) {
+                    if (!e.isAdmin(id) && !BotUtils.isBotOwner(id) && !BotUtils.isBotAdmin(id)) {
                         if (user.getMsgVL() != 5) {
                             user.setMsgVL(user.getMsgVL() + 1);
                             e.getHttpApi().sendGroupMsg(e.getGroupId(), BotUtils.getLocalMessage("msg.bot-prefix")
                                     + new MessageBuilder().add(new ComponentAt(id)).toString()
-                                    + " 你发言的速率太快, 请放慢一点哦~");
+                                    + " 你发言的速度太快了, 请放慢一点哦~");
                         } else {
                             e.ban(BotConstants.cfg.getSpamMuteTime());
                             e.getHttpApi().sendGroupMsg(e.getGroupId(), BotUtils.getLocalMessage("msg.bot-prefix")
                                     + new MessageBuilder().add(new ComponentAt(id)).toString()
                                     + " 因为刷屏被禁言");
                         }
-                    //}
+                    }
                 }
             }
         }

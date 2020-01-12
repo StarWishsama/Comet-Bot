@@ -1,6 +1,7 @@
 package io.github.starwishsama.namelessbot.objects;
 
-import com.rometools.rome.feed.synd.*;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;

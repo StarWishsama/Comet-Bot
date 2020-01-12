@@ -43,6 +43,8 @@ public class MusicCommand implements EverywhereCommand {
                             case "qq":
                                 BotConstants.cfg.setApi(MusicType.QQ);
                                 break;
+                            default:
+                                return BotUtils.getLocalMessage("msg.bot-prefix") + "/music set [QQ/网易]";
                         }
                     } else
                         return BotUtils.getLocalMessage("msg.bot-prefix") + "/music set [音乐API]";

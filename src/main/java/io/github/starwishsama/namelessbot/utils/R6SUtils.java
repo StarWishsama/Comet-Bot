@@ -68,6 +68,7 @@ public class R6SUtils {
                 break;
             default:
                 pf = Platform.UPLAY;
+                break;
         }
 
         try {

@@ -20,28 +20,29 @@ public class AdminCommand implements GroupCommand {
                 switch (args.get(0)) {
                     case "set":
                         if (args.size() == 2) {
-                            if (BotUtils.isBotOwner(sender.getId())){
-                                if (args.get(0) != null){
-                                    long qq = StringUtils.isNumeric(args.get(0)) ? Long.parseLong(args.get(1)) : BotUtils.parseAt(args.get(1));
-                                    if (qq != -1000L) {
-                                        if (BotConstants.cfg.getBotAdmins() == null) {
-                                            BotConstants.cfg.setBotAdmins(new ArrayList<>());
-                                        }
-                                        if (BotUtils.isBotAdmin(sender.getId())) {
-                                            BotConstants.cfg.getBotAdmins().remove(qq);
-                                            return BotUtils.getLocalMessage("msg.bot-prefix") + "删除机器人管理员成功!";
-                                        } else {
-                                            BotConstants.cfg.getBotAdmins().add(qq);
-                                            return BotUtils.getLocalMessage("msg.bot-prefix") + "添加机器人管理员成功!";
-                                        }
-                                    } else
-                                        return BotUtils.getLocalMessage("msg.bot-prefix") + "请检查QQ号是否正确!";
-                                }
+                            if (BotUtils.isBotOwner(sender.getId()) && args.get(0) != null){
+                                long qq = StringUtils.isNumeric(args.get(0)) ? Long.parseLong(args.get(1)) : BotUtils.parseAt(args.get(1));
+                                if (qq != -1000L) {
+                                    if (BotConstants.cfg.getBotAdmins() == null) {
+                                        BotConstants.cfg.setBotAdmins(new ArrayList<>());
+                                    }
+                                    if (BotUtils.isBotAdmin(sender.getId())) {
+                                        BotConstants.cfg.getBotAdmins().remove(qq);
+                                        return BotUtils.getLocalMessage("msg.bot-prefix") + "删除机器人管理员成功!";
+                                    } else {
+                                        BotConstants.cfg.getBotAdmins().add(qq);
+                                        return BotUtils.getLocalMessage("msg.bot-prefix") + "添加机器人管理员成功!";
+                                    }
+                                } else
+                                    return BotUtils.getLocalMessage("msg.bot-prefix") + "请检查QQ号是否正确!";
+
                             }
                         }
                         break;
                     case "help":
                         return "Nothing here now";
+                    default:
+                        return null;
                 }
             } else
                 return BotUtils.getLocalMessage("msg.bot-prefix") + "/admin help";
