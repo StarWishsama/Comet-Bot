@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 public class MusicIDUtils {
     // 仅供测试
     public static void main(String[] args){
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in), 1024);
         boolean quit = false;
 
         while (!quit){

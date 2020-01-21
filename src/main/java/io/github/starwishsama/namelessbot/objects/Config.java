@@ -45,4 +45,6 @@ public class Config {
     private List<String> filterWords;
     @SerializedName("default_music_api")
     private MusicCommand.MusicType api = MusicCommand.MusicType.QQ;
+    @SerializedName("bili_live_api")
+    private String liveApi = "https://api.vtbs.moe/v1/info";
 }

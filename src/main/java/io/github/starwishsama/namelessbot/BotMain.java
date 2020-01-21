@@ -14,15 +14,23 @@ import io.github.starwishsama.namelessbot.config.FileSetup;
 import io.github.starwishsama.namelessbot.listeners.ExceptionListener;
 import io.github.starwishsama.namelessbot.listeners.SpamListener;
 
+import io.github.starwishsama.namelessbot.objects.BiliLiver;
+import io.github.starwishsama.namelessbot.utils.LiveUtils;
 import lombok.Getter;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author Nameless
+ */
 public class BotMain {
     @Getter
     private static HyLogger logger;
@@ -62,6 +70,30 @@ public class BotMain {
             FileSetup.saveLang();
             BotMain.getLogger().log("[Bot] 自动保存数据完成");
         }, 0, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
+
+        Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
+            try {
+                if (BotConstants.livers != null && !BotConstants.livers.isEmpty()){
+                    List<BiliLiver> allLiver = LiveUtils.getVTubers();
+                    for (BiliLiver liver : allLiver){
+                        for (String liverName : BotConstants.livers){
+                            if (liver.getVtuberName().equals(liverName)){
+                                if (liver.isStreaming()) {
+                                    getApi().sendPrivateMsg(BotConstants.cfg.getOwnerID(),
+                                            "bilibili 直播开播提醒\n"
+                                                    + liverName + " 开始直播了!\n"
+                                                    + "开播时间: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(liver.getLastLive().getTime()) + "\n"
+                                                    + "☞单击直达直播 " + "https://live.bilibili.com/" + liver.getRoomid()
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }, 0, 10, TimeUnit.MINUTES);
 
         if (BotConstants.cfg.getRconPwd() != null && BotConstants.cfg.getRconPort() != 0) {
             try {
@@ -112,8 +144,9 @@ public class BotMain {
         logger = bot.getLogger();
         bot.setUniversalHyExpSupport(true);
         bot.addAccount(BotConstants.cfg.getBotName(), BotConstants.cfg.getPostUrl(), BotConstants.cfg.getPostPort());
-        if (bot.getAccountManager().getAccounts().size() != 0)
+        if (bot.getAccountManager().getAccounts().size() != 0) {
             api = bot.getAccountManager().getNonAccountSpecifiedApi();
+        }
         bot.enableCommandManager(BotConstants.cfg.getCmdPrefix());
         bot.getCommandManager().registerCommands(commands);
         bot.getEventManager().registerListeners(listeners);

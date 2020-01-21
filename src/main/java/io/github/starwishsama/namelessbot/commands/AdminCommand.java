@@ -12,6 +12,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
+/**
+ * @author Nameless
+ */
 public class AdminCommand implements GroupCommand {
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String command, ArrayList<String> args) {
@@ -33,19 +36,23 @@ public class AdminCommand implements GroupCommand {
                                         BotConstants.cfg.getBotAdmins().add(qq);
                                         return BotUtils.getLocalMessage("msg.bot-prefix") + "添加机器人管理员成功!";
                                     }
-                                } else
+                                } else {
                                     return BotUtils.getLocalMessage("msg.bot-prefix") + "请检查QQ号是否正确!";
-
+                                }
                             }
                         }
+                        break;
+                    case "filter":
+                        
                         break;
                     case "help":
                         return "Nothing here now";
                     default:
                         return null;
                 }
-            } else
+            } else {
                 return BotUtils.getLocalMessage("msg.bot-prefix") + "/admin help";
+            }
         }
         return null;
     }
