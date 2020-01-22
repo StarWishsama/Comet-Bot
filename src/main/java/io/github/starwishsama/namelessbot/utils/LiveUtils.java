@@ -23,6 +23,8 @@ public class LiveUtils {
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String result = br.readLine();
             if (result != null){
+                // 去除特殊字符
+                result = result.replaceAll(":", "：").replace("/", "");
                 return gson.fromJson(result, new TypeToken<List<BiliLiver>>(){}.getType());
             }
         }

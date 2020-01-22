@@ -23,11 +23,13 @@ public class AdminCommand implements GroupCommand {
                 switch (args.get(0)) {
                     case "set":
                         if (args.size() == 2) {
-                            if (BotUtils.isBotOwner(sender.getId()) && args.get(0) != null){
-                                long qq = StringUtils.isNumeric(args.get(0)) ? Long.parseLong(args.get(1)) : BotUtils.parseAt(args.get(1));
+                            if (BotUtils.isBotOwner(sender.getId()) && args.get(1) != null){
+                                long qq = StringUtils.isNumeric(args.get(1)) ? Long.parseLong(args.get(1)) : BotUtils.parseAt(args.get(1));
                                 if (qq != -1000L) {
                                     if (BotConstants.cfg.getBotAdmins() == null) {
                                         BotConstants.cfg.setBotAdmins(new ArrayList<>());
+                                        BotConstants.cfg.getBotAdmins().add(qq);
+                                        return BotUtils.getLocalMessage("msg.bot-prefix") + "添加机器人管理员成功!";
                                     }
                                     if (BotUtils.isBotAdmin(sender.getId())) {
                                         BotConstants.cfg.getBotAdmins().remove(qq);
