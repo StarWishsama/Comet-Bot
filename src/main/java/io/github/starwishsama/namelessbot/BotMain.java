@@ -21,12 +21,18 @@ import lombok.Getter;
 
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -63,49 +69,90 @@ public class BotMain {
             new ExceptionListener()
     };
 
-    public static void main(String[] args){
-        startBot();
+    public static void main(String[] args) {
+        boolean isQuit = false;
+        ExecutorService service = Executors.newCachedThreadPool();
+        ScheduledExecutorService timerService = Executors.newScheduledThreadPool(1);
+        try {
+            while (!isQuit) {
 
-        // 自动保存 Timer
-        Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
-            FileSetup.saveCfg();
-            FileSetup.saveLang();
-            BotMain.getLogger().log("[Bot] 自动保存数据完成");
-        }, 0, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
+                service.execute(BotMain::startBot);
 
-        Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
-            try {
-                if (BotConstants.livers != null && !BotConstants.livers.isEmpty()){
-                    List<BiliLiver> allLiver = LiveUtils.getBiliLivers();
-                    for (BiliLiver liver : allLiver){
-                        for (String liverName : BotConstants.livers){
-                            if (liver.getVtuberName().equals(liverName)){
-                                if (liver.isStreaming()) {
-                                    getApi().sendPrivateMsg(BotConstants.cfg.getOwnerID(),
-                                            "bilibili 直播开播提醒\n"
-                                                    + liverName + " 开始直播了!\n"
-                                                    + "开播时间: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(liver.getLastLive().getTime()) + "\n"
-                                                    + "☞单击直达直播 " + "https://live.bilibili.com/" + liver.getRoomid()
-                                    );
+                if (BotConstants.cfg.getRconPwd() != null && BotConstants.cfg.getRconPort() != 0) {
+                    try {
+                        rcon = new Rcon(BotConstants.cfg.getRconUrl(), BotConstants.cfg.getRconPort(), BotConstants.cfg.getRconPwd());
+                        logger.log("[RCON] 已连接至服务器");
+                    } catch (IOException e) {
+                        logger.warning("[RCON] 连接至服务器时发生了错误, 错误信息: " + e);
+                    } catch (AuthenticationException ae) {
+                        logger.warning("[RCON] RCON 密码有误, 请检查是否输入了正确的密码!");
+                    }
+                }
+
+                // 自动保存 Timer
+                timerService.scheduleWithFixedDelay(() -> {
+                    FileSetup.saveCfg();
+                    FileSetup.saveLang();
+                    BotMain.getLogger().log("[Bot] 自动保存数据完成");
+                }, 0, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
+
+                // 定时推送开播消息 (WIP)
+                timerService.scheduleWithFixedDelay(() -> {
+                    try {
+                        if (BotConstants.livers != null && !BotConstants.livers.isEmpty()) {
+                            List<BiliLiver> allLiver = LiveUtils.getBiliLivers();
+                            for (BiliLiver liver : allLiver) {
+                                for (String liverName : BotConstants.livers) {
+                                    if (liver.getVtuberName().equals(liverName)) {
+                                        if (liver.isStreaming()) {
+                                            getApi().sendPrivateMsg(BotConstants.cfg.getOwnerID(),
+                                                    "bilibili 直播开播提醒\n"
+                                                            + liverName + " 开始直播了!\n"
+                                                            + "开播时间: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(liver.getLastLive().getTime()) + "\n"
+                                                            + "☞单击直达直播 " + "https://live.bilibili.com/" + liver.getRoomid()
+                                            );
+                                        }
+                                    }
                                 }
                             }
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-        }, 0, 10, TimeUnit.MINUTES);
+                }, 0, 10, TimeUnit.MINUTES);
 
-        if (BotConstants.cfg.getRconPwd() != null && BotConstants.cfg.getRconPort() != 0) {
-            try {
-                rcon = new Rcon(BotConstants.cfg.getRconUrl(), BotConstants.cfg.getRconPort(), BotConstants.cfg.getRconPwd());
-                logger.log("[RCON] 已连接至服务器");
-            } catch (IOException e) {
-                logger.warning("[RCON] 连接至服务器时发生了错误, 错误信息: " + e);
-            } catch (AuthenticationException ae) {
-                logger.warning("[RCON] RCON 密码有误, 请检查是否输入了正确的密码!");
+                BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+                String[] line = in.readLine().split(" ");
+
+                switch (line[0]){
+                    case "stop":
+                        service.shutdown();
+                        timerService.shutdown();
+                        FileSetup.saveCfg();
+                        FileSetup.saveLang();
+                        isQuit = true;
+                        break;
+                    case "setowner":
+                        if (line.length > 1) {
+                            if (line[1] != null && StringUtils.isNumeric(line[1])) {
+                                BotConstants.cfg.setOwnerID(Integer.parseInt(line[1]));
+                                logger.log("设置机器人主人成功");
+                            }
+                        } else {
+                            logger.log("setowner [QQ]");
+                        }
+                        break;
+                    case "reload":
+                        FileSetup.loadCfg();
+                        FileSetup.loadLang();
+                        logger.log("重载机器人文件成功");
+                        break;
+                    default:
+                        logger.log("未知命令.");
+                }
             }
+        } catch (IOException e) {
+            logger.warning("在运行时遇到了问题, " + e);
         }
     }
 
@@ -124,7 +171,7 @@ public class BotMain {
         return location.getPath();
     }
 
-    private static void startBot(){
+    private static void startBot() {
         try {
             jarPath = getPath();
             FileSetup.loadCfg();

@@ -24,8 +24,7 @@ public class LiveUtils {
             String result = br.readLine();
             if (result != null){
                 // 去除特殊字符
-                result = result.replaceAll(":", "：").replace("/", "");
-                return gson.fromJson(result, new TypeToken<List<BiliLiver>>(){}.getType());
+                return gson.fromJson(gson.toJson(result), new TypeToken<List<BiliLiver>>(){}.getType());
             }
         }
         return new ArrayList<>();
