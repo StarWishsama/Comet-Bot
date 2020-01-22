@@ -91,12 +91,12 @@ public class MusicIDUtils {
                         if (object.getAsJsonObject("data").getAsJsonObject("song").getAsJsonArray("list") != null){
                             return object.getAsJsonObject("data").getAsJsonObject("song").getAsJsonArray("list");
                         } else
-                            BotMain.getLogger().debug("Can't request song(s) from API, Please wait a moment.");
+                            BotMain.getLogger().debug("无法从 API 获取到歌曲信息, 获取到的 JSON 是空的.");
                     }
                 } else
                     BotMain.getLogger().debug("无法从 API 获取到歌曲信息, 响应码为 " + hc.getResponseCode());
             } catch (Exception x) {
-                BotMain.getLogger().warning("在通过 QQ 音乐搜索歌曲时发生了一个错误, " + x.getMessage());
+                BotMain.getLogger().warning("在通过 QQ 音乐搜索歌曲时发生了一个错误, " + x);
             }
         }
         return null;

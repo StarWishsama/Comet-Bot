@@ -16,14 +16,15 @@ import io.github.starwishsama.namelessbot.listeners.SpamListener;
 
 import io.github.starwishsama.namelessbot.objects.BiliLiver;
 import io.github.starwishsama.namelessbot.utils.LiveUtils;
+
 import lombok.Getter;
+
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -52,6 +53,7 @@ public class BotMain {
             new MuteCommand(),
             new R6SCommand(),
             new RandomCommand(),
+            new RSSCommand(),
             new RConGroupCommand(),
             new ServerInfoCommand(),
             new VersionCommand()
@@ -74,7 +76,7 @@ public class BotMain {
         Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
             try {
                 if (BotConstants.livers != null && !BotConstants.livers.isEmpty()){
-                    List<BiliLiver> allLiver = LiveUtils.getVTubers();
+                    List<BiliLiver> allLiver = LiveUtils.getBiliLivers();
                     for (BiliLiver liver : allLiver){
                         for (String liverName : BotConstants.livers){
                             if (liver.getVtuberName().equals(liverName)){
@@ -107,7 +109,7 @@ public class BotMain {
         }
     }
 
-    // https://blog.csdn.net/df0128/article/details/90484684
+    // From https://blog.csdn.net/df0128/article/details/90484684
     private static String getPath() {
         String path = BotMain.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         if (System.getProperty("os.name").toLowerCase().contains("dows")) {

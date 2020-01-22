@@ -2,6 +2,7 @@ package io.github.starwishsama.namelessbot.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.objects.BiliLiver;
 
@@ -16,7 +17,7 @@ import java.util.List;
 public class LiveUtils {
     private static Gson gson = new Gson();
 
-    public static List<BiliLiver> getVTubers() throws IOException {
+    public static List<BiliLiver> getBiliLivers() throws IOException {
         HttpURLConnection conn = (HttpURLConnection) new URL(BotConstants.cfg.getLiveApi()).openConnection();
         if (conn.getResponseCode() == 200){
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -28,8 +29,8 @@ public class LiveUtils {
         return new ArrayList<>();
     }
 
-    public static BiliLiver getVTuber(String name) throws IOException {
-        List<BiliLiver> livers = getVTubers();
+    public static BiliLiver getBiliLiver(String name) throws IOException {
+        List<BiliLiver> livers = getBiliLivers();
         for (BiliLiver liver : livers){
             if (liver.getVtuberName().equals(name)){
                 return liver;

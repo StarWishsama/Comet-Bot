@@ -145,6 +145,19 @@ public class BotUtils {
         return true;
     }
 
+    public static boolean isNoCoolDown(User user){
+        long qq = user.getId();
+        long currentTime = System.currentTimeMillis();
+        if (coolDown.containsKey(qq) && !BotUtils.isBotOwner(qq)){
+            if (currentTime - coolDown.get(qq) < BotConstants.cfg.getCoolDownTime() * 1000){
+                return false;
+            } else
+                coolDown.remove(qq);
+        } else
+            BotUtils.coolDown.put(qq, currentTime);
+        return true;
+    }
+
     /**
      * 判断ID是否符合Minecraft用户名格式
      *
