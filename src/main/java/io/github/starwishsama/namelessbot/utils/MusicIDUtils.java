@@ -67,7 +67,7 @@ public class MusicIDUtils {
             if (hc.getResponseCode() == 200) {
                 InputStream is = url.openStream();
                 BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-                JsonObject object = (JsonObject) new JsonParser().parse(br.readLine());
+                JsonObject object = (JsonObject) JsonParser.parseString(br.readLine());
                 if (!object.isJsonNull()){
                     return object.getAsJsonObject("result").getAsJsonArray("songs");
                 } else
@@ -86,7 +86,7 @@ public class MusicIDUtils {
                 if (hc.getResponseCode() == 200) {
                     InputStream is = url.openStream();
                     BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-                    JsonObject object = (JsonObject) new JsonParser().parse(br.readLine());
+                    JsonObject object = (JsonObject) JsonParser.parseString(br.readLine());
                     if (!object.isJsonNull()){
                         if (object.getAsJsonObject("data").getAsJsonObject("song").getAsJsonArray("list") != null){
                             return object.getAsJsonObject("data").getAsJsonObject("song").getAsJsonArray("list");

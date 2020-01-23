@@ -14,7 +14,7 @@ plugins {
 }
 
 group 'io.github.starwishsama.namelessbot'
-version '0.2-DEV-200110'
+version '0.2.1-DEV-200122'
 
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
@@ -33,7 +33,7 @@ dependencies {
     implementation 'org.apache.commons:commons-io:1.3.2'
     implementation 'com.gitlab.siege-insights:r6tab-java-api-client:0.7-alpha'
     implementation 'com.deadmandungeons:mc-server-status:1.2.0'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.rometools:rome:1.12.2'
     implementation 'com.rometools:rome-utils:1.12.2'
     implementation 'com.rometools:rome-fetcher:1.12.2'

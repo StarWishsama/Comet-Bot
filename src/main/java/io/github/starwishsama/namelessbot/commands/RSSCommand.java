@@ -38,7 +38,7 @@ public class RSSCommand implements EverywhereCommand {
                 } else
                     return BotUtils.getLocalMessage("msg.bot-prefix") + BotUtils.getLocalMessage("msg.no-permission");
             } else
-                return BotUtils.getLocalMessage("msg.bot-prefix") + BotUtils.getLocalMessage("msg.no-permission");
+                return BotUtils.getLocalMessage("msg.bot-prefix") + "/订阅 [bilibili] [频道名]\n由于 API 的关系, 现在只能订阅B站的虚拟主播";
         }
         return null;
     }

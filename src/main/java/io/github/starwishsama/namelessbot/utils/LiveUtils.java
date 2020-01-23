@@ -1,6 +1,9 @@
 package io.github.starwishsama.namelessbot.utils;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import io.github.starwishsama.namelessbot.BotConstants;
@@ -15,16 +18,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LiveUtils {
-    private static Gson gson = new Gson();
+    private static Gson gson = new GsonBuilder().serializeNulls().setLenient().create();
 
     public static List<BiliLiver> getBiliLivers() throws IOException {
         HttpURLConnection conn = (HttpURLConnection) new URL(BotConstants.cfg.getLiveApi()).openConnection();
-        if (conn.getResponseCode() == 200){
+        conn.setRequestProperty("Accept-Charset", "utf-8");
+        conn.setRequestProperty("contentType", "utf-8");
+        if (conn.getResponseCode() == HttpURLConnection.HTTP_OK){
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String result = br.readLine();
-            if (result != null){
+            JsonElement result = JsonParser.parseString(br.readLine());
+            if (result != null && !result.isJsonNull()) {
                 // 去除特殊字符
-                return gson.fromJson(gson.toJson(result), new TypeToken<List<BiliLiver>>(){}.getType());
+                return gson.fromJson(result, new TypeToken<List<BiliLiver>>(){}.getType());
             }
         }
         return new ArrayList<>();

@@ -81,8 +81,8 @@ public class FileSetup {
             String userContent = FileReader.create(userCfg).readString();
             String configContent = FileReader.create(cfgFile).readString();
 
-            JsonElement checkInParser = new JsonParser().parse(userContent);
-            JsonElement configParser = new JsonParser().parse(configContent);
+            JsonElement checkInParser = JsonParser.parseString(userContent);
+            JsonElement configParser = JsonParser.parseString(configContent);
             if (!checkInParser.isJsonNull() && !configParser.isJsonNull()){
                 cfg = gson.fromJson(configContent, Config.class);
                 users = gson.fromJson(userContent, new TypeToken<Collection<BotUser>>(){}.getType());
@@ -103,7 +103,7 @@ public class FileSetup {
             msg.add(new BotLocalization("checkin.first-time", "你还没有签到过, 先用 /qd 签到一次吧~"));
             FileWriter.create(langCfg).write(gson.toJson(msg));
         } else {
-            JsonElement lang = new JsonParser().parse(FileReader.create(langCfg).readString());
+            JsonElement lang = JsonParser.parseString(FileReader.create(langCfg).readString());
             if (!lang.isJsonNull()) {
                 msg = gson.fromJson(FileReader.create(langCfg).readString(), new TypeToken<List<BotLocalization>>(){}.getType());
             } else
