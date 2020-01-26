@@ -1,5 +1,6 @@
 package io.github.starwishsama.namelessbot.utils;
 
+import cc.moecraft.icq.user.GroupUser;
 import cc.moecraft.icq.user.User;
 import com.deadmandungeons.serverstatus.MinecraftServerStatus;
 import com.deadmandungeons.serverstatus.ping.PingResponse;

@@ -6,11 +6,11 @@ import cc.moecraft.icq.event.events.message.EventGroupMessage;
 import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
 
-import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.config.FileSetup;
 import io.github.starwishsama.namelessbot.objects.BiliLiver;
 import io.github.starwishsama.namelessbot.objects.BotUser;
+import io.github.starwishsama.namelessbot.objects.RssItem;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import io.github.starwishsama.namelessbot.utils.LiveUtils;
 
@@ -50,16 +50,21 @@ public class DebugCommand implements GroupCommand {
                     }
                 case "raw":
                     return args.toString();
+                case "ncov":
+                    RssItem rss = new RssItem("https://rsshub.app/telegram/channel/nCoV2019");
+                    return RssItem.simplifyHTML(rss.getEntry().getDescription().getValue().trim());
                 case "vtuber":
                     try {
                         if (args.size() == 2) {
                             BiliLiver liver = LiveUtils.getBiliLiver(args.get(1));
                             if (liver != null) {
                                 return "bilibili 主播信息\n"
-                                        + "主播名: " + liver.getVtuberName() + "\n"
+                                        + "主播名: " + liver.getUname() + "\n"
                                         + "上次开播时间: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(liver.getLastLive().getTime()) + "\n"
                                         + "直播房间地址: " + "https://live.bilibili.com/" + liver.getRoomid() + "\n"
                                         + "直播状态:" + (liver.isStreaming() ? "√" : "X");
+                            } else {
+                                return "Not found";
                             }
                         }
                     } catch (IOException e){

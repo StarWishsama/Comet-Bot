@@ -8,14 +8,13 @@ import cc.moecraft.icq.sender.IcqHttpApi;
 import cc.moecraft.logger.HyLogger;
 import cc.moecraft.logger.environments.ColorSupportLevel;
 
+import com.rometools.rome.feed.synd.SyndEntry;
 import io.github.starwishsama.namelessbot.commands.*;
 import io.github.starwishsama.namelessbot.config.FileSetup;
 import io.github.starwishsama.namelessbot.listeners.ExceptionListener;
 import io.github.starwishsama.namelessbot.listeners.SpamListener;
 
-import io.github.starwishsama.namelessbot.objects.BiliLiver;
-import io.github.starwishsama.namelessbot.utils.LiveUtils;
-
+import io.github.starwishsama.namelessbot.objects.RssItem;
 import lombok.Getter;
 
 import net.kronos.rkon.core.Rcon;
@@ -23,15 +22,15 @@ import net.kronos.rkon.core.ex.AuthenticationException;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author Nameless
  */
 public class BotMain {
+    public static String temp;
     @Getter
     private static HyLogger logger;
     @Getter
@@ -55,6 +54,7 @@ public class BotMain {
             new RSSCommand(),
             new RConGroupCommand(),
             new ServerInfoCommand(),
+            new SayCommand(),
             new VersionCommand()
     };
 
@@ -63,12 +63,36 @@ public class BotMain {
     };
 
     public static void main(String[] args) {
+        ScheduledExecutorService saveService = Executors.newScheduledThreadPool(1);
+        jarPath = getPath();
+        FileSetup.loadCfg();
+        FileSetup.loadLang();
+
+        PicqConfig cfg = new PicqConfig(BotConstants.cfg.getBotPort())
+                .setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT)
+                .setLogFileName("Nameless-Bot-Log")
+                .setUseAsyncCommands(true);
+        PicqBotX bot = new PicqBotX(cfg);
+        logger = bot.getLogger();
+        bot.addAccount(BotConstants.cfg.getBotName(), BotConstants.cfg.getPostUrl(), BotConstants.cfg.getPostPort());
+        if (bot.getAccountManager().getAccounts().size() != 0) {
+            api = bot.getAccountManager().getNonAccountSpecifiedApi();
+        }
+        bot.enableCommandManager(BotConstants.cfg.getCmdPrefix());
+        bot.getCommandManager().registerCommands(commands);
+        bot.getEventManager().registerListeners(listeners);
+        if (BotConstants.cfg.isAntiSpam()) {
+            bot.getEventManager().registerListener(new SpamListener());
+        }
+        bot.startBot();
+        logger.log("启动完成! 机器人运行在端口 " + BotConstants.cfg.getBotPort() + " 上.");
+
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             FileSetup.saveCfg();
             FileSetup.saveLang();
+            saveService.shutdown();
+            logger.log("Bye!");
         }));
-
-        startBot();
 
         if (BotConstants.cfg.getRconPwd() != null && BotConstants.cfg.getRconPort() != 0) {
             try {
@@ -82,38 +106,30 @@ public class BotMain {
         }
 
         // 自动保存 Timer
-        Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
+        saveService.scheduleWithFixedDelay(() -> {
             FileSetup.saveCfg();
             FileSetup.saveLang();
-            BotMain.getLogger().log("[Bot] 自动保存数据完成");
-        }, BotConstants.cfg.getAutoSaveTime() * 1000, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
+            logger.log("[Bot] 自动保存数据完成");
+        }, 0, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
 
-        // 定时推送开播消息 (WIP)
-        Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
             try {
-                if (BotConstants.livers != null && !BotConstants.livers.isEmpty()) {
-                    List<BiliLiver> allLiver = LiveUtils.getBiliLivers();
-                    if (!allLiver.isEmpty()) {
-                        for (BiliLiver liver : allLiver) {
-                            for (String liverName : BotConstants.livers) {
-                                if (liver.getVtuberName().equals(liverName)) {
-                                    if (liver.isStreaming()) {
-                                        getApi().sendPrivateMsg(BotConstants.cfg.getOwnerID(),
-                                                "bilibili 直播开播提醒\n"
-                                                        + liverName + " 开始直播了!\n"
-                                                        + "开播时间: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(liver.getLastLive().getTime()) + "\n"
-                                                        + "☞单击直达直播 " + "https://live.bilibili.com/" + liver.getRoomid()
-                                        );
-                                    }
-                                }
-                            }
+                RssItem rss = new RssItem("https://rsshub.app/telegram/channel/nCoV2019");
+                if (rss.getContext() != null && !BotConstants.cfg.getSubscribers().isEmpty()){
+                    SyndEntry entry = rss.getEntry();
+                    String title = rss.getTitle();
+                    if (!title.equals(temp)) {
+                        for (Long group : BotConstants.cfg.getSubscribers()) {
+                            getApi().sendGroupMsg(group, RssItem.simplifyHTML(entry.getDescription().getValue().trim()));
+                            temp = title;
                         }
                     }
                 }
-            } catch (Exception e) {
-               logger.log("在推送开播消息时遇到了问题" + e);
+            } catch (Exception e){
+                logger.warning("发生异常: " + e);
+                e.printStackTrace();
             }
-        }, 0, 10, TimeUnit.MINUTES);
+        }, 0, 5, TimeUnit.MINUTES);
     }
 
     // From https://blog.csdn.net/df0128/article/details/90484684
@@ -129,35 +145,5 @@ public class BotMain {
 
         File location = new File(path.replace("target/classes/", ""));
         return location.getPath();
-    }
-
-    private static void startBot() {
-        try {
-            jarPath = getPath();
-            FileSetup.loadCfg();
-            FileSetup.loadLang();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        PicqConfig cfg = new PicqConfig(BotConstants.cfg.getBotPort())
-                .setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT)
-                .setLogFileName("Nameless-Bot-Log")
-                .setUseAsyncCommands(true);
-        PicqBotX bot = new PicqBotX(cfg);
-        logger = bot.getLogger();
-        bot.setUniversalHyExpSupport(true);
-        bot.addAccount(BotConstants.cfg.getBotName(), BotConstants.cfg.getPostUrl(), BotConstants.cfg.getPostPort());
-        if (bot.getAccountManager().getAccounts().size() != 0) {
-            api = bot.getAccountManager().getNonAccountSpecifiedApi();
-        }
-        bot.enableCommandManager(BotConstants.cfg.getCmdPrefix());
-        bot.getCommandManager().registerCommands(commands);
-        bot.getEventManager().registerListeners(listeners);
-        if (BotConstants.cfg.isAntiSpam()){
-            bot.getEventManager().registerListener(new SpamListener());
-        }
-        bot.startBot();
-        logger.log("启动完成! 机器人运行在端口 " + BotConstants.cfg.getBotPort() + " 上.");
     }
 }

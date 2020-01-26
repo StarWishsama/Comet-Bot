@@ -2,6 +2,7 @@ package io.github.starwishsama.namelessbot.config;
 
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
+import cn.hutool.core.util.CharsetUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -29,12 +30,13 @@ public class FileSetup {
     private static File shopItemCfg = new File(BotMain.getJarPath() + "/items.json");
     private static File cfgFile = new File(BotMain.getJarPath() + "/config.json");
     private static File langCfg = new File(BotMain.getJarPath() + "/lang.json");
+    private static File rssTemp = new File(BotMain.getJarPath() + "/temp.txt");
 
     private static Gson gson = new GsonBuilder().serializeNulls().create();
 
     public static void loadCfg(){
         if (BotMain.getJarPath() != null) {
-            if (userCfg.exists() && cfgFile.exists()){
+            if (userCfg.exists() && cfgFile.exists() && rssTemp.exists()){
                 load();
             } else {
                 try {
@@ -55,6 +57,9 @@ public class FileSetup {
                     FileWriter.create(cfgFile).write(gson.toJson(cfg));
                     FileWriter.create(userCfg).write(gson.toJson(users));
                     FileWriter.create(shopItemCfg).write(gson.toJson(shopItems));
+                    if (!rssTemp.createNewFile()){
+                        System.out.println("[配置] 缓存文件已存在, 已自动忽略.");
+                    }
 
                     load();
                     System.out.println("[配置] 已自动生成新的配置文件.");
@@ -70,6 +75,7 @@ public class FileSetup {
             FileWriter.create(cfgFile).write(gson.toJson(cfg));
             FileWriter.create(userCfg).write(gson.toJson(users));
             FileWriter.create(shopItemCfg).write(gson.toJson(shopItems));
+            FileWriter.create(rssTemp).write(BotMain.temp);
         } catch (Exception e){
             System.err.println("[配置] 在保存配置文件时发生了问题, 错误信息: ");
             e.printStackTrace();
@@ -80,6 +86,7 @@ public class FileSetup {
         try {
             String userContent = FileReader.create(userCfg).readString();
             String configContent = FileReader.create(cfgFile).readString();
+            BotMain.temp = FileReader.create(rssTemp).readString();
 
             JsonElement checkInParser = JsonParser.parseString(userContent);
             JsonElement configParser = JsonParser.parseString(configContent);

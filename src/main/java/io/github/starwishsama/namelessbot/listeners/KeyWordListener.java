@@ -27,8 +27,12 @@ public class KeyWordListener extends IcqListener {
     } */
 
     private boolean isFilterWord(String context){
-        for (String word : BotConstants.cfg.getFilterWords()){
-            return word.equals(context);
+        if (BotConstants.cfg.getFilterWords() != null && !BotConstants.cfg.getFilterWords().isEmpty()) {
+            for (String word : BotConstants.cfg.getFilterWords()) {
+                if (word.equals(context)){
+                    return true;
+                }
+            }
         }
         return false;
     }

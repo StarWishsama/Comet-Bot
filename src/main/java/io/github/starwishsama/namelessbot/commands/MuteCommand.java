@@ -29,17 +29,7 @@ public class MuteCommand implements GroupCommand {
             if (event.isAdmin()) {
                 if (args.size() > 0) {
                     try {
-                        long banQQ;
-                        if (StringUtils.isNumeric(args.get(0))){
-                            banQQ = Long.parseLong(args.get(0));
-                        } else {
-                            ExComponent ec = ExComponent.parseComponent(args.get(0));
-                            if (ec instanceof ExComponentAt) {
-                                banQQ = ((ExComponentAt) ec).getAt();
-                            } else
-                                banQQ = -1000;
-                        }
-
+                        long banQQ = StringUtils.isNumeric(args.get(0)) ? Integer.parseInt(args.get(0)) : BotUtils.parseAt(args.get(0));
                         if (banQQ != -1000) {
                             long banTime = 0; // 此处单位为秒
                             if (args.size() == 1)

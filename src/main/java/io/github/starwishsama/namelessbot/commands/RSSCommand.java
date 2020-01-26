@@ -4,6 +4,7 @@ import cc.moecraft.icq.command.CommandProperties;
 import cc.moecraft.icq.command.interfaces.EverywhereCommand;
 import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
+import cc.moecraft.utils.StringUtils;
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
@@ -32,6 +33,12 @@ public class RSSCommand implements EverywhereCommand {
                             } else {
                                 return BotUtils.getLocalMessage("msg.bot-prefix") + "/订阅 [哔哩哔哩] [频道名]\n由于 API 的关系, 现在只能订阅B站的虚拟主播";
                             }
+                        case "ncov":
+                            if (args.size() > 1 && StringUtils.isNumeric(args.get(1))){
+                                BotConstants.cfg.getSubscribers().add(Long.parseLong(args.get(1)));
+                                return BotUtils.getLocalMessage("msg.bot-prefix") + "订阅成功!";
+                            } else
+                                return BotUtils.getLocalMessage("msg.bot-prefix") + "/rss ncov [推送群]";
                         default:
                             return BotUtils.getLocalMessage("msg.bot-prefix") + "/订阅 [bilibili] [频道名]\n由于 API 的关系, 现在只能订阅B站的虚拟主播";
                     }

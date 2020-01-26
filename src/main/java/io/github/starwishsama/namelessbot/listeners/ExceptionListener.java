@@ -24,10 +24,12 @@ public class ExceptionListener extends IcqListener {
     {
         if (e.getParentEvent() instanceof EventMessage)
         {
-            if (BotUtils.isBotAdmin(((EventMessage) e.getParentEvent()).getSenderId()) || BotUtils.isBotOwner(((EventMessage) e.getParentEvent()).getSenderId()))
+            if (BotUtils.isBotAdmin(((EventMessage) e.getParentEvent()).getSenderId()) || BotUtils.isBotOwner(((EventMessage) e.getParentEvent()).getSenderId())) {
                 ((EventMessage) e.getParentEvent()).respond("在执行命令时发生了异常, 请查看后台");
-            if (BotConstants.cfg.getOwnerID() != 0)
+            }
+            if (BotConstants.cfg.getOwnerID() != 0) {
                 e.getParentEvent().getHttpApi().sendPrivateMsg(BotConstants.cfg.getOwnerID(), "消息事件异常: " + e.getParentEvent().toString() + "\n" + e.getException().getLocalizedMessage());
+            }
             BotMain.getLogger().warning("消息事件异常: " + e.getParentEvent().toString());
             e.getException().printStackTrace();
         }

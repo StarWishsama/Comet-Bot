@@ -42,9 +42,11 @@ public class Config {
     @SerializedName("cool_down_time")
     private int coolDownTime = 6;
     @SerializedName("filter_words")
-    private List<String> filterWords;
+    private List<String> filterWords = new ArrayList<>();
     @SerializedName("default_music_api")
     private MusicCommand.MusicType api = MusicCommand.MusicType.QQ;
     @SerializedName("bili_live_api")
     private String liveApi = "https://api.vtbs.moe/v1/info";
+    @SerializedName("rss_subscribers")
+    private List<Long> subscribers = new ArrayList<>();
 }

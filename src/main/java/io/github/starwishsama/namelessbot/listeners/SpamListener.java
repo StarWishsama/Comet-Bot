@@ -14,7 +14,6 @@ public class SpamListener extends IcqListener {
     @EventHandler
     public void onGroupChat(EventGroupMessage e) {
         Long id = e.getSenderId();
-        e.getHttpApi().getBot().getAccountManager().refreshCache();
         if (System.currentTimeMillis() - e.getGroupUser(id).getInfo().getLastSentTime() < 3 * 1000) {
             BotUser user = BotUtils.getUser(id);
             if (user == null) {

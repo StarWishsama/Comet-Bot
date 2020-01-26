@@ -18,6 +18,7 @@ public class R6SUtils {
             "\n目前段位: %s(current)" +
             "\nKD: %s" +
             "\n爆头率: %s";
+    private static NumberFormat num = NumberFormat.getPercentInstance();
 
     public static Player getR6SAccount(String player){
         if (BotUtils.isLegitID(player)){
@@ -43,7 +44,6 @@ public class R6SUtils {
                 if (result != null) {
                     p = api.getPlayerByUUID(result.getResults().get(0).getUserUuid());
                     if (p.isPlayerFound()){
-                        NumberFormat num = NumberFormat.getPercentInstance();
                         num.setMaximumIntegerDigits(3);
                         num.setMaximumFractionDigits(2);
                         return String.format(infoText, p.getName(), p.getLevel(), p.getCurrentRank().getName(), String.format("%.2f", p.getKd()), num.format(p.getHeadshotAccuraccy() / 100000000d)).replaceAll("current", p.getCurrentMmr() + "");
@@ -75,7 +75,6 @@ public class R6SUtils {
             if (BotUtils.isLegitID(player)) {
                 Player p = api.getPlayerByUUID(api.searchPlayer(player, pf).getResults().get(0).getUserUuid());
                 if (p.isPlayerFound()) {
-                    NumberFormat num = NumberFormat.getPercentInstance();
                     num.setMaximumIntegerDigits(3);
                     num.setMaximumFractionDigits(2);
                     return String.format(infoText, p.getName(), p.getLevel(), p.getCurrentRank().getName(), String.format("%.2f", p.getKd()), num.format(p.getHeadshotAccuraccy() / 100000000d)).replaceAll("current", p.getCurrentMmr() + "");

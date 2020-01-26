@@ -9,12 +9,13 @@ import java.util.List;
 public class BiliLiver {
     public int mid;
     public String uuid;
-    @SerializedName("uname")
-    public String vtuberName;
+    public String uname;
     public int video;
     public int roomid;
+    // 签名
     public String sign;
     @SerializedName("notice")
+    // 直播间公告
     public String announcement;
     @SerializedName("face")
     public String faceImgLink;
@@ -28,7 +29,7 @@ public class BiliLiver {
     public int recordNumber;
     @SerializedName("guardNum")
     public int guardNumber;
-    public LiveStat lastLive;
+    public LastLive lastLive;
     public int guardChange;
     public List<Integer> guardType;
     public int areaRank;

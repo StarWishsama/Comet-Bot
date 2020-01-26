@@ -9,6 +9,7 @@ import com.rometools.rome.io.XmlReader;
 import lombok.Data;
 
 
+import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -19,8 +20,11 @@ public class RssItem {
     private boolean ifEnabled;
     private List<Long> subscribers;
 
+    public RssItem(String address){
+        this.address = address;
+    }
+
     public static void main(String[] args){
-        System.out.println(new RssItem().getContext());
     }
 
     public String getContext() {
@@ -29,6 +33,10 @@ public class RssItem {
 
     public String getTitle() {
         return (simplifyHTML(getTitleFromURL(address)));
+    }
+
+    public SyndEntry getEntry(){
+        return getEntryFromURL(address);
     }
 
     // 此函数仅供内部调用，正常情况下不应调用
@@ -48,6 +56,22 @@ public class RssItem {
             e.printStackTrace();
             return "Encountered a wrong URL or a network error.";
         }
+    }
+
+    private static SyndEntry getEntryFromURL(String address) {
+        try {
+            URL url = new URL(address);
+            // 读取RSS源
+            XmlReader reader = new XmlReader(url);
+            SyndFeedInput input = new SyndFeedInput();
+            // 得到SyndFeed对象，即得到RSS源里的所有信息
+            SyndFeed feed = input.build(reader);
+            // 得到Rss新闻中子项
+            return feed.getEntries().get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static String getTitleFromURL(String address){
