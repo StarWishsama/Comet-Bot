@@ -49,4 +49,6 @@ public class Config {
     private String liveApi = "https://api.vtbs.moe/v1/info";
     @SerializedName("rss_subscribers")
     private List<Long> subscribers = new ArrayList<>();
+    @SerializedName("guess_max_number")
+    private int maxNumber = 100;
 }

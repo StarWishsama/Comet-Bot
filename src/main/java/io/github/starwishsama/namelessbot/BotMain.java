@@ -14,6 +14,7 @@ import io.github.starwishsama.namelessbot.config.FileSetup;
 import io.github.starwishsama.namelessbot.listeners.ExceptionListener;
 import io.github.starwishsama.namelessbot.listeners.SpamListener;
 
+import io.github.starwishsama.namelessbot.listeners.commands.GuessNumberListener;
 import io.github.starwishsama.namelessbot.objects.RssItem;
 import lombok.Getter;
 
@@ -45,6 +46,7 @@ public class BotMain {
             new BindCommand(),
             new CheckInCommand(),
             new DebugCommand(),
+            new GuessNumberCommand(),
             new HelpCommand(),
             new InfoCommand(),
             new MusicCommand(),
@@ -59,11 +61,12 @@ public class BotMain {
     };
 
     private static IcqListener[] listeners = new IcqListener[]{
-            new ExceptionListener()
+            new ExceptionListener(),
+            new GuessNumberListener()
     };
 
     public static void main(String[] args) {
-        ScheduledExecutorService saveService = Executors.newScheduledThreadPool(1);
+        ScheduledExecutorService service = Executors.newScheduledThreadPool(2);
         jarPath = getPath();
         FileSetup.loadCfg();
         FileSetup.loadLang();
@@ -90,7 +93,7 @@ public class BotMain {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             FileSetup.saveCfg();
             FileSetup.saveLang();
-            saveService.shutdown();
+            service.shutdown();
             logger.log("Bye!");
         }));
 
@@ -106,13 +109,13 @@ public class BotMain {
         }
 
         // 自动保存 Timer
-        saveService.scheduleWithFixedDelay(() -> {
+        service.scheduleWithFixedDelay(() -> {
             FileSetup.saveCfg();
             FileSetup.saveLang();
             logger.log("[Bot] 自动保存数据完成");
         }, 0, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
 
-        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
+        service.scheduleWithFixedDelay(() -> {
             try {
                 RssItem rss = new RssItem("https://rsshub.app/telegram/channel/nCoV2019");
                 if (rss.getContext() != null && !BotConstants.cfg.getSubscribers().isEmpty()){
@@ -129,7 +132,7 @@ public class BotMain {
                 logger.warning("发生异常: " + e);
                 e.printStackTrace();
             }
-        }, 0, 5, TimeUnit.MINUTES);
+        }, 0, 1, TimeUnit.MINUTES);
     }
 
     // From https://blog.csdn.net/df0128/article/details/90484684

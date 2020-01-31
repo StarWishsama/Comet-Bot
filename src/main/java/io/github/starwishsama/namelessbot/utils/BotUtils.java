@@ -228,6 +228,9 @@ public class BotUtils {
                     return true;
             }
         }
+        if (isBotAdmin(qq)){
+            return true;
+        }
         return false;
     }
 
@@ -237,6 +240,9 @@ public class BotUtils {
                 if (qq == sender.getId())
                     return true;
             }
+        }
+        if (isBotAdmin(sender.getId())){
+            return true;
         }
         return false;
     }

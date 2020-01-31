@@ -8,10 +8,11 @@ import cc.moecraft.icq.user.User;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 public class RandomCommand implements EverywhereCommand {
+    Map<String, Double> events = new HashMap<>();
+
     @Override
     public CommandProperties properties() {
         return new CommandProperties("random", "占卜", "zb");
@@ -25,31 +26,16 @@ public class RandomCommand implements EverywhereCommand {
                 sb.append(arg).append(" ");
             }
             String randomEventName = sb.toString().trim();
-            if (randomEventName.length() < 30 && BotUtils.isEmojiCharacter(randomEventName)) {
-                double i = new Random().nextDouble();
-                EventRate rate = getRate(i);
-                NumberFormat nf = NumberFormat.getPercentInstance();
-                nf.setMaximumIntegerDigits(3);
-                nf.setMinimumFractionDigits(2);
-                String finalRate = nf.format(i);
-                switch (rate) {
-                    case HIGHEST:
-                        return "结果是" + EventRate.HIGHEST.event + " (" + finalRate + "), 今天非常适合" + randomEventName + "哦!";
-                    case HIGH:
-                        return "结果是" + EventRate.HIGH.event + " (" + finalRate + "), 今天很适合" + randomEventName + "哦!";
-                    case NORMAL:
-                        return "结果是" + EventRate.NORMAL.event + " (" + finalRate + "), 今天适合" + randomEventName + "哦!";
-                    case LOW:
-                        return "结果是" + EventRate.LOW.event + " (" + finalRate + "), 今天不太适合" + randomEventName + "...";
-                    case LOWEST:
-                        return "结果是" + EventRate.LOWEST.event + " (" + finalRate + "), 今天最好不要" + randomEventName + "了...";
-                    case NEVER:
-                        return "结果是" + EventRate.NEVER.event + " (" + finalRate + "), 千万别" + randomEventName + "!";
-                    default:
-                        return "你要占卜的东西有点怪呢, 我无法占卜出结果哦.";
-                }
-            } else
-                return BotUtils.getLocalMessage("msg.bot-prefix") + "需要占卜的东西太长了或者含有非法字符!";
+            if (events.isEmpty() || events.get(randomEventName) == null){
+                if (randomEventName.length() < 30 && BotUtils.isEmojiCharacter(randomEventName)) {
+                    double i = new Random().nextDouble();
+                    events.put(randomEventName, i);
+                    return getRate(randomEventName, i);
+                } else
+                    return BotUtils.getLocalMessage("msg.bot-prefix") + "需要占卜的东西太长了或者含有非法字符!";
+            } else {
+                return getRate(randomEventName, events.get(randomEventName));
+            }
         }
         return null;
     }
@@ -60,8 +46,7 @@ public class RandomCommand implements EverywhereCommand {
         NORMAL("小吉"),
         LOW("末吉"),
         LOWEST("凶"),
-        NEVER("大凶"),
-        UNKNOWN("未知");
+        NEVER("大凶");
 
         private String event;
 
@@ -70,20 +55,24 @@ public class RandomCommand implements EverywhereCommand {
         }
     }
 
-    private EventRate getRate(double chance){
+    private String getRate(String eventName, double chance){
+        NumberFormat nf = NumberFormat.getPercentInstance();
+        nf.setMaximumIntegerDigits(3);
+        nf.setMinimumFractionDigits(2);
+        String finalRate = nf.format(chance);
         if (chance > 0.8 && chance <= 1.0){
-            return EventRate.HIGHEST;
+            return "结果是" + EventRate.HIGHEST.event + " (" + finalRate + "), 今天非常适合" + eventName + "哦!";
         } else if (chance > 0.6 && chance <= 0.8){
-            return EventRate.HIGH;
+            return "结果是" + EventRate.HIGH.event + " (" + finalRate + "), 今天很适合" + eventName + "哦!";
         } else if (chance > 0.5 && chance <= 0.6){
-            return EventRate.NORMAL;
+            return "结果是" + EventRate.NORMAL.event + " (" + finalRate + "), 今天适合" + eventName + "哦!";
         } else if (chance > 0.3 && chance <= 0.5){
-            return EventRate.LOW;
+            return "结果是" + EventRate.LOW.event + " (" + finalRate + "), 今天不太适合" + eventName + "...";
         } else if (chance > 0.1 && chance <= 0.3){
-            return EventRate.LOWEST;
+            return "结果是" + EventRate.LOWEST.event + " (" + finalRate + "), 今天最好不要" + eventName + "了...";
         } else if (chance <= 0.1){
-            return EventRate.NEVER;
+            return "结果是" + EventRate.NEVER.event + " (" + finalRate + "), 千万别" + eventName + "!";
         } else
-            return EventRate.UNKNOWN;
+            return "你要占卜的东西有点怪呢, 我无法占卜出结果哦.";
     }
 }
