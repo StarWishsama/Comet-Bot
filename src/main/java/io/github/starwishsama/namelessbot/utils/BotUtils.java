@@ -139,10 +139,12 @@ public class BotUtils {
         if (coolDown.containsKey(qq) && !BotUtils.isBotOwner(qq)){
             if (currentTime - coolDown.get(qq) < BotConstants.cfg.getCoolDownTime() * 1000){
                 return false;
-            } else
+            } else {
                 coolDown.remove(qq);
-        } else
+            }
+        } else {
             BotUtils.coolDown.put(qq, currentTime);
+        }
         return true;
     }
 
@@ -152,10 +154,12 @@ public class BotUtils {
         if (coolDown.containsKey(qq) && !BotUtils.isBotOwner(qq)){
             if (currentTime - coolDown.get(qq) < BotConstants.cfg.getCoolDownTime() * 1000){
                 return false;
-            } else
+            } else {
                 coolDown.remove(qq);
-        } else
+            }
+        } else {
             BotUtils.coolDown.put(qq, currentTime);
+        }
         return true;
     }
 
@@ -166,33 +170,37 @@ public class BotUtils {
      * @param id
      * @return true / false
      */
-    public static boolean isLegitID(String id){
+    public static boolean isLegitId(String id){
         return id.matches("[a-zA-Z0-9_.-]*");
     }
 
-    public static UUID generateUUID(){
+    public static UUID generateUuid(){
         return UUID.randomUUID();
     }
 
     public static BotUser getUser(Long qq){
         if (BotConstants.users != null){
             for (BotUser user : BotConstants.users){
-                if (user.getUserQQ() == qq)
+                if (user.getUserQQ() == qq) {
                     return user;
+                }
             }
-        } else
+        } else {
             BotMain.getLogger().warning("在获取 QQ 号为 " + qq + " 的签到数据时出现了问题: 用户列表为空");
+        }
         return null;
     }
 
     public static BotUser getUser(User sender){
         if (BotConstants.users != null){
             for (BotUser user : BotConstants.users){
-                if (user.getUserQQ() == sender.getId())
+                if (user.getUserQQ() == sender.getId()) {
                     return user;
+                }
             }
-        } else
+        } else {
             BotMain.getLogger().warning("在获取 QQ 号为 " + sender.getId() + " 的签到数据时出现了问题: 用户列表为空");
+        }
         return null;
     }
 
@@ -205,6 +213,25 @@ public class BotUtils {
             }
         } else {
             BotMain.getLogger().warning("无法获取本地化文本, 文本节点为: " + node);
+        }
+        return null;
+    }
+
+    public static String sendLocalMessage(String node, String otherText){
+        if (getLocalMessage(node) != null){
+            return getLocalMessage(node) + otherText;
+        }
+        return null;
+    }
+
+    public static String sendLocalMessage(String node, String... otherText){
+        if (getLocalMessage(node) != null){
+            StringBuilder sb = new StringBuilder();
+            sb.append(getLocalMessage(node));
+            for (String s : otherText){
+                sb.append(s).append("\n");
+            }
+            return sb.toString().trim();
         }
         return null;
     }
@@ -224,12 +251,10 @@ public class BotUtils {
     public static boolean isBotAdmin(long qq){
         if (BotConstants.cfg.getBotAdmins() != null){
             for (long value: BotConstants.cfg.getBotAdmins()){
-                if (value == qq)
+                if (value == qq) {
                     return true;
+                }
             }
-        }
-        if (isBotAdmin(qq)){
-            return true;
         }
         return false;
     }
@@ -237,12 +262,10 @@ public class BotUtils {
     public static boolean isBotAdmin(User sender){
         if (BotConstants.cfg.getBotAdmins() != null){
             for (long qq: BotConstants.cfg.getBotAdmins()){
-                if (qq == sender.getId())
+                if (qq == sender.getId()) {
                     return true;
+                }
             }
-        }
-        if (isBotAdmin(sender.getId())){
-            return true;
         }
         return false;
     }
@@ -253,7 +276,7 @@ public class BotUtils {
      * @param text
      * @return boolean
      */
-    public static boolean isEmojiCharacter(String text) {
+    public static boolean containsEmoji(String text) {
         for (int i = 0; i < text.length(); i++) {
             char codePoint = text.charAt(i);
             if (codePoint == 0x0 || codePoint == 0x9 || codePoint == 0xA
@@ -281,8 +304,9 @@ public class BotUtils {
         if (msg != null){
             ArrayList<ExComponent> components = ExComponent.parseComponents(msg);
             for (ExComponent c : components){
-                if (c instanceof ExComponentAt)
+                if (c instanceof ExComponentAt) {
                     ats.add(((ExComponentAt) c).getAt());
+                }
             }
             ats.remove(-1000L);
         }

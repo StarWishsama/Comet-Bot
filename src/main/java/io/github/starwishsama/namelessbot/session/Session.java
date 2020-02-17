@@ -2,12 +2,24 @@ package io.github.starwishsama.namelessbot.session;
 
 import lombok.Data;
 
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * @author Nameless
+ */
 @Data
 public class Session {
-    private final long id;
-    private long timeStamp = System.currentTimeMillis();
+    private List<SessionUser> users = new LinkedList<>();
 
-    public void updateTimeStamp(){
-        timeStamp = System.currentTimeMillis();
+    public SessionUser getUserById(long id){
+        if (!users.isEmpty()){
+            for (SessionUser user : users){
+                if (user.getUserId() == id){
+                    return user;
+                }
+            }
+        }
+        return null;
     }
 }

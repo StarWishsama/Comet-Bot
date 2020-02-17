@@ -5,6 +5,7 @@ import cc.moecraft.icq.command.interfaces.GroupCommand;
 import cc.moecraft.icq.event.events.message.EventGroupMessage;
 import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
+import cc.moecraft.utils.ArrayUtils;
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
@@ -45,10 +46,29 @@ public class AdminCommand implements GroupCommand {
                         }
                         break;
                     case "filter":
-                        
+                        if (args.size() > 1){
+                            BotConstants.cfg.getFilterWords().add(ArrayUtils.getTheRestArgsAsString(args, 1));
+                            return BotUtils.getLocalMessage("msg.bot-prefix") + "添加屏蔽词成功";
+                        }
                         break;
                     case "help":
                         return "Nothing here now";
+                    case "musicapi":
+                        if (args.size() == 2){
+                            switch (args.get(1).toLowerCase()) {
+                                case "网易":
+                                case "wy":
+                                case "netease":
+                                    BotConstants.cfg.setApi(MusicCommand.MusicType.NETEASE);
+                                    return BotUtils.getLocalMessage("msg.bot-prefix") + "音乐 API 已设置为网易";
+                                case "qq":
+                                    BotConstants.cfg.setApi(MusicCommand.MusicType.QQ);
+                                    return BotUtils.getLocalMessage("msg.bot-prefix") + "音乐 API 已设置为 QQ";
+                                default:
+                                    return BotUtils.getLocalMessage("msg.bot-prefix") + "/debug setapi [QQ/网易]";
+                            }
+                        } else
+                            return BotUtils.getLocalMessage("msg.bot-prefix") + "/debug setapi [音乐API]";
                     default:
                         return null;
                 }

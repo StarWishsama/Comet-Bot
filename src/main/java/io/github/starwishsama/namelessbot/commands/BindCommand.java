@@ -21,7 +21,7 @@ public class BindCommand implements EverywhereCommand {
                 if (user != null) {
                     if (user.getBindServerAccount() == null) {
                         if (args.size() > 0) {
-                            if (args.get(0) != null && BotUtils.isLegitID(args.get(0)) && args.get(0).length() < 17) {
+                            if (args.get(0) != null && BotUtils.isLegitId(args.get(0)) && args.get(0).length() < 17) {
                                 Objects.requireNonNull(BotUtils.getUser(sender.getId())).setBindServerAccount(args.get(0));
                                 return "Bot > 已绑定账号 " + args.get(0);
                             } else

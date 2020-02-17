@@ -1,31 +1,33 @@
 package io.github.starwishsama.namelessbot.commands;
 
 import cc.moecraft.icq.command.CommandProperties;
+import cc.moecraft.icq.command.interfaces.EverywhereCommand;
 import cc.moecraft.icq.command.interfaces.GroupCommand;
 import cc.moecraft.icq.event.events.message.EventGroupMessage;
+import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
 
-import io.github.starwishsama.namelessbot.BotMain;
+import cc.moecraft.icq.user.User;
+import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.config.FileSetup;
-import io.github.starwishsama.namelessbot.objects.BiliLiver;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.objects.RssItem;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import io.github.starwishsama.namelessbot.utils.LiveUtils;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-public class DebugCommand implements GroupCommand {
+public class DebugCommand implements EverywhereCommand {
     @Override
     public CommandProperties properties(){
         return new CommandProperties("debug");
     }
 
+    /** Need rework */
+
     @Override
-    public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String cmd, ArrayList<String> args){
+    public String run(EventMessage event, User sender, String command, ArrayList<String> args) {
         if (BotUtils.isBotOwner(sender.getId()) || BotUtils.isBotAdmin(sender.getId())) {
             switch (args.get(0)) {
                 case "reload":
@@ -44,38 +46,19 @@ public class DebugCommand implements GroupCommand {
                     break;
                 case "rc":
                 case "refreshcache":
-                    if (BotUtils.isBotAdmin(sender.getId()) || BotUtils.isBotOwner(sender.getId())) {
+                    if (BotUtils.isBotOwner(sender.getId())) {
                         event.getBot().getAccountManager().refreshCache();
                         return BotUtils.getLocalMessage("msg.bot-prefix") + "已手动刷新信息缓存.";
                     }
-                case "raw":
-                    return args.toString();
-                case "ncov":
-                    RssItem rss = new RssItem("https://rsshub.app/telegram/channel/nCoV2019");
-                    return RssItem.simplifyHTML(rss.getEntry().getDescription().getValue().trim());
+                    break;
                 case "vtuber":
-                    try {
-                        if (args.size() == 2) {
-                            BiliLiver liver = LiveUtils.getBiliLiver(args.get(1));
-                            if (liver != null) {
-                                return "bilibili 主播信息\n"
-                                        + "主播名: " + liver.getUname() + "\n"
-                                        + "上次开播时间: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(liver.getLastLive().getTime()) + "\n"
-                                        + "直播房间地址: " + "https://live.bilibili.com/" + liver.getRoomid() + "\n"
-                                        + "直播状态:" + (liver.isStreaming() ? "√" : "X");
-                            } else {
-                                return "Not found";
-                            }
-                        }
-                    } catch (IOException e){
-                        BotMain.getLogger().warning("在获取主播信息时发生了一个错误");
+                    if (args.size() > 1) {
+                        return LiveUtils.getLiver(args.get(1));
                     }
-                case "getat":
-                    if (args.size() == 2){
-                        return "" + BotUtils.parseAt(args.get(1));
-                    }
+                    break;
                 default:
-                    return "Bot > 命令不存在";
+                    return "Bot > 命令不存在" +
+                            "\n请注意: 这里的命令随时会被删除.";
             }
         }
         return null;

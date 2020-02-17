@@ -1,53 +1,56 @@
 package io.github.starwishsama.namelessbot.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-
-import com.google.gson.stream.JsonReader;
-import io.github.starwishsama.namelessbot.BotConstants;
-import io.github.starwishsama.namelessbot.objects.BiliLiver;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import cn.hutool.core.date.DateUtil;
+import io.github.starwishsama.namelessbot.objects.RssItem;
 
 public class LiveUtils {
-    private static Gson gson = new GsonBuilder().setLenient().create();
+    private final static String biliUrlOnline = "https://rsshub.app/bilibili/live/search/%s/online";
+    private final static String biliUrlLastLive = "https://rsshub.app/bilibili/live/search/%s/live_time";
+    private final static String biliLiveStatus = "https://rsshub.app/bilibili/live/room/";
 
-    public static List<BiliLiver> getBiliLivers() throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) new URL(BotConstants.cfg.getLiveApi()).openConnection();
-        conn.connect();
-        if (conn.getResponseCode() == HttpURLConnection.HTTP_OK){
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            return gson.fromJson(br.readLine().trim(), new TypeToken<List<BiliLiver>>(){}.getType());
-        }
-        conn.disconnect();
-        return new ArrayList<>();
+    public static boolean isValidLiver(String liverName){
+        return new RssItem(String.format(biliUrlOnline, liverName)).getContext() != null;
     }
 
-    public static BiliLiver getBiliLiver(String name) throws IOException {
-        List<BiliLiver> result = getBiliLiverList(name);
-        if (!result.isEmpty()){
-            return result.get(0);
+    public static String getLastLiveTime(String liverName){
+        if (isValidLiver(liverName)){
+            RssItem item = new RssItem(String.format(biliUrlLastLive, liverName));
+            if (item.getEntry() != null){
+                return DateUtil.parseDateTime(item.getEntry().getDescription().getValue().trim()).toString("yyyy-MM-dd HH:mm:ss");
+            }
         }
         return null;
     }
 
-    public static List<BiliLiver> getBiliLiverList(String name) throws IOException {
-        List<BiliLiver> livers = getBiliLivers();
-        List<BiliLiver> result = new ArrayList<>();
-        if (livers != null) {
-            for (BiliLiver liver : livers) {
-                if (liver.getUname().contains(name)) {
-                    result.add(liver);
-                }
+    public static long getLiverId(String liverName){
+        if (isValidLiver(liverName)){
+            RssItem item = new RssItem(String.format(biliUrlOnline, liverName));
+            return Long.parseLong(item.getEntry().getLink().replace("https://live.bilibili.com/", ""));
+        }
+        return 0;
+    }
+
+    public static String checkLiveStatus(String liverName){
+        if (isValidLiver(liverName)){
+            RssItem item = new RssItem(biliLiveStatus + getLiverId(liverName));
+            if (item.getEntry() != null){
+                return item.getTitle().replace("直播间开播状态", "").trim() + "开播了!\n"
+                        + item.getEntry().getDescription().getValue().trim() + "\n"
+                        + "直播间直达链接👉 " + item.getEntry().getLink();
             }
         }
-        return result;
+        return null;
+    }
+
+    public static String getLiver(String liverName){
+        if (isValidLiver(liverName)){
+            RssItem item = new RssItem(biliUrlLastLive + getLiverId(liverName));
+            if (item.getEntry() != null){
+                return item.getTitle() + "\n"
+                        + item.getEntry().getDescription().getValue().trim() + "\n"
+                        + "直播间直达链接👉 " + item.getEntry().getLink();
+            }
+        }
+        return "找不到主播";
     }
 }

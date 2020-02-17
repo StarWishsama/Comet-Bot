@@ -8,7 +8,6 @@ import cc.moecraft.icq.sender.returndata.returnpojo.get.RGroup;
 import cc.moecraft.icq.user.User;
 import cc.moecraft.utils.ArrayUtils;
 
-import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 public class SayCommand implements EverywhereCommand {
     @Override
     public String run(EventMessage event, User sender, String command, ArrayList<String> args) {
-       IcqHttpApi api = BotMain.getApi();
+       IcqHttpApi api = event.getHttpApi();
         if (BotUtils.isBotOwner(sender) && args.size() > 1) {
             switch (args.get(0).toLowerCase()){
                 case "broadcast":
@@ -29,8 +28,9 @@ public class SayCommand implements EverywhereCommand {
                             String text = ArrayUtils.getTheRestArgsAsString(args, 1);
                             api.sendGroupMsg(group.getGroupId(), text);
                         }
-                    } else
+                    } else {
                         return BotUtils.getLocalMessage("msg.bot-prefix") + "机器人还没有加入任何一个群!";
+                    }
                     break;
                 default:
                     if (StringUtils.isNumeric(args.get(0))){

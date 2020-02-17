@@ -23,7 +23,7 @@ public class RSSCommand implements EverywhereCommand {
                         case "哔哩哔哩":
                             if (args.size() > 1) {
                                 try {
-                                    if (LiveUtils.getBiliLiver(args.get(1)) != null) {
+                                    if (LiveUtils.isValidLiver(args.get(1))) {
                                         BotConstants.livers.add(args.get(1));
                                         return BotUtils.getLocalMessage("msg.bot-prefix") + "订阅 " + args.get(1) + "成功!";
                                     }
@@ -35,17 +35,23 @@ public class RSSCommand implements EverywhereCommand {
                             }
                         case "ncov":
                             if (args.size() > 1 && StringUtils.isNumeric(args.get(1))){
-                                BotConstants.cfg.getSubscribers().add(Long.parseLong(args.get(1)));
-                                return BotUtils.getLocalMessage("msg.bot-prefix") + "订阅成功!";
-                            } else
+                                if (!BotConstants.cfg.getSubscribers().contains(Long.parseLong(args.get(1)))) {
+                                    BotConstants.cfg.getSubscribers().add(Long.parseLong(args.get(1)));
+                                    return BotUtils.getLocalMessage("msg.bot-prefix") + "订阅成功!";
+                                } else {
+                                    BotConstants.cfg.getSubscribers().remove(Long.parseLong(args.get(1)));
+                                    return BotUtils.getLocalMessage("msg.bot-prefix") + "退订成功!";
+                                }
+                            } else {
                                 return BotUtils.getLocalMessage("msg.bot-prefix") + "/rss ncov [推送群]";
+                            }
                         default:
-                            return BotUtils.getLocalMessage("msg.bot-prefix") + "/订阅 [bilibili] [频道名]\n由于 API 的关系, 现在只能订阅B站的虚拟主播";
+                            return BotUtils.getLocalMessage("msg.bot-prefix") + "/订阅 [类别]";
                     }
-                } else
+                } else {
                     return BotUtils.getLocalMessage("msg.bot-prefix") + BotUtils.getLocalMessage("msg.no-permission");
-            } else
-                return BotUtils.getLocalMessage("msg.bot-prefix") + "/订阅 [bilibili] [频道名]\n由于 API 的关系, 现在只能订阅B站的虚拟主播";
+                }
+            }
         }
         return null;
     }

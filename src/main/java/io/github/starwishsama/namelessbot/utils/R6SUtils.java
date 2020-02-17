@@ -21,13 +21,14 @@ public class R6SUtils {
     private static NumberFormat num = NumberFormat.getPercentInstance();
 
     public static Player getR6SAccount(String player){
-        if (BotUtils.isLegitID(player)){
+        if (BotUtils.isLegitId(player)){
             try {
                 SearchResultWrapper result = api.searchPlayer(player, Platform.UPLAY);
                 if (result != null){
                     Player p = api.getPlayerByUUID(result.getResults().get(0).getUserUuid());
-                    if (p.isPlayerFound())
+                    if (p.isPlayerFound()) {
                         return p;
+                    }
                 }
             } catch (R6TabApiException | R6TabPlayerNotFoundException r6e){
                 BotMain.getLogger().warning("在获取 R6 玩家信息时出现了问题, " + r6e);
@@ -39,14 +40,17 @@ public class R6SUtils {
     public static String getR6SInfo(String player) {
         Player p;
         try {
-            if (BotUtils.isLegitID(player)) {
+            if (BotUtils.isLegitId(player)) {
                 SearchResultWrapper result = api.searchPlayer(player, Platform.UPLAY);
                 if (result != null) {
                     p = api.getPlayerByUUID(result.getResults().get(0).getUserUuid());
                     if (p.isPlayerFound()){
                         num.setMaximumIntegerDigits(3);
                         num.setMaximumFractionDigits(2);
-                        return String.format(infoText, p.getName(), p.getLevel(), p.getCurrentRank().getName(), String.format("%.2f", p.getKd()), num.format(p.getHeadshotAccuraccy() / 100000000d)).replaceAll("current", p.getCurrentMmr() + "");
+                        return String.format(infoText, p.getName(), p.getLevel(),
+                                p.getCurrentRank().getName(), String.format("%.2f", p.getKd()),
+                                num.format(p.getHeadshotAccuraccy() / 100000000d)).replaceAll("current", p.getCurrentMmr()
+                                + "");
                     }
                 }
             }
@@ -72,12 +76,15 @@ public class R6SUtils {
         }
 
         try {
-            if (BotUtils.isLegitID(player)) {
+            if (BotUtils.isLegitId(player)) {
                 Player p = api.getPlayerByUUID(api.searchPlayer(player, pf).getResults().get(0).getUserUuid());
                 if (p.isPlayerFound()) {
                     num.setMaximumIntegerDigits(3);
                     num.setMaximumFractionDigits(2);
-                    return String.format(infoText, p.getName(), p.getLevel(), p.getCurrentRank().getName(), String.format("%.2f", p.getKd()), num.format(p.getHeadshotAccuraccy() / 100000000d)).replaceAll("current", p.getCurrentMmr() + "");
+                    return String.format(infoText, p.getName(), p.getLevel(), p.getCurrentRank().getName(),
+                            String.format("%.2f", p.getKd()),
+                            num.format(p.getHeadshotAccuraccy() / 100000000d))
+                            .replaceAll("current", p.getCurrentMmr() + "");
                 }
             }
         } catch (Exception e){

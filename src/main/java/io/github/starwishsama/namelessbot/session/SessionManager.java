@@ -1,28 +1,52 @@
 package io.github.starwishsama.namelessbot.session;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
+/**
+ * @author Nameless
+ */
 public class SessionManager {
-    private static Map<Long, Session> sessions = new LinkedHashMap<>();
+    /**
+     * 会话列表
+     */
+    private static List<Session> sessions = new LinkedList<>();
 
     public static void addSession(Session session){
-        sessions.put(null, session);
+        sessions.add(session);
     }
 
-    public static void addSession(long id, Session session){
-        sessions.put(id, session);
+    public static void expireSession(Session session){
+        sessions.remove(session);
     }
 
-    public static void expireSession(long id){
-        sessions.remove(id);
+    public static boolean expireSession(long id){
+        if (isValidSession(id)) {
+            sessions.remove(getSession(id));
+            return true;
+        }
+        return false;
     }
 
     public static boolean isValidSession(long id){
-        return sessions.get(id) != null;
+        return getSession(id) != null;
     }
 
     public static Session getSession(long id){
-        return sessions.get(id);
+        if (!sessions.isEmpty()){
+            for (Session session : sessions){
+                if (session.getUserById(id) != null){
+                    return session;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static List<Session> getSessions(){
+        if (!sessions.isEmpty()){
+            return sessions;
+        }
+        return null;
     }
 }

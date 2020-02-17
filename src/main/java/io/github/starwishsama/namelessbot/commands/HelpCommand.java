@@ -14,9 +14,10 @@ public class HelpCommand implements EverywhereCommand {
     @Override
     public String run(EventMessage event, User sender, String command, ArrayList<String> args) {
         MessageBuilder builder = new MessageBuilder().add("= 无名 Bot 命令列表 =").newLine();
-        for (IcqCommand cmd: BotMain.getCommands()){
-            builder.add("/").add(cmd.properties().getName()).newLine();
+        for (int i = 0; i < 10 ; i++) {
+            builder.add("/").add(BotMain.getCommands()[i].properties().getName()).newLine();
         }
+        builder.add("...");
         return builder.toString().trim();
     }
 

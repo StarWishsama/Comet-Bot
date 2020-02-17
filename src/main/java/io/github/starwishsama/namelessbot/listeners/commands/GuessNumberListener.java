@@ -3,35 +3,59 @@ package io.github.starwishsama.namelessbot.listeners.commands;
 import cc.moecraft.icq.event.EventHandler;
 import cc.moecraft.icq.event.IcqListener;
 import cc.moecraft.icq.event.events.message.EventGroupMessage;
-import io.github.starwishsama.namelessbot.session.SessionManager;
-import io.github.starwishsama.namelessbot.session.commands.GuessNumberSession;
-import io.github.starwishsama.namelessbot.utils.BotUtils;
-import org.apache.commons.lang3.StringUtils;
+import cc.moecraft.utils.StringUtils;
 
+import io.github.starwishsama.namelessbot.session.Session;
+import io.github.starwishsama.namelessbot.session.SessionManager;
+import io.github.starwishsama.namelessbot.session.commands.guessnumber.GuessNumberPlayer;
+import io.github.starwishsama.namelessbot.session.commands.guessnumber.GuessNumberSession;
+import io.github.starwishsama.namelessbot.utils.BotUtils;
+
+/**
+ * @author Nameless
+ */
 public class GuessNumberListener extends IcqListener {
     @EventHandler
     public void onMessage(EventGroupMessage e){
-        if (StringUtils.isNumeric(e.getMessage()) && SessionManager.isValidSession(e.getSenderId())) {
-            GuessNumberSession session = (GuessNumberSession) SessionManager.getSession(e.getSenderId());
-            if (session.isValid()) {
-                SessionManager.expireSession(e.getSenderId());
-            } else {
-                long answer = Long.parseLong(e.getMessage());
-
-                if (session.getGuessTime() < 15) {
-                    if (answer < session.getAnswer()) {
-                        e.respond(BotUtils.getLocalMessage("msg.bot-prefix") + "你猜的数字小了");
-                        session.addCount();
-                    } else if (answer > session.getAnswer()) {
-                        e.respond(BotUtils.getLocalMessage("msg.bot-prefix") + "你猜的数字大了");
-                        session.addCount();
-                    } else {
-                        e.respond(BotUtils.getLocalMessage("msg.bot-prefix") + "你猜对了!\n尝试次数: " + session.getGuessTime());
-                        SessionManager.expireSession(e.getSenderId());
+        if (StringUtils.isNumeric(e.getMessage())) {
+            GuessNumberSession session = null;
+            if (SessionManager.getSessions() != null) {
+                for (Session s : SessionManager.getSessions()) {
+                    if (s instanceof GuessNumberSession){
+                        if (((GuessNumberSession) s).getGroupId() == e.getGroupId()){
+                            session = (GuessNumberSession) s;
+                        }
                     }
-                } else {
-                    e.respond(BotUtils.getLocalMessage("msg.bot-prefix") + "你输了!\n正确答案是: " + session.getAnswer());
-                    SessionManager.expireSession(e.getSenderId());
+                }
+
+                long id = e.getSenderId();
+
+                if (session != null) {
+                    if (session.isExpire()) {
+                        SessionManager.expireSession(session);
+                    } else {
+                        long answer = Long.parseLong(e.getMessage());
+                        GuessNumberPlayer player = (GuessNumberPlayer) session.getUserById(id);
+                        if (player == null) {
+                            session.join(id);
+                            player = (GuessNumberPlayer) session.getUserById(id);
+                        }
+
+                        if (answer < session.getAnswer()) {
+                            e.respond(BotUtils.getLocalMessage("msg.bot-prefix") + "你猜的数字小了");
+                            player.addGuessTime();
+                            session.updateTime();
+                        } else if (answer > session.getAnswer()) {
+                            e.respond(BotUtils.getLocalMessage("msg.bot-prefix") + "你猜的数字大了");
+                            player.addGuessTime();
+                            session.updateTime();
+                        } else {
+                            e.respond(BotUtils.getLocalMessage("msg.bot-prefix")
+                                    + e.getHttpApi().getStrangerInfo(id).getData().getNickname() + "猜对了!"
+                                    + "\n次数: " + player.getGuessTime());
+                            SessionManager.expireSession(session);
+                        }
+                    }
                 }
             }
         }

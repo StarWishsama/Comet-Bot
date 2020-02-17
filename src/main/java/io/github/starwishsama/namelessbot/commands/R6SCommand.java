@@ -29,12 +29,12 @@ public class R6SCommand implements EverywhereCommand {
                         String result = R6SUtils.getR6SInfo(bu.getR6sAccount());
                         return new MessageBuilder().add(new ComponentAt(user.getId())).newLine().add(result).toString();
                     } else {
-                        if (args.size() == 2 && !args.get(1).isEmpty() && BotUtils.isLegitID(args.get(1))) {
+                        if (args.size() == 2 && !args.get(1).isEmpty() && BotUtils.isLegitId(args.get(1))) {
                             String result = R6SUtils.getR6SInfo(args.get(1));
                             return new MessageBuilder().add(new ComponentAt(user.getId())).newLine().add(result).toString();
                         }
-                        if (args.size() == 3 && BotUtils.isLegitID(args.get(1))) {
-                            if (!args.get(0).isEmpty() || BotUtils.isLegitID(args.get(1)) || !args.get(2).isEmpty()) {
+                        if (args.size() == 3 && BotUtils.isLegitId(args.get(1))) {
+                            if (!args.get(0).isEmpty() || BotUtils.isLegitId(args.get(1)) || !args.get(2).isEmpty()) {
                                 String result = R6SUtils.getR6SInfo(args.get(1), args.get(2));
                                 return new MessageBuilder().add(new ComponentAt(user.getId())).newLine().add(result).toString();
                             }
@@ -45,7 +45,7 @@ public class R6SCommand implements EverywhereCommand {
                     }
                 case "bind":
                     if (args.size() == 2 && args.get(1) != null){
-                        if (BotUtils.isLegitID(args.get(1))){
+                        if (BotUtils.isLegitId(args.get(1))){
                             if (BotUtils.isUserExist(user.getId())){
                                 BotUser botUser1 = BotUtils.getUser(user.getId());
                                 if (botUser1 != null && botUser1.getR6sAccount() == null)

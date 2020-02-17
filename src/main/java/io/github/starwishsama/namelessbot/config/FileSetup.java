@@ -2,7 +2,6 @@ package io.github.starwishsama.namelessbot.config;
 
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
-import cn.hutool.core.util.CharsetUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -14,11 +13,14 @@ import io.github.starwishsama.namelessbot.objects.BotLocalization;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.objects.Config;
 import io.github.starwishsama.namelessbot.objects.ShopItem;
+import io.github.starwishsama.namelessbot.objects.groupconfig.GroupConfig;
+import io.github.starwishsama.namelessbot.objects.groupconfig.GroupConfigManager;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static io.github.starwishsama.namelessbot.BotConstants.shopItems;
 import static io.github.starwishsama.namelessbot.BotConstants.users;
@@ -31,12 +33,13 @@ public class FileSetup {
     private static File cfgFile = new File(BotMain.getJarPath() + "/config.json");
     private static File langCfg = new File(BotMain.getJarPath() + "/lang.json");
     private static File rssTemp = new File(BotMain.getJarPath() + "/temp.txt");
+    private static File groupCfg = new File(BotMain.getJarPath() + "/groups.json");
 
     private static Gson gson = new GsonBuilder().serializeNulls().create();
 
     public static void loadCfg(){
         if (BotMain.getJarPath() != null) {
-            if (userCfg.exists() && cfgFile.exists() && rssTemp.exists()){
+            if (userCfg.exists() && cfgFile.exists()){
                 load();
             } else {
                 try {
@@ -57,6 +60,8 @@ public class FileSetup {
                     FileWriter.create(cfgFile).write(gson.toJson(cfg));
                     FileWriter.create(userCfg).write(gson.toJson(users));
                     FileWriter.create(shopItemCfg).write(gson.toJson(shopItems));
+                    FileWriter.create(groupCfg).write(gson.toJson(GroupConfigManager.getConfigMap()));
+
                     if (!rssTemp.createNewFile()){
                         System.out.println("[配置] 缓存文件已存在, 已自动忽略.");
                     }
@@ -76,6 +81,7 @@ public class FileSetup {
             FileWriter.create(userCfg).write(gson.toJson(users));
             FileWriter.create(shopItemCfg).write(gson.toJson(shopItems));
             FileWriter.create(rssTemp).write(BotMain.temp);
+            FileWriter.create(groupCfg).write(gson.toJson(GroupConfigManager.getConfigMap()));
         } catch (Exception e){
             System.err.println("[配置] 在保存配置文件时发生了问题, 错误信息: ");
             e.printStackTrace();
@@ -86,6 +92,7 @@ public class FileSetup {
         try {
             String userContent = FileReader.create(userCfg).readString();
             String configContent = FileReader.create(cfgFile).readString();
+            String groupContent = FileReader.create(groupCfg).readString();
             BotMain.temp = FileReader.create(rssTemp).readString();
 
             JsonElement checkInParser = JsonParser.parseString(userContent);
@@ -94,6 +101,7 @@ public class FileSetup {
                 cfg = gson.fromJson(configContent, Config.class);
                 users = gson.fromJson(userContent, new TypeToken<Collection<BotUser>>(){}.getType());
                 shopItems = gson.fromJson(FileReader.create(shopItemCfg).readString(), new TypeToken<Collection<ShopItem>>(){}.getType());
+                GroupConfigManager.setConfigMap(gson.fromJson(groupContent, new TypeToken<Map<Long, GroupConfig>>(){}.getType()));
             } else {
                 System.err.println("[配置] 在加载配置文件时发生了问题, JSON 文件为空.");
             }
@@ -120,5 +128,11 @@ public class FileSetup {
 
     public static void saveLang(){
         FileWriter.create(langCfg).write(gson.toJson(msg));
+    }
+
+    public static void saveFiles(){
+        BotMain.getLogger().log("[Bot] 自动保存数据完成");
+        saveCfg();
+        saveLang();
     }
 }

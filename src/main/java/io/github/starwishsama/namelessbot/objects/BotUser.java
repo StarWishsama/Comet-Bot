@@ -4,11 +4,9 @@ import java.util.Calendar;
 import java.util.UUID;
 
 import io.github.starwishsama.namelessbot.utils.BotUtils;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class BotUser {
     private long userQQ;
     private UUID userUUID;
@@ -21,6 +19,6 @@ public class BotUser {
 
     public BotUser(long qq){
         userQQ = qq;
-        userUUID = BotUtils.generateUUID();
+        userUUID = BotUtils.generateUuid();
     }
 }

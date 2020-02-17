@@ -15,6 +15,7 @@ public class KeyWordListener extends IcqListener {
             els.setMessage(null);
         }
     }
+
     /**
     //@EventHandler
     public void onGroupMessage(EventGroupMessage em){
@@ -29,7 +30,7 @@ public class KeyWordListener extends IcqListener {
     private boolean isFilterWord(String context){
         if (BotConstants.cfg.getFilterWords() != null && !BotConstants.cfg.getFilterWords().isEmpty()) {
             for (String word : BotConstants.cfg.getFilterWords()) {
-                if (word.equals(context)){
+                if (context.contains(word)){
                     return true;
                 }
             }

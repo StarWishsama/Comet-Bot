@@ -15,6 +15,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * @author Nameless
+ */
 public class MusicIDUtils {
     // 仅供测试
     public static void main(String[] args){

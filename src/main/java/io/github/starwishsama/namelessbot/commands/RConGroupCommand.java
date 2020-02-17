@@ -19,8 +19,8 @@ public class RConGroupCommand implements GroupCommand {
 
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String msg, ArrayList<String> args){
-        long fromQQ = sender.getId();
-        if (BotUtils.isNoCoolDown(fromQQ)) {
+        long id = sender.getId();
+        if (BotUtils.isNoCoolDown(id)) {
             if (BotUtils.isBotOwner(sender.getId()) || BotUtils.isBotAdmin(sender.getId())) {
                 if (BotMain.getRcon() != null) {
                     try {
@@ -33,12 +33,14 @@ public class RConGroupCommand implements GroupCommand {
                     } catch (Exception e) {
                         return BotUtils.getLocalMessage("msg.bot-prefix") + "在连接至服务器时发生了错误, 错误信息: " + e.getMessage();
                     }
-                } else
+                } else {
                     return BotUtils.getLocalMessage("msg.bot-prefix") + "RCON 未启用";
+                }
             } else {
                 return BotUtils.getLocalMessage("msg.bot-prefix") + BotUtils.getLocalMessage("msg.no-permission");
             }
-        } else
+        } else {
             return null;
+        }
     }
 }
