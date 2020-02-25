@@ -10,12 +10,11 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class GuessNumberSession extends Session {
-    private final long groupId;
     private final long answer;
     private long lastGuessTime = System.currentTimeMillis();
 
     public GuessNumberSession(long id, long groupId, long answer) {
-        this.groupId = groupId;
+        super.setGroupId(groupId);
         super.getUsers().add(new GuessNumberPlayer(id));
         this.answer = answer;
     }

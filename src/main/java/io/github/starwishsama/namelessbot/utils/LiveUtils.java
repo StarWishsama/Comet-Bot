@@ -4,6 +4,9 @@ import cn.hutool.core.date.DateUtil;
 import io.github.starwishsama.namelessbot.objects.RssItem;
 
 public class LiveUtils {
+    /**
+     * @TODO: Rework get logic
+     */
     private final static String biliUrlOnline = "https://rsshub.app/bilibili/live/search/%s/online";
     private final static String biliUrlLastLive = "https://rsshub.app/bilibili/live/search/%s/live_time";
     private final static String biliLiveStatus = "https://rsshub.app/bilibili/live/room/";

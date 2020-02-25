@@ -13,6 +13,8 @@ import io.github.starwishsama.namelessbot.config.FileSetup;
 import io.github.starwishsama.namelessbot.listeners.*;
 
 import io.github.starwishsama.namelessbot.listeners.commands.GuessNumberListener;
+import io.github.starwishsama.namelessbot.listeners.commands.VoteListener;
+import io.github.starwishsama.namelessbot.objects.BotUser;
 import lombok.Getter;
 
 import net.kronos.rkon.core.Rcon;
@@ -21,7 +23,10 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * @author Nameless
@@ -56,16 +61,18 @@ public class BotMain {
             new SayCommand(),
             new SettingsCommand(),
             new UnderCoverCommand(),
+            new VoteCommand(),
             new VersionCommand()
     };
-    public final static String version = "v0.2.7-DEV-200217";
+    public final static String version = "v0.2.7.1-DEV-200225";
 
     private static IcqListener[] listeners = new IcqListener[]{
             new DebugListener(),
             new GuessNumberListener(),
-            new KeyWordListener(),
+            new SendMessageListener(),
             new GroupRequestHandler(),
-            new RequestListener()
+            new RequestListener(),
+            new VoteListener()
     };
 
     public static void main(String[] args) {
@@ -118,9 +125,10 @@ public class BotMain {
             }
         }
 
-        // 自动保存 Timer
-        service.scheduleWithFixedDelay(FileSetup::saveFiles, 0, BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
-        service.scheduleWithFixedDelay(() -> BotConstants.underCovers.clear(),0 ,3, TimeUnit.HOURS);
+        // 定时任务
+        service.scheduleWithFixedDelay(FileSetup::saveFiles, BotConstants.cfg.getAutoSaveTime(), BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
+        service.scheduleWithFixedDelay(() -> BotConstants.underCovers.clear(),3,3, TimeUnit.HOURS);
+        service.scheduleWithFixedDelay(() -> BotConstants.users.forEach(BotUser::updateTime), 0, 3, TimeUnit.HOURS);
     }
 
     // From https://blog.csdn.net/df0128/article/details/90484684

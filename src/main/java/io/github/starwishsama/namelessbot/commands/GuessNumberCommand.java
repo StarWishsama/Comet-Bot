@@ -10,6 +10,7 @@ import cc.moecraft.utils.StringUtils;
 import cn.hutool.core.util.RandomUtil;
 
 import io.github.starwishsama.namelessbot.BotConstants;
+import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.session.SessionManager;
 import io.github.starwishsama.namelessbot.session.commands.guessnumber.GuessNumberSession;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
@@ -24,25 +25,30 @@ public class GuessNumberCommand implements GroupCommand {
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String command, ArrayList<String> args) {
         if (BotUtils.isNoCoolDown(sender.getId())) {
-
-            if (args.isEmpty()) {
-                if (!SessionManager.isValidSession(sender.getId())) {
+            if (SessionManager.getSessionByGroup(group.getId()) != null){
+                return BotUtils.getLocalMessage("msg.bot-prefix") + "你还没猜出数字呢!";
+            } else {
+                if (args.isEmpty()) {
                     event.respond(BotUtils.getLocalMessage("msg.bot-prefix") + "正在生成数字...");
-                    SessionManager.addSession(new GuessNumberSession(sender.getId(), event.getGroupId(), new Random().nextInt(BotConstants.cfg.getMaxNumber())));
+                    GuessNumberSession session = new GuessNumberSession(sender.getId(), event.getGroupId(), new Random().nextInt(BotConstants.cfg.getMaxNumber()));
+                    SessionManager.addSession(session);
+                    BotMain.getLogger().log("[猜数字] 已生成随机数: " + session.getAnswer() + " 群聊: " + group.getId());
                     return BotUtils.getLocalMessage("msg.bot-prefix") + "请猜一个数字 (范围: [0," + BotConstants.cfg.getMaxNumber() + "])";
                 } else {
-                    return BotUtils.getLocalMessage("msg.bot-prefix") + "你还没猜出数字呢!";
-                }
-            } else {
-                if (!SessionManager.isValidSession(sender.getId()) && args.size() > 1) {
-                    if (StringUtils.isNumeric(args.get(0)) && StringUtils.isNumeric(args.get(1))) {
-                        SessionManager.addSession(new GuessNumberSession(sender.getId(), event.getGroupId(), RandomUtil.randomInt(Integer.parseInt(args.get(0)), Integer.parseInt(args.get(1)))));
-                        return BotUtils.getLocalMessage("msg.bot-prefix") + "请猜一个数字 (范围: [" + args.get(0) + "," + args.get(1) + "])";
-                    } else {
-                        return BotUtils.getLocalMessage("msg.bot-prefix") + "请输入有效数字!";
+                    if (args.size() > 1) {
+                        if (StringUtils.isNumeric(args.get(0)) && StringUtils.isNumeric(args.get(1)) && !args.get(0).equals(args.get(1))) {
+                            if (args.get(0).contains(".") || args.get(1).contains(".")) {
+                                return BotUtils.getLocalMessage("msg.bot-prefix") + "不支持小数";
+                            } else {
+                                GuessNumberSession session = new GuessNumberSession(sender.getId(), event.getGroupId(), RandomUtil.randomInt(Integer.parseInt(args.get(0)), Integer.parseInt(args.get(1))));
+                                SessionManager.addSession(session);
+                                BotMain.getLogger().log("[猜数字] 已生成随机数: " + session.getAnswer() + " 群聊: " + group.getId());
+                                return BotUtils.getLocalMessage("msg.bot-prefix") + "请猜一个数字 (范围: [" + args.get(0) + "," + args.get(1) + "])";
+                            }
+                        } else {
+                            return BotUtils.getLocalMessage("msg.bot-prefix") + "请输入有效数字!";
+                        }
                     }
-                } else {
-                    return BotUtils.getLocalMessage("msg.bot-prefix") + "你还没猜出数字呢!";
                 }
             }
         }
@@ -51,6 +57,6 @@ public class GuessNumberCommand implements GroupCommand {
 
     @Override
     public CommandProperties properties() {
-        return new CommandProperties("猜数字", "guess");
+        return new CommandProperties("guess", "猜数字");
     }
 }

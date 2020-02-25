@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 public class Session {
     private List<SessionUser> users = new LinkedList<>();
+    private long groupId;
 
     public SessionUser getUserById(long id){
         if (!users.isEmpty()){

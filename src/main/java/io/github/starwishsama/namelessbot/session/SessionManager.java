@@ -1,5 +1,7 @@
 package io.github.starwishsama.namelessbot.session;
 
+import io.github.starwishsama.namelessbot.session.commands.guessnumber.GuessNumberSession;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,10 +45,16 @@ public class SessionManager {
         return null;
     }
 
-    public static List<Session> getSessions(){
-        if (!sessions.isEmpty()){
-            return sessions;
+    public static Session getSessionByGroup(long id){
+        for (Session session : sessions){
+            if (session.getGroupId() == id){
+                return session;
+            }
         }
         return null;
+    }
+
+    public static List<Session> getSessions(){
+        return sessions;
     }
 }

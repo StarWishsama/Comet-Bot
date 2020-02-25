@@ -1,4 +1,4 @@
-package io.github.starwishsama.namelessbot.session.commands.WereWolfKill;
+package io.github.starwishsama.namelessbot.session.commands.werewolfkill;
 
 import cc.moecraft.icq.event.EventHandler;
 import cc.moecraft.icq.event.IcqListener;

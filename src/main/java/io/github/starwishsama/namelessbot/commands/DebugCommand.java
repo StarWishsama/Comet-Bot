@@ -2,17 +2,11 @@ package io.github.starwishsama.namelessbot.commands;
 
 import cc.moecraft.icq.command.CommandProperties;
 import cc.moecraft.icq.command.interfaces.EverywhereCommand;
-import cc.moecraft.icq.command.interfaces.GroupCommand;
-import cc.moecraft.icq.event.events.message.EventGroupMessage;
 import cc.moecraft.icq.event.events.message.EventMessage;
-import cc.moecraft.icq.user.Group;
-import cc.moecraft.icq.user.GroupUser;
-
 import cc.moecraft.icq.user.User;
-import io.github.starwishsama.namelessbot.BotConstants;
+
 import io.github.starwishsama.namelessbot.config.FileSetup;
 import io.github.starwishsama.namelessbot.objects.BotUser;
-import io.github.starwishsama.namelessbot.objects.RssItem;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import io.github.starwishsama.namelessbot.utils.LiveUtils;
 
@@ -23,8 +17,6 @@ public class DebugCommand implements EverywhereCommand {
     public CommandProperties properties(){
         return new CommandProperties("debug");
     }
-
-    /** Need rework */
 
     @Override
     public String run(EventMessage event, User sender, String command, ArrayList<String> args) {
@@ -56,6 +48,10 @@ public class DebugCommand implements EverywhereCommand {
                         return LiveUtils.getLiver(args.get(1));
                     }
                     break;
+                case "addcount":
+                    if (BotUtils.getUser(sender) != null){
+                        BotUtils.getUser(sender).setRandomTime(100);
+                    }
                 default:
                     return "Bot > 命令不存在" +
                             "\n请注意: 这里的命令随时会被删除.";

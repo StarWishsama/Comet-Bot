@@ -6,15 +6,16 @@ import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.extra.emoji.EmojiUtil;
 import io.github.starwishsama.namelessbot.BotConstants;
+import io.github.starwishsama.namelessbot.enums.UserLevel;
+import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.objects.RandomResult;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.*;
 
 public class RandomCommand implements EverywhereCommand {
-    List<RandomResult> events = new LinkedList<>();
-
     @Override
     public CommandProperties properties() {
         return new CommandProperties("random", "占卜", "zb");
@@ -25,35 +26,28 @@ public class RandomCommand implements EverywhereCommand {
         if (BotUtils.isNoCoolDown(sender.getId()) && !args.isEmpty()) {
             RandomResult underCover = getResultFromList(BotConstants.underCovers, sender.getId());
             if (underCover == null) {
-                StringBuilder sb = new StringBuilder();
-                for (String arg : args) {
-                    sb.append(arg).append(" ");
-                }
-                String randomEventName = sb.toString().trim();
-                if (!isDuplicate(randomEventName)) {
-                    if (randomEventName.length() < 30 && BotUtils.containsEmoji(randomEventName)) {
-                        RandomResult result = new RandomResult(-1000, RandomUtil.randomDouble(0, 1), randomEventName);
-                        events.add(result);
-                        return RandomResult.getChance(result);
-                    } else {
-                        return BotUtils.getLocalMessage("msg.bot-prefix") + "需要占卜的东西太长了或者含有非法字符!";
-                    }
-                } else {
-                    RandomResult result = getResult(randomEventName);
-                    if (result != null) {
-                        return RandomResult.getChance(result.getEventName(), result.getChance());
-                    } else {
-                        if (randomEventName.length() < 30 && BotUtils.containsEmoji(randomEventName)) {
-                            RandomResult result1 = new RandomResult(-1000, RandomUtil.randomDouble(0, 1), randomEventName);
-                            events.add(result1);
-                            return RandomResult.getChance(result1);
+                if (BotUtils.isUserExist(sender.getId())) {
+                    BotUser user = BotUtils.getUser(sender);
+                    if (user.getRandomTime() > 0 || user.getLevel() != UserLevel.USER) {
+                        StringBuilder sb = new StringBuilder();
+                        for (String arg : args) {
+                            sb.append(arg).append(" ");
+                        }
+                        String randomEventName = sb.toString().trim();
+                        if (randomEventName.length() < 30 && !EmojiUtil.containsEmoji(randomEventName)) {
+                            RandomResult result = new RandomResult(-1000, RandomUtil.randomDouble(0, 1), randomEventName);
+                            BotUtils.getUser(sender).decreaseTime();
+                            return RandomResult.getChance(result);
                         } else {
                             return BotUtils.getLocalMessage("msg.bot-prefix") + "需要占卜的东西太长了或者含有非法字符!";
                         }
+                    } else {
+                        return BotUtils.sendLocalMessage("msg.bot-prefix") + "今日占卜次数已达十次上限, 如需增加次数请咨询机器人管理.";
                     }
+                } else {
+                    return BotUtils.sendLocalMessage("msg.bot-prefix") + "需要先签到才能使用占卜功能!";
                 }
             } else {
-                events.add(underCover);
                 BotConstants.underCovers.remove(underCover);
                 return RandomResult.getChance(underCover);
             }
@@ -61,20 +55,6 @@ public class RandomCommand implements EverywhereCommand {
         return null;
     }
 
-    private boolean isDuplicate(String eventName){
-        return getResult(eventName) != null;
-    }
-
-    private RandomResult getResult(String eventName){
-        if (!events.isEmpty()){
-            for (RandomResult result: events){
-                if (result.getEventName().equals(eventName)){
-                    return result;
-                }
-            }
-        }
-        return null;
-    }
 
     private RandomResult getResultFromList(List<RandomResult> results, long id){
         if (!results.isEmpty()){

@@ -5,6 +5,7 @@ import io.github.starwishsama.namelessbot.commands.MusicCommand;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Data
@@ -14,6 +15,7 @@ public class Config {
     @SerializedName("auto_save_time")
     private int autoSaveTime = 15;
     @SerializedName("bot_admins")
+    @Deprecated
     private List<Long> botAdmins = new ArrayList<>();
     @SerializedName("post_port")
     private int postPort = 5700;
@@ -51,4 +53,5 @@ public class Config {
     private List<Long> subscribers = new ArrayList<>();
     @SerializedName("guess_max_number")
     private int maxNumber = 100;
+    private List<Long> blackList = new LinkedList<>();
 }

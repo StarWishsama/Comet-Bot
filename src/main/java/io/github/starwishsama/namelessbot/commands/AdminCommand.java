@@ -6,10 +6,12 @@ import cc.moecraft.icq.event.events.message.EventGroupMessage;
 import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
 import cc.moecraft.utils.ArrayUtils;
+import cc.moecraft.utils.StringUtils;
 import io.github.starwishsama.namelessbot.BotConstants;
+import io.github.starwishsama.namelessbot.enums.UserLevel;
+import io.github.starwishsama.namelessbot.listeners.SendMessageListener;
+import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
@@ -19,7 +21,7 @@ import java.util.ArrayList;
 public class AdminCommand implements GroupCommand {
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String command, ArrayList<String> args) {
-        if (BotUtils.isBotOwner(sender.getId()) || BotConstants.cfg.getBotAdmins().contains(sender.getId())){
+        if (BotUtils.isBotAdmin(sender.getId())){
             if (args.size() > 0) {
                 switch (args.get(0)) {
                     case "set":
@@ -27,17 +29,16 @@ public class AdminCommand implements GroupCommand {
                             if (BotUtils.isBotOwner(sender.getId()) && args.get(1) != null){
                                 long qq = StringUtils.isNumeric(args.get(1)) ? Long.parseLong(args.get(1)) : BotUtils.parseAt(args.get(1));
                                 if (qq != -1000L) {
-                                    if (BotConstants.cfg.getBotAdmins() == null) {
-                                        BotConstants.cfg.setBotAdmins(new ArrayList<>());
-                                        BotConstants.cfg.getBotAdmins().add(qq);
-                                        return BotUtils.getLocalMessage("msg.bot-prefix") + "添加机器人管理员成功!";
-                                    }
-                                    if (BotUtils.isBotAdmin(sender.getId())) {
-                                        BotConstants.cfg.getBotAdmins().remove(qq);
-                                        return BotUtils.getLocalMessage("msg.bot-prefix") + "删除机器人管理员成功!";
+                                    BotUser user = BotUtils.getUser(sender.getId());
+                                    if (user == null){
+                                        user = new BotUser(sender.getId());
+                                        BotConstants.users.add(user);
                                     } else {
-                                        BotConstants.cfg.getBotAdmins().add(qq);
-                                        return BotUtils.getLocalMessage("msg.bot-prefix") + "添加机器人管理员成功!";
+                                        if (user.getLevel().ordinal() > UserLevel.VIP.ordinal()){
+                                            user.setLevel(UserLevel.USER);
+                                        } else {
+                                            user.setLevel(UserLevel.ADMIN);
+                                        }
                                     }
                                 } else {
                                     return BotUtils.getLocalMessage("msg.bot-prefix") + "请检查QQ号是否正确!";
@@ -69,6 +70,33 @@ public class AdminCommand implements GroupCommand {
                             }
                         } else
                             return BotUtils.getLocalMessage("msg.bot-prefix") + "/debug setapi [音乐API]";
+                    case "upgrade":
+                        BotUser user;
+                        if (args.size() == 1) {
+                            user = BotUtils.getUser(sender.getId());
+                            if (user != null) {
+                                if (BotConstants.cfg.getBotAdmins().contains(sender.getId())) {
+                                    user.setLevel(UserLevel.ADMIN);
+                                    return BotUtils.sendLocalMessage("msg.bot-prefix", "完成");
+                                } else if (BotConstants.cfg.getOwnerID() == sender.getId()) {
+                                    user.setLevel(UserLevel.OWNER);
+                                    return BotUtils.sendLocalMessage("msg.bot-prefix", "完成");
+                                }
+                            } else
+                                return BotUtils.getLocalMessage("msg.bot-prefix") + BotUtils.getLocalMessage("checkin.first-time");
+                        } else if (args.size() == 2){
+                            long id = StringUtils.isNumeric(args.get(1)) ? Integer.parseInt(args.get(1)) : BotUtils.parseAt(args.get(1));
+                            user = BotUtils.getUser(id);
+                            if (user != null){
+                                user.setLevel(UserLevel.VIP);
+                            } else {
+                                return BotUtils.sendLocalMessage("msg.bot-prefix", "此用户未注册");
+                            }
+                        }
+                        break;
+                    case "switch":
+                        SendMessageListener.botSwitch = !SendMessageListener.botSwitch;
+                        break;
                     default:
                         return null;
                 }

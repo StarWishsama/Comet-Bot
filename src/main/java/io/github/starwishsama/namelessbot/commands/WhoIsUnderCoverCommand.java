@@ -9,7 +9,7 @@ import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
 
-public class WereWolfKillCommand implements GroupCommand {
+public class WhoIsUnderCoverCommand implements GroupCommand {
     // WIP
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String command, ArrayList<String> args) {

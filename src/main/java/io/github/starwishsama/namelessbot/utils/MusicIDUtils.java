@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.BotMain;
 
 import java.io.BufferedReader;
@@ -19,30 +20,6 @@ import java.nio.charset.StandardCharsets;
  * @author Nameless
  */
 public class MusicIDUtils {
-    // 仅供测试
-    public static void main(String[] args){
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in), 1024);
-        boolean quit = false;
-
-        while (!quit){
-            try {
-                System.out.println("输入你要搜索的歌名 / Type song name you want to search (By Netease Cloud Music): ");
-                String input = in.readLine();
-
-                if (input == null || input.isEmpty()){
-                    System.out.println("Exit!");
-                    quit = true;
-                } else {
-                    System.out.println(getQQMusicSongID(input));
-                    System.out.println(getNetEaseSongID(input));
-                }
-            } catch (Exception x) {
-                x.printStackTrace(System.out);
-                System.out.println("Can't request song(s) from API.");
-            }
-        }
-    }
-
     public static int getQQMusicSongID(String name){
         if (name != null) {
             JsonArray songs = searchQQMusic(name);
@@ -65,7 +42,7 @@ public class MusicIDUtils {
 
     private static JsonArray searchNetEaseMusic(String songName) throws IOException {
         if (songName != null){
-            URL url = new URL("http://localhost:3000/search?keywords=" + URLEncoder.encode(songName, "UTF-8"));
+            URL url = new URL(BotConstants.cfg.getNetEaseApi() + "/search?keywords=" + URLEncoder.encode(songName, "UTF-8"));
             HttpURLConnection hc = (HttpURLConnection) url.openConnection();
             if (hc.getResponseCode() == 200) {
                 InputStream is = url.openStream();

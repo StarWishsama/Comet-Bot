@@ -26,9 +26,9 @@ public class DebugListener extends IcqListener {
                 ((EventMessage) e.getParentEvent()).respond("在执行命令时发生了异常, 请查看后台");
             }
             if (BotConstants.cfg.getOwnerID() != 0) {
-                e.getParentEvent().getHttpApi().sendPrivateMsg(BotConstants.cfg.getOwnerID(), "消息事件异常: " + e.getParentEvent().toString() + "\n" + e.getException().getLocalizedMessage());
+                e.getParentEvent().getHttpApi().sendPrivateMsg(BotConstants.cfg.getOwnerID(), "消息事件异常: " + e.getParentEvent() + "\n" + e.getException().getLocalizedMessage());
             }
-            BotMain.getLogger().warning("消息事件异常: " + e.getParentEvent().toString());
+            BotMain.getLogger().warning("消息事件异常: " + e.getParentEvent());
             e.getException().printStackTrace();
         }
     }

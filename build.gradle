@@ -14,7 +14,7 @@ plugins {
 }
 
 group 'io.github.starwishsama.namelessbot'
-version '0.2.7-DEV-200217'
+version '0.2.7.1-DEV-200218'
 
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
@@ -41,6 +41,7 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.16'
     implementation 'org.apache.httpcomponents:httpclient:4.5.2'
     implementation 'org.apache.httpcomponents:httpcore:4.4.4'
+    implementation 'com.vdurmont:emoji-java:4.0.0'
 }
 
 shadowJar {

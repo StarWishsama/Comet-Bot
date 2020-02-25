@@ -2,11 +2,13 @@ package io.github.starwishsama.namelessbot.utils;
 
 import cc.moecraft.icq.user.GroupUser;
 import cc.moecraft.icq.user.User;
+import cn.hutool.extra.emoji.EmojiUtil;
 import com.deadmandungeons.serverstatus.MinecraftServerStatus;
 import com.deadmandungeons.serverstatus.ping.PingResponse;
 
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.BotConstants;
+import io.github.starwishsama.namelessbot.enums.UserLevel;
 import io.github.starwishsama.namelessbot.objects.BotLocalization;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 
@@ -186,7 +188,7 @@ public class BotUtils {
                 }
             }
         } else {
-            BotMain.getLogger().warning("在获取 QQ 号为 " + qq + " 的签到数据时出现了问题: 用户列表为空");
+            BotMain.getLogger().warning("在获取 QQ 号为 " + qq + " 的用户数据时出现了问题: 用户列表为空");
         }
         return null;
     }
@@ -199,7 +201,7 @@ public class BotUtils {
                 }
             }
         } else {
-            BotMain.getLogger().warning("在获取 QQ 号为 " + sender.getId() + " 的签到数据时出现了问题: 用户列表为空");
+            BotMain.getLogger().warning("在获取 QQ 号为 " + sender.getId() + " 的用户数据时出现了问题: 用户列表为空");
         }
         return null;
     }
@@ -240,52 +242,28 @@ public class BotUtils {
         return getUser(qq) != null;
     }
 
-    public static boolean isBotOwner(long qq){
-        return BotConstants.cfg.getOwnerID() == qq;
+    public static UserLevel getLevel(long qq){
+        BotUser user = getUser(qq);
+        if (user != null){
+            return user.getLevel();
+        }
+        return UserLevel.USER;
+    }
+
+    public static boolean isBotAdmin(long id){
+        return getLevel(id).ordinal() > 1;
+    }
+
+    public static boolean isBotOwner(long id){
+        return getLevel(id) == UserLevel.OWNER;
     }
 
     public static boolean isBotOwner(User sender){
-        return BotConstants.cfg.getOwnerID() == sender.getId();
-    }
-
-    public static boolean isBotAdmin(long qq){
-        if (BotConstants.cfg.getBotAdmins() != null){
-            for (long value: BotConstants.cfg.getBotAdmins()){
-                if (value == qq) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return isBotOwner(sender.getId());
     }
 
     public static boolean isBotAdmin(User sender){
-        if (BotConstants.cfg.getBotAdmins() != null){
-            for (long qq: BotConstants.cfg.getBotAdmins()){
-                if (qq == sender.getId()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 判断是否为 Emoji 表情
-     *
-     * @param text
-     * @return boolean
-     */
-    public static boolean containsEmoji(String text) {
-        for (int i = 0; i < text.length(); i++) {
-            char codePoint = text.charAt(i);
-            if (codePoint == 0x0 || codePoint == 0x9 || codePoint == 0xA
-                    || codePoint == 0xD || codePoint >= 0x20 && codePoint <= 0xD7FF
-                    || codePoint >= 0xE000 && codePoint <= 0xFFFD) {
-                return true;
-            }
-        }
-        return false;
+        return isBotAdmin(sender.getId());
     }
 
     public static long parseAt(String msg){
