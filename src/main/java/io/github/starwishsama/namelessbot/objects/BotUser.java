@@ -18,7 +18,7 @@ public class BotUser {
     private int msgVL;
     private String r6sAccount;
     private UserLevel level = UserLevel.USER;
-    private int randomTime = 10;
+    private int randomTime = 20;
 
     public BotUser(long qq){
         userQQ = qq;
@@ -29,9 +29,11 @@ public class BotUser {
         this.randomTime--;
     }
 
-    public void updateTime(){
-        if (level == UserLevel.USER && randomTime < 10) {
+    public boolean updateTime(){
+        if (level == UserLevel.USER && randomTime < 20) {
             this.randomTime++;
+            return true;
         }
+        return false;
     }
 }

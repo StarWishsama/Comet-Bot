@@ -42,7 +42,7 @@ public class RandomCommand implements EverywhereCommand {
                             return BotUtils.getLocalMessage("msg.bot-prefix") + "需要占卜的东西太长了或者含有非法字符!";
                         }
                     } else {
-                        return BotUtils.sendLocalMessage("msg.bot-prefix") + "今日占卜次数已达十次上限, 如需增加次数请咨询机器人管理.";
+                        return BotUtils.sendLocalMessage("msg.bot-prefix") + "今日占卜次数已达上限, 如需增加次数请咨询机器人管理.";
                     }
                 } else {
                     return BotUtils.sendLocalMessage("msg.bot-prefix") + "需要先签到才能使用占卜功能!";

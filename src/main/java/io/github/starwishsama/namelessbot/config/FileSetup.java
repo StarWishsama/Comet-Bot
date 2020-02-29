@@ -15,6 +15,7 @@ import io.github.starwishsama.namelessbot.objects.Config;
 import io.github.starwishsama.namelessbot.objects.ShopItem;
 import io.github.starwishsama.namelessbot.objects.groupconfig.GroupConfig;
 import io.github.starwishsama.namelessbot.objects.groupconfig.GroupConfigManager;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,7 +46,6 @@ public class FileSetup {
                 try {
                     cfg.setOwnerID(0);
                     cfg.setAutoSaveTime(15);
-                    cfg.setBotAdmins(new ArrayList<>());
                     cfg.setPostPort(5700);
                     cfg.setPostUrl("127.0.0.1");
                     cfg.setBotName("Bot");

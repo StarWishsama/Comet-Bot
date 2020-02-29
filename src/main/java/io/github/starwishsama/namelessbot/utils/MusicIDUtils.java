@@ -23,7 +23,7 @@ public class MusicIDUtils {
     public static int getQQMusicSongID(String name){
         if (name != null) {
             JsonArray songs = searchQQMusic(name);
-            if (songs.get(0).getAsJsonObject().get("songid") != null){
+            if (songs != null && songs.size() != 0 && songs.get(0).getAsJsonObject().get("songid") != null){
                 return songs.get(0).getAsJsonObject().get("songid").getAsInt();
             }
         }

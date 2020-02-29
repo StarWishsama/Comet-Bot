@@ -34,7 +34,7 @@ public class Config {
     @SerializedName("netease_api_url")
     private String netEaseApi;
     @SerializedName("cmd_prefix")
-    private String[] cmdPrefix = new String[]{"/", "#", "!"};
+    private String[] cmdPrefix = new String[]{"/", "#", "!", "."};
     @SerializedName("bind_minecraft_account")
     private boolean bindMCAccount = false;
     @SerializedName("anti_spam")

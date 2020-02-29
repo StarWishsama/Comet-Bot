@@ -14,7 +14,7 @@ plugins {
 }
 
 group 'io.github.starwishsama.namelessbot'
-version '0.2.7.1-DEV-200218'
+version '0.2.7.2-DEV-200227'
 
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'

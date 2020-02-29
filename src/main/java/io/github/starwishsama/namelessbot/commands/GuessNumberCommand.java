@@ -36,9 +36,13 @@ public class GuessNumberCommand implements GroupCommand {
                     return BotUtils.getLocalMessage("msg.bot-prefix") + "请猜一个数字 (范围: [0," + BotConstants.cfg.getMaxNumber() + "])";
                 } else {
                     if (args.size() > 1) {
-                        if (StringUtils.isNumeric(args.get(0)) && StringUtils.isNumeric(args.get(1)) && !args.get(0).equals(args.get(1))) {
+                        if (StringUtils.isNumeric(args.get(0)) && StringUtils.isNumeric(args.get(1))) {
+                            double min = Double.parseDouble(args.get(0));
+                            double max = Double.parseDouble(args.get(1));
                             if (args.get(0).contains(".") || args.get(1).contains(".")) {
                                 return BotUtils.getLocalMessage("msg.bot-prefix") + "不支持小数";
+                            } else if (min == max){
+                                return BotUtils.sendLocalMessage("msg.bot-prefix" + "两个数字不能相等!");
                             } else {
                                 GuessNumberSession session = new GuessNumberSession(sender.getId(), event.getGroupId(), RandomUtil.randomInt(Integer.parseInt(args.get(0)), Integer.parseInt(args.get(1))));
                                 SessionManager.addSession(session);

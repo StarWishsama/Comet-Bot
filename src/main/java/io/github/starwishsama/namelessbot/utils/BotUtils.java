@@ -216,26 +216,26 @@ public class BotUtils {
         } else {
             BotMain.getLogger().warning("无法获取本地化文本, 文本节点为: " + node);
         }
-        return null;
+        return "PlaceHolder";
     }
 
     public static String sendLocalMessage(String node, String otherText){
         if (getLocalMessage(node) != null){
-            return getLocalMessage(node) + otherText;
+            return getLocalMessage(node) + " " + otherText;
         }
-        return null;
+        return "PlaceHolder";
     }
 
     public static String sendLocalMessage(String node, String... otherText){
         if (getLocalMessage(node) != null){
             StringBuilder sb = new StringBuilder();
-            sb.append(getLocalMessage(node));
+            sb.append(getLocalMessage(node)).append(" ");
             for (String s : otherText){
                 sb.append(s).append("\n");
             }
             return sb.toString().trim();
         }
-        return null;
+        return "PlaceHolder";
     }
 
     public static boolean isUserExist(long qq) {

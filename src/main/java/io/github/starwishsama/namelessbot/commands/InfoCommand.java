@@ -27,6 +27,7 @@ public class InfoCommand implements EverywhereCommand {
                     + "\n累计连续签到了 " + user.getCheckInTime() + " 天"
                     + "\n上次签到于: " + new SimpleDateFormat("yyyy-MM-dd").format(user.getLastCheckInTime().getTime())
                     + "\n你的权限组: " + user.getLevel()
+                    + "\n占卜次数: " + user.getRandomTime()
             ;
             if (user.getBindServerAccount() != null) {
                 reply = reply + "绑定的游戏账号是: " + user.getBindServerAccount();

@@ -5,7 +5,9 @@ import cc.moecraft.icq.command.interfaces.EverywhereCommand;
 import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
 
+import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.config.FileSetup;
+import io.github.starwishsama.namelessbot.objects.BiliBiliUser;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import io.github.starwishsama.namelessbot.utils.LiveUtils;
@@ -43,15 +45,32 @@ public class DebugCommand implements EverywhereCommand {
                         return BotUtils.getLocalMessage("msg.bot-prefix") + "已手动刷新信息缓存.";
                     }
                     break;
-                case "vtuber":
+                case "up":
                     if (args.size() > 1) {
-                        return LiveUtils.getLiver(args.get(1));
+                        if (LiveUtils.getUserCache().isEmpty()){
+                            LiveUtils.refreshUserCache();
+                        }
+
+                        BiliBiliUser biliUser = LiveUtils.getUserByName(args.get(1));
+                        if (biliUser != null){
+                            if (LiveUtils.getLiveStatus(biliUser)){
+                                return "Bot > 你单推的 " + biliUser.getUname() + " 正在直播\n直播间直达链接: https://live.bilibili.com/" + biliUser.getRoomid();
+                            } else {
+                                return "Bot > 你单推的 " + biliUser.getUname() + " 摸了, 没在播";
+                            }
+                        } else {
+                            return "Bot > 用户不存在";
+                        }
                     }
                     break;
-                case "addcount":
-                    if (BotUtils.getUser(sender) != null){
-                        BotUtils.getUser(sender).setRandomTime(100);
+                case "resetcount":
+                    if (BotUtils.isBotOwner(sender.getId())){
+                        for (BotUser botUser : BotConstants.users){
+                            botUser.setRandomTime(20);
+                        }
+                        return "Bot > Reset random time successful";
                     }
+                    break;
                 default:
                     return "Bot > 命令不存在" +
                             "\n请注意: 这里的命令随时会被删除.";

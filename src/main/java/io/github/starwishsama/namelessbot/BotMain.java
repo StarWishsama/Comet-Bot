@@ -27,7 +27,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-
 /**
  * @author Nameless
  */
@@ -41,6 +40,8 @@ public class BotMain {
     private static String jarPath;
     @Getter
     private static Rcon rcon;
+    @Getter
+    private static PicqBotX instance;
     @Getter
     private static IcqCommand[] commands = new IcqCommand[]{
             new AdminCommand(),
@@ -60,11 +61,12 @@ public class BotMain {
             new ServerInfoCommand(),
             new SayCommand(),
             new SettingsCommand(),
+            new ShopCommand(),
             new UnderCoverCommand(),
             new VoteCommand(),
             new VersionCommand()
     };
-    public final static String version = "v0.2.7.1-DEV-200225";
+    public final static String version = "v0.2.7.2-DEV-200227";
 
     private static IcqListener[] listeners = new IcqListener[]{
             new DebugListener(),
@@ -86,6 +88,7 @@ public class BotMain {
                 .setLogFileName("Nameless-Bot-Log")
                 .setUseAsyncCommands(true);
         PicqBotX bot = new PicqBotX(cfg);
+        instance = bot;
         logger = bot.getLogger();
         bot.addAccount(BotConstants.cfg.getBotName(), BotConstants.cfg.getPostUrl(), BotConstants.cfg.getPostPort());
         if (bot.getAccountManager().getAccounts().size() != 0) {
@@ -128,7 +131,7 @@ public class BotMain {
         // 定时任务
         service.scheduleWithFixedDelay(FileSetup::saveFiles, BotConstants.cfg.getAutoSaveTime(), BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
         service.scheduleWithFixedDelay(() -> BotConstants.underCovers.clear(),3,3, TimeUnit.HOURS);
-        service.scheduleWithFixedDelay(() -> BotConstants.users.forEach(BotUser::updateTime), 0, 3, TimeUnit.HOURS);
+        service.scheduleWithFixedDelay(() -> BotConstants.users.forEach(BotUser::updateTime), 3, 3, TimeUnit.HOURS);
     }
 
     // From https://blog.csdn.net/df0128/article/details/90484684
