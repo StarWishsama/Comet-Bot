@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        jcenter()
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
@@ -8,27 +8,27 @@ buildscript {
 }
 
 plugins {
-    id "io.freefair.lombok" version "4.1.6"
+    id 'java'
     id "com.github.johnrengelman.shadow" version "5.2.0"
-    id "java"
+    id 'org.jetbrains.kotlin.jvm' version '1.3.61'
 }
 
-group 'io.github.starwishsama.namelessbot'
-version '0.2.7.1-DEV-200218'
-
-compileJava.options.encoding = 'UTF-8'
-compileTestJava.options.encoding = 'UTF-8'
+group 'io.github.starwishsama.nbot'
+version '0.0.1-ALPHA-Kotlin'
 
 repositories {
-    mavenCentral()
+    maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'http://deadmandungeons.com/artifactory/public' }
 }
 
 dependencies {
+    implementation 'net.mamoe:mirai-core-qqandroid-jvm:0.22.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile group: 'com.hiczp', name: 'bilibili-api', version: '0.1.1'
     implementation 'cn.hutool:hutool-all:4.5.10'
-    implementation 'com.github.hydevelop:PicqBotX:4.12.0.1019.PRE'
     implementation 'org.apache.commons:commons-lang3:3.8.1'
     implementation 'org.apache.commons:commons-io:1.3.2'
     implementation 'com.gitlab.siege-insights:r6tab-java-api-client:0.7-alpha'
@@ -42,6 +42,7 @@ dependencies {
     implementation 'org.apache.httpcomponents:httpclient:4.5.2'
     implementation 'org.apache.httpcomponents:httpcore:4.4.4'
     implementation 'com.vdurmont:emoji-java:4.0.0'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
 shadowJar {
@@ -49,4 +50,11 @@ shadowJar {
     manifest {
         attributes "Main-Class": "io.github.starwishsama.namelessbot.BotMain"
     }
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
 }
