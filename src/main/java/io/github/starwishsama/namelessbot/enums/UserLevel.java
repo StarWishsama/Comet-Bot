@@ -4,5 +4,5 @@ public enum UserLevel {
     USER,
     VIP,
     ADMIN,
-    OWNER;
+    OWNER
 }

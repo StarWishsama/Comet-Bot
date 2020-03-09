@@ -7,26 +7,20 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-
 import io.github.starwishsama.namelessbot.BotMain;
+import io.github.starwishsama.namelessbot.managers.GroupConfigManager;
 import io.github.starwishsama.namelessbot.objects.BotLocalization;
 import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.objects.Config;
-import io.github.starwishsama.namelessbot.objects.ShopItem;
+import io.github.starwishsama.namelessbot.objects.GroupShop;
 import io.github.starwishsama.namelessbot.objects.groupconfig.GroupConfig;
-import io.github.starwishsama.namelessbot.objects.groupconfig.GroupConfigManager;
-import org.slf4j.Logger;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static io.github.starwishsama.namelessbot.BotConstants.shopItems;
-import static io.github.starwishsama.namelessbot.BotConstants.users;
-import static io.github.starwishsama.namelessbot.BotConstants.cfg;
-import static io.github.starwishsama.namelessbot.BotConstants.msg;
+import static io.github.starwishsama.namelessbot.BotConstants.*;
 
 public class FileSetup {
     private static File userCfg = new File(BotMain.getJarPath() + "/users.json");
@@ -59,7 +53,7 @@ public class FileSetup {
 
                     FileWriter.create(cfgFile).write(gson.toJson(cfg));
                     FileWriter.create(userCfg).write(gson.toJson(users));
-                    FileWriter.create(shopItemCfg).write(gson.toJson(shopItems));
+                    FileWriter.create(shopItemCfg).write(gson.toJson(shop));
                     FileWriter.create(groupCfg).write(gson.toJson(GroupConfigManager.getConfigMap()));
 
                     if (!rssTemp.createNewFile()){
@@ -75,14 +69,14 @@ public class FileSetup {
         }
     }
 
-    public static void saveCfg(){
+    public static void saveData() {
         try {
             FileWriter.create(cfgFile).write(gson.toJson(cfg));
             FileWriter.create(userCfg).write(gson.toJson(users));
-            FileWriter.create(shopItemCfg).write(gson.toJson(shopItems));
+            FileWriter.create(shopItemCfg).write(gson.toJson(shop));
             FileWriter.create(rssTemp).write(BotMain.temp);
             FileWriter.create(groupCfg).write(gson.toJson(GroupConfigManager.getConfigMap()));
-        } catch (Exception e){
+        } catch (Exception e) {
             System.err.println("[配置] 在保存配置文件时发生了问题, 错误信息: ");
             e.printStackTrace();
         }
@@ -93,15 +87,17 @@ public class FileSetup {
             String userContent = FileReader.create(userCfg).readString();
             String configContent = FileReader.create(cfgFile).readString();
             String groupContent = FileReader.create(groupCfg).readString();
-            BotMain.temp = FileReader.create(rssTemp).readString();
 
             JsonElement checkInParser = JsonParser.parseString(userContent);
             JsonElement configParser = JsonParser.parseString(configContent);
             if (!checkInParser.isJsonNull() && !configParser.isJsonNull()){
                 cfg = gson.fromJson(configContent, Config.class);
-                users = gson.fromJson(userContent, new TypeToken<Collection<BotUser>>(){}.getType());
-                shopItems = gson.fromJson(FileReader.create(shopItemCfg).readString(), new TypeToken<Collection<ShopItem>>(){}.getType());
-                GroupConfigManager.setConfigMap(gson.fromJson(groupContent, new TypeToken<Map<Long, GroupConfig>>(){}.getType()));
+                users = gson.fromJson(userContent, new TypeToken<Collection<BotUser>>() {
+                }.getType());
+                shop = gson.fromJson(FileReader.create(shopItemCfg).readString(), new TypeToken<List<GroupShop>>() {
+                }.getType());
+                GroupConfigManager.setConfigMap(gson.fromJson(groupContent, new TypeToken<Map<Long, GroupConfig>>() {
+                }.getType()));
             } else {
                 System.err.println("[配置] 在加载配置文件时发生了问题, JSON 文件为空.");
             }
@@ -132,7 +128,7 @@ public class FileSetup {
 
     public static void saveFiles(){
         BotMain.getLogger().log("[Bot] 自动保存数据完成");
-        saveCfg();
+        saveData();
         saveLang();
     }
 }

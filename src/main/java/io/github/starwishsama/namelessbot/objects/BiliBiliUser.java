@@ -1,5 +1,6 @@
 package io.github.starwishsama.namelessbot.objects;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.util.List;
@@ -8,7 +9,8 @@ import java.util.List;
 public class BiliBiliUser {
     private int mid;
     private String uuid;
-    private String uname;
+    @SerializedName("uname")
+    private String userName;
     private int video;
     private int roomid;
     private String sign;

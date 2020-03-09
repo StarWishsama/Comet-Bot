@@ -4,11 +4,7 @@ import cc.moecraft.icq.command.CommandProperties;
 import cc.moecraft.icq.command.interfaces.EverywhereCommand;
 import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
-import cc.moecraft.utils.StringUtils;
-import io.github.starwishsama.namelessbot.BotConstants;
-import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
-import io.github.starwishsama.namelessbot.utils.LiveUtils;
 
 import java.util.ArrayList;
 

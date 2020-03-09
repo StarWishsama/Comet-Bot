@@ -4,9 +4,7 @@ import cc.moecraft.icq.event.EventHandler;
 import cc.moecraft.icq.event.IcqListener;
 import cc.moecraft.icq.event.events.message.EventGroupMessage;
 import cc.moecraft.utils.StringUtils;
-
-import io.github.starwishsama.namelessbot.session.Session;
-import io.github.starwishsama.namelessbot.session.SessionManager;
+import io.github.starwishsama.namelessbot.managers.SessionManager;
 import io.github.starwishsama.namelessbot.session.commands.guessnumber.GuessNumberPlayer;
 import io.github.starwishsama.namelessbot.session.commands.guessnumber.GuessNumberSession;
 import io.github.starwishsama.namelessbot.utils.BotUtils;

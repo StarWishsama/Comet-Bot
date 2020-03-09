@@ -1,17 +1,13 @@
 package io.github.starwishsama.namelessbot.utils;
 
-import cc.moecraft.icq.user.GroupUser;
 import cc.moecraft.icq.user.User;
-import cn.hutool.extra.emoji.EmojiUtil;
 import com.deadmandungeons.serverstatus.MinecraftServerStatus;
 import com.deadmandungeons.serverstatus.ping.PingResponse;
-
-import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.BotConstants;
+import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.enums.UserLevel;
 import io.github.starwishsama.namelessbot.objects.BotLocalization;
 import io.github.starwishsama.namelessbot.objects.BotUser;
-
 import taskeren.extrabot.components.ExComponent;
 import taskeren.extrabot.components.ExComponentAt;
 
@@ -136,10 +132,14 @@ public class BotUtils {
      * @return true/false
      */
 
-    public static boolean isNoCoolDown(long qq){
+    public static boolean isNoCoolDown(long qq) {
         long currentTime = System.currentTimeMillis();
-        if (coolDown.containsKey(qq) && !BotUtils.isBotOwner(qq)){
-            if (currentTime - coolDown.get(qq) < BotConstants.cfg.getCoolDownTime() * 1000){
+        if (qq == 80000000) {
+            return false;
+        }
+
+        if (coolDown.containsKey(qq) && !BotUtils.isBotOwner(qq)) {
+            if (currentTime - coolDown.get(qq) < BotConstants.cfg.getCoolDownTime() * 1000) {
                 return false;
             } else {
                 coolDown.remove(qq);
@@ -255,7 +255,7 @@ public class BotUtils {
     }
 
     public static boolean isBotOwner(long id){
-        return getLevel(id) == UserLevel.OWNER;
+        return getLevel(id) == UserLevel.OWNER || BotConstants.cfg.getOwnerID() == id;
     }
 
     public static boolean isBotOwner(User sender){

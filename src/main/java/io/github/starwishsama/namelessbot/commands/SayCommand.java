@@ -7,9 +7,7 @@ import cc.moecraft.icq.sender.IcqHttpApi;
 import cc.moecraft.icq.sender.returndata.returnpojo.get.RGroup;
 import cc.moecraft.icq.user.User;
 import cc.moecraft.utils.ArrayUtils;
-
 import io.github.starwishsama.namelessbot.utils.BotUtils;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -44,6 +42,6 @@ public class SayCommand implements EverywhereCommand {
 
     @Override
     public CommandProperties properties() {
-        return new CommandProperties("say", "echo", "复读");
+        return new CommandProperties("say", "echo");
     }
 }

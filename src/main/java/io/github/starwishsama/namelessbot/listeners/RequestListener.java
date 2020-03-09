@@ -4,10 +4,9 @@ import cc.moecraft.icq.event.EventHandler;
 import cc.moecraft.icq.event.IcqListener;
 import cc.moecraft.icq.event.events.message.EventPrivateMessage;
 import cc.moecraft.icq.event.events.request.EventGroupInviteRequest;
-
 import io.github.starwishsama.namelessbot.BotConstants;
+import io.github.starwishsama.namelessbot.managers.SessionManager;
 import io.github.starwishsama.namelessbot.session.Session;
-import io.github.starwishsama.namelessbot.session.SessionManager;
 import io.github.starwishsama.namelessbot.session.commands.RequestSession;
 
 public class RequestListener extends IcqListener {

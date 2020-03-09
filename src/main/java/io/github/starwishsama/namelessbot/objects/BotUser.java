@@ -1,11 +1,11 @@
 package io.github.starwishsama.namelessbot.objects;
 
-import java.util.Calendar;
-import java.util.UUID;
-
 import io.github.starwishsama.namelessbot.enums.UserLevel;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import lombok.Data;
+
+import java.util.Calendar;
+import java.util.UUID;
 
 @Data
 public class BotUser {
@@ -29,11 +29,21 @@ public class BotUser {
         this.randomTime--;
     }
 
-    public boolean updateTime(){
+    public boolean updateTime() {
         if (level == UserLevel.USER && randomTime < 20) {
             this.randomTime++;
             return true;
         }
         return false;
+    }
+
+    public void addPoint(double point) {
+        checkInPoint = checkInPoint + point;
+    }
+
+    public void addTime(int time) {
+        if (level == UserLevel.USER && randomTime < 20) {
+            randomTime = randomTime + time;
+        }
     }
 }

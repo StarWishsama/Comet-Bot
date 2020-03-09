@@ -1,5 +1,6 @@
-package io.github.starwishsama.namelessbot.objects.groupconfig;
+package io.github.starwishsama.namelessbot.managers;
 
+import io.github.starwishsama.namelessbot.objects.groupconfig.GroupConfig;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,20 +16,16 @@ public class GroupConfigManager {
         return configMap.getOrDefault(groupId, null);
     }
 
-    public static boolean addConfig(Long groupId, GroupConfig cfg){
-        if (!configMap.containsKey(groupId)){
+    public static void addConfig(Long groupId, GroupConfig cfg) {
+        if (!configMap.containsKey(groupId)) {
             configMap.put(groupId, cfg);
-            return true;
         }
-        return false;
     }
 
-    public static boolean removeConfig(Long groupId){
-        if (!configMap.containsKey(groupId)){
+    public static void removeConfig(Long groupId) {
+        if (!configMap.containsKey(groupId)) {
             configMap.remove(groupId);
-            return true;
         }
-        return false;
     }
 
     public static boolean isValidGroupConfig(Long groupId){

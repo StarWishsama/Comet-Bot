@@ -1,6 +1,6 @@
-package io.github.starwishsama.namelessbot.session;
+package io.github.starwishsama.namelessbot.managers;
 
-import io.github.starwishsama.namelessbot.session.commands.guessnumber.GuessNumberSession;
+import io.github.starwishsama.namelessbot.session.Session;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -7,16 +7,14 @@ import cc.moecraft.icq.event.IcqListener;
 import cc.moecraft.icq.sender.IcqHttpApi;
 import cc.moecraft.logger.HyLogger;
 import cc.moecraft.logger.environments.ColorSupportLevel;
-
 import io.github.starwishsama.namelessbot.commands.*;
 import io.github.starwishsama.namelessbot.config.FileSetup;
 import io.github.starwishsama.namelessbot.listeners.*;
-
 import io.github.starwishsama.namelessbot.listeners.commands.GuessNumberListener;
 import io.github.starwishsama.namelessbot.listeners.commands.VoteListener;
 import io.github.starwishsama.namelessbot.objects.BotUser;
+import io.github.starwishsama.namelessbot.utils.BiliUtils;
 import lombok.Getter;
-
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -57,7 +55,7 @@ public class BotMain {
             new RandomCommand(),
             new RandomNumberCommand(),
             new RSSCommand(),
-            new RConGroupCommand(),
+            new RConCommand(),
             new ServerInfoCommand(),
             new SayCommand(),
             new SettingsCommand(),
@@ -74,11 +72,13 @@ public class BotMain {
             new SendMessageListener(),
             new GroupRequestHandler(),
             new RequestListener(),
-            new VoteListener()
+            new VoteListener(),
+            new TeacherListener()
     };
 
     public static void main(String[] args) {
-        ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1, new BasicThreadFactory.Builder().build());
+        ScheduledExecutorService service = new ScheduledThreadPoolExecutor(8, new BasicThreadFactory.Builder().build());
+
         jarPath = getPath();
         FileSetup.loadCfg();
         FileSetup.loadLang();
@@ -112,7 +112,7 @@ public class BotMain {
                     e.printStackTrace();
                 }
             }
-            FileSetup.saveCfg();
+            FileSetup.saveData();
             FileSetup.saveLang();
             service.shutdown();
         }));
@@ -132,6 +132,7 @@ public class BotMain {
         service.scheduleWithFixedDelay(FileSetup::saveFiles, BotConstants.cfg.getAutoSaveTime(), BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
         service.scheduleWithFixedDelay(() -> BotConstants.underCovers.clear(),3,3, TimeUnit.HOURS);
         service.scheduleWithFixedDelay(() -> BotConstants.users.forEach(BotUser::updateTime), 3, 3, TimeUnit.HOURS);
+        service.scheduleWithFixedDelay(BiliUtils::refreshUserCache, 5, 5, TimeUnit.MINUTES);
     }
 
     // From https://blog.csdn.net/df0128/article/details/90484684

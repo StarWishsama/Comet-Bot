@@ -5,8 +5,7 @@ import cc.moecraft.icq.command.interfaces.GroupCommand;
 import cc.moecraft.icq.event.events.message.EventGroupMessage;
 import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
-
-import io.github.starwishsama.namelessbot.objects.groupconfig.GroupConfigManager;
+import io.github.starwishsama.namelessbot.managers.GroupConfigManager;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import org.apache.commons.lang3.StringUtils;
 

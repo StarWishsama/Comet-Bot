@@ -1,24 +1,22 @@
 package io.github.starwishsama.namelessbot.commands;
 
 import cc.moecraft.icq.command.CommandProperties;
-import cc.moecraft.icq.command.interfaces.GroupCommand;
-import cc.moecraft.icq.event.events.message.EventGroupMessage;
-import cc.moecraft.icq.user.Group;
-import cc.moecraft.icq.user.GroupUser;
-
+import cc.moecraft.icq.command.interfaces.EverywhereCommand;
+import cc.moecraft.icq.event.events.message.EventMessage;
+import cc.moecraft.icq.user.User;
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
 
-public class RConGroupCommand implements GroupCommand {
+public class RConCommand implements EverywhereCommand {
     @Override
-    public CommandProperties properties(){
+    public CommandProperties properties() {
         return new CommandProperties("rcon", "rc");
     }
 
     @Override
-    public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String msg, ArrayList<String> args){
+    public String run(EventMessage event, User sender, String command, ArrayList<String> args) {
         long id = sender.getId();
         if (BotUtils.isNoCoolDown(id)) {
             if (BotUtils.isBotOwner(sender.getId()) || BotUtils.isBotAdmin(sender.getId())) {

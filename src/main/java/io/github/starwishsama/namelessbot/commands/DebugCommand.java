@@ -4,17 +4,18 @@ import cc.moecraft.icq.command.CommandProperties;
 import cc.moecraft.icq.command.interfaces.EverywhereCommand;
 import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
-
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.config.FileSetup;
 import io.github.starwishsama.namelessbot.objects.BiliBiliUser;
 import io.github.starwishsama.namelessbot.objects.BotUser;
+import io.github.starwishsama.namelessbot.utils.BiliUtils;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
-import io.github.starwishsama.namelessbot.utils.LiveUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class DebugCommand implements EverywhereCommand {
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     @Override
     public CommandProperties properties(){
         return new CommandProperties("debug");
@@ -47,16 +48,23 @@ public class DebugCommand implements EverywhereCommand {
                     break;
                 case "up":
                     if (args.size() > 1) {
-                        if (LiveUtils.getUserCache().isEmpty()){
-                            LiveUtils.refreshUserCache();
+                        if (BiliUtils.getUserCache().isEmpty()) {
+                            BiliUtils.refreshUserCache();
                         }
 
-                        BiliBiliUser biliUser = LiveUtils.getUserByName(args.get(1));
-                        if (biliUser != null){
-                            if (LiveUtils.getLiveStatus(biliUser)){
-                                return "Bot > 你单推的 " + biliUser.getUname() + " 正在直播\n直播间直达链接: https://live.bilibili.com/" + biliUser.getRoomid();
+                        BiliBiliUser biliUser = BiliUtils.getUserByName(args.get(1));
+                        if (biliUser != null) {
+                            if (BiliUtils.getLiveStatus(biliUser)) {
+                                return "Bot > " + biliUser.getUserName() + " 正在直播\n" +
+                                        "直播间直达链接: https://live.bilibili.com/" + biliUser.getRoomid() + "\n" +
+                                        "直播间标题: " + biliUser.getTitle() + "\n" +
+                                        "直播开始时间" + dateFormat.format(biliUser.getTime());
                             } else {
-                                return "Bot > 你单推的 " + biliUser.getUname() + " 摸了, 没在播";
+                                return "Bot > " + biliUser.getUserName() + " 没有在直播\n" +
+                                        "上次直播数据:\n" +
+                                        "时间" + dateFormat.format(biliUser.getLastLive().getTime()) +
+                                        "\n同接: " + biliUser.getLastLive().getOnline()
+                                        ;
                             }
                         } else {
                             return "Bot > 用户不存在";

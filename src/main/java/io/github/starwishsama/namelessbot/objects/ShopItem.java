@@ -5,22 +5,23 @@ import lombok.Data;
 @Data
 public class ShopItem {
     private String itemName;
-    private int needPoint;
+    private double point;
     private String itemCommand;
     private int buyTime;
-    private int money;
 
-    public ShopItem(String name, int point, int times, String itemCommand){
-        itemName = name;
-        needPoint = point;
+    public ShopItem() {
+    }
+
+    public ShopItem(String itemName, double point, int times, String itemCommand) {
+        this.itemName = itemName;
+        this.point = point;
         buyTime = times;
         this.itemCommand = itemCommand;
     }
 
-    public ShopItem(String name, int point, int times, int money){
-        itemName = name;
-        needPoint = point;
-        buyTime = times;
-        this.money = money;
+    public ShopItem(String itemName, double point, String itemCommand) {
+        this.itemName = itemName;
+        this.point = point;
+        this.itemCommand = itemCommand;
     }
 }

@@ -4,7 +4,7 @@ import cc.moecraft.icq.event.EventHandler;
 import cc.moecraft.icq.event.IcqListener;
 import cc.moecraft.icq.event.events.request.EventGroupAddRequest;
 import cc.moecraft.icq.user.Group;
-import io.github.starwishsama.namelessbot.objects.groupconfig.GroupConfigManager;
+import io.github.starwishsama.namelessbot.managers.GroupConfigManager;
 
 public class GroupRequestHandler extends IcqListener {
     @EventHandler

@@ -1,11 +1,12 @@
 package io.github.starwishsama.namelessbot.utils;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.CharsetUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.objects.BiliBiliUser;
 import lombok.Getter;
@@ -15,33 +16,25 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LiveUtils {
+public class BiliUtils {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().setLenient().serializeNulls().create();
     @Getter
     private static List<BiliBiliUser> userCache = new ArrayList<>();
 
     private static String getApiJson() throws IOException {
         String response = "";
-        if (BotConstants.cfg.getLiveApi() != null){
+        if (BotConstants.cfg.getLiveApi() != null) {
             URL url = new URL(BotConstants.cfg.getLiveApi());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Charset", "utf-8");
 
             if (conn.getResponseCode() == HttpURLConnection.HTTP_OK){
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder sb = new StringBuilder();
-                while ((response = br.readLine()) != null) {
-                    response = new String(response.getBytes("GBK"), StandardCharsets.UTF_8);
-                    sb.append(response);
-                }
-
-                response = sb.toString().trim();
+                response = Convert.convertCharset(br.readLine(), CharsetUtil.GBK, CharsetUtil.UTF_8);
                 br.close();
                 conn.disconnect();
             }
@@ -66,7 +59,7 @@ public class LiveUtils {
     public static BiliBiliUser getUserByName(String userName){
         if (!userCache.isEmpty()){
             for (BiliBiliUser user : userCache){
-                if (user.getUname().contains(userName)){
+                if (user.getUserName().contains(userName)) {
                     return user;
                 }
             }
@@ -76,7 +69,7 @@ public class LiveUtils {
 
     public static boolean getLiveStatus(BiliBiliUser user){
         if (user != null){
-            return user.getOnline() != 0;
+            return user.getOnline() != 0 && !user.getTitle().contains("投稿视频");
         }
         return false;
     }

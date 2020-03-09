@@ -6,12 +6,10 @@ import cc.moecraft.icq.event.events.message.EventGroupMessage;
 import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
 import cc.moecraft.utils.StringUtils;
-
 import cn.hutool.core.util.RandomUtil;
-
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.BotMain;
-import io.github.starwishsama.namelessbot.session.SessionManager;
+import io.github.starwishsama.namelessbot.managers.SessionManager;
 import io.github.starwishsama.namelessbot.session.commands.guessnumber.GuessNumberSession;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
