@@ -1,4 +1,4 @@
-package io.github.starwishsama.namelessbot.objects;
+package io.github.starwishsama.namelessbot.objects.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +20,7 @@ public class RandomResult {
         LOWEST("凶"),
         NEVER("大凶");
 
-        private String event;
+        private final String event;
 
         EventRate(String event) {
             this.event = event;

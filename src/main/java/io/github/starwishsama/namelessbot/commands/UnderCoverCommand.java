@@ -7,7 +7,8 @@ import cc.moecraft.icq.user.User;
 import cc.moecraft.utils.ArrayUtils;
 import cc.moecraft.utils.StringUtils;
 import io.github.starwishsama.namelessbot.BotConstants;
-import io.github.starwishsama.namelessbot.objects.RandomResult;
+import io.github.starwishsama.namelessbot.objects.user.BotUser;
+import io.github.starwishsama.namelessbot.objects.user.RandomResult;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 public class UnderCoverCommand implements PrivateCommand {
     @Override
     public String privateMessage(EventPrivateMessage event, User sender, String command, ArrayList<String> args) {
-        if (BotUtils.isBotAdmin(sender) || BotUtils.isBotOwner(sender)){
+        if (BotUser.isBotAdmin(sender) || BotUser.isBotOwner(sender)){
             if (args.size() > 0){
                 if (StringUtils.isNumeric(args.get(0))){
                     double v = Double.parseDouble(args.get(0));

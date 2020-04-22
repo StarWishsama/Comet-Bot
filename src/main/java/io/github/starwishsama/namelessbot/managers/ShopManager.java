@@ -1,8 +1,8 @@
 package io.github.starwishsama.namelessbot.managers;
 
 import io.github.starwishsama.namelessbot.BotMain;
-import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.objects.ShopItem;
+import io.github.starwishsama.namelessbot.objects.user.BotUser;
 
 import java.io.IOException;
 
@@ -13,11 +13,16 @@ public class ShopManager {
             String[] cmds = command.split(" ");
             if (cmds[1].equalsIgnoreCase("time")) {
                 user.addTime(1);
-                return "购买命令条数成功";
+                user.cost(item.getPoint());
+                return "购买成功";
             }
         } else {
             if (BotMain.getRcon() != null) {
-                return BotMain.getRcon().command(command);
+                String result = BotMain.getRcon().command(command);
+                if (result != null){
+                    user.cost(item.getPoint());
+                }
+                return "购买成功";
             }
         }
         return "发生了意外问题, 请联系管理员.";

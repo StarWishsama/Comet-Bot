@@ -1,10 +1,11 @@
-package io.github.starwishsama.namelessbot.objects;
+package io.github.starwishsama.namelessbot.objects.dtos;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.util.List;
 
+@Deprecated
 @Data
 public class BiliBiliUser {
     private int mid;

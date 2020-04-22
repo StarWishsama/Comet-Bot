@@ -5,6 +5,7 @@ import cc.moecraft.icq.command.interfaces.EverywhereCommand;
 import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
 import io.github.starwishsama.namelessbot.BotMain;
+import io.github.starwishsama.namelessbot.objects.user.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class RConCommand implements EverywhereCommand {
     public String run(EventMessage event, User sender, String command, ArrayList<String> args) {
         long id = sender.getId();
         if (BotUtils.isNoCoolDown(id)) {
-            if (BotUtils.isBotOwner(sender.getId()) || BotUtils.isBotAdmin(sender.getId())) {
+            if (BotUser.isBotOwner(sender.getId()) || BotUser.isBotAdmin(sender.getId())) {
                 if (BotMain.getRcon() != null) {
                     try {
                         StringBuilder sb = new StringBuilder();

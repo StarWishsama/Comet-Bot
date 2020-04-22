@@ -3,7 +3,6 @@ package io.github.starwishsama.namelessbot.utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.BotMain;
 
@@ -76,7 +75,7 @@ public class MusicIDUtils {
                 } else
                     BotMain.getLogger().debug("无法从 API 获取到歌曲信息, 响应码为 " + hc.getResponseCode());
             } catch (Exception x) {
-                BotMain.getLogger().warning("在通过 QQ 音乐搜索歌曲时发生了一个错误, " + x);
+                BotMain.getLogger().error("在通过 QQ 音乐搜索歌曲时发生了一个错误, ", x);
             }
         }
         return null;

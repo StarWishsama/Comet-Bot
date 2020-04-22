@@ -1,6 +1,8 @@
-package io.github.starwishsama.namelessbot.objects;
+package io.github.starwishsama.namelessbot.objects.group;
 
 import io.github.starwishsama.namelessbot.BotConstants;
+import io.github.starwishsama.namelessbot.objects.ShopItem;
+import io.github.starwishsama.namelessbot.objects.user.BotUser;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -11,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class GroupShop {
     private long groupId;
     private List<BotUser> admins;
-    private ArrayList<ShopItem> items;
+    private ArrayList<ShopItem> items = new ArrayList<>();
 
     public GroupShop() {
 
@@ -40,7 +42,11 @@ public class GroupShop {
     }
 
     public void addNewItem(ShopItem item) {
-        if (!items.contains(item)) {
+        if (items == null){
+            items = new ArrayList<>();
+        }
+
+        if (!items.contains(item) && item != null) {
             items.add(item);
         }
     }

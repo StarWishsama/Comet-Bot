@@ -8,12 +8,12 @@ import cc.moecraft.icq.sender.IcqHttpApi;
 import cc.moecraft.logger.HyLogger;
 import cc.moecraft.logger.environments.ColorSupportLevel;
 import io.github.starwishsama.namelessbot.commands.*;
+import io.github.starwishsama.namelessbot.config.BackupHelper;
 import io.github.starwishsama.namelessbot.config.FileSetup;
 import io.github.starwishsama.namelessbot.listeners.*;
 import io.github.starwishsama.namelessbot.listeners.commands.GuessNumberListener;
 import io.github.starwishsama.namelessbot.listeners.commands.VoteListener;
-import io.github.starwishsama.namelessbot.objects.BotUser;
-import io.github.starwishsama.namelessbot.utils.BiliUtils;
+import io.github.starwishsama.namelessbot.objects.user.BotUser;
 import lombok.Getter;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
@@ -21,8 +21,8 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,9 +41,11 @@ public class BotMain {
     @Getter
     private static PicqBotX instance;
     @Getter
-    private static IcqCommand[] commands = new IcqCommand[]{
+    private static final IcqCommand[] commands = new IcqCommand[]{
             new AdminCommand(),
+            new ArknightCommand(),
             new BindCommand(),
+            new BiliBiliCommand(),
             new CheckInCommand(),
             new DebugCommand(),
             new GuessNumberCommand(),
@@ -62,22 +64,31 @@ public class BotMain {
             new ShopCommand(),
             new UnderCoverCommand(),
             new VoteCommand(),
-            new VersionCommand()
+            new VersionCommand(),
+            new RepeatCommand(),
+            new PetCommand(),
+            new ClockInCommand(),
+            new PingCommand(),
+            new PCRCommand()
     };
-    public final static String version = "v0.2.7.2-DEV-200227";
+    public final static String version = "v0.3.2-DEV-200420";
 
-    private static IcqListener[] listeners = new IcqListener[]{
+    private static final IcqListener[] listeners = new IcqListener[]{
             new DebugListener(),
             new GuessNumberListener(),
             new SendMessageListener(),
             new GroupRequestHandler(),
             new RequestListener(),
             new VoteListener(),
-            new TeacherListener()
+            new TeacherListener(),
+            new RepeatListener()
     };
 
     public static void main(String[] args) {
-        ScheduledExecutorService service = new ScheduledThreadPoolExecutor(8, new BasicThreadFactory.Builder().build());
+        // Service Thread, use 1 thread
+        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor(new BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build());
+        // RSS Info Listener, custom thread count
+        //ScheduledExecutorService rssService = Executors.newScheduledThreadPool(count, new BasicThreadFactory.Builder().namingPattern("rss-service-%d").daemon(true).build());
 
         jarPath = getPath();
         FileSetup.loadCfg();
@@ -86,6 +97,7 @@ public class BotMain {
         PicqConfig cfg = new PicqConfig(BotConstants.cfg.getBotPort())
                 .setColorSupportLevel(ColorSupportLevel.OS_DEPENDENT)
                 .setLogFileName("Nameless-Bot-Log")
+                // 1 message per thread
                 .setUseAsyncCommands(true);
         PicqBotX bot = new PicqBotX(cfg);
         instance = bot;
@@ -109,9 +121,10 @@ public class BotMain {
                 try {
                     rcon.disconnect();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.log(e);
                 }
             }
+
             FileSetup.saveData();
             FileSetup.saveLang();
             service.shutdown();
@@ -132,7 +145,8 @@ public class BotMain {
         service.scheduleWithFixedDelay(FileSetup::saveFiles, BotConstants.cfg.getAutoSaveTime(), BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
         service.scheduleWithFixedDelay(() -> BotConstants.underCovers.clear(),3,3, TimeUnit.HOURS);
         service.scheduleWithFixedDelay(() -> BotConstants.users.forEach(BotUser::updateTime), 3, 3, TimeUnit.HOURS);
-        service.scheduleWithFixedDelay(BiliUtils::refreshUserCache, 5, 5, TimeUnit.MINUTES);
+        service.scheduleWithFixedDelay(BackupHelper::createBackup, 1, 1, TimeUnit.HOURS);
+        //service.scheduleWithFixedDelay(BiliUtilsOld::refreshUserCache, 5, 5, TimeUnit.MINUTES);
     }
 
     // From https://blog.csdn.net/df0128/article/details/90484684

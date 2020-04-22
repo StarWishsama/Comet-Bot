@@ -7,6 +7,7 @@ import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
 import io.github.starwishsama.namelessbot.listeners.commands.VoteListener;
 import io.github.starwishsama.namelessbot.managers.SessionManager;
+import io.github.starwishsama.namelessbot.objects.user.BotUser;
 import io.github.starwishsama.namelessbot.session.commands.vote.VoteSession;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
@@ -38,7 +39,7 @@ public class VoteCommand implements GroupCommand {
                     return BotUtils.sendLocalMessage("msg.bot-prefix", "有一个投票正在进行中!");
                 }
             } else if (args.get(0).equalsIgnoreCase("cancel")){
-                if (BotUtils.isBotAdmin(sender.getId())) {
+                if (BotUser.isBotAdmin(sender.getId())) {
                     if (VoteListener.getVoteInProgress(group.getId()) != null) {
                         SessionManager.expireSession(VoteListener.getVoteInProgress(group.getId()));
                         return BotUtils.sendLocalMessage("msg.bot-prefix", "成功");

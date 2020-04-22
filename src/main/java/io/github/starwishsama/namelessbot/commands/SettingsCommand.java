@@ -6,7 +6,8 @@ import cc.moecraft.icq.event.events.message.EventGroupMessage;
 import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
 import io.github.starwishsama.namelessbot.managers.GroupConfigManager;
-import io.github.starwishsama.namelessbot.objects.groupconfig.GroupConfig;
+import io.github.starwishsama.namelessbot.objects.group.GroupConfig;
+import io.github.starwishsama.namelessbot.objects.user.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 public class SettingsCommand implements GroupCommand {
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String command, ArrayList<String> args) {
-        if (BotUtils.isBotAdmin(sender.getId()) || BotUtils.isBotOwner(sender.getId())) {
+        if (BotUser.isBotAdmin(sender.getId()) || BotUser.isBotOwner(sender.getId())) {
             if (args.isEmpty()) {
                 return "/config help";
             } else {

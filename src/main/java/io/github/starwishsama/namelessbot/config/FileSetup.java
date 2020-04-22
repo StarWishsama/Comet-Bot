@@ -7,13 +7,16 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import io.github.starwishsama.namelessbot.BotConstants;
 import io.github.starwishsama.namelessbot.BotMain;
 import io.github.starwishsama.namelessbot.managers.GroupConfigManager;
 import io.github.starwishsama.namelessbot.objects.BotLocalization;
-import io.github.starwishsama.namelessbot.objects.BotUser;
 import io.github.starwishsama.namelessbot.objects.Config;
-import io.github.starwishsama.namelessbot.objects.GroupShop;
-import io.github.starwishsama.namelessbot.objects.groupconfig.GroupConfig;
+import io.github.starwishsama.namelessbot.objects.draws.ArkNightOperator;
+import io.github.starwishsama.namelessbot.objects.draws.PCRCharacter;
+import io.github.starwishsama.namelessbot.objects.group.GroupConfig;
+import io.github.starwishsama.namelessbot.objects.group.GroupShop;
+import io.github.starwishsama.namelessbot.objects.user.BotUser;
 
 import java.io.File;
 import java.util.Collection;
@@ -23,14 +26,14 @@ import java.util.Map;
 import static io.github.starwishsama.namelessbot.BotConstants.*;
 
 public class FileSetup {
-    private static File userCfg = new File(BotMain.getJarPath() + "/users.json");
-    private static File shopItemCfg = new File(BotMain.getJarPath() + "/items.json");
-    private static File cfgFile = new File(BotMain.getJarPath() + "/config.json");
-    private static File langCfg = new File(BotMain.getJarPath() + "/lang.json");
-    private static File rssTemp = new File(BotMain.getJarPath() + "/temp.txt");
-    private static File groupCfg = new File(BotMain.getJarPath() + "/groups.json");
+    private static final File userCfg = new File(BotMain.getJarPath(), "/users.json");
+    private static final File shopItemCfg = new File(BotMain.getJarPath(), "/items.json");
+    private static final File cfgFile = new File(BotMain.getJarPath(), "/config.json");
+    private static final File langCfg = new File(BotMain.getJarPath(), "/lang.json");
+    private static final File repeatData = new File(BotMain.getJarPath(), "/repeat.json");
+    private static final File groupCfg = new File(BotMain.getJarPath(), "/groups.json");
 
-    private static Gson gson = new GsonBuilder().serializeNulls().create();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
     public static void loadCfg(){
         if (BotMain.getJarPath() != null) {
@@ -56,8 +59,8 @@ public class FileSetup {
                     FileWriter.create(shopItemCfg).write(gson.toJson(shop));
                     FileWriter.create(groupCfg).write(gson.toJson(GroupConfigManager.getConfigMap()));
 
-                    if (!rssTemp.createNewFile()){
-                        System.out.println("[配置] 缓存文件已存在, 已自动忽略.");
+                    if (!repeatData.createNewFile()){
+                        System.out.println("[配置] 复读数据已存在, 已自动忽略.");
                     }
 
                     load();
@@ -74,11 +77,10 @@ public class FileSetup {
             FileWriter.create(cfgFile).write(gson.toJson(cfg));
             FileWriter.create(userCfg).write(gson.toJson(users));
             FileWriter.create(shopItemCfg).write(gson.toJson(shop));
-            FileWriter.create(rssTemp).write(BotMain.temp);
+            FileWriter.create(repeatData).write(gson.toJson(BotConstants.repeatData));
             FileWriter.create(groupCfg).write(gson.toJson(GroupConfigManager.getConfigMap()));
         } catch (Exception e) {
-            System.err.println("[配置] 在保存配置文件时发生了问题, 错误信息: ");
-            e.printStackTrace();
+            BotMain.getLogger().error("[配置] 在保存配置文件时发生了问题, 错误信息: ", e);
         }
     }
 
@@ -90,6 +92,7 @@ public class FileSetup {
 
             JsonElement checkInParser = JsonParser.parseString(userContent);
             JsonElement configParser = JsonParser.parseString(configContent);
+
             if (!checkInParser.isJsonNull() && !configParser.isJsonNull()){
                 cfg = gson.fromJson(configContent, Config.class);
                 users = gson.fromJson(userContent, new TypeToken<Collection<BotUser>>() {
@@ -98,9 +101,17 @@ public class FileSetup {
                 }.getType());
                 GroupConfigManager.setConfigMap(gson.fromJson(groupContent, new TypeToken<Map<Long, GroupConfig>>() {
                 }.getType()));
+                repeatData.createNewFile();
+                BotConstants.repeatData = gson.fromJson(FileReader.create(repeatData).readString(), new TypeToken<Map<String, Integer>>(){
+                }.getType());
+                operators = gson.fromJson(FileReader.create(new File(BotMain.getJarPath(), "/operator.json")).readString(), new TypeToken<List<ArkNightOperator>>() {
+                }.getType());
+                pcr = gson.fromJson(FileReader.create(new File(BotMain.getJarPath(), "/pcr.json")).readString(), new TypeToken<List<PCRCharacter>>(){
+                }.getType());
             } else {
                 System.err.println("[配置] 在加载配置文件时发生了问题, JSON 文件为空.");
             }
+
         } catch (Exception e) {
             System.err.println("[配置] 在加载配置文件时发生了问题, 错误信息: " + e);
         }
@@ -127,7 +138,7 @@ public class FileSetup {
     }
 
     public static void saveFiles(){
-        BotMain.getLogger().log("[Bot] 自动保存数据完成");
+        BotMain.getLogger().debug("[Bot] 自动保存数据完成");
         saveData();
         saveLang();
     }

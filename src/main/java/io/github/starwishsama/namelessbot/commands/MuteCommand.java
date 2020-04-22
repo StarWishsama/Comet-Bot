@@ -8,6 +8,7 @@ import cc.moecraft.icq.sender.returndata.returnpojo.get.RGroupMemberInfo;
 import cc.moecraft.icq.user.Group;
 import cc.moecraft.icq.user.GroupUser;
 import cn.hutool.core.util.RandomUtil;
+import io.github.starwishsama.namelessbot.objects.user.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -22,7 +23,7 @@ public class MuteCommand implements GroupCommand {
 
     @Override
     public String groupMessage(EventGroupMessage event, GroupUser sender, Group group, String msg, ArrayList<String> args){
-        if (sender.isAdmin() || BotUtils.isBotAdmin(sender.getId())) {
+        if (sender.isAdmin() || BotUser.isBotAdmin(sender.getId())) {
             if (event.isAdmin()) {
                 if (args.size() > 0) {
                     switch (args.get(0)) {
@@ -34,14 +35,22 @@ public class MuteCommand implements GroupCommand {
                         case "random":
                             List<RGroupMemberInfo> data = event.getHttpApi().getGroupMemberList(group.getId()).getData();
                             Long id = data.get(RandomUtil.randomInt(data.size())).getUserId();
+
                             while (event.isAdmin(id)) {
                                 id = data.get(RandomUtil.randomInt(data.size())).getUserId();
                             }
 
-                            if (event.getHttpApi().setGroupBan(group.getId(), id, RandomUtil.randomInt(60, 3600)).getStatus().equals(ReturnStatus.failed))
+                            int time = RandomUtil.randomInt(60, 3600);
+                            if (event.getHttpApi().setGroupBan(group.getId(), id, time).getStatus().equals(ReturnStatus.failed)) {
                                 return BotUtils.getLocalMessage("msg.bot-prefix") + "禁言失败";
-                            break;
+                            } else {
+                                return BotUtils.sendLocalMessage("msg.bot-prefix", "恭喜 [CQ:at,qq=" + id + "] 喜提 " + time / 60L + " 分钟禁言!");
+                            }
                         default:
+                            /**
+                             * @author Stiven.Ding
+                             * 禁言逻辑
+                             */
                             try {
                                 long banQQ = StringUtils.isNumeric(args.get(0)) ? Integer.parseInt(args.get(0)) : BotUtils.parseAt(args.get(0));
                                 if (banQQ != -1000) {
@@ -77,6 +86,9 @@ public class MuteCommand implements GroupCommand {
                                     if (banTime < 0)
                                         throw new NumberFormatException("Equal or less than 0");
                                     if (banTime <= 30 * 24 * 60 * 60 && banTime >= 60) {
+                                        if (event.getHttpApi().setGroupBan(group.getId(), banQQ, banTime).getStatus().equals(ReturnStatus.failed))
+                                            return BotUtils.getLocalMessage("msg.bot-prefix") + "禁言失败";
+                                    } else if (banTime == 0){
                                         if (event.getHttpApi().setGroupBan(group.getId(), banQQ, banTime).getStatus().equals(ReturnStatus.failed))
                                             return BotUtils.getLocalMessage("msg.bot-prefix") + "禁言失败";
                                     } else

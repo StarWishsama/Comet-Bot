@@ -1,6 +1,6 @@
 package io.github.starwishsama.namelessbot.managers;
 
-import io.github.starwishsama.namelessbot.objects.groupconfig.GroupConfig;
+import io.github.starwishsama.namelessbot.objects.group.GroupConfig;
 import lombok.Getter;
 import lombok.Setter;
 

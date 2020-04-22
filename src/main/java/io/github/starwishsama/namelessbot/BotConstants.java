@@ -1,9 +1,17 @@
 package io.github.starwishsama.namelessbot;
 
-import io.github.starwishsama.namelessbot.objects.*;
+import io.github.starwishsama.namelessbot.objects.BotLocalization;
+import io.github.starwishsama.namelessbot.objects.Config;
+import io.github.starwishsama.namelessbot.objects.draws.ArkNightOperator;
+import io.github.starwishsama.namelessbot.objects.draws.PCRCharacter;
+import io.github.starwishsama.namelessbot.objects.group.GroupShop;
+import io.github.starwishsama.namelessbot.objects.user.BotUser;
+import io.github.starwishsama.namelessbot.objects.user.ClockInData;
+import io.github.starwishsama.namelessbot.objects.user.RandomResult;
 import lombok.Data;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 public class BotConstants {
@@ -13,4 +21,8 @@ public class BotConstants {
     public static Config cfg = new Config();
     public static List<String> livers = new ArrayList<>();
     public static List<RandomResult> underCovers = new LinkedList<>();
+    public static Map<Long, ClockInData> data = new HashMap<>();
+    public static Map<String, Integer> repeatData = new ConcurrentHashMap<>();
+    public static List<ArkNightOperator> operators = new LinkedList<>();
+    public static List<PCRCharacter> pcr = new LinkedList<>();
 }

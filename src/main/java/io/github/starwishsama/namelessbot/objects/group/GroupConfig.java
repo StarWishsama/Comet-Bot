@@ -1,4 +1,4 @@
-package io.github.starwishsama.namelessbot.objects.groupconfig;
+package io.github.starwishsama.namelessbot.objects.group;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;

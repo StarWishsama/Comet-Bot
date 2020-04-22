@@ -4,9 +4,8 @@ import cc.moecraft.icq.command.CommandProperties;
 import cc.moecraft.icq.command.interfaces.EverywhereCommand;
 import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
-
 import io.github.starwishsama.namelessbot.BotConstants;
-import io.github.starwishsama.namelessbot.objects.BotUser;
+import io.github.starwishsama.namelessbot.objects.user.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
@@ -17,12 +16,12 @@ public class BindCommand implements EverywhereCommand {
     public String run(EventMessage event, User sender, String command, ArrayList<String> args) {
         if (BotUtils.isNoCoolDown(sender.getId())) {
             if (BotConstants.cfg.isBindMCAccount()) {
-                BotUser user = BotUtils.getUser(sender.getId());
+                BotUser user = BotUser.getUser(sender.getId());
                 if (user != null) {
                     if (user.getBindServerAccount() == null) {
                         if (args.size() > 0) {
                             if (args.get(0) != null && BotUtils.isLegitId(args.get(0)) && args.get(0).length() < 17) {
-                                Objects.requireNonNull(BotUtils.getUser(sender.getId())).setBindServerAccount(args.get(0));
+                                Objects.requireNonNull(BotUser.getUser(sender.getId())).setBindServerAccount(args.get(0));
                                 return "Bot > 已绑定账号 " + args.get(0);
                             } else
                                 return BotUtils.getLocalMessage("msg.bot-prefix") + "ID 不符合规范";

@@ -4,6 +4,7 @@ import cc.moecraft.icq.command.CommandProperties;
 import cc.moecraft.icq.command.interfaces.EverywhereCommand;
 import cc.moecraft.icq.event.events.message.EventMessage;
 import cc.moecraft.icq.user.User;
+import io.github.starwishsama.namelessbot.objects.user.BotUser;
 import io.github.starwishsama.namelessbot.utils.BotUtils;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ public class RSSCommand implements EverywhereCommand {
     public String run(EventMessage event, User sender, String command, ArrayList<String> args) {
         if (BotUtils.isNoCoolDown(sender)){
             if (args.size() > 0){
-                if (BotUtils.isBotAdmin(sender) || BotUtils.isBotOwner(sender)) {
+                if (BotUser.isBotAdmin(sender) || BotUser.isBotOwner(sender)) {
                     switch (args.get(0).toLowerCase()) {
                         default:
                             return BotUtils.getLocalMessage("msg.bot-prefix") + "/订阅 [类别]";

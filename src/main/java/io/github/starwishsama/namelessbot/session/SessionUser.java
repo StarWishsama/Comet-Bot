@@ -10,7 +10,6 @@ public class SessionUser {
     private long userId;
 
     public SessionUser() {
-
     }
 
     public SessionUser(long userId) {
