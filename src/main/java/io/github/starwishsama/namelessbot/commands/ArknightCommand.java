@@ -56,7 +56,7 @@ public class ArknightCommand implements EverywhereCommand {
             List<ArkNightOperator> ops = ArkNightUtils.tenTimeDraw();
             StringBuilder sb = new StringBuilder("十连结果:\n");
             for (ArkNightOperator op: ops){
-                sb.append(op.getName()).append(" ").append(getStar(op.getRare())).append("\n");
+                sb.append(op.getName()).append(" ").append(getStar(op.getRare())).append(" ");
             }
             return sb.toString().trim();
         } else {

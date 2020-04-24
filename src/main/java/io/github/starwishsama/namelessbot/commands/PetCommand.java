@@ -77,13 +77,26 @@ public class PetCommand implements EverywhereCommand {
                             } else {
                                 return BotUtils.sendLocalMessage("msg.bot-prefix", "你还没有领取宠物!");
                             }
+                        case "rename":
+                        case "改名":
+                            if (user.getPet() != null) {
+                                Pet op = user.getPet();
+                                if (args.size() > 1) {
+                                    op.setName(args.get(1));
+                                } else {
+                                    return BotUtils.sendLocalMessage("msg.bot-prefix") + "/pet rename [宠物名]";
+                                }
+                            } else {
+                                return BotUtils.sendLocalMessage("msg.bot-prefix", "你还没有领取宠物!");
+                            }
+                            break;
                         case "sj":
                         case "升级":
                             //TODO: 升级系统
                             break;
                     }
                 } else {
-                    return BotUtils.sendLocalMessage("msg.bot-prefix") + "/pet help!";
+                    return BotUtils.sendLocalMessage("msg.bot-prefix") + "/pet get [宠物名]";
                 }
             } else {
                 return BotUtils.sendLocalMessage("msg.bot-prefix") + "需要先签到才能使用宠物功能!";

@@ -4,7 +4,7 @@ A QQ Group bot developed for CoolQ-Air/Pro.
 
 Need [CoolQ HTTP API](https://github.com/richardchien/coolq-http-api) as dependency!
 
-Simplified Chinese Edition 中文版本: [README](https://github.com/StarWishsama/Nameless-Bot/blob/master/README_zhCN.md)
+Simplified Chinese Edition 中文版本: [README](https://github.com/StarWishsama/Nameless-Bot/blob/http-api/README_zhCN.md)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d1416f718df943b4bb252e98cbd6604e)](https://www.codacy.com/manual/StarWishsama/Nameless-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Nameless-Bot&amp;utm_campaign=Badge_Grade)
 <a href="https://travis-ci.org/StarWishsama/Nameless-Bot">
@@ -17,6 +17,20 @@ Simplified Chinese Edition 中文版本: [README](https://github.com/StarWishsam
   <img src="https://img.shields.io/github/issues/StarWishsama/Nameless-Bot.svg?style=popout">
 </a> 
 
+## 🎉 Features
+* Arknight / Princess Connect Re:dive draw simulator
+* Rainbow six: siege game data info
+* Lookup bilibili liver status
+* Check-in / Clock-in
+* Guess number
+* Pet system (WIP)
+* Check minecraft server status
+* Communicate with minecraft server by rcon
+* Repeat Repeat Repeat Repeat
+* Group Shop / Check-in point system
+* Vote
+* Divine
+* I forgot
 
 ## ☑ To-Do 
 Development Roadmap: [Project Page](https://github.com/StarWishsama/Nameless-Bot/projects/2)

@@ -4,6 +4,10 @@
 
 需要 [CoolQ HTTP API](https://github.com/richardchien/coolq-http-api) 作为前置!
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d1416f718df943b4bb252e98cbd6604e)](https://www.codacy.com/manual/StarWishsama/Nameless-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Nameless-Bot&amp;utm_campaign=Badge_Grade)
+<a href="https://travis-ci.org/StarWishsama/Nameless-Bot">
+  <img src="https://api.travis-ci.org/StarWishsama/Nameless-Bot.svg?branch=master">
+</a>
 <a href="https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE">
   <img src="https://img.shields.io/github/license/StarWishsama/Nameless-Bot.svg?style=popout">
 </a>
@@ -14,6 +18,19 @@
 
 ## ☑ To-Do 列表
 详见 [Project Page](https://github.com/StarWishsama/Nameless-Bot/projects/2)
+
+## 🎉 功能
+* 明日方舟 / 公主连结 抽卡模拟器
+* 彩虹六号战绩查询
+* 群管相关功能
+* 占卜系统
+* 打卡/签到
+* 宠物系统 (WIP)
+* 查看 Minecraft 服务器信息
+* BiliBili 主播状态监控
+* 通过 Rcon 遥控 Minecraft 服务器
+* 占卜
+* 我忘记了
 
 ## 💽 如何构建
 

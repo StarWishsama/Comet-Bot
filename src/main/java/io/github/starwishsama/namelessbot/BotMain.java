@@ -143,8 +143,8 @@ public class BotMain {
 
         // 定时任务
         service.scheduleWithFixedDelay(FileSetup::saveFiles, BotConstants.cfg.getAutoSaveTime(), BotConstants.cfg.getAutoSaveTime(), TimeUnit.MINUTES);
-        service.scheduleWithFixedDelay(() -> BotConstants.underCovers.clear(),3,3, TimeUnit.HOURS);
-        service.scheduleWithFixedDelay(() -> BotConstants.users.forEach(BotUser::updateTime), 3, 3, TimeUnit.HOURS);
+        service.scheduleWithFixedDelay(() -> BotConstants.underCovers.clear(), 3, 3, TimeUnit.HOURS);
+        service.scheduleWithFixedDelay(() -> BotConstants.users.forEach(BotUser::updateTime), 30, 30, TimeUnit.MINUTES);
         service.scheduleWithFixedDelay(BackupHelper::createBackup, 1, 1, TimeUnit.HOURS);
         //service.scheduleWithFixedDelay(BiliUtilsOld::refreshUserCache, 5, 5, TimeUnit.MINUTES);
     }

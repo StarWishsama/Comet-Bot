@@ -68,8 +68,8 @@ public class BotUser {
     }
 
     public void updateTime() {
-        if (level == UserLevel.USER && randomTime < 20) {
-            this.randomTime++;
+        if (level == UserLevel.USER && randomTime < 100) {
+            addTime(15);
         }
     }
 
@@ -78,7 +78,7 @@ public class BotUser {
     }
 
     public void addTime(int time) {
-        if (level == UserLevel.USER && randomTime < 20) {
+        if (level == UserLevel.USER && randomTime < 100) {
             randomTime = randomTime + time;
         }
     }
