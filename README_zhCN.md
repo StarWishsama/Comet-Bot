@@ -1,9 +1,13 @@
 # Nameless-Bot
 
-一个可用于 酷Q Air/Pro 的机器人插件.
+一个基于 Mirai-Core 开发的机器人
 
-需要 [CoolQ HTTP API](https://github.com/richardchien/coolq-http-api) 作为前置!
+本项目处于开发阶段, 很多功能将不能使用
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d1416f718df943b4bb252e98cbd6604e)](https://www.codacy.com/manual/StarWishsama/Nameless-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Nameless-Bot&amp;utm_campaign=Badge_Grade)
+<a href="https://travis-ci.org/StarWishsama/Nameless-Bot">
+  <img src="https://api.travis-ci.org/StarWishsama/Nameless-Bot.svg?branch=mirai">
+</a>
 <a href="https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE">
   <img src="https://img.shields.io/github/license/StarWishsama/Nameless-Bot.svg?style=popout">
 </a>
@@ -11,6 +15,15 @@
   <img src="https://img.shields.io/github/issues/StarWishsama/Nameless-Bot.svg?style=popout">
 </a> 
 
+## 🎉 功能
+* 以图搜图
+* 彩虹六号战绩查询
+* 打卡
+* 签到
+* bilibili UP主数据查询
+* 点歌 (JSON 样式)
+* 占卜
+* 还在开发中...
 
 ## ☑ To-Do 列表
 详见 [Project Page](https://github.com/StarWishsama/Nameless-Bot/projects/2)

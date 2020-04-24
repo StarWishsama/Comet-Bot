@@ -1,0 +1,101 @@
+package io.github.starwishsama.nbot.objects.rainbowsix
+
+data class R6Player(var status : Int, var found : Boolean,
+        var player: PlayerBean? = null, var custom: CustomBean? = null,
+        var refresh: RefreshBean? = null,
+        var stats: StatsBean? = null,
+        var ranked: RankedBean? = null) {
+
+    data class PlayerBean (var p_id: String? = null,
+            var p_user: String? = null,
+            var p_name: String? = null,
+            var p_platform: String? = null) {
+    }
+
+    data class CustomBean(var customurl: String? = null,
+            var verified : Boolean = false,
+            var visitors : Int = 0,
+            var banned : Boolean = false){
+    }
+
+    data class RefreshBean (var queued : Boolean = false,
+            var possible : Boolean = false,
+            var qtime : Int = 0,
+            var utime : Int = 0,
+            var status : Int = 0) {
+    }
+
+    data class StatsBean(var level : Int = 0,
+            var casualpvp_kills : Int = 0,
+            var casualpvp_death : Int = 0,
+            var casualpvp_matchwon : Int = 0,
+            var casualpvp_matchlost : Int = 0,
+            var casualpvp_timeplayed : Int = 0,
+            var casualpvp_hoursplayed : Int = 0,
+            var casualpvp_matches : Int = 0,
+            var casualpvp_kd: String? = null,
+            var casualpvp_wl: String? = null,
+            var rankedpvp_kills : Int = 0,
+            var rankedpvp_death : Int = 0,
+            var rankedpvp_matchwon : Int = 0,
+            var rankedpvp_matchlost : Int = 0,
+            var rankedpvp_timeplayed : Int = 0,
+            var rankedpvp_hoursplayed : Int = 0,
+            var rankedpvp_matches : Int = 0,
+            var rankedpvp_kd: String? = null,
+            var rankedpvp_wl: String? = null,
+            var generalpvp_headshot : Int = 0,
+            var generalpvp_kills : Int = 0,
+            var generalpvp_timeplayed : Int = 0,
+            var generalpve_kills : Int = 0,
+            var generalpve_death : Int = 0,
+            var generalpve_matchwon : Int = 0,
+            var generalpve_matchlost : Int = 0,
+            var generalpve_headshot : Int = 0,
+            var generalpve_timeplayed : Int = 0,
+            var generalpvp_hoursplayed : Int = 0,
+            var generalpvp_death : Int = 0,
+            var generalpvp_kd : Double = 0.0,
+            var generalpvp_matchwon : Int = 0,
+            var generalpvp_matchlost : Int = 0,
+            var generalpvp_matches : Int = 0,
+            var generalpvp_wl: String? = null,
+            var generalpvp_hsrate: String? = null) {
+    }
+
+    data class RankedBean(var AS_kills : Int = 0,
+                          var AS_deaths : Int = 0,
+                          var AS_wins : Int = 0,
+                          var AS_losses : Int = 0,
+                          var AS_abandons : Int = 0,
+                          var AS_mmr : Int = 0,
+                          var AS_maxmmr : Int = 0,
+                          var AS_champ : Int = 0,
+                          var AS_mmrchange : Int = 0,
+                          var AS_actualmmr : Int = 0,
+                          var AS_matches : Int = 0,
+                          var AS_wl: String? = null,
+                          var AS_kd: String? = null,
+                          var AS_rank : Int = 0,
+                          var AS_rankname: String? = null,
+                          var AS_maxrank : Int = 0,
+                          var AS_maxrankname: String? = null,
+                          var AS_killpermatch : Int = 0,
+                          var AS_deathspermatch : Int = 0,
+                          var mmr : Int = 0,
+                          var maxmmr : Int = 0,
+                          var kd : Double = 0.0,
+                          var rank : Int = 0,
+                          var rankname: String? = null,
+                          var maxrank : Int = 0,
+                          var maxrankname: String? = null,
+                          var champ : Int = 0,
+                          var topregion: String? = null,
+                          var actualmmr : Int = 0,
+                          var allmatches : Int = 0,
+                          var allkd: String? = null,
+                          var allwl: String? = null,
+                          var killpermatch : Int = 0,
+                          var deathspermatch : Int = 0) {
+    }
+}
