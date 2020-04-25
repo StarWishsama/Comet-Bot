@@ -44,7 +44,7 @@ class BotInstance {
         bot = Bot(qqId, password)
         bot.alsoLogin()
         logger = bot.logger
-        handler.setupCommand(arrayOf(AdminCommand(), BotCommand(), DebugCommand(), PictureSearch(), MusicCommand(), R6SCommand(), CheckInCommand(), ClockInCommand(), InfoCommand(), DivineCommand()))
+        handler.setupCommand(arrayOf(AdminCommand(), BotCommand(), DebugCommand(), PictureSearch(), MuteCommand(), MusicCommand(), R6SCommand(), CheckInCommand(), ClockInCommand(), InfoCommand(), DivineCommand()))
         bot.logger.info("已注册 " + CommandHandler.commands.size + " 个命令")
 
         if (!BotConstants.cfg.biliUserName.isNullOrBlank() && BotConstants.cfg.biliPassword.isNullOrBlank()) {

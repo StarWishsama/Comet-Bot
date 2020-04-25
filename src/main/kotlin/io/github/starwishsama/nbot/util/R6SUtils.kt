@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.enums.R6Rank
 import io.github.starwishsama.nbot.objects.rainbowsix.R6Player
 import java.text.NumberFormat
@@ -22,7 +23,7 @@ object R6SUtils {
     private fun searchPlayer(name: String): R6Player? {
         try {
             val hr: HttpResponse =
-                HttpRequest.get("https://r6.apitab.com/search/uplay/$name").timeout(5000).executeAsync()
+                HttpRequest.get("https://r6.apitab.com/search/uplay/$name?cid=${BotConstants.cfg.r6tabKey}").timeout(5000).executeAsync()
             if (hr.isOk) {
                 val body: String = hr.body()
                 if (isValidJson(body)) {
@@ -33,7 +34,7 @@ object R6SUtils {
                         val uuid: String =
                             `object`.get(`object`.keySet().iterator().next()).asJsonObject.get("profile")
                                 .asJsonObject.get("p_user").asString
-                        val hr2: HttpResponse = HttpRequest.get("https://r6.apitab.com/player/$uuid").timeout(5000)
+                        val hr2: HttpResponse = HttpRequest.get("https://r6.apitab.com/player/$uuid?cid=${BotConstants.cfg.r6tabKey}").timeout(5000)
                             .setFollowRedirects(true).executeAsync()
                         if (hr2.isOk) {
                             return gson.fromJson(hr2.body(), R6Player::class.java)

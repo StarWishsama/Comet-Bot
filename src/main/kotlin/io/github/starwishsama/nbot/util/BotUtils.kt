@@ -5,6 +5,7 @@ import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotInstance
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
+import io.github.starwishsama.nbot.objects.BotUser.Companion.isBotAdmin
 import io.github.starwishsama.nbot.objects.BotUser.Companion.isBotOwner
 import java.io.IOException
 import java.net.URISyntaxException
@@ -152,7 +153,12 @@ object BotUtils {
         if (qq == 80000000L) {
             return false
         }
-        if (coolDown.containsKey(qq) && !isBotOwner(qq)) {
+
+        if (qq == BotConstants.cfg.ownerId){
+            return true
+        }
+
+        if (coolDown.containsKey(qq) && !isBotAdmin(qq)) {
             if (currentTime - coolDown[qq]!! < BotConstants.cfg.coolDownTime * 1000) {
                 return false
             } else {
@@ -180,7 +186,7 @@ object BotUtils {
         }
 
         if (qq == BotConstants.cfg.ownerId){
-            return false
+            return true
         }
 
         if (coolDown.containsKey(qq) && !isBotOwner(qq)) {
@@ -273,7 +279,11 @@ object BotUtils {
 
     fun getRestStringInArgs(args: List<String>, startAt: Int): String{
         val sb = StringBuilder()
-        for (index in startAt..args.size){
+        if (args.size == 1){
+            return args[0]
+        }
+
+        for (index in startAt until args.size){
             sb.append(args[index]).append(" ")
         }
         return sb.toString().trim()

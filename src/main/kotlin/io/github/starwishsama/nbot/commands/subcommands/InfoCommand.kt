@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter
 class InfoCommand : UniversalCommand {
     override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
         try {
-            if (args.size == 1) {
+            if (args.isEmpty()) {
                 return run {
                     var reply =
                             "\n积分: "+ String.format("%.1f", user.checkInPoint) +
@@ -33,7 +33,7 @@ class InfoCommand : UniversalCommand {
                         reply.toMessage().asMessageChain()
                     }
                 }
-            } else if (args.size == 2 && args[1].contentEquals("排行") || args[1].contentEquals("ph")) {
+            } else if (args.size == 1 && args[0].contentEquals("排行") || args[0].contentEquals("ph")) {
                 val users = BotConstants.users
                 users.sortedByDescending { it.checkInPoint }
                 val sb = StringBuilder()

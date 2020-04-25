@@ -63,8 +63,8 @@ data class BotUser(var userQQ: Long,
      * 比较权限组
      * @return 自己的权限组是否大于需要比较的权限组
      */
-    fun compareLevel(level: UserLevel): Boolean{
-        return this.level > level
+    fun compareLevel(cmdLevel: UserLevel): Boolean{
+        return this.level >= cmdLevel
     }
 
     companion object {
@@ -73,7 +73,7 @@ data class BotUser(var userQQ: Long,
         }
 
         fun isBotAdmin(id: Long): Boolean {
-            return getLevel(id).ordinal > 1
+            return getLevel(id) >= UserLevel.ADMIN
         }
 
         fun isBotOwner(id: Long): Boolean {
