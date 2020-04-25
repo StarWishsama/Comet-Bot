@@ -45,6 +45,7 @@ class ClockInCommand : UniversalCommand{
     }
 
     override fun getProps(): CommandProps = CommandProps("clockin", arrayListOf("打卡", "dk"), "nbot.commands.clockin", UserLevel.USER)
+    override fun getHelp(): String = ""
 
     private fun clockIn(sender: Member, msg: GroupMessage): String {
         val data = BotConstants.checkInCalendar[msg.group.id]

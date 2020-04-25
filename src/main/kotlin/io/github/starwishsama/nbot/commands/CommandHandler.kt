@@ -39,20 +39,22 @@ class CommandHandler {
     /**
      * 执行消息中的命令
      *
-     * @param raw 消息
+     * @param message 消息
      */
-    suspend fun execute(raw: ContactMessage): MessageChain {
-        val cmdPrefix = getCmdPrefix(raw.message.contentToString())
+    suspend fun execute(message: ContactMessage): MessageChain {
+        val cmdPrefix = getCmdPrefix(message.message.contentToString())
         for (cmd in commands){
             if (isPrefix(cmd, cmdPrefix)){
-                BotInstance.logger.debug("[命令] " + raw.sender.id + " 执行了命令: " + cmd.getProps().name)
-                var user = BotUser.getUser(raw.sender.id)
+                BotInstance.logger.debug("[命令] " + message.sender.id + " 执行了命令: " + cmd.getProps().name)
+                var user = BotUser.getUser(message.sender.id)
                 if (user == null){
-                    user = BotUser.quickRegister(raw.sender.id)
+                    user = BotUser.quickRegister(message.sender.id)
                 }
-                //@TODO 命令权限, 权限组
-                val splitMessage = raw.message.contentToString().split(" ")
-                return cmd.execute(raw, splitMessage.subList(1, splitMessage.size), user)
+
+                if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
+                    val splitMessage = message.message.contentToString().split(" ")
+                    return cmd.execute(message, splitMessage.subList(1, splitMessage.size), user)
+                }
             }
         }
         return EmptyMessageChain

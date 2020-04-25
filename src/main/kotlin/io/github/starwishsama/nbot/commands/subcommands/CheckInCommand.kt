@@ -31,6 +31,8 @@ class CheckInCommand : UniversalCommand {
 
     override fun getProps(): CommandProps = CommandProps("checkin", arrayListOf("签到", "qd"), "nbot.commands.checkin", UserLevel.USER)
 
+    override fun getHelp(): String = ""
+
     private fun checkIn(sender: Member, msg: ContactMessage, user: BotUser): String {
         return run {
             val point = calculatePoint(user)

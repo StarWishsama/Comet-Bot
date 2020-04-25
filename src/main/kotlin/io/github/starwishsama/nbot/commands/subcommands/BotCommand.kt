@@ -22,4 +22,6 @@ class BotCommand : UniversalCommand {
     override fun getProps(): CommandProps {
         return CommandProps("bot", arrayListOf("version", "v", "版本"), "nbot.commands.version", UserLevel.USER)
     }
+
+    override fun getHelp(): String = ""
 }

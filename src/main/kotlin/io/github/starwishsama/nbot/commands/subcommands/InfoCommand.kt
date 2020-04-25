@@ -48,6 +48,8 @@ class InfoCommand : UniversalCommand {
                 } else {
                     "数据不足".toMessage().asMessageChain()
                 }
+            } else {
+                return getHelp().toMessage().asMessageChain()
             }
         } catch (e: Exception) {
             BotInstance.logger.error(e)
@@ -56,5 +58,10 @@ class InfoCommand : UniversalCommand {
     }
 
     override fun getProps(): CommandProps = CommandProps("info", arrayListOf("cx", "查询"), "nbot.commands.info", UserLevel.USER)
+    override fun getHelp(): String = """
+        ======= 命令帮助 =======
+        /cx 查询自己的积分信息
+        /cx ph 查询积分排行榜
+    """.trimIndent()
 
 }

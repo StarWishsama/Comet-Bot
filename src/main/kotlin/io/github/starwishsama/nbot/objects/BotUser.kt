@@ -3,8 +3,10 @@ package io.github.starwishsama.nbot.objects
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.util.BotUtils.getLevel
+import net.mamoe.mirai.contact.User
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 data class BotUser(var userQQ: Long,
@@ -17,6 +19,7 @@ data class BotUser(var userQQ: Long,
                    var level: UserLevel = UserLevel.USER,
                    var randomTime : Int = 20,
                    var checkInGroup: Long = 0,
+                   var permissions: List<String> = ArrayList(),
                    var biliSubs: List<Long> = ArrayList()) {
     fun decreaseTime() {
         if (level == UserLevel.USER) {
@@ -50,6 +53,18 @@ data class BotUser(var userQQ: Long,
 
     fun resetDay(){
         checkInTime = 1
+    }
+
+    fun hasPermission(permission: String): Boolean {
+        return !permissions.isNullOrEmpty() && permissions.contains(permission)
+    }
+
+    /**
+     * 比较权限组
+     * @return 自己的权限组是否大于需要比较的权限组
+     */
+    fun compareLevel(level: UserLevel): Boolean{
+        return this.level > level
     }
 
     companion object {

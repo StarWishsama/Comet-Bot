@@ -32,4 +32,8 @@ class PictureSearch : UniversalCommand {
     }
 
     override fun getProps(): CommandProps = CommandProps("ps", arrayListOf("ytst", "st", "搜图", "以图搜图"), "nbot.commands.picturesearch", UserLevel.USER)
+    override fun getHelp(): String = """
+        ======= 命令帮助 =======
+        /ytst 以图搜图
+    """.trimIndent()
 }

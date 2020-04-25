@@ -24,9 +24,9 @@ class AdminCommand : UniversalCommand {
     val commands = arrayOf("checkin")
     override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
         if (message is GroupMessage && BotUser.isBotOwner(message.sender.id)){
-            when (args[1]) {
+            when (args[0]) {
                 "clockin", "dk", "打卡" -> {
-                    if (args.size == 4 && args[2].isNotEmpty() && args[3].isNotEmpty()){
+                    if (args.size == 3 && args[1].isNotEmpty() && args[2].isNotEmpty()){
                         if (BotConstants.checkInCalendar.isEmpty() || BotConstants.checkInCalendar.containsKey(message.group.id)){
                             val timeNow = LocalDateTime.now()
                             val startTime = LocalDateTime.of(LocalDate.now(), LocalTime.parse(args[2], BotConstants.dateFormatter))
@@ -49,7 +49,7 @@ class AdminCommand : UniversalCommand {
                         } else {
                             message.quoteReply(BotUtils.getLocalMessage("msg.bot-prefix") + "该群还有一个未完成的签到!")
                         }
-                    } else if (args.size == 3 && args[2].isNotEmpty()){
+                    } else if (args.size == 2 && args[1].isNotEmpty()){
                         if (BotConstants.checkInCalendar.isEmpty() || BotConstants.checkInCalendar.containsKey(message.group.id)){
                             val startTime = LocalDateTime.now()
                             val endTime = LocalDateTime.of(LocalDate.now(), LocalTime.parse(args[2], BotConstants.dateFormatter))
@@ -111,12 +111,7 @@ class AdminCommand : UniversalCommand {
                     }
                 }
                 "help", "帮助" -> {
-                    val sb = StringBuilder()
-                    for (cmd in commands){
-                        sb.append(cmd).append(",")
-                    }
-                    val result = sb.toString().trim()
-                    return (BotUtils.getLocalMessage("msg.bot-prefix") + "可用的命令列表: " + result.substring(0, result.length)).toMessage().asMessageChain()
+                    return getHelp().toMessage().asMessageChain()
                 }
                 else -> return (BotUtils.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMessage().asMessageChain()
             }
@@ -125,5 +120,11 @@ class AdminCommand : UniversalCommand {
     }
 
     override fun getProps(): CommandProps = CommandProps("admin", arrayListOf("管理", "管", "gl"), "nbot.commands.admin", UserLevel.ADMIN)
+
+    override fun getHelp(): String = """
+        ======= 命令帮助 =======
+        /admin dk [结束时间] 创建一个打卡
+        /admin gbdk 结束一个正在进行的打卡
+    """.trimIndent()
 
 }

@@ -51,4 +51,10 @@ class R6SCommand : UniversalCommand {
     }
 
     override fun getProps(): CommandProps = CommandProps("r6", arrayListOf("r6s", "彩六"), "nbot.commands.r6s", UserLevel.USER)
+    override fun getHelp(): String = """
+        ======= 命令帮助 =======
+        /r6 info [Uplay账号名] 查询战绩
+        /r6 bind [Uplay账号名] 绑定账号
+        /r6 info 查询战绩 (需要绑定账号)
+    """.trimIndent()
 }

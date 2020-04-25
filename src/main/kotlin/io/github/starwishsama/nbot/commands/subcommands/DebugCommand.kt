@@ -18,8 +18,8 @@ class DebugCommand : UniversalCommand {
     override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
         val client = BotInstance.client
 
-        if (args.size > 1 && BotUtils.isNoCoolDown(message.sender.id)) {
-            when (args[1]) {
+        if (args.isNotEmpty() && BotUtils.isNoCoolDown(message.sender.id)) {
+            when (args[0]) {
                 "image" -> {
                     val map = mutableMapOf<String, String>()
                     map["user-agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36"
@@ -62,9 +62,9 @@ class DebugCommand : UniversalCommand {
                             "}").asMessageChain()
                 }
                 "bili" -> {
-                    when (args[2]){
+                    when (args[1]){
                         "search", "搜索" -> {
-                            val searchResult = client.appAPI.searchUser(keyword = args[3]).await()
+                            val searchResult = client.appAPI.searchUser(keyword = args[2]).await()
                             return if (searchResult.data.items.isNotEmpty()) {
                                 val item = searchResult.data.items[0]
                                 (item.title + "\n粉丝数: " + item.fans + "\n最近投递的视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") + "\n直播状态: " + (if (item.liveStatus == 1) "直播中" else  "未直播")).toMessage()
@@ -74,8 +74,8 @@ class DebugCommand : UniversalCommand {
                             }
                         }
                         "coin", "投币" -> {
-                            if (message.sender.id == 1552409060L) {
-                                val avNumber = args[3].toLong()
+                            if (user.level == UserLevel.OWNER) {
+                                val avNumber = args[2].toLong()
                                 if (avNumber != 0L) {
                                     val response = client.appAPI.addCoin(aid = avNumber, multiply = 2).await()
                                     return if (response.code == 0) {
@@ -88,6 +88,7 @@ class DebugCommand : UniversalCommand {
                         }
                     }
                 }
+                "help" -> return getHelp().toMessage().asMessageChain()
                 else -> return "Bot > 命令不存在\n请注意: 这里的命令随时会被删除.".toMessage().asMessageChain()
             }
         }
@@ -97,4 +98,6 @@ class DebugCommand : UniversalCommand {
     override fun getProps(): CommandProps {
         return CommandProps("debug", null, "nbot.commands.debug", UserLevel.ADMIN)
     }
+
+    override fun getHelp(): String = "直接开 IDE 看会死掉吗"
 }
