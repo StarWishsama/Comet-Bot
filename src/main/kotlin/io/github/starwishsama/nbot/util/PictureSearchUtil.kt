@@ -3,7 +3,7 @@ package io.github.starwishsama.nbot.util
 import cn.hutool.http.HttpRequest
 import com.google.gson.JsonParser
 import io.github.starwishsama.nbot.BotConstants
-import io.github.starwishsama.nbot.objects.PicSearchResult
+import io.github.starwishsama.nbot.objects.pojo.PicSearchResult
 
 object PictureSearchUtil {
     private val apiUrl = "https://saucenao.com/search.php?db=999&output_type=2&api_key=${BotConstants.cfg.saucenaoApiKey}&numres=16&url="

@@ -1,4 +1,4 @@
-package io.github.starwishsama.nbot.objects
+package io.github.starwishsama.nbot.objects.group
 
 import com.google.gson.annotations.SerializedName
 import java.util.*

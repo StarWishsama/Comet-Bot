@@ -1,6 +1,8 @@
-package io.github.starwishsama.nbot.objects
+package io.github.starwishsama.nbot.objects.group
 
 import io.github.starwishsama.nbot.BotConstants
+import io.github.starwishsama.nbot.objects.BotUser
+import io.github.starwishsama.nbot.objects.ShopItem
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer

@@ -5,10 +5,10 @@ import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
-import io.github.starwishsama.nbot.util.BotUtils.getLocalMessage
-import io.github.starwishsama.nbot.util.BotUtils.isLegitId
-import io.github.starwishsama.nbot.util.BotUtils.isNoCoolDown
-import io.github.starwishsama.nbot.util.BotUtils.sendLocalMessage
+import io.github.starwishsama.nbot.util.BotUtil.getLocalMessage
+import io.github.starwishsama.nbot.util.BotUtil.isLegitId
+import io.github.starwishsama.nbot.util.BotUtil.isNoCoolDown
+import io.github.starwishsama.nbot.util.BotUtil.sendLocalMessage
 import io.github.starwishsama.nbot.util.R6SUtils.getR6SInfo
 import net.mamoe.mirai.message.ContactMessage
 import net.mamoe.mirai.message.GroupMessage

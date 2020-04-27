@@ -1,11 +1,17 @@
 package io.github.starwishsama.nbot
 
+import cn.hutool.core.text.UnicodeUtil
 import cn.hutool.core.util.RandomUtil
 import cn.hutool.core.util.URLUtil
 import cn.hutool.http.HttpRequest
 import com.github.salomonbrys.kotson.get
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import io.github.starwishsama.nbot.enums.UserLevel
+import io.github.starwishsama.nbot.objects.BotUser
+import io.github.starwishsama.nbot.objects.draw.ArkNightOperator
+import io.github.starwishsama.nbot.util.BiliBiliUtil
+import io.github.starwishsama.nbot.util.DrawUtil
 import io.github.starwishsama.nbot.util.R6SUtils
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
@@ -18,6 +24,8 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
+import java.util.stream.Collectors
 
 /**
  * For test purpose
@@ -25,9 +33,6 @@ import java.time.format.DateTimeFormatter
  */
 
 fun main(){
-    for (i in 0..20){
-        println(RandomUtil.randomInt(0, 10000))
-    }
 }
 
 fun searchNetEaseMusic(songName: String?): MessageChain {

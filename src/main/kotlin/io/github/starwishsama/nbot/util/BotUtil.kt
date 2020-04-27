@@ -7,10 +7,12 @@ import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.objects.BotUser.Companion.isBotAdmin
 import io.github.starwishsama.nbot.objects.BotUser.Companion.isBotOwner
+import net.mamoe.mirai.Bot
 import java.io.IOException
 import java.net.URISyntaxException
 import java.time.LocalDateTime
 import java.util.*
+
 
 /**
  * 用于辅助机器人运行中的各种工具方法
@@ -18,7 +20,7 @@ import java.util.*
  * @author Nameless
  */
 
-object BotUtils {
+object BotUtil {
     private var coolDown: MutableMap<Long, Long> = HashMap()
 
     /**
@@ -219,7 +221,7 @@ object BotUtils {
      * @param node 本地化文本节点
      * @return 本地化文本
      */
-    fun getLocalMessage(node: String): String? {
+    fun getLocalMessage(node: String): String {
         for ((n, t) in BotConstants.msg) {
             if (n.contentEquals(node)) {
                 return t
@@ -237,9 +239,7 @@ object BotUtils {
      * @return 本地化文本
      */
     fun sendLocalMessage(node: String, otherText: String): String {
-        return if (getLocalMessage(node) != null) {
-            getLocalMessage(node) + otherText
-        } else "PlaceHolder"
+        return getLocalMessage(node) + otherText
     }
 
     /**
@@ -251,15 +251,12 @@ object BotUtils {
      * @return 本地化文本
      */
     fun sendLocalMessage(node: String, vararg otherText: String?): String {
-        if (getLocalMessage(node) != null) {
-            val sb = StringBuilder()
-            sb.append(getLocalMessage(node)).append(" ")
-            for (s in otherText) {
-                sb.append(s).append("\n")
-            }
-            return sb.toString().trim { it <= ' ' }
+        val sb = StringBuilder()
+        sb.append(getLocalMessage(node)).append(" ")
+        for (s in otherText) {
+            sb.append(s).append("\n")
         }
-        return "PlaceHolder"
+        return sb.toString().trim { it <= ' ' }
     }
 
     /**
@@ -287,6 +284,28 @@ object BotUtils {
             sb.append(args[index]).append(" ")
         }
         return sb.toString().trim()
+    }
+
+    fun getRunningTime(): String? {
+        val remain = System.currentTimeMillis() - BotInstance.startTime
+        var second = remain / 1000
+        val ms = remain - second * 1000
+        var minute = 0L
+        var hour = 0L
+        var day = 0L
+        if (second >= 60) {
+            minute = second / 60
+            second -= minute * 60
+            if (minute >= 60) {
+                hour = minute / 60
+                minute -= second * 60
+                if (hour >= 24) {
+                    day = hour / 24
+                    hour -= day * 24
+                }
+            }
+        }
+        return day.toString() + "天" + hour + "时" + minute + "分" + second + "秒" + ms + "毫秒"
     }
 
 }

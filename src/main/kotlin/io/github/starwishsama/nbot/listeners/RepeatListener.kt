@@ -11,7 +11,7 @@ object RepeatListener {
             always {
                 val chance = RandomUtil.randomInt(0, 1000)
                 val length = message.size
-                if (chance in 244..344 && length > RandomUtil.randomInt(0, 50)){
+                if (chance in 532 until 655 && length > RandomUtil.randomInt(1, 50)){
                     reply(this.message)
                 }
             }

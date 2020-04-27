@@ -50,7 +50,7 @@ object R6SUtils {
 
     fun getR6SInfo(player: String): String {
         try {
-            if (BotUtils.isLegitId(player)) {
+            if (BotUtil.isLegitId(player)) {
                 val p: R6Player? = searchPlayer(player)
                 if (p != null && p.found) {
                     num.maximumIntegerDigits = 3

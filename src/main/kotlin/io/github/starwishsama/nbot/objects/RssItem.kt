@@ -78,8 +78,8 @@ class RssItem(private val address: String) {
             }
         }
 
-        fun simplifyHTML(context: String): String {
-            var context = context
+        fun simplifyHTML(rssContext: String): String {
+            var context = rssContext
             context = context.replace("<br />".toRegex(), "\n").replace("<br>".toRegex(), "\n")
                 .replace("</p><p>".toRegex(), "\n")
                 .replace("	".toRegex(), "")

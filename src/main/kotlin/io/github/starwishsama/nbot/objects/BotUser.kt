@@ -2,10 +2,8 @@ package io.github.starwishsama.nbot.objects
 
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.enums.UserLevel
-import io.github.starwishsama.nbot.util.BotUtils.getLevel
-import net.mamoe.mirai.contact.User
+import io.github.starwishsama.nbot.util.BotUtil.getLevel
 import java.time.LocalDateTime
-import java.util.*
 import kotlin.collections.ArrayList
 
 
@@ -17,19 +15,19 @@ data class BotUser(var userQQ: Long,
                    var msgVL : Int = 0,
                    var r6sAccount: String? = null,
                    var level: UserLevel = UserLevel.USER,
-                   var randomTime : Int = 20,
+                   var commandTime : Int = 100,
                    var checkInGroup: Long = 0,
                    var permissions: List<String> = ArrayList(),
-                   var biliSubs: List<Long> = ArrayList()) {
+                   var biliSubs: List<String> = ArrayList()) {
     fun decreaseTime() {
-        if (level == UserLevel.USER) {
-            randomTime--
+        if (level <= UserLevel.VIP) {
+            commandTime--
         }
     }
 
-    fun updateTime() {
-        if (level == UserLevel.USER && randomTime < 20) {
-            randomTime++
+    fun decreaseTime(time: Int) {
+        if (level <= UserLevel.VIP) {
+            commandTime -= time
         }
     }
 
@@ -38,8 +36,8 @@ data class BotUser(var userQQ: Long,
     }
 
     fun addTime(time: Int) {
-        if (level == UserLevel.USER && randomTime < 20) {
-            randomTime += time
+        if (level == UserLevel.USER) {
+            commandTime += time
         }
     }
 

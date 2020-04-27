@@ -5,7 +5,7 @@ import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
-import io.github.starwishsama.nbot.util.BotUtils
+import io.github.starwishsama.nbot.util.BotUtil
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.ContactMessage
@@ -19,8 +19,8 @@ import java.time.LocalDateTime
 
 class CheckInCommand : UniversalCommand {
     override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtils.isNoCoolDown(message.sender.id) && message is GroupMessage) {
-            return if (!BotUtils.isChecked(user) || user.checkInTime == 0) {
+        if (BotUtil.isNoCoolDown(message.sender.id) && message is GroupMessage) {
+            return if (!BotUtil.isChecked(user) || user.checkInTime == 0) {
                 checkIn(message.sender, message, user).toMessage().asMessageChain()
             } else {
                 "Bot > 你今天已经签到过了! 输入 /cx 可查询签到信息".toMessage().asMessageChain()

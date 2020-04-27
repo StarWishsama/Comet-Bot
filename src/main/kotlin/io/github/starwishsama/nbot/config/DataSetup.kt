@@ -9,9 +9,12 @@ import com.google.gson.reflect.TypeToken
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotInstance
 import io.github.starwishsama.nbot.objects.*
+import io.github.starwishsama.nbot.objects.draw.ArkNightOperator
+import io.github.starwishsama.nbot.objects.draw.PCRCharacter
+import io.github.starwishsama.nbot.objects.group.GroupShop
 import java.io.File
 
-object FileSetup {
+object DataSetup {
     private val userCfg: File = File(BotInstance.filePath.toString() + "/users.json")
     private val shopItemCfg: File = File(BotInstance.filePath.toString() + "/items.json")
     private val cfgFile: File = File(BotInstance.filePath.toString() + "/config.json")
@@ -69,13 +72,17 @@ object FileSetup {
                 ) as List<BotUser>
                 BotConstants.shop = gson.fromJson(
                     FileReader.create(shopItemCfg).readString(),
-                    object : TypeToken<List<GroupShop?>?>() {}.type
+                    object : TypeToken<List<GroupShop>>() {}.type
                 )
 
                 loadLang()
             } else {
                 System.err.println("[配置] 在加载配置文件时发生了问题, JSON 文件为空.")
             }
+
+            BotConstants.pcr = gson.fromJson(FileReader.create(File(BotInstance.filePath.toString() + "/pcr.json")).readString(), object : TypeToken<List<PCRCharacter>>() {}.type)
+            BotConstants.arkNight = gson.fromJson(FileReader.create(File(BotInstance.filePath.toString() + "/ark.json")).readString(), object : TypeToken<List<ArkNightOperator>>() {}.type)
+
         } catch (e: Exception) {
             System.err.println("[配置] 在加载配置文件时发生了问题, 错误信息: $e")
         }

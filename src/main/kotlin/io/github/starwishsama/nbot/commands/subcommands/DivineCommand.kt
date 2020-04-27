@@ -8,9 +8,9 @@ import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.objects.RandomResult
-import io.github.starwishsama.nbot.util.BotUtils
-import io.github.starwishsama.nbot.util.BotUtils.getLocalMessage
-import io.github.starwishsama.nbot.util.BotUtils.isNoCoolDown
+import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.util.BotUtil.getLocalMessage
+import io.github.starwishsama.nbot.util.BotUtil.isNoCoolDown
 import net.mamoe.mirai.message.ContactMessage
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -23,8 +23,8 @@ class DivineCommand : UniversalCommand {
             val underCover = getResultFromList(BotConstants.underCovers, message.sender.id)
             return if (args.isNotEmpty()) {
                 if (underCover == null) {
-                    if (user.randomTime > 0 || user.level != UserLevel.USER) {
-                        val randomEventName = BotUtils.getRestStringInArgs(args, 0)
+                    if (user.commandTime > 0 || user.level != UserLevel.USER) {
+                        val randomEventName = BotUtil.getRestStringInArgs(args, 0)
                         if (randomEventName.length < 30 && EmojiUtil.extractEmojis(randomEventName).isEmpty()) {
                             val result = RandomResult(-1000, RandomUtil.randomDouble(0.0, 1.0), randomEventName)
                             user.decreaseTime()
@@ -47,9 +47,10 @@ class DivineCommand : UniversalCommand {
     }
 
     override fun getProps(): CommandProps = CommandProps("divine", arrayListOf("zb", "占卜"), "nbot.commands.divine", UserLevel.USER)
-    override fun getHelp(): String {
-        TODO("Not yet implemented")
-    }
+    override fun getHelp(): String = """
+         ======= 命令帮助 =======
+         /zb [占卜内容] 占卜
+    """.trimIndent()
 
     private fun getResultFromList(results: List<RandomResult>, id: Long): RandomResult? {
         if (results.isNotEmpty()) {

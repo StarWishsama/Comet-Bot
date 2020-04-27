@@ -5,7 +5,7 @@ import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
-import io.github.starwishsama.nbot.util.BotUtils
+import io.github.starwishsama.nbot.util.BotUtil
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.ContactMessage
@@ -29,7 +29,7 @@ class ClockInCommand : UniversalCommand{
                     data.checkedUsers.forEach { member ->
                         run {
                             return if (member.id == message.sender.id) {
-                                (BotUtils.getLocalMessage("msg.bot-prefix") + "你已经打卡过了!").toMessage()
+                                (BotUtil.getLocalMessage("msg.bot-prefix") + "你已经打卡过了!").toMessage()
                                     .asMessageChain()
                             } else {
                                 clockIn(message.sender, message).toMessage().asMessageChain()
@@ -38,7 +38,7 @@ class ClockInCommand : UniversalCommand{
                     }
                 }
             } else {
-                return (BotUtils.getLocalMessage("msg.bot-prefix") + "没有正在进行的打卡").toMessage().asMessageChain()
+                return (BotUtil.getLocalMessage("msg.bot-prefix") + "没有正在进行的打卡").toMessage().asMessageChain()
             }
         }
         return EmptyMessageChain

@@ -4,7 +4,7 @@ import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
-import io.github.starwishsama.nbot.util.BotUtils
+import io.github.starwishsama.nbot.util.BotUtil
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.ContactMessage
 import net.mamoe.mirai.message.GroupMessage
@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils
 
 class MuteCommand : UniversalCommand {
     override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtils.isNoCoolDown(user.userQQ) && BotUser.isBotAdmin(user.userQQ) && message is GroupMessage){
+        if (BotUtil.isNoCoolDown(user.userQQ) && BotUser.isBotAdmin(user.userQQ) && message is GroupMessage){
             if (message.group.botPermission.isOperator()) {
                 if (args.isNotEmpty()) {
                     try {
@@ -32,7 +32,7 @@ class MuteCommand : UniversalCommand {
                     return getHelp().toMessage().asMessageChain()
                 }
             } else {
-                BotUtils.sendLocalMessage("msg.bot-prefix", "我不是绿帽 我爬 我爬").toMessage().asMessageChain()
+                BotUtil.sendLocalMessage("msg.bot-prefix", "我不是绿帽 我爬 我爬").toMessage().asMessageChain()
             }
         }
         return EmptyMessageChain
@@ -51,9 +51,9 @@ class MuteCommand : UniversalCommand {
             if (isAll) {
                 group.settings.isMuteAll = !group.settings.isMuteAll
                 return if (group.settings.isMuteAll) {
-                    BotUtils.sendLocalMessage("msg.bot-prefix", "The World!").toMessage().asMessageChain()
+                    BotUtil.sendLocalMessage("msg.bot-prefix", "The World!").toMessage().asMessageChain()
                 } else {
-                    BotUtils.sendLocalMessage("msg.bot-prefix", "然后时间开始流动").toMessage().asMessageChain()
+                    BotUtil.sendLocalMessage("msg.bot-prefix", "然后时间开始流动").toMessage().asMessageChain()
                 }
             } else {
                 group.members.forEach { member ->
@@ -62,14 +62,14 @@ class MuteCommand : UniversalCommand {
                             return when (muteTime) {
                                 in 1..2592000 -> {
                                     member.mute(muteTime)
-                                    BotUtils.sendLocalMessage("msg.bot-prefix", "禁言成功").toMessage().asMessageChain()
+                                    BotUtil.sendLocalMessage("msg.bot-prefix", "禁言成功").toMessage().asMessageChain()
                                 }
                                 0L -> {
                                     member.unmute()
-                                    BotUtils.sendLocalMessage("msg.bot-prefix", "解禁成功").toMessage().asMessageChain()
+                                    BotUtil.sendLocalMessage("msg.bot-prefix", "解禁成功").toMessage().asMessageChain()
                                 }
                                 else -> {
-                                    BotUtils.sendLocalMessage("msg.bot-prefix", "禁言时间有误, 范围: (0s, 30days]").toMessage().asMessageChain()
+                                    BotUtil.sendLocalMessage("msg.bot-prefix", "禁言时间有误, 范围: (0s, 30days]").toMessage().asMessageChain()
                                 }
                             }
                         }
@@ -77,9 +77,9 @@ class MuteCommand : UniversalCommand {
                 }
             }
 
-            return BotUtils.sendLocalMessage("msg.bot-prefix", "找不到此用户").toMessage().asMessageChain()
+            return BotUtil.sendLocalMessage("msg.bot-prefix", "找不到此用户").toMessage().asMessageChain()
         } catch (e: PermissionDeniedException){
-            return BotUtils.sendLocalMessage("msg.bot-prefix", "我不是绿帽 我爬 我爬").toMessage().asMessageChain()
+            return BotUtil.sendLocalMessage("msg.bot-prefix", "我不是绿帽 我爬 我爬").toMessage().asMessageChain()
         }
     }
 

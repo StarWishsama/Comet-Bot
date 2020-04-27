@@ -6,7 +6,6 @@ import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
-import io.github.starwishsama.nbot.util.BotUtils.getLocalMessage
 import net.mamoe.mirai.message.ContactMessage
 import net.mamoe.mirai.message.GroupMessage
 import net.mamoe.mirai.message.data.*
@@ -22,7 +21,7 @@ class InfoCommand : UniversalCommand {
                                     "\n累计连续签到了 " + user.checkInTime.toString() + " 天" + "\n上次签到于: " +
                                     user.lastCheckInTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString() +
                                     "\n权限组: " + user.level.toString() +
-                                    "\n命令条数: " + user.randomTime
+                                    "\n命令条数: " + user.commandTime
                     if (user.bindServerAccount != null) {
                         reply = reply + "绑定的游戏账号是: " + user.bindServerAccount
                     }

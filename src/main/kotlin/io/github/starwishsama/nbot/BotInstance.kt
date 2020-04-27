@@ -5,10 +5,9 @@ import io.github.starwishsama.nbot.BotInstance.Companion.logger
 import io.github.starwishsama.nbot.commands.CommandHandler
 import io.github.starwishsama.nbot.commands.subcommands.*
 import io.github.starwishsama.nbot.config.BackupHelper
-import io.github.starwishsama.nbot.config.FileSetup
+import io.github.starwishsama.nbot.config.DataSetup
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.listeners.PictureSearchListener
-import io.github.starwishsama.nbot.listeners.RepeatListener
 import io.github.starwishsama.nbot.objects.BotUser
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
@@ -21,6 +20,7 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
 import java.util.*
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
@@ -33,19 +33,22 @@ class BotInstance {
         lateinit var bot : Bot
         var handler = CommandHandler().getInstance()
         val client = BilibiliClient()
+        var startTime: Long = 0
+        lateinit var service : ScheduledExecutorService
         lateinit var logger: MiraiLogger
     }
 
     suspend fun run() {
-        FileSetup.loadCfg()
-        FileSetup.loadLang()
+        DataSetup.loadCfg()
+        DataSetup.loadLang()
         qqId = BotConstants.cfg.botId
         password = BotConstants.cfg.botPassword
         bot = Bot(qqId, password)
         bot.alsoLogin()
         logger = bot.logger
-        handler.setupCommand(arrayOf(AdminCommand(), BotCommand(), DebugCommand(), PictureSearch(), MuteCommand(), MusicCommand(), R6SCommand(), CheckInCommand(), ClockInCommand(), InfoCommand(), DivineCommand()))
+        handler.setupCommand(arrayOf(AdminCommand(), BotCommand(), BiliBiliCommand(), DrawCommand(), DebugCommand(), PictureSearch(), MuteCommand(), MusicCommand(), R6SCommand(), CheckInCommand(), ClockInCommand(), InfoCommand(), DivineCommand()))
         bot.logger.info("已注册 " + CommandHandler.commands.size + " 个命令")
+        startTime = System.currentTimeMillis()
 
         if (!BotConstants.cfg.biliUserName.isNullOrBlank() && BotConstants.cfg.biliPassword.isNullOrBlank()) {
             client.runCatching {
@@ -54,8 +57,8 @@ class BotInstance {
                 }
             }
         }
-
-        val service = Executors.newSingleThreadScheduledExecutor(BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build())
+        
+        service = Executors.newSingleThreadScheduledExecutor(BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build())
 
         /** 备份服务 */
         service.scheduleAtFixedRate({BackupHelper.createBackup()}, 0, 3, TimeUnit.HOURS)
@@ -75,7 +78,7 @@ class BotInstance {
         }
 
         Runtime.getRuntime().addShutdownHook(Thread(Runnable {
-            FileSetup.saveFiles()
+            DataSetup.saveFiles()
             service.shutdown()
         }))
 

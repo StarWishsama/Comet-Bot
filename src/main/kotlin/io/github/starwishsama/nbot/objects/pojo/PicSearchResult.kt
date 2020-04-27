@@ -1,4 +1,4 @@
-package io.github.starwishsama.nbot.objects
+package io.github.starwishsama.nbot.objects.pojo
 
 data class PicSearchResult(val picUrl: String, val originalUrl: String, val similarity: Double) {
     companion object {
