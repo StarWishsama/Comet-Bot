@@ -22,7 +22,7 @@ jar {
 }
 
 group 'io.github.starwishsama.nbot'
-version '0.1.0-Canary'
+version '0.1.1-Canary'
 
 repositories {
     maven { url 'https://jitpack.io' }
