@@ -40,18 +40,14 @@ class CheckInCommand : UniversalCommand {
             if (user.checkInTime < 2 || point[1] == 0.0) {
                 extra = ""
             }
-            val text = "Hi ${sender.nameCardOrNick}, 签到成功!\n获得 ${point[0]} 点积分." + extra + "\n目前积分数: ${String.format("%.1f", user.checkInPoint)}."
+            val text = "Hi ${sender.nameCardOrNick}, 签到成功!\n获得了 ${point[0]} 点积分" + extra + "\n目前积分数: ${String.format("%.1f", user.checkInPoint)}."
             if (msg is GroupMessage)
                 user.checkInGroup = msg.group.id
 
             if (point[0] + point[1] == 0.0) {
                 "Bot > 签到成功! 今天运气不佳, 没有积分"
             } else {
-                if (user.bindServerAccount != null) {
-                    String.format(text, user.bindServerAccount)
-                } else {
-                    String.format(text, sender.nick)
-                }
+                text
             }
         }
     }

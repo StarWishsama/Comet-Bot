@@ -20,7 +20,7 @@ data class RoomInfo(
     @SerializedName("title")
     val title: String){
 
-    fun getRoomURL(): String? {
+    fun getRoomURL(): String {
         return "https://live.bilibili.com/$roomID"
     }
 

@@ -1,5 +1,6 @@
 package io.github.starwishsama.nbot.sessions
 
+import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.SessionType
 import java.util.*
 
@@ -7,7 +8,7 @@ import java.util.*
 /**
  * @author Nameless
  */
-open class Session(var groupId: Long, var type: SessionType) {
+open class Session(var groupId: Long, var type: SessionType, var command: UniversalCommand) {
     private var users: List<SessionUser> = LinkedList<SessionUser>()
 
     fun putUser(id: Long){

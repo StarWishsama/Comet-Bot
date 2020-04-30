@@ -7,7 +7,7 @@ import io.github.starwishsama.nbot.commands.subcommands.*
 import io.github.starwishsama.nbot.config.BackupHelper
 import io.github.starwishsama.nbot.config.DataSetup
 import io.github.starwishsama.nbot.enums.UserLevel
-import io.github.starwishsama.nbot.listeners.PictureSearchListener
+import io.github.starwishsama.nbot.listeners.SessionListener
 import io.github.starwishsama.nbot.objects.BotUser
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
@@ -24,7 +24,7 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
-class BotInstance {
+class BotInstance private constructor() {
     companion object {
         val filePath: File? = File(getPath())
         const val version = "0.1.0-Canary"
@@ -36,6 +36,9 @@ class BotInstance {
         var startTime: Long = 0
         lateinit var service : ScheduledExecutorService
         lateinit var logger: MiraiLogger
+        val instance: BotInstance
+            @Synchronized
+            get() { return BotInstance() }
     }
 
     suspend fun run() {
@@ -46,7 +49,7 @@ class BotInstance {
         bot = Bot(qqId, password)
         bot.alsoLogin()
         logger = bot.logger
-        handler.setupCommand(arrayOf(AdminCommand(), BotCommand(), BiliBiliCommand(), DrawCommand(), DebugCommand(), PictureSearch(), MuteCommand(), MusicCommand(), R6SCommand(), CheckInCommand(), ClockInCommand(), InfoCommand(), DivineCommand()))
+        handler.setupCommand(arrayOf(AdminCommand(), BotCommand(), BiliBiliCommand(), DrawCommand(), DebugCommand(), FlowerCommand(), PictureSearch(), MuteCommand(), MusicCommand(), R6SCommand(), CheckInCommand(), ClockInCommand(), InfoCommand(), DivineCommand()))
         bot.logger.info("已注册 " + CommandHandler.commands.size + " 个命令")
         startTime = System.currentTimeMillis()
 
@@ -64,7 +67,7 @@ class BotInstance {
         service.scheduleAtFixedRate({BackupHelper.createBackup()}, 0, 3, TimeUnit.HOURS)
 
         /** 监听器 */
-        PictureSearchListener.register(bot)
+        SessionListener.register(bot)
 
         bot.subscribeMessages {
             always {
@@ -89,7 +92,7 @@ class BotInstance {
 }
 
 suspend fun main(){
-    BotInstance().run()
+    BotInstance.instance.run()
 }
 
 private fun executeCommand(){

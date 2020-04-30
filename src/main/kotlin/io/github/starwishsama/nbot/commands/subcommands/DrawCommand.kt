@@ -99,7 +99,7 @@ class DrawCommand : UniversalCommand {
                 "今日抽卡次数已达上限, 别抽卡上头了"
             }
         } else {
-            if (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN)) {
+            if (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000) {
                 for (i in 0 until time) {
                     if (user.commandTime >= 1 || user.compareLevel(UserLevel.ADMIN)) {
                         user.decreaseTime(1)
@@ -127,7 +127,7 @@ class DrawCommand : UniversalCommand {
                         "四星个数: ${result.stream().filter { it.rare == 4 }.count()}\n" +
                         "三星个数: ${result.stream().filter { it.rare == 3 }.count()}"
             } else {
-               return "你要抽卡的次数大于你的抽卡次数"
+               return "你要抽卡的次数大于你剩余的抽卡次数"
             }
         }
     }

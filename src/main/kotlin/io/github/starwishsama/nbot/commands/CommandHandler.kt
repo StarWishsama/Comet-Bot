@@ -61,14 +61,12 @@ class CommandHandler {
     }
 
     private fun getCmdPrefix(command: String): String {
-        val cmdPrefix: String
-        var parseTemp = ""
+        var cmdPrefix = command
         for (string : String in BotConstants.cfg.commandPrefix){
-            parseTemp = command.replace(string, "")
+            cmdPrefix = cmdPrefix.replace(string, "")
         }
 
-        cmdPrefix = parseTemp.split(" ")[0].substring(1)
-        return cmdPrefix
+        return cmdPrefix.split(" ")[0]
     }
 
     private fun isPrefix(cmd: UniversalCommand, prefix: String): Boolean {

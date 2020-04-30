@@ -1,5 +1,6 @@
 package io.github.starwishsama.nbot.commands.subcommands
 
+import cn.hutool.http.HttpRequest
 import com.hiczp.bilibili.api.app.model.SearchUserResult
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
@@ -12,6 +13,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
+import net.mamoe.mirai.message.uploadAsImage
 import java.lang.StringBuilder
 
 class BiliBiliCommand : UniversalCommand {
@@ -21,6 +23,7 @@ class BiliBiliCommand : UniversalCommand {
                 if (user.biliSubs.isEmpty()) {
                     return getHelp().toMessage().asMessageChain()
                 } else {
+                    message.quoteReply("请稍等...")
                     val list: MutableList<SearchUserResult.Data.Item> = mutableListOf()
                     for (name in user.biliSubs){
                         if (BiliBiliUtil.searchUser(name).items.isNotEmpty()) {
@@ -31,14 +34,9 @@ class BiliBiliCommand : UniversalCommand {
                     val sb = StringBuilder("监控室列表:\n")
 
                     if (list.isNotEmpty()){
+                        list.sortByDescending { it.liveStatus }
                         for (item in list){
-                            if (item.liveStatus == 1) {
-                                sb.append(item.title).append(" ").append("✔")
-                                        .append(BiliBiliUtil.getLiveRoom(item.roomid).data.title)
-                            } else {
-                                sb.append(item.title).append(" ").append("✘")
-                                        .append("\n最近投递的视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "无"))
-                            }
+                            sb.append(item.title).append(" ").append( if (item.liveStatus == 1) "✔" else "✘").append("\n")
                         }
                     }
 
@@ -47,40 +45,61 @@ class BiliBiliCommand : UniversalCommand {
             } else {
                 when (args[0]){
                     "sub", "订阅" -> {
-                        return if (!user.biliSubs.contains(args[1])) {
-                            val searchResult = BiliBiliUtil.searchUser(args[1])
-                            if (searchResult.items.isNotEmpty()) {
-                                val item = searchResult.items[0]
-                                user.biliSubs += item.title
-                                "Bot > 订阅 ${item.title} 成功".toMessage().asMessageChain()
+                        if (args.size > 1) {
+                            return if (!user.biliSubs.contains(args[1])) {
+                                val searchResult = BiliBiliUtil.searchUser(args[1])
+                                if (searchResult.items.isNotEmpty()) {
+                                    val item = searchResult.items[0]
+                                    user.biliSubs += item.title
+                                    "Bot > 订阅 ${item.title} 成功".toMessage().asMessageChain()
+                                } else {
+                                    "Bot > 账号不存在".toMessage().asMessageChain()
+                                }
                             } else {
-                                "Bot > 账号不存在".toMessage().asMessageChain()
+                                "Bot > 你已经订阅过 ${args[1]} 了".toMessage().asMessageChain()
                             }
                         } else {
-                            "Bot > 你已经订阅过 ${args[1]} 了".toMessage().asMessageChain()
+                            return getHelp().toMessage().asMessageChain()
                         }
                     }
                     "unsub", "取消订阅" -> {
-                        return if (user.biliSubs.isEmpty() || !user.biliSubs.contains(args[1])){
-                            "Bot > 你还没订阅 ${args[1]}".toMessage().asMessageChain()
+                        return if (args.size > 1) {
+                            if (user.biliSubs.isEmpty() || !user.biliSubs.contains(args[1])) {
+                                "Bot > 你还没订阅 ${args[1]}".toMessage().asMessageChain()
+                            } else {
+                                user.biliSubs -= args[1]
+                                "Bot > 取消订阅 ${args[1]} 成功".toMessage().asMessageChain()
+                            }
                         } else {
-                            user.biliSubs -= args[1]
-                            "Bot > 取消订阅 ${args[1]} 成功".toMessage().asMessageChain()
+                            getHelp().toMessage().asMessageChain()
                         }
                     }
                     "info", "查询" -> {
+                        message.quoteReply("请稍等...")
                         val searchResult = BiliBiliUtil.searchUser(args[1])
-                        return if (searchResult.items.isNotEmpty()) {
+                        if (searchResult.items.isNotEmpty()) {
                             val item = searchResult.items[0]
-                            (item.title + "\n" + item.sign + "\n粉丝数: " + item.fans +
-                                    "\n最近投递视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频")
-                                    + "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") +
-                                    "\n最近动态: " + BiliBiliUtil.getDynamic(item.mid, message.subject)).toMessage()
-                                .asMessageChain()
+                            val before = item.title + "\n粉丝数: " + item.fans +
+                                    "\n最近投递视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
+                                    "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘")
+                            val dynamic = BiliBiliUtil.getDynamic(item.mid)
+                            return if (dynamic.isEmpty()) {
+                                ("$before\n无最近动态").toMessage().asMessageChain()
+                            } else {
+                                when (dynamic.size) {
+                                    1 -> ("$before\n最近动态: ${dynamic[0]}").toMessage().asMessageChain()
+                                    2 -> {
+                                        val stream = HttpRequest.get(dynamic[1]).timeout(150_000).executeAsync().bodyStream()
+                                        ("$before\n最近动态: ${dynamic[0]}").toMessage().asMessageChain().plus(stream.uploadAsImage(message.subject))
+                                    }
+                                    else -> ("$before\n无最近动态").toMessage().asMessageChain()
+                                }
+                            }
                         } else {
-                            "Bot > 账号不存在".toMessage().asMessageChain()
+                            return "Bot > 账号不存在".toMessage().asMessageChain()
                         }
                     }
+                    else -> return getHelp().toMessage().asMessageChain()
                 }
             }
         }

@@ -37,12 +37,16 @@ class MiniVideo : DynamicData {
         }
     }
 
-    override suspend fun getMessageChain(contact: Contact): MessageChain {
-        val text = "发了一个小视频: ${item?.description}".toMessage().asMessageChain()
+    override suspend fun getContact(): List<String> {
+        val list = arrayListOf<String>()
+        list.add("发了一个小视频: ${item?.description}\n")
         if (item?.cover?.originImgURL != null){
-            val response = HttpRequest.get(item?.cover?.originImgURL).timeout(150_000).executeAsync().bodyStream()
-            return text.plus(response.uploadAsImage(contact))
+            item?.cover?.originImgURL.let {
+                if (it != null) {
+                    list.add(it)
+                }
+            }
         }
-        return text
+        return list
     }
 }

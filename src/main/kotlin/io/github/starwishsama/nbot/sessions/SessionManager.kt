@@ -4,6 +4,8 @@ import java.util.*
 
 
 /**
+ * 管理运行中产生的会话
+ *
  * @author Nameless
  */
 object SessionManager {

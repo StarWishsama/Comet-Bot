@@ -4,21 +4,23 @@ import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.util.BotUtil.getLevel
 import java.time.LocalDateTime
+import java.util.*
 import kotlin.collections.ArrayList
 
+class BotUser(var userQQ: Long) {
+    var lastCheckInTime : LocalDateTime = LocalDateTime.now()
+    var checkInPoint : Double = 0.0
+    var checkInTime : Int = 0
+    var bindServerAccount: String? = null
+    var msgVL : Int = 0
+    var r6sAccount: String? = null
+    var level: UserLevel = UserLevel.USER
+    var commandTime : Int = 100
+    var checkInGroup: Long = 0
+    var permissions: List<String> = ArrayList()
+    var biliSubs: List<String> = ArrayList()
+    var flower: Flower? = null
 
-data class BotUser(var userQQ: Long,
-                   var lastCheckInTime : LocalDateTime = LocalDateTime.now(),
-                   var checkInPoint : Double = 0.0,
-                   var checkInTime : Int = 0,
-                   var bindServerAccount: String? = null,
-                   var msgVL : Int = 0,
-                   var r6sAccount: String? = null,
-                   var level: UserLevel = UserLevel.USER,
-                   var commandTime : Int = 100,
-                   var checkInGroup: Long = 0,
-                   var permissions: List<String> = ArrayList(),
-                   var biliSubs: List<String> = ArrayList()) {
     fun decreaseTime() {
         if (level <= UserLevel.VIP) {
             commandTime--

@@ -30,7 +30,7 @@ open class Config {
     @SerializedName("bilibili_password")
     var userPassword: String? = null
     @SerializedName("command_prefix")
-    var commandPrefix: List<String> = mutableListOf(".", "。", "#", "!")
+    var commandPrefix: List<String> = mutableListOf(".", "。", "#", "!", "/")
     @SerializedName("bili_user_name")
     var biliUserName: String? = null
     @SerializedName("bili_password")

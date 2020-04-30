@@ -1,21 +1,15 @@
 package io.github.starwishsama.nbot.util
 
 import cn.hutool.http.HttpRequest
-import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
-import com.google.gson.reflect.TypeToken
 import com.hiczp.bilibili.api.app.model.SearchUserResult
 import com.hiczp.bilibili.api.live.model.RoomInfo
 import io.github.starwishsama.nbot.BotInstance
-import io.github.starwishsama.nbot.objects.BotLocalization
 import io.github.starwishsama.nbot.objects.bilibili.dynamic.DynamicAdapter
-import kotlinx.serialization.json.Json
-import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.message.data.toMessage
+import io.github.starwishsama.nbot.objects.bilibili.dynamic.dynamicdata.UnknownType
+import java.lang.IllegalStateException
 
 object BiliBiliUtil {
     private val client = BotInstance.client
@@ -31,21 +25,29 @@ object BiliBiliUtil {
         return client.liveAPI.getInfo(roomId).await()
     }
 
-    suspend fun getDynamic(mid: Long, contact: Contact): MessageChain {
+    suspend fun getDynamic(mid: Long): List<String> {
         val response = HttpRequest.get(dynamicUrl.replace("%uid%", mid.toString())).executeAsync()
         if (response.isOk) {
             val dynamicObject = JsonParser.parseString(response.body())
             if (dynamicObject.isJsonObject){
-                val entity = dynamicObject.asJsonObject["data"].asJsonObject["cards"].asJsonArray[0]
-                val dynamicInfo = entity.asJsonObject["card"].asString
-                val trueDynamicJson= JsonParser.parseString(dynamicInfo)
-                if (trueDynamicJson.isJsonObject){
-                    val type = entity.asJsonObject["desc"].asJsonObject["type"].asInt
-                    val result = gson.fromJson(dynamicInfo, DynamicAdapter.getType(type))
-                    return result.getMessageChain(contact)
+                try {
+                    val entity = dynamicObject.asJsonObject["data"].asJsonObject["cards"].asJsonArray[0]
+                    val dynamicInfo = entity.asJsonObject["card"].asString
+                    val trueDynamicJson = JsonParser.parseString(dynamicInfo)
+                    if (trueDynamicJson.isJsonObject) {
+                        val dynamicType = DynamicAdapter.getType(entity.asJsonObject["desc"].asJsonObject["type"].asInt)
+                        return if (dynamicType.typeName != UnknownType::javaClass.name) {
+                            val info = gson.fromJson(dynamicInfo, dynamicType)
+                            info.getContact()
+                        } else {
+                            arrayListOf("错误: 不支持的动态类型")
+                        }
+                    }
+                } catch (e: IllegalStateException){
+                    return arrayListOf("没有发过动态")
                 }
             }
         }
-        return "获取时出问题".toMessage().asMessageChain()
+        return arrayListOf("获取时出问题")
     }
 }

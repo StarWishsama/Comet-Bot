@@ -1,16 +1,14 @@
 package io.github.starwishsama.nbot.objects.bilibili.dynamic.dynamicdata
 
+import com.google.gson.GsonBuilder
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.nbot.objects.bilibili.dynamic.DynamicAdapter
 
 import io.github.starwishsama.nbot.objects.bilibili.dynamic.DynamicData
 import io.github.starwishsama.nbot.objects.bilibili.user.UserProfile
-import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.message.data.toMessage
 
 data class Repost(@SerializedName("origin")
-                  var originDynamic: String?,
+                  var originDynamic: String,
                   @SerializedName("origin_extend_json")
                   var originExtend: String?,
                   @SerializedName("origin_user")
@@ -23,14 +21,34 @@ data class Repost(@SerializedName("origin")
                         @SerializedName("miss")
                         val deleted: Int,
                         @SerializedName("tips")
-                        val tips: String?) {
+                        val tips: String?,
+                        @SerializedName("orig_type")
+                        val originType: Int?) {
         fun isDeleted(): Boolean {
             return deleted == 1
         }
     }
 
-    override suspend fun getMessageChain(contact: Contact): MessageChain {
-        return ("转发了 ${if (item?.isDeleted()!!) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item?.content}\n" +
-                "原动态信息: $originDynamic").toMessage().asMessageChain()
+    override suspend fun getContact(): List<String> {
+        return arrayListOf(("转发了 ${if (item?.isDeleted()!!) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item?.content}\n" +
+                "原动态信息: ${item?.originType?.let { getOriginalDynamic(originDynamic, it) }}"))
+    }
+
+    private suspend fun getOriginalDynamic(contact: String, type: Int): String {
+        try {
+            val dynamicType = DynamicAdapter.getType(type)
+            if (dynamicType.typeName != UnknownType::javaClass.name) {
+                val gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
+                val info = gson.fromJson(contact, dynamicType)
+                if (info != null && !info.getContact().isNullOrEmpty()) {
+                    return info.getContact()[0]
+                }
+            }
+            return "无法解析此动态消息, 你还是另请高明吧"
+        } catch (e: Exception) {
+            println("在处理时遇到了问题\n原动态内容: $contact\n动态类型: $type\n报错堆栈")
+            e.printStackTrace()
+        }
+        return "在获取时遇到了错误"
     }
 }
