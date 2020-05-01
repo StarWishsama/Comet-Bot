@@ -2,7 +2,7 @@
 
 一个基于 Mirai-Core 开发的机器人
 
-本项目处于开发阶段, 很多功能将不能使用
+本项目处于开发阶段, 很多功能不一定正常使用 ~~反正也没人用~~
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d1416f718df943b4bb252e98cbd6604e)](https://www.codacy.com/manual/StarWishsama/Nameless-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Nameless-Bot&amp;utm_campaign=Badge_Grade)
 <a href="https://travis-ci.org/StarWishsama/Nameless-Bot">
@@ -23,10 +23,11 @@
 * bilibili UP主数据查询
 * 点歌 (JSON 样式)
 * 占卜
+* 明日方舟 / 公主连结抽卡模拟器
 * 还在开发中...
 
 ## ☑ To-Do 列表
-详见 [Project Page](https://github.com/StarWishsama/Nameless-Bot/projects/2)
+详见 [项目页面](https://github.com/StarWishsama/Nameless-Bot/projects/2)
 
 ## 💽 如何构建
 

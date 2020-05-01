@@ -4,7 +4,7 @@ A QQ Group bot developed in Mirai-Core.
 
 This bot is under heavy develop now, Many feature may not work as well.
 
-Simplified Chinese Edition 中文版本: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mirai/README_zhCN.md)
+中文版本: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mirai/README_zhCN.md)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d1416f718df943b4bb252e98cbd6604e)](https://www.codacy.com/manual/StarWishsama/Nameless-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Nameless-Bot&amp;utm_campaign=Badge_Grade)
 <a href="https://travis-ci.org/StarWishsama/Nameless-Bot">
@@ -24,6 +24,7 @@ Simplified Chinese Edition 中文版本: [README](https://github.com/StarWishsam
 * Check-in
 * Bilibili up info lookup
 * Search music with LightApp message
+* Arknights / PCR draw simulator
 * WIP
 
 ## ☑ To-Do 
