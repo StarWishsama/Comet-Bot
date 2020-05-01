@@ -7,7 +7,10 @@ import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BotUtil
 import net.mamoe.mirai.message.ContactMessage
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.asMessageChain
+import net.mamoe.mirai.message.data.toMessage
 import net.mamoe.mirai.message.uploadAsImage
 
 class DebugCommand : UniversalCommand {
@@ -23,37 +26,6 @@ class DebugCommand : UniversalCommand {
                         .addHeaders(map)
                         .execute().bodyStream()
                     return stream.uploadAsImage(message.subject).asMessageChain()
-                }
-                "xml" ->{
-                    message.quoteReply("Test")
-                    return XmlMessage(15,"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><msg serviceID=\"15\" templateID=\"1\" action=\"web\" brief=\"测试\" sourceMsgId=\"0\" url=\"https://space.bilibili.com/410484677\" flag=\"0\" adverSign=\"0\" multiMsgFlag=\"0\"><item layout=\"0\" mode=\"1\" advertiser_id=\"0\" aid=\"0\"><summary>测试</summary><hr hidden=\"false\" style=\"0\" /></item><item layout=\"2\" mode=\"1\" advertiser_id=\"0\" aid=\"0\"><picture cover=\"https://i2.hdslb.com/bfs/face/ec24bb376f1448219295eb80db2a537b0c4d87bd.jpg\" w=\"0\" h=\"0\" needRoundView=\"0\" /><title>测试</title><summary>测试</summary></item><source name=\"\" icon=\"\" action=\"\" appid=\"-1\" /></msg>").asMessageChain()
-                }
-                "json" -> {
-                    message.quoteReply("等1下")
-                    return LightApp("{\n" +
-                            "    \"app\": \"com.tencent.structmsg\",\n" +
-                            "    \"desc\": \"音乐\",\n" +
-                            "    \"view\": \"music\",\n" +
-                            "    \"ver\": \"0.0.0.1\",\n" +
-                            "    \"prompt\": \"[分享] Shiny Smily Story\",\n" +
-                            "    \"meta\": {\n" +
-                            "        \"music\": {\n" +
-                            "            \"action\": \"\",\n" +
-                            "            \"android_pkg_name\": \"\",\n" +
-                            "            \"app_type\": 1,\n" +
-                            "            \"appid\": 100497308,\n" +
-                            "            \"desc\": \"HOLOLIVE Idol Project\",\n" +
-                            "            \"jumpUrl\": \"http://url.cn/500SgnR?_wv=1\",\n" +
-                            "            \"musicUrl\": \"http://url.cn/5ndGtwZ\",\n" +
-                            "            \"preview\": \"http://y.gtimg.cn/music/photo_new/T002R150x150M000003EDKWq0V5WXs_1.jpg\",\n" +
-                            "            \"sourceMsgId\": \"0\",\n" +
-                            "            \"source_icon\": \"\",\n" +
-                            "            \"source_url\": \"\",\n" +
-                            "            \"tag\": \"QQ音乐\",\n" +
-                            "            \"title\": \"Shiny Smily Story\"\n" +
-                            "        }\n" +
-                            "    }\n" +
-                            "}").asMessageChain()
                 }
                 "help" -> return getHelp().toMessage().asMessageChain()
                 else -> return "Bot > 命令不存在\n请注意: 这里的命令随时会被删除.".toMessage().asMessageChain()

@@ -33,7 +33,8 @@ class DivineCommand : UniversalCommand {
                             (getLocalMessage("msg.bot-prefix") + "需要占卜的东西太长了或者含有非法字符!").toMessage().asMessageChain()
                         }
                     } else {
-                        (getLocalMessage("msg.bot-prefix") + "今日占卜次数已达上限, 如需增加次数请咨询机器人管理.").toMessage().asMessageChain()
+                        (getLocalMessage("msg.bot-prefix") + "今日命令条数已达上限, 请等待条数自动恢复哦~\n命令条数现在每小时会恢复100次, 封顶1000次").toMessage()
+                            .asMessageChain()
                     }
                 } else {
                     BotConstants.underCovers.minusElement(underCover)

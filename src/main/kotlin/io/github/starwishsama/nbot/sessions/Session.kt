@@ -8,10 +8,14 @@ import java.util.*
 /**
  * @author Nameless
  */
-open class Session(var groupId: Long, var type: SessionType, var command: UniversalCommand) {
+open class Session(var groupId: Long = 0, var type: SessionType, var command: UniversalCommand) {
     private var users: List<SessionUser> = LinkedList<SessionUser>()
 
-    fun putUser(id: Long){
+    constructor(type: SessionType, command: UniversalCommand, id: Long) : this(0, type, command) {
+        putUser(id)
+    }
+
+    fun putUser(id: Long) {
         users = users.plusElement(SessionUser(id))
     }
 

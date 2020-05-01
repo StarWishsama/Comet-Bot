@@ -67,8 +67,36 @@ class ClockInCommand : UniversalCommand{
             }
             return result
         } else {
+            val checkedCount = data?.checkedUsers?.size
+            var lateText = StringBuilder()
+            var unCheckedText = StringBuilder()
+
+            val unChecked = data?.groupUsers?.minus(data.checkedUsers)?.minus(data.lateUsers)
+
+            unChecked?.forEach { member ->
+                run {
+                    unCheckedText.append(member.nameCardOrNick).append(",")
+                }
+                unCheckedText.removeSuffix(",")
+            }
+
+            data?.lateUsers?.forEach { member ->
+                run {
+                    lateText.append(member.nameCardOrNick).append(",")
+                }
+                lateText.removeSuffix(",")
+            }
+
+            if (lateText.toString().isEmpty()) {
+                lateText = StringBuilder("无")
+            }
+
+            if (unCheckedText.toString().isEmpty()) {
+                unCheckedText = StringBuilder("无")
+            }
+
             BotConstants.checkInCalendar.remove(msg.group.id)
-            return "签到已过期"
+            return "${BotUtil.getLocalMessage("msg.bot-prefix")}打卡已关闭\n已打卡人数: $checkedCount\n迟到: $lateText\n未打卡: $unCheckedText"
         }
     }
 }

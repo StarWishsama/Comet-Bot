@@ -43,7 +43,7 @@ class PictureSearch : UniversalCommand, WaitableCommand {
         try {
             val image = message[Image]
             message.reply(run {
-                if (image.isNotEmpty()) {
+                if (image.isContentNotEmpty()) {
                     message.reply("请稍等...")
                     val result = PictureSearchUtil.sauceNaoSearch(image.queryUrl())
                     if (result.similarity >= 60.0) {

@@ -3,13 +3,14 @@ package io.github.starwishsama.nbot.util
 import cn.hutool.core.util.URLUtil
 import cn.hutool.http.HttpRequest
 import com.github.salomonbrys.kotson.get
-import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotInstance
-import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.message.uploadAsImage
+import net.mamoe.mirai.message.data.LightApp
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.asMessageChain
+import net.mamoe.mirai.message.data.toMessage
 import java.io.IOException
 import java.net.URLEncoder
 
@@ -93,10 +94,9 @@ object MusicUtil {
                     val json= JsonParser.parseString(songResult.body())
                     if (!json.isJsonNull) {
                         val info = json.asJsonObject["data"].asJsonObject["song"]["list"].asJsonArray[0].asJsonObject
-                        println(info)
                         val mid = info["songmid"].asString
                         val songName = info["songname"].asString
-                        val songUrl = info["songurl"].asString
+                        val songId = info["songid"].asInt
                         val albumId = info["albumid"]
                         val playResult = HttpRequest.get("$thirdPartyApi$mid").executeAsync()
                         if (playResult.isOk) {
@@ -126,7 +126,7 @@ object MusicUtil {
                                     "            \"app_type\": 1,\n" +
                                     "            \"appid\": 100497308,\n" +
                                     "            \"desc\": \"$artistName\",\n" +
-                                    "            \"jumpUrl\": \"$songUrl\",\n" +
+                                    "            \"jumpUrl\": \"http://y.qq.com/#type=song&id=$songId\",\n" +
                                     "            \"musicUrl\": \"$playUrl\",\n" +
                                     "            \"preview\": \"http://imgcache.qq.com/music/photo/album_300/17/300_albumpic_${albumId}_0.jpg\",\n" +
                                     "            \"sourceMsgId\": \"0\",\n" +

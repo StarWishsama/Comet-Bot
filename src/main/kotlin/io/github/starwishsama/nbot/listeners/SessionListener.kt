@@ -1,7 +1,7 @@
 package io.github.starwishsama.nbot.listeners
 
 import io.github.starwishsama.nbot.BotConstants
-import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
+import io.github.starwishsama.nbot.BotInstance
 import io.github.starwishsama.nbot.commands.interfaces.WaitableCommand
 import io.github.starwishsama.nbot.enums.SessionType
 import io.github.starwishsama.nbot.objects.BotUser
@@ -24,6 +24,7 @@ object SessionListener {
                             if (user == null) {
                                 user = BotUser.quickRegister(sender.id)
                             }
+                            BotInstance.logger.info("Executing waitable command")
                             command.replyResult(this, user, session)
                         }
                     }

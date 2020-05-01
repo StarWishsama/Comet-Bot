@@ -84,7 +84,8 @@ class DrawCommand : UniversalCommand {
                 val (name, _, rare) = DrawUtil.drawAr()
                 name + " " + getStar(rare)
             } else {
-                "今日抽卡次数已达上限, 别抽卡上头了"
+                "今日命令条数已达上限, 请等待条数自动恢复哦~\n" +
+                        "命令条数现在每小时会恢复100次, 封顶1000次"
             }
         } else if (time == 10){
             return if (user.commandTime >= 10 || user.compareLevel(UserLevel.ADMIN)) {
@@ -96,7 +97,8 @@ class DrawCommand : UniversalCommand {
                 }
                 sb.toString().trim()
             } else {
-                "今日抽卡次数已达上限, 别抽卡上头了"
+                "今日命令条数已达上限, 请等待条数自动恢复哦~\n" +
+                        "命令条数现在每小时会恢复100次, 封顶1000次"
             }
         } else {
             if (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000) {
@@ -127,7 +129,8 @@ class DrawCommand : UniversalCommand {
                         "四星个数: ${result.stream().filter { it.rare == 4 }.count()}\n" +
                         "三星个数: ${result.stream().filter { it.rare == 3 }.count()}"
             } else {
-               return "你要抽卡的次数大于你剩余的抽卡次数"
+                return "今日命令条数已达上限, 请等待条数自动恢复哦~\n" +
+                        "命令条数现在每小时会恢复100次, 封顶1000次"
             }
         }
     }

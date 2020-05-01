@@ -5,7 +5,10 @@ import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BotUtil
-import net.mamoe.mirai.contact.*
+import net.mamoe.mirai.contact.Group
+import net.mamoe.mirai.contact.PermissionDeniedException
+import net.mamoe.mirai.contact.isOperator
+import net.mamoe.mirai.contact.mute
 import net.mamoe.mirai.message.ContactMessage
 import net.mamoe.mirai.message.GroupMessage
 import net.mamoe.mirai.message.data.*
@@ -13,12 +16,12 @@ import org.apache.commons.lang3.StringUtils
 
 class MuteCommand : UniversalCommand {
     override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.userQQ) && BotUser.isBotAdmin(user.userQQ) && message is GroupMessage){
+        if (BotUtil.isNoCoolDown(user.userQQ) && message is GroupMessage && (user.isBotAdmin() || message.sender.isOperator())) {
             if (message.group.botPermission.isOperator()) {
                 if (args.isNotEmpty()) {
                     try {
                         val at = message[At]
-                        if (at.isNotEmpty()) {
+                        if (at.isContentNotEmpty()) {
                             doMute(message.group, at.target, getMuteTime(args[1]), false)
                         }
                     } catch (e: NoSuchElementException) {

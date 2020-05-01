@@ -7,6 +7,8 @@ import io.github.starwishsama.nbot.commands.subcommands.*
 import io.github.starwishsama.nbot.config.BackupHelper
 import io.github.starwishsama.nbot.config.DataSetup
 import io.github.starwishsama.nbot.enums.UserLevel
+import io.github.starwishsama.nbot.listeners.GroupChatListener
+import io.github.starwishsama.nbot.listeners.RepeatListener
 import io.github.starwishsama.nbot.listeners.SessionListener
 import io.github.starwishsama.nbot.objects.BotUser
 import net.mamoe.mirai.Bot
@@ -27,7 +29,7 @@ import kotlin.system.exitProcess
 class BotInstance private constructor() {
     companion object {
         val filePath: File? = File(getPath())
-        const val version = "0.1.0-Canary"
+        const val version = "0.1.2-Canary-200501"
         private var qqId = 0L
         private lateinit var password: String
         lateinit var bot : Bot
@@ -42,6 +44,7 @@ class BotInstance private constructor() {
     }
 
     suspend fun run() {
+        startTime = System.currentTimeMillis()
         DataSetup.loadCfg()
         DataSetup.loadLang()
         qqId = BotConstants.cfg.botId
@@ -49,9 +52,25 @@ class BotInstance private constructor() {
         bot = Bot(qqId, password)
         bot.alsoLogin()
         logger = bot.logger
-        handler.setupCommand(arrayOf(AdminCommand(), BotCommand(), BiliBiliCommand(), DrawCommand(), DebugCommand(), FlowerCommand(), PictureSearch(), MuteCommand(), MusicCommand(), R6SCommand(), CheckInCommand(), ClockInCommand(), InfoCommand(), DivineCommand()))
-        bot.logger.info("已注册 " + CommandHandler.commands.size + " 个命令")
-        startTime = System.currentTimeMillis()
+        handler.setupCommand(
+            arrayOf(
+                AdminCommand(),
+                BotCommand(),
+                BiliBiliCommand(),
+                DrawCommand(),
+                DebugCommand(),
+                FlowerCommand(),
+                PictureSearch(),
+                MuteCommand(),
+                MusicCommand(),
+                R6SCommand(),
+                CheckInCommand(),
+                ClockInCommand(),
+                InfoCommand(),
+                DivineCommand()
+            )
+        )
+        logger.info("已注册 " + CommandHandler.commands.size + " 个命令")
 
         if (!BotConstants.cfg.biliUserName.isNullOrBlank() && BotConstants.cfg.biliPassword.isNullOrBlank()) {
             client.runCatching {
@@ -60,18 +79,34 @@ class BotInstance private constructor() {
                 }
             }
         }
-        
-        service = Executors.newSingleThreadScheduledExecutor(BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build())
+
+        service = Executors.newSingleThreadScheduledExecutor(
+            BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
+        )
 
         /** 备份服务 */
-        service.scheduleAtFixedRate({BackupHelper.createBackup()}, 0, 3, TimeUnit.HOURS)
+        service.scheduleAtFixedRate({ BackupHelper.createBackup() }, 0, 3, TimeUnit.HOURS)
+        service.scheduleAtFixedRate({ BotConstants.users.forEach { it.addTime(100) } }, 1, 1, TimeUnit.HOURS)
 
         /** 监听器 */
         SessionListener.register(bot)
+        RepeatListener.register(bot)
+        GroupChatListener.register(bot)
+
+        val startUsedTime = if (System.currentTimeMillis() - startTime > 1000) {
+            String.format("%.2f", ((System.currentTimeMillis() - startTime.toDouble()) / 1000)) + "s"
+        } else {
+            ((System.currentTimeMillis() - startTime).toString() + "ms")
+        }
+
+        logger.info("无名 Bot 启动成功, 耗时 $startUsedTime")
 
         bot.subscribeMessages {
             always {
-                if (this.message.contentToString().isNotEmpty() && BotConstants.cfg.commandPrefix.contains(this.message.contentToString().substring(0, 1))) {
+                if (this.message.contentToString().isNotEmpty() && BotConstants.cfg.commandPrefix.contains(
+                        this.message.contentToString().substring(0, 1)
+                    )
+                ) {
                     val result = handler.execute(this)
                     if (result !is EmptyMessageChain) {
                         reply(result)

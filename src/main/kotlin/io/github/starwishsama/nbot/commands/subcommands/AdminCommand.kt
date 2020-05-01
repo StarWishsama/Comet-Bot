@@ -13,7 +13,6 @@ import net.mamoe.mirai.message.ContactMessage
 import net.mamoe.mirai.message.GroupMessage
 import net.mamoe.mirai.message.data.*
 import org.apache.commons.lang3.StringUtils
-import java.lang.StringBuilder
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -21,22 +20,32 @@ import java.time.LocalTime
 class AdminCommand : UniversalCommand {
     val commands = arrayOf("checkin")
     override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
-        if (message is GroupMessage && BotUser.isBotOwner(message.sender.id)){
-            if (args.isEmpty()){
-                return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMessage().asMessageChain()
+        if (message is GroupMessage && user.isBotOwner()) {
+            if (args.isEmpty()) {
+                return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMessage()
+                    .asMessageChain()
             } else {
                 when (args[0]) {
                     "clockin", "dk", "打卡" -> {
                         if (args.size == 3 && args[1].isNotEmpty() && args[2].isNotEmpty()) {
-                            if (BotConstants.checkInCalendar.isEmpty() || BotConstants.checkInCalendar.containsKey(message.group.id)) {
+                            if (BotConstants.checkInCalendar.isEmpty() || BotConstants.checkInCalendar.containsKey(
+                                    message.group.id
+                                )
+                            ) {
                                 val timeNow = LocalDateTime.now()
-                                val startTime = LocalDateTime.of(LocalDate.now(), LocalTime.parse(args[2], BotConstants.dateFormatter))
-                                val endTime = LocalDateTime.of(LocalDate.now(), LocalTime.parse(args[3], BotConstants.dateFormatter))
+                                val startTime = LocalDateTime.of(
+                                    LocalDate.now(),
+                                    LocalTime.parse(args[1], BotConstants.dateFormatter)
+                                )
+                                val endTime = LocalDateTime.of(
+                                    LocalDate.now(),
+                                    LocalTime.parse(args[2], BotConstants.dateFormatter)
+                                )
                                 val usersList = arrayListOf<Member>()
 
                                 return if (startTime.isBefore(timeNow) || endTime.isBefore(timeNow)) {
                                     (BotUtil.getLocalMessage("msg.bot-prefix") + "在吗 为什么时间穿越").toMessage()
-                                            .asMessageChain()
+                                        .asMessageChain()
                                 } else {
                                     for (member in message.group.members) {
                                         usersList.add(member)
@@ -53,7 +62,10 @@ class AdminCommand : UniversalCommand {
                         } else if (args.size == 2 && args[1].isNotEmpty()) {
                             if (BotConstants.checkInCalendar.isEmpty() || BotConstants.checkInCalendar.containsKey(message.group.id)) {
                                 val startTime = LocalDateTime.now()
-                                val endTime = LocalDateTime.of(LocalDate.now(), LocalTime.parse(args[2], BotConstants.dateFormatter))
+                                val endTime = LocalDateTime.of(
+                                    LocalDate.now(),
+                                    LocalTime.parse(args[1], BotConstants.dateFormatter)
+                                )
                                 val usersList = arrayListOf<Member>()
 
                                 return if (endTime.isBefore(startTime)) {
@@ -118,17 +130,20 @@ class AdminCommand : UniversalCommand {
                         if (args.size > 1) {
                             try {
                                 val at = message[At]
-                                return if (at.isNotEmpty() && StringUtils.isNumeric(args[2])) {
+                                return if (at.isContentNotEmpty() && StringUtils.isNumeric(args[2])) {
                                     val target = BotUser.getUser(at.target)
                                     if (target != null) {
                                         if (args[2].toInt() <= 1000000) {
                                             target.addTime(args[2].toInt())
-                                            BotUtil.getLocalMessage("msg.bot-prefix").toMessage().asMessageChain() + "成功为 " + at + " 添加 ${args[2]} 次命令条数"
+                                            BotUtil.getLocalMessage("msg.bot-prefix").toMessage()
+                                                .asMessageChain() + "成功为 " + at + " 添加 ${args[2]} 次命令条数"
                                         } else {
-                                            BotUtil.sendLocalMessage("msg.bot-prefix", "给予的次数超过上限").toMessage().asMessageChain()
+                                            BotUtil.sendLocalMessage("msg.bot-prefix", "给予的次数超过上限").toMessage()
+                                                .asMessageChain()
                                         }
                                     } else {
-                                        BotUtil.sendLocalMessage("msg.bot-prefix", "找不到此用户").toMessage().asMessageChain()
+                                        BotUtil.sendLocalMessage("msg.bot-prefix", "找不到此用户").toMessage()
+                                            .asMessageChain()
                                     }
                                 } else {
                                     BotUtil.sendLocalMessage("msg.bot-prefix", "老板写个整数好吗").toMessage().asMessageChain()

@@ -4,8 +4,6 @@ import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.util.BotUtil.getLevel
 import java.time.LocalDateTime
-import java.util.*
-import kotlin.collections.ArrayList
 
 class BotUser(var userQQ: Long) {
     var lastCheckInTime : LocalDateTime = LocalDateTime.now()
@@ -63,8 +61,16 @@ class BotUser(var userQQ: Long) {
      * 比较权限组
      * @return 自己的权限组是否大于需要比较的权限组
      */
-    fun compareLevel(cmdLevel: UserLevel): Boolean{
+    fun compareLevel(cmdLevel: UserLevel): Boolean {
         return this.level >= cmdLevel
+    }
+
+    fun isBotAdmin(): Boolean {
+        return level >= UserLevel.ADMIN
+    }
+
+    fun isBotOwner(): Boolean {
+        return level == UserLevel.OWNER || BotConstants.cfg.ownerId == userQQ
     }
 
     companion object {

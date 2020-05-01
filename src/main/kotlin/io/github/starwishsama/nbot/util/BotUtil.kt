@@ -7,7 +7,6 @@ import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.objects.BotUser.Companion.isBotAdmin
 import io.github.starwishsama.nbot.objects.BotUser.Companion.isBotOwner
-import net.mamoe.mirai.Bot
 import java.io.IOException
 import java.net.URISyntaxException
 import java.time.LocalDateTime
@@ -24,11 +23,10 @@ object BotUtil {
     private var coolDown: MutableMap<Long, Long> = HashMap()
 
     /**
-     * @param string 需要去除彩色符号的字符串
      * @return 去除彩色符号的字符串
      */
-    private fun removeColor(string: String): String {
-        return string.replace("§\\S".toRegex(), "")
+    private fun String.removeColor(): String {
+        return replace("§\\S".toRegex(), "")
     }
 
     /**
@@ -43,7 +41,7 @@ object BotUtil {
             """
      在线玩家: ${response.players}
      延迟:${response.latency}ms
-     MOTD: ${removeColor(response.description.toString())}
+     MOTD: ${response.description.text.removeColor()}
      版本: ${response.version}
      """.trimIndent()
         } catch (e: IOException) {
@@ -68,7 +66,7 @@ object BotUtil {
             """
      在线玩家: ${response.players}
      延迟:${response.latency}ms
-     MOTD: ${removeColor(response.description.toString())}
+     MOTD: ${response.description.text.removeColor()}
      版本: ${response.version}
      """.trimIndent()
         } catch (e: IOException) {
@@ -93,7 +91,7 @@ object BotUtil {
             msg.replace("%延迟%".toRegex(), response.latency.toString() + "ms")
                 .replace("%在线玩家%".toRegex(), response.players.toString())
                 .replace("%换行%".toRegex(), "\n")
-                .replace("%MOTD%".toRegex(), removeColor(response.description.toString()))
+                .replace("%MOTD%".toRegex(), response.description.text.removeColor())
                 .replace("%版本%".toRegex(), response.version.toString())
         } catch (e: IOException) {
             BotInstance.logger.warning("在获取服务器信息时出现了问题, $e")
@@ -116,7 +114,7 @@ object BotUtil {
             msg.replace("%延迟%".toRegex(), response.latency.toString() + "ms")
                 .replace("%在线玩家%".toRegex(), response.players.toString())
                 .replace("%换行%".toRegex(), "\n")
-                .replace("%MOTD%".toRegex(), removeColor(response.description.toString()))
+                .replace("%MOTD%".toRegex(), response.description.text.removeColor())
                 .replace("%版本%".toRegex(), response.version.toString())
         } catch (e: IOException) {
             BotInstance.logger.warning("在获取服务器信息时出现了问题, $e")
@@ -286,26 +284,30 @@ object BotUtil {
         return sb.toString().trim()
     }
 
-    fun getRunningTime(): String? {
+    fun getRunningTime(): String {
         val remain = System.currentTimeMillis() - BotInstance.startTime
         var second = remain / 1000
         val ms = remain - second * 1000
         var minute = 0L
         var hour = 0L
         var day = 0L
-        if (second >= 60) {
-            minute = second / 60
+
+        while (second >= 60) {
+            minute += second / 60
             second -= minute * 60
-            if (minute >= 60) {
-                hour = minute / 60
-                minute -= second * 60
-                if (hour >= 24) {
-                    day = hour / 24
-                    hour -= day * 24
-                }
-            }
         }
-        return day.toString() + "天" + hour + "时" + minute + "分" + second + "秒" + ms + "毫秒"
+
+        while (minute >= 60) {
+            hour += minute / 60
+            minute -= second * 60
+        }
+
+        while (hour >= 24) {
+            day += hour / 24
+            hour -= day * 24
+        }
+
+        return day.toString() + "天" + hour + "时" + minute + "分" + second + "秒" + ms + "毫秒\n$remain"
     }
 
 }

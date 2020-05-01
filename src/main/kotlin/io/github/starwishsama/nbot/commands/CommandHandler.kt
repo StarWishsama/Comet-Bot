@@ -47,7 +47,7 @@ class CommandHandler {
             if (isPrefix(cmd, cmdPrefix)){
                 BotInstance.logger.debug("[命令] " + message.sender.id + " 执行了命令: " + cmd.getProps().name)
                 var user = BotUser.getUser(message.sender.id)
-                if (user == null){
+                if (user == null) {
                     user = BotUser.quickRegister(message.sender.id)
                 }
 
