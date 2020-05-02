@@ -8,21 +8,21 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 
 
-class GroupShop {
+class Shop {
     var groupId: Long = 0
-    val admins: MutableList<BotUser>? = null
-    var items: ArrayList<ShopItem?>? = ArrayList()
+    val admins: MutableList<BotUser> = mutableListOf()
+    var items: ArrayList<ShopItem> = ArrayList()
 
-    constructor() {}
+    constructor()
 
     constructor(groupId: Long) {
         this.groupId = groupId
     }
 
-    fun getItemByName(itemName: String): ShopItem? {
-        val result = AtomicReference<ShopItem?>()
-        items!!.forEach(Consumer { item: ShopItem? ->
-            if (item!!.itemName == itemName) {
+    fun getItemByName(itemName: String): ShopItem {
+        val result = AtomicReference<ShopItem>()
+        items.forEach(Consumer { item ->
+            if (item.itemName == itemName) {
                 result.set(item)
             }
         })
@@ -30,25 +30,22 @@ class GroupShop {
     }
 
     fun addAdmin(user: BotUser) {
-        admins!!.add(user)
+        admins.add(user)
     }
 
     fun removeAdmin(user: BotUser) {
-        admins!!.remove(user)
+        admins.remove(user)
     }
 
     fun addNewItem(item: ShopItem) {
-        if (items == null) {
-            items = ArrayList()
-        }
-        if (!items!!.contains(item)) {
-            items!!.add(item)
+        if (!items.contains(item)) {
+            items.add(item)
         }
     }
 
     companion object {
-        fun getShopById(groupId: Long): GroupShop {
-            val result = AtomicReference(GroupShop())
+        fun getShopById(groupId: Long): Shop {
+            val result = AtomicReference(Shop())
             BotConstants.shop.forEach { shop ->
                 if (shop.groupId == groupId) {
                     result.set(shop)

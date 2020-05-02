@@ -1,11 +1,10 @@
-package io.github.starwishsama.nbot.config
+package io.github.starwishsama.nbot.file
 
 import cn.hutool.core.io.file.FileWriter
 import com.google.gson.GsonBuilder
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotInstance
 import java.io.File
-import java.lang.Exception
 import java.nio.charset.Charset
 import java.time.LocalDateTime
 

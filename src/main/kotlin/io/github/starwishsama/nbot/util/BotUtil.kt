@@ -7,6 +7,9 @@ import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.objects.BotUser.Companion.isBotAdmin
 import io.github.starwishsama.nbot.objects.BotUser.Companion.isBotOwner
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.asMessageChain
+import net.mamoe.mirai.message.data.toMessage
 import java.io.IOException
 import java.net.URISyntaxException
 import java.time.LocalDateTime
@@ -27,6 +30,10 @@ object BotUtil {
      */
     private fun String.removeColor(): String {
         return replace("§\\S".toRegex(), "")
+    }
+
+    fun String.toMirai(): MessageChain {
+        return toMessage().asMessageChain()
     }
 
     /**
@@ -248,7 +255,7 @@ object BotUtil {
      * @param otherText 需要添加的文本
      * @return 本地化文本
      */
-    fun sendLocalMessage(node: String, vararg otherText: String?): String {
+    fun sendLocalMessage(node: String, vararg otherText: String): String {
         val sb = StringBuilder()
         sb.append(getLocalMessage(node)).append(" ")
         for (s in otherText) {
@@ -299,7 +306,7 @@ object BotUtil {
 
         while (minute >= 60) {
             hour += minute / 60
-            minute -= second * 60
+            minute -= hour * 60
         }
 
         while (hour >= 24) {
@@ -307,7 +314,7 @@ object BotUtil {
             hour -= day * 24
         }
 
-        return day.toString() + "天" + hour + "时" + minute + "分" + second + "秒" + ms + "毫秒\n$remain"
+        return day.toString() + "天" + hour + "时" + minute + "分" + second + "秒" + ms + "毫秒"
     }
 
 }

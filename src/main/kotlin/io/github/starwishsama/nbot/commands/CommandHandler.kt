@@ -24,7 +24,9 @@ class CommandHandler {
      * @param command 要注册的命令
      */
     fun setupCommand(command: UniversalCommand){
-        commands = commands + command
+        if (!commands.contains(command)) {
+            commands = commands + command
+        }
     }
 
     /**
@@ -32,8 +34,12 @@ class CommandHandler {
      *
      * @param commands 要注册的命令集合
      */
-    fun setupCommand(commands: Array<UniversalCommand>){
-        CommandHandler.commands += commands
+    fun setupCommand(commands: Array<UniversalCommand>) {
+        commands.forEach {
+            if (!Companion.commands.contains(it)) {
+                Companion.commands = Companion.commands.plus(it)
+            }
+        }
     }
 
     /**

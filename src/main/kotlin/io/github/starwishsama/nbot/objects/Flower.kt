@@ -5,4 +5,8 @@ class Flower(name: String) {
     var flowerName: String = name
     var waterCount = 200
     var energy = 0.0
+
+    fun addEnergy(amount: Double) {
+        energy += amount
+    }
 }

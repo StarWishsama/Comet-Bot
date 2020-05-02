@@ -15,7 +15,7 @@ class BotUser(var userQQ: Long) {
     var level: UserLevel = UserLevel.USER
     var commandTime : Int = 100
     var checkInGroup: Long = 0
-    var permissions: List<String> = ArrayList()
+    private var permissions: List<String> = ArrayList()
     var biliSubs: List<String> = ArrayList()
     var flower: Flower? = null
 

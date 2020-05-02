@@ -4,11 +4,11 @@ import io.github.starwishsama.nbot.BotInstance
 import java.util.concurrent.TimeUnit
 
 object TaskManager {
-    fun runAsync(task: Runnable, delay: Long) {
+    fun runAsync(task: () -> Unit, delay: Long) {
         BotInstance.service.schedule(task, delay, TimeUnit.SECONDS)
     }
 
-    fun runScheduleTaskAsync(task: Runnable, delay: Long, period: Long, unit: TimeUnit) {
+    fun runScheduleTaskAsync(task: () -> Unit, delay: Long, period: Long, unit: TimeUnit) {
         BotInstance.service.scheduleAtFixedRate(task, delay, period, unit)
     }
 }

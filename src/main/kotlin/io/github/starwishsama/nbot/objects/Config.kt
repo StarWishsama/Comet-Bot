@@ -6,23 +6,27 @@ import io.github.starwishsama.nbot.enums.MusicApi
 
 open class Config {
     @SerializedName("botId")
-    var botId : Long = 123456
+    var botId: Long = 0
+
     @SerializedName("botPassword")
     var botPassword: String = "password"
     @SerializedName("auto_save_config_time")
     var autoSaveTime : Int = 15
+
     @SerializedName("rcon_url")
     var rConUrl: String? = null
+
     @SerializedName("rcon_port")
-    var rConPort : Int= 0
+    var rConPort: Int = 0
+
     @SerializedName("rcon_password")
     var rConPassword: String? = null
+
     @SerializedName("netease_api")
-    var netEaseApi: String? = "http://localhost:3000"
+    var netEaseApi: String = "http://localhost:3000"
+
     @SerializedName("cool_down_time")
-    var coolDownTime : Int = 7
-    @SerializedName("bilibili_username")
-    var userName: String? = null
+    var coolDownTime: Int = 7
     @SerializedName("filter_words")
     lateinit var filterWords: Array<String>
     @SerializedName("default_music_api")

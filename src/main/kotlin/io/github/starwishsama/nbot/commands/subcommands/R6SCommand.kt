@@ -9,16 +9,20 @@ import io.github.starwishsama.nbot.util.BotUtil.getLocalMessage
 import io.github.starwishsama.nbot.util.BotUtil.isLegitId
 import io.github.starwishsama.nbot.util.BotUtil.isNoCoolDown
 import io.github.starwishsama.nbot.util.BotUtil.sendLocalMessage
+import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import io.github.starwishsama.nbot.util.R6SUtils.getR6SInfo
 import net.mamoe.mirai.message.ContactMessage
 import net.mamoe.mirai.message.GroupMessage
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.at
+import net.mamoe.mirai.message.data.toMessage
 
 class R6SCommand : UniversalCommand {
     override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
         if (isNoCoolDown(message.sender.id) && message is GroupMessage) {
             if (args.isEmpty()){
-                return (getLocalMessage("msg.bot-prefix") + "/r6s info [Uplay账号名]").toMessage().asMessageChain()
+                return (getLocalMessage("msg.bot-prefix") + "/r6s info [Uplay账号名]").toMirai()
             } else {
                 when (args[0].toLowerCase()) {
                     "info", "查询" -> {
@@ -32,7 +36,7 @@ class R6SCommand : UniversalCommand {
                             message.sender.at().plus("\n" + result.toMessage())
                         } else {
                             ("${getLocalMessage("msg.bot-prefix")} /r6 查询 [ID] 或者 /r6 绑定 [id]\n" +
-                                    "绑定彩虹六号账号 无需输入ID快捷查询游戏数据").toMessage().asMessageChain()
+                                    "绑定彩虹六号账号 无需输入ID快捷查询游戏数据").toMirai()
                         }
                     }
                     "bind", "绑定" ->
@@ -42,12 +46,12 @@ class R6SCommand : UniversalCommand {
                                     val botUser1 = BotUser.getUser(message.sender.id)
                                     if (botUser1 != null) {
                                         botUser1.r6sAccount = args[1]
-                                        return (getLocalMessage("msg.bot-prefix") + "绑定成功!").toMessage().asMessageChain()
+                                        return (getLocalMessage("msg.bot-prefix") + "绑定成功!").toMirai()
                                     }
-                                } else return (getLocalMessage("msg.bot-prefix") + "使用 /qd 签到自动注册机器人系统").toMessage().asMessageChain()
-                            } else return (getLocalMessage("msg.bot-prefix") + "ID 格式有误!").toMessage().asMessageChain()
+                                } else return (getLocalMessage("msg.bot-prefix") + "使用 /qd 签到自动注册机器人系统").toMirai()
+                            } else return (getLocalMessage("msg.bot-prefix") + "ID 格式有误!").toMirai()
                         }
-                    else -> return (getLocalMessage("msg.bot-prefix") + "/r6s info [Uplay账号名]").toMessage().asMessageChain()
+                    else -> return (getLocalMessage("msg.bot-prefix") + "/r6s info [Uplay账号名]").toMirai()
                 }
             }
         }

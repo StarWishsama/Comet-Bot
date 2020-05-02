@@ -1,10 +1,15 @@
 package io.github.starwishsama.nbot
 
-import io.github.starwishsama.nbot.objects.*
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import io.github.starwishsama.nbot.objects.BotLocalization
+import io.github.starwishsama.nbot.objects.BotUser
+import io.github.starwishsama.nbot.objects.Config
+import io.github.starwishsama.nbot.objects.RandomResult
 import io.github.starwishsama.nbot.objects.checkin.CheckInData
 import io.github.starwishsama.nbot.objects.draw.ArkNightOperator
 import io.github.starwishsama.nbot.objects.draw.PCRCharacter
-import io.github.starwishsama.nbot.objects.group.GroupShop
+import io.github.starwishsama.nbot.objects.group.Shop
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -16,7 +21,7 @@ import java.util.*
  */
 
 object BotConstants {
-    var shop: List<GroupShop> = LinkedList()
+    var shop: List<Shop> = LinkedList()
     var users: List<BotUser> = LinkedList()
     var msg: List<BotLocalization> = ArrayList()
     var cfg = Config()
@@ -29,4 +34,6 @@ object BotConstants {
     /** 舟游/PCR 数据 */
     var arkNight: MutableList<ArkNightOperator> = LinkedList()
     var pcr: List<PCRCharacter> = LinkedList()
+
+    var gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
 }

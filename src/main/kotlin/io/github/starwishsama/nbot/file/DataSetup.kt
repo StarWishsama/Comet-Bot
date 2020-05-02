@@ -1,4 +1,4 @@
-package io.github.starwishsama.nbot.config
+package io.github.starwishsama.nbot.file
 
 import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
@@ -9,11 +9,13 @@ import com.google.gson.reflect.TypeToken
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotInstance
 import io.github.starwishsama.nbot.managers.GroupConfigManager
-import io.github.starwishsama.nbot.objects.*
+import io.github.starwishsama.nbot.objects.BotLocalization
+import io.github.starwishsama.nbot.objects.BotUser
+import io.github.starwishsama.nbot.objects.Config
 import io.github.starwishsama.nbot.objects.draw.ArkNightOperator
 import io.github.starwishsama.nbot.objects.draw.PCRCharacter
 import io.github.starwishsama.nbot.objects.group.GroupConfig
-import io.github.starwishsama.nbot.objects.group.GroupShop
+import io.github.starwishsama.nbot.objects.group.Shop
 import java.io.File
 
 object DataSetup {
@@ -25,21 +27,18 @@ object DataSetup {
     private val gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
 
     fun loadCfg() {
-        if (BotInstance.filePath != null) {
-            if (userCfg.exists() && cfgFile.exists()) {
+        if (userCfg.exists() && cfgFile.exists()) {
+            load()
+        } else {
+            try {
+                FileWriter.create(cfgFile).write(gson.toJson(BotConstants.cfg))
+                FileWriter.create(userCfg).write(gson.toJson(BotConstants.users))
+                FileWriter.create(shopItemCfg).write(gson.toJson(BotConstants.shop))
+                FileWriter.create(groupCfg).write(gson.toJson(GroupConfigManager.configs))
                 load()
-            } else {
-                try {
-                    BotConstants.cfg.autoSaveTime = 15
-                    FileWriter.create(cfgFile).write(gson.toJson(BotConstants.cfg))
-                    FileWriter.create(userCfg).write(gson.toJson(BotConstants.users))
-                    FileWriter.create(shopItemCfg).write(gson.toJson(BotConstants.shop))
-                    FileWriter.create(groupCfg).write(gson.toJson(GroupConfigManager.configs))
-                    load()
-                    println("[配置] 已自动生成新的配置文件.")
-                } catch (e: Exception) {
-                    System.err.println("[配置] 在生成配置文件时发生了错误, 错误信息: " + e.message)
-                }
+                println("[配置] 已自动生成新的配置文件.")
+            } catch (e: Exception) {
+                System.err.println("[配置] 在生成配置文件时发生了错误, 错误信息: " + e.message)
             }
         }
     }
@@ -56,7 +55,6 @@ object DataSetup {
         }
     }
 
-
     private fun load() {
         try {
             val userContent: String = FileReader.create(userCfg).readString()
@@ -72,7 +70,7 @@ object DataSetup {
                 )
                 BotConstants.shop = gson.fromJson(
                     FileReader.create(shopItemCfg).readString(),
-                    object : TypeToken<List<GroupShop>>() {}.type
+                        object : TypeToken<List<Shop>>() {}.type
                 )
                 GroupConfigManager.configs = gson.fromJson(
                         groupContent,
@@ -116,5 +114,9 @@ object DataSetup {
         BotInstance.logger.info("[Bot] 自动保存数据完成")
         saveCfg()
         saveLang()
+    }
+
+    fun reload() {
+        load()
     }
 }
