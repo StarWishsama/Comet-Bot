@@ -22,7 +22,7 @@ English Version: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mira
 * 彩虹六号战绩查询
 * 打卡
 * 签到
-* bilibili UP主数据查询
+* bilibili UP主信息/动态查询
 * 点歌 (JSON 样式)
 * 占卜
 * 明日方舟 / 公主连结抽卡模拟器

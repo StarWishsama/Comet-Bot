@@ -22,7 +22,7 @@ This bot is under heavy develop now, Many feature may not work as well.
 * Rainbow Six: Siege game data info lookup
 * Class clock in
 * Check-in
-* Bilibili up info lookup
+* Bilibili uploader info/dynamic
 * Search music with LightApp message
 * Arknights / PCR draw simulator
 * Auto convert QQ LightApp for PC user(s)
