@@ -1,10 +1,10 @@
 # Nameless-Bot
 
-一个基于 Mirai-Core 开发的机器人
+A QQ Group bot developed in Mirai-Core.
 
-本项目处于开发阶段, 很多功能不一定正常使用 ~~反正也没人用~~
+This bot is under heavy develop now, Many feature may not work as well.
 
-English Version: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mirai/README_en.md)
+中文版本: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mirai/README_zhCN.md)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d1416f718df943b4bb252e98cbd6604e)](https://www.codacy.com/manual/StarWishsama/Nameless-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Nameless-Bot&amp;utm_campaign=Badge_Grade)
 <a href="https://travis-ci.org/StarWishsama/Nameless-Bot">
@@ -17,33 +17,31 @@ English Version: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mira
   <img src="https://img.shields.io/github/issues/StarWishsama/Nameless-Bot.svg?style=popout">
 </a> 
 
-## 🎉 功能
-* 以图搜图
-* 彩虹六号战绩查询
-* 打卡
-* 签到
-* bilibili UP主数据查询
-* 点歌 (JSON 样式)
-* 占卜
-* 明日方舟 / 公主连结抽卡模拟器
-* 去你大爷的小程序 (将B站分享的视频自动转换为文本)
-* 还在开发中...
+## 🎉 Features
+* Search picture original source by picture
+* Rainbow Six: Siege game data info lookup
+* Class clock in
+* Check-in
+* Bilibili up info lookup
+* Search music with LightApp message
+* Arknights / PCR draw simulator
+* Auto convert QQ LightApp for PC user(s)
+* WIP
 
-## ☑ To-Do 列表
-详见 [项目页面](https://github.com/StarWishsama/Nameless-Bot/projects/2)
+## ☑ To-Do 
+Development Roadmap: [Project Page](https://github.com/StarWishsama/Nameless-Bot/projects/2)
 
-## 💽 如何构建
+## 💽 How to Build 
 
-1. Clone 或者下载这个项目.
+1. Clone or download the repository to your local computer.
 
 ```bash
 git clone https://github.com/StarWishsama/Nameless-Bot.git
 ```
 
-2. 编译
+2. Compile
 
-本项目使用 Gradle, 因此你可以双击文件夹中的 `gradlew.bat` 以构建这个项目.
-(你可以在 `/build/libs` 下找到构建好的 jar 文件)
+Configurations for Gradle is well done. Double-click `gradlew.bat` in the root directory to compile a jar file in folder `/build/libs`.
 
-## 📜 协议 
+## 📜 License 
 [GPL v3.0](https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE)
