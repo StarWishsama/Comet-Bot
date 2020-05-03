@@ -6,6 +6,7 @@ import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.ContactMessage
@@ -24,7 +25,7 @@ class ClockInCommand : UniversalCommand{
             if (BotConstants.checkInCalendar.containsKey(id)){
                 val data = BotConstants.checkInCalendar[id]
                 if (data?.checkedUsers?.isEmpty()!!){
-                    return clockIn(message.sender, message).toMessage().asMessageChain()
+                    return clockIn(message.sender, message).toMirai()
                 } else {
                     data.checkedUsers.forEach { member ->
                         run {
@@ -32,13 +33,13 @@ class ClockInCommand : UniversalCommand{
                                 (BotUtil.getLocalMessage("msg.bot-prefix") + "你已经打卡过了!").toMessage()
                                     .asMessageChain()
                             } else {
-                                clockIn(message.sender, message).toMessage().asMessageChain()
+                                clockIn(message.sender, message).toMirai()
                             }
                         }
                     }
                 }
             } else {
-                return (BotUtil.getLocalMessage("msg.bot-prefix") + "没有正在进行的打卡").toMessage().asMessageChain()
+                return (BotUtil.getLocalMessage("msg.bot-prefix") + "没有正在进行的打卡").toMirai()
             }
         }
         return EmptyMessageChain

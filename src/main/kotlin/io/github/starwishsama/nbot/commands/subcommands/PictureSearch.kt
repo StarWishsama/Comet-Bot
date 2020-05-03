@@ -9,6 +9,7 @@ import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.sessions.Session
 import io.github.starwishsama.nbot.sessions.SessionManager
 import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import io.github.starwishsama.nbot.util.PictureSearchUtil
 import net.mamoe.mirai.message.ContactMessage
 import net.mamoe.mirai.message.GroupMessage
@@ -19,15 +20,15 @@ class PictureSearch : UniversalCommand, WaitableCommand {
        if (BotUtil.isNoCoolDown(message.sender.id, 90)){
            return if (message is GroupMessage) {
                if (SessionManager.isValidSession(message.sender.id)){
-                   BotUtil.sendLocalMessage("msg.bot-prefix", "请发送需要搜索的图片").toMessage().asMessageChain()
+                   BotUtil.sendLocalMessage("msg.bot-prefix", "请发送需要搜索的图片").toMirai()
                } else {
                    val session = Session(message.group.id, SessionType.DELAY, this)
                    session.putUser(message.sender.id)
                    SessionManager.addSession(session)
-                   BotUtil.sendLocalMessage("msg.bot-prefix", "请发送需要搜索的图片").toMessage().asMessageChain()
+                   BotUtil.sendLocalMessage("msg.bot-prefix", "请发送需要搜索的图片").toMirai()
                }
            } else {
-               BotUtil.sendLocalMessage("msg.bot-prefix", "抱歉, 本功能暂时只支持群聊使用").toMessage().asMessageChain()
+               BotUtil.sendLocalMessage("msg.bot-prefix", "抱歉, 本功能暂时只支持群聊使用").toMirai()
            }
        }
         return EmptyMessageChain
@@ -58,7 +59,7 @@ class PictureSearch : UniversalCommand, WaitableCommand {
                         "相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n".toMessage()
                                 .asMessageChain()/**.plus(stream.uploadAsImage(subject).asMessageChain())*/
                     } else {
-                        "相似度过低 (${result.similarity}%), 请尝试更换图片重试".toMessage().asMessageChain()
+                        "相似度过低 (${result.similarity}%), 请尝试更换图片重试".toMirai()
                     }
                 } else {
                     EmptyMessageChain

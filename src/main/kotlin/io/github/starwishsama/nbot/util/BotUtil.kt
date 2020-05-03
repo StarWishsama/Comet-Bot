@@ -1,5 +1,6 @@
 package io.github.starwishsama.nbot.util
 
+import cn.hutool.http.HttpRequest
 import com.deadmandungeons.serverstatus.MinecraftServerStatus
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotInstance
@@ -11,10 +12,10 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
 import java.io.IOException
+import java.io.InputStream
 import java.net.URISyntaxException
 import java.time.LocalDateTime
 import java.util.*
-
 
 /**
  * 用于辅助机器人运行中的各种工具方法
@@ -315,6 +316,18 @@ object BotUtil {
         }
 
         return day.toString() + "天" + hour + "时" + minute + "分" + second + "秒" + ms + "毫秒"
+    }
+
+    fun getImageStream(url: String): InputStream {
+        val map = mutableMapOf<String, String>()
+        map["user-agent"] =
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36"
+
+        return HttpRequest.get(url)
+                .setFollowRedirects(true)
+                .timeout(8000)
+                .addHeaders(map)
+                .execute().bodyStream()
     }
 
 }

@@ -1,6 +1,5 @@
 package io.github.starwishsama.nbot.commands.subcommands
 
-import cn.hutool.http.HttpRequest
 import com.hiczp.bilibili.api.app.model.SearchUserResult
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
@@ -14,7 +13,6 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
 import net.mamoe.mirai.message.uploadAsImage
-import java.lang.StringBuilder
 
 class BiliBiliCommand : UniversalCommand {
     override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
@@ -80,7 +78,7 @@ class BiliBiliCommand : UniversalCommand {
                         if (searchResult.items.isNotEmpty()) {
                             val item = searchResult.items[0]
                             val before = item.title + "\n粉丝数: " + item.fans +
-                                    "\n最近投递视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
+                                    "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
                                     "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘")
                             val dynamic = BiliBiliUtil.getDynamic(item.mid)
                             return if (dynamic.isEmpty()) {
@@ -89,8 +87,7 @@ class BiliBiliCommand : UniversalCommand {
                                 when (dynamic.size) {
                                     1 -> ("$before\n最近动态: ${dynamic[0]}").toMessage().asMessageChain()
                                     2 -> {
-                                        val stream = HttpRequest.get(dynamic[1]).timeout(150_000).executeAsync().bodyStream()
-                                        ("$before\n最近动态: ${dynamic[0]}").toMessage().asMessageChain().plus(stream.uploadAsImage(message.subject))
+                                        ("$before\n最近动态: ${dynamic[0]}").toMessage().asMessageChain().plus(BotUtil.getImageStream(dynamic[1]).uploadAsImage(message.subject))
                                     }
                                     else -> ("$before\n无最近动态").toMessage().asMessageChain()
                                 }

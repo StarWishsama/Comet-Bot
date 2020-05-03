@@ -6,9 +6,12 @@ import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
+import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import net.mamoe.mirai.message.ContactMessage
 import net.mamoe.mirai.message.GroupMessage
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.at
 import java.time.format.DateTimeFormatter
 
 class InfoCommand : UniversalCommand {
@@ -27,9 +30,9 @@ class InfoCommand : UniversalCommand {
                     }
 
                     if (message is GroupMessage){
-                        message.sender.at() + reply.toMessage().asMessageChain()
+                        message.sender.at() + reply.toMirai()
                     } else {
-                        reply.toMessage().asMessageChain()
+                        reply.toMirai()
                     }
                 }
             } else if (args.size == 1 && args[0].contentEquals("排行") || args[0].contentEquals("ph")) {
@@ -43,12 +46,12 @@ class InfoCommand : UniversalCommand {
                             .append(message.sender.nick)
                             .append(" ").append(String.format("%.1f", users[i].checkInPoint)).append("\n")
                     }
-                    (sb.toString().trim { it <= ' ' }).toMessage().asMessageChain()
+                    (sb.toString().trim { it <= ' ' }).toMirai()
                 } else {
-                    "数据不足".toMessage().asMessageChain()
+                    "数据不足".toMirai()
                 }
             } else {
-                return getHelp().toMessage().asMessageChain()
+                return getHelp().toMirai()
             }
         } catch (e: Exception) {
             BotInstance.logger.error(e)

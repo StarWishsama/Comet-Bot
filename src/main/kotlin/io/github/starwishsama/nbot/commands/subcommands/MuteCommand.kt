@@ -5,13 +5,17 @@ import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.PermissionDeniedException
 import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.contact.mute
 import net.mamoe.mirai.message.ContactMessage
 import net.mamoe.mirai.message.GroupMessage
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.At
+import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.isContentNotEmpty
 import org.apache.commons.lang3.StringUtils
 
 class MuteCommand : UniversalCommand {
@@ -32,10 +36,10 @@ class MuteCommand : UniversalCommand {
                         }
                     }
                 } else {
-                    return getHelp().toMessage().asMessageChain()
+                    return getHelp().toMirai()
                 }
             } else {
-                BotUtil.sendLocalMessage("msg.bot-prefix", "我不是绿帽 我爬 我爬").toMessage().asMessageChain()
+                BotUtil.sendLocalMessage("msg.bot-prefix", "我不是绿帽 我爬 我爬").toMirai()
             }
         }
         return EmptyMessageChain
@@ -54,9 +58,9 @@ class MuteCommand : UniversalCommand {
             if (isAll) {
                 group.settings.isMuteAll = !group.settings.isMuteAll
                 return if (group.settings.isMuteAll) {
-                    BotUtil.sendLocalMessage("msg.bot-prefix", "The World!").toMessage().asMessageChain()
+                    BotUtil.sendLocalMessage("msg.bot-prefix", "The World!").toMirai()
                 } else {
-                    BotUtil.sendLocalMessage("msg.bot-prefix", "然后时间开始流动").toMessage().asMessageChain()
+                    BotUtil.sendLocalMessage("msg.bot-prefix", "然后时间开始流动").toMirai()
                 }
             } else {
                 group.members.forEach { member ->
@@ -65,14 +69,14 @@ class MuteCommand : UniversalCommand {
                             return when (muteTime) {
                                 in 1..2592000 -> {
                                     member.mute(muteTime)
-                                    BotUtil.sendLocalMessage("msg.bot-prefix", "禁言成功").toMessage().asMessageChain()
+                                    BotUtil.sendLocalMessage("msg.bot-prefix", "禁言成功").toMirai()
                                 }
                                 0L -> {
                                     member.unmute()
-                                    BotUtil.sendLocalMessage("msg.bot-prefix", "解禁成功").toMessage().asMessageChain()
+                                    BotUtil.sendLocalMessage("msg.bot-prefix", "解禁成功").toMirai()
                                 }
                                 else -> {
-                                    BotUtil.sendLocalMessage("msg.bot-prefix", "禁言时间有误, 范围: (0s, 30days]").toMessage().asMessageChain()
+                                    BotUtil.sendLocalMessage("msg.bot-prefix", "禁言时间有误, 范围: (0s, 30days]").toMirai()
                                 }
                             }
                         }
@@ -80,9 +84,9 @@ class MuteCommand : UniversalCommand {
                 }
             }
 
-            return BotUtil.sendLocalMessage("msg.bot-prefix", "找不到此用户").toMessage().asMessageChain()
+            return BotUtil.sendLocalMessage("msg.bot-prefix", "找不到此用户").toMirai()
         } catch (e: PermissionDeniedException){
-            return BotUtil.sendLocalMessage("msg.bot-prefix", "我不是绿帽 我爬 我爬").toMessage().asMessageChain()
+            return BotUtil.sendLocalMessage("msg.bot-prefix", "我不是绿帽 我爬 我爬").toMirai()
         }
     }
 

@@ -63,7 +63,7 @@ class BotInstance private constructor() {
             handler.setupCommand(
                     arrayOf(
                             AdminCommand(),
-                            BotCommand(),
+                            VersionCommand(),
                             BiliBiliCommand(),
                             DrawCommand(),
                             DebugCommand(),

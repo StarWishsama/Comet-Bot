@@ -37,7 +37,7 @@ class DivineCommand : UniversalCommand {
                             .asMessageChain()
                     }
                 } else {
-                    BotConstants.underCovers.minusElement(underCover)
+                    BotConstants.underCovers -= underCover
                     RandomResult.getChance(underCover).toMessage().asMessageChain()
                 }
             } else {
