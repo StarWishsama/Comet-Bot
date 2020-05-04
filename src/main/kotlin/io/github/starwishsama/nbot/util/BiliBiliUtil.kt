@@ -9,12 +9,13 @@ import com.hiczp.bilibili.api.live.model.RoomInfo
 import io.github.starwishsama.nbot.BotInstance
 import io.github.starwishsama.nbot.objects.bilibili.dynamic.DynamicAdapter
 import io.github.starwishsama.nbot.objects.bilibili.dynamic.dynamicdata.UnknownType
-import java.lang.IllegalStateException
 
 object BiliBiliUtil {
     private val client = BotInstance.client
-    private val gson : Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
-    private var dynamicUrl = "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?visitor_uid=0&host_uid=%uid%&offset_dynamic_id=0&need_top=0"
+    private val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
+    private var dynamicUrl =
+        "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?visitor_uid=0&host_uid=%uid%&offset_dynamic_id=0&need_top=0"
+    private val infoUrl = "http://api.bilibili.com/x/space/acc/info?mid="
 
     suspend fun searchUser(userName: String): SearchUserResult.Data {
         val searchResult = client.appAPI.searchUser(keyword = userName).await()
@@ -25,11 +26,18 @@ object BiliBiliUtil {
         return client.liveAPI.getInfo(roomId).await()
     }
 
+    fun getUserNameByMid(mid: Long): String {
+        val response = HttpRequest.get(infoUrl + mid).timeout(8000)
+            .addHeaders(mutableMapOf("User-Agent" to "Nameless live status checker (starwishsama@outlook.com)"))
+            .executeAsync()
+        return JsonParser.parseString(response.body()).asJsonObject["data"].asJsonObject["name"].asString
+    }
+
     suspend fun getDynamic(mid: Long): List<String> {
         val response = HttpRequest.get(dynamicUrl.replace("%uid%", mid.toString())).executeAsync()
         if (response.isOk) {
             val dynamicObject = JsonParser.parseString(response.body())
-            if (dynamicObject.isJsonObject){
+            if (dynamicObject.isJsonObject) {
                 try {
                     val entity = dynamicObject.asJsonObject["data"].asJsonObject["cards"].asJsonArray[0]
                     val dynamicInfo = entity.asJsonObject["card"].asString

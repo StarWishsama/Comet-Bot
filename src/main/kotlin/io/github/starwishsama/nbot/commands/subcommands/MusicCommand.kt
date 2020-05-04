@@ -50,7 +50,9 @@ class MusicCommand : UniversalCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps = CommandProps("music", arrayListOf("dg", "点歌", "歌"), "nbot.commands.music", UserLevel.USER)
+    override fun getProps(): CommandProps =
+        CommandProps("music", arrayListOf("dg", "点歌", "歌"), "点歌命令", "nbot.commands.music", UserLevel.USER)
+
     override fun getHelp(): String = """
         ======= 命令帮助 =======
         /music [歌名] 点歌

@@ -27,6 +27,7 @@ English Version: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mira
 * 占卜
 * 明日方舟 / 公主连结抽卡模拟器
 * 去你大爷的小程序 (将B站分享的视频自动转换为文本)
+* 单推小助手 (自动订阅 VTB 开播状态[B站])
 * 还在开发中...
 
 ## ☑ To-Do 列表

@@ -14,6 +14,7 @@ import io.github.starwishsama.nbot.listeners.RepeatListener
 import io.github.starwishsama.nbot.listeners.SessionListener
 import io.github.starwishsama.nbot.managers.TaskManager
 import io.github.starwishsama.nbot.objects.BotUser
+import io.github.starwishsama.nbot.tasks.CheckLiveStatus
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.event.subscribeMessages
@@ -32,11 +33,10 @@ import kotlin.system.exitProcess
 class BotInstance private constructor() {
     companion object {
         val filePath: File = File(getPath())
-        const val version = "0.1.2-Canary-200502"
+        const val version = "0.1.3-Dev-200504"
         private var qqId = 0L
         private lateinit var password: String
         lateinit var bot: Bot
-        var handler = CommandHandler().getInstance()
         val client = BilibiliClient()
         var startTime: Long = 0
         lateinit var service: ScheduledExecutorService
@@ -60,23 +60,24 @@ class BotInstance private constructor() {
             bot = Bot(qqId, password)
             bot.alsoLogin()
             logger = bot.logger
-            handler.setupCommand(
-                    arrayOf(
-                            AdminCommand(),
-                            VersionCommand(),
-                            BiliBiliCommand(),
-                            DrawCommand(),
-                            DebugCommand(),
-                            FlowerCommand(),
-                            PictureSearch(),
-                            MuteCommand(),
-                            MusicCommand(),
-                            R6SCommand(),
-                            CheckInCommand(),
-                            ClockInCommand(),
-                            InfoCommand(),
-                            DivineCommand()
-                    )
+            CommandHandler.setupCommand(
+                arrayOf(
+                    AdminCommand(),
+                    VersionCommand(),
+                    BiliBiliCommand(),
+                    DrawCommand(),
+                    DebugCommand(),
+                    HelpCommand(),
+                    FlowerCommand(),
+                    PictureSearch(),
+                    MuteCommand(),
+                    MusicCommand(),
+                    R6SCommand(),
+                    CheckInCommand(),
+                    ClockInCommand(),
+                    InfoCommand(),
+                    DivineCommand()
+                )
             )
 
             val listeners = arrayOf(FuckLightAppListener, GroupChatListener, RepeatListener, SessionListener)
@@ -92,12 +93,20 @@ class BotInstance private constructor() {
             }
 
             service = Executors.newSingleThreadScheduledExecutor(
-                    BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
+                BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
             )
 
             /** 备份服务 */
             TaskManager.runScheduleTaskAsync({ BackupHelper.createBackup() }, 0, 3, TimeUnit.HOURS)
             TaskManager.runScheduleTaskAsync({ BotConstants.users.forEach { it.addTime(100) } }, 5, 5, TimeUnit.HOURS)
+            if (BotConstants.cfg.subList.isNotEmpty()) {
+                TaskManager.runScheduleTaskAsync(
+                    CheckLiveStatus::run,
+                    BotConstants.cfg.checkDelay,
+                    BotConstants.cfg.checkDelay,
+                    TimeUnit.MINUTES
+                )
+            }
 
             /** 监听器 */
             listeners.forEach {
@@ -119,7 +128,7 @@ class BotInstance private constructor() {
                                     this.message.contentToString().substring(0, 1)
                             )
                     ) {
-                        val result = handler.execute(this)
+                        val result = CommandHandler.execute(this)
                         if (result !is EmptyMessageChain) {
                             reply(result)
                         }
@@ -127,10 +136,10 @@ class BotInstance private constructor() {
                 }
             }
 
-            Runtime.getRuntime().addShutdownHook(Thread(Runnable {
+            Runtime.getRuntime().addShutdownHook(Thread {
                 DataSetup.saveFiles()
                 service.shutdown()
-            }))
+            })
 
             executeCommand()
 

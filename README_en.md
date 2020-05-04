@@ -26,6 +26,7 @@ This bot is under heavy develop now, Many feature may not work as well.
 * Search music with LightApp message
 * Arknights / PCR draw simulator
 * Auto convert QQ LightApp for PC user(s)
+* Virtual Youtuber live streaming notice
 * WIP
 
 ## ☑ To-Do 

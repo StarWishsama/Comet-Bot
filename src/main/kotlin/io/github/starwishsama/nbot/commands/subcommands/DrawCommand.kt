@@ -60,7 +60,8 @@ class DrawCommand : UniversalCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps = CommandProps("draw", arrayListOf("ck", "抽卡"), "nbot.commands.draw", UserLevel.USER)
+    override fun getProps(): CommandProps =
+        CommandProps("draw", arrayListOf("ck", "抽卡"), "抽卡模拟器", "nbot.commands.draw", UserLevel.USER)
 
     override fun getHelp(): String = """
          ============ 命令帮助 ============

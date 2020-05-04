@@ -1,12 +1,13 @@
 package io.github.starwishsama.nbot.commands.subcommands
 
-import com.hiczp.bilibili.api.app.model.SearchUserResult
+import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BiliBiliUtil
 import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.util.BotUtil.isNumeric
 import net.mamoe.mirai.message.ContactMessage
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -18,55 +19,50 @@ class BiliBiliCommand : UniversalCommand {
     override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.userQQ)){
             if (args.isEmpty()) {
-                if (user.biliSubs.isEmpty()) {
-                    return getHelp().toMessage().asMessageChain()
-                } else {
-                    message.quoteReply("请稍等...")
-                    val list: MutableList<SearchUserResult.Data.Item> = mutableListOf()
-                    for (name in user.biliSubs){
-                        if (BiliBiliUtil.searchUser(name).items.isNotEmpty()) {
-                            list.add(BiliBiliUtil.searchUser(name).items[0])
-                        }
-                    }
-
-                    val sb = StringBuilder("监控室列表:\n")
-
-                    if (list.isNotEmpty()){
-                        list.sortByDescending { it.liveStatus }
-                        for (item in list){
-                            sb.append(item.title).append(" ").append( if (item.liveStatus == 1) "✔" else "✘").append("\n")
-                        }
-                    }
-
-                    return sb.toString().trim().toMessage().asMessageChain()
-                }
+                return getHelp().toMessage().asMessageChain()
             } else {
                 when (args[0]){
                     "sub", "订阅" -> {
                         if (args.size > 1) {
-                            return if (!user.biliSubs.contains(args[1])) {
-                                val searchResult = BiliBiliUtil.searchUser(args[1])
-                                if (searchResult.items.isNotEmpty()) {
-                                    val item = searchResult.items[0]
-                                    user.biliSubs += item.title
-                                    "Bot > 订阅 ${item.title} 成功".toMessage().asMessageChain()
+                            return if (user.isBotAdmin()) {
+                                if (args[1].isNumeric()) {
+                                    BotConstants.cfg.subList.add(args[1].toLong())
+                                    "Bot > 订阅房间号 ${args[1]} 成功".toMessage().asMessageChain()
                                 } else {
-                                    "Bot > 账号不存在".toMessage().asMessageChain()
+                                    val searchResult = BiliBiliUtil.searchUser(args[1])
+                                    if (searchResult.items.isNotEmpty()) {
+                                        val item = searchResult.items[0]
+                                        BotConstants.cfg.subList.add(item.roomid)
+                                        "Bot > 订阅 ${item.title} 成功".toMessage().asMessageChain()
+                                    } else {
+                                        "Bot > 账号不存在".toMessage().asMessageChain()
+                                    }
                                 }
                             } else {
-                                "Bot > 你已经订阅过 ${args[1]} 了".toMessage().asMessageChain()
+                                "Bot > 你已经订阅过直播间 ${args[1]} 了".toMessage().asMessageChain()
                             }
                         } else {
                             return getHelp().toMessage().asMessageChain()
                         }
                     }
                     "unsub", "取消订阅" -> {
-                        return if (args.size > 1) {
-                            if (user.biliSubs.isEmpty() || !user.biliSubs.contains(args[1])) {
-                                "Bot > 你还没订阅 ${args[1]}".toMessage().asMessageChain()
+                        if (args.size > 1) {
+                            var roomId = 0L
+                            if (args[1].isNumeric()) {
+                                roomId = args[1].toLong()
                             } else {
-                                user.biliSubs -= args[1]
-                                "Bot > 取消订阅 ${args[1]} 成功".toMessage().asMessageChain()
+                                val searchResult = BiliBiliUtil.searchUser(args[1])
+                                if (searchResult.items.isNotEmpty()) {
+                                    val item = searchResult.items[0]
+                                    roomId = item.mid
+                                }
+                            }
+
+                            return if (BotConstants.cfg.subList.isEmpty() || !BotConstants.cfg.subList.contains(roomId)) {
+                                "Bot > 你还没订阅直播间 ${args[1]}".toMessage().asMessageChain()
+                            } else {
+                                BotConstants.cfg.subList.remove(args[1].toLong())
+                                "Bot > 取消订阅直播间 ${args[1]} 成功".toMessage().asMessageChain()
                             }
                         } else {
                             getHelp().toMessage().asMessageChain()
@@ -86,9 +82,8 @@ class BiliBiliCommand : UniversalCommand {
                             } else {
                                 when (dynamic.size) {
                                     1 -> ("$before\n最近动态: ${dynamic[0]}").toMessage().asMessageChain()
-                                    2 -> {
-                                        ("$before\n最近动态: ${dynamic[0]}").toMessage().asMessageChain().plus(BotUtil.getImageStream(dynamic[1]).uploadAsImage(message.subject))
-                                    }
+                                    2 -> ("$before\n最近动态: ${dynamic[0]}").toMessage().asMessageChain()
+                                        .plus(BotUtil.getImageStream(dynamic[1]).uploadAsImage(message.subject))
                                     else -> ("$before\n无最近动态").toMessage().asMessageChain()
                                 }
                             }
@@ -103,7 +98,8 @@ class BiliBiliCommand : UniversalCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps = CommandProps("bili", arrayListOf(), "nbot.commands.bili", UserLevel.USER)
+    override fun getProps(): CommandProps =
+        CommandProps("bili", arrayListOf(), "订阅B站主播/查询用户动态", "nbot.commands.bili", UserLevel.USER)
 
     override fun getHelp(): String = """
         /bili sub [用户名] 订阅用户相关信息

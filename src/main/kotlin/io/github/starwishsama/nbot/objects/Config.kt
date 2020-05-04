@@ -48,4 +48,10 @@ open class Config {
 
     @SerializedName("universal_subs")
     var subList = mutableListOf<Long>()
+
+    @SerializedName("push_groups")
+    var pushGroups = mutableListOf<Long>()
+
+    @SerializedName("check_delay")
+    var checkDelay: Long = 1
 }

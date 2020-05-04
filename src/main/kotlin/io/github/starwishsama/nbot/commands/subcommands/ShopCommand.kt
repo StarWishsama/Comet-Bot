@@ -15,7 +15,8 @@ class ShopCommand : UniversalCommand, WaitableCommand {
         return "WIP".toMirai()
     }
 
-    override fun getProps(): CommandProps = CommandProps("shop", arrayListOf("sd", "商店"), "nbot.commands.shop", UserLevel.USER)
+    override fun getProps(): CommandProps =
+        CommandProps("shop", arrayListOf("sd", "商店"), "积分商店", "nbot.commands.shop", UserLevel.USER)
 
     override fun getHelp(): String = """
         /shop list 查看商品列表

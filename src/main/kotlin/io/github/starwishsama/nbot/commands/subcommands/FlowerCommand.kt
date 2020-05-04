@@ -81,7 +81,7 @@ class FlowerCommand : UniversalCommand, WaitableCommand {
                     if (user.flower != null) {
                         val flower = user.flower
                         BotUtil.sendLocalMessage("msg.bot-prefix", "${flower?.flowerName}\n能量值: ${String.format("%.2f", flower?.energy)}\n能量值可以通过水群获得")
-                                .toMirai()
+                            .toMirai()
                     } else {
                         BotUtil.sendLocalMessage("msg.bot-prefix", "你还没有种植花朵").toMirai()
                     }
@@ -91,7 +91,8 @@ class FlowerCommand : UniversalCommand, WaitableCommand {
         }
     }
 
-    override fun getProps(): CommandProps = CommandProps("flower", arrayListOf("hy", "花园"), "nbot.commands.flower", UserLevel.USER)
+    override fun getProps(): CommandProps =
+        CommandProps("flower", arrayListOf("hy", "花园"), "🔨花园", "nbot.commands.flower", UserLevel.USER)
 
     override fun getHelp(): String = """
         /hy lq 领取你的绿植

@@ -46,7 +46,7 @@ class DebugCommand : UniversalCommand {
     }
 
     override fun getProps(): CommandProps {
-        return CommandProps("debug", null, "nbot.commands.debug", UserLevel.ADMIN)
+        return CommandProps("debug", null, "nbot.commands.debug", "", UserLevel.ADMIN)
     }
 
     override fun getHelp(): String = "直接开 IDE 看会死掉吗"

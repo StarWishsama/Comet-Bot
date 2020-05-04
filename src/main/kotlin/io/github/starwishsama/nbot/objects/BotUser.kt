@@ -16,7 +16,6 @@ class BotUser(var userQQ: Long) {
     var commandTime : Int = 100
     var checkInGroup: Long = 0
     private var permissions: List<String> = ArrayList()
-    var biliSubs: List<String> = ArrayList()
     var flower: Flower? = null
 
     fun decreaseTime() {

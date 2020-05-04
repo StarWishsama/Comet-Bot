@@ -38,6 +38,18 @@ object BotUtil {
     }
 
     /**
+     * 判断字符串是不是数字
+     * @return 是不是数字
+     */
+    fun String.isNumeric(): Boolean {
+        return matches("[-+]?\\d*\\.?\\d+".toRegex())
+    }
+
+    fun String.limitStringSize(size: Int): String {
+        return if (length <= size) this else substring(0, size - 3) + "..."
+    }
+
+    /**
      * 获取 Minecraft 服务器信息 (SRV解析)
      * @author NamelessSAMA
      * @param address 服务器地址

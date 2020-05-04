@@ -28,7 +28,8 @@ class CheckInCommand : UniversalCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps = CommandProps("checkin", arrayListOf("签到", "qd"), "nbot.commands.checkin", UserLevel.USER)
+    override fun getProps(): CommandProps =
+        CommandProps("checkin", arrayListOf("签到", "qd"), "签到命令", "nbot.commands.checkin", UserLevel.USER)
 
     override fun getHelp(): String = ""
 

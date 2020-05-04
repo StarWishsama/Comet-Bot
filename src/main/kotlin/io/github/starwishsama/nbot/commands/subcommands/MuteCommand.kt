@@ -45,7 +45,8 @@ class MuteCommand : UniversalCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps = CommandProps("mute", arrayListOf("jy", "禁言"), "nbot.commands.mute", UserLevel.ADMIN)
+    override fun getProps(): CommandProps =
+        CommandProps("mute", arrayListOf("jy", "禁言"), "禁言", "nbot.commands.mute", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
         ======= 命令帮助 =======
@@ -53,7 +54,7 @@ class MuteCommand : UniversalCommand {
         时长为 0 时解禁
     """.trimIndent()
 
-    private suspend fun doMute(group : Group, id : Long, muteTime: Long, isAll: Boolean) : MessageChain {
+    private suspend fun doMute(group: Group, id: Long, muteTime: Long, isAll: Boolean): MessageChain {
         try {
             if (isAll) {
                 group.settings.isMuteAll = !group.settings.isMuteAll

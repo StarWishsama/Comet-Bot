@@ -58,7 +58,9 @@ class R6SCommand : UniversalCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps = CommandProps("r6", arrayListOf("r6s", "彩六"), "nbot.commands.r6s", UserLevel.USER)
+    override fun getProps(): CommandProps =
+        CommandProps("r6", arrayListOf("r6s", "彩六"), "彩虹六号数据查询", "nbot.commands.r6s", UserLevel.USER)
+
     override fun getHelp(): String = """
         ======= 命令帮助 =======
         /r6 info [Uplay账号名] 查询战绩

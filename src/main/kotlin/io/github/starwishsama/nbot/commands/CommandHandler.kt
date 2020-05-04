@@ -13,17 +13,15 @@ import net.mamoe.mirai.message.data.MessageChain
  * 处理群聊/私聊聊天信息中存在的命令
  * @author Nameless
  */
-class CommandHandler {
-    companion object {
-        var commands: List<UniversalCommand> = mutableListOf()
-    }
+object CommandHandler {
+    var commands: List<UniversalCommand> = mutableListOf()
 
     /**
      * 注册命令
      *
      * @param command 要注册的命令
      */
-    fun setupCommand(command: UniversalCommand){
+    fun setupCommand(command: UniversalCommand) {
         if (!commands.contains(command)) {
             commands = commands + command
         }
@@ -36,8 +34,8 @@ class CommandHandler {
      */
     fun setupCommand(commands: Array<UniversalCommand>) {
         commands.forEach {
-            if (!Companion.commands.contains(it)) {
-                Companion.commands = Companion.commands.plus(it)
+            if (!this.commands.contains(it)) {
+                this.commands = this.commands.plus(it)
             }
         }
     }
@@ -93,9 +91,5 @@ class CommandHandler {
             }
         }
         return false
-    }
-
-    fun getInstance(): CommandHandler {
-        return this
     }
 }

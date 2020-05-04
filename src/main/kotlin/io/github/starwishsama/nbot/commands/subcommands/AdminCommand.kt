@@ -166,14 +166,16 @@ class AdminCommand : UniversalCommand {
                             }
                         }
                     }
-                    else -> return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMessage().asMessageChain()
+                    else -> return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMessage()
+                        .asMessageChain()
                 }
             }
         }
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps = CommandProps("admin", arrayListOf("管理", "管", "gl"), "nbot.commands.admin", UserLevel.ADMIN)
+    override fun getProps(): CommandProps =
+        CommandProps("admin", arrayListOf("管理", "管", "gl"), "机器人管理员命令", "nbot.commands.admin", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
         ======= 命令帮助 =======

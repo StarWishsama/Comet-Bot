@@ -59,7 +59,9 @@ class InfoCommand : UniversalCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps = CommandProps("info", arrayListOf("cx", "查询"), "nbot.commands.info", UserLevel.USER)
+    override fun getProps(): CommandProps =
+        CommandProps("info", arrayListOf("cx", "查询"), "查询积分等", "nbot.commands.info", UserLevel.USER)
+
     override fun getHelp(): String = """
         ======= 命令帮助 =======
         /cx 查询自己的积分信息

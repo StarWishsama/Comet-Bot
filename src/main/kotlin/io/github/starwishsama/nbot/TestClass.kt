@@ -5,6 +5,6 @@ package io.github.starwishsama.nbot
  * Run anything here
  */
 
-suspend fun main(){
+fun main() {
 }
 
