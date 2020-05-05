@@ -278,6 +278,22 @@ object BotUtil {
     }
 
     /**
+     * 发送带前缀的消息
+     *
+     * @author NamelessSAMA
+     * @param otherText 需要添加的文本
+     * @return 本地化文本
+     */
+    fun sendMsgPrefix(vararg otherText: String): String {
+        val sb = StringBuilder()
+        sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
+        for (s in otherText) {
+            sb.append(s).append("\n")
+        }
+        return sb.toString().trim { it <= ' ' }
+    }
+
+    /**
      * 获取用户的权限组等级
      *
      * @author NamelessSAMA

@@ -8,18 +8,17 @@ import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BiliBiliUtil
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.isNumeric
+import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import net.mamoe.mirai.message.ContactMessage
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.message.data.toMessage
 import net.mamoe.mirai.message.uploadAsImage
 
 class BiliBiliCommand : UniversalCommand {
     override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.userQQ)){
             if (args.isEmpty()) {
-                return getHelp().toMessage().asMessageChain()
+                return getHelp().toMirai()
             } else {
                 when (args[0]){
                     "sub", "订阅" -> {
@@ -27,22 +26,22 @@ class BiliBiliCommand : UniversalCommand {
                             return if (user.isBotAdmin()) {
                                 if (args[1].isNumeric()) {
                                     BotConstants.cfg.subList.add(args[1].toLong())
-                                    "Bot > 订阅房间号 ${args[1]} 成功".toMessage().asMessageChain()
+                                    BotUtil.sendMsgPrefix("订阅房间号 ${args[1]} 成功").toMirai()
                                 } else {
                                     val searchResult = BiliBiliUtil.searchUser(args[1])
                                     if (searchResult.items.isNotEmpty()) {
                                         val item = searchResult.items[0]
                                         BotConstants.cfg.subList.add(item.roomid)
-                                        "Bot > 订阅 ${item.title} 成功".toMessage().asMessageChain()
+                                        BotUtil.sendMsgPrefix("订阅 ${item.title} 成功").toMirai()
                                     } else {
-                                        "Bot > 账号不存在".toMessage().asMessageChain()
+                                        BotUtil.sendMsgPrefix("账号不存在").toMirai()
                                     }
                                 }
                             } else {
-                                "Bot > 你已经订阅过直播间 ${args[1]} 了".toMessage().asMessageChain()
+                                BotUtil.sendMsgPrefix("你已经订阅过直播间 ${args[1]} 了").toMirai()
                             }
                         } else {
-                            return getHelp().toMessage().asMessageChain()
+                            return getHelp().toMirai()
                         }
                     }
                     "unsub", "取消订阅" -> {
@@ -59,13 +58,13 @@ class BiliBiliCommand : UniversalCommand {
                             }
 
                             return if (BotConstants.cfg.subList.isEmpty() || !BotConstants.cfg.subList.contains(roomId)) {
-                                "Bot > 你还没订阅直播间 ${args[1]}".toMessage().asMessageChain()
+                                BotUtil.sendMsgPrefix("你还没订阅直播间 ${args[1]}").toMirai()
                             } else {
                                 BotConstants.cfg.subList.remove(args[1].toLong())
-                                "Bot > 取消订阅直播间 ${args[1]} 成功".toMessage().asMessageChain()
+                                BotUtil.sendMsgPrefix("取消订阅直播间 ${args[1]} 成功").toMirai()
                             }
                         } else {
-                            getHelp().toMessage().asMessageChain()
+                            getHelp().toMirai()
                         }
                     }
                     "info", "查询" -> {
@@ -78,20 +77,20 @@ class BiliBiliCommand : UniversalCommand {
                                     "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘")
                             val dynamic = BiliBiliUtil.getDynamic(item.mid)
                             return if (dynamic.isEmpty()) {
-                                ("$before\n无最近动态").toMessage().asMessageChain()
+                                ("$before\n无最近动态").toMirai()
                             } else {
                                 when (dynamic.size) {
-                                    1 -> ("$before\n最近动态: ${dynamic[0]}").toMessage().asMessageChain()
-                                    2 -> ("$before\n最近动态: ${dynamic[0]}").toMessage().asMessageChain()
-                                        .plus(BotUtil.getImageStream(dynamic[1]).uploadAsImage(message.subject))
-                                    else -> ("$before\n无最近动态").toMessage().asMessageChain()
+                                    1 -> ("$before\n最近动态: ${dynamic[0]}").toMirai()
+                                    2 -> ("$before\n最近动态: ${dynamic[0]}").toMirai()
+                                            .plus(BotUtil.getImageStream(dynamic[1]).uploadAsImage(message.subject))
+                                    else -> ("$before\n无最近动态").toMirai()
                                 }
                             }
                         } else {
-                            return "Bot > 账号不存在".toMessage().asMessageChain()
+                            return "Bot > 账号不存在".toMirai()
                         }
                     }
-                    else -> return getHelp().toMessage().asMessageChain()
+                    else -> return getHelp().toMirai()
                 }
             }
         }
