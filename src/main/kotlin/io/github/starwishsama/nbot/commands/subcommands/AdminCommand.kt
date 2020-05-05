@@ -9,7 +9,6 @@ import io.github.starwishsama.nbot.objects.checkin.CheckInData
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import net.mamoe.mirai.contact.Member
-import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.ContactMessage
 import net.mamoe.mirai.message.GroupMessage
 import net.mamoe.mirai.message.data.*
@@ -21,52 +20,39 @@ import java.time.LocalTime
 class AdminCommand : UniversalCommand {
     val commands = arrayOf("checkin")
     override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
-        if (message is GroupMessage && user.isBotOwner()) {
+        if (user.isBotAdmin()) {
             if (args.isEmpty()) {
                 return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMessage()
-                    .asMessageChain()
+                        .asMessageChain()
             } else {
                 when (args[0]) {
-                    "clockin", "dk", "打卡" -> clockIn(args, message)
-                    "stopclock", "关闭打卡", "gbdk" -> {
-                        if (BotConstants.checkInCalendar.isEmpty() || !BotConstants.checkInCalendar.containsKey(message.group.id)) {
-                            return (BotUtil.getLocalMessage("msg.bot-prefix") + "本群没有正在进行的打卡").toMessage().asMessageChain()
+                    "clockin", "dk", "打卡" -> {
+                        return if (message is GroupMessage) {
+                            clockIn(args, message)
                         } else {
+                            BotUtil.sendMsgPrefix("该命令只能在群聊使用").toMirai()
+                        }
+                    }
+                    "stopclock", "关闭打卡", "gbdk" -> {
+                        return if (message is GroupMessage) {
                             val data = BotConstants.checkInCalendar[message.group.id]
-                            val checkedCount = data?.checkedUsers?.size
-                            var lateText = StringBuilder()
-                            var unCheckedText = StringBuilder()
-
-                            val unChecked = data?.groupUsers?.minus(data.checkedUsers)?.minus(data.lateUsers)
-
-                            unChecked?.forEach { member ->
-                                run {
-                                    unCheckedText.append(member.nameCardOrNick).append(",")
-                                }
-                                unCheckedText.removeSuffix(",")
-                            }
-
-                            data?.lateUsers?.forEach { member ->
-                                run {
-                                    lateText.append(member.nameCardOrNick).append(",")
-                                }
-                                lateText.removeSuffix(",")
-                            }
-
-                            if (lateText.toString().isEmpty()) {
-                                lateText = StringBuilder("无")
-                            }
-
-                            if (unCheckedText.toString().isEmpty()) {
-                                unCheckedText = StringBuilder("无")
-                            }
-
-                            BotConstants.checkInCalendar.remove(message.group.id)
-                            return "${BotUtil.getLocalMessage("msg.bot-prefix")}打卡已关闭\n已打卡人数: $checkedCount\n迟到: $lateText\n未打卡: $unCheckedText".toMessage().asMessageChain()
+                            data?.unregister(message.group.id) ?: BotUtil.sendMsgPrefix("本群没有正在进行的打卡").toMirai()
+                        } else {
+                            BotUtil.sendMsgPrefix("该命令只能在群聊使用").toMirai()
                         }
                     }
                     "help", "帮助" -> {
-                        return getHelp().toMessage().asMessageChain()
+                        return getHelp().toMirai()
+                    }
+                    "permadd", "添加权限", "tjqx" -> {
+                        if (user.isBotOwner()) {
+                            if (args.size > 1) {
+                                user.addPermission(args[1])
+                                return BotUtil.sendMsgPrefix("添加权限成功").toMirai()
+                            }
+                        } else {
+                            return BotUtil.sendMsgPrefix("你没有权限").toMirai()
+                        }
                     }
                     "give", "增加次数" -> {
                         if (args.size > 1) {
@@ -77,26 +63,24 @@ class AdminCommand : UniversalCommand {
                                 if (StringUtils.isNumeric(args[1])) {
                                     BotUser.getUser(args[1].toLong())
                                 } else {
-                                    return BotUtil.sendLocalMessage("msg.bot-prefix", "给予的次数超过上限").toMessage().asMessageChain()
+                                    return BotUtil.sendLocalMessage("msg.bot-prefix", "给予的次数超过上限").toMirai()
                                 }
                             }
 
                             return if (target != null) {
                                 if (args[2].toInt() <= 1000000) {
                                     target.addTime(args[2].toInt())
-                                    BotUtil.sendMsgPrefix("成功为 ").toMirai() + At(message.group[user.userQQ]) + " 添加 ${args[2]} 次命令条数"
+                                    BotUtil.sendMsgPrefix("成功为 $target 添加 ${args[2]} 次命令条数").toMirai()
                                 } else {
                                     BotUtil.sendLocalMessage("msg.bot-prefix", "给予的次数超过上限").toMessage()
                                             .asMessageChain()
                                 }
                             } else {
-                                BotUtil.sendLocalMessage("msg.bot-prefix", "找不到此用户").toMessage()
-                                        .asMessageChain()
+                                BotUtil.sendLocalMessage("msg.bot-prefix", "找不到此用户").toMirai()
                             }
                         }
                     }
-                    else -> return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMessage()
-                        .asMessageChain()
+                    else -> return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMirai()
                 }
             }
         }
@@ -117,23 +101,27 @@ class AdminCommand : UniversalCommand {
             val startTime: LocalDateTime
             val endTime: LocalDateTime
 
-            if (args.size == 3 && args[1].isNotEmpty() && args[2].isNotEmpty()) {
-                startTime = LocalDateTime.of(
-                        LocalDate.now(),
-                        LocalTime.parse(args[1], BotConstants.dateFormatter)
-                )
-                endTime = LocalDateTime.of(
-                        LocalDate.now(),
-                        LocalTime.parse(args[2], BotConstants.dateFormatter)
-                )
-            } else if (args.size == 2 && args[1].isNotEmpty()) {
-                startTime = LocalDateTime.now()
-                endTime = LocalDateTime.of(
-                        LocalDate.now(),
-                        LocalTime.parse(args[1], BotConstants.dateFormatter)
-                )
-            } else {
-                return BotUtil.sendMsgPrefix("/admin dk (开始时间) [结束时间])").toMirai()
+            when (args.size) {
+                3 -> {
+                    startTime = LocalDateTime.of(
+                            LocalDate.now(),
+                            LocalTime.parse(args[1], BotConstants.dateFormatter)
+                    )
+                    endTime = LocalDateTime.of(
+                            LocalDate.now(),
+                            LocalTime.parse(args[2], BotConstants.dateFormatter)
+                    )
+                }
+                2 -> {
+                    startTime = LocalDateTime.now()
+                    endTime = LocalDateTime.of(
+                            LocalDate.now(),
+                            LocalTime.parse(args[1], BotConstants.dateFormatter)
+                    )
+                }
+                else -> {
+                    return BotUtil.sendMsgPrefix("/admin dk (开始时间) [结束时间])").toMirai()
+                }
             }
 
             val usersList = arrayListOf<Member>()

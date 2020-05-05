@@ -2,7 +2,10 @@ package io.github.starwishsama.nbot
 
 import com.hiczp.bilibili.api.BilibiliClient
 import io.github.starwishsama.nbot.BotInstance.bot
+import io.github.starwishsama.nbot.BotInstance.client
 import io.github.starwishsama.nbot.BotInstance.executeCommand
+import io.github.starwishsama.nbot.BotInstance.rCon
+import io.github.starwishsama.nbot.BotInstance.setupRCon
 import io.github.starwishsama.nbot.commands.CommandHandler
 import io.github.starwishsama.nbot.commands.subcommands.*
 import io.github.starwishsama.nbot.enums.UserLevel
@@ -15,6 +18,7 @@ import io.github.starwishsama.nbot.listeners.SessionListener
 import io.github.starwishsama.nbot.managers.TaskManager
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.tasks.CheckLiveStatus
+import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.event.subscribeMessages
@@ -40,6 +44,7 @@ object BotInstance {
     var startTime: Long = 0
     lateinit var service: ScheduledExecutorService
     lateinit var logger: MiraiLogger
+    var rCon: Rcon? = null
 
     fun executeCommand() {
         val scanner = Scanner(System.`in`)
@@ -78,6 +83,12 @@ object BotInstance {
         val location = File(path.replace("target/classes/", ""))
         return location.path
     }
+
+    fun setupRCon() {
+        if (BotConstants.cfg.rConUrl != null && BotConstants.cfg.rConPassword != null && rCon == null) {
+            rCon = Rcon(BotConstants.cfg.rConUrl!!, BotConstants.cfg.rConPort, BotConstants.cfg.rConPassword!!.toByteArray())
+        }
+    }
 }
 
 suspend fun main() {
@@ -97,20 +108,21 @@ suspend fun main() {
         CommandHandler.setupCommand(
                 arrayOf(
                         AdminCommand(),
-                        VersionCommand(),
                         BiliBiliCommand(),
-                        DrawCommand(),
-                        DebugCommand(),
-                        HelpCommand(),
-                        FlowerCommand(),
-                        PictureSearch(),
-                        MuteCommand(),
-                        MusicCommand(),
-                        R6SCommand(),
                         CheckInCommand(),
                         ClockInCommand(),
+                        DebugCommand(),
+                        DivineCommand(),
+                        DrawCommand(),
+                        FlowerCommand(),
+                        HelpCommand(),
                         InfoCommand(),
-                        DivineCommand()
+                        MusicCommand(),
+                        MuteCommand(),
+                        PictureSearch(),
+                        R6SCommand(),
+                        RConCommand(),
+                        VersionCommand()
                 )
         )
 
@@ -118,13 +130,16 @@ suspend fun main() {
 
         BotInstance.logger.info("已注册 " + CommandHandler.commands.size + " 个命令")
 
-        if (!BotConstants.cfg.biliUserName.isNullOrBlank() && !BotConstants.cfg.biliPassword.isNullOrBlank()) {
-            BotInstance.client.runCatching {
-                BotConstants.cfg.biliPassword?.let {
-                    login(username = BotConstants.cfg.biliUserName!!, password = it)
-                }
+        client.runCatching {
+            val pwd = BotConstants.cfg.biliPassword
+            val uname = BotConstants.cfg.biliUserName
+
+            if (pwd != null && uname != null) {
+                login(username = uname, password = pwd)
             }
         }
+
+        setupRCon()
 
         BotInstance.service = Executors.newSingleThreadScheduledExecutor(
                 BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
@@ -133,14 +148,14 @@ suspend fun main() {
         /** 备份服务 */
         TaskManager.runScheduleTaskAsync({ BackupHelper.createBackup() }, 0, 3, TimeUnit.HOURS)
         TaskManager.runScheduleTaskAsync({ BotConstants.users.forEach { it.addTime(100) } }, 5, 5, TimeUnit.HOURS)
-        if (BotConstants.cfg.subList.isNotEmpty()) {
-            TaskManager.runScheduleTaskAsync(
-                    CheckLiveStatus::run,
-                    BotConstants.cfg.checkDelay,
-                    BotConstants.cfg.checkDelay,
-                    TimeUnit.MINUTES
-            )
-        }
+        TaskManager.runScheduleTaskAsyncIf(
+                CheckLiveStatus::run,
+                BotConstants.cfg.checkDelay,
+                BotConstants.cfg.checkDelay,
+                TimeUnit.MINUTES,
+                BotConstants.cfg.subList.isNotEmpty()
+        )
+
 
         /** 监听器 */
         listeners.forEach {
@@ -173,6 +188,7 @@ suspend fun main() {
         Runtime.getRuntime().addShutdownHook(Thread {
             DataSetup.saveFiles()
             BotInstance.service.shutdown()
+            rCon?.disconnect()
         })
 
         executeCommand()

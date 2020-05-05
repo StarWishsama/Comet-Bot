@@ -43,7 +43,7 @@ class InfoCommand : UniversalCommand {
                 return if (users.size > 9) {
                     for (i in 0..9) {
                         sb.append(i + 1).append(" ")
-                            .append(message.sender.nick)
+                                .append(users[i].userQQ)
                             .append(" ").append(String.format("%.1f", users[i].checkInPoint)).append("\n")
                     }
                     (sb.toString().trim { it <= ' ' }).toMirai()

@@ -103,7 +103,7 @@ class BiliBiliCommand : UniversalCommand {
     override fun getHelp(): String = """
         /bili sub [用户名] 订阅用户相关信息
         /bili unsub [用户名] 取消订阅用户相关信息
-        /bili info [用户名] 查看用户的账号详情
+        /bili info [用户名] 查看用户的动态
     """.trimIndent()
 
 }

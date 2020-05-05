@@ -55,14 +55,6 @@ class PictureSearch : UniversalCommand, WaitableCommand {
                     message.reply("请稍等...")
                     val result = PictureSearchUtil.sauceNaoSearch(image.queryUrl())
                     if (result.similarity >= 60.0) {
-                        /**val map = mutableMapOf<String, String>()
-                        map["user-agent"] =
-                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36"
-                        val stream = HttpRequest.get(result.picUrl)
-                        .setFollowRedirects(true)
-                        .timeout(150_000)
-                        .addHeaders(map)
-                        .execute().bodyStream()*/
                         "相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n".toMessage()
                                 .asMessageChain()/**.plus(stream.uploadAsImage(subject).asMessageChain())*/
                     } else {

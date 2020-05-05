@@ -11,4 +11,10 @@ object TaskManager {
     fun runScheduleTaskAsync(task: () -> Unit, delay: Long, period: Long, unit: TimeUnit) {
         BotInstance.service.scheduleAtFixedRate(task, delay, period, unit)
     }
+
+    fun runScheduleTaskAsyncIf(task: () -> Unit, delay: Long, period: Long, unit: TimeUnit, condition: Boolean) {
+        if (condition) {
+            BotInstance.service.scheduleAtFixedRate(task, delay, period, unit)
+        }
+    }
 }

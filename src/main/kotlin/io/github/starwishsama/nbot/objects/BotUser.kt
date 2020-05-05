@@ -53,7 +53,7 @@ class BotUser(var userQQ: Long) {
     }
 
     fun hasPermission(permission: String): Boolean {
-        return !permissions.isNullOrEmpty() && permissions.contains(permission)
+        return (!permissions.isNullOrEmpty() && permissions.contains(permission)) || isBotOwner()
     }
 
     /**
@@ -70,6 +70,10 @@ class BotUser(var userQQ: Long) {
 
     fun isBotOwner(): Boolean {
         return level == UserLevel.OWNER || BotConstants.cfg.ownerId == userQQ
+    }
+
+    fun addPermission(permission: String) {
+        permissions = permissions + permission
     }
 
     companion object {

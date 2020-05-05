@@ -22,7 +22,7 @@ class CheckInCommand : UniversalCommand {
             return if (!BotUtil.isChecked(user) || user.checkInTime == 0) {
                 checkIn(message.sender, message, user).toMirai()
             } else {
-                "Bot > 你今天已经签到过了! 输入 /cx 可查询签到信息".toMirai()
+                BotUtil.sendMsgPrefix("你今天已经签到过了! 输入 /cx 可查询签到信息").toMirai()
             }
         }
         return EmptyMessageChain
@@ -40,15 +40,21 @@ class CheckInCommand : UniversalCommand {
             if (user.checkInTime < 2 || point[1] == 0.0) {
                 extra = ""
             }
-            val text = "Hi ${sender.nameCardOrNick}, 签到成功!\n获得了 ${point[0]} 点积分" + extra + "\n目前积分数: ${String.format("%.1f", user.checkInPoint)}."
-            if (msg is GroupMessage)
-                user.checkInGroup = msg.group.id
 
-            if (point[0] + point[1] == 0.0) {
-                "Bot > 签到成功! 今天运气不佳, 没有积分"
+            var text = "Hi ${sender.nameCardOrNick}, 签到成功!\n"
+            if (msg is GroupMessage) {
+                user.checkInGroup = msg.group.id
             } else {
-                text
+                user.checkInGroup = 0
             }
+
+            text += if (point[0] + point[1] == 0.0) {
+                "今天运气不佳, 没有积分"
+            } else {
+                "获得了 ${point[0]} 点积分$extra\n目前积分数: ${String.format("%.1f", user.checkInPoint)}."
+            }
+
+            text
         }
     }
 
@@ -56,11 +62,9 @@ class CheckInCommand : UniversalCommand {
         val now = LocalDateTime.now()
         // 计算连续签到次数，此处用了 Date 这个废弃的类，应换为 Calendar，too lazy to do so.
         // 已经更换为 Java 8 的全新日期 API :)
-        if (user.lastCheckInTime.month == now.month
-            && user.lastCheckInTime.dayOfMonth == now.dayOfMonth - 1
-        ) {
-            user.plusDay()
-        } else if (user.lastCheckInTime.month < now.month) {
+        if ((user.lastCheckInTime.month == now.month
+                        && user.lastCheckInTime.dayOfMonth == now.dayOfMonth - 1)
+                || user.lastCheckInTime.month < now.month) {
             user.plusDay()
         } else {
             user.resetDay()

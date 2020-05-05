@@ -27,6 +27,7 @@ This bot is under heavy develop now, Many feature may not work as well.
 * Arknights / PCR draw simulator
 * Auto convert QQ LightApp for PC user(s)
 * Virtual Youtuber live streaming notice
+* RCON feature
 * WIP
 
 ## ☑ To-Do 

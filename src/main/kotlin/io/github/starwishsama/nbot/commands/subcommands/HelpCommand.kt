@@ -16,11 +16,11 @@ class HelpCommand : UniversalCommand {
         val sb = StringBuilder()
         for (cmd in CommandHandler.commands) {
             if (cmd.getProps().name != "help" || cmd.getProps().name != "debug") {
-                sb.append(cmd.getProps().name).append("  ").append(cmd.getProps().description).append("\n")
+                sb.append("/").append(cmd.getProps().name).append("  ").append(cmd.getProps().description).append("\n")
             }
         }
 
-        return sb.toString().trim().limitStringSize(50).toMessage().asMessageChain()
+        return sb.toString().trim().limitStringSize(150).toMessage().asMessageChain()
     }
 
     override fun getProps(): CommandProps =

@@ -1,5 +1,6 @@
 package net.kronos.rkon.core
 
+import io.github.starwishsama.nbot.util.BotUtil
 import net.kronos.rkon.core.ex.AuthenticationException
 import java.io.IOException
 import java.net.Socket
@@ -80,7 +81,7 @@ class Rcon(host: String, port: Int, password: ByteArray?) {
     fun command(payload: String): String {
         require(payload.trim { it <= ' ' }.isNotEmpty()) { "Payload can't be null or empty" }
         val response = send(RconPacket.SERVERDATA_EXECCOMMAND, payload.toByteArray())
-        return String(response!!.payload, charset)
+        return BotUtil.sendMsgPrefix(String(response!!.payload, charset))
     }
 
     @Throws(IOException::class)
@@ -88,16 +89,6 @@ class Rcon(host: String, port: Int, password: ByteArray?) {
         synchronized(sync) { return RconPacket.send(this, type, payload) }
     }
 
-    /**
-     * Create, connect and authenticate a new Rcon object
-     *
-     * @param host Rcon server address
-     * @param port Rcon server port
-     * @param password Rcon server password
-     *
-     * @throws IOException
-     * @throws AuthenticationException Thrown if server rejects password
-     */
     init {
         // Default charset is utf8
         charset = Charset.forName("UTF-8")
