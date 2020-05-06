@@ -9,9 +9,9 @@ object FuckLightAppListener : NListener {
     override fun register(bot: Bot) {
         bot.subscribeGroupMessages {
             always {
-                try {
-                    val lightApp = this.message[LightApp]
-                    val json = JsonParser.parseString(lightApp?.content)
+                val lightApp = message[LightApp]
+                if (lightApp != null) {
+                    val json = JsonParser.parseString(lightApp.content)
                     if (json.isJsonObject) {
                         val jsonObject = json.asJsonObject
                         val prompt = jsonObject["prompt"].asString
@@ -23,11 +23,11 @@ object FuckLightAppListener : NListener {
                                 reply(
                                     "小程序Anti > 自动为电脑选手转换了小程序:\n" +
                                             "视频标题: $title\n" +
-                                        "链接: ${url.substring(0, url.indexOf("?") - 1)}")
+                                            "链接: ${url.substring(0, url.indexOf("?") - 1)}"
+                                )
                             }
                         }
                     }
-                } catch (ignored: NoSuchElementException) {
                 }
             }
         }

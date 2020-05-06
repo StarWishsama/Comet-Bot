@@ -13,7 +13,7 @@ object RepeatListener : NListener {
     override fun register(bot: Bot) {
         bot.subscribeGroupMessages {
             always {
-                if (message.get(QuoteReply) == null) {
+                if (message[QuoteReply] == null) {
                     val chance = RandomUtil.randomDouble(0.0, 1.0, 3, RoundingMode.HALF_DOWN)
                     val length = message.size
                     if (chance >= 0.7652 && length > RandomUtil.randomInt(1, 50)) {
