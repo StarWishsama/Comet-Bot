@@ -12,15 +12,15 @@ import io.github.starwishsama.nbot.sessions.Session
 import io.github.starwishsama.nbot.sessions.SessionManager
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
-import net.mamoe.mirai.message.ContactMessage
+import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
 import java.math.RoundingMode
 
 class FlowerCommand : UniversalCommand, WaitableCommand {
-    override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
-        if (args.isEmpty()){
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+        if (args.isEmpty()) {
             return getHelp().toMirai()
         } else {
             return when (args[0]) {
@@ -101,10 +101,10 @@ class FlowerCommand : UniversalCommand, WaitableCommand {
         /hy cx 查询绿植状态
     """.trimIndent()
 
-    override suspend fun replyResult(message: ContactMessage, user: BotUser, session: Session) {
+    override suspend fun replyResult(message: MessageEvent, user: BotUser, session: Session) {
         user.flower = Flower(message.message.contentToString())
         message.reply(
-                BotUtil.sendLocalMessage("msg.bot-prefix", "成功种植 ${user.flower?.flowerName}").toMirai()
+            BotUtil.sendLocalMessage("msg.bot-prefix", "成功种植 ${user.flower?.flowerName}").toMirai()
         )
         SessionManager.expireSession(session)
     }

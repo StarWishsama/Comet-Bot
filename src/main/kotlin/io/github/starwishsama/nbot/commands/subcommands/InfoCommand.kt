@@ -7,30 +7,30 @@ import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
-import net.mamoe.mirai.message.ContactMessage
-import net.mamoe.mirai.message.GroupMessage
+import net.mamoe.mirai.message.GroupMessageEvent
+import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.at
 import java.time.format.DateTimeFormatter
 
 class InfoCommand : UniversalCommand {
-    override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         try {
             if (args.isEmpty()) {
                 return run {
                     var reply =
-                            "\n积分: "+ String.format("%.1f", user.checkInPoint) +
-                                    "\n累计连续签到了 " + user.checkInTime.toString() + " 天" + "\n上次签到于: " +
-                                    user.lastCheckInTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString() +
-                                    "\n权限组: " + user.level.toString() +
-                                    "\n命令条数: " + user.commandTime
+                        "\n积分: " + String.format("%.1f", user.checkInPoint) +
+                                "\n累计连续签到了 " + user.checkInTime.toString() + " 天" + "\n上次签到于: " +
+                                user.lastCheckInTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString() +
+                                "\n权限组: " + user.level.toString() +
+                                "\n命令条数: " + user.commandTime
                     if (user.bindServerAccount != null) {
                         reply = reply + "绑定的游戏账号是: " + user.bindServerAccount
                     }
 
-                    if (message is GroupMessage){
-                        message.sender.at() + reply.toMirai()
+                    if (event is GroupMessageEvent) {
+                        event.sender.at() + reply.toMirai()
                     } else {
                         reply.toMirai()
                     }

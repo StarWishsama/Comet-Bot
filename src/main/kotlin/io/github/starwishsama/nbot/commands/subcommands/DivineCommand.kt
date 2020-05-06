@@ -11,16 +11,16 @@ import io.github.starwishsama.nbot.objects.RandomResult
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.getLocalMessage
 import io.github.starwishsama.nbot.util.BotUtil.isNoCoolDown
-import net.mamoe.mirai.message.ContactMessage
+import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
 
 class DivineCommand : UniversalCommand {
-    override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
-        if (isNoCoolDown(message.sender.id) && args.isNotEmpty()) {
-            val underCover = getResultFromList(BotConstants.underCovers, message.sender.id)
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+        if (isNoCoolDown(event.sender.id) && args.isNotEmpty()) {
+            val underCover = getResultFromList(BotConstants.underCovers, event.sender.id)
             return if (args.isNotEmpty()) {
                 if (underCover == null) {
                     if (user.commandTime > 0 || user.level != UserLevel.USER) {

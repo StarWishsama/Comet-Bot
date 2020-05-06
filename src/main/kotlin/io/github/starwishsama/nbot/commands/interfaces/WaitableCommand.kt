@@ -2,8 +2,8 @@ package io.github.starwishsama.nbot.commands.interfaces
 
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.sessions.Session
-import net.mamoe.mirai.message.ContactMessage
+import net.mamoe.mirai.message.MessageEvent
 
 interface WaitableCommand {
-    suspend fun replyResult(message: ContactMessage, user: BotUser, session: Session)
+    suspend fun replyResult(message: MessageEvent, user: BotUser, session: Session)
 }

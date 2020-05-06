@@ -9,18 +9,18 @@ import io.github.starwishsama.nbot.util.BiliBiliUtil
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.isNumeric
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
-import net.mamoe.mirai.message.ContactMessage
+import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.uploadAsImage
 
 class BiliBiliCommand : UniversalCommand {
-    override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.userQQ)){
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+        if (BotUtil.isNoCoolDown(user.userQQ)) {
             if (args.isEmpty()) {
                 return getHelp().toMirai()
             } else {
-                when (args[0]){
+                when (args[0]) {
                     "sub", "订阅" -> {
                         if (args.size > 1) {
                             return if (user.isBotAdmin()) {
@@ -68,7 +68,7 @@ class BiliBiliCommand : UniversalCommand {
                         }
                     }
                     "info", "查询" -> {
-                        message.quoteReply("请稍等...")
+                        event.quoteReply("请稍等...")
                         val searchResult = BiliBiliUtil.searchUser(args[1])
                         if (searchResult.items.isNotEmpty()) {
                             val item = searchResult.items[0]
@@ -82,7 +82,7 @@ class BiliBiliCommand : UniversalCommand {
                                 when (dynamic.size) {
                                     1 -> ("$before\n最近动态: ${dynamic[0]}").toMirai()
                                     2 -> ("$before\n最近动态: ${dynamic[0]}").toMirai()
-                                            .plus(BotUtil.getImageStream(dynamic[1]).uploadAsImage(message.subject))
+                                        .plus(BotUtil.getImageStream(dynamic[1]).uploadAsImage(event.subject))
                                     else -> ("$before\n无最近动态").toMirai()
                                 }
                             }

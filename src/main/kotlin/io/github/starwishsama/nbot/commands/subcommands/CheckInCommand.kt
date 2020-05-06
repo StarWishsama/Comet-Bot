@@ -9,18 +9,18 @@ import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
-import net.mamoe.mirai.message.ContactMessage
-import net.mamoe.mirai.message.GroupMessage
+import net.mamoe.mirai.message.GroupMessageEvent
+import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.math.RoundingMode
 import java.time.LocalDateTime
 
 class CheckInCommand : UniversalCommand {
-    override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(message.sender.id) && message is GroupMessage) {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+        if (BotUtil.isNoCoolDown(event.sender.id) && event is GroupMessageEvent) {
             return if (!BotUtil.isChecked(user) || user.checkInTime == 0) {
-                checkIn(message.sender, message, user).toMirai()
+                checkIn(event.sender, event, user).toMirai()
             } else {
                 BotUtil.sendMsgPrefix("你今天已经签到过了! 输入 /cx 可查询签到信息").toMirai()
             }
@@ -33,7 +33,7 @@ class CheckInCommand : UniversalCommand {
 
     override fun getHelp(): String = ""
 
-    private fun checkIn(sender: Member, msg: ContactMessage, user: BotUser): String {
+    private fun checkIn(sender: Member, msg: MessageEvent, user: BotUser): String {
         return run {
             val point = calculatePoint(user)
             var extra = "\n连续签到 ${user.checkInTime} 天, 额外获得了 ${point[1]} 点积分~"
@@ -42,7 +42,7 @@ class CheckInCommand : UniversalCommand {
             }
 
             var text = "Hi ${sender.nameCardOrNick}, 签到成功!\n"
-            if (msg is GroupMessage) {
+            if (msg is GroupMessageEvent) {
                 user.checkInGroup = msg.group.id
             } else {
                 user.checkInGroup = 0

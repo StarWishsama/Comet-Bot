@@ -15,7 +15,7 @@ import io.github.starwishsama.nbot.util.BotUtil.isNumeric
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.mamoe.mirai.message.ContactMessage
+import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
@@ -23,7 +23,7 @@ import java.io.IOException
 class RConCommand : UniversalCommand, WaitableCommand {
     private val waitList = mutableMapOf<BotUser, Int>()
 
-    override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.userQQ) && user.hasPermission(getProps().permission)) {
             if (args.isEmpty()) {
                 return getHelp().toMirai()
@@ -66,7 +66,7 @@ class RConCommand : UniversalCommand, WaitableCommand {
         还可以使用 mc, 执行命令 作为等效命令.
     """.trimIndent()
 
-    override suspend fun replyResult(message: ContactMessage, user: BotUser, session: Session) {
+    override suspend fun replyResult(message: MessageEvent, user: BotUser, session: Session) {
         if (message.message.contentToString().contains("退出")) {
             waitList.remove(user)
             SessionManager.expireSession(session)

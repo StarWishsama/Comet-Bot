@@ -8,11 +8,11 @@ import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.sessions.Session
 import io.github.starwishsama.nbot.sessions.SessionManager
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
-import net.mamoe.mirai.message.ContactMessage
+import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 class ShopCommand : UniversalCommand, WaitableCommand {
-    override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         return "WIP".toMirai()
     }
 
@@ -25,7 +25,7 @@ class ShopCommand : UniversalCommand, WaitableCommand {
         /shop put 上架商品
     """.trimIndent()
 
-    override suspend fun replyResult(message: ContactMessage, user: BotUser, session: Session) {
+    override suspend fun replyResult(message: MessageEvent, user: BotUser, session: Session) {
         message.reply("WIP")
         SessionManager.expireSession(session)
     }

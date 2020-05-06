@@ -10,8 +10,8 @@ object FuckLightAppListener : NListener {
         bot.subscribeGroupMessages {
             always {
                 try {
-                    val lightApp = this[LightApp]
-                    val json = JsonParser.parseString(lightApp.content)
+                    val lightApp = this.message[LightApp]
+                    val json = JsonParser.parseString(lightApp?.content)
                     if (json.isJsonObject) {
                         val jsonObject = json.asJsonObject
                         val prompt = jsonObject["prompt"].asString
@@ -20,8 +20,9 @@ object FuckLightAppListener : NListener {
                             if (meta != null) {
                                 val title = meta["desc"].asString
                                 val url = meta["qqdocurl"].asString
-                                reply("小程序Anti > 自动为电脑选手转换了小程序:\n" +
-                                        "视频标题: $title\n" +
+                                reply(
+                                    "小程序Anti > 自动为电脑选手转换了小程序:\n" +
+                                            "视频标题: $title\n" +
                                         "链接: ${url.substring(0, url.indexOf("?") - 1)}")
                             }
                         }

@@ -165,7 +165,6 @@ suspend fun main() {
 
         }, 5)
 
-
         /** 监听器 */
         listeners.forEach {
             it.register(bot)
@@ -186,8 +185,6 @@ suspend fun main() {
             rCon?.disconnect()
         })
 
-        executeCommand()
-
         bot.subscribeMessages {
             always {
                 val result = CommandHandler.execute(this)
@@ -196,6 +193,8 @@ suspend fun main() {
                 }
             }
         }
+
+        executeCommand()
 
         bot.join() // 等待 Bot 离线, 避免主线程退出
     }

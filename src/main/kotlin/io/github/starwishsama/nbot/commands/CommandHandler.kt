@@ -4,7 +4,7 @@ import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotInstance
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.objects.BotUser
-import net.mamoe.mirai.message.ContactMessage
+import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 
@@ -45,10 +45,12 @@ object CommandHandler {
      *
      * @param message 消息
      */
-    suspend fun execute(message: ContactMessage): MessageChain {
+    suspend fun execute(message: MessageEvent): MessageChain {
         if (message.message.contentToString().isNotEmpty() &&
-                BotConstants.cfg.commandPrefix.contains(
-                        message.message.contentToString().substring(0, 1))) {
+            BotConstants.cfg.commandPrefix.contains(
+                message.message.contentToString().substring(0, 1)
+            )
+        ) {
             val cmdPrefix = getCmdPrefix(message.message.contentToString())
             for (cmd in commands) {
                 if (isPrefix(cmd, cmdPrefix)) {

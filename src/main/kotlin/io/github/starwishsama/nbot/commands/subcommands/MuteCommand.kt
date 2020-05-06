@@ -10,8 +10,8 @@ import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.PermissionDeniedException
 import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.contact.mute
-import net.mamoe.mirai.message.ContactMessage
-import net.mamoe.mirai.message.GroupMessage
+import net.mamoe.mirai.message.GroupMessageEvent
+import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -19,20 +19,20 @@ import net.mamoe.mirai.message.data.isContentNotEmpty
 import org.apache.commons.lang3.StringUtils
 
 class MuteCommand : UniversalCommand {
-    override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.userQQ) && message is GroupMessage && (user.isBotAdmin() || message.sender.isOperator())) {
-            if (message.group.botPermission.isOperator()) {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+        if (BotUtil.isNoCoolDown(user.userQQ) && event is GroupMessageEvent && (user.isBotAdmin() || event.sender.isOperator())) {
+            if (event.group.botPermission.isOperator()) {
                 if (args.isNotEmpty()) {
-                    try {
-                        val at = message[At]
+                    val at = event.message[At]
+                    if (at != null) {
                         if (at.isContentNotEmpty()) {
-                            doMute(message.group, at.target, getMuteTime(args[1]), false)
+                            doMute(event.group, at.target, getMuteTime(args[1]), false)
                         }
-                    } catch (e: NoSuchElementException) {
+                    } else {
                         if (StringUtils.isNumeric(args[0])) {
-                            doMute(message.group, args[0].toLong(), getMuteTime(args[1]), false)
-                        } else if (args[0].contentEquals("all")){
-                            doMute(message.group, 0, 0, true)
+                            doMute(event.group, args[0].toLong(), getMuteTime(args[1]), false)
+                        } else if (args[0].contentEquals("all")) {
+                            doMute(event.group, 0, 0, true)
                         }
                     }
                 } else {

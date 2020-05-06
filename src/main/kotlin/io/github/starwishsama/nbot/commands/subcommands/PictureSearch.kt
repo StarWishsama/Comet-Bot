@@ -11,19 +11,22 @@ import io.github.starwishsama.nbot.sessions.SessionManager
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import io.github.starwishsama.nbot.util.PictureSearchUtil
-import net.mamoe.mirai.message.ContactMessage
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.message.data.Image
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.queryUrl
 
 class PictureSearch : UniversalCommand, WaitableCommand {
-    override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
-       if (BotUtil.isNoCoolDown(message.sender.id, 90)){
-           if (!SessionManager.isValidSession(message.sender.id)) {
-               val session = Session(SessionType.DELAY, this, user.userQQ)
-               session.putUser(message.sender.id)
-               SessionManager.addSession(session)
-           }
-           return BotUtil.sendLocalMessage("msg.bot-prefix", "请发送需要搜索的图片").toMirai()
-       }
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+        if (BotUtil.isNoCoolDown(event.sender.id, 90)) {
+            if (!SessionManager.isValidSession(event.sender.id)) {
+                val session = Session(SessionType.DELAY, this, user.userQQ)
+                session.putUser(event.sender.id)
+                SessionManager.addSession(session)
+            }
+            return BotUtil.sendLocalMessage("msg.bot-prefix", "请发送需要搜索的图片").toMirai()
+        }
         return EmptyMessageChain
     }
 
@@ -40,26 +43,22 @@ class PictureSearch : UniversalCommand, WaitableCommand {
         /ytst 以图搜图
     """.trimIndent()
 
-    override suspend fun replyResult(message: ContactMessage, user: BotUser, session: Session) {
-        try {
-            val image = message[Image]
-            message.reply(run {
-                if (image.isContentNotEmpty()) {
-                    message.reply("请稍等...")
-                    val result = PictureSearchUtil.sauceNaoSearch(image.queryUrl())
-                    if (result.similarity >= 60.0) {
-                        "相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n".toMessage()
-                                .asMessageChain()/**.plus(stream.uploadAsImage(subject).asMessageChain())*/
-                    } else {
-                        "相似度过低 (${result.similarity}%), 请尝试更换图片重试".toMirai()
-                    }
+    override suspend fun replyResult(message: MessageEvent, user: BotUser, session: Session) {
+        val image = message.message[Image]
+        message.reply(run {
+            if (image != null) {
+                message.reply("请稍等...")
+                val result = PictureSearchUtil.sauceNaoSearch(image.queryUrl())
+                if (result.similarity >= 60.0) {
+                    "相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n".toMirai()
+                    /**.plus(stream.uploadAsImage(subject).asMessageChain())*/
                 } else {
-                    EmptyMessageChain
+                    "相似度过低 (${result.similarity}%), 请尝试更换图片重试".toMirai()
                 }
-            })
-        } catch (e: NoSuchElementException) {
-            message.reply("无法识别图片")
-        }
+            } else {
+                "无法识别图片".toMirai()
+            }
+        })
 
         SessionManager.expireSession(session)
     }

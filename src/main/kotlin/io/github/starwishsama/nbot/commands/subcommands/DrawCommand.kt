@@ -7,21 +7,27 @@ import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import io.github.starwishsama.nbot.util.DrawUtil
-import net.mamoe.mirai.message.ContactMessage
+import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import org.apache.commons.lang3.StringUtils
 
 class DrawCommand : UniversalCommand {
-    override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.userQQ)){
-            if (args.isNotEmpty()){
-                when (args[0]){
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+        if (BotUtil.isNoCoolDown(user.userQQ)) {
+            if (args.isNotEmpty()) {
+                when (args[0]) {
                     "明日方舟", "舟游", "mrfz", "ak" -> {
-                        return if (args.size == 2){
+                        return if (args.size == 2) {
                             when (args[1]) {
-                                "十连" -> (BotUtil.getLocalMessage("msg.bot-prefix") + DrawUtil.getArkDrawResult(user, 10)).toMirai()
-                                "单抽" -> (BotUtil.getLocalMessage("msg.bot-prefix") + DrawUtil.getArkDrawResult(user, 1)).toMirai()
+                                "十连" -> (BotUtil.getLocalMessage("msg.bot-prefix") + DrawUtil.getArkDrawResult(
+                                    user,
+                                    10
+                                )).toMirai()
+                                "单抽" -> (BotUtil.getLocalMessage("msg.bot-prefix") + DrawUtil.getArkDrawResult(
+                                    user,
+                                    1
+                                )).toMirai()
                                 else -> {
                                     if (StringUtils.isNumeric(args[1])) {
                                         (BotUtil.getLocalMessage("msg.bot-prefix") + DrawUtil.getArkDrawResult(user, args[1].toInt())).toMirai()

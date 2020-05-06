@@ -4,13 +4,13 @@ import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
+import io.github.starwishsama.nbot.managers.ClockInManager
 import io.github.starwishsama.nbot.objects.BotUser
-import io.github.starwishsama.nbot.objects.checkin.CheckInData
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import net.mamoe.mirai.contact.Member
-import net.mamoe.mirai.message.ContactMessage
-import net.mamoe.mirai.message.GroupMessage
+import net.mamoe.mirai.message.GroupMessageEvent
+import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
 import org.apache.commons.lang3.StringUtils
 import java.time.LocalDate
@@ -19,24 +19,24 @@ import java.time.LocalTime
 
 class AdminCommand : UniversalCommand {
     val commands = arrayOf("checkin")
-    override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (user.isBotAdmin()) {
             if (args.isEmpty()) {
                 return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMessage()
-                        .asMessageChain()
+                    .asMessageChain()
             } else {
                 when (args[0]) {
                     "clockin", "dk", "打卡" -> {
-                        return if (message is GroupMessage) {
-                            clockIn(args, message)
+                        return if (event is GroupMessageEvent) {
+                            clockIn(args, event)
                         } else {
                             BotUtil.sendMsgPrefix("该命令只能在群聊使用").toMirai()
                         }
                     }
-                    "stopclock", "关闭打卡", "gbdk" -> {
-                        return if (message is GroupMessage) {
-                            val data = BotConstants.checkInCalendar[message.group.id]
-                            data?.unregister(message.group.id) ?: BotUtil.sendMsgPrefix("本群没有正在进行的打卡").toMirai()
+                    "showdata", "打卡数据", "dksj" -> {
+                        return if (event is GroupMessageEvent) {
+                            val data = ClockInManager.getNearestClockIn(event.group.id)
+                            data?.viewData() ?: BotUtil.sendMsgPrefix("本群没有正在进行的打卡").toMirai()
                         } else {
                             BotUtil.sendMsgPrefix("该命令只能在群聊使用").toMirai()
                         }
@@ -56,10 +56,11 @@ class AdminCommand : UniversalCommand {
                     }
                     "give", "增加次数" -> {
                         if (args.size > 1) {
-                            val target: BotUser? = try {
-                                val at = message[At]
+                            val target: BotUser?
+                            val at = event.message[At]
+                            target = if (at != null) {
                                 BotUser.getUser(at.target)
-                            } catch (e: NoSuchElementException) {
+                            } else {
                                 if (StringUtils.isNumeric(args[1])) {
                                     BotUser.getUser(args[1].toLong())
                                 } else {
@@ -72,15 +73,15 @@ class AdminCommand : UniversalCommand {
                                     target.addTime(args[2].toInt())
                                     BotUtil.sendMsgPrefix("成功为 $target 添加 ${args[2]} 次命令条数").toMirai()
                                 } else {
-                                    BotUtil.sendLocalMessage("msg.bot-prefix", "给予的次数超过上限").toMessage()
-                                            .asMessageChain()
+                                    BotUtil.sendMsgPrefix("给予的次数超过上限").toMessage()
+                                        .asMessageChain()
                                 }
                             } else {
-                                BotUtil.sendLocalMessage("msg.bot-prefix", "找不到此用户").toMirai()
+                                BotUtil.sendMsgPrefix("找不到此用户").toMirai()
                             }
                         }
                     }
-                    else -> return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMirai()
+                    else -> return BotUtil.sendMsgPrefix("命令不存在, 使用 /admin help 查看更多").toMirai()
                 }
             }
         }
@@ -88,7 +89,7 @@ class AdminCommand : UniversalCommand {
     }
 
     override fun getProps(): CommandProps =
-            CommandProps("admin", arrayListOf("管理", "管", "gl"), "机器人管理员命令", "nbot.commands.admin", UserLevel.ADMIN)
+        CommandProps("admin", arrayListOf("管理", "管", "gl"), "机器人管理员命令", "nbot.commands.admin", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
         ======= 命令帮助 =======
@@ -96,16 +97,16 @@ class AdminCommand : UniversalCommand {
         /admin gbdk 结束一个正在进行的打卡
     """.trimIndent()
 
-    private suspend fun clockIn(args: List<String>, message: GroupMessage): MessageChain {
-        if (BotConstants.checkInCalendar.isEmpty() || BotConstants.checkInCalendar.containsKey(message.group.id)) {
+    private fun clockIn(args: List<String>, message: GroupMessageEvent): MessageChain {
+        if (!ClockInManager.isDuplicate(message.group.id, 10)) {
             val startTime: LocalDateTime
             val endTime: LocalDateTime
 
             when (args.size) {
                 3 -> {
                     startTime = LocalDateTime.of(
-                            LocalDate.now(),
-                            LocalTime.parse(args[1], BotConstants.dateFormatter)
+                        LocalDate.now(),
+                        LocalTime.parse(args[1], BotConstants.dateFormatter)
                     )
                     endTime = LocalDateTime.of(
                             LocalDate.now(),
@@ -133,13 +134,11 @@ class AdminCommand : UniversalCommand {
                     usersList.add(member)
                 }
 
-                BotConstants.checkInCalendar[message.group.id] =
-                        CheckInData(startTime, endTime, usersList)
+                ClockInManager.newClockIn(message.group.id, usersList, startTime, endTime)
                 BotUtil.sendMsgPrefix("打卡已开启 请发送 /dk 来打卡").toMirai()
             }
         } else {
-            message.quoteReply(BotUtil.sendMsgPrefix("该群还有一个未完成的签到!"))
+            return BotUtil.sendMsgPrefix("10 分钟内还有一个打卡未结束").toMirai()
         }
-        return EmptyMessageChain
     }
 }
