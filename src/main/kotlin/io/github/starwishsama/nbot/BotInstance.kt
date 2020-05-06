@@ -18,6 +18,9 @@ import io.github.starwishsama.nbot.listeners.SessionListener
 import io.github.starwishsama.nbot.managers.TaskManager
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.tasks.CheckLiveStatus
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
@@ -36,7 +39,7 @@ import kotlin.system.exitProcess
 
 object BotInstance {
     val filePath: File = File(getPath())
-    const val version = "0.1.3-Dev-200504"
+    const val version = "0.2-BETA-200505"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -128,16 +131,7 @@ suspend fun main() {
 
         val listeners = arrayOf(FuckLightAppListener, GroupChatListener, RepeatListener, SessionListener)
 
-        BotInstance.logger.info("已注册 " + CommandHandler.commands.size + " 个命令")
-
-        client.runCatching {
-            val pwd = BotConstants.cfg.biliPassword
-            val uname = BotConstants.cfg.biliUserName
-
-            if (pwd != null && uname != null) {
-                login(username = uname, password = pwd)
-            }
-        }
+        BotInstance.logger.info("[命令] 已注册 " + CommandHandler.commands.size + " 个命令")
 
         setupRCon()
 
@@ -145,7 +139,7 @@ suspend fun main() {
                 BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
         )
 
-        /** 备份服务 */
+        /** 服务 */
         TaskManager.runScheduleTaskAsync({ BackupHelper.createBackup() }, 0, 3, TimeUnit.HOURS)
         TaskManager.runScheduleTaskAsync({ BotConstants.users.forEach { it.addTime(100) } }, 5, 5, TimeUnit.HOURS)
         TaskManager.runScheduleTaskAsyncIf(
@@ -155,6 +149,21 @@ suspend fun main() {
                 TimeUnit.MINUTES,
                 BotConstants.cfg.subList.isNotEmpty()
         )
+        TaskManager.runAsync({
+            client.runCatching {
+                val pwd = BotConstants.cfg.biliPassword
+                val uname = BotConstants.cfg.biliUserName
+
+                if (pwd != null && uname != null) {
+                    runBlocking {
+                        withContext(Dispatchers.IO) {
+                            login(username = uname, password = pwd)
+                        }
+                    }
+                }
+            }
+
+        }, 5)
 
 
         /** 监听器 */
@@ -171,20 +180,6 @@ suspend fun main() {
 
         BotInstance.logger.info("无名 Bot 启动成功, 耗时 $startUsedTime")
 
-        bot.subscribeMessages {
-            always {
-                if (this.message.contentToString().isNotEmpty() && BotConstants.cfg.commandPrefix.contains(
-                                this.message.contentToString().substring(0, 1)
-                        )
-                ) {
-                    val result = CommandHandler.execute(this)
-                    if (result !is EmptyMessageChain) {
-                        reply(result)
-                    }
-                }
-            }
-        }
-
         Runtime.getRuntime().addShutdownHook(Thread {
             DataSetup.saveFiles()
             BotInstance.service.shutdown()
@@ -192,6 +187,15 @@ suspend fun main() {
         })
 
         executeCommand()
+
+        bot.subscribeMessages {
+            always {
+                val result = CommandHandler.execute(this)
+                if (result !is EmptyMessageChain) {
+                    reply(result)
+                }
+            }
+        }
 
         bot.join() // 等待 Bot 离线, 避免主线程退出
     }

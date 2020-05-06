@@ -6,6 +6,7 @@ import io.github.starwishsama.nbot.commands.interfaces.WaitableCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.sessions.Session
+import io.github.starwishsama.nbot.sessions.SessionManager
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import net.mamoe.mirai.message.ContactMessage
 import net.mamoe.mirai.message.data.MessageChain
@@ -26,5 +27,6 @@ class ShopCommand : UniversalCommand, WaitableCommand {
 
     override suspend fun replyResult(message: ContactMessage, user: BotUser, session: Session) {
         message.reply("WIP")
+        SessionManager.expireSession(session)
     }
 }

@@ -106,6 +106,7 @@ class FlowerCommand : UniversalCommand, WaitableCommand {
         message.reply(
                 BotUtil.sendLocalMessage("msg.bot-prefix", "成功种植 ${user.flower?.flowerName}").toMirai()
         )
+        SessionManager.expireSession(session)
     }
 
 }

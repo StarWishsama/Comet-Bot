@@ -38,7 +38,7 @@ class RConCommand : UniversalCommand, WaitableCommand {
                         if (rCon != null) {
                             if (args.size > 1) {
                                 try {
-                                    withContext(Dispatchers.IO) {
+                                    return withContext(Dispatchers.IO) {
                                         return@withContext rCon.command(BotUtil.getRestStringInArgs(args, 1)).toMirai()
                                     }
                                 } catch (e: IOException) {

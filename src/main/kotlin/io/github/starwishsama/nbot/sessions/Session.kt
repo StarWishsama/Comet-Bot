@@ -16,7 +16,7 @@ open class Session(var groupId: Long = 0, var type: SessionType, var command: Un
     }
 
     fun putUser(id: Long) {
-        users = users.plusElement(SessionUser(id))
+        users = users + SessionUser(id)
     }
 
     fun getUserById(id: Long): SessionUser? {
@@ -28,5 +28,9 @@ open class Session(var groupId: Long = 0, var type: SessionType, var command: Un
             }
         }
         return null
+    }
+
+    override fun toString(): String {
+        return "${type.name}|$command|$groupId"
     }
 }

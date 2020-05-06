@@ -1,17 +1,16 @@
 package io.github.starwishsama.nbot.listeners
 
 import io.github.starwishsama.nbot.BotConstants
-import io.github.starwishsama.nbot.BotInstance
 import io.github.starwishsama.nbot.commands.interfaces.WaitableCommand
 import io.github.starwishsama.nbot.enums.SessionType
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.sessions.SessionManager
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.event.subscribeGroupMessages
+import net.mamoe.mirai.event.subscribeMessages
 
 object SessionListener : NListener {
     override fun register(bot: Bot) {
-        bot.subscribeGroupMessages {
+        bot.subscribeMessages {
             always {
                 if (!isPrefix(message.contentToString())) {
                     if (SessionManager.isValidSession(sender.id)) {
@@ -19,12 +18,11 @@ object SessionListener : NListener {
                         if (session != null) {
                             val command = session.command
                             if (session.type == SessionType.DELAY && command is WaitableCommand) {
-                                SessionManager.expireSession(sender.id)
                                 var user = BotUser.getUser(sender.id)
                                 if (user == null) {
                                     user = BotUser.quickRegister(sender.id)
                                 }
-                                BotInstance.logger.info("Executing waitable command")
+                                // 为了一些特殊需求, 请在命令中释放 Session
                                 command.replyResult(this, user, session)
                             }
                         }

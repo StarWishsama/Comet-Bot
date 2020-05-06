@@ -12,24 +12,17 @@ import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import io.github.starwishsama.nbot.util.PictureSearchUtil
 import net.mamoe.mirai.message.ContactMessage
-import net.mamoe.mirai.message.GroupMessage
 import net.mamoe.mirai.message.data.*
 
 class PictureSearch : UniversalCommand, WaitableCommand {
     override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
        if (BotUtil.isNoCoolDown(message.sender.id, 90)){
-           return if (message is GroupMessage) {
-               if (SessionManager.isValidSession(message.sender.id)){
-                   BotUtil.sendLocalMessage("msg.bot-prefix", "请发送需要搜索的图片").toMirai()
-               } else {
-                   val session = Session(message.group.id, SessionType.DELAY, this)
-                   session.putUser(message.sender.id)
-                   SessionManager.addSession(session)
-                   BotUtil.sendLocalMessage("msg.bot-prefix", "请发送需要搜索的图片").toMirai()
-               }
-           } else {
-               BotUtil.sendLocalMessage("msg.bot-prefix", "抱歉, 本功能暂时只支持群聊使用").toMirai()
+           if (!SessionManager.isValidSession(message.sender.id)) {
+               val session = Session(SessionType.DELAY, this, user.userQQ)
+               session.putUser(message.sender.id)
+               SessionManager.addSession(session)
            }
+           return BotUtil.sendLocalMessage("msg.bot-prefix", "请发送需要搜索的图片").toMirai()
        }
         return EmptyMessageChain
     }
@@ -64,8 +57,10 @@ class PictureSearch : UniversalCommand, WaitableCommand {
                     EmptyMessageChain
                 }
             })
-        } catch (e: NoSuchElementException){
+        } catch (e: NoSuchElementException) {
             message.reply("无法识别图片")
         }
+
+        SessionManager.expireSession(session)
     }
 }

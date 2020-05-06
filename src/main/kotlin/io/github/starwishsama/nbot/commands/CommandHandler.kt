@@ -46,18 +46,22 @@ object CommandHandler {
      * @param message 消息
      */
     suspend fun execute(message: ContactMessage): MessageChain {
-        val cmdPrefix = getCmdPrefix(message.message.contentToString())
-        for (cmd in commands){
-            if (isPrefix(cmd, cmdPrefix)){
-                BotInstance.logger.debug("[命令] " + message.sender.id + " 执行了命令: " + cmd.getProps().name)
-                var user = BotUser.getUser(message.sender.id)
-                if (user == null) {
-                    user = BotUser.quickRegister(message.sender.id)
-                }
+        if (message.message.contentToString().isNotEmpty() &&
+                BotConstants.cfg.commandPrefix.contains(
+                        message.message.contentToString().substring(0, 1))) {
+            val cmdPrefix = getCmdPrefix(message.message.contentToString())
+            for (cmd in commands) {
+                if (isPrefix(cmd, cmdPrefix)) {
+                    BotInstance.logger.debug("[命令] " + message.sender.id + " 执行了命令: " + cmd.getProps().name)
+                    var user = BotUser.getUser(message.sender.id)
+                    if (user == null) {
+                        user = BotUser.quickRegister(message.sender.id)
+                    }
 
-                if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
-                    val splitMessage = message.message.contentToString().split(" ")
-                    return cmd.execute(message, splitMessage.subList(1, splitMessage.size), user)
+                    if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
+                        val splitMessage = message.message.contentToString().split(" ")
+                        return cmd.execute(message, splitMessage.subList(1, splitMessage.size), user)
+                    }
                 }
             }
         }

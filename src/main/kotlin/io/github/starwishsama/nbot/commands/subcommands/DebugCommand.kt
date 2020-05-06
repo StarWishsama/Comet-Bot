@@ -1,11 +1,11 @@
 package io.github.starwishsama.nbot.commands.subcommands
 
-import cn.hutool.http.HttpRequest
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.file.DataSetup
 import io.github.starwishsama.nbot.objects.BotUser
+import io.github.starwishsama.nbot.sessions.SessionManager
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import net.mamoe.mirai.message.ContactMessage
@@ -21,22 +21,27 @@ class DebugCommand : UniversalCommand {
         if (args.isNotEmpty() && BotUtil.isNoCoolDown(message.sender.id)) {
             when (args[0]) {
                 "image" -> {
-                    val map = mutableMapOf<String, String>()
-                    map["user-agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36"
-                    val stream = HttpRequest.get("https://i.loli.net/2020/04/14/INmrZVhiyK5dgbk.jpg")
-                            .setFollowRedirects(true)
-                            .timeout(150_000)
-                            .addHeaders(map)
-                            .execute().bodyStream()
-                    return stream.uploadAsImage(message.subject).asMessageChain()
+                    return BotUtil.getImageStream("https://i.loli.net/2020/04/14/INmrZVhiyK5dgbk.jpg").uploadAsImage(message.subject).asMessageChain()
                 }
                 "reload" -> {
                     return try {
                         DataSetup.reload()
-                        BotUtil.sendLocalMessage("msg.bot-prefix", "重载成功.").toMirai()
+                        BotUtil.sendMsgPrefix("重载成功.").toMirai()
                     } catch (e: IOException) {
-                        BotUtil.sendLocalMessage("msg.bot-prefix", "在重载时发生了异常.").toMirai()
+                        BotUtil.sendMsgPrefix("在重载时发生了异常.").toMirai()
                     }
+                }
+                "session" -> {
+                    val sb = StringBuilder("目前活跃的会话列表: \n")
+                    val sessions = SessionManager.getSessions()
+                    if (sessions.isEmpty()) {
+                        sb.append("无")
+                    } else {
+                        for (i in sessions.indices) {
+                            sb.append(i + 1).append(" ").append(sessions[i].toString()).append("\n")
+                        }
+                    }
+                    return sb.toString().trim().toMirai()
                 }
                 "help" -> return getHelp().toMessage().asMessageChain()
                 else -> return "Bot > 命令不存在\n${getHelp()}".toMirai()

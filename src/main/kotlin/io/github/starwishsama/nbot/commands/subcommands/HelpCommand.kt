@@ -15,7 +15,7 @@ class HelpCommand : UniversalCommand {
     override suspend fun execute(message: ContactMessage, args: List<String>, user: BotUser): MessageChain {
         val sb = StringBuilder()
         for (cmd in CommandHandler.commands) {
-            if (cmd.getProps().name != "help" || cmd.getProps().name != "debug") {
+            if (cmd.getProps().name.contentEquals("help") || !cmd.getProps().name.contentEquals("debug")) {
                 sb.append("/").append(cmd.getProps().name).append("  ").append(cmd.getProps().description).append("\n")
             }
         }

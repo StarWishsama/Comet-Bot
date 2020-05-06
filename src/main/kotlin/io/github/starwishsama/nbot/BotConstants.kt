@@ -28,11 +28,10 @@ object BotConstants {
     var livers: List<String> = ArrayList()
     var underCovers: List<RandomResult> = LinkedList()
     var checkInCalendar = mutableMapOf<Long, CheckInData>()
-    var checkInData: List<CheckInData> = LinkedList()
     val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     /** 舟游/PCR 数据 */
-    var arkNight: MutableList<ArkNightOperator> = LinkedList()
+    var arkNight: List<ArkNightOperator> = LinkedList()
     var pcr: List<PCRCharacter> = LinkedList()
 
     var gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
