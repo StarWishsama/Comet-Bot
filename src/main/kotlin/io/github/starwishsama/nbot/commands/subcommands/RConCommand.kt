@@ -11,6 +11,7 @@ import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.sessions.Session
 import io.github.starwishsama.nbot.sessions.SessionManager
 import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.util.BotUtil.getRestString
 import io.github.starwishsama.nbot.util.BotUtil.isNumeric
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +40,7 @@ class RConCommand : UniversalCommand, WaitableCommand {
                             if (args.size > 1) {
                                 try {
                                     return withContext(Dispatchers.IO) {
-                                        return@withContext rCon.command(BotUtil.getRestStringInArgs(args, 1)).toMirai()
+                                        return@withContext rCon.command(args.getRestString(1)).toMirai()
                                     }
                                 } catch (e: IOException) {
                                     BotInstance.logger.error("在连接到 rCon 服务器时发生了错误", e)

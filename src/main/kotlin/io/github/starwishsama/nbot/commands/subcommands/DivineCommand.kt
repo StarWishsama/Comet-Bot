@@ -8,8 +8,8 @@ import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.objects.RandomResult
-import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.getLocalMessage
+import io.github.starwishsama.nbot.util.BotUtil.getRestString
 import io.github.starwishsama.nbot.util.BotUtil.isNoCoolDown
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -24,13 +24,16 @@ class DivineCommand : UniversalCommand {
             return if (args.isNotEmpty()) {
                 if (underCover == null) {
                     if (user.commandTime > 0 || user.level != UserLevel.USER) {
-                        val randomEventName = BotUtil.getRestStringInArgs(args, 0)
-                        if (randomEventName.length < 30 && EmojiUtil.extractEmojis(randomEventName).isEmpty()) {
+                        val randomEventName = args.getRestString(0)
+                        if (randomEventName.isNotBlank() && randomEventName.length < 30 && EmojiUtil.extractEmojis(
+                                randomEventName
+                            ).isEmpty()
+                        ) {
                             val result = RandomResult(-1000, RandomUtil.randomDouble(0.0, 1.0), randomEventName)
                             user.decreaseTime()
                             RandomResult.getChance(result).toMessage().asMessageChain()
                         } else {
-                            (getLocalMessage("msg.bot-prefix") + "需要占卜的东西太长了或者含有非法字符!").toMessage().asMessageChain()
+                            (getLocalMessage("msg.bot-prefix") + "请检查需要占卜的字符是否超过上限或为空!").toMessage().asMessageChain()
                         }
                     } else {
                         (getLocalMessage("msg.bot-prefix") + "今日命令条数已达上限, 请等待条数自动恢复哦~\n命令条数现在每小时会恢复100次, 封顶1000次").toMessage()

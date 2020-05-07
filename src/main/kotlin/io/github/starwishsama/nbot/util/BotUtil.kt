@@ -308,14 +308,14 @@ object BotUtil {
         return UserLevel.USER
     }
 
-    fun getRestStringInArgs(args: List<String>, startAt: Int): String{
+    fun List<String>.getRestString(startAt: Int): String {
         val sb = StringBuilder()
-        if (args.size == 1){
-            return args[0]
+        if (this.size == 1) {
+            return this[0]
         }
 
-        for (index in startAt until args.size){
-            sb.append(args[index]).append(" ")
+        for (index in startAt until this.size) {
+            sb.append(this[index]).append(" ")
         }
         return sb.toString().trim()
     }

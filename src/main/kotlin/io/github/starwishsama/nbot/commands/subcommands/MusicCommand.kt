@@ -7,6 +7,7 @@ import io.github.starwishsama.nbot.enums.MusicApi
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.util.BotUtil.getRestString
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import io.github.starwishsama.nbot.util.MusicUtil
 import net.mamoe.mirai.message.MessageEvent
@@ -35,12 +36,12 @@ class MusicCommand : UniversalCommand {
                     return when (api) {
                         MusicApi.QQ -> {
                             if (BotUtil.isNoCoolDown(event.sender.id, 30)) {
-                                MusicUtil.searchQQMusic(BotUtil.getRestStringInArgs(args, 0))
+                                MusicUtil.searchQQMusic(args.getRestString(0))
                             } else {
                                 EmptyMessageChain
                             }
                         }
-                        MusicApi.NETEASE -> MusicUtil.searchNetEaseMusic(BotUtil.getRestStringInArgs(args, 0))
+                        MusicApi.NETEASE -> MusicUtil.searchNetEaseMusic(args.getRestString(0))
                     }
                 }
             } else {

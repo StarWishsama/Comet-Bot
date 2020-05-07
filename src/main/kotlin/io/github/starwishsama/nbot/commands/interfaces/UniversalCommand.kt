@@ -14,7 +14,6 @@ import net.mamoe.mirai.message.data.MessageChain
 interface UniversalCommand {
     /** 执行命令后的逻辑 */
     suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain
-
     /** 命令属性 */
     fun getProps(): CommandProps
     /** 命令帮助文本 必写 不敢自己都看不懂哦 */

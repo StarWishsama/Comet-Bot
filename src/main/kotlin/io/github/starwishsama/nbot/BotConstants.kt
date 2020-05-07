@@ -2,6 +2,7 @@ package io.github.starwishsama.nbot
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
 import io.github.starwishsama.nbot.objects.BotLocalization
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.objects.Config
@@ -25,6 +26,7 @@ object BotConstants {
     var msg: List<BotLocalization> = ArrayList()
     var cfg = Config()
     var underCovers: List<RandomResult> = LinkedList()
+    var cache: JsonObject = JsonObject()
 
     /** 舟游/PCR 数据 */
     var arkNight: List<ArkNightOperator> = LinkedList()

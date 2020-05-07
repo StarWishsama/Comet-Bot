@@ -18,6 +18,7 @@ import io.github.starwishsama.nbot.listeners.SessionListener
 import io.github.starwishsama.nbot.managers.TaskManager
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.tasks.CheckLiveStatus
+import io.github.starwishsama.nbot.util.TwitterUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -135,8 +136,9 @@ suspend fun main() {
 
         setupRCon()
 
-        BotInstance.service = Executors.newSingleThreadScheduledExecutor(
-                BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
+        BotInstance.service = Executors.newScheduledThreadPool(
+            2,
+            BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
         )
 
         /** 服务 */
@@ -164,6 +166,7 @@ suspend fun main() {
             }
 
         }, 5)
+        TaskManager.runScheduleTaskAsync({ TwitterUtil.apiExecuteTime = 0 }, 1, 1, TimeUnit.DAYS)
 
         /** 监听器 */
         listeners.forEach {

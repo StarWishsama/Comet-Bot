@@ -54,4 +54,16 @@ open class Config {
 
     @SerializedName("check_delay")
     var checkDelay: Long = 1
+
+    @SerializedName("twitter_token")
+    var twitterToken: String? = null
+
+    @SerializedName("twitter_secret")
+    var twitterSecret: String? = null
+
+    @SerializedName("proxy_url")
+    var proxyUrl: String? = null
+
+    @SerializedName("proxy_port")
+    var proxyPort: Int = 0
 }

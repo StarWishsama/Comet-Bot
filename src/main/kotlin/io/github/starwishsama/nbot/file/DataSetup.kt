@@ -4,6 +4,7 @@ import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
 import io.github.starwishsama.nbot.BotConstants
@@ -24,6 +25,7 @@ object DataSetup {
     private val cfgFile: File = File(BotInstance.filePath.toString(),"/config.json")
     private val langCfg: File = File(BotInstance.filePath.toString(), "/lang.json")
     private val groupCfg: File = File(BotInstance.filePath.toString(), "/groups.json")
+    private val cacheCfg: File = File(BotInstance.filePath.toString(), "cache.json")
     private val gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
 
     fun loadCfg() {
@@ -74,15 +76,30 @@ object DataSetup {
                 )
                 GroupConfigManager.configs = gson.fromJson(
                         groupContent,
-                        object : TypeToken<Map<Long, GroupConfig>>() {}.type
+                    object : TypeToken<Map<Long, GroupConfig>>() {}.type
                 )
                 loadLang()
             } else {
                 System.err.println("[配置] 在加载配置文件时发生了问题, JSON 文件为空.")
             }
 
-            BotConstants.pcr = gson.fromJson(FileReader.create(File(BotInstance.filePath.toString(), "/pcr.json")).readString(), object : TypeToken<List<PCRCharacter>>() {}.type)
-            BotConstants.arkNight = gson.fromJson(FileReader.create(File(BotInstance.filePath.toString(), "/ark.json")).readString(), object : TypeToken<List<ArkNightOperator>>() {}.type)
+            BotConstants.pcr = gson.fromJson(
+                FileReader.create(File(BotInstance.filePath.toString(), "/pcr.json")).readString(),
+                object : TypeToken<List<PCRCharacter>>() {}.type
+            )
+            BotConstants.arkNight = gson.fromJson(
+                FileReader.create(File(BotInstance.filePath.toString(), "/ark.json")).readString(),
+                object : TypeToken<List<ArkNightOperator>>() {}.type
+            )
+
+            if (!cacheCfg.exists()) {
+                val jsonObject = JsonObject()
+                jsonObject.addProperty("token", "")
+                jsonObject.addProperty("get_time", 0L)
+                FileWriter.create(cacheCfg).write(gson.toJson(jsonObject))
+            } else {
+                BotConstants.cache = JsonParser.parseString(FileReader.create(cacheCfg).readString()).asJsonObject
+            }
 
         } catch (e: Exception) {
             System.err.println("[配置] 在加载配置文件时发生了问题, 错误信息: $e")
