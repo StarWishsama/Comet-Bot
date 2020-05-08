@@ -18,7 +18,6 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 
 class AdminCommand : UniversalCommand {
-    val commands = arrayOf("checkin")
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (user.isBotAdmin()) {
             if (args.isEmpty()) {
@@ -47,7 +46,19 @@ class AdminCommand : UniversalCommand {
                     "permadd", "添加权限", "tjqx" -> {
                         if (user.isBotOwner()) {
                             if (args.size > 1) {
-                                user.addPermission(args[1])
+                                val target: BotUser?
+                                val at = event.message[At]
+                                target = if (at != null) {
+                                    BotUser.getUser(at.target)
+                                } else {
+                                    if (StringUtils.isNumeric(args[1])) {
+                                        BotUser.getUser(args[1].toLong())
+                                    } else {
+                                        return BotUtil.sendLocalMessage("msg.bot-prefix", "请输入正确的QQ号或者@TA").toMirai()
+                                    }
+                                }
+
+                                target?.addPermission(args[2])
                                 return BotUtil.sendMsgPrefix("添加权限成功").toMirai()
                             }
                         } else {
@@ -64,7 +75,7 @@ class AdminCommand : UniversalCommand {
                                 if (StringUtils.isNumeric(args[1])) {
                                     BotUser.getUser(args[1].toLong())
                                 } else {
-                                    return BotUtil.sendLocalMessage("msg.bot-prefix", "给予的次数超过上限").toMirai()
+                                    return BotUtil.sendLocalMessage("msg.bot-prefix", "请输入正确的QQ号或者@TA").toMirai()
                                 }
                             }
 
@@ -93,8 +104,10 @@ class AdminCommand : UniversalCommand {
 
     override fun getHelp(): String = """
         ======= 命令帮助 =======
-        /admin dk [结束时间] 创建一个打卡
-        /admin gbdk 结束一个正在进行的打卡
+        /admin dk (开始时间) [结束时间] 创建一个打卡
+        /admin dksj 查看最近一次打卡的数据
+        /admin permadd [用户] [权限名] 给一个用户添加权限
+        /admin give [用户] [命令条数] 给一个用户添加命令条数
     """.trimIndent()
 
     private fun clockIn(args: List<String>, message: GroupMessageEvent): MessageChain {

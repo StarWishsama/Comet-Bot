@@ -28,9 +28,8 @@ class BiliBiliCommand : UniversalCommand {
                                     BotConstants.cfg.subList.add(args[1].toLong())
                                     BotUtil.sendMsgPrefix("订阅房间号 ${args[1]} 成功").toMirai()
                                 } else {
-                                    val searchResult = BiliBiliUtil.searchUser(args[1])
-                                    if (searchResult.items.isNotEmpty()) {
-                                        val item = searchResult.items[0]
+                                    val item = BiliBiliUtil.getUser(args[1])
+                                    if (item != null) {
                                         BotConstants.cfg.subList.add(item.roomid)
                                         BotUtil.sendMsgPrefix("订阅 ${item.title} 成功").toMirai()
                                     } else {
@@ -50,14 +49,13 @@ class BiliBiliCommand : UniversalCommand {
                             if (args[1].isNumeric()) {
                                 roomId = args[1].toLong()
                             } else {
-                                val searchResult = BiliBiliUtil.searchUser(args[1])
-                                if (searchResult.items.isNotEmpty()) {
-                                    val item = searchResult.items[0]
+                                val item = BiliBiliUtil.getUser(args[1])
+                                if (item != null) {
                                     roomId = item.mid
                                 }
                             }
 
-                            return if (BotConstants.cfg.subList.isEmpty() || !BotConstants.cfg.subList.contains(roomId)) {
+                            return if (!BotConstants.cfg.subList.contains(roomId)) {
                                 BotUtil.sendMsgPrefix("你还没订阅直播间 ${args[1]}").toMirai()
                             } else {
                                 BotConstants.cfg.subList.remove(args[1].toLong())
@@ -67,28 +65,27 @@ class BiliBiliCommand : UniversalCommand {
                             getHelp().toMirai()
                         }
                     }
+                    "list" -> {
+                        val subs = StringBuilder("监控室列表:\n")
+                        BotConstants.cfg.subList.forEach {
+                            val room = BiliBiliUtil.getLiveRoom(it)
+                            subs.append("${BiliBiliUtil.getUserNameByMid(room.data.uid)} ${if (room.data.liveStatus == 1) "✔" else "✘"}\n")
+                        }
+                        return subs.toString().trim().toMirai()
+                    }
                     "info", "查询" -> {
                         event.quoteReply("请稍等...")
-                        val searchResult = BiliBiliUtil.searchUser(args[1])
-                        if (searchResult.items.isNotEmpty()) {
-                            val item = searchResult.items[0]
+                        val item = BiliBiliUtil.getUser(args[1])
+                        return if (item != null) {
                             val before = item.title + "\n粉丝数: " + item.fans +
                                     "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
                                     "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘")
                             val dynamic = BiliBiliUtil.getDynamic(item.mid)
-                            return if (dynamic.isEmpty()) {
-                                ("$before\n无最近动态").toMirai()
-                            } else {
-                                when (dynamic.size) {
-                                    1 -> ("$before\n最近动态: ${dynamic[0]}").toMirai()
-                                    2 -> ("$before\n最近动态: ${dynamic[0]}").toMirai()
-                                        .plus(BotUtil.getImageStream(dynamic[1]).uploadAsImage(event.subject))
-                                    else -> ("$before\n无最近动态").toMirai()
-                                }
-                            }
+                            before.toMirai() + getDynamicText(dynamic, event)
                         } else {
-                            return "Bot > 账号不存在".toMirai()
+                            BotUtil.sendMsgPrefix("账号不存在").toMirai()
                         }
+
                     }
                     else -> return getHelp().toMirai()
                 }
@@ -98,12 +95,25 @@ class BiliBiliCommand : UniversalCommand {
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("bili", arrayListOf(), "订阅B站主播/查询用户动态", "nbot.commands.bili", UserLevel.USER)
+            CommandProps("bili", arrayListOf(), "订阅B站主播/查询用户动态", "nbot.commands.bili", UserLevel.USER)
 
     override fun getHelp(): String = """
         /bili sub [用户名] 订阅用户相关信息
         /bili unsub [用户名] 取消订阅用户相关信息
         /bili info [用户名] 查看用户的动态
     """.trimIndent()
+
+    private suspend fun getDynamicText(dynamic: List<String>, event: MessageEvent): MessageChain {
+        return if (dynamic.isEmpty()) {
+            ("\n无最近动态").toMirai()
+        } else {
+            when (dynamic.size) {
+                1 -> ("\n最近动态: ${dynamic[0]}").toMirai()
+                2 -> ("\n最近动态: ${dynamic[0]}").toMirai()
+                        .plus(BotUtil.getImageStream(dynamic[1]).uploadAsImage(event.subject))
+                else -> ("\n无最近动态").toMirai()
+            }
+        }
+    }
 
 }

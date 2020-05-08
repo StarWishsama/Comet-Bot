@@ -1,5 +1,7 @@
 package io.github.starwishsama.nbot.util
 
+import cn.hutool.core.io.file.FileReader
+import cn.hutool.core.io.file.FileWriter
 import cn.hutool.http.HttpRequest
 import com.deadmandungeons.serverstatus.MinecraftServerStatus
 import io.github.starwishsama.nbot.BotConstants
@@ -11,6 +13,7 @@ import io.github.starwishsama.nbot.objects.BotUser.Companion.isBotOwner
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.net.URISyntaxException
@@ -35,6 +38,22 @@ object BotUtil {
 
     fun String.toMirai(): MessageChain {
         return toMessage().asMessageChain()
+    }
+
+    fun File.initConfig(context: Any) {
+        FileWriter.create(this).write(BotConstants.gson.toJson(context))
+    }
+
+    fun File.writeJson(context: Any) {
+        if (!this.exists()) {
+            this.createNewFile()
+        }
+
+        FileWriter.create(this).write(BotConstants.gson.toJson(context))
+    }
+
+    fun File.getContext(): String {
+        return FileReader.create(this).readString()
     }
 
     /**

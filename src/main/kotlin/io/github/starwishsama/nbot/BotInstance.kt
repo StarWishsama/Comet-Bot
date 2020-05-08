@@ -117,7 +117,7 @@ suspend fun main() {
                         ClockInCommand(),
                         DebugCommand(),
                         DivineCommand(),
-                        DrawCommand(),
+                        GachaCommand(),
                         FlowerCommand(),
                         HelpCommand(),
                         InfoCommand(),

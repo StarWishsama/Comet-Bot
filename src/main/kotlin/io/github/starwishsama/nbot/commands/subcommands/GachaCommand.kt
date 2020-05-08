@@ -12,7 +12,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import org.apache.commons.lang3.StringUtils
 
-class DrawCommand : UniversalCommand {
+class GachaCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.userQQ)) {
             if (args.isNotEmpty()) {
@@ -21,8 +21,8 @@ class DrawCommand : UniversalCommand {
                         return if (args.size == 2) {
                             when (args[1]) {
                                 "十连" -> (BotUtil.getLocalMessage("msg.bot-prefix") + DrawUtil.getArkDrawResult(
-                                    user,
-                                    10
+                                        user,
+                                        10
                                 )).toMirai()
                                 "单抽" -> (BotUtil.getLocalMessage("msg.bot-prefix") + DrawUtil.getArkDrawResult(
                                     user,
@@ -67,7 +67,7 @@ class DrawCommand : UniversalCommand {
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("draw", arrayListOf("ck", "抽卡"), "抽卡模拟器", "nbot.commands.draw", UserLevel.USER)
+            CommandProps("gacha", arrayListOf("ck", "抽卡"), "抽卡模拟器", "nbot.commands.draw", UserLevel.USER)
 
     override fun getHelp(): String = """
          ============ 命令帮助 ============

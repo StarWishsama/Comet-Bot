@@ -4,6 +4,8 @@ import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotInstance
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.objects.BotUser
+import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -60,9 +62,11 @@ object CommandHandler {
                         user = BotUser.quickRegister(message.sender.id)
                     }
 
-                    if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
+                    return if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
                         val splitMessage = message.message.contentToString().split(" ")
-                        return cmd.execute(message, splitMessage.subList(1, splitMessage.size), user)
+                        cmd.execute(message, splitMessage.subList(1, splitMessage.size), user)
+                    } else {
+                        BotUtil.sendMsgPrefix("你没有权限!").toMirai()
                     }
                 }
             }
@@ -82,12 +86,12 @@ object CommandHandler {
     private fun isPrefix(cmd: UniversalCommand, prefix: String): Boolean {
         val props = cmd.getProps()
         when {
-            props.name == prefix -> {
+            props.name.contentEquals(prefix) -> {
                 return true
             }
             props.aliases != null -> {
-                for (pre in props.aliases!!) {
-                    if (pre == prefix) {
+                props.aliases?.forEach {
+                    if (it.contentEquals(prefix)) {
                         return true
                     }
                 }

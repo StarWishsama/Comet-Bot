@@ -31,6 +31,7 @@ class DebugCommand : UniversalCommand {
                     return if (args.size == 1) {
                         BotUtil.sendMsgPrefix("/debug twitter [蓝鸟账号]").toMirai()
                     } else {
+                        event.quoteReply("正在查询...")
                         try {
                             val twitterUser = TwitterUtil.getUserInfo(args.getRestString(1))
                             if (twitterUser == null) {
@@ -80,7 +81,7 @@ class DebugCommand : UniversalCommand {
     }
 
     override fun getProps(): CommandProps {
-        return CommandProps("debug", null, "nbot.commands.debug", "", UserLevel.ADMIN)
+        return CommandProps("debug", null, "Debug", "nbot.commands.debug", UserLevel.ADMIN)
     }
 
     override fun getHelp(): String = "直接开 IDE 看会死掉吗"

@@ -12,6 +12,8 @@ import io.github.starwishsama.nbot.objects.twitter.TwitterUser
 import java.io.IOException
 import java.net.Proxy
 import java.net.Socket
+import java.time.Duration
+import java.time.LocalDateTime
 
 
 object TwitterUtil {
@@ -63,25 +65,27 @@ object TwitterUtil {
         if (apiExecuteTime < 1500) {
             apiExecuteTime++
             return try {
+                val startTime = LocalDateTime.now()
                 val request = HttpRequest.get("$universalApi/users/show.json?screen_name=$username")
-                    .header(
-                        "authorization",
-                        "Bearer $token"
-                    )
-                    .timeout(150_000)
+                        .header(
+                                "authorization",
+                                "Bearer $token"
+                        )
+                        .timeout(150_000)
 
                 if (proxyHost != null && BotConstants.cfg.proxyPort != -1) {
                     request.setProxy(
-                        Proxy(
-                            Proxy.Type.HTTP,
-                            Socket(proxyHost, BotConstants.cfg.proxyPort).remoteSocketAddress
-                        )
+                            Proxy(
+                                    Proxy.Type.HTTP,
+                                    Socket(proxyHost, BotConstants.cfg.proxyPort).remoteSocketAddress
+                            )
                     )
                 }
 
                 val result = request.executeAsync()
-
-                BotConstants.gson.fromJson(result.body(), TwitterUser::class.java)
+                val entity = BotConstants.gson.fromJson(result.body(), TwitterUser::class.java)
+                BotInstance.logger.info("Used time ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+                entity
             } catch (e: Exception) {
                 BotInstance.logger.error("获取蓝鸟用户信息出现问题", e)
                 null

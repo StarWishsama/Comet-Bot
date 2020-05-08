@@ -25,42 +25,45 @@ class ClockInCommand : UniversalCommand {
         if (event is GroupMessageEvent) {
             val id = event.group.id
             val data = ClockInManager.getNearestClockIn(id)
-            if (data != null) {
-                if (data.checkedUsers.isEmpty()) {
-                    return clockIn(event.sender, event, data)
+            return if (data != null) {
+                if (isClockIn(data, event)) {
+                    clockIn(event.sender, event, data)
                 } else {
-                    data.checkedUsers.forEach { member ->
-                        run {
-                            return if (member.id == event.sender.id) {
-                                (BotUtil.getLocalMessage("msg.bot-prefix") + "你已经打卡过了!").toMessage()
-                                    .asMessageChain()
-                            } else {
-                                clockIn(event.sender, event, data)
-                            }
-                        }
-                    }
+                    (BotUtil.getLocalMessage("msg.bot-prefix") + "你已经打卡过了!").toMessage()
+                            .asMessageChain()
                 }
             } else {
-                return (BotUtil.getLocalMessage("msg.bot-prefix") + "没有正在进行的打卡").toMirai()
+                (BotUtil.getLocalMessage("msg.bot-prefix") + "没有正在进行的打卡").toMirai()
             }
         }
         return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("clockin", arrayListOf("打卡", "dk"), "打卡命令", "nbot.commands.clockin", UserLevel.USER)
+            CommandProps("clockin", arrayListOf("打卡", "dk"), "打卡命令", "nbot.commands.clockin", UserLevel.USER)
 
     override fun getHelp(): String = ""
+
+    private fun isClockIn(data: ClockInData, event: GroupMessageEvent): Boolean {
+        if (data.checkedUsers.isNotEmpty()) {
+            data.checkedUsers.forEach { member ->
+                run {
+                    return member.id == event.sender.id
+                }
+            }
+        }
+        return false
+    }
 
     private fun clockIn(sender: Member, msg: GroupMessageEvent, data: ClockInData): MessageChain {
         val checkInTime = LocalDateTime.now()
         if (Duration.between(data.endTime, checkInTime).toMinutes() <= 5) {
             var result =
-                "Bot > ${msg.sender.nameCardOrNick}, 签到成功!\n签到时间: ${checkInTime.format(
-                    DateTimeFormatter.ofPattern(
-                        "yyyy-MM-dd HH:mm:ss"
-                    )
-                )}"
+                    "Bot > ${msg.sender.nameCardOrNick}, 签到成功!\n签到时间: ${checkInTime.format(
+                            DateTimeFormatter.ofPattern(
+                                    "yyyy-MM-dd HH:mm:ss"
+                            )
+                    )}"
             result += if (checkInTime.isAfter(data.endTime)) {
                 data.lateUsers.add(sender)
                 data.checkedUsers.add(sender)

@@ -53,7 +53,7 @@ class BotUser(var userQQ: Long) {
     }
 
     fun hasPermission(permission: String): Boolean {
-        return (!permissions.isNullOrEmpty() && permissions.contains(permission)) || isBotOwner()
+        return permissions.contains(permission) || isBotOwner()
     }
 
     /**

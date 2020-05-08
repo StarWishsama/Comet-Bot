@@ -2,7 +2,6 @@ package io.github.starwishsama.nbot.file
 
 import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -17,40 +16,45 @@ import io.github.starwishsama.nbot.objects.draw.ArkNightOperator
 import io.github.starwishsama.nbot.objects.draw.PCRCharacter
 import io.github.starwishsama.nbot.objects.group.GroupConfig
 import io.github.starwishsama.nbot.objects.group.Shop
+import io.github.starwishsama.nbot.util.BotUtil.getContext
+import io.github.starwishsama.nbot.util.BotUtil.initConfig
+import io.github.starwishsama.nbot.util.BotUtil.writeJson
 import java.io.File
 
 object DataSetup {
-    private val userCfg: File = File(BotInstance.filePath.toString(),"users.json")
-    private val shopItemCfg: File = File(BotInstance.filePath.toString(),"/items.json")
-    private val cfgFile: File = File(BotInstance.filePath.toString(),"/config.json")
+    private val userCfg: File = File(BotInstance.filePath.toString(), "users.json")
+    private val shopItemCfg: File = File(BotInstance.filePath.toString(), "/items.json")
+    private val cfgFile: File = File(BotInstance.filePath.toString(), "/config.json")
     private val langCfg: File = File(BotInstance.filePath.toString(), "/lang.json")
     private val groupCfg: File = File(BotInstance.filePath.toString(), "/groups.json")
     private val cacheCfg: File = File(BotInstance.filePath.toString(), "cache.json")
-    private val gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
+    private val pcrData = File(BotInstance.filePath.toString(), "/pcr.json")
+    private val arkNightData = File(BotInstance.filePath.toString(), "/ark.json")
+    private val gson = BotConstants.gson
 
     fun loadCfg() {
-        if (userCfg.exists() && cfgFile.exists()) {
-            load()
-        } else {
+        if (!userCfg.exists() || !cfgFile.exists()) {
             try {
-                FileWriter.create(cfgFile).write(gson.toJson(BotConstants.cfg))
-                FileWriter.create(userCfg).write(gson.toJson(BotConstants.users))
-                FileWriter.create(shopItemCfg).write(gson.toJson(BotConstants.shop))
-                FileWriter.create(groupCfg).write(gson.toJson(GroupConfigManager.configs))
-                load()
+                cfgFile.initConfig(BotConstants.cfg)
+                userCfg.initConfig(BotConstants.users)
+                shopItemCfg.initConfig(BotConstants.shop)
+                groupCfg.initConfig(GroupConfigManager.configs)
                 println("[配置] 已自动生成新的配置文件.")
             } catch (e: Exception) {
                 System.err.println("[配置] 在生成配置文件时发生了错误, 错误信息: " + e.message)
             }
         }
+
+        load()
     }
 
     private fun saveCfg() {
         try {
-            FileWriter.create(cfgFile).write(gson.toJson(BotConstants.cfg))
-            FileWriter.create(userCfg).write(gson.toJson(BotConstants.users))
-            FileWriter.create(shopItemCfg).write(gson.toJson(BotConstants.shop))
-            FileWriter.create(groupCfg).write(gson.toJson(GroupConfigManager.configs))
+            cfgFile.writeJson(BotConstants.cfg)
+            userCfg.writeJson(BotConstants.users)
+            shopItemCfg.writeJson(BotConstants.shop)
+            groupCfg.writeJson(GroupConfigManager.configs)
+            cacheCfg.writeJson(BotConstants.cache)
         } catch (e: Exception) {
             System.err.println("[配置] 在保存配置文件时发生了问题, 错误信息: ")
             e.printStackTrace()
@@ -59,46 +63,36 @@ object DataSetup {
 
     private fun load() {
         try {
-            val userContent: String = FileReader.create(userCfg).readString()
-            val configContent: String = FileReader.create(cfgFile).readString()
-            val groupContent: String = FileReader.create(groupCfg).readString()
-            val checkInParser: JsonElement = JsonParser.parseString(userContent)
-            val configParser: JsonElement = JsonParser.parseString(configContent)
-            if (!checkInParser.isJsonNull && !configParser.isJsonNull) {
-                BotConstants.cfg = gson.fromJson(configContent, Config::class.java) as Config
-                BotConstants.users = gson.fromJson(
-                    userContent,
+            BotConstants.cfg = gson.fromJson(cfgFile.getContext(), Config::class.java) as Config
+            BotConstants.users = gson.fromJson(
+                    userCfg.getContext(),
                     object : TypeToken<List<BotUser>>() {}.type
-                )
-                BotConstants.shop = gson.fromJson(
-                    FileReader.create(shopItemCfg).readString(),
-                        object : TypeToken<List<Shop>>() {}.type
-                )
-                GroupConfigManager.configs = gson.fromJson(
-                        groupContent,
-                    object : TypeToken<Map<Long, GroupConfig>>() {}.type
-                )
-                loadLang()
-            } else {
-                System.err.println("[配置] 在加载配置文件时发生了问题, JSON 文件为空.")
-            }
-
-            BotConstants.pcr = gson.fromJson(
-                FileReader.create(File(BotInstance.filePath.toString(), "/pcr.json")).readString(),
-                object : TypeToken<List<PCRCharacter>>() {}.type
             )
-            BotConstants.arkNight = gson.fromJson(
-                FileReader.create(File(BotInstance.filePath.toString(), "/ark.json")).readString(),
-                object : TypeToken<List<ArkNightOperator>>() {}.type
+            BotConstants.shop = gson.fromJson(
+                    shopItemCfg.getContext(),
+                    object : TypeToken<List<Shop>>() {}.type
+            )
+            GroupConfigManager.configs = gson.fromJson(
+                    groupCfg.getContext(),
+                    object : TypeToken<Map<Long, GroupConfig>>() {}.type
+            )
+
+            loadLang()
+
+            BotConstants.pcr = gson.fromJson(pcrData.getContext(),
+                    object : TypeToken<List<PCRCharacter>>() {}.type
+            )
+            BotConstants.arkNight = gson.fromJson(arkNightData.getContext(),
+                    object : TypeToken<List<ArkNightOperator>>() {}.type
             )
 
             if (!cacheCfg.exists()) {
                 val jsonObject = JsonObject()
                 jsonObject.addProperty("token", "")
                 jsonObject.addProperty("get_time", 0L)
-                FileWriter.create(cacheCfg).write(gson.toJson(jsonObject))
+                cacheCfg.writeJson(jsonObject)
             } else {
-                BotConstants.cache = JsonParser.parseString(FileReader.create(cacheCfg).readString()).asJsonObject
+                BotConstants.cache = JsonParser.parseString(cacheCfg.getContext()).asJsonObject
             }
 
         } catch (e: Exception) {
@@ -107,7 +101,7 @@ object DataSetup {
     }
 
     fun loadLang() {
-        if (!langCfg.exists() && BotConstants.msg.isEmpty()) {
+        if (!langCfg.exists()) {
             BotConstants.msg = BotConstants.msg + BotLocalization("msg.bot-prefix", "Bot > ")
             BotConstants.msg = BotConstants.msg + BotLocalization("msg.no-permission", "你没有权限")
             BotConstants.msg = BotConstants.msg + BotLocalization("msg.bind-success", "绑定账号 %s 成功!")
@@ -115,16 +109,19 @@ object DataSetup {
             FileWriter.create(langCfg).write(gson.toJson(BotConstants.msg))
         } else {
             val lang: JsonElement =
-                JsonParser.parseString(FileReader.create(langCfg).readString())
-            if (!lang.isJsonNull) {
-                BotConstants.msg = gson.fromJson(FileReader.create(langCfg).readString(), object : TypeToken<List<BotLocalization>>() {}.type
+                    JsonParser.parseString(langCfg.getContext())
+            if (lang.isJsonObject) {
+                BotConstants.msg = gson.fromJson(FileReader.create(langCfg).readString(),
+                        object : TypeToken<List<BotLocalization>>() {}.type
                 )
-            } else System.err.println("[配置] 在读取时发生了问题, JSON 文件为空")
+            } else {
+                System.err.println("[配置] 在读取时发生了问题, 非法的 JSON 文件")
+            }
         }
     }
 
     private fun saveLang() {
-        FileWriter.create(langCfg).write(gson.toJson(BotConstants.msg))
+        langCfg.writeJson(BotConstants.msg)
     }
 
     fun saveFiles() {
