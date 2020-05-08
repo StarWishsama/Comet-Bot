@@ -17,7 +17,7 @@ English Version: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mira
   <img src="https://img.shields.io/github/issues/StarWishsama/Nameless-Bot.svg?style=popout">
 </a> 
 
-## 🎉 功能
+## 🎉 它能干什么?
 * 以图搜图
 * 彩虹六号战绩查询
 * 打卡
