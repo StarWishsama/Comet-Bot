@@ -37,7 +37,7 @@ English Version: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mira
 
 ## 💽 如何使用
 
-# 自编译
+### 自编译
 1.1. Clone 或者下载这个项目.
 
 ```bash
@@ -49,7 +49,7 @@ git clone https://github.com/StarWishsama/Nameless-Bot.git
 本项目使用 Gradle, 因此你可以双击文件夹中的 `gradlew.bat` 以构建这个项目.
 (你可以在 `/build/libs` 下找到构建好的 jar 文件)
 
-# 直接下载
+### 直接下载
 1. 到项目的 releases 页面下载最新版本的 jar
 
 2. 使用 cmd 启动 Bot, 然后去 config.json 下面填写账号密码
