@@ -52,6 +52,14 @@ object BotUtil {
         FileWriter.create(this).write(BotConstants.gson.toJson(context))
     }
 
+    fun File.writeString(context: String) {
+        if (!this.exists()) {
+            this.createNewFile()
+        }
+
+        FileWriter.create(this).write(context)
+    }
+
     fun File.getContext(): String {
         return FileReader.create(this).readString()
     }

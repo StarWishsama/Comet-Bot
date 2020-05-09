@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 object BackupHelper {
     private val location: File = File(BotInstance.filePath.toString() + "/backups")
 
-    fun createBackup(){
+    private fun createBackup(){
         try {
             if (!location.exists()) {
                 location.mkdirs()

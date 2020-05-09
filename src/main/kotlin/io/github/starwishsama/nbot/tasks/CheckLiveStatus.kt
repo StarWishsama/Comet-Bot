@@ -13,29 +13,31 @@ object CheckLiveStatus : Runnable {
         if (BotConstants.cfg.subList.isNotEmpty() && BotConstants.cfg.pushGroups.isNotEmpty()) {
             for (roomId in BotConstants.cfg.subList) {
                 val data = runBlocking {
-                    BiliBiliUtil.getLiveRoom(roomId).data
+                    BiliBiliUtil.getLiveRoom(roomId)?.data
                 }
-                when (data.liveStatus) {
-                    0 -> {
-                        /** 如果下播了就删除, 等待下一次开播后做提醒 */
-                        if (pushedList.contains(roomId)) {
-                            pushedList.remove(roomId)
-                        }
-                    }
-                    1 -> {
-                        if (!pushedList.contains(roomId)) {
-                            val msg =
-                                "单推助手 > \n${BiliBiliUtil.getUserNameByMid(data.uid)} 开播了!\n标题: ${data.title}\n开播时间: ${data.liveTime}\n传送门: https://live.bilibili.com/${data.roomId}"
-                            for (group in BotInstance.bot.groups) {
-                                runBlocking {
-                                    if (BotConstants.cfg.pushGroups.contains(group.id)) {
-                                        group.sendMessage(msg)
-                                    }
-                                }
-                                /** 防止消息发送失败 */
-                                Thread.sleep(8000)
+                if (data != null) {
+                    when (data.liveStatus) {
+                        0 -> {
+                            /** 如果下播了就删除, 等待下一次开播后做提醒 */
+                            if (pushedList.contains(roomId)) {
+                                pushedList.remove(roomId)
                             }
-                            pushedList.add(roomId)
+                        }
+                        1 -> {
+                            if (!pushedList.contains(roomId)) {
+                                val msg =
+                                    "单推助手 > \n${BiliBiliUtil.getUserNameByMid(data.uid)} 开播了!\n标题: ${data.title}\n开播时间: ${data.liveTime}\n传送门: https://live.bilibili.com/${data.roomId}"
+                                for (group in BotInstance.bot.groups) {
+                                    runBlocking {
+                                        if (BotConstants.cfg.pushGroups.contains(group.id)) {
+                                            group.sendMessage(msg)
+                                        }
+                                    }
+                                    /** 防止消息发送失败 */
+                                    Thread.sleep(8000)
+                                }
+                                pushedList.add(roomId)
+                            }
                         }
                     }
                 }

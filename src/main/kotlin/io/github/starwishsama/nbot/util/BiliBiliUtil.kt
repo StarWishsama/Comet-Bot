@@ -4,6 +4,7 @@ import cn.hutool.http.HttpRequest
 import com.google.gson.JsonParser
 import com.hiczp.bilibili.api.app.model.SearchUserResult
 import com.hiczp.bilibili.api.live.model.RoomInfo
+import com.hiczp.bilibili.api.retrofit.exception.BilibiliApiException
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotInstance
 import io.github.starwishsama.nbot.objects.bilibili.dynamic.DynamicAdapter
@@ -16,26 +17,39 @@ object BiliBiliUtil {
             "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?visitor_uid=0&host_uid=%uid%&offset_dynamic_id=0&need_top=0"
     private const val infoUrl = "http://api.bilibili.com/x/space/acc/info?mid="
 
-    suspend fun searchUser(userName: String): SearchUserResult.Data {
+    private suspend fun searchUser(userName: String): SearchUserResult.Data {
         val searchResult = client.appAPI.searchUser(keyword = userName).await()
         return searchResult.data
     }
 
     suspend fun getUser(userName: String): SearchUserResult.Data.Item? {
-        val searchResult = searchUser(userName)
-        if (searchResult.items.isNotEmpty()) {
-            return searchResult.items[0]
+        try {
+            val searchResult = searchUser(userName)
+            if (searchResult.items.isNotEmpty()) {
+                return searchResult.items[0]
+            }
+        } catch (e: BilibiliApiException) {
+            BotInstance.logger.error("在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
+                    "${e.commonResponse.msg}\n" +
+                    "${e.commonResponse.message}", e)
         }
         return null
     }
 
-    suspend fun getLiveRoom(roomId: Long): RoomInfo {
-        return client.liveAPI.getInfo(roomId).await()
+    suspend fun getLiveRoom(roomId: Long): RoomInfo? {
+        try {
+            return client.liveAPI.getInfo(roomId).await()
+        } catch (e: BilibiliApiException) {
+            BotInstance.logger.error("在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
+                    "${e.commonResponse.msg}\n" +
+                    "${e.commonResponse.message}", e)
+        }
+        return null
     }
 
     fun getUserNameByMid(mid: Long): String {
         val response = HttpRequest.get(infoUrl + mid).timeout(8000)
-                .addHeaders(mutableMapOf("User-Agent" to "Nameless live status checker (starwishsama@outlook.com)"))
+                .addHeaders(mutableMapOf("User-Agent" to "Nameless live status checker by StarWishsama"))
                 .executeAsync()
         return JsonParser.parseString(response.body()).asJsonObject["data"].asJsonObject["name"].asString
     }

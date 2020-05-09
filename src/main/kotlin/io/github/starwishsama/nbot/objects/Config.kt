@@ -2,6 +2,7 @@ package io.github.starwishsama.nbot.objects
 
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.nbot.enums.MusicApi
+import java.util.*
 
 
 open class Config {
@@ -10,22 +11,31 @@ open class Config {
 
     @SerializedName("botPassword")
     var botPassword: String = "password"
+
     @SerializedName("auto_save_config_time")
     var autoSaveTime : Int = 15
+
     @SerializedName("rcon_url")
     var rConUrl: String? = null
+
     @SerializedName("rcon_port")
     var rConPort: Int = 0
+
     @SerializedName("rcon_password")
     var rConPassword: String? = null
+
     @SerializedName("netease_api")
     var netEaseApi: String = "http://localhost:3000"
+
     @SerializedName("cool_down_time")
     var coolDownTime: Int = 7
+
     @SerializedName("filter_words")
-    lateinit var filterWords: Array<String>
+    var filterWords = mutableListOf<String>()
+
     @SerializedName("default_music_api")
     var musicApi = MusicApi.QQ
+
     @SerializedName("command_prefix")
     var commandPrefix: List<String> = mutableListOf(".", "。", "#", "!", "/")
 
@@ -45,7 +55,7 @@ open class Config {
     var r6tabKey: String? = null
 
     @SerializedName("universal_subs")
-    var subList = mutableListOf<Long>()
+    var subList = LinkedList<Long>()
 
     @SerializedName("push_groups")
     var pushGroups = mutableListOf<Long>()

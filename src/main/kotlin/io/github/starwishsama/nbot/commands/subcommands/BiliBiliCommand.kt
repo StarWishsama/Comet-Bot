@@ -9,6 +9,7 @@ import io.github.starwishsama.nbot.util.BiliBiliUtil
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.isNumeric
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
+import kotlinx.coroutines.delay
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -24,15 +25,24 @@ class BiliBiliCommand : UniversalCommand {
                     "sub", "订阅" -> {
                         if (args.size > 1) {
                             if (user.isBotAdmin()) {
-                                val mid: Long
-                                mid = if (args[1].isNumeric()) {
-                                    args[1].toLong()
+                                if (args[1].contains("|")) {
+                                    val users = args[1].split("|")
+                                    users.forEach {
+                                        val result = subscribe(it)
+                                        if (result is EmptyMessageChain) {
+                                            return BotUtil.sendMsgPrefix("账号不存在").toMirai()
+                                        }
+                                        delay(120)
+                                    }
+                                    return BotUtil.sendMsgPrefix("订阅多个直播间成功 你好D啊").toMirai()
                                 } else {
-                                    val item = BiliBiliUtil.getUser(args[1])
-                                    item?.roomid ?: return BotUtil.sendMsgPrefix("账号不存在").toMirai()
+                                    var result = subscribe(args[1])
+                                    if (result is EmptyMessageChain) {
+                                        result = BotUtil.sendMsgPrefix("账号不存在").toMirai()
+                                    }
+
+                                    return result
                                 }
-                                BotConstants.cfg.subList.add(mid)
-                                return BotUtil.sendMsgPrefix("订阅 ${BiliBiliUtil.getUserNameByMid(mid)} 的直播间成功").toMirai()
                             } else {
                                 BotUtil.sendMsgPrefix("你没有权限").toMirai()
                             }
@@ -66,7 +76,10 @@ class BiliBiliCommand : UniversalCommand {
                         val subs = StringBuilder("监控室列表:\n")
                         BotConstants.cfg.subList.forEach {
                             val room = BiliBiliUtil.getLiveRoom(it)
-                            subs.append("${BiliBiliUtil.getUserNameByMid(room.data.uid)} ${if (room.data.liveStatus == 1) "✔" else "✘"}\n")
+                            if (room != null) {
+                                subs.append("${BiliBiliUtil.getUserNameByMid(room.data.uid)} " +
+                                        "${if (room.data.liveStatus == 1) "✔" else "✘"}\n")
+                            }
                         }
                         return subs.toString().trim().toMirai()
                     }
@@ -111,6 +124,22 @@ class BiliBiliCommand : UniversalCommand {
                 else -> ("\n无最近动态").toMirai()
             }
         }
+    }
+
+    private suspend fun subscribe(roomId: String) : MessageChain{
+        val mid: Long
+        mid = if (roomId.isNumeric()) {
+            roomId.toLong()
+        } else {
+            val item = BiliBiliUtil.getUser(roomId)
+            item?.roomid ?: return EmptyMessageChain
+        }
+
+        if (!BotConstants.cfg.subList.contains(mid)) {
+            BotConstants.cfg.subList.add(mid)
+        }
+
+        return BotUtil.sendMsgPrefix("订阅 ${BiliBiliUtil.getUserNameByMid(mid)} 成功").toMirai()
     }
 
 }

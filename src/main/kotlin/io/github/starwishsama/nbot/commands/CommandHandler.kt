@@ -8,9 +8,8 @@ import io.github.starwishsama.nbot.sessions.SessionManager
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import net.mamoe.mirai.message.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
-import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.content
+import net.mamoe.mirai.message.data.*
+import java.util.*
 
 /**
  * Mirai 命令处理器
@@ -61,7 +60,7 @@ object CommandHandler {
 
                 return if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
                     val splitMessage = event.message.contentToString().split(" ")
-                    cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
+                    doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size), user))
                 } else {
                     BotUtil.sendMsgPrefix("你没有权限!").toMirai()
                 }
@@ -112,5 +111,35 @@ object CommandHandler {
             }
         }
         return false
+    }
+
+    private fun doFilter(chain: MessageChain) : MessageChain {
+        if (BotConstants.cfg.filterWords.isNullOrEmpty()) {
+            return chain
+        }
+
+        val revampChain = LinkedList<SingleMessage>()
+        chain.forEach { revampChain.add(it) }
+
+        var count = 0
+
+        for (i in revampChain.indices) {
+            if (revampChain[i] is PlainText) {
+                var context = revampChain[i].content
+                BotConstants.cfg.filterWords.forEach {
+                    if (context.contains(it)) {
+                        count++
+                        context = context.replace(it.toRegex(), "")
+                    }
+
+                    if (count > 3) {
+                        return EmptyMessageChain
+                    }
+                }
+                revampChain[i] = PlainText(context)
+            }
+        }
+
+        return revampChain.asMessageChain()
     }
 }

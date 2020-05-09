@@ -94,6 +94,7 @@ object DataSetup {
                 BotConstants.cache = JsonParser.parseString(cacheCfg.getContext()).asJsonObject
             }
 
+            println("[配置] 成功载入配置文件")
         } catch (e: Exception) {
             System.err.println("[配置] 在加载配置文件时发生了问题, 错误信息: $e")
         }
@@ -117,6 +118,7 @@ object DataSetup {
                 BotConstants.msg = gson.fromJson(FileReader.create(langCfg).readString(),
                         object : TypeToken<List<BotLocalization>>() {}.type
                 )
+                println("[配置] 成功载入多语言文件")
             } else {
                 System.err.println("[配置] 在读取时发生了问题, 非法的 JSON 文件")
             }
