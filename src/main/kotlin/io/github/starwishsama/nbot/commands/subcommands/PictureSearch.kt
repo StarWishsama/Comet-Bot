@@ -1,5 +1,6 @@
 package io.github.starwishsama.nbot.commands.subcommands
 
+import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.commands.interfaces.WaitableCommand
@@ -20,12 +21,14 @@ import net.mamoe.mirai.message.data.queryUrl
 class PictureSearch : UniversalCommand, WaitableCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(event.sender.id, 90)) {
-            if (!SessionManager.isValidSession(event.sender.id)) {
-                val session = Session(SessionType.DELAY, this, user.userQQ)
-                session.putUser(event.sender.id)
-                SessionManager.addSession(session)
+            return if (BotConstants.cfg.saucenaoApiKey != null) {
+                if (!SessionManager.isValidSession(event.sender.id)) {
+                    SessionManager.addSession(Session(SessionType.DELAY, this, user.userQQ))
+                }
+                BotUtil.sendLocalMessage("msg.bot-prefix", "请发送需要搜索的图片").toMirai()
+            } else {
+                BotUtil.sendMsgPrefix("请在配置文件里填入 SauceNao api key").toMirai()
             }
-            return BotUtil.sendLocalMessage("msg.bot-prefix", "请发送需要搜索的图片").toMirai()
         }
         return EmptyMessageChain
     }
@@ -56,7 +59,7 @@ class PictureSearch : UniversalCommand, WaitableCommand {
                     "相似度过低 (${result.similarity}%), 请尝试更换图片重试".toMirai()
                 }
             } else {
-                "无法识别图片".toMirai()
+                "请发送正确的图片!".toMirai()
             }
         })
 

@@ -26,8 +26,6 @@ open class Config {
     lateinit var filterWords: Array<String>
     @SerializedName("default_music_api")
     var musicApi = MusicApi.QQ
-    @SerializedName("bilibili_password")
-    var userPassword: String? = null
     @SerializedName("command_prefix")
     var commandPrefix: List<String> = mutableListOf(".", "。", "#", "!", "/")
 
@@ -41,10 +39,10 @@ open class Config {
     var ownerId: Long = 0L
 
     @SerializedName("saucenao_api_key")
-    var saucenaoApiKey = "noKey"
+    var saucenaoApiKey: String? = null
 
     @SerializedName("r6tab_apikey")
-    var r6tabKey = "noKey"
+    var r6tabKey: String? = null
 
     @SerializedName("universal_subs")
     var subList = mutableListOf<Long>()

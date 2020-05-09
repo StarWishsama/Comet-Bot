@@ -25,6 +25,7 @@ class InfoCommand : UniversalCommand {
                                 user.lastCheckInTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString() +
                                 "\n权限组: " + user.level.toString() +
                                 "\n命令条数: " + user.commandTime
+
                     if (user.bindServerAccount != null) {
                         reply = reply + "绑定的游戏账号是: " + user.bindServerAccount
                     }

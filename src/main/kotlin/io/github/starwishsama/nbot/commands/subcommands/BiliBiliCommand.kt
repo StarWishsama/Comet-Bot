@@ -23,21 +23,18 @@ class BiliBiliCommand : UniversalCommand {
                 when (args[0]) {
                     "sub", "订阅" -> {
                         if (args.size > 1) {
-                            return if (user.isBotAdmin()) {
-                                if (args[1].isNumeric()) {
-                                    BotConstants.cfg.subList.add(args[1].toLong())
-                                    BotUtil.sendMsgPrefix("订阅房间号 ${args[1]} 成功").toMirai()
+                            if (user.isBotAdmin()) {
+                                val mid: Long
+                                mid = if (args[1].isNumeric()) {
+                                    args[1].toLong()
                                 } else {
                                     val item = BiliBiliUtil.getUser(args[1])
-                                    if (item != null) {
-                                        BotConstants.cfg.subList.add(item.roomid)
-                                        BotUtil.sendMsgPrefix("订阅 ${item.title} 成功").toMirai()
-                                    } else {
-                                        BotUtil.sendMsgPrefix("账号不存在").toMirai()
-                                    }
+                                    item?.roomid ?: return BotUtil.sendMsgPrefix("账号不存在").toMirai()
                                 }
+                                BotConstants.cfg.subList.add(mid)
+                                return BotUtil.sendMsgPrefix("订阅 ${BiliBiliUtil.getUserNameByMid(mid)} 的直播间成功").toMirai()
                             } else {
-                                BotUtil.sendMsgPrefix("你已经订阅过直播间 ${args[1]} 了").toMirai()
+                                BotUtil.sendMsgPrefix("你没有权限").toMirai()
                             }
                         } else {
                             return getHelp().toMirai()

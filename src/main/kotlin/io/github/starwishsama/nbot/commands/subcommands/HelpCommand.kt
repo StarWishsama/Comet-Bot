@@ -20,7 +20,7 @@ class HelpCommand : UniversalCommand {
             }
         }
 
-        return sb.toString().trim().limitStringSize(150).toMessage().asMessageChain()
+        return sb.toString().trim().limitStringSize(200).toMessage().asMessageChain()
     }
 
     override fun getProps(): CommandProps =

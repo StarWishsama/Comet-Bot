@@ -7,19 +7,17 @@ import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.message.data.toMessage
 
 class VersionCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(event.sender.id)) {
-            val v = "无名Bot " + BotInstance.version + "\n已注册的命令个数: " + CommandHandler.commands.size +
+            return ("无名Bot " + BotInstance.version + "\n已注册的命令个数: " + CommandHandler.commands.size +
                     "\n运行时间: ${BotUtil.getRunningTime()}" +
-                    "\nMade with ❤, Running on Mirai"
-            return v.toMessage().asMessageChain()
+                    "\nMade with ❤, Running on Mirai").toMirai()
         }
         return EmptyMessageChain
     }

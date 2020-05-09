@@ -40,7 +40,7 @@ import kotlin.system.exitProcess
 
 object BotInstance {
     val filePath: File = File(getPath())
-    const val version = "0.3-BETA-200506"
+    const val version = "0.3.1-BETA-200509"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -126,6 +126,7 @@ suspend fun main() {
                         PictureSearch(),
                         R6SCommand(),
                         RConCommand(),
+                        TwitterCommand(),
                         VersionCommand()
                 )
         )
@@ -136,13 +137,12 @@ suspend fun main() {
 
         setupRCon()
 
-        BotInstance.service = Executors.newScheduledThreadPool(
-            2,
-            BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
+        BotInstance.service = Executors.newSingleThreadScheduledExecutor(
+                BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
         )
 
         /** 服务 */
-        TaskManager.runScheduleTaskAsync({ BackupHelper.createBackup() }, 0, 3, TimeUnit.HOURS)
+        BackupHelper.scheduleBackup()
         TaskManager.runScheduleTaskAsync({ BotConstants.users.forEach { it.addTime(100) } }, 5, 5, TimeUnit.HOURS)
         TaskManager.runScheduleTaskAsyncIf(
                 CheckLiveStatus::run,

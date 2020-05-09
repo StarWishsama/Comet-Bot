@@ -173,8 +173,8 @@ object BotUtil {
      */
     fun isChecked(user: BotUser): Boolean {
         val now = LocalDateTime.now()
-        return if (user.lastCheckInTime.month == now.month
-            && user.lastCheckInTime.dayOfMonth == now.dayOfMonth - 1
+        return if ((user.lastCheckInTime.month == now.month
+                        && user.lastCheckInTime.dayOfMonth == now.dayOfMonth - 1) || user.checkInTime == 0
         ) {
             false
         } else user.lastCheckInTime.month >= now.month

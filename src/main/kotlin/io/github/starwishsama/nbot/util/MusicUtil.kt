@@ -20,11 +20,11 @@ object MusicUtil {
 
     fun searchNetEaseMusic(songName: String): MessageChain {
         try {
-            val searchResult = HttpRequest.get("http://${BotConstants.cfg.netEaseApi}/search?keywords=${URLEncoder.encode(songName, "UTF-8")}").timeout(8000).executeAsync()
-            if (searchResult.isOk) {
-                val result: JsonObject = JsonParser.parseString(searchResult.body()) as JsonObject
-                if (result.isJsonObject) {
-                    val musicId = result.getAsJsonObject("result").getAsJsonArray("songs")[0]["id"].asInt
+            val searchResponse = HttpRequest.get("http://${BotConstants.cfg.netEaseApi}/search?keywords=${URLEncoder.encode(songName, "UTF-8")}").timeout(8000).executeAsync()
+            if (searchResponse.isOk) {
+                val searchResult: JsonObject = JsonParser.parseString(searchResponse.body()) as JsonObject
+                if (searchResult.isJsonObject) {
+                    val musicId = searchResult.getAsJsonObject("result").getAsJsonArray("songs")[0]["id"].asInt
                     val musicUrl = "https://music.163.com/#/song?id=$musicId"
                     val songResult = HttpRequest.get("http://${BotConstants.cfg.netEaseApi}/song/detail?ids=$musicId").timeout(8000).executeAsync()
                     if (songResult.isOk) {

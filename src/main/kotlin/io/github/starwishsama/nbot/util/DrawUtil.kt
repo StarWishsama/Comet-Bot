@@ -11,7 +11,7 @@ import java.util.*
 import java.util.stream.Collectors
 
 object DrawUtil {
-    fun tenTimeDrawAr(): List<ArkNightOperator> {
+    private fun tenTimeDrawAr(): List<ArkNightOperator> {
         val ops: MutableList<ArkNightOperator> = ArrayList<ArkNightOperator>()
         for (i in 0..9) {
             ops.add(drawAr())
@@ -19,7 +19,7 @@ object DrawUtil {
         return ops
     }
 
-    fun drawAr(): ArkNightOperator {
+    private fun drawAr(): ArkNightOperator {
         val probability = RandomUtil.randomDouble(0.0, 1.0, 2, RoundingMode.HALF_DOWN)
         val rare: Int
         rare = when (probability) {
@@ -31,7 +31,7 @@ object DrawUtil {
         return getOperator(rare)
     }
 
-    fun getOperator(rare: Int): ArkNightOperator {
+    private fun getOperator(rare: Int): ArkNightOperator {
         val ops: List<ArkNightOperator> = BotConstants.arkNight
         val tempOps: MutableList<ArkNightOperator> = LinkedList<ArkNightOperator>()
         for (op in ops) {
@@ -46,7 +46,7 @@ object DrawUtil {
     private const val R2 = 200
     private const val R1 = 775
 
-    fun drawPCR(): PCRCharacter {
+    private fun drawPCR(): PCRCharacter {
         val chance = RandomUtil.randomInt(0, R1 + R2 + R3)
         return when {
             chance <= R3 -> {
@@ -61,7 +61,7 @@ object DrawUtil {
         }
     }
 
-    fun tenTimesDrawPCR(): List<PCRCharacter> {
+    private fun tenTimesDrawPCR(): List<PCRCharacter> {
         val result: MutableList<PCRCharacter> = LinkedList<PCRCharacter>()
         for (i in 0..9) {
             result.add(drawPCR())
@@ -76,7 +76,7 @@ object DrawUtil {
         return result
     }
 
-    fun getCharacter(rare: Int): PCRCharacter {
+    private fun getCharacter(rare: Int): PCRCharacter {
         val temp: MutableList<PCRCharacter> = LinkedList<PCRCharacter>()
         for (c in BotConstants.pcr) {
             if (c.star == rare) {
@@ -92,7 +92,7 @@ object DrawUtil {
         if (time == 1) {
             return if (user.commandTime >= 1 || user.compareLevel(UserLevel.ADMIN)) {
                 user.decreaseTime()
-                val (name, _, rare) = DrawUtil.drawAr()
+                val (name, _, rare) = drawAr()
                 name + " " + getStar(rare)
             } else {
                 "今日命令条数已达上限, 请等待条数自动恢复哦~\n" +
@@ -100,7 +100,7 @@ object DrawUtil {
             }
         } else if (time == 10) {
             return if (user.commandTime >= 10 || user.compareLevel(UserLevel.ADMIN)) {
-                result.addAll(DrawUtil.tenTimeDrawAr())
+                result.addAll(tenTimeDrawAr())
                 user.decreaseTime(10)
                 val sb = StringBuilder("十连结果:\n")
                 for ((name, _, rare) in result) {
@@ -121,9 +121,9 @@ object DrawUtil {
                         }
 
                         if (r6Time != 0 && i == r6Time) {
-                            result.add(DrawUtil.getOperator(6))
+                            result.add(getOperator(6))
                         } else {
-                            result.add(DrawUtil.drawAr())
+                            result.add(drawAr())
                         }
                     } else {
                         break
@@ -150,7 +150,7 @@ object DrawUtil {
         return if (time == 10) {
             if (user.commandTime >= 10) {
                 user.decreaseTime(10)
-                val ops: List<PCRCharacter> = DrawUtil.tenTimesDrawPCR()
+                val ops: List<PCRCharacter> = tenTimesDrawPCR()
                 val sb = java.lang.StringBuilder("十连结果:\n")
                 for ((name, star) in ops) {
                     sb.append(name).append(" ").append(getStar(star)).append(" ")
@@ -162,7 +162,7 @@ object DrawUtil {
         } else if (time == 1) {
             if (user.commandTime >= 1) {
                 user.decreaseTime()
-                val (name, star) = DrawUtil.drawPCR()
+                val (name, star) = drawPCR()
                 name + " " + getStar(star)
             } else {
                 "今日抽卡次数已达上限, 别抽卡上头了"
@@ -176,9 +176,9 @@ object DrawUtil {
                     if (user.commandTime > 0) {
                         user.decreaseTime()
                         if (i % 10 == 0) {
-                            ops.add(DrawUtil.getCharacter(2))
+                            ops.add(getCharacter(2))
                         } else {
-                            ops.add(DrawUtil.drawPCR())
+                            ops.add(drawPCR())
                         }
                     } else {
                         break
@@ -205,7 +205,7 @@ object DrawUtil {
         }
     }
 
-    fun getStar(rare: Int): String {
+    private fun getStar(rare: Int): String {
         val sb = StringBuilder("★")
         for (i in 1 until rare) {
             sb.append("★")

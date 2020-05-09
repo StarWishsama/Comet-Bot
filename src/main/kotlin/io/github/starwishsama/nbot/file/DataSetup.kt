@@ -1,7 +1,6 @@
 package io.github.starwishsama.nbot.file
 
 import cn.hutool.core.io.file.FileReader
-import cn.hutool.core.io.file.FileWriter
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -102,15 +101,19 @@ object DataSetup {
 
     fun loadLang() {
         if (!langCfg.exists()) {
-            BotConstants.msg = BotConstants.msg + BotLocalization("msg.bot-prefix", "Bot > ")
-            BotConstants.msg = BotConstants.msg + BotLocalization("msg.no-permission", "你没有权限")
-            BotConstants.msg = BotConstants.msg + BotLocalization("msg.bind-success", "绑定账号 %s 成功!")
-            BotConstants.msg = BotConstants.msg + BotLocalization("checkin.first-time", "你还没有签到过, 先用 /qd 签到一次吧~")
-            FileWriter.create(langCfg).write(gson.toJson(BotConstants.msg))
+            val default = arrayOf(BotLocalization("msg.bot-prefix", "Bot > "),
+                    BotLocalization("msg.no-permission", "你没有权限"),
+                    BotLocalization("msg.bind-success", "绑定账号 %s 成功!"),
+                    BotLocalization("checkin.first-time", "你还没有签到过, 先用 /qd 签到一次吧~")
+            )
+            for (text in default) {
+                BotConstants.msg = BotConstants.msg + text
+            }
+            langCfg.writeJson(BotConstants.msg)
         } else {
             val lang: JsonElement =
                     JsonParser.parseString(langCfg.getContext())
-            if (lang.isJsonObject) {
+            if (lang.isJsonArray) {
                 BotConstants.msg = gson.fromJson(FileReader.create(langCfg).readString(),
                         object : TypeToken<List<BotLocalization>>() {}.type
                 )

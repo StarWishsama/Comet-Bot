@@ -59,19 +59,19 @@ class ClockInCommand : UniversalCommand {
         val checkInTime = LocalDateTime.now()
         if (Duration.between(data.endTime, checkInTime).toMinutes() <= 5) {
             var result =
-                    "Bot > ${msg.sender.nameCardOrNick}, 签到成功!\n签到时间: ${checkInTime.format(
+                    "Bot > ${msg.sender.nameCardOrNick} 打卡成功!\n打卡时间: ${checkInTime.format(
                             DateTimeFormatter.ofPattern(
                                     "yyyy-MM-dd HH:mm:ss"
                             )
                     )}"
             result += if (checkInTime.isAfter(data.endTime)) {
                 data.lateUsers.add(sender)
-                data.checkedUsers.add(sender)
                 "\n签到状态: 迟到"
             } else {
-                data.checkedUsers.add(sender)
                 "\n签到状态: 成功"
             }
+
+            data.checkedUsers.add(sender)
             return result.toMirai()
         } else {
             return data.viewData()

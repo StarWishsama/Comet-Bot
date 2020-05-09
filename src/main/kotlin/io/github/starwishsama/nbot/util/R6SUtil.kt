@@ -2,7 +2,6 @@ package io.github.starwishsama.nbot.util
 
 import cn.hutool.http.HttpRequest
 import cn.hutool.http.HttpResponse
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -11,14 +10,13 @@ import io.github.starwishsama.nbot.enums.R6Rank
 import io.github.starwishsama.nbot.objects.rainbowsix.R6Player
 import java.text.NumberFormat
 
-
-object R6SUtils {
+object R6SUtil {
     private const val infoText = "=== 彩虹六号战绩查询 ===\n%s [%d级]" +
             "\n目前段位: %s current mmrchange" +
             "\nKD: %s" +
             "\n爆头率: %s"
     private val num = NumberFormat.getPercentInstance()
-    private val gson = GsonBuilder().serializeNulls().setLenient().create()
+    private val gson = BotConstants.gson
 
     private fun searchPlayer(name: String): R6Player? {
         try {
@@ -30,12 +28,12 @@ object R6SUtils {
                     val element: JsonElement =
                         JsonParser.parseString(body).asJsonObject["players"]
                     if (isValidJson(element)) {
-                        val `object`: JsonObject = element.asJsonObject
+                        val jsonObject: JsonObject = element.asJsonObject
                         val uuid: String =
-                            `object`.get(`object`.keySet().iterator().next()).asJsonObject.get("profile")
-                                .asJsonObject.get("p_user").asString
+                                jsonObject.get(jsonObject.keySet().iterator().next()).asJsonObject.get("profile")
+                                        .asJsonObject.get("p_user").asString
                         val hr2: HttpResponse = HttpRequest.get("https://r6.apitab.com/player/$uuid?cid=${BotConstants.cfg.r6tabKey}").timeout(5000)
-                            .setFollowRedirects(true).executeAsync()
+                                .setFollowRedirects(true).executeAsync()
                         if (hr2.isOk) {
                             return gson.fromJson(hr2.body(), R6Player::class.java)
                         }

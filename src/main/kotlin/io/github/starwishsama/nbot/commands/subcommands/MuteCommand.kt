@@ -1,10 +1,12 @@
 package io.github.starwishsama.nbot.commands.subcommands
 
+import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.util.BotUtil.isNumeric
 import io.github.starwishsama.nbot.util.BotUtil.toMirai
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.PermissionDeniedException
@@ -20,33 +22,62 @@ import org.apache.commons.lang3.StringUtils
 
 class MuteCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.userQQ) && event is GroupMessageEvent && (user.isBotAdmin() || event.sender.isOperator())) {
+        if (BotUtil.isNoCoolDown(user.userQQ) && event is GroupMessageEvent) {
             if (event.group.botPermission.isOperator()) {
-                if (args.isNotEmpty()) {
-                    val at = event.message[At]
-                    if (at != null) {
-                        if (at.isContentNotEmpty()) {
-                            doMute(event.group, at.target, getMuteTime(args[1]), false)
+                if (user.isBotAdmin() || event.sender.isOperator()) {
+                    if (args.isNotEmpty()) {
+                        val at = event.message[At]
+                        if (at != null) {
+                            if (at.isContentNotEmpty()) {
+                                doMute(event.group, at.target, getMuteTime(args[1]), false)
+                            }
+                        } else {
+
+                            if (args[0].isNumeric()) {
+                                doMute(event.group, args[0].toLong(), getMuteTime(args[1]), false)
+                            } else {
+                                when (args[0]) {
+                                    "all", "全体", "全禁", "全体禁言" -> {
+                                        doMute(event.group, args[0].toLong(), getMuteTime(args[1]), false)
+                                    }
+                                    "random", "rand", "随机", "抽奖" -> {
+                                        val iterator = event.group.members.iterator()
+                                        var runTime = 0
+                                        val randomTime = RandomUtil.randomInt(0, event.group.members.size)
+                                        var target: Long = -1
+                                        while (iterator.hasNext()) {
+                                            val member = iterator.next()
+                                            if (runTime == randomTime) {
+                                                target = member.id
+                                            }
+                                            runTime++
+                                        }
+                                        doMute(event.group, target, RandomUtil.randomLong(1, 2592000), false)
+                                    }
+                                }
+                            }
+
+                            if (StringUtils.isNumeric(args[0])) {
+                                doMute(event.group, args[0].toLong(), getMuteTime(args[1]), false)
+                            } else if (args[0].contentEquals("all")) {
+                                doMute(event.group, 0, 0, true)
+                            }
                         }
                     } else {
-                        if (StringUtils.isNumeric(args[0])) {
-                            doMute(event.group, args[0].toLong(), getMuteTime(args[1]), false)
-                        } else if (args[0].contentEquals("all")) {
-                            doMute(event.group, 0, 0, true)
-                        }
+                        return getHelp().toMirai()
                     }
                 } else {
-                    return getHelp().toMirai()
+                    BotUtil.sendMsgPrefix("你不是绿帽 你爬 你爬").toMirai()
                 }
             } else {
-                BotUtil.sendLocalMessage("msg.bot-prefix", "我不是绿帽 我爬 我爬").toMirai()
+                BotUtil.sendMsgPrefix("我不是绿帽 我爬 我爬").toMirai()
             }
         }
         return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("mute", arrayListOf("jy", "禁言"), "禁言", "nbot.commands.mute", UserLevel.ADMIN)
+            CommandProps("mute", arrayListOf("jy", "禁言"), "禁言", "nbot.commands.mute", UserLevel.USER)
 
     override fun getHelp(): String = """
         ======= 命令帮助 =======
@@ -59,9 +90,9 @@ class MuteCommand : UniversalCommand {
             if (isAll) {
                 group.settings.isMuteAll = !group.settings.isMuteAll
                 return if (group.settings.isMuteAll) {
-                    BotUtil.sendLocalMessage("msg.bot-prefix", "The World!").toMirai()
+                    BotUtil.sendMsgPrefix("The World!").toMirai()
                 } else {
-                    BotUtil.sendLocalMessage("msg.bot-prefix", "然后时间开始流动").toMirai()
+                    BotUtil.sendMsgPrefix("然后时间开始流动").toMirai()
                 }
             } else {
                 group.members.forEach { member ->
