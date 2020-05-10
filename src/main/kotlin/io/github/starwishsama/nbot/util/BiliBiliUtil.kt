@@ -25,7 +25,7 @@ object BiliBiliUtil {
     suspend fun getUser(userName: String): SearchUserResult.Data.Item? {
         try {
             val searchResult = searchUser(userName)
-            if (searchResult.items.isNotEmpty()) {
+            if (!searchResult.items.isNullOrEmpty()) {
                 return searchResult.items[0]
             }
         } catch (e: BilibiliApiException) {

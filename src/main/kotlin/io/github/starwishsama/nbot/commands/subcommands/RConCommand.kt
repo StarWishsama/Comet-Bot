@@ -5,7 +5,6 @@ import io.github.starwishsama.nbot.BotInstance
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.commands.interfaces.WaitableCommand
-import io.github.starwishsama.nbot.enums.SessionType
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.sessions.Session
@@ -31,7 +30,7 @@ class RConCommand : UniversalCommand, WaitableCommand {
             } else {
                 when (args[0]) {
                     "setup" -> {
-                        SessionManager.addSession(Session(SessionType.DELAY, this, user.userQQ))
+                        SessionManager.addSession(Session(this, user.userQQ))
                         return BotUtil.sendMsgPrefix("请在下一条消息发送 rCon 连接地址").toMirai()
                     }
                     "cmd", "exec", "命令" -> {
@@ -67,8 +66,8 @@ class RConCommand : UniversalCommand, WaitableCommand {
         还可以使用 mc, 执行命令 作为等效命令.
     """.trimIndent()
 
-    override suspend fun replyResult(message: MessageEvent, user: BotUser, session: Session) {
-        if (message.message.contentToString().contains("退出")) {
+    override suspend fun replyResult(event: MessageEvent, user: BotUser, session: Session) {
+        if (event.message.contentToString().contains("退出")) {
             waitList.remove(user)
             SessionManager.expireSession(session)
             return
@@ -76,25 +75,25 @@ class RConCommand : UniversalCommand, WaitableCommand {
 
         when (waitList[user] ?: 0) {
             0 -> {
-                BotConstants.cfg.rConUrl = message.message.contentToString()
-                message.reply(BotUtil.sendMsgPrefix("已设置 rCon 连接地址为 ${BotConstants.cfg.rConUrl}\n请在下一条消息发送 rCon 密码\n如果需要退出设置 请回复退出"))
+                BotConstants.cfg.rConUrl = event.message.contentToString()
+                event.reply(BotUtil.sendMsgPrefix("已设置 rCon 连接地址为 ${BotConstants.cfg.rConUrl}\n请在下一条消息发送 rCon 密码\n如果需要退出设置 请回复退出"))
                 waitList[user] = 1
             }
             1 -> {
-                val port = message.message.contentToString()
+                val port = event.message.contentToString()
                 if (port.isNumeric()) {
-                    BotConstants.cfg.rConPort = message.message.contentToString().toInt()
-                    message.reply(BotUtil.sendMsgPrefix("设置密码成功!\n请在下一条消息发送 rCon 密码\n" +
+                    BotConstants.cfg.rConPort = event.message.contentToString().toInt()
+                    event.reply(BotUtil.sendMsgPrefix("设置密码成功!\n请在下一条消息发送 rCon 密码\n" +
                             "如果需要退出设置 请回复退出"))
                     waitList[user] = 2
                 } else {
-                    message.reply(BotUtil.sendMsgPrefix("不是有效的端口\n" +
+                    event.reply(BotUtil.sendMsgPrefix("不是有效的端口\n" +
                             "如果需要退出设置 请回复退出"))
                 }
             }
             2 -> {
-                BotConstants.cfg.rConPassword = message.message.contentToString()
-                message.reply(BotUtil.sendMsgPrefix("设置 rCon 完成!"))
+                BotConstants.cfg.rConPassword = event.message.contentToString()
+                event.reply(BotUtil.sendMsgPrefix("设置 rCon 完成!"))
                 BotInstance.setupRCon()
                 waitList.remove(user)
                 SessionManager.expireSession(session)

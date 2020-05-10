@@ -31,7 +31,7 @@ object DataSetup {
     private val arkNightData = File(BotInstance.filePath.toString(), "/ark.json")
     private val gson = BotConstants.gson
 
-    fun loadCfg() {
+    fun initData() {
         if (!userCfg.exists() || !cfgFile.exists()) {
             try {
                 cfgFile.initConfig(BotConstants.cfg)
@@ -100,7 +100,7 @@ object DataSetup {
         }
     }
 
-    fun loadLang() {
+    private fun loadLang() {
         if (!langCfg.exists()) {
             val default = arrayOf(BotLocalization("msg.bot-prefix", "Bot > "),
                     BotLocalization("msg.no-permission", "你没有权限"),

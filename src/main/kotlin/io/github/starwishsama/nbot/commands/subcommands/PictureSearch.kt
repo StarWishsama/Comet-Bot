@@ -4,7 +4,6 @@ import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.commands.interfaces.WaitableCommand
-import io.github.starwishsama.nbot.enums.SessionType
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.sessions.Session
@@ -23,7 +22,7 @@ class PictureSearch : UniversalCommand, WaitableCommand {
         if (BotUtil.isNoCoolDown(event.sender.id, 90)) {
             return if (BotConstants.cfg.saucenaoApiKey != null) {
                 if (!SessionManager.isValidSession(event.sender.id)) {
-                    SessionManager.addSession(Session(SessionType.DELAY, this, user.userQQ))
+                    SessionManager.addSession(Session(this, user.userQQ))
                 }
                 BotUtil.sendLocalMessage("msg.bot-prefix", "请发送需要搜索的图片").toMirai()
             } else {
@@ -46,11 +45,11 @@ class PictureSearch : UniversalCommand, WaitableCommand {
         /ytst 以图搜图
     """.trimIndent()
 
-    override suspend fun replyResult(message: MessageEvent, user: BotUser, session: Session) {
-        val image = message.message[Image]
-        message.reply(run {
+    override suspend fun replyResult(event: MessageEvent, user: BotUser, session: Session) {
+        val image = event.message[Image]
+        event.reply(run {
             if (image != null) {
-                message.reply("请稍等...")
+                event.reply("请稍等...")
                 val result = PictureSearchUtil.sauceNaoSearch(image.queryUrl())
                 if (result.similarity >= 60.0) {
                     "相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n".toMirai()

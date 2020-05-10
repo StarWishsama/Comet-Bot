@@ -5,5 +5,5 @@ import io.github.starwishsama.nbot.sessions.Session
 import net.mamoe.mirai.message.MessageEvent
 
 interface WaitableCommand {
-    suspend fun replyResult(message: MessageEvent, user: BotUser, session: Session)
+    suspend fun replyResult(event: MessageEvent, user: BotUser, session: Session)
 }

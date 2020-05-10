@@ -4,7 +4,6 @@ import com.hiczp.bilibili.api.BilibiliClient
 import io.github.starwishsama.nbot.BotInstance.bot
 import io.github.starwishsama.nbot.BotInstance.client
 import io.github.starwishsama.nbot.BotInstance.executeCommand
-import io.github.starwishsama.nbot.BotInstance.getPath
 import io.github.starwishsama.nbot.BotInstance.initLog
 import io.github.starwishsama.nbot.BotInstance.log
 import io.github.starwishsama.nbot.BotInstance.rCon
@@ -37,9 +36,7 @@ import net.mamoe.mirai.utils.*
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
-import java.io.PrintStream
 import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.Executors
@@ -122,8 +119,7 @@ object BotInstance {
 suspend fun main() {
     initLog()
     BotInstance.startTime = System.currentTimeMillis()
-    DataSetup.loadCfg()
-    DataSetup.loadLang()
+    DataSetup.initData()
     BotInstance.qqId = BotConstants.cfg.botId
     BotInstance.password = BotConstants.cfg.botPassword
 
@@ -149,25 +145,26 @@ suspend fun main() {
         bot.alsoLogin()
         BotInstance.logger = bot.logger
         CommandHandler.setupCommand(
-                arrayOf(
-                        AdminCommand(),
-                        BiliBiliCommand(),
-                        CheckInCommand(),
-                        ClockInCommand(),
-                        DebugCommand(),
-                        DivineCommand(),
-                        GachaCommand(),
-                        FlowerCommand(),
-                        HelpCommand(),
-                        InfoCommand(),
-                        MusicCommand(),
-                        MuteCommand(),
-                        PictureSearch(),
-                        R6SCommand(),
-                        RConCommand(),
-                        TwitterCommand(),
-                        VersionCommand()
-                )
+            arrayOf(
+                AdminCommand(),
+                BiliBiliCommand(),
+                CheckInCommand(),
+                ClockInCommand(),
+                DebugCommand(),
+                DivineCommand(),
+                GachaCommand(),
+                GuessNumberCommand(),
+                FlowerCommand(),
+                HelpCommand(),
+                InfoCommand(),
+                MusicCommand(),
+                MuteCommand(),
+                PictureSearch(),
+                R6SCommand(),
+                RConCommand(),
+                TwitterCommand(),
+                VersionCommand()
+            )
         )
 
         val listeners = arrayOf(FuckLightAppListener, GroupChatListener, RepeatListener, SessionListener)
@@ -231,9 +228,11 @@ suspend fun main() {
 
         bot.subscribeMessages {
             always {
-                val result = CommandHandler.execute(this)
-                if (result !is EmptyMessageChain) {
-                    reply(result)
+                if (sender.id != 80000000L) {
+                    val result = CommandHandler.execute(this)
+                    if (result !is EmptyMessageChain) {
+                        reply(result)
+                    }
                 }
             }
         }

@@ -4,7 +4,6 @@ import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.commands.interfaces.WaitableCommand
-import io.github.starwishsama.nbot.enums.SessionType
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.objects.Flower
@@ -26,7 +25,7 @@ class FlowerCommand : UniversalCommand, WaitableCommand {
             return when (args[0]) {
                 "lq", "get", "领取" -> {
                     if (user.flower == null) {
-                        SessionManager.addSession(Session(SessionType.DELAY, this, user.userQQ))
+                        SessionManager.addSession(Session(this, user.userQQ))
                         BotUtil.sendLocalMessage("msg.bot-prefix", "请给你的花取个名吧 发送你要取的名字").toMirai()
                     } else {
                         BotUtil.sendLocalMessage("msg.bot-prefix", "你已经种植了 ${user.flower?.flowerName}").toMessage()
@@ -101,9 +100,9 @@ class FlowerCommand : UniversalCommand, WaitableCommand {
         /hy cx 查询绿植状态
     """.trimIndent()
 
-    override suspend fun replyResult(message: MessageEvent, user: BotUser, session: Session) {
-        user.flower = Flower(message.message.contentToString())
-        message.reply(
+    override suspend fun replyResult(event: MessageEvent, user: BotUser, session: Session) {
+        user.flower = Flower(event.message.contentToString())
+        event.reply(
             BotUtil.sendLocalMessage("msg.bot-prefix", "成功种植 ${user.flower?.flowerName}").toMirai()
         )
         SessionManager.expireSession(session)

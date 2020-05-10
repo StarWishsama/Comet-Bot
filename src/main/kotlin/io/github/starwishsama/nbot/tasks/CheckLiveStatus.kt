@@ -3,6 +3,7 @@ package io.github.starwishsama.nbot.tasks
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotInstance
 import io.github.starwishsama.nbot.util.BiliBiliUtil
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
 object CheckLiveStatus : Runnable {
@@ -27,17 +28,17 @@ object CheckLiveStatus : Runnable {
                             if (!pushedList.contains(roomId)) {
                                 val msg =
                                     "单推助手 > \n${BiliBiliUtil.getUserNameByMid(data.uid)} 开播了!\n标题: ${data.title}\n开播时间: ${data.liveTime}\n传送门: https://live.bilibili.com/${data.roomId}"
-                                for (group in BotInstance.bot.groups) {
+                                BotInstance.bot.groups.forEach { group ->
                                     runBlocking {
                                         if (BotConstants.cfg.pushGroups.contains(group.id)) {
                                             group.sendMessage(msg)
                                         }
+                                        /** 防止消息发送失败 */
+                                        delay(1000)
                                     }
-                                    /** 防止消息发送失败 */
-                                    Thread.sleep(8000)
                                 }
-                                pushedList.add(roomId)
                             }
+                            pushedList.add(roomId)
                         }
                     }
                 }

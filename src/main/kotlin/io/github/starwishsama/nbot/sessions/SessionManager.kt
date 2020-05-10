@@ -34,6 +34,10 @@ object SessionManager {
         return getSession(id) != null
     }
 
+    fun isValidSessionByGroup(groupId: Long): Boolean {
+        return getSessionByGroup(groupId) != null
+    }
+
     fun getSession(id: Long): Session? {
         if (sessions.isNotEmpty()) {
             for (session in sessions) {

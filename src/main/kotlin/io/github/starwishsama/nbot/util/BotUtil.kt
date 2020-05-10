@@ -69,7 +69,7 @@ object BotUtil {
      * @return 是不是数字
      */
     fun String.isNumeric(): Boolean {
-        return matches("[-+]?\\d*\\.?\\d+".toRegex())
+        return matches("[-+]?\\d*\\.?\\d+".toRegex()) && !this.contains(".")
     }
 
     fun String.limitStringSize(size: Int): String {

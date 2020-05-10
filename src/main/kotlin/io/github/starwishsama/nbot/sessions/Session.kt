@@ -1,21 +1,20 @@
 package io.github.starwishsama.nbot.sessions
 
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
-import io.github.starwishsama.nbot.enums.SessionType
 import java.util.*
 
 
 /**
  * @author Nameless
  */
-open class Session(var groupId: Long = 0, var type: SessionType, var command: UniversalCommand) {
-    private var users: List<SessionUser> = LinkedList<SessionUser>()
+open class Session(open var groupId: Long = 0, var command: UniversalCommand) {
+    var users: List<SessionUser> = LinkedList<SessionUser>()
 
-    constructor(type: SessionType, command: UniversalCommand, id: Long) : this(0, type, command) {
+    constructor(command: UniversalCommand, id: Long) : this(0, command) {
         putUser(id)
     }
 
-    fun putUser(id: Long) {
+    private fun putUser(id: Long) {
         users = users + SessionUser(id)
     }
 
@@ -28,9 +27,5 @@ open class Session(var groupId: Long = 0, var type: SessionType, var command: Un
             }
         }
         return null
-    }
-
-    override fun toString(): String {
-        return "${type.name}|$command|$groupId"
     }
 }
