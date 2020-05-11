@@ -19,7 +19,6 @@ import net.mamoe.mirai.message.data.MessageChain
 class DivineCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (isNoCoolDown(event.sender.id)) {
-            if (args.isNotEmpty()) return getHelp().toMirai()
             val underCover = getResultFromList(BotConstants.underCovers, event.sender.id)
             return if (args.isNotEmpty()) {
                 if (underCover == null) {
