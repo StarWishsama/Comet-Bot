@@ -24,4 +24,8 @@ jobs:
         run: ./gradlew clean
       - name: Gradle build
         run: ./gradlew build
+      - uses: actions/upload-artifact@v1
+      with:
+        name: Nameless-Bot.jar
+        path: staging
     
