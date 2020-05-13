@@ -21,7 +21,7 @@ jar {
 }
 
 group 'io.github.starwishsama.nbot'
-version '0.3.2-BETA-200509'
+version '0.3.3-BETA-200513'
 
 repositories {
     maven { url 'https://jitpack.io' }
@@ -62,5 +62,5 @@ shadowJar {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }
