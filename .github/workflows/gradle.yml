@@ -27,5 +27,5 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: Nameless-Bot.jar
-          path: staging
+          path: libs
     
