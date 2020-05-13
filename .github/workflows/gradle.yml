@@ -22,8 +22,8 @@ jobs:
         run: chmod +x gradlew
       - name: Gradle clean
         run: ./gradlew clean
-      - name: Gradle build
-        run: ./gradlew build
+      - name: Gradle shadowjar
+        run: ./gradlew shadowjar
       - uses: actions/upload-artifact@v1
         with:
           name: Nameless-Bot.jar
