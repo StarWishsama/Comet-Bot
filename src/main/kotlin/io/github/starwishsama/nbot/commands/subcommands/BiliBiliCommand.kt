@@ -7,8 +7,8 @@ import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BiliBiliUtil
 import io.github.starwishsama.nbot.util.BotUtil
-import io.github.starwishsama.nbot.util.BotUtil.isNumeric
-import io.github.starwishsama.nbot.util.BotUtil.toMirai
+import io.github.starwishsama.nbot.util.isNumeric
+import io.github.starwishsama.nbot.util.toMirai
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain

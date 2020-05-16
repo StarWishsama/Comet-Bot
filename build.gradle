@@ -21,7 +21,7 @@ jar {
 }
 
 group 'io.github.starwishsama.nbot'
-version '0.3.3-BETA-200513'
+version '0.3.3-BETA-200516'
 
 repositories {
     maven { url 'https://jitpack.io' }
@@ -35,8 +35,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'net.mamoe:mirai-core:1.0-RC'
-    implementation 'net.mamoe:mirai-core-qqandroid:1.0-RC'
+    implementation 'net.mamoe:mirai-core:1.0-RC2-1'
+    implementation 'net.mamoe:mirai-core-qqandroid:1.0-RC2-1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile 'com.hiczp:bilibili-api:0.2.0'
     implementation 'cn.hutool:hutool-all:4.5.10'

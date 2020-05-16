@@ -17,7 +17,9 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.net.URISyntaxException
+import java.time.Duration
 import java.time.LocalDateTime
+import java.time.Period
 import java.util.*
 
 /**
@@ -25,56 +27,57 @@ import java.util.*
  *
  * @author Nameless
  */
+/**
+ * @return 去除彩色符号的字符串
+ */
+fun String.removeColor(): String {
+    return replace("§\\S".toRegex(), "")
+}
+
+fun String.toMirai(): MessageChain {
+    return toMessage().asMessageChain()
+}
+
+fun File.initConfig(context: Any) {
+    FileWriter.create(this).write(BotConstants.gson.toJson(context))
+}
+
+fun File.writeJson(context: Any) {
+    if (!this.exists()) {
+        this.createNewFile()
+    }
+
+    FileWriter.create(this).write(BotConstants.gson.toJson(context))
+}
+
+fun File.writeString(context: String) {
+    if (!this.exists()) {
+        this.createNewFile()
+    }
+
+    FileWriter.create(this).write(context)
+}
+
+fun File.getContext(): String {
+    return FileReader.create(this).readString()
+}
+
+/**
+ * 判断字符串是不是数字
+ * @return 是不是数字
+ */
+fun String.isNumeric(): Boolean {
+    return matches("[-+]?\\d*\\.?\\d+".toRegex()) && !this.contains(".")
+}
+
+fun String.limitStringSize(size: Int): String {
+    return if (length <= size) this else substring(0, size - 3) + "..."
+}
 
 object BotUtil {
     private var coolDown: MutableMap<Long, Long> = HashMap()
 
-    /**
-     * @return 去除彩色符号的字符串
-     */
-    private fun String.removeColor(): String {
-        return replace("§\\S".toRegex(), "")
-    }
 
-    fun String.toMirai(): MessageChain {
-        return toMessage().asMessageChain()
-    }
-
-    fun File.initConfig(context: Any) {
-        FileWriter.create(this).write(BotConstants.gson.toJson(context))
-    }
-
-    fun File.writeJson(context: Any) {
-        if (!this.exists()) {
-            this.createNewFile()
-        }
-
-        FileWriter.create(this).write(BotConstants.gson.toJson(context))
-    }
-
-    fun File.writeString(context: String) {
-        if (!this.exists()) {
-            this.createNewFile()
-        }
-
-        FileWriter.create(this).write(context)
-    }
-
-    fun File.getContext(): String {
-        return FileReader.create(this).readString()
-    }
-
-    /**
-     * 判断字符串是不是数字
-     * @return 是不是数字
-     */
-    fun String.isNumeric(): Boolean {
-        return matches("[-+]?\\d*\\.?\\d+".toRegex()) && !this.contains(".")
-    }
-
-    fun String.limitStringSize(size: Int): String {
-        return if (length <= size) this else substring(0, size - 3) + "..."
-    }
 
     /**
      * 获取 Minecraft 服务器信息 (SRV解析)
@@ -181,13 +184,8 @@ object BotUtil {
      */
     fun isChecked(user: BotUser): Boolean {
         val now = LocalDateTime.now()
-        return if (user.lastCheckInTime.month >= now.month && user.lastCheckInTime.dayOfMonth == (now.dayOfMonth - 1)) {
-            false
-        } else if (user.checkInTime == 0) {
-            false
-        } else {
-            true
-        }
+
+        return !(now.dayOfMonth >= user.lastCheckInTime.dayOfMonth || now.dayOfMonth == user.lastCheckInTime.dayOfMonth + 1)
     }
 
     /**

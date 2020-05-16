@@ -11,7 +11,7 @@ import io.github.starwishsama.nbot.objects.RandomResult
 import io.github.starwishsama.nbot.util.BotUtil.getLocalMessage
 import io.github.starwishsama.nbot.util.BotUtil.getRestString
 import io.github.starwishsama.nbot.util.BotUtil.isNoCoolDown
-import io.github.starwishsama.nbot.util.BotUtil.toMirai
+import io.github.starwishsama.nbot.util.toMirai
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain

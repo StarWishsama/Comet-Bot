@@ -6,7 +6,7 @@ import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BotUtil
-import io.github.starwishsama.nbot.util.BotUtil.toMirai
+import io.github.starwishsama.nbot.util.toMirai
 import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.GroupMessageEvent
@@ -14,15 +14,16 @@ import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.math.RoundingMode
+import java.time.Duration
 import java.time.LocalDateTime
 
 class CheckInCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(event.sender.id) && event is GroupMessageEvent) {
-            return if (!BotUtil.isChecked(user)) {
-                checkIn(event.sender, event, user).toMirai()
-            } else {
+            return if (BotUtil.isChecked(user)) {
                 BotUtil.sendMsgPrefix("你今天已经签到过了! 输入 /cx 可查询签到信息").toMirai()
+            } else {
+                checkIn(event.sender, event, user).toMirai()
             }
         }
         return EmptyMessageChain
@@ -62,9 +63,8 @@ class CheckInCommand : UniversalCommand {
         val now = LocalDateTime.now()
         // 计算连续签到次数，此处用了 Date 这个废弃的类，应换为 Calendar，too lazy to do so.
         // 已经更换为 Java 8 的全新日期 API :)
-        if ((user.lastCheckInTime.month == now.month
-                        && user.lastCheckInTime.dayOfMonth == now.dayOfMonth - 1)
-                || user.lastCheckInTime.month < now.month) {
+        val duration = Duration.between(user.lastCheckInTime, now)
+        if (duration.toDays() <= 1) {
             user.plusDay()
         } else {
             user.resetDay()

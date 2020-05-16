@@ -8,7 +8,7 @@ import io.github.starwishsama.nbot.util.BotUtil.getLocalMessage
 import io.github.starwishsama.nbot.util.BotUtil.isLegitId
 import io.github.starwishsama.nbot.util.BotUtil.isNoCoolDown
 import io.github.starwishsama.nbot.util.BotUtil.sendLocalMessage
-import io.github.starwishsama.nbot.util.BotUtil.toMirai
+import io.github.starwishsama.nbot.util.toMirai
 import io.github.starwishsama.nbot.util.R6SUtil.getR6SInfo
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent

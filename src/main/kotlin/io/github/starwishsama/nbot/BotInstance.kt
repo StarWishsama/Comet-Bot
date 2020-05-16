@@ -20,8 +20,8 @@ import io.github.starwishsama.nbot.listeners.SessionListener
 import io.github.starwishsama.nbot.managers.TaskManager
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.tasks.CheckLiveStatus
-import io.github.starwishsama.nbot.util.BotUtil.getContext
-import io.github.starwishsama.nbot.util.BotUtil.writeString
+import io.github.starwishsama.nbot.util.getContext
+import io.github.starwishsama.nbot.util.writeString
 import io.github.starwishsama.nbot.util.TwitterUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking

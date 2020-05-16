@@ -1,7 +1,7 @@
 package io.github.starwishsama.nbot.objects.checkin
 
 import io.github.starwishsama.nbot.util.BotUtil
-import io.github.starwishsama.nbot.util.BotUtil.toMirai
+import io.github.starwishsama.nbot.util.toMirai
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.data.MessageChain

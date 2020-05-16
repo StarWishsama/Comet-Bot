@@ -7,7 +7,7 @@ import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.managers.ClockInManager
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BotUtil
-import io.github.starwishsama.nbot.util.BotUtil.toMirai
+import io.github.starwishsama.nbot.util.toMirai
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent

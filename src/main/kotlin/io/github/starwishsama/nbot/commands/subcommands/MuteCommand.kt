@@ -6,8 +6,8 @@ import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BotUtil
-import io.github.starwishsama.nbot.util.BotUtil.isNumeric
-import io.github.starwishsama.nbot.util.BotUtil.toMirai
+import io.github.starwishsama.nbot.util.isNumeric
+import io.github.starwishsama.nbot.util.toMirai
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.PermissionDeniedException
 import net.mamoe.mirai.contact.isOperator

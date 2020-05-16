@@ -5,7 +5,7 @@ import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
-import io.github.starwishsama.nbot.util.BotUtil.limitStringSize
+import io.github.starwishsama.nbot.util.limitStringSize
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain

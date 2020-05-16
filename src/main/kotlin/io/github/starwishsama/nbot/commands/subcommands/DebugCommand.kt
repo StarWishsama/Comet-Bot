@@ -7,7 +7,7 @@ import io.github.starwishsama.nbot.file.DataSetup
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.sessions.SessionManager
 import io.github.starwishsama.nbot.util.BotUtil
-import io.github.starwishsama.nbot.util.BotUtil.toMirai
+import io.github.starwishsama.nbot.util.toMirai
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
