@@ -11,17 +11,17 @@ buildscript {
 plugins {
     id 'java'
     id "com.github.johnrengelman.shadow" version "5.2.0"
-    id 'org.jetbrains.kotlin.jvm' version '1.3.71'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
 }
 
 jar {
     manifest {
-        attributes 'Main-Class': 'io.github.starwishsama.nbot.BotInstanceKt'
+        attributes 'Main-Class': 'io.github.starwishsama.nbot.BotMainKt'
     }
 }
 
 group 'io.github.starwishsama.nbot'
-version '0.3.3-BETA-200516'
+version '0.3.4-BETA-200522'
 
 repositories {
     maven { url 'https://jitpack.io' }
@@ -35,8 +35,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'net.mamoe:mirai-core:1.0-RC2-1'
-    implementation 'net.mamoe:mirai-core-qqandroid:1.0-RC2-1'
+    implementation 'net.mamoe:mirai-core:1.0.0'
+    implementation 'net.mamoe:mirai-core-qqandroid:1.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile 'com.hiczp:bilibili-api:0.2.0'
     implementation 'cn.hutool:hutool-all:4.5.10'

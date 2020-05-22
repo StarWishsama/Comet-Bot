@@ -5,7 +5,8 @@ import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
-import io.github.starwishsama.nbot.util.BiliBiliUtil
+import io.github.starwishsama.nbot.api.bilibili.DynamicApi
+import io.github.starwishsama.nbot.api.bilibili.FakeClientApi
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.isNumeric
 import io.github.starwishsama.nbot.util.toMirai
@@ -56,7 +57,7 @@ class BiliBiliCommand : UniversalCommand {
                             if (args[1].isNumeric()) {
                                 roomId = args[1].toLong()
                             } else {
-                                val item = BiliBiliUtil.getUser(args[1])
+                                val item = FakeClientApi.getUser(args[1])
                                 if (item != null) {
                                     roomId = item.mid
                                 }
@@ -75,27 +76,28 @@ class BiliBiliCommand : UniversalCommand {
                     "list" -> {
                         val subs = StringBuilder("监控室列表:\n")
                         BotConstants.cfg.subList.forEach {
-                            val room = BiliBiliUtil.getLiveRoom(it)
+                            val room = FakeClientApi.getLiveRoom(it)
                             if (room != null) {
-                                subs.append("${BiliBiliUtil.getUserNameByMid(room.data.uid)} " +
+                                subs.append("${DynamicApi.getUserNameByMid(room.data.uid)} " +
                                         "${if (room.data.liveStatus == 1) "✔" else "✘"}\n")
                             }
                         }
                         return subs.toString().trim().toMirai()
                     }
                     "info", "查询" -> {
-                        event.quoteReply("请稍等...")
-                        val item = BiliBiliUtil.getUser(args[1])
-                        return if (item != null) {
-                            val before = item.title + "\n粉丝数: " + item.fans +
-                                    "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
-                                    "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘")
-                            val dynamic = BiliBiliUtil.getDynamic(item.mid)
-                            before.toMirai() + getDynamicText(dynamic, event)
-                        } else {
-                            BotUtil.sendMsgPrefix("账号不存在").toMirai()
-                        }
-
+                        return if (args.size > 1) {
+                            event.quoteReply("请稍等...")
+                            val item = FakeClientApi.getUser(args[1])
+                            if (item != null) {
+                                val before = item.title + "\n粉丝数: " + item.fans +
+                                        "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
+                                        "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘")
+                                val dynamic = DynamicApi.getDynamic(item.mid)
+                                before.toMirai() + getDynamicText(dynamic, event)
+                            } else {
+                                BotUtil.sendMsgPrefix("找不到对应的B站用户").toMirai()
+                            }
+                        } else getHelp().toMirai()
                     }
                     else -> return getHelp().toMirai()
                 }
@@ -131,7 +133,7 @@ class BiliBiliCommand : UniversalCommand {
         mid = if (roomId.isNumeric()) {
             roomId.toLong()
         } else {
-            val item = BiliBiliUtil.getUser(roomId)
+            val item = FakeClientApi.getUser(roomId)
             item?.roomid ?: return EmptyMessageChain
         }
 
@@ -139,7 +141,7 @@ class BiliBiliCommand : UniversalCommand {
             BotConstants.cfg.subList.add(mid)
         }
 
-        return BotUtil.sendMsgPrefix("订阅 ${BiliBiliUtil.getUserNameByMid(mid)} 成功").toMirai()
+        return BotUtil.sendMsgPrefix("订阅 ${DynamicApi.getUserNameByMid(mid)} 成功").toMirai()
     }
 
 }

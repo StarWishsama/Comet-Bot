@@ -184,8 +184,9 @@ object BotUtil {
      */
     fun isChecked(user: BotUser): Boolean {
         val now = LocalDateTime.now()
+        val period = user.lastCheckInTime.toLocalDate().until(now.toLocalDate())
 
-        return !(now.dayOfMonth >= user.lastCheckInTime.dayOfMonth || now.dayOfMonth == user.lastCheckInTime.dayOfMonth + 1)
+        return period.days == 0
     }
 
     /**
@@ -206,10 +207,13 @@ object BotUtil {
         }
 
         if (coolDown.containsKey(qq) && !isBotAdmin(qq)) {
-            if (currentTime - coolDown[qq]!! < BotConstants.cfg.coolDownTime * 1000) {
-                return false
-            } else {
-                coolDown.remove(qq)
+            val cd = coolDown[qq]
+            if (cd != null) {
+                if (currentTime - cd < BotConstants.cfg.coolDownTime * 1000) {
+                    return false
+                } else {
+                    coolDown.remove(qq)
+                }
             }
         } else {
             coolDown[qq] = currentTime

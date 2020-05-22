@@ -1,14 +1,8 @@
-package io.github.starwishsama.nbot.objects.bilibili.dynamic.dynamicdata
+package io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.dynamicdata
 
-import cn.hutool.http.HttpRequest
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.nbot.objects.bilibili.dynamic.DynamicData
-import io.github.starwishsama.nbot.objects.bilibili.user.UserProfile
-import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.message.data.toMessage
-import net.mamoe.mirai.message.uploadAsImage
+import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicData
+import io.github.starwishsama.nbot.objects.pojo.bilibili.user.UserProfile
 
 class MiniVideo : DynamicData {
     var item: Item? = null

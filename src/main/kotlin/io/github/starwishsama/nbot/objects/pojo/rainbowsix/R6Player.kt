@@ -1,4 +1,4 @@
-package io.github.starwishsama.nbot.objects.rainbowsix
+package io.github.starwishsama.nbot.objects.pojo.rainbowsix
 
 data class R6Player(var status : Int, var found : Boolean,
         var player: PlayerBean? = null, var custom: CustomBean? = null,

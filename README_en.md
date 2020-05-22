@@ -46,4 +46,4 @@ git clone https://github.com/StarWishsama/Nameless-Bot.git
 Configurations for Gradle is well done. Double-click `gradlew.bat` in the root directory to compile a jar file in folder `/build/libs`.
 
 ## 📜 License 
-[GPL v3.0](https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE)
+[AGPL v3.0](https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE)

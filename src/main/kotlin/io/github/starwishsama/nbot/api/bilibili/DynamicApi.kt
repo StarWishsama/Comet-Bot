@@ -1,51 +1,21 @@
-package io.github.starwishsama.nbot.util
+package io.github.starwishsama.nbot.api.bilibili
 
 import cn.hutool.http.HttpRequest
 import com.google.gson.JsonParser
 import com.hiczp.bilibili.api.app.model.SearchUserResult
 import com.hiczp.bilibili.api.live.model.RoomInfo
 import com.hiczp.bilibili.api.retrofit.exception.BilibiliApiException
-import io.github.starwishsama.nbot.BotConstants
+import io.github.starwishsama.nbot.BotConstants.gson
 import io.github.starwishsama.nbot.BotInstance
-import io.github.starwishsama.nbot.objects.bilibili.dynamic.DynamicAdapter
-import io.github.starwishsama.nbot.objects.bilibili.dynamic.dynamicdata.UnknownType
+import io.github.starwishsama.nbot.api.ApiExecutor
+import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicTypeSelector
+import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.dynamicdata.UnknownType
+import java.time.LocalDateTime
 
-object BiliBiliUtil {
-    private val client = BotInstance.client
-    private val gson = BotConstants.gson
+object DynamicApi : ApiExecutor {
     private var dynamicUrl =
             "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?visitor_uid=0&host_uid=%uid%&offset_dynamic_id=0&need_top=0"
     private const val infoUrl = "http://api.bilibili.com/x/space/acc/info?mid="
-
-    private suspend fun searchUser(userName: String): SearchUserResult.Data {
-        val searchResult = client.appAPI.searchUser(keyword = userName).await()
-        return searchResult.data
-    }
-
-    suspend fun getUser(userName: String): SearchUserResult.Data.Item? {
-        try {
-            val searchResult = searchUser(userName)
-            if (!searchResult.items.isNullOrEmpty()) {
-                return searchResult.items[0]
-            }
-        } catch (e: BilibiliApiException) {
-            BotInstance.logger.error("在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
-                    "${e.commonResponse.msg}\n" +
-                    "${e.commonResponse.message}", e)
-        }
-        return null
-    }
-
-    suspend fun getLiveRoom(roomId: Long): RoomInfo? {
-        try {
-            return client.liveAPI.getInfo(roomId).await()
-        } catch (e: BilibiliApiException) {
-            BotInstance.logger.error("在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
-                    "${e.commonResponse.msg}\n" +
-                    "${e.commonResponse.message}", e)
-        }
-        return null
-    }
 
     fun getUserNameByMid(mid: Long): String {
         val response = HttpRequest.get(infoUrl + mid).timeout(8000)
@@ -64,7 +34,7 @@ object BiliBiliUtil {
                     val dynamicInfo = entity.asJsonObject["card"].asString
                     val trueDynamicJson = JsonParser.parseString(dynamicInfo)
                     if (trueDynamicJson.isJsonObject) {
-                        val dynamicType = DynamicAdapter.getType(entity.asJsonObject["desc"].asJsonObject["type"].asInt)
+                        val dynamicType = DynamicTypeSelector.getType(entity.asJsonObject["desc"].asJsonObject["type"].asInt)
                         return if (dynamicType.typeName != UnknownType::javaClass.name) {
                             val info = gson.fromJson(dynamicInfo, dynamicType)
                             info.getContact()
@@ -78,5 +48,18 @@ object BiliBiliUtil {
             }
         }
         return arrayListOf("获取时出问题")
+    }
+
+    override val usedTime: Int
+        get() = TODO("Not yet implemented")
+    override val lastUsedTime: LocalDateTime
+        get() = TODO("Not yet implemented")
+
+    override fun isReachLimit() {
+        TODO("Not yet implemented")
+    }
+
+    override fun getLimitTime() {
+        TODO("Not yet implemented")
     }
 }

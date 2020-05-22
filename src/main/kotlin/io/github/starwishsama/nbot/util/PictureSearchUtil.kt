@@ -9,7 +9,7 @@ object PictureSearchUtil {
     private val apiUrl = "https://saucenao.com/search.php?db=999&output_type=2&api_key=${BotConstants.cfg.saucenaoApiKey}&numres=16&url="
 
     fun sauceNaoSearch(url: String): PicSearchResult {
-        val result = HttpRequest.get(apiUrl + url).timeout(150_000).executeAsync()
+        val result = HttpRequest.get(apiUrl + url).timeout(5000).executeAsync()
         if (result.isOk){
             val resultBody = JsonParser.parseString(result.body())
             if (resultBody.isJsonObject){

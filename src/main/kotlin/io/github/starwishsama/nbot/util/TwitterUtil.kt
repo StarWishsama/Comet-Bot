@@ -1,14 +1,16 @@
 package io.github.starwishsama.nbot.util
 
+import cn.hutool.http.HttpException
 import cn.hutool.http.HttpRequest
 import com.google.gson.JsonParser
+import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import com.roxstudio.utils.CUrl
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotInstance
 import io.github.starwishsama.nbot.exceptions.RateLimitException
-import io.github.starwishsama.nbot.objects.twitter.Tweet
-import io.github.starwishsama.nbot.objects.twitter.TwitterUser
+import io.github.starwishsama.nbot.objects.pojo.twitter.Tweet
+import io.github.starwishsama.nbot.objects.pojo.twitter.TwitterUser
 import java.io.IOException
 import java.net.Proxy
 import java.net.Socket
@@ -71,7 +73,7 @@ object TwitterUtil {
                                 "authorization",
                                 "Bearer $token"
                         )
-                        .timeout(150_000)
+                        .timeout(8000)
 
                 if (proxyHost != null && BotConstants.cfg.proxyPort != -1) {
                     request.setProxy(
@@ -84,7 +86,7 @@ object TwitterUtil {
 
                 val result = request.executeAsync()
                 val entity = BotConstants.gson.fromJson(result.body(), TwitterUser::class.java)
-                BotInstance.logger.info("Used time ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+                BotInstance.logger.debug("[蓝鸟] 查询用户信息耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
                 entity
             } catch (e: Exception) {
                 BotInstance.logger.error("获取蓝鸟用户信息出现问题", e)
@@ -99,12 +101,13 @@ object TwitterUtil {
     fun getLatestTweet(username: String): Tweet? {
         if (apiExecuteTime < 1500) {
             return try {
+                val startTime = LocalDateTime.now()
                 val request = HttpRequest.get("$universalApi/statuses/user_timeline.json?screen_name=$username&count=2")
                     .header(
                         "authorization",
                         "Bearer $token"
                     )
-                    .timeout(150_000)
+                    .timeout(8000)
 
                 if (proxyHost != null && BotConstants.cfg.proxyPort != -1) {
                     request.setProxy(
@@ -116,6 +119,8 @@ object TwitterUtil {
                 }
 
                 val result = request.executeAsync()
+                BotInstance.logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+                BotInstance.logger.debug("获取到的 Json: \n${result.body()}")
                 return (BotConstants.gson.fromJson(
                     result.body(),
                     object : TypeToken<List<Tweet>>() {}.type
@@ -123,6 +128,12 @@ object TwitterUtil {
             } catch (e: IOException) {
                 null
             } catch (e: NullPointerException) {
+                null
+            } catch (e: HttpException) {
+                BotInstance.logger.error("[蓝鸟] 在获取用户最新推文时出现了问题")
+                null
+            } catch (e: JsonSyntaxException) {
+                BotInstance.logger.error("[蓝鸟] 解析推文 JSON 时出现问题", e)
                 null
             }
         } else {

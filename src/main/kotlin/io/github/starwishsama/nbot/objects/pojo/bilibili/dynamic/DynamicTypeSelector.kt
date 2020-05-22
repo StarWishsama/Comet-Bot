@@ -1,8 +1,8 @@
-package io.github.starwishsama.nbot.objects.bilibili.dynamic
+package io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic
 
-import io.github.starwishsama.nbot.objects.bilibili.dynamic.dynamicdata.*
+import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.dynamicdata.*
 
-object DynamicAdapter {
+object DynamicTypeSelector {
     fun getType(type: Int): Class<out DynamicData> {
         var dynamicType: Class<out DynamicData> = UnknownType::class.java
         when (type) {

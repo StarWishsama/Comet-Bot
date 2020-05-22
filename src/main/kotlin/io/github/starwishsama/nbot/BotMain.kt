@@ -20,9 +20,9 @@ import io.github.starwishsama.nbot.listeners.SessionListener
 import io.github.starwishsama.nbot.managers.TaskManager
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.tasks.CheckLiveStatus
+import io.github.starwishsama.nbot.util.TwitterUtil
 import io.github.starwishsama.nbot.util.getContext
 import io.github.starwishsama.nbot.util.writeString
-import io.github.starwishsama.nbot.util.TwitterUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -46,7 +46,7 @@ import kotlin.system.exitProcess
 
 object BotInstance {
     val filePath: File = File(getPath())
-    const val version = "0.3.2-BETA-200509"
+    const val version = "0.3.4-BETA-200522"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -82,7 +82,7 @@ object BotInstance {
         scanner.close()
     }
 
-    fun getPath(): String {
+    private fun getPath(): String {
         var path: String = BotInstance::class.java.protectionDomain.codeSource.location.path
         if (System.getProperty("os.name").toLowerCase().contains("dows")) {
             path = path.substring(1)
@@ -129,18 +129,15 @@ suspend fun main() {
         exitProcess(0)
     } else {
         val config = BotConfiguration.Default
-        config.botLoggerSupplier = { it ->
-            PlatformLogger("Bot(${it.id})") {
-                log.writeString(log.getContext() + "$it\n")
-                println(it)
-            }
-        }
-        config.networkLoggerSupplier = { it ->
-            PlatformLogger("Network(${it.bot.id})") {
-                log.writeString(log.getContext() + "$it\n")
-                println(it)
-            }
-        }
+        config.botLoggerSupplier = { it -> PlatformLogger("Bot ${it.id}", {
+            log.writeString(log.getContext() + "$it\n")
+            println(it)
+        })}
+        config.networkLoggerSupplier = { it -> PlatformLogger("Net ${it.id}", {
+            log.writeString(log.getContext() + "$it\n")
+            println(it)
+        })}
+        config.fileBasedDeviceInfo()
         bot = Bot(qq = BotInstance.qqId, password = BotInstance.password, configuration = config)
         bot.alsoLogin()
         BotInstance.logger = bot.logger
@@ -179,7 +176,11 @@ suspend fun main() {
 
         /** 服务 */
         BackupHelper.scheduleBackup()
-        TaskManager.runScheduleTaskAsync({ BotConstants.users.forEach { it.addTime(100) } }, 5, 5, TimeUnit.HOURS)
+        TaskManager.runScheduleTaskAsync(
+            {BotConstants.users.forEach {it.addTime(100)}},
+            5,
+            5,
+            TimeUnit.HOURS)
         TaskManager.runScheduleTaskAsyncIf(
                 CheckLiveStatus::run,
                 BotConstants.cfg.checkDelay,

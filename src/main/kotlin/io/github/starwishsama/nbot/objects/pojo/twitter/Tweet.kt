@@ -1,4 +1,4 @@
-package io.github.starwishsama.nbot.objects.twitter
+package io.github.starwishsama.nbot.objects.pojo.twitter
 
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName

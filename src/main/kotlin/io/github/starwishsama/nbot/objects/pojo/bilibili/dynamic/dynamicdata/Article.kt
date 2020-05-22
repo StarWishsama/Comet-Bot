@@ -1,7 +1,7 @@
-package io.github.starwishsama.nbot.objects.bilibili.dynamic.dynamicdata
+package io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.dynamicdata
 
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.nbot.objects.bilibili.dynamic.DynamicData
+import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicData
 
 data class Article(@SerializedName("title")
                    val title: String,

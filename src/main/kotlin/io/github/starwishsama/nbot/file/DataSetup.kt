@@ -32,6 +32,10 @@ object DataSetup {
     private val gson = BotConstants.gson
 
     fun initData() {
+        if (!BotInstance.log.exists()) {
+            BotInstance.log.mkdirs()
+        }
+
         if (!userCfg.exists() || !cfgFile.exists()) {
             try {
                 cfgFile.initConfig(BotConstants.cfg)
@@ -62,7 +66,7 @@ object DataSetup {
 
     private fun load() {
         try {
-            BotConstants.cfg = gson.fromJson(cfgFile.getContext(), Config::class.java) as Config
+            BotConstants.cfg = gson.fromJson(cfgFile.getContext(), Config::class.java)
             BotConstants.users = gson.fromJson(
                     userCfg.getContext(),
                     object : TypeToken<List<BotUser>>() {}.type

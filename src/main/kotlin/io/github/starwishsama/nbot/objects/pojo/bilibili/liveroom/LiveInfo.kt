@@ -1,4 +1,4 @@
-package io.github.starwishsama.nbot.objects.bilibili.liveroom
+package io.github.starwishsama.nbot.objects.pojo.bilibili.liveroom
 
 import com.google.gson.annotations.SerializedName
 

@@ -1,6 +1,6 @@
-package io.github.starwishsama.nbot.objects.bilibili.dynamic.dynamicdata
+package io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.dynamicdata
 
-import io.github.starwishsama.nbot.objects.bilibili.dynamic.DynamicData
+import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicData
 
 data class ShareContext(var vest: VestBean, var sketch: SketchBean)  : DynamicData {
     override suspend fun getContact(): List<String> {

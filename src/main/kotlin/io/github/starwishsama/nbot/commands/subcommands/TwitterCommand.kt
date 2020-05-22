@@ -34,12 +34,17 @@ class TwitterCommand : UniversalCommand {
                                     if (twitterUser == null) {
                                         BotUtil.sendMsgPrefix("找不到此用户或连接超时").toMirai()
                                     } else {
-                                        BotUtil.sendMsgPrefix(
+                                        val tweet = TwitterUtil.getLatestTweet(args.getRestString(1))
+                                        if (tweet != null) {
+                                            BotUtil.sendMsgPrefix(
                                                 "\n${twitterUser.name}\n" +
                                                         "粉丝数: ${twitterUser.followersCount}\n" +
                                                         "最近推文: \n" +
-                                                        TwitterUtil.getLatestTweet(args.getRestString(1))?.text
-                                        ).toMirai()
+                                                        tweet.text + "\n" + tweet.source
+                                            ).toMirai()
+                                        } else {
+                                            BotUtil.sendMsgPrefix("获取推文时出现了问题").toMirai()
+                                        }
                                     }
                                 } catch (e: RateLimitException) {
                                     BotUtil.sendMsgPrefix("API 调用已达上限").toMirai()

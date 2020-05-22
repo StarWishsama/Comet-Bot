@@ -1,11 +1,11 @@
-package io.github.starwishsama.nbot.objects.bilibili.dynamic.dynamicdata
+package io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.dynamicdata
 
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.nbot.objects.bilibili.dynamic.DynamicAdapter
+import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicTypeSelector
 
-import io.github.starwishsama.nbot.objects.bilibili.dynamic.DynamicData
-import io.github.starwishsama.nbot.objects.bilibili.user.UserProfile
+import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicData
+import io.github.starwishsama.nbot.objects.pojo.bilibili.user.UserProfile
 
 data class Repost(@SerializedName("origin")
                   var originDynamic: String,
@@ -36,7 +36,7 @@ data class Repost(@SerializedName("origin")
 
     private suspend fun getOriginalDynamic(contact: String, type: Int): String {
         try {
-            val dynamicType = DynamicAdapter.getType(type)
+            val dynamicType = DynamicTypeSelector.getType(type)
             if (dynamicType.typeName != UnknownType::javaClass.name) {
                 val gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
                 val info = gson.fromJson(contact, dynamicType)

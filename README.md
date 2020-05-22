@@ -57,4 +57,4 @@ git clone https://github.com/StarWishsama/Nameless-Bot.git
 3. 重新启动 Bot, 提示启动完成后就可以开始使用了!
 
 ## 📜 协议 
-[GPL v3.0](https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE)
+[AGPL v3.0](https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE)

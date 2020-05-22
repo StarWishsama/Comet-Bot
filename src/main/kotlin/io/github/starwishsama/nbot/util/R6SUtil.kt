@@ -7,7 +7,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.enums.R6Rank
-import io.github.starwishsama.nbot.objects.rainbowsix.R6Player
+import io.github.starwishsama.nbot.objects.pojo.rainbowsix.R6Player
 import java.text.NumberFormat
 
 object R6SUtil {
@@ -53,7 +53,7 @@ object R6SUtil {
                 if (p != null && p.found) {
                     num.maximumIntegerDigits = 3
                     num.maximumFractionDigits = 2
-                    var response = java.lang.String.format(
+                    var response = String.format(
                         infoText,
                         p.player?.p_name,
                         p.stats?.level,

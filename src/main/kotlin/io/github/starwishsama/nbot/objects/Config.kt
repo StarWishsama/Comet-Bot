@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.nbot.enums.MusicApi
 import java.util.*
 
-
 open class Config {
     @SerializedName("botId")
     var botId: Long = 0
