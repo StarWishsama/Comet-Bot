@@ -7,15 +7,9 @@
 English Version: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mirai/README_en.md)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d1416f718df943b4bb252e98cbd6604e)](https://www.codacy.com/manual/StarWishsama/Nameless-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Nameless-Bot&amp;utm_campaign=Badge_Grade)
-<a href="https://travis-ci.org/StarWishsama/Nameless-Bot">
-  <img src="https://api.travis-ci.org/StarWishsama/Nameless-Bot.svg?branch=mirai">
-</a>
-<a href="https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE">
-  <img src="https://img.shields.io/github/license/StarWishsama/Nameless-Bot.svg?style=popout">
-</a>
-<a href="https://github.com/StarWishsama/Nameless-Bot/issues">
-  <img src="https://img.shields.io/github/issues/StarWishsama/Nameless-Bot.svg?style=popout">
-</a> 
+[![Kotlin Gradle](https://github.com/StarWishsama/Nameless-Bot/workflows/Kotlin%20Gradle/badge.svg)](https://github.com/StarWishsama/Nameless-Bot/actions/)
+[![LICENSE](https://img.shields.io/github/license/StarWishsama/Nameless-Bot.svg?style=popout)](https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE)
+[![Issues](https://img.shields.io/github/issues/StarWishsama/Nameless-Bot.svg?style=popout)](https://github.com/StarWishsama/Nameless-Bot/issues)
 
 ## 🎉 它能干什么?
 * 以图搜图
