@@ -1,4 +1,4 @@
-<p align="center">Nameless-Bot</p><br/>
+## 无名 Bot
 
 一个基于 Mirai-Core 开发的机器人
 
@@ -15,19 +15,19 @@ English Version: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mira
 [![Release](https://img.shields.io/github/v/release/StarWishSama/Nameless-Bot?include_prereleases)](https://github.com/StarWishsama/Nameless-Bot/releases)
 
 ## 🎉 它能干什么?
-* 以图搜图
-* 彩虹六号战绩查询
-* 打卡
-* 签到
-* bilibili UP主信息/动态查询
-* 点歌 (JSON 样式)
-* 占卜
-* 明日方舟 / 公主连结抽卡模拟器
-* 去你大爷的小程序 (将B站分享的视频自动转换为文本)
-* 单推小助手 (自动订阅 VTB 开播状态[B站])
-* RCON 远程遥控 MC 服务器
-* 查询 Twitter 用户信息/推文
-* 还在开发中...
+  * 以图搜图
+  * 彩虹六号战绩查询
+  * 打卡
+  * 签到
+  * bilibili UP主信息/动态查询
+  * 点歌 (JSON 样式)
+  * 占卜
+  * 明日方舟 / 公主连结抽卡模拟器
+  * 去你大爷的小程序 (将B站分享的视频自动转换为文本)
+  * 单推小助手 (自动订阅 VTB 开播状态[B站])
+  * RCON 远程遥控 MC 服务器
+  * 查询 Twitter 用户信息/推文
+  * 还在开发中...
 
 ## ☑ To-Do 列表
 详见 [项目页面](https://github.com/StarWishsama/Nameless-Bot/projects/2)
@@ -47,11 +47,9 @@ git clone https://github.com/StarWishsama/Nameless-Bot.git
 (你可以在 `/build/libs` 下找到构建好的 jar 文件)
 
 ### 直接下载
-1. 到项目的 releases 页面下载最新版本的 jar
-
-2. 使用 cmd 启动 Bot, 然后去 config.json 下面填写账号密码
-
-3. 重新启动 Bot, 提示启动完成后就可以开始使用了!
+ 1. 到项目的 releases 页面下载最新版本的 jar
+ 2. 使用 cmd 启动 Bot, 然后去 config.json 下面填写账号密码
+ 3. 重新启动 Bot, 提示启动完成后就可以开始使用了!
 
 ## 📜 协议 
 [AGPL v3.0](https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE)
