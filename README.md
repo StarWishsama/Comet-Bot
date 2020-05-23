@@ -1,4 +1,4 @@
-# Nameless-Bot
+<p align="center">Nameless-Bot</p><br/>
 
 一个基于 Mirai-Core 开发的机器人
 
@@ -7,9 +7,12 @@
 English Version: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mirai/README_en.md)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d1416f718df943b4bb252e98cbd6604e)](https://www.codacy.com/manual/StarWishsama/Nameless-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Nameless-Bot&amp;utm_campaign=Badge_Grade)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=StarWishsama_Nameless-Bot&metric=alert_status)](https://sonarcloud.io/dashboard?id=StarWishsama_Nameless-Bot)
 [![Kotlin Gradle](https://github.com/StarWishsama/Nameless-Bot/workflows/Kotlin%20Gradle/badge.svg)](https://github.com/StarWishsama/Nameless-Bot/actions/)
 [![LICENSE](https://img.shields.io/github/license/StarWishsama/Nameless-Bot.svg?style=popout)](https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE)
 [![Issues](https://img.shields.io/github/issues/StarWishsama/Nameless-Bot.svg?style=popout)](https://github.com/StarWishsama/Nameless-Bot/issues)
+![Stars](https://img.shields.io/github/stars/starwishsama/Nameless-Bot)
+[![Release](https://img.shields.io/github/v/release/StarWishSama/Nameless-Bot?include_prereleases)](https://github.com/StarWishsama/Nameless-Bot/releases)
 
 ## 🎉 它能干什么?
 * 以图搜图

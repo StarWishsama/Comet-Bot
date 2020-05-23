@@ -7,6 +7,7 @@ This bot is under heavy develop now, Many feature may not work as well.
 中文版本: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mirai/README_zhCN.md)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d1416f718df943b4bb252e98cbd6604e)](https://www.codacy.com/manual/StarWishsama/Nameless-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Nameless-Bot&amp;utm_campaign=Badge_Grade)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=StarWishsama_Nameless-Bot&metric=alert_status)](https://sonarcloud.io/dashboard?id=StarWishsama_Nameless-Bot)
 [![Kotlin Gradle](https://github.com/StarWishsama/Nameless-Bot/workflows/Kotlin%20Gradle/badge.svg)](https://github.com/StarWishsama/Nameless-Bot/actions/)
 [![LICENSE](https://img.shields.io/github/license/StarWishsama/Nameless-Bot.svg?style=popout)](https://github.com/StarWishsama/Nameless-Bot/blob/master/LICENSE)
 [![Issues](https://img.shields.io/github/issues/StarWishsama/Nameless-Bot.svg?style=popout)](https://github.com/StarWishsama/Nameless-Bot/issues)
