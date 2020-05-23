@@ -134,6 +134,7 @@ object BotMain {
                     println(it)
                 })
             }
+            config.heartbeatPeriodMillis = BotConstants.cfg.heartBeatPeriod * 60 * 1000
             config.fileBasedDeviceInfo()
             bot = Bot(qq = qqId, password = password, configuration = config)
             bot.alsoLogin()

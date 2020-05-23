@@ -16,7 +16,7 @@ plugins {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'io.github.starwishsama.nbot.BotMainKt'
+        attributes 'Main-Class': 'io.github.starwishsama.nbot.BotMain'
     }
 }
 
