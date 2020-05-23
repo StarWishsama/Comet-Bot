@@ -8,10 +8,7 @@ import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.isNumeric
 import io.github.starwishsama.nbot.util.toMirai
-import net.mamoe.mirai.contact.Group
-import net.mamoe.mirai.contact.PermissionDeniedException
-import net.mamoe.mirai.contact.isOperator
-import net.mamoe.mirai.contact.mute
+import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.At
@@ -43,11 +40,15 @@ class MuteCommand : UniversalCommand {
                                     "random", "rand", "随机", "抽奖" -> {
                                         val iterator = event.group.members.iterator()
                                         var runTime = 0
-                                        val randomTime = RandomUtil.randomInt(0, event.group.members.size)
+                                        var randomTime = RandomUtil.randomInt(0, event.group.members.size)
                                         var target: Long = -1
                                         while (iterator.hasNext()) {
                                             val member = iterator.next()
                                             if (runTime == randomTime) {
+                                                if (member.isAdministrator()) {
+                                                    randomTime++
+                                                    continue
+                                                }
                                                 target = member.id
                                             }
                                             runTime++
@@ -101,14 +102,14 @@ class MuteCommand : UniversalCommand {
                             return when (muteTime) {
                                 in 1..2592000 -> {
                                     member.mute(muteTime)
-                                    BotUtil.sendLocalMessage("msg.bot-prefix", "禁言成功").toMirai()
+                                    BotUtil.sendMsgPrefix("禁言成功").toMirai()
                                 }
                                 0L -> {
                                     member.unmute()
-                                    BotUtil.sendLocalMessage("msg.bot-prefix", "解禁成功").toMirai()
+                                    BotUtil.sendMsgPrefix("解禁成功").toMirai()
                                 }
                                 else -> {
-                                    BotUtil.sendLocalMessage("msg.bot-prefix", "禁言时间有误, 范围: (0s, 30days]").toMirai()
+                                    BotUtil.sendMsgPrefix("禁言时间有误, 范围: (0s, 30days]").toMirai()
                                 }
                             }
                         }
@@ -116,9 +117,9 @@ class MuteCommand : UniversalCommand {
                 }
             }
 
-            return BotUtil.sendLocalMessage("msg.bot-prefix", "找不到此用户").toMirai()
+            return BotUtil.sendMsgPrefix("找不到此用户").toMirai()
         } catch (e: PermissionDeniedException){
-            return BotUtil.sendLocalMessage("msg.bot-prefix", "我不是绿帽 我爬 我爬").toMirai()
+            return BotUtil.sendMsgPrefix("我不是绿帽 我爬 我爬").toMirai()
         }
     }
 

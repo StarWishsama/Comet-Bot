@@ -5,7 +5,7 @@ import com.github.salomonbrys.kotson.get
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.nbot.BotConstants
-import io.github.starwishsama.nbot.BotInstance
+import io.github.starwishsama.nbot.BotMain
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
@@ -78,7 +78,7 @@ object MusicUtil {
                 }
             }
         } catch (e: IOException) {
-            BotInstance.logger.error(e)
+            BotMain.logger.error(e)
         }
         return "找不到歌曲".toMessage().asMessageChain()
     }
@@ -135,9 +135,9 @@ object MusicUtil {
                                 "}").asMessageChain()
                     }
                 }
-            } else BotInstance.logger.debug("无法从 API 获取到歌曲信息, 响应码为 " + songResult.status)
+            } else BotMain.logger.debug("无法从 API 获取到歌曲信息, 响应码为 " + songResult.status)
         } catch (x: Exception) {
-            BotInstance.logger.error("在通过 QQ 音乐搜索歌曲时发生了一个错误, ", x)
+            BotMain.logger.error("在通过 QQ 音乐搜索歌曲时发生了一个错误, ", x)
         }
         return "找不到歌曲".toMessage().asMessageChain()
     }

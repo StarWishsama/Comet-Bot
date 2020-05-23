@@ -55,30 +55,28 @@ object R6SUtil {
                     num.maximumFractionDigits = 2
                     var response = String.format(
                         infoText,
-                        p.player?.p_name,
+                        p.player?.playerName,
                         p.stats?.level,
-                        p.ranked?.AS_rank?.let { R6Rank.getRank(it).rankName },
-                        String.format("%.2f", p.stats?.generalpvp_kd),
+                        p.ranked?.asRank?.let { R6Rank.getRank(it).rankName },
+                        String.format("%.2f", p.stats?.generalKd),
                         num.format(
-                            p.stats?.generalpvp_kills?.toDouble()?.let { p.stats?.generalpvp_headshot?.div(it) }
+                            p.stats?.generalKills?.toDouble()?.let { p.stats?.generalHeadShot?.div(it) }
                         )
                     )
-                    response = if (p.ranked?.AS_rank?.let { R6Rank.getRank(it) } !== R6Rank.UNRANKED) {
+                    response = if (p.ranked?.asRank?.let { R6Rank.getRank(it) } !== R6Rank.UNRANKED) {
                         response.replace(
-                            "current".toRegex(), p.ranked?.AS_mmr
+                            "current".toRegex(), p.ranked?.asMMR
                                 .toString() + ""
                         )
                     } else {
                         response.replace("current".toRegex(), "")
                     }
-                    val mmrChange: Int? = p.ranked?.AS_mmrchange
-                    if (mmrChange != 0) {
-                        if (mmrChange != null) {
-                            response = if (mmrChange > 0) {
-                                response.replace("mmrchange".toRegex(), "+$mmrChange")
-                            } else {
-                                response.replace("mmrchange".toRegex(), "" + mmrChange)
-                            }
+                    val mmrChange: Int? = p.ranked?.asMMRChange
+                    if (mmrChange != null && mmrChange != 0) {
+                        response = if (mmrChange > 0) {
+                            response.replace("mmrchange".toRegex(), "+$mmrChange")
+                        } else {
+                            response.replace("mmrchange".toRegex(), "" + mmrChange)
                         }
                     }
                     return response

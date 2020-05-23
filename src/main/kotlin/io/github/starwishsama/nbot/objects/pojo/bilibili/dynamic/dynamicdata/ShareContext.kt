@@ -1,20 +1,28 @@
 package io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.dynamicdata
 
+import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.nbot.objects.WrappedMessage
 import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicData
 
-data class ShareContext(var vest: VestBean, var sketch: SketchBean)  : DynamicData {
-    override suspend fun getContact(): List<String> {
-        val list = arrayListOf("分享了 ${vest.context}\n")
-        if (!sketch.cover_url.isNullOrEmpty()){
-            sketch.cover_url.let {
+data class ShareContext(var vest: VestBean, var sketch: SketchBean) : DynamicData {
+    data class VestBean(var uid: Long, var context: String)
+    data class SketchBean(var title: String?,
+                          @SerializedName("desc_text")
+                          var descText: String?,
+                          @SerializedName("cover_url")
+                          var coverUrl: String?,
+                          @SerializedName("target_url")
+                          var targetUrl: String?)
+
+    override suspend fun getContact(): WrappedMessage {
+        val wrapped = WrappedMessage("分享了 ${vest.context}\n")
+        if (!sketch.coverUrl.isNullOrEmpty()){
+            sketch.coverUrl.let {
                 if (it != null) {
-                    list.add(it)
+                    wrapped.picture = it
                 }
             }
         }
-        return list
+        return wrapped
     }
-
-    data class VestBean(var uid: Long, var context: String)
-    data class SketchBean(var title: String?, var desc_text: String?, var cover_url: String?, var target_url: String?)
 }

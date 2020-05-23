@@ -24,11 +24,11 @@ class MusicCommand : UniversalCommand {
                         when (args[1].toUpperCase()) {
                             "QQ" -> {
                                 BotConstants.cfg.musicApi = MusicApi.QQ
-                                return BotUtil.sendLocalMessage("msg.bot-prefix", "音乐API已修改为QQ").toMirai()
+                                return BotUtil.sendMsgPrefix("音乐API已修改为QQ").toMirai()
                             }
                             "NETEASE", "网易" -> {
                                 BotConstants.cfg.musicApi = MusicApi.NETEASE
-                                return BotUtil.sendLocalMessage("msg.bot-prefix", "音乐API已修改为网易").toMirai()
+                                return BotUtil.sendMsgPrefix("音乐API已修改为网易").toMirai()
                             }
                         }
                     }

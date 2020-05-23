@@ -1,7 +1,7 @@
 package io.github.starwishsama.nbot.commands.subcommands
 
 import io.github.starwishsama.nbot.BotConstants
-import io.github.starwishsama.nbot.BotInstance
+import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
@@ -55,7 +55,7 @@ class InfoCommand : UniversalCommand {
                 return getHelp().toMirai()
             }
         } catch (e: Exception) {
-            BotInstance.logger.error(e)
+            BotMain.logger.error(e)
         }
         return EmptyMessageChain
     }

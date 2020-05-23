@@ -1,3 +1,3 @@
 package io.github.starwishsama.nbot.exceptions
 
-class RateLimitException(reason: String) : Exception(reason)
+class RateLimitException(reason: String) : RuntimeException(reason)

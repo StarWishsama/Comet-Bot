@@ -8,6 +8,7 @@ import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.objects.RandomResult
+import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.getLocalMessage
 import io.github.starwishsama.nbot.util.BotUtil.getRestString
 import io.github.starwishsama.nbot.util.BotUtil.isNoCoolDown
@@ -32,10 +33,10 @@ class DivineCommand : UniversalCommand {
                             user.decreaseTime()
                             RandomResult.getChance(result).toMirai()
                         } else {
-                            (getLocalMessage("msg.bot-prefix") + "请检查需要占卜的字符是否超过上限或为空!").toMirai()
+                            BotUtil.sendMsgPrefix("请检查需要占卜的字符是否超过上限或为空!").toMirai()
                         }
                     } else {
-                        (getLocalMessage("msg.bot-prefix") + "今日命令条数已达上限, 请等待条数自动恢复哦~\n命令条数现在每小时会恢复100次, 封顶1000次").toMirai()
+                        BotUtil.sendMsgPrefix("今日命令条数已达上限, 请等待条数自动恢复哦~\n命令条数现在每小时会恢复100次, 封顶1000次").toMirai()
                     }
                 } else {
                     BotConstants.underCovers -= underCover

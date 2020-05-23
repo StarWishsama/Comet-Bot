@@ -30,10 +30,10 @@ open class Config {
     var coolDownTime: Int = 7
 
     @SerializedName("filter_words")
-    var filterWords = mutableListOf<String>()
+    var filterWords : List<String> = mutableListOf()
 
     @SerializedName("default_music_api")
-    var musicApi = MusicApi.QQ
+    var musicApi : MusicApi = MusicApi.QQ
 
     @SerializedName("command_prefix")
     var commandPrefix: List<String> = mutableListOf(".", "。", "#", "!", "/")
@@ -57,7 +57,7 @@ open class Config {
     var subList = LinkedList<Long>()
 
     @SerializedName("push_groups")
-    var pushGroups = mutableListOf<Long>()
+    var pushGroups : List<Long> = mutableListOf()
 
     @SerializedName("check_delay")
     var checkDelay: Long = 1

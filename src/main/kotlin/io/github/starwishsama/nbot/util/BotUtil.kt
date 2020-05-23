@@ -5,7 +5,8 @@ import cn.hutool.core.io.file.FileWriter
 import cn.hutool.http.HttpRequest
 import com.deadmandungeons.serverstatus.MinecraftServerStatus
 import io.github.starwishsama.nbot.BotConstants
-import io.github.starwishsama.nbot.BotInstance
+import io.github.starwishsama.nbot.BotMain
+import io.github.starwishsama.nbot.api.twitter.TwitterApi
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.objects.BotUser.Companion.isBotAdmin
@@ -16,10 +17,10 @@ import net.mamoe.mirai.message.data.toMessage
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.net.Proxy
+import java.net.Socket
 import java.net.URISyntaxException
-import java.time.Duration
 import java.time.LocalDateTime
-import java.time.Period
 import java.util.*
 
 /**
@@ -95,10 +96,10 @@ object BotUtil {
      版本: ${response.version}
      """.trimIndent()
         } catch (e: IOException) {
-            BotInstance.logger.warning("在获取服务器信息时出现了问题, $e")
+            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
             "Bot > 无法连接至 $address"
         } catch (e: URISyntaxException) {
-            BotInstance.logger.warning("在获取服务器信息时出现了问题, $e")
+            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
             "Bot > 无法连接至 $address"
         }
     }
@@ -120,10 +121,10 @@ object BotUtil {
      版本: ${response.version}
      """.trimIndent()
         } catch (e: IOException) {
-            BotInstance.logger.warning("在获取服务器信息时出现了问题, $e")
+            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
             "Bot > 无法连接至 $address"
         } catch (e: URISyntaxException) {
-            BotInstance.logger.warning("在获取服务器信息时出现了问题, $e")
+            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
             "Bot > 无法连接至 $address"
         }
     }
@@ -144,10 +145,10 @@ object BotUtil {
                 .replace("%MOTD%".toRegex(), response.description.text.removeColor())
                 .replace("%版本%".toRegex(), response.version.toString())
         } catch (e: IOException) {
-            BotInstance.logger.warning("在获取服务器信息时出现了问题, $e")
+            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
             "Bot > 无法连接至 $address"
         } catch (e: URISyntaxException) {
-            BotInstance.logger.warning("在获取服务器信息时出现了问题, $e")
+            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
             "Bot > 无法连接至 $address"
         }
     }
@@ -167,10 +168,10 @@ object BotUtil {
                 .replace("%MOTD%".toRegex(), response.description.text.removeColor())
                 .replace("%版本%".toRegex(), response.version.toString())
         } catch (e: IOException) {
-            BotInstance.logger.warning("在获取服务器信息时出现了问题, $e")
+            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
             "Bot > 无法连接至 $address"
         } catch (e: URISyntaxException) {
-            BotInstance.logger.warning("在获取服务器信息时出现了问题, $e")
+            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
             "Bot > 无法连接至 $address"
         }
     }
@@ -352,7 +353,7 @@ object BotUtil {
     }
 
     fun getRunningTime(): String {
-        val remain = System.currentTimeMillis() - BotInstance.startTime
+        val remain = System.currentTimeMillis() - BotMain.startTime
         var second = remain / 1000
         val ms = remain - second * 1000
         var minute = 0L
@@ -378,15 +379,23 @@ object BotUtil {
     }
 
     fun getImageStream(url: String): InputStream {
-        val map = mutableMapOf<String, String>()
-        map["user-agent"] =
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36"
-
-        return HttpRequest.get(url)
+        val request = HttpRequest.get(url)
                 .setFollowRedirects(true)
                 .timeout(8000)
-                .addHeaders(map)
-                .execute().bodyStream()
+                .addHeaders(mapOf(
+                    "user-agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36"
+                ))
+
+        if (BotConstants.cfg.proxyUrl != null && BotConstants.cfg.proxyPort != -1) {
+            request.setProxy(
+                Proxy(
+                    Proxy.Type.HTTP,
+                    Socket(BotConstants.cfg.proxyUrl, BotConstants.cfg.proxyPort).remoteSocketAddress
+                )
+            )
+        }
+
+        return request.execute().bodyStream()
     }
 
 }

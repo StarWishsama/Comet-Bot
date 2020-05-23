@@ -54,7 +54,7 @@ class AdminCommand : UniversalCommand {
                                     if (StringUtils.isNumeric(args[1])) {
                                         BotUser.getUser(args[1].toLong())
                                     } else {
-                                        return BotUtil.sendLocalMessage("msg.bot-prefix", "请输入正确的QQ号或者@TA").toMirai()
+                                        return BotUtil.sendMsgPrefix( "请输入正确的QQ号或者@TA").toMirai()
                                     }
                                 }
 
@@ -75,7 +75,7 @@ class AdminCommand : UniversalCommand {
                                 if (StringUtils.isNumeric(args[1])) {
                                     BotUser.getUser(args[1].toLong())
                                 } else {
-                                    return BotUtil.sendLocalMessage("msg.bot-prefix", "请输入正确的QQ号或者@TA").toMirai()
+                                    return BotUtil.sendMsgPrefix( "请输入正确的QQ号或者@TA").toMirai()
                                 }
                             }
 

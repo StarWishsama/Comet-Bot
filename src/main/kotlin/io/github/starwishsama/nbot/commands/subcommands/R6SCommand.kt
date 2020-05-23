@@ -4,10 +4,10 @@ import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
+import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.getLocalMessage
 import io.github.starwishsama.nbot.util.BotUtil.isLegitId
 import io.github.starwishsama.nbot.util.BotUtil.isNoCoolDown
-import io.github.starwishsama.nbot.util.BotUtil.sendLocalMessage
 import io.github.starwishsama.nbot.util.toMirai
 import io.github.starwishsama.nbot.util.R6SUtil.getR6SInfo
 import net.mamoe.mirai.message.GroupMessageEvent
@@ -32,7 +32,7 @@ class R6SCommand : UniversalCommand {
                                     "绑定彩虹六号账号 无需输入ID快捷查询游戏数据").toMirai()
                         }
 
-                        event.reply(sendLocalMessage("msg.bot-prefix", "查询中..."))
+                        event.reply(BotUtil.sendMsgPrefix("查询中..."))
                         val result = getR6SInfo(r6Account)
                         return event.sender.at() + ("\n" + result)
                     }

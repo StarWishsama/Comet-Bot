@@ -6,7 +6,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
 import io.github.starwishsama.nbot.BotConstants
-import io.github.starwishsama.nbot.BotInstance
+import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.managers.GroupConfigManager
 import io.github.starwishsama.nbot.objects.BotLocalization
 import io.github.starwishsama.nbot.objects.BotUser
@@ -21,19 +21,19 @@ import io.github.starwishsama.nbot.util.writeJson
 import java.io.File
 
 object DataSetup {
-    private val userCfg: File = File(BotInstance.filePath.toString(), "users.json")
-    private val shopItemCfg: File = File(BotInstance.filePath.toString(), "/items.json")
-    private val cfgFile: File = File(BotInstance.filePath.toString(), "/config.json")
-    private val langCfg: File = File(BotInstance.filePath.toString(), "/lang.json")
-    private val groupCfg: File = File(BotInstance.filePath.toString(), "/groups.json")
-    private val cacheCfg: File = File(BotInstance.filePath.toString(), "cache.json")
-    private val pcrData = File(BotInstance.filePath.toString(), "/pcr.json")
-    private val arkNightData = File(BotInstance.filePath.toString(), "/ark.json")
+    private val userCfg: File = File(BotMain.filePath.toString(), "users.json")
+    private val shopItemCfg: File = File(BotMain.filePath.toString(), "/items.json")
+    private val cfgFile: File = File(BotMain.filePath.toString(), "/config.json")
+    private val langCfg: File = File(BotMain.filePath.toString(), "/lang.json")
+    private val groupCfg: File = File(BotMain.filePath.toString(), "/groups.json")
+    private val cacheCfg: File = File(BotMain.filePath.toString(), "cache.json")
+    private val pcrData = File(BotMain.filePath.toString(), "/pcr.json")
+    private val arkNightData = File(BotMain.filePath.toString(), "/ark.json")
     private val gson = BotConstants.gson
 
     fun initData() {
-        if (!BotInstance.log.exists()) {
-            BotInstance.log.mkdirs()
+        if (!BotMain.log.exists()) {
+            BotMain.log.mkdirs()
         }
 
         if (!userCfg.exists() || !cfgFile.exists()) {
@@ -134,7 +134,7 @@ object DataSetup {
     }
 
     fun saveFiles() {
-        BotInstance.logger.info("[Bot] 自动保存数据完成")
+        BotMain.logger.info("[Bot] 自动保存数据完成")
         saveCfg()
         saveLang()
     }

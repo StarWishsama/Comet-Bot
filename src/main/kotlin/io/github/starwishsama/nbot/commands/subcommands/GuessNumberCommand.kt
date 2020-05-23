@@ -1,7 +1,7 @@
 package io.github.starwishsama.nbot.commands.subcommands
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.nbot.BotInstance
+import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.commands.interfaces.WaitableCommand
@@ -32,7 +32,7 @@ class GuessNumberCommand: UniversalCommand, WaitableCommand {
                 when {
                     args.isEmpty() -> {
                         val answer = RandomUtil.randomInt(0, 100)
-                        BotInstance.logger.verbose("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
+                        BotMain.logger.verbose("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
                         SessionManager.addSession(GuessNumberSession(event.group.id, RandomUtil.randomInt(0, 101)))
                         return BotUtil.sendMsgPrefix("猜一个数字吧! 范围 [0, 100]").toMirai()
                     }
@@ -48,11 +48,11 @@ class GuessNumberCommand: UniversalCommand, WaitableCommand {
                                 throw NumberFormatException("最小值不能大于等于最大值")
                             }
                             val answer = RandomUtil.randomInt(min, max + 1)
-                            BotInstance.logger.verbose("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
+                            BotMain.logger.verbose("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
                             SessionManager.addSession(GuessNumberSession(event.group.id, RandomUtil.randomInt(0, 100)))
                             return BotUtil.sendMsgPrefix("猜一个数字吧! 范围 [$min, $max]").toMirai()
                         } catch (e: NumberFormatException) {
-                            return BotUtil.sendMsgPrefix("请输入有效的非负整数!").toMirai()
+                            return BotUtil.sendMsgPrefix("${e.message}").toMirai()
                         }
                     }
                     else -> {

@@ -20,17 +20,17 @@ class GachaCommand : UniversalCommand {
                     "明日方舟", "舟游", "mrfz", "ak" -> {
                         return if (args.size == 2) {
                             when (args[1]) {
-                                "十连" -> (BotUtil.getLocalMessage("msg.bot-prefix") + DrawUtil.getArkDrawResult(
+                                "十连" -> BotUtil.sendMsgPrefix(DrawUtil.getArkDrawResult(
                                         user,
                                         10
                                 )).toMirai()
-                                "单抽" -> (BotUtil.getLocalMessage("msg.bot-prefix") + DrawUtil.getArkDrawResult(
+                                "单抽" -> BotUtil.sendMsgPrefix(DrawUtil.getArkDrawResult(
                                     user,
                                     1
                                 )).toMirai()
                                 else -> {
                                     if (StringUtils.isNumeric(args[1])) {
-                                        (BotUtil.getLocalMessage("msg.bot-prefix") + DrawUtil.getArkDrawResult(user, args[1].toInt())).toMirai()
+                                        BotUtil.sendMsgPrefix(DrawUtil.getArkDrawResult(user, args[1].toInt())).toMirai()
                                     } else {
                                         getHelp().toMirai()
                                     }
@@ -43,11 +43,11 @@ class GachaCommand : UniversalCommand {
                     "公主连结", "pcr", "gzlj" -> {
                         return if (args.size == 2){
                             when (args[1]) {
-                                "十连" -> (BotUtil.getLocalMessage("msg.bot-prefix") + DrawUtil.getPCRResult(user, 10)).toMirai()
-                                "单抽" -> (BotUtil.getLocalMessage("msg.bot-prefix") + DrawUtil.getPCRResult(user, 1)).toMirai()
+                                "十连" -> BotUtil.sendMsgPrefix(DrawUtil.getPCRResult(user, 10)).toMirai()
+                                "单抽" -> BotUtil.sendMsgPrefix(DrawUtil.getPCRResult(user, 1)).toMirai()
                                 else -> {
                                     if (StringUtils.isNumeric(args[1])) {
-                                        (BotUtil.getLocalMessage("msg.bot-prefix") + DrawUtil.getPCRResult(user, args[1].toInt())).toMirai()
+                                        BotUtil.sendMsgPrefix(DrawUtil.getPCRResult(user, args[1].toInt())).toMirai()
                                     } else {
                                         getHelp().toMirai()
                                     }

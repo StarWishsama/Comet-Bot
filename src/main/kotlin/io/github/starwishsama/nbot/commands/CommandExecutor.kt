@@ -1,7 +1,7 @@
 package io.github.starwishsama.nbot.commands
 
 import io.github.starwishsama.nbot.BotConstants
-import io.github.starwishsama.nbot.BotInstance
+import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.sessions.SessionManager
@@ -16,7 +16,7 @@ import java.util.*
  * 处理群聊/私聊聊天信息中存在的命令
  * @author Nameless
  */
-object CommandHandler {
+object CommandExecutor {
     var commands: List<UniversalCommand> = mutableListOf()
 
     /**
@@ -52,7 +52,7 @@ object CommandHandler {
         if (isCommandPrefix(event.message.content) && !SessionManager.isValidSession(event.sender.id)) {
             val cmd = getCommand(getCommandName(event.message.contentToString()))
             if (cmd != null) {
-                BotInstance.logger.debug("[命令] " + event.sender.id + " 执行了命令: " + cmd.getProps().name)
+                BotMain.logger.debug("[命令] " + event.sender.id + " 执行了命令: " + cmd.getProps().name)
                 var user = BotUser.getUser(event.sender.id)
                 if (user == null) {
                     user = BotUser.quickRegister(event.sender.id)
@@ -129,7 +129,7 @@ object CommandHandler {
                 BotConstants.cfg.filterWords.forEach {
                     if (context.contains(it)) {
                         count++
-                        context = context.replace(it.toRegex(), "")
+                        context = context.replace(it.toRegex(), " ")
                     }
 
                     if (count > 3) {

@@ -24,7 +24,7 @@ class PictureSearch : UniversalCommand, WaitableCommand {
                 if (!SessionManager.isValidSession(event.sender.id)) {
                     SessionManager.addSession(Session(this, user.userQQ))
                 }
-                BotUtil.sendLocalMessage("msg.bot-prefix", "请发送需要搜索的图片").toMirai()
+                BotUtil.sendMsgPrefix("请发送需要搜索的图片").toMirai()
             } else {
                 BotUtil.sendMsgPrefix("请在配置文件里填入 SauceNao api key").toMirai()
             }

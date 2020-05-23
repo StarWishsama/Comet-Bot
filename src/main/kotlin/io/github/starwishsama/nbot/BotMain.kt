@@ -1,14 +1,15 @@
 package io.github.starwishsama.nbot
 
 import com.hiczp.bilibili.api.BilibiliClient
-import io.github.starwishsama.nbot.BotInstance.bot
-import io.github.starwishsama.nbot.BotInstance.client
-import io.github.starwishsama.nbot.BotInstance.executeCommand
-import io.github.starwishsama.nbot.BotInstance.initLog
-import io.github.starwishsama.nbot.BotInstance.log
-import io.github.starwishsama.nbot.BotInstance.rCon
-import io.github.starwishsama.nbot.BotInstance.setupRCon
-import io.github.starwishsama.nbot.commands.CommandHandler
+import io.github.starwishsama.nbot.BotMain.bot
+import io.github.starwishsama.nbot.BotMain.client
+import io.github.starwishsama.nbot.BotMain.executeCommand
+import io.github.starwishsama.nbot.BotMain.initLog
+import io.github.starwishsama.nbot.BotMain.log
+import io.github.starwishsama.nbot.BotMain.rCon
+import io.github.starwishsama.nbot.BotMain.setupRCon
+import io.github.starwishsama.nbot.api.bilibili.DynamicApi
+import io.github.starwishsama.nbot.commands.CommandExecutor
 import io.github.starwishsama.nbot.commands.subcommands.*
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.file.BackupHelper
@@ -20,7 +21,7 @@ import io.github.starwishsama.nbot.listeners.SessionListener
 import io.github.starwishsama.nbot.managers.TaskManager
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.tasks.CheckLiveStatus
-import io.github.starwishsama.nbot.util.TwitterUtil
+import io.github.starwishsama.nbot.api.twitter.TwitterApi
 import io.github.starwishsama.nbot.util.getContext
 import io.github.starwishsama.nbot.util.writeString
 import kotlinx.coroutines.Dispatchers
@@ -44,9 +45,9 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
-object BotInstance {
+object BotMain {
     val filePath: File = File(getPath())
-    const val version = "0.3.4-BETA-200522"
+    const val version = "0.3.5-BETA-200523"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -63,7 +64,7 @@ object BotInstance {
         while (scanner.hasNextLine()) {
             command = scanner.nextLine()
             if ("stop" == command) {
-                logger.info("[Bot] Stopping bot...")
+                logger.info("[Bot] 正在关闭 Bot...")
                 exitProcess(0)
             } else if ("upgrade" == command) {
                 val cmd = command.split(" ")
@@ -83,7 +84,7 @@ object BotInstance {
     }
 
     private fun getPath(): String {
-        var path: String = BotInstance::class.java.protectionDomain.codeSource.location.path
+        var path: String = BotMain::class.java.protectionDomain.codeSource.location.path
         if (System.getProperty("os.name").toLowerCase().contains("dows")) {
             path = path.substring(1)
         }
@@ -108,7 +109,7 @@ object BotInstance {
             if (!parent.exists()) {
                 parent.mkdirs()
             }
-            log = File(parent, "log-${initTime.year}-${initTime.month.value}-${initTime.dayOfMonth}-${initTime.hour}-${initTime.minute}.txt")
+            log = File(parent, "log-${initTime.year}-${initTime.month.value}-${initTime.dayOfMonth}-${initTime.hour}-${initTime.minute}.log")
             log.createNewFile()
         } catch (e: IOException) {
             error("尝试输出 Log 失败")
@@ -118,14 +119,14 @@ object BotInstance {
 
 suspend fun main() {
     initLog()
-    BotInstance.startTime = System.currentTimeMillis()
+    BotMain.startTime = System.currentTimeMillis()
     DataSetup.initData()
-    BotInstance.qqId = BotConstants.cfg.botId
-    BotInstance.password = BotConstants.cfg.botPassword
+    BotMain.qqId = BotConstants.cfg.botId
+    BotMain.password = BotConstants.cfg.botPassword
 
-    if (BotInstance.qqId == 0L) {
+    if (BotMain.qqId == 0L) {
         println("请到 config.json 里填写机器人的QQ号&密码")
-        BotInstance.logger.info("[Bot] Stopping bot...")
+        BotMain.logger.info("[Bot] Stopping bot...")
         exitProcess(0)
     } else {
         val config = BotConfiguration.Default
@@ -138,10 +139,10 @@ suspend fun main() {
             println(it)
         })}
         config.fileBasedDeviceInfo()
-        bot = Bot(qq = BotInstance.qqId, password = BotInstance.password, configuration = config)
+        bot = Bot(qq = BotMain.qqId, password = BotMain.password, configuration = config)
         bot.alsoLogin()
-        BotInstance.logger = bot.logger
-        CommandHandler.setupCommand(
+        BotMain.logger = bot.logger
+        CommandExecutor.setupCommand(
             arrayOf(
                 AdminCommand(),
                 BiliBiliCommand(),
@@ -165,12 +166,13 @@ suspend fun main() {
         )
 
         val listeners = arrayOf(FuckLightAppListener, GroupChatListener, RepeatListener, SessionListener)
+        val apis = arrayOf(DynamicApi, TwitterApi)
 
-        BotInstance.logger.info("[命令] 已注册 " + CommandHandler.commands.size + " 个命令")
+        BotMain.logger.info("[命令] 已注册 " + CommandExecutor.commands.size + " 个命令")
 
         setupRCon()
 
-        BotInstance.service = Executors.newSingleThreadScheduledExecutor(
+        BotMain.service = Executors.newSingleThreadScheduledExecutor(
                 BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
         )
 
@@ -203,15 +205,15 @@ suspend fun main() {
             }
 
         }, 5)
-        TaskManager.runScheduleTaskAsync({ TwitterUtil.apiExecuteTime = 0 }, 15, 15, TimeUnit.MINUTES)
+        TaskManager.runScheduleTaskAsync({ apis.forEach{ it.resetTime() }}, 25, 25, TimeUnit.MINUTES)
 
         /** 监听器 */
         listeners.forEach {
             it.register(bot)
-            BotInstance.logger.info("[监听器] 已注册 ${it.getName()} 监听器")
+            BotMain.logger.info("[监听器] 已注册 ${it.getName()} 监听器")
         }
 
-        val time = System.currentTimeMillis() - BotInstance.startTime
+        val time = System.currentTimeMillis() - BotMain.startTime
         val startUsedTime =
                 if (time > 1000) {
                     String.format("%.2f", (time.toDouble() / 1000)) + "s"
@@ -219,18 +221,18 @@ suspend fun main() {
                     (time.toString() + "ms")
                 }
 
-        BotInstance.logger.info("无名 Bot 启动成功, 耗时 $startUsedTime")
+        BotMain.logger.info("无名 Bot 启动成功, 耗时 $startUsedTime")
 
         Runtime.getRuntime().addShutdownHook(Thread {
             DataSetup.saveFiles()
-            BotInstance.service.shutdown()
+            BotMain.service.shutdown()
             rCon?.disconnect()
         })
 
         bot.subscribeMessages {
             always {
                 if (sender.id != 80000000L) {
-                    val result = CommandHandler.execute(this)
+                    val result = CommandExecutor.execute(this)
                     if (result !is EmptyMessageChain) {
                         reply(result)
                     }

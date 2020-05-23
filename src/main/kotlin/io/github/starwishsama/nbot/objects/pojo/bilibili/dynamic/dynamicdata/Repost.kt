@@ -1,7 +1,9 @@
 package io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.dynamicdata
 
-import com.google.gson.GsonBuilder
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.nbot.BotConstants.gson
+import io.github.starwishsama.nbot.BotMain
+import io.github.starwishsama.nbot.objects.WrappedMessage
 import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicTypeSelector
 
 import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicData
@@ -29,8 +31,8 @@ data class Repost(@SerializedName("origin")
         }
     }
 
-    override suspend fun getContact(): List<String> {
-        return arrayListOf(("转发了 ${if (item?.isDeleted()!!) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item?.content}\n" +
+    override suspend fun getContact(): WrappedMessage {
+        return WrappedMessage(("转发了 ${if (item?.isDeleted()!!) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item?.content}\n" +
                 "原动态信息: ${item?.originType?.let { getOriginalDynamic(originDynamic, it) }}"))
     }
 
@@ -38,16 +40,14 @@ data class Repost(@SerializedName("origin")
         try {
             val dynamicType = DynamicTypeSelector.getType(type)
             if (dynamicType.typeName != UnknownType::javaClass.name) {
-                val gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
                 val info = gson.fromJson(contact, dynamicType)
-                if (info != null && !info.getContact().isNullOrEmpty()) {
-                    return info.getContact()[0]
+                if (info != null) {
+                    return info.getContact().text ?: "没有动态"
                 }
             }
             return "无法解析此动态消息, 你还是另请高明吧"
         } catch (e: Exception) {
-            println("在处理时遇到了问题\n原动态内容: $contact\n动态类型: $type\n报错堆栈")
-            e.printStackTrace()
+            BotMain.logger.error("在处理时遇到了问题\n原动态内容: $contact\n动态类型: $type\n报错堆栈", e)
         }
         return "在获取时遇到了错误"
     }

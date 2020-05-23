@@ -1,7 +1,5 @@
 package io.github.starwishsama.nbot.api
 
-import java.time.LocalDateTime
-
 /**
  * Api 调用器
  * 摒除使用多个乱七八糟的 Util 类
@@ -9,8 +7,10 @@ import java.time.LocalDateTime
  * @author Nameless
  */
 interface ApiExecutor {
-    val usedTime: Int
-    val lastUsedTime: LocalDateTime
-    fun isReachLimit()
-    fun getLimitTime()
+    var usedTime: Int
+    fun isReachLimit() : Boolean
+    fun getLimitTime() : Int
+    fun resetTime() {
+        usedTime = 0
+    }
 }

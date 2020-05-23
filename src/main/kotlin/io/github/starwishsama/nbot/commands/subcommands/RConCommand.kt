@@ -1,7 +1,7 @@
 package io.github.starwishsama.nbot.commands.subcommands
 
 import io.github.starwishsama.nbot.BotConstants
-import io.github.starwishsama.nbot.BotInstance
+import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.commands.interfaces.WaitableCommand
@@ -34,7 +34,7 @@ class RConCommand : UniversalCommand, WaitableCommand {
                         return BotUtil.sendMsgPrefix("请在下一条消息发送 rCon 连接地址").toMirai()
                     }
                     "cmd", "exec", "命令" -> {
-                        val rCon = BotInstance.rCon
+                        val rCon = BotMain.rCon
                         if (rCon != null) {
                             if (args.size > 1) {
                                 try {
@@ -42,7 +42,7 @@ class RConCommand : UniversalCommand, WaitableCommand {
                                         return@withContext rCon.command(args.getRestString(1)).toMirai()
                                     }
                                 } catch (e: IOException) {
-                                    BotInstance.logger.error("在连接到 rCon 服务器时发生了错误", e)
+                                    BotMain.logger.error("在连接到 rCon 服务器时发生了错误", e)
                                     return BotUtil.sendMsgPrefix("在连接到 rCon 服务器时发生了错误").toMirai()
                                 }
                             }
@@ -94,7 +94,7 @@ class RConCommand : UniversalCommand, WaitableCommand {
             2 -> {
                 BotConstants.cfg.rConPassword = event.message.contentToString()
                 event.reply(BotUtil.sendMsgPrefix("设置 rCon 完成!"))
-                BotInstance.setupRCon()
+                BotMain.setupRCon()
                 waitList.remove(user)
                 SessionManager.expireSession(session)
             }

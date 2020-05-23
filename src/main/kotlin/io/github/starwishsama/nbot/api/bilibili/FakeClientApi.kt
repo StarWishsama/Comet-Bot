@@ -3,10 +3,10 @@ package io.github.starwishsama.nbot.api.bilibili
 import com.hiczp.bilibili.api.app.model.SearchUserResult
 import com.hiczp.bilibili.api.live.model.RoomInfo
 import com.hiczp.bilibili.api.retrofit.exception.BilibiliApiException
-import io.github.starwishsama.nbot.BotInstance
+import io.github.starwishsama.nbot.BotMain
 
 object FakeClientApi {
-    private val client = BotInstance.client
+    private val client = BotMain.client
 
     private suspend fun searchUser(userName: String): SearchUserResult.Data {
         val searchResult = client.appAPI.searchUser(keyword = userName).await()
@@ -17,7 +17,7 @@ object FakeClientApi {
         try {
             return client.liveAPI.getInfo(roomId).await()
         } catch (e: BilibiliApiException) {
-            BotInstance.logger.error("在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
+            BotMain.logger.error("在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
                     "${e.commonResponse.msg}\n" +
                     "${e.commonResponse.message}", e)
         }
@@ -32,7 +32,7 @@ object FakeClientApi {
                 return searchResult.items[0]
             }
         } catch (e: BilibiliApiException) {
-            BotInstance.logger.error("在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
+            BotMain.logger.error("在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
                     "${e.commonResponse.msg}\n" +
                     "${e.commonResponse.message}", e)
         }

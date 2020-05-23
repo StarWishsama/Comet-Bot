@@ -87,6 +87,8 @@ object DrawUtil {
     }
 
     fun getArkDrawResult(user: BotUser, time: Int): String {
+        val overTimeMessage = "今日命令条数已达上限, 请等待条数自动恢复哦~\n" +
+                "命令条数现在每小时会恢复100次, 封顶1000次"
         val result = LinkedList<ArkNightOperator>()
         var r6Time = 0
         if (time == 1) {
@@ -95,8 +97,7 @@ object DrawUtil {
                 val (name, _, rare) = drawAr()
                 name + " " + getStar(rare)
             } else {
-                "今日命令条数已达上限, 请等待条数自动恢复哦~\n" +
-                        "命令条数现在每小时会恢复100次, 封顶1000次"
+               overTimeMessage
             }
         } else if (time == 10) {
             return if (user.commandTime >= 10 || user.compareLevel(UserLevel.ADMIN)) {
@@ -108,8 +109,7 @@ object DrawUtil {
                 }
                 sb.toString().trim()
             } else {
-                "今日命令条数已达上限, 请等待条数自动恢复哦~\n" +
-                        "命令条数现在每小时会恢复100次, 封顶1000次"
+                overTimeMessage
             }
         } else {
             if (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000) {
@@ -140,8 +140,7 @@ object DrawUtil {
                         "四星个数: ${result.stream().filter { it.rare == 4 }.count()}\n" +
                         "三星个数: ${result.stream().filter { it.rare == 3 }.count()}"
             } else {
-                return "今日命令条数已达上限, 请等待条数自动恢复哦~\n" +
-                        "命令条数现在每小时会恢复100次, 封顶1000次"
+                return overTimeMessage
             }
         }
     }

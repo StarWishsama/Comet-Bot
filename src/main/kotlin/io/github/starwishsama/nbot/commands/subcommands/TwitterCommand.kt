@@ -9,10 +9,10 @@ import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.getRestString
 import io.github.starwishsama.nbot.util.toMirai
-import io.github.starwishsama.nbot.util.TwitterUtil
+import io.github.starwishsama.nbot.api.twitter.TwitterApi
 import net.mamoe.mirai.message.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
-import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.*
+import java.lang.Exception
 
 class TwitterCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
@@ -30,20 +30,31 @@ class TwitterCommand : UniversalCommand {
                             if (args.size > 1) {
                                 event.quoteReply("正在查询...")
                                 try {
-                                    val twitterUser = TwitterUtil.getUserInfo(args.getRestString(1))
+                                    val twitterUser = TwitterApi.getUserInfo(args.getRestString(1))
                                     if (twitterUser == null) {
                                         BotUtil.sendMsgPrefix("找不到此用户或连接超时").toMirai()
                                     } else {
-                                        val tweet = TwitterUtil.getLatestTweet(args.getRestString(1))
-                                        if (tweet != null) {
-                                            BotUtil.sendMsgPrefix(
-                                                "\n${twitterUser.name}\n" +
-                                                        "粉丝数: ${twitterUser.followersCount}\n" +
-                                                        "最近推文: \n" +
-                                                        tweet.text + "\n" + tweet.source
-                                            ).toMirai()
-                                        } else {
-                                            BotUtil.sendMsgPrefix("获取推文时出现了问题").toMirai()
+                                        try {
+                                            val tweet = TwitterApi.getLatestTweet(args.getRestString(1))
+                                            if (tweet != null) {
+                                                val image = tweet.getPictureOrNull(event.subject)
+                                                var result = (BotUtil.sendMsgPrefix(
+                                                    "\n${twitterUser.name}\n" +
+                                                            "粉丝数: ${twitterUser.followersCount}\n" +
+                                                            "最近推文: \n${tweet.text}"
+                                                ).toMirai())
+
+                                                if (image != null) {
+                                                    result += image
+                                                }
+
+                                                result
+                                            } else {
+                                                BotUtil.sendMsgPrefix("获取推文时出现了问题, 请查看后台").toMirai()
+                                            }
+                                        } catch (e: Exception) {
+                                            e.printStackTrace()
+                                            BotUtil.sendMsgPrefix("获取推文时出现了问题, 请查看后台").toMirai()
                                         }
                                     }
                                 } catch (e: RateLimitException) {

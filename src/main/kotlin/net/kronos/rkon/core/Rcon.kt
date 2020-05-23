@@ -66,7 +66,7 @@ class Rcon(host: String, port: Int, password: ByteArray?) {
      */
     @Throws(IOException::class)
     fun disconnect() {
-        synchronized(sync) { socket!!.close() }
+        synchronized(sync) { socket?.close() }
     }
 
     /**
@@ -77,11 +77,14 @@ class Rcon(host: String, port: Int, password: ByteArray?) {
      *
      * @throws IOException
      */
-    @Throws(IOException::class)
+    @Throws(Exception::class)
     fun command(payload: String): String {
         require(payload.trim { it <= ' ' }.isNotEmpty()) { "Payload can't be null or empty" }
         val response = send(RconPacket.SERVERDATA_EXECCOMMAND, payload.toByteArray())
-        return BotUtil.sendMsgPrefix(String(response!!.payload, charset))
+        if (response != null) {
+            return BotUtil.sendMsgPrefix(String(response.payload, charset))
+        }
+        return "发生异常"
     }
 
     @Throws(IOException::class)

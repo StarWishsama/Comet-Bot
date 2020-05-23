@@ -7,6 +7,7 @@ import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.api.bilibili.DynamicApi
 import io.github.starwishsama.nbot.api.bilibili.FakeClientApi
+import io.github.starwishsama.nbot.objects.WrappedMessage
 import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.isNumeric
 import io.github.starwishsama.nbot.util.toMirai
@@ -115,16 +116,20 @@ class BiliBiliCommand : UniversalCommand {
         /bili info [用户名] 查看用户的动态
     """.trimIndent()
 
-    private suspend fun getDynamicText(dynamic: List<String>, event: MessageEvent): MessageChain {
-        return if (dynamic.isEmpty()) {
+    private suspend fun getDynamicText(dynamic: WrappedMessage?, event: MessageEvent): MessageChain {
+        return if (dynamic == null) {
             ("\n无最近动态").toMirai()
         } else {
-            when (dynamic.size) {
-                1 -> ("\n最近动态: ${dynamic[0]}").toMirai()
-                2 -> ("\n最近动态: ${dynamic[0]}").toMirai()
-                        .plus(BotUtil.getImageStream(dynamic[1]).uploadAsImage(event.subject))
-                else -> ("\n无最近动态").toMirai()
+            val image = dynamic.getPicture(event.subject)
+            var result = dynamic.text?.toMirai()
+
+            if (result != null) {
+                if (image != null) {
+                    result += image
+                }
+                return result
             }
+            return ("\n无最近动态").toMirai()
         }
     }
 

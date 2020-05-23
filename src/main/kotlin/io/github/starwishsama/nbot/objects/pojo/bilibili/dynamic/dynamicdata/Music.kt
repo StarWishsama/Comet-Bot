@@ -1,6 +1,7 @@
 package io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.dynamicdata
 
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.nbot.objects.WrappedMessage
 import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicData
 
 data class Music(var id: Long,
@@ -8,16 +9,15 @@ data class Music(var id: Long,
                  var coverURL: String?,
                  @SerializedName("intro")
                  var dynamic: String) : DynamicData {
-    override suspend fun getContact(): List<String> {
-        val list = arrayListOf<String>()
-        list.add("发布了音乐 $dynamic\n")
+    override suspend fun getContact(): WrappedMessage {
+        val wrapped = WrappedMessage("发布了音乐 $dynamic\n")
 
         coverURL.let {
             if (it != null) {
-                list.add(it)
+                wrapped.picture = it
             }
         }
 
-        return list
+        return wrapped
     }
 }
