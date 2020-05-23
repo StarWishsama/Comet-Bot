@@ -4,9 +4,9 @@ import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
 import cn.hutool.http.HttpRequest
 import com.deadmandungeons.serverstatus.MinecraftServerStatus
+import com.deadmandungeons.serverstatus.ping.PingResponse
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotMain
-import io.github.starwishsama.nbot.api.twitter.TwitterApi
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.objects.BotUser.Companion.isBotAdmin
@@ -77,9 +77,6 @@ fun String.limitStringSize(size: Int): String {
 
 object BotUtil {
     private var coolDown: MutableMap<Long, Long> = HashMap()
-
-
-
     /**
      * 获取 Minecraft 服务器信息 (SRV解析)
      * @author NamelessSAMA
@@ -139,11 +136,7 @@ object BotUtil {
     fun getCustomServerInfo(address: String, port: Int, msg: String): String {
         return try {
             val response = MinecraftServerStatus.pingServerStatus(address, port)
-            msg.replace("%延迟%".toRegex(), response.latency.toString() + "ms")
-                .replace("%在线玩家%".toRegex(), response.players.toString())
-                .replace("%换行%".toRegex(), "\n")
-                .replace("%MOTD%".toRegex(), response.description.text.removeColor())
-                .replace("%版本%".toRegex(), response.version.toString())
+            replacePlaceHolder(msg, response)
         } catch (e: IOException) {
             BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
             "Bot > 无法连接至 $address"
@@ -162,11 +155,7 @@ object BotUtil {
     fun getCustomServerInfo(address: String, msg: String): String {
         return try {
             val response = MinecraftServerStatus.pingServerStatus(address)
-            msg.replace("%延迟%".toRegex(), response.latency.toString() + "ms")
-                .replace("%在线玩家%".toRegex(), response.players.toString())
-                .replace("%换行%".toRegex(), "\n")
-                .replace("%MOTD%".toRegex(), response.description.text.removeColor())
-                .replace("%版本%".toRegex(), response.version.toString())
+            replacePlaceHolder(msg, response)
         } catch (e: IOException) {
             BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
             "Bot > 无法连接至 $address"
@@ -174,6 +163,14 @@ object BotUtil {
             BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
             "Bot > 无法连接至 $address"
         }
+    }
+
+    private fun replacePlaceHolder(msg: String, response: PingResponse) : String {
+        return msg.replace("%延迟%".toRegex(), response.latency.toString() + "ms")
+                .replace("%在线玩家%".toRegex(), response.players.toString())
+                .replace("%换行%".toRegex(), "\n")
+                .replace("%MOTD%".toRegex(), response.description.text.removeColor())
+                .replace("%版本%".toRegex(), response.version.toString())
     }
 
     /**

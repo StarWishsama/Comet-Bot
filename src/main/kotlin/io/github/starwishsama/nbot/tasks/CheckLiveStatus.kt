@@ -13,7 +13,7 @@ object CheckLiveStatus : Runnable {
 
     override fun run() {
         if (BotConstants.cfg.subList.isNotEmpty() && BotConstants.cfg.pushGroups.isNotEmpty()) {
-            BotConstants.cfg.subList.forEach {roomId ->
+            BotConstants.cfg.subList.forEach { roomId ->
                 val data = runBlocking {
                     FakeClientApi.getLiveRoom(roomId)?.data
                 }
