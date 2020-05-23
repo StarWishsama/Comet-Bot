@@ -3,8 +3,7 @@ package io.github.starwishsama.nbot.objects.pojo.twitter
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
-import com.google.gson.reflect.TypeToken
-import io.github.starwishsama.nbot.BotConstants.gson
+import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.objects.pojo.twitter.tweetEntity.Media
 import io.github.starwishsama.nbot.util.BotUtil
@@ -12,7 +11,7 @@ import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.uploadAsImage
 
-data class Tweet(
+data class ReTweet(
         @SerializedName("created_at")
         var postTime: String,
         var id: Long,
@@ -24,26 +23,25 @@ data class Tweet(
         var source: String,
         var user: TwitterUser,
         @SerializedName("retweeted_status")
-        var retweetStatus: ReTweet?,
+        var retweetStatus: JsonObject?,
         @SerializedName("retweet_count")
         var retweetCount: Long,
         @SerializedName("favorite_count")
         var likeCount: Long,
         @SerializedName("possibly_sensitive")
-        var sensitive: Boolean
+        var sensitive: Boolean,
+        @SerializedName("quoted_status")
+        var quotedTweet: Tweet?
 ) {
-    fun contentEquals(tweet: Tweet): Boolean {
-        return text.contentEquals(tweet.text)
-    }
-
     suspend fun getPictureOrNull(contact: Contact) : Image? {
         val objects = entities
         var picture : Image? = null
+
         if (objects != null) {
             val media = objects["media"]
             if (media != null) {
                 try {
-                    val image = gson.fromJson(objects["media"].asJsonArray[0].asJsonObject.toString(), Media::class.java)
+                    val image = BotConstants.gson.fromJson(objects["media"].asJsonArray[0].asJsonObject.toString(), Media::class.java)
                     if (image.isSendableMedia()) {
                         picture = BotUtil.getImageStream(image.mediaUrlHttps).uploadAsImage(contact)
                     }
@@ -53,10 +51,11 @@ data class Tweet(
             }
         }
 
-        if (retweetStatus != null) {
-            val image = retweetStatus?.getPictureOrNull(contact)
-            picture = image
+        val quotedTweet = quotedTweet
+        if (quotedTweet != null) {
+            picture = quotedTweet.getPictureOrNull(contact)
         }
+
         return picture
     }
 }

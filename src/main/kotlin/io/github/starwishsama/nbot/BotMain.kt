@@ -11,6 +11,7 @@ import io.github.starwishsama.nbot.managers.TaskManager
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.tasks.CheckLiveStatus
 import io.github.starwishsama.nbot.api.twitter.TwitterApi
+import io.github.starwishsama.nbot.tasks.LatestTweetChecker
 import io.github.starwishsama.nbot.util.getContext
 import io.github.starwishsama.nbot.util.writeString
 import kotlinx.coroutines.Dispatchers
@@ -198,6 +199,13 @@ suspend fun main() {
 
         }, 5)
         TaskManager.runScheduleTaskAsync({ apis.forEach { it.resetTime() } }, 25, 25, TimeUnit.MINUTES)
+        TaskManager.runScheduleTaskAsyncIf(
+                LatestTweetChecker::run,
+                1,
+                15,
+                TimeUnit.MINUTES,
+                (BotConstants.cfg.twitterSubs.isNotEmpty() && BotConstants.cfg.tweetPushGroups.isNotEmpty())
+        )
 
         /** 监听器 */
         listeners.forEach {

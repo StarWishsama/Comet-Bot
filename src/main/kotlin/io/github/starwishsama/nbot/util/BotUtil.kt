@@ -316,8 +316,8 @@ object BotUtil {
     fun sendMsgPrefix(vararg otherText: String): String {
         val sb = StringBuilder()
         sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
-        for (s in otherText) {
-            sb.append(s).append("\n")
+        otherText.forEach {
+            sb.append(it).append("\n")
         }
         return sb.toString().trim { it <= ' ' }
     }

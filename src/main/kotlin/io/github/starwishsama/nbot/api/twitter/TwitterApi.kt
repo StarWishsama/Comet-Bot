@@ -11,6 +11,7 @@ import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotConstants.gson
 import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.api.ApiExecutor
+import io.github.starwishsama.nbot.exceptions.EmptyTweetException
 import io.github.starwishsama.nbot.exceptions.RateLimitException
 import io.github.starwishsama.nbot.objects.pojo.twitter.Tweet
 import io.github.starwishsama.nbot.objects.pojo.twitter.TwitterErrorInfo
@@ -84,7 +85,7 @@ object TwitterApi : ApiExecutor {
                             "authorization",
                             "Bearer $token"
                     )
-                    .timeout(8000)
+                    .timeout(12_000)
 
             if (proxyHost != null && BotConstants.cfg.proxyPort != -1) {
                 request.setProxy(
@@ -105,7 +106,7 @@ object TwitterApi : ApiExecutor {
         }
     }
 
-    @Throws(RateLimitException::class)
+    @Throws(RateLimitException::class, EmptyTweetException::class)
     fun getLatestTweet(username: String): Tweet? {
         if (isReachLimit()) {
             throw RateLimitException("已达到API调用上限")
@@ -118,7 +119,7 @@ object TwitterApi : ApiExecutor {
                         "authorization",
                         "Bearer $token"
                 )
-                .timeout(8000)
+                .timeout(12_000)
 
         if (proxyHost != null && BotConstants.cfg.proxyPort != -1) {
             request.setProxy(
@@ -135,14 +136,21 @@ object TwitterApi : ApiExecutor {
         } catch (e: HttpException) {
             BotMain.logger.error("[蓝鸟] 在获取用户最新推文时出现了问题", e)
         }
+
         BotMain.logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+
         if (result != null) {
             var tweet: Tweet? = null
             try {
-                tweet = (gson.fromJson(
+                val tweets = gson.fromJson(
                         result.body(),
                         object : TypeToken<List<Tweet>>() {}.type
-                ) as List<Tweet>)[0]
+                ) as List<Tweet>
+
+                if (tweets.isEmpty()) {
+                    throw EmptyTweetException()
+                }
+                tweet = tweets[0]
             } catch (e: JsonSyntaxException) {
                 try {
                     val errorInfo = gson.fromJson(result.body(), TwitterErrorInfo::class.java)

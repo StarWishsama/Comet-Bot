@@ -68,6 +68,12 @@ open class Config {
     @SerializedName("twitter_secret")
     var twitterSecret: String? = null
 
+    @SerializedName("twitter_subs")
+    var twitterSubs: List<String> = LinkedList()
+
+    @SerializedName("tweet_push_groups")
+    var tweetPushGroups: List<Long> = LinkedList()
+
     @SerializedName("proxy_url")
     var proxyUrl: String? = null
 

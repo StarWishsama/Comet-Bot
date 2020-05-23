@@ -10,6 +10,7 @@ import io.github.starwishsama.nbot.util.BotUtil
 import io.github.starwishsama.nbot.util.BotUtil.getRestString
 import io.github.starwishsama.nbot.util.toMirai
 import io.github.starwishsama.nbot.api.twitter.TwitterApi
+import io.github.starwishsama.nbot.exceptions.EmptyTweetException
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
 import java.lang.Exception
@@ -28,47 +29,68 @@ class TwitterCommand : UniversalCommand {
                     return when (args[0]) {
                         "info", "cx", "查询" -> {
                             if (args.size > 1) {
-                                event.quoteReply("正在查询...")
+                                event.quoteReply(BotUtil.sendMsgPrefix("正在查询, 请稍等"))
                                 try {
                                     val twitterUser = TwitterApi.getUserInfo(args.getRestString(1))
                                     if (twitterUser == null) {
                                         BotUtil.sendMsgPrefix("找不到此用户或连接超时").toMirai()
                                     } else {
-                                        try {
-                                            val tweet = TwitterApi.getLatestTweet(args.getRestString(1))
-                                            if (tweet != null) {
-                                                val image = tweet.getPictureOrNull(event.subject)
-                                                var result = (BotUtil.sendMsgPrefix(
+                                        val tweet = TwitterApi.getLatestTweet(args.getRestString(1))
+                                        if (tweet != null) {
+                                            val image = tweet.getPictureOrNull(event.subject)
+                                            var result = (BotUtil.sendMsgPrefix(
                                                     "\n${twitterUser.name}\n" +
                                                             "粉丝数: ${twitterUser.followersCount}\n" +
                                                             "最近推文: \n${tweet.text}"
-                                                ).toMirai())
+                                            ).toMirai())
 
-                                                if (image != null) {
-                                                    result += image
-                                                }
-
-                                                result
-                                            } else {
-                                                BotUtil.sendMsgPrefix("获取推文时出现了问题, 请查看后台").toMirai()
+                                            if (image != null) {
+                                                result += image
                                             }
-                                        } catch (e: Exception) {
-                                            e.printStackTrace()
+
+                                            result
+                                        } else {
                                             BotUtil.sendMsgPrefix("获取推文时出现了问题, 请查看后台").toMirai()
                                         }
                                     }
                                 } catch (e: RateLimitException) {
                                     BotUtil.sendMsgPrefix("API 调用已达上限").toMirai()
+                                } catch (e: EmptyTweetException) {
+                                    BotUtil.sendMsgPrefix(e.message ?: "").toMirai()
                                 }
                             } else {
                                 getHelp().toMirai()
                             }
                         }
                         "sub" -> {
-                            "WIP".toMirai()
+                            if (args.size > 1) {
+                                if (!BotConstants.cfg.twitterSubs.contains(args[1])) {
+                                    val twitter = TwitterApi.getUserInfo(args[1])
+
+                                    if (twitter == null) {
+                                        BotUtil.sendMsgPrefix("@${args[1]} 不存在或获取时连接超时, 请检查ID").toMirai()
+                                    }
+
+                                    BotConstants.cfg.twitterSubs += args[1]
+                                    BotUtil.sendMsgPrefix("订阅 @${args[1]} 成功").toMirai()
+                                } else {
+                                    BotUtil.sendMsgPrefix("你已经订阅了 @${args[1]}").toMirai()
+                                }
+                            } else {
+                                getHelp().toMirai()
+                            }
                         }
                         "unsub" -> {
-                            "WIP".toMirai()
+                            if (args.size > 1) {
+                                if (BotConstants.cfg.twitterSubs.contains(args[1])) {
+                                    BotConstants.cfg.twitterSubs -= args[1]
+                                    BotUtil.sendMsgPrefix("退订 @${args[1]} 成功").toMirai()
+                                } else {
+                                    BotUtil.sendMsgPrefix("没有订阅过 @${args[1]}").toMirai()
+                                }
+                            } else {
+                                getHelp().toMirai()
+                            }
                         }
                         else -> getHelp().toMirai()
                     }
@@ -78,11 +100,11 @@ class TwitterCommand : UniversalCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps = CommandProps("twitter", arrayListOf("twit", "蓝鸟"), "查询/订阅蓝鸟账号", "nbot.commands.twitter", UserLevel.USER)
+    override fun getProps(): CommandProps = CommandProps("twitter", arrayListOf("twit", "蓝鸟"), "查询/订阅蓝鸟账号", "nbot.commands.twitter", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
-        /twi info [蓝鸟ID] 查询账号信息
-        /twi sub [蓝鸟ID] 订阅用户的推文
-        /twi unsub [蓝鸟ID] 取消订阅用户的推文
+        /twit info [蓝鸟ID] 查询账号信息
+        /twit sub [蓝鸟ID] 订阅用户的推文
+        /twit unsub [蓝鸟ID] 取消订阅用户的推文
     """.trimIndent()
 }
