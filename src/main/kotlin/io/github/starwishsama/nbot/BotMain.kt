@@ -1,13 +1,6 @@
 package io.github.starwishsama.nbot
 
 import com.hiczp.bilibili.api.BilibiliClient
-import io.github.starwishsama.nbot.BotMain.bot
-import io.github.starwishsama.nbot.BotMain.client
-import io.github.starwishsama.nbot.BotMain.executeCommand
-import io.github.starwishsama.nbot.BotMain.initLog
-import io.github.starwishsama.nbot.BotMain.log
-import io.github.starwishsama.nbot.BotMain.rCon
-import io.github.starwishsama.nbot.BotMain.setupRCon
 import io.github.starwishsama.nbot.api.bilibili.DynamicApi
 import io.github.starwishsama.nbot.commands.CommandExecutor
 import io.github.starwishsama.nbot.commands.subcommands.*
@@ -115,134 +108,138 @@ object BotMain {
             error("尝试输出 Log 失败")
         }
     }
-}
 
-suspend fun main() {
-    initLog()
-    BotMain.startTime = System.currentTimeMillis()
-    DataSetup.initData()
-    BotMain.qqId = BotConstants.cfg.botId
-    BotMain.password = BotConstants.cfg.botPassword
+    @JvmStatic
+    suspend fun main(args: Array<String>) {
+        initLog()
+        startTime = System.currentTimeMillis()
+        DataSetup.initData()
+        qqId = BotConstants.cfg.botId
+        password = BotConstants.cfg.botPassword
 
-    if (BotMain.qqId == 0L) {
-        println("请到 config.json 里填写机器人的QQ号&密码")
-        BotMain.logger.info("[Bot] Stopping bot...")
-        exitProcess(0)
-    } else {
-        val config = BotConfiguration.Default
-        config.botLoggerSupplier = { it -> PlatformLogger("Bot ${it.id}", {
-            log.writeString(log.getContext() + "$it\n")
-            println(it)
-        })}
-        config.networkLoggerSupplier = { it -> PlatformLogger("Net ${it.id}", {
-            log.writeString(log.getContext() + "$it\n")
-            println(it)
-        })}
-        config.fileBasedDeviceInfo()
-        bot = Bot(qq = BotMain.qqId, password = BotMain.password, configuration = config)
-        bot.alsoLogin()
-        BotMain.logger = bot.logger
-        CommandExecutor.setupCommand(
-            arrayOf(
-                AdminCommand(),
-                BiliBiliCommand(),
-                CheckInCommand(),
-                ClockInCommand(),
-                DebugCommand(),
-                DivineCommand(),
-                GachaCommand(),
-                GuessNumberCommand(),
-                FlowerCommand(),
-                HelpCommand(),
-                InfoCommand(),
-                MusicCommand(),
-                MuteCommand(),
-                PictureSearch(),
-                R6SCommand(),
-                RConCommand(),
-                TwitterCommand(),
-                VersionCommand()
+        if (qqId == 0L) {
+            println("请到 config.json 里填写机器人的QQ号&密码")
+            exitProcess(0)
+        } else {
+            val config = BotConfiguration.Default
+            config.botLoggerSupplier = { it ->
+                PlatformLogger("Bot ${it.id}", {
+                    log.writeString(log.getContext() + "$it\n")
+                    println(it)
+                })
+            }
+            config.networkLoggerSupplier = { it ->
+                PlatformLogger("Net ${it.id}", {
+                    log.writeString(log.getContext() + "$it\n")
+                    println(it)
+                })
+            }
+            config.fileBasedDeviceInfo()
+            bot = Bot(qq = qqId, password = password, configuration = config)
+            bot.alsoLogin()
+            logger = bot.logger
+            CommandExecutor.setupCommand(
+                    arrayOf(
+                            AdminCommand(),
+                            BiliBiliCommand(),
+                            CheckInCommand(),
+                            ClockInCommand(),
+                            DebugCommand(),
+                            DivineCommand(),
+                            GachaCommand(),
+                            GuessNumberCommand(),
+                            FlowerCommand(),
+                            HelpCommand(),
+                            InfoCommand(),
+                            MusicCommand(),
+                            MuteCommand(),
+                            PictureSearch(),
+                            R6SCommand(),
+                            RConCommand(),
+                            TwitterCommand(),
+                            VersionCommand()
+                    )
             )
-        )
 
-        val listeners = arrayOf(FuckLightAppListener, GroupChatListener, RepeatListener, SessionListener)
-        val apis = arrayOf(DynamicApi, TwitterApi)
+            val listeners = arrayOf(FuckLightAppListener, GroupChatListener, RepeatListener, SessionListener)
+            val apis = arrayOf(DynamicApi, TwitterApi)
 
-        BotMain.logger.info("[命令] 已注册 " + CommandExecutor.commands.size + " 个命令")
+            logger.info("[命令] 已注册 " + CommandExecutor.commands.size + " 个命令")
 
-        setupRCon()
+            setupRCon()
 
-        BotMain.service = Executors.newSingleThreadScheduledExecutor(
-                BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
-        )
+            service = Executors.newSingleThreadScheduledExecutor(
+                    BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
+            )
 
-        /** 服务 */
-        BackupHelper.scheduleBackup()
-        TaskManager.runScheduleTaskAsync(
-            {BotConstants.users.forEach {it.addTime(100)}},
-            5,
-            5,
-            TimeUnit.HOURS)
-        TaskManager.runScheduleTaskAsyncIf(
-                CheckLiveStatus::run,
-                BotConstants.cfg.checkDelay,
-                BotConstants.cfg.checkDelay,
-                TimeUnit.MINUTES,
-                BotConstants.cfg.subList.isNotEmpty()
-        )
-        TaskManager.runAsync({
-            client.runCatching {
-                val pwd = BotConstants.cfg.biliPassword
-                val uname = BotConstants.cfg.biliUserName
+            /** 服务 */
+            BackupHelper.scheduleBackup()
+            TaskManager.runScheduleTaskAsync(
+                    { BotConstants.users.forEach { it.addTime(100) } },
+                    5,
+                    5,
+                    TimeUnit.HOURS)
+            TaskManager.runScheduleTaskAsyncIf(
+                    CheckLiveStatus::run,
+                    BotConstants.cfg.checkDelay,
+                    BotConstants.cfg.checkDelay,
+                    TimeUnit.MINUTES,
+                    BotConstants.cfg.subList.isNotEmpty()
+            )
+            TaskManager.runAsync({
+                client.runCatching {
+                    val pwd = BotConstants.cfg.biliPassword
+                    val uname = BotConstants.cfg.biliUserName
 
-                if (pwd != null && uname != null) {
-                    runBlocking {
-                        withContext(Dispatchers.IO) {
-                            login(username = uname, password = pwd)
+                    if (pwd != null && uname != null) {
+                        runBlocking {
+                            withContext(Dispatchers.IO) {
+                                login(username = uname, password = pwd)
+                            }
+                        }
+                    }
+                }
+
+            }, 5)
+            TaskManager.runScheduleTaskAsync({ apis.forEach { it.resetTime() } }, 25, 25, TimeUnit.MINUTES)
+
+            /** 监听器 */
+            listeners.forEach {
+                it.register(bot)
+                logger.info("[监听器] 已注册 ${it.getName()} 监听器")
+            }
+
+            val time = System.currentTimeMillis() - startTime
+            val startUsedTime =
+                    if (time > 1000) {
+                        String.format("%.2f", (time.toDouble() / 1000)) + "s"
+                    } else {
+                        (time.toString() + "ms")
+                    }
+
+            logger.info("无名 Bot 启动成功, 耗时 $startUsedTime")
+
+            Runtime.getRuntime().addShutdownHook(Thread {
+                DataSetup.saveFiles()
+                service.shutdown()
+                rCon?.disconnect()
+            })
+
+            bot.subscribeMessages {
+                always {
+                    if (sender.id != 80000000L) {
+                        val result = CommandExecutor.execute(this)
+                        if (result !is EmptyMessageChain) {
+                            reply(result)
                         }
                     }
                 }
             }
 
-        }, 5)
-        TaskManager.runScheduleTaskAsync({ apis.forEach{ it.resetTime() }}, 25, 25, TimeUnit.MINUTES)
+            executeCommand()
 
-        /** 监听器 */
-        listeners.forEach {
-            it.register(bot)
-            BotMain.logger.info("[监听器] 已注册 ${it.getName()} 监听器")
+            bot.join() // 等待 Bot 离线, 避免主线程退出
         }
-
-        val time = System.currentTimeMillis() - BotMain.startTime
-        val startUsedTime =
-                if (time > 1000) {
-                    String.format("%.2f", (time.toDouble() / 1000)) + "s"
-                } else {
-                    (time.toString() + "ms")
-                }
-
-        BotMain.logger.info("无名 Bot 启动成功, 耗时 $startUsedTime")
-
-        Runtime.getRuntime().addShutdownHook(Thread {
-            DataSetup.saveFiles()
-            BotMain.service.shutdown()
-            rCon?.disconnect()
-        })
-
-        bot.subscribeMessages {
-            always {
-                if (sender.id != 80000000L) {
-                    val result = CommandExecutor.execute(this)
-                    if (result !is EmptyMessageChain) {
-                        reply(result)
-                    }
-                }
-            }
-        }
-
-        executeCommand()
-
-        bot.join() // 等待 Bot 离线, 避免主线程退出
     }
 }
 
