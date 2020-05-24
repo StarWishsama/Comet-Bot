@@ -38,11 +38,11 @@ class FlowerCommand : UniversalCommand, WaitableCommand {
                 "gm", "rename", "改名" -> {
                     if (user.flower != null) {
                         if (args.size == 2) {
-                            if (!args[1].isOutRange(25)) {
+                            if (!args[1].isOutRange(25) && args[1].isNotBlank()) {
                                 user.flower?.flowerName = args[1]
                                 BotUtil.sendMsgPrefix("成功改名为 ${args[1]}").toMirai()
                             } else {
-                                BotUtil.sendMsgPrefix("名字太长不改").toMirai()
+                                BotUtil.sendMsgPrefix("名字太长|名字是空白的, 不改").toMirai()
                             }
                         } else {
                             getHelp().toMirai()
@@ -85,14 +85,14 @@ class FlowerCommand : UniversalCommand, WaitableCommand {
 
     override suspend fun replyResult(event: MessageEvent, user: BotUser, session: Session) {
         val name = event.message.contentToString()
-        if (!name.isOutRange(25)) {
+        if (!name.isOutRange(25) && name.isNotBlank()) {
             user.flower = Flower(name)
             event.reply(
                 BotUtil.sendMsgPrefix("成功种植 ${user.flower?.flowerName}").toMirai()
             )
         } else {
             event.reply(
-                BotUtil.sendMsgPrefix("名字太长不种").toMirai()
+                BotUtil.sendMsgPrefix("名字太长|名字是空白的, 不种").toMirai()
             )
         }
         SessionManager.expireSession(session)
