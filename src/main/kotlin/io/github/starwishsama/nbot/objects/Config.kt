@@ -81,5 +81,5 @@ open class Config {
     var proxyPort: Int = 0
 
     @SerializedName("mirai_heartbeat_period")
-    var heartBeatPeriod : Long = 10
+    var heartBeatPeriod : Long = 2
 }
