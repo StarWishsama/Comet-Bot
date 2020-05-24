@@ -43,20 +43,23 @@ class AdminCommand : UniversalCommand {
                     "help", "帮助" -> {
                         return getHelp().toMirai()
                     }
+                    "permlist", "权限列表", "qxlb" -> {
+                        return if (args.size > 1) {
+                            val target: BotUser? = BotUtil.getAt(event, args[1])
+                            val permission = target?.getPermissions()
+                            if (permission != null) {
+                                BotUtil.sendMsgPrefix(permission).toMirai()
+                            } else {
+                                BotUtil.sendMsgPrefix("该用户没有任何权限").toMirai()
+                            }
+                        } else {
+                            BotUtil.sendMsgPrefix(user.getPermissions()).toMirai()
+                        }
+                    }
                     "permadd", "添加权限", "tjqx" -> {
                         if (user.isBotOwner()) {
                             if (args.size > 1) {
-                                val target: BotUser?
-                                val at = event.message[At]
-                                target = if (at != null) {
-                                    BotUser.getUser(at.target)
-                                } else {
-                                    if (StringUtils.isNumeric(args[1])) {
-                                        BotUser.getUser(args[1].toLong())
-                                    } else {
-                                        return BotUtil.sendMsgPrefix( "请输入正确的QQ号或者@TA").toMirai()
-                                    }
-                                }
+                                val target: BotUser? = BotUtil.getAt(event, args[1])
 
                                 target?.addPermission(args[2])
                                 return BotUtil.sendMsgPrefix("添加权限成功").toMirai()
@@ -67,17 +70,7 @@ class AdminCommand : UniversalCommand {
                     }
                     "give", "增加次数" -> {
                         if (args.size > 1) {
-                            val target: BotUser?
-                            val at = event.message[At]
-                            target = if (at != null) {
-                                BotUser.getUser(at.target)
-                            } else {
-                                if (StringUtils.isNumeric(args[1])) {
-                                    BotUser.getUser(args[1].toLong())
-                                } else {
-                                    return BotUtil.sendMsgPrefix( "请输入正确的QQ号或者@TA").toMirai()
-                                }
-                            }
+                            val target: BotUser? = BotUtil.getAt(event, args[1])
 
                             return if (target != null) {
                                 if (args[2].toInt() <= 1000000) {

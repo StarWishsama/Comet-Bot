@@ -6,6 +6,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
 import io.github.starwishsama.nbot.BotConstants
+import io.github.starwishsama.nbot.BotConstants.gson
 import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.managers.GroupConfigManager
 import io.github.starwishsama.nbot.objects.BotLocalization
@@ -29,7 +30,6 @@ object DataSetup {
     private val cacheCfg: File = File(BotMain.filePath.toString(), "cache.json")
     private val pcrData = File(BotMain.filePath.toString(), "/pcr.json")
     private val arkNightData = File(BotMain.filePath.toString(), "/ark.json")
-    private val gson = BotConstants.gson
 
     fun initData() {
         if (!BotMain.log.exists()) {

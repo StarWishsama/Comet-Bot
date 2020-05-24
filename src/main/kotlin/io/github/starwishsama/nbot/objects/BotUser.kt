@@ -56,6 +56,15 @@ class BotUser(var userQQ: Long) {
         return permissions.contains(permission) || isBotOwner()
     }
 
+    fun getPermissions() : String {
+        var permissions = ""
+        this.permissions.forEach {
+            permissions = "$permissions$it "
+        }
+
+        return permissions.trim()
+    }
+
     /**
      * 比较权限组
      * @return 自己的权限组是否大于需要比较的权限组

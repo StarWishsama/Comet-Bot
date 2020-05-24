@@ -25,7 +25,7 @@ object BackupHelper {
             backupFile.createNewFile()
             FileWriter.create(backupFile, Charsets.UTF_8)
                     .write(BotConstants.gson.toJson(BotConstants.users))
-            BotMain.logger.info("[备份] 备份成功! 文件名是${backupName}")
+            BotMain.logger.info("[备份] 备份成功! 文件名是 $backupName")
         } catch (e: Exception) {
             BotMain.logger.error("[备份] 备份时出问题", e)
         }

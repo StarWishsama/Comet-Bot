@@ -31,27 +31,22 @@ class TwitterCommand : UniversalCommand {
                             if (args.size > 1) {
                                 event.quoteReply(BotUtil.sendMsgPrefix("正在查询, 请稍等"))
                                 try {
-                                    val twitterUser = TwitterApi.getUserInfo(args.getRestString(1))
-                                    if (twitterUser == null) {
-                                        BotUtil.sendMsgPrefix("找不到此用户或连接超时").toMirai()
+                                    val tweet = TwitterApi.getLatestTweet(args.getRestString(1))
+                                    if (tweet == null) {
+                                        BotUtil.sendMsgPrefix("找不到此用户|该用户没有发送过推文|连接超时").toMirai()
                                     } else {
-                                        val tweet = TwitterApi.getLatestTweet(args.getRestString(1))
-                                        if (tweet != null) {
-                                            val image = tweet.getPictureOrNull(event.subject)
-                                            var result = (BotUtil.sendMsgPrefix(
-                                                    "\n${twitterUser.name}\n" +
-                                                            "粉丝数: ${twitterUser.followersCount}\n" +
-                                                            "最近推文: \n${tweet.text}"
-                                            ).toMirai())
+                                        val image = tweet.getPictureOrNull(event.subject)
+                                        var result = (BotUtil.sendMsgPrefix(
+                                            "\n${tweet.user.name}\n" +
+                                                    "粉丝数: ${tweet.user.followersCount}\n" +
+                                                    "最近推文: \n${tweet.text}"
+                                        ).toMirai())
 
-                                            if (image != null) {
-                                                result += image
-                                            }
-
-                                            result
-                                        } else {
-                                            BotUtil.sendMsgPrefix("获取推文时出现了问题, 请查看后台").toMirai()
+                                        if (image != null) {
+                                            result += image
                                         }
+
+                                        result
                                     }
                                 } catch (e: RateLimitException) {
                                     BotUtil.sendMsgPrefix("API 调用已达上限").toMirai()

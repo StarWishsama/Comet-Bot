@@ -11,9 +11,12 @@ import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.objects.BotUser.Companion.isBotAdmin
 import io.github.starwishsama.nbot.objects.BotUser.Companion.isBotOwner
+import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
+import org.apache.commons.lang3.StringUtils
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -37,6 +40,10 @@ fun String.removeColor(): String {
 
 fun String.toMirai(): MessageChain {
     return toMessage().asMessageChain()
+}
+
+fun String.isOutRange(range: Int) : Boolean {
+    return length > range
 }
 
 fun File.initConfig(context: Any) {
@@ -395,4 +402,17 @@ object BotUtil {
         return request.execute().bodyStream()
     }
 
+    fun getAt(event: MessageEvent, id: String) : BotUser? {
+        val at = event.message[At]
+
+        return if (at != null) {
+            BotUser.getUser(at.target)
+        } else {
+            if (StringUtils.isNumeric(id)) {
+                BotUser.getUser(id.toLong())
+            } else {
+                 null
+            }
+        }
+    }
 }

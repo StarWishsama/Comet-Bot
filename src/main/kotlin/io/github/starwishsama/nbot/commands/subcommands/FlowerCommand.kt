@@ -10,8 +10,10 @@ import io.github.starwishsama.nbot.objects.Flower
 import io.github.starwishsama.nbot.sessions.Session
 import io.github.starwishsama.nbot.sessions.SessionManager
 import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.util.isOutRange
 import io.github.starwishsama.nbot.util.toMirai
 import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
@@ -36,8 +38,12 @@ class FlowerCommand : UniversalCommand, WaitableCommand {
                 "gm", "rename", "改名" -> {
                     if (user.flower != null) {
                         if (args.size == 2) {
-                            user.flower?.flowerName = args[1]
-                            BotUtil.sendMsgPrefix( "成功改名为 ${args[1]}").toMirai()
+                            if (!args[1].isOutRange(25)) {
+                                user.flower?.flowerName = args[1]
+                                BotUtil.sendMsgPrefix("成功改名为 ${args[1]}").toMirai()
+                            } else {
+                                BotUtil.sendMsgPrefix("名字太长不改").toMirai()
+                            }
                         } else {
                             getHelp().toMirai()
                         }
@@ -48,31 +54,7 @@ class FlowerCommand : UniversalCommand, WaitableCommand {
                 "sj", "collect", "收集" -> {
                     val flower = user.flower
                     if (flower != null) {
-                        when (flower.waterCount) {
-                            200 -> {
-                                val point = RandomUtil.randomDouble(12.0, 34.0, 2, RoundingMode.HALF_DOWN)
-                                flower.waterCount = flower.waterCount - RandomUtil.randomInt(10, 50)
-                                BotUtil.sendMsgPrefix( "成功收集 $point 点积分, 水量剩余 ${flower.waterCount}").toMirai()
-                            }
-                            in 100 until 200 -> {
-                                val point = RandomUtil.randomDouble(8.0, 26.0, 2, RoundingMode.HALF_DOWN)
-                                flower.waterCount = flower.waterCount - RandomUtil.randomInt(9, 40)
-                                BotUtil.sendMsgPrefix( "成功收集 $point 点积分, 水量剩余 ${flower.waterCount}").toMirai()
-                            }
-                            in 50 until 100 -> {
-                                val point = RandomUtil.randomDouble(6.0, 17.0, 2, RoundingMode.HALF_DOWN)
-                                flower.waterCount = flower.waterCount - RandomUtil.randomInt(8, 38)
-                                BotUtil.sendMsgPrefix( "成功收集 $point 点积分, 水量剩余 ${flower.waterCount}").toMirai()
-                            }
-                            in 1 until 50 -> {
-                                val point = RandomUtil.randomDouble(1.0, 4.0, 2, RoundingMode.HALF_DOWN)
-                                flower.waterCount = flower.waterCount - RandomUtil.randomInt(flower.waterCount - 5, flower.waterCount)
-                                BotUtil.sendMsgPrefix( "成功收集 $point 点积分, 水量剩余 ${flower.waterCount}").toMirai()
-                            }
-                            else -> {
-                                BotUtil.sendMsgPrefix( "你的花需要浇水了! 水壶可以在商店里购买.").toMirai()
-                            }
-                        }
+                        collect(flower)
                     } else {
                         BotUtil.sendMsgPrefix(noFlower).toMirai()
                     }
@@ -102,10 +84,46 @@ class FlowerCommand : UniversalCommand, WaitableCommand {
     """.trimIndent()
 
     override suspend fun replyResult(event: MessageEvent, user: BotUser, session: Session) {
-        user.flower = Flower(event.message.contentToString())
-        event.reply(
-            BotUtil.sendMsgPrefix( "成功种植 ${user.flower?.flowerName}").toMirai()
-        )
+        val name = event.message.contentToString()
+        if (!name.isOutRange(25)) {
+            user.flower = Flower(name)
+            event.reply(
+                BotUtil.sendMsgPrefix("成功种植 ${user.flower?.flowerName}").toMirai()
+            )
+        } else {
+            event.reply(
+                BotUtil.sendMsgPrefix("名字太长不种").toMirai()
+            )
+        }
         SessionManager.expireSession(session)
+    }
+
+    private fun collect(flower: Flower) : MessageChain {
+        when (flower.waterCount) {
+            200 -> {
+                val point = RandomUtil.randomDouble(12.0, 34.0, 2, RoundingMode.HALF_DOWN)
+                flower.waterCount = flower.waterCount - RandomUtil.randomInt(10, 50)
+                BotUtil.sendMsgPrefix( "成功收集 $point 点积分, 水量剩余 ${flower.waterCount}").toMirai()
+            }
+            in 100 until 200 -> {
+                val point = RandomUtil.randomDouble(8.0, 26.0, 2, RoundingMode.HALF_DOWN)
+                flower.waterCount = flower.waterCount - RandomUtil.randomInt(9, 40)
+                BotUtil.sendMsgPrefix( "成功收集 $point 点积分, 水量剩余 ${flower.waterCount}").toMirai()
+            }
+            in 50 until 100 -> {
+                val point = RandomUtil.randomDouble(6.0, 17.0, 2, RoundingMode.HALF_DOWN)
+                flower.waterCount = flower.waterCount - RandomUtil.randomInt(8, 38)
+                BotUtil.sendMsgPrefix( "成功收集 $point 点积分, 水量剩余 ${flower.waterCount}").toMirai()
+            }
+            in 1 until 50 -> {
+                val point = RandomUtil.randomDouble(1.0, 4.0, 2, RoundingMode.HALF_DOWN)
+                flower.waterCount = flower.waterCount - RandomUtil.randomInt(flower.waterCount - 5, flower.waterCount)
+                BotUtil.sendMsgPrefix( "成功收集 $point 点积分, 水量剩余 ${flower.waterCount}").toMirai()
+            }
+            else -> {
+                BotUtil.sendMsgPrefix( "你的花需要浇水了! 水壶可以在商店里购买.").toMirai()
+            }
+        }
+        return EmptyMessageChain
     }
 }
