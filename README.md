@@ -27,6 +27,7 @@ English Version: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mira
 * 单推小助手 (自动订阅 VTB 开播状态[B站])
 * RCON 远程遥控 MC 服务器
 * 查询 Twitter 用户信息/推文
+* 自动推送最新推文到指定群聊
 * 还在开发中...
 
 ## ☑ To-Do 列表

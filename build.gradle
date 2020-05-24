@@ -21,7 +21,7 @@ jar {
 }
 
 group 'io.github.starwishsama.nbot'
-version '0.3.5-BETA-200523'
+version '0.3.6-rc1-200524'
 
 repositories {
     maven { url 'https://jitpack.io' }

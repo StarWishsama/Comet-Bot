@@ -20,8 +20,9 @@ This bot is under heavy develop now, Many feature may not work as well.
 * Bilibili uploader info/dynamic
 * Search music with LightApp message
 * Arknights / PCR draw simulator
-* Auto convert QQ LightApp for PC user(s)
-* Virtual Youtuber live streaming notice
+* Auto convert QQ LightApp message to text for PC user(s)
+* VTuber live streaming reminder (BiliBili)
+* Push specific user's latest tweet realtime to specific group(s)
 * RCON feature
 * WIP
 
