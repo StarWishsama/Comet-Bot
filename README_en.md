@@ -1,6 +1,6 @@
 # Nameless-Bot
 
-A QQ Group bot developed in Mirai-Core.
+A QQ Group bot developed in [Mirai-Core](https://github.com/mamoe/mirai).
 
 This bot is under heavy develop now, Many feature may not work as well.
 

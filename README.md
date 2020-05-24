@@ -1,6 +1,6 @@
 ## 无名 Bot
 
-一个基于 Mirai-Core 开发的机器人
+一个基于 [Mirai-Core](https://github.com/mamoe/mirai) 开发的机器人
 
 本项目处于开发阶段, 部分功能可能无法使用 (除了写在下面的功能) ~~反正也没人用~~
 
