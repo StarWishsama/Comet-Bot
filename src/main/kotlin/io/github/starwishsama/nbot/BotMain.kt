@@ -131,6 +131,7 @@ suspend fun main() {
             })
         }
         config.heartbeatPeriodMillis = BotConstants.cfg.heartBeatPeriod * 60 * 1000
+        
         config.fileBasedDeviceInfo()
         BotMain.bot = Bot(qq = BotMain.qqId, password = BotMain.password, configuration = config)
         BotMain.bot.alsoLogin()
