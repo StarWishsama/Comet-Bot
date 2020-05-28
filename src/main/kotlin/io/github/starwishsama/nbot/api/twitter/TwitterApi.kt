@@ -16,6 +16,7 @@ import io.github.starwishsama.nbot.exceptions.RateLimitException
 import io.github.starwishsama.nbot.objects.pojo.twitter.Tweet
 import io.github.starwishsama.nbot.objects.pojo.twitter.TwitterErrorInfo
 import io.github.starwishsama.nbot.objects.pojo.twitter.TwitterUser
+import org.jsoup.Jsoup
 import java.io.IOException
 import java.net.Proxy
 import java.net.Socket
@@ -74,30 +75,23 @@ object TwitterApi : ApiExecutor {
     @Throws(RateLimitException::class)
     fun getUserInfo(username: String): TwitterUser? {
         if (isReachLimit()) {
-            throw RateLimitException("已达到API调用上限")
+            throw RateLimitException()
         }
 
         usedTime++
+
         return try {
             val startTime = LocalDateTime.now()
-            val request = HttpRequest.get("$universalApi/users/show.json?screen_name=$username")
-                    .header(
-                            "authorization",
-                            "Bearer $token"
-                    )
-                    .timeout(12_000)
+            val conn = Jsoup.connect("$universalApi/users/show.json?screen_name=$username")
+                .data("authorization", "Bearer $token")
+                .timeout(12_000)
 
             if (proxyHost != null && BotConstants.cfg.proxyPort != -1) {
-                request.setProxy(
-                        Proxy(
-                                Proxy.Type.HTTP,
-                                Socket(proxyHost, BotConstants.cfg.proxyPort).remoteSocketAddress
-                        )
-                )
+                conn.proxy(proxyHost, BotConstants.cfg.proxyPort)
             }
 
-            val result = request.executeAsync()
-            val entity = gson.fromJson(result.body(), TwitterUser::class.java)
+            val result = conn.post().body().toString()
+            val entity = gson.fromJson(result, TwitterUser::class.java)
             BotMain.logger.debug("[蓝鸟] 查询用户信息耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
             entity
         } catch (e: Exception) {

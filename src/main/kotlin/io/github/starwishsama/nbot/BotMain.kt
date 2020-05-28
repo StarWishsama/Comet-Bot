@@ -53,19 +53,20 @@ object BotMain {
         var command: String
         while (scanner.hasNextLine()) {
             command = scanner.nextLine()
-            if ("stop" == command) {
-                exitProcess(0)
-            } else if ("upgrade" == command) {
-                val cmd = command.split(" ")
-                if (cmd.isNotEmpty() && StringUtils.isNumeric(cmd[1])) {
-                    val user = BotUser.getUser(cmd[1].toLong())
-                    if (user != null) {
-                        logger.info("[后台命令] 已升级权限组至 ${UserLevel.upgrade(user)}")
+            when (command) {
+                "stop" -> exitProcess(0)
+                "upgrade" -> {
+                    val cmd = command.split(" ")
+                    if (cmd.isNotEmpty() && StringUtils.isNumeric(cmd[1])) {
+                        val user = BotUser.getUser(cmd[1].toLong())
+                        if (user != null) {
+                            logger.info("[CONSOLE] 已升级权限组至 ${UserLevel.upgrade(user)}")
+                        } else {
+                            logger.info("[CONSOLE] 找不到此用户")
+                        }
                     } else {
-                        logger.info("[后台命令] 找不到此用户")
+                        logger.warning("[CONSOLE] 请输入有效的QQ号")
                     }
-                } else {
-                    logger.warning("[后台命令] 请输入有效的QQ号")
                 }
             }
         }
@@ -86,8 +87,10 @@ object BotMain {
     }
 
     fun setupRCon() {
-        if (BotConstants.cfg.rConUrl != null && BotConstants.cfg.rConPassword != null && rCon == null) {
-            rCon = Rcon(BotConstants.cfg.rConUrl!!, BotConstants.cfg.rConPort, BotConstants.cfg.rConPassword!!.toByteArray())
+        val url = BotConstants.cfg.rConUrl
+        val pwd = BotConstants.cfg.rConPassword
+        if (url != null && pwd != null && rCon == null) {
+            rCon = Rcon(url, BotConstants.cfg.rConPort, pwd.toByteArray())
         }
     }
 
