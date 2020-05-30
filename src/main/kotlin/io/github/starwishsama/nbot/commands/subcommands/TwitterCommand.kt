@@ -1,5 +1,6 @@
 package io.github.starwishsama.nbot.commands.subcommands
 
+import cn.hutool.http.HttpException
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
@@ -11,9 +12,12 @@ import io.github.starwishsama.nbot.util.BotUtil.getRestString
 import io.github.starwishsama.nbot.util.toMirai
 import io.github.starwishsama.nbot.api.twitter.TwitterApi
 import io.github.starwishsama.nbot.exceptions.EmptyTweetException
+import io.github.starwishsama.nbot.objects.pojo.twitter.TwitterUser
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
+import java.io.IOException
 import java.lang.Exception
+import java.net.SocketTimeoutException
 
 class TwitterCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
@@ -39,7 +43,7 @@ class TwitterCommand : UniversalCommand {
                                         var result = (BotUtil.sendMsgPrefix(
                                             "\n${tweet.user.name}\n" +
                                                     "粉丝数: ${tweet.user.followersCount}\n" +
-                                                    "最近推文: \n${tweet.text}"
+                                                    "最近推文: \n${tweet.getFullText()}"
                                         ).toMirai())
 
                                         if (image != null) {
@@ -60,14 +64,22 @@ class TwitterCommand : UniversalCommand {
                         "sub" -> {
                             if (args.size > 1) {
                                 if (!BotConstants.cfg.twitterSubs.contains(args[1])) {
-                                    val twitter = TwitterApi.getUserInfo(args[1])
+                                    var twitter : TwitterUser? = null
 
-                                    if (twitter == null) {
-                                        BotUtil.sendMsgPrefix("@${args[1]} 不存在或获取时连接超时, 请检查ID").toMirai()
+                                    try {
+                                        twitter = TwitterApi.getUserInfo(args[1])
+                                    } catch (e: HttpException) {
+                                        when (e.cause) {
+                                            is SocketTimeoutException -> BotUtil.sendMsgPrefix("连接至蓝鸟服务器超时, 等下再试试吧").toMirai()
+                                        }
                                     }
 
-                                    BotConstants.cfg.twitterSubs += args[1]
-                                    BotUtil.sendMsgPrefix("订阅 @${args[1]} 成功").toMirai()
+                                    if (twitter != null) {
+                                        BotConstants.cfg.twitterSubs += args[1]
+                                        BotUtil.sendMsgPrefix("订阅 @${args[1]} 成功").toMirai()
+                                    }
+
+                                    BotUtil.sendMsgPrefix("订阅 @${args[1]} 失败").toMirai()
                                 } else {
                                     BotUtil.sendMsgPrefix("你已经订阅了 @${args[1]}").toMirai()
                                 }

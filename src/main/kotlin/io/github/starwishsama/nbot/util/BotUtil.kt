@@ -386,9 +386,9 @@ object BotUtil {
         val request = HttpRequest.get(url)
                 .setFollowRedirects(true)
                 .timeout(8000)
-                .addHeaders(mapOf(
-                    "user-agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36"
-                ))
+                .header(
+                    "user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36"
+                )
 
         if (BotConstants.cfg.proxyUrl != null && BotConstants.cfg.proxyPort != -1) {
             request.setProxy(

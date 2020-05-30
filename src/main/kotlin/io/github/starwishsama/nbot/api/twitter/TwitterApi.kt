@@ -16,7 +16,6 @@ import io.github.starwishsama.nbot.exceptions.RateLimitException
 import io.github.starwishsama.nbot.objects.pojo.twitter.Tweet
 import io.github.starwishsama.nbot.objects.pojo.twitter.TwitterErrorInfo
 import io.github.starwishsama.nbot.objects.pojo.twitter.TwitterUser
-import org.jsoup.Jsoup
 import java.io.IOException
 import java.net.Proxy
 import java.net.Socket
@@ -32,7 +31,7 @@ object TwitterApi : ApiExecutor {
     // 蓝鸟 API 地址
     private const val universalApi = "https://api.twitter.com/1.1/"
 
-    // 使用 curl, 请
+    // 使用 curl 获取 token, 请
     private const val tokenGetApi = "https://api.twitter.com/oauth2/token"
 
     // Bearer Token
@@ -44,8 +43,8 @@ object TwitterApi : ApiExecutor {
     // Api 调用次数
     override var usedTime: Int = 0
 
-    // 代理地址
-    private val proxyHost = BotConstants.cfg.proxyUrl
+    // 代理
+    private var proxy = Proxy(Proxy.Type.HTTP, Socket(BotConstants.cfg.proxyUrl, BotConstants.cfg.proxyPort).remoteSocketAddress)
 
     fun getBearerToken() {
         try {
@@ -56,9 +55,8 @@ object TwitterApi : ApiExecutor {
                 "grant_type=client_credentials"
             )
 
-            val proxyHost = BotConstants.cfg.proxyUrl
-            if (proxyHost != null && BotConstants.cfg.proxyPort != -1) {
-                curl.proxy(proxyHost, BotConstants.cfg.proxyPort)
+            if (BotConstants.cfg.proxyUrl != null && BotConstants.cfg.proxyPort != -1) {
+                curl.proxy(BotConstants.cfg.proxyUrl, BotConstants.cfg.proxyPort)
             }
             val result = curl.exec("UTF-8")
 
@@ -80,24 +78,25 @@ object TwitterApi : ApiExecutor {
 
         usedTime++
 
-        return try {
-            val startTime = LocalDateTime.now()
-            val conn = Jsoup.connect("$universalApi/users/show.json?screen_name=$username")
-                .data("authorization", "Bearer $token")
+        val startTime = LocalDateTime.now()
+        val conn = HttpRequest.get("$universalApi/users/show.json?screen_name=$username")
+                .header("authorization", "Bearer $token")
                 .timeout(12_000)
 
-            if (proxyHost != null && BotConstants.cfg.proxyPort != -1) {
-                conn.proxy(proxyHost, BotConstants.cfg.proxyPort)
-            }
-
-            val result = conn.post().body().toString()
-            val entity = gson.fromJson(result, TwitterUser::class.java)
-            BotMain.logger.debug("[蓝鸟] 查询用户信息耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
-            entity
-        } catch (e: Exception) {
-            BotMain.logger.error("获取蓝鸟用户信息出现问题", e)
-            null
+        if (BotConstants.cfg.proxyUrl != null && BotConstants.cfg.proxyPort != 0) {
+            conn.setProxy(proxy)
         }
+
+        var result : HttpResponse? = null
+        try {
+            result = conn.executeAsync()
+        } catch (e: HttpException) {
+            BotMain.logger.error("[蓝鸟] 在获取用户最新推文时出现了问题", e)
+        }
+
+        val entity = gson.fromJson(result?.body(), TwitterUser::class.java)
+        BotMain.logger.debug("[蓝鸟] 查询用户信息耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+        return entity
     }
 
     @Throws(RateLimitException::class, EmptyTweetException::class)
@@ -115,21 +114,11 @@ object TwitterApi : ApiExecutor {
                 )
                 .timeout(12_000)
 
-        if (proxyHost != null && BotConstants.cfg.proxyPort != -1) {
-            request.setProxy(
-                    Proxy(
-                            Proxy.Type.HTTP,
-                            Socket(proxyHost, BotConstants.cfg.proxyPort).remoteSocketAddress
-                    )
-            )
+        if (BotConstants.cfg.proxyUrl != null && BotConstants.cfg.proxyPort != -1) {
+            request.setProxy(proxy)
         }
 
-        var result : HttpResponse? = null
-        try {
-            result = request.executeAsync()
-        } catch (e: HttpException) {
-            BotMain.logger.error("[蓝鸟] 在获取用户最新推文时出现了问题", e)
-        }
+        val result = request.executeAsync()
 
         BotMain.logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
 
@@ -154,9 +143,9 @@ object TwitterApi : ApiExecutor {
                 }
             }
             return tweet
-        } else {
-           return null
         }
+
+        return null
     }
 
     override fun isReachLimit(): Boolean {

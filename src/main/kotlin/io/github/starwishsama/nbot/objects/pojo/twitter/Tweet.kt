@@ -3,7 +3,6 @@ package io.github.starwishsama.nbot.objects.pojo.twitter
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
-import com.google.gson.reflect.TypeToken
 import io.github.starwishsama.nbot.BotConstants.gson
 import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.objects.pojo.twitter.tweetEntity.Media
@@ -19,6 +18,8 @@ data class Tweet(
         @SerializedName("id_str")
         var idString: String,
         var text: String,
+        @SerializedName("extended_text")
+        var extendedText : ExtendedTweet?,
         var truncated: Boolean,
         var entities: JsonObject?,
         var source: String,
@@ -32,13 +33,30 @@ data class Tweet(
         @SerializedName("possibly_sensitive")
         var sensitive: Boolean
 ) {
+    data class ExtendedTweet(
+            @SerializedName("full_text")
+            val fullText: String,
+            val entities: JsonObject?
+    )
+
+    fun getFullText() : String {
+        return extendedText?.fullText ?: this.text
+    }
+
     fun contentEquals(tweet: Tweet): Boolean {
-        return text.contentEquals(tweet.text)
+        return getFullText().contentEquals(tweet.getFullText())
     }
 
     suspend fun getPictureOrNull(contact: Contact) : Image? {
-        val objects = entities
+        val objects =
+                if (entities != null && extendedText?.entities != null) {
+                    extendedText?.entities
+                } else {
+                    entities
+                }
+
         var picture : Image? = null
+
         if (objects != null) {
             val media = objects["media"]
             if (media != null) {
