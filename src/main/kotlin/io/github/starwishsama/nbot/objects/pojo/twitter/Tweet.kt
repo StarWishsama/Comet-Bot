@@ -31,7 +31,11 @@ data class Tweet(
         @SerializedName("favorite_count")
         var likeCount: Long,
         @SerializedName("possibly_sensitive")
-        var sensitive: Boolean
+        var sensitive: Boolean,
+        @SerializedName("quoted_status")
+        var quotedStatus : Tweet?,
+        @SerializedName("is_quote_status")
+        var isQuoted: Boolean
 ) {
     data class ExtendedTweet(
             @SerializedName("full_text")
@@ -40,7 +44,13 @@ data class Tweet(
     )
 
     fun getFullText() : String {
-        return extendedText?.fullText ?: this.text
+        var text = extendedText?.fullText ?: this.text
+
+        if (isQuoted) {
+            text += "\n引用的推文:\n${quotedStatus?.getFullText()}"
+        }
+
+        return text
     }
 
     fun contentEquals(tweet: Tweet): Boolean {
@@ -75,6 +85,11 @@ data class Tweet(
             val image = retweetStatus?.getPictureOrNull(contact)
             picture = image
         }
+
+        if (quotedStatus != null && picture == null) {
+            picture = quotedStatus?.getPictureOrNull(contact)
+        }
+
         return picture
     }
 }

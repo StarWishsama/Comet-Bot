@@ -2,6 +2,7 @@ package io.github.starwishsama.nbot.commands.subcommands
 
 import cn.hutool.http.HttpException
 import io.github.starwishsama.nbot.BotConstants
+import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
@@ -12,11 +13,13 @@ import io.github.starwishsama.nbot.util.BotUtil.getRestString
 import io.github.starwishsama.nbot.util.toMirai
 import io.github.starwishsama.nbot.api.twitter.TwitterApi
 import io.github.starwishsama.nbot.exceptions.EmptyTweetException
+import io.github.starwishsama.nbot.objects.pojo.twitter.Tweet
 import io.github.starwishsama.nbot.objects.pojo.twitter.TwitterUser
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
 import java.io.IOException
 import java.lang.Exception
+import java.net.ConnectException
 import java.net.SocketTimeoutException
 
 class TwitterCommand : UniversalCommand {
@@ -35,16 +38,28 @@ class TwitterCommand : UniversalCommand {
                             if (args.size > 1) {
                                 event.quoteReply(BotUtil.sendMsgPrefix("正在查询, 请稍等"))
                                 try {
-                                    val tweet = TwitterApi.getLatestTweet(args.getRestString(1))
+                                    var tweet: Tweet? = null
+
+                                    try {
+                                        tweet = TwitterApi.getLatestTweet(args.getRestString(1))
+                                    } catch (e: HttpException) {
+                                        when (e.cause) {
+                                            is ConnectException -> {
+                                                return if (BotConstants.cfg.proxyPort != 0)
+                                                    BotUtil.sendMsgPrefix("无法连接到蓝鸟服务器").toMirai()
+                                                else
+                                                    BotUtil.sendMsgPrefix("无法连接至代理服务器").toMirai()
+                                            }
+                                            is SocketTimeoutException -> return BotUtil.sendMsgPrefix("连接超时").toMirai()
+                                        }
+                                    }
+
                                     if (tweet == null) {
-                                        BotUtil.sendMsgPrefix("找不到此用户|该用户没有发送过推文|连接超时").toMirai()
+                                        BotUtil.sendMsgPrefix("获取推文时出现了意外").toMirai()
                                     } else {
                                         val image = tweet.getPictureOrNull(event.subject)
-                                        var result = (BotUtil.sendMsgPrefix(
-                                            "\n${tweet.user.name}\n" +
-                                                    "粉丝数: ${tweet.user.followersCount}\n" +
-                                                    "最近推文: \n${tweet.getFullText()}"
-                                        ).toMirai())
+                                        var result =
+                                            BotUtil.sendMsgPrefix("\n${tweet.user.name}\n${tweet.getFullText()}").toMirai()
 
                                         if (image != null) {
                                             result += image

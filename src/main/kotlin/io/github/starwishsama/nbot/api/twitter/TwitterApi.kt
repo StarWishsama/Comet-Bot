@@ -17,6 +17,7 @@ import io.github.starwishsama.nbot.objects.pojo.twitter.Tweet
 import io.github.starwishsama.nbot.objects.pojo.twitter.TwitterErrorInfo
 import io.github.starwishsama.nbot.objects.pojo.twitter.TwitterUser
 import java.io.IOException
+import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.Socket
 import java.time.Duration
@@ -42,9 +43,6 @@ object TwitterApi : ApiExecutor {
 
     // Api 调用次数
     override var usedTime: Int = 0
-
-    // 代理
-    private var proxy = Proxy(Proxy.Type.HTTP, Socket(BotConstants.cfg.proxyUrl, BotConstants.cfg.proxyPort).remoteSocketAddress)
 
     fun getBearerToken() {
         try {
@@ -84,7 +82,7 @@ object TwitterApi : ApiExecutor {
                 .timeout(12_000)
 
         if (BotConstants.cfg.proxyUrl != null && BotConstants.cfg.proxyPort != 0) {
-            conn.setProxy(proxy)
+            conn.setProxy(Proxy(Proxy.Type.HTTP, Socket(BotConstants.cfg.proxyUrl, BotConstants.cfg.proxyPort).remoteSocketAddress))
         }
 
         var result : HttpResponse? = null
@@ -115,10 +113,11 @@ object TwitterApi : ApiExecutor {
                 .timeout(12_000)
 
         if (BotConstants.cfg.proxyUrl != null && BotConstants.cfg.proxyPort != -1) {
-            request.setProxy(proxy)
+            request.setProxy(Proxy(Proxy.Type.HTTP, Socket(BotConstants.cfg.proxyUrl, BotConstants.cfg.proxyPort).remoteSocketAddress))
         }
 
         val result = request.executeAsync()
+        val resultBody = result.body()
 
         BotMain.logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
 
@@ -126,7 +125,7 @@ object TwitterApi : ApiExecutor {
             var tweet: Tweet? = null
             try {
                 val tweets = gson.fromJson(
-                        result.body(),
+                        resultBody,
                         object : TypeToken<List<Tweet>>() {}.type
                 ) as List<Tweet>
 
