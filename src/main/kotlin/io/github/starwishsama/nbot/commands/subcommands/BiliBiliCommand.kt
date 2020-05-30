@@ -85,7 +85,7 @@ class BiliBiliCommand : UniversalCommand {
                         }
                         return subs.toString().trim().toMirai()
                     }
-                    "info", "查询" -> {
+                    "info", "查询", "cx" -> {
                         return if (args.size > 1) {
                             event.quoteReply("请稍等...")
                             val item = FakeClientApi.getUser(args[1])
