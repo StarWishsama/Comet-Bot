@@ -17,9 +17,8 @@ data class Tweet(
         var id: Long,
         @SerializedName("id_str")
         var idString: String,
+        @SerializedName("full_text")
         var text: String,
-        @SerializedName("extended_text")
-        var extendedText : ExtendedTweet?,
         var truncated: Boolean,
         var entities: JsonObject?,
         var source: String,
@@ -37,34 +36,12 @@ data class Tweet(
         @SerializedName("is_quote_status")
         var isQuoted: Boolean
 ) {
-    data class ExtendedTweet(
-            @SerializedName("full_text")
-            val fullText: String,
-            val entities: JsonObject?
-    )
-
-    fun getFullText() : String {
-        var text = extendedText?.fullText ?: this.text
-
-        if (isQuoted) {
-            text += "\n引用的推文:\n${quotedStatus?.getFullText()}"
-        }
-
-        return text
-    }
-
     fun contentEquals(tweet: Tweet): Boolean {
-        return getFullText().contentEquals(tweet.getFullText())
+        return text.contentEquals(tweet.text)
     }
 
     suspend fun getPictureOrNull(contact: Contact) : Image? {
-        val objects =
-                if (entities != null && extendedText?.entities != null) {
-                    extendedText?.entities
-                } else {
-                    entities
-                }
-
+        val objects = entities
         var picture : Image? = null
 
         if (objects != null) {

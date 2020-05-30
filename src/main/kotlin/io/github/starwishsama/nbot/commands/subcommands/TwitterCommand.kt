@@ -59,7 +59,7 @@ class TwitterCommand : UniversalCommand {
                                     } else {
                                         val image = tweet.getPictureOrNull(event.subject)
                                         var result =
-                                            BotUtil.sendMsgPrefix("\n${tweet.user.name}\n${tweet.getFullText()}").toMirai()
+                                            BotUtil.sendMsgPrefix("\n${tweet.user.name}\n${tweet.text}").toMirai()
 
                                         if (image != null) {
                                             result += image

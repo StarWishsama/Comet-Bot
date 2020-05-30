@@ -17,9 +17,8 @@ data class ReTweet (
         var id: Long,
         @SerializedName("id_str")
         var idString: String,
+        @SerializedName("full_text")
         var text: String,
-        @SerializedName("extended_text")
-        var extendedText : Tweet.ExtendedTweet?,
         var truncated: Boolean,
         var entities: JsonObject?,
         var source: String,
@@ -35,18 +34,9 @@ data class ReTweet (
         @SerializedName("quoted_status")
         var quotedTweet: Tweet?
 ) {
-    fun getFullText() : String {
-        return extendedText?.fullText ?: this.text
-    }
 
     suspend fun getPictureOrNull(contact: Contact) : Image? {
-        val objects =
-                if (entities != null && extendedText?.entities != null) {
-                    extendedText?.entities
-                } else {
-                    entities
-                }
-
+        val objects = entities
         var picture : Image? = null
 
         if (objects != null) {

@@ -17,7 +17,6 @@ import io.github.starwishsama.nbot.objects.pojo.twitter.Tweet
 import io.github.starwishsama.nbot.objects.pojo.twitter.TwitterErrorInfo
 import io.github.starwishsama.nbot.objects.pojo.twitter.TwitterUser
 import java.io.IOException
-import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.Socket
 import java.time.Duration
@@ -77,7 +76,7 @@ object TwitterApi : ApiExecutor {
         usedTime++
 
         val startTime = LocalDateTime.now()
-        val conn = HttpRequest.get("$universalApi/users/show.json?screen_name=$username")
+        val conn = HttpRequest.get("$universalApi/users/show.json?screen_name=$username&tweet_mode=extended")
                 .header("authorization", "Bearer $token")
                 .timeout(12_000)
 
@@ -105,7 +104,7 @@ object TwitterApi : ApiExecutor {
 
         usedTime++
         val startTime = LocalDateTime.now()
-        val request = HttpRequest.get("$universalApi/statuses/user_timeline.json?screen_name=$username&count=2")
+        val request = HttpRequest.get("$universalApi/statuses/user_timeline.json?screen_name=$username&count=2&tweet_mode=extended")
                 .header(
                         "authorization",
                         "Bearer $token"
@@ -117,7 +116,6 @@ object TwitterApi : ApiExecutor {
         }
 
         val result = request.executeAsync()
-        val resultBody = result.body()
 
         BotMain.logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
 
@@ -125,7 +123,7 @@ object TwitterApi : ApiExecutor {
             var tweet: Tweet? = null
             try {
                 val tweets = gson.fromJson(
-                        resultBody,
+                        result.body(),
                         object : TypeToken<List<Tweet>>() {}.type
                 ) as List<Tweet>
 
