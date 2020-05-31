@@ -57,7 +57,7 @@ data class Tweet(
     }
 
     fun contentEquals(tweet: Tweet): Boolean {
-        return text.contentEquals(tweet.text)
+        return text == tweet.text
     }
 
     suspend fun getPictureOrNull(contact: Contact): Image? {

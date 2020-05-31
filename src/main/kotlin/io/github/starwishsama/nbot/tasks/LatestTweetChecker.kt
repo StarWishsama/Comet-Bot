@@ -20,7 +20,7 @@ object LatestTweetChecker : Runnable {
             val tweet = TwitterApi.getLatestTweet(it)
             val historyTweet = pushedMap[it]
 
-            if (tweet != null && (historyTweet == null || historyTweet.contentEquals(tweet))) {
+            if (tweet != null && (historyTweet == null || !historyTweet.contentEquals(tweet))) {
                 pushedMap[it] = tweet
 
                 BotMain.bot.groups.forEach { group ->
