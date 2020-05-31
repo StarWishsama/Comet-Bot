@@ -8,10 +8,10 @@ import io.github.starwishsama.nbot.exceptions.RateLimitException
 import io.github.starwishsama.nbot.objects.WrappedMessage
 import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicTypeSelector
 import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.dynamicdata.UnknownType
-import java.time.LocalDateTime
 
 /**
  * BiliBili 动态 API
+ *
  * 获取用户的最新动态
  * 支持多种格式
  * @author Nameless

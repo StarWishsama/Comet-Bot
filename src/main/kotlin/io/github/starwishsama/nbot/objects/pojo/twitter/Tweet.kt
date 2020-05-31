@@ -3,6 +3,7 @@ package io.github.starwishsama.nbot.objects.pojo.twitter
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotConstants.gson
 import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.objects.pojo.twitter.tweetEntity.Media
@@ -10,6 +11,9 @@ import io.github.starwishsama.nbot.util.BotUtil
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.uploadAsImage
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 data class Tweet(
         @SerializedName("created_at")
@@ -36,13 +40,29 @@ data class Tweet(
         @SerializedName("is_quote_status")
         var isQuoted: Boolean
 ) {
+    fun getFullText(): String {
+        val quoted = quotedStatus
+        val sentTime = BotConstants.twitterTimeFormat.parse(postTime)
+        var result = text
+
+        if (isQuoted && quoted != null) {
+            result = "对推文进行了回复\n$text\n\n引用推文\n${quoted.text}"
+        }
+
+        val duration =
+            Duration.between(sentTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), LocalDateTime.now())
+        result += "\n\n距离发送已过去了 ${duration.toDaysPart()}天${duration.toMinutesPart()}分${duration.toSecondsPart()}秒"
+
+        return result
+    }
+
     fun contentEquals(tweet: Tweet): Boolean {
         return text.contentEquals(tweet.text)
     }
 
-    suspend fun getPictureOrNull(contact: Contact) : Image? {
+    suspend fun getPictureOrNull(contact: Contact): Image? {
         val objects = entities
-        var picture : Image? = null
+        var picture: Image? = null
 
         if (objects != null) {
             val media = objects["media"]

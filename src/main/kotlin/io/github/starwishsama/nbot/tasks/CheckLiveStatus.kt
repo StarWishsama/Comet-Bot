@@ -17,6 +17,7 @@ object CheckLiveStatus : Runnable {
                 val data = runBlocking {
                     FakeClientApi.getLiveRoom(roomId)?.data
                 }
+
                 if (data != null) {
                     when (data.liveStatus) {
                         0 -> {

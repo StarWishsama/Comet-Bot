@@ -1,20 +1,26 @@
 package io.github.starwishsama.nbot
 
 import com.hiczp.bilibili.api.BilibiliClient
+import io.github.starwishsama.nbot.BotMain.bot
 import io.github.starwishsama.nbot.api.bilibili.DynamicApi
+import io.github.starwishsama.nbot.api.twitter.TwitterApi
 import io.github.starwishsama.nbot.commands.CommandExecutor
 import io.github.starwishsama.nbot.commands.subcommands.*
 import io.github.starwishsama.nbot.enums.UserLevel
-import io.github.starwishsama.nbot.file.*
-import io.github.starwishsama.nbot.listeners.*
+import io.github.starwishsama.nbot.file.BackupHelper
+import io.github.starwishsama.nbot.file.DataSetup
+import io.github.starwishsama.nbot.listeners.FuckLightAppListener
+import io.github.starwishsama.nbot.listeners.GroupChatListener
+import io.github.starwishsama.nbot.listeners.RepeatListener
+import io.github.starwishsama.nbot.listeners.SessionListener
 import io.github.starwishsama.nbot.managers.TaskManager
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.tasks.CheckLiveStatus
-import io.github.starwishsama.nbot.api.twitter.TwitterApi
 import io.github.starwishsama.nbot.tasks.LatestTweetChecker
 import io.github.starwishsama.nbot.util.getContext
 import io.github.starwishsama.nbot.util.writeString
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import net.kronos.rkon.core.Rcon
@@ -23,7 +29,9 @@ import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.join
 import net.mamoe.mirai.message.data.EmptyMessageChain
-import net.mamoe.mirai.utils.*
+import net.mamoe.mirai.utils.BotConfiguration
+import net.mamoe.mirai.utils.MiraiLogger
+import net.mamoe.mirai.utils.PlatformLogger
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
@@ -37,7 +45,7 @@ import kotlin.system.exitProcess
 
 object BotMain {
     val filePath: File = File(getPath())
-    const val version = "0.3.6-rc1-200524"
+    const val version = "0.3.6-rc2-200531"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -57,7 +65,7 @@ object BotMain {
                 "stop" -> exitProcess(0)
                 "upgrade" -> {
                     val cmd = command.split(" ")
-                    if (cmd.isNotEmpty() && StringUtils.isNumeric(cmd[1])) {
+                    if (cmd.size > 1 && StringUtils.isNumeric(cmd[1])) {
                         val user = BotUser.getUser(cmd[1].toLong())
                         if (user != null) {
                             logger.info("[CONSOLE] 已升级权限组至 ${UserLevel.upgrade(user)}")
@@ -109,9 +117,10 @@ object BotMain {
     }
 }
 
+@ObsoleteCoroutinesApi
 suspend fun main() {
-    BotMain.initLog()
     BotMain.startTime = System.currentTimeMillis()
+    BotMain.initLog()
     DataSetup.initData()
     BotMain.qqId = BotConstants.cfg.botId
     BotMain.password = BotConstants.cfg.botPassword
@@ -135,30 +144,30 @@ suspend fun main() {
         }
         config.heartbeatPeriodMillis = BotConstants.cfg.heartBeatPeriod * 60 * 1000
         config.fileBasedDeviceInfo()
-        BotMain.bot = Bot(qq = BotMain.qqId, password = BotMain.password, configuration = config)
-        BotMain.bot.alsoLogin()
-        BotMain.logger = BotMain.bot.logger
+        bot = Bot(qq = BotMain.qqId, password = BotMain.password, configuration = config)
+        bot.alsoLogin()
+        BotMain.logger = bot.logger
         CommandExecutor.setupCommand(
-                arrayOf(
-                        AdminCommand(),
-                        BiliBiliCommand(),
-                        CheckInCommand(),
-                        ClockInCommand(),
-                        DebugCommand(),
-                        DivineCommand(),
-                        GachaCommand(),
-                        GuessNumberCommand(),
-                        FlowerCommand(),
-                        HelpCommand(),
-                        InfoCommand(),
-                        MusicCommand(),
-                        MuteCommand(),
-                        PictureSearch(),
-                        R6SCommand(),
-                        RConCommand(),
-                        TwitterCommand(),
-                        VersionCommand()
-                )
+            arrayOf(
+                AdminCommand(),
+                BiliBiliCommand(),
+                CheckInCommand(),
+                ClockInCommand(),
+                DebugCommand(),
+                DivineCommand(),
+                GachaCommand(),
+                GuessNumberCommand(),
+                FlowerCommand(),
+                HelpCommand(),
+                InfoCommand(),
+                MusicCommand(),
+                MuteCommand(),
+                PictureSearch(),
+                R6SCommand(),
+                RConCommand(),
+                TwitterCommand(),
+                VersionCommand()
+            )
         )
 
         val listeners = arrayOf(FuckLightAppListener, GroupChatListener, RepeatListener, SessionListener)
@@ -168,33 +177,34 @@ suspend fun main() {
 
         BotMain.setupRCon()
 
-        BotMain.service = Executors.newSingleThreadScheduledExecutor(
-                BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
+        BotMain.service = Executors.newScheduledThreadPool(
+            4,
+            BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
         )
 
-        /** 服务 */
+        /** 定时任务 */
         BackupHelper.scheduleBackup()
         TaskManager.runScheduleTaskAsync(
-                { BotConstants.users.forEach { it.addTime(100) } },
-                5,
-                5,
-                TimeUnit.HOURS)
+            { BotConstants.users.forEach { it.addTime(100) } },
+            5,
+            5,
+            TimeUnit.HOURS)
         TaskManager.runScheduleTaskAsyncIf(
-                CheckLiveStatus::run,
-                BotConstants.cfg.checkDelay,
-                BotConstants.cfg.checkDelay,
-                TimeUnit.MINUTES,
-                BotConstants.cfg.subList.isNotEmpty()
+            CheckLiveStatus::run,
+            BotConstants.cfg.checkDelay,
+            BotConstants.cfg.checkDelay,
+            TimeUnit.MINUTES,
+            BotConstants.cfg.subList.isNotEmpty()
         )
         TaskManager.runAsync({
             BotMain.client.runCatching {
                 val pwd = BotConstants.cfg.biliPassword
-                val uname = BotConstants.cfg.biliUserName
+                val username = BotConstants.cfg.biliUserName
 
-                if (pwd != null && uname != null) {
+                if (pwd != null && username != null) {
                     runBlocking {
                         withContext(Dispatchers.IO) {
-                            login(username = uname, password = pwd)
+                            login(username = username, password = pwd)
                         }
                     }
                 }
@@ -203,26 +213,26 @@ suspend fun main() {
         }, 5)
         TaskManager.runScheduleTaskAsync({ apis.forEach { it.resetTime() } }, 25, 25, TimeUnit.MINUTES)
         TaskManager.runScheduleTaskAsyncIf(
-                LatestTweetChecker::run,
-                1,
-                15,
-                TimeUnit.MINUTES,
-                (BotConstants.cfg.twitterSubs.isNotEmpty() && BotConstants.cfg.tweetPushGroups.isNotEmpty())
+            LatestTweetChecker::run,
+            1,
+            8,
+            TimeUnit.MINUTES,
+            (BotConstants.cfg.twitterSubs.isNotEmpty() && BotConstants.cfg.tweetPushGroups.isNotEmpty())
         )
 
         /** 监听器 */
         listeners.forEach {
-            it.register(BotMain.bot)
+            it.register(bot)
             BotMain.logger.info("[监听器] 已注册 ${it.getName()} 监听器")
         }
 
         val time = System.currentTimeMillis() - BotMain.startTime
         val startUsedTime =
-                if (time > 1000) {
-                    String.format("%.2f", (time.toDouble() / 1000)) + "s"
-                } else {
-                    (time.toString() + "ms")
-                }
+            if (time > 1000) {
+                String.format("%.2f", (time.toDouble() / 1000)) + "s"
+            } else {
+                (time.toString() + "ms")
+            }
 
         BotMain.logger.info("无名 Bot 启动成功, 耗时 $startUsedTime")
 
@@ -233,7 +243,7 @@ suspend fun main() {
             BotMain.rCon?.disconnect()
         })
 
-        BotMain.bot.subscribeMessages {
+        bot.subscribeMessages {
             always {
                 if (sender.id != 80000000L) {
                     val result = CommandExecutor.execute(this)
@@ -246,7 +256,7 @@ suspend fun main() {
 
         BotMain.executeCommand()
 
-        BotMain.bot.join() // 等待 Bot 离线, 避免主线程退出
+        bot.join() // 等待 Bot 离线, 避免主线程退出
     }
 }
 

@@ -7,16 +7,16 @@ import net.mamoe.mirai.message.data.Message
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.QuoteReply
 import net.mamoe.mirai.message.data.asMessageChain
-import java.math.RoundingMode
 
 object RepeatListener : NListener {
     override fun register(bot: Bot) {
+        val value = RandomUtil.randomInt(1_000, 10_000)
         bot.subscribeGroupMessages {
             always {
                 if (message[QuoteReply] == null) {
-                    val chance = RandomUtil.randomDouble(0.0, 1.0, 3, RoundingMode.HALF_DOWN)
+                    val chance = RandomUtil.randomInt(0, 10_000)
                     val length = message.size
-                    if (chance >= 0.7652 && length > RandomUtil.randomInt(1, 50)) {
+                    if (chance >= value && length > RandomUtil.randomInt(1, 50)) {
                         val msgChain = ArrayList<Message>()
 
                         message.forEach { msgChain.add(it) }

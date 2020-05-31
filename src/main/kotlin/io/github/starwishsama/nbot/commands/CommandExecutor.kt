@@ -12,7 +12,7 @@ import net.mamoe.mirai.message.data.*
 import java.util.*
 
 /**
- * Mirai 命令处理器
+ * 无名 Bot 命令处理器
  * 处理群聊/私聊聊天信息中存在的命令
  * @author Nameless
  */
@@ -88,9 +88,7 @@ object CommandExecutor {
     }
 
     private fun isCommandPrefix(message: String): Boolean {
-        return BotConstants.cfg.commandPrefix.contains(
-                message.substring(0, 1)
-        ) && message.isNotEmpty()
+        return message.isNotEmpty() && BotConstants.cfg.commandPrefix.contains(message.substring(0, 1))
     }
 
     private fun commandEquals(cmd: UniversalCommand, cmdName: String): Boolean {

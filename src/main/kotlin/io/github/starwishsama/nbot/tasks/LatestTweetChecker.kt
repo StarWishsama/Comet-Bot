@@ -5,29 +5,29 @@ import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.api.twitter.TwitterApi
 import io.github.starwishsama.nbot.objects.pojo.twitter.Tweet
 import io.github.starwishsama.nbot.util.toMirai
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 
 object LatestTweetChecker : Runnable {
     private val pushedMap = mutableMapOf<String, Tweet>()
 
+    @ObsoleteCoroutinesApi
     override fun run() {
+        if (TwitterApi.token.isNullOrEmpty()) {
+            TwitterApi.getBearerToken()
+        }
+
         BotConstants.cfg.twitterSubs.forEach {
             val tweet = TwitterApi.getLatestTweet(it)
             val historyTweet = pushedMap[it]
-            val name = TwitterApi.getUserInfo(it)?.name
-            if (tweet != null) {
-                if (historyTweet != null && historyTweet.contentEquals(tweet)) {
-                    return
-                }
 
+            if (tweet != null && (historyTweet == null || historyTweet.contentEquals(tweet))) {
                 pushedMap[it] = tweet
 
                 BotMain.bot.groups.forEach { group ->
                     if (BotConstants.cfg.tweetPushGroups.contains(group.id)) {
-                        runBlocking {
-                            var message = "$name ($it) 发送了一条推文\n${tweet.text}".toMirai()
-                            val image = tweet.getPictureOrNull(group.botAsMember)
+                        GlobalScope.launch(newSingleThreadContext("Push-Thread")) {
+                            var message = "${tweet.user.name} ($it) 发送了一条推文\n${tweet.getFullText()}".toMirai()
+                            val image = tweet.getPictureOrNull(group)
                             if (image != null) {
                                 message += image
                             }

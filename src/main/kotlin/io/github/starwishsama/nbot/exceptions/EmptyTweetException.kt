@@ -1,3 +1,3 @@
 package io.github.starwishsama.nbot.exceptions
 
-class EmptyTweetException : Exception("该用户没有发送过推文")
+class EmptyTweetException : NullPointerException("该用户没有发送过推文")

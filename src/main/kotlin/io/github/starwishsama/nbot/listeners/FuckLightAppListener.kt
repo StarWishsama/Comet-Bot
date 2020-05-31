@@ -21,7 +21,7 @@ object FuckLightAppListener : NListener {
                                 val title = meta["desc"].asString
                                 val url = meta["qqdocurl"].asString
                                 reply(
-                                    "小程序Anti > 自动为电脑选手转换了小程序:\n" +
+                                    "小程序Anti > 自动转换了小程序链接:\n" +
                                             "视频标题: $title\n" +
                                             "链接: ${url.substring(0, url.indexOf("?") - 1)}"
                                 )

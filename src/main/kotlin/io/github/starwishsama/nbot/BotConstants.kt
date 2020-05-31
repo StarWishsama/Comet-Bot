@@ -10,6 +10,7 @@ import io.github.starwishsama.nbot.objects.RandomResult
 import io.github.starwishsama.nbot.objects.draw.ArkNightOperator
 import io.github.starwishsama.nbot.objects.draw.PCRCharacter
 import io.github.starwishsama.nbot.objects.group.Shop
+import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -34,4 +35,5 @@ object BotConstants {
 
     var gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
     val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    val twitterTimeFormat: SimpleDateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZZZ yyyy", Locale.ENGLISH)
 }

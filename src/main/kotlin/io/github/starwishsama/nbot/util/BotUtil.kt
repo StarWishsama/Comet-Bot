@@ -411,8 +411,13 @@ object BotUtil {
             if (StringUtils.isNumeric(id)) {
                 BotUser.getUser(id.toLong())
             } else {
-                 null
+                null
             }
         }
+    }
+
+    fun getMemoryUsage(): String {
+
+        return "0"
     }
 }

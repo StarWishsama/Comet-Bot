@@ -140,6 +140,7 @@ object DataSetup {
     }
 
     fun reload() {
-        load()
+        // 仅重载配置文件
+        BotConstants.cfg = gson.fromJson(cfgFile.getContext(), Config::class.java)
     }
 }
