@@ -42,15 +42,17 @@ object TwitterApi : ApiExecutor {
     // Token 获取时间, 时间过长需要重新获取, Token 可能会到期
     var tokenGetTime = BotConstants.cache["get_time"].asLong
 
+    private var cacheTweet = mutableMapOf<String, ArrayList<Tweet>>()
+
     // Api 调用次数
     override var usedTime: Int = 0
 
     fun getBearerToken() {
         try {
             val curl = CUrl(tokenGetApi).opt(
-                "-u",
-                "${BotConstants.cfg.twitterToken}:${BotConstants.cfg.twitterSecret}",
-                "--data",
+                    "-u",
+                    "${BotConstants.cfg.twitterToken}:${BotConstants.cfg.twitterSecret}",
+                    "--data",
                 "grant_type=client_credentials"
             )
 
@@ -122,21 +124,18 @@ object TwitterApi : ApiExecutor {
         }
 
         usedTime++
-        val startTime = LocalDateTime.now()
         val request = HttpRequest.get("$universalApi/statuses/user_timeline.json?screen_name=$username&count=2&tweet_mode=extended")
                 .header(
                         "authorization",
                         "Bearer $token"
                 )
-                .timeout(12_000)
+                .timeout(5_000)
 
         if (BotConstants.cfg.proxyUrl != null && BotConstants.cfg.proxyPort != -1) {
             request.setProxy(Proxy(Proxy.Type.HTTP, Socket(BotConstants.cfg.proxyUrl, BotConstants.cfg.proxyPort).remoteSocketAddress))
         }
 
         val result = request.executeAsync()
-
-        BotMain.logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
 
         if (result != null) {
             var tweet: Tweet? = null
@@ -150,6 +149,7 @@ object TwitterApi : ApiExecutor {
                     throw EmptyTweetException()
                 }
                 tweet = tweets[0]
+                addCacheTweet(username, tweet)
             } catch (e: JsonSyntaxException) {
                 try {
                     val errorInfo = gson.fromJson(result.body(), TwitterErrorInfo::class.java)
@@ -163,6 +163,42 @@ object TwitterApi : ApiExecutor {
         }
 
         return null
+    }
+
+    @Throws(RateLimitException::class)
+    fun getTweetWithCache(username: String): Tweet? {
+        try {
+            val startTime = LocalDateTime.now()
+            var cacheTweets = cacheTweet[username]
+            val result: Tweet?
+
+            if (cacheTweets == null) {
+                cacheTweets = ArrayList()
+            }
+
+            cacheTweets.sortedBy { it.getSentTime() }
+
+            result = if (Duration.between(cacheTweets[0].getSentTime(), LocalDateTime.now()).toMinutes() <= 1) {
+                cacheTweets[0]
+            } else {
+                getLatestTweet(username)
+            }
+
+            BotMain.logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+
+            return result
+        } catch (x: TwitterApiException) {
+            BotMain.logger.error("[蓝鸟] 调用 API 时出现了问题\n错误代码: ${x.code}\n理由: ${x.reason}}")
+        }
+        return null
+    }
+
+    fun addCacheTweet(username: String, tweet: Tweet) {
+        if (!cacheTweet.containsKey(username)) {
+            cacheTweet[username] = ArrayList()
+        } else {
+            cacheTweet[username]?.add(tweet)
+        }
     }
 
     override fun isReachLimit(): Boolean {

@@ -42,7 +42,6 @@ data class Tweet(
 ) {
     fun getFullText(): String {
         val quoted = quotedStatus
-        val sentTime = BotConstants.twitterTimeFormat.parse(postTime)
         var result = text
 
         if (isQuoted && quoted != null) {
@@ -50,7 +49,7 @@ data class Tweet(
         }
 
         val duration =
-            Duration.between(sentTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), LocalDateTime.now())
+                Duration.between(getSentTime(), LocalDateTime.now())
         result += "\n\n距离发送已过去了 ${duration.toDaysPart()}天${duration.toMinutesPart()}分${duration.toSecondsPart()}秒"
 
         return result
@@ -58,6 +57,10 @@ data class Tweet(
 
     fun contentEquals(tweet: Tweet): Boolean {
         return text == tweet.text
+    }
+
+    fun getSentTime(): LocalDateTime {
+        return BotConstants.twitterTimeFormat.parse(postTime).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
     }
 
     suspend fun getPictureOrNull(contact: Contact): Image? {

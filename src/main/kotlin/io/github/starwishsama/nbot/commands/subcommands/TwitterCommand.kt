@@ -41,7 +41,7 @@ class TwitterCommand : UniversalCommand {
                                     val tweet: Tweet?
 
                                     try {
-                                        tweet = TwitterApi.getLatestTweet(args.getRestString(1))
+                                        tweet = TwitterApi.getTweetWithCache(args.getRestString(1))
                                     } catch (e: HttpException) {
                                         return when (e.cause) {
                                             is ConnectException -> {
