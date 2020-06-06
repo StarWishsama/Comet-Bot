@@ -42,7 +42,7 @@ object TwitterApi : ApiExecutor {
     // Token 获取时间, 时间过长需要重新获取, Token 可能会到期
     var tokenGetTime = BotConstants.cache["get_time"].asLong
 
-    private var cacheTweet = mutableMapOf<String, ArrayList<Tweet>>()
+    var cacheTweet = mutableMapOf<String, ArrayList<Tweet>>()
 
     // Api 调用次数
     override var usedTime: Int = 0
