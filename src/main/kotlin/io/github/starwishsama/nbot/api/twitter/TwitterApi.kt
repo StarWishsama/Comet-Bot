@@ -178,7 +178,9 @@ object TwitterApi : ApiExecutor {
 
             cacheTweets.sortedBy { it.getSentTime() }
 
-            result = if (Duration.between(cacheTweets[0].getSentTime(), LocalDateTime.now()).toMinutes() <= 1) {
+            result = if (cacheTweets.isNotEmpty() && Duration.between(cacheTweets[0].getSentTime(), LocalDateTime.now())
+                    .toMinutes() <= 1
+            ) {
                 cacheTweets[0]
             } else {
                 getLatestTweet(username)

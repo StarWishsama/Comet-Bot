@@ -23,6 +23,7 @@ import java.io.InputStream
 import java.net.Proxy
 import java.net.Socket
 import java.net.URISyntaxException
+import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
 
@@ -357,29 +358,8 @@ object BotUtil {
     }
 
     fun getRunningTime(): String {
-        val remain = System.currentTimeMillis() - BotMain.startTime
-        var second = remain / 1000
-        val ms = remain - second * 1000
-        var minute = 0L
-        var hour = 0L
-        var day = 0L
-
-        while (second >= 60) {
-            minute += second / 60
-            second -= minute * 60
-        }
-
-        while (minute >= 60) {
-            hour += minute / 60
-            minute -= hour * 60
-        }
-
-        while (hour >= 24) {
-            day += hour / 24
-            hour -= day * 24
-        }
-
-        return day.toString() + "天" + hour + "时" + minute + "分" + second + "秒" + ms + "毫秒"
+        val remain = Duration.between(BotMain.startTime, LocalDateTime.now())
+        return "${remain.toDaysPart()}天${remain.toHoursPart()}时${remain.toMinutesPart()}分${remain.toSecondsPart()}秒${remain.toMillisPart()}毫秒"
     }
 
     fun getImageStream(url: String): InputStream {

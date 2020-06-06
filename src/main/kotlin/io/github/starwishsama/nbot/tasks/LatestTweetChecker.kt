@@ -26,6 +26,7 @@ object LatestTweetChecker : Runnable {
 
                 if (tweet != null && (historyTweet == null || !historyTweet.contentEquals(tweet))) {
                     pushedMap[it] = tweet
+                    TwitterApi.addCacheTweet(it, tweet)
 
                     BotMain.bot.groups.forEach { group ->
                         if (BotConstants.cfg.tweetPushGroups.contains(group.id)) {

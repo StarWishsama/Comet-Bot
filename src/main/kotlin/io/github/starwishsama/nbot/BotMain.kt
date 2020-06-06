@@ -2,6 +2,7 @@ package io.github.starwishsama.nbot
 
 import com.hiczp.bilibili.api.BilibiliClient
 import io.github.starwishsama.nbot.BotMain.bot
+import io.github.starwishsama.nbot.BotMain.startTime
 import io.github.starwishsama.nbot.api.bilibili.DynamicApi
 import io.github.starwishsama.nbot.api.twitter.TwitterApi
 import io.github.starwishsama.nbot.commands.CommandExecutor
@@ -20,7 +21,6 @@ import io.github.starwishsama.nbot.tasks.LatestTweetChecker
 import io.github.starwishsama.nbot.util.getContext
 import io.github.starwishsama.nbot.util.writeString
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import net.kronos.rkon.core.Rcon
@@ -36,7 +36,9 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
 import java.io.IOException
+import java.time.Duration
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -50,7 +52,7 @@ object BotMain {
     lateinit var password: String
     lateinit var bot: Bot
     val client = BilibiliClient()
-    var startTime: Long = 0
+    lateinit var startTime: LocalDateTime
     lateinit var service: ScheduledExecutorService
     lateinit var logger: MiraiLogger
     var rCon: Rcon? = null
@@ -104,12 +106,13 @@ object BotMain {
 
     fun initLog() {
         try {
+            val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
             val initTime = LocalDateTime.now()
             val parent = File(getPath() + File.separator + "logs")
             if (!parent.exists()) {
                 parent.mkdirs()
             }
-            log = File(parent, "log-${initTime.year}-${initTime.month.value}-${initTime.dayOfMonth}-${initTime.hour}-${initTime.minute}.log")
+            log = File(parent, "log-${dateFormatter.format(initTime)}.log")
             log.createNewFile()
         } catch (e: IOException) {
             error("尝试输出 Log 失败")
@@ -117,9 +120,8 @@ object BotMain {
     }
 }
 
-@ObsoleteCoroutinesApi
 suspend fun main() {
-    BotMain.startTime = System.currentTimeMillis()
+    startTime = LocalDateTime.now()
     BotMain.initLog()
     DataSetup.initData()
     BotMain.qqId = BotConstants.cfg.botId
@@ -226,12 +228,12 @@ suspend fun main() {
             BotMain.logger.info("[监听器] 已注册 ${it.getName()} 监听器")
         }
 
-        val time = System.currentTimeMillis() - BotMain.startTime
+        val time = Duration.between(startTime, LocalDateTime.now())
         val startUsedTime =
-            if (time > 1000) {
-                String.format("%.2f", (time.toDouble() / 1000)) + "s"
+            if (time.toMillis() > 1000) {
+                String.format("%.2f", (time.toMillis().toDouble() / 1000)) + "s"
             } else {
-                (time.toString() + "ms")
+                "${time.toMillis()}ms"
             }
 
         BotMain.logger.info("无名 Bot 启动成功, 耗时 $startUsedTime")
