@@ -4,6 +4,7 @@ import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.api.twitter.TwitterApi
 import io.github.starwishsama.nbot.exceptions.RateLimitException
+import io.github.starwishsama.nbot.objects.pojo.twitter.Tweet
 import io.github.starwishsama.nbot.util.toMirai
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Runnable
@@ -11,6 +12,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 object LatestTweetChecker : Runnable {
+    private val pushedMap = mutableMapOf<String, Tweet>()
+
     override fun run() {
         if (TwitterApi.token.isNullOrEmpty()) {
             TwitterApi.getBearerToken()
@@ -19,11 +22,10 @@ object LatestTweetChecker : Runnable {
         BotConstants.cfg.twitterSubs.forEach {
             try {
                 val tweet = TwitterApi.getTweetWithCache(it)
-                TwitterApi.cacheTweet[it]?.sortBy { t -> t.getSentTime() }
-                val historyTweet = TwitterApi.cacheTweet[it]?.get(0)
+                val historyTweet = pushedMap[it]
 
                 if (tweet != null && (historyTweet == null || !historyTweet.contentEquals(tweet))) {
-                    TwitterApi.addCacheTweet(it, tweet)
+                    pushedMap[it] = tweet
 
                     BotMain.bot.groups.forEach { group ->
                         if (BotConstants.cfg.tweetPushGroups.contains(group.id)) {
