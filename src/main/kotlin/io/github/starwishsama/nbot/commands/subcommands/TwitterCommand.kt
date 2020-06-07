@@ -37,24 +37,32 @@ class TwitterCommand : UniversalCommand {
                         "info", "cx", "查询" -> {
                             if (args.size > 1) {
                                 event.quoteReply(BotUtil.sendMsgPrefix("正在查询, 请稍等"))
+
                                 try {
                                     val tweet: Tweet?
 
                                     try {
                                         tweet = TwitterApi.getTweetWithCache(args.getRestString(1))
-                                    } catch (e: HttpException) {
-                                        return when (e.cause) {
-                                            is ConnectException -> {
-                                                if (BotConstants.cfg.proxyPort != 0)
-                                                    BotUtil.sendMsgPrefix("无法连接到蓝鸟服务器").toMirai()
-                                                else
-                                                    BotUtil.sendMsgPrefix("无法连接至代理服务器").toMirai()
+                                    } catch (x: RuntimeException) {
+                                        return when (x) {
+                                            is HttpException -> {
+                                                when (x.cause) {
+                                                    is ConnectException -> {
+                                                        if (BotConstants.cfg.proxyPort != 0)
+                                                            BotUtil.sendMsgPrefix("无法连接到蓝鸟服务器").toMirai()
+                                                        else
+                                                            BotUtil.sendMsgPrefix("无法连接至代理服务器").toMirai()
+                                                    }
+                                                    is SocketTimeoutException -> BotUtil.sendMsgPrefix("连接超时").toMirai()
+                                                    else -> {
+                                                        BotMain.logger.error(x)
+                                                        BotUtil.sendMsgPrefix("获取推文时出现了意外").toMirai()
+                                                    }
+                                                }
                                             }
-                                            is SocketTimeoutException -> BotUtil.sendMsgPrefix("连接超时").toMirai()
-                                            else -> {
-                                                BotMain.logger.error(e)
-                                                BotUtil.sendMsgPrefix("获取推文时出现了意外").toMirai()
-                                            }
+                                            is RateLimitException -> BotUtil.sendMsgPrefix("已达到蓝鸟 API 调用上限, 请等会再试吧")
+                                                .toMirai()
+                                            else -> BotUtil.sendMsgPrefix("获取推文时出现了意外").toMirai()
                                         }
                                     }
 

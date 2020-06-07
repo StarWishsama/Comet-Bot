@@ -1,5 +1,7 @@
 package io.github.starwishsama.nbot.commands.subcommands
 
+import io.github.starwishsama.nbot.BotMain
+import io.github.starwishsama.nbot.commands.CommandExecutor
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
@@ -44,6 +46,12 @@ class DebugCommand : UniversalCommand {
                     }
                 }
                 "help" -> return getHelp().toMessage().asMessageChain()
+                "info" ->
+                    return """
+                        无名Bot ${BotMain.version}
+                        已注册的命令个数: ${CommandExecutor.commands.size}
+                        ${BotUtil.getMemoryUsage()}
+                    """.trimIndent().toMirai()
                 else -> return "Bot > 命令不存在\n${getHelp()}".toMirai()
             }
         }

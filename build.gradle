@@ -11,7 +11,7 @@ buildscript {
 plugins {
     id 'java'
     id "com.github.johnrengelman.shadow" version "5.2.0"
-    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+    id 'org.jetbrains.kotlin.jvm' version "1.3.72"
 }
 
 jar {
@@ -20,8 +20,11 @@ jar {
     }
 }
 
+def gitCommitId = 'git rev-parse --short HEAD'
+def versionCode = "0.3.6-rc2-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
+
 group 'io.github.starwishsama.nbot'
-version '0.3.6-rc2-200606'
+version versionCode
 
 repositories {
     maven { url 'https://jitpack.io' }
@@ -33,6 +36,29 @@ repositories {
     mavenCentral()
     mavenLocal()
 }
+
+task updateVersion {
+    def versionFileDir = projectDir.getAbsolutePath() + File.separatorChar + 'src' + File.separatorChar + 'main' + File.separatorChar + 'kotlin' + File.separatorChar + 'io' + File.separatorChar + 'github' + File.separatorChar + 'starwishsama' + File.separatorChar + 'nbot' + File.separatorChar + 'BotMain.kt'
+    def oldVersionStr = findOldVersionStr(versionFileDir)
+    def newVersionStr = "    const val version = \"" + versionCode + "\""
+    def updatedContent = new File(versionFileDir).getText('UTF-8').replaceAll(oldVersionStr, newVersionStr)
+    new File(versionFileDir).write(updatedContent, 'UTF-8')
+}
+
+static def findOldVersionStr(path) {
+    def readerString = ""
+    new File(path).withReader('UTF-8') { reader ->
+        reader.eachLine {
+            if (it.contains("version")) {
+                readerString <<= it
+                return readerString
+            }
+        }
+        return readerString
+    }
+}
+
+jar.dependsOn updateVersion
 
 dependencies {
     implementation 'net.mamoe:mirai-core:1.0.1'
@@ -62,8 +88,4 @@ dependencies {
 
 shadowJar {
     zip64 true
-}
-
-compileKotlin {
-    kotlinOptions.jvmTarget = "11"
 }

@@ -22,6 +22,7 @@ import java.net.Proxy
 import java.net.Socket
 import java.time.Duration
 import java.time.LocalDateTime
+import java.util.*
 
 /**
  * Twitter API
@@ -167,16 +168,15 @@ object TwitterApi : ApiExecutor {
 
     @Throws(RateLimitException::class)
     fun getTweetWithCache(username: String): Tweet? {
+        val startTime = LocalDateTime.now()
+
         try {
-            val startTime = LocalDateTime.now()
             var cacheTweets = cacheTweet[username]
             val result: Tweet?
 
             if (cacheTweets == null) {
-                cacheTweets = ArrayList()
+                cacheTweets = LinkedList()
             }
-
-            cacheTweets.sortedBy { it.getSentTime() }
 
             result = if (cacheTweets.isNotEmpty() && Duration.between(cacheTweets[0].getSentTime(), LocalDateTime.now())
                     .toMinutes() <= 1
@@ -186,18 +186,18 @@ object TwitterApi : ApiExecutor {
                 getLatestTweet(username)
             }
 
-            BotMain.logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
-
             return result
         } catch (x: TwitterApiException) {
             BotMain.logger.error("[蓝鸟] 调用 API 时出现了问题\n错误代码: ${x.code}\n理由: ${x.reason}}")
         }
+
+        BotMain.logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
         return null
     }
 
     fun addCacheTweet(username: String, tweet: Tweet) {
         if (!cacheTweet.containsKey(username)) {
-            cacheTweet[username] = ArrayList()
+            cacheTweet[username] = LinkedList()
         } else {
             cacheTweet[username]?.add(tweet)
         }
