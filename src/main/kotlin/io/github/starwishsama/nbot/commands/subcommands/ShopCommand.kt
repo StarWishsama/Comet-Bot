@@ -25,7 +25,7 @@ class ShopCommand : UniversalCommand, WaitableCommand {
         /shop put 上架商品
     """.trimIndent()
 
-    override suspend fun replyResult(event: MessageEvent, user: BotUser, session: Session) {
+    override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
         event.reply("WIP")
         SessionManager.expireSession(session)
     }

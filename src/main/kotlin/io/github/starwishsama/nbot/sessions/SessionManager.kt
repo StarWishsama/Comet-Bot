@@ -1,5 +1,7 @@
 package io.github.starwishsama.nbot.sessions
 
+import net.mamoe.mirai.message.GroupMessageEvent
+import net.mamoe.mirai.message.MessageEvent
 import java.util.*
 
 
@@ -56,6 +58,19 @@ object SessionManager {
             }
         }
         return null
+    }
+
+    fun getSessionByEvent(event: MessageEvent): Session? {
+        return when (event) {
+            is GroupMessageEvent -> {
+                if (isValidSessionByGroup(event.group.id)) {
+                    getSessionByGroup(event.group.id)
+                } else {
+                    null
+                }
+            }
+            else -> getSession(event.sender.id)
+        }
     }
 
     fun getSessions(): List<Session> {

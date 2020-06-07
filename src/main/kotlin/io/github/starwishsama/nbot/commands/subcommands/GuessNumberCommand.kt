@@ -20,7 +20,6 @@ import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.content
-import java.lang.StringBuilder
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -74,7 +73,7 @@ class GuessNumberCommand: UniversalCommand, WaitableCommand {
         /csz [最小值] [最大值] 猜指定范围内的数字
     """.trimIndent()
 
-    override suspend fun replyResult(event: MessageEvent, user: BotUser, session: Session) {
+    override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
         val trueAnswer = (session as GuessNumberSession).answer
         session.lastAnswerTime = LocalDateTime.now()
         val answer = event.message.content

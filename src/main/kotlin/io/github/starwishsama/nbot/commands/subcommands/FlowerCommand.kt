@@ -83,7 +83,7 @@ class FlowerCommand : UniversalCommand, WaitableCommand {
         /hy cx 查询绿植状态
     """.trimIndent()
 
-    override suspend fun replyResult(event: MessageEvent, user: BotUser, session: Session) {
+    override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
         val name = event.message.contentToString()
         if (!name.isOutRange(25) && name.isNotBlank()) {
             user.flower = Flower(name)

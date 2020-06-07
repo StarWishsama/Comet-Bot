@@ -47,11 +47,9 @@ class DebugCommand : UniversalCommand {
                 }
                 "help" -> return getHelp().toMessage().asMessageChain()
                 "info" ->
-                    return """
-                        无名Bot ${BotMain.version}
-                        已注册的命令个数: ${CommandExecutor.commands.size}
-                        ${BotUtil.getMemoryUsage()}
-                    """.trimIndent().toMirai()
+                    return ("无名Bot ${BotMain.version}\n" +
+                            "已注册的命令个数: ${CommandExecutor.commands.size}\n" +
+                            BotUtil.getMemoryUsage()).toMirai()
                 else -> return "Bot > 命令不存在\n${getHelp()}".toMirai()
             }
         }

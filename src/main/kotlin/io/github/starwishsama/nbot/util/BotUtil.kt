@@ -396,12 +396,8 @@ object BotUtil {
         }
     }
 
-    fun getMemoryUsage(): String {
-        return """
-            操作系统: ${getOsName()}
-            JVM 版本: ${getJVMVersion()}
-            内存占用: ${getUsedMemory()}MB/${getMaxMemory()}MB
-            运行时长: ${getRunningTime()}
-        """.trimIndent()
-    }
+    fun getMemoryUsage(): String = "操作系统: ${getOsName()}\n" +
+            "JVM 版本: ${getJVMVersion()}\n" +
+            "内存占用: ${getUsedMemory()}MB/${getMaxMemory()}MB\n" +
+            "运行时长: ${getRunningTime()}"
 }

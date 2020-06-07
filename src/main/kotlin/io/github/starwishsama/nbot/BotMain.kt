@@ -3,7 +3,7 @@ package io.github.starwishsama.nbot
 import com.hiczp.bilibili.api.BilibiliClient
 import io.github.starwishsama.nbot.BotMain.bot
 import io.github.starwishsama.nbot.BotMain.startTime
-import io.github.starwishsama.nbot.api.bilibili.DynamicApi
+import io.github.starwishsama.nbot.api.bilibili.BiliBiliApi
 import io.github.starwishsama.nbot.api.twitter.TwitterApi
 import io.github.starwishsama.nbot.commands.CommandExecutor
 import io.github.starwishsama.nbot.commands.subcommands.*
@@ -47,7 +47,7 @@ import kotlin.system.exitProcess
 
 object BotMain {
     val filePath: File = File(getPath())
-    const val version = "0.3.6-rc2-474ba39-20200607"
+    const val version = "0.3.6-rc2-13e8577-20200607"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -173,7 +173,7 @@ suspend fun main() {
         )
 
         val listeners = arrayOf(FuckLightAppListener, GroupChatListener, RepeatListener, SessionListener)
-        val apis = arrayOf(DynamicApi, TwitterApi)
+        val apis = arrayOf(BiliBiliApi, TwitterApi)
 
         BotMain.logger.info("[命令] 已注册 " + CommandExecutor.commands.size + " 个命令")
 

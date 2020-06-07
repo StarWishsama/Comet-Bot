@@ -7,18 +7,13 @@ import io.github.starwishsama.nbot.sessions.Session
 import io.github.starwishsama.nbot.sessions.SessionManager
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeMessages
-import net.mamoe.mirai.message.GroupMessageEvent
 
 object SessionListener : NListener {
     override fun register(bot: Bot) {
         bot.subscribeMessages {
             always {
                 if (!isPrefix(message.contentToString()) && SessionManager.isValidSession(sender.id)) {
-                    val session : Session? = if (this is GroupMessageEvent && SessionManager.isValidSessionByGroup(group.id)) {
-                        SessionManager.getSessionByGroup(group.id)
-                    } else {
-                        SessionManager.getSession(sender.id)
-                    }
+                    val session: Session? = SessionManager.getSessionByEvent(this)
 
                     if (session != null) {
                         val command = session.command
@@ -28,7 +23,7 @@ object SessionListener : NListener {
                                 user = BotUser.quickRegister(sender.id)
                             }
                             // 为了一些特殊需求, 请在命令中释放 Session
-                            command.replyResult(this, user, session)
+                            command.handleInput(this, user, session)
                         }
                     }
                 }

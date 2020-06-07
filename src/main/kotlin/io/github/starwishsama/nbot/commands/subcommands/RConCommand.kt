@@ -66,7 +66,7 @@ class RConCommand : UniversalCommand, WaitableCommand {
         还可以使用 mc, 执行命令 作为等效命令.
     """.trimIndent()
 
-    override suspend fun replyResult(event: MessageEvent, user: BotUser, session: Session) {
+    override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
         if (event.message.contentToString().contains("退出")) {
             waitList.remove(user)
             SessionManager.expireSession(session)

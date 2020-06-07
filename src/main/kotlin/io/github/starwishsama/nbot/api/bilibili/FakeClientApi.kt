@@ -4,6 +4,7 @@ import com.hiczp.bilibili.api.app.model.SearchUserResult
 import com.hiczp.bilibili.api.live.model.RoomInfo
 import com.hiczp.bilibili.api.retrofit.exception.BilibiliApiException
 import io.github.starwishsama.nbot.BotMain
+import io.github.starwishsama.nbot.exceptions.RateLimitException
 
 object FakeClientApi {
     private val client = BotMain.client
@@ -17,9 +18,13 @@ object FakeClientApi {
         try {
             return client.liveAPI.getInfo(roomId).await()
         } catch (e: BilibiliApiException) {
-            BotMain.logger.error("在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
-                    "${e.commonResponse.msg}\n" +
-                    "${e.commonResponse.message}", e)
+            BotMain.logger.error(
+                "在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
+                        "${e.commonResponse.msg}\n" +
+                        "${e.commonResponse.message}", e
+            )
+        } catch (e: RateLimitException) {
+            BotMain.logger.error(e.message)
         }
         return null
     }

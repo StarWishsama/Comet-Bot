@@ -9,8 +9,8 @@ import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.sessions.Session
 import io.github.starwishsama.nbot.sessions.SessionManager
 import io.github.starwishsama.nbot.util.BotUtil
-import io.github.starwishsama.nbot.util.toMirai
 import io.github.starwishsama.nbot.util.PictureSearchUtil
+import io.github.starwishsama.nbot.util.toMirai
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.Image
@@ -45,7 +45,7 @@ class PictureSearch : UniversalCommand, WaitableCommand {
         /ytst 以图搜图
     """.trimIndent()
 
-    override suspend fun replyResult(event: MessageEvent, user: BotUser, session: Session) {
+    override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
         val image = event.message[Image]
         event.reply(run {
             if (image != null) {
