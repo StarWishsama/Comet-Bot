@@ -75,16 +75,17 @@ class BiliBiliCommand : UniversalCommand {
                     }
                     "list" -> {
                         val subs = StringBuilder("监控室列表:\n")
-                        val infos = ArrayList<com.hiczp.bilibili.api.live.model.RoomInfo>()
+                        val info = ArrayList<com.hiczp.bilibili.api.live.model.RoomInfo>()
                         BotConstants.cfg.subList.forEach {
                             val room = FakeClientApi.getLiveRoom(it)
                             if (room != null) {
-                                infos.add(room)
+                                info.add(room)
                             }
                         }
-                        infos.sortBy { it.data.liveStatus == 1 }
 
-                        infos.forEach {
+                        info.sortByDescending { it.data.liveStatus == 1 }
+
+                        info.forEach {
                             subs.append(
                                 "${BiliBiliApi.getUserNameByMid(it.data.uid)} " +
                                         "${if (it.data.liveStatus == 1) "✔" else "✘"}\n"
