@@ -72,22 +72,29 @@ object DataSetup {
                     object : TypeToken<List<BotUser>>() {}.type
             )
             BotConstants.shop = gson.fromJson(
-                    shopItemCfg.getContext(),
-                    object : TypeToken<List<Shop>>() {}.type
+                shopItemCfg.getContext(),
+                object : TypeToken<List<Shop>>() {}.type
             )
             GroupConfigManager.configs = gson.fromJson(
-                    groupCfg.getContext(),
-                    object : TypeToken<Map<Long, GroupConfig>>() {}.type
+                groupCfg.getContext(),
+                object : TypeToken<Map<Long, GroupConfig>>() {}.type
             )
 
             loadLang()
 
-            BotConstants.pcr = gson.fromJson(pcrData.getContext(),
+            if (pcrData.exists()) {
+                BotConstants.pcr = gson.fromJson(
+                    pcrData.getContext(),
                     object : TypeToken<List<PCRCharacter>>() {}.type
-            )
-            BotConstants.arkNight = gson.fromJson(arkNightData.getContext(),
+                )
+            }
+
+            if (arkNightData.exists()) {
+                BotConstants.arkNight = gson.fromJson(
+                    arkNightData.getContext(),
                     object : TypeToken<List<ArkNightOperator>>() {}.type
-            )
+                )
+            }
 
             if (!cacheCfg.exists()) {
                 val jsonObject = JsonObject()
