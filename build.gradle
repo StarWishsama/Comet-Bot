@@ -73,12 +73,10 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.16'
     implementation 'org.apache.httpcomponents:httpclient:4.5.2'
     implementation 'org.apache.httpcomponents:httpcore:4.4.4'
-    implementation 'com.vdurmont:emoji-java:4.0.0'
     // RSS Service
     implementation 'com.rometools:rome:1.12.2'
     implementation 'com.rometools:rome-utils:1.12.2'
     implementation 'com.rometools:rome-fetcher:1.12.2'
-    implementation 'org.jsoup:jsoup:1.13.1'
     // CUrl
     implementation'com.github.rockswang:java-curl:1.2.2.2'
     // BiliBili

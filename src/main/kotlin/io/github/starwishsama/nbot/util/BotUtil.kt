@@ -39,6 +39,9 @@ fun String.removeColor(): String {
     return replace("§\\S".toRegex(), "")
 }
 
+/**
+ * 将字符串转换为消息链
+ */
 fun String.toMirai(): MessageChain {
     return toMessage().asMessageChain()
 }

@@ -11,7 +11,6 @@ import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.file.BackupHelper
 import io.github.starwishsama.nbot.file.DataSetup
 import io.github.starwishsama.nbot.listeners.FuckLightAppListener
-import io.github.starwishsama.nbot.listeners.GroupChatListener
 import io.github.starwishsama.nbot.listeners.RepeatListener
 import io.github.starwishsama.nbot.listeners.SessionListener
 import io.github.starwishsama.nbot.managers.TaskManager
@@ -47,7 +46,7 @@ import kotlin.system.exitProcess
 
 object BotMain {
     val filePath: File = File(getPath())
-    const val version = "0.3.6-rc2-8a13e0a-20200607"
+    const val version = "0.3.6-rc2-ecc23aa-20200613"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -159,7 +158,6 @@ suspend fun main() {
                 DivineCommand(),
                 GachaCommand(),
                 GuessNumberCommand(),
-                FlowerCommand(),
                 HelpCommand(),
                 InfoCommand(),
                 MusicCommand(),
@@ -172,7 +170,7 @@ suspend fun main() {
             )
         )
 
-        val listeners = arrayOf(FuckLightAppListener, GroupChatListener, RepeatListener, SessionListener)
+        val listeners = arrayOf(FuckLightAppListener, RepeatListener, SessionListener)
         val apis = arrayOf(BiliBiliApi, TwitterApi)
 
         BotMain.logger.info("[命令] 已注册 " + CommandExecutor.commands.size + " 个命令")

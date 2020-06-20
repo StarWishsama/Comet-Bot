@@ -43,7 +43,7 @@ object TwitterApi : ApiExecutor {
     // Token 获取时间, 时间过长需要重新获取, Token 可能会到期
     var tokenGetTime = BotConstants.cache["get_time"].asLong
 
-    var cacheTweet = mutableMapOf<String, ArrayList<Tweet>>()
+    private var cacheTweet = mutableMapOf<String, LinkedList<Tweet>>()
 
     // Api 调用次数
     override var usedTime: Int = 0
@@ -60,6 +60,7 @@ object TwitterApi : ApiExecutor {
             if (BotConstants.cfg.proxyUrl != null && BotConstants.cfg.proxyPort != -1) {
                 curl.proxy(BotConstants.cfg.proxyUrl, BotConstants.cfg.proxyPort)
             }
+
             val result = curl.exec("UTF-8")
 
             if (JsonParser.parseString(result).isJsonObject) {
@@ -101,10 +102,10 @@ object TwitterApi : ApiExecutor {
             BotMain.logger.error("[蓝鸟] 在获取用户最新推文时出现了问题", e)
         }
 
-        var entity: TwitterUser? = null
+        var tUser: TwitterUser? = null
 
         try {
-            entity = gson.fromJson(result?.body(), TwitterUser::class.java)
+            tUser = gson.fromJson(result?.body(), TwitterUser::class.java)
         } catch (e: JsonSyntaxException) {
             try {
                 val errorInfo = gson.fromJson(result?.body(), TwitterErrorInfo::class.java)
@@ -115,7 +116,7 @@ object TwitterApi : ApiExecutor {
             }
         }
         BotMain.logger.debug("[蓝鸟] 查询用户信息耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
-        return entity
+        return tUser
     }
 
     @Throws(RateLimitException::class, EmptyTweetException::class, TwitterApiException::class)
