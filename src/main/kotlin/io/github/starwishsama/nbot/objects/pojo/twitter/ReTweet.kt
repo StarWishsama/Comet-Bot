@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.objects.pojo.twitter.tweetEntity.Media
-import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.utils.BotUtil
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.uploadAsImage

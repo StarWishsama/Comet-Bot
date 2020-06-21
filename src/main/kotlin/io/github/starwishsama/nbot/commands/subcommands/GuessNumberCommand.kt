@@ -11,9 +11,9 @@ import io.github.starwishsama.nbot.sessions.Session
 import io.github.starwishsama.nbot.sessions.SessionManager
 import io.github.starwishsama.nbot.sessions.commands.guessnumber.GuessNumberSession
 import io.github.starwishsama.nbot.sessions.commands.guessnumber.GuessNumberUser
-import io.github.starwishsama.nbot.util.BotUtil
-import io.github.starwishsama.nbot.util.isNumeric
-import io.github.starwishsama.nbot.util.toMirai
+import io.github.starwishsama.nbot.utils.BotUtil
+import io.github.starwishsama.nbot.utils.isNumeric
+import io.github.starwishsama.nbot.utils.toMirai
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent

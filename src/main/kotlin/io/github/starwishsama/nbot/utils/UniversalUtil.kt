@@ -1,4 +1,4 @@
-package io.github.starwishsama.nbot.util
+package io.github.starwishsama.nbot.utils
 
 import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
@@ -86,8 +86,39 @@ fun String.limitStringSize(size: Int): String {
     return if (length <= size) this else substring(0, size - 3) + "..."
 }
 
+fun Long.getLength(): Int {
+    return this.toString().length
+}
+
+/**
+ * 这些方法本来应该要 Java 9+ 才有的
+ * 但是为了把 JVM 版本降到 8
+ * 才有了这些方法
+ */
+fun Duration.toDayPart(): Int {
+    return (seconds / 60 * 60 * 24).toInt()
+}
+
+fun Duration.toHourPart(): Int {
+    return (toHours() % 24).toInt()
+}
+
+fun Duration.toMinutePart(): Int {
+    return (toMinutes() % 60).toInt()
+}
+
+fun Duration.toSecondPart(): Int {
+    return (seconds % 60).toInt()
+}
+
+fun Duration.toMilliPart(): Int {
+    return (toNanos() / 1000000).toInt()
+}
+
 object BotUtil {
+    /** 冷却 */
     private var coolDown: MutableMap<Long, Long> = HashMap()
+
     /**
      * 获取 Minecraft 服务器信息 (SRV解析)
      * @author NamelessSAMA
@@ -362,7 +393,7 @@ object BotUtil {
 
     fun getRunningTime(): String {
         val remain = Duration.between(BotMain.startTime, LocalDateTime.now())
-        return "${remain.toDaysPart()}天${remain.toHoursPart()}时${remain.toMinutesPart()}分${remain.toSecondsPart()}秒${remain.toMillisPart()}毫秒"
+        return "${remain.toDayPart()}天${remain.toHourPart()}时${remain.toMinutePart()}分${remain.toSecondPart()}秒${remain.toMilliPart()}毫秒"
     }
 
     fun getImageStream(url: String): InputStream {
@@ -403,4 +434,19 @@ object BotUtil {
             "JVM 版本: ${getJVMVersion()}\n" +
             "内存占用: ${getUsedMemory()}MB/${getMaxMemory()}MB\n" +
             "运行时长: ${getRunningTime()}"
+
+    fun returnMsgIf(condition: Boolean, msg: MessageChain): MessageChain {
+        if (condition) {
+            return msg
+        } else {
+            throw UnsupportedOperationException()
+        }
+    }
+
+    fun returnMsgIfElse(condition: Boolean, msg: MessageChain, default: MessageChain): MessageChain {
+        if (condition) {
+            return msg
+        }
+        return default
+    }
 }

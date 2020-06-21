@@ -17,8 +17,8 @@ import io.github.starwishsama.nbot.managers.TaskManager
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.tasks.CheckLiveStatus
 import io.github.starwishsama.nbot.tasks.LatestTweetChecker
-import io.github.starwishsama.nbot.util.getContext
-import io.github.starwishsama.nbot.util.writeString
+import io.github.starwishsama.nbot.utils.getContext
+import io.github.starwishsama.nbot.utils.writeString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -46,7 +46,7 @@ import kotlin.system.exitProcess
 
 object BotMain {
     val filePath: File = File(getPath())
-    const val version = "0.3.6-rc2-7c99ef7-20200620"
+    const val version = "0.3.7-DEV-49f7f1c-20200621"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot

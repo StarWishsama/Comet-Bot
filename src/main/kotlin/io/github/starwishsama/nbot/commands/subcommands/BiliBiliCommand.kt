@@ -8,13 +8,14 @@ import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.objects.WrappedMessage
-import io.github.starwishsama.nbot.util.BotUtil
-import io.github.starwishsama.nbot.util.isNumeric
-import io.github.starwishsama.nbot.util.toMirai
+import io.github.starwishsama.nbot.utils.BotUtil
+import io.github.starwishsama.nbot.utils.isNumeric
+import io.github.starwishsama.nbot.utils.toMirai
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import org.apache.commons.lang3.Validate
 
 class BiliBiliCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
@@ -24,31 +25,27 @@ class BiliBiliCommand : UniversalCommand {
             } else {
                 when (args[0]) {
                     "sub", "订阅" -> {
-                        if (args.size > 1) {
-                            if (user.isBotAdmin()) {
-                                if (args[1].contains("|")) {
-                                    val users = args[1].split("|")
-                                    users.forEach {
-                                        val result = subscribe(it)
-                                        if (result is EmptyMessageChain) {
-                                            return BotUtil.sendMsgPrefix("账号 $it 不存在").toMirai()
-                                        }
-                                        delay(200)
-                                    }
-                                    return BotUtil.sendMsgPrefix("订阅多个直播间成功 你好D啊").toMirai()
-                                } else {
-                                    var result = subscribe(args[1])
-                                    if (result is EmptyMessageChain) {
-                                        result = BotUtil.sendMsgPrefix("账号不存在").toMirai()
-                                    }
+                        try {
+                            Validate.isTrue(args.size > 1, getHelp())
+                            Validate.isTrue(user.isBotAdmin(), BotUtil.sendMsgPrefix("你没有权限"))
 
-                                    return result
+                            if (args[1].contains("|")) {
+                                val users = args[1].split("|")
+                                users.forEach {
+                                    val result = subscribe(it)
+                                    delay(500)
+                                    return BotUtil.returnMsgIf(result is EmptyMessageChain, BotUtil.sendMsgPrefix("账号 $it 不存在").toMirai())
                                 }
+                                return BotUtil.sendMsgPrefix("订阅多个直播间成功 你好D啊").toMirai()
                             } else {
-                                BotUtil.sendMsgPrefix("你没有权限").toMirai()
+                                val result = subscribe(args[1])
+                                return BotUtil.returnMsgIfElse(result is EmptyMessageChain, BotUtil.sendMsgPrefix("账号不存在").toMirai(), result)
                             }
-                        } else {
-                            return getHelp().toMirai()
+                        } catch (e: IllegalArgumentException) {
+                            val msg = e.message
+                            if (msg != null) {
+                                return msg.toMirai()
+                            }
                         }
                     }
                     "unsub", "取消订阅" -> {
@@ -74,6 +71,8 @@ class BiliBiliCommand : UniversalCommand {
                         }
                     }
                     "list" -> {
+                        event.reply("请稍等..")
+
                         val subs = StringBuilder("监控室列表:\n")
                         val info = ArrayList<com.hiczp.bilibili.api.live.model.RoomInfo>()
                         BotConstants.cfg.subList.forEach {

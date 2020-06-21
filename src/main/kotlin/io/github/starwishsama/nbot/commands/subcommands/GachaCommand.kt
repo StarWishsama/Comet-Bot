@@ -4,9 +4,9 @@ import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
-import io.github.starwishsama.nbot.util.BotUtil
-import io.github.starwishsama.nbot.util.toMirai
-import io.github.starwishsama.nbot.util.DrawUtil
+import io.github.starwishsama.nbot.utils.BotUtil
+import io.github.starwishsama.nbot.utils.DrawUtil
+import io.github.starwishsama.nbot.utils.toMirai
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain

@@ -1,4 +1,4 @@
-package io.github.starwishsama.nbot.util
+package io.github.starwishsama.nbot.utils
 
 import cn.hutool.http.HttpRequest
 import com.google.gson.JsonParser

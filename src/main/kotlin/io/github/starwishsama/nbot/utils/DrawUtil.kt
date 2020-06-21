@@ -1,4 +1,4 @@
-package io.github.starwishsama.nbot.util
+package io.github.starwishsama.nbot.utils
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.nbot.BotConstants
@@ -91,57 +91,54 @@ object DrawUtil {
                 "命令条数现在每小时会恢复100次, 封顶1000次"
         val result = LinkedList<ArkNightOperator>()
         var r6Time = 0
-        if (time == 1) {
-            return if (user.commandTime >= 1 || user.compareLevel(UserLevel.ADMIN)) {
-                user.decreaseTime()
-                val (name, _, rare) = drawAr()
-                name + " " + getStar(rare)
-            } else {
-               overTimeMessage
-            }
-        } else if (time == 10) {
-            return if (user.commandTime >= 10 || user.compareLevel(UserLevel.ADMIN)) {
-                result.addAll(tenTimeDrawAr())
-                user.decreaseTime(10)
-                val sb = StringBuilder("十连结果:\n")
-                for ((name, _, rare) in result) {
-                    sb.append(name).append(" ").append(getStar(rare)).append(" ")
+
+        if (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000) {
+            when (time) {
+                1 -> {
+                    user.decreaseTime()
+                    val (name, _, rare) = drawAr()
+                    return name + " " + getStar(rare)
                 }
-                sb.toString().trim()
-            } else {
-                overTimeMessage
+                10 -> {
+                    result.addAll(tenTimeDrawAr())
+                    user.decreaseTime(10)
+                    val sb = StringBuilder("十连结果:\n")
+                    for ((name, _, rare) in result) {
+                        sb.append(name).append(" ").append(getStar(rare)).append(" ")
+                    }
+                    return sb.toString().trim()
+                }
+                else -> {
+                    for (i in 0 until time) {
+                        if (user.commandTime >= 1 || user.compareLevel(UserLevel.ADMIN)) {
+                            user.decreaseTime(1)
+                            if (i == 50) {
+                                r6Time = RandomUtil.randomInt(51, time - 1)
+                            }
+
+                            if (r6Time != 0 && i == r6Time) {
+                                result.add(getOperator(6))
+                            } else {
+                                result.add(drawAr())
+                            }
+                        } else {
+                            break
+                        }
+                    }
+                    val r6Char = result.stream().filter { it.rare == 6 }.collect(Collectors.toList())
+                    val r6Text = StringBuilder()
+                    r6Char.forEach { r6Text.append("${it.name} ${getStar(it.rare)} ") }
+
+                    return "抽卡结果:\n" +
+                            "抽卡次数: ${result.size}\n" +
+                            "六星: ${r6Text.toString().trim()}\n" +
+                            "五星个数: ${result.stream().filter { it.rare == 5 }.count()}\n" +
+                            "四星个数: ${result.stream().filter { it.rare == 4 }.count()}\n" +
+                            "三星个数: ${result.stream().filter { it.rare == 3 }.count()}"
+                }
             }
         } else {
-            if (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000) {
-                for (i in 0 until time) {
-                    if (user.commandTime >= 1 || user.compareLevel(UserLevel.ADMIN)) {
-                        user.decreaseTime(1)
-                        if (i == 50) {
-                            r6Time = RandomUtil.randomInt(51, time - 1)
-                        }
-
-                        if (r6Time != 0 && i == r6Time) {
-                            result.add(getOperator(6))
-                        } else {
-                            result.add(drawAr())
-                        }
-                    } else {
-                        break
-                    }
-                }
-                val r6Char = result.stream().filter { it.rare == 6 }.collect(Collectors.toList())
-                val r6Text = StringBuilder()
-                r6Char.forEach { r6Text.append("${it.name} ${getStar(it.rare)} ") }
-
-                return "抽卡结果:\n" +
-                        "抽卡次数: ${result.size}\n" +
-                        "六星: ${r6Text.toString().trim()}\n" +
-                        "五星个数: ${result.stream().filter { it.rare == 5 }.count()}\n" +
-                        "四星个数: ${result.stream().filter { it.rare == 4 }.count()}\n" +
-                        "三星个数: ${result.stream().filter { it.rare == 3 }.count()}"
-            } else {
-                return overTimeMessage
-            }
+            return overTimeMessage
         }
     }
 

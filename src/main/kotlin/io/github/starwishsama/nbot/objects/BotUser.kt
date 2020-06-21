@@ -2,7 +2,7 @@ package io.github.starwishsama.nbot.objects
 
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.enums.UserLevel
-import io.github.starwishsama.nbot.util.BotUtil.getLevel
+import io.github.starwishsama.nbot.utils.BotUtil.getLevel
 import java.time.LocalDateTime
 
 class BotUser(var userQQ: Long) {

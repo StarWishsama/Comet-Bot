@@ -16,9 +16,9 @@ import io.github.starwishsama.nbot.objects.draw.ArkNightOperator
 import io.github.starwishsama.nbot.objects.draw.PCRCharacter
 import io.github.starwishsama.nbot.objects.group.GroupConfig
 import io.github.starwishsama.nbot.objects.group.Shop
-import io.github.starwishsama.nbot.util.getContext
-import io.github.starwishsama.nbot.util.initConfig
-import io.github.starwishsama.nbot.util.writeJson
+import io.github.starwishsama.nbot.utils.getContext
+import io.github.starwishsama.nbot.utils.initConfig
+import io.github.starwishsama.nbot.utils.writeJson
 import java.io.File
 
 object DataSetup {

@@ -5,8 +5,8 @@ import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
-import io.github.starwishsama.nbot.util.BotUtil
-import io.github.starwishsama.nbot.util.toMirai
+import io.github.starwishsama.nbot.utils.BotUtil
+import io.github.starwishsama.nbot.utils.toMirai
 import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.GroupMessageEvent

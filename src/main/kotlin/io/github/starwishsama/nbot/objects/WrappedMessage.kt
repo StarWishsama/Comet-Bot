@@ -1,6 +1,6 @@
 package io.github.starwishsama.nbot.objects
 
-import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.utils.BotUtil
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.uploadAsImage

@@ -5,7 +5,7 @@ import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.api.twitter.TwitterApi
 import io.github.starwishsama.nbot.exceptions.RateLimitException
 import io.github.starwishsama.nbot.objects.pojo.twitter.Tweet
-import io.github.starwishsama.nbot.util.toMirai
+import io.github.starwishsama.nbot.utils.toMirai
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.delay

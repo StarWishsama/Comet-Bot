@@ -1,6 +1,6 @@
 package net.kronos.rkon.core
 
-import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.utils.BotUtil
 import net.kronos.rkon.core.ex.AuthenticationException
 import java.io.IOException
 import java.net.Socket

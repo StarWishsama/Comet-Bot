@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 
 object CheckLiveStatus : Runnable {
     /** 推送过的直播间列表, 避免重复推送 */
-    private val pushedList = mutableListOf<Long>()
+    private val pushedList = mutableSetOf<Long>()
 
     override fun run() {
         if (BotConstants.cfg.subList.isNotEmpty() && BotConstants.cfg.pushGroups.isNotEmpty()) {
@@ -28,15 +28,17 @@ object CheckLiveStatus : Runnable {
                         }
                         1 -> {
                             if (!pushedList.contains(roomId)) {
-                                val msg =
-                                    "单推助手 > \n${BiliBiliApi.getUserNameByMid(data.uid)} 开播了!\n标题: ${data.title}\n开播时间: ${data.liveTime}\n传送门: https://live.bilibili.com/${data.roomId}"
+                                val msg = "单推助手 > \n${BiliBiliApi.getUserNameByMid(data.uid)} 开播了!" +
+                                        "\n标题: ${data.title}" +
+                                        "\n开播时间: ${data.liveTime}" +
+                                        "\n传送门: https://live.bilibili.com/${data.roomId}"
                                 BotMain.bot.groups.forEach { group ->
                                     runBlocking {
                                         if (BotConstants.cfg.pushGroups.contains(group.id)) {
                                             group.sendMessage(msg)
                                         }
                                         /** 防止消息发送失败 */
-                                        delay(1000)
+                                        delay(2_000)
                                     }
                                 }
                             }

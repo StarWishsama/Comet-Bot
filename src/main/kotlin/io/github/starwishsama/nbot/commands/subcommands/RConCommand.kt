@@ -9,10 +9,10 @@ import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.sessions.Session
 import io.github.starwishsama.nbot.sessions.SessionManager
-import io.github.starwishsama.nbot.util.BotUtil
-import io.github.starwishsama.nbot.util.BotUtil.getRestString
-import io.github.starwishsama.nbot.util.isNumeric
-import io.github.starwishsama.nbot.util.toMirai
+import io.github.starwishsama.nbot.utils.BotUtil
+import io.github.starwishsama.nbot.utils.BotUtil.getRestString
+import io.github.starwishsama.nbot.utils.isNumeric
+import io.github.starwishsama.nbot.utils.toMirai
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.message.MessageEvent

@@ -20,11 +20,8 @@ jar {
     }
 }
 
-sourceCompatibility = 11
-targetCompatibility = 11
-
 def gitCommitId = 'git rev-parse --short HEAD'
-def versionCode = "0.3.6-rc2-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
+def versionCode = "0.3.7-DEV-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
 
 group 'io.github.starwishsama.nbot'
 version versionCode
@@ -33,7 +30,6 @@ repositories {
     maven { url 'https://jitpack.io' }
     maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-    maven { url 'https://repo1.maven.org/maven2/' }
     maven { url 'http://deadmandungeons.com/artifactory/public' }
     jcenter()
     mavenCentral()
@@ -64,8 +60,8 @@ static def findOldVersionStr(path) {
 jar.dependsOn updateVersion
 
 dependencies {
-    implementation 'net.mamoe:mirai-core:1.0.2'
-    implementation 'net.mamoe:mirai-core-qqandroid:1.0.2'
+    implementation 'net.mamoe:mirai-core:1.1-EA'
+    implementation 'net.mamoe:mirai-core-qqandroid:1.1-EA'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation 'cn.hutool:hutool-all:4.5.10'
     implementation 'org.apache.commons:commons-lang3:3.8.1'
@@ -83,10 +79,17 @@ dependencies {
     // CUrl
     implementation'com.github.rockswang:java-curl:1.2.2.2'
     // BiliBili
-    compile 'com.hiczp:bilibili-api:0.2.0'
+    implementation 'com.hiczp:bilibili-api:0.2.0'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
 shadowJar {
     zip64 true
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+        freeCompilerArgs = ["-Xjvm-default=enable", "-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses"]
+    }
 }

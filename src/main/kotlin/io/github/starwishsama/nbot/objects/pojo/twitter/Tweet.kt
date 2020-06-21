@@ -7,7 +7,10 @@ import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotConstants.gson
 import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.objects.pojo.twitter.tweetEntity.Media
-import io.github.starwishsama.nbot.util.BotUtil
+import io.github.starwishsama.nbot.utils.BotUtil
+import io.github.starwishsama.nbot.utils.toDayPart
+import io.github.starwishsama.nbot.utils.toMinutePart
+import io.github.starwishsama.nbot.utils.toSecondPart
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.uploadAsImage
@@ -50,7 +53,7 @@ data class Tweet(
 
         val duration =
                 Duration.between(getSentTime(), LocalDateTime.now())
-        result += "\n\n距离发送已过去了 ${duration.toDaysPart()}天${duration.toMinutesPart()}分${duration.toSecondsPart()}秒"
+        result += "\n\n距离发送已过去了 ${duration.toDayPart()}天${duration.toMinutePart()}分${duration.toSecondPart()}秒"
 
         return result
     }
