@@ -22,7 +22,7 @@ import java.time.format.DateTimeParseException
 
 class MuteCommand : UniversalCommand {
     private val patternZH: DateTimeFormatter = DateTimeFormatter.ofPattern("HH时mm分ss秒")
-    private val patternEN: DateTimeFormatter = DateTimeFormatter.ofPattern("HHhmmmsss")
+    private val patternEN: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.userQQ) && event is GroupMessageEvent) {
