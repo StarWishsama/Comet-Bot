@@ -46,7 +46,7 @@ import kotlin.system.exitProcess
 
 object BotMain {
     val filePath: File = File(getPath())
-    const val version = "0.3.7-DEV-6ff8eb8-20200625"
+    const val version = "0.3.7-DEV-b8a0790-20200625"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -227,12 +227,7 @@ suspend fun main() {
         }
 
         val time = Duration.between(startTime, LocalDateTime.now())
-        val startUsedTime =
-            if (time.toMillis() > 1000) {
-                String.format("%.2f", (time.toMillis().toDouble() / 1000)) + "s"
-            } else {
-                "${time.toMillis()}ms"
-            }
+        val startUsedTime = "${time.toSecondsPart()}s${time.toMillisPart()}ms"
 
         BotMain.logger.info("无名 Bot 启动成功, 耗时 $startUsedTime")
 

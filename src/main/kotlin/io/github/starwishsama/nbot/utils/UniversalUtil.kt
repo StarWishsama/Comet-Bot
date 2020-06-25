@@ -3,8 +3,6 @@ package io.github.starwishsama.nbot.utils
 import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
 import cn.hutool.http.HttpRequest
-import com.deadmandungeons.serverstatus.MinecraftServerStatus
-import com.deadmandungeons.serverstatus.ping.PingResponse
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.enums.UserLevel
@@ -18,11 +16,9 @@ import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
 import org.apache.commons.lang3.StringUtils
 import java.io.File
-import java.io.IOException
 import java.io.InputStream
 import java.net.Proxy
 import java.net.Socket
-import java.net.URISyntaxException
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
@@ -90,130 +86,9 @@ fun Long.getLength(): Int {
     return this.toString().length
 }
 
-/**
- * 这些方法本来应该要 Java 9+ 才有的
- * 但是为了把 JVM 版本降到 8
- * 才有了这些方法
- */
-fun Duration.toDayPart(): Int {
-    return (seconds / 60 * 60 * 24).toInt()
-}
-
-fun Duration.toHourPart(): Int {
-    return (toHours() % 24).toInt()
-}
-
-fun Duration.toMinutePart(): Int {
-    return (toMinutes() % 60).toInt()
-}
-
-fun Duration.toSecondPart(): Int {
-    return (seconds % 60).toInt()
-}
-
-fun Duration.toMilliPart(): Int {
-    return (toNanos() / 1000000).toInt()
-}
-
 object BotUtil {
     /** 冷却 */
     private var coolDown: MutableMap<Long, Long> = HashMap()
-
-    /**
-     * 获取 Minecraft 服务器信息 (SRV解析)
-     * @author NamelessSAMA
-     * @param address 服务器地址
-     * @return 服务器状态信息
-     */
-    fun getServerInfo(address: String): String {
-        return try {
-            val response = MinecraftServerStatus.pingServerStatus(address)
-            """
-     在线玩家: ${response.players}
-     延迟:${response.latency}ms
-     MOTD: ${response.description.text.removeColor()}
-     版本: ${response.version}
-     """.trimIndent()
-        } catch (e: IOException) {
-            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
-            "Bot > 无法连接至 $address"
-        } catch (e: URISyntaxException) {
-            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
-            "Bot > 无法连接至 $address"
-        }
-    }
-
-    /**
-     * 获取 Minecraft 服务器信息 (非SRV解析)
-     * @author NamelessSAMA
-     * @param address 服务器地址
-     * @param port 服务器端口
-     * @return 服务器状态信息
-     */
-    fun getServerInfo(address: String, port: Int): String {
-        return try {
-            val response = MinecraftServerStatus.pingServerStatus(address, port)
-            """
-     在线玩家: ${response.players}
-     延迟:${response.latency}ms
-     MOTD: ${response.description.text.removeColor()}
-     版本: ${response.version}
-     """.trimIndent()
-        } catch (e: IOException) {
-            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
-            "Bot > 无法连接至 $address"
-        } catch (e: URISyntaxException) {
-            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
-            "Bot > 无法连接至 $address"
-        }
-    }
-
-    /**
-     * 获取 Minecraft 服务器信息 (非SRV解析 + 自定义消息样式)
-     * @param address 服务器IP
-     * @param port 端口
-     * @param msg 自定义消息
-     * @return 服务器状态信息
-     */
-    fun getCustomServerInfo(address: String, port: Int, msg: String): String {
-        return try {
-            val response = MinecraftServerStatus.pingServerStatus(address, port)
-            replacePlaceHolder(msg, response)
-        } catch (e: IOException) {
-            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
-            "Bot > 无法连接至 $address"
-        } catch (e: URISyntaxException) {
-            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
-            "Bot > 无法连接至 $address"
-        }
-    }
-
-    /**
-     * 获取 Minecraft 服务器信息 (SRV解析 + 自定义消息样式)
-     * @param address 服务器IP
-     * @param msg 自定义消息
-     * @return 服务器状态信息
-     */
-    fun getCustomServerInfo(address: String, msg: String): String {
-        return try {
-            val response = MinecraftServerStatus.pingServerStatus(address)
-            replacePlaceHolder(msg, response)
-        } catch (e: IOException) {
-            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
-            "Bot > 无法连接至 $address"
-        } catch (e: URISyntaxException) {
-            BotMain.logger.warning("在获取服务器信息时出现了问题, $e")
-            "Bot > 无法连接至 $address"
-        }
-    }
-
-    private fun replacePlaceHolder(msg: String, response: PingResponse) : String {
-        return msg.replace("%延迟%".toRegex(), response.latency.toString() + "ms")
-                .replace("%在线玩家%".toRegex(), response.players.toString())
-                .replace("%换行%".toRegex(), "\n")
-                .replace("%MOTD%".toRegex(), response.description.text.removeColor())
-                .replace("%版本%".toRegex(), response.version.toString())
-    }
 
     /**
      * 判断是否签到过了
@@ -393,7 +268,7 @@ object BotUtil {
 
     fun getRunningTime(): String {
         val remain = Duration.between(BotMain.startTime, LocalDateTime.now())
-        return "${remain.toDayPart()}天${remain.toHourPart()}时${remain.toMinutePart()}分${remain.toSecondPart()}秒${remain.toMilliPart()}毫秒"
+        return "${remain.toDaysPart()}天${remain.toHoursPart()}时${remain.toMinutesPart()}分${remain.toSecondsPart()}秒${remain.toMillisPart()}毫秒"
     }
 
     fun getImageStream(url: String): InputStream {

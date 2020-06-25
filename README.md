@@ -37,7 +37,7 @@ English Version: [README](https://github.com/StarWishsama/Nameless-Bot/blob/mira
 
 ### 自编译
 
-- 注意: 请使用 JDK 8 或更高版本打包
+- 注意: 请使用 JDK 11 或更高版本打包
 
 1.1. Clone 或者下载这个项目.
 

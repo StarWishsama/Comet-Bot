@@ -16,9 +16,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.isContentNotEmpty
 import org.apache.commons.lang3.StringUtils
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 
 class MuteCommand : UniversalCommand {
     private val patternZH: DateTimeFormatter = DateTimeFormatter.ofPattern("HH时mm分ss秒")
@@ -35,7 +33,6 @@ class MuteCommand : UniversalCommand {
                                 doMute(event.group, at.target, getMuteTime(args[1]), false)
                             }
                         } else {
-
                             if (args[0].isNumeric()) {
                                 doMute(event.group, args[0].toLong(), getMuteTime(args[1]), false)
                             } else {
@@ -124,22 +121,42 @@ class MuteCommand : UniversalCommand {
             }
 
             return BotUtil.sendMsgPrefix("找不到此用户").toMirai()
-        } catch (e: PermissionDeniedException){
+        } catch (e: PermissionDeniedException) {
             return BotUtil.sendMsgPrefix("我不是绿帽 我爬 我爬").toMirai()
         }
     }
 
-    private fun getMuteTime(message: String) : Long {
-        return try {
-            val time = LocalTime.parse(message, patternZH)
-            (time.toSecondOfDay() / 60).toLong()
-        } catch (x: DateTimeParseException) {
-            try {
-                val time = LocalTime.parse(message, patternEN)
-                (time.toSecondOfDay() / 60).toLong()
-            } catch (x: DateTimeParseException) {
-                -1
-            }
+    /**
+     * 这段代码看起来很神必
+     * 但是 It just works.
+     */
+    private fun getMuteTime(message: String): Long {
+        var banTime = 0L
+        var tempTime: String = message
+        if (tempTime.indexOf('d') != -1) {
+            banTime += (tempTime.substring(0, tempTime.indexOf('d')).toInt() * 24
+                    * 60 * 60)
+            tempTime = tempTime.substring(tempTime.indexOf('d') + 1)
+        } else if (tempTime.contains("天")) {
+            banTime += (tempTime.substring(0, tempTime.indexOf('天')).toInt() * 24
+                    * 60 * 60)
+            tempTime = tempTime.substring(tempTime.indexOf('天') + 1)
         }
+        if (tempTime.indexOf('h') != -1) {
+            banTime += (tempTime.substring(0, tempTime.indexOf('h')).toInt() * 60
+                    * 60)
+            tempTime = tempTime.substring(tempTime.indexOf('h') + 1)
+        } else if (tempTime.contains("小时")) {
+            banTime += (tempTime.substring(0, tempTime.indexOf("时")).toInt() * 60
+                    * 60)
+            tempTime = tempTime.substring(tempTime.indexOf("时") + 1)
+        }
+        if (tempTime.indexOf('m') != -1) {
+            banTime += tempTime.substring(0, tempTime.indexOf('m')).toInt() * 60
+        } else if (tempTime.contains("钟")) {
+            banTime += tempTime.substring(0, tempTime.indexOf("钟")).toInt() * 60
+        }
+        return banTime
     }
+
 }
