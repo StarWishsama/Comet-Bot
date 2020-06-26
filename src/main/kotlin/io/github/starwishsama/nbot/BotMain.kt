@@ -46,7 +46,7 @@ import kotlin.system.exitProcess
 
 object BotMain {
     val filePath: File = File(getPath())
-    const val version = "0.3.7-DEV-b8a0790-20200625"
+    const val version = "0.3.7-DEV-2b21272-20200626"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -209,7 +209,6 @@ suspend fun main() {
                     }
                 }
             }
-
         }, 5)
         TaskManager.runScheduleTaskAsync({ apis.forEach { it.resetTime() } }, 25, 25, TimeUnit.MINUTES)
         TaskManager.runScheduleTaskAsyncIf(

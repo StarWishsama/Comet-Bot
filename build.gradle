@@ -54,6 +54,7 @@ static def findOldVersionStr(path) {
                 readerString <<= it
                 return readerString
             }
+            return void
         }
         return readerString
     }
