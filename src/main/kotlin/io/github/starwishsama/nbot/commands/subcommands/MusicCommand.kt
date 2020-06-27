@@ -22,25 +22,14 @@ class MusicCommand : UniversalCommand {
                 if (args[0].contentEquals("api")) {
                     if (args.size > 1) {
                         when (args[1].toUpperCase()) {
-                            "QQ" -> {
-                                BotConstants.cfg.musicApi = MusicApi.QQ
-                                return BotUtil.sendMsgPrefix("音乐API已修改为QQ").toMirai()
-                            }
-                            "NETEASE", "网易" -> {
-                                BotConstants.cfg.musicApi = MusicApi.NETEASE
-                                return BotUtil.sendMsgPrefix("音乐API已修改为网易").toMirai()
-                            }
+                            "QQ" -> BotConstants.cfg.musicApi = MusicApi.QQ
+                            "NETEASE", "网易" -> BotConstants.cfg.musicApi = MusicApi.NETEASE
                         }
+                        return BotUtil.sendMsgPrefix("音乐API已修改为 ${BotConstants.cfg.musicApi}").toMirai()
                     }
                 } else {
                     return when (api) {
-                        MusicApi.QQ -> {
-                            if (BotUtil.isNoCoolDown(event.sender.id, 30)) {
-                                MusicUtil.searchQQMusic(args.getRestString(0))
-                            } else {
-                                EmptyMessageChain
-                            }
-                        }
+                        MusicApi.QQ -> MusicUtil.searchQQMusic(args.getRestString(0))
                         MusicApi.NETEASE -> MusicUtil.searchNetEaseMusic(args.getRestString(0))
                     }
                 }

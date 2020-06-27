@@ -20,9 +20,6 @@ jar {
     }
 }
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
-
 def gitCommitId = 'git rev-parse --short HEAD'
 def versionCode = "0.3.7-DEV-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
 
@@ -81,9 +78,7 @@ shadowJar {
     zip64 true
 }
 
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11
-        freeCompilerArgs = ["-Xjvm-default=enable", "-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses"]
-    }
+compileKotlin.kotlinOptions {
+    jvmTarget = JavaVersion.VERSION_11
+    freeCompilerArgs = ["-Xjvm-default=enable", "-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses"]
 }
