@@ -80,6 +80,7 @@ object CommandExecutor {
             }
         } catch (t: Throwable) {
             BotMain.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId", t)
+            return MessageHolder("", "Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMirai())
         }
         return MessageHolder("", EmptyMessageChain)
     }

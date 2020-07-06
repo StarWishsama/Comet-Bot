@@ -16,12 +16,8 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.isContentNotEmpty
 import org.apache.commons.lang3.StringUtils
-import java.time.format.DateTimeFormatter
 
 class MuteCommand : UniversalCommand {
-    private val patternZH: DateTimeFormatter = DateTimeFormatter.ofPattern("HH时mm分ss秒")
-    private val patternEN: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
-
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.userQQ) && event is GroupMessageEvent) {
             if (event.group.botPermission.isOperator()) {
@@ -99,21 +95,19 @@ class MuteCommand : UniversalCommand {
                     BotUtil.sendMsgPrefix("然后时间开始流动").toMirai()
                 }
             } else {
-                group.members.forEach { member ->
-                    run {
-                        if (member.id == id) {
-                            return when (muteTime) {
-                                in 1..2592000 -> {
-                                    member.mute(muteTime)
-                                    BotUtil.sendMsgPrefix("禁言成功").toMirai()
-                                }
-                                0L -> {
-                                    member.unmute()
-                                    BotUtil.sendMsgPrefix("解禁成功").toMirai()
-                                }
-                                else -> {
-                                    BotUtil.sendMsgPrefix("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]").toMirai()
-                                }
+                for (member in group.members) {
+                    if (member.id == id) {
+                        return when (muteTime) {
+                            in 1..2592000 -> {
+                                member.mute(muteTime)
+                                BotUtil.sendMsgPrefix("禁言成功").toMirai()
+                            }
+                            0L -> {
+                                member.unmute()
+                                BotUtil.sendMsgPrefix("解禁成功").toMirai()
+                            }
+                            else -> {
+                                BotUtil.sendMsgPrefix("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]").toMirai()
                             }
                         }
                     }
@@ -153,8 +147,8 @@ class MuteCommand : UniversalCommand {
         }
         if (tempTime.indexOf('m') != -1) {
             banTime += tempTime.substring(0, tempTime.indexOf('m')).toInt() * 60
-        } else if (tempTime.contains("钟")) {
-            banTime += tempTime.substring(0, tempTime.indexOf("钟")).toInt() * 60
+        } else if (tempTime.contains("分钟")) {
+            banTime += tempTime.substring(0, tempTime.indexOf("分钟")).toInt() * 60
         }
         return banTime
     }

@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.objects.pojo.twitter.tweetEntity.Media
-import io.github.starwishsama.nbot.utils.BotUtil
+import io.github.starwishsama.nbot.utils.NetUtil
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.uploadAsImage
@@ -45,7 +45,7 @@ data class ReTweet (
                 try {
                     val image = BotConstants.gson.fromJson(objects["media"].asJsonArray[0].asJsonObject.toString(), Media::class.java)
                     if (image.isSendableMedia()) {
-                        picture = BotUtil.getImageStream(image.mediaUrlHttps).uploadAsImage(contact)
+                        picture = NetUtil.getUrlInputStream(image.mediaUrlHttps).uploadAsImage(contact)
                     }
                 } catch (e: JsonSyntaxException) {
                     BotMain.logger.error("在获取推文下的图片时发生了问题", e)

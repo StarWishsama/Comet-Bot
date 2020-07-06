@@ -16,6 +16,7 @@ import io.github.starwishsama.nbot.listeners.SessionListener
 import io.github.starwishsama.nbot.managers.TaskManager
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.tasks.CheckLiveStatus
+import io.github.starwishsama.nbot.tasks.Hitokoto
 import io.github.starwishsama.nbot.tasks.LatestTweetChecker
 import io.github.starwishsama.nbot.utils.getContext
 import io.github.starwishsama.nbot.utils.writeString
@@ -45,7 +46,7 @@ import kotlin.system.exitProcess
 
 object BotMain {
     val filePath: File = File(getPath())
-    const val version = "0.3.7-DEV-533efce-20200706"
+    const val version = "0.3.8-DEV-bc47aea-20200706"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -211,12 +212,13 @@ suspend fun main() {
         }, 5)
         TaskManager.runScheduleTaskAsync({ apis.forEach { it.resetTime() } }, 25, 25, TimeUnit.MINUTES)
         TaskManager.runScheduleTaskAsyncIf(
-            LatestTweetChecker::run,
-            1,
-            8,
-            TimeUnit.MINUTES,
-            (BotConstants.cfg.twitterSubs.isNotEmpty() && BotConstants.cfg.tweetPushGroups.isNotEmpty())
+                LatestTweetChecker::run,
+                1,
+                8,
+                TimeUnit.MINUTES,
+                (BotConstants.cfg.twitterSubs.isNotEmpty() && BotConstants.cfg.tweetPushGroups.isNotEmpty())
         )
+        TaskManager.runAsync(Hitokoto::run, 5)
 
         /** 监听器 */
         listeners.forEach {

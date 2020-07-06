@@ -17,7 +17,6 @@ import io.github.starwishsama.nbot.objects.draw.PCRCharacter
 import io.github.starwishsama.nbot.objects.group.GroupConfig
 import io.github.starwishsama.nbot.objects.group.Shop
 import io.github.starwishsama.nbot.utils.getContext
-import io.github.starwishsama.nbot.utils.initConfig
 import io.github.starwishsama.nbot.utils.writeJson
 import java.io.File
 
@@ -38,10 +37,10 @@ object DataSetup {
 
         if (!userCfg.exists() || !cfgFile.exists()) {
             try {
-                cfgFile.initConfig(BotConstants.cfg)
-                userCfg.initConfig(BotConstants.users)
-                shopItemCfg.initConfig(BotConstants.shop)
-                groupCfg.initConfig(GroupConfigManager.configs)
+                cfgFile.writeJson(BotConstants.cfg)
+                userCfg.writeJson(BotConstants.users)
+                shopItemCfg.writeJson(BotConstants.shop)
+                groupCfg.writeJson(GroupConfigManager.configs)
                 println("[配置] 已自动生成新的配置文件.")
             } catch (e: Exception) {
                 System.err.println("[配置] 在生成配置文件时发生了错误, 错误信息: " + e.message)

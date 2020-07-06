@@ -2,7 +2,6 @@ package io.github.starwishsama.nbot.utils
 
 import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
-import cn.hutool.http.HttpRequest
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.enums.UserLevel
@@ -16,18 +15,10 @@ import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
 import org.apache.commons.lang3.StringUtils
 import java.io.File
-import java.io.InputStream
-import java.net.Proxy
-import java.net.Socket
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
 
-/**
- * 用于辅助机器人运行中的各种工具方法
- *
- * @author Nameless
- */
 /**
  * @return 去除彩色符号的字符串
  */
@@ -44,10 +35,6 @@ fun String.toMirai(): MessageChain {
 
 fun String.isOutRange(range: Int) : Boolean {
     return length > range
-}
-
-fun File.initConfig(context: Any) {
-    FileWriter.create(this).write(BotConstants.gson.toJson(context))
 }
 
 fun File.writeJson(context: Any) {
@@ -79,12 +66,18 @@ fun String.isNumeric(): Boolean {
 }
 
 fun String.limitStringSize(size: Int): String {
-    return if (length <= size) this else substring(0, size - 3) + "..."
+    return if (length <= size) this else substring(0, size) + "..."
 }
 
 fun Long.getLength(): Int {
     return this.toString().length
 }
+
+/**
+ * 用于辅助机器人运行中的各种工具方法
+ *
+ * @author Nameless
+ */
 
 object BotUtil {
     /** 冷却 */
@@ -240,6 +233,26 @@ object BotUtil {
     }
 
     /**
+     * 发送带前缀的消息, 兼容空的字符串
+     *
+     * @author NamelessSAMA
+     * @param otherText 需要添加的文本
+     * @return 本地化文本
+     */
+    fun sendMsgPrefixOrEmpty(otherText: String?): String {
+        return if (!otherText.isNullOrEmpty()) {
+            val sb = StringBuilder()
+            sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
+            otherText.forEach {
+                sb.append(it).append("\n")
+            }
+            sb.toString().trim { it <= ' ' }
+        } else {
+            ""
+        }
+    }
+
+    /**
      * 获取用户的权限组等级
      *
      * @author NamelessSAMA
@@ -269,26 +282,6 @@ object BotUtil {
     fun getRunningTime(): String {
         val remain = Duration.between(BotMain.startTime, LocalDateTime.now())
         return "${remain.toDaysPart()}天${remain.toHoursPart()}时${remain.toMinutesPart()}分${remain.toSecondsPart()}秒${remain.toMillisPart()}毫秒"
-    }
-
-    fun getImageStream(url: String): InputStream {
-        val request = HttpRequest.get(url)
-                .setFollowRedirects(true)
-                .timeout(8000)
-                .header(
-                    "user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36"
-                )
-
-        if (BotConstants.cfg.proxyUrl != null && BotConstants.cfg.proxyPort != -1) {
-            request.setProxy(
-                Proxy(
-                    Proxy.Type.HTTP,
-                    Socket(BotConstants.cfg.proxyUrl, BotConstants.cfg.proxyPort).remoteSocketAddress
-                )
-            )
-        }
-
-        return request.execute().bodyStream()
     }
 
     fun getAt(event: MessageEvent, id: String) : BotUser? {

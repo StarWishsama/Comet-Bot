@@ -48,50 +48,10 @@ class BiliBiliCommand : UniversalCommand {
                             }
                         }
                     }
-                    "unsub", "取消订阅" -> {
-                        if (args.size > 1) {
-                            var roomId = 0L
-                            if (args[1].isNumeric()) {
-                                roomId = args[1].toLong()
-                            } else {
-                                val item = FakeClientApi.getUser(args[1])
-                                if (item != null) {
-                                    roomId = item.roomid
-                                }
-                            }
-
-                            return if (!BotConstants.cfg.subList.contains(roomId)) {
-                                BotUtil.sendMsgPrefix("你还没订阅直播间 ${args[1]}").toMirai()
-                            } else {
-                                BotConstants.cfg.subList.remove(args[1].toLong())
-                                BotUtil.sendMsgPrefix("取消订阅直播间 ${args[1]} 成功").toMirai()
-                            }
-                        } else {
-                            getHelp().toMirai()
-                        }
-                    }
+                    "unsub", "取消订阅" -> return unsubscribe(args)
                     "list" -> {
-                        event.reply("请稍等..")
-
-                        val subs = StringBuilder("监控室列表:\n")
-                        val info = ArrayList<com.hiczp.bilibili.api.live.model.RoomInfo>()
-                        BotConstants.cfg.subList.forEach {
-                            val room = FakeClientApi.getLiveRoom(it)
-                            if (room != null) {
-                                info.add(room)
-                            }
-                        }
-
-                        info.sortByDescending { it.data.liveStatus == 1 }
-
-                        info.forEach {
-                            subs.append(
-                                "${BiliBiliApi.getUserNameByMid(it.data.uid)} " +
-                                        "${if (it.data.liveStatus == 1) "✔" else "✘"}\n"
-                            )
-                        }
-
-                        return subs.toString().trim().toMirai()
+                        event.reply("请稍等...")
+                        return getLiveStatus()
                     }
                     "info", "查询", "cx" -> {
                         return if (args.size > 1) {
@@ -123,6 +83,52 @@ class BiliBiliCommand : UniversalCommand {
         /bili unsub [用户名] 取消订阅用户相关信息
         /bili info [用户名] 查看用户的动态
     """.trimIndent()
+
+    private suspend fun unsubscribe(args: List<String>): MessageChain {
+        if (args.size > 1) {
+            var roomId = 0L
+            if (args[1].isNumeric()) {
+                roomId = args[1].toLong()
+            } else {
+                val item = FakeClientApi.getUser(args[1])
+                if (item != null) {
+                    roomId = item.roomid
+                }
+            }
+
+            return if (!BotConstants.cfg.subList.contains(roomId)) {
+                BotUtil.sendMsgPrefix("你还没订阅直播间 ${args[1]}").toMirai()
+            } else {
+                BotConstants.cfg.subList.remove(args[1].toLong())
+                BotUtil.sendMsgPrefix("取消订阅直播间 ${args[1]} 成功").toMirai()
+            }
+        } else {
+            return getHelp().toMirai()
+        }
+    }
+
+    private suspend fun getLiveStatus(): MessageChain {
+        val subs = StringBuilder("监控室列表:\n")
+        val info = ArrayList<com.hiczp.bilibili.api.live.model.RoomInfo>()
+
+        for (l in BotConstants.cfg.subList) {
+            val room = FakeClientApi.getLiveRoom(l)
+            if (room != null) {
+                info.add(room)
+            }
+        }
+
+        info.sortByDescending { it.data.liveStatus == 1 }
+
+        for (roomInfo in info) {
+            subs.append(
+                    "${BiliBiliApi.getUserNameByMid(roomInfo.data.uid)} " +
+                            "${if (roomInfo.data.liveStatus == 1) "✔" else "✘"}\n"
+            )
+        }
+
+        return subs.toString().trim().toMirai()
+    }
 
     private suspend fun getDynamicText(dynamic: WrappedMessage?, event: MessageEvent): MessageChain {
         return if (dynamic == null) {
