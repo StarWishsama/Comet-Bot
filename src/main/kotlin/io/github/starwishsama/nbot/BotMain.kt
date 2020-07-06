@@ -46,7 +46,7 @@ import kotlin.system.exitProcess
 
 object BotMain {
     val filePath: File = File(getPath())
-    const val version = "0.3.8-DEV-bc47aea-20200706"
+    const val version = "0.3.8-DEV-e7c581c-20200706"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot

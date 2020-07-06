@@ -1,5 +1,7 @@
 package io.github.starwishsama.nbot.tasks
 
+import com.github.salomonbrys.kotson.contains
+import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonParser
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotMain
@@ -12,13 +14,18 @@ object Hitokoto : Runnable {
             val jsonObject = JsonParser.parseString(hitokotoJson)
             if (jsonObject.isJsonObject) {
                 val cacheObject = BotConstants.cache
-                val hitokoto = cacheObject.asJsonObject["hitokoto"].asString
-                if (cacheObject["hitokoto"] != null && cacheObject["hitokoto"].asJsonObject["hitokoto"].asString != hitokoto) {
-                    cacheObject.add("hitokoto", jsonObject)
+                if (cacheObject.contains("hitokoto")) {
+                    val hitokotoCache = cacheObject.asJsonObject["hitokoto"].asString
+                    if (jsonObject.asJsonObject["hitokoto"].asString != hitokotoCache) {
+                        cacheObject["hitokoto"] = jsonObject
+                    }
+                } else {
+                    cacheObject["hitokoto"] = jsonObject
                 }
+                BotMain.logger.warning("已获取到今日一言")
             }
         } catch (e: Throwable) {
-            BotMain.logger.warning("无法连接至一言 API 服务器", e)
+            BotMain.logger.warning("在获取一言时发生了问题", e)
         }
     }
 }
