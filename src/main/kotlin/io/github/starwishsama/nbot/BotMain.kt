@@ -27,7 +27,6 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.join
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.PlatformLogger
@@ -46,7 +45,7 @@ import kotlin.system.exitProcess
 
 object BotMain {
     val filePath: File = File(getPath())
-    const val version = "0.3.7-DEV-6e694e8-20200627"
+    const val version = "0.3.7-DEV-533efce-20200706"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -240,9 +239,9 @@ suspend fun main() {
         bot.subscribeMessages {
             always {
                 if (sender.id != 80000000L) {
-                    val result = CommandExecutor.execute(this)
-                    if (result !is EmptyMessageChain) {
-                        reply(result)
+                    val result = CommandExecutor.execute("", this)
+                    if (!result.isEmpty() && result.messageChain != null) {
+                        reply(result.messageChain)
                     }
                 }
             }

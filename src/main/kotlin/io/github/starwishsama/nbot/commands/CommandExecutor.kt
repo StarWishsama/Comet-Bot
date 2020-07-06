@@ -2,8 +2,10 @@ package io.github.starwishsama.nbot.commands
 
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotMain
+import io.github.starwishsama.nbot.commands.interfaces.ConsoleCommand
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.objects.BotUser
+import io.github.starwishsama.nbot.objects.MessageHolder
 import io.github.starwishsama.nbot.sessions.SessionManager
 import io.github.starwishsama.nbot.utils.BotUtil
 import io.github.starwishsama.nbot.utils.toMirai
@@ -46,27 +48,40 @@ object CommandExecutor {
     /**
      * 执行消息中的命令
      *
-     * @param event 消息
+     * @param command 纯文本命令 (后台)
+     * @param event Mirai 消息命令 (聊天)
      */
-    suspend fun execute(event: MessageEvent): MessageChain {
-        if (isCommandPrefix(event.message.content) && !SessionManager.isValidSession(event.sender.id)) {
-            val cmd = getCommand(getCommandName(event.message.contentToString()))
-            if (cmd != null) {
-                BotMain.logger.debug("[命令] " + event.sender.id + " 执行了命令: " + cmd.getProps().name)
-                var user = BotUser.getUser(event.sender.id)
-                if (user == null) {
-                    user = BotUser.quickRegister(event.sender.id)
-                }
+    suspend fun execute(command: String, event: MessageEvent?): MessageHolder {
+        val senderId = event?.sender?.id ?: -1
+        val message = event?.message?.contentToString() ?: command
+        try {
+            if (isCommandPrefix(message) && !SessionManager.isValidSessionById(senderId)) {
+                val cmd = getCommand(getCommandName(message))
+                if (cmd != null) {
+                    val splitMessage = message.split(" ")
+                    val splitCommand = splitMessage.subList(1, splitMessage.size)
+                    if (cmd is ConsoleCommand) {
+                        val result = cmd.execute(splitCommand)
+                        return MessageHolder(result, null)
+                    } else if (event != null) {
+                        BotMain.logger.debug("[命令] " + senderId + " 执行了命令: " + cmd.getProps().name)
+                        var user = BotUser.getUser(senderId)
+                        if (user == null) {
+                            user = BotUser.quickRegister(senderId)
+                        }
 
-                return if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
-                    val splitMessage = event.message.contentToString().split(" ")
-                    doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size), user))
-                } else {
-                    BotUtil.sendMsgPrefix("你没有权限!").toMirai()
+                        return if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
+                            MessageHolder("", doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)))
+                        } else {
+                            MessageHolder("", BotUtil.sendMsgPrefix("你没有权限!").toMirai())
+                        }
+                    }
                 }
             }
+        } catch (t: Throwable) {
+            BotMain.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId", t)
         }
-        return EmptyMessageChain
+        return MessageHolder("", EmptyMessageChain)
     }
 
     private fun getCommand(cmdPrefix: String): UniversalCommand? {

@@ -21,7 +21,7 @@ class PictureSearch : UniversalCommand, WaitableCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(event.sender.id, 90)) {
             return if (BotConstants.cfg.saucenaoApiKey != null) {
-                if (!SessionManager.isValidSession(event.sender.id)) {
+                if (!SessionManager.isValidSessionById(event.sender.id)) {
                     SessionManager.addSession(Session(this, user.userQQ))
                 }
                 BotUtil.sendMsgPrefix("请发送需要搜索的图片").toMirai()

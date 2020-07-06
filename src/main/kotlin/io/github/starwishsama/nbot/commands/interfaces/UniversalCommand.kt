@@ -7,7 +7,7 @@ import net.mamoe.mirai.message.data.MessageChain
 
 /**
  * 通用命令接口
- * 支持任意环境下处理命令
+ * 支持QQ聊天任意环境下处理命令
  *
  * @author StarWishsama
  */

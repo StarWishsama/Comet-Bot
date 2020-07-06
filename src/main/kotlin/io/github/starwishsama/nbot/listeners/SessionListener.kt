@@ -12,7 +12,7 @@ object SessionListener : NListener {
     override fun register(bot: Bot) {
         bot.subscribeMessages {
             always {
-                if (!isPrefix(message.contentToString()) && SessionManager.isValidSession(sender.id)) {
+                if (!isPrefix(message.contentToString()) && SessionManager.isValidSessionById(sender.id)) {
                     val session: Session? = SessionManager.getSessionByEvent(this)
 
                     if (session != null) {

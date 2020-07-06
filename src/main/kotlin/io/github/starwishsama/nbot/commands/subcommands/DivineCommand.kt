@@ -1,7 +1,6 @@
 package io.github.starwishsama.nbot.commands.subcommands
 
 import cn.hutool.core.util.RandomUtil
-import cn.hutool.extra.emoji.EmojiUtil
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
@@ -24,10 +23,7 @@ class DivineCommand : UniversalCommand {
                 if (underCover == null) {
                     if (user.commandTime > 0 || user.level != UserLevel.USER) {
                         val randomEventName = args.getRestString(0)
-                        if (randomEventName.isNotBlank() && randomEventName.length < 30 && EmojiUtil.extractEmojis(
-                                randomEventName
-                            ).isEmpty()
-                        ) {
+                        if (randomEventName.isNotBlank() && randomEventName.length < 30) {
                             val result = RandomResult(-1000, RandomUtil.randomDouble(0.0, 1.0), randomEventName)
                             user.decreaseTime()
                             RandomResult.getChance(result).toMirai()

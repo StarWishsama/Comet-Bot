@@ -25,22 +25,22 @@ object SessionManager {
     }
 
     fun expireSession(id: Long): Boolean {
-        if (isValidSession(id)) {
+        if (isValidSessionById(id)) {
             sessions.remove(getSession(id))
             return true
         }
         return false
     }
 
-    fun isValidSession(id: Long): Boolean {
+    fun isValidSessionById(id: Long): Boolean {
         return getSession(id) != null
     }
 
-    fun isValidSessionByGroup(groupId: Long): Boolean {
+    private fun isValidSessionByGroup(groupId: Long): Boolean {
         return getSessionByGroup(groupId) != null
     }
 
-    fun getSession(id: Long): Session? {
+    private fun getSession(id: Long): Session? {
         if (sessions.isNotEmpty()) {
             for (session in sessions) {
                 if (session.getUserById(id) != null) {
