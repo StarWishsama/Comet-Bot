@@ -8,6 +8,7 @@ import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.file.DataSetup
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.sessions.SessionManager
+import io.github.starwishsama.nbot.tasks.HitokotoUpdater
 import io.github.starwishsama.nbot.utils.BotUtil
 import io.github.starwishsama.nbot.utils.toMirai
 import net.mamoe.mirai.message.MessageEvent
@@ -50,6 +51,7 @@ class DebugCommand : UniversalCommand {
                     return ("无名Bot ${BotMain.version}\n" +
                             "已注册的命令个数: ${CommandExecutor.commands.size}\n" +
                             BotUtil.getMemoryUsage()).toMirai()
+                "hitokoto" -> return HitokotoUpdater.getHitokoto().toMirai()
                 else -> return "Bot > 命令不存在\n${getHelp()}".toMirai()
             }
         }

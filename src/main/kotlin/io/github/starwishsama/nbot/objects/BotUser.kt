@@ -6,8 +6,8 @@ import io.github.starwishsama.nbot.utils.BotUtil.getLevel
 import java.time.LocalDateTime
 
 class BotUser(var userQQ: Long) {
-    var lastCheckInTime : LocalDateTime = LocalDateTime.now()
-    var checkInPoint : Double = 0.0
+    var lastCheckInTime: LocalDateTime = LocalDateTime.now().minusDays(1)
+    var checkInPoint: Double = 0.0
     var checkInTime : Int = 0
     var bindServerAccount: String? = null
     var msgVL : Int = 0

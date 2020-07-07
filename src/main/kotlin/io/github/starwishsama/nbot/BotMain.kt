@@ -16,7 +16,7 @@ import io.github.starwishsama.nbot.listeners.SessionListener
 import io.github.starwishsama.nbot.managers.TaskManager
 import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.tasks.CheckLiveStatus
-import io.github.starwishsama.nbot.tasks.Hitokoto
+import io.github.starwishsama.nbot.tasks.HitokotoUpdater
 import io.github.starwishsama.nbot.tasks.LatestTweetChecker
 import io.github.starwishsama.nbot.utils.getContext
 import io.github.starwishsama.nbot.utils.writeString
@@ -46,7 +46,7 @@ import kotlin.system.exitProcess
 
 object BotMain {
     val filePath: File = File(getPath())
-    const val version = "0.3.8-DEV-e7c581c-20200706"
+    const val version = "0.3.8-DEV-ee98456-20200707"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -218,7 +218,7 @@ suspend fun main() {
                 TimeUnit.MINUTES,
                 (BotConstants.cfg.twitterSubs.isNotEmpty() && BotConstants.cfg.tweetPushGroups.isNotEmpty())
         )
-        TaskManager.runAsync(Hitokoto::run, 5)
+        TaskManager.runAsync(HitokotoUpdater::run, 5)
 
         /** 监听器 */
         listeners.forEach {
@@ -242,7 +242,7 @@ suspend fun main() {
             always {
                 if (sender.id != 80000000L) {
                     val result = CommandExecutor.execute("", this)
-                    if (!result.isEmpty() && result.messageChain != null) {
+                    if (!result.isEmpty() && result.messageChain != null && result.messageChain.contentToString().isNotEmpty()) {
                         reply(result.messageChain)
                     }
                 }

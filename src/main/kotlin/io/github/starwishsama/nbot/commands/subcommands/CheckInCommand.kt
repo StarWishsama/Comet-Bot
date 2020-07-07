@@ -1,11 +1,11 @@
 package io.github.starwishsama.nbot.commands.subcommands
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
+import io.github.starwishsama.nbot.tasks.HitokotoUpdater
 import io.github.starwishsama.nbot.utils.BotUtil
 import io.github.starwishsama.nbot.utils.toMirai
 import net.mamoe.mirai.contact.User
@@ -56,7 +56,7 @@ class CheckInCommand : UniversalCommand {
                 "获得了 ${point[0]} 点积分$extra\n目前积分数: ${String.format("%.1f", user.checkInPoint)}."
             }
 
-            text + getHitokoto()
+            text + HitokotoUpdater.getHitokoto()
         }
     }
 
@@ -84,17 +84,6 @@ class CheckInCommand : UniversalCommand {
         }).toDouble()
         user.addPoint(basePoint + awardPoint)
         return doubleArrayOf(basePoint, awardPoint)
-    }
-
-    private fun getHitokoto(): String {
-        val cache = BotConstants.cache["hitokoto"]
-        if (cache.isJsonObject) {
-            val hitokoto = cache.asJsonObject["hitokoto"].asString
-            val from = cache.asJsonObject["from"].asString
-            val fromWho = cache.asJsonObject["from_who"].asString
-            return "\n今日一言:\n$hitokoto ——$fromWho($from)"
-        }
-        return ""
     }
 
 }
