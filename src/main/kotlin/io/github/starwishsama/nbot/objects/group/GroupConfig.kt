@@ -10,10 +10,4 @@ class GroupConfig(@SerializedName("group_id") val groupId: Long) {
 
     val admins: List<Long> = LinkedList()
 
-    @SerializedName("mc_server_info")
-    val mcServerInfo = false
-
-    @SerializedName("mc_server_address")
-    val mcServerAddress: String? = null
-
 }

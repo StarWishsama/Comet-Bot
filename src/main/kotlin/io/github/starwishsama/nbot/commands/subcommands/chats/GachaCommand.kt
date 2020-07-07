@@ -1,4 +1,4 @@
-package io.github.starwishsama.nbot.commands.subcommands
+package io.github.starwishsama.nbot.commands.subcommands.chats
 
 import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand

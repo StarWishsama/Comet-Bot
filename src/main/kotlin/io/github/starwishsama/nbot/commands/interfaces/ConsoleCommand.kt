@@ -8,13 +8,10 @@ import io.github.starwishsama.nbot.commands.CommandProps
  *
  * @author StarWishsama
  */
-interface ConsoleCommand : UniversalCommand {
+interface ConsoleCommand {
     /** 执行命令后的逻辑 */
     suspend fun execute(args: List<String>): String
 
     /** 命令属性 */
-    override fun getProps(): CommandProps
-
-    /** 命令帮助文本 必写 不敢自己都看不懂哦 */
-    override fun getHelp(): String
+    fun getProps(): CommandProps
 }

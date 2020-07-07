@@ -10,7 +10,6 @@ class BotUser(var userQQ: Long) {
     var checkInPoint: Double = 0.0
     var checkInTime : Int = 0
     var bindServerAccount: String? = null
-    var msgVL : Int = 0
     var r6sAccount: String? = null
     var level: UserLevel = UserLevel.USER
     var commandTime : Int = 100

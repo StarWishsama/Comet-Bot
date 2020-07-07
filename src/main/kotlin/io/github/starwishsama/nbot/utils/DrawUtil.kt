@@ -12,7 +12,7 @@ import java.util.stream.Collectors
 
 object DrawUtil {
     private fun tenTimeDrawAr(): List<ArkNightOperator> {
-        val ops: MutableList<ArkNightOperator> = ArrayList<ArkNightOperator>()
+        val ops: MutableList<ArkNightOperator> = ArrayList()
         for (i in 0..9) {
             ops.add(drawAr())
         }
@@ -20,7 +20,7 @@ object DrawUtil {
     }
 
     private fun drawAr(): ArkNightOperator {
-        val probability = RandomUtil.randomDouble(0.0, 1.0, 2, RoundingMode.HALF_DOWN)
+        val probability = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
         val rare: Int
         rare = when (probability) {
             in 0.48..0.50 -> 6
@@ -33,7 +33,7 @@ object DrawUtil {
 
     private fun getOperator(rare: Int): ArkNightOperator {
         val ops: List<ArkNightOperator> = BotConstants.arkNight
-        val tempOps: MutableList<ArkNightOperator> = LinkedList<ArkNightOperator>()
+        val tempOps: MutableList<ArkNightOperator> = LinkedList()
         for (op in ops) {
             if (op.rare == rare) {
                 tempOps.add(op)
@@ -62,7 +62,7 @@ object DrawUtil {
     }
 
     private fun tenTimesDrawPCR(): List<PCRCharacter> {
-        val result: MutableList<PCRCharacter> = LinkedList<PCRCharacter>()
+        val result: MutableList<PCRCharacter> = LinkedList()
         for (i in 0..9) {
             result.add(drawPCR())
         }
@@ -77,7 +77,7 @@ object DrawUtil {
     }
 
     private fun getCharacter(rare: Int): PCRCharacter {
-        val temp: MutableList<PCRCharacter> = LinkedList<PCRCharacter>()
+        val temp: MutableList<PCRCharacter> = LinkedList()
         for (c in BotConstants.pcr) {
             if (c.star == rare) {
                 temp.add(c)

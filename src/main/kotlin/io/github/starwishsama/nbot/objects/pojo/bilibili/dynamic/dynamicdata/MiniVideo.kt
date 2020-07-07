@@ -1,7 +1,7 @@
 package io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.dynamicdata
 
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.nbot.objects.WrappedMessage
+import io.github.starwishsama.nbot.objects.TextPlusPicture
 import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicData
 import io.github.starwishsama.nbot.objects.pojo.bilibili.user.UserProfile
 
@@ -32,8 +32,8 @@ class MiniVideo : DynamicData {
         }
     }
 
-    override suspend fun getContact(): WrappedMessage {
-        val wrapped = WrappedMessage("发了一个小视频: ${item?.description}\n")
+    override suspend fun getContact(): TextPlusPicture {
+        val wrapped = TextPlusPicture("发了一个小视频: ${item?.description}\n")
 
         item?.cover?.originImgURL.let {
             if (it != null) {

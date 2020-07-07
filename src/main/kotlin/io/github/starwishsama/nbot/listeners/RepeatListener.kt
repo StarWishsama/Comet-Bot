@@ -5,26 +5,22 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
-import kotlin.math.pow
+import java.math.RoundingMode
 
 object RepeatListener : NListener {
-    private var value: Long = 0
-    override fun register(bot: Bot) {
-        if (value == 0L) {
-            value = System.nanoTime()
-        }
+    private const val VALUE = 85.0
 
+    override fun register(bot: Bot) {
         bot.subscribeGroupMessages {
             always {
-                val min = 10.0.pow(value.toDouble()).toInt()
-                val chance = RandomUtil.randomInt(min.div(2), min)
+                val chance = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
                 handleRepeat(this, chance)
             }
         }
     }
 
-    private suspend fun handleRepeat(event: GroupMessageEvent, chance: Int) {
-        if (event.message[QuoteReply] == null && chance >= value) {
+    private suspend fun handleRepeat(event: GroupMessageEvent, chance: Double) {
+        if (event.message[QuoteReply] == null && chance >= VALUE) {
             // 避免复读过多图片刷屏
             val count = event.message.stream().filter { it is Image }.count()
 

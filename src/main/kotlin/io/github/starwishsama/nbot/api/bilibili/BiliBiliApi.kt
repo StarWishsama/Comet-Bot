@@ -5,7 +5,7 @@ import com.google.gson.JsonParser
 import io.github.starwishsama.nbot.BotConstants.gson
 import io.github.starwishsama.nbot.api.ApiExecutor
 import io.github.starwishsama.nbot.exceptions.RateLimitException
-import io.github.starwishsama.nbot.objects.WrappedMessage
+import io.github.starwishsama.nbot.objects.TextPlusPicture
 import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicTypeSelector
 import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.dynamicdata.UnknownType
 
@@ -63,7 +63,7 @@ object BiliBiliApi : ApiExecutor {
     }
 
     @Throws(RateLimitException::class)
-    suspend fun getDynamic(mid: Long): WrappedMessage {
+    suspend fun getDynamic(mid: Long): TextPlusPicture {
         if (isReachLimit()) {
             throw RateLimitException("BiliBili API调用已达上限")
         }
@@ -81,15 +81,15 @@ object BiliBiliApi : ApiExecutor {
                         return if (dynamicType.typeName != UnknownType::javaClass.name) {
                             gson.fromJson(dynamicInfo, dynamicType).getContact()
                         } else {
-                            WrappedMessage("错误: 不支持的动态类型")
+                            TextPlusPicture("错误: 不支持的动态类型")
                         }
                     }
                 } catch (e: IllegalStateException) {
-                    return WrappedMessage("没有发过动态")
+                    return TextPlusPicture("没有发过动态")
                 }
             }
         }
-        return WrappedMessage("获取时出问题")
+        return TextPlusPicture("获取时出问题")
     }
 
     override var usedTime: Int = 0

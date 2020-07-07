@@ -5,11 +5,7 @@ import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.uploadAsImage
 
-/**
- * 将会被 [MessageHolder] 替代
- */
-@Deprecated("Will replace by MessageHolder")
-data class WrappedMessage(var text: String?) {
+data class TextPlusPicture(var text: String?) {
     var picture: String? = null
     suspend fun getPicture(contact: Contact): Image? {
         picture.let {

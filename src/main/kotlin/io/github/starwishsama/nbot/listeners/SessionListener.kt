@@ -22,7 +22,10 @@ object SessionListener : NListener {
                             if (user == null) {
                                 user = BotUser.quickRegister(sender.id)
                             }
-                            // 为了一些特殊需求, 请在命令中释放 Session
+
+                            /** 为了一些特殊需求, 请在命令中释放 Session
+                             * 见 [WaitableCommand]
+                             */
                             command.handleInput(this, user, session)
                         }
                     }

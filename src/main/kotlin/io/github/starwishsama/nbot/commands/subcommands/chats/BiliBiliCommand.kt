@@ -1,4 +1,4 @@
-package io.github.starwishsama.nbot.commands.subcommands
+package io.github.starwishsama.nbot.commands.subcommands.chats
 
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.api.bilibili.BiliBiliApi
@@ -7,7 +7,7 @@ import io.github.starwishsama.nbot.commands.CommandProps
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.enums.UserLevel
 import io.github.starwishsama.nbot.objects.BotUser
-import io.github.starwishsama.nbot.objects.WrappedMessage
+import io.github.starwishsama.nbot.objects.TextPlusPicture
 import io.github.starwishsama.nbot.utils.BotUtil
 import io.github.starwishsama.nbot.utils.isNumeric
 import io.github.starwishsama.nbot.utils.toMirai
@@ -130,7 +130,7 @@ class BiliBiliCommand : UniversalCommand {
         return subs.toString().trim().toMirai()
     }
 
-    private suspend fun getDynamicText(dynamic: WrappedMessage?, event: MessageEvent): MessageChain {
+    private suspend fun getDynamicText(dynamic: TextPlusPicture?, event: MessageEvent): MessageChain {
         return if (dynamic == null) {
             ("\n无最近动态").toMirai()
         } else {

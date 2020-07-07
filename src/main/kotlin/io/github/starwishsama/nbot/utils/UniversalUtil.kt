@@ -2,6 +2,8 @@ package io.github.starwishsama.nbot.utils
 
 import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
+import com.google.gson.JsonElement
+import com.google.gson.JsonParser
 import io.github.starwishsama.nbot.BotConstants
 import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.enums.UserLevel
@@ -20,13 +22,6 @@ import java.time.LocalDateTime
 import java.util.*
 
 /**
- * @return 去除彩色符号的字符串
- */
-fun String.removeColor(): String {
-    return replace("§\\S".toRegex(), "")
-}
-
-/**
  * 将字符串转换为消息链
  */
 fun String.toMirai(): MessageChain {
@@ -38,19 +33,23 @@ fun String.isOutRange(range: Int) : Boolean {
 }
 
 fun File.writeJson(context: Any) {
-    if (!this.exists()) {
-        this.createNewFile()
-    }
+    synchronized(this) {
+        if (!this.exists()) {
+            this.createNewFile()
+        }
 
-    FileWriter.create(this).write(BotConstants.gson.toJson(context))
+        FileWriter.create(this).write(BotConstants.gson.toJson(context))
+    }
 }
 
 fun File.writeString(context: String) {
-    if (!this.exists()) {
-        this.createNewFile()
-    }
+    synchronized(this) {
+        if (!this.exists()) {
+            this.createNewFile()
+        }
 
-    FileWriter.create(this).write(context)
+        FileWriter.create(this).write(context)
+    }
 }
 
 fun File.getContext(): String {
@@ -58,8 +57,8 @@ fun File.getContext(): String {
 }
 
 /**
- * 判断字符串是不是数字
- * @return 是不是数字
+ * 判断字符串是否为整数
+ * @return 是否为整数
  */
 fun String.isNumeric(): Boolean {
     return matches("[-+]?\\d*\\.?\\d+".toRegex()) && !this.contains(".")
@@ -69,9 +68,6 @@ fun String.limitStringSize(size: Int): String {
     return if (length <= size) this else substring(0, size) + "..."
 }
 
-fun Long.getLength(): Int {
-    return this.toString().length
-}
 
 /**
  * 用于辅助机器人运行中的各种工具方法
@@ -316,5 +312,18 @@ object BotUtil {
             return msg
         }
         return default
+    }
+
+    fun isValidJson(json: String): Boolean {
+        val jsonElement: JsonElement? = try {
+            JsonParser.parseString(json)
+        } catch (e: Exception) {
+            return false
+        }
+        return jsonElement?.isJsonObject ?: false
+    }
+
+    fun isValidJson(element: JsonElement?): Boolean {
+        return element?.isJsonObject ?: false
     }
 }

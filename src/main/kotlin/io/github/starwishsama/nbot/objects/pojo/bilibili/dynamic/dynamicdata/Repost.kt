@@ -3,10 +3,9 @@ package io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.dynamicdata
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.nbot.BotConstants.gson
 import io.github.starwishsama.nbot.BotMain
-import io.github.starwishsama.nbot.objects.WrappedMessage
-import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicTypeSelector
-
+import io.github.starwishsama.nbot.objects.TextPlusPicture
 import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicData
+import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicTypeSelector
 import io.github.starwishsama.nbot.objects.pojo.bilibili.user.UserProfile
 
 data class Repost(@SerializedName("origin")
@@ -31,8 +30,8 @@ data class Repost(@SerializedName("origin")
         }
     }
 
-    override suspend fun getContact(): WrappedMessage {
-        return WrappedMessage(("转发了 ${if (item?.isDeleted()!!) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item?.content}\n" +
+    override suspend fun getContact(): TextPlusPicture {
+        return TextPlusPicture(("转发了 ${if (item?.isDeleted()!!) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item?.content}\n" +
                 "原动态信息: ${item?.originType?.let { getOriginalDynamic(originDynamic, it) }}"))
     }
 

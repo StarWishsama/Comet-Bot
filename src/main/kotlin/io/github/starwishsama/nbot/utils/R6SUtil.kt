@@ -1,11 +1,10 @@
 package io.github.starwishsama.nbot.utils
 
-import cn.hutool.http.HttpRequest
-import cn.hutool.http.HttpResponse
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.nbot.BotConstants
+import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.enums.R6Rank
 import io.github.starwishsama.nbot.objects.pojo.rainbowsix.R6Player
 import java.text.NumberFormat
@@ -20,28 +19,17 @@ object R6SUtil {
 
     private fun searchPlayer(name: String): R6Player? {
         try {
-            val hr: HttpResponse =
-                HttpRequest.get("https://r6.apitab.com/search/uplay/$name?cid=${BotConstants.cfg.r6tabKey}").timeout(5000).executeAsync()
-            if (hr.isOk) {
-                val body: String = hr.body()
-                if (isValidJson(body)) {
-                    val element: JsonElement =
-                        JsonParser.parseString(body).asJsonObject["players"]
-                    if (isValidJson(element)) {
-                        val jsonObject: JsonObject = element.asJsonObject
-                        val uuid: String =
-                                jsonObject.get(jsonObject.keySet().iterator().next()).asJsonObject.get("profile")
-                                        .asJsonObject.get("p_user").asString
-                        val hr2: HttpResponse = HttpRequest.get("https://r6.apitab.com/player/$uuid?cid=${BotConstants.cfg.r6tabKey}").timeout(5000)
-                                .setFollowRedirects(true).executeAsync()
-                        if (hr2.isOk) {
-                            return gson.fromJson(hr2.body(), R6Player::class.java)
-                        }
-                    }
+            val body: String = NetUtil.getPageContent("https://r6.apitab.com/search/uplay/$name?cid=${BotConstants.cfg.r6tabKey}")
+            if (BotUtil.isValidJson(body)) {
+                val element: JsonElement = JsonParser.parseString(body).asJsonObject["players"]
+                if (BotUtil.isValidJson(element)) {
+                    val jsonObject: JsonObject = element.asJsonObject
+                    val uuid: String = jsonObject.get(jsonObject.keySet().iterator().next()).asJsonObject.get("profile").asJsonObject.get("p_user").asString
+                    return gson.fromJson(NetUtil.getPageContent("https://r6.apitab.com/player/$uuid?cid=${BotConstants.cfg.r6tabKey}"), R6Player::class.java)
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            BotMain.logger.warning("在获取 R6 玩家时出现了问题: ", e)
         }
         return null
     }
@@ -87,18 +75,5 @@ object R6SUtil {
             return "在获取时发生了问题"
         }
         return "找不到此账号"
-    }
-
-    private fun isValidJson(json: String): Boolean {
-        val jsonElement: JsonElement? = try {
-            JsonParser.parseString(json)
-        } catch (e: Exception) {
-            return false
-        }
-        return jsonElement?.isJsonObject ?: false
-    }
-
-    private fun isValidJson(element: JsonElement?): Boolean {
-        return element?.isJsonObject ?: false
     }
 }

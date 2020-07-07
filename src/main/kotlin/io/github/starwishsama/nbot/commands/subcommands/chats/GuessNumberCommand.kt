@@ -1,4 +1,4 @@
-package io.github.starwishsama.nbot.commands.subcommands
+package io.github.starwishsama.nbot.commands.subcommands.chats
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.nbot.BotMain

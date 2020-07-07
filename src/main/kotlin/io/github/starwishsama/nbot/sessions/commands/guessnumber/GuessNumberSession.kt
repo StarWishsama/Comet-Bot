@@ -1,6 +1,6 @@
 package io.github.starwishsama.nbot.sessions.commands.guessnumber
 
-import io.github.starwishsama.nbot.commands.subcommands.GuessNumberCommand
+import io.github.starwishsama.nbot.commands.subcommands.chats.GuessNumberCommand
 import io.github.starwishsama.nbot.sessions.Session
 import java.time.Duration
 import java.time.LocalDateTime

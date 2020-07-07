@@ -5,7 +5,7 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.LightApp
 
-object FuckLightAppListener : NListener {
+object ConvertLightAppListener : NListener {
     override fun register(bot: Bot) {
         bot.subscribeGroupMessages {
             always {

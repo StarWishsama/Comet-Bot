@@ -1,5 +1,6 @@
 package io.github.starwishsama.nbot.utils
 
+import cn.hutool.http.HttpException
 import cn.hutool.http.HttpRequest
 import io.github.starwishsama.nbot.BotConstants
 import java.io.InputStream
@@ -21,6 +22,7 @@ object NetUtil {
         return request.execute().bodyStream()
     }
 
+    @Throws(HttpException::class)
     private fun doHttpRequest(url: String, timeout: Int): HttpRequest {
         return HttpRequest.get(url)
                 .setFollowRedirects(true)

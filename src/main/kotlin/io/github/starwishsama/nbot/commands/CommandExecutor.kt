@@ -5,12 +5,13 @@ import io.github.starwishsama.nbot.BotMain
 import io.github.starwishsama.nbot.commands.interfaces.ConsoleCommand
 import io.github.starwishsama.nbot.commands.interfaces.UniversalCommand
 import io.github.starwishsama.nbot.objects.BotUser
-import io.github.starwishsama.nbot.objects.MessageHolder
 import io.github.starwishsama.nbot.sessions.SessionManager
 import io.github.starwishsama.nbot.utils.BotUtil
 import io.github.starwishsama.nbot.utils.toMirai
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
+import java.time.Duration
+import java.time.LocalDateTime
 import java.util.*
 
 /**
@@ -20,13 +21,14 @@ import java.util.*
  */
 object CommandExecutor {
     var commands: List<UniversalCommand> = mutableListOf()
+    private var consoleCommands = mutableListOf<ConsoleCommand>()
 
     /**
      * 注册命令
      *
      * @param command 要注册的命令
      */
-    fun setupCommand(command: UniversalCommand) {
+    private fun setupCommand(command: UniversalCommand) {
         if (!commands.contains(command)) {
             commands = commands + command
         }
@@ -45,56 +47,94 @@ object CommandExecutor {
         }
     }
 
+    fun setupCommand(commands: Array<Any>) {
+        commands.forEach {
+            when (it) {
+                is UniversalCommand -> setupCommand(it)
+                is ConsoleCommand -> consoleCommands.plusAssign(it)
+                else -> BotMain.logger.warning("[命令] 正在尝试注册非命令类 ${it.javaClass.simpleName}")
+            }
+        }
+    }
+
     /**
      * 执行消息中的命令
      *
-     * @param command 纯文本命令 (后台)
      * @param event Mirai 消息命令 (聊天)
      */
-    suspend fun execute(command: String, event: MessageEvent?): MessageHolder {
-        val senderId = event?.sender?.id ?: -1
-        val message = event?.message?.contentToString() ?: command
+    suspend fun execute(event: MessageEvent): MessageChain {
+        val executedTime = LocalDateTime.now()
+        val senderId = event.sender.id
+        val message = event.message.contentToString()
         try {
             if (isCommandPrefix(message) && !SessionManager.isValidSessionById(senderId)) {
                 val cmd = getCommand(getCommandName(message))
                 if (cmd != null) {
                     val splitMessage = message.split(" ")
-                    val splitCommand = splitMessage.subList(1, splitMessage.size)
-                    if (cmd is ConsoleCommand) {
-                        val result = cmd.execute(splitCommand)
-                        return MessageHolder(result, null)
-                    } else if (event != null) {
-                        BotMain.logger.debug("[命令] " + senderId + " 执行了命令: " + cmd.getProps().name)
-                        var user = BotUser.getUser(senderId)
-                        if (user == null) {
-                            user = BotUser.quickRegister(senderId)
-                        }
+                    BotMain.logger.debug("[命令] ${if (senderId != -1L) senderId.toString() else "后台"} 尝试执行命令: " + cmd.getProps().name)
+                    var user = BotUser.getUser(senderId)
+                    if (user == null) {
+                        user = BotUser.quickRegister(senderId)
+                    }
 
-                        return if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
-                            MessageHolder("", doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)))
-                        } else {
-                            MessageHolder("", BotUtil.sendMsgPrefix("你没有权限!").toMirai())
-                        }
+                    return if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
+                        doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size), user))
+                    } else {
+                        BotUtil.sendMsgPrefix("你没有权限!").toMirai()
                     }
                 }
             }
         } catch (t: Throwable) {
             BotMain.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId", t)
-            return MessageHolder("", "Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMirai())
+            return "Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMirai()
         }
-        return MessageHolder("", EmptyMessageChain)
+        val usedTime = Duration.between(executedTime, LocalDateTime.now())
+        BotMain.logger.debug("[命令] 命令执行耗时 ${usedTime.toSecondsPart()}s${usedTime.toMillisPart()}ms")
+        return EmptyMessageChain
+    }
+
+    /**
+     * 执行后台命令
+     *
+     * @param content 纯文本命令 (后台)
+     */
+    suspend fun executeConsole(content: String): String {
+        try {
+            if (isCommandPrefix(content)) {
+                val cmd = getConsoleCommand(getCommandName(content))
+                if (cmd != null) {
+                    val splitMessage = content.split(" ")
+                    val splitCommand = splitMessage.subList(1, splitMessage.size)
+                    BotMain.logger.debug("[命令] 后台尝试执行命令: " + cmd.getProps().name)
+                    return cmd.execute(splitCommand)
+                }
+            }
+        } catch (t: Throwable) {
+            BotMain.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $content, 发送者: 后台", t)
+            return "Bot > 在试图执行命令时发生了一个错误, 请联系管理员"
+        }
+        return ""
     }
 
     private fun getCommand(cmdPrefix: String): UniversalCommand? {
-        commands.forEach {
-            if (commandEquals(it, cmdPrefix)) {
-                return it
+        for (command in commands) {
+            if (commandEquals(command, cmdPrefix)) {
+                return command
             }
         }
         return null
     }
 
-    private fun getCommandName(command: String): String {
+    private fun getConsoleCommand(cmdPrefix: String): ConsoleCommand? {
+        for (command in consoleCommands) {
+            if (commandEquals(command, cmdPrefix)) {
+                return command
+            }
+        }
+        return null
+    }
+
+    fun getCommandName(command: String): String {
         var cmdPrefix = command
         for (string: String in BotConstants.cfg.commandPrefix) {
             cmdPrefix = cmdPrefix.replace(string, "")
@@ -127,7 +167,27 @@ object CommandExecutor {
         return false
     }
 
-    private fun doFilter(chain: MessageChain) : MessageChain {
+    private fun commandEquals(cmd: ConsoleCommand, cmdName: String): Boolean {
+        val props = cmd.getProps()
+        when {
+            props.name.contentEquals(cmdName) -> {
+                return true
+            }
+            props.aliases != null -> {
+                props.aliases?.forEach {
+                    if (it.contentEquals(cmdName)) {
+                        return true
+                    }
+                }
+            }
+            else -> {
+                return false
+            }
+        }
+        return false
+    }
+
+    private fun doFilter(chain: MessageChain): MessageChain {
         if (BotConstants.cfg.filterWords.isNullOrEmpty()) {
             return chain
         }

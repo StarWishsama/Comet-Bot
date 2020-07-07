@@ -1,7 +1,7 @@
 package io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.dynamicdata
 
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.nbot.objects.WrappedMessage
+import io.github.starwishsama.nbot.objects.TextPlusPicture
 import io.github.starwishsama.nbot.objects.pojo.bilibili.dynamic.DynamicData
 
 data class Article(@SerializedName("title")
@@ -11,9 +11,9 @@ data class Article(@SerializedName("title")
                    @SerializedName("id")
                    val id: Long,
                    @SerializedName("dynamic")
-                   val context: String) : DynamicData{
-    override suspend fun getContact(): WrappedMessage {
-        val wrapped = WrappedMessage("专栏 $title: $context\n查看全文: https://www.bilibili.com/read/cv/$id\n")
+                   val context: String) : DynamicData {
+    override suspend fun getContact(): TextPlusPicture {
+        val wrapped = TextPlusPicture("专栏 $title: $context\n查看全文: https://www.bilibili.com/read/cv/$id\n")
         if (!imageURL.isNullOrEmpty()) {
             wrapped.picture = imageURL[0]
         }

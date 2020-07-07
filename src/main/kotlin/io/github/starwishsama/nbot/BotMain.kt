@@ -6,15 +6,15 @@ import io.github.starwishsama.nbot.BotMain.startTime
 import io.github.starwishsama.nbot.api.bilibili.BiliBiliApi
 import io.github.starwishsama.nbot.api.twitter.TwitterApi
 import io.github.starwishsama.nbot.commands.CommandExecutor
-import io.github.starwishsama.nbot.commands.subcommands.*
-import io.github.starwishsama.nbot.enums.UserLevel
+import io.github.starwishsama.nbot.commands.subcommands.chats.*
+import io.github.starwishsama.nbot.commands.subcommands.console.StopCommand
+import io.github.starwishsama.nbot.commands.subcommands.console.TestCommand
 import io.github.starwishsama.nbot.file.BackupHelper
 import io.github.starwishsama.nbot.file.DataSetup
-import io.github.starwishsama.nbot.listeners.FuckLightAppListener
+import io.github.starwishsama.nbot.listeners.ConvertLightAppListener
 import io.github.starwishsama.nbot.listeners.RepeatListener
 import io.github.starwishsama.nbot.listeners.SessionListener
 import io.github.starwishsama.nbot.managers.TaskManager
-import io.github.starwishsama.nbot.objects.BotUser
 import io.github.starwishsama.nbot.tasks.CheckLiveStatus
 import io.github.starwishsama.nbot.tasks.HitokotoUpdater
 import io.github.starwishsama.nbot.tasks.LatestTweetChecker
@@ -28,10 +28,10 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.join
+import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.PlatformLogger
-import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
 import java.io.IOException
@@ -46,7 +46,7 @@ import kotlin.system.exitProcess
 
 object BotMain {
     val filePath: File = File(getPath())
-    const val version = "0.3.8-DEV-ee98456-20200707"
+    const val version = "0.3.8-DEV-6288d35-20200707"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -62,21 +62,13 @@ object BotMain {
         var command: String
         while (scanner.hasNextLine()) {
             command = scanner.nextLine()
-            when (command) {
-                "stop" -> exitProcess(0)
-                "upgrade" -> {
-                    val cmd = command.split(" ")
-                    if (cmd.size > 1 && StringUtils.isNumeric(cmd[1])) {
-                        val user = BotUser.getUser(cmd[1].toLong())
-                        if (user != null) {
-                            logger.info("[CONSOLE] 已升级权限组至 ${UserLevel.upgrade(user)}")
-                        } else {
-                            logger.info("[CONSOLE] 找不到此用户")
-                        }
-                    } else {
-                        logger.warning("[CONSOLE] 请输入有效的QQ号")
-                    }
+            runBlocking {
+                val result = CommandExecutor.executeConsole(command)
+                if (result.isNotEmpty()) {
+                    logger.info(result)
+                    return@runBlocking
                 }
+                logger.info("命令 ${CommandExecutor.getCommandName(command)} 不存在!")
             }
         }
         scanner.close()
@@ -150,27 +142,30 @@ suspend fun main() {
         BotMain.logger = bot.logger
         CommandExecutor.setupCommand(
             arrayOf(
-                AdminCommand(),
-                BiliBiliCommand(),
-                CheckInCommand(),
-                ClockInCommand(),
-                DebugCommand(),
-                DivineCommand(),
-                GachaCommand(),
-                GuessNumberCommand(),
-                HelpCommand(),
-                InfoCommand(),
-                MusicCommand(),
-                MuteCommand(),
-                PictureSearch(),
-                R6SCommand(),
-                RConCommand(),
-                TwitterCommand(),
-                VersionCommand()
+                    AdminCommand(),
+                    BiliBiliCommand(),
+                    CheckInCommand(),
+                    ClockInCommand(),
+                    DebugCommand(),
+                    DivineCommand(),
+                    GachaCommand(),
+                    GuessNumberCommand(),
+                    HelpCommand(),
+                    InfoCommand(),
+                    MusicCommand(),
+                    MuteCommand(),
+                    PictureSearch(),
+                    R6SCommand(),
+                    RConCommand(),
+                    TwitterCommand(),
+                    VersionCommand(),
+                    // Console Command
+                    StopCommand(),
+                    TestCommand()
             )
         )
 
-        val listeners = arrayOf(FuckLightAppListener, RepeatListener, SessionListener)
+        val listeners = arrayOf(ConvertLightAppListener, RepeatListener, SessionListener)
         val apis = arrayOf(BiliBiliApi, TwitterApi)
 
         BotMain.logger.info("[命令] 已注册 " + CommandExecutor.commands.size + " 个命令")
@@ -241,9 +236,9 @@ suspend fun main() {
         bot.subscribeMessages {
             always {
                 if (sender.id != 80000000L) {
-                    val result = CommandExecutor.execute("", this)
-                    if (!result.isEmpty() && result.messageChain != null && result.messageChain.contentToString().isNotEmpty()) {
-                        reply(result.messageChain)
+                    val result = CommandExecutor.execute(this)
+                    if (result !is EmptyMessageChain) {
+                        reply(result)
                     }
                 }
             }
