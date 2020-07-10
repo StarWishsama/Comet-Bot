@@ -7,7 +7,7 @@ import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
 import io.github.starwishsama.comet.BotConstants
 import io.github.starwishsama.comet.BotConstants.gson
-import io.github.starwishsama.comet.BotMain
+import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
@@ -21,18 +21,18 @@ import io.github.starwishsama.comet.utils.writeJson
 import java.io.File
 
 object DataSetup {
-    private val userCfg: File = File(BotMain.filePath.toString(), "users.json")
-    private val shopItemCfg: File = File(BotMain.filePath.toString(), "/items.json")
-    private val cfgFile: File = File(BotMain.filePath.toString(), "/config.json")
-    private val langCfg: File = File(BotMain.filePath.toString(), "/lang.json")
-    private val groupCfg: File = File(BotMain.filePath.toString(), "/groups.json")
-    private val cacheCfg: File = File(BotMain.filePath.toString(), "cache.json")
-    private val pcrData = File(BotMain.filePath.toString(), "/pcr.json")
-    private val arkNightData = File(BotMain.filePath.toString(), "/ark.json")
+    private val userCfg: File = File(Comet.filePath.toString(), "users.json")
+    private val shopItemCfg: File = File(Comet.filePath.toString(), "/items.json")
+    private val cfgFile: File = File(Comet.filePath.toString(), "/config.json")
+    private val langCfg: File = File(Comet.filePath.toString(), "/lang.json")
+    private val groupCfg: File = File(Comet.filePath.toString(), "/groups.json")
+    private val cacheCfg: File = File(Comet.filePath.toString(), "cache.json")
+    private val pcrData = File(Comet.filePath.toString(), "/pcr.json")
+    private val arkNightData = File(Comet.filePath.toString(), "/ark.json")
 
     fun initData() {
-        if (!BotMain.log.exists()) {
-            BotMain.log.mkdirs()
+        if (!Comet.log.exists()) {
+            Comet.log.mkdirs()
         }
 
         if (!userCfg.exists() || !cfgFile.exists()) {
@@ -141,7 +141,7 @@ object DataSetup {
     }
 
     fun saveFiles() {
-        BotMain.logger.info("[Bot] 自动保存数据完成")
+        Comet.logger.info("[Bot] 自动保存数据完成")
         saveCfg()
         saveLang()
     }

@@ -4,7 +4,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotConstants
-import io.github.starwishsama.comet.BotMain
+import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
 import io.github.starwishsama.comet.utils.NetUtil
 import net.mamoe.mirai.contact.Contact
@@ -48,7 +48,7 @@ data class ReTweet (
                         picture = NetUtil.getUrlInputStream(image.mediaUrlHttps).uploadAsImage(contact)
                     }
                 } catch (e: JsonSyntaxException) {
-                    BotMain.logger.error("在获取推文下的图片时发生了问题", e)
+                    Comet.logger.error("在获取推文下的图片时发生了问题", e)
                 }
             }
         }

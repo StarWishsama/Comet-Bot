@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.tasks
 
 import io.github.starwishsama.comet.BotConstants
-import io.github.starwishsama.comet.BotMain
+import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
@@ -28,7 +28,7 @@ object LatestTweetChecker : Runnable {
                     pushedMap[it] = tweet
                     TwitterApi.addCacheTweet(it, tweet)
 
-                    BotMain.bot.groups.forEach { group ->
+                    Comet.bot.groups.forEach { group ->
                         if (BotConstants.cfg.tweetPushGroups.contains(group.id)) {
                             GlobalScope.launch {
                                 var message = "${tweet.user.name} ($it) 发送了一条推文\n${tweet.getFullText()}".toMirai()
@@ -43,7 +43,7 @@ object LatestTweetChecker : Runnable {
                     }
                 }
             } catch (e: RateLimitException) {
-                BotMain.logger.debug(e.localizedMessage)
+                Comet.logger.debug(e.localizedMessage)
             }
         }
     }

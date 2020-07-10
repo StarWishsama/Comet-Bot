@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.tasks
 
 import io.github.starwishsama.comet.BotConstants
-import io.github.starwishsama.comet.BotMain
+import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
 import kotlinx.coroutines.delay
@@ -32,7 +32,7 @@ object CheckLiveStatus : Runnable {
                                         "\n标题: ${data.title}" +
                                         "\n开播时间: ${data.liveTime}" +
                                         "\n传送门: https://live.bilibili.com/${data.roomId}"
-                                BotMain.bot.groups.forEach { group ->
+                                Comet.bot.groups.forEach { group ->
                                     runBlocking {
                                         if (BotConstants.cfg.pushGroups.contains(group.id)) {
                                             group.sendMessage(msg)

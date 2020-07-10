@@ -9,7 +9,7 @@ import com.google.gson.reflect.TypeToken
 import com.roxstudio.utils.CUrl
 import io.github.starwishsama.comet.BotConstants
 import io.github.starwishsama.comet.BotConstants.gson
-import io.github.starwishsama.comet.BotMain
+import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.api.ApiExecutor
 import io.github.starwishsama.comet.exceptions.EmptyTweetException
 import io.github.starwishsama.comet.exceptions.RateLimitException
@@ -66,10 +66,10 @@ object TwitterApi : ApiExecutor {
             if (JsonParser.parseString(result).isJsonObject) {
                 // Get Token
                 token = JsonParser.parseString(result).asJsonObject["access_token"].asString
-                BotMain.logger.debug("[蓝鸟] 成功获取 Access Token")
+                Comet.logger.debug("[蓝鸟] 成功获取 Access Token")
             }
         } catch (e: IOException) {
-            BotMain.logger.error("获取 Token 时出现问题", e)
+            Comet.logger.error("获取 Token 时出现问题", e)
         }
     }
 
@@ -99,7 +99,7 @@ object TwitterApi : ApiExecutor {
         try {
             result = conn.executeAsync()
         } catch (e: HttpException) {
-            BotMain.logger.error("[蓝鸟] 在获取用户最新推文时出现了问题", e)
+            Comet.logger.error("[蓝鸟] 在获取用户最新推文时出现了问题", e)
         }
 
         var tUser: TwitterUser? = null
@@ -109,13 +109,13 @@ object TwitterApi : ApiExecutor {
         } catch (e: JsonSyntaxException) {
             try {
                 val errorInfo = gson.fromJson(result?.body(), TwitterErrorInfo::class.java)
-                BotMain.logger.error("[蓝鸟] 调用 API 时出现了问题\n${errorInfo.getReason()}")
+                Comet.logger.error("[蓝鸟] 调用 API 时出现了问题\n${errorInfo.getReason()}")
                 throw TwitterApiException(errorInfo.errors[0].code, errorInfo.errors[0].reason)
             } catch (e: JsonSyntaxException) {
-                BotMain.logger.error("[蓝鸟] 解析推文 JSON 时出现问题: 不支持的类型", e)
+                Comet.logger.error("[蓝鸟] 解析推文 JSON 时出现问题: 不支持的类型", e)
             }
         }
-        BotMain.logger.debug("[蓝鸟] 查询用户信息耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+        Comet.logger.debug("[蓝鸟] 查询用户信息耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
         return tUser
     }
 
@@ -155,10 +155,10 @@ object TwitterApi : ApiExecutor {
             } catch (e: JsonSyntaxException) {
                 try {
                     val errorInfo = gson.fromJson(result.body(), TwitterErrorInfo::class.java)
-                    BotMain.logger.error("[蓝鸟] 调用 API 时出现了问题\n${errorInfo.getReason()}")
+                    Comet.logger.error("[蓝鸟] 调用 API 时出现了问题\n${errorInfo.getReason()}")
                     throw TwitterApiException(errorInfo.errors[0].code, errorInfo.errors[0].reason)
                 } catch (e: JsonSyntaxException) {
-                    BotMain.logger.error("[蓝鸟] 解析推文 JSON 时出现问题: 不支持的类型", e)
+                    Comet.logger.error("[蓝鸟] 解析推文 JSON 时出现问题: 不支持的类型", e)
                 }
             }
             return tweet
@@ -189,10 +189,10 @@ object TwitterApi : ApiExecutor {
 
             return result
         } catch (x: TwitterApiException) {
-            BotMain.logger.error("[蓝鸟] 调用 API 时出现了问题\n错误代码: ${x.code}\n理由: ${x.reason}}")
+            Comet.logger.error("[蓝鸟] 调用 API 时出现了问题\n错误代码: ${x.code}\n理由: ${x.reason}}")
         }
 
-        BotMain.logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+        Comet.logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
         return null
     }
 

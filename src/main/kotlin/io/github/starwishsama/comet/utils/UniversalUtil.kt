@@ -5,7 +5,7 @@ import cn.hutool.core.io.file.FileWriter
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotConstants
-import io.github.starwishsama.comet.BotMain
+import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotAdmin
@@ -276,7 +276,7 @@ object BotUtil {
     }
 
     fun getRunningTime(): String {
-        val remain = Duration.between(BotMain.startTime, LocalDateTime.now())
+        val remain = Duration.between(Comet.startTime, LocalDateTime.now())
         return "${remain.toDaysPart()}天${remain.toHoursPart()}时${remain.toMinutesPart()}分${remain.toSecondsPart()}秒${remain.toMillisPart()}毫秒"
     }
 

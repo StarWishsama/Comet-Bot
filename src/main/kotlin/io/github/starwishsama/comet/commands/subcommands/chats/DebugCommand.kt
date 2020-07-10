@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
-import io.github.starwishsama.comet.BotMain
+import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.commands.CommandExecutor
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
@@ -48,7 +48,7 @@ class DebugCommand : UniversalCommand {
                 }
                 "help" -> return getHelp().toMessage().asMessageChain()
                 "info" ->
-                    return ("无名Bot ${BotMain.version}\n" +
+                    return ("彗星 Bot ${Comet.version}\n" +
                             "已注册的命令个数: ${CommandExecutor.commands.size}\n" +
                             BotUtil.getMemoryUsage()).toMirai()
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().toMirai()

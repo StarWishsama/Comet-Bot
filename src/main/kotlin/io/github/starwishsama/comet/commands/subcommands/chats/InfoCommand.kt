@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
 import io.github.starwishsama.comet.BotConstants
-import io.github.starwishsama.comet.BotMain
+import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -55,7 +55,7 @@ class InfoCommand : UniversalCommand {
                 return getHelp().toMirai()
             }
         } catch (e: Exception) {
-            BotMain.logger.error(e)
+            Comet.logger.error(e)
         }
         return EmptyMessageChain
     }

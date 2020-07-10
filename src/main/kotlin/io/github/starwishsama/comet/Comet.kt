@@ -1,8 +1,8 @@
 package io.github.starwishsama.comet
 
 import com.hiczp.bilibili.api.BilibiliClient
-import io.github.starwishsama.comet.BotMain.bot
-import io.github.starwishsama.comet.BotMain.startTime
+import io.github.starwishsama.comet.Comet.bot
+import io.github.starwishsama.comet.Comet.startTime
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.CommandExecutor
@@ -44,9 +44,9 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
-object BotMain {
+object Comet {
     val filePath: File = File(getPath())
-    const val version = "0.3.8-DEV-a0fa6ec-20200710"
+    const val version = "0.3.8-DEV-b834be7-20200710"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -73,7 +73,7 @@ object BotMain {
     }
 
     private fun getPath(): String {
-        var path: String = BotMain::class.java.protectionDomain.codeSource.location.path
+        var path: String = Comet::class.java.protectionDomain.codeSource.location.path
         if (System.getProperty("os.name").toLowerCase().contains("dows")) {
             path = path.substring(1)
         }
@@ -121,33 +121,33 @@ suspend fun main() {
 
 
     """.trimIndent())
-    BotMain.initLog()
+    Comet.initLog()
     DataSetup.initData()
-    BotMain.qqId = BotConstants.cfg.botId
-    BotMain.password = BotConstants.cfg.botPassword
+    Comet.qqId = BotConstants.cfg.botId
+    Comet.password = BotConstants.cfg.botPassword
 
-    if (BotMain.qqId == 0L) {
+    if (Comet.qqId == 0L) {
         println("请到 config.json 里填写机器人的QQ号&密码")
         exitProcess(0)
     } else {
         val config = BotConfiguration.Default
         config.botLoggerSupplier = { it ->
             PlatformLogger("Bot ${it.id}", {
-                BotMain.log.writeString(BotMain.log.getContext() + "$it\n")
+                Comet.log.writeString(Comet.log.getContext() + "$it\n")
                 println(it)
             })
         }
         config.networkLoggerSupplier = { it ->
             PlatformLogger("Net ${it.id}", {
-                BotMain.log.writeString(BotMain.log.getContext() + "$it\n")
+                Comet.log.writeString(Comet.log.getContext() + "$it\n")
                 println(it)
             })
         }
         config.heartbeatPeriodMillis = BotConstants.cfg.heartBeatPeriod * 60 * 1000
         config.fileBasedDeviceInfo()
-        bot = Bot(qq = BotMain.qqId, password = BotMain.password, configuration = config)
+        bot = Bot(qq = Comet.qqId, password = Comet.password, configuration = config)
         bot.alsoLogin()
-        BotMain.logger = bot.logger
+        Comet.logger = bot.logger
         CommandExecutor.setupCommand(
             arrayOf(
                     AdminCommand(),
@@ -176,13 +176,13 @@ suspend fun main() {
         val listeners = arrayOf(ConvertLightAppListener, RepeatListener, SessionListener)
         val apis = arrayOf(BiliBiliApi, TwitterApi)
 
-        BotMain.logger.info("[命令] 已注册 " + CommandExecutor.commands.size + " 个命令")
+        Comet.logger.info("[命令] 已注册 " + CommandExecutor.commands.size + " 个命令")
 
-        BotMain.setupRCon()
+        Comet.setupRCon()
 
-        BotMain.service = Executors.newScheduledThreadPool(
-            4,
-            BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
+        Comet.service = Executors.newScheduledThreadPool(
+                4,
+                BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
         )
 
         /** 定时任务 */
@@ -200,7 +200,7 @@ suspend fun main() {
             BotConstants.cfg.subList.isNotEmpty()
         )
         TaskManager.runAsync({
-            BotMain.client.runCatching {
+            Comet.client.runCatching {
                 val pwd = BotConstants.cfg.biliPassword
                 val username = BotConstants.cfg.biliUserName
 
@@ -226,19 +226,19 @@ suspend fun main() {
         /** 监听器 */
         listeners.forEach {
             it.register(bot)
-            BotMain.logger.info("[监听器] 已注册 ${it.getName()} 监听器")
+            Comet.logger.info("[监听器] 已注册 ${it.getName()} 监听器")
         }
 
         val time = Duration.between(startTime, LocalDateTime.now())
         val startUsedTime = "${time.toSecondsPart()}s${time.toMillisPart()}ms"
 
-        BotMain.logger.info("无名 Bot 启动成功, 耗时 $startUsedTime")
+        Comet.logger.info("彗星 Bot 启动成功, 耗时 $startUsedTime")
 
         Runtime.getRuntime().addShutdownHook(Thread {
-            BotMain.logger.info("[Bot] 正在关闭 Bot...")
+            Comet.logger.info("[Bot] 正在关闭 Bot...")
             DataSetup.saveFiles()
-            BotMain.service.shutdown()
-            BotMain.rCon?.disconnect()
+            Comet.service.shutdown()
+            Comet.rCon?.disconnect()
         })
 
         bot.subscribeMessages {
@@ -252,7 +252,7 @@ suspend fun main() {
             }
         }
 
-        BotMain.executeCommand()
+        Comet.executeCommand()
 
         bot.join() // 等待 Bot 离线, 避免主线程退出
     }

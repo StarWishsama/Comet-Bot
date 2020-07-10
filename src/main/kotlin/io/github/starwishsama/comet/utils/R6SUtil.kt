@@ -4,7 +4,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotConstants
-import io.github.starwishsama.comet.BotMain
+import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.enums.R6Rank
 import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6Player
 import java.text.NumberFormat
@@ -29,7 +29,7 @@ object R6SUtil {
                 }
             }
         } catch (e: Exception) {
-            BotMain.logger.warning("在获取 R6 玩家时出现了问题: ", e)
+            Comet.logger.warning("在获取 R6 玩家时出现了问题: ", e)
         }
         return null
     }
