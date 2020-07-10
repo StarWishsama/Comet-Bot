@@ -16,14 +16,14 @@ plugins {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'io.github.starwishsama.nbot.BotMainKt'
+        attributes 'Main-Class': 'io.github.starwishsama.comet.BotMainKt'
     }
 }
 
 def gitCommitId = 'git rev-parse --short HEAD'
 def versionCode = "0.3.8-DEV-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
 
-group 'io.github.starwishsama.nbot'
+group 'io.github.starwishsama.comet'
 version versionCode
 
 repositories {
@@ -36,7 +36,7 @@ repositories {
 }
 
 task updateVersion {
-    def versionFileDir = projectDir.getAbsolutePath() + File.separatorChar + 'src' + File.separatorChar + 'main' + File.separatorChar + 'kotlin' + File.separatorChar + 'io' + File.separatorChar + 'github' + File.separatorChar + 'starwishsama' + File.separatorChar + 'nbot' + File.separatorChar + 'BotMain.kt'
+    def versionFileDir = projectDir.getAbsolutePath() + File.separatorChar + 'src' + File.separatorChar + 'main' + File.separatorChar + 'kotlin' + File.separatorChar + 'io' + File.separatorChar + 'github' + File.separatorChar + 'starwishsama' + File.separatorChar + 'comet' + File.separatorChar + 'BotMain.kt'
     def oldVersionStr = findOldVersionStr(versionFileDir)
     def newVersionStr = "    const val version = \"" + versionCode + "\""
     def updatedContent = new File(versionFileDir).getText('UTF-8').replaceAll(oldVersionStr, newVersionStr)
