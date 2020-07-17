@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.utils
 
 import cn.hutool.http.HttpException
 import cn.hutool.http.HttpRequest
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import java.io.InputStream
 import java.net.Proxy
 import java.net.Socket
@@ -15,8 +15,13 @@ object NetUtil {
     fun getUrlInputStream(url: String, timeout: Int): InputStream {
         val request = doHttpRequest(url, timeout)
 
-        if (BotConstants.cfg.proxyUrl != null && BotConstants.cfg.proxyPort != -1) {
-            request.setProxy(Proxy(Proxy.Type.HTTP, Socket(BotConstants.cfg.proxyUrl, BotConstants.cfg.proxyPort).remoteSocketAddress))
+        if (BotVariables.cfg.proxyUrl != null && BotVariables.cfg.proxyPort != -1) {
+            request.setProxy(
+                Proxy(
+                    Proxy.Type.HTTP,
+                    Socket(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort).remoteSocketAddress
+                )
+            )
         }
 
         return request.execute().bodyStream()

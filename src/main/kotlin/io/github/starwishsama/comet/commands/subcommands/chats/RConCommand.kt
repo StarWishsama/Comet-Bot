@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.SuspendCommand
@@ -75,14 +75,14 @@ class RConCommand : UniversalCommand, SuspendCommand {
 
         when (waitList[user] ?: 0) {
             0 -> {
-                BotConstants.cfg.rConUrl = event.message.contentToString()
-                event.reply(BotUtil.sendMsgPrefix("已设置 rCon 连接地址为 ${BotConstants.cfg.rConUrl}\n请在下一条消息发送 rCon 密码\n如果需要退出设置 请回复退出"))
+                BotVariables.cfg.rConUrl = event.message.contentToString()
+                event.reply(BotUtil.sendMsgPrefix("已设置 rCon 连接地址为 ${BotVariables.cfg.rConUrl}\n请在下一条消息发送 rCon 密码\n如果需要退出设置 请回复退出"))
                 waitList[user] = 1
             }
             1 -> {
                 val port = event.message.contentToString()
                 if (port.isNumeric()) {
-                    BotConstants.cfg.rConPort = event.message.contentToString().toInt()
+                    BotVariables.cfg.rConPort = event.message.contentToString().toInt()
                     event.reply(BotUtil.sendMsgPrefix("设置密码成功!\n请在下一条消息发送 rCon 密码\n" +
                             "如果需要退出设置 请回复退出"))
                     waitList[user] = 2
@@ -92,7 +92,7 @@ class RConCommand : UniversalCommand, SuspendCommand {
                 }
             }
             2 -> {
-                BotConstants.cfg.rConPassword = event.message.contentToString()
+                BotVariables.cfg.rConPassword = event.message.contentToString()
                 event.reply(BotUtil.sendMsgPrefix("设置 rCon 完成!"))
                 Comet.setupRCon()
                 waitList.remove(user)

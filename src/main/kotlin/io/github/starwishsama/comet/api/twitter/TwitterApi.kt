@@ -7,8 +7,8 @@ import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import com.roxstudio.utils.CUrl
-import io.github.starwishsama.comet.BotConstants
-import io.github.starwishsama.comet.BotConstants.gson
+import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.api.ApiExecutor
 import io.github.starwishsama.comet.exceptions.EmptyTweetException
@@ -38,10 +38,10 @@ object TwitterApi : ApiExecutor {
     private const val tokenGetApi = "https://api.twitter.com/oauth2/token"
 
     // Bearer Token
-    var token: String? = BotConstants.cache["token"].asString
+    var token: String? = BotVariables.cache["token"].asString
 
     // Token 获取时间, 时间过长需要重新获取, Token 可能会到期
-    var tokenGetTime = BotConstants.cache["get_time"].asLong
+    var tokenGetTime = BotVariables.cache["get_time"].asLong
 
     private var cacheTweet = mutableMapOf<String, LinkedList<Tweet>>()
 
@@ -51,14 +51,14 @@ object TwitterApi : ApiExecutor {
     fun getBearerToken() {
         try {
             val curl = CUrl(tokenGetApi).opt(
-                    "-u",
-                    "${BotConstants.cfg.twitterToken}:${BotConstants.cfg.twitterSecret}",
-                    "--data",
+                "-u",
+                "${BotVariables.cfg.twitterToken}:${BotVariables.cfg.twitterSecret}",
+                "--data",
                 "grant_type=client_credentials"
             )
 
-            if (BotConstants.cfg.proxyUrl != null && BotConstants.cfg.proxyPort != -1) {
-                curl.proxy(BotConstants.cfg.proxyUrl, BotConstants.cfg.proxyPort)
+            if (BotVariables.cfg.proxyUrl != null && BotVariables.cfg.proxyPort != -1) {
+                curl.proxy(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
             }
 
             val result = curl.exec("UTF-8")
@@ -86,11 +86,11 @@ object TwitterApi : ApiExecutor {
                 .header("authorization", "Bearer $token")
                 .timeout(12_000)
 
-        if (BotConstants.cfg.proxyUrl != null && BotConstants.cfg.proxyPort != 0) {
+        if (BotVariables.cfg.proxyUrl != null && BotVariables.cfg.proxyPort != 0) {
             conn.setProxy(
                 Proxy(
                     Proxy.Type.HTTP,
-                    Socket(BotConstants.cfg.proxyUrl, BotConstants.cfg.proxyPort).remoteSocketAddress
+                    Socket(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort).remoteSocketAddress
                 )
             )
         }
@@ -126,15 +126,21 @@ object TwitterApi : ApiExecutor {
         }
 
         usedTime++
-        val request = HttpRequest.get("$universalApi/statuses/user_timeline.json?screen_name=$username&count=2&tweet_mode=extended")
+        val request =
+            HttpRequest.get("$universalApi/statuses/user_timeline.json?screen_name=$username&count=2&tweet_mode=extended")
                 .header(
-                        "authorization",
-                        "Bearer $token"
+                    "authorization",
+                    "Bearer $token"
                 )
                 .timeout(5_000)
 
-        if (BotConstants.cfg.proxyUrl != null && BotConstants.cfg.proxyPort != -1) {
-            request.setProxy(Proxy(Proxy.Type.HTTP, Socket(BotConstants.cfg.proxyUrl, BotConstants.cfg.proxyPort).remoteSocketAddress))
+        if (BotVariables.cfg.proxyUrl != null && BotVariables.cfg.proxyPort != -1) {
+            request.setProxy(
+                Proxy(
+                    Proxy.Type.HTTP,
+                    Socket(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort).remoteSocketAddress
+                )
+            )
         }
 
         val result = request.executeAsync()
@@ -143,8 +149,8 @@ object TwitterApi : ApiExecutor {
             var tweet: Tweet? = null
             try {
                 val tweets = gson.fromJson(
-                        result.body(),
-                        object : TypeToken<List<Tweet>>() {}.type
+                    result.body(),
+                    object : TypeToken<List<Tweet>>() {}.type
                 ) as List<Tweet>
 
                 if (tweets.isEmpty()) {

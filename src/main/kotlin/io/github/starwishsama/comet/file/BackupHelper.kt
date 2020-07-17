@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.file
 
 import cn.hutool.core.io.file.FileWriter
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.managers.TaskManager
 import java.io.File
@@ -24,7 +24,7 @@ object BackupHelper {
             val backupFile = File(Comet.filePath.toString() + "/backups/${backupName}")
             backupFile.createNewFile()
             FileWriter.create(backupFile, Charsets.UTF_8)
-                    .write(BotConstants.gson.toJson(BotConstants.users))
+                .write(BotVariables.gson.toJson(BotVariables.users))
             Comet.logger.info("[备份] 备份成功! 文件名是 $backupName")
         } catch (e: Exception) {
             Comet.logger.error("[备份] 备份时出问题", e)

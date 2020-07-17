@@ -1,8 +1,8 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
 import io.github.starwishsama.comet.Comet
-import io.github.starwishsama.comet.commands.CommandExecutor
 import io.github.starwishsama.comet.commands.CommandProps
+import io.github.starwishsama.comet.commands.MessageHandler
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
@@ -15,7 +15,7 @@ import net.mamoe.mirai.message.data.MessageChain
 class VersionCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(event.sender.id)) {
-            return ("彗星 Bot " + Comet.version + "\n已注册的命令个数: " + CommandExecutor.commands.size +
+            return ("彗星 Bot " + Comet.version + "\n已注册的命令个数: " + MessageHandler.commands.size +
                     "\n运行时间: ${BotUtil.getRunningTime()}" +
                     "\nMade with ❤, Running on Mirai").toMirai()
         }

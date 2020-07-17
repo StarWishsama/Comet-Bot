@@ -4,7 +4,7 @@ import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
@@ -38,7 +38,7 @@ fun File.writeJson(context: Any) {
             this.createNewFile()
         }
 
-        FileWriter.create(this).write(BotConstants.gson.toJson(context))
+        FileWriter.create(this).write(BotVariables.gson.toJson(context))
     }
 }
 
@@ -106,14 +106,14 @@ object BotUtil {
             return false
         }
 
-        if (qq == BotConstants.cfg.ownerId){
+        if (qq == BotVariables.cfg.ownerId) {
             return true
         }
 
         if (coolDown.containsKey(qq) && !isBotAdmin(qq)) {
             val cd = coolDown[qq]
             if (cd != null) {
-                if (currentTime - cd < BotConstants.cfg.coolDownTime * 1000) {
+                if (currentTime - cd < BotVariables.cfg.coolDownTime * 1000) {
                     return false
                 } else {
                     coolDown.remove(qq)
@@ -140,7 +140,7 @@ object BotUtil {
             return false
         }
 
-        if (qq == BotConstants.cfg.ownerId){
+        if (qq == BotVariables.cfg.ownerId) {
             return true
         }
 
@@ -175,7 +175,7 @@ object BotUtil {
      * @return 本地化文本
      */
     fun getLocalMessage(node: String): String {
-        for ((n, t) in BotConstants.msg) {
+        for ((n, t) in BotVariables.localMessage) {
             if (n.contentEquals(node)) {
                 return t
             }

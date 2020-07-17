@@ -3,7 +3,7 @@ package io.github.starwishsama.comet.objects.pojo.twitter
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
 import io.github.starwishsama.comet.utils.NetUtil
@@ -43,7 +43,10 @@ data class ReTweet (
             val media = objects["media"]
             if (media != null) {
                 try {
-                    val image = BotConstants.gson.fromJson(objects["media"].asJsonArray[0].asJsonObject.toString(), Media::class.java)
+                    val image = BotVariables.gson.fromJson(
+                        objects["media"].asJsonArray[0].asJsonObject.toString(),
+                        Media::class.java
+                    )
                     if (image.isSendableMedia()) {
                         picture = NetUtil.getUrlInputStream(image.mediaUrlHttps).uploadAsImage(contact)
                     }

@@ -4,7 +4,7 @@ import cn.hutool.http.HttpRequest
 import com.github.salomonbrys.kotson.get
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
@@ -20,13 +20,20 @@ object MusicUtil {
 
     fun searchNetEaseMusic(songName: String): MessageChain {
         try {
-            val searchResponse = HttpRequest.get("http://${BotConstants.cfg.netEaseApi}/search?keywords=${URLEncoder.encode(songName, "UTF-8")}").timeout(8000).executeAsync()
+            val searchResponse = HttpRequest.get(
+                "http://${BotVariables.cfg.netEaseApi}/search?keywords=${URLEncoder.encode(
+                    songName,
+                    "UTF-8"
+                )}"
+            ).timeout(8000).executeAsync()
             if (searchResponse.isOk) {
                 val searchResult: JsonObject = JsonParser.parseString(searchResponse.body()) as JsonObject
                 if (searchResult.isJsonObject) {
                     val musicId = searchResult.getAsJsonObject("result").getAsJsonArray("songs")[0]["id"].asInt
                     val musicUrl = "https://music.163.com/#/song?id=$musicId"
-                    val songResult = HttpRequest.get("http://${BotConstants.cfg.netEaseApi}/song/detail?ids=$musicId").timeout(8000).executeAsync()
+                    val songResult =
+                        HttpRequest.get("http://${BotVariables.cfg.netEaseApi}/song/detail?ids=$musicId").timeout(8000)
+                            .executeAsync()
                     if (songResult.isOk) {
                         val songJson = JsonParser.parseString(songResult.body())
                         if (songJson.isJsonObject) {
@@ -42,7 +49,9 @@ object MusicUtil {
 
                             artistName = artistName.substring(0, artistName.length - 1)
 
-                            val playResult = HttpRequest.get("http://${BotConstants.cfg.netEaseApi}/song/url?id=$musicId").timeout(8000).executeAsync()
+                            val playResult =
+                                HttpRequest.get("http://${BotVariables.cfg.netEaseApi}/song/url?id=$musicId")
+                                    .timeout(8000).executeAsync()
                             if (playResult.isOk) {
                                 val playJson = JsonParser.parseString(playResult.body())
                                 if (playJson.isJsonObject) {

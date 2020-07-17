@@ -1,10 +1,12 @@
 package io.github.starwishsama.comet.commands
 
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.commands.interfaces.ConsoleCommand
+import io.github.starwishsama.comet.commands.interfaces.SuspendCommand
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
 import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.toMirai
@@ -19,7 +21,7 @@ import java.util.*
  * 处理群聊/私聊聊天信息中存在的命令
  * @author Nameless
  */
-object CommandExecutor {
+object MessageHandler {
     var commands: List<UniversalCommand> = mutableListOf()
     private var consoleCommands = mutableListOf<ConsoleCommand>()
 
@@ -69,11 +71,15 @@ object CommandExecutor {
         val senderId = event.sender.id
         val message = event.message.contentToString()
         try {
-            if (isCommandPrefix(message) && !SessionManager.isValidSessionById(senderId)) {
+            if (SessionManager.isValidSessionById(senderId)) {
+                handleSession(event, executedTime)
+            }
+
+            if (isCommandPrefix(message)) {
                 val cmd = getCommand(getCommandName(message))
                 if (cmd != null) {
                     val splitMessage = message.split(" ")
-                    Comet.logger.debug("[命令] ${if (senderId != -1L) senderId.toString() else "后台"} 尝试执行命令: " + cmd.getProps().name)
+                    Comet.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.getProps().name}")
                     var user = BotUser.getUser(senderId)
                     if (user == null) {
                         user = BotUser.quickRegister(senderId)
@@ -122,6 +128,26 @@ object CommandExecutor {
         return ""
     }
 
+    private suspend fun handleSession(event: MessageEvent, time: LocalDateTime) {
+        val sender = event.sender
+        if (!isCommandPrefix(event.message.contentToString()) && SessionManager.isValidSessionById(sender.id)) {
+            val session: Session? = SessionManager.getSessionByEvent(event)
+            if (session != null) {
+                val command = session.command
+                if (command is SuspendCommand) {
+                    var user = BotUser.getUser(sender.id)
+                    if (user == null) {
+                        user = BotUser.quickRegister(sender.id)
+                    }
+                    command.handleInput(event, user, session)
+                }
+            }
+        }
+
+        val usedTime = Duration.between(time, LocalDateTime.now())
+        Comet.logger.debug("[会话] 处理会话耗时 ${usedTime.toSecondsPart()}s${usedTime.toMillisPart()}ms")
+    }
+
     private fun getCommand(cmdPrefix: String): UniversalCommand? {
         for (command in commands) {
             if (commandEquals(command, cmdPrefix)) {
@@ -140,17 +166,25 @@ object CommandExecutor {
         return null
     }
 
-    fun getCommandName(command: String): String {
+    private fun getCommandName(command: String): String {
         var cmdPrefix = command
-        for (string: String in BotConstants.cfg.commandPrefix) {
+        for (string: String in BotVariables.cfg.commandPrefix) {
             cmdPrefix = cmdPrefix.replace(string, "")
         }
 
         return cmdPrefix.split(" ")[0]
     }
 
-    private fun isCommandPrefix(message: String): Boolean {
-        return message.isNotEmpty() && BotConstants.cfg.commandPrefix.contains(message.substring(0, 1))
+    fun isCommandPrefix(message: String): Boolean {
+        if (message.isNotEmpty()) {
+            BotVariables.cfg.commandPrefix.forEach {
+                if (message.startsWith(it)) {
+                    return true
+                }
+            }
+        }
+
+        return false
     }
 
     private fun commandEquals(cmd: UniversalCommand, cmdName: String): Boolean {
@@ -194,7 +228,7 @@ object CommandExecutor {
     }
 
     private fun doFilter(chain: MessageChain): MessageChain {
-        if (BotConstants.cfg.filterWords.isNullOrEmpty()) {
+        if (BotVariables.cfg.filterWords.isNullOrEmpty()) {
             return chain
         }
 
@@ -206,7 +240,7 @@ object CommandExecutor {
         for (i in revampChain.indices) {
             if (revampChain[i] is PlainText) {
                 var context = revampChain[i].content
-                BotConstants.cfg.filterWords.forEach {
+                BotVariables.cfg.filterWords.forEach {
                     if (context.contains(it)) {
                         count++
                         context = context.replace(it.toRegex(), " ")

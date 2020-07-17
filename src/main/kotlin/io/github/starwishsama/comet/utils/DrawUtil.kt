@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.ArkNightOperator
@@ -32,7 +32,7 @@ object DrawUtil {
     }
 
     private fun getOperator(rare: Int): ArkNightOperator {
-        val ops: List<ArkNightOperator> = BotConstants.arkNight
+        val ops: List<ArkNightOperator> = BotVariables.arkNight
         val tempOps: MutableList<ArkNightOperator> = LinkedList()
         for (op in ops) {
             if (op.rare == rare) {
@@ -78,7 +78,7 @@ object DrawUtil {
 
     private fun getCharacter(rare: Int): PCRCharacter {
         val temp: MutableList<PCRCharacter> = LinkedList()
-        for (c in BotConstants.pcr) {
+        for (c in BotVariables.pcr) {
             if (c.star == rare) {
                 temp.add(c)
             }

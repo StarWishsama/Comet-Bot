@@ -21,7 +21,7 @@ jar {
 }
 
 def gitCommitId = 'git rev-parse --short HEAD'
-def versionCode = "0.3.8-DEV-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
+def versionCode = "0.3.8.1-DEV-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
 
 group 'io.github.starwishsama.comet'
 version versionCode
@@ -60,8 +60,8 @@ static def findOldVersionStr(path) {
 jar.dependsOn updateVersion
 
 dependencies {
-    implementation 'net.mamoe:mirai-core:1.0.4'
-    implementation 'net.mamoe:mirai-core-qqandroid:1.0.4'
+    implementation 'net.mamoe:mirai-core:1.1.2'
+    implementation 'net.mamoe:mirai-core-qqandroid:1.1.2'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation 'cn.hutool:hutool-all:4.5.10'
     implementation 'org.apache.commons:commons-lang3:3.8.1'

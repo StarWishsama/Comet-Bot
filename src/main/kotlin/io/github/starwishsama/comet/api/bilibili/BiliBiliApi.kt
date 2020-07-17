@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.api.bilibili
 
 import cn.hutool.http.HttpRequest
 import com.google.gson.JsonParser
-import io.github.starwishsama.comet.BotConstants.gson
+import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.api.ApiExecutor
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.WrappedMessage

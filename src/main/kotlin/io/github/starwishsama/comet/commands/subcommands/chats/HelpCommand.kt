@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
-import io.github.starwishsama.comet.commands.CommandExecutor
 import io.github.starwishsama.comet.commands.CommandProps
+import io.github.starwishsama.comet.commands.MessageHandler
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
@@ -14,7 +14,7 @@ import net.mamoe.mirai.message.data.toMessage
 class HelpCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         val sb = StringBuilder()
-        for (cmd in CommandExecutor.commands) {
+        for (cmd in MessageHandler.commands) {
             if (cmd.getProps().name.contentEquals("help") || !cmd.getProps().name.contentEquals("debug")) {
                 sb.append("/").append(cmd.getProps().name).append("  ").append(cmd.getProps().description).append("\n")
             }

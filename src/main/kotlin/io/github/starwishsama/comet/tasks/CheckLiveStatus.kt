@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.tasks
 
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
@@ -12,8 +12,8 @@ object CheckLiveStatus : Runnable {
     private val pushedList = mutableSetOf<Long>()
 
     override fun run() {
-        if (BotConstants.cfg.subList.isNotEmpty() && BotConstants.cfg.pushGroups.isNotEmpty()) {
-            BotConstants.cfg.subList.forEach { roomId ->
+        if (BotVariables.cfg.subList.isNotEmpty() && BotVariables.cfg.pushGroups.isNotEmpty()) {
+            BotVariables.cfg.subList.forEach { roomId ->
                 val data = runBlocking {
                     FakeClientApi.getLiveRoom(roomId)?.data
                 }
@@ -34,7 +34,7 @@ object CheckLiveStatus : Runnable {
                                         "\n传送门: https://live.bilibili.com/${data.roomId}"
                                 Comet.bot.groups.forEach { group ->
                                     runBlocking {
-                                        if (BotConstants.cfg.pushGroups.contains(group.id)) {
+                                        if (BotVariables.cfg.pushGroups.contains(group.id)) {
                                             group.sendMessage(msg)
                                         }
                                         /** 防止消息发送失败 */

@@ -8,8 +8,8 @@ object TaskManager {
         Comet.service.schedule(task, delay, TimeUnit.SECONDS)
     }
 
-    fun runScheduleTaskAsync(task: () -> Unit, delay: Long, period: Long, unit: TimeUnit) {
-        Comet.service.scheduleAtFixedRate(task, delay, period, unit)
+    fun runScheduleTaskAsync(task: () -> Unit, firstTimeDelay: Long, period: Long, unit: TimeUnit) {
+        Comet.service.scheduleAtFixedRate(task, firstTimeDelay, period, unit)
     }
 
     fun runScheduleTaskAsyncIf(task: () -> Unit, delay: Long, period: Long, unit: TimeUnit, condition: Boolean) {

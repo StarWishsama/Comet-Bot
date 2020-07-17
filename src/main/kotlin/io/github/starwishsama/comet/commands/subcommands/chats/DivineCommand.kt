@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -18,7 +18,7 @@ import net.mamoe.mirai.message.data.MessageChain
 class DivineCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (isNoCoolDown(event.sender.id)) {
-            val underCover = getResultFromList(BotConstants.underCovers, event.sender.id)
+            val underCover = getResultFromList(BotVariables.underCovers, event.sender.id)
             return if (args.isNotEmpty()) {
                 if (underCover == null) {
                     if (user.commandTime > 0 || user.level != UserLevel.USER) {
@@ -34,7 +34,7 @@ class DivineCommand : UniversalCommand {
                         BotUtil.sendMsgPrefix("今日命令条数已达上限, 请等待条数自动恢复哦~\n命令条数现在每小时会恢复100次, 封顶1000次").toMirai()
                     }
                 } else {
-                    BotConstants.underCovers -= underCover
+                    BotVariables.underCovers -= underCover
                     RandomResult.getChance(underCover).toMirai()
                 }
             } else {

@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.dynamicdata
 
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.comet.BotConstants.gson
+import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.objects.WrappedMessage
 import io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.DynamicData

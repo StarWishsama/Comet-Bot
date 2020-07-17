@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
 import io.github.starwishsama.comet.commands.CommandProps
@@ -96,10 +96,10 @@ class BiliBiliCommand : UniversalCommand {
                 }
             }
 
-            return if (!BotConstants.cfg.subList.contains(roomId)) {
+            return if (!BotVariables.cfg.subList.contains(roomId)) {
                 BotUtil.sendMsgPrefix("你还没订阅直播间 ${args[1]}").toMirai()
             } else {
-                BotConstants.cfg.subList.remove(args[1].toLong())
+                BotVariables.cfg.subList.remove(args[1].toLong())
                 BotUtil.sendMsgPrefix("取消订阅直播间 ${args[1]} 成功").toMirai()
             }
         } else {
@@ -111,7 +111,7 @@ class BiliBiliCommand : UniversalCommand {
         val subs = StringBuilder("监控室列表:\n")
         val info = ArrayList<com.hiczp.bilibili.api.live.model.RoomInfo>()
 
-        for (l in BotConstants.cfg.subList) {
+        for (l in BotVariables.cfg.subList) {
             val room = FakeClientApi.getLiveRoom(l)
             if (room != null) {
                 info.add(room)
@@ -159,8 +159,8 @@ class BiliBiliCommand : UniversalCommand {
             item?.roomid ?: return EmptyMessageChain
         }
 
-        if (!BotConstants.cfg.subList.contains(rid)) {
-            BotConstants.cfg.subList.add(rid)
+        if (!BotVariables.cfg.subList.contains(rid)) {
+            BotVariables.cfg.subList.add(rid)
         }
 
         return BotUtil.sendMsgPrefix("订阅 ${if (name.isNotBlank()) name else BiliBiliApi.getUserNameByMid(rid)}($rid) 成功")

@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.objects.group
 
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.ShopItem
 import java.util.*
@@ -46,7 +46,7 @@ class Shop {
     companion object {
         fun getShopById(groupId: Long): Shop {
             val result = AtomicReference(Shop())
-            BotConstants.shop.forEach { shop ->
+            BotVariables.shop.forEach { shop ->
                 if (shop.groupId == groupId) {
                     result.set(shop)
                 }

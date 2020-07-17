@@ -3,17 +3,18 @@ package io.github.starwishsama.comet.objects.pojo.twitter
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.comet.BotConstants
-import io.github.starwishsama.comet.BotConstants.gson
+import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
 import io.github.starwishsama.comet.utils.NetUtil
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.uploadAsImage
+import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.util.*
 
 data class Tweet(
         @SerializedName("created_at")
@@ -60,7 +61,8 @@ data class Tweet(
     }
 
     fun getSentTime(): LocalDateTime {
-        return BotConstants.twitterTimeFormat.parse(postTime).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+        val twitterTimeFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZZZ yyyy", Locale.ENGLISH)
+        return twitterTimeFormat.parse(postTime).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
     }
 
     suspend fun getPictureOrNull(contact: Contact): Image? {

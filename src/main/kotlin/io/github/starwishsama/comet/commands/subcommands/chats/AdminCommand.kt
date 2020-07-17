@@ -1,6 +1,5 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
-import io.github.starwishsama.comet.BotConstants
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -18,8 +17,11 @@ import net.mamoe.mirai.message.data.toMessage
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 class AdminCommand : UniversalCommand {
+    val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (user.isBotAdmin()) {
             if (args.isEmpty()) {
@@ -114,18 +116,18 @@ class AdminCommand : UniversalCommand {
                 3 -> {
                     startTime = LocalDateTime.of(
                         LocalDate.now(),
-                        LocalTime.parse(args[1], BotConstants.dateFormatter)
+                        LocalTime.parse(args[1], dateFormatter)
                     )
                     endTime = LocalDateTime.of(
                             LocalDate.now(),
-                            LocalTime.parse(args[2], BotConstants.dateFormatter)
+                        LocalTime.parse(args[2], dateFormatter)
                     )
                 }
                 2 -> {
                     startTime = LocalDateTime.now()
                     endTime = LocalDateTime.of(
                             LocalDate.now(),
-                            LocalTime.parse(args[1], BotConstants.dateFormatter)
+                        LocalTime.parse(args[1], dateFormatter)
                     )
                 }
                 else -> {

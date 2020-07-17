@@ -1,8 +1,10 @@
 package io.github.starwishsama.comet.sessions
 
+import io.github.starwishsama.comet.managers.TaskManager
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
-import java.util.*
+import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -11,13 +13,30 @@ import java.util.*
  * @author Nameless
  */
 object SessionManager {
+    init {
+        TaskManager.runScheduleTaskAsync({
+            val timeNow = LocalDateTime.now()
+            sessions.forEach { (session, time) ->
+                run {
+                    if (time.plusMinutes(3).isAfter(timeNow)) {
+                        this.expireSession(session)
+                    }
+                }
+            }
+        }, 3, 3, TimeUnit.MINUTES)
+    }
+
     /**
      * 会话列表
      */
-    private val sessions: MutableList<Session> = LinkedList()
+    private val sessions: MutableMap<Session, LocalDateTime> = HashMap()
 
     fun addSession(session: Session) {
-        sessions.add(session)
+        sessions[session] = LocalDateTime.now()
+    }
+
+    fun addSession(session: Session, time: LocalDateTime) {
+        sessions[session] = time
     }
 
     fun expireSession(session: Session) {
@@ -43,8 +62,8 @@ object SessionManager {
     private fun getSession(id: Long): Session? {
         if (sessions.isNotEmpty()) {
             for (session in sessions) {
-                if (session.getUserById(id) != null) {
-                    return session
+                if (session.key.getUserById(id) != null) {
+                    return session.key
                 }
             }
         }
@@ -53,8 +72,8 @@ object SessionManager {
 
     fun getSessionByGroup(id: Long): Session? {
         for (session in sessions) {
-            if (session.groupId == id) {
-                return session
+            if (session.key.groupId == id) {
+                return session.key
             }
         }
         return null
@@ -66,14 +85,14 @@ object SessionManager {
                 if (isValidSessionByGroup(event.group.id)) {
                     getSessionByGroup(event.group.id)
                 } else {
-                    null
+                    getSession(event.sender.id)
                 }
             }
             else -> getSession(event.sender.id)
         }
     }
 
-    fun getSessions(): List<Session> {
+    fun getSessions(): Map<Session, LocalDateTime> {
         return sessions
     }
 }

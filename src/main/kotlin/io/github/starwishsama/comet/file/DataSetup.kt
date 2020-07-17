@@ -5,8 +5,8 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
-import io.github.starwishsama.comet.BotConstants
-import io.github.starwishsama.comet.BotConstants.gson
+import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotLocalization
@@ -37,9 +37,9 @@ object DataSetup {
 
         if (!userCfg.exists() || !cfgFile.exists()) {
             try {
-                cfgFile.writeJson(BotConstants.cfg)
-                userCfg.writeJson(BotConstants.users)
-                shopItemCfg.writeJson(BotConstants.shop)
+                cfgFile.writeJson(BotVariables.cfg)
+                userCfg.writeJson(BotVariables.users)
+                shopItemCfg.writeJson(BotVariables.shop)
                 groupCfg.writeJson(GroupConfigManager.configs)
                 println("[配置] 已自动生成新的配置文件.")
             } catch (e: Exception) {
@@ -52,11 +52,11 @@ object DataSetup {
 
     private fun saveCfg() {
         try {
-            cfgFile.writeJson(BotConstants.cfg)
-            userCfg.writeJson(BotConstants.users)
-            shopItemCfg.writeJson(BotConstants.shop)
+            cfgFile.writeJson(BotVariables.cfg)
+            userCfg.writeJson(BotVariables.users)
+            shopItemCfg.writeJson(BotVariables.shop)
             groupCfg.writeJson(GroupConfigManager.configs)
-            cacheCfg.writeJson(BotConstants.cache)
+            cacheCfg.writeJson(BotVariables.cache)
         } catch (e: Exception) {
             System.err.println("[配置] 在保存配置文件时发生了问题, 错误信息: ")
             e.printStackTrace()
@@ -65,12 +65,12 @@ object DataSetup {
 
     private fun load() {
         try {
-            BotConstants.cfg = gson.fromJson(cfgFile.getContext(), Config::class.java)
-            BotConstants.users = gson.fromJson(
-                    userCfg.getContext(),
-                    object : TypeToken<List<BotUser>>() {}.type
+            BotVariables.cfg = gson.fromJson(cfgFile.getContext(), Config::class.java)
+            BotVariables.users = gson.fromJson(
+                userCfg.getContext(),
+                object : TypeToken<List<BotUser>>() {}.type
             )
-            BotConstants.shop = gson.fromJson(
+            BotVariables.shop = gson.fromJson(
                 shopItemCfg.getContext(),
                 object : TypeToken<List<Shop>>() {}.type
             )
@@ -82,14 +82,14 @@ object DataSetup {
             loadLang()
 
             if (pcrData.exists()) {
-                BotConstants.pcr = gson.fromJson(
+                BotVariables.pcr = gson.fromJson(
                     pcrData.getContext(),
                     object : TypeToken<List<PCRCharacter>>() {}.type
                 )
             }
 
             if (arkNightData.exists()) {
-                BotConstants.arkNight = gson.fromJson(
+                BotVariables.arkNight = gson.fromJson(
                     arkNightData.getContext(),
                     object : TypeToken<List<ArkNightOperator>>() {}.type
                 )
@@ -101,7 +101,7 @@ object DataSetup {
                 jsonObject.addProperty("get_time", 0L)
                 cacheCfg.writeJson(jsonObject)
             } else {
-                BotConstants.cache = JsonParser.parseString(cacheCfg.getContext()).asJsonObject
+                BotVariables.cache = JsonParser.parseString(cacheCfg.getContext()).asJsonObject
             }
 
             println("[配置] 成功载入配置文件")
@@ -119,15 +119,16 @@ object DataSetup {
                     BotLocalization("checkin.first-time", "你还没有签到过, 先用 /qd 签到一次吧~")
             )
             for (text in default) {
-                BotConstants.msg = BotConstants.msg + text
+                BotVariables.localMessage = BotVariables.localMessage + text
             }
-            langCfg.writeJson(BotConstants.msg)
+            langCfg.writeJson(BotVariables.localMessage)
         } else {
             val lang: JsonElement =
                     JsonParser.parseString(langCfg.getContext())
             if (lang.isJsonArray) {
-                BotConstants.msg = gson.fromJson(FileReader.create(langCfg).readString(),
-                        object : TypeToken<List<BotLocalization>>() {}.type
+                BotVariables.localMessage = gson.fromJson(
+                    FileReader.create(langCfg).readString(),
+                    object : TypeToken<List<BotLocalization>>() {}.type
                 )
                 println("[配置] 成功载入多语言文件")
             } else {
@@ -137,7 +138,7 @@ object DataSetup {
     }
 
     private fun saveLang() {
-        langCfg.writeJson(BotConstants.msg)
+        langCfg.writeJson(BotVariables.localMessage)
     }
 
     fun saveFiles() {
@@ -148,6 +149,6 @@ object DataSetup {
 
     fun reload() {
         // 仅重载配置文件
-        BotConstants.cfg = gson.fromJson(cfgFile.getContext(), Config::class.java)
+        BotVariables.cfg = gson.fromJson(cfgFile.getContext(), Config::class.java)
     }
 }

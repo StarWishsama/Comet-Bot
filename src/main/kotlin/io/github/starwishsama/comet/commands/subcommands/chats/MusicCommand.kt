@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
 import io.github.starwishsama.comet.enums.MusicApi
@@ -16,16 +16,16 @@ import net.mamoe.mirai.message.data.MessageChain
 
 class MusicCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        val api = BotConstants.cfg.musicApi
+        val api = BotVariables.cfg.musicApi
         if (BotUtil.isNoCoolDown(event.sender.id)) {
             if (args.isNotEmpty()) {
                 if (args[0].contentEquals("api")) {
                     if (args.size > 1) {
                         when (args[1].toUpperCase()) {
-                            "QQ" -> BotConstants.cfg.musicApi = MusicApi.QQ
-                            "NETEASE", "网易" -> BotConstants.cfg.musicApi = MusicApi.NETEASE
+                            "QQ" -> BotVariables.cfg.musicApi = MusicApi.QQ
+                            "NETEASE", "网易" -> BotVariables.cfg.musicApi = MusicApi.NETEASE
                         }
-                        return BotUtil.sendMsgPrefix("音乐API已修改为 ${BotConstants.cfg.musicApi}").toMirai()
+                        return BotUtil.sendMsgPrefix("音乐API已修改为 ${BotVariables.cfg.musicApi}").toMirai()
                     }
                 } else {
                     return when (api) {

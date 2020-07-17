@@ -9,9 +9,6 @@ import net.mamoe.mirai.message.MessageEvent
  *
  * 用于接收用户输入, 利用 [Session] 接收用户输入的内容
  *
- * 请自行在使用结束后释放
- *
- * 否则会一直接收
  */
 interface SuspendCommand {
     suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session)

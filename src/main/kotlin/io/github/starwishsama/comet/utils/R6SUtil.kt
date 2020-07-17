@@ -3,7 +3,7 @@ package io.github.starwishsama.comet.utils
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.enums.R6Rank
 import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6Player
@@ -15,17 +15,21 @@ object R6SUtil {
             "\nKD: %s" +
             "\n爆头率: %s"
     private val num = NumberFormat.getPercentInstance()
-    private val gson = BotConstants.gson
+    private val gson = BotVariables.gson
 
     private fun searchPlayer(name: String): R6Player? {
         try {
-            val body: String = NetUtil.getPageContent("https://r6.apitab.com/search/uplay/$name?cid=${BotConstants.cfg.r6tabKey}")
+            val body: String =
+                NetUtil.getPageContent("https://r6.apitab.com/search/uplay/$name?cid=${BotVariables.cfg.r6tabKey}")
             if (BotUtil.isValidJson(body)) {
                 val element: JsonElement = JsonParser.parseString(body).asJsonObject["players"]
                 if (BotUtil.isValidJson(element)) {
                     val jsonObject: JsonObject = element.asJsonObject
                     val uuid: String = jsonObject.get(jsonObject.keySet().iterator().next()).asJsonObject.get("profile").asJsonObject.get("p_user").asString
-                    return gson.fromJson(NetUtil.getPageContent("https://r6.apitab.com/player/$uuid?cid=${BotConstants.cfg.r6tabKey}"), R6Player::class.java)
+                    return gson.fromJson(
+                        NetUtil.getPageContent("https://r6.apitab.com/player/$uuid?cid=${BotVariables.cfg.r6tabKey}"),
+                        R6Player::class.java
+                    )
                 }
             }
         } catch (e: Exception) {

@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
@@ -37,7 +37,7 @@ class InfoCommand : UniversalCommand {
                     }
                 }
             } else if (args.size == 1 && args[0].contentEquals("排行") || args[0].contentEquals("ph")) {
-                val users = BotConstants.users
+                val users = BotVariables.users
                 users.sortedByDescending { it.checkInPoint }
                 val sb = StringBuilder()
                 sb.append("积分排行榜").append("\n")

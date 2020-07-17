@@ -1,8 +1,8 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
 import io.github.starwishsama.comet.Comet
-import io.github.starwishsama.comet.commands.CommandExecutor
 import io.github.starwishsama.comet.commands.CommandProps
+import io.github.starwishsama.comet.commands.MessageHandler
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
@@ -39,8 +39,10 @@ class DebugCommand : UniversalCommand {
                         if (sessions.isEmpty()) {
                             sb.append("无")
                         } else {
-                            for (i in sessions.indices) {
-                                sb.append(i + 1).append(" ").append(sessions[i].toString()).append("\n")
+                            var i = 1
+                            for (session in sessions) {
+                                sb.append(i + 1).append(" ").append(session.key.toString()).append("\n")
+                                i++
                             }
                         }
                         return sb.toString().trim().toMirai()
@@ -49,7 +51,7 @@ class DebugCommand : UniversalCommand {
                 "help" -> return getHelp().toMessage().asMessageChain()
                 "info" ->
                     return ("彗星 Bot ${Comet.version}\n" +
-                            "已注册的命令个数: ${CommandExecutor.commands.size}\n" +
+                            "已注册的命令个数: ${MessageHandler.commands.size}\n" +
                             BotUtil.getMemoryUsage()).toMirai()
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().toMirai()
                 else -> return "Bot > 命令不存在\n${getHelp()}".toMirai()

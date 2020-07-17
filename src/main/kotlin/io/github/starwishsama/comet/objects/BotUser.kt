@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.objects
 
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.utils.BotUtil.getLevel
 import java.time.LocalDateTime
@@ -76,7 +76,7 @@ class BotUser(var userQQ: Long) {
     }
 
     fun isBotOwner(): Boolean {
-        return level == UserLevel.OWNER || BotConstants.cfg.ownerId == userQQ
+        return level == UserLevel.OWNER || BotVariables.cfg.ownerId == userQQ
     }
 
     fun addPermission(permission: String) {
@@ -93,17 +93,17 @@ class BotUser(var userQQ: Long) {
         }
 
         fun isBotOwner(id: Long): Boolean {
-            return getLevel(id) == UserLevel.OWNER || BotConstants.cfg.ownerId == id
+            return getLevel(id) == UserLevel.OWNER || BotVariables.cfg.ownerId == id
         }
 
         fun quickRegister(id: Long): BotUser {
             val user = BotUser(id)
-            BotConstants.users = BotConstants.users.plusElement(user)
+            BotVariables.users = BotVariables.users.plusElement(user)
             return user
         }
 
         fun getUser(qq: Long): BotUser? {
-            for (user in BotConstants.users) {
+            for (user in BotVariables.users) {
                 if (user.userQQ == qq) {
                     return user
                 }

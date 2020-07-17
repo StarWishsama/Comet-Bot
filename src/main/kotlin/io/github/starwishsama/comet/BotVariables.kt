@@ -11,8 +11,6 @@ import io.github.starwishsama.comet.objects.draw.ArkNightOperator
 import io.github.starwishsama.comet.objects.draw.PCRCharacter
 import io.github.starwishsama.comet.objects.group.Shop
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
-import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -22,21 +20,19 @@ import java.util.*
  * @author Nameless
  */
 
-object BotConstants {
+object BotVariables {
     var shop: List<Shop> = LinkedList()
     var users: List<BotUser> = LinkedList()
-    var msg: List<BotLocalization> = ArrayList()
+    var localMessage: List<BotLocalization> = ArrayList()
     var cfg = Config()
     var underCovers: List<RandomResult> = LinkedList()
     var cache: JsonObject = JsonObject()
 
-    /** 舟游/PCR 数据 */
+    /** 明日方舟/PCR 卡池数据 */
     var arkNight: List<ArkNightOperator> = LinkedList()
     var pcr: List<PCRCharacter> = LinkedList()
 
-    var gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
-    val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-    val twitterTimeFormat: SimpleDateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZZZ yyyy", Locale.ENGLISH)
+    val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
 
     var hitokoto: Hitokoto? = null
 }

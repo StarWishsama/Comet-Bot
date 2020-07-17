@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.tasks
 
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.exceptions.RateLimitException
@@ -19,7 +19,7 @@ object LatestTweetChecker : Runnable {
             TwitterApi.getBearerToken()
         }
 
-        BotConstants.cfg.twitterSubs.forEach {
+        BotVariables.cfg.twitterSubs.forEach {
             try {
                 val tweet = TwitterApi.getTweetWithCache(it)
                 val historyTweet = pushedMap[it]
@@ -29,7 +29,7 @@ object LatestTweetChecker : Runnable {
                     TwitterApi.addCacheTweet(it, tweet)
 
                     Comet.bot.groups.forEach { group ->
-                        if (BotConstants.cfg.tweetPushGroups.contains(group.id)) {
+                        if (BotVariables.cfg.tweetPushGroups.contains(group.id)) {
                             GlobalScope.launch {
                                 var message = "${tweet.user.name} ($it) 发送了一条推文\n${tweet.getFullText()}".toMirai()
                                 val image = tweet.getPictureOrNull(group)

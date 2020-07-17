@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
 import cn.hutool.http.HttpException
-import io.github.starwishsama.comet.BotConstants
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.CommandProps
@@ -29,13 +29,13 @@ class TwitterCommand : UniversalCommand {
         if (BotUtil.isNoCoolDown(user.userQQ)) {
             when {
                 args.isEmpty() -> return getHelp().toMirai()
-                BotConstants.cfg.twitterToken == null -> return BotUtil.sendMsgPrefix("请到配置文件中填写蓝鸟 Token").toMirai()
+                BotVariables.cfg.twitterToken == null -> return BotUtil.sendMsgPrefix("请到配置文件中填写蓝鸟 Token").toMirai()
                 else -> {
                     when (args[0]) {
                         "info", "cx", "查询" -> return searchUser(args, event)
                         "sub", "订阅" -> return subscribeUser(args)
                         "unsub", "退订" -> return unsubscribeUser(args)
-                        "list" -> return BotConstants.cfg.twitterSubs.toString().toMirai()
+                        "list" -> return BotVariables.cfg.twitterSubs.toString().toMirai()
                         else -> getHelp().toMirai()
                     }
                 }
@@ -91,7 +91,7 @@ class TwitterCommand : UniversalCommand {
 
     private fun subscribeUser(args: List<String>): MessageChain {
         if (args.size > 1) {
-            if (!BotConstants.cfg.twitterSubs.contains(args[1])) {
+            if (!BotVariables.cfg.twitterSubs.contains(args[1])) {
                 val twitter: TwitterUser?
 
                 try {
@@ -101,7 +101,7 @@ class TwitterCommand : UniversalCommand {
                 }
 
                 if (twitter != null) {
-                    BotConstants.cfg.twitterSubs += args[1]
+                    BotVariables.cfg.twitterSubs += args[1]
                     return BotUtil.sendMsgPrefix("订阅 @${args[1]} 成功").toMirai()
                 }
 
@@ -116,8 +116,8 @@ class TwitterCommand : UniversalCommand {
 
     private fun unsubscribeUser(args: List<String>): MessageChain {
         return if (args.size > 1) {
-            if (BotConstants.cfg.twitterSubs.contains(args[1])) {
-                BotConstants.cfg.twitterSubs -= args[1]
+            if (BotVariables.cfg.twitterSubs.contains(args[1])) {
+                BotVariables.cfg.twitterSubs -= args[1]
                 BotUtil.sendMsgPrefix("退订 @${args[1]} 成功").toMirai()
             } else {
                 BotUtil.sendMsgPrefix("没有订阅过 @${args[1]}").toMirai()
@@ -132,7 +132,7 @@ class TwitterCommand : UniversalCommand {
             is HttpException -> {
                 when (t.cause) {
                     is ConnectException -> {
-                        if (BotConstants.cfg.proxyPort != 0) {
+                        if (BotVariables.cfg.proxyPort != 0) {
                             BotUtil.sendMsgPrefix("无法连接到蓝鸟服务器").toMirai()
                         } else {
                             BotUtil.sendMsgPrefix("无法连接至代理服务器").toMirai()

@@ -5,15 +5,14 @@ import io.github.starwishsama.comet.Comet.bot
 import io.github.starwishsama.comet.Comet.startTime
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.twitter.TwitterApi
-import io.github.starwishsama.comet.commands.CommandExecutor
+import io.github.starwishsama.comet.commands.MessageHandler
 import io.github.starwishsama.comet.commands.subcommands.chats.*
+import io.github.starwishsama.comet.commands.subcommands.console.DebugCommand
 import io.github.starwishsama.comet.commands.subcommands.console.StopCommand
-import io.github.starwishsama.comet.commands.subcommands.console.TestCommand
 import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.ConvertLightAppListener
 import io.github.starwishsama.comet.listeners.RepeatListener
-import io.github.starwishsama.comet.listeners.SessionListener
 import io.github.starwishsama.comet.managers.TaskManager
 import io.github.starwishsama.comet.tasks.CheckLiveStatus
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
@@ -46,7 +45,7 @@ import kotlin.system.exitProcess
 
 object Comet {
     val filePath: File = File(getPath())
-    const val version = "0.3.8-DEV-b834be7-20200710"
+    const val version = "0.3.8.1-DEV-1abbd40-20200717"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -63,7 +62,7 @@ object Comet {
         while (scanner.hasNextLine()) {
             command = scanner.nextLine()
             runBlocking {
-                val result = CommandExecutor.executeConsole(command)
+                val result = MessageHandler.executeConsole(command)
                 if (result.isNotEmpty()) {
                     logger.info(result)
                 }
@@ -86,10 +85,10 @@ object Comet {
     }
 
     fun setupRCon() {
-        val url = BotConstants.cfg.rConUrl
-        val pwd = BotConstants.cfg.rConPassword
+        val url = BotVariables.cfg.rConUrl
+        val pwd = BotVariables.cfg.rConPassword
         if (url != null && pwd != null && rCon == null) {
-            rCon = Rcon(url, BotConstants.cfg.rConPort, pwd.toByteArray())
+            rCon = Rcon(url, BotVariables.cfg.rConPort, pwd.toByteArray())
         }
     }
 
@@ -120,11 +119,12 @@ suspend fun main() {
         \____/\____/_/ /_/ /_/\___/\__/  
 
 
-    """.trimIndent())
+    """.trimIndent()
+    )
     Comet.initLog()
     DataSetup.initData()
-    Comet.qqId = BotConstants.cfg.botId
-    Comet.password = BotConstants.cfg.botPassword
+    Comet.qqId = BotVariables.cfg.botId
+    Comet.password = BotVariables.cfg.botPassword
 
     if (Comet.qqId == 0L) {
         println("请到 config.json 里填写机器人的QQ号&密码")
@@ -143,22 +143,22 @@ suspend fun main() {
                 println(it)
             })
         }
-        config.heartbeatPeriodMillis = BotConstants.cfg.heartBeatPeriod * 60 * 1000
+        config.heartbeatPeriodMillis = BotVariables.cfg.heartBeatPeriod * 60 * 1000
         config.fileBasedDeviceInfo()
         bot = Bot(qq = Comet.qqId, password = Comet.password, configuration = config)
         bot.alsoLogin()
         Comet.logger = bot.logger
-        CommandExecutor.setupCommand(
+        MessageHandler.setupCommand(
             arrayOf(
-                    AdminCommand(),
-                    BiliBiliCommand(),
-                    CheckInCommand(),
-                    ClockInCommand(),
-                    DebugCommand(),
-                    DivineCommand(),
-                    GachaCommand(),
-                    GuessNumberCommand(),
-                    HelpCommand(),
+                AdminCommand(),
+                BiliBiliCommand(),
+                CheckInCommand(),
+                ClockInCommand(),
+                DebugCommand(),
+                DivineCommand(),
+                GachaCommand(),
+                GuessNumberCommand(),
+                HelpCommand(),
                     InfoCommand(),
                     MusicCommand(),
                     MuteCommand(),
@@ -169,14 +169,14 @@ suspend fun main() {
                     VersionCommand(),
                     // Console Command
                     StopCommand(),
-                    TestCommand()
+                DebugCommand()
             )
         )
 
-        val listeners = arrayOf(ConvertLightAppListener, RepeatListener, SessionListener)
+        val listeners = arrayOf(ConvertLightAppListener, RepeatListener)
         val apis = arrayOf(BiliBiliApi, TwitterApi)
 
-        Comet.logger.info("[命令] 已注册 " + CommandExecutor.commands.size + " 个命令")
+        Comet.logger.info("[命令] 已注册 " + MessageHandler.commands.size + " 个命令")
 
         Comet.setupRCon()
 
@@ -188,21 +188,22 @@ suspend fun main() {
         /** 定时任务 */
         BackupHelper.scheduleBackup()
         TaskManager.runScheduleTaskAsync(
-            { BotConstants.users.forEach { it.addTime(100) } },
+            { BotVariables.users.forEach { it.addTime(100) } },
             5,
             5,
-            TimeUnit.HOURS)
+            TimeUnit.HOURS
+        )
         TaskManager.runScheduleTaskAsyncIf(
             CheckLiveStatus::run,
-            BotConstants.cfg.checkDelay,
-            BotConstants.cfg.checkDelay,
+            BotVariables.cfg.checkDelay,
+            BotVariables.cfg.checkDelay,
             TimeUnit.MINUTES,
-            BotConstants.cfg.subList.isNotEmpty()
+            BotVariables.cfg.subList.isNotEmpty()
         )
         TaskManager.runAsync({
             Comet.client.runCatching {
-                val pwd = BotConstants.cfg.biliPassword
-                val username = BotConstants.cfg.biliUserName
+                val pwd = BotVariables.cfg.biliPassword
+                val username = BotVariables.cfg.biliUserName
 
                 if (pwd != null && username != null) {
                     runBlocking {
@@ -215,13 +216,13 @@ suspend fun main() {
         }, 5)
         TaskManager.runScheduleTaskAsync({ apis.forEach { it.resetTime() } }, 25, 25, TimeUnit.MINUTES)
         TaskManager.runScheduleTaskAsyncIf(
-                LatestTweetChecker::run,
-                1,
-                8,
-                TimeUnit.MINUTES,
-                (BotConstants.cfg.twitterSubs.isNotEmpty() && BotConstants.cfg.tweetPushGroups.isNotEmpty())
+            LatestTweetChecker::run,
+            1,
+            8,
+            TimeUnit.MINUTES,
+            (BotVariables.cfg.twitterSubs.isNotEmpty() && BotVariables.cfg.tweetPushGroups.isNotEmpty())
         )
-        TaskManager.runAsync(HitokotoUpdater::run, 5)
+        TaskManager.runScheduleTaskAsync(HitokotoUpdater::run, 5, 60 * 60 * 24, TimeUnit.SECONDS)
 
         /** 监听器 */
         listeners.forEach {
@@ -244,7 +245,7 @@ suspend fun main() {
         bot.subscribeMessages {
             always {
                 if (sender.id != 80000000L) {
-                    val result = CommandExecutor.execute(this)
+                    val result = MessageHandler.execute(this)
                     if (result !is EmptyMessageChain) {
                         reply(result)
                     }
