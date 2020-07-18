@@ -14,7 +14,7 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.Config
 import io.github.starwishsama.comet.objects.draw.ArkNightOperator
 import io.github.starwishsama.comet.objects.draw.PCRCharacter
-import io.github.starwishsama.comet.objects.group.GroupConfig
+import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.objects.group.Shop
 import io.github.starwishsama.comet.utils.getContext
 import io.github.starwishsama.comet.utils.writeJson
@@ -76,7 +76,7 @@ object DataSetup {
             )
             GroupConfigManager.configs = gson.fromJson(
                 groupCfg.getContext(),
-                object : TypeToken<Map<Long, GroupConfig>>() {}.type
+                object : TypeToken<Map<Long, PerGroupConfig>>() {}.type
             )
 
             loadLang()

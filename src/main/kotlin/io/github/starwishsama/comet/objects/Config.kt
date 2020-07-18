@@ -9,10 +9,10 @@ open class Config {
     var botId: Long = 0
 
     @SerializedName("botPassword")
-    var botPassword: String = "password"
+    var botPassword: String = ""
 
     @SerializedName("auto_save_config_time")
-    var autoSaveTime : Int = 15
+    var autoSaveTime: Long = 60
 
     @SerializedName("rcon_url")
     var rConUrl: String? = null
@@ -24,10 +24,10 @@ open class Config {
     var rConPassword: String? = null
 
     @SerializedName("netease_api")
-    var netEaseApi: String = "http://localhost:3000"
+    var netEaseApi: String = ""
 
     @SerializedName("cool_down_time")
-    var coolDownTime: Int = 7
+    var coolDownTime: Int = 5
 
     @SerializedName("filter_words")
     var filterWords : List<String> = mutableListOf()
@@ -56,6 +56,7 @@ open class Config {
     @SerializedName("universal_subs")
     var subList = LinkedList<Long>()
 
+    @Deprecated("Soon will replace by PerGroupSetting")
     @SerializedName("push_groups")
     var pushGroups : List<Long> = mutableListOf()
 
@@ -68,6 +69,7 @@ open class Config {
     @SerializedName("twitter_secret")
     var twitterSecret: String? = null
 
+    @Deprecated("Soon will replace by PerGroupSetting")
     @SerializedName("twitter_subs")
     var twitterSubs: List<String> = LinkedList()
 
@@ -81,5 +83,8 @@ open class Config {
     var proxyPort: Int = 0
 
     @SerializedName("mirai_heartbeat_period")
-    var heartBeatPeriod : Long = 2
+    var heartBeatPeriod: Long = 2
+
+    @SerializedName("youtube_api_key")
+    var youtubeApiKey: String = ""
 }

@@ -31,7 +31,7 @@ object BiliBiliApi : ApiExecutor {
 
         usedTime++
         val response = HttpRequest.get(infoUrl + mid).timeout(2000)
-            .addHeaders(mutableMapOf("User-Agent" to "Nameless live status checker by StarWishsama"))
+            .addHeaders(agent)
             .executeAsync()
         return JsonParser.parseString(response.body()).asJsonObject["data"].asJsonObject["name"].asString
     }

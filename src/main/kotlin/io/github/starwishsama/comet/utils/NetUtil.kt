@@ -28,13 +28,14 @@ object NetUtil {
     }
 
     @Throws(HttpException::class)
-    private fun doHttpRequest(url: String, timeout: Int): HttpRequest {
+    fun doHttpRequest(url: String, timeout: Int): HttpRequest {
         return HttpRequest.get(url)
-                .setFollowRedirects(true)
-                .timeout(timeout)
-                .header(
-                        "user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36"
-                )
+            .setFollowRedirects(true)
+            .timeout(timeout)
+            .header(
+                "user-agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36"
+            )
     }
 
     fun getPageContent(url: String): String {

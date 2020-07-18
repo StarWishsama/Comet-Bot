@@ -1,11 +1,11 @@
 package io.github.starwishsama.comet.managers
 
-import io.github.starwishsama.comet.objects.group.GroupConfig
+import io.github.starwishsama.comet.objects.group.PerGroupConfig
 
 object GroupConfigManager {
-    var configs = mutableMapOf<Long, GroupConfig>()
+    var configs = mutableMapOf<Long, PerGroupConfig>()
 
-    fun getConfig(groupId: Long) : GroupConfig {
-        return configs.getOrDefault(groupId, GroupConfig(groupId))
+    fun getConfig(groupId: Long): PerGroupConfig {
+        return configs.getOrDefault(groupId, PerGroupConfig(groupId))
     }
 }
