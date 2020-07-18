@@ -14,7 +14,7 @@ import net.mamoe.mirai.message.data.toMessage
 class HelpCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         val sb = StringBuilder()
-        for (cmd in MessageHandler.commands) {
+        for (cmd in MessageHandler.getCommands()) {
             if (cmd.getProps().name.contentEquals("help") || !cmd.getProps().name.contentEquals("debug")) {
                 sb.append("/").append(cmd.getProps().name).append("  ").append(cmd.getProps().description).append("\n")
             }

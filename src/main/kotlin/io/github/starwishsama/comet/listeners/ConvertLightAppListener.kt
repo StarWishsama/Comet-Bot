@@ -1,21 +1,31 @@
 package io.github.starwishsama.comet.listeners
 
 import com.google.gson.JsonParser
+import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.utils.toMirai
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.contact.BotIsBeingMutedException
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.utils.asHumanReadable
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
 object ConvertLightAppListener : NListener {
+    @ExperimentalTime
     override fun register(bot: Bot) {
         bot.subscribeGroupMessages {
             always {
-                val lightApp = message[LightApp]
-                if (lightApp != null) {
-                    val result = parseCard(lightApp)
-                    if (result !is EmptyMessageChain) reply(parseCard(lightApp))
+                try {
+                    val lightApp = message[LightApp]
+                    if (lightApp != null) {
+                        val result = parseCard(lightApp)
+                        if (result !is EmptyMessageChain) reply(parseCard(lightApp))
+                    }
+                } catch (e: BotIsBeingMutedException) {
+                    Comet.logger.debug("[复读] 机器人已被禁言, ${e.target.botMuteRemaining.seconds.asHumanReadable}s")
                 }
             }
         }

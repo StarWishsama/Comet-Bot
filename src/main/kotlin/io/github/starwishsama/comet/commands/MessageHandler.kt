@@ -22,7 +22,7 @@ import java.util.*
  * @author Nameless
  */
 object MessageHandler {
-    var commands: List<UniversalCommand> = mutableListOf()
+    private var commands: List<UniversalCommand> = mutableListOf()
     private var consoleCommands = mutableListOf<ConsoleCommand>()
 
     /**
@@ -175,7 +175,7 @@ object MessageHandler {
         return cmdPrefix.split(" ")[0]
     }
 
-    fun isCommandPrefix(message: String): Boolean {
+    private fun isCommandPrefix(message: String): Boolean {
         if (message.isNotEmpty()) {
             BotVariables.cfg.commandPrefix.forEach {
                 if (message.startsWith(it)) {
@@ -256,4 +256,8 @@ object MessageHandler {
 
         return revampChain.asMessageChain()
     }
+
+    fun countCommands(): Int = commands.size + consoleCommands.size
+
+    fun getCommands() = commands
 }

@@ -15,7 +15,7 @@ import net.mamoe.mirai.message.data.MessageChain
 class VersionCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(event.sender.id)) {
-            return ("彗星 Bot " + Comet.version + "\n已注册的命令个数: " + MessageHandler.commands.size +
+            return ("彗星 Bot " + Comet.version + "\n已注册的命令个数: " + MessageHandler.countCommands() +
                     "\n运行时间: ${BotUtil.getRunningTime()}" +
                     "\nMade with ❤, Running on Mirai").toMirai()
         }

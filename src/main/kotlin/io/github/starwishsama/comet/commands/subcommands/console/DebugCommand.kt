@@ -27,7 +27,7 @@ class DebugCommand : ConsoleCommand {
                     return sb.toString().trim()
                 }
                 "info" ->
-                    return ("彗星 Bot ${Comet.version}\n已注册的命令个数: ${MessageHandler.commands.size}\n${BotUtil.getMemoryUsage()}")
+                    return ("彗星 Bot ${Comet.version}\n已注册的命令个数: ${MessageHandler.countCommands()}\n${BotUtil.getMemoryUsage()}")
             }
         }
         return ""

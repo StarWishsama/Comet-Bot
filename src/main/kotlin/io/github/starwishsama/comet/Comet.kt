@@ -45,7 +45,7 @@ import kotlin.system.exitProcess
 
 object Comet {
     val filePath: File = File(getPath())
-    const val version = "0.3.8.1-DEV-1abbd40-20200717"
+    const val version = "0.3.8.1-DEV-974ab40-20200718"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -148,35 +148,6 @@ suspend fun main() {
         bot = Bot(qq = Comet.qqId, password = Comet.password, configuration = config)
         bot.alsoLogin()
         Comet.logger = bot.logger
-        MessageHandler.setupCommand(
-            arrayOf(
-                AdminCommand(),
-                BiliBiliCommand(),
-                CheckInCommand(),
-                ClockInCommand(),
-                DebugCommand(),
-                DivineCommand(),
-                GachaCommand(),
-                GuessNumberCommand(),
-                HelpCommand(),
-                    InfoCommand(),
-                    MusicCommand(),
-                    MuteCommand(),
-                    PictureSearch(),
-                    R6SCommand(),
-                    RConCommand(),
-                    TwitterCommand(),
-                    VersionCommand(),
-                    // Console Command
-                    StopCommand(),
-                DebugCommand()
-            )
-        )
-
-        val listeners = arrayOf(ConvertLightAppListener, RepeatListener)
-        val apis = arrayOf(BiliBiliApi, TwitterApi)
-
-        Comet.logger.info("[命令] 已注册 " + MessageHandler.commands.size + " 个命令")
 
         Comet.setupRCon()
 
@@ -185,14 +156,17 @@ suspend fun main() {
                 BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
         )
 
+        val apis = arrayOf(BiliBiliApi, TwitterApi)
+
         /** 定时任务 */
         BackupHelper.scheduleBackup()
         TaskManager.runScheduleTaskAsync(
-            { BotVariables.users.forEach { it.addTime(100) } },
-            5,
-            5,
-            TimeUnit.HOURS
+                { BotVariables.users.forEach { it.addTime(100) } },
+                5,
+                5,
+                TimeUnit.HOURS
         )
+
         TaskManager.runScheduleTaskAsyncIf(
             CheckLiveStatus::run,
             BotVariables.cfg.checkDelay,
@@ -200,6 +174,7 @@ suspend fun main() {
             TimeUnit.MINUTES,
             BotVariables.cfg.subList.isNotEmpty()
         )
+
         TaskManager.runAsync({
             Comet.client.runCatching {
                 val pwd = BotVariables.cfg.biliPassword
@@ -214,17 +189,48 @@ suspend fun main() {
                 }
             }
         }, 5)
+
         TaskManager.runScheduleTaskAsync({ apis.forEach { it.resetTime() } }, 25, 25, TimeUnit.MINUTES)
         TaskManager.runScheduleTaskAsyncIf(
-            LatestTweetChecker::run,
-            1,
-            8,
-            TimeUnit.MINUTES,
-            (BotVariables.cfg.twitterSubs.isNotEmpty() && BotVariables.cfg.tweetPushGroups.isNotEmpty())
+                LatestTweetChecker::run,
+                1,
+                8,
+                TimeUnit.MINUTES,
+                (BotVariables.cfg.twitterSubs.isNotEmpty() && BotVariables.cfg.tweetPushGroups.isNotEmpty())
         )
+
         TaskManager.runScheduleTaskAsync(HitokotoUpdater::run, 5, 60 * 60 * 24, TimeUnit.SECONDS)
 
+        MessageHandler.setupCommand(
+                arrayOf(
+                        AdminCommand(),
+                        BiliBiliCommand(),
+                        CheckInCommand(),
+                        ClockInCommand(),
+                        DebugCommand(),
+                        DivineCommand(),
+                        GachaCommand(),
+                        GuessNumberCommand(),
+                        HelpCommand(),
+                        InfoCommand(),
+                        MusicCommand(),
+                        MuteCommand(),
+                        PictureSearch(),
+                        R6SCommand(),
+                        RConCommand(),
+                        TwitterCommand(),
+                        VersionCommand(),
+                        // Console Command
+                        StopCommand(),
+                        DebugCommand()
+                )
+        )
+
+        Comet.logger.info("[命令] 已注册 " + MessageHandler.countCommands() + " 个命令")
+
         /** 监听器 */
+        val listeners = arrayOf(ConvertLightAppListener, RepeatListener)
+
         listeners.forEach {
             it.register(bot)
             Comet.logger.info("[监听器] 已注册 ${it.getName()} 监听器")

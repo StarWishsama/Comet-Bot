@@ -51,7 +51,7 @@ class DebugCommand : UniversalCommand {
                 "help" -> return getHelp().toMessage().asMessageChain()
                 "info" ->
                     return ("彗星 Bot ${Comet.version}\n" +
-                            "已注册的命令个数: ${MessageHandler.commands.size}\n" +
+                            "已注册的命令个数: ${MessageHandler.countCommands()}\n" +
                             BotUtil.getMemoryUsage()).toMirai()
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().toMirai()
                 else -> return "Bot > 命令不存在\n${getHelp()}".toMirai()
