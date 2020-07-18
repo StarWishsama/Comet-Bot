@@ -25,7 +25,7 @@ object ConvertLightAppListener : NListener {
                         if (result !is EmptyMessageChain) reply(parseCard(lightApp))
                     }
                 } catch (e: BotIsBeingMutedException) {
-                    Comet.logger.debug("[复读] 机器人已被禁言, ${e.target.botMuteRemaining.seconds.asHumanReadable}s")
+                    Comet.logger.debug("[监听器] 机器人已被禁言, ${e.target.botMuteRemaining.seconds.asHumanReadable}s")
                 }
             }
         }
