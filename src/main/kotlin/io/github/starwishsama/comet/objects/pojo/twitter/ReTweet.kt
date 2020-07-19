@@ -48,7 +48,7 @@ data class ReTweet (
                         Media::class.java
                     )
                     if (image.isSendableMedia()) {
-                        picture = NetUtil.getUrlInputStream(image.mediaUrlHttps).uploadAsImage(contact)
+                        picture = NetUtil.getUrlInputStream(image.getImageUrl()).uploadAsImage(contact)
                     }
                 } catch (e: JsonSyntaxException) {
                     Comet.logger.error("在获取推文下的图片时发生了问题", e)

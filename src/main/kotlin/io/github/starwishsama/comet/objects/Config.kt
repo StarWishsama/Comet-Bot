@@ -87,4 +87,7 @@ open class Config {
 
     @SerializedName("youtube_api_key")
     var youtubeApiKey: String = ""
+
+    @SerializedName("small_image_mode")
+    var smallImageMode: Boolean = true
 }

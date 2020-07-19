@@ -134,7 +134,7 @@ class BiliBiliCommand : UniversalCommand {
         return if (dynamic == null) {
             ("\n无最近动态").toMirai()
         } else {
-            if (dynamic.text.isNotEmpty()) {
+            if (dynamic.text != null) {
                 dynamic.toMessageChain(event.subject)
             } else {
                 ("\n无最近动态").toMirai()

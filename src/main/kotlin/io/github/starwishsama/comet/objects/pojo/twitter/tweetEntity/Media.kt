@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity
 
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.comet.BotVariables
 
 /**
  * 推文中的媒体实体类
@@ -48,7 +49,15 @@ data class Media(
      */
     val type: String
 ) {
-    fun isSendableMedia() : Boolean {
+    fun isSendableMedia(): Boolean {
         return !type.contentEquals("video")
+    }
+
+    fun getImageUrl(): String {
+        if (BotVariables.cfg.smallImageMode) {
+            val type = mediaUrlHttps.split(".")[1]
+            return mediaUrlHttps.replace(".$type", "") + "?format=$type&name=small"
+        }
+        return mediaUrlHttps
     }
 }

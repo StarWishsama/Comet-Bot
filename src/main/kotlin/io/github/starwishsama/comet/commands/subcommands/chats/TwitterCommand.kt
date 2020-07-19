@@ -146,8 +146,7 @@ class TwitterCommand : UniversalCommand {
                     }
                 }
             }
-            is RateLimitException -> BotUtil.sendMsgPrefix("已达到蓝鸟 API 调用上限, 请等会再试吧")
-                    .toMirai()
+            is RateLimitException -> BotUtil.sendMsgPrefix("已达到蓝鸟 API 调用上限, 请等会再试吧").toMirai()
             else -> BotUtil.sendMsgPrefix("获取推文时出现了意外").toMirai()
         }
     }

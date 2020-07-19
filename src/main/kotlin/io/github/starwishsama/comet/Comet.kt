@@ -45,7 +45,7 @@ import kotlin.system.exitProcess
 
 object Comet {
     val filePath: File = File(getPath())
-    const val version = "0.3.8.1-DEV-42c7210-20200719"
+    const val version = "0.3.8.1-DEV-cb0a36a-20200719"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
