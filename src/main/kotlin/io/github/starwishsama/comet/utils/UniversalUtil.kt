@@ -32,24 +32,22 @@ fun String.isOutRange(range: Int) : Boolean {
     return length > range
 }
 
+@Synchronized
 fun File.writeJson(context: Any) {
-    synchronized(this) {
-        if (!this.exists()) {
-            this.createNewFile()
-        }
-
-        FileWriter.create(this).write(BotVariables.gson.toJson(context))
+    if (!this.exists()) {
+        this.createNewFile()
     }
+
+    FileWriter.create(this).write(BotVariables.gson.toJson(context))
 }
 
+@Synchronized
 fun File.writeString(context: String) {
-    synchronized(this) {
-        if (!this.exists()) {
-            this.createNewFile()
-        }
-
-        FileWriter.create(this).write(context)
+    if (!this.exists()) {
+        this.createNewFile()
     }
+
+    FileWriter.create(this).write(context)
 }
 
 fun File.getContext(): String {

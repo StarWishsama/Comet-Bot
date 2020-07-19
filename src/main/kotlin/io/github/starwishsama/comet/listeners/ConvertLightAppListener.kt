@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.listeners
 
 import com.google.gson.JsonParser
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.utils.toMirai
 import net.mamoe.mirai.Bot
@@ -18,14 +19,16 @@ object ConvertLightAppListener : NListener {
     override fun register(bot: Bot) {
         bot.subscribeGroupMessages {
             always {
-                try {
-                    val lightApp = message[LightApp]
-                    if (lightApp != null) {
-                        val result = parseCard(lightApp)
-                        if (result !is EmptyMessageChain) reply(parseCard(lightApp))
+                if (BotVariables.switch) {
+                    try {
+                        val lightApp = message[LightApp]
+                        if (lightApp != null) {
+                            val result = parseCard(lightApp)
+                            if (result !is EmptyMessageChain) reply(parseCard(lightApp))
+                        }
+                    } catch (e: BotIsBeingMutedException) {
+                        Comet.logger.debug("[监听器] 机器人已被禁言, ${e.target.botMuteRemaining.seconds.asHumanReadable}s")
                     }
-                } catch (e: BotIsBeingMutedException) {
-                    Comet.logger.debug("[监听器] 机器人已被禁言, ${e.target.botMuteRemaining.seconds.asHumanReadable}s")
                 }
             }
         }

@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.commands.subcommands.console
 
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.MessageHandler
@@ -10,7 +11,7 @@ import io.github.starwishsama.comet.utils.BotUtil
 
 class DebugCommand : ConsoleCommand {
     override suspend fun execute(args: List<String>): String {
-        if (args.size > 1) {
+        if (args.isNotEmpty()) {
             when (args[1]) {
                 "sessions" -> {
                     val sb = StringBuilder("目前活跃的会话列表: \n")
@@ -28,6 +29,15 @@ class DebugCommand : ConsoleCommand {
                 }
                 "info" ->
                     return ("彗星 Bot ${Comet.version}\n已注册的命令个数: ${MessageHandler.countCommands()}\n${BotUtil.getMemoryUsage()}")
+                "switch" -> {
+                    BotVariables.switch = !BotVariables.switch
+
+                    return if (!BotVariables.switch) {
+                        "Bot > おつまち~"
+                    } else {
+                        "今日もかわいい!"
+                    }
+                }
             }
         }
         return ""

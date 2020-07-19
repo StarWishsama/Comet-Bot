@@ -134,16 +134,11 @@ class BiliBiliCommand : UniversalCommand {
         return if (dynamic == null) {
             ("\n无最近动态").toMirai()
         } else {
-            val image = dynamic.getPicture(event.subject)
-            var result = dynamic.text?.toMirai()
-
-            if (result != null) {
-                if (image != null) {
-                    result += image
-                }
-                return result
+            if (dynamic.text.isNotEmpty()) {
+                dynamic.toMessageChain(event.subject)
+            } else {
+                ("\n无最近动态").toMirai()
             }
-            return ("\n无最近动态").toMirai()
         }
     }
 

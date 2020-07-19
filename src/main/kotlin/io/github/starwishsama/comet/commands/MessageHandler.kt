@@ -33,6 +33,8 @@ object MessageHandler {
     private fun setupCommand(command: UniversalCommand) {
         if (!commands.contains(command)) {
             commands = commands + command
+        } else {
+            Comet.logger.warning("[命令] 正在尝试注册已有命令 ${command.getProps().name}")
         }
     }
 
@@ -53,7 +55,12 @@ object MessageHandler {
         commands.forEach {
             when (it) {
                 is UniversalCommand -> setupCommand(it)
-                is ConsoleCommand -> consoleCommands.plusAssign(it)
+                is ConsoleCommand ->
+                    if (!consoleCommands.contains(it)) {
+                        consoleCommands.plusAssign(it)
+                    } else {
+                        Comet.logger.warning("[命令] 正在尝试注册已有命令 ${it.getProps().name}")
+                    }
                 else -> {
                     Comet.logger.warning("[命令] 正在尝试注册非命令类 ${it.javaClass.simpleName}")
                 }

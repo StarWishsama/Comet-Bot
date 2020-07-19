@@ -1,6 +1,8 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
+import io.github.starwishsama.comet.api.youtube.YoutubeApi
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.MessageHandler
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
@@ -54,6 +56,22 @@ class DebugCommand : UniversalCommand {
                             "已注册的命令个数: ${MessageHandler.countCommands()}\n" +
                             BotUtil.getMemoryUsage()).toMirai()
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().toMirai()
+                "switch" -> {
+                    BotVariables.switch = !BotVariables.switch
+
+                    return if (!BotVariables.switch) {
+                        "Bot > おつまち~".toMirai()
+                    } else {
+                        "今日もかわいい!".toMirai()
+                    }
+                }
+                "youtube" -> {
+                    // Minato Aqua ch.
+                    val result = YoutubeApi.getChannelVideos("UC1opHUrw8rvnsadT-iGp7Cg", 1)
+                    if (result != null) {
+                        return result.items[0].toString().toMirai()
+                    }
+                }
                 else -> return "Bot > 命令不存在\n${getHelp()}".toMirai()
             }
         }

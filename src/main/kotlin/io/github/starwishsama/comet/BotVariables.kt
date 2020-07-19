@@ -35,4 +35,6 @@ object BotVariables {
     val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
 
     var hitokoto: Hitokoto? = null
+
+    var switch: Boolean = true
 }

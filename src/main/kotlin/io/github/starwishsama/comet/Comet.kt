@@ -45,7 +45,7 @@ import kotlin.system.exitProcess
 
 object Comet {
     val filePath: File = File(getPath())
-    const val version = "0.3.8.1-DEV-db3c91d-20200718"
+    const val version = "0.3.8.1-DEV-42c7210-20200719"
     var qqId = 0L
     lateinit var password: String
     lateinit var bot: Bot
@@ -207,7 +207,7 @@ suspend fun main() {
                         BiliBiliCommand(),
                         CheckInCommand(),
                         ClockInCommand(),
-                        DebugCommand(),
+                        io.github.starwishsama.comet.commands.subcommands.chats.DebugCommand(),
                         DivineCommand(),
                         GachaCommand(),
                         GuessNumberCommand(),
@@ -250,7 +250,7 @@ suspend fun main() {
 
         bot.subscribeMessages {
             always {
-                if (sender.id != 80000000L) {
+                if (BotVariables.switch && sender.id != 80000000L) {
                     val result = MessageHandler.execute(this)
                     if (result !is EmptyMessageChain) {
                         reply(result)

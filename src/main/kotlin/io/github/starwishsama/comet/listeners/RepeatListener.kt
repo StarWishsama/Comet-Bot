@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.listeners
 
 import cn.hutool.core.util.RandomUtil
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.managers.TaskManager
 import net.mamoe.mirai.Bot
@@ -26,10 +27,12 @@ object RepeatListener : NListener {
     override fun register(bot: Bot) {
         bot.subscribeGroupMessages {
             always {
-                try {
-                    handleRepeat(this, RandomUtil.randomDouble())
-                } catch (e: BotIsBeingMutedException) {
-                    Comet.logger.debug("[监听器] 机器人已被禁言, ${e.target.botMuteRemaining.seconds.asHumanReadable}s")
+                if (BotVariables.switch) {
+                    try {
+                        handleRepeat(this, RandomUtil.randomDouble())
+                    } catch (e: BotIsBeingMutedException) {
+                        Comet.logger.debug("[监听器] 机器人已被禁言, ${e.target.botMuteRemaining.seconds.asHumanReadable}s")
+                    }
                 }
             }
         }

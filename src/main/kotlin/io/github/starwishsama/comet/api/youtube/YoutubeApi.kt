@@ -1,9 +1,13 @@
 package io.github.starwishsama.comet.api.youtube
 
+import cn.hutool.http.HttpException
 import com.google.gson.JsonSyntaxException
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
+import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
+import io.github.starwishsama.comet.objects.WrappedMessage
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchResult
+import io.github.starwishsama.comet.objects.pojo.youtube.VideoType
 import io.github.starwishsama.comet.objects.pojo.youtube.YoutubeRequestError
 import io.github.starwishsama.comet.utils.NetUtil
 import java.net.Proxy
@@ -19,9 +23,9 @@ object YoutubeApi {
         }
     }
 
+    @Throws(ApiKeyIsEmptyException::class, HttpException::class)
     fun getChannelVideos(channelId: String, count: Int): SearchResult? {
-        /** @TODO 自定义错误 ApiKeyIsEmptyException */
-        if (channelInfoUrl.endsWith("date")) return null
+        if (!channelInfoUrl.contains("&key")) throw ApiKeyIsEmptyException("Youtube")
 
         val request = NetUtil.doHttpRequest("${channelInfoUrl}&channelId=${channelId}&maxResults=${count}", 5000)
 
@@ -53,6 +57,25 @@ object YoutubeApi {
             }
         }
 
+        return null
+    }
+
+    fun getLiveStatus(channelId: String): WrappedMessage? {
+        try {
+            val result = getChannelVideos(channelId, 5)
+            if (result != null) {
+                val items = result.items
+                items.forEach { item ->
+                    run {
+                        if (item.snippet.getType() == VideoType.STREAMING) {
+                            return item.snippet.getCoverImgUrl()?.let { WrappedMessage(item.snippet.videoTitle + item.snippet.desc).plusImageUrl(it) }
+                        }
+                    }
+                }
+            }
+        } catch (e: ApiKeyIsEmptyException) {
+            return WrappedMessage("${e.message}")
+        }
         return null
     }
 }

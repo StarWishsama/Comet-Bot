@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.objects.pojo.youtube
 
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 
 data class SearchResult(
@@ -20,16 +21,42 @@ data class SearchResult(
     ) {
         data class VideoId(val kind: String, val videoId: String)
         data class Snippet(
-            val publishedAt: String,
-            val channelId: String,
-            @SerializedName("title")
-            val videoTitle: String,
-            @SerializedName("description")
-            val desc: String,
-            val channelTitle: String,
-            @SerializedName("liveBroadcastContent")
-            val contentType: String,
-            val publishTime: String
-        )
+                val publishedAt: String,
+                val channelId: String,
+                @SerializedName("title")
+                val videoTitle: String,
+                @SerializedName("description")
+                val desc: String,
+                val thumbnails: JsonObject,
+                val channelTitle: String,
+                @SerializedName("liveBroadcastContent")
+                val contentType: String,
+                val publishTime: String
+        ) {
+            fun getType(): VideoType {
+                return when (contentType) {
+                    "live" -> return VideoType.STREAMING
+                    "upcoming" -> return VideoType.UPCOMING
+                    "none" -> return VideoType.VIDEO
+                    else -> VideoType.UNKNOWN
+                }
+            }
+
+            fun getCoverImgUrl(): String? {
+                return try {
+                    thumbnails.get("medium").asJsonObject.get("url").asString
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        }
+
+        fun getVideoUrl(): String {
+            return "https://www.youtube.com/watch?v=${id.videoId}"
+        }
     }
+}
+
+enum class VideoType {
+    VIDEO, STREAMING, UPCOMING, UNKNOWN
 }
