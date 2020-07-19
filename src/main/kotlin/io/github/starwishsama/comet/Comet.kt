@@ -1,9 +1,9 @@
 package io.github.starwishsama.comet
 
-import com.hiczp.bilibili.api.BilibiliClient
 import io.github.starwishsama.comet.Comet.bot
 import io.github.starwishsama.comet.Comet.startTime
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
+import io.github.starwishsama.comet.api.bilibili.FakeClientApi
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.MessageHandler
 import io.github.starwishsama.comet.commands.subcommands.chats.*
@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.managers.TaskManager
 import io.github.starwishsama.comet.tasks.BiliBiliLiveStatusChecker
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.tasks.TweetUpdateChecker
+import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.getContext
 import io.github.starwishsama.comet.utils.writeString
 import kotlinx.coroutines.Dispatchers
@@ -33,10 +34,8 @@ import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.PlatformLogger
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
-import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -44,12 +43,9 @@ import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
 object Comet {
-    val filePath: File = File(getPath())
-    const val version = "0.3.8.1-DEV-cb0a36a-20200719"
-    var qqId = 0L
-    lateinit var password: String
+    val filePath: File = File(FileUtil.getJarLocation())
+    const val version = "0.3.8.1-DEV-3d17b34-20200719"
     lateinit var bot: Bot
-    val client = BilibiliClient()
     lateinit var startTime: LocalDateTime
     lateinit var service: ScheduledExecutorService
     lateinit var logger: MiraiLogger
@@ -71,19 +67,6 @@ object Comet {
         scanner.close()
     }
 
-    private fun getPath(): String {
-        var path: String = Comet::class.java.protectionDomain.codeSource.location.path
-        if (System.getProperty("os.name").toLowerCase().contains("dows")) {
-            path = path.substring(1)
-        }
-        if (path.contains("jar")) {
-            path = path.substring(0, path.lastIndexOf("/"))
-            return path
-        }
-        val location = File(path.replace("target/classes/", ""))
-        return location.path
-    }
-
     fun setupRCon() {
         val url = BotVariables.cfg.rConUrl
         val pwd = BotVariables.cfg.rConPassword
@@ -92,20 +75,6 @@ object Comet {
         }
     }
 
-    fun initLog() {
-        try {
-            val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
-            val initTime = LocalDateTime.now()
-            val parent = File(getPath() + File.separator + "logs")
-            if (!parent.exists()) {
-                parent.mkdirs()
-            }
-            log = File(parent, "log-${dateFormatter.format(initTime)}.log")
-            log.createNewFile()
-        } catch (e: IOException) {
-            error("尝试输出 Log 失败")
-        }
-    }
 }
 
 suspend fun main() {
@@ -121,12 +90,12 @@ suspend fun main() {
 
     """.trimIndent()
     )
-    Comet.initLog()
+    FileUtil.initLog()
     DataSetup.initData()
-    Comet.qqId = BotVariables.cfg.botId
-    Comet.password = BotVariables.cfg.botPassword
+    val qqId = BotVariables.cfg.botId
+    val password = BotVariables.cfg.botPassword
 
-    if (Comet.qqId == 0L) {
+    if (qqId == 0L) {
         println("请到 config.json 里填写机器人的QQ号&密码")
         exitProcess(0)
     } else {
@@ -145,7 +114,7 @@ suspend fun main() {
         }
         config.heartbeatPeriodMillis = BotVariables.cfg.heartBeatPeriod * 60 * 1000
         config.fileBasedDeviceInfo()
-        bot = Bot(qq = Comet.qqId, password = Comet.password, configuration = config)
+        bot = Bot(qq = qqId, password = password, configuration = config)
         bot.alsoLogin()
         Comet.logger = bot.logger
 
@@ -155,51 +124,6 @@ suspend fun main() {
                 4,
                 BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
         )
-
-        val apis = arrayOf(BiliBiliApi, TwitterApi)
-
-        /** 定时任务 */
-        BackupHelper.scheduleBackup()
-        TaskManager.runScheduleTaskAsync(
-                { BotVariables.users.forEach { it.addTime(100) } },
-                5,
-                5,
-                TimeUnit.HOURS
-        )
-
-        TaskManager.runScheduleTaskAsyncIf(
-                BiliBiliLiveStatusChecker::run,
-                BotVariables.cfg.checkDelay,
-                BotVariables.cfg.checkDelay,
-                TimeUnit.MINUTES,
-                BotVariables.cfg.subList.isNotEmpty()
-        )
-
-        TaskManager.runAsync({
-            Comet.client.runCatching {
-                val pwd = BotVariables.cfg.biliPassword
-                val username = BotVariables.cfg.biliUserName
-
-                if (pwd != null && username != null) {
-                    runBlocking {
-                        withContext(Dispatchers.IO) {
-                            login(username = username, password = pwd)
-                        }
-                    }
-                }
-            }
-        }, 5)
-
-        TaskManager.runScheduleTaskAsync({ apis.forEach { it.resetTime() } }, 25, 25, TimeUnit.MINUTES)
-        TaskManager.runScheduleTaskAsyncIf(
-                TweetUpdateChecker::run,
-                1,
-                8,
-                TimeUnit.MINUTES,
-                (BotVariables.cfg.twitterSubs.isNotEmpty() && BotVariables.cfg.tweetPushGroups.isNotEmpty())
-        )
-
-        TaskManager.runScheduleTaskAsync(HitokotoUpdater::run, 5, 60 * 60 * 24, TimeUnit.SECONDS)
 
         MessageHandler.setupCommand(
                 arrayOf(
@@ -236,6 +160,8 @@ suspend fun main() {
             Comet.logger.info("[监听器] 已注册 ${it.getName()} 监听器")
         }
 
+        startUpTask()
+
         val time = Duration.between(startTime, LocalDateTime.now())
         val startUsedTime = "${time.toSecondsPart()}s${time.toMillisPart()}ms"
 
@@ -263,5 +189,52 @@ suspend fun main() {
 
         bot.join() // 等待 Bot 离线, 避免主线程退出
     }
+}
+
+fun startUpTask() {
+    val apis = arrayOf(BiliBiliApi, TwitterApi)
+
+    /** 定时任务 */
+    BackupHelper.scheduleBackup()
+    TaskManager.runScheduleTaskAsync(
+            { BotVariables.users.forEach { it.addTime(100) } },
+            5,
+            5,
+            TimeUnit.HOURS
+    )
+
+    TaskManager.runScheduleTaskAsyncIf(
+            BiliBiliLiveStatusChecker::run,
+            BotVariables.cfg.checkDelay,
+            BotVariables.cfg.checkDelay,
+            TimeUnit.MINUTES,
+            BotVariables.cfg.subList.isNotEmpty()
+    )
+
+    TaskManager.runAsync({
+        FakeClientApi.client.runCatching {
+            val pwd = BotVariables.cfg.biliPassword
+            val username = BotVariables.cfg.biliUserName
+
+            if (pwd != null && username != null) {
+                runBlocking {
+                    withContext(Dispatchers.IO) {
+                        login(username = username, password = pwd)
+                    }
+                }
+            }
+        }
+    }, 5)
+
+    TaskManager.runScheduleTaskAsync({ apis.forEach { it.resetTime() } }, 25, 25, TimeUnit.MINUTES)
+    TaskManager.runScheduleTaskAsyncIf(
+            TweetUpdateChecker::run,
+            1,
+            8,
+            TimeUnit.MINUTES,
+            (BotVariables.cfg.twitterSubs.isNotEmpty() && BotVariables.cfg.tweetPushGroups.isNotEmpty())
+    )
+
+    TaskManager.runScheduleTaskAsync(HitokotoUpdater::run, 5, 60 * 60 * 24, TimeUnit.SECONDS)
 }
 

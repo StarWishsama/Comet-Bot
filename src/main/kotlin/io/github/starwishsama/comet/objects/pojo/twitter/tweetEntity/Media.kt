@@ -54,9 +54,19 @@ data class Media(
     }
 
     fun getImageUrl(): String {
+        val imgType = arrayOf("jpg", "png", "jpeg", "webp", "heif", "gif")
         if (BotVariables.cfg.smallImageMode) {
-            val type = mediaUrlHttps.split(".")[1]
-            return mediaUrlHttps.replace(".$type", "") + "?format=$type&name=small"
+            var type = ""
+            imgType.forEach {
+                if (mediaUrlHttps.contains(it)) {
+                    type = it
+                    return@forEach
+                }
+            }
+
+            if (type.isBlank()) return mediaUrlHttps
+
+            return mediaUrlHttps.replace(".$type".toRegex(), "") + "?format=$type&name=small"
         }
         return mediaUrlHttps
     }

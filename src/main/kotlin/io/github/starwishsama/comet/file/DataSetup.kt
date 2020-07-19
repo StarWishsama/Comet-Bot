@@ -31,10 +31,6 @@ object DataSetup {
     private val arkNightData = File(Comet.filePath.toString(), "/ark.json")
 
     fun initData() {
-        if (!Comet.log.exists()) {
-            Comet.log.mkdirs()
-        }
-
         if (!userCfg.exists() || !cfgFile.exists()) {
             try {
                 cfgFile.writeJson(BotVariables.cfg)

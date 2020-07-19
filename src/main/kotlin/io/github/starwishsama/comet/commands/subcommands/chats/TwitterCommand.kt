@@ -74,19 +74,11 @@ class TwitterCommand : UniversalCommand {
             return handleTimeout(x)
         }
 
-        if (tweet != null) {
-            val image = tweet.getPictureOrNull(subject)
-            var result =
-                    BotUtil.sendMsgPrefix("\n${tweet.user.name}\n${tweet.getFullText()}")
-                            .toMirai()
-
-            if (image != null) {
-                result += image
-            }
-
-            return result
+        return if (tweet != null) {
+            BotUtil.sendMsgPrefix("\n${tweet.user.name}\n").toMirai() + tweet.getAsMessageChain(subject)
+        } else {
+            BotUtil.sendMsgPrefix("获取推文时出现了意外").toMirai()
         }
-        return BotUtil.sendMsgPrefix("获取推文时出现了意外").toMirai()
     }
 
     private fun subscribeUser(args: List<String>): MessageChain {

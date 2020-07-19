@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.api.bilibili
 
+import com.hiczp.bilibili.api.BilibiliClient
 import com.hiczp.bilibili.api.app.model.SearchUserResult
 import com.hiczp.bilibili.api.live.model.RoomInfo
 import com.hiczp.bilibili.api.retrofit.exception.BilibiliApiException
@@ -7,7 +8,7 @@ import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.exceptions.RateLimitException
 
 object FakeClientApi {
-    private val client = Comet.client
+    val client = BilibiliClient()
 
     private suspend fun searchUser(userName: String): SearchUserResult.Data {
         val searchResult = client.appAPI.searchUser(keyword = userName).await()
