@@ -14,9 +14,9 @@ import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.ConvertLightAppListener
 import io.github.starwishsama.comet.listeners.RepeatListener
 import io.github.starwishsama.comet.managers.TaskManager
-import io.github.starwishsama.comet.tasks.CheckLiveStatus
+import io.github.starwishsama.comet.tasks.BiliBiliLiveStatusChecker
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
-import io.github.starwishsama.comet.tasks.LatestTweetChecker
+import io.github.starwishsama.comet.tasks.TweetUpdateChecker
 import io.github.starwishsama.comet.utils.getContext
 import io.github.starwishsama.comet.utils.writeString
 import kotlinx.coroutines.Dispatchers
@@ -168,11 +168,11 @@ suspend fun main() {
         )
 
         TaskManager.runScheduleTaskAsyncIf(
-            CheckLiveStatus::run,
-            BotVariables.cfg.checkDelay,
-            BotVariables.cfg.checkDelay,
-            TimeUnit.MINUTES,
-            BotVariables.cfg.subList.isNotEmpty()
+                BiliBiliLiveStatusChecker::run,
+                BotVariables.cfg.checkDelay,
+                BotVariables.cfg.checkDelay,
+                TimeUnit.MINUTES,
+                BotVariables.cfg.subList.isNotEmpty()
         )
 
         TaskManager.runAsync({
@@ -192,7 +192,7 @@ suspend fun main() {
 
         TaskManager.runScheduleTaskAsync({ apis.forEach { it.resetTime() } }, 25, 25, TimeUnit.MINUTES)
         TaskManager.runScheduleTaskAsyncIf(
-                LatestTweetChecker::run,
+                TweetUpdateChecker::run,
                 1,
                 8,
                 TimeUnit.MINUTES,

@@ -11,7 +11,7 @@ import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-object LatestTweetChecker : Runnable {
+object TweetUpdateChecker : Runnable {
     private val pushedMap = mutableMapOf<String, Tweet>()
 
     override fun run() {

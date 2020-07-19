@@ -7,14 +7,9 @@ import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.data.MessageChain
 import java.time.LocalDateTime
 
-class ClockInData(var startTime: LocalDateTime, var endTime: LocalDateTime, var groupUsers: List<Member>) {
+class ClockInData(var startTime: LocalDateTime, var endTime: LocalDateTime, private var groupUsers: List<Member>) {
     var checkedUsers = arrayListOf<Member>()
     var lateUsers = arrayListOf<Member>()
-    var filterWords = arrayListOf<String>()
-
-    fun addFilterWord(string: String) {
-        filterWords.add(string)
-    }
 
     fun viewData(): MessageChain {
         val checkedCount = checkedUsers.size

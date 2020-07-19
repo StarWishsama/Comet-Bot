@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.api.bilibili.FakeClientApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
-object CheckLiveStatus : Runnable {
+object BiliBiliLiveStatusChecker : Runnable {
     /** 推送过的直播间列表, 避免重复推送 */
     private val pushedList = mutableSetOf<Long>()
 
