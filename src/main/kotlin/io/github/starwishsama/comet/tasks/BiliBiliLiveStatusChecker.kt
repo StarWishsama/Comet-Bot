@@ -1,12 +1,12 @@
 package io.github.starwishsama.comet.tasks
 
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
+@Deprecated("Will be refactor soon")
 object BiliBiliLiveStatusChecker : Runnable {
     /** 推送过的直播间列表, 避免重复推送 */
     private val pushedList = mutableSetOf<Long>()
@@ -32,7 +32,7 @@ object BiliBiliLiveStatusChecker : Runnable {
                                         "\n标题: ${data.title}" +
                                         "\n开播时间: ${data.liveTime}" +
                                         "\n传送门: https://live.bilibili.com/${data.roomId}"
-                                Comet.bot.groups.forEach { group ->
+                                BotVariables.bot.groups.forEach { group ->
                                     runBlocking {
                                         if (BotVariables.cfg.pushGroups.contains(group.id)) {
                                             group.sendMessage(msg)

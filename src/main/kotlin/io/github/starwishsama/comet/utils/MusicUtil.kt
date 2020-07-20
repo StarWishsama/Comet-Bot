@@ -5,7 +5,6 @@ import com.github.salomonbrys.kotson.get
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.Comet
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
@@ -87,7 +86,7 @@ object MusicUtil {
                 }
             }
         } catch (e: IOException) {
-            Comet.logger.error(e)
+            BotVariables.logger.error(e)
         }
         return "找不到歌曲".toMessage().asMessageChain()
     }
@@ -141,12 +140,13 @@ object MusicUtil {
                                 "            \"title\": \"$songName\"\n" +
                                 "        }\n" +
                                 "    }\n" +
-                                "}").asMessageChain()
+                                "}"
+                        ).asMessageChain()
                     }
                 }
-            } else Comet.logger.debug("无法从 API 获取到歌曲信息, 响应码为 " + songResult.status)
+            } else BotVariables.logger.debug("无法从 API 获取到歌曲信息, 响应码为 " + songResult.status)
         } catch (x: Exception) {
-            Comet.logger.error("在通过 QQ 音乐搜索歌曲时发生了一个错误, ", x)
+            BotVariables.logger.error("在通过 QQ 音乐搜索歌曲时发生了一个错误, ", x)
         }
         return "找不到歌曲".toMessage().asMessageChain()
     }

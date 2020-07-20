@@ -3,7 +3,6 @@ package io.github.starwishsama.comet.api.youtube
 import cn.hutool.http.HttpException
 import com.google.gson.JsonSyntaxException
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
 import io.github.starwishsama.comet.objects.WrappedMessage
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchResult
@@ -50,9 +49,9 @@ object YoutubeApi {
             } catch (e: JsonSyntaxException) {
                 try {
                     val error = BotVariables.gson.fromJson(body, YoutubeRequestError::class.java)
-                    Comet.logger.error("[YTB] 无法访问 API \n返回码: ${error.code}, 信息: ${error.message}")
+                    BotVariables.logger.error("[YTB] 无法访问 API \n返回码: ${error.code}, 信息: ${error.message}")
                 } catch (e: JsonSyntaxException) {
-                    Comet.logger.error("[YTB] 无法解析 API 传入的 json", e)
+                    BotVariables.logger.error("[YTB] 无法解析 API 传入的 json", e)
                 }
             }
         }

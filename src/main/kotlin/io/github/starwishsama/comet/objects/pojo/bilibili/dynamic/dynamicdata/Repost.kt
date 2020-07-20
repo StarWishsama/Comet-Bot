@@ -1,8 +1,8 @@
 package io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.dynamicdata
 
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.gson
-import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.objects.WrappedMessage
 import io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.DynamicTypeSelector
@@ -46,7 +46,7 @@ data class Repost(@SerializedName("origin")
             }
             return "无法解析此动态消息, 你还是另请高明吧"
         } catch (e: Exception) {
-            Comet.logger.error("在处理时遇到了问题\n原动态内容: $contact\n动态类型: $type\n报错堆栈", e)
+            BotVariables.logger.error("在处理时遇到了问题\n原动态内容: $contact\n动态类型: $type\n报错堆栈", e)
         }
         return "在获取时遇到了错误"
     }

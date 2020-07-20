@@ -15,7 +15,6 @@ import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.isContentNotEmpty
-import org.apache.commons.lang3.StringUtils
 
 class MuteCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
@@ -24,24 +23,21 @@ class MuteCommand : UniversalCommand {
                 if (user.isBotAdmin() || event.sender.isOperator()) {
                     if (args.isNotEmpty()) {
                         val at = event.message[At]
-                        if (at != null) {
-                            if (at.isContentNotEmpty()) {
-                                doMute(event.group, at.target, getMuteTime(args[1]), false)
-                            }
+                        if (at != null && at.isContentNotEmpty()) {
+                            doMute(event.group, at.target, getMuteTime(args[1]), false)
                         } else {
                             if (args[0].isNumeric()) {
                                 doMute(event.group, args[0].toLong(), getMuteTime(args[1]), false)
                             } else {
                                 when (args[0]) {
-                                    "all", "全体", "全禁", "全体禁言" -> doMute(event.group, args[0].toLong(), getMuteTime(args[1]), false)
+                                    "all", "全体", "全禁", "全体禁言" -> doMute(
+                                        event.group,
+                                        args[0].toLong(),
+                                        getMuteTime(args[1]),
+                                        false
+                                    )
                                     "random", "rand", "随机", "抽奖" -> doRandomMute(event)
                                 }
-                            }
-
-                            if (StringUtils.isNumeric(args[0])) {
-                                doMute(event.group, args[0].toLong(), getMuteTime(args[1]), false)
-                            } else if (args[0].contentEquals("all")) {
-                                doMute(event.group, 0, 0, true)
                             }
                         }
                     } else {
@@ -95,8 +91,11 @@ class MuteCommand : UniversalCommand {
                     BotUtil.sendMsgPrefix("然后时间开始流动").toMirai()
                 }
             } else {
+                if (group.botAsMember.id == id) BotUtil.sendMsgPrefix("不能踢出机器人").toMirai()
+
                 for (member in group.members) {
                     if (member.id == id) {
+                        if (member.isOperator()) BotUtil.sendMsgPrefix("不能踢出管理员").toMirai()
                         return when (muteTime) {
                             in 1..2592000 -> {
                                 member.mute(muteTime)

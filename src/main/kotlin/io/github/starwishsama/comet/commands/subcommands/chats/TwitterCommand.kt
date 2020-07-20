@@ -2,7 +2,6 @@ package io.github.starwishsama.comet.commands.subcommands.chats
 
 import cn.hutool.http.HttpException
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
@@ -133,7 +132,7 @@ class TwitterCommand : UniversalCommand {
                     is SocketTimeoutException -> BotUtil.sendMsgPrefix("连接超时").toMirai()
                     is SSLException -> BotUtil.sendMsgPrefix("连接超时").toMirai()
                     else -> {
-                        Comet.logger.error(t)
+                        BotVariables.logger.error(t)
                         BotUtil.sendMsgPrefix("获取推文时出现了意外").toMirai()
                     }
                 }

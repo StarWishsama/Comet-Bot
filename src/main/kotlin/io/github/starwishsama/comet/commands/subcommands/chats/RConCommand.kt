@@ -34,7 +34,7 @@ class RConCommand : UniversalCommand, SuspendCommand {
                         return BotUtil.sendMsgPrefix("请在下一条消息发送 rCon 连接地址").toMirai()
                     }
                     "cmd", "exec", "命令" -> {
-                        val rCon = Comet.rCon
+                        val rCon = BotVariables.rCon
                         if (rCon != null) {
                             if (args.size > 1) {
                                 try {
@@ -42,7 +42,7 @@ class RConCommand : UniversalCommand, SuspendCommand {
                                         return@withContext rCon.command(args.getRestString(1)).toMirai()
                                     }
                                 } catch (e: IOException) {
-                                    Comet.logger.error("在连接到 rCon 服务器时发生了错误", e)
+                                    BotVariables.logger.error("在连接到 rCon 服务器时发生了错误", e)
                                     return BotUtil.sendMsgPrefix("在连接到 rCon 服务器时发生了错误").toMirai()
                                 }
                             }

@@ -11,7 +11,14 @@ import io.github.starwishsama.comet.objects.draw.ArkNightOperator
 import io.github.starwishsama.comet.objects.draw.PCRCharacter
 import io.github.starwishsama.comet.objects.group.Shop
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
+import io.github.starwishsama.comet.utils.FileUtil
+import net.kronos.rkon.core.Rcon
+import net.mamoe.mirai.Bot
+import net.mamoe.mirai.utils.MiraiLogger
+import java.io.File
+import java.time.LocalDateTime
 import java.util.*
+import java.util.concurrent.ScheduledExecutorService
 
 
 /**
@@ -21,6 +28,15 @@ import java.util.*
  */
 
 object BotVariables {
+    val filePath: File = File(FileUtil.getJarLocation())
+    const val version = "0.4-DEV-040168c-20200720"
+    lateinit var bot: Bot
+    lateinit var startTime: LocalDateTime
+    lateinit var service: ScheduledExecutorService
+    lateinit var logger: MiraiLogger
+    var rCon: Rcon? = null
+    lateinit var log: File
+
     var shop: List<Shop> = LinkedList()
     var users: List<BotUser> = LinkedList()
     var localMessage: List<BotLocalization> = ArrayList()

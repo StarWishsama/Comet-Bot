@@ -3,7 +3,6 @@ package io.github.starwishsama.comet.utils
 import cn.hutool.http.HttpException
 import cn.hutool.http.HttpRequest
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.Comet
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.uploadAsImage
@@ -18,7 +17,7 @@ suspend fun InputStream.uploadAsImageSafely(type: String, contact: Contact): Ima
             return this.uploadAsImage(contact)
         }
     } catch (e: Exception) {
-        Comet.logger.warning("[网络] 在尝试上传图片时发生了问题", e)
+        BotVariables.logger.warning("[网络] 在尝试上传图片时发生了问题", e)
     }
     return null
 }
@@ -88,17 +87,17 @@ object NetUtil {
                 `in`.close()
                 fos.close()
             } else {
-                Comet.logger.error("在下载时发生了错误, 响应码 ${response.status}")
+                BotVariables.logger.error("在下载时发生了错误, 响应码 ${response.status}")
             }
         } catch (e: Exception) {
             if (!file.delete()) {
-                Comet.logger.error("无法删除损坏文件: $fileName")
+                BotVariables.logger.error("无法删除损坏文件: $fileName")
             }
             if (e.cause is SocketTimeoutException) {
-                Comet.logger.error("在下载时发生了错误: 连接超时")
+                BotVariables.logger.error("在下载时发生了错误: 连接超时")
                 return
             }
-            Comet.logger.error("在下载时发生了错误")
+            BotVariables.logger.error("在下载时发生了错误")
         }
     }
 

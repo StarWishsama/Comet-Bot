@@ -1,24 +1,37 @@
 package io.github.starwishsama.comet.utils
 
-import cn.hutool.http.HttpRequest
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.pojo.PicSearchResult
 
 object PictureSearchUtil {
-    private val apiUrl =
-        "https://saucenao.com/search.php?db=999&output_type=2&api_key=${BotVariables.cfg.saucenaoApiKey}&numres=16&url="
+    private const val apiUrl = "https://saucenao.com/search.php?db=5&output_type=2&numres=3&url="
 
     fun sauceNaoSearch(url: String): PicSearchResult {
-        val result = HttpRequest.get(apiUrl + url).timeout(5000).executeAsync()
-        if (result.isOk){
-            val resultBody = JsonParser.parseString(result.body())
-            if (resultBody.isJsonObject){
-                val resultJson = resultBody.asJsonObject["results"].asJsonArray[0].asJsonObject
-                val similarity = resultJson["header"].asJsonObject["similarity"].asDouble
-                val pictureUrl = resultJson["header"].asJsonObject["thumbnail"].asString
-                val originalUrl = resultJson["data"].asJsonObject["ext_urls"].asJsonArray[0].asString
-                return PicSearchResult(pictureUrl, originalUrl, similarity)
+        val request = NetUtil.doHttpRequest(apiUrl + url, 5000)
+        val result = request.executeAsync()
+
+        if (result.isOk && result.header("Content-Type") == "application/json") {
+            val body = result.body()
+            try {
+                val resultBody = JsonParser.parseString(body)
+                if (resultBody.isJsonObject) {
+                    val resultJson = resultBody.asJsonObject["results"].asJsonArray[0].asJsonObject
+                    val similarity = resultJson["header"].asJsonObject["similarity"].asDouble
+                    val pictureUrl = resultJson["header"].asJsonObject["thumbnail"].asString
+                    val originalUrl = resultJson["data"].asJsonObject["ext_urls"].asJsonArray[0].asString
+                    return PicSearchResult(pictureUrl, originalUrl, similarity)
+                }
+            } catch (e: Exception) {
+                BotVariables.logger.error("[以图搜图] 在解析 API 传回的 json 时出现了问题", e)
+                BotVariables.logger.debug(
+                    "错误报告已转储至 ${FileUtil.createErrorReportFile(
+                        "picsearch",
+                        e,
+                        body,
+                        apiUrl + url
+                    )}"
+                )
             }
         }
         return PicSearchResult.emptyResult()

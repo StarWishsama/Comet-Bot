@@ -32,24 +32,38 @@ fun File.getContext(): String {
 }
 
 object FileUtil {
-    fun getCacheFolder(): File {
-        val cacheFolder = File(Comet.filePath.path + File.separator + "cache")
-        if (!cacheFolder.exists()) {
-            cacheFolder.mkdirs()
+    private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
+
+    fun getChildFolder(childName: String): File {
+        val childFolder = File(BotVariables.filePath.path + File.separator + childName)
+        if (!childFolder.exists()) {
+            childFolder.mkdirs()
         }
-        return cacheFolder
+        return childFolder
+    }
+
+    fun getCacheFolder(): File = getChildFolder("cache")
+
+    fun getErrorReportFolder(): File = getChildFolder("error-reports")
+
+    fun createErrorReportFile(type: String, t: Throwable, content: String, url: String): String {
+        val fileName = "$type-${dateFormatter.format(LocalDateTime.now())}.txt"
+        val location = File(getErrorReportFolder(), fileName)
+        if (location.exists()) return location.path
+
+        location.createNewFile()
+
+        val report = "Error occurred:\nRequested url: $url\n${getBeautyStackTrace(t)}\n\nRaw content:\n$content"
+        location.writeString(report)
+        return location.path
     }
 
     fun initLog() {
         try {
-            val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
             val initTime = LocalDateTime.now()
-            val parent = File(getJarLocation() + File.separator + "logs")
-            if (!parent.exists()) {
-                parent.mkdirs()
-            }
-            Comet.log = File(parent, "log-${dateFormatter.format(initTime)}.log")
-            Comet.log.createNewFile()
+            val parent = getChildFolder("logs")
+            BotVariables.log = File(parent, "log-${dateFormatter.format(initTime)}.log")
+            BotVariables.log.createNewFile()
         } catch (e: IOException) {
             error("尝试输出 Log 失败")
         }
@@ -66,5 +80,45 @@ object FileUtil {
         }
         val location = File(path.replace("target/classes/", ""))
         return location.path
+    }
+
+    /**
+     * https://github.com/Polar-Pumpkin/ParrotX/blob/master/src/main/java/org/serverct/parrot/parrotx/utils/I18n.java#L328
+     *
+     * @author Polar-Pumpkin
+     * @param exception Throwable 类型的异常。
+     */
+    private fun getBeautyStackTrace(exception: Throwable): String {
+        val sb = StringBuilder()
+        sb.append("========================= StackTrace =========================\n")
+        sb.append("Exception Type ▶\n")
+        sb.append(exception.toString() + "\n")
+        sb.append("\n")
+        var lastPackage = ""
+        for (elem in exception.stackTrace) {
+            val key = elem.className
+            val nameSet = key.split("[.]".toRegex()).toTypedArray()
+            val className = nameSet[nameSet.size - 1]
+            val packageSet = arrayOfNulls<String>(nameSet.size - 2)
+            System.arraycopy(nameSet, 0, packageSet, 0, nameSet.size - 2)
+            val packageName = StringBuilder()
+            for ((counter, nameElem) in packageSet.withIndex()) {
+                packageName.append(nameElem)
+                if (counter < packageSet.size - 1) {
+                    packageName.append(".")
+                }
+            }
+
+            if (packageName.toString() != lastPackage) {
+                lastPackage = packageName.toString()
+                sb.append("\n")
+                sb.append("Package $packageName ▶\n")
+            }
+            sb.append("  ▶ at Class " + className + ", Method " + elem.methodName + ". (" + elem.fileName + ", Line " + elem.lineNumber + ")" + "\n")
+
+        }
+        sb.append("========================= StackTrace =========================\n")
+
+        return sb.toString()
     }
 }

@@ -4,8 +4,8 @@ import cn.hutool.http.HttpException
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.gson
-import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
 import io.github.starwishsama.comet.utils.NetUtil
 import io.github.starwishsama.comet.utils.toMirai
@@ -85,9 +85,9 @@ data class Tweet(
                         }
                     }
                 } catch (e: JsonSyntaxException) {
-                    Comet.logger.error("在获取推文下的图片链接时发生了问题", e)
+                    BotVariables.logger.error("在获取推文下的图片链接时发生了问题", e)
                 } catch (e: HttpException) {
-                    Comet.logger.error("在下载推文图片时发生了问题", e)
+                    BotVariables.logger.error("在下载推文图片时发生了问题", e)
                 }
             }
         }

@@ -4,7 +4,7 @@ import com.hiczp.bilibili.api.BilibiliClient
 import com.hiczp.bilibili.api.app.model.SearchUserResult
 import com.hiczp.bilibili.api.live.model.RoomInfo
 import com.hiczp.bilibili.api.retrofit.exception.BilibiliApiException
-import io.github.starwishsama.comet.Comet
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.exceptions.RateLimitException
 
 object FakeClientApi {
@@ -19,13 +19,13 @@ object FakeClientApi {
         try {
             return client.liveAPI.getInfo(roomId).await()
         } catch (e: BilibiliApiException) {
-            Comet.logger.error(
-                    "在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
-                            "${e.commonResponse.msg}\n" +
-                            "${e.commonResponse.message}", e
+            BotVariables.logger.error(
+                "在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
+                        "${e.commonResponse.msg}\n" +
+                        "${e.commonResponse.message}", e
             )
         } catch (e: RateLimitException) {
-            Comet.logger.error(e.message)
+            BotVariables.logger.error(e.message)
         }
         return null
     }
@@ -38,9 +38,11 @@ object FakeClientApi {
                 return searchResult.items[0]
             }
         } catch (e: BilibiliApiException) {
-            Comet.logger.error("在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
-                    "${e.commonResponse.msg}\n" +
-                    "${e.commonResponse.message}", e)
+            BotVariables.logger.error(
+                "在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
+                        "${e.commonResponse.msg}\n" +
+                        "${e.commonResponse.message}", e
+            )
         }
         return null
     }

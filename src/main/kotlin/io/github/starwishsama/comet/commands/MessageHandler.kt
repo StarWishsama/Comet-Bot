@@ -1,7 +1,6 @@
 package io.github.starwishsama.comet.commands
 
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.commands.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.commands.interfaces.SuspendCommand
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
@@ -34,7 +33,7 @@ object MessageHandler {
         if (!commands.contains(command)) {
             commands = commands + command
         } else {
-            Comet.logger.warning("[命令] 正在尝试注册已有命令 ${command.getProps().name}")
+            BotVariables.logger.warning("[命令] 正在尝试注册已有命令 ${command.getProps().name}")
         }
     }
 
@@ -59,10 +58,10 @@ object MessageHandler {
                     if (!consoleCommands.contains(it)) {
                         consoleCommands.plusAssign(it)
                     } else {
-                        Comet.logger.warning("[命令] 正在尝试注册已有命令 ${it.getProps().name}")
+                        BotVariables.logger.warning("[命令] 正在尝试注册已有命令 ${it.getProps().name}")
                     }
                 else -> {
-                    Comet.logger.warning("[命令] 正在尝试注册非命令类 ${it.javaClass.simpleName}")
+                    BotVariables.logger.warning("[命令] 正在尝试注册非命令类 ${it.javaClass.simpleName}")
                 }
             }
         }
@@ -86,7 +85,7 @@ object MessageHandler {
                 val cmd = getCommand(getCommandName(message))
                 if (cmd != null) {
                     val splitMessage = message.split(" ")
-                    Comet.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.getProps().name}")
+                    BotVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.getProps().name}")
                     var user = BotUser.getUser(senderId)
                     if (user == null) {
                         user = BotUser.quickRegister(senderId)
@@ -100,13 +99,13 @@ object MessageHandler {
                             }
 
                     val usedTime = Duration.between(executedTime, LocalDateTime.now())
-                    Comet.logger.debug("[命令] 命令执行耗时 ${usedTime.toSecondsPart()}s${usedTime.toMillisPart()}ms")
+                    BotVariables.logger.debug("[命令] 命令执行耗时 ${usedTime.toSecondsPart()}s${usedTime.toMillisPart()}ms")
 
                     return result
                 }
             }
         } catch (t: Throwable) {
-            Comet.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId", t)
+            BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId", t)
             return "Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMirai()
         }
         return EmptyMessageChain
@@ -124,12 +123,12 @@ object MessageHandler {
                 if (cmd != null) {
                     val splitMessage = content.split(" ")
                     val splitCommand = splitMessage.subList(1, splitMessage.size)
-                    Comet.logger.debug("[命令] 后台尝试执行命令: " + cmd.getProps().name)
+                    BotVariables.logger.debug("[命令] 后台尝试执行命令: " + cmd.getProps().name)
                     return cmd.execute(splitCommand)
                 }
             }
         } catch (t: Throwable) {
-            Comet.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $content", t)
+            BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $content", t)
             return ""
         }
         return ""
@@ -152,7 +151,7 @@ object MessageHandler {
         }
 
         val usedTime = Duration.between(time, LocalDateTime.now())
-        Comet.logger.debug("[会话] 处理会话耗时 ${usedTime.toSecondsPart()}s${usedTime.toMillisPart()}ms")
+        BotVariables.logger.debug("[会话] 处理会话耗时 ${usedTime.toSecondsPart()}s${usedTime.toMillisPart()}ms")
     }
 
     private fun getCommand(cmdPrefix: String): UniversalCommand? {

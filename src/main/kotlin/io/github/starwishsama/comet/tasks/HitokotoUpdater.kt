@@ -1,7 +1,6 @@
 package io.github.starwishsama.comet.tasks
 
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.utils.NetUtil
 
@@ -10,9 +9,9 @@ object HitokotoUpdater : Runnable {
         try {
             val hitokotoJson = NetUtil.getPageContent("https://v1.hitokoto.cn/")
             BotVariables.hitokoto = BotVariables.gson.fromJson(hitokotoJson, Hitokoto::class.java)
-            Comet.logger.info("已获取到今日一言")
+            BotVariables.logger.info("已获取到今日一言")
         } catch (e: Throwable) {
-            Comet.logger.warning("在获取一言时发生了问题", e)
+            BotVariables.logger.warning("在获取一言时发生了问题", e)
         }
     }
 
@@ -21,7 +20,7 @@ object HitokotoUpdater : Runnable {
             val hitokoto = BotVariables.hitokoto
             return "\n今日一言:\n${hitokoto?.content} ——${hitokoto?.author}(${hitokoto?.source})"
         } catch (e: Exception) {
-            Comet.logger.error("在从缓存中获取一言时发生错误", e)
+            BotVariables.logger.error("在从缓存中获取一言时发生错误", e)
         }
         return "无法获取今日一言"
     }

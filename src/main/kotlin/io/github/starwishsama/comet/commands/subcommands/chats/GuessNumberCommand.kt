@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.Comet
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.SuspendCommand
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
@@ -31,7 +31,7 @@ class GuessNumberCommand : UniversalCommand, SuspendCommand {
                 when {
                     args.isEmpty() -> {
                         val answer = RandomUtil.randomInt(0, 100)
-                        Comet.logger.verbose("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
+                        BotVariables.logger.verbose("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
                         SessionManager.addSession(GuessNumberSession(event.group.id, RandomUtil.randomInt(0, 101)))
                         return BotUtil.sendMsgPrefix("猜一个数字吧! 范围 [0, 100]").toMirai()
                     }
@@ -47,7 +47,7 @@ class GuessNumberCommand : UniversalCommand, SuspendCommand {
                                 throw NumberFormatException("最小值不能大于等于最大值")
                             }
                             val answer = RandomUtil.randomInt(min, max + 1)
-                            Comet.logger.verbose("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
+                            BotVariables.logger.verbose("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
                             SessionManager.addSession(GuessNumberSession(event.group.id, RandomUtil.randomInt(0, 100)))
                             return BotUtil.sendMsgPrefix("猜一个数字吧! 范围 [$min, $max]").toMirai()
                         } catch (e: NumberFormatException) {

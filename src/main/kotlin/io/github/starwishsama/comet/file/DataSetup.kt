@@ -7,7 +7,6 @@ import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.gson
-import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
@@ -21,14 +20,14 @@ import io.github.starwishsama.comet.utils.writeJson
 import java.io.File
 
 object DataSetup {
-    private val userCfg: File = File(Comet.filePath.toString(), "users.json")
-    private val shopItemCfg: File = File(Comet.filePath.toString(), "/items.json")
-    private val cfgFile: File = File(Comet.filePath.toString(), "/config.json")
-    private val langCfg: File = File(Comet.filePath.toString(), "/lang.json")
-    private val groupCfg: File = File(Comet.filePath.toString(), "/groups.json")
-    private val cacheCfg: File = File(Comet.filePath.toString(), "cache.json")
-    private val pcrData = File(Comet.filePath.toString(), "/pcr.json")
-    private val arkNightData = File(Comet.filePath.toString(), "/ark.json")
+    private val userCfg: File = File(BotVariables.filePath.toString(), "users.json")
+    private val shopItemCfg: File = File(BotVariables.filePath.toString(), "/items.json")
+    private val cfgFile: File = File(BotVariables.filePath.toString(), "/config.json")
+    private val langCfg: File = File(BotVariables.filePath.toString(), "/lang.json")
+    private val groupCfg: File = File(BotVariables.filePath.toString(), "/groups.json")
+    private val cacheCfg: File = File(BotVariables.filePath.toString(), "cache.json")
+    private val pcrData = File(BotVariables.filePath.toString(), "/pcr.json")
+    private val arkNightData = File(BotVariables.filePath.toString(), "/ark.json")
 
     fun initData() {
         if (!userCfg.exists() || !cfgFile.exists()) {
@@ -138,7 +137,7 @@ object DataSetup {
     }
 
     fun saveFiles() {
-        Comet.logger.info("[Bot] 自动保存数据完成")
+        BotVariables.logger.info("[Bot] 自动保存数据完成")
         saveCfg()
         saveLang()
     }

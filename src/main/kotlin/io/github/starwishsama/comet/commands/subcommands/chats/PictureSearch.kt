@@ -46,10 +46,16 @@ class PictureSearch : UniversalCommand, SuspendCommand {
         if (image != null) {
             event.reply("请稍等...")
             val result = PictureSearchUtil.sauceNaoSearch(image.queryUrl())
-            if (result.similarity >= 52.5) {
-                event.reply("相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n")
-            } else {
-                event.reply("相似度过低 (${result.similarity}%), 请尝试更换图片重试")
+            when {
+                result.similarity >= 52.5 -> {
+                    event.reply("相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n")
+                }
+                result.similarity == -1.0 -> {
+                    event.reply("在识图时发生了问题, 请联系管理员")
+                }
+                else -> {
+                    event.reply("相似度过低 (${result.similarity}%), 请尝试更换图片重试")
+                }
             }
         } else {
             event.reply("请发送图片!")
