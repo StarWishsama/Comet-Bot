@@ -73,11 +73,12 @@ open class Config {
     @SerializedName("twitter_subs")
     var twitterSubs: List<String> = LinkedList()
 
+    @Deprecated("Soon will replace by PerGroupSetting")
     @SerializedName("tweet_push_groups")
     var tweetPushGroups: List<Long> = LinkedList()
 
     @SerializedName("proxy_url")
-    var proxyUrl: String? = null
+    var proxyUrl: String = ""
 
     @SerializedName("proxy_port")
     var proxyPort: Int = 0

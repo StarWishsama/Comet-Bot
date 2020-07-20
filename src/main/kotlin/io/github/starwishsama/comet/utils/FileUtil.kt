@@ -46,16 +46,16 @@ object FileUtil {
 
     fun getErrorReportFolder(): File = getChildFolder("error-reports")
 
-    fun createErrorReportFile(type: String, t: Throwable, content: String, url: String): String {
+    fun createErrorReportFile(type: String, t: Throwable, content: String, url: String) {
         val fileName = "$type-${dateFormatter.format(LocalDateTime.now())}.txt"
         val location = File(getErrorReportFolder(), fileName)
-        if (location.exists()) return location.path
+        if (location.exists()) return
 
         location.createNewFile()
 
         val report = "Error occurred:\nRequested url: $url\n${getBeautyStackTrace(t)}\n\nRaw content:\n$content"
         location.writeString(report)
-        return location.path
+        BotVariables.logger.debug("错误报告已生成! 保存在 ${location.path}")
     }
 
     fun initLog() {

@@ -116,7 +116,7 @@ object TwitterApi : ApiExecutor {
                     throw TwitterApiException(errorInfo.errors[0].code, errorInfo.errors[0].reason)
                 } catch (e: JsonSyntaxException) {
                     BotVariables.logger.error("[蓝鸟] 解析推文 JSON 时出现问题: 不支持的类型", e)
-                    BotVariables.logger.debug("错误报告已转储至 ${FileUtil.createErrorReportFile("twitter", e, body, url)}")
+                    FileUtil.createErrorReportFile("twitter", e, body, url)
                 }
             }
         }

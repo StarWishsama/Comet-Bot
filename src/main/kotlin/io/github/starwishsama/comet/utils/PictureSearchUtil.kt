@@ -24,14 +24,7 @@ object PictureSearchUtil {
                 }
             } catch (e: Exception) {
                 BotVariables.logger.error("[以图搜图] 在解析 API 传回的 json 时出现了问题", e)
-                BotVariables.logger.debug(
-                    "错误报告已转储至 ${FileUtil.createErrorReportFile(
-                        "picsearch",
-                        e,
-                        body,
-                        apiUrl + url
-                    )}"
-                )
+                FileUtil.createErrorReportFile("picsearch", e, body, request.url)
             }
         }
         return PicSearchResult.emptyResult()

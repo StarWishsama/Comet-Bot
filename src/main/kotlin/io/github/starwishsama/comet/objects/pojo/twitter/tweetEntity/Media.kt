@@ -60,7 +60,6 @@ data class Media(
             imgType.forEach {
                 if (mediaUrlHttps.contains(it)) {
                     type = it
-                    return@forEach
                 }
             }
 

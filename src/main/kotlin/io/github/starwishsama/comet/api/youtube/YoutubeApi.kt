@@ -5,47 +5,63 @@ import com.google.gson.JsonSyntaxException
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
 import io.github.starwishsama.comet.objects.WrappedMessage
-import io.github.starwishsama.comet.objects.pojo.youtube.SearchResult
+import io.github.starwishsama.comet.objects.pojo.youtube.SearchUserResult
+import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
 import io.github.starwishsama.comet.objects.pojo.youtube.VideoType
 import io.github.starwishsama.comet.objects.pojo.youtube.YoutubeRequestError
+import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.NetUtil
-import java.net.Proxy
-import java.net.Socket
 
 
 object YoutubeApi {
-    private var channelInfoUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet,id&order=date"
+    private var searchApi = "https://www.googleapis.com/youtube/v3/search?order=date&part=snippet,"
+    private const val searchByUserName = "contentDetails,statistics&forUsername="
+    private const val maxResult = "&maxResults="
 
     init {
         if (BotVariables.cfg.youtubeApiKey.isNotEmpty()) {
-            channelInfoUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet,id&order=date&key=${BotVariables.cfg.youtubeApiKey}"
+            searchApi = "https://www.googleapis.com/youtube/v3/search?key=${BotVariables.cfg.youtubeApiKey}&order=date&part=snippet,"
         }
     }
 
-    @Throws(ApiKeyIsEmptyException::class, HttpException::class)
-    fun getChannelVideos(channelId: String, count: Int): SearchResult? {
-        if (!channelInfoUrl.contains("&key")) throw ApiKeyIsEmptyException("Youtube")
+    fun searchYoutubeUser(channelName: String, count: Int): SearchUserResult? {
+        if (!searchApi.contains("&key")) throw ApiKeyIsEmptyException("Youtube")
 
-        val request = NetUtil.doHttpRequest("${channelInfoUrl}&channelId=${channelId}&maxResults=${count}", 5000)
+        val request = NetUtil.doHttpRequest("$searchApi$searchByUserName$channelName$maxResult$count", 5000)
 
-        /**
-         * @TODO 重构设置代理这一步, 可以复用
-         */
-        if (BotVariables.cfg.proxyUrl != null && BotVariables.cfg.proxyPort != 0) {
-            request.setProxy(
-                    Proxy(
-                            Proxy.Type.HTTP,
-                            Socket(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort).remoteSocketAddress
-                    )
-            )
+        val response = request.executeAsync()
+
+        if (response.isOk) {
+            val body = response.body()
+            /** @TODO 类型自动选择, 类似于 BiliBili 的动态解析 */
+            try {
+                return BotVariables.gson.fromJson(body, SearchUserResult::class.java)
+            } catch (e: JsonSyntaxException) {
+                try {
+                    val error = BotVariables.gson.fromJson(body, YoutubeRequestError::class.java)
+                    BotVariables.logger.error("[API] 无法访问 Youtube API \n返回码: ${error.code}, 信息: ${error.message}")
+                } catch (t: Throwable) {
+                    BotVariables.logger.error("[API] 无法解析 Youtube API 传入的 json", t)
+                    FileUtil.createErrorReportFile("youtube", t, body, request.url)
+                }
+            }
         }
+
+        return null
+    }
+
+    @Throws(ApiKeyIsEmptyException::class, HttpException::class)
+    fun getChannelVideos(channelId: String, count: Int): SearchVideoResult? {
+        if (!searchApi.contains("&key")) throw ApiKeyIsEmptyException("Youtube")
+
+        val request = NetUtil.doHttpRequest("${searchApi}id&channelId=${channelId}$maxResult${count}", 5000)
 
         val response = request.executeAsync()
         if (response.isOk) {
             val body = response.body()
             /** @TODO 类型自动选择, 类似于 BiliBili 的动态解析 */
             try {
-                return BotVariables.gson.fromJson(body, SearchResult::class.java)
+                return BotVariables.gson.fromJson(body, SearchVideoResult::class.java)
             } catch (e: JsonSyntaxException) {
                 try {
                     val error = BotVariables.gson.fromJson(body, YoutubeRequestError::class.java)

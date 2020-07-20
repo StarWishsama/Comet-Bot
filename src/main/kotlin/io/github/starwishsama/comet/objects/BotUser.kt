@@ -84,10 +84,6 @@ class BotUser(var userQQ: Long) {
     }
 
     companion object {
-        fun isUserExist(qq: Long): Boolean {
-            return getUser(qq) != null
-        }
-
         fun isBotAdmin(id: Long): Boolean {
             return getLevel(id) >= UserLevel.ADMIN
         }

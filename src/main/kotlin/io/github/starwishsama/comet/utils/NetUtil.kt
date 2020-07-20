@@ -37,15 +37,20 @@ object NetUtil {
 
     @Throws(HttpException::class)
     fun doHttpRequest(url: String, timeout: Int): HttpRequest {
+        return doHttpRequest(url, timeout, BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
+    }
+
+    @Throws(HttpException::class)
+    fun doHttpRequest(url: String, timeout: Int, proxyUrl: String, proxyPort: Int): HttpRequest {
         val request = HttpRequest.get(url)
                 .setFollowRedirects(true)
                 .timeout(timeout)
                 .header("user-agent", defaultUA)
-        if (BotVariables.cfg.proxyUrl != null && BotVariables.cfg.proxyPort != -1) {
+        if (proxyUrl.isNotEmpty() && proxyPort != -1) {
             request.setProxy(
                     Proxy(
                             Proxy.Type.HTTP,
-                            Socket(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort).remoteSocketAddress
+                            Socket(proxyUrl, proxyPort).remoteSocketAddress
                     )
             )
         }

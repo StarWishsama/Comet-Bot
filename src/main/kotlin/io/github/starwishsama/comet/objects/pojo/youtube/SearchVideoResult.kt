@@ -3,13 +3,13 @@ package io.github.starwishsama.comet.objects.pojo.youtube
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 
-data class SearchResult(
-    val kind: String,
-    val etag: String,
-    val nextPageToken: String,
-    val regionCode: String,
-    val pageInfo: PageInfo,
-    val items: List<SearchResultItem>
+data class SearchVideoResult(
+        val kind: String,
+        val etag: String,
+        val nextPageToken: String?,
+        val regionCode: String?,
+        val pageInfo: PageInfo?,
+        val items: List<SearchResultItem>
 ) {
     data class PageInfo(val totalResults: Int, val resultsPerPage: Int)
 
