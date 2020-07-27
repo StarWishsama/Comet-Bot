@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.isNumeric
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.message.GroupMessageEvent
@@ -29,18 +29,18 @@ class KickCommand : UniversalCommand {
                             if (args[0].isNumeric()) {
                                 doKick(event, args[0].toLong(), "")
                             } else {
-                                getHelp().toMirai()
+                                getHelp().toMsgChain()
                             }
 
                         }
                     } else {
-                        return getHelp().toMirai()
+                        return getHelp().toMsgChain()
                     }
                 } else {
-                    BotUtil.sendMsgPrefix("你不是绿帽 你爬 你爬").toMirai()
+                    BotUtil.sendMsgPrefix("你不是绿帽 你爬 你爬").toMsgChain()
                 }
             } else {
-                BotUtil.sendMsgPrefix("我不是绿帽 我爬 我爬").toMirai()
+                BotUtil.sendMsgPrefix("我不是绿帽 我爬 我爬").toMsgChain()
             }
         }
         return EmptyMessageChain

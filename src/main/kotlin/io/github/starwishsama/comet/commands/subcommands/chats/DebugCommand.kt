@@ -11,15 +11,17 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
 import java.io.IOException
+import kotlin.time.ExperimentalTime
 
 class DebugCommand : UniversalCommand {
+    @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (args.isNotEmpty() && BotUtil.isNoCoolDown(event.sender.id)) {
             when (args[0]) {
@@ -27,9 +29,9 @@ class DebugCommand : UniversalCommand {
                     if (user.isBotOwner()) {
                         return try {
                             DataSetup.reload()
-                            BotUtil.sendMsgPrefix("重载成功.").toMirai()
+                            BotUtil.sendMsgPrefix("重载成功.").toMsgChain()
                         } catch (e: IOException) {
-                            BotUtil.sendMsgPrefix("在重载时发生了异常.").toMirai()
+                            BotUtil.sendMsgPrefix("在重载时发生了异常.").toMsgChain()
                         }
                     }
                 }
@@ -46,33 +48,33 @@ class DebugCommand : UniversalCommand {
                                 i++
                             }
                         }
-                        return sb.toString().trim().toMirai()
+                        return sb.toString().trim().toMsgChain()
                     }
                 }
                 "help" -> return getHelp().toMessage().asMessageChain()
                 "info" ->
                     return ("彗星 Bot ${BotVariables.version}\n" +
                             "已注册的命令个数: ${MessageHandler.countCommands()}\n" +
-                            BotUtil.getMemoryUsage()).toMirai()
-                "hitokoto" -> return HitokotoUpdater.getHitokoto().toMirai()
+                            BotUtil.getMemoryUsage()).toMsgChain()
+                "hitokoto" -> return HitokotoUpdater.getHitokoto().toMsgChain()
                 "switch" -> {
                     BotVariables.switch = !BotVariables.switch
 
                     return if (!BotVariables.switch) {
-                        "Bot > おつまち~".toMirai()
+                        "Bot > おつまち~".toMsgChain()
                     } else {
-                        "今日もかわいい!".toMirai()
+                        "今日もかわいい!".toMsgChain()
                     }
                 }
                 "youtube" -> {
                     if (args.size > 1) {
                         val result = YoutubeApi.getChannelVideos(args[1], 1)
                         if (result != null) {
-                            return result.items[0].toString().toMirai()
+                            return result.items[0].toString().toMsgChain()
                         }
                     }
                 }
-                else -> return "Bot > 命令不存在\n${getHelp()}".toMirai()
+                else -> return "Bot > 命令不存在\n${getHelp()}".toMsgChain()
             }
         }
         return EmptyMessageChain

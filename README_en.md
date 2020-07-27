@@ -33,6 +33,8 @@ Development Roadmap: [Project Page](https://github.com/StarWishsama/Comet-Bot/pr
 
 ## 💽 How to Build 
 
+- Notice: You need use JDK 8+ to build
+
 1. Clone or download the repository to your local computer.
 
 ```bash

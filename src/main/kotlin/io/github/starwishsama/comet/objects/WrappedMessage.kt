@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.objects
 
 import io.github.starwishsama.comet.utils.NetUtil
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.Image
@@ -28,9 +28,9 @@ data class WrappedMessage(var text: String?) {
         if (sText != null) {
             val image = getPicture(contact)
             if (image != null) {
-                return sText.toMirai() + image
+                return sText.toMsgChain() + image
             }
-            return sText.toMirai()
+            return sText.toMsgChain()
         }
         return EmptyMessageChain
     }

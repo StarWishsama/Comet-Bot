@@ -8,12 +8,15 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.toKotlinDuration
 
 /**
  * 无名 Bot 命令处理器
@@ -72,6 +75,7 @@ object MessageHandler {
      *
      * @param event Mirai 消息命令 (聊天)
      */
+    @ExperimentalTime
     suspend fun execute(event: MessageEvent): MessageChain {
         val executedTime = LocalDateTime.now()
         val senderId = event.sender.id
@@ -92,21 +96,25 @@ object MessageHandler {
                     }
 
                     val result: MessageChain =
-                            if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
-                                doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size), user))
-                            } else {
-                                BotUtil.sendMsgPrefix("你没有权限!").toMirai()
-                            }
+                        if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
+                            doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size), user))
+                        } else {
+                            BotUtil.sendMsgPrefix("你没有权限!").toMsgChain()
+                        }
 
                     val usedTime = Duration.between(executedTime, LocalDateTime.now())
-                    BotVariables.logger.debug("[命令] 命令执行耗时 ${usedTime.toSecondsPart()}s${usedTime.toMillisPart()}ms")
+                    BotVariables.logger.debug(
+                        "[命令] 命令执行耗时 ${usedTime.toKotlinDuration()
+                            .toLong(DurationUnit.SECONDS)}s${usedTime.toKotlinDuration()
+                            .toLong(DurationUnit.MILLISECONDS)}ms"
+                    )
 
                     return result
                 }
             }
         } catch (t: Throwable) {
             BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId", t)
-            return "Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMirai()
+            return "Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain()
         }
         return EmptyMessageChain
     }
@@ -134,6 +142,7 @@ object MessageHandler {
         return ""
     }
 
+    @ExperimentalTime
     private suspend fun handleSession(event: MessageEvent, time: LocalDateTime) {
         val sender = event.sender
         if (!isCommandPrefix(event.message.contentToString()) && SessionManager.isValidSessionById(sender.id)) {
@@ -151,7 +160,10 @@ object MessageHandler {
         }
 
         val usedTime = Duration.between(time, LocalDateTime.now())
-        BotVariables.logger.debug("[会话] 处理会话耗时 ${usedTime.toSecondsPart()}s${usedTime.toMillisPart()}ms")
+        BotVariables.logger.debug(
+            "[会话] 处理会话耗时 ${usedTime.toKotlinDuration().toLong(DurationUnit.SECONDS)}s${usedTime.toKotlinDuration()
+                .toLong(DurationUnit.MILLISECONDS)}ms"
+        )
     }
 
     private fun getCommand(cmdPrefix: String): UniversalCommand? {

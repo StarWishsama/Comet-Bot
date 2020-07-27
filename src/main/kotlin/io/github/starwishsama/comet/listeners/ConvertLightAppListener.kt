@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.listeners
 
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.BotIsBeingMutedException
 import net.mamoe.mirai.event.subscribeGroupMessages
@@ -48,7 +48,7 @@ object ConvertLightAppListener : NListener {
                                 "小程序Anti > 自动转换了小程序链接:\n" +
                                         "视频标题: $title\n" +
                                         "链接: ${url.substring(0, url.indexOf("?") - 1)}"
-                                ).toMirai()
+                                ).toMsgChain()
                     }
                 } catch (e: IllegalStateException) {
                     BotVariables.logger.error("[监听器] 无法解析卡片消息", e)

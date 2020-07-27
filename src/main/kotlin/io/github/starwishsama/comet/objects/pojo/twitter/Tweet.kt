@@ -8,7 +8,8 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
 import io.github.starwishsama.comet.utils.NetUtil
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toFriendly
+import io.github.starwishsama.comet.utils.toMsgChain
 import io.github.starwishsama.comet.utils.uploadAsImageSafely
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -19,6 +20,9 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.toKotlinDuration
 
 data class Tweet(
         @SerializedName("created_at")
@@ -45,6 +49,7 @@ data class Tweet(
         @SerializedName("is_quote_status")
         var isQuoted: Boolean
 ) {
+    @ExperimentalTime
     fun getFullText(): String {
         val quoted = quotedStatus
         var result = text
@@ -54,8 +59,8 @@ data class Tweet(
         }
 
         val duration =
-                Duration.between(getSentTime(), LocalDateTime.now())
-        result += "\n\n距离发送已过去了 ${duration.toDaysPart()}天${duration.toMinutesPart()}分${duration.toSecondsPart()}秒"
+            Duration.between(getSentTime(), LocalDateTime.now())
+        result += "\n\n距离发送已过去了 ${duration.toKotlinDuration().toFriendly(TimeUnit.DAYS)}"
 
         return result
     }
@@ -104,10 +109,11 @@ data class Tweet(
         return picture
     }
 
+    @ExperimentalTime
     suspend fun getAsMessageChain(contact: Contact?): MessageChain {
-        if (contact == null || getPictureOrNull(contact) == null) return getFullText().toMirai()
+        if (contact == null || getPictureOrNull(contact) == null) return getFullText().toMsgChain()
 
         val image = getPictureOrNull(contact)
-        return getFullText().toMirai() + (image ?: EmptyMessageChain)
+        return getFullText().toMsgChain() + (image ?: EmptyMessageChain)
     }
 }

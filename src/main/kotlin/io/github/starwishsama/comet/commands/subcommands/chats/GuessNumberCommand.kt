@@ -13,7 +13,7 @@ import io.github.starwishsama.comet.sessions.commands.guessnumber.GuessNumberSes
 import io.github.starwishsama.comet.sessions.commands.guessnumber.GuessNumberUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.isNumeric
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
@@ -33,7 +33,7 @@ class GuessNumberCommand : UniversalCommand, SuspendCommand {
                         val answer = RandomUtil.randomInt(0, 100)
                         BotVariables.logger.verbose("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
                         SessionManager.addSession(GuessNumberSession(event.group.id, RandomUtil.randomInt(0, 101)))
-                        return BotUtil.sendMsgPrefix("猜一个数字吧! 范围 [0, 100]").toMirai()
+                        return BotUtil.sendMsgPrefix("猜一个数字吧! 范围 [0, 100]").toMsgChain()
                     }
                     args.size == 2 -> {
                         try {
@@ -49,17 +49,17 @@ class GuessNumberCommand : UniversalCommand, SuspendCommand {
                             val answer = RandomUtil.randomInt(min, max + 1)
                             BotVariables.logger.verbose("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
                             SessionManager.addSession(GuessNumberSession(event.group.id, RandomUtil.randomInt(0, 100)))
-                            return BotUtil.sendMsgPrefix("猜一个数字吧! 范围 [$min, $max]").toMirai()
+                            return BotUtil.sendMsgPrefix("猜一个数字吧! 范围 [$min, $max]").toMsgChain()
                         } catch (e: NumberFormatException) {
-                            return BotUtil.sendMsgPrefix("${e.message}").toMirai()
+                            return BotUtil.sendMsgPrefix("${e.message}").toMsgChain()
                         }
                     }
                     else -> {
-                        return getHelp().toMirai()
+                        return getHelp().toMsgChain()
                     }
                 }
             } else {
-                return BotUtil.sendMsgPrefix("已经有一个游戏在进程中啦~").toMirai()
+                return BotUtil.sendMsgPrefix("已经有一个游戏在进程中啦~").toMsgChain()
             }
         }
         return EmptyMessageChain

@@ -4,16 +4,18 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.ExperimentalTime
 
 @Deprecated("Will be refactor soon")
 object TweetUpdateChecker : Runnable {
     private val pushedMap = mutableMapOf<String, Tweet>()
 
+    @ExperimentalTime
     override fun run() {
         if (TwitterApi.token.isNullOrEmpty()) {
             TwitterApi.getBearerToken()
@@ -31,7 +33,7 @@ object TweetUpdateChecker : Runnable {
                     BotVariables.bot.groups.forEach { group ->
                         if (BotVariables.cfg.tweetPushGroups.contains(group.id)) {
                             GlobalScope.launch {
-                                var message = "${tweet.user.name} ($it) 发送了一条推文\n${tweet.getFullText()}".toMirai()
+                                var message = "${tweet.user.name} ($it) 发送了一条推文\n${tweet.getFullText()}".toMsgChain()
                                 val image = tweet.getPictureOrNull(group)
                                 if (image != null) {
                                     message += image

@@ -10,7 +10,7 @@ import io.github.starwishsama.comet.objects.RandomResult
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.getRestString
 import io.github.starwishsama.comet.utils.BotUtil.isNoCoolDown
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -26,19 +26,19 @@ class DivineCommand : UniversalCommand {
                         if (randomEventName.isNotBlank() && randomEventName.length < 30) {
                             val result = RandomResult(-1000, RandomUtil.randomDouble(0.0, 1.0), randomEventName)
                             user.decreaseTime()
-                            RandomResult.getChance(result).toMirai()
+                            RandomResult.getChance(result).toMsgChain()
                         } else {
-                            BotUtil.sendMsgPrefix("请检查需要占卜的字符是否超过上限或为空!").toMirai()
+                            BotUtil.sendMsgPrefix("请检查需要占卜的字符是否超过上限或为空!").toMsgChain()
                         }
                     } else {
-                        BotUtil.sendMsgPrefix("今日命令条数已达上限, 请等待条数自动恢复哦~\n命令条数现在每小时会恢复100次, 封顶1000次").toMirai()
+                        BotUtil.sendMsgPrefix("今日命令条数已达上限, 请等待条数自动恢复哦~\n命令条数现在每小时会恢复100次, 封顶1000次").toMsgChain()
                     }
                 } else {
                     BotVariables.underCovers -= underCover
-                    RandomResult.getChance(underCover).toMirai()
+                    RandomResult.getChance(underCover).toMsgChain()
                 }
             } else {
-                return getHelp().toMirai()
+                return getHelp().toMsgChain()
             }
         }
         return EmptyMessageChain

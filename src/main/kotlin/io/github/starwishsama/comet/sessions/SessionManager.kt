@@ -13,6 +13,11 @@ import java.util.concurrent.TimeUnit
  * @author Nameless
  */
 object SessionManager {
+    /**
+     * 会话列表
+     */
+    private val sessions: MutableMap<Session, LocalDateTime> = HashMap()
+
     init {
         TaskManager.runScheduleTaskAsync({
             val timeNow = LocalDateTime.now()
@@ -25,11 +30,6 @@ object SessionManager {
             }
         }, 3, 3, TimeUnit.MINUTES)
     }
-
-    /**
-     * 会话列表
-     */
-    private val sessions: MutableMap<Session, LocalDateTime> = HashMap()
 
     fun addSession(session: Session) {
         sessions[session] = LocalDateTime.now()

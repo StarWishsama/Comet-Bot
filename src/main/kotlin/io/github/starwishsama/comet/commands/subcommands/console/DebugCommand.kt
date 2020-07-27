@@ -7,8 +7,10 @@ import io.github.starwishsama.comet.commands.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
+import kotlin.time.ExperimentalTime
 
 class DebugCommand : ConsoleCommand {
+    @ExperimentalTime
     override suspend fun execute(args: List<String>): String {
         if (args.isNotEmpty()) {
             when (args[1]) {

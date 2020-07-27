@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.isNumeric
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
@@ -41,13 +41,13 @@ class MuteCommand : UniversalCommand {
                             }
                         }
                     } else {
-                        return getHelp().toMirai()
+                        return getHelp().toMsgChain()
                     }
                 } else {
-                    BotUtil.sendMsgPrefix("你不是绿帽 你爬 你爬").toMirai()
+                    BotUtil.sendMsgPrefix("你不是绿帽 你爬 你爬").toMsgChain()
                 }
             } else {
-                BotUtil.sendMsgPrefix("我不是绿帽 我爬 我爬").toMirai()
+                BotUtil.sendMsgPrefix("我不是绿帽 我爬 我爬").toMsgChain()
             }
         }
         return EmptyMessageChain
@@ -86,36 +86,36 @@ class MuteCommand : UniversalCommand {
             if (isAll) {
                 group.settings.isMuteAll = !group.settings.isMuteAll
                 return if (group.settings.isMuteAll) {
-                    BotUtil.sendMsgPrefix("The World!").toMirai()
+                    BotUtil.sendMsgPrefix("The World!").toMsgChain()
                 } else {
-                    BotUtil.sendMsgPrefix("然后时间开始流动").toMirai()
+                    BotUtil.sendMsgPrefix("然后时间开始流动").toMsgChain()
                 }
             } else {
-                if (group.botAsMember.id == id) BotUtil.sendMsgPrefix("不能踢出机器人").toMirai()
+                if (group.botAsMember.id == id) BotUtil.sendMsgPrefix("不能踢出机器人").toMsgChain()
 
                 for (member in group.members) {
                     if (member.id == id) {
-                        if (member.isOperator()) BotUtil.sendMsgPrefix("不能踢出管理员").toMirai()
+                        if (member.isOperator()) BotUtil.sendMsgPrefix("不能踢出管理员").toMsgChain()
                         return when (muteTime) {
                             in 1..2592000 -> {
                                 member.mute(muteTime)
-                                BotUtil.sendMsgPrefix("禁言成功").toMirai()
+                                BotUtil.sendMsgPrefix("禁言成功").toMsgChain()
                             }
                             0L -> {
                                 member.unmute()
-                                BotUtil.sendMsgPrefix("解禁成功").toMirai()
+                                BotUtil.sendMsgPrefix("解禁成功").toMsgChain()
                             }
                             else -> {
-                                BotUtil.sendMsgPrefix("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]").toMirai()
+                                BotUtil.sendMsgPrefix("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]").toMsgChain()
                             }
                         }
                     }
                 }
             }
 
-            return BotUtil.sendMsgPrefix("找不到此用户").toMirai()
+            return BotUtil.sendMsgPrefix("找不到此用户").toMsgChain()
         } catch (e: PermissionDeniedException) {
-            return BotUtil.sendMsgPrefix("我不是绿帽 我爬 我爬").toMirai()
+            return BotUtil.sendMsgPrefix("我不是绿帽 我爬 我爬").toMsgChain()
         }
     }
 

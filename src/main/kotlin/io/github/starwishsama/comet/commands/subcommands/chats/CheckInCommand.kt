@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.GroupMessageEvent
@@ -22,9 +22,9 @@ class CheckInCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(event.sender.id) && event is GroupMessageEvent) {
             return if (BotUtil.isChecked(user)) {
-                BotUtil.sendMsgPrefix("你今天已经签到过了! 输入 /cx 可查询签到信息").toMirai()
+                BotUtil.sendMsgPrefix("你今天已经签到过了! 输入 /cx 可查询签到信息").toMsgChain()
             } else {
-                checkIn(event.sender, event, user).toMirai()
+                checkIn(event.sender, event, user).toMsgChain()
             }
         }
         return EmptyMessageChain

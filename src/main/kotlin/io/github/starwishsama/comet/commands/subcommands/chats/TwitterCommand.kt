@@ -14,7 +14,7 @@ import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.getRestString
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -22,20 +22,22 @@ import net.mamoe.mirai.message.data.MessageChain
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import javax.net.ssl.SSLException
+import kotlin.time.ExperimentalTime
 
 class TwitterCommand : UniversalCommand {
+    @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.userQQ)) {
             when {
-                args.isEmpty() -> return getHelp().toMirai()
-                BotVariables.cfg.twitterToken == null -> return BotUtil.sendMsgPrefix("请到配置文件中填写蓝鸟 Token").toMirai()
+                args.isEmpty() -> return getHelp().toMsgChain()
+                BotVariables.cfg.twitterToken == null -> return BotUtil.sendMsgPrefix("请到配置文件中填写蓝鸟 Token").toMsgChain()
                 else -> {
                     when (args[0]) {
                         "info", "cx", "查询" -> return searchUser(args, event)
                         "sub", "订阅" -> return subscribeUser(args)
                         "unsub", "退订" -> return unsubscribeUser(args)
-                        "list" -> return BotVariables.cfg.twitterSubs.toString().toMirai()
-                        else -> getHelp().toMirai()
+                        "list" -> return BotVariables.cfg.twitterSubs.toString().toMsgChain()
+                        else -> getHelp().toMsgChain()
                     }
                 }
             }
@@ -43,28 +45,30 @@ class TwitterCommand : UniversalCommand {
         return EmptyMessageChain
     }
 
+    @ExperimentalTime
     private suspend fun searchUser(args: List<String>, event: MessageEvent): MessageChain {
         if (args.size > 1) {
             event.quoteReply(BotUtil.sendMsgPrefix("正在查询, 请稍等"))
             try {
                 return getTweetAsChain(args.getRestString(1), event.subject)
             } catch (e: RateLimitException) {
-                return BotUtil.sendMsgPrefix("API 调用已达上限").toMirai()
+                return BotUtil.sendMsgPrefix("API 调用已达上限").toMsgChain()
             } catch (e: EmptyTweetException) {
-                return BotUtil.sendMsgPrefixOrEmpty(e.message).toMirai()
+                return BotUtil.sendMsgPrefixOrEmpty(e.message).toMsgChain()
             } catch (e: TwitterApiException) {
                 if (e.code == 34) {
-                    return BotUtil.sendMsgPrefix("找不到此蓝鸟用户").toMirai()
+                    return BotUtil.sendMsgPrefix("找不到此蓝鸟用户").toMsgChain()
                 } else {
-                    BotUtil.sendMsgPrefix("获取推文时出现了意外").toMirai()
+                    BotUtil.sendMsgPrefix("获取推文时出现了意外").toMsgChain()
                 }
             }
         } else {
-            return getHelp().toMirai()
+            return getHelp().toMsgChain()
         }
         return EmptyMessageChain
     }
 
+    @ExperimentalTime
     private suspend fun getTweetAsChain(name: String, subject: Contact): MessageChain {
         val tweet: Tweet?
         try {
@@ -74,9 +78,9 @@ class TwitterCommand : UniversalCommand {
         }
 
         return if (tweet != null) {
-            BotUtil.sendMsgPrefix("\n${tweet.user.name}\n").toMirai() + tweet.getAsMessageChain(subject)
+            BotUtil.sendMsgPrefix("\n${tweet.user.name}\n").toMsgChain() + tweet.getAsMessageChain(subject)
         } else {
-            BotUtil.sendMsgPrefix("获取推文时出现了意外").toMirai()
+            BotUtil.sendMsgPrefix("获取推文时出现了意外").toMsgChain()
         }
     }
 
@@ -88,20 +92,20 @@ class TwitterCommand : UniversalCommand {
                 try {
                     twitter = TwitterApi.getUserInfo(args[1])
                 } catch (e: HttpException) {
-                    return BotUtil.sendMsgPrefix("连接至蓝鸟服务器超时, 等下再试试吧").toMirai()
+                    return BotUtil.sendMsgPrefix("连接至蓝鸟服务器超时, 等下再试试吧").toMsgChain()
                 }
 
                 if (twitter != null) {
                     BotVariables.cfg.twitterSubs += args[1]
-                    return BotUtil.sendMsgPrefix("订阅 @${args[1]} 成功").toMirai()
+                    return BotUtil.sendMsgPrefix("订阅 @${args[1]} 成功").toMsgChain()
                 }
 
-                return BotUtil.sendMsgPrefix("订阅 @${args[1]} 失败").toMirai()
+                return BotUtil.sendMsgPrefix("订阅 @${args[1]} 失败").toMsgChain()
             } else {
-                return BotUtil.sendMsgPrefix("已经订阅过 @${args[1]} 了").toMirai()
+                return BotUtil.sendMsgPrefix("已经订阅过 @${args[1]} 了").toMsgChain()
             }
         } else {
-            return getHelp().toMirai()
+            return getHelp().toMsgChain()
         }
     }
 
@@ -109,12 +113,12 @@ class TwitterCommand : UniversalCommand {
         return if (args.size > 1) {
             if (BotVariables.cfg.twitterSubs.contains(args[1])) {
                 BotVariables.cfg.twitterSubs -= args[1]
-                BotUtil.sendMsgPrefix("退订 @${args[1]} 成功").toMirai()
+                BotUtil.sendMsgPrefix("退订 @${args[1]} 成功").toMsgChain()
             } else {
-                BotUtil.sendMsgPrefix("没有订阅过 @${args[1]}").toMirai()
+                BotUtil.sendMsgPrefix("没有订阅过 @${args[1]}").toMsgChain()
             }
         } else {
-            getHelp().toMirai()
+            getHelp().toMsgChain()
         }
     }
 
@@ -124,21 +128,21 @@ class TwitterCommand : UniversalCommand {
                 when (t.cause) {
                     is ConnectException -> {
                         if (BotVariables.cfg.proxyPort != 0) {
-                            BotUtil.sendMsgPrefix("无法连接到蓝鸟服务器").toMirai()
+                            BotUtil.sendMsgPrefix("无法连接到蓝鸟服务器").toMsgChain()
                         } else {
-                            BotUtil.sendMsgPrefix("无法连接至代理服务器").toMirai()
+                            BotUtil.sendMsgPrefix("无法连接至代理服务器").toMsgChain()
                         }
                     }
-                    is SocketTimeoutException -> BotUtil.sendMsgPrefix("连接超时").toMirai()
-                    is SSLException -> BotUtil.sendMsgPrefix("连接超时").toMirai()
+                    is SocketTimeoutException -> BotUtil.sendMsgPrefix("连接超时").toMsgChain()
+                    is SSLException -> BotUtil.sendMsgPrefix("连接超时").toMsgChain()
                     else -> {
                         BotVariables.logger.error(t)
-                        BotUtil.sendMsgPrefix("获取推文时出现了意外").toMirai()
+                        BotUtil.sendMsgPrefix("获取推文时出现了意外").toMsgChain()
                     }
                 }
             }
-            is RateLimitException -> BotUtil.sendMsgPrefix("已达到蓝鸟 API 调用上限, 请等会再试吧").toMirai()
-            else -> BotUtil.sendMsgPrefix("获取推文时出现了意外").toMirai()
+            is RateLimitException -> BotUtil.sendMsgPrefix("已达到蓝鸟 API 调用上限, 请等会再试吧").toMsgChain()
+            else -> BotUtil.sendMsgPrefix("获取推文时出现了意外").toMsgChain()
         }
     }
 

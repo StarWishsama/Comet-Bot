@@ -9,7 +9,7 @@ import io.github.starwishsama.comet.utils.BotUtil.getLocalMessage
 import io.github.starwishsama.comet.utils.BotUtil.isLegitId
 import io.github.starwishsama.comet.utils.BotUtil.isNoCoolDown
 import io.github.starwishsama.comet.utils.R6SUtil.getR6SInfo
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -20,7 +20,7 @@ class R6SCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (isNoCoolDown(event.sender.id) && event is GroupMessageEvent) {
             if (args.isEmpty()) {
-                return (getLocalMessage("msg.bot-prefix") + "/r6s info [Uplay账号名]").toMirai()
+                return (getLocalMessage("msg.bot-prefix") + "/r6s info [Uplay账号名]").toMsgChain()
             } else {
                 when (args[0].toLowerCase()) {
                     "info", "查询" -> {
@@ -29,7 +29,7 @@ class R6SCommand : UniversalCommand {
                             r6Account = args[1]
                         } else {
                             return ("${getLocalMessage("msg.bot-prefix")} /r6 查询 [ID] 或者 /r6 绑定 [id]\n" +
-                                    "绑定彩虹六号账号 无需输入ID快捷查询游戏数据").toMirai()
+                                    "绑定彩虹六号账号 无需输入ID快捷查询游戏数据").toMsgChain()
                         }
 
                         event.reply(BotUtil.sendMsgPrefix("查询中..."))
@@ -42,14 +42,14 @@ class R6SCommand : UniversalCommand {
                                 val botUser1 = BotUser.getUser(event.sender.id)
                                 if (botUser1 != null) {
                                     botUser1.r6sAccount = args[1]
-                                    return (getLocalMessage("msg.bot-prefix") + "绑定成功!").toMirai()
+                                    return (getLocalMessage("msg.bot-prefix") + "绑定成功!").toMsgChain()
                                 }
                             } else {
-                                return (getLocalMessage("msg.bot-prefix") + "ID 格式有误!").toMirai()
+                                return (getLocalMessage("msg.bot-prefix") + "ID 格式有误!").toMsgChain()
                             }
                         }
                     else -> {
-                        return (getLocalMessage("msg.bot-prefix") + "/r6s info [Uplay账号名]").toMirai()
+                        return (getLocalMessage("msg.bot-prefix") + "/r6s info [Uplay账号名]").toMsgChain()
                     }
                 }
             }

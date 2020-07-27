@@ -10,7 +10,7 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.WrappedMessage
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.isNumeric
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -21,7 +21,7 @@ class BiliBiliCommand : UniversalCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.userQQ)) {
             if (args.isEmpty()) {
-                return getHelp().toMirai()
+                return getHelp().toMsgChain()
             } else {
                 when (args[0]) {
                     "sub", "订阅" -> {
@@ -34,17 +34,24 @@ class BiliBiliCommand : UniversalCommand {
                                 users.forEach {
                                     val result = subscribe(it)
                                     delay(500)
-                                    return BotUtil.returnMsgIf(result is EmptyMessageChain, BotUtil.sendMsgPrefix("账号 $it 不存在").toMirai())
+                                    return BotUtil.returnMsgIf(
+                                        result is EmptyMessageChain,
+                                        BotUtil.sendMsgPrefix("账号 $it 不存在").toMsgChain()
+                                    )
                                 }
-                                return BotUtil.sendMsgPrefix("订阅多个直播间成功 你好D啊").toMirai()
+                                return BotUtil.sendMsgPrefix("订阅多个直播间成功 你好D啊").toMsgChain()
                             } else {
                                 val result = subscribe(args[1])
-                                return BotUtil.returnMsgIfElse(result is EmptyMessageChain, BotUtil.sendMsgPrefix("账号不存在").toMirai(), result)
+                                return BotUtil.returnMsgIfElse(
+                                    result is EmptyMessageChain,
+                                    BotUtil.sendMsgPrefix("账号不存在").toMsgChain(),
+                                    result
+                                )
                             }
                         } catch (e: IllegalArgumentException) {
                             val msg = e.message
                             if (msg != null) {
-                                return msg.toMirai()
+                                return msg.toMsgChain()
                             }
                         }
                     }
@@ -62,13 +69,13 @@ class BiliBiliCommand : UniversalCommand {
                                         "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
                                         "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") + "\n"
                                 val dynamic = BiliBiliApi.getDynamic(item.mid)
-                                before.toMirai() + getDynamicText(dynamic, event)
+                                before.toMsgChain() + getDynamicText(dynamic, event)
                             } else {
-                                BotUtil.sendMsgPrefix("找不到对应的B站用户").toMirai()
+                                BotUtil.sendMsgPrefix("找不到对应的B站用户").toMsgChain()
                             }
-                        } else getHelp().toMirai()
+                        } else getHelp().toMsgChain()
                     }
-                    else -> return getHelp().toMirai()
+                    else -> return getHelp().toMsgChain()
                 }
             }
         }
@@ -97,13 +104,13 @@ class BiliBiliCommand : UniversalCommand {
             }
 
             return if (!BotVariables.cfg.subList.contains(roomId)) {
-                BotUtil.sendMsgPrefix("你还没订阅直播间 ${args[1]}").toMirai()
+                BotUtil.sendMsgPrefix("你还没订阅直播间 ${args[1]}").toMsgChain()
             } else {
                 BotVariables.cfg.subList.remove(args[1].toLong())
-                BotUtil.sendMsgPrefix("取消订阅直播间 ${args[1]} 成功").toMirai()
+                BotUtil.sendMsgPrefix("取消订阅直播间 ${args[1]} 成功").toMsgChain()
             }
         } else {
-            return getHelp().toMirai()
+            return getHelp().toMsgChain()
         }
     }
 
@@ -127,17 +134,17 @@ class BiliBiliCommand : UniversalCommand {
             )
         }
 
-        return subs.toString().trim().toMirai()
+        return subs.toString().trim().toMsgChain()
     }
 
     private suspend fun getDynamicText(dynamic: WrappedMessage?, event: MessageEvent): MessageChain {
         return if (dynamic == null) {
-            ("\n无最近动态").toMirai()
+            ("\n无最近动态").toMsgChain()
         } else {
             if (dynamic.text != null) {
                 dynamic.toMessageChain(event.subject)
             } else {
-                ("\n无最近动态").toMirai()
+                ("\n无最近动态").toMsgChain()
             }
         }
     }
@@ -159,7 +166,7 @@ class BiliBiliCommand : UniversalCommand {
         }
 
         return BotUtil.sendMsgPrefix("订阅 ${if (name.isNotBlank()) name else BiliBiliApi.getUserNameByMid(rid)}($rid) 成功")
-            .toMirai()
+            .toMsgChain()
     }
 
 }

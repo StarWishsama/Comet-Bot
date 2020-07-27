@@ -12,15 +12,21 @@ import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
+import net.mamoe.mirai.utils.asHumanReadable
 import org.apache.commons.lang3.StringUtils
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.math.floor
+import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.toKotlinDuration
 
 /**
  * 将字符串转换为消息链
  */
-fun String.toMirai(): MessageChain {
+fun String.toMsgChain(): MessageChain {
     return toMessage().asMessageChain()
 }
 
@@ -38,6 +44,25 @@ fun String.isNumeric(): Boolean {
 
 fun String.limitStringSize(size: Int): String {
     return if (length <= size) this else substring(0, size) + "..."
+}
+
+/**
+ * 来自 Mirai 的 [asHumanReadable]
+ */
+@ExperimentalTime
+fun kotlin.time.Duration.toFriendly(maxUnit: DurationUnit): String {
+    val days = toInt(DurationUnit.DAYS)
+    val hours = toInt(DurationUnit.HOURS) % 24
+    val minutes = toInt(DurationUnit.MINUTES) % 60
+    val s = (toInt(DurationUnit.SECONDS) % 60 * 1000) / 1000
+    val ms = floor(toDouble(DurationUnit.SECONDS) % 60 * 1000)
+    return buildString {
+        if (days != 0 && maxUnit >= DurationUnit.DAYS) append("${days}天")
+        if (hours != 0 && maxUnit >= DurationUnit.HOURS) append("${hours}时")
+        if (minutes != 0 && maxUnit >= DurationUnit.MINUTES) append("${minutes}分")
+        if (s != 0 && maxUnit >= DurationUnit.SECONDS) append("${s}秒")
+        append("${ms}毫秒")
+    }
 }
 
 
@@ -247,9 +272,10 @@ object BotUtil {
         return sb.toString().trim()
     }
 
+    @ExperimentalTime
     fun getRunningTime(): String {
         val remain = Duration.between(BotVariables.startTime, LocalDateTime.now())
-        return "${remain.toDaysPart()}天${remain.toHoursPart()}时${remain.toMinutesPart()}分${remain.toSecondsPart()}秒${remain.toMillisPart()}毫秒"
+        return remain.toKotlinDuration().toFriendly(TimeUnit.DAYS)
     }
 
     fun getAt(event: MessageEvent, id: String) : BotUser? {
@@ -266,6 +292,8 @@ object BotUtil {
         }
     }
 
+    // From []
+    @ExperimentalTime
     fun getMemoryUsage(): String = "操作系统: ${getOsName()}\n" +
             "JVM 版本: ${getJVMVersion()}\n" +
             "内存占用: ${getUsedMemory()}MB/${getMaxMemory()}MB\n" +

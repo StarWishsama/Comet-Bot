@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.DrawUtil
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -20,47 +20,52 @@ class GachaCommand : UniversalCommand {
                     "明日方舟", "舟游", "mrfz", "ak" -> {
                         return if (args.size == 2) {
                             when (args[1]) {
-                                "十连" -> BotUtil.sendMsgPrefix(DrawUtil.getArkDrawResult(
+                                "十连" -> BotUtil.sendMsgPrefix(
+                                    DrawUtil.getArkDrawResult(
                                         user,
                                         10
-                                )).toMirai()
-                                "单抽" -> BotUtil.sendMsgPrefix(DrawUtil.getArkDrawResult(
-                                    user,
-                                    1
-                                )).toMirai()
+                                    )
+                                ).toMsgChain()
+                                "单抽" -> BotUtil.sendMsgPrefix(
+                                    DrawUtil.getArkDrawResult(
+                                        user,
+                                        1
+                                    )
+                                ).toMsgChain()
                                 else -> {
                                     if (StringUtils.isNumeric(args[1])) {
-                                        BotUtil.sendMsgPrefix(DrawUtil.getArkDrawResult(user, args[1].toInt())).toMirai()
+                                        BotUtil.sendMsgPrefix(DrawUtil.getArkDrawResult(user, args[1].toInt()))
+                                            .toMsgChain()
                                     } else {
-                                        getHelp().toMirai()
+                                        getHelp().toMsgChain()
                                     }
                                 }
                             }
                         } else {
-                            getHelp().toMirai()
+                            getHelp().toMsgChain()
                         }
                     }
                     "公主连结", "pcr", "gzlj" -> {
                         return if (args.size == 2){
                             when (args[1]) {
-                                "十连" -> BotUtil.sendMsgPrefix(DrawUtil.getPCRResult(user, 10)).toMirai()
-                                "单抽" -> BotUtil.sendMsgPrefix(DrawUtil.getPCRResult(user, 1)).toMirai()
+                                "十连" -> BotUtil.sendMsgPrefix(DrawUtil.getPCRResult(user, 10)).toMsgChain()
+                                "单抽" -> BotUtil.sendMsgPrefix(DrawUtil.getPCRResult(user, 1)).toMsgChain()
                                 else -> {
                                     if (StringUtils.isNumeric(args[1])) {
-                                        BotUtil.sendMsgPrefix(DrawUtil.getPCRResult(user, args[1].toInt())).toMirai()
+                                        BotUtil.sendMsgPrefix(DrawUtil.getPCRResult(user, args[1].toInt())).toMsgChain()
                                     } else {
-                                        getHelp().toMirai()
+                                        getHelp().toMsgChain()
                                     }
                                 }
                             }
                         } else {
-                            return getHelp().toMirai()
+                            return getHelp().toMsgChain()
                         }
                     }
-                    else -> return getHelp().toMirai()
+                    else -> return getHelp().toMsgChain()
                 }
             } else {
-                return getHelp().toMirai()
+                return getHelp().toMsgChain()
             }
         }
         return EmptyMessageChain

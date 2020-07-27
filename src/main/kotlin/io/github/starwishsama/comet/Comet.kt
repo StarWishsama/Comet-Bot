@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.tasks.TweetUpdateChecker
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.getContext
+import io.github.starwishsama.comet.utils.toFriendly
 import io.github.starwishsama.comet.utils.writeString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -36,9 +37,12 @@ import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
+import kotlin.time.ExperimentalTime
+import kotlin.time.toKotlinDuration
 
 object Comet {
 
+    @ExperimentalTime
     fun startUpTask() {
         val apis = arrayOf(BiliBiliApi, TwitterApi)
 
@@ -112,6 +116,7 @@ object Comet {
     }
 }
 
+@ExperimentalTime
 suspend fun main() {
     BotVariables.startTime = LocalDateTime.now()
     println("""
@@ -162,11 +167,11 @@ suspend fun main() {
 
         MessageHandler.setupCommand(
             arrayOf(
-                        AdminCommand(),
-                        BiliBiliCommand(),
-                        CheckInCommand(),
-                        ClockInCommand(),
-                        io.github.starwishsama.comet.commands.subcommands.chats.DebugCommand(),
+                AdminCommand(),
+                BiliBiliCommand(),
+                CheckInCommand(),
+                ClockInCommand(),
+                io.github.starwishsama.comet.commands.subcommands.chats.DebugCommand(),
                 DivineCommand(),
                 GachaCommand(),
                 GuessNumberCommand(),
@@ -199,9 +204,8 @@ suspend fun main() {
         Comet.startUpTask()
 
         val time = Duration.between(BotVariables.startTime, LocalDateTime.now())
-        val startUsedTime = "${time.toSecondsPart()}s${time.toMillisPart()}ms"
 
-        BotVariables.logger.info("彗星 Bot 启动成功, 耗时 $startUsedTime")
+        BotVariables.logger.info("彗星 Bot 启动成功, 耗时 ${time.toKotlinDuration().toFriendly(TimeUnit.SECONDS)}")
 
         Runtime.getRuntime().addShutdownHook(Thread {
             BotVariables.logger.info("[Bot] 正在关闭 Bot...")

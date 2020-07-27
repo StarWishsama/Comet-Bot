@@ -12,7 +12,7 @@ import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.getRestString
 import io.github.starwishsama.comet.utils.isNumeric
-import io.github.starwishsama.comet.utils.toMirai
+import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.message.MessageEvent
@@ -26,12 +26,12 @@ class RConCommand : UniversalCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.userQQ) && user.hasPermission(getProps().permission)) {
             if (args.isEmpty()) {
-                return getHelp().toMirai()
+                return getHelp().toMsgChain()
             } else {
                 when (args[0]) {
                     "setup" -> {
                         SessionManager.addSession(Session(this, user.userQQ))
-                        return BotUtil.sendMsgPrefix("请在下一条消息发送 rCon 连接地址").toMirai()
+                        return BotUtil.sendMsgPrefix("请在下一条消息发送 rCon 连接地址").toMsgChain()
                     }
                     "cmd", "exec", "命令" -> {
                         val rCon = BotVariables.rCon
@@ -39,18 +39,18 @@ class RConCommand : UniversalCommand, SuspendCommand {
                             if (args.size > 1) {
                                 try {
                                     return withContext(Dispatchers.IO) {
-                                        return@withContext rCon.command(args.getRestString(1)).toMirai()
+                                        return@withContext rCon.command(args.getRestString(1)).toMsgChain()
                                     }
                                 } catch (e: IOException) {
                                     BotVariables.logger.error("在连接到 rCon 服务器时发生了错误", e)
-                                    return BotUtil.sendMsgPrefix("在连接到 rCon 服务器时发生了错误").toMirai()
+                                    return BotUtil.sendMsgPrefix("在连接到 rCon 服务器时发生了错误").toMsgChain()
                                 }
                             }
                         } else {
-                            return BotUtil.sendMsgPrefix("rCon 还没有设置\n你可以在 MC 服务端设置下打开 rCon 并设置地址/端口/密码").toMirai()
+                            return BotUtil.sendMsgPrefix("rCon 还没有设置\n你可以在 MC 服务端设置下打开 rCon 并设置地址/端口/密码").toMsgChain()
                         }
                     }
-                    else -> getHelp().toMirai()
+                    else -> getHelp().toMsgChain()
                 }
             }
         }
