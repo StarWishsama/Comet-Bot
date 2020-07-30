@@ -39,20 +39,23 @@ object PictureSearchUtil {
     }
 
     fun ascii2dSearch(url: String): PicSearchResult {
-        val encodedUrl = URLUtil.encode(url)
-        val request = NetUtil.doHttpRequestGet("$ascii2d$encodedUrl", 5000)
-        val result = request.executeAsync()
+        val request = Jsoup.connect("$ascii2d$url")
+        request.header("user-agent", NetUtil.defaultUA).followRedirects(true)
+            .proxy(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
+        println("$ascii2d$url")
 
-        if (result.isOk) {
-            val html = Jsoup.parse(result.body())
-            val elements = html.body().getElementsByClass("container")
-            val imgUrl: String =
-                "https://ascii2d.net/" + elements.select(".image-box")[1].select("img")[0].attributes()["src"]
-            val sources = elements.select(".info-box")[1].select("a")
-            val original = sources[0].attributes()["href"]
-            return PicSearchResult(imgUrl, original, -1.0, "$ascii2d$encodedUrl")
+        val html = request.get()
+        val elements = html.body().getElementsByClass("container")
+        var imgUrl = "无"
+        val sources = elements.select(".info-box")[1].select("a")
+        var original = "无"
+        try {
+            imgUrl = "https://ascii2d.net/" + elements.select(".image-box")[1].select("img")[0].attributes()["src"]
+            original = sources[0].attributes()["href"]
+        } catch (ignored: IndexOutOfBoundsException) {
         }
-
-        return PicSearchResult.emptyResult()
+        val r = PicSearchResult(imgUrl, original, -1.0, "$ascii2d$url")
+        println(r)
+        return r
     }
 }

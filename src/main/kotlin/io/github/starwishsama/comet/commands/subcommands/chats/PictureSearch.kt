@@ -69,7 +69,11 @@ class PictureSearch : UniversalCommand, SuspendCommand {
                 }
                 provider.contentEquals("ascii2d") -> {
                     val result = PictureSearchUtil.ascii2dSearch(image.queryUrl())
-                    event.reply("已找到可能相似的图片\n图片来源${result.originalUrl}")
+                    if (result.isNotEmpty()) {
+                        event.reply("已找到可能相似的图片\n图片来源${result.originalUrl}\n打开 ascii2d 页面查看更多\n${result.openUrl}")
+                    } else {
+                        event.reply("找不到相似的图片")
+                    }
                 }
                 else -> {
                     event.reply("设置的识图 API 不正确! 请联系管理员修改")

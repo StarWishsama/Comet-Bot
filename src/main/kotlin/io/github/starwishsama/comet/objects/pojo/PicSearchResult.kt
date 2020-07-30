@@ -6,4 +6,8 @@ data class PicSearchResult(val picUrl: String, val originalUrl: String, val simi
             return PicSearchResult("", "", -1.0, "")
         }
     }
+
+    fun isNotEmpty(): Boolean {
+        return picUrl.isNotEmpty() || originalUrl.isNotEmpty()
+    }
 }

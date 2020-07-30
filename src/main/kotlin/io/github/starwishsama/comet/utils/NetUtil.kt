@@ -25,7 +25,7 @@ suspend fun InputStream.uploadAsImageSafely(type: String, contact: Contact): Ima
 }
 
 object NetUtil {
-    private const val defaultUA =
+    const val defaultUA =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
 
     fun getUrlInputStream(url: String): InputStream {
