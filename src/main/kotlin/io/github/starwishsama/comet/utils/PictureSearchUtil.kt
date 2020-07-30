@@ -1,17 +1,20 @@
 package io.github.starwishsama.comet.utils
 
+import cn.hutool.core.util.URLUtil
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.pojo.PicSearchResult
 
 object PictureSearchUtil {
-    private const val apiUrl = "https://saucenao.com/search.php?db=999&output_type=2&numres=3&url="
+    private const val apiUrl = "https://saucenao.com/search.php?db=5&output_type=2&numres=3&url="
 
     fun sauceNaoSearch(url: String): PicSearchResult {
-        val request = NetUtil.doHttpRequestGet(apiUrl + url, 5000)
+        val encodedUrl = URLUtil.encode(url)
+        val request = NetUtil.doHttpRequestGet("$apiUrl$encodedUrl&api_key=${BotVariables.cfg.saucenaoApiKey}", 5000)
+            .setFollowRedirects(false)
         val result = request.executeAsync()
 
-        if (result.isOk) {
+        if (result.isOk && result.header("Content-Type").contains("json")) {
             val body = result.body()
             try {
                 val resultBody = JsonParser.parseString(body)
