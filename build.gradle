@@ -73,6 +73,8 @@ dependencies {
     implementation 'com.github.rockswang:java-curl:1.2.2.2'
     // BiliBili
     implementation 'com.hiczp:bilibili-api:0.2.0'
+    // jsoup HTML parser library @ https://jsoup.org/
+    implementation 'org.jsoup:jsoup:1.13.1'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

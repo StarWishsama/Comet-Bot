@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.SuspendCommand
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
@@ -15,14 +16,19 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.queryUrl
+import java.util.*
 
 class PictureSearch : UniversalCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(event.sender.id)) {
-            if (!SessionManager.isValidSessionById(event.sender.id)) {
-                SessionManager.addSession(Session(this, user.userQQ))
+            if (args.isEmpty() || SessionManager.isValidSessionById(event.sender.id)) {
+                if (!SessionManager.isValidSessionById(event.sender.id)) {
+                    SessionManager.addSession(Session(this, user.userQQ))
+                }
+                return BotUtil.sendMsgPrefix("请发送需要搜索的图片").toMsgChain()
+            } else if (args[0].contentEquals("source") && args.size > 1) {
+                BotVariables.cfg.pictureSearchProvider = args[1]
             }
-            return BotUtil.sendMsgPrefix("请发送需要搜索的图片").toMsgChain()
         }
         return EmptyMessageChain
     }
@@ -45,16 +51,28 @@ class PictureSearch : UniversalCommand, SuspendCommand {
         val image = event.message[Image]
         if (image != null) {
             event.reply("请稍等...")
-            val result = PictureSearchUtil.sauceNaoSearch(image.queryUrl())
+            val provider = BotVariables.cfg.pictureSearchProvider.toLowerCase(Locale.ROOT)
             when {
-                result.similarity >= 52.5 -> {
-                    event.reply("相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n")
+                provider.contentEquals("saucenao") -> {
+                    val result = PictureSearchUtil.sauceNaoSearch(image.queryUrl())
+                    when {
+                        result.similarity >= 52.5 -> {
+                            event.reply("相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n")
+                        }
+                        result.similarity == -1.0 -> {
+                            event.reply("在识图时发生了问题, 请联系管理员")
+                        }
+                        else -> {
+                            event.reply("相似度过低 (${result.similarity}%), 请尝试更换图片重试")
+                        }
+                    }
                 }
-                result.similarity == -1.0 -> {
-                    event.reply("在识图时发生了问题, 请联系管理员")
+                provider.contentEquals("ascii2d") -> {
+                    val result = PictureSearchUtil.ascii2dSearch(image.queryUrl())
+                    event.reply("已找到可能相似的图片\n图片来源${result.originalUrl}")
                 }
                 else -> {
-                    event.reply("相似度过低 (${result.similarity}%), 请尝试更换图片重试")
+                    event.reply("设置的识图 API 不正确! 请联系管理员修改")
                 }
             }
         } else {

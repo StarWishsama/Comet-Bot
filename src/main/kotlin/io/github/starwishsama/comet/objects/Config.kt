@@ -2,7 +2,6 @@ package io.github.starwishsama.comet.objects
 
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.enums.MusicApi
-import java.util.*
 
 open class Config {
     @SerializedName("botId")
@@ -53,30 +52,11 @@ open class Config {
     @SerializedName("r6tab_apikey")
     var r6tabKey: String? = null
 
-    @Deprecated("Soon will replace by PerGroupSetting")
-    @SerializedName("universal_subs")
-    var subList = LinkedList<Long>()
-
-    @Deprecated("Soon will replace by PerGroupSetting")
-    @SerializedName("push_groups")
-    var pushGroups : List<Long> = mutableListOf()
-
-    @SerializedName("check_delay")
-    var checkDelay: Long = 1
-
     @SerializedName("twitter_token")
     var twitterToken: String? = null
 
     @SerializedName("twitter_secret")
     var twitterSecret: String? = null
-
-    @Deprecated("Soon will replace by PerGroupSetting")
-    @SerializedName("twitter_subs")
-    var twitterSubs: List<String> = LinkedList()
-
-    @Deprecated("Soon will replace by PerGroupSetting")
-    @SerializedName("tweet_push_groups")
-    var tweetPushGroups: List<Long> = LinkedList()
 
     @SerializedName("proxy_url")
     var proxyUrl: String = ""
@@ -92,4 +72,7 @@ open class Config {
 
     @SerializedName("small_image_mode")
     var smallImageMode: Boolean = true
+
+    @SerializedName("picture_search_provider")
+    var pictureSearchProvider: String = "saucenao"
 }
