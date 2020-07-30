@@ -7,7 +7,6 @@ import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.gson
-import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.Config
@@ -15,27 +14,30 @@ import io.github.starwishsama.comet.objects.draw.ArkNightOperator
 import io.github.starwishsama.comet.objects.draw.PCRCharacter
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.objects.group.Shop
+import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.getContext
-import io.github.starwishsama.comet.utils.writeJson
+import io.github.starwishsama.comet.utils.parseAsClass
+import io.github.starwishsama.comet.utils.writeClassToJson
 import java.io.File
 
 object DataSetup {
-    private val userCfg: File = File(BotVariables.filePath.toString(), "users.json")
-    private val shopItemCfg: File = File(BotVariables.filePath.toString(), "/items.json")
-    private val cfgFile: File = File(BotVariables.filePath.toString(), "/config.json")
-    private val langCfg: File = File(BotVariables.filePath.toString(), "/lang.json")
-    private val groupCfg: File = File(BotVariables.filePath.toString(), "/groups.json")
-    private val cacheCfg: File = File(BotVariables.filePath.toString(), "cache.json")
-    private val pcrData = File(BotVariables.filePath.toString(), "/pcr.json")
-    private val arkNightData = File(BotVariables.filePath.toString(), "/ark.json")
+    private val userCfg: File = File(BotVariables.filePath, "users.json")
+    private val shopItemCfg: File = File(BotVariables.filePath, "/items.json")
+    private val cfgFile: File = File(BotVariables.filePath, "/config.json")
+    private val langCfg: File = File(BotVariables.filePath, "/lang.json")
+    private val groupCfg: File = File(BotVariables.filePath, "/groups.json")
+    private val cacheCfg: File = File(BotVariables.filePath, "cache.json")
+    private val pcrData = File(BotVariables.filePath, "/pcr.json")
+    private val arkNightData = File(BotVariables.filePath, "/ark.json")
 
-    fun initData() {
+    private val perGroupFolder = FileUtil.getChildFolder("groups")
+
+    fun init() {
         if (!userCfg.exists() || !cfgFile.exists()) {
             try {
-                cfgFile.writeJson(BotVariables.cfg)
-                userCfg.writeJson(BotVariables.users)
-                shopItemCfg.writeJson(BotVariables.shop)
-                groupCfg.writeJson(GroupConfigManager.configs)
+                cfgFile.writeClassToJson(BotVariables.cfg)
+                userCfg.writeClassToJson(BotVariables.users)
+                shopItemCfg.writeClassToJson(BotVariables.shop)
                 println("[配置] 已自动生成新的配置文件.")
             } catch (e: Exception) {
                 System.err.println("[配置] 在生成配置文件时发生了错误, 错误信息: " + e.message)
@@ -47,11 +49,11 @@ object DataSetup {
 
     private fun saveCfg() {
         try {
-            cfgFile.writeJson(BotVariables.cfg)
-            userCfg.writeJson(BotVariables.users)
-            shopItemCfg.writeJson(BotVariables.shop)
-            groupCfg.writeJson(GroupConfigManager.configs)
-            cacheCfg.writeJson(BotVariables.cache)
+            cfgFile.writeClassToJson(BotVariables.cfg)
+            userCfg.writeClassToJson(BotVariables.users)
+            shopItemCfg.writeClassToJson(BotVariables.shop)
+            savePerGroupSetting()
+            cacheCfg.writeClassToJson(BotVariables.cache)
         } catch (e: Exception) {
             System.err.println("[配置] 在保存配置文件时发生了问题, 错误信息: ")
             e.printStackTrace()
@@ -68,10 +70,6 @@ object DataSetup {
             BotVariables.shop = gson.fromJson(
                 shopItemCfg.getContext(),
                 object : TypeToken<List<Shop>>() {}.type
-            )
-            GroupConfigManager.configs = gson.fromJson(
-                groupCfg.getContext(),
-                object : TypeToken<Map<Long, PerGroupConfig>>() {}.type
             )
 
             loadLang()
@@ -94,7 +92,7 @@ object DataSetup {
                 val jsonObject = JsonObject()
                 jsonObject.addProperty("token", "")
                 jsonObject.addProperty("get_time", 0L)
-                cacheCfg.writeJson(jsonObject)
+                cacheCfg.writeClassToJson(jsonObject)
             } else {
                 BotVariables.cache = JsonParser.parseString(cacheCfg.getContext()).asJsonObject
             }
@@ -116,7 +114,7 @@ object DataSetup {
             for (text in default) {
                 BotVariables.localMessage = BotVariables.localMessage + text
             }
-            langCfg.writeJson(BotVariables.localMessage)
+            langCfg.writeClassToJson(BotVariables.localMessage)
         } else {
             val lang: JsonElement =
                     JsonParser.parseString(langCfg.getContext())
@@ -133,7 +131,7 @@ object DataSetup {
     }
 
     private fun saveLang() {
-        langCfg.writeJson(BotVariables.localMessage)
+        langCfg.writeClassToJson(BotVariables.localMessage)
     }
 
     fun saveFiles() {
@@ -144,6 +142,42 @@ object DataSetup {
 
     fun reload() {
         // 仅重载配置文件
-        BotVariables.cfg = gson.fromJson(cfgFile.getContext(), Config::class.java)
+        BotVariables.cfg = cfgFile.parseAsClass(Config::class.java)
+    }
+
+    fun initPerGroupSetting() {
+        if (!perGroupFolder.exists()) {
+            perGroupFolder.mkdirs()
+        }
+
+        var count = 0
+
+        BotVariables.bot.groups.forEach {
+            val loc = File(perGroupFolder, "${it.id}.json")
+            if (!loc.exists()) {
+                FileUtil.createBlankFile(loc)
+                BotVariables.perGroup.add(PerGroupConfig(it.id))
+                count++
+            } else {
+                try {
+                    BotVariables.perGroup.add(loc.parseAsClass(PerGroupConfig::class.java))
+                    count++
+                } catch (t: Throwable) {
+                    BotVariables.logger.warning("[配置] 在加载分群配置时出现了问题", t)
+                }
+            }
+        }
+
+        BotVariables.logger.info("[群配置] 成功加载了 $count 个群配置")
+    }
+
+    private fun savePerGroupSetting() {
+        if (!perGroupFolder.exists()) return
+
+        BotVariables.perGroup.forEach {
+            val loc = File(perGroupFolder, "${it.groupId}.json")
+            if (!loc.exists()) loc.createNewFile()
+            loc.writeClassToJson(it)
+        }
     }
 }

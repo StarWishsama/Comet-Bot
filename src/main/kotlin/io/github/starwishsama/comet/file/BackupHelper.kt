@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.file
 
 import cn.hutool.core.io.file.FileWriter
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.managers.TaskManager
+import io.github.starwishsama.comet.utils.TaskUtil
 import java.io.File
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
@@ -31,6 +31,6 @@ object BackupHelper {
     }
 
     fun scheduleBackup() {
-        TaskManager.runScheduleTaskAsync(BackupHelper::createBackup, 0, BotVariables.cfg.autoSaveTime, TimeUnit.MINUTES)
+        TaskUtil.runScheduleTaskAsync(BackupHelper::createBackup, 0, BotVariables.cfg.autoSaveTime, TimeUnit.MINUTES)
     }
 }

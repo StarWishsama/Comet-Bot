@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Synchronized
-fun File.writeJson(context: Any) {
+fun File.writeClassToJson(context: Any) {
     if (!this.exists()) {
         this.createNewFile()
     }
@@ -29,6 +29,16 @@ fun File.writeString(context: String) {
 
 fun File.getContext(): String {
     return FileReader.create(this).readString()
+}
+
+/**
+ * 直接将文件内容转换为指定的类
+ *
+ * @param clazz 指定类
+ * @return 指定类
+ */
+fun <T> File.parseAsClass(clazz: Class<T>): T {
+    return BotVariables.gson.fromJson(getContext(), clazz)
 }
 
 object FileUtil {
@@ -120,5 +130,14 @@ object FileUtil {
         sb.append("========================= StackTrace =========================\n")
 
         return sb.toString()
+    }
+
+    fun createBlankFile(path: File, child: String) {
+        val file = File(path, child)
+        createBlankFile(file)
+    }
+
+    fun createBlankFile(location: File) {
+        if (!location.exists()) location.createNewFile()
     }
 }

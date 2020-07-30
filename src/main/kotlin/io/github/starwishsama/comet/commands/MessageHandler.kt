@@ -19,7 +19,8 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
 /**
- * 无名 Bot 命令处理器
+ * 彗星 Bot 命令处理器
+ *
  * 处理群聊/私聊聊天信息中存在的命令
  * @author Nameless
  */

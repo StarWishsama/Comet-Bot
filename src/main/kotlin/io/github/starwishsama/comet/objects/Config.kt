@@ -53,6 +53,7 @@ open class Config {
     @SerializedName("r6tab_apikey")
     var r6tabKey: String? = null
 
+    @Deprecated("Soon will replace by PerGroupSetting")
     @SerializedName("universal_subs")
     var subList = LinkedList<Long>()
 

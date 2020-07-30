@@ -20,7 +20,7 @@ object HitokotoUpdater : Runnable {
             val hitokoto = BotVariables.hitokoto
             return "\n今日一言:\n${hitokoto?.content} ——${hitokoto?.author}(${hitokoto?.source})"
         } catch (e: Exception) {
-            BotVariables.logger.error("在从缓存中获取一言时发生错误", e)
+            BotVariables.logger.warning("在从缓存中获取一言时发生错误", e)
         }
         return "无法获取今日一言"
     }

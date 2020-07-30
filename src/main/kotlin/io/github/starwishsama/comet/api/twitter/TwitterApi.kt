@@ -1,7 +1,6 @@
 package io.github.starwishsama.comet.api.twitter
 
 import cn.hutool.http.HttpException
-import cn.hutool.http.HttpRequest
 import cn.hutool.http.HttpResponse
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
@@ -17,9 +16,8 @@ import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterErrorInfo
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
 import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.NetUtil
 import java.io.IOException
-import java.net.Proxy
-import java.net.Socket
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
@@ -57,7 +55,7 @@ object TwitterApi : ApiExecutor {
                 "grant_type=client_credentials"
             )
 
-            if (BotVariables.cfg.proxyUrl != null && BotVariables.cfg.proxyPort != -1) {
+            if (BotVariables.cfg.proxyUrl.isNotEmpty() && BotVariables.cfg.proxyPort != -1) {
                 curl.proxy(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
             }
 
@@ -69,7 +67,7 @@ object TwitterApi : ApiExecutor {
                 BotVariables.logger.debug("[蓝鸟] 成功获取 Access Token")
             }
         } catch (e: IOException) {
-            BotVariables.logger.error("获取 Token 时出现问题", e)
+            BotVariables.logger.warning("获取 Token 时出现问题", e)
         }
     }
 
@@ -83,24 +81,14 @@ object TwitterApi : ApiExecutor {
 
         val startTime = LocalDateTime.now()
         val url = "$universalApi/users/show.json?screen_name=$username&tweet_mode=extended"
-        val conn = HttpRequest.get(url)
+        val conn = NetUtil.doHttpRequestGet(url, 12_000)
             .header("authorization", "Bearer $token")
-            .timeout(12_000)
-
-        if (BotVariables.cfg.proxyUrl != null && BotVariables.cfg.proxyPort != 0) {
-            conn.setProxy(
-                Proxy(
-                    Proxy.Type.HTTP,
-                    Socket(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort).remoteSocketAddress
-                )
-            )
-        }
 
         var result: HttpResponse? = null
         try {
             result = conn.executeAsync()
         } catch (e: HttpException) {
-            BotVariables.logger.error("[蓝鸟] 在获取用户最新推文时出现了问题", e)
+            BotVariables.logger.warning("[蓝鸟] 在获取用户最新推文时出现了问题", e)
         }
 
         var tUser: TwitterUser? = null
@@ -112,10 +100,10 @@ object TwitterApi : ApiExecutor {
             } catch (e: JsonSyntaxException) {
                 try {
                     val errorInfo = gson.fromJson(result?.body(), TwitterErrorInfo::class.java)
-                    BotVariables.logger.error("[蓝鸟] 调用 API 时出现了问题\n${errorInfo.getReason()}")
+                    BotVariables.logger.warning("[蓝鸟] 调用 API 时出现了问题\n${errorInfo.getReason()}")
                     throw TwitterApiException(errorInfo.errors[0].code, errorInfo.errors[0].reason)
                 } catch (e: JsonSyntaxException) {
-                    BotVariables.logger.error("[蓝鸟] 解析推文 JSON 时出现问题: 不支持的类型", e)
+                    BotVariables.logger.warning("[蓝鸟] 解析推文 JSON 时出现问题: 不支持的类型", e)
                     FileUtil.createErrorReportFile("twitter", e, body, url)
                 }
             }
@@ -132,21 +120,14 @@ object TwitterApi : ApiExecutor {
 
         usedTime++
         val request =
-            HttpRequest.get("$universalApi/statuses/user_timeline.json?screen_name=$username&count=2&tweet_mode=extended")
+            NetUtil.doHttpRequestGet(
+                "$universalApi/statuses/user_timeline.json?screen_name=$username&count=2&tweet_mode=extended",
+                5_000
+            )
                 .header(
                     "authorization",
                     "Bearer $token"
                 )
-                .timeout(5_000)
-
-        if (BotVariables.cfg.proxyUrl != null && BotVariables.cfg.proxyPort != -1) {
-            request.setProxy(
-                Proxy(
-                    Proxy.Type.HTTP,
-                    Socket(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort).remoteSocketAddress
-                )
-            )
-        }
 
         val result = request.executeAsync()
 
@@ -166,10 +147,10 @@ object TwitterApi : ApiExecutor {
             } catch (e: JsonSyntaxException) {
                 try {
                     val errorInfo = gson.fromJson(result.body(), TwitterErrorInfo::class.java)
-                    BotVariables.logger.error("[蓝鸟] 调用 API 时出现了问题\n${errorInfo.getReason()}")
+                    BotVariables.logger.warning("[蓝鸟] 调用 API 时出现了问题\n${errorInfo.getReason()}")
                     throw TwitterApiException(errorInfo.errors[0].code, errorInfo.errors[0].reason)
                 } catch (e: JsonSyntaxException) {
-                    BotVariables.logger.error("[蓝鸟] 解析推文 JSON 时出现问题: 不支持的类型", e)
+                    BotVariables.logger.warning("[蓝鸟] 解析推文 JSON 时出现问题: 不支持的类型", e)
                 }
             }
             return tweet
@@ -200,7 +181,7 @@ object TwitterApi : ApiExecutor {
 
             return result
         } catch (x: TwitterApiException) {
-            BotVariables.logger.error("[蓝鸟] 调用 API 时出现了问题\n错误代码: ${x.code}\n理由: ${x.reason}}")
+            BotVariables.logger.warning("[蓝鸟] 调用 API 时出现了问题\n错误代码: ${x.code}\n理由: ${x.reason}}")
         }
 
         BotVariables.logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")

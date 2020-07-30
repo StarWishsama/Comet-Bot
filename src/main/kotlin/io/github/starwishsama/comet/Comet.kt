@@ -11,14 +11,8 @@ import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.ConvertLightAppListener
 import io.github.starwishsama.comet.listeners.RepeatListener
-import io.github.starwishsama.comet.managers.TaskManager
-import io.github.starwishsama.comet.tasks.BiliBiliLiveStatusChecker
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
-import io.github.starwishsama.comet.tasks.TweetUpdateChecker
-import io.github.starwishsama.comet.utils.FileUtil
-import io.github.starwishsama.comet.utils.getContext
-import io.github.starwishsama.comet.utils.toFriendly
-import io.github.starwishsama.comet.utils.writeString
+import io.github.starwishsama.comet.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -48,22 +42,14 @@ object Comet {
 
         /** 定时任务 */
         BackupHelper.scheduleBackup()
-        TaskManager.runScheduleTaskAsync(
+        TaskUtil.runScheduleTaskAsync(
             { BotVariables.users.forEach { it.addTime(100) } },
             5,
             5,
             TimeUnit.HOURS
         )
 
-        TaskManager.runScheduleTaskAsyncIf(
-            BiliBiliLiveStatusChecker::run,
-            BotVariables.cfg.checkDelay,
-            BotVariables.cfg.checkDelay,
-            TimeUnit.MINUTES,
-            BotVariables.cfg.subList.isNotEmpty()
-        )
-
-        TaskManager.runAsync({
+        TaskUtil.runAsync({
             FakeClientApi.client.runCatching {
                 val pwd = BotVariables.cfg.biliPassword
                 val username = BotVariables.cfg.biliUserName
@@ -78,20 +64,12 @@ object Comet {
             }
         }, 5)
 
-        TaskManager.runScheduleTaskAsync({ apis.forEach { it.resetTime() } }, 25, 25, TimeUnit.MINUTES)
-        TaskManager.runScheduleTaskAsyncIf(
-            TweetUpdateChecker::run,
-            1,
-            8,
-            TimeUnit.MINUTES,
-            (BotVariables.cfg.twitterSubs.isNotEmpty() && BotVariables.cfg.tweetPushGroups.isNotEmpty())
-        )
-
-        TaskManager.runScheduleTaskAsync(HitokotoUpdater::run, 5, 60 * 60 * 24, TimeUnit.SECONDS)
+        TaskUtil.runScheduleTaskAsync({ apis.forEach { it.resetTime() } }, 25, 25, TimeUnit.MINUTES)
+        TaskUtil.runScheduleTaskAsync(HitokotoUpdater::run, 5, 60 * 60, TimeUnit.SECONDS)
     }
 
     fun handleConsoleCommand() {
-        TaskManager.runAsync({
+        TaskUtil.runAsync({
             val scanner = Scanner(System.`in`)
             var command: String
             while (scanner.hasNextLine()) {
@@ -119,7 +97,8 @@ object Comet {
 @ExperimentalTime
 suspend fun main() {
     BotVariables.startTime = LocalDateTime.now()
-    println("""
+    println(
+        """
         
            ______                     __ 
           / ____/___  ____ ___  ___  / /_
@@ -131,7 +110,7 @@ suspend fun main() {
     """.trimIndent()
     )
     FileUtil.initLog()
-    DataSetup.initData()
+    DataSetup.init()
     val qqId = BotVariables.cfg.botId
     val password = BotVariables.cfg.botPassword
 
@@ -157,6 +136,8 @@ suspend fun main() {
         BotVariables.bot = Bot(qq = qqId, password = password, configuration = config)
         BotVariables.bot.alsoLogin()
         BotVariables.logger = BotVariables.bot.logger
+
+        DataSetup.initPerGroupSetting()
 
         Comet.setupRCon()
 
@@ -205,7 +186,7 @@ suspend fun main() {
 
         val time = Duration.between(BotVariables.startTime, LocalDateTime.now())
 
-        BotVariables.logger.info("彗星 Bot 启动成功, 耗时 ${time.toKotlinDuration().toFriendly(TimeUnit.SECONDS)}")
+        BotVariables.logger.info("彗星 Bot 启动成功, 耗时 ${time.toKotlinDuration().toFriendly()}")
 
         Runtime.getRuntime().addShutdownHook(Thread {
             BotVariables.logger.info("[Bot] 正在关闭 Bot...")

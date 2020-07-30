@@ -1,9 +1,9 @@
-package io.github.starwishsama.comet.managers
+package io.github.starwishsama.comet.utils
 
 import io.github.starwishsama.comet.BotVariables
 import java.util.concurrent.TimeUnit
 
-object TaskManager {
+object TaskUtil {
     fun runAsync(task: () -> Unit, delay: Long) {
         BotVariables.service.schedule(task, delay, TimeUnit.SECONDS)
     }
@@ -14,7 +14,12 @@ object TaskManager {
 
     fun runScheduleTaskAsyncIf(task: () -> Unit, delay: Long, period: Long, unit: TimeUnit, condition: Boolean) {
         if (condition) {
-            runScheduleTaskAsync(task, delay, period, unit)
+            runScheduleTaskAsync(
+                task,
+                delay,
+                period,
+                unit
+            )
         }
     }
 }

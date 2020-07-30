@@ -27,7 +27,7 @@ object YoutubeApi {
     fun searchYoutubeUser(channelName: String, count: Int): SearchUserResult? {
         if (!searchApi.contains("&key")) throw ApiKeyIsEmptyException("Youtube")
 
-        val request = NetUtil.doHttpRequest("$searchApi$searchByUserName$channelName$maxResult$count", 5000)
+        val request = NetUtil.doHttpRequestGet("$searchApi$searchByUserName$channelName$maxResult$count", 5000)
 
         val response = request.executeAsync()
 
@@ -39,9 +39,9 @@ object YoutubeApi {
             } catch (e: JsonSyntaxException) {
                 try {
                     val error = BotVariables.gson.fromJson(body, YoutubeRequestError::class.java)
-                    BotVariables.logger.error("[API] 无法访问 Youtube API \n返回码: ${error.code}, 信息: ${error.message}")
+                    BotVariables.logger.warning("[API] 无法访问 Youtube API \n返回码: ${error.code}, 信息: ${error.message}")
                 } catch (t: Throwable) {
-                    BotVariables.logger.error("[API] 无法解析 Youtube API 传入的 json", t)
+                    BotVariables.logger.warning("[API] 无法解析 Youtube API 传入的 json", t)
                     FileUtil.createErrorReportFile("youtube", t, body, request.url)
                 }
             }
@@ -54,7 +54,7 @@ object YoutubeApi {
     fun getChannelVideos(channelId: String, count: Int): SearchVideoResult? {
         if (!searchApi.contains("&key")) throw ApiKeyIsEmptyException("Youtube")
 
-        val request = NetUtil.doHttpRequest("${searchApi}id&channelId=${channelId}$maxResult${count}", 5000)
+        val request = NetUtil.doHttpRequestGet("${searchApi}id&channelId=${channelId}$maxResult${count}", 5000)
 
         val response = request.executeAsync()
         if (response.isOk) {
@@ -65,9 +65,9 @@ object YoutubeApi {
             } catch (e: JsonSyntaxException) {
                 try {
                     val error = BotVariables.gson.fromJson(body, YoutubeRequestError::class.java)
-                    BotVariables.logger.error("[YTB] 无法访问 API \n返回码: ${error.code}, 信息: ${error.message}")
+                    BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.code}, 信息: ${error.message}")
                 } catch (e: JsonSyntaxException) {
-                    BotVariables.logger.error("[YTB] 无法解析 API 传入的 json", e)
+                    BotVariables.logger.warning("[YTB] 无法解析 API 传入的 json", e)
                 }
             }
         }

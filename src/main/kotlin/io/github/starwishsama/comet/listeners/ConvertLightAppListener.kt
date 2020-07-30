@@ -22,8 +22,8 @@ object ConvertLightAppListener : NListener {
                     try {
                         val lightApp = message[LightApp]
                         if (lightApp != null) {
-                            val result = parseCard(lightApp)
-                            if (result !is EmptyMessageChain) reply(parseCard(lightApp))
+                            val result = parseJsonMessage(lightApp)
+                            if (result !is EmptyMessageChain) reply(result)
                         }
                     } catch (e: BotIsBeingMutedException) {
                         BotVariables.logger.debug("[监听器] 机器人已被禁言, ${e.target.botMuteRemaining.seconds.asHumanReadable}s")
@@ -33,7 +33,7 @@ object ConvertLightAppListener : NListener {
         }
     }
 
-    private fun parseCard(lightApp: LightApp): MessageChain {
+    private fun parseJsonMessage(lightApp: LightApp): MessageChain {
         val json = JsonParser.parseString(lightApp.content)
         if (json.isJsonObject) {
             val jsonObject = json.asJsonObject
@@ -51,7 +51,7 @@ object ConvertLightAppListener : NListener {
                                 ).toMsgChain()
                     }
                 } catch (e: IllegalStateException) {
-                    BotVariables.logger.error("[监听器] 无法解析卡片消息", e)
+                    BotVariables.logger.warning("[监听器] 无法解析卡片消息", e)
                     return EmptyMessageChain
                 }
             }

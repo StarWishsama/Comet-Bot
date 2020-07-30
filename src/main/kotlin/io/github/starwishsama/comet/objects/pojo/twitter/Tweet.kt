@@ -84,15 +84,15 @@ data class Tweet(
                 try {
                     val image = gson.fromJson(objects["media"].asJsonArray[0].asJsonObject.toString(), Media::class.java)
                     if (image.isSendableMedia()) {
-                        val response = NetUtil.doHttpRequest(image.getImageUrl(), 8000).executeAsync()
+                        val response = NetUtil.doHttpRequestGet(image.getImageUrl(), 8000).executeAsync()
                         if (response.isOk) {
                             picture = NetUtil.getUrlInputStream(image.getImageUrl()).uploadAsImageSafely(response.header("content-type"), contact)
                         }
                     }
                 } catch (e: JsonSyntaxException) {
-                    BotVariables.logger.error("在获取推文下的图片链接时发生了问题", e)
+                    BotVariables.logger.warning("在获取推文下的图片链接时发生了问题", e)
                 } catch (e: HttpException) {
-                    BotVariables.logger.error("在下载推文图片时发生了问题", e)
+                    BotVariables.logger.warning("在下载推文图片时发生了问题", e)
                 }
             }
         }

@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.sessions
 
-import io.github.starwishsama.comet.managers.TaskManager
+import io.github.starwishsama.comet.utils.TaskUtil
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import java.time.LocalDateTime
@@ -19,7 +19,7 @@ object SessionManager {
     private val sessions: MutableMap<Session, LocalDateTime> = HashMap()
 
     init {
-        TaskManager.runScheduleTaskAsync({
+        TaskUtil.runScheduleTaskAsync({
             val timeNow = LocalDateTime.now()
             sessions.forEach { (session, time) ->
                 run {

@@ -2,7 +2,8 @@ package io.github.starwishsama.comet.listeners
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.managers.TaskManager
+import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.utils.TaskUtil
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.BotIsBeingMutedException
 import net.mamoe.mirai.event.subscribeGroupMessages
@@ -17,7 +18,7 @@ object RepeatListener : NListener {
     private var repeatTimes = 0
 
     init {
-        TaskManager.runScheduleTaskAsync({
+        TaskUtil.runScheduleTaskAsync({
             repeatTimes = 0
         }, 1, 1, TimeUnit.MINUTES)
     }
@@ -38,7 +39,7 @@ object RepeatListener : NListener {
     }
 
     private suspend fun handleRepeat(event: GroupMessageEvent, chance: Double) {
-        if (repeatTimes <= 50 && event.message[QuoteReply] == null && chance in 0.9001..0.9002) {
+        if (canRepeat(event.group.id) && repeatTimes <= 50 && event.message[QuoteReply] == null && chance in 0.90..0.91) {
             // 避免复读过多图片刷屏
             val count = event.message.stream().filter { it is Image }.count()
 
@@ -57,6 +58,11 @@ object RepeatListener : NListener {
                 event.reply(msgChain.asMessageChain())
             }
         }
+    }
+
+    private fun canRepeat(groupId: Long): Boolean {
+        val cfg = GroupConfigManager.getConfig(groupId) ?: return true
+        return cfg.doRepeat
     }
 
     override fun getName(): String = "复读机"

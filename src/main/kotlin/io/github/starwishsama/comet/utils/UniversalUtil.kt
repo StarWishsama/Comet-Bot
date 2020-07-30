@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.utils
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.coolDown
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotAdmin
@@ -16,9 +17,7 @@ import net.mamoe.mirai.utils.asHumanReadable
 import org.apache.commons.lang3.StringUtils
 import java.time.Duration
 import java.time.LocalDateTime
-import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.math.floor
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
@@ -50,32 +49,29 @@ fun String.limitStringSize(size: Int): String {
  * 来自 Mirai 的 [asHumanReadable]
  */
 @ExperimentalTime
-fun kotlin.time.Duration.toFriendly(maxUnit: DurationUnit): String {
+fun kotlin.time.Duration.toFriendly(maxUnit: DurationUnit = TimeUnit.SECONDS): String {
     val days = toInt(DurationUnit.DAYS)
     val hours = toInt(DurationUnit.HOURS) % 24
     val minutes = toInt(DurationUnit.MINUTES) % 60
-    val s = (toInt(DurationUnit.SECONDS) % 60 * 1000) / 1000
-    val ms = floor(toDouble(DurationUnit.SECONDS) % 60 * 1000)
+    val seconds = (toInt(DurationUnit.SECONDS) % 60 * 1000) / 1000
+    val ms = (toInt(DurationUnit.MILLISECONDS) % 60 * 1000 * 1000) / 1000 / 1000
     return buildString {
-        if (days != 0 && maxUnit >= DurationUnit.DAYS) append("${days}天")
-        if (hours != 0 && maxUnit >= DurationUnit.HOURS) append("${hours}时")
-        if (minutes != 0 && maxUnit >= DurationUnit.MINUTES) append("${minutes}分")
-        if (s != 0 && maxUnit >= DurationUnit.SECONDS) append("${s}秒")
+        if (days != 0 && maxUnit >= TimeUnit.DAYS) append("${days}天")
+        if (hours != 0 && maxUnit >= TimeUnit.HOURS) append("${hours}时")
+        if (minutes != 0 && maxUnit >= TimeUnit.MINUTES) append("${minutes}分")
+        if (seconds != 0 && maxUnit >= TimeUnit.SECONDS) append("${seconds}秒")
         append("${ms}毫秒")
     }
 }
 
 
 /**
- * 用于辅助机器人运行中的各种工具方法
+ * 用于辅助机器人运行的各种工具方法
  *
  * @author Nameless
  */
 
 object BotUtil {
-    /** 冷却 */
-    private var coolDown: MutableMap<Long, Long> = HashMap()
-
     /**
      * 判断是否签到过了
      *
@@ -292,7 +288,6 @@ object BotUtil {
         }
     }
 
-    // From []
     @ExperimentalTime
     fun getMemoryUsage(): String = "操作系统: ${getOsName()}\n" +
             "JVM 版本: ${getJVMVersion()}\n" +

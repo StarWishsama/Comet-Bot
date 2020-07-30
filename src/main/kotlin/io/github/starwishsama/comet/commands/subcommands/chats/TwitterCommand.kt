@@ -9,6 +9,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.EmptyTweetException
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.exceptions.TwitterApiException
+import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
@@ -16,6 +17,7 @@ import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.getRestString
 import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.Contact
+import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -28,17 +30,23 @@ class TwitterCommand : UniversalCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.userQQ)) {
-            when {
-                args.isEmpty() -> return getHelp().toMsgChain()
-                BotVariables.cfg.twitterToken == null -> return BotUtil.sendMsgPrefix("请到配置文件中填写蓝鸟 Token").toMsgChain()
-                else -> {
-                    when (args[0]) {
-                        "info", "cx", "查询" -> return searchUser(args, event)
-                        "sub", "订阅" -> return subscribeUser(args)
-                        "unsub", "退订" -> return unsubscribeUser(args)
-                        "list" -> return BotVariables.cfg.twitterSubs.toString().toMsgChain()
-                        else -> getHelp().toMsgChain()
+            if (BotVariables.cfg.twitterToken == null) {
+                return BotUtil.sendMsgPrefix("请到配置文件中填写蓝鸟 Token").toMsgChain()
+            }
+
+            return if (args.isEmpty()) {
+                getHelp().toMsgChain()
+            } else {
+                val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
+                when (args[0]) {
+                    "info", "cx", "查询" -> searchUser(args, event)
+                    "sub", "订阅" -> subscribeUser(args, id)
+                    "unsub", "退订" -> unsubscribeUser(args, id)
+                    "list" -> {
+                        val list = GroupConfigManager.getConfigSafely(id).twitterSubscribers
+                        if (list.isEmpty()) "没有订阅任何蓝鸟用户".toMsgChain() else list.toString().toMsgChain()
                     }
+                    else -> getHelp().toMsgChain()
                 }
             }
         }
@@ -59,7 +67,8 @@ class TwitterCommand : UniversalCommand {
                 if (e.code == 34) {
                     return BotUtil.sendMsgPrefix("找不到此蓝鸟用户").toMsgChain()
                 } else {
-                    BotUtil.sendMsgPrefix("获取推文时出现了意外").toMsgChain()
+                    BotUtil.sendMsgPrefix("无法获取推文, 状态码: ${e.code}").toMsgChain()
+                    BotVariables.logger.warning("[推文] 无法解析推文, ${e.code} | ${e.reason}")
                 }
             }
         } else {
@@ -84,9 +93,10 @@ class TwitterCommand : UniversalCommand {
         }
     }
 
-    private fun subscribeUser(args: List<String>): MessageChain {
+    private fun subscribeUser(args: List<String>, groupId: Long): MessageChain {
+        val cfg = GroupConfigManager.getConfigSafely(groupId)
         if (args.size > 1) {
-            if (!BotVariables.cfg.twitterSubs.contains(args[1])) {
+            if (!cfg.twitterSubscribers.contains(args[1])) {
                 val twitter: TwitterUser?
 
                 try {
@@ -96,7 +106,7 @@ class TwitterCommand : UniversalCommand {
                 }
 
                 if (twitter != null) {
-                    BotVariables.cfg.twitterSubs += args[1]
+                    cfg.twitterSubscribers.add(args[1])
                     return BotUtil.sendMsgPrefix("订阅 @${args[1]} 成功").toMsgChain()
                 }
 
@@ -109,10 +119,11 @@ class TwitterCommand : UniversalCommand {
         }
     }
 
-    private fun unsubscribeUser(args: List<String>): MessageChain {
+    private fun unsubscribeUser(args: List<String>, groupId: Long): MessageChain {
+        val cfg = GroupConfigManager.getConfigSafely(groupId)
         return if (args.size > 1) {
-            if (BotVariables.cfg.twitterSubs.contains(args[1])) {
-                BotVariables.cfg.twitterSubs -= args[1]
+            if (cfg.twitterSubscribers.contains(args[1])) {
+                cfg.twitterSubscribers.remove(args[1])
                 BotUtil.sendMsgPrefix("退订 @${args[1]} 成功").toMsgChain()
             } else {
                 BotUtil.sendMsgPrefix("没有订阅过 @${args[1]}").toMsgChain()
@@ -136,13 +147,16 @@ class TwitterCommand : UniversalCommand {
                     is SocketTimeoutException -> BotUtil.sendMsgPrefix("连接超时").toMsgChain()
                     is SSLException -> BotUtil.sendMsgPrefix("连接超时").toMsgChain()
                     else -> {
-                        BotVariables.logger.error(t)
+                        BotVariables.logger.warning(t)
                         BotUtil.sendMsgPrefix("获取推文时出现了意外").toMsgChain()
                     }
                 }
             }
             is RateLimitException -> BotUtil.sendMsgPrefix("已达到蓝鸟 API 调用上限, 请等会再试吧").toMsgChain()
-            else -> BotUtil.sendMsgPrefix("获取推文时出现了意外").toMsgChain()
+            else -> {
+                BotVariables.logger.warning(t)
+                BotUtil.sendMsgPrefix("获取推文时出现了意外").toMsgChain()
+            }
         }
     }
 

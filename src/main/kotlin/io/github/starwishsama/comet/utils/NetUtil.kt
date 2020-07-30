@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.utils
 
 import cn.hutool.http.HttpException
 import cn.hutool.http.HttpRequest
+import cn.hutool.http.Method
 import io.github.starwishsama.comet.BotVariables
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.Image
@@ -10,6 +11,7 @@ import java.io.*
 import java.net.Proxy
 import java.net.Socket
 import java.net.SocketTimeoutException
+
 
 suspend fun InputStream.uploadAsImageSafely(type: String, contact: Contact): Image? {
     try {
@@ -30,28 +32,30 @@ object NetUtil {
     }
 
     fun getUrlInputStream(url: String, timeout: Int): InputStream {
-        val request = doHttpRequest(url, timeout)
+        val request = doHttpRequestGet(url, timeout)
 
         return request.execute().bodyStream()
     }
 
     @Throws(HttpException::class)
-    fun doHttpRequest(url: String, timeout: Int): HttpRequest {
-        return doHttpRequest(url, timeout, BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
+    fun doHttpRequestGet(url: String, timeout: Int): HttpRequest {
+        return doHttpRequest(url, timeout, BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort, Method.GET)
     }
 
     @Throws(HttpException::class)
-    fun doHttpRequest(url: String, timeout: Int, proxyUrl: String, proxyPort: Int): HttpRequest {
-        val request = HttpRequest.get(url)
-                .setFollowRedirects(true)
-                .timeout(timeout)
-                .header("user-agent", defaultUA)
+    fun doHttpRequest(url: String, timeout: Int, proxyUrl: String, proxyPort: Int, method: Method): HttpRequest {
+        val request = HttpRequest(url)
+            .method(method)
+            .setFollowRedirects(true)
+            .timeout(timeout)
+            .header("user-agent", defaultUA)
+
         if (proxyUrl.isNotEmpty() && proxyPort != -1) {
             request.setProxy(
-                    Proxy(
-                            Proxy.Type.HTTP,
-                            Socket(proxyUrl, proxyPort).remoteSocketAddress
-                    )
+                Proxy(
+                    Proxy.Type.HTTP,
+                    Socket(proxyUrl, proxyPort).remoteSocketAddress
+                )
             )
         }
 
@@ -59,7 +63,7 @@ object NetUtil {
     }
 
     fun getPageContent(url: String): String {
-        val response = doHttpRequest(url, 8000).executeAsync()
+        val response = doHttpRequestGet(url, 8000).executeAsync()
         return if (response.isOk) response.body() else response.status.toString()
     }
 
@@ -69,14 +73,10 @@ object NetUtil {
      * @param address  下载地址
      * @param fileName 下载文件的名称
      */
-    fun downloadFile(address: String, fileFolder: String, fileName: String) {
+    fun downloadFile(fileFolder: File, address: String, fileName: String): File? {
         val file = File(fileFolder, fileName)
         try {
-            val request = doHttpRequest(address, 8000)
-            request.setFollowRedirects(true)
-            request.header("User-Agent", defaultUA)
-
-            val response = request.executeAsync()
+            val response = doHttpRequestGet(address, 5000).executeAsync()
 
             if (response.isOk) {
                 val `in` = BufferedInputStream(response.bodyStream())
@@ -100,13 +100,15 @@ object NetUtil {
             }
             if (e.cause is SocketTimeoutException) {
                 BotVariables.logger.error("在下载时发生了错误: 连接超时")
-                return
+                return null
             }
             BotVariables.logger.error("在下载时发生了错误")
         }
+
+        return file
     }
 
-    fun downloadFileToCache(url: String): File? {
-        return null
+    fun downloadFileToCache(url: String, fileName: String): File? {
+        return downloadFile(FileUtil.getCacheFolder(), url, fileName)
     }
 }

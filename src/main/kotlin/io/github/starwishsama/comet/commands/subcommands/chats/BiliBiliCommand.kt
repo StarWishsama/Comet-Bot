@@ -1,17 +1,18 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
 import io.github.starwishsama.comet.enums.UserLevel
+import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.WrappedMessage
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.isNumeric
 import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.delay
+import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -31,8 +32,9 @@ class BiliBiliCommand : UniversalCommand {
 
                             if (args[1].contains("|")) {
                                 val users = args[1].split("|")
+                                val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
                                 users.forEach {
-                                    val result = subscribe(it)
+                                    val result = subscribe(it, id)
                                     delay(500)
                                     return BotUtil.returnMsgIf(
                                         result is EmptyMessageChain,
@@ -41,7 +43,8 @@ class BiliBiliCommand : UniversalCommand {
                                 }
                                 return BotUtil.sendMsgPrefix("订阅多个直播间成功 你好D啊").toMsgChain()
                             } else {
-                                val result = subscribe(args[1])
+                                val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
+                                val result = subscribe(args[1], id)
                                 return BotUtil.returnMsgIfElse(
                                     result is EmptyMessageChain,
                                     BotUtil.sendMsgPrefix("账号不存在").toMsgChain(),
@@ -55,10 +58,13 @@ class BiliBiliCommand : UniversalCommand {
                             }
                         }
                     }
-                    "unsub", "取消订阅" -> return unsubscribe(args)
+                    "unsub", "取消订阅" -> {
+                        val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
+                        return unsubscribe(args, id)
+                    }
                     "list" -> {
                         event.reply("请稍等...")
-                        return getLiveStatus()
+                        return getLiveStatus(event)
                     }
                     "info", "查询", "cx" -> {
                         return if (args.size > 1) {
@@ -91,7 +97,7 @@ class BiliBiliCommand : UniversalCommand {
         /bili info [用户名] 查看用户的动态
     """.trimIndent()
 
-    private suspend fun unsubscribe(args: List<String>): MessageChain {
+    private suspend fun unsubscribe(args: List<String>, groupId: Long): MessageChain {
         if (args.size > 1) {
             var roomId = 0L
             if (args[1].isNumeric()) {
@@ -103,10 +109,12 @@ class BiliBiliCommand : UniversalCommand {
                 }
             }
 
-            return if (!BotVariables.cfg.subList.contains(roomId)) {
+            val cfg = GroupConfigManager.getConfigSafely(groupId)
+
+            return if (!cfg.biliSubscribers.contains(roomId)) {
                 BotUtil.sendMsgPrefix("你还没订阅直播间 ${args[1]}").toMsgChain()
             } else {
-                BotVariables.cfg.subList.remove(args[1].toLong())
+                cfg.biliSubscribers.remove(args[1].toLong())
                 BotUtil.sendMsgPrefix("取消订阅直播间 ${args[1]} 成功").toMsgChain()
             }
         } else {
@@ -114,27 +122,34 @@ class BiliBiliCommand : UniversalCommand {
         }
     }
 
-    private suspend fun getLiveStatus(): MessageChain {
+    private suspend fun getLiveStatus(event: MessageEvent): MessageChain {
+        if (event !is GroupMessageEvent) return BotUtil.sendMsgPrefix("只能在群里查看订阅列表").toMsgChain()
+
         val subs = StringBuilder("监控室列表:\n")
         val info = ArrayList<com.hiczp.bilibili.api.live.model.RoomInfo>()
 
-        for (l in BotVariables.cfg.subList) {
-            val room = FakeClientApi.getLiveRoom(l)
-            if (room != null) {
-                info.add(room)
+        val cfg = GroupConfigManager.getConfigSafely(event.group.id)
+
+        if (cfg.biliSubscribers.isNotEmpty()) {
+            for (roomId in cfg.biliSubscribers) {
+                val room = FakeClientApi.getLiveRoom(roomId)
+                if (room != null) {
+                    info.add(room)
+                }
             }
-        }
 
-        info.sortByDescending { it.data.liveStatus == 1 }
+            info.sortByDescending { it.data.liveStatus == 1 }
 
-        for (roomInfo in info) {
-            subs.append(
+            for (roomInfo in info) {
+                subs.append(
                     "${BiliBiliApi.getUserNameByMid(roomInfo.data.uid)} " +
                             "${if (roomInfo.data.liveStatus == 1) "✔" else "✘"}\n"
-            )
-        }
+                )
+            }
 
-        return subs.toString().trim().toMsgChain()
+            return subs.toString().trim().toMsgChain()
+        }
+        return BotUtil.sendMsgPrefix("未订阅任何用户").toMsgChain()
     }
 
     private suspend fun getDynamicText(dynamic: WrappedMessage?, event: MessageEvent): MessageChain {
@@ -149,7 +164,8 @@ class BiliBiliCommand : UniversalCommand {
         }
     }
 
-    private suspend fun subscribe(roomId: String): MessageChain {
+    private suspend fun subscribe(roomId: String, groupId: Long): MessageChain {
+        val cfg = GroupConfigManager.getConfigSafely(groupId)
         val rid: Long
         var name = ""
         rid = if (roomId.isNumeric()) {
@@ -161,8 +177,8 @@ class BiliBiliCommand : UniversalCommand {
             item?.roomid ?: return EmptyMessageChain
         }
 
-        if (!BotVariables.cfg.subList.contains(rid)) {
-            BotVariables.cfg.subList.add(rid)
+        if (!cfg.biliSubscribers.contains(rid)) {
+            cfg.biliSubscribers.add(rid)
         }
 
         return BotUtil.sendMsgPrefix("订阅 ${if (name.isNotBlank()) name else BiliBiliApi.getUserNameByMid(rid)}($rid) 成功")
