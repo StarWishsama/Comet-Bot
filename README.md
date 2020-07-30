@@ -15,23 +15,26 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
 [![Release](https://img.shields.io/github/v/release/StarWishSama/Comet-Bot?include_prereleases)](https://github.com/StarWishsama/Comet-Bot/releases)
 
 ## 🎉 它能干什么?
-* 以图搜图
+* 以图搜图 (支持 ascii2d/SauceNao)
 * 彩虹六号战绩查询
 * 打卡
 * 签到
 * bilibili UP主信息/动态查询
-* 点歌 (JSON 样式)
-* 占卜
+* 点歌 (QQ小程序卡片样式)
+* 事件概率占卜
 * 明日方舟 / 公主连结抽卡模拟器
-* 去你大爷的小程序 (将B站分享的视频自动转换为文本)
-* 单推小助手 (自动订阅 VTB 开播状态[B站])
-* RCON 远程遥控 MC 服务器
+* 去你大爷的小程序 (将小程序转换为文本)
+* 单推小助手 
+  - 支持订阅 bilibili 用户动态/开播提醒
+  - 支持订阅 Twitter 最新推文
+* rCon 功能, 支持连接到可以使用 rCon 的游戏服务器
 * 查询 Twitter 用户信息/推文
 * 自动推送最新推文到指定群聊
+* 禁言/踢出群员
 * 还在开发中...
 
 ## ☑ To-Do 列表
-详见 [项目页面](https://github.com/StarWishsama/Comet-Bot/projects/2)
+详见 [Issues](https://github.com/StarWishsama/Comet-Bot/issues)
 
 ## 💽 如何使用
 

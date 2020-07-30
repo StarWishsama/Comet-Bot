@@ -19,13 +19,14 @@ This bot is under heavy develop now, Many feature may not work as well.
 * Rainbow Six: Siege game data info lookup
 * Class clock in
 * Check-in
-* Bilibili uploader info/dynamic
-* Search music with LightApp message
+* Bilibili user info/dynamic/streaming notice
+* Search music and share as LightApp style
 * Arknights / PCR draw simulator
 * Auto convert QQ LightApp message to text for PC user(s)
-* VTuber live streaming reminder (BiliBili)
-* Push specific user's latest tweet realtime to specific group(s)
+* VTuber monitor (BiliBili/Twitter)
+* Tweet Pusher
 * RCON feature
+* Mute/Kick group member
 * WIP
 
 ## ☑ To-Do 
@@ -33,7 +34,7 @@ Development Roadmap: [Project Page](https://github.com/StarWishsama/Comet-Bot/pr
 
 ## 💽 How to Build 
 
-- Notice: You need use JDK 8+ to build
+- Notice: You need use JDK 8+ to build it
 
 1. Clone or download the repository to your local computer.
 
