@@ -175,7 +175,7 @@ object DataSetup {
         if (!perGroupFolder.exists()) return
 
         BotVariables.perGroup.forEach {
-            val loc = File(perGroupFolder, "${it.groupId}.json")
+            val loc = File(perGroupFolder, "${it.id}.json")
             if (!loc.exists()) loc.createNewFile()
             loc.writeClassToJson(it)
         }

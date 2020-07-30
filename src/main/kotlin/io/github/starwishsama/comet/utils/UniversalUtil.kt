@@ -221,6 +221,17 @@ object BotUtil {
         return sb.toString().trim { it <= ' ' }
     }
 
+    fun sendMessage(vararg otherText: String?, addPrefix: Boolean): MessageChain {
+        if (!otherText.isNullOrEmpty()) return "".toMsgChain()
+
+        val sb = StringBuilder()
+        if (addPrefix) sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
+        otherText.forEach {
+            sb.append(it).append("\n")
+        }
+        return sb.toString().trim { it <= ' ' }.toMsgChain()
+    }
+
     /**
      * 发送带前缀的消息, 兼容空的字符串
      *

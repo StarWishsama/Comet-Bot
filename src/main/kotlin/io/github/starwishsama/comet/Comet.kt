@@ -3,6 +3,7 @@ package io.github.starwishsama.comet
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
 import io.github.starwishsama.comet.api.twitter.TwitterApi
+import io.github.starwishsama.comet.api.youtube.YoutubeApi
 import io.github.starwishsama.comet.commands.MessageHandler
 import io.github.starwishsama.comet.commands.subcommands.chats.*
 import io.github.starwishsama.comet.commands.subcommands.console.DebugCommand
@@ -11,7 +12,9 @@ import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.ConvertLightAppListener
 import io.github.starwishsama.comet.listeners.RepeatListener
+import io.github.starwishsama.comet.tasks.BiliDynamicChecker
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
+import io.github.starwishsama.comet.tasks.TweetUpdateChecker
 import io.github.starwishsama.comet.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -38,7 +41,7 @@ object Comet {
 
     @ExperimentalTime
     fun startUpTask() {
-        val apis = arrayOf(BiliBiliApi, TwitterApi)
+        val apis = arrayOf(BiliBiliApi, TwitterApi, YoutubeApi)
 
         /** 定时任务 */
         BackupHelper.scheduleBackup()
@@ -90,6 +93,13 @@ object Comet {
         val pwd = BotVariables.cfg.rConPassword
         if (url != null && pwd != null && BotVariables.rCon == null) {
             BotVariables.rCon = Rcon(url, BotVariables.cfg.rConPort, pwd.toByteArray())
+        }
+    }
+
+    fun startAllPusher() {
+        val pushers = arrayOf(BiliDynamicChecker, TweetUpdateChecker)
+        pushers.forEach {
+            TaskUtil.runScheduleTaskAsync(it::retrieve, it.delayTime, it.cycle, TimeUnit.MINUTES)
         }
     }
 }
@@ -183,6 +193,7 @@ suspend fun main() {
         }
 
         Comet.startUpTask()
+        Comet.startAllPusher()
 
         val time = Duration.between(BotVariables.startTime, LocalDateTime.now())
 

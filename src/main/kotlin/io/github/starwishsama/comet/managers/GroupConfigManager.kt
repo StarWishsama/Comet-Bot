@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.objects.group.PerGroupConfig
 object GroupConfigManager {
     fun getConfig(groupId: Long): PerGroupConfig? {
         BotVariables.perGroup.forEach {
-            if (it.groupId == groupId) {
+            if (it.id == groupId) {
                 return it
             }
         }

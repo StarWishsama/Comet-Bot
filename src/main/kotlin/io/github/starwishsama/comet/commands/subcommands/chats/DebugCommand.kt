@@ -61,9 +61,9 @@ class DebugCommand : UniversalCommand {
                     BotVariables.switch = !BotVariables.switch
 
                     return if (!BotVariables.switch) {
-                        "Bot > おつまち~".toMsgChain()
+                        BotUtil.sendMsgPrefix("おつまち~").toMsgChain()
                     } else {
-                        "今日もかわいい!".toMsgChain()
+                        BotUtil.sendMsgPrefix("今日もかわいい!").toMsgChain()
                     }
                 }
                 "youtube" -> {

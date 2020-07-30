@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.api.youtube
 import cn.hutool.http.HttpException
 import com.google.gson.JsonSyntaxException
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.api.ApiExecutor
 import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
 import io.github.starwishsama.comet.objects.WrappedMessage
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchUserResult
@@ -12,20 +13,24 @@ import io.github.starwishsama.comet.objects.pojo.youtube.YoutubeRequestError
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.NetUtil
 
-
-object YoutubeApi {
+object YoutubeApi : ApiExecutor {
     private var searchApi = "https://www.googleapis.com/youtube/v3/search?order=date&part=snippet,"
     private const val searchByUserName = "contentDetails,statistics&forUsername="
     private const val maxResult = "&maxResults="
+    private var init = false
 
-    init {
+    fun init() {
         if (BotVariables.cfg.youtubeApiKey.isNotEmpty()) {
             searchApi = "https://www.googleapis.com/youtube/v3/search?key=${BotVariables.cfg.youtubeApiKey}&order=date&part=snippet,"
         }
+        init = true
     }
 
+    @Throws(ApiKeyIsEmptyException::class, HttpException::class)
     fun searchYoutubeUser(channelName: String, count: Int): SearchUserResult? {
-        if (!searchApi.contains("&key")) throw ApiKeyIsEmptyException("Youtube")
+        if (!init) init()
+
+        if (!searchApi.contains("key")) throw ApiKeyIsEmptyException("Youtube")
 
         val request = NetUtil.doHttpRequestGet("$searchApi$searchByUserName$channelName$maxResult$count", 5000)
 
@@ -52,7 +57,8 @@ object YoutubeApi {
 
     @Throws(ApiKeyIsEmptyException::class, HttpException::class)
     fun getChannelVideos(channelId: String, count: Int): SearchVideoResult? {
-        if (!searchApi.contains("&key")) throw ApiKeyIsEmptyException("Youtube")
+        if (!init) init()
+        if (!searchApi.contains("key")) throw ApiKeyIsEmptyException("Youtube")
 
         val request = NetUtil.doHttpRequestGet("${searchApi}id&channelId=${channelId}$maxResult${count}", 5000)
 
@@ -92,5 +98,15 @@ object YoutubeApi {
             return WrappedMessage("${e.message}")
         }
         return null
+    }
+
+    override var usedTime: Int = 0
+
+    override fun isReachLimit(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun getLimitTime(): Int {
+        TODO("Not yet implemented")
     }
 }

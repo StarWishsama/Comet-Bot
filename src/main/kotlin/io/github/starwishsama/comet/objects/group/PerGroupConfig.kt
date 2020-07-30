@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables
 import java.util.*
 
-data class PerGroupConfig(@SerializedName("group_id") val groupId: Long) {
+data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
 
     @SerializedName("auto_accept")
     var autoAccept: Boolean = false
