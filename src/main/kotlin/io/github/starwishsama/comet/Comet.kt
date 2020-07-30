@@ -101,6 +101,7 @@ object Comet {
         pushers.forEach {
             TaskUtil.runScheduleTaskAsync(it::retrieve, it.delayTime, it.cycle, TimeUnit.MINUTES)
         }
+        BotVariables.logger.debug("Started all pusher!")
     }
 }
 

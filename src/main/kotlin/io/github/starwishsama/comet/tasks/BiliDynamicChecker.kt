@@ -7,11 +7,10 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.util.*
-import kotlin.collections.HashMap
 
 object BiliDynamicChecker : CometPusher {
     /** 推送过的直播间列表, 避免重复推送 */
-    private val pushedList = HashMap<Long, HashSet<Long>>()
+    private val pushedList = mutableMapOf<Long, HashSet<Long>>()
     override val delayTime: Long = 5
     override val cycle: Long = 10
 
@@ -58,28 +57,25 @@ object BiliDynamicChecker : CometPusher {
     }
 
     override fun push() {
-        pushedList.forEach { (roomId, set) ->
-            run {
-                val data = runBlocking {
-                    FakeClientApi.getLiveRoom(roomId)?.data
-                }
-                val msg = "单推助手 > \n${data?.uid?.let { BiliBiliApi.getUserNameByMid(it) }} 开播了!" +
-                        "\n标题: ${data?.title}" +
-                        "\n开播时间: ${data?.liveTime}" +
-                        "\n传送门: https://live.bilibili.com/${data?.roomId}"
+        pushedList.forEach { t, u ->
+            val data = runBlocking {
+                FakeClientApi.getLiveRoom(t)?.data
+            }
 
-                set.forEach { groupId ->
-                    if (GroupConfigManager.getConfigSafely(groupId).biliPushEnabled) {
-                        runBlocking {
-                            val group = BotVariables.bot.getGroup(groupId)
-                            group.sendMessage(msg)
-                            delay(2_000)
-                        }
+            val msg = "单推助手 > \n${data?.uid?.let { BiliBiliApi.getUserNameByMid(it) }} 开播了!" +
+                    "\n标题: ${data?.title}" +
+                    "\n开播时间: ${data?.liveTime}" +
+                    "\n传送门: https://live.bilibili.com/${data?.roomId}"
+
+            for (l in u) {
+                if (GroupConfigManager.getConfigSafely(l).biliPushEnabled) {
+                    runBlocking {
+                        val group = BotVariables.bot.getGroup(l)
+                        group.sendMessage(msg)
+                        delay(2_000)
                     }
                 }
             }
         }
     }
-
-    data class CachedUser(val id: Long, var isPushed: Boolean)
 }

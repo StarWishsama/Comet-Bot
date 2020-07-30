@@ -7,11 +7,13 @@ import io.github.starwishsama.comet.commands.MessageHandler
 import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
+import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.toMsgChain
+import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -72,6 +74,12 @@ class DebugCommand : UniversalCommand {
                         if (result != null) {
                             return result.items[0].toString().toMsgChain()
                         }
+                    }
+                }
+                "push" -> {
+                    if (event is GroupMessageEvent) {
+                        val group = GroupConfigManager.getConfigSafely(event.group.id)
+                        group.twitterPushEnabled = true
                     }
                 }
                 else -> return "Bot > 命令不存在\n${getHelp()}".toMsgChain()
