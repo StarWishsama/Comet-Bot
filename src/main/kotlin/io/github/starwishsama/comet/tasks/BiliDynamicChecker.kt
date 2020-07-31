@@ -19,12 +19,11 @@ object BiliDynamicChecker : CometPusher {
 
         BotVariables.perGroup.forEach { cfg ->
             cfg.biliSubscribers.forEach { roomId ->
-                readyToRetrieveList.forEach { (id, u) ->
-                    run {
-                        if (id == roomId) {
-                            u.add(cfg.id)
-                        }
-                    }
+                if (readyToRetrieveList.containsKey(roomId)) {
+                    readyToRetrieveList[roomId]?.add(cfg.id)
+                } else {
+                    readyToRetrieveList[roomId] = LinkedList()
+                    readyToRetrieveList[roomId]?.add(cfg.id)
                 }
             }
         }
@@ -57,9 +56,11 @@ object BiliDynamicChecker : CometPusher {
     }
 
     override fun push() {
-        pushedList.forEach { t, u ->
+        if (pushedList.isNullOrEmpty()) return
+
+        pushedList.forEach { roomId, groupIds ->
             val data = runBlocking {
-                FakeClientApi.getLiveRoom(t)?.data
+                FakeClientApi.getLiveRoom(roomId)?.data
             }
 
             val msg = "单推助手 > \n${data?.uid?.let { BiliBiliApi.getUserNameByMid(it) }} 开播了!" +
@@ -67,10 +68,10 @@ object BiliDynamicChecker : CometPusher {
                     "\n开播时间: ${data?.liveTime}" +
                     "\n传送门: https://live.bilibili.com/${data?.roomId}"
 
-            for (l in u) {
-                if (GroupConfigManager.getConfigSafely(l).biliPushEnabled) {
+            for (groupId in groupIds) {
+                if (GroupConfigManager.getConfigSafely(groupId).biliPushEnabled) {
                     runBlocking {
-                        val group = BotVariables.bot.getGroup(l)
+                        val group = BotVariables.bot.getGroup(groupId)
                         group.sendMessage(msg)
                         delay(2_000)
                     }

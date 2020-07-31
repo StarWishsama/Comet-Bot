@@ -25,39 +25,7 @@ class BiliBiliCommand : UniversalCommand {
                 return getHelp().toMsgChain()
             } else {
                 when (args[0]) {
-                    "sub", "订阅" -> {
-                        try {
-                            Validate.isTrue(args.size > 1, getHelp())
-                            Validate.isTrue(user.isBotAdmin(), BotUtil.sendMsgPrefix("你没有权限"))
-
-                            if (args[1].contains("|")) {
-                                val users = args[1].split("|")
-                                val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
-                                users.forEach {
-                                    val result = subscribe(it, id)
-                                    delay(500)
-                                    return BotUtil.returnMsgIf(
-                                        result is EmptyMessageChain,
-                                        BotUtil.sendMsgPrefix("账号 $it 不存在").toMsgChain()
-                                    )
-                                }
-                                return BotUtil.sendMsgPrefix("订阅多个直播间成功 你好D啊").toMsgChain()
-                            } else {
-                                val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
-                                val result = subscribe(args[1], id)
-                                return BotUtil.returnMsgIfElse(
-                                    result is EmptyMessageChain,
-                                    BotUtil.sendMsgPrefix("账号不存在").toMsgChain(),
-                                    result
-                                )
-                            }
-                        } catch (e: IllegalArgumentException) {
-                            val msg = e.message
-                            if (msg != null) {
-                                return msg.toMsgChain()
-                            }
-                        }
-                    }
+                    "sub", "订阅" -> return advancedSubscribe(user, args, event)
                     "unsub", "取消订阅" -> {
                         val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
                         return unsubscribe(args, id)
@@ -89,13 +57,48 @@ class BiliBiliCommand : UniversalCommand {
     }
 
     override fun getProps(): CommandProps =
-            CommandProps("bili", arrayListOf(), "订阅B站主播/查询用户动态", "nbot.commands.bili", UserLevel.USER)
+        CommandProps("bili", arrayListOf(), "订阅B站主播/查询用户动态", "nbot.commands.bili", UserLevel.USER)
 
     override fun getHelp(): String = """
         /bili sub [用户名] 订阅用户相关信息
         /bili unsub [用户名] 取消订阅用户相关信息
         /bili info [用户名] 查看用户的动态
     """.trimIndent()
+
+    private suspend fun advancedSubscribe(user: BotUser, args: List<String>, event: MessageEvent): MessageChain {
+        try {
+            Validate.isTrue(args.size > 1, getHelp())
+            Validate.isTrue(user.isBotAdmin(), BotUtil.sendMsgPrefix("你没有权限"))
+
+            return if (args[1].contains("|")) {
+                val users = args[1].split("|")
+                val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
+                subscribeUsers(users, id) ?: BotUtil.sendMessage("订阅多个直播间成功 你好D啊", true)
+            } else {
+                val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
+                val result = subscribe(args[1], id)
+                BotUtil.returnMsgIfElse(
+                    result is EmptyMessageChain,
+                    BotUtil.sendMessage("账号不存在", true),
+                    result
+                )
+            }
+        } catch (e: IllegalArgumentException) {
+            return BotUtil.sendMessage(e.message, true)
+        }
+    }
+
+    private suspend fun subscribeUsers(users: List<String>, id: Long): MessageChain? {
+        users.forEach {
+            val result = subscribe(it, id)
+            delay(500)
+            return BotUtil.returnMsgIf(
+                result is EmptyMessageChain,
+                BotUtil.sendMessage("账号 $it 不存在", true)
+            )
+        }
+        return null
+    }
 
     private suspend fun unsubscribe(args: List<String>, groupId: Long): MessageChain {
         if (args.size > 1) {

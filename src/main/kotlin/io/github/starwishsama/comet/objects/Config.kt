@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.objects
 
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.enums.MusicApi
+import io.github.starwishsama.comet.enums.PicSearchApi
 
 open class Config {
     @SerializedName("botId")
@@ -73,6 +74,6 @@ open class Config {
     @SerializedName("small_image_mode")
     var smallImageMode: Boolean = true
 
-    @SerializedName("picture_search_provider")
-    var pictureSearchProvider: String = "saucenao"
+    @SerializedName("picture_search_api")
+    var pictureSearchApi: PicSearchApi = PicSearchApi.SAUCENAO
 }

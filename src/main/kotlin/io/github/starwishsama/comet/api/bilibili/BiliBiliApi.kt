@@ -22,11 +22,12 @@ object BiliBiliApi : ApiExecutor {
     private const val infoUrl = "http://api.bilibili.com/x/space/acc/info?mid="
     private const val liveUrl = "http://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid="
     private val agent = mutableMapOf("User-Agent" to "Nameless live status checker by StarWishsama")
+    private const val apiRateLimit = "BiliBili API调用已达上限"
 
     @Throws(RateLimitException::class)
     fun getUserNameByMid(mid: Long): String {
         if (isReachLimit()) {
-            throw RateLimitException("BiliBili API调用已达上限")
+            throw RateLimitException(apiRateLimit)
         }
 
         usedTime++
@@ -39,7 +40,7 @@ object BiliBiliApi : ApiExecutor {
     @Throws(RateLimitException::class)
     fun getLiveStatus(mid: Long): Boolean {
         if (isReachLimit()) {
-            throw RateLimitException("BiliBili API调用已达上限")
+            throw RateLimitException(apiRateLimit)
         }
 
         usedTime++
@@ -52,7 +53,7 @@ object BiliBiliApi : ApiExecutor {
     @Throws(RateLimitException::class)
     fun getRoomIdByMid(mid: Long): Long {
         if (isReachLimit()) {
-            throw RateLimitException("BiliBili API调用已达上限")
+            throw RateLimitException(apiRateLimit)
         }
 
         usedTime++
@@ -65,7 +66,7 @@ object BiliBiliApi : ApiExecutor {
     @Throws(RateLimitException::class)
     suspend fun getDynamic(mid: Long): WrappedMessage {
         if (isReachLimit()) {
-            throw RateLimitException("BiliBili API调用已达上限")
+            throw RateLimitException(apiRateLimit)
         }
         usedTime++
         val response = HttpRequest.get(dynamicUrl.replace("%uid%", mid.toString())).executeAsync()
@@ -89,7 +90,7 @@ object BiliBiliApi : ApiExecutor {
                 }
             }
         }
-        return WrappedMessage("获取时出问题")
+        return WrappedMessage("获取时出现问题")
     }
 
     override var usedTime: Int = 0

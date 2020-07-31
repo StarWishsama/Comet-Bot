@@ -221,6 +221,14 @@ object BotUtil {
         return sb.toString().trim { it <= ' ' }
     }
 
+    fun sendMessage(otherText: String?, addPrefix: Boolean): MessageChain {
+        if (!otherText.isNullOrEmpty()) return "".toMsgChain()
+        val sb = StringBuilder()
+        if (addPrefix) sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
+        sb.append(otherText)
+        return sb.toString().trim { it <= ' ' }.toMsgChain()
+    }
+
     fun sendMessage(vararg otherText: String?, addPrefix: Boolean): MessageChain {
         if (!otherText.isNullOrEmpty()) return "".toMsgChain()
 

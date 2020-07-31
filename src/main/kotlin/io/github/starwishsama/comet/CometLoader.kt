@@ -7,7 +7,7 @@ class CometLoader : ClassLoader() {
 
     private var rootDir: String? = null
 
-    fun FileSystemClassLoader(rootDir: String?) {
+    fun CometLoader(rootDir: String?) {
         this.rootDir = rootDir
     }
 

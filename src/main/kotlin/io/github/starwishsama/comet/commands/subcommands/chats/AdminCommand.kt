@@ -20,13 +20,12 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class AdminCommand : UniversalCommand {
-    val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (user.isBotAdmin()) {
             if (args.isEmpty()) {
-                return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMessage()
-                    .asMessageChain()
+                return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMsgChain()
             } else {
                 when (args[0]) {
                     "clockin", "dk", "打卡" -> {
@@ -44,51 +43,10 @@ class AdminCommand : UniversalCommand {
                             BotUtil.sendMsgPrefix("该命令只能在群聊使用").toMsgChain()
                         }
                     }
-                    "help", "帮助" -> {
-                        return getHelp().toMsgChain()
-                    }
-                    "permlist", "权限列表", "qxlb" -> {
-                        return if (args.size > 1) {
-                            val target: BotUser? = BotUtil.getAt(event, args[1])
-                            val permission = target?.getPermissions()
-                            if (permission != null) {
-                                BotUtil.sendMsgPrefix(permission).toMsgChain()
-                            } else {
-                                BotUtil.sendMsgPrefix("该用户没有任何权限").toMsgChain()
-                            }
-                        } else {
-                            BotUtil.sendMsgPrefix(user.getPermissions()).toMsgChain()
-                        }
-                    }
-                    "permadd", "添加权限", "tjqx" -> {
-                        if (user.isBotOwner()) {
-                            if (args.size > 1) {
-                                val target: BotUser? = BotUtil.getAt(event, args[1])
-
-                                target?.addPermission(args[2])
-                                return BotUtil.sendMsgPrefix("添加权限成功").toMsgChain()
-                            }
-                        } else {
-                            return BotUtil.sendMsgPrefix("你没有权限").toMsgChain()
-                        }
-                    }
-                    "give", "增加次数" -> {
-                        if (args.size > 1) {
-                            val target: BotUser? = BotUtil.getAt(event, args[1])
-
-                            return if (target != null) {
-                                if (args[2].toInt() <= 1000000) {
-                                    target.addTime(args[2].toInt())
-                                    BotUtil.sendMsgPrefix("成功为 $target 添加 ${args[2]} 次命令条数").toMsgChain()
-                                } else {
-                                    BotUtil.sendMsgPrefix("给予的次数超过上限").toMessage()
-                                        .asMessageChain()
-                                }
-                            } else {
-                                BotUtil.sendMsgPrefix("找不到此用户").toMsgChain()
-                            }
-                        }
-                    }
+                    "help", "帮助" -> return getHelp().toMsgChain()
+                    "permlist", "权限列表", "qxlb" -> return permList(user, args, event)
+                    "permadd", "添加权限", "tjqx" -> return permAdd(user, args, event)
+                    "give", "增加次数" -> return giveCommandUseTime(event, args)
                     else -> return BotUtil.sendMsgPrefix("命令不存在, 使用 /admin help 查看更多").toMsgChain()
                 }
             }
@@ -106,6 +64,53 @@ class AdminCommand : UniversalCommand {
         /admin permadd [用户] [权限名] 给一个用户添加权限
         /admin give [用户] [命令条数] 给一个用户添加命令条数
     """.trimIndent()
+
+    private fun permList(user: BotUser, args: List<String>, event: MessageEvent): MessageChain {
+        return if (args.size > 1) {
+            val target: BotUser? = BotUtil.getAt(event, args[1])
+            val permission = target?.getPermissions()
+            if (permission != null) {
+                BotUtil.sendMsgPrefix(permission).toMsgChain()
+            } else {
+                BotUtil.sendMsgPrefix("该用户没有任何权限").toMsgChain()
+            }
+        } else {
+            BotUtil.sendMsgPrefix(user.getPermissions()).toMsgChain()
+        }
+    }
+
+    private fun permAdd(user: BotUser, args: List<String>, event: MessageEvent): MessageChain {
+        if (user.isBotOwner()) {
+            if (args.size > 1) {
+                val target: BotUser? = BotUtil.getAt(event, args[1])
+
+                target?.addPermission(args[2])
+                return BotUtil.sendMsgPrefix("添加权限成功").toMsgChain()
+            }
+        } else {
+            return BotUtil.sendMsgPrefix("你没有权限").toMsgChain()
+        }
+        return EmptyMessageChain
+    }
+
+    private fun giveCommandUseTime(event: MessageEvent, args: List<String>): MessageChain {
+        if (args.size > 1) {
+            val target: BotUser? = BotUtil.getAt(event, args[1])
+
+            return if (target != null) {
+                if (args[2].toInt() <= 1000000) {
+                    target.addTime(args[2].toInt())
+                    BotUtil.sendMsgPrefix("成功为 $target 添加 ${args[2]} 次命令条数").toMsgChain()
+                } else {
+                    BotUtil.sendMsgPrefix("给予的次数超过上限").toMessage()
+                        .asMessageChain()
+                }
+            } else {
+                BotUtil.sendMsgPrefix("找不到此用户").toMsgChain()
+            }
+        }
+        return EmptyMessageChain
+    }
 
     private fun clockIn(args: List<String>, message: GroupMessageEvent): MessageChain {
         if (!ClockInManager.isDuplicate(message.group.id, 10)) {

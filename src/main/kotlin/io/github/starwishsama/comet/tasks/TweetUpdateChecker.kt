@@ -8,6 +8,8 @@ import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
 import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import java.time.Duration
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.time.ExperimentalTime
 
@@ -34,10 +36,10 @@ object TweetUpdateChecker : CometPusher {
         subList.forEach {
             try {
                 val tweet = TwitterApi.getTweetWithCache(it)
-                val historyTweet = pushContent[it]?.tweet
+                val oldTweet = pushContent[it]?.tweet ?: return@forEach
 
                 /** 检查是否为重复推文, 如果不是则加入推送队列 */
-                if (tweet != null && (historyTweet == null || !historyTweet.contentEquals(tweet))) {
+                if (tweet != null && !isOutdatedTweet(tweet, oldTweet)) {
                     /** 加入推送队列, 注明尚未推送过 */
                     pushContent[it] = PushedTweet(tweet, false)
                     /** 添加到缓存池中 */
@@ -75,7 +77,7 @@ object TweetUpdateChecker : CometPusher {
         pushQueue.forEach { (userName, pushGroups) ->
             val container = pushContent[userName]
             /** 检查该推文是否被推送过 */
-            if (container?.isPushed == false) {
+            if (container != null && !container.isPushed) {
                 val tweet = container.tweet
                 var message = "${tweet.user.name} (@${userName}) 发送了一条推文\n${tweet.getFullText()}".toMsgChain()
                 pushGroups.forEach {
@@ -97,4 +99,10 @@ object TweetUpdateChecker : CometPusher {
     }
 
     data class PushedTweet(val tweet: Tweet, var isPushed: Boolean)
+
+    private fun isOutdatedTweet(retrieve: Tweet, toCompare: Tweet): Boolean {
+        val timeNow = LocalDateTime.now()
+        val tweetSentTime = retrieve.getSentTime()
+        return Duration.between(tweetSentTime, timeNow).toMinutes() >= 30 || toCompare.contentEquals(retrieve)
+    }
 }
