@@ -43,7 +43,7 @@ object RepeatListener : NListener {
             // 避免复读过多图片刷屏
             val count = event.message.stream().filter { it is Image }.count()
 
-            if (count == 1L) {
+            if (count <= 1L) {
                 val msgChain = ArrayList<Message>()
 
                 event.message.forEach { msgChain.add(it) }
