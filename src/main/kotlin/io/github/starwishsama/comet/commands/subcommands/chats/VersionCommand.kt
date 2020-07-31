@@ -3,7 +3,7 @@ package io.github.starwishsama.comet.commands.subcommands.chats
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.MessageHandler
-import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
+import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
@@ -13,13 +13,14 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import kotlin.time.ExperimentalTime
 
-class VersionCommand : UniversalCommand {
+class VersionCommand : ChatCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(event.sender.id)) {
-            return ("彗星 Bot " + BotVariables.version + "\n已注册的命令个数: " + MessageHandler.countCommands() +
-                    "\n运行时间: ${BotUtil.getRunningTime()}" +
-                    "\nMade with ❤, Running on Mirai").toMsgChain()
+            return ("彗星 Bot " + BotVariables.version +
+                    "\n已注册命令数: " + MessageHandler.countCommands() +
+                    "\n运行时长 ${BotUtil.getRunningTime()}" +
+                    "\nMade with ❤ & Mirai 1.1.3").toMsgChain()
         }
         return EmptyMessageChain
     }

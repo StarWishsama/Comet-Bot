@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
 import io.github.starwishsama.comet.commands.CommandProps
-import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
+import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.ClockInManager
 import io.github.starwishsama.comet.objects.BotUser
@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-class AdminCommand : UniversalCommand {
+class AdminCommand : ChatCommand {
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {

@@ -1,9 +1,9 @@
 package io.github.starwishsama.comet.commands
 
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.commands.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.commands.interfaces.SuspendCommand
-import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
@@ -25,7 +25,7 @@ import kotlin.time.toKotlinDuration
  * @author Nameless
  */
 object MessageHandler {
-    private var commands: List<UniversalCommand> = mutableListOf()
+    private var commands: List<ChatCommand> = mutableListOf()
     private var consoleCommands = mutableListOf<ConsoleCommand>()
 
     /**
@@ -33,7 +33,7 @@ object MessageHandler {
      *
      * @param command 要注册的命令
      */
-    private fun setupCommand(command: UniversalCommand) {
+    private fun setupCommand(command: ChatCommand) {
         if (!commands.contains(command)) {
             commands = commands + command
         } else {
@@ -46,7 +46,7 @@ object MessageHandler {
      *
      * @param commands 要注册的命令集合
      */
-    fun setupCommand(commands: Array<UniversalCommand>) {
+    fun setupCommand(commands: Array<ChatCommand>) {
         commands.forEach {
             if (!this.commands.contains(it)) {
                 this.commands = this.commands.plus(it)
@@ -57,7 +57,7 @@ object MessageHandler {
     fun setupCommand(commands: Array<Any>) {
         commands.forEach {
             when (it) {
-                is UniversalCommand -> setupCommand(it)
+                is ChatCommand -> setupCommand(it)
                 is ConsoleCommand ->
                     if (!consoleCommands.contains(it)) {
                         consoleCommands.plusAssign(it)
@@ -167,7 +167,7 @@ object MessageHandler {
         )
     }
 
-    private fun getCommand(cmdPrefix: String): UniversalCommand? {
+    private fun getCommand(cmdPrefix: String): ChatCommand? {
         for (command in commands) {
             if (commandEquals(command, cmdPrefix)) {
                 return command
@@ -206,7 +206,7 @@ object MessageHandler {
         return false
     }
 
-    private fun commandEquals(cmd: UniversalCommand, cmdName: String): Boolean {
+    private fun commandEquals(cmd: ChatCommand, cmdName: String): Boolean {
         val props = cmd.getProps()
         when {
             props.name.contentEquals(cmdName) -> {

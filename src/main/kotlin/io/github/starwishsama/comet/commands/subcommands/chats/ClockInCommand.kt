@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
 import io.github.starwishsama.comet.commands.CommandProps
-import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
+import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.ClockInManager
 import io.github.starwishsama.comet.objects.BotUser
@@ -20,7 +20,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class ClockInCommand : UniversalCommand {
+class ClockInCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (event is GroupMessageEvent) {
             val id = event.group.id
@@ -30,7 +30,7 @@ class ClockInCommand : UniversalCommand {
                     clockIn(event.sender, event, data)
                 } else {
                     (BotUtil.getLocalMessage("msg.bot-prefix") + "你已经打卡过了!").toMessage()
-                            .asMessageChain()
+                        .asMessageChain()
                 }
             } else {
                 (BotUtil.getLocalMessage("msg.bot-prefix") + "没有正在进行的打卡").toMsgChain()

@@ -4,7 +4,7 @@ import cn.hutool.http.HttpException
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.CommandProps
-import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
+import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.EmptyTweetException
 import io.github.starwishsama.comet.exceptions.RateLimitException
@@ -26,7 +26,7 @@ import java.net.SocketTimeoutException
 import javax.net.ssl.SSLException
 import kotlin.time.ExperimentalTime
 
-class TwitterCommand : UniversalCommand {
+class TwitterCommand : ChatCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.userQQ)) {

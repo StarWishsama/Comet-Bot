@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.commands.subcommands.chats
 
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.MessageHandler
-import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
+import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.limitStringSize
@@ -11,7 +11,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
 
-class HelpCommand : UniversalCommand {
+class HelpCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         val sb = StringBuilder()
         for (cmd in MessageHandler.getCommands()) {

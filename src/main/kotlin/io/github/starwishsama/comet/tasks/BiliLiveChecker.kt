@@ -8,12 +8,14 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.util.*
+import java.util.concurrent.ScheduledFuture
 
-object BiliDynamicChecker : CometPusher {
+object BiliLiveChecker : CometPusher {
     /** 推送过的直播间列表, 避免重复推送 */
     private val pushedList = mutableMapOf<Long, HashSet<Long>>()
     override val delayTime: Long = 5
     override val cycle: Long = 10
+    override lateinit var future: ScheduledFuture<*>
 
     override fun retrieve() {
         val readyToRetrieveList = mutableMapOf<Long, LinkedList<Long>>()
@@ -28,6 +30,8 @@ object BiliDynamicChecker : CometPusher {
                 }
             }
         }
+
+        if (readyToRetrieveList.isEmpty()) return
 
         readyToRetrieveList.forEach { (roomId, pushGroups) ->
             run {

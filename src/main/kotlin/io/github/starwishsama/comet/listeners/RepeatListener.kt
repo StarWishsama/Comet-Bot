@@ -9,10 +9,8 @@ import net.mamoe.mirai.contact.BotIsBeingMutedException
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.utils.asHumanReadable
 import java.util.concurrent.TimeUnit
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 object RepeatListener : NListener {
     private var repeatTimes = 0
@@ -31,7 +29,7 @@ object RepeatListener : NListener {
                     try {
                         handleRepeat(this, RandomUtil.randomDouble())
                     } catch (e: BotIsBeingMutedException) {
-                        BotVariables.logger.debug("[监听器] 机器人已被禁言, ${e.target.botMuteRemaining.seconds.asHumanReadable}s")
+                        BotVariables.logger.debug("[监听器] 机器人已被禁言, ${e.message}")
                     }
                 }
             }

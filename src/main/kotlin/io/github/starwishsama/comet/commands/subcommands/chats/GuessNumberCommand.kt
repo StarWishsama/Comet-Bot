@@ -3,8 +3,8 @@ package io.github.starwishsama.comet.commands.subcommands.chats
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.commands.CommandProps
+import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.commands.interfaces.SuspendCommand
-import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
@@ -23,7 +23,7 @@ import net.mamoe.mirai.message.data.content
 import java.time.Duration
 import java.time.LocalDateTime
 
-class GuessNumberCommand : UniversalCommand, SuspendCommand {
+class GuessNumberCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.userQQ) && event is GroupMessageEvent) {
             val session = SessionManager.getSessionByGroup(event.group.id)

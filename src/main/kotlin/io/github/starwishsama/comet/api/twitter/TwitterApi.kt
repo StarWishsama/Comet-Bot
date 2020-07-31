@@ -179,12 +179,13 @@ object TwitterApi : ApiExecutor {
                 getLatestTweet(username)
             }
 
+            BotVariables.logger.debug(
+                "[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms"
+            )
             return result
         } catch (x: TwitterApiException) {
             BotVariables.logger.warning("[蓝鸟] 调用 API 时出现了问题\n错误代码: ${x.code}\n理由: ${x.reason}}")
         }
-
-        BotVariables.logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
         return null
     }
 

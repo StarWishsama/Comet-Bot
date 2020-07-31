@@ -12,7 +12,7 @@ import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.ConvertLightAppListener
 import io.github.starwishsama.comet.listeners.RepeatListener
-import io.github.starwishsama.comet.tasks.BiliDynamicChecker
+import io.github.starwishsama.comet.tasks.BiliLiveChecker
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.tasks.TweetUpdateChecker
 import io.github.starwishsama.comet.utils.*
@@ -38,7 +38,6 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
 object Comet {
-
     @ExperimentalTime
     fun startUpTask() {
         val apis = arrayOf(BiliBiliApi, TwitterApi, YoutubeApi)
@@ -97,11 +96,11 @@ object Comet {
     }
 
     fun startAllPusher() {
-        val pushers = arrayOf(BiliDynamicChecker, TweetUpdateChecker)
+        val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker)
         pushers.forEach {
-            TaskUtil.runScheduleTaskAsync(it::retrieve, it.delayTime, it.cycle, TimeUnit.MINUTES)
+            val future = TaskUtil.runScheduleTaskAsync(it::retrieve, it.delayTime, it.cycle, TimeUnit.MINUTES)
+            it.future = future
         }
-        BotVariables.logger.debug("Started all pusher!")
     }
 }
 
@@ -154,7 +153,12 @@ suspend fun main() {
 
         BotVariables.service = Executors.newScheduledThreadPool(
             4,
-            BasicThreadFactory.Builder().namingPattern("bot-service-%d").daemon(true).build()
+            BasicThreadFactory.Builder()
+                .namingPattern("bot-service-%d")
+                .daemon(true)
+                .uncaughtExceptionHandler { thread, t ->
+                    BotVariables.logger.warning("[定时任务] 线程 ${thread.name} 在运行时发生了错误", t)
+                }.build()
         )
 
         MessageHandler.setupCommand(

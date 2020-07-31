@@ -4,7 +4,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.youtube.YoutubeApi
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.MessageHandler
-import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
+import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.managers.GroupConfigManager
@@ -22,7 +22,7 @@ import net.mamoe.mirai.message.data.toMessage
 import java.io.IOException
 import kotlin.time.ExperimentalTime
 
-class DebugCommand : UniversalCommand {
+class DebugCommand : ChatCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (args.isNotEmpty() && BotUtil.isNoCoolDown(event.sender.id)) {
@@ -56,7 +56,8 @@ class DebugCommand : UniversalCommand {
                 "help" -> return getHelp().toMessage().asMessageChain()
                 "info" ->
                     return ("彗星 Bot ${BotVariables.version}\n" +
-                            "已注册的命令个数: ${MessageHandler.countCommands()}\n" +
+                            "今日もかわいい~\n" +
+                            "已注册命令数: ${MessageHandler.countCommands()}\n" +
                             BotUtil.getMemoryUsage()).toMsgChain()
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().toMsgChain()
                 "switch" -> {

@@ -66,7 +66,7 @@ data class Tweet(
     }
 
     fun contentEquals(tweet: Tweet): Boolean {
-        return text == tweet.text
+        return text.contentEquals(tweet.text) || getSentTime().isEqual(tweet.getSentTime())
     }
 
     fun getSentTime(): LocalDateTime {

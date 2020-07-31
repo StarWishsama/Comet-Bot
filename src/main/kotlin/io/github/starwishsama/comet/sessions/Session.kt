@@ -1,16 +1,16 @@
 package io.github.starwishsama.comet.sessions
 
-import io.github.starwishsama.comet.commands.interfaces.UniversalCommand
+import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import java.util.*
 
 
 /**
  * @author Nameless
  */
-open class Session(open var groupId: Long = 0, var command: UniversalCommand) {
+open class Session(open var groupId: Long = 0, var command: ChatCommand) {
     var users: List<SessionUser> = LinkedList<SessionUser>()
 
-    constructor(command: UniversalCommand, id: Long) : this(0, command) {
+    constructor(command: ChatCommand, id: Long) : this(0, command) {
         putUser(id)
     }
 

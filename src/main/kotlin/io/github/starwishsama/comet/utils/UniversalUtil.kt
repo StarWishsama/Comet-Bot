@@ -9,10 +9,7 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotAdmin
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotOwner
 import net.mamoe.mirai.message.MessageEvent
-import net.mamoe.mirai.message.data.At
-import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.message.data.toMessage
+import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.asHumanReadable
 import org.apache.commons.lang3.StringUtils
 import java.time.Duration
@@ -308,18 +305,13 @@ object BotUtil {
     }
 
     @ExperimentalTime
-    fun getMemoryUsage(): String = "操作系统: ${getOsName()}\n" +
-            "JVM 版本: ${getJVMVersion()}\n" +
-            "内存占用: ${getUsedMemory()}MB/${getMaxMemory()}MB\n" +
-            "运行时长: ${getRunningTime()}"
+    fun getMemoryUsage(): String =
+        "OS 信息: ${getOsInfo()}\n" +
+                "JVM 版本: ${getJVMVersion()}\n" +
+                "内存占用: ${getUsedMemory()}MB/${getMaxMemory()}MB\n" +
+                "运行时长: ${getRunningTime()}"
 
-    fun returnMsgIf(condition: Boolean, msg: MessageChain): MessageChain {
-        if (condition) {
-            return msg
-        } else {
-            throw UnsupportedOperationException()
-        }
-    }
+    fun returnMsgIf(condition: Boolean, msg: MessageChain): MessageChain = if (condition) msg else EmptyMessageChain
 
     fun returnMsgIfElse(condition: Boolean, msg: MessageChain, default: MessageChain): MessageChain {
         if (condition) {
@@ -329,15 +321,15 @@ object BotUtil {
     }
 
     fun isValidJson(json: String): Boolean {
-        val jsonElement: JsonElement? = try {
+        val jsonElement: JsonElement = try {
             JsonParser.parseString(json)
         } catch (e: Exception) {
             return false
         }
-        return jsonElement?.isJsonObject ?: false
+        return jsonElement.isJsonObject
     }
 
-    fun isValidJson(element: JsonElement?): Boolean {
-        return element?.isJsonObject ?: false
+    fun isValidJson(element: JsonElement): Boolean {
+        return element.isJsonObject || element.isJsonArray
     }
 }

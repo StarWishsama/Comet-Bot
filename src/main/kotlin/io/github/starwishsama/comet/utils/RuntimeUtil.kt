@@ -2,8 +2,9 @@ package io.github.starwishsama.comet.utils
 
 import java.lang.management.ManagementFactory
 
-fun getOsName(): String? {
-    return System.getProperty("os.name")
+fun getOsInfo(): String {
+    val osMX = ManagementFactory.getOperatingSystemMXBean()
+    return "${osMX.name}_${osMX.version} (${osMX.arch})"
 }
 
 fun getUsedMemory(): Long {

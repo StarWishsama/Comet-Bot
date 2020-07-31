@@ -11,12 +11,14 @@ import kotlinx.coroutines.runBlocking
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
+import java.util.concurrent.ScheduledFuture
 import kotlin.time.ExperimentalTime
 
 object TweetUpdateChecker : CometPusher {
     private val pushContent = mutableMapOf<String, PushedTweet>()
     override val delayTime: Long = 5
-    override val cycle: Long = 15
+    override val cycle: Long = 10
+    override lateinit var future: ScheduledFuture<*>
 
     @ExperimentalTime
     override fun retrieve() {
@@ -36,17 +38,18 @@ object TweetUpdateChecker : CometPusher {
         subList.forEach {
             try {
                 val tweet = TwitterApi.getTweetWithCache(it)
-                val oldTweet = pushContent[it]?.tweet ?: return@forEach
+                val oldTweet = pushContent[it]?.tweet
 
                 /** 检查是否为重复推文, 如果不是则加入推送队列 */
                 if (tweet != null && !isOutdatedTweet(tweet, oldTweet)) {
                     /** 加入推送队列, 注明尚未推送过 */
                     pushContent[it] = PushedTweet(tweet, false)
-                    /** 添加到缓存池中 */
+                    /** 添加到推文缓存池中 */
                     TwitterApi.addCacheTweet(it, tweet)
                 }
-            } catch (e: RateLimitException) {
-                BotVariables.logger.debug(e.localizedMessage)
+            } catch (e: Throwable) {
+                if (e is RateLimitException) BotVariables.logger.warning(e.message)
+                else BotVariables.logger.warning(e)
             }
         }
 
@@ -95,19 +98,21 @@ object TweetUpdateChecker : CometPusher {
                             message += image
                         }
                         group.sendMessage(message)
-                        BotVariables.logger.debug("Successfully push latest tweet to ${group.id}")
                         delay(2_500)
                     }
                 }
+                container.isPushed = true
             }
-
-            container?.isPushed = true
         }
     }
 
-    private fun isOutdatedTweet(retrieve: Tweet, toCompare: Tweet): Boolean {
+    private fun isOutdatedTweet(retrieve: Tweet, toCompare: Tweet?): Boolean {
         val timeNow = LocalDateTime.now()
         val tweetSentTime = retrieve.getSentTime()
-        return Duration.between(tweetSentTime, timeNow).toMinutes() >= 30 || toCompare.contentEquals(retrieve)
+        if (Duration.between(tweetSentTime, timeNow).toHours() >= 1) return true
+
+        if (toCompare == null) return false
+
+        return retrieve.contentEquals(toCompare)
     }
 }
