@@ -73,6 +73,13 @@ object TweetUpdateChecker : CometPusher {
             }
         }
 
+        pushToGroups(pushQueue)
+    }
+
+    data class PushedTweet(val tweet: Tweet, var isPushed: Boolean)
+
+    @ExperimentalTime
+    private fun pushToGroups(pushQueue: HashMap<String, List<Long>>) {
         /** 遍历推送列表推送推文 */
         pushQueue.forEach { (userName, pushGroups) ->
             val container = pushContent[userName]
@@ -97,8 +104,6 @@ object TweetUpdateChecker : CometPusher {
             container?.isPushed = true
         }
     }
-
-    data class PushedTweet(val tweet: Tweet, var isPushed: Boolean)
 
     private fun isOutdatedTweet(retrieve: Tweet, toCompare: Tweet): Boolean {
         val timeNow = LocalDateTime.now()

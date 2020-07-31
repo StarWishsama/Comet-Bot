@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.tasks
 
+import com.hiczp.bilibili.api.live.model.RoomInfo
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
@@ -28,27 +29,13 @@ object BiliDynamicChecker : CometPusher {
             }
         }
 
-        readyToRetrieveList.forEach { (roomId, list) ->
+        readyToRetrieveList.forEach { (roomId, pushGroups) ->
             run {
                 val data = runBlocking {
                     FakeClientApi.getLiveRoom(roomId)?.data
                 }
 
-                if (data != null) {
-                    when (data.liveStatus) {
-                        0 -> {
-                            /** 如果下播了就删除, 等待下一次开播后做提醒 */
-                            if (pushedList.contains(roomId)) {
-                                pushedList.remove(roomId)
-                            }
-                        }
-                        1 -> {
-                            if (!pushedList.contains(roomId)) {
-                                pushedList[roomId]?.addAll(list)
-                            }
-                        }
-                    }
-                }
+                checkIfNeedPush(data, roomId, pushGroups)
             }
         }
 
@@ -74,6 +61,24 @@ object BiliDynamicChecker : CometPusher {
                         val group = BotVariables.bot.getGroup(groupId)
                         group.sendMessage(msg)
                         delay(2_000)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun checkIfNeedPush(data: RoomInfo.Data?, roomId: Long, list: List<Long>) {
+        if (data != null) {
+            when (data.liveStatus) {
+                0 -> {
+                    /** 如果下播了就删除, 等待下一次开播后做提醒 */
+                    if (pushedList.contains(roomId)) {
+                        pushedList.remove(roomId)
+                    }
+                }
+                1 -> {
+                    if (!pushedList.contains(roomId)) {
+                        pushedList[roomId]?.addAll(list)
                     }
                 }
             }

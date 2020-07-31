@@ -46,16 +46,15 @@ object PictureSearchUtil {
 
         val html = request.get()
         val elements = html.body().getElementsByClass("container")
-        var imgUrl = "无"
+        val imgUrl: String
         val sources = elements.select(".info-box")[1].select("a")
-        var original = "无"
+        val original: String
         try {
             imgUrl = "https://ascii2d.net/" + elements.select(".image-box")[1].select("img")[0].attributes()["src"]
             original = sources[0].attributes()["href"]
         } catch (ignored: IndexOutOfBoundsException) {
+            return PicSearchResult.emptyResult()
         }
-        val r = PicSearchResult(imgUrl, original, -1.0, "$ascii2d$url")
-        println(r)
-        return r
+        return PicSearchResult(imgUrl, original, -1.0, "$ascii2d$url")
     }
 }
