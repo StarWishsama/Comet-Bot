@@ -24,13 +24,13 @@ class RConCommand : ChatCommand, SuspendCommand {
     private val waitList = mutableMapOf<BotUser, Int>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.userQQ) && user.hasPermission(getProps().permission)) {
+        if (BotUtil.isNoCoolDown(user.id) && user.hasPermission(getProps().permission)) {
             if (args.isEmpty()) {
                 return getHelp().toMsgChain()
             } else {
                 when (args[0]) {
                     "setup" -> {
-                        SessionManager.addSession(Session(this, user.userQQ))
+                        SessionManager.addSession(Session(this, user.id))
                         return BotUtil.sendMsgPrefix("请在下一条消息发送 rCon 连接地址").toMsgChain()
                     }
                     "cmd", "exec", "命令" -> {

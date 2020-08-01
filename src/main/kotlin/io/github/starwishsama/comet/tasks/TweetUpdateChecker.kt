@@ -109,7 +109,7 @@ object TweetUpdateChecker : CometPusher {
     private fun isOutdatedTweet(retrieve: Tweet, toCompare: Tweet?): Boolean {
         val timeNow = LocalDateTime.now()
         val tweetSentTime = retrieve.getSentTime()
-        if (Duration.between(tweetSentTime, timeNow).toHours() >= 1) return true
+        if (Duration.between(tweetSentTime, timeNow).toMinutes() >= 30) return true
 
         if (toCompare == null) return false
 

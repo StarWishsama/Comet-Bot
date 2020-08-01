@@ -6,6 +6,7 @@ import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.gson
+import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
 import io.github.starwishsama.comet.utils.NetUtil
 import io.github.starwishsama.comet.utils.toFriendly
@@ -26,43 +27,47 @@ import kotlin.time.toKotlinDuration
 
 data class Tweet(
         @SerializedName("created_at")
-        var postTime: String,
-        var id: Long,
+        val postTime: String,
+        val id: Long,
         @SerializedName("id_str")
-        var idString: String,
+        val idAsString: String,
         @SerializedName("full_text")
-        var text: String,
-        var truncated: Boolean,
-        var entities: JsonObject?,
-        var source: String,
-        var user: TwitterUser,
+        val text: String,
+        val truncated: Boolean,
+        val entities: JsonObject?,
+        val source: String,
+        @SerializedName("in_reply_to_status_id")
+        val replyTweetId: Long?,
+        val user: TwitterUser,
         @SerializedName("retweeted_status")
-        var retweetStatus: ReTweet?,
+        val retweetStatus: ReTweet?,
         @SerializedName("retweet_count")
-        var retweetCount: Long,
+        val retweetCount: Long,
         @SerializedName("favorite_count")
-        var likeCount: Long,
+        val likeCount: Long,
         @SerializedName("possibly_sensitive")
-        var sensitive: Boolean,
+        val sensitive: Boolean,
         @SerializedName("quoted_status")
-        var quotedStatus : Tweet?,
+        val quotedStatus: Tweet?,
         @SerializedName("is_quote_status")
-        var isQuoted: Boolean
+        val isQuoted: Boolean
 ) {
     @ExperimentalTime
     fun getFullText(): String {
-        val quoted = quotedStatus
-        var result = text
+        val duration =
+                Duration.between(getSentTime(), LocalDateTime.now())
+        val durationText = "\n\n距离发送已过去了 ${duration.toKotlinDuration().toFriendly(TimeUnit.DAYS)}"
 
-        if (isQuoted && quoted != null) {
-            result = "对推文进行了回复\n$text\n\n引用推文\n${quoted.text}"
+        if (isQuoted && quotedStatus != null) {
+            return "对于 ${quotedStatus.user.name} 的推文\n${quotedStatus.text}\n\n${user.name} 进行了评论\n$text" + durationText
         }
 
-        val duration =
-            Duration.between(getSentTime(), LocalDateTime.now())
-        result += "\n\n距离发送已过去了 ${duration.toKotlinDuration().toFriendly(TimeUnit.DAYS)}"
+        if (replyTweetId != null) {
+            val repliedTweet = TwitterApi.getTweetById(replyTweetId) ?: return text + durationText
+            return "对于 ${repliedTweet.user.name} 的推文\n${repliedTweet.text}\n\n${user.name} 进行了回复\n$text" + durationText
+        }
 
-        return result
+        return text + durationText
     }
 
     fun contentEquals(tweet: Tweet): Boolean {
@@ -98,12 +103,12 @@ data class Tweet(
         }
 
         if (retweetStatus != null) {
-            val image = retweetStatus?.getPictureOrNull(contact)
+            val image = retweetStatus.getPictureOrNull(contact)
             picture = image
         }
 
         if (quotedStatus != null && picture == null) {
-            picture = quotedStatus?.getPictureOrNull(contact)
+            picture = quotedStatus.getPictureOrNull(contact)
         }
 
         return picture

@@ -20,7 +20,7 @@ import org.apache.commons.lang3.Validate
 
 class BiliBiliCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.userQQ)) {
+        if (BotUtil.isNoCoolDown(user.id)) {
             if (args.isEmpty()) {
                 return getHelp().toMsgChain()
             } else {

@@ -3,24 +3,14 @@ package io.github.starwishsama.comet.listeners
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.utils.TaskUtil
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.BotIsBeingMutedException
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
-import java.util.concurrent.TimeUnit
 import kotlin.time.ExperimentalTime
 
 object RepeatListener : NListener {
-    private var repeatTimes = 0
-
-    init {
-        TaskUtil.runScheduleTaskAsync({
-            repeatTimes = 0
-        }, 1, 1, TimeUnit.MINUTES)
-    }
-
     @ExperimentalTime
     override fun register(bot: Bot) {
         bot.subscribeGroupMessages {
@@ -37,7 +27,7 @@ object RepeatListener : NListener {
     }
 
     private suspend fun handleRepeat(event: GroupMessageEvent, chance: Double) {
-        if (canRepeat(event.group.id) && repeatTimes <= 50 && event.message[QuoteReply] == null && chance in 0.90..0.91) {
+        if (canRepeat(event.group.id) && event.message[QuoteReply] == null && chance in 0.90..0.91) {
             // 避免复读过多图片刷屏
             val count = event.message.stream().filter { it is Image }.count()
 
@@ -52,7 +42,6 @@ object RepeatListener : NListener {
                         msgChain[i] = PlainText(chain.content.replace("我", "你"))
                     }
                 }
-                repeatTimes += 1
                 event.reply(msgChain.asMessageChain())
             }
         }

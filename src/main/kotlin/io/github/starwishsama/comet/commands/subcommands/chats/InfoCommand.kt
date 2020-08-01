@@ -43,7 +43,7 @@ class InfoCommand : ChatCommand {
                 return if (users.size > 9) {
                     for (i in 0..9) {
                         sb.append(i + 1).append(" ")
-                                .append(users[i].userQQ)
+                                .append(users[i].id)
                             .append(" ").append(String.format("%.1f", users[i].checkInPoint)).append("\n")
                     }
                     (sb.toString().trim { it <= ' ' }).toMsgChain()

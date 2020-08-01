@@ -11,6 +11,7 @@ import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.utils.asHumanReadable
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
@@ -77,17 +78,17 @@ object MessageHandler {
      * @param event Mirai 消息命令 (聊天)
      */
     @ExperimentalTime
-    suspend fun execute(event: MessageEvent): MessageChain {
+    suspend fun execute(event: MessageEvent): ExecutedResult {
         val executedTime = LocalDateTime.now()
         val senderId = event.sender.id
         val message = event.message.contentToString()
+        val cmd = getCommand(getCommandName(message))
         try {
             if (SessionManager.isValidSessionById(senderId)) {
                 handleSession(event, executedTime)
             }
 
             if (isCommandPrefix(message)) {
-                val cmd = getCommand(getCommandName(message))
                 if (cmd != null) {
                     val splitMessage = message.split(" ")
                     BotVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.getProps().name}")
@@ -105,19 +106,17 @@ object MessageHandler {
 
                     val usedTime = Duration.between(executedTime, LocalDateTime.now())
                     BotVariables.logger.debug(
-                        "[命令] 命令执行耗时 ${usedTime.toKotlinDuration()
-                            .toLong(DurationUnit.SECONDS)}s${usedTime.toKotlinDuration()
-                            .toLong(DurationUnit.MILLISECONDS)}ms"
+                            "[命令] 命令执行耗时 ${usedTime.toKotlinDuration().asHumanReadable}"
                     )
 
-                    return result
+                    return ExecutedResult(result, cmd)
                 }
             }
         } catch (t: Throwable) {
             BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId", t)
-            return "Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain()
+            return ExecutedResult("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain(), cmd)
         }
-        return EmptyMessageChain
+        return ExecutedResult(EmptyMessageChain, cmd)
     }
 
     /**
@@ -279,4 +278,6 @@ object MessageHandler {
     fun countCommands(): Int = commands.size + consoleCommands.size
 
     fun getCommands() = commands
+
+    data class ExecutedResult(val msg: MessageChain, val cmd: ChatCommand?)
 }

@@ -14,17 +14,17 @@ import org.apache.commons.lang3.StringUtils
 
 class GachaCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.userQQ)) {
+        if (BotUtil.isNoCoolDown(user.id)) {
             if (args.isNotEmpty()) {
                 when (args[0]) {
                     "明日方舟", "舟游", "mrfz", "ak" -> {
                         return if (args.size == 2) {
                             when (args[1]) {
                                 "十连" -> BotUtil.sendMsgPrefix(
-                                    DrawUtil.getArkDrawResult(
-                                        user,
-                                        10
-                                    )
+                                        DrawUtil.getArkDrawResult(
+                                                user,
+                                                10
+                                        )
                                 ).toMsgChain()
                                 "单抽" -> BotUtil.sendMsgPrefix(
                                     DrawUtil.getArkDrawResult(

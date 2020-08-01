@@ -18,7 +18,7 @@ import net.mamoe.mirai.message.data.isContentNotEmpty
 
 class MuteCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.userQQ) && event is GroupMessageEvent) {
+        if (BotUtil.isNoCoolDown(user.id) && event is GroupMessageEvent) {
             if (event.group.botPermission.isOperator()) {
                 if (user.isBotAdmin() || event.sender.isOperator()) {
                     if (args.isNotEmpty()) {

@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.utils
 
+import cn.hutool.http.HttpResponse
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
@@ -61,6 +62,10 @@ fun kotlin.time.Duration.toFriendly(maxUnit: DurationUnit = TimeUnit.SECONDS): S
     }
 }
 
+fun HttpResponse.isType(typeName: String): Boolean {
+    val contentType = this.header("content-type") ?: return false
+    return contentType.contains(typeName)
+}
 
 /**
  * 用于辅助机器人运行的各种工具方法
@@ -218,8 +223,8 @@ object BotUtil {
         return sb.toString().trim { it <= ' ' }
     }
 
-    fun sendMessage(otherText: String?, addPrefix: Boolean): MessageChain {
-        if (!otherText.isNullOrEmpty()) return "".toMsgChain()
+    fun sendMessage(otherText: String?, addPrefix: Boolean = true): MessageChain {
+        if (otherText.isNullOrEmpty()) return EmptyMessageChain
         val sb = StringBuilder()
         if (addPrefix) sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
         sb.append(otherText)

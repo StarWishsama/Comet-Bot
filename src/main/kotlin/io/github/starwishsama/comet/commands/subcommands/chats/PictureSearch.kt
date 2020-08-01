@@ -17,18 +17,19 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.queryUrl
+import java.util.*
 
 class PictureSearch : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(event.sender.id)) {
             if (args.isEmpty() || SessionManager.isValidSessionById(event.sender.id)) {
                 if (!SessionManager.isValidSessionById(event.sender.id)) {
-                    SessionManager.addSession(Session(this, user.userQQ))
+                    SessionManager.addSession(Session(this, user.id))
                 }
                 return BotUtil.sendMsgPrefix("请发送需要搜索的图片").toMsgChain()
             } else if (args[0].contentEquals("source") && args.size > 1) {
                 try {
-                    val api = PicSearchApi.valueOf(args[1])
+                    val api = PicSearchApi.valueOf(args[1].toUpperCase(Locale.ROOT))
                     BotVariables.cfg.pictureSearchApi = api
                 } catch (e: Throwable) {
                     return BotUtil.sendMessage("该识图 API 不存在, 可用的 API 名称: ${PicSearchApi.values()}", true)
@@ -78,6 +79,10 @@ class PictureSearch : ChatCommand, SuspendCommand {
                     } else {
                         event.reply("找不到相似的图片")
                     }
+                }
+                PicSearchApi.BAIDU -> {
+                    event.reply("点击下方链接查看\n" +
+                            "https://graph.baidu.com/details?isfromtusoupc=1&tn=pc&carousel=0&promotion_name=pc_image_shituindex&extUiData%5bisLogoShow%5d=1&image=${image.queryUrl()}")
                 }
             }
         } else {

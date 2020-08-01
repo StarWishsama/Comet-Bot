@@ -29,9 +29,9 @@ import kotlin.time.ExperimentalTime
 class TwitterCommand : ChatCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.userQQ)) {
+        if (BotUtil.isNoCoolDown(user.id)) {
             if (BotVariables.cfg.twitterToken == null) {
-                return BotUtil.sendMsgPrefix("请到配置文件中填写蓝鸟 Token").toMsgChain()
+                return BotUtil.sendMessage("请到配置文件中填写推特 Token")
             }
 
             return if (args.isEmpty()) {
@@ -39,7 +39,7 @@ class TwitterCommand : ChatCommand {
             } else {
                 val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
                 when (args[0]) {
-                    "info", "cx", "查询" -> searchUser(args, event)
+                    "info", "cx", "推文", "tweet", "查推" -> searchUser(args, event)
                     "sub", "订阅" -> subscribeUser(args, id)
                     "unsub", "退订" -> unsubscribeUser(args, id)
                     "list" -> {
@@ -57,28 +57,27 @@ class TwitterCommand : ChatCommand {
     private suspend fun searchUser(args: List<String>, event: MessageEvent): MessageChain {
         if (args.size > 1) {
             event.quoteReply(BotUtil.sendMsgPrefix("正在查询, 请稍等"))
-            try {
-                return getTweetAsChain(args.getRestString(1), event.subject)
+            return try {
+                getTweetWithDesc(args.getRestString(1), event.subject)
             } catch (e: RateLimitException) {
-                return BotUtil.sendMsgPrefix("API 调用已达上限").toMsgChain()
+                BotUtil.sendMessage("API 调用已达上限")
             } catch (e: EmptyTweetException) {
-                return BotUtil.sendMsgPrefixOrEmpty(e.message).toMsgChain()
+                BotUtil.sendMessage(e.message)
             } catch (e: TwitterApiException) {
                 if (e.code == 34) {
-                    return BotUtil.sendMsgPrefix("找不到此蓝鸟用户").toMsgChain()
+                    BotUtil.sendMessage("找不到此蓝鸟用户")
                 } else {
-                    BotUtil.sendMsgPrefix("无法获取推文, 状态码: ${e.code}").toMsgChain()
-                    BotVariables.logger.warning("[推文] 无法解析推文, ${e.code} | ${e.reason}")
+                    BotVariables.logger.warning("[推文] 无法解析推文", e)
+                    BotUtil.sendMessage("无法获取到推文")
                 }
             }
         } else {
             return getHelp().toMsgChain()
         }
-        return EmptyMessageChain
     }
 
     @ExperimentalTime
-    private suspend fun getTweetAsChain(name: String, subject: Contact): MessageChain {
+    private suspend fun getTweetWithDesc(name: String, subject: Contact): MessageChain {
         val tweet: Tweet?
         try {
             tweet = TwitterApi.getTweetWithCache(name)
@@ -87,9 +86,9 @@ class TwitterCommand : ChatCommand {
         }
 
         return if (tweet != null) {
-            BotUtil.sendMsgPrefix("\n${tweet.user.name}\n").toMsgChain() + tweet.getAsMessageChain(subject)
+            BotUtil.sendMessage("\n${tweet.user.name}\n${tweet.getAsMessageChain(subject)}")
         } else {
-            BotUtil.sendMsgPrefix("获取推文时出现了意外").toMsgChain()
+            BotUtil.sendMessage("获取到的推文为空")
         }
     }
 

@@ -1,18 +1,19 @@
 package io.github.starwishsama.comet.objects
 
+import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.utils.BotUtil.getLevel
 import java.time.LocalDateTime
 
-class BotUser(var userQQ: Long) {
+class BotUser(@SerializedName("userQQ") var id: Long) {
     var lastCheckInTime: LocalDateTime = LocalDateTime.now().minusDays(1)
     var checkInPoint: Double = 0.0
-    var checkInTime : Int = 0
+    var checkInTime: Int = 0
     var bindServerAccount: String? = null
     var r6sAccount: String? = null
     var level: UserLevel = UserLevel.USER
-    var commandTime : Int = 100
+    var commandTime: Int = 100
     var checkInGroup: Long = 0
     private var permissions: List<String> = ArrayList()
 
@@ -76,7 +77,7 @@ class BotUser(var userQQ: Long) {
     }
 
     fun isBotOwner(): Boolean {
-        return level == UserLevel.OWNER || BotVariables.cfg.ownerId == userQQ
+        return level == UserLevel.OWNER || BotVariables.cfg.ownerId == id
     }
 
     fun addPermission(permission: String) {
@@ -100,7 +101,7 @@ class BotUser(var userQQ: Long) {
 
         fun getUser(qq: Long): BotUser? {
             for (user in BotVariables.users) {
-                if (user.userQQ == qq) {
+                if (user.id == qq) {
                     return user
                 }
             }

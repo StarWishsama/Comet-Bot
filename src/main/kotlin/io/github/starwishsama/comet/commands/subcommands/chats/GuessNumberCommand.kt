@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 
 class GuessNumberCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.userQQ) && event is GroupMessageEvent) {
+        if (BotUtil.isNoCoolDown(user.id) && event is GroupMessageEvent) {
             val session = SessionManager.getSessionByGroup(event.group.id)
             if (session == null) {
                 when {
@@ -77,7 +77,7 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
         val trueAnswer = (session as GuessNumberSession).answer
         session.lastAnswerTime = LocalDateTime.now()
         val answer = event.message.content
-        var gnUser = session.getGNUser(user.userQQ)
+        var gnUser = session.getGNUser(user.id)
 
         if (answer.isNumeric()) {
             val answerInInt = answer.toInt()

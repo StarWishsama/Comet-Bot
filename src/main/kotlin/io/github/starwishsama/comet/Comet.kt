@@ -215,8 +215,12 @@ suspend fun main() {
             always {
                 if (BotVariables.switch && sender.id != 80000000L) {
                     val result = MessageHandler.execute(this)
-                    if (result !is EmptyMessageChain) {
-                        reply(result)
+                    try {
+                        if (result.msg !is EmptyMessageChain && result.msg.isNotEmpty()) {
+                            reply(result.msg)
+                        }
+                    } catch (e: IllegalArgumentException) {
+                        BotVariables.logger.warning("正在尝试发送空消息, 执行结果 $result")
                     }
                 }
             }
