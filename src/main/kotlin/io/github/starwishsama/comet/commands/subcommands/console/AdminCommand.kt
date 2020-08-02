@@ -9,9 +9,9 @@ import io.github.starwishsama.comet.utils.isNumeric
 class AdminCommand : ConsoleCommand {
     override suspend fun execute(args: List<String>): String {
         if (args.isNotEmpty()) {
-            when (args[1]) {
+            when (args[0]) {
                 "admin" -> {
-                    if (args.size > 2 && args[1].isNumeric()) {
+                    if (args.size > 1 && args[1].isNumeric()) {
                         var target = BotUser.getUser(args[1].toLong())
                         if (target == null) {
                             target = BotUser.quickRegister(args[1].toLong())

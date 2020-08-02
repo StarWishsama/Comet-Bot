@@ -2,46 +2,50 @@ package io.github.starwishsama.comet.tasks
 
 import com.hiczp.bilibili.api.live.model.RoomInfo
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
-import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import java.util.*
 import java.util.concurrent.ScheduledFuture
 
 object BiliLiveChecker : CometPusher {
-    /** 推送过的直播间列表, 避免重复推送 */
-    private val pushedList = mutableMapOf<Long, HashSet<Long>>()
-    override val delayTime: Long = 5
-    override val cycle: Long = 10
+    private val pushedList = mutableListOf<StoredLiveInfo>()
+    override val delayTime: Long = 1
+    override val cycle: Long = 1
     override lateinit var future: ScheduledFuture<*>
 
     override fun retrieve() {
-        if (!BotVariables.bot.isOnline) future.cancel(true)
+        if (!bot.isOnline) future.cancel(true)
 
-        val readyToRetrieveList = mutableMapOf<Long, LinkedList<Long>>()
+        val collectedUsers = mutableSetOf<Long>()
 
-        BotVariables.perGroup.parallelStream().forEach { cfg ->
-            cfg.biliSubscribers.forEach { roomId ->
-                if (readyToRetrieveList.containsKey(roomId)) {
-                    readyToRetrieveList[roomId]?.add(cfg.id)
-                } else {
-                    readyToRetrieveList[roomId] = LinkedList()
-                    readyToRetrieveList[roomId]?.add(cfg.id)
-                }
+        BotVariables.perGroup.parallelStream().forEach {
+            if (it.biliPushEnabled) {
+                collectedUsers.plusAssign(it.biliSubscribers)
             }
         }
 
-        if (readyToRetrieveList.isEmpty()) return
+        collectedUsers.parallelStream().forEach { roomId ->
+            val data = runBlocking { FakeClientApi.getLiveRoom(roomId) }
+            if (data != null) {
+                val sli = StoredLiveInfo(data.data, false)
+                if (pushedList.isEmpty()) {
+                    pushedList.plusAssign(sli)
+                } else {
+                    var hasOldData = false
+                    for (i in pushedList.indices) {
+                        if (pushedList[i].data.roomId == roomId) {
+                            hasOldData = true
+                            if (data.code == 1) pushedList[i] = sli
+                            break
+                        }
+                    }
 
-        readyToRetrieveList.forEach { (roomId, pushGroups) ->
-            run {
-                val data = runBlocking {
-                    FakeClientApi.getLiveRoom(roomId)?.data
+                    if (!hasOldData) {
+                        pushedList.add(sli)
+                    }
                 }
-
-                checkIfNeedPush(data, roomId, pushGroups)
             }
         }
 
@@ -49,45 +53,40 @@ object BiliLiveChecker : CometPusher {
     }
 
     override fun push() {
-        if (pushedList.isNullOrEmpty()) return
+        val liverToGroups = mutableMapOf<StoredLiveInfo, MutableSet<Long>>()
+        pushedList.parallelStream().forEach { liverToGroups.plusAssign(it to mutableSetOf()) }
 
-        pushedList.forEach { roomId, groupIds ->
-            val data = runBlocking {
-                FakeClientApi.getLiveRoom(roomId)?.data
-            }
-
-            val msg = "单推助手 > \n${data?.uid?.let { BiliBiliApi.getUserNameByMid(it) }} 开播了!" +
-                    "\n直播间标题: ${data?.title}" +
-                    "\n开播时间: ${data?.liveTime}" +
-                    "\n传送门: https://live.bilibili.com/${data?.roomId}"
-
-            for (groupId in groupIds) {
-                if (GroupConfigManager.getConfigSafely(groupId).biliPushEnabled) {
-                    runBlocking {
-                        val group = BotVariables.bot.getGroup(groupId)
-                        group.sendMessage(msg)
-                        delay(1_500)
+        BotVariables.perGroup.parallelStream().forEach { cfg ->
+            if (cfg.biliPushEnabled) {
+                liverToGroups.forEach {
+                    if (cfg.biliSubscribers.contains(it.key.getRoomId())) {
+                        it.value.plusAssign(cfg.id)
                     }
+                }
+            }
+        }
+
+        pushToGroups(liverToGroups)
+    }
+
+    private fun pushToGroups(pushQueue: MutableMap<StoredLiveInfo, MutableSet<Long>>) {
+        /** 遍历推送列表推送开播消息 */
+        pushQueue.forEach { (info, pushGroups) ->
+            val data = info.data
+            val msg = "单推助手 > \n${BiliBiliApi.getUserNameByMid(data.uid)} 开播了!" +
+                    "\n直播间标题: ${data.title}" +
+                    "\n开播时间: ${data.liveTime}" +
+                    "\n传送门: https://live.bilibili.com/${data.roomId}"
+            pushGroups.forEach {
+                runBlocking {
+                    bot.getGroup(it).sendMessage(msg)
+                    delay(2_500)
                 }
             }
         }
     }
 
-    private fun checkIfNeedPush(data: RoomInfo.Data?, roomId: Long, list: List<Long>) {
-        if (data != null) {
-            when (data.liveStatus) {
-                0 -> {
-                    /** 如果下播了就删除, 等待下一次开播后做提醒 */
-                    if (pushedList.contains(roomId)) {
-                        pushedList.remove(roomId)
-                    }
-                }
-                1 -> {
-                    if (!pushedList.contains(roomId)) {
-                        pushedList[roomId]?.addAll(list)
-                    }
-                }
-            }
-        }
+    data class StoredLiveInfo(val data: RoomInfo.Data, var isPushed: Boolean) {
+        fun getRoomId() = data.roomId
     }
 }

@@ -13,7 +13,7 @@ class DebugCommand : ConsoleCommand {
     @ExperimentalTime
     override suspend fun execute(args: List<String>): String {
         if (args.isNotEmpty()) {
-            when (args[1]) {
+            when (args[0]) {
                 "sessions" -> {
                     val sb = StringBuilder("目前活跃的会话列表: \n")
                     val sessions = SessionManager.getSessions()

@@ -95,7 +95,7 @@ object TweetUpdateChecker : CometPusher {
                 var message = "${tweet.user.name} (@${userName}) 发送了一条推文\n${tweet.getFullText()}".toMsgChain()
                 pushGroups.forEach {
                     runBlocking {
-                        val group = BotVariables.bot.getGroup(it)
+                        val group = bot.getGroup(it)
                         val image = tweet.getPictureOrNull(group)
                         if (image != null) {
                             message += image
