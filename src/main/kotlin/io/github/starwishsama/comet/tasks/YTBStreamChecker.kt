@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.tasks
 
+import io.github.starwishsama.comet.BotVariables
 import java.util.concurrent.ScheduledFuture
 
 object YTBStreamChecker : CometPusher {
@@ -8,6 +9,7 @@ object YTBStreamChecker : CometPusher {
     override lateinit var future: ScheduledFuture<*>
 
     override fun retrieve() {
+        if (!BotVariables.bot.isOnline) future.cancel(true)
         TODO("Not yet implemented")
     }
 

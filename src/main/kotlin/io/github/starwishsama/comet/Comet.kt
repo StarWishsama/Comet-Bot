@@ -237,6 +237,7 @@ suspend fun main() {
                 BotVariables.cfg.botPassword = command
                 println("成功设置密码, 按下 Enter 启动机器人")
             } else if (BotVariables.cfg.botId != 0L && BotVariables.cfg.botPassword.isNotEmpty()) {
+                println("请稍等...")
                 Comet.startPoint(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
                 break
             }

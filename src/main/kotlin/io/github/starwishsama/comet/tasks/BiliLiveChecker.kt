@@ -18,6 +18,8 @@ object BiliLiveChecker : CometPusher {
     override lateinit var future: ScheduledFuture<*>
 
     override fun retrieve() {
+        if (!BotVariables.bot.isOnline) future.cancel(true)
+
         val readyToRetrieveList = mutableMapOf<Long, LinkedList<Long>>()
 
         BotVariables.perGroup.parallelStream().forEach { cfg ->

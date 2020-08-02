@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.tasks
 
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.managers.GroupConfigManager
@@ -22,6 +23,8 @@ object TweetUpdateChecker : CometPusher {
 
     @ExperimentalTime
     override fun retrieve() {
+        if (!bot.isOnline) future.cancel(true)
+
         /** 检查是否有 Twitter Token, 如无则手动获取 */
         if (TwitterApi.token.isNullOrEmpty()) {
             TwitterApi.getBearerToken()
