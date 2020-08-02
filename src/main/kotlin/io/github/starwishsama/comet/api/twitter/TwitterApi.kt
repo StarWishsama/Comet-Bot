@@ -22,7 +22,6 @@ import io.github.starwishsama.comet.utils.isType
 import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime
-import java.util.*
 
 /**
  * Twitter API
@@ -40,7 +39,7 @@ object TwitterApi : ApiExecutor {
     // Bearer Token
     var token: String? = BotVariables.cache["token"].asString
 
-    private var cacheTweet = mutableMapOf<String, LinkedList<Tweet>>()
+    private var cacheTweet = mutableMapOf<String, Tweet>()
 
     // Api 调用次数
     override var usedTime: Int = 0
@@ -157,17 +156,16 @@ object TwitterApi : ApiExecutor {
         val startTime = LocalDateTime.now()
 
         try {
-            var cacheTweets = cacheTweet[username]
+            var cachedTweet = cacheTweet[username]
             val result: Tweet?
 
-            if (cacheTweets == null) {
-                cacheTweets = LinkedList()
+            if (cachedTweet == null) {
+                cachedTweet = getUserLatestTweet(username)
             }
 
-            result = if (cacheTweets.isNotEmpty() && Duration.between(cacheTweets[0].getSentTime(), LocalDateTime.now())
-                    .toMinutes() <= 1
+            result = if (Duration.between(cachedTweet?.getSentTime(), LocalDateTime.now()).toMinutes() <= 3
             ) {
-                cacheTweets[0]
+                cachedTweet
             } else {
                 getUserLatestTweet(username)
             }
@@ -184,11 +182,7 @@ object TwitterApi : ApiExecutor {
 
     @Synchronized
     fun addCacheTweet(username: String, tweet: Tweet) {
-        if (!cacheTweet.containsKey(username)) {
-            cacheTweet[username] = LinkedList()
-        } else {
-            cacheTweet[username]?.add(tweet)
-        }
+        cacheTweet[username] = tweet
     }
 
     private fun parseJsonToTweet(json: String): Tweet? {

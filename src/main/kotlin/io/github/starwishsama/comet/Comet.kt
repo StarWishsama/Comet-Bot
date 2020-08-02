@@ -105,7 +105,7 @@ object Comet {
     }
 
     @ExperimentalTime
-    suspend fun startPoint(qqId: Long, password: String) {
+    suspend fun startBot(qqId: Long, password: String) {
         val config = BotConfiguration.Default
         config.botLoggerSupplier = { it ->
             PlatformLogger("Bot ${it.id}", {
@@ -223,7 +223,9 @@ suspend fun main() {
     FileUtil.initLog()
     DataSetup.init()
 
-    if (BotVariables.cfg.botId == 0L) {
+    val id = BotVariables.cfg.botId
+
+    if (id == 0L) {
         println("请输入欲登录的机器人账号")
         val scanner = Scanner(System.`in`)
         var command: String
@@ -238,12 +240,12 @@ suspend fun main() {
                 println("成功设置密码, 按下 Enter 启动机器人")
             } else if (BotVariables.cfg.botId != 0L && BotVariables.cfg.botPassword.isNotEmpty()) {
                 println("请稍等...")
-                Comet.startPoint(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
+                Comet.startBot(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
                 break
             }
         }
         scanner.close()
     } else {
-        Comet.startPoint(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
+        Comet.startBot(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
     }
 }

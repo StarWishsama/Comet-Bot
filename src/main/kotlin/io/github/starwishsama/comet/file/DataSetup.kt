@@ -25,7 +25,6 @@ object DataSetup {
     private val shopItemCfg: File = File(BotVariables.filePath, "/items.json")
     private val cfgFile: File = File(BotVariables.filePath, "/config.json")
     private val langCfg: File = File(BotVariables.filePath, "/lang.json")
-    private val groupCfg: File = File(BotVariables.filePath, "/groups.json")
     private val cacheCfg: File = File(BotVariables.filePath, "cache.json")
     private val pcrData = File(BotVariables.filePath, "/pcr.json")
     private val arkNightData = File(BotVariables.filePath, "/ark.json")
@@ -33,6 +32,7 @@ object DataSetup {
     private val perGroupFolder = FileUtil.getChildFolder("groups")
 
     fun init() {
+        println("机器人文件路径在: " + BotVariables.filePath)
         if (!userCfg.exists() || !cfgFile.exists()) {
             try {
                 cfgFile.writeClassToJson(BotVariables.cfg)

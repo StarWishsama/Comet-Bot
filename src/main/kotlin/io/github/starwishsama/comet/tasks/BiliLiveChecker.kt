@@ -82,6 +82,9 @@ object BiliLiveChecker : CometPusher {
                     bot.getGroup(it).sendMessage(msg)
                     delay(2_500)
                 }
+                if (it == pushGroups.last()) {
+                    info.isPushed = true
+                }
             }
         }
     }
