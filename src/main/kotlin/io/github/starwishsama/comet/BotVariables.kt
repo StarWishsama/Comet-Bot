@@ -16,9 +16,11 @@ import io.github.starwishsama.comet.utils.FileUtil
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.utils.MiraiLogger
+import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
 import java.time.LocalDateTime
 import java.util.*
+import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 
 
@@ -30,10 +32,18 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     val filePath: File = File(FileUtil.getJarLocation())
-    const val version = "0.4.2-DEV-97ccf62-20200802"
+    const val version = "0.4.2-DEV-ea3b503-20200802"
     lateinit var bot: Bot
     lateinit var startTime: LocalDateTime
-    lateinit var service: ScheduledExecutorService
+    var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
+        4,
+        BasicThreadFactory.Builder()
+            .namingPattern("bot-service-%d")
+            .daemon(true)
+            .uncaughtExceptionHandler { thread, t ->
+                logger.warning("[定时任务] 线程 ${thread.name} 在运行时发生了错误", t)
+            }.build()
+    )
     lateinit var logger: MiraiLogger
     var rCon: Rcon? = null
     lateinit var log: File

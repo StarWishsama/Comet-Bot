@@ -1,5 +1,7 @@
 package io.github.starwishsama.comet
 
+import io.github.starwishsama.comet.BotVariables.bot
+import io.github.starwishsama.comet.BotVariables.startTime
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
 import io.github.starwishsama.comet.api.twitter.TwitterApi
@@ -29,13 +31,10 @@ import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.PlatformLogger
-import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import kotlin.system.exitProcess
 import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
@@ -72,7 +71,7 @@ object Comet {
         TaskUtil.runScheduleTaskAsync(HitokotoUpdater::run, 5, 60 * 60, TimeUnit.SECONDS)
     }
 
-    fun handleConsoleCommand() {
+    private fun handleConsoleCommand() {
         TaskUtil.runAsync({
             val scanner = Scanner(System.`in`)
             var command: String
@@ -97,39 +96,16 @@ object Comet {
         }
     }
 
-    fun startAllPusher() {
+    private fun startAllPusher() {
         val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker)
         pushers.forEach {
             val future = TaskUtil.runScheduleTaskAsync(it::retrieve, it.delayTime, it.cycle, TimeUnit.MINUTES)
             it.future = future
         }
     }
-}
 
-@ExperimentalTime
-suspend fun main() {
-    BotVariables.startTime = LocalDateTime.now()
-    println(
-        """
-        
-           ______                     __ 
-          / ____/___  ____ ___  ___  / /_
-         / /   / __ \/ __ `__ \/ _ \/ __/
-        / /___/ /_/ / / / / / /  __/ /_  
-        \____/\____/_/ /_/ /_/\___/\__/  
-
-
-    """.trimIndent()
-    )
-    FileUtil.initLog()
-    DataSetup.init()
-    val qqId = BotVariables.cfg.botId
-    val password = BotVariables.cfg.botPassword
-
-    if (qqId == 0L) {
-        println("请到 config.json 里填写机器人的QQ号&密码")
-        exitProcess(0)
-    } else {
+    @ExperimentalTime
+    suspend fun startPoint(qqId: Long, password: String) {
         val config = BotConfiguration.Default
         config.botLoggerSupplier = { it ->
             PlatformLogger("Bot ${it.id}", {
@@ -145,23 +121,13 @@ suspend fun main() {
         }
         config.heartbeatPeriodMillis = BotVariables.cfg.heartBeatPeriod * 60 * 1000
         config.fileBasedDeviceInfo()
-        BotVariables.bot = Bot(qq = qqId, password = password, configuration = config)
-        BotVariables.bot.alsoLogin()
-        BotVariables.logger = BotVariables.bot.logger
+        bot = Bot(qq = qqId, password = password, configuration = config)
+        bot.alsoLogin()
+        BotVariables.logger = bot.logger
 
         DataSetup.initPerGroupSetting()
 
-        Comet.setupRCon()
-
-        BotVariables.service = Executors.newScheduledThreadPool(
-            4,
-            BasicThreadFactory.Builder()
-                .namingPattern("bot-service-%d")
-                .daemon(true)
-                .uncaughtExceptionHandler { thread, t ->
-                    BotVariables.logger.warning("[定时任务] 线程 ${thread.name} 在运行时发生了错误", t)
-                }.build()
-        )
+        setupRCon()
 
         MessageHandler.setupCommand(
                 arrayOf(
@@ -197,16 +163,16 @@ suspend fun main() {
         val listeners = arrayOf(ConvertLightAppListener, RepeatListener)
 
         listeners.forEach {
-            it.register(BotVariables.bot)
+            it.register(bot)
             BotVariables.logger.info("[监听器] 已注册 ${it.getName()} 监听器")
         }
 
-        Comet.startUpTask()
-        Comet.startAllPusher()
+        startUpTask()
+        startAllPusher()
 
-        val time = Duration.between(BotVariables.startTime, LocalDateTime.now())
+        val duration = Duration.between(startTime, LocalDateTime.now())
 
-        BotVariables.logger.info("彗星 Bot 启动成功, 耗时 ${time.toKotlinDuration().toFriendly()}")
+        BotVariables.logger.info("彗星 Bot 启动成功, 耗时 ${duration.toKotlinDuration().toFriendly()}")
 
         Runtime.getRuntime().addShutdownHook(Thread {
             BotVariables.logger.info("[Bot] 正在关闭 Bot...")
@@ -215,7 +181,7 @@ suspend fun main() {
             BotVariables.rCon?.disconnect()
         })
 
-        BotVariables.bot.subscribeMessages {
+        bot.subscribeMessages {
             always {
                 if (BotVariables.switch && sender.id != 80000000L) {
                     if (this is GroupMessageEvent && group.isBotMuted) return@always
@@ -232,8 +198,51 @@ suspend fun main() {
             }
         }
 
-        Comet.handleConsoleCommand()
+        handleConsoleCommand()
 
-        BotVariables.bot.join() // 等待 Bot 离线, 避免主线程退出
+        bot.join() // 等待 Bot 离线, 避免主线程退出
+    }
+}
+
+@ExperimentalStdlibApi
+@ExperimentalTime
+suspend fun main() {
+    startTime = LocalDateTime.now()
+    println(
+            """
+        
+           ______                     __ 
+          / ____/___  ____ ___  ___  / /_
+         / /   / __ \/ __ `__ \/ _ \/ __/
+        / /___/ /_/ / / / / / /  __/ /_  
+        \____/\____/_/ /_/ /_/\___/\__/  
+
+
+    """.trimIndent()
+    )
+    FileUtil.initLog()
+    DataSetup.init()
+
+    if (BotVariables.cfg.botId == 0L) {
+        println("请输入欲登录的机器人账号")
+        val scanner = Scanner(System.`in`)
+        var command: String
+        while (scanner.hasNextLine()) {
+            command = scanner.nextLine()
+            if (BotVariables.cfg.botId == 0L && command.isNumeric()) {
+                BotVariables.cfg.botId = command.toLong()
+                println("成功设置账号为 ${BotVariables.cfg.botId}")
+                println("请输入欲登录的机器人密码")
+            } else if (BotVariables.cfg.botPassword.isEmpty()) {
+                BotVariables.cfg.botPassword = command
+                println("成功设置密码, 按下 Enter 启动机器人")
+            } else if (BotVariables.cfg.botId != 0L && BotVariables.cfg.botPassword.isNotEmpty()) {
+                Comet.startPoint(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
+                break
+            }
+        }
+        scanner.close()
+    } else {
+        Comet.startPoint(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
     }
 }
