@@ -67,8 +67,6 @@ git clone https://github.com/StarWishsama/Comet-Bot.git
 
 **本项目禁止进行被二次分发为进行违反中华人民共和国法律法规的行为**
 
-使用前必须查看 [Mirai 使用协议](https://github.com/mamoe/mirai#%E8%AE%B8%E5%8F%AF%E8%AF%81)
-
 [AGPL v3.0](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE)
 
 ------
