@@ -35,7 +35,7 @@ object TweetUpdateChecker : CometPusher {
         }
 
         /** 获取推文 */
-        subList.forEach {
+        subList.parallelStream().forEach {
             try {
                 val tweet = TwitterApi.getTweetWithCache(it)
                 val oldTweet = pushContent[it]?.tweet
@@ -62,7 +62,7 @@ object TweetUpdateChecker : CometPusher {
         val pushQueue = HashMap<String, List<Long>>()
 
         /** 从分群配置文件中获取需要被推送的群 */
-        BotVariables.perGroup.forEach {
+        BotVariables.perGroup.parallelStream().forEach {
             /** 检查该群是否启用了推送功能 */
             if (GroupConfigManager.getConfigSafely(it.id).twitterPushEnabled) {
                 for (subs in it.twitterSubscribers) {

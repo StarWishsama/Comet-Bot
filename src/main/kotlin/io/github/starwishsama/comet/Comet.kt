@@ -171,19 +171,20 @@ suspend fun main() {
                 DivineCommand(),
                 GachaCommand(),
                 GuessNumberCommand(),
-                HelpCommand(),
-                InfoCommand(),
-                MusicCommand(),
-                MuteCommand(),
-                PictureSearch(),
-                R6SCommand(),
-                RConCommand(),
-                KickCommand(),
-                TwitterCommand(),
-                VersionCommand(),
-                // Console Command
-                StopCommand(),
-                DebugCommand()
+                    HelpCommand(),
+                    InfoCommand(),
+                    MusicCommand(),
+                    MuteCommand(),
+                    PictureSearch(),
+                    R6SCommand(),
+                    RConCommand(),
+                    KickCommand(),
+                    TwitterCommand(),
+                    VersionCommand(),
+                    GroupConfigCommand(),
+                    // Console Command
+                    StopCommand(),
+                    DebugCommand()
             )
         )
 

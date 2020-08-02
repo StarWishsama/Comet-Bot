@@ -182,6 +182,7 @@ object TwitterApi : ApiExecutor {
         return null
     }
 
+    @Synchronized
     fun addCacheTweet(username: String, tweet: Tweet) {
         if (!cacheTweet.containsKey(username)) {
             cacheTweet[username] = LinkedList()
