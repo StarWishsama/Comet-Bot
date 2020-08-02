@@ -46,6 +46,11 @@ class TwitterCommand : ChatCommand {
                         val list = GroupConfigManager.getConfigSafely(id).twitterSubscribers
                         if (list.isEmpty()) "没有订阅任何蓝鸟用户".toMsgChain() else list.toString().toMsgChain()
                     }
+                    "push" -> {
+                        val switch = GroupConfigManager.getConfigSafely(id).twitterPushEnabled
+                        GroupConfigManager.getConfigSafely(id).twitterPushEnabled = !switch
+                        return BotUtil.sendMessage("蓝鸟动态推送已${if (switch) "开启" else "关闭"}")
+                    }
                     else -> getHelp().toMsgChain()
                 }
             }
