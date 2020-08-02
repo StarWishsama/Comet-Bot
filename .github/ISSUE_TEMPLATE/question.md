@@ -1,5 +1,5 @@
 ---
-name: 问题
+name: 疑问 / 帮助
 about: 提出关于 Comet-Bot 使用问题或其他问题
 title: ''
 labels: question
