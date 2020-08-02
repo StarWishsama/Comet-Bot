@@ -20,7 +20,7 @@ object BiliLiveChecker : CometPusher {
     override fun retrieve() {
         val readyToRetrieveList = mutableMapOf<Long, LinkedList<Long>>()
 
-        BotVariables.perGroup.forEach { cfg ->
+        BotVariables.perGroup.parallelStream().forEach { cfg ->
             cfg.biliSubscribers.forEach { roomId ->
                 if (readyToRetrieveList.containsKey(roomId)) {
                     readyToRetrieveList[roomId]?.add(cfg.id)
@@ -55,7 +55,7 @@ object BiliLiveChecker : CometPusher {
             }
 
             val msg = "单推助手 > \n${data?.uid?.let { BiliBiliApi.getUserNameByMid(it) }} 开播了!" +
-                    "\n标题: ${data?.title}" +
+                    "\n直播间标题: ${data?.title}" +
                     "\n开播时间: ${data?.liveTime}" +
                     "\n传送门: https://live.bilibili.com/${data?.roomId}"
 
@@ -64,7 +64,7 @@ object BiliLiveChecker : CometPusher {
                     runBlocking {
                         val group = BotVariables.bot.getGroup(groupId)
                         group.sendMessage(msg)
-                        delay(2_000)
+                        delay(1_500)
                     }
                 }
             }
