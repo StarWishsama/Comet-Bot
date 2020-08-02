@@ -3,6 +3,7 @@
 一个基于 [Mirai-Core](https://github.com/mamoe/mirai) 开发的机器人
 
 本项目处于开发阶段, 部分功能可能无法使用 (除了写在下面的功能) ~~反正也没人用~~
+**一切开发旨在学习，请勿用于非法用途**
 
 English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/README_en.md)
 
@@ -26,9 +27,9 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
 * 去你大爷的小程序 (将小程序转换为文本)
 * 单推小助手 
   - 支持订阅 bilibili 用户动态/开播提醒
-  - 支持订阅 Twitter 最新推文
+  - 支持订阅蓝🐦用户最新消息
 * rCon 功能, 支持连接到可以使用 rCon 的游戏服务器
-* 查询 Twitter 用户信息/推文
+* 查询蓝🐦用户信息/推文
 * 自动推送最新推文到指定群聊
 * 禁言/踢出群员
 * 还在开发中...
@@ -59,4 +60,26 @@ git clone https://github.com/StarWishsama/Comet-Bot.git
 3. 重新启动 Bot, 提示启动完成后就可以开始使用了!
 
 ## 📜 协议 
+**一切开发旨在学习，请勿用于非法用途**
+**本项目禁止进行被二次分发为进行违反中华人民共和国法律法规的行为**
+使用前必须查看 [](https://github.com/mamoe/mirai#%E8%AE%B8%E5%8F%AF%E8%AF%81)
 [AGPL v3.0](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE)
+
+------
+
+    Copyright (C) 2018-2020 StarWishsama
+    
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+    
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+    
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
