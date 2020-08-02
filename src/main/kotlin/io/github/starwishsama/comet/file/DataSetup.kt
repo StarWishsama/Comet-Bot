@@ -138,6 +138,7 @@ object DataSetup {
         BotVariables.logger.info("[Bot] 自动保存数据完成")
         saveCfg()
         saveLang()
+        savePerGroupSetting()
     }
 
     fun reload() {

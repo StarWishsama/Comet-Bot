@@ -22,9 +22,10 @@ import kotlinx.coroutines.withContext
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
-import net.mamoe.mirai.contact.BotIsBeingMutedException
+import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.join
+import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.PlatformLogger
@@ -217,6 +218,8 @@ suspend fun main() {
         BotVariables.bot.subscribeMessages {
             always {
                 if (BotVariables.switch && sender.id != 80000000L) {
+                    if (this is GroupMessageEvent && group.isBotMuted) return@always
+
                     val result = MessageHandler.execute(this)
                     try {
                         if (result.msg !is EmptyMessageChain && result.msg.isNotEmpty()) {
@@ -224,8 +227,6 @@ suspend fun main() {
                         }
                     } catch (e: IllegalArgumentException) {
                         BotVariables.logger.warning("正在尝试发送空消息, 执行结果 $result")
-                    } catch (ignored: BotIsBeingMutedException) {
-                        // 机器人已被禁言, 此时不处理任何命令
                     }
                 }
             }

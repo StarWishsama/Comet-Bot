@@ -4,7 +4,7 @@ import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.contact.BotIsBeingMutedException
+import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
@@ -15,12 +15,8 @@ object RepeatListener : NListener {
     override fun register(bot: Bot) {
         bot.subscribeGroupMessages {
             always {
-                if (BotVariables.switch) {
-                    try {
-                        handleRepeat(this, RandomUtil.randomDouble())
-                    } catch (e: BotIsBeingMutedException) {
-                        BotVariables.logger.debug("[监听器] 机器人已被禁言, ${e.message}")
-                    }
+                if (BotVariables.switch && !group.isBotMuted) {
+                    handleRepeat(this, RandomUtil.randomDouble())
                 }
             }
         }
