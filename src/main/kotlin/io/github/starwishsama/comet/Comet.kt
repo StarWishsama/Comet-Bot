@@ -22,6 +22,7 @@ import kotlinx.coroutines.withContext
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
+import net.mamoe.mirai.contact.BotIsBeingMutedException
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.join
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -162,30 +163,31 @@ suspend fun main() {
         )
 
         MessageHandler.setupCommand(
-            arrayOf(
-                AdminCommand(),
-                BiliBiliCommand(),
-                CheckInCommand(),
-                ClockInCommand(),
-                io.github.starwishsama.comet.commands.subcommands.chats.DebugCommand(),
-                DivineCommand(),
-                GachaCommand(),
-                GuessNumberCommand(),
-                    HelpCommand(),
-                    InfoCommand(),
-                    MusicCommand(),
-                    MuteCommand(),
-                    PictureSearch(),
-                    R6SCommand(),
-                    RConCommand(),
-                    KickCommand(),
-                    TwitterCommand(),
-                    VersionCommand(),
-                    GroupConfigCommand(),
-                    // Console Command
-                    StopCommand(),
-                    DebugCommand()
-            )
+                arrayOf(
+                        AdminCommand(),
+                        BiliBiliCommand(),
+                        CheckInCommand(),
+                        ClockInCommand(),
+                        io.github.starwishsama.comet.commands.subcommands.chats.DebugCommand(),
+                        DivineCommand(),
+                        GachaCommand(),
+                        GuessNumberCommand(),
+                        HelpCommand(),
+                        InfoCommand(),
+                        MusicCommand(),
+                        MuteCommand(),
+                        PictureSearch(),
+                        R6SCommand(),
+                        RConCommand(),
+                        KickCommand(),
+                        TwitterCommand(),
+                        VersionCommand(),
+                        GroupConfigCommand(),
+                        // Console Command
+                        StopCommand(),
+                        DebugCommand(),
+                        io.github.starwishsama.comet.commands.subcommands.console.AdminCommand()
+                )
         )
 
         BotVariables.logger.info("[命令] 已注册 " + MessageHandler.countCommands() + " 个命令")
@@ -222,6 +224,8 @@ suspend fun main() {
                         }
                     } catch (e: IllegalArgumentException) {
                         BotVariables.logger.warning("正在尝试发送空消息, 执行结果 $result")
+                    } catch (ignored: BotIsBeingMutedException) {
+                        // 机器人已被禁言, 此时不处理任何命令
                     }
                 }
             }

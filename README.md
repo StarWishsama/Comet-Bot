@@ -2,6 +2,8 @@
 
 一个基于 [Mirai-Core](https://github.com/mamoe/mirai) 开发的机器人
 
+项目名来源于 [星街彗星 (Hoshimati Suisei)](https://zh.moegirl.org.cn/%E6%98%9F%E8%A1%97%E5%BD%97%E6%98%9F)
+
 本项目处于开发阶段, 部分功能可能无法使用 (除了写在下面的功能) ~~反正也没人用~~
 
 **一切开发旨在学习，请勿用于非法用途**
