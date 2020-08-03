@@ -26,31 +26,31 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
 data class Tweet(
-    @SerializedName("created_at")
+        @SerializedName("created_at")
         val postTime: String,
-    val id: Long,
-    @SerializedName("id_str")
+        val id: Long,
+        @SerializedName("id_str")
         val idAsString: String,
-    @SerializedName("full_text")
+        @SerializedName("full_text")
         val text: String,
-    val truncated: Boolean,
-    val entities: JsonObject?,
-    val source: String,
-    @SerializedName("in_reply_to_status_id")
-    val replyTweetId: Long?,
-    val user: TwitterUser,
-    @SerializedName("retweeted_status")
-    val retweetStatus: ReTweet?,
-    @SerializedName("retweet_count")
-    val retweetCount: Long,
-    @SerializedName("favorite_count")
-    val likeCount: Long?,
-    @SerializedName("possibly_sensitive")
-    val sensitive: Boolean,
-    @SerializedName("quoted_status")
-    val quotedStatus: Tweet?,
-    @SerializedName("is_quote_status")
-    val isQuoted: Boolean
+        val truncated: Boolean,
+        val entities: JsonObject?,
+        val source: String,
+        @SerializedName("in_reply_to_status_id")
+        val replyTweetId: Long?,
+        val user: TwitterUser,
+        @SerializedName("retweeted_status")
+        val retweetStatus: ReTweet?,
+        @SerializedName("retweet_count")
+        val retweetCount: Long,
+        @SerializedName("favorite_count")
+        val likeCount: Long?,
+        @SerializedName("possibly_sensitive")
+        val sensitive: Boolean?,
+        @SerializedName("quoted_status")
+        val quotedStatus: Tweet?,
+        @SerializedName("is_quote_status")
+        val isQuoted: Boolean
 ) {
     @ExperimentalTime
     fun getFullText(): String {
