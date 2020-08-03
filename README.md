@@ -1,2 +1,1 @@
-# Nameless-Bot
-A QQ Group bot developed with CoolQ.
+欲查看 Vtuber 相关信息, 建议使用 https://github.com/dd-center/vtbs.moe
