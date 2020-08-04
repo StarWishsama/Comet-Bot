@@ -72,6 +72,7 @@ class BiliBiliCommand : ChatCommand {
         /bili sub [用户名] 订阅用户相关信息
         /bili unsub [用户名] 取消订阅用户相关信息
         /bili info [用户名] 查看用户的动态
+        /bili push 开启/关闭本群开播推送
     """.trimIndent()
 
     private suspend fun advancedSubscribe(user: BotUser, args: List<String>, event: MessageEvent): MessageChain {

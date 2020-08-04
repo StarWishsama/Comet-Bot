@@ -11,6 +11,9 @@ import java.util.*
 import java.util.stream.Collectors
 
 object DrawUtil {
+    /**
+     * 明日方舟
+     */
     private fun tenTimeDrawAr(): List<ArkNightOperator> {
         val ops: MutableList<ArkNightOperator> = ArrayList()
         for (i in 0..9) {
@@ -40,50 +43,6 @@ object DrawUtil {
             }
         }
         return tempOps[RandomUtil.randomInt(1, tempOps.size)]
-    }
-
-    private const val R3 = 25
-    private const val R2 = 200
-    private const val R1 = 775
-
-    private fun drawPCR(): PCRCharacter {
-        val chance = RandomUtil.randomInt(0, R1 + R2 + R3)
-        return when {
-            chance <= R3 -> {
-                getCharacter(3)
-            }
-            chance <= R2 + R3 -> {
-                getCharacter(2)
-            }
-            else -> {
-                getCharacter(1)
-            }
-        }
-    }
-
-    private fun tenTimesDrawPCR(): List<PCRCharacter> {
-        val result: MutableList<PCRCharacter> = LinkedList()
-        for (i in 0..9) {
-            result.add(drawPCR())
-        }
-        for (i in result.indices) {
-            if (result[i].star > 2) {
-                break
-            } else if (i == result.size - 1 && result[i].star < 2) {
-                result[i] = getCharacter(2)
-            }
-        }
-        return result
-    }
-
-    private fun getCharacter(rare: Int): PCRCharacter {
-        val temp: MutableList<PCRCharacter> = LinkedList()
-        for (c in BotVariables.pcr) {
-            if (c.star == rare) {
-                temp.add(c)
-            }
-        }
-        return temp[RandomUtil.randomInt(0, 1.coerceAtLeast(temp.size))]
     }
 
     fun getArkDrawResult(user: BotUser, time: Int): String {
@@ -140,6 +99,54 @@ object DrawUtil {
         } else {
             return overTimeMessage
         }
+    }
+
+    /**
+     * 公主连结
+     */
+
+    private const val R3 = 25
+    private const val R2 = 200
+    private const val R1 = 775
+
+    private fun drawPCR(): PCRCharacter {
+        val chance = RandomUtil.randomInt(0, R1 + R2 + R3)
+        return when {
+            chance <= R3 -> {
+                getCharacter(3)
+            }
+            chance <= R2 + R3 -> {
+                getCharacter(2)
+            }
+            else -> {
+                getCharacter(1)
+            }
+        }
+    }
+
+    private fun tenTimesDrawPCR(): List<PCRCharacter> {
+        val result: MutableList<PCRCharacter> = LinkedList()
+        for (i in 0..9) {
+            result.add(drawPCR())
+        }
+        for (i in result.indices) {
+            if (result[i].star > 2) {
+                break
+            } else if (i == result.size - 1 && result[i].star < 2) {
+                result[i] = getCharacter(2)
+            }
+        }
+        return result
+    }
+
+    private fun getCharacter(rare: Int): PCRCharacter {
+        val temp: MutableList<PCRCharacter> = LinkedList()
+        for (c in BotVariables.pcr) {
+            if (c.star == rare) {
+                temp.add(c)
+            }
+        }
+        return temp[RandomUtil.randomInt(0, 1.coerceAtLeast(temp.size))]
     }
 
     fun getPCRResult(user: BotUser, time: Int): String {

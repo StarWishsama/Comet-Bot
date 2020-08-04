@@ -170,5 +170,6 @@ class TwitterCommand : ChatCommand {
         /twit info [蓝鸟ID] 查询账号信息
         /twit sub [蓝鸟ID] 订阅用户的推文
         /twit unsub [蓝鸟ID] 取消订阅用户的推文
+        /twit push 开启/关闭本群推文推送
     """.trimIndent()
 }

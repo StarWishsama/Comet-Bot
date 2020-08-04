@@ -8,7 +8,7 @@ import java.util.*
  * @author Nameless
  */
 open class Session(open var groupId: Long = 0, var command: ChatCommand) {
-    var users: List<SessionUser> = LinkedList<SessionUser>()
+    var users: List<SessionUser> = LinkedList()
 
     constructor(command: ChatCommand, id: Long) : this(0, command) {
         putUser(id)

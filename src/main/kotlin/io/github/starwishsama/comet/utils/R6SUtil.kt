@@ -4,6 +4,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.enums.R6Rank
 import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6Player
 import java.text.NumberFormat
@@ -32,7 +33,7 @@ object R6SUtil {
                 }
             }
         } catch (e: Exception) {
-            BotVariables.logger.warning("在获取 R6 玩家时出现了问题: ", e)
+            logger.warning("在获取 R6 玩家时出现了问题: ", e)
         }
         return null
     }
@@ -45,18 +46,18 @@ object R6SUtil {
                     num.maximumIntegerDigits = 3
                     num.maximumFractionDigits = 2
                     var response = String.format(
-                        infoText,
-                        p.player?.playerName,
-                        p.stats?.level,
-                        p.ranked?.asRank?.let { R6Rank.getRank(it).rankName },
-                        String.format("%.2f", p.stats?.generalKd),
-                        num.format(
-                            p.stats?.generalKills?.toDouble()?.let { p.stats?.generalHeadShot?.div(it) }
-                        )
+                            infoText,
+                            p.player?.playerName,
+                            p.stats?.level,
+                            p.ranked?.asRank?.let { R6Rank.getRank(it).rankName },
+                            p.stats?.generalKd,
+                            num.format(
+                                    p.stats?.generalKills?.toDouble()?.let { p.stats?.generalHeadShot?.div(it) }
+                            )
                     )
-                    response = if (p.ranked?.asRank?.let { R6Rank.getRank(it) } !== R6Rank.UNRANKED) {
+                    response = if (p.ranked?.asRank?.let { R6Rank.getRank(it) } != R6Rank.UNRANKED) {
                         response.replace(
-                            "current".toRegex(), p.ranked?.asMMR
+                                "current".toRegex(), p.ranked?.asMMR
                                 .toString() + ""
                         )
                     } else {
@@ -74,7 +75,7 @@ object R6SUtil {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            logger.warning("[R6] 在获取 R6 玩家信息时出现错误", e)
             return "在获取时发生了问题"
         }
         return "找不到此账号"

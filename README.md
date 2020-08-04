@@ -65,7 +65,7 @@ git clone https://github.com/StarWishsama/Comet-Bot.git
 ## 📜 协议 
 **一切开发旨在学习，请勿用于非法用途**
 
-**本项目禁止进行被二次分发为进行违反中华人民共和国法律法规的行为**
+**本项目禁止被用于进行违反中华人民共和国法律法规的行为**
 
 [AGPL v3.0](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE)
 

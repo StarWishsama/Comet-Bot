@@ -144,8 +144,12 @@ object TwitterApi : ApiExecutor {
         val request = NetUtil.doHttpRequestGet("$twitterApiUrl/statuses/show.json?id=$id&tweet_mode=extended", 5_000).header("authorization", "Bearer $token")
         val response = request.executeAsync()
 
-        if (response.isOk && response.isType(ContentType.JSON.value)) {
-            return parseJsonToTweet(response.body())
+        try {
+            if (response.isOk && response.isType(ContentType.JSON.value)) {
+                return parseJsonToTweet(response.body())
+            }
+        } catch (t: Throwable) {
+            FileUtil.createErrorReportFile("twitter", t, response.body(), request.url)
         }
 
         return null

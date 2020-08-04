@@ -31,7 +31,7 @@ class GroupConfigCommand : ChatCommand {
                                     BotUtil.sendMessage("成功将 ${target.id} 移出群助手列表")
                                 }
                             } else {
-                                BotUtil.sendMessage("找不到你想要添加的用户")
+                                BotUtil.sendMessage("找不到你想要添加/删除的用户")
                             }
                         } else {
                             BotUtil.sendMessage(getHelp())
@@ -67,6 +67,6 @@ class GroupConfigCommand : ChatCommand {
     """.trimIndent()
 
     private fun hasPermission(user: BotUser, permission: MemberPermission): Boolean {
-        return permission >= MemberPermission.ADMINISTRATOR || user.isBotOwner()
+        return user.isBotOwner() || permission != MemberPermission.OWNER
     }
 }

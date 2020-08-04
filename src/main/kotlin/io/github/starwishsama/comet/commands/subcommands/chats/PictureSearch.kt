@@ -28,11 +28,16 @@ class PictureSearch : ChatCommand, SuspendCommand {
                 }
                 return BotUtil.sendMsgPrefix("请发送需要搜索的图片").toMsgChain()
             } else if (args[0].contentEquals("source") && args.size > 1) {
-                try {
+                return try {
                     val api = PicSearchApi.valueOf(args[1].toUpperCase(Locale.ROOT))
                     BotVariables.cfg.pictureSearchApi = api
+                    BotUtil.sendMessage("已切换识图 API 为 ${api.name}", true)
                 } catch (e: Throwable) {
-                    return BotUtil.sendMessage("该识图 API 不存在, 可用的 API 名称: ${PicSearchApi.values()}", true)
+                    var type = ""
+                    PicSearchApi.values().forEach {
+                        type = type + it.name + " " + it.desc + "\n"
+                    }
+                    BotUtil.sendMessage("该识图 API 不存在, 可用的 API 类型:\n ${type.trim()}", true)
                 }
             }
         }
@@ -50,6 +55,7 @@ class PictureSearch : ChatCommand, SuspendCommand {
     override fun getHelp(): String = """
         ======= 命令帮助 =======
         /ytst 以图搜图
+        /ytst source [API名称] 修改搜图源
     """.trimIndent()
 
     override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {

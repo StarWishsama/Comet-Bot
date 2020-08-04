@@ -5,36 +5,38 @@ import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.getLocalMessage
 import io.github.starwishsama.comet.utils.BotUtil.isLegitId
 import io.github.starwishsama.comet.utils.BotUtil.isNoCoolDown
 import io.github.starwishsama.comet.utils.R6SUtil.getR6SInfo
-import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.at
+import java.util.*
 
 class R6SCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (isNoCoolDown(event.sender.id) && event is GroupMessageEvent) {
             if (args.isEmpty()) {
-                return (getLocalMessage("msg.bot-prefix") + "/r6s info [Uplay账号名]").toMsgChain()
+                return BotUtil.sendMessage(getHelp(), true)
             } else {
-                when (args[0].toLowerCase()) {
+                when (args[0].toLowerCase(Locale.ROOT)) {
                     "info", "查询" -> {
-                        var r6Account = user.r6sAccount
-                        if (r6Account == null && args.size > 1 && isLegitId(args[1])) {
-                            r6Account = args[1]
+                        val account = user.r6sAccount
+                        return if (args.size <= 1 && account != null) {
+                            event.reply(BotUtil.sendMsgPrefix("查询中..."))
+                            val result = getR6SInfo(account)
+                            event.sender.at() + ("\n" + result)
                         } else {
-                            return ("${getLocalMessage("msg.bot-prefix")} /r6 查询 [ID] 或者 /r6 绑定 [id]\n" +
-                                    "绑定彩虹六号账号 无需输入ID快捷查询游戏数据").toMsgChain()
+                            if (isLegitId(args[1])) {
+                                event.reply(BotUtil.sendMsgPrefix("查询中..."))
+                                val result = getR6SInfo(args[1])
+                                event.sender.at() + ("\n" + result)
+                            } else {
+                                BotUtil.sendMessage("你输入的 ID 名不符合育碧用户名规范!")
+                            }
                         }
-
-                        event.reply(BotUtil.sendMsgPrefix("查询中..."))
-                        val result = getR6SInfo(r6Account)
-                        return event.sender.at() + ("\n" + result)
                     }
                     "bind", "绑定" ->
                         if (args[1].isNotEmpty() && args.size > 1) {
@@ -42,14 +44,14 @@ class R6SCommand : ChatCommand {
                                 val botUser1 = BotUser.getUser(event.sender.id)
                                 if (botUser1 != null) {
                                     botUser1.r6sAccount = args[1]
-                                    return (getLocalMessage("msg.bot-prefix") + "绑定成功!").toMsgChain()
+                                    return BotUtil.sendMessage("绑定成功!")
                                 }
                             } else {
-                                return (getLocalMessage("msg.bot-prefix") + "ID 格式有误!").toMsgChain()
+                                return BotUtil.sendMessage("ID 格式有误!")
                             }
                         }
                     else -> {
-                        return (getLocalMessage("msg.bot-prefix") + "/r6s info [Uplay账号名]").toMsgChain()
+                        return BotUtil.sendMessage("/r6s info [Uplay账号名]")
                     }
                 }
             }
