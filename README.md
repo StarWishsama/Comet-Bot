@@ -1,7 +1,5 @@
 ## 彗星 Bot (Comet)
 
-一个基于 [Mirai-Core](https://github.com/mamoe/mirai) 开发的机器人
-
 项目名来源于 [星街彗星 (Hoshimati Suisei)](https://zh.moegirl.org.cn/%E6%98%9F%E8%A1%97%E5%BD%97%E6%98%9F)
 
 本项目处于开发阶段, 部分功能可能无法使用 (除了写在下面的功能) ~~反正也没人用~~
@@ -54,20 +52,17 @@ git clone https://github.com/StarWishsama/Comet-Bot.git
 
 1.2. 编译
 
-本项目使用 Gradle, 因此你可以双击文件夹中的 `gradlew.bat` 以构建这个项目.
-(你可以在 `/build/libs` 下找到构建好的 jar 文件)
+本项目使用 Gradle 作为包管理系统, 还使用了 ShadowJar 引入依赖, 请自行搜索 Gradle 如何打包
 
-### 直接下载
-1. 到项目的 releases 页面下载最新版本的 jar
-2. 使用 cmd 启动 Bot, 然后去 config.json 下面填写账号密码
-3. 重新启动 Bot, 提示启动完成后就可以开始使用了!
+2. 使用 cmd 启动 Bot, 按照提示登录
+3. 提示启动完成后就可以开始使用了
 
 ## 📜 协议 
 **一切开发旨在学习，请勿用于非法用途**
 
 **本项目禁止被用于进行违反中华人民共和国法律法规的行为**
 
-[AGPL v3.0](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE)
+本项目使用 [AGPL v3.0](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE) 协议
 
 ------
 

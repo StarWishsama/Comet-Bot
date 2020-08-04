@@ -1,6 +1,6 @@
 # Comet-Bot
 
-A QQ Group bot developed in [Mirai-Core](https://github.com/mamoe/mirai).
+Just a bot.
 
 This bot is under heavy develop now, Many feature may not work as well.
 
@@ -19,8 +19,7 @@ This bot is under heavy develop now, Many feature may not work as well.
 ## 🎉 Features
 * Search picture original source by picture
 * Rainbow Six: Siege game data info lookup
-* Class clock in
-* Check-in
+* Clock in & Check-In
 * Bilibili user info/dynamic/streaming notice
 * Search music and share as LightApp style
 * Arknights / PCR draw simulator
