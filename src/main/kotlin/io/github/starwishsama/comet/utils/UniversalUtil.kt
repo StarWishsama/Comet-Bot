@@ -1,10 +1,12 @@
 package io.github.starwishsama.comet.utils
 
+import cn.hutool.core.io.IORuntimeException
 import cn.hutool.http.HttpResponse
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.coolDown
+import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotAdmin
@@ -336,5 +338,27 @@ object BotUtil {
 
     fun isValidJson(element: JsonElement): Boolean {
         return element.isJsonObject || element.isJsonArray
+    }
+
+    fun executeWithRetry(task: () -> Unit, retryTime: Int, message: String) {
+        if (retryTime >= 5) return
+
+        var initRetryTime = 0
+        fun runTask(): () -> Unit = {
+            try {
+                if (initRetryTime <= retryTime) {
+                    task()
+                }
+            } catch (t: Throwable) {
+                if (t is IORuntimeException) {
+                    initRetryTime++
+                    runTask()()
+                } else {
+                    logger.warning(message, t)
+                }
+            }
+        }
+
+        runTask()()
     }
 }

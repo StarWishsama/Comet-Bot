@@ -21,15 +21,21 @@ data class SearchVideoResult(
     ) {
         data class VideoId(val kind: String, val videoId: String)
         data class Snippet(
+                /** 发布/开播时间 */
                 val publishedAt: String,
+                /** 频道ID */
                 val channelId: String,
                 @SerializedName("title")
+                /** 视频/直播标题 */
                 val videoTitle: String,
                 @SerializedName("description")
+                /** 视频/直播信息 */
                 val desc: String,
+                /** 视频/直播封面 */
                 val thumbnails: JsonObject,
                 val channelTitle: String,
                 @SerializedName("liveBroadcastContent")
+                /** 视频类型 */
                 val contentType: String,
                 val publishTime: String
         ) {

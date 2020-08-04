@@ -183,7 +183,7 @@ object Comet {
 
         bot.subscribeMessages {
             always {
-                if (BotVariables.switch && sender.id != 80000000L) {
+                if (sender.id != 80000000L) {
                     if (this is GroupMessageEvent && group.isBotMuted) return@always
 
                     val result = MessageHandler.execute(this)

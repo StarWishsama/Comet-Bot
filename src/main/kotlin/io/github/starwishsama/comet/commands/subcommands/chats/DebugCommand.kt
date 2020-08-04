@@ -9,6 +9,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.pojo.youtube.VideoType
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.utils.BotUtil
@@ -71,9 +72,15 @@ class DebugCommand : ChatCommand {
                 }
                 "youtube" -> {
                     if (args.size > 1) {
-                        val result = YoutubeApi.getChannelVideos(args[1], 1)
-                        if (result != null) {
-                            return result.items[0].toString().toMsgChain()
+                        val result = YoutubeApi.getChannelVideos(args[1], 10)
+                        result?.items?.forEach {
+                            if (it.snippet.getType() == VideoType.STREAMING) {
+                                return """
+                                    ${it.snippet.videoTitle}
+                                    ${it.snippet.desc}
+                                    ${it.snippet.publishTime}
+                                """.trimIndent().toMsgChain()
+                            }
                         }
                     }
                 }

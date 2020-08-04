@@ -54,9 +54,13 @@ object FileUtil {
 
     fun getCacheFolder(): File = getChildFolder("cache")
 
-    fun getErrorReportFolder(): File = getChildFolder("error-reports")
+    private fun getErrorReportFolder(): File = getChildFolder("error-reports")
 
     fun createErrorReportFile(type: String, t: Throwable, content: String, url: String) {
+        createErrorReportFile("发生了一个错误", type, t, content, url)
+    }
+
+    fun createErrorReportFile(reason: String, type: String, t: Throwable, content: String, url: String) {
         val fileName = "$type-${dateFormatter.format(LocalDateTime.now())}.txt"
         val location = File(getErrorReportFolder(), fileName)
         if (location.exists()) return
@@ -65,7 +69,7 @@ object FileUtil {
 
         val report = "Error occurred:\nRequested url: $url\n${getBeautyStackTrace(t)}\n\nRaw content:\n$content"
         location.writeString(report)
-        BotVariables.logger.debug("错误报告已生成! 保存在 ${location.path}")
+        BotVariables.logger.debug("$reason, 错误报告已生成! 保存在 ${location.path}")
     }
 
     fun initLog() {

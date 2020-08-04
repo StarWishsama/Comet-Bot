@@ -83,38 +83,46 @@ object MessageHandler {
         val senderId = event.sender.id
         val message = event.message.contentToString()
         val cmd = getCommand(getCommandName(message))
-        try {
-            if (SessionManager.isValidSessionById(senderId)) {
-                handleSession(event, executedTime)
-            }
 
-            if (isCommandPrefix(message)) {
-                if (cmd != null) {
-                    val splitMessage = message.split(" ")
-                    BotVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.getProps().name}")
-                    var user = BotUser.getUser(senderId)
-                    if (user == null) {
-                        user = BotUser.quickRegister(senderId)
-                    }
+        if (BotVariables.switch || (cmd != null && cmd.getProps().name.contentEquals("debug"))) {
+            try {
+                if (SessionManager.isValidSessionById(senderId)) {
+                    handleSession(event, executedTime)
+                }
 
-                    val result: MessageChain =
-                        if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
-                            doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size), user))
-                        } else {
-                            BotUtil.sendMsgPrefix("你没有权限!").toMsgChain()
+                if (isCommandPrefix(message)) {
+                    if (cmd != null) {
+                        val splitMessage = message.split(" ")
+                        BotVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.getProps().name}")
+                        var user = BotUser.getUser(senderId)
+                        if (user == null) {
+                            user = BotUser.quickRegister(senderId)
                         }
 
-                    val usedTime = Duration.between(executedTime, LocalDateTime.now())
-                    BotVariables.logger.debug(
-                            "[命令] 命令执行耗时 ${usedTime.toKotlinDuration().asHumanReadable}"
-                    )
+                        val result: MessageChain =
+                                if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
+                                    doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size), user))
+                                } else {
+                                    BotUtil.sendMsgPrefix("你没有权限!").toMsgChain()
+                                }
 
-                    return ExecutedResult(result, cmd)
+                        val usedTime = Duration.between(executedTime, LocalDateTime.now())
+                        BotVariables.logger.debug(
+                                "[命令] 命令执行耗时 ${usedTime.toKotlinDuration().asHumanReadable}"
+                        )
+
+                        return ExecutedResult(result, cmd)
+                    }
+                }
+            } catch (t: Throwable) {
+                val msg = t.message
+                return if (msg != null && msg.contains("times out")) {
+                    ExecutedResult("Bot > 在执行网络操作时连接超时".toMsgChain(), cmd)
+                } else {
+                    BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId", t)
+                    ExecutedResult("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain(), cmd)
                 }
             }
-        } catch (t: Throwable) {
-            BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId", t)
-            return ExecutedResult("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain(), cmd)
         }
         return ExecutedResult(EmptyMessageChain, cmd)
     }

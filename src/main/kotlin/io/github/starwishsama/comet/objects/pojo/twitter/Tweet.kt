@@ -42,7 +42,7 @@ data class Tweet(
         @SerializedName("retweeted_status")
         val retweetStatus: ReTweet?,
         @SerializedName("retweet_count")
-        val retweetCount: Long,
+        val retweetCount: Long?,
         @SerializedName("favorite_count")
         val likeCount: Long?,
         @SerializedName("possibly_sensitive")
@@ -55,8 +55,8 @@ data class Tweet(
     @ExperimentalTime
     fun getFullText(): String {
         val duration =
-            Duration.between(getSentTime(), LocalDateTime.now())
-        val extraText = "\n❤ ${likeCount}\n\n距离发送已过去了 ${duration.toKotlinDuration().toFriendly(TimeUnit.DAYS)}"
+                Duration.between(getSentTime(), LocalDateTime.now())
+        val extraText = "\n❤${likeCount}|\uD83D\uDD01${retweetCount}\n\n距离发送已过去了 ${duration.toKotlinDuration().toFriendly(TimeUnit.DAYS)}"
 
         if (isQuoted && quotedStatus != null) {
             return "对于 ${quotedStatus.user.name} 的推文\n${quotedStatus.text}\n\n${user.name} 进行了评论\n$text" + extraText
