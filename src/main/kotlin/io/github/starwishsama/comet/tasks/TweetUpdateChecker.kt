@@ -23,7 +23,7 @@ object TweetUpdateChecker : CometPusher {
 
     @ExperimentalTime
     override fun retrieve() {
-        if (!bot.isOnline) future.cancel(true)
+        if (!bot.isOnline) future.cancel(false)
 
         /** 检查是否有 Twitter Token, 如无则手动获取 */
         if (TwitterApi.token.isNullOrEmpty()) {

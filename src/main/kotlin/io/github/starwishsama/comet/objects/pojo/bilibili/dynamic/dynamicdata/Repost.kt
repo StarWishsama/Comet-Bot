@@ -31,23 +31,28 @@ data class Repost(@SerializedName("origin")
     }
 
     override suspend fun getContact(): WrappedMessage {
-        return WrappedMessage(("转发了 ${if (item?.isDeleted()!!) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item?.content}\n" +
-                "原动态信息: ${item?.originType?.let { getOriginalDynamic(originDynamic, it) }}"))
+        val originalDynamic = item?.originType?.let { getOriginalDynamic(originDynamic, it) }
+                ?: return WrappedMessage("源动态已被删除")
+        val repostPicture = originalDynamic.picture
+        val msg = WrappedMessage(("转发了 ${if (item?.isDeleted()!!) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item?.content}\n" +
+                "原动态信息: \n${originalDynamic.text}"))
+        if (!repostPicture.isNullOrEmpty()) msg.plusImageUrl(repostPicture)
+        return msg
     }
 
-    private suspend fun getOriginalDynamic(contact: String, type: Int): String {
+    private suspend fun getOriginalDynamic(contact: String, type: Int): WrappedMessage {
         try {
             val dynamicType = DynamicTypeSelector.getType(type)
-            if (dynamicType.typeName != UnknownType::javaClass.name) {
+            if (dynamicType != UnknownType::class.java) {
                 val info = gson.fromJson(contact, dynamicType)
                 if (info != null) {
-                    return info.getContact().text ?: "没有动态"
+                    return info.getContact()
                 }
             }
-            return "无法解析此动态消息, 你还是另请高明吧"
+            return WrappedMessage("无法解析此动态消息, 你还是另请高明吧")
         } catch (e: Exception) {
-            BotVariables.logger.error("在处理时遇到了问题\n原动态内容: $contact\n动态类型: $type\n报错堆栈", e)
+            BotVariables.logger.error("在处理时遇到了问题\n原动态内容: $contact\n动态类型: $type", e)
         }
-        return "在获取时遇到了错误"
+        return WrappedMessage("在获取时遇到了错误")
     }
 }

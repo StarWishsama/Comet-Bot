@@ -16,7 +16,7 @@ object BiliLiveChecker : CometPusher {
     override lateinit var future: ScheduledFuture<*>
 
     override fun retrieve() {
-        if (!bot.isOnline) future.cancel(true)
+        if (!bot.isOnline) future.cancel(false)
 
         val collectedUsers = mutableSetOf<Long>()
 
