@@ -101,9 +101,9 @@ object MessageHandler {
 
                         val result: MessageChain =
                                 if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
-                                    doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size), user))
+                                    cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
                                 } else {
-                                    BotUtil.sendMsgPrefix("你没有权限!").toMsgChain()
+                                    BotUtil.sendMessage("你没有权限!")
                                 }
 
                         val usedTime = Duration.between(executedTime, LocalDateTime.now())
@@ -116,7 +116,7 @@ object MessageHandler {
                 }
             } catch (t: Throwable) {
                 val msg = t.message
-                return if (msg != null && msg.contains("times out")) {
+                return if (msg != null && msg.contains("time")) {
                     ExecutedResult("Bot > 在执行网络操作时连接超时".toMsgChain(), cmd)
                 } else {
                     BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId", t)
@@ -253,13 +253,13 @@ object MessageHandler {
         return false
     }
 
-    private fun doFilter(chain: MessageChain): MessageChain {
+    fun MessageChain.doFilter(): MessageChain {
         if (BotVariables.cfg.filterWords.isNullOrEmpty()) {
-            return chain
+            return this
         }
 
         val revampChain = LinkedList<SingleMessage>()
-        chain.forEach { revampChain.add(it) }
+        this.forEach { revampChain.add(it) }
 
         var count = 0
 

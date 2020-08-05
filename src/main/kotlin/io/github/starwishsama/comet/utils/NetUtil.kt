@@ -1,7 +1,9 @@
 package io.github.starwishsama.comet.utils
 
+import cn.hutool.core.io.IORuntimeException
 import cn.hutool.http.HttpException
 import cn.hutool.http.HttpRequest
+import cn.hutool.http.HttpResponse
 import cn.hutool.http.Method
 import io.github.starwishsama.comet.BotVariables
 import net.mamoe.mirai.contact.Contact
@@ -10,7 +12,6 @@ import net.mamoe.mirai.message.uploadAsImage
 import java.io.*
 import java.net.Proxy
 import java.net.Socket
-import java.net.SocketTimeoutException
 
 
 suspend fun InputStream.uploadAsImageSafely(type: String, contact: Contact): Image? {
@@ -24,18 +25,26 @@ suspend fun InputStream.uploadAsImageSafely(type: String, contact: Contact): Ima
     return null
 }
 
+fun HttpResponse.getContentLength(): Int {
+    return header("Content-Length").toIntOrNull() ?: -1
+}
+
 object NetUtil {
     const val defaultUA =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
 
-    fun getUrlInputStream(url: String): InputStream {
+    fun getUrlInputStream(url: String?): InputStream? {
+        if (url == null) return null
         return getUrlInputStream(url, 8000)
     }
 
-    fun getUrlInputStream(url: String, timeout: Int): InputStream {
-        val request = doHttpRequestGet(url, timeout)
+    fun getUrlInputStream(url: String, timeout: Int): InputStream? {
+        val response = doHttpRequestGet(url, timeout).executeAsync()
+        val length = response.getContentLength()
+        val bytes = response.bodyBytes()
+        if (bytes.size < length) return null
 
-        return request.execute().bodyStream()
+        return ByteArrayInputStream(bytes)
     }
 
     @Throws(HttpException::class)
@@ -99,7 +108,7 @@ object NetUtil {
             if (!file.delete()) {
                 BotVariables.logger.error("无法删除损坏文件: $fileName")
             }
-            if (e.cause is SocketTimeoutException) {
+            if (e.cause is IORuntimeException) {
                 BotVariables.logger.error("在下载时发生了错误: 连接超时")
                 return null
             }

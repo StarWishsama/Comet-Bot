@@ -19,9 +19,10 @@ object YoutubeApi : ApiExecutor {
     private const val maxResult = "&maxResults="
     private var init = false
 
-    fun init() {
+    private fun init() {
         if (BotVariables.cfg.youtubeApiKey.isNotEmpty()) {
-            searchApi = "https://www.googleapis.com/youtube/v3/search?key=${BotVariables.cfg.youtubeApiKey}&order=date&part=snippet,"
+            searchApi =
+                "https://www.googleapis.com/youtube/v3/search?key=${BotVariables.cfg.youtubeApiKey}&order=date&part=snippet,"
         }
         init = true
     }

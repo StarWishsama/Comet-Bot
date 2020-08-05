@@ -11,9 +11,9 @@ import net.mamoe.mirai.message.uploadAsImage
 data class WrappedMessage(var text: String?) {
     var picture: String? = null
 
-    suspend fun getPicture(contact: Contact): Image? {
+    private suspend fun getPicture(contact: Contact): Image? {
         if (picture != null) {
-            return picture?.let { NetUtil.getUrlInputStream(it).uploadAsImage(contact) }
+            return picture?.let { NetUtil.getUrlInputStream(it)?.uploadAsImage(contact) }
         }
         return null
     }

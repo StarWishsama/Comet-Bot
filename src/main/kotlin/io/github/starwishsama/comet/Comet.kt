@@ -7,6 +7,7 @@ import io.github.starwishsama.comet.api.bilibili.FakeClientApi
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.api.youtube.YoutubeApi
 import io.github.starwishsama.comet.commands.MessageHandler
+import io.github.starwishsama.comet.commands.MessageHandler.doFilter
 import io.github.starwishsama.comet.commands.subcommands.chats.*
 import io.github.starwishsama.comet.commands.subcommands.console.DebugCommand
 import io.github.starwishsama.comet.commands.subcommands.console.StopCommand
@@ -30,6 +31,7 @@ import net.mamoe.mirai.join
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.utils.BotConfiguration
+import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.PlatformLogger
 import java.time.Duration
 import java.time.LocalDateTime
@@ -121,6 +123,7 @@ object Comet {
         }
         config.heartbeatPeriodMillis = BotVariables.cfg.heartBeatPeriod * 60 * 1000
         config.fileBasedDeviceInfo()
+        config.fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
         bot = Bot(qq = qqId, password = password, configuration = config)
         bot.alsoLogin()
         BotVariables.logger = bot.logger
@@ -189,7 +192,7 @@ object Comet {
                     val result = MessageHandler.execute(this)
                     try {
                         if (result.msg !is EmptyMessageChain && result.msg.isNotEmpty()) {
-                            reply(result.msg)
+                            reply(result.msg.doFilter())
                         }
                     } catch (e: IllegalArgumentException) {
                         BotVariables.logger.warning("正在尝试发送空消息, 执行结果 $result")

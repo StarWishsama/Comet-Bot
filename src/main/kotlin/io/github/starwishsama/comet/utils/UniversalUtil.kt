@@ -8,6 +8,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.coolDown
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.enums.UserLevel
+import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotAdmin
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotOwner
@@ -340,25 +341,40 @@ object BotUtil {
         return element.isJsonObject || element.isJsonArray
     }
 
-    fun executeWithRetry(task: () -> Unit, retryTime: Int, message: String) {
-        if (retryTime >= 5) return
+    fun executeWithRetry(task: () -> Unit, retryTime: Int): TaskStatus {
+        var status = TaskStatus.TIMEOUT
+        if (retryTime >= 5) return TaskStatus.FAILED
 
         var initRetryTime = 0
         fun runTask(): () -> Unit = {
             try {
                 if (initRetryTime <= retryTime) {
                     task()
+                    status = TaskStatus.SUCCESS
                 }
             } catch (t: Throwable) {
-                if (t is IORuntimeException) {
-                    initRetryTime++
-                    runTask()()
-                } else {
-                    logger.warning(message, t)
+                when (t) {
+                    is IORuntimeException -> {
+                        initRetryTime++
+                        logger.debug("Retried failed, ${t.message}")
+                        runTask()()
+                    }
+                    is RateLimitException -> {
+                        status = TaskStatus.CUSTOMERROR
+                    }
+                    else -> {
+                        status = TaskStatus.FAILED
+                    }
                 }
             }
         }
 
         runTask()()
+
+        return status
+    }
+
+    enum class TaskStatus {
+        SUCCESS, FAILED, TIMEOUT, CUSTOMERROR
     }
 }

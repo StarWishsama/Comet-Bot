@@ -9,7 +9,7 @@ object YTBStreamChecker : CometPusher {
     override lateinit var future: ScheduledFuture<*>
 
     override fun retrieve() {
-        if (!BotVariables.bot.isOnline) future.cancel(false)
+        if (!BotVariables.bot.isOnline) future.cancel(true)
         TODO("Not yet implemented")
     }
 

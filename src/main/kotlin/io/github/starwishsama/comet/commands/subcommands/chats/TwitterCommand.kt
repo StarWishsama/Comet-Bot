@@ -6,24 +6,20 @@ import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.exceptions.EmptyTweetException
-import io.github.starwishsama.comet.exceptions.RateLimitException
-import io.github.starwishsama.comet.exceptions.TwitterApiException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.getRestString
+import io.github.starwishsama.comet.utils.NetUtil
 import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.MessageChain
-import java.net.ConnectException
-import java.net.SocketTimeoutException
-import javax.net.ssl.SSLException
+import net.mamoe.mirai.message.uploadAsImage
 import kotlin.time.ExperimentalTime
 
 class TwitterCommand : ChatCommand {
@@ -38,8 +34,9 @@ class TwitterCommand : ChatCommand {
                 getHelp().toMsgChain()
             } else {
                 val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
+
                 when (args[0]) {
-                    "info", "cx", "推文", "tweet", "查推" -> searchUser(args, event)
+                    "info", "cx", "推文", "tweet", "查推" -> getTweetToMessageChain(args, event)
                     "sub", "订阅" -> subscribeUser(args, id)
                     "unsub", "退订" -> unsubscribeUser(args, id)
                     "list" -> {
@@ -59,41 +56,40 @@ class TwitterCommand : ChatCommand {
     }
 
     @ExperimentalTime
-    private suspend fun searchUser(args: List<String>, event: MessageEvent): MessageChain {
-        if (args.size > 1) {
+    private suspend fun getTweetToMessageChain(args: List<String>, event: MessageEvent): MessageChain {
+        return if (args.size > 1) {
             event.quoteReply(BotUtil.sendMsgPrefix("正在查询, 请稍等"))
-            return try {
-                getTweetWithDesc(args.getRestString(1), event.subject)
-            } catch (e: RateLimitException) {
-                BotUtil.sendMessage("API 调用已达上限")
-            } catch (e: EmptyTweetException) {
-                BotUtil.sendMessage(e.message)
-            } catch (e: TwitterApiException) {
-                if (e.code == 34) {
-                    BotUtil.sendMessage("找不到此蓝鸟用户")
-                } else {
-                    BotVariables.logger.warning("[推文] 无法解析推文", e)
-                    BotUtil.sendMessage("无法获取到推文")
-                }
+            try {
+                if (args.size > 2) getTweetWithDesc(args[1], event.subject, args[2].toInt(), 1 + args[2].toInt())
+                else getTweetWithDesc(args[1], event.subject, 0, 1)
+            } catch (e: NumberFormatException) {
+                BotUtil.sendMessage("请输入有效数字")
             }
         } else {
-            return getHelp().toMsgChain()
+            getHelp().toMsgChain()
         }
     }
 
     @ExperimentalTime
-    private suspend fun getTweetWithDesc(name: String, subject: Contact): MessageChain {
-        val tweet: Tweet?
-        try {
-            tweet = TwitterApi.getTweetWithCache(name)
-        } catch (x: RuntimeException) {
-            return handleTimeout(x)
-        }
+    private suspend fun getTweetWithDesc(name: String, subject: Contact, index: Int = 1, max: Int = 10): MessageChain {
+        val response = TwitterApi.getCachedTweet(name, index, max)
+        val tweet: Tweet? = response.tweet
+        val status: BotUtil.TaskStatus = response.status
 
-        return if (tweet != null) {
-            BotUtil.sendMessage("\n${tweet.user.name}\n${tweet.getAsMessageChain(subject)}")
+        return if (tweet != null && status == BotUtil.TaskStatus.SUCCESS) {
+            val resultMessage = BotUtil.sendMessage("\n${tweet.user.name}\n${tweet.getFullText()}")
+            val imageUrl = tweet.getPictureUrl()
+            var image: Image? = null
+            if (imageUrl != null) image = NetUtil.getUrlInputStream(imageUrl)?.uploadAsImage(subject)
+
+            if (image != null) resultMessage + image else resultMessage
         } else {
-            BotUtil.sendMessage("获取到的推文为空")
+            when (status) {
+                BotUtil.TaskStatus.FAILED -> BotUtil.sendMessage("获取推文时出现了异常, 请联系管理员")
+                BotUtil.TaskStatus.TIMEOUT -> BotUtil.sendMessage("获取推文超时, 请稍后重试")
+                BotUtil.TaskStatus.CUSTOMERROR -> BotUtil.sendMessage("已达到蓝鸟 API 请求上限啦, 请稍等一会再获取吧")
+                else -> BotUtil.sendMessage("获取推文时出现了异常")
+            }
         }
     }
 
@@ -134,33 +130,6 @@ class TwitterCommand : ChatCommand {
             }
         } else {
             getHelp().toMsgChain()
-        }
-    }
-
-    private fun handleTimeout(t: Throwable): MessageChain {
-        return when (t) {
-            is HttpException -> {
-                when (t.cause) {
-                    is ConnectException -> {
-                        if (BotVariables.cfg.proxyPort != 0) {
-                            BotUtil.sendMsgPrefix("无法连接到蓝鸟服务器").toMsgChain()
-                        } else {
-                            BotUtil.sendMsgPrefix("无法连接至代理服务器").toMsgChain()
-                        }
-                    }
-                    is SocketTimeoutException -> BotUtil.sendMsgPrefix("连接超时").toMsgChain()
-                    is SSLException -> BotUtil.sendMsgPrefix("连接超时").toMsgChain()
-                    else -> {
-                        BotVariables.logger.warning(t)
-                        BotUtil.sendMsgPrefix("获取推文时出现了意外").toMsgChain()
-                    }
-                }
-            }
-            is RateLimitException -> BotUtil.sendMsgPrefix("已达到蓝鸟 API 调用上限, 请等会再试吧").toMsgChain()
-            else -> {
-                BotVariables.logger.warning(t)
-                BotUtil.sendMsgPrefix("获取推文时出现了意外").toMsgChain()
-            }
         }
     }
 

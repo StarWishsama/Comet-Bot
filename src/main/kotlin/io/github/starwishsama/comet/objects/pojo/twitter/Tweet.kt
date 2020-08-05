@@ -8,14 +8,8 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
-import io.github.starwishsama.comet.utils.NetUtil
+import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.toFriendly
-import io.github.starwishsama.comet.utils.toMsgChain
-import io.github.starwishsama.comet.utils.uploadAsImageSafely
-import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.message.data.EmptyMessageChain
-import net.mamoe.mirai.message.data.Image
-import net.mamoe.mirai.message.data.MessageChain
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime
@@ -26,37 +20,43 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
 data class Tweet(
-        @SerializedName("created_at")
-        val postTime: String,
-        val id: Long,
-        @SerializedName("id_str")
-        val idAsString: String,
-        @SerializedName("full_text")
-        val text: String,
-        val truncated: Boolean,
-        val entities: JsonObject?,
-        val source: String,
-        @SerializedName("in_reply_to_status_id")
-        val replyTweetId: Long?,
-        val user: TwitterUser,
-        @SerializedName("retweeted_status")
-        val retweetStatus: ReTweet?,
-        @SerializedName("retweet_count")
-        val retweetCount: Long?,
-        @SerializedName("favorite_count")
-        val likeCount: Long?,
-        @SerializedName("possibly_sensitive")
-        val sensitive: Boolean?,
-        @SerializedName("quoted_status")
-        val quotedStatus: Tweet?,
-        @SerializedName("is_quote_status")
-        val isQuoted: Boolean
+    @SerializedName("created_at")
+    val postTime: String,
+    val id: Long,
+    @SerializedName("id_str")
+    val idAsString: String,
+    @SerializedName("full_text")
+    val text: String,
+    val truncated: Boolean,
+    val entities: JsonObject?,
+    val source: String,
+    @SerializedName("in_reply_to_status_id")
+    val replyTweetId: Long?,
+    val user: TwitterUser,
+    @SerializedName("retweeted_status")
+    val retweetStatus: Tweet?,
+    @SerializedName("retweet_count")
+    val retweetCount: Long?,
+    @SerializedName("favorite_count")
+    val likeCount: Long?,
+    @SerializedName("possibly_sensitive")
+    val sensitive: Boolean?,
+    @SerializedName("quoted_status")
+    val quotedStatus: Tweet?,
+    @SerializedName("is_quote_status")
+    val isQuoted: Boolean
 ) {
     @ExperimentalTime
     fun getFullText(): String {
         val duration =
-                Duration.between(getSentTime(), LocalDateTime.now())
-        val extraText = "\n❤${likeCount}|\uD83D\uDD01${retweetCount}\n\n距离发送已过去了 ${duration.toKotlinDuration().toFriendly(TimeUnit.DAYS)}"
+            Duration.between(getSentTime(), LocalDateTime.now())
+        val extraText =
+            "\n❤${likeCount?.getBetterNumber()}|\uD83D\uDD01${retweetCount}\n\n距离发送已过去了 ${duration.toKotlinDuration()
+                .toFriendly(TimeUnit.DAYS)}"
+
+        if (retweetStatus != null) {
+            return "转发了 ${retweetStatus.user.name} 的推文\n${retweetStatus.text}"
+        }
 
         if (isQuoted && quotedStatus != null) {
             return "对于 ${quotedStatus.user.name} 的推文\n${quotedStatus.text}\n\n${user.name} 进行了评论\n$text" + extraText
@@ -71,7 +71,7 @@ data class Tweet(
     }
 
     fun contentEquals(tweet: Tweet): Boolean {
-        return text.contentEquals(tweet.text) || getSentTime().isEqual(tweet.getSentTime())
+        return text == tweet.text || getSentTime().isEqual(tweet.getSentTime())
     }
 
     fun getSentTime(): LocalDateTime {
@@ -79,20 +79,17 @@ data class Tweet(
         return twitterTimeFormat.parse(postTime).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
     }
 
-    suspend fun getPictureOrNull(contact: Contact): Image? {
+    suspend fun getPictureUrl(): String? {
         val objects = entities
-        var picture: Image? = null
 
         if (objects != null) {
             val media = objects["media"]
             if (media != null) {
                 try {
-                    val image = gson.fromJson(objects["media"].asJsonArray[0].asJsonObject.toString(), Media::class.java)
+                    val image =
+                        gson.fromJson(objects["media"].asJsonArray[0].asJsonObject.toString(), Media::class.java)
                     if (image.isSendableMedia()) {
-                        val response = NetUtil.doHttpRequestGet(image.getImageUrl(), 8000).executeAsync()
-                        if (response.isOk) {
-                            picture = NetUtil.getUrlInputStream(image.getImageUrl()).uploadAsImageSafely(response.header("content-type"), contact)
-                        }
+                        return image.getImageUrl()
                     }
                 } catch (e: JsonSyntaxException) {
                     BotVariables.logger.warning("在获取推文下的图片链接时发生了问题", e)
@@ -103,22 +100,13 @@ data class Tweet(
         }
 
         if (retweetStatus != null) {
-            val image = retweetStatus.getPictureOrNull(contact)
-            picture = image
+            return retweetStatus.getPictureUrl()
         }
 
-        if (quotedStatus != null && picture == null) {
-            picture = quotedStatus.getPictureOrNull(contact)
+        if (quotedStatus != null) {
+            return quotedStatus.getPictureUrl()
         }
 
-        return picture
-    }
-
-    @ExperimentalTime
-    suspend fun getAsMessageChain(contact: Contact?): MessageChain {
-        if (contact == null || getPictureOrNull(contact) == null) return getFullText().toMsgChain()
-
-        val image = getPictureOrNull(contact)
-        return getFullText().toMsgChain() + (image ?: EmptyMessageChain)
+        return null
     }
 }

@@ -60,14 +60,14 @@ object FileUtil {
         createErrorReportFile("发生了一个错误", type, t, content, url)
     }
 
-    fun createErrorReportFile(reason: String, type: String, t: Throwable, content: String, url: String) {
+    fun createErrorReportFile(reason: String, type: String, t: Throwable, content: String, message: String) {
         val fileName = "$type-${dateFormatter.format(LocalDateTime.now())}.txt"
         val location = File(getErrorReportFolder(), fileName)
         if (location.exists()) return
 
         location.createNewFile()
 
-        val report = "Error occurred:\nRequested url: $url\n${getBeautyStackTrace(t)}\n\nRaw content:\n$content"
+        val report = "Error occurred:\nExtra message: $message\n${getBeautyStackTrace(t)}\n\nRaw content:\n$content"
         location.writeString(report)
         BotVariables.logger.debug("$reason, 错误报告已生成! 保存在 ${location.path}")
     }

@@ -3,12 +3,16 @@ package io.github.starwishsama.comet.tasks
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.api.twitter.TwitterApi
+import io.github.starwishsama.comet.commands.MessageHandler.doFilter
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
+import io.github.starwishsama.comet.utils.NetUtil
 import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.message.uploadAsImage
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
@@ -40,7 +44,7 @@ object TweetUpdateChecker : CometPusher {
         /** 获取推文 */
         subList.parallelStream().forEach {
             try {
-                val tweet = TwitterApi.getTweetWithCache(it)
+                val tweet = TwitterApi.getCachedTweet(it, 0, 1).tweet
                 val oldTweet = pushContent[it]?.tweet
 
                 /** 检查是否为重复推文, 如果不是则加入推送队列 */
@@ -95,13 +99,16 @@ object TweetUpdateChecker : CometPusher {
                 var message = "${tweet.user.name} (@${userName}) 发送了一条推文\n${tweet.getFullText()}".toMsgChain()
                 pushGroups.forEach {
                     runBlocking {
-                        val group = bot.getGroup(it)
-                        val image = tweet.getPictureOrNull(group)
-                        if (image != null) {
-                            message += image
+                        try {
+                            val group = bot.getGroup(it)
+                            val image = tweet.getPictureUrl()
+                            if (image != null) {
+                                message += NetUtil.getUrlInputStream(image)?.uploadAsImage(group) ?: EmptyMessageChain
+                            }
+                            group.sendMessage(message.doFilter())
+                            delay(2_500)
+                        } catch (ignored: NoSuchElementException) {
                         }
-                        group.sendMessage(message)
-                        delay(2_500)
                     }
                 }
                 container.isPushed = true
@@ -112,7 +119,7 @@ object TweetUpdateChecker : CometPusher {
     private fun isOutdatedTweet(retrieve: Tweet, toCompare: Tweet?): Boolean {
         val timeNow = LocalDateTime.now()
         val tweetSentTime = retrieve.getSentTime()
-        if (Duration.between(tweetSentTime, timeNow).toMinutes() >= 30) return true
+        if (Duration.between(tweetSentTime, timeNow).toHours() >= 1) return true
 
         if (toCompare == null) return false
 

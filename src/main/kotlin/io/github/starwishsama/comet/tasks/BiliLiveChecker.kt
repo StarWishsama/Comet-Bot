@@ -5,6 +5,8 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
+import io.github.starwishsama.comet.commands.MessageHandler.doFilter
+import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.ScheduledFuture
@@ -79,13 +81,14 @@ object BiliLiveChecker : CometPusher {
                     "\n传送门: https://live.bilibili.com/${data.roomId}"
             pushGroups.forEach {
                 runBlocking {
-                    bot.getGroup(it).sendMessage(msg)
-                    delay(2_500)
-                }
-                if (it == pushGroups.last()) {
-                    info.isPushed = true
+                    try {
+                        bot.getGroup(it).sendMessage(msg.toMsgChain().doFilter())
+                        delay(2_500)
+                    } catch (ignored: NoSuchElementException) {
+                    }
                 }
             }
+            info.isPushed = true
         }
     }
 

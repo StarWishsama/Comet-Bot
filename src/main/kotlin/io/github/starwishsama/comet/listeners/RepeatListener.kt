@@ -15,7 +15,7 @@ object RepeatListener : NListener {
     override fun register(bot: Bot) {
         bot.subscribeGroupMessages {
             always {
-                if (BotVariables.switch && !group.isBotMuted) {
+                if (BotVariables.switch && !group.isBotMuted && canRepeat(group.id)) {
                     handleRepeat(this, RandomUtil.randomDouble())
                 }
             }
@@ -23,7 +23,7 @@ object RepeatListener : NListener {
     }
 
     private suspend fun handleRepeat(event: GroupMessageEvent, chance: Double) {
-        if (canRepeat(event.group.id) && event.message[QuoteReply] == null && chance in 0.90..0.909) {
+        if (event.message[QuoteReply] == null && chance in 0.90..0.909) {
             // 避免复读过多图片刷屏
             val count = event.message.stream().filter { it is Image }.count()
 
@@ -44,7 +44,7 @@ object RepeatListener : NListener {
     }
 
     private fun canRepeat(groupId: Long): Boolean {
-        val cfg = GroupConfigManager.getConfig(groupId) ?: return true
+        val cfg = GroupConfigManager.getConfigSafely(groupId)
         return cfg.doRepeat
     }
 
