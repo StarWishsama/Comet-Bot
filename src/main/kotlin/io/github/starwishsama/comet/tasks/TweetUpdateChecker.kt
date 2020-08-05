@@ -30,7 +30,10 @@ object TweetUpdateChecker : CometPusher {
         if (!bot.isOnline) future.cancel(false)
 
         /** 检查是否有 Twitter Token, 如无则手动获取 */
-        if (TwitterApi.token.isNullOrEmpty()) {
+
+        try {
+            TwitterApi.token = BotVariables.cache["token"].asString
+        } catch (t: Throwable) {
             TwitterApi.getBearerToken()
         }
 
