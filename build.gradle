@@ -87,6 +87,7 @@ dependencies {
 
 shadowJar {
     zip64 true
+    exclude("README", "README.md", "NOTICE.txt", "LICENSE", "LICENSE.txt", "CHANGES")
 }
 
 compileKotlin.kotlinOptions {
