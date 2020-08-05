@@ -38,7 +38,7 @@ object TwitterApi : ApiExecutor {
     private const val twitterTokenGetUrl = "https://api.twitter.com/oauth2/token"
 
     // Bearer Token
-    var token: String? = null
+    var token = BotVariables.cfg.twitterToken
 
     private var cacheTweet = mutableMapOf<String, Tweet>()
 
