@@ -1,78 +1,82 @@
 package io.github.starwishsama.comet.objects
 
-import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.enums.MusicApi
 import io.github.starwishsama.comet.enums.PicSearchApi
+import kotlinx.serialization.Serializable
 
+//import net.mamoe.yamlkt.Comment
+
+@Serializable
 data class Config(
-    @SerializedName("botId")
+    //@Comment("机器人的账号")
     var botId: Long = 0,
 
-    @SerializedName("botPassword")
+    //@Comment("机器人的密码")
     var botPassword: String = "",
 
-    @SerializedName("auto_save_config_time")
+    //@Comment("自动保存数据周期, 单位分钟")
     var autoSaveTime: Long = 60,
 
-    @SerializedName("rcon_url")
+    //@Comment("RCON 服务器地址, 不使用 RCON 功能可不填")
     var rConUrl: String? = null,
 
-    @SerializedName("rcon_port")
+    //@Comment("RCON 服务器端口, 不使用 RCON 功能可不填")
     var rConPort: Int = 0,
 
-    @SerializedName("rcon_password")
+    //@Comment("RCON 服务器连接密码, 不使用 RCON 功能可不填")
     var rConPassword: String? = null,
 
-    @SerializedName("netease_api")
-    var netEaseApi: String = "",
-
-    @SerializedName("cool_down_time")
+    //@Comment("执行所有机器人命令的全局冷却时间, 单位秒")
     var coolDownTime: Int = 5,
 
-    @SerializedName("filter_words")
-    var filterWords: List<String> = mutableListOf(),
+    //@Comment("机器人发送消息需要屏蔽的字词")
+    var filterWords: MutableList<String> = mutableListOf(),
 
-    @SerializedName("default_music_api")
+    //@Comment("点歌 API 类型")
     var musicApi: MusicApi = MusicApi.QQ,
 
-    @SerializedName("command_prefix")
-    var commandPrefix: List<String> = mutableListOf(".", "。", "#", "!", "/"),
+    //@Comment("命令前缀")
+    var commandPrefix: MutableList<String> = mutableListOf(".", "。", "#", "!", "/"),
 
-    @SerializedName("bili_user_name")
+    //@Comment("BiliBili 账号, 使用开播提醒时必填")
     var biliUserName: String? = null,
 
-    @SerializedName("bili_password")
+    //@Comment("BiliBili 账号密码, 使用开播提醒时必填")
     var biliPassword: String? = null,
 
-    @SerializedName("owner_id")
+    //@Comment("机器人主人QQ号, 对应的用户将自动获得 OWNER 权限组")
     var ownerId: Long = 0L,
 
-    @SerializedName("saucenao_api_key")
-    var saucenaoApiKey: String? = null,
+    //@Comment("SauceNao 以图搜图 APIKey, 不填亦可, 但可搜索次数会减少")
+    var sauceNaoApiKey: String? = null,
 
-    @SerializedName("r6tab_apikey")
+    //@Comment("彩虹六号玩家数据 API, 需要自行向 r6tab 作者申请")
     var r6tabKey: String? = null,
 
-    @SerializedName("twitter_token")
+    //@Comment("用于获取 Twitter Token 的 Access Token")
+    var twitterAccessToken: String? = null,
+
+    //@Comment("用于获取 Twitter Token 的 Access Secret")
+    var twitterAccessSecret: String? = null,
+
+    //@Comment("用于使用 Twitter Developer API 的 Token")
     var twitterToken: String? = null,
 
-    @SerializedName("twitter_secret")
-    var twitterSecret: String? = null,
-
-    @SerializedName("proxy_url")
+    //@Comment("代理服务器地址, 目前仅支持 HTTP 代理")
     var proxyUrl: String = "",
 
-    @SerializedName("proxy_port")
+    //@Comment("代理服务器端口, 目前仅支持 HTTP 代理")
     var proxyPort: Int = 0,
 
-    @SerializedName("mirai_heartbeat_period")
-    var heartBeatPeriod: Long = 2,
+    //@Comment("Mirai 心跳周期, 单位分钟, 过长会导致被服务器断开连接")
+    var heartBeatPeriod: Int = 2,
 
-    @SerializedName("youtube_api_key")
+    //@Comment("Youtube APIKey, 申请请见 https://developers.google.com/youtube/v3/getting-started")
     var youtubeApiKey: String = "",
-    @SerializedName("small_image_mode")
+
+    //@Comment("推文推送时候是否发送小图而不是原图")
     var smallImageMode: Boolean = true,
 
-    @SerializedName("picture_search_api")
+    //@Comment("以图搜图 API 类型, 请使用 /ps source 命令修改")
     var pictureSearchApi: PicSearchApi = PicSearchApi.SAUCENAO
 )

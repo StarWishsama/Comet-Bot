@@ -13,7 +13,7 @@ object PictureSearchUtil {
 
     fun sauceNaoSearch(url: String): PicSearchResult {
         val encodedUrl = URLUtil.encode(url)
-        val key = BotVariables.cfg.saucenaoApiKey
+        val key = BotVariables.cfg.sauceNaoApiKey
         val request = NetUtil.doHttpRequestGet(
             "$sauceNaoApi$encodedUrl${if (key != null && key.isNotEmpty()) "&api_key=$key" else ""}",
             5000

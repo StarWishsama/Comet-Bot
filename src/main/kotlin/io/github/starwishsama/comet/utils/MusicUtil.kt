@@ -15,12 +15,13 @@ import java.net.URLEncoder
 
 object MusicUtil {
     /** 1分钟100次，10分钟500次，1小时2000次 */
-    private const val thirdPartyApi = "https://api.qq.jsososo.com/song/urls?id="
+    private const val api4qq = "https://api.qq.jsososo.com/song/urls?id="
+    private const val api4NetEase = "http://musicapi.leanapp.cn/"
 
     fun searchNetEaseMusic(songName: String): MessageChain {
         try {
             val searchResponse = HttpRequest.get(
-                "http://${BotVariables.cfg.netEaseApi}/search?keywords=${URLEncoder.encode(
+                "http://${api4NetEase}/search?keywords=${URLEncoder.encode(
                     songName,
                     "UTF-8"
                 )}"
@@ -31,7 +32,7 @@ object MusicUtil {
                     val musicId = searchResult.getAsJsonObject("result").getAsJsonArray("songs")[0]["id"].asInt
                     val musicUrl = "https://music.163.com/#/song?id=$musicId"
                     val songResult =
-                        HttpRequest.get("http://${BotVariables.cfg.netEaseApi}/song/detail?ids=$musicId").timeout(8000)
+                        HttpRequest.get("http://${api4NetEase}/song/detail?ids=$musicId").timeout(8000)
                             .executeAsync()
                     if (songResult.isOk) {
                         val songJson = JsonParser.parseString(songResult.body())
@@ -49,7 +50,7 @@ object MusicUtil {
                             artistName = artistName.substring(0, artistName.length - 1)
 
                             val playResult =
-                                HttpRequest.get("http://${BotVariables.cfg.netEaseApi}/song/url?id=$musicId")
+                                HttpRequest.get("http://${api4NetEase}/song/url?id=$musicId")
                                     .timeout(8000).executeAsync()
                             if (playResult.isOk) {
                                 val playJson = JsonParser.parseString(playResult.body())
@@ -102,7 +103,7 @@ object MusicUtil {
                     val songName = info["songname"].asString
                     val songId = info["songid"].asInt
                     val albumId = info["albumid"]
-                    val playResult = HttpRequest.get("$thirdPartyApi$mid").executeAsync()
+                    val playResult = HttpRequest.get("$api4qq$mid").executeAsync()
                     if (playResult.isOk) {
                         val playJson = JsonParser.parseString(playResult.body())
                         val playUrl = playJson.asJsonObject["data"].asJsonObject[mid].asString

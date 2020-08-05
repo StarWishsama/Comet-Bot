@@ -26,7 +26,7 @@ class TwitterCommand : ChatCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.id)) {
-            if (BotVariables.cfg.twitterToken == null) {
+            if (BotVariables.cfg.twitterAccessToken == null) {
                 return BotUtil.sendMessage("请到配置文件中填写推特 Token")
             }
 

@@ -50,10 +50,10 @@ object TwitterApi : ApiExecutor {
     fun getBearerToken() {
         try {
             val curl = CUrl(twitterTokenGetUrl).opt(
-                    "-u",
-                    "${BotVariables.cfg.twitterToken}:${BotVariables.cfg.twitterSecret}",
-                    "--data",
-                    "grant_type=client_credentials"
+                "-u",
+                "${BotVariables.cfg.twitterAccessToken}:${BotVariables.cfg.twitterAccessSecret}",
+                "--data",
+                "grant_type=client_credentials"
             )
 
             if (BotVariables.cfg.proxyUrl.isNotEmpty() && BotVariables.cfg.proxyPort != -1) {

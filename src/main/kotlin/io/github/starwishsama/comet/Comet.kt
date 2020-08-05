@@ -33,6 +33,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.PlatformLogger
+import net.mamoe.mirai.utils.secondsToMillis
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
@@ -121,7 +122,7 @@ object Comet {
                 println(it)
             })
         }
-        config.heartbeatPeriodMillis = BotVariables.cfg.heartBeatPeriod * 60 * 1000
+        config.heartbeatPeriodMillis = (BotVariables.cfg.heartBeatPeriod * 60).secondsToMillis
         config.fileBasedDeviceInfo()
         config.fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
         bot = Bot(qq = qqId, password = password, configuration = config)

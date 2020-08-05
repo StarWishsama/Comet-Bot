@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.file
 
 import cn.hutool.core.io.file.FileReader
+import com.charleskorn.kaml.Yaml
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -14,16 +15,13 @@ import io.github.starwishsama.comet.objects.draw.ArkNightOperator
 import io.github.starwishsama.comet.objects.draw.PCRCharacter
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.objects.group.Shop
-import io.github.starwishsama.comet.utils.FileUtil
-import io.github.starwishsama.comet.utils.getContext
-import io.github.starwishsama.comet.utils.parseAsClass
-import io.github.starwishsama.comet.utils.writeClassToJson
+import io.github.starwishsama.comet.utils.*
 import java.io.File
 
 object DataSetup {
     private val userCfg: File = File(BotVariables.filePath, "users.json")
     private val shopItemCfg: File = File(BotVariables.filePath, "/items.json")
-    private val cfgFile: File = File(BotVariables.filePath, "/config.json")
+    private val cfgFile: File = File(BotVariables.filePath, "/config.yml")
     private val langCfg: File = File(BotVariables.filePath, "/lang.json")
     private val cacheCfg: File = File(BotVariables.filePath, "cache.json")
     private val pcrData = File(BotVariables.filePath, "/pcr.json")
@@ -35,12 +33,13 @@ object DataSetup {
         println("机器人文件路径在: " + BotVariables.filePath)
         if (!userCfg.exists() || !cfgFile.exists()) {
             try {
-                cfgFile.writeClassToJson(BotVariables.cfg)
+                cfgFile.writeString(Yaml.default.stringify(Config.serializer(), Config()))
                 userCfg.writeClassToJson(BotVariables.users)
                 shopItemCfg.writeClassToJson(BotVariables.shop)
                 println("[配置] 已自动生成新的配置文件.")
             } catch (e: Exception) {
-                System.err.println("[配置] 在生成配置文件时发生了错误, 错误信息: " + e.message)
+                System.err.println("[配置] 在生成配置文件时发生了错误")
+                e.printStackTrace()
             }
         }
 
@@ -49,7 +48,7 @@ object DataSetup {
 
     private fun saveCfg() {
         try {
-            cfgFile.writeClassToJson(BotVariables.cfg)
+            cfgFile.writeString(Yaml.default.stringify(Config.serializer(), BotVariables.cfg))
             userCfg.writeClassToJson(BotVariables.users)
             shopItemCfg.writeClassToJson(BotVariables.shop)
             savePerGroupSetting()
@@ -62,7 +61,7 @@ object DataSetup {
 
     private fun load() {
         try {
-            BotVariables.cfg = gson.fromJson(cfgFile.getContext(), Config::class.java)
+            BotVariables.cfg = Yaml.default.parse(Config.serializer(), cfgFile.getContext())
             BotVariables.users = gson.fromJson(
                 userCfg.getContext(),
                 object : TypeToken<List<BotUser>>() {}.type
