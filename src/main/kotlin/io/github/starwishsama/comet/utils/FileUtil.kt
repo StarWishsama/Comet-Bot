@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
+import cn.hutool.core.net.URLDecoder
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import java.io.File
@@ -83,17 +84,16 @@ object FileUtil {
         }
     }
 
-    fun getJarLocation(): String {
+    fun getJarLocation(): File {
         var path: String = Comet::class.java.protectionDomain.codeSource.location.path
         if (System.getProperty("os.name").toLowerCase().contains("dows")) {
             path = path.substring(1)
         }
         if (path.contains("jar")) {
             path = path.substring(0, path.lastIndexOf("/"))
-            return path
+            return File(URLDecoder.decode(path, Charsets.UTF_8))
         }
-        val location = File(path.replace("target/classes/", ""))
-        return location.path
+        return File(URLDecoder.decode(path.replace("target/classes/", ""), Charsets.UTF_8))
     }
 
     /**

@@ -31,18 +31,18 @@ import java.util.concurrent.ScheduledExecutorService
  */
 
 object BotVariables {
-    val filePath: File = File(FileUtil.getJarLocation())
-    const val version = "0.4.3-DEV-74e6b2c-20200805"
+    val filePath: File = FileUtil.getJarLocation()
+    const val version = "0.4.3-DEV-a0b5edb-20200806"
     lateinit var bot: Bot
     lateinit var startTime: LocalDateTime
     var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
-        4,
-        BasicThreadFactory.Builder()
-            .namingPattern("bot-service-%d")
-            .daemon(true)
-            .uncaughtExceptionHandler { thread, t ->
-                logger.warning("[定时任务] 线程 ${thread.name} 在运行时发生了错误", t)
-            }.build()
+            4,
+            BasicThreadFactory.Builder()
+                    .namingPattern("bot-service-%d")
+                    .daemon(true)
+                    .uncaughtExceptionHandler { thread, t ->
+                        logger.warning("[定时任务] 线程 ${thread.name} 在运行时发生了错误", t)
+                    }.build()
     )
     lateinit var logger: MiraiLogger
     var rCon: Rcon? = null
