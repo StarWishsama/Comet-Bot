@@ -108,5 +108,5 @@ class DebugCommand : ChatCommand {
         return CommandProps("debug", null, "Debug", "nbot.commands.debug", UserLevel.ADMIN)
     }
 
-    override fun getHelp(): String = "直接开 IDE 看会死掉吗"
+    override fun getHelp(): String = "Debug 中的命令会随时变动, 请自行查阅代码"
 }

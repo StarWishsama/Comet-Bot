@@ -62,13 +62,14 @@ object DataSetup {
     private fun load() {
         try {
             BotVariables.cfg = Yaml.default.parse(Config.serializer(), cfgFile.getContext())
-            BotVariables.users = gson.fromJson(
-                userCfg.getContext(),
-                object : TypeToken<List<BotUser>>() {}.type
-            )
+            BotVariables.users.addAll(gson.fromJson(
+                    userCfg.getContext(),
+                    object : TypeToken<List<BotUser>>() {}.type
+            ))
+
             BotVariables.shop = gson.fromJson(
-                shopItemCfg.getContext(),
-                object : TypeToken<List<Shop>>() {}.type
+                    shopItemCfg.getContext(),
+                    object : TypeToken<List<Shop>>() {}.type
             )
 
             loadLang()
@@ -111,7 +112,7 @@ object DataSetup {
                     BotLocalization("checkin.first-time", "你还没有签到过, 先用 /qd 签到一次吧~")
             )
             for (text in default) {
-                BotVariables.localMessage = BotVariables.localMessage + text
+                BotVariables.localMessage.plusAssign(text)
             }
             langCfg.writeClassToJson(BotVariables.localMessage)
         } else {

@@ -32,7 +32,7 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     val filePath: File = FileUtil.getJarLocation()
-    const val version = "0.4.3-DEV-a0b5edb-20200806"
+    const val version = "0.4.3-DEV-3806805-20200806"
     lateinit var bot: Bot
     lateinit var startTime: LocalDateTime
     var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
@@ -48,17 +48,17 @@ object BotVariables {
     var rCon: Rcon? = null
     lateinit var log: File
 
-    var shop: List<Shop> = LinkedList()
-    var users: List<BotUser> = LinkedList()
-    var localMessage: List<BotLocalization> = ArrayList()
+    var shop: MutableList<Shop> = LinkedList()
+    val users: MutableList<BotUser> = LinkedList()
+    var localMessage: MutableList<BotLocalization> = ArrayList()
     var cfg = Config()
-    var underCovers: List<RandomResult> = LinkedList()
+    var underCovers: MutableList<RandomResult> = LinkedList()
     var cache: JsonObject = JsonObject()
-    val perGroup: HashSet<PerGroupConfig> = HashSet()
+    val perGroup: MutableSet<PerGroupConfig> = HashSet()
 
     /** 明日方舟/PCR 卡池数据 */
-    var arkNight: List<ArkNightOperator> = LinkedList()
-    var pcr: List<PCRCharacter> = LinkedList()
+    var arkNight: MutableList<ArkNightOperator> = LinkedList()
+    var pcr: MutableList<PCRCharacter> = LinkedList()
 
     val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
 

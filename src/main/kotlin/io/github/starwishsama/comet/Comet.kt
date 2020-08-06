@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet
 
 import io.github.starwishsama.comet.BotVariables.bot
+import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.BotVariables.startTime
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
@@ -30,6 +31,7 @@ import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.join
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.PlatformLogger
@@ -38,6 +40,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
@@ -83,7 +86,7 @@ object Comet {
                 runBlocking {
                     val result = MessageHandler.executeConsole(command)
                     if (result.isNotEmpty()) {
-                        BotVariables.logger.info(result)
+                        logger.info(result)
                     }
                 }
             }
@@ -125,9 +128,15 @@ object Comet {
         config.heartbeatPeriodMillis = (BotVariables.cfg.heartBeatPeriod * 60).secondsToMillis
         config.fileBasedDeviceInfo()
         config.fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
-        bot = Bot(qq = qqId, password = password, configuration = config)
-        bot.alsoLogin()
-        BotVariables.logger = bot.logger
+        try {
+            bot = Bot(qq = qqId, password = password, configuration = config)
+            bot.alsoLogin()
+        } catch (e: LoginFailedException) {
+            println("登录失败, 服务器返回信息: ${e.message ?: "无"}")
+            println("如是密码错误请重新启动机器人填入正确密码")
+            exitProcess(0)
+        }
+        logger = bot.logger
 
         DataSetup.initPerGroupSetting()
 
@@ -161,14 +170,14 @@ object Comet {
                 )
         )
 
-        BotVariables.logger.info("[命令] 已注册 " + MessageHandler.countCommands() + " 个命令")
+        logger.info("[命令] 已注册 " + MessageHandler.countCommands() + " 个命令")
 
         /** 监听器 */
         val listeners = arrayOf(ConvertLightAppListener, RepeatListener)
 
         listeners.forEach {
             it.register(bot)
-            BotVariables.logger.info("[监听器] 已注册 ${it.getName()} 监听器")
+            logger.info("[监听器] 已注册 ${it.getName()} 监听器")
         }
 
         startUpTask()
@@ -176,10 +185,10 @@ object Comet {
 
         val duration = Duration.between(startTime, LocalDateTime.now())
 
-        BotVariables.logger.info("彗星 Bot 启动成功, 耗时 ${duration.toKotlinDuration().toFriendly()}")
+        logger.info("彗星 Bot 启动成功, 耗时 ${duration.toKotlinDuration().toFriendly()}")
 
         Runtime.getRuntime().addShutdownHook(Thread {
-            BotVariables.logger.info("[Bot] 正在关闭 Bot...")
+            logger.info("[Bot] 正在关闭 Bot...")
             DataSetup.saveFiles()
             BotVariables.service.shutdown()
             BotVariables.rCon?.disconnect()
@@ -196,7 +205,7 @@ object Comet {
                             reply(result.msg.doFilter())
                         }
                     } catch (e: IllegalArgumentException) {
-                        BotVariables.logger.warning("正在尝试发送空消息, 执行结果 $result")
+                        logger.warning("正在尝试发送空消息, 执行结果 $result")
                     }
                 }
             }

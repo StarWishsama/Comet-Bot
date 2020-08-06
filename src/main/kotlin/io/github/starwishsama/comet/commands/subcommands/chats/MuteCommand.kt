@@ -6,8 +6,8 @@ import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.BotUtil.hasPermission
 import io.github.starwishsama.comet.utils.isNumeric
 import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.*
@@ -20,7 +20,7 @@ import net.mamoe.mirai.message.data.isContentNotEmpty
 
 class MuteCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.id) && event is GroupMessageEvent) {
+        if (event is GroupMessageEvent && (BotUtil.isNoCoolDown(user.id) || hasPermission(user.id, GroupConfigManager.getConfigSafely(event.group.id), event.sender.permission))) {
             if (event.group.botPermission.isOperator()) {
                 if (hasPermission(user.id, GroupConfigManager.getConfigSafely(event.group.id), event.sender.permission)) {
                     if (args.isNotEmpty()) {
@@ -152,9 +152,5 @@ class MuteCommand : ChatCommand {
             banTime += tempTime.substring(0, tempTime.indexOf("分钟")).toInt() * 60
         }
         return banTime
-    }
-
-    private fun hasPermission(id: Long, cfg: PerGroupConfig, permission: MemberPermission): Boolean {
-        return permission >= MemberPermission.ADMINISTRATOR || cfg.isHelper(id)
     }
 }

@@ -55,6 +55,15 @@ class TwitterCommand : ChatCommand {
         return EmptyMessageChain
     }
 
+    override fun getProps(): CommandProps = CommandProps("twitter", arrayListOf("twit", "蓝鸟"), "查询/订阅蓝鸟账号", "nbot.commands.twitter", UserLevel.ADMIN)
+
+    override fun getHelp(): String = """
+        /twit info [蓝鸟ID] 查询账号信息
+        /twit sub [蓝鸟ID] 订阅用户的推文
+        /twit unsub [蓝鸟ID] 取消订阅用户的推文
+        /twit push 开启/关闭本群推文推送
+    """.trimIndent()
+
     @ExperimentalTime
     private suspend fun getTweetToMessageChain(args: List<String>, event: MessageEvent): MessageChain {
         return if (args.size > 1) {
@@ -132,13 +141,4 @@ class TwitterCommand : ChatCommand {
             getHelp().toMsgChain()
         }
     }
-
-    override fun getProps(): CommandProps = CommandProps("twitter", arrayListOf("twit", "蓝鸟"), "查询/订阅蓝鸟账号", "nbot.commands.twitter", UserLevel.ADMIN)
-
-    override fun getHelp(): String = """
-        /twit info [蓝鸟ID] 查询账号信息
-        /twit sub [蓝鸟ID] 订阅用户的推文
-        /twit unsub [蓝鸟ID] 取消订阅用户的推文
-        /twit push 开启/关闭本群推文推送
-    """.trimIndent()
 }

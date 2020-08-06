@@ -34,7 +34,7 @@ class DivineCommand : ChatCommand {
                         BotUtil.sendMsgPrefix("今日命令条数已达上限, 请等待条数自动恢复哦~\n命令条数现在每小时会恢复100次, 封顶1000次").toMsgChain()
                     }
                 } else {
-                    BotVariables.underCovers -= underCover
+                    BotVariables.underCovers.minusAssign(underCover)
                     RandomResult.getChance(underCover).toMsgChain()
                 }
             } else {

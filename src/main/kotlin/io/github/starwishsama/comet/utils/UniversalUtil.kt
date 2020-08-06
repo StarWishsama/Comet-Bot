@@ -12,6 +12,8 @@ import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotAdmin
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotOwner
+import io.github.starwishsama.comet.objects.group.PerGroupConfig
+import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.asHumanReadable
@@ -376,5 +378,9 @@ object BotUtil {
 
     enum class TaskStatus {
         SUCCESS, FAILED, TIMEOUT, CUSTOMERROR
+    }
+
+    fun hasPermission(id: Long, cfg: PerGroupConfig, permission: MemberPermission): Boolean {
+        return permission >= MemberPermission.ADMINISTRATOR || cfg.isHelper(id)
     }
 }

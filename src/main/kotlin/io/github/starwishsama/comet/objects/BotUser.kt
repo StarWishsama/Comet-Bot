@@ -95,7 +95,7 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
 
         fun quickRegister(id: Long): BotUser {
             val user = BotUser(id)
-            BotVariables.users = BotVariables.users.plusElement(user)
+            BotVariables.users.plusAssign(user)
             return user
         }
 
