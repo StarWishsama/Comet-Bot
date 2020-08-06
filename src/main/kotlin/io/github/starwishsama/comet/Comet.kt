@@ -40,7 +40,6 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.system.exitProcess
 import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
@@ -132,9 +131,7 @@ object Comet {
             bot = Bot(qq = qqId, password = password, configuration = config)
             bot.alsoLogin()
         } catch (e: LoginFailedException) {
-            println("登录失败, 服务器返回信息: ${e.message ?: "无"}")
-            println("如是密码错误请重新启动机器人填入正确密码")
-            exitProcess(0)
+            throw e
         }
         logger = bot.logger
 
@@ -242,18 +239,32 @@ suspend fun main() {
         println("请输入欲登录的机器人账号")
         val scanner = Scanner(System.`in`)
         var command: String
+        var isFailed = false
         while (scanner.hasNextLine()) {
+            if (bot.isOnline) {
+                scanner.close()
+                break
+            }
+
             command = scanner.nextLine()
             if (BotVariables.cfg.botId == 0L && command.isNumeric()) {
                 BotVariables.cfg.botId = command.toLong()
                 println("成功设置账号为 ${BotVariables.cfg.botId}")
                 println("请输入欲登录的机器人密码")
-            } else if (BotVariables.cfg.botPassword.isEmpty()) {
+            } else if (BotVariables.cfg.botPassword.isEmpty() || isFailed) {
                 BotVariables.cfg.botPassword = command
                 println("成功设置密码, 按下 Enter 启动机器人")
+                isFailed = false
             } else if (BotVariables.cfg.botId != 0L && BotVariables.cfg.botPassword.isNotEmpty()) {
                 println("请稍等...")
-                Comet.startBot(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
+
+                try {
+                    Comet.startBot(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
+                } catch (e: LoginFailedException) {
+                    println("登录失败: $e\n如果是密码错误, 请重新输入密码")
+                    isFailed = true
+                    continue
+                }
                 break
             }
         }
