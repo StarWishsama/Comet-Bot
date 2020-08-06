@@ -45,7 +45,7 @@ class BiliBiliCommand : ChatCommand {
                                 val dynamic = BiliBiliApi.getDynamic(item.mid)
                                 before.toMsgChain() + getDynamicText(dynamic, event)
                             } else {
-                                BotUtil.sendMsgPrefix("找不到对应的B站用户").toMsgChain()
+                                BotUtil.sendMessage("找不到对应的B站用户")
                             }
                         } else getHelp().toMsgChain()
                     }
@@ -55,7 +55,7 @@ class BiliBiliCommand : ChatCommand {
                             cfg.biliPushEnabled = !cfg.biliPushEnabled
                             BotUtil.sendMessage("B站开播提醒功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}")
                         } else {
-                            BotUtil.sendLocalMessage("msg.no-permission").toMsgChain()
+                            BotUtil.sendMessage(BotUtil.getLocalMessage("msg.no-permission"))
                         }
                     }
                     else -> return getHelp().toMsgChain()
@@ -78,7 +78,7 @@ class BiliBiliCommand : ChatCommand {
     private suspend fun advancedSubscribe(user: BotUser, args: List<String>, event: MessageEvent): MessageChain {
         try {
             Validate.isTrue(args.size > 1, getHelp())
-            Validate.isTrue(user.isBotAdmin(), BotUtil.sendMsgPrefix("你没有权限"))
+            Validate.isTrue(user.isBotAdmin(), BotUtil.sendMessage(BotUtil.getLocalMessage("msg.no-permission")).contentToString())
 
             return if (args[1].contains("|")) {
                 val users = args[1].split("|")
@@ -125,10 +125,10 @@ class BiliBiliCommand : ChatCommand {
             val cfg = GroupConfigManager.getConfigSafely(groupId)
 
             return if (!cfg.biliSubscribers.contains(roomId)) {
-                BotUtil.sendMsgPrefix("你还没订阅直播间 ${args[1]}").toMsgChain()
+                BotUtil.sendMessage("你还没订阅直播间 ${args[1]}")
             } else {
                 cfg.biliSubscribers.remove(args[1].toLong())
-                BotUtil.sendMsgPrefix("取消订阅直播间 ${args[1]} 成功").toMsgChain()
+                BotUtil.sendMessage("取消订阅直播间 ${args[1]} 成功")
             }
         } else {
             return getHelp().toMsgChain()
@@ -136,7 +136,7 @@ class BiliBiliCommand : ChatCommand {
     }
 
     private suspend fun getLiveStatus(event: MessageEvent): MessageChain {
-        if (event !is GroupMessageEvent) return BotUtil.sendMsgPrefix("只能在群里查看订阅列表").toMsgChain()
+        if (event !is GroupMessageEvent) return BotUtil.sendMessage("只能在群里查看订阅列表")
 
         val subs = StringBuilder("监控室列表:\n")
         val info = ArrayList<com.hiczp.bilibili.api.live.model.RoomInfo>()
@@ -162,7 +162,7 @@ class BiliBiliCommand : ChatCommand {
 
             return subs.toString().trim().toMsgChain()
         }
-        return BotUtil.sendMsgPrefix("未订阅任何用户").toMsgChain()
+        return BotUtil.sendMessage("未订阅任何用户")
     }
 
     private suspend fun getDynamicText(dynamic: WrappedMessage?, event: MessageEvent): MessageChain {
@@ -194,8 +194,7 @@ class BiliBiliCommand : ChatCommand {
             cfg.biliSubscribers.add(rid)
         }
 
-        return BotUtil.sendMsgPrefix("订阅 ${if (name.isNotBlank()) name else BiliBiliApi.getUserNameByMid(rid)}($rid) 成功")
-            .toMsgChain()
+        return BotUtil.sendMessage("订阅 ${if (name.isNotBlank()) name else BiliBiliApi.getUserNameByMid(rid)}($rid) 成功")
     }
 
 }

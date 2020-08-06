@@ -40,10 +40,10 @@ class KickCommand : ChatCommand {
                         return getHelp().toMsgChain()
                     }
                 } else {
-                    BotUtil.sendMsgPrefix("你不是绿帽 你爬 你爬").toMsgChain()
+                    BotUtil.sendMessage("你不是绿帽 你爬 你爬")
                 }
             } else {
-                BotUtil.sendMsgPrefix("我不是绿帽 我爬 我爬").toMsgChain()
+                BotUtil.sendMessage("我不是绿帽 我爬 我爬")
             }
         }
         return EmptyMessageChain

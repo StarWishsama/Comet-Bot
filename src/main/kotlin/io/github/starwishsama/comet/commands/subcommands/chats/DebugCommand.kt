@@ -32,9 +32,9 @@ class DebugCommand : ChatCommand {
                     if (user.isBotOwner()) {
                         return try {
                             DataSetup.reload()
-                            BotUtil.sendMsgPrefix("重载成功.").toMsgChain()
+                            BotUtil.sendMessage("重载成功.")
                         } catch (e: IOException) {
-                            BotUtil.sendMsgPrefix("在重载时发生了异常.").toMsgChain()
+                            BotUtil.sendMessage("在重载时发生了异常.")
                         }
                     }
                 }
@@ -65,9 +65,9 @@ class DebugCommand : ChatCommand {
                     BotVariables.switch = !BotVariables.switch
 
                     return if (!BotVariables.switch) {
-                        BotUtil.sendMsgPrefix("おつまち~").toMsgChain()
+                        BotUtil.sendMessage("おつまち~")
                     } else {
-                        BotUtil.sendMsgPrefix("今日もかわいい!").toMsgChain()
+                        BotUtil.sendMessage("今日もかわいい!")
                     }
                 }
                 "youtube" -> {

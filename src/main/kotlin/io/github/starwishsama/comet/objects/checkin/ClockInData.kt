@@ -1,7 +1,6 @@
 package io.github.starwishsama.comet.objects.checkin
 
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.data.MessageChain
@@ -40,7 +39,6 @@ class ClockInData(var startTime: LocalDateTime, var endTime: LocalDateTime, priv
             unCheckedText = StringBuilder("无")
         }
 
-        return BotUtil.sendMsgPrefix("最近一次打卡的数据:\n已打卡人数: $checkedCount\n迟到: $lateText\n未打卡: $unCheckedText")
-            .toMsgChain()
+        return BotUtil.sendMessage("最近一次打卡的数据:\n已打卡人数: $checkedCount\n迟到: $lateText\n未打卡: $unCheckedText")
     }
 }

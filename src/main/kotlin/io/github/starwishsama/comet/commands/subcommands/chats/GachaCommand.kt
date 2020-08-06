@@ -20,22 +20,21 @@ class GachaCommand : ChatCommand {
                     "明日方舟", "舟游", "mrfz", "ak" -> {
                         return if (args.size == 2) {
                             when (args[1]) {
-                                "十连" -> BotUtil.sendMsgPrefix(
+                                "十连" -> BotUtil.sendMessage(
                                         DrawUtil.getArkDrawResult(
                                                 user,
                                                 10
                                         )
-                                ).toMsgChain()
-                                "单抽" -> BotUtil.sendMsgPrefix(
-                                    DrawUtil.getArkDrawResult(
-                                        user,
-                                        1
-                                    )
-                                ).toMsgChain()
+                                )
+                                "单抽" -> BotUtil.sendMessage(
+                                        DrawUtil.getArkDrawResult(
+                                                user,
+                                                1
+                                        )
+                                )
                                 else -> {
                                     if (StringUtils.isNumeric(args[1])) {
-                                        BotUtil.sendMsgPrefix(DrawUtil.getArkDrawResult(user, args[1].toInt()))
-                                            .toMsgChain()
+                                        BotUtil.sendMessage(DrawUtil.getArkDrawResult(user, args[1].toInt()))
                                     } else {
                                         getHelp().toMsgChain()
                                     }
@@ -48,11 +47,11 @@ class GachaCommand : ChatCommand {
                     "公主连结", "pcr", "gzlj" -> {
                         return if (args.size == 2){
                             when (args[1]) {
-                                "十连" -> BotUtil.sendMsgPrefix(DrawUtil.getPCRResult(user, 10)).toMsgChain()
-                                "单抽" -> BotUtil.sendMsgPrefix(DrawUtil.getPCRResult(user, 1)).toMsgChain()
+                                "十连" -> BotUtil.sendMessage(DrawUtil.getPCRResult(user, 10))
+                                "单抽" -> BotUtil.sendMessage(DrawUtil.getPCRResult(user, 1))
                                 else -> {
                                     if (StringUtils.isNumeric(args[1])) {
-                                        BotUtil.sendMsgPrefix(DrawUtil.getPCRResult(user, args[1].toInt())).toMsgChain()
+                                        BotUtil.sendMessage(DrawUtil.getPCRResult(user, args[1].toInt()))
                                     } else {
                                         getHelp().toMsgChain()
                                     }

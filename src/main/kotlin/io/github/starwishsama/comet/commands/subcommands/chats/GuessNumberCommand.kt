@@ -33,7 +33,7 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
                         val answer = RandomUtil.randomInt(0, 100)
                         BotVariables.logger.verbose("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
                         SessionManager.addSession(GuessNumberSession(event.group.id, RandomUtil.randomInt(0, 101)))
-                        return BotUtil.sendMsgPrefix("猜一个数字吧! 范围 [0, 100]").toMsgChain()
+                        return BotUtil.sendMessage("来猜个数字吧! 范围 [0, 100]")
                     }
                     args.size == 2 -> {
                         try {
@@ -49,9 +49,9 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
                             val answer = RandomUtil.randomInt(min, max + 1)
                             BotVariables.logger.verbose("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
                             SessionManager.addSession(GuessNumberSession(event.group.id, RandomUtil.randomInt(0, 100)))
-                            return BotUtil.sendMsgPrefix("猜一个数字吧! 范围 [$min, $max]").toMsgChain()
+                            return BotUtil.sendMessage("猜一个数字吧! 范围 [$min, $max]")
                         } catch (e: NumberFormatException) {
-                            return BotUtil.sendMsgPrefix("${e.message}").toMsgChain()
+                            return BotUtil.sendMessage("${e.message}")
                         }
                     }
                     else -> {
@@ -59,7 +59,7 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
                     }
                 }
             } else {
-                return BotUtil.sendMsgPrefix("已经有一个游戏在进程中啦~").toMsgChain()
+                return BotUtil.sendMessage("已经有一个游戏在进行中啦~")
             }
         }
         return EmptyMessageChain
@@ -91,14 +91,14 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
 
             when {
                 answerInInt > trueAnswer -> {
-                    event.reply(BotUtil.sendMsgPrefix("你猜的数字大了"))
+                    event.reply(BotUtil.sendMessage("你猜的数字大了").contentToString())
                 }
                 answerInInt < trueAnswer -> {
-                    event.reply(BotUtil.sendMsgPrefix("你猜的数字小了"))
+                    event.reply(BotUtil.sendMessageToString("你猜的数字小了"))
                 }
                 answerInInt == trueAnswer -> {
                     session.usedTime = Duration.between(session.startTime, LocalDateTime.now())
-                    val sb = StringBuilder(BotUtil.sendMsgPrefix("${event.sender.nameCardOrNick} 猜对了!\n总用时: ${session.usedTime.seconds}s\n\n"))
+                    val sb = StringBuilder(BotUtil.sendMessageToString("${event.sender.nameCardOrNick} 猜对了!\n总用时: ${session.usedTime.seconds}s\n\n"))
                     val list = session.users.sortedBy { (it as GuessNumberUser).guessTime }
                     list.forEach {
                         sb.append((it as GuessNumberUser).username).append(" ").append(it.guessTime).append("次\n")
@@ -111,7 +111,7 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
             when (answer) {
                 "不玩了", "结束游戏", "退出游戏" -> {
                     SessionManager.expireSession(session)
-                    event.reply(BotUtil.sendMsgPrefix("游戏已结束"))
+                    event.reply(BotUtil.sendMessageToString("游戏已结束"))
                 }
             }
         }

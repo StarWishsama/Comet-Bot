@@ -12,8 +12,6 @@ import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.message.data.toMessage
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -31,22 +29,22 @@ class AdminCommand : ChatCommand {
                     return if (event is GroupMessageEvent) {
                         clockIn(args, event)
                     } else {
-                        BotUtil.sendMsgPrefix("该命令只能在群聊使用").toMsgChain()
+                        BotUtil.sendMessage("该命令只能在群聊使用")
                     }
                 }
                 "showdata", "打卡数据", "dksj" -> {
                     return if (event is GroupMessageEvent) {
                         val data = ClockInManager.getNearestClockIn(event.group.id)
-                        data?.viewData() ?: BotUtil.sendMsgPrefix("本群没有正在进行的打卡").toMsgChain()
+                        data?.viewData() ?: BotUtil.sendMessage("本群没有正在进行的打卡")
                     } else {
-                        BotUtil.sendMsgPrefix("该命令只能在群聊使用").toMsgChain()
+                        BotUtil.sendMessage("该命令只能在群聊使用")
                     }
                 }
                 "help", "帮助" -> return getHelp().toMsgChain()
                 "permlist", "权限列表", "qxlb" -> return permList(user, args, event)
                 "permadd", "添加权限", "tjqx" -> return permAdd(user, args, event)
                 "give", "增加次数" -> return giveCommandUseTime(event, args)
-                else -> return BotUtil.sendMsgPrefix("命令不存在, 使用 /admin help 查看更多").toMsgChain()
+                else -> return BotUtil.sendMessage("命令不存在, 使用 /admin help 查看更多")
             }
         }
     }
@@ -67,12 +65,12 @@ class AdminCommand : ChatCommand {
             val target: BotUser? = BotUtil.getAt(event, args[1])
             val permission = target?.getPermissions()
             if (permission != null) {
-                BotUtil.sendMsgPrefix(permission).toMsgChain()
+                BotUtil.sendMessage(permission)
             } else {
-                BotUtil.sendMsgPrefix("该用户没有任何权限").toMsgChain()
+                BotUtil.sendMessage("该用户没有任何权限")
             }
         } else {
-            BotUtil.sendMsgPrefix(user.getPermissions()).toMsgChain()
+            BotUtil.sendMessage(user.getPermissions())
         }
     }
 
@@ -82,10 +80,10 @@ class AdminCommand : ChatCommand {
                 val target: BotUser? = BotUtil.getAt(event, args[1])
 
                 target?.addPermission(args[2])
-                return BotUtil.sendMsgPrefix("添加权限成功").toMsgChain()
+                return BotUtil.sendMessage("添加权限成功")
             }
         } else {
-            return BotUtil.sendMsgPrefix("你没有权限").toMsgChain()
+            return BotUtil.sendMessage("你没有权限")
         }
         return EmptyMessageChain
     }
@@ -97,13 +95,12 @@ class AdminCommand : ChatCommand {
             return if (target != null) {
                 if (args[2].toInt() <= 1000000) {
                     target.addTime(args[2].toInt())
-                    BotUtil.sendMsgPrefix("成功为 $target 添加 ${args[2]} 次命令条数").toMsgChain()
+                    BotUtil.sendMessage("成功为 $target 添加 ${args[2]} 次命令条数")
                 } else {
-                    BotUtil.sendMsgPrefix("给予的次数超过上限").toMessage()
-                        .asMessageChain()
+                    BotUtil.sendMessage("给予的次数超过系统限制上限")
                 }
             } else {
-                BotUtil.sendMsgPrefix("找不到此用户").toMsgChain()
+                BotUtil.sendMessage("找不到此用户")
             }
         }
         return EmptyMessageChain
@@ -133,24 +130,24 @@ class AdminCommand : ChatCommand {
                     )
                 }
                 else -> {
-                    return BotUtil.sendMsgPrefix("/admin dk (开始时间) [结束时间])").toMsgChain()
+                    return BotUtil.sendMessage("/admin dk (开始时间) [结束时间])")
                 }
             }
 
             val usersList = arrayListOf<Member>()
 
             return if (endTime.isBefore(startTime) || endTime.isEqual(startTime)) {
-                BotUtil.sendMsgPrefix("在吗 为什么时间穿越").toMsgChain()
+                BotUtil.sendMessage("在吗 为什么时间穿越")
             } else {
                 for (member in message.group.members) {
                     usersList.add(member)
                 }
 
                 ClockInManager.newClockIn(message.group.id, usersList, startTime, endTime)
-                BotUtil.sendMsgPrefix("打卡已开启 请发送 /dk 来打卡").toMsgChain()
+                BotUtil.sendMessage("打卡已开启 请发送 /dk 来打卡")
             }
         } else {
-            return BotUtil.sendMsgPrefix("10 分钟内还有一个打卡未结束").toMsgChain()
+            return BotUtil.sendMessage("10 分钟内还有一个打卡未结束")
         }
     }
 }

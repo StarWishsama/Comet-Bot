@@ -67,7 +67,7 @@ class TwitterCommand : ChatCommand {
     @ExperimentalTime
     private suspend fun getTweetToMessageChain(args: List<String>, event: MessageEvent): MessageChain {
         return if (args.size > 1) {
-            event.quoteReply(BotUtil.sendMsgPrefix("正在查询, 请稍等"))
+            event.quoteReply(BotUtil.sendMessage("正在查询, 请稍等").contentToString())
             try {
                 if (args.size > 2) getTweetWithDesc(args[1], event.subject, args[2].toInt(), 1 + args[2].toInt())
                 else getTweetWithDesc(args[1], event.subject, 0, 1)
@@ -96,7 +96,7 @@ class TwitterCommand : ChatCommand {
             when (status) {
                 BotUtil.TaskStatus.FAILED -> BotUtil.sendMessage("获取推文时出现了异常, 请联系管理员")
                 BotUtil.TaskStatus.TIMEOUT -> BotUtil.sendMessage("获取推文超时, 请稍后重试")
-                BotUtil.TaskStatus.CUSTOMERROR -> BotUtil.sendMessage("已达到蓝鸟 API 请求上限啦, 请稍等一会再获取吧")
+                BotUtil.TaskStatus.CUSTOM -> BotUtil.sendMessage("已达到蓝鸟 API 请求上限啦, 请稍等一会再获取吧")
                 else -> BotUtil.sendMessage("获取推文时出现了异常")
             }
         }
@@ -111,17 +111,17 @@ class TwitterCommand : ChatCommand {
                 try {
                     twitter = TwitterApi.getUserInfo(args[1])
                 } catch (e: HttpException) {
-                    return BotUtil.sendMsgPrefix("连接至蓝鸟服务器超时, 等下再试试吧").toMsgChain()
+                    return BotUtil.sendMessage("连接至蓝鸟服务器超时, 等下再试试吧")
                 }
 
                 if (twitter != null) {
                     cfg.twitterSubscribers.add(args[1])
-                    return BotUtil.sendMsgPrefix("订阅 @${args[1]} 成功").toMsgChain()
+                    return BotUtil.sendMessage("订阅 @${args[1]} 成功")
                 }
 
-                return BotUtil.sendMsgPrefix("订阅 @${args[1]} 失败").toMsgChain()
+                return BotUtil.sendMessage("订阅 @${args[1]} 失败")
             } else {
-                return BotUtil.sendMsgPrefix("已经订阅过 @${args[1]} 了").toMsgChain()
+                return BotUtil.sendMessage("已经订阅过 @${args[1]} 了")
             }
         } else {
             return getHelp().toMsgChain()
@@ -133,9 +133,9 @@ class TwitterCommand : ChatCommand {
         return if (args.size > 1) {
             if (cfg.twitterSubscribers.contains(args[1])) {
                 cfg.twitterSubscribers.remove(args[1])
-                BotUtil.sendMsgPrefix("退订 @${args[1]} 成功").toMsgChain()
+                BotUtil.sendMessage("退订 @${args[1]} 成功")
             } else {
-                BotUtil.sendMsgPrefix("没有订阅过 @${args[1]}").toMsgChain()
+                BotUtil.sendMessage("没有订阅过 @${args[1]}")
             }
         } else {
             getHelp().toMsgChain()

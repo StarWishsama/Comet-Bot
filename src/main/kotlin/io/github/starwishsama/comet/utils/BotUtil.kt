@@ -5,6 +5,7 @@ import cn.hutool.http.HttpResponse
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.coolDown
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.enums.UserLevel
@@ -101,19 +102,21 @@ object BotUtil {
      * @return 目标QQ号是否处于冷却状态
      */
     fun isNoCoolDown(qq: Long): Boolean {
+        if (cfg.coolDownTime < 1) return true
+
         val currentTime = System.currentTimeMillis()
         if (qq == 80000000L) {
             return false
         }
 
-        if (qq == BotVariables.cfg.ownerId) {
+        if (qq == cfg.ownerId) {
             return true
         }
 
         if (coolDown.containsKey(qq) && !isBotAdmin(qq)) {
             val cd = coolDown[qq]
             if (cd != null) {
-                if (currentTime - cd < BotVariables.cfg.coolDownTime * 1000) {
+                if (currentTime - cd < cfg.coolDownTime * 1000) {
                     return false
                 } else {
                     coolDown.remove(qq)
@@ -135,12 +138,14 @@ object BotUtil {
      * @return 目标QQ号是否处于冷却状态
      */
     fun isNoCoolDown(qq: Long, seconds: Int): Boolean {
+        if (seconds < 1) return true
+
         val currentTime = System.currentTimeMillis()
         if (qq == 80000000L) {
             return false
         }
 
-        if (qq == BotVariables.cfg.ownerId) {
+        if (qq == cfg.ownerId) {
             return true
         }
 
@@ -183,48 +188,11 @@ object BotUtil {
         return "PlaceHolder"
     }
 
-    /**
-     * 获取带有本地化文本的消息
-     *
-     * @author NamelessSAMA
-     * @param node 本地化文本节点
-     * @param otherText 需要添加的文本
-     * @return 本地化文本
-     */
-    fun sendLocalMessage(node: String, otherText: String): String {
-        return getLocalMessage(node) + otherText
-    }
-
-    /**
-     * 获取带有本地化文本的消息
-     *
-     * @author NamelessSAMA
-     * @param node 本地化文本节点
-     * @param otherText 需要添加的文本
-     * @return 本地化文本
-     */
-    fun sendLocalMessage(node: String, vararg otherText: String): String {
+    fun sendMessageToString(otherText: String?, addPrefix: Boolean = true): String {
+        if (otherText.isNullOrEmpty()) return ""
         val sb = StringBuilder()
-        sb.append(getLocalMessage(node)).append(" ")
-        for (s in otherText) {
-            sb.append(s).append("\n")
-        }
-        return sb.toString().trim { it <= ' ' }
-    }
-
-    /**
-     * 发送带前缀的消息
-     *
-     * @author NamelessSAMA
-     * @param otherText 需要添加的文本
-     * @return 本地化文本
-     */
-    fun sendMsgPrefix(vararg otherText: String): String {
-        val sb = StringBuilder()
-        sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
-        otherText.forEach {
-            sb.append(it).append("\n")
-        }
+        if (addPrefix) sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
+        sb.append(otherText)
         return sb.toString().trim { it <= ' ' }
     }
 
@@ -245,26 +213,6 @@ object BotUtil {
             sb.append(it).append("\n")
         }
         return sb.toString().trim { it <= ' ' }.toMsgChain()
-    }
-
-    /**
-     * 发送带前缀的消息, 兼容空的字符串
-     *
-     * @author NamelessSAMA
-     * @param otherText 需要添加的文本
-     * @return 本地化文本
-     */
-    fun sendMsgPrefixOrEmpty(otherText: String?): String {
-        return if (!otherText.isNullOrEmpty()) {
-            val sb = StringBuilder()
-            sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
-            otherText.forEach {
-                sb.append(it).append("\n")
-            }
-            sb.toString().trim { it <= ' ' }
-        } else {
-            ""
-        }
     }
 
     /**
@@ -362,7 +310,7 @@ object BotUtil {
                         runTask()()
                     }
                     is RateLimitException -> {
-                        status = TaskStatus.CUSTOMERROR
+                        status = TaskStatus.CUSTOM
                     }
                     else -> {
                         status = TaskStatus.FAILED
@@ -377,7 +325,7 @@ object BotUtil {
     }
 
     enum class TaskStatus {
-        SUCCESS, FAILED, TIMEOUT, CUSTOMERROR
+        SUCCESS, FAILED, TIMEOUT, CUSTOM
     }
 
     fun hasPermission(id: Long, cfg: PerGroupConfig, permission: MemberPermission): Boolean {

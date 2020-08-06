@@ -11,7 +11,6 @@ import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.PictureSearchUtil
-import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.Image
@@ -26,7 +25,7 @@ class PictureSearch : ChatCommand, SuspendCommand {
                 if (!SessionManager.isValidSessionById(event.sender.id)) {
                     SessionManager.addSession(Session(this, user.id))
                 }
-                return BotUtil.sendMsgPrefix("请发送需要搜索的图片").toMsgChain()
+                return BotUtil.sendMessage("请发送需要搜索的图片")
             } else if (args[0].contentEquals("source") && args.size > 1) {
                 return try {
                     val api = PicSearchApi.valueOf(args[1].toUpperCase(Locale.ROOT))

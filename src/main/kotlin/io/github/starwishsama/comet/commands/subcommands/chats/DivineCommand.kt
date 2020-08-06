@@ -28,10 +28,10 @@ class DivineCommand : ChatCommand {
                             user.decreaseTime()
                             RandomResult.getChance(result).toMsgChain()
                         } else {
-                            BotUtil.sendMsgPrefix("请检查需要占卜的字符是否超过上限或为空!").toMsgChain()
+                            BotUtil.sendMessage("请检查需要占卜的字符是否超过上限或为空!")
                         }
                     } else {
-                        BotUtil.sendMsgPrefix("今日命令条数已达上限, 请等待条数自动恢复哦~\n命令条数现在每小时会恢复100次, 封顶1000次").toMsgChain()
+                        BotUtil.sendMessage("今日命令条数已达上限, 请等待条数自动恢复哦~\n命令条数现在每小时会恢复100次, 封顶1000次")
                     }
                 } else {
                     BotVariables.underCovers.minusAssign(underCover)

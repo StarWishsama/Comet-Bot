@@ -22,7 +22,7 @@ class CheckInCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(event.sender.id) && event is GroupMessageEvent) {
             return if (BotUtil.isChecked(user)) {
-                BotUtil.sendMsgPrefix("你今天已经签到过了! 输入 /cx 可查询签到信息").toMsgChain()
+                BotUtil.sendMessage("你今天已经签到过了! 输入 /cx 可查询签到信息")
             } else {
                 checkIn(event.sender, event, user).toMsgChain()
             }

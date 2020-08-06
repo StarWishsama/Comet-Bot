@@ -46,10 +46,10 @@ class MuteCommand : ChatCommand {
                         return getHelp().toMsgChain()
                     }
                 } else {
-                    BotUtil.sendMsgPrefix("你不是绿帽 你爬 你爬").toMsgChain()
+                    BotUtil.sendMessage("你不是绿帽 你爬 你爬")
                 }
             } else {
-                BotUtil.sendMsgPrefix("我不是绿帽 我爬 我爬").toMsgChain()
+                BotUtil.sendMessage("我不是绿帽 我爬 我爬")
             }
         }
         return EmptyMessageChain
@@ -88,36 +88,36 @@ class MuteCommand : ChatCommand {
             if (isAll) {
                 group.settings.isMuteAll = !group.settings.isMuteAll
                 return if (group.settings.isMuteAll) {
-                    BotUtil.sendMsgPrefix("The World!").toMsgChain()
+                    BotUtil.sendMessage("The World!")
                 } else {
-                    BotUtil.sendMsgPrefix("然后时间开始流动").toMsgChain()
+                    BotUtil.sendMessage("然后时间开始流动")
                 }
             } else {
-                if (group.botAsMember.id == id) BotUtil.sendMsgPrefix("不能踢出机器人").toMsgChain()
+                if (group.botAsMember.id == id) BotUtil.sendMessage("不能踢出机器人")
 
                 for (member in group.members) {
                     if (member.id == id) {
-                        if (member.isOperator()) BotUtil.sendMsgPrefix("不能踢出管理员").toMsgChain()
+                        if (member.isOperator()) BotUtil.sendMessage("不能踢出管理员")
                         return when (muteTime) {
                             in 1..2592000 -> {
                                 member.mute(muteTime)
-                                BotUtil.sendMsgPrefix("禁言成功").toMsgChain()
+                                BotUtil.sendMessage("禁言成功")
                             }
                             0L -> {
                                 member.unmute()
-                                BotUtil.sendMsgPrefix("解禁成功").toMsgChain()
+                                BotUtil.sendMessage("解禁成功")
                             }
                             else -> {
-                                BotUtil.sendMsgPrefix("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]").toMsgChain()
+                                BotUtil.sendMessage("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]")
                             }
                         }
                     }
                 }
             }
 
-            return BotUtil.sendMsgPrefix("找不到此用户").toMsgChain()
+            return BotUtil.sendMessage("找不到此用户")
         } catch (e: PermissionDeniedException) {
-            return BotUtil.sendMsgPrefix("我不是绿帽 我爬 我爬").toMsgChain()
+            return BotUtil.sendMessage("我不是绿帽 我爬 我爬")
         }
     }
 

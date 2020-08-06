@@ -25,7 +25,7 @@ class MusicCommand : ChatCommand {
                             "QQ" -> BotVariables.cfg.musicApi = MusicApi.QQ
                             "NETEASE", "网易" -> BotVariables.cfg.musicApi = MusicApi.NETEASE
                         }
-                        return BotUtil.sendMsgPrefix("音乐API已修改为 ${BotVariables.cfg.musicApi}").toMsgChain()
+                        return BotUtil.sendMessage("音乐API已修改为 ${BotVariables.cfg.musicApi}")
                     }
                 } else {
                     return when (api) {
