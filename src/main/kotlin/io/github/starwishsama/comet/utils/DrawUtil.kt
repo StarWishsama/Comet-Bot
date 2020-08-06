@@ -84,7 +84,7 @@ object DrawUtil {
                             break
                         }
                     }
-                    val r6Char = result.stream().filter { it.rare == 6 }.collect(Collectors.toList())
+                    val r6Char = result.parallelStream().filter { it.rare == 6 }.collect(Collectors.toList())
                     val r6Text = StringBuilder()
                     r6Char.forEach { r6Text.append("${it.name} ${getStar(it.rare)} ") }
 
@@ -189,7 +189,7 @@ object DrawUtil {
                     }
                 }
 
-                val r3s = ops.stream().filter { (_, star) -> star == 3 }.collect(Collectors.toList())
+                val r3s = ops.parallelStream().filter { (_, star) -> star == 3 }.collect(Collectors.toList())
 
                 val sb = StringBuilder()
                 for ((name) in r3s) {
