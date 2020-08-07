@@ -44,8 +44,8 @@ object RepeatListener : NListener {
     }
 
     private fun canRepeat(groupId: Long): Boolean {
-        val cfg = GroupConfigManager.getConfigSafely(groupId)
-        return cfg.doRepeat
+        val cfg = GroupConfigManager.getConfig(groupId)
+        return cfg?.doRepeat ?: true
     }
 
     override fun getName(): String = "复读机"

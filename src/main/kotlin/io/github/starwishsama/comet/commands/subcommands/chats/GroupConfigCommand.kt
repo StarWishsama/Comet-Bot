@@ -38,15 +38,15 @@ class GroupConfigCommand : ChatCommand {
                         }
                     }
                     "repeat" -> {
-                        val result = !cfg.doRepeat
-                        return BotUtil.sendMessage("已${if (result) "开启" else "关闭"}群复读机")
+                        cfg.doRepeat = !cfg.doRepeat
+                        return BotUtil.sendMessage("已${if (cfg.doRepeat) "开启" else "关闭"}群复读机")
                     }
                     "autojoin" -> {
                         return if (event.group.botPermission == MemberPermission.MEMBER) {
                             BotUtil.sendMessage("抱歉, 机器人不是群管, 无法自动接受加群请求.")
                         } else {
-                            val result = !cfg.autoAccept
-                            BotUtil.sendMessage("已${if (result) "开启" else "关闭"}自动接受加群请求")
+                            cfg.autoAccept = !cfg.autoAccept
+                            BotUtil.sendMessage("已${if (cfg.autoAccept) "开启" else "关闭"}自动接受加群请求")
                         }
                     }
                 }
