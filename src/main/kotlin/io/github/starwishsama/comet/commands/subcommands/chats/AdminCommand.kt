@@ -8,6 +8,7 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.Member
+import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -21,36 +22,39 @@ class AdminCommand : ChatCommand {
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (args.isEmpty()) {
-            return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMsgChain()
-        } else {
-            when (args[0]) {
-                "clockin", "dk", "打卡" -> {
-                    return if (event is GroupMessageEvent) {
-                        clockIn(args, event)
-                    } else {
-                        BotUtil.sendMessage("该命令只能在群聊使用")
+        if (BotUtil.isNoCoolDown(event.sender.id)) {
+            if (args.isEmpty()) {
+                return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMsgChain()
+            } else {
+                when (args[0]) {
+                    "clockin", "dk", "打卡" -> {
+                        return if (event is GroupMessageEvent) {
+                            clockIn(args, event)
+                        } else {
+                            BotUtil.sendMessage("该命令只能在群聊使用")
+                        }
                     }
-                }
-                "showdata", "打卡数据", "dksj" -> {
-                    return if (event is GroupMessageEvent) {
-                        val data = ClockInManager.getNearestClockIn(event.group.id)
-                        data?.viewData() ?: BotUtil.sendMessage("本群没有正在进行的打卡")
-                    } else {
-                        BotUtil.sendMessage("该命令只能在群聊使用")
+                    "showdata", "打卡数据", "dksj" -> {
+                        return if (event is GroupMessageEvent) {
+                            val data = ClockInManager.getNearestClockIn(event.group.id)
+                            data?.viewData() ?: BotUtil.sendMessage("本群没有正在进行的打卡")
+                        } else {
+                            BotUtil.sendMessage("该命令只能在群聊使用")
+                        }
                     }
+                    "help", "帮助" -> return getHelp().toMsgChain()
+                    "permlist", "权限列表", "qxlb" -> return permList(user, args, event)
+                    "permadd", "添加权限", "tjqx" -> return permAdd(user, args, event)
+                    "give", "增加次数" -> return giveCommandUseTime(event, args)
+                    else -> return BotUtil.sendMessage("命令不存在, 使用 /admin help 查看更多")
                 }
-                "help", "帮助" -> return getHelp().toMsgChain()
-                "permlist", "权限列表", "qxlb" -> return permList(user, args, event)
-                "permadd", "添加权限", "tjqx" -> return permAdd(user, args, event)
-                "give", "增加次数" -> return giveCommandUseTime(event, args)
-                else -> return BotUtil.sendMessage("命令不存在, 使用 /admin help 查看更多")
             }
         }
+        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("admin", arrayListOf("管理", "管", "gl"), "机器人管理员命令", "nbot.commands.admin", UserLevel.ADMIN)
+            CommandProps("admin", arrayListOf("管理", "管", "gl"), "机器人管理员命令", "nbot.commands.admin", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
         ======= 命令帮助 =======
@@ -59,6 +63,13 @@ class AdminCommand : ChatCommand {
         /admin permadd [用户] [权限名] 给一个用户添加权限
         /admin give [用户] [命令条数] 给一个用户添加命令条数
     """.trimIndent()
+
+    override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean {
+        val bLevel = getProps().level
+        if (botUser.compareLevel(bLevel)) return true
+        if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true
+        return false
+    }
 
     private fun permList(user: BotUser, args: List<String>, event: MessageEvent): MessageChain {
         return if (args.size > 1) {

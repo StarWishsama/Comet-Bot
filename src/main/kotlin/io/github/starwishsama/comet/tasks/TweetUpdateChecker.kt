@@ -3,7 +3,7 @@ package io.github.starwishsama.comet.tasks
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.api.twitter.TwitterApi
-import io.github.starwishsama.comet.commands.MessageHandler.doFilter
+import io.github.starwishsama.comet.commands.CommandExecutor.doFilter
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet

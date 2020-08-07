@@ -2,8 +2,8 @@ package io.github.starwishsama.comet.commands.subcommands.chats
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.youtube.YoutubeApi
+import io.github.starwishsama.comet.commands.CommandExecutor
 import io.github.starwishsama.comet.commands.CommandProps
-import io.github.starwishsama.comet.commands.MessageHandler
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
@@ -58,7 +58,7 @@ class DebugCommand : ChatCommand {
                 "info" ->
                     return ("彗星 Bot ${BotVariables.version}\n" +
                             "今日もかわいい~\n" +
-                            "已注册命令数: ${MessageHandler.countCommands()}\n" +
+                            "已注册命令数: ${CommandExecutor.countCommands()}\n" +
                             BotUtil.getMemoryUsage()).toMsgChain()
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().toMsgChain()
                 "switch" -> {
@@ -83,7 +83,7 @@ class DebugCommand : ChatCommand {
                                                         """.trimIndent().toMessage()
 
                                 return msg + (NetUtil.getUrlInputStream(it.snippet.getCoverImgUrl())
-                                    ?.uploadAsImage(event.subject) ?: EmptyMessageChain)
+                                        ?.uploadAsImage(event.subject) ?: EmptyMessageChain)
                             } else if (it.snippet.getType() == VideoType.UPCOMING) {
                                 val msg = """
                                                             ${it.snippet.channelTitle} 有即将进行的直播!
@@ -92,7 +92,7 @@ class DebugCommand : ChatCommand {
                                                         """.trimIndent().toMessage()
 
                                 return msg + (NetUtil.getUrlInputStream(it.snippet.getCoverImgUrl())
-                                    ?.uploadAsImage(event.subject) ?: EmptyMessageChain)
+                                        ?.uploadAsImage(event.subject) ?: EmptyMessageChain)
                             }
                         }
                         return BotUtil.sendMessage("${result?.items?.get(0)?.snippet?.channelTitle} 现在没有在直播哦")

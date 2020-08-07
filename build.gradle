@@ -71,8 +71,8 @@ dependencies {
     implementation 'org.apache.commons:commons-io:1.3.2'
 
     implementation 'com.google.code.gson:gson:2.8.6'
-    // Wait for https://github.com/Him188/yamlkt/issues/5 be fixed
-    // implementation("net.mamoe.yamlkt:yamlkt:0.3.2")
+    // yamlkt @ https://github.com/Him188/yamlkt
+    implementation("net.mamoe.yamlkt:yamlkt:0.3.3")
     implementation 'com.charleskorn.kaml:kaml:0.18.1'
 
     // CUrl

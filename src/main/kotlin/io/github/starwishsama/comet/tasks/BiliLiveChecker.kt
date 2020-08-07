@@ -5,7 +5,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
-import io.github.starwishsama.comet.commands.MessageHandler.doFilter
+import io.github.starwishsama.comet.commands.CommandExecutor.doFilter
 import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking

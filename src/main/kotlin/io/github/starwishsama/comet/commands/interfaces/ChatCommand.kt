@@ -20,4 +20,7 @@ interface ChatCommand {
 
     /** 命令帮助文本 必填 */
     fun getHelp(): String
+
+    fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean =
+            botUser.compareLevel(getProps().level) || botUser.hasPermission(getProps().permission)
 }

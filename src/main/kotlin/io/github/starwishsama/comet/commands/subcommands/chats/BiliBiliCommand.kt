@@ -12,6 +12,7 @@ import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.isNumeric
 import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.delay
+import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
@@ -66,7 +67,7 @@ class BiliBiliCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("bili", arrayListOf(), "订阅B站主播/查询用户动态", "nbot.commands.bili", UserLevel.USER)
+            CommandProps("bili", arrayListOf(), "订阅B站主播/查询用户动态", "nbot.commands.bili", UserLevel.USER)
 
     override fun getHelp(): String = """
         /bili sub [用户名] 订阅用户相关信息
@@ -74,6 +75,13 @@ class BiliBiliCommand : ChatCommand {
         /bili info [用户名] 查看用户的动态
         /bili push 开启/关闭本群开播推送
     """.trimIndent()
+
+    override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean {
+        val level = getProps().level
+        if (botUser.compareLevel(level)) return true
+        if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true
+        return false
+    }
 
     private suspend fun advancedSubscribe(user: BotUser, args: List<String>, event: MessageEvent): MessageChain {
         try {

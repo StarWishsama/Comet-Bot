@@ -44,6 +44,8 @@ class ClockInCommand : ChatCommand {
 
     override fun getHelp(): String = ""
 
+    override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean = botUser.compareLevel(getProps().level)
+
     private fun isClockIn(data: ClockInData, event: GroupMessageEvent): Boolean {
         if (data.checkedUsers.isNotEmpty()) {
             data.checkedUsers.forEach { member ->

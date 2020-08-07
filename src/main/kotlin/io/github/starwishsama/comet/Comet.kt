@@ -7,8 +7,8 @@ import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.api.youtube.YoutubeApi
-import io.github.starwishsama.comet.commands.MessageHandler
-import io.github.starwishsama.comet.commands.MessageHandler.doFilter
+import io.github.starwishsama.comet.commands.CommandExecutor
+import io.github.starwishsama.comet.commands.CommandExecutor.doFilter
 import io.github.starwishsama.comet.commands.subcommands.chats.*
 import io.github.starwishsama.comet.commands.subcommands.console.DebugCommand
 import io.github.starwishsama.comet.commands.subcommands.console.StopCommand
@@ -83,7 +83,7 @@ object Comet {
             while (scanner.hasNextLine()) {
                 command = scanner.nextLine()
                 runBlocking {
-                    val result = MessageHandler.executeConsole(command)
+                    val result = CommandExecutor.executeConsole(command)
                     if (result.isNotEmpty()) {
                         logger.info(result)
                     }
@@ -139,7 +139,7 @@ object Comet {
 
         setupRCon()
 
-        MessageHandler.setupCommand(
+        CommandExecutor.setupCommand(
                 arrayOf(
                         AdminCommand(),
                         BiliBiliCommand(),
@@ -167,7 +167,7 @@ object Comet {
                 )
         )
 
-        logger.info("[命令] 已注册 " + MessageHandler.countCommands() + " 个命令")
+        logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
 
         /** 监听器 */
         val listeners = arrayOf(ConvertLightAppListener, RepeatListener)
@@ -196,7 +196,7 @@ object Comet {
                 if (sender.id != 80000000L) {
                     if (this is GroupMessageEvent && group.isBotMuted) return@always
 
-                    val result = MessageHandler.execute(this)
+                    val result = CommandExecutor.execute(this)
                     try {
                         if (result.msg !is EmptyMessageChain && result.msg.isNotEmpty()) {
                             reply(result.msg.doFilter())

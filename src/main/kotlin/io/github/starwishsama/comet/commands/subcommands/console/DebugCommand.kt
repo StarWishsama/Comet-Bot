@@ -1,8 +1,8 @@
 package io.github.starwishsama.comet.commands.subcommands.console
 
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.commands.CommandExecutor
 import io.github.starwishsama.comet.commands.CommandProps
-import io.github.starwishsama.comet.commands.MessageHandler
 import io.github.starwishsama.comet.commands.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.sessions.SessionManager
@@ -29,7 +29,7 @@ class DebugCommand : ConsoleCommand {
                     return sb.toString().trim()
                 }
                 "info" ->
-                    return ("彗星 Bot ${BotVariables.version}\n已注册的命令个数: ${MessageHandler.countCommands()}\n${BotUtil.getMemoryUsage()}")
+                    return ("彗星 Bot ${BotVariables.version}\n已注册的命令个数: ${CommandExecutor.countCommands()}\n${BotUtil.getMemoryUsage()}")
                 "switch" -> {
                     BotVariables.switch = !BotVariables.switch
 

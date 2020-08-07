@@ -7,7 +7,6 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.hasPermission
 import io.github.starwishsama.comet.utils.isNumeric
 import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.*
@@ -20,33 +19,29 @@ import net.mamoe.mirai.message.data.isContentNotEmpty
 
 class MuteCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (event is GroupMessageEvent && (BotUtil.isNoCoolDown(user.id) || hasPermission(user.id, GroupConfigManager.getConfigSafely(event.group.id), event.sender.permission))) {
+        if (event is GroupMessageEvent && (BotUtil.isNoCoolDown(user.id) || hasPermission(user, event))) {
             if (event.group.botPermission.isOperator()) {
-                if (hasPermission(user.id, GroupConfigManager.getConfigSafely(event.group.id), event.sender.permission)) {
-                    if (args.isNotEmpty()) {
-                        val at = event.message[At]
-                        if (at != null && at.isContentNotEmpty()) {
-                            doMute(event.group, at.target, getMuteTime(args[1]), false)
+                if (args.isNotEmpty()) {
+                    val at = event.message[At]
+                    if (at != null && at.isContentNotEmpty()) {
+                        doMute(event.group, at.target, getMuteTime(args[1]), false)
+                    } else {
+                        if (args[0].isNumeric()) {
+                            doMute(event.group, args[0].toLong(), getMuteTime(args[1]), false)
                         } else {
-                            if (args[0].isNumeric()) {
-                                doMute(event.group, args[0].toLong(), getMuteTime(args[1]), false)
-                            } else {
-                                when (args[0]) {
-                                    "all", "全体", "全禁", "全体禁言" -> doMute(
+                            when (args[0]) {
+                                "all", "全体", "全禁", "全体禁言" -> doMute(
                                         event.group,
                                         args[0].toLong(),
                                         getMuteTime(args[1]),
                                         false
-                                    )
-                                    "random", "rand", "随机", "抽奖" -> doRandomMute(event)
-                                }
+                                )
+                                "random", "rand", "随机", "抽奖" -> doRandomMute(event)
                             }
                         }
-                    } else {
-                        return getHelp().toMsgChain()
                     }
                 } else {
-                    BotUtil.sendMessage("你不是绿帽 你爬 你爬")
+                    return getHelp().toMsgChain()
                 }
             } else {
                 BotUtil.sendMessage("我不是绿帽 我爬 我爬")
@@ -63,6 +58,16 @@ class MuteCommand : ChatCommand {
         /mute [@/Q/all] [禁言时长]
         时长为 0 时解禁
     """.trimIndent()
+
+    override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean {
+        if (super.hasPermission(botUser, e)) return true
+        if (e is GroupMessageEvent) {
+            if (e.sender.permission >= MemberPermission.ADMINISTRATOR) return true
+            val cfg = GroupConfigManager.getConfigSafely(e.group.id)
+            if (cfg.isHelper(e.sender.id)) return true
+        }
+        return false
+    }
 
     private suspend fun doRandomMute(event: GroupMessageEvent) {
         val iterator = event.group.members.iterator()

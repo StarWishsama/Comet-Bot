@@ -31,9 +31,11 @@ class CheckInCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("checkin", arrayListOf("签到", "qd"), "签到命令", "nbot.commands.checkin", UserLevel.USER)
+            CommandProps("checkin", arrayListOf("签到", "qd"), "签到命令", "nbot.commands.checkin", UserLevel.USER)
 
     override fun getHelp(): String = ""
+
+    override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean = botUser.compareLevel(getProps().level)
 
     private fun checkIn(sender: User, msg: MessageEvent, user: BotUser): String {
         return run {

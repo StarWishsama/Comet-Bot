@@ -66,7 +66,7 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
 
     /**
      * 比较权限组
-     * @return 自己的权限组是否大于需要比较的权限组
+     * @return 自己的权限组是否大于等于需要比较的权限组
      */
     fun compareLevel(cmdLevel: UserLevel): Boolean {
         return this.level >= cmdLevel

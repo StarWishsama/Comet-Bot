@@ -14,6 +14,7 @@ import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.NetUtil
 import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.Contact
+import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -63,6 +64,12 @@ class TwitterCommand : ChatCommand {
         /twit unsub [蓝鸟ID] 取消订阅用户的推文
         /twit push 开启/关闭本群推文推送
     """.trimIndent()
+
+    override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean {
+        if (super.hasPermission(botUser, e)) return true
+        if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true
+        return false
+    }
 
     @ExperimentalTime
     private suspend fun getTweetToMessageChain(args: List<String>, event: MessageEvent): MessageChain {

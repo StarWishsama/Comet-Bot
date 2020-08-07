@@ -25,7 +25,7 @@ import kotlin.time.toKotlinDuration
  * 处理群聊/私聊聊天信息中存在的命令
  * @author Nameless
  */
-object MessageHandler {
+object CommandExecutor {
     private var commands: List<ChatCommand> = mutableListOf()
     private var consoleCommands = mutableListOf<ConsoleCommand>()
 
@@ -99,13 +99,11 @@ object MessageHandler {
                             user = BotUser.quickRegister(senderId)
                         }
 
-                        val result: MessageChain =
-                                if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
-                                    cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
-                                } else {
-                                    BotUtil.sendMessage("你没有权限!")
-                                }
-
+                        val result: MessageChain = if (cmd.hasPermission(user, event)) {
+                            cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
+                        } else {
+                            BotUtil.sendMessage("你没有权限!")
+                        }
                         val usedTime = Duration.between(executedTime, LocalDateTime.now())
                         BotVariables.logger.debug(
                                 "[命令] 命令执行耗时 ${usedTime.toKotlinDuration().asHumanReadable}"

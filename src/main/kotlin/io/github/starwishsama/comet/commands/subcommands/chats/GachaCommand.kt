@@ -61,6 +61,7 @@ class GachaCommand : ChatCommand {
                             return getHelp().toMsgChain()
                         }
                     }
+                    "来一井" -> return BotUtil.sendMessage(DrawUtil.getPCRResult(user, 300))
                     else -> return getHelp().toMsgChain()
                 }
             } else {

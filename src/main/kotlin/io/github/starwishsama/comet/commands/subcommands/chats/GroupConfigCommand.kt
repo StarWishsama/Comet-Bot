@@ -15,7 +15,7 @@ import java.util.*
 
 class GroupConfigCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.id) && event is GroupMessageEvent && hasPermission(user, event.sender.permission)) {
+        if (BotUtil.isNoCoolDown(user.id) && event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
                 val cfg = GroupConfigManager.getConfigSafely(event.group.id)
                 when (args[0].toLowerCase(Locale.ROOT)) {
@@ -66,7 +66,10 @@ class GroupConfigCommand : ChatCommand {
         /group autojoin 开启/关闭本群机器人自动接受加群请求
     """.trimIndent()
 
-    private fun hasPermission(user: BotUser, permission: MemberPermission): Boolean {
-        return user.isBotOwner() || permission != MemberPermission.OWNER
+    override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean {
+        val level = getProps().level
+        if (botUser.compareLevel(level)) return true
+        if (e is GroupMessageEvent && e.sender.permission > MemberPermission.MEMBER) return true
+        return false
     }
 }
