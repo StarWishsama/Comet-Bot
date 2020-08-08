@@ -41,7 +41,7 @@ object ConvertLightAppListener : NListener {
                         return (
                                 "小程序Anti > 自动转换了小程序链接:\n" +
                                         "视频标题: $title\n" +
-                                        "链接: ${url.substring(0, url.indexOf("?") - 1)}"
+                                        "链接: $url"
                                 ).toMsgChain()
                     }
                 } catch (e: IllegalStateException) {
