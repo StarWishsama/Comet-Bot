@@ -79,14 +79,14 @@ class BiliBiliCommand : ChatCommand {
     override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean {
         val level = getProps().level
         if (botUser.compareLevel(level)) return true
-        if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true
+        if (e is GroupMessageEvent && e.sender.permission >= MemberPermission.MEMBER) return true
         return false
     }
 
     private suspend fun advancedSubscribe(user: BotUser, args: List<String>, event: MessageEvent): MessageChain {
         try {
             Validate.isTrue(args.size > 1, getHelp())
-            Validate.isTrue(user.isBotAdmin(), BotUtil.sendMessage(BotUtil.getLocalMessage("msg.no-permission")).contentToString())
+            Validate.isTrue((user.isBotAdmin() || (event is GroupMessageEvent && event.sender.isOperator())), BotUtil.getLocalMessage("msg.no-permission"))
 
             return if (args[1].contains("|")) {
                 val users = args[1].split("|")

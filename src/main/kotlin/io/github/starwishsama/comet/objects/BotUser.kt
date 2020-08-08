@@ -73,7 +73,7 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
     }
 
     fun isBotAdmin(): Boolean {
-        return level >= UserLevel.ADMIN
+        return level >= UserLevel.ADMIN || isBotOwner()
     }
 
     fun isBotOwner(): Boolean {
@@ -86,7 +86,7 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
 
     companion object {
         fun isBotAdmin(id: Long): Boolean {
-            return getLevel(id) >= UserLevel.ADMIN
+            return getLevel(id) >= UserLevel.ADMIN || isBotOwner(id)
         }
 
         fun isBotOwner(id: Long): Boolean {

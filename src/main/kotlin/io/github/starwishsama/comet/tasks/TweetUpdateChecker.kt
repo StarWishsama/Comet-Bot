@@ -13,6 +13,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.uploadAsImage
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.ScheduledFuture
 import kotlin.time.ExperimentalTime
@@ -116,6 +117,7 @@ object TweetUpdateChecker : CometPusher {
 
     private fun isOutdatedTweet(retrieve: Tweet, toCompare: Tweet?): Boolean {
         if (toCompare == null) return false
+        if (Duration.between(toCompare.getSentTime(), retrieve.getSentTime()).toHours() >= 1) return true
         return retrieve.contentEquals(toCompare)
     }
 }

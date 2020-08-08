@@ -75,18 +75,20 @@ object BiliLiveChecker : CometPusher {
     private fun pushToGroups(pushQueue: MutableMap<StoredLiveInfo, MutableSet<Long>>) {
         /** 遍历推送列表推送开播消息 */
         pushQueue.forEach { (info, pushGroups) ->
-            val data = info.data
-            val msg = "单推助手 > \n${BiliBiliApi.getUserNameByMid(data.uid)} 开播了!" +
-                    "\n直播间标题: ${data.title}" +
-                    "\n开播时间: ${data.liveTime}" +
-                    "\n传送门: https://live.bilibili.com/${data.roomId}"
-            pushGroups.forEach {
-                runBlocking {
-                    bot.getGroupOrNull(it)?.sendMessage(msg.toMsgChain().doFilter())
-                    delay(2_500)
+            if (!info.isPushed) {
+                val data = info.data
+                val msg = "单推助手 > \n${BiliBiliApi.getUserNameByMid(data.uid)} 开播了!" +
+                        "\n直播间标题: ${data.title}" +
+                        "\n开播时间: ${data.liveTime}" +
+                        "\n传送门: https://live.bilibili.com/${data.roomId}"
+                pushGroups.forEach {
+                    runBlocking {
+                        bot.getGroupOrNull(it)?.sendMessage(msg.toMsgChain().doFilter())
+                        delay(2_500)
+                    }
                 }
+                info.isPushed = true
             }
-            info.isPushed = true
         }
     }
 
