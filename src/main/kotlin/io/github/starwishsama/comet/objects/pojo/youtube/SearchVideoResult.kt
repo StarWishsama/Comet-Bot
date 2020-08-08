@@ -65,6 +65,10 @@ data class SearchVideoResult(
         fun getVideoUrl(): String {
             return "https://www.youtube.com/watch?v=${id.videoId}"
         }
+
+        fun getChannelId(): String {
+            return snippet.channelId
+        }
     }
 }
 

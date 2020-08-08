@@ -9,6 +9,7 @@ import io.github.starwishsama.comet.commands.CommandExecutor.doFilter
 import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.getGroupOrNull
 import java.util.concurrent.ScheduledFuture
 
 object BiliLiveChecker : CometPusher {
@@ -81,11 +82,8 @@ object BiliLiveChecker : CometPusher {
                     "\n传送门: https://live.bilibili.com/${data.roomId}"
             pushGroups.forEach {
                 runBlocking {
-                    try {
-                        bot.getGroup(it).sendMessage(msg.toMsgChain().doFilter())
-                        delay(2_500)
-                    } catch (ignored: NoSuchElementException) {
-                    }
+                    bot.getGroupOrNull(it)?.sendMessage(msg.toMsgChain().doFilter())
+                    delay(2_500)
                 }
             }
             info.isPushed = true

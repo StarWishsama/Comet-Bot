@@ -18,7 +18,7 @@ data class WrappedMessage(var text: String?) {
         return null
     }
 
-    fun plusImageUrl(url: String): WrappedMessage {
+    fun plusImageUrl(url: String?): WrappedMessage {
         this.picture = url
         return this
     }

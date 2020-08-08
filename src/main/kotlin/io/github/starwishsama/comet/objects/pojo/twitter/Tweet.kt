@@ -55,7 +55,7 @@ data class Tweet(
                 .toFriendly(TimeUnit.DAYS)}"
 
         if (retweetStatus != null) {
-            return "转发了 ${retweetStatus.user.name} 的推文\n${retweetStatus.text}"
+            return "转发了 ${retweetStatus.user.name} 的推文\n${retweetStatus.text}" + extraText
         }
 
         if (isQuoted && quotedStatus != null) {

@@ -19,6 +19,7 @@ import io.github.starwishsama.comet.listeners.RepeatListener
 import io.github.starwishsama.comet.tasks.BiliLiveChecker
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.tasks.TweetUpdateChecker
+import io.github.starwishsama.comet.tasks.YTBStreamChecker
 import io.github.starwishsama.comet.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -102,7 +103,7 @@ object Comet {
     }
 
     private fun startAllPusher() {
-        val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker)
+        val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker, YTBStreamChecker)
         pushers.forEach {
             val future = TaskUtil.runScheduleTaskAsync(it::retrieve, it.delayTime, it.cycle, TimeUnit.MINUTES)
             it.future = future
@@ -119,7 +120,7 @@ object Comet {
             })
         }
         config.networkLoggerSupplier = { it ->
-            PlatformLogger("Net ${it.id}", {
+            PlatformLogger("BotNet ${it.id}", {
                 BotVariables.log.writeString(BotVariables.log.getContext() + "$it\n")
                 println(it)
             })

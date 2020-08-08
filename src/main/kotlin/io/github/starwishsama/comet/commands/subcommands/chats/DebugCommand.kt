@@ -8,19 +8,16 @@ import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.pojo.youtube.VideoType
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.tasks.TweetUpdateChecker
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.NetUtil
 import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
-import net.mamoe.mirai.message.uploadAsImage
 import java.io.IOException
 import kotlin.time.ExperimentalTime
 
@@ -77,29 +74,7 @@ class DebugCommand : ChatCommand {
                 "youtube" -> {
                     if (args.size > 1) {
                         val result = YoutubeApi.getChannelVideos(args[1], 10)
-                        result?.items?.forEach {
-                            if (it.snippet.getType() == VideoType.STREAMING) {
-                                val msg = """
-                                                            ${it.snippet.channelTitle} 正在直播!
-                                                            直播标题: ${it.snippet.videoTitle}
-                                                            直播时间: ${it.snippet.publishTime}
-                                                            直达链接: ${it.getVideoUrl()}
-                                                        """.trimIndent().toMessage()
-
-                                return msg + (NetUtil.getUrlInputStream(it.snippet.getCoverImgUrl())
-                                        ?.uploadAsImage(event.subject) ?: EmptyMessageChain)
-                            } else if (it.snippet.getType() == VideoType.UPCOMING) {
-                                val msg = """
-                                                            ${it.snippet.channelTitle} 有即将进行的直播!
-                                                            直播标题: ${it.snippet.videoTitle}
-                                                            开播时间请打开查看 ${it.getVideoUrl()}
-                                                        """.trimIndent().toMessage()
-
-                                return msg + (NetUtil.getUrlInputStream(it.snippet.getCoverImgUrl())
-                                        ?.uploadAsImage(event.subject) ?: EmptyMessageChain)
-                            }
-                        }
-                        return BotUtil.sendMessage("${result?.items?.get(0)?.snippet?.channelTitle} 现在没有在直播哦")
+                        return YoutubeApi.getLiveStatusByResult(result).toMessageChain(event.subject)
                     }
                 }
                 else -> return "Bot > 命令不存在\n${getHelp()}".toMsgChain()
