@@ -120,17 +120,22 @@ class BiliBiliCommand : ChatCommand {
 
     private suspend fun unsubscribe(args: List<String>, groupId: Long): MessageChain {
         if (args.size > 1) {
+            val cfg = GroupConfigManager.getConfigSafely(groupId)
             var roomId = 0L
             if (args[1].isNumeric()) {
                 roomId = args[1].toLong()
             } else {
+                if (args[1] == "all" || args[1] == "全部") {
+                    cfg.twitterSubscribers.clear()
+                    return BotUtil.sendMessage("退订全部成功")
+                }
+
                 val item = FakeClientApi.getUser(args[1])
                 if (item != null) {
                     roomId = item.roomid
                 }
             }
 
-            val cfg = GroupConfigManager.getConfigSafely(groupId)
 
             return if (!cfg.biliSubscribers.contains(roomId)) {
                 BotUtil.sendMessage("你还没订阅直播间 ${args[1]}")

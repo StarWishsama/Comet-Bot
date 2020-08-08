@@ -77,7 +77,7 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
         val trueAnswer = (session as GuessNumberSession).answer
         session.lastAnswerTime = LocalDateTime.now()
         val answer = event.message.content
-        var gnUser = session.getGNUser(user.id)
+        var gnUser = session.getGuessNumberUser(user.id)
 
         if (answer.isNumeric()) {
             val answerInInt = answer.toInt()

@@ -10,7 +10,7 @@ open class GuessNumberSession(override var groupId: Long, val answer: Int): Sess
     lateinit var usedTime: Duration
     lateinit var lastAnswerTime: LocalDateTime
 
-    fun getGNUser(id: Long) : GuessNumberUser? {
+    fun getGuessNumberUser(id: Long): GuessNumberUser? {
         users.forEach {
             if (it is GuessNumberUser && it.userId == id) {
                 return it

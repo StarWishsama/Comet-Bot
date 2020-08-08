@@ -15,10 +15,10 @@ object BiliLiveChecker : CometPusher {
     private val pushedList = mutableListOf<StoredLiveInfo>()
     override val delayTime: Long = 1
     override val cycle: Long = 1
-    override lateinit var future: ScheduledFuture<*>
+    override var future: ScheduledFuture<*>? = null
 
     override fun retrieve() {
-        if (!bot.isOnline) future.cancel(false)
+        if (!bot.isOnline) future?.cancel(false)
 
         val collectedUsers = mutableSetOf<Long>()
 

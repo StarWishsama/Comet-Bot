@@ -6,10 +6,10 @@ import java.util.concurrent.ScheduledFuture
 object YTBStreamChecker : CometPusher {
     override val delayTime: Long = 10
     override val cycle: Long = 10
-    override lateinit var future: ScheduledFuture<*>
+    override var future: ScheduledFuture<*>? = null
 
     override fun retrieve() {
-        if (!BotVariables.bot.isOnline) future.cancel(true)
+        if (!BotVariables.bot.isOnline) future?.cancel(true)
         TODO("Not yet implemented")
     }
 

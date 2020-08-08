@@ -11,6 +11,7 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.youtube.VideoType
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
+import io.github.starwishsama.comet.tasks.TweetUpdateChecker
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.NetUtil
 import io.github.starwishsama.comet.utils.toMsgChain
@@ -69,6 +70,9 @@ class DebugCommand : ChatCommand {
                     } else {
                         BotUtil.sendMessage("今日もかわいい!")
                     }
+                }
+                "tpush" -> {
+                    TweetUpdateChecker.retrieve()
                 }
                 "youtube" -> {
                     if (args.size > 1) {

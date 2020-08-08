@@ -16,7 +16,7 @@ interface CometPusher {
     /**
      * @TODO 在这里加注解
      */
-    var future: ScheduledFuture<*>
+    var future: ScheduledFuture<*>?
 
     /**
      * 获取逻辑

@@ -13,8 +13,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.uploadAsImage
-import java.time.Duration
-import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.ScheduledFuture
 import kotlin.time.ExperimentalTime
@@ -23,11 +21,11 @@ object TweetUpdateChecker : CometPusher {
     private val pushContent = mutableMapOf<String, PushedTweet>()
     override val delayTime: Long = 5
     override val cycle: Long = 10
-    override lateinit var future: ScheduledFuture<*>
+    override var future: ScheduledFuture<*>? = null
 
     @ExperimentalTime
     override fun retrieve() {
-        if (!bot.isOnline) future.cancel(false)
+        if (!bot.isOnline) future?.cancel(false)
 
         /** 检查是否有 Twitter Token, 如无则手动获取 */
         if (TwitterApi.token == null) {
@@ -117,12 +115,7 @@ object TweetUpdateChecker : CometPusher {
     }
 
     private fun isOutdatedTweet(retrieve: Tweet, toCompare: Tweet?): Boolean {
-        val timeNow = LocalDateTime.now()
-        val tweetSentTime = retrieve.getSentTime()
-        if (Duration.between(tweetSentTime, timeNow).toHours() >= 1) return true
-
         if (toCompare == null) return false
-
         return retrieve.contentEquals(toCompare)
     }
 }

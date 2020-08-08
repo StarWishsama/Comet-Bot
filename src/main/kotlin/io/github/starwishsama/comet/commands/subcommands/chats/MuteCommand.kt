@@ -20,7 +20,7 @@ import net.mamoe.mirai.message.data.isContentNotEmpty
 class MuteCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (event is GroupMessageEvent && (BotUtil.isNoCoolDown(user.id) || hasPermission(user, event))) {
-            if (event.group.botPermission.isOperator()) {
+            return if (event.group.botPermission.isOperator()) {
                 if (args.isNotEmpty()) {
                     val at = event.message[At]
                     if (at != null && at.isContentNotEmpty()) {
@@ -36,12 +36,16 @@ class MuteCommand : ChatCommand {
                                         getMuteTime(args[1]),
                                         false
                                 )
-                                "random", "rand", "随机", "抽奖" -> doRandomMute(event)
+                                "random", "rand", "随机", "抽奖" -> {
+                                    doRandomMute(event)
+                                    BotUtil.sendMessage("下面将抽取一位幸运群友禁言")
+                                }
+                                else -> getHelp().toMsgChain()
                             }
                         }
                     }
                 } else {
-                    return getHelp().toMsgChain()
+                    getHelp().toMsgChain()
                 }
             } else {
                 BotUtil.sendMessage("我不是绿帽 我爬 我爬")
@@ -106,11 +110,11 @@ class MuteCommand : ChatCommand {
                         return when (muteTime) {
                             in 1..2592000 -> {
                                 member.mute(muteTime)
-                                BotUtil.sendMessage("禁言成功")
+                                BotUtil.sendMessage("禁言 ${member.nameCardOrNick} 成功")
                             }
                             0L -> {
                                 member.unmute()
-                                BotUtil.sendMessage("解禁成功")
+                                BotUtil.sendMessage("解禁 ${member.nameCardOrNick} 成功")
                             }
                             else -> {
                                 BotUtil.sendMessage("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]")
