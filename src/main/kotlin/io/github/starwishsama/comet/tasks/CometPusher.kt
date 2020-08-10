@@ -14,7 +14,7 @@ interface CometPusher {
     val cycle: Long
 
     /**
-     * @TODO 在这里加注解
+     * 用于关闭当前推送器
      */
     var future: ScheduledFuture<*>?
 

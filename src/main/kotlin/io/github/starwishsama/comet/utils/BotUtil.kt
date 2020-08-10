@@ -71,6 +71,14 @@ fun HttpResponse.isType(typeName: String): Boolean {
     return contentType.contains(typeName)
 }
 
+suspend fun MessageEvent.replyWithNullCheck(text: String?) {
+    if (!text.isNullOrEmpty()) reply(text)
+}
+
+suspend fun MessageEvent.replyWithNullCheck(plainText: PlainText?) {
+    if (plainText != null && plainText.isContentNotEmpty()) reply(plainText)
+}
+
 /**
  * 用于辅助机器人运行的各种工具方法
  *

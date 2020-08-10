@@ -23,7 +23,6 @@ import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 
-
 /**
  * 机器人(几乎)所有数据的存放类
  * 可以直接访问数据
@@ -32,7 +31,7 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     val filePath: File = FileUtil.getJarLocation()
-    const val version = "0.4.3-DEV-6ad42f4-20200808"
+    const val version = "0.4.3-DEV-407a14e-20200810"
     lateinit var bot: Bot
     lateinit var startTime: LocalDateTime
     var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
@@ -45,6 +44,7 @@ object BotVariables {
                     }.build()
     )
     lateinit var logger: MiraiLogger
+    val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
     var rCon: Rcon? = null
     lateinit var log: File
 
@@ -59,8 +59,6 @@ object BotVariables {
     /** 明日方舟/PCR 卡池数据 */
     var arkNight: MutableList<ArkNightOperator> = LinkedList()
     var pcr: MutableList<PCRCharacter> = LinkedList()
-
-    val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
 
     var hitokoto: Hitokoto? = null
 

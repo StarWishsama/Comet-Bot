@@ -26,7 +26,7 @@ import kotlin.time.toKotlinDuration
  * @author Nameless
  */
 object CommandExecutor {
-    private var commands: List<ChatCommand> = mutableListOf()
+    private var commands: MutableSet<ChatCommand> = mutableSetOf()
     private var consoleCommands = mutableListOf<ConsoleCommand>()
 
     /**
@@ -36,7 +36,7 @@ object CommandExecutor {
      */
     private fun setupCommand(command: ChatCommand) {
         if (!commands.contains(command)) {
-            commands = commands + command
+            commands.add(command)
         } else {
             BotVariables.logger.warning("[命令] 正在尝试注册已有命令 ${command.getProps().name}")
         }
@@ -50,7 +50,7 @@ object CommandExecutor {
     fun setupCommand(commands: Array<ChatCommand>) {
         commands.forEach {
             if (!this.commands.contains(it)) {
-                this.commands = this.commands.plus(it)
+                this.commands.add(it)
             }
         }
     }
@@ -172,7 +172,7 @@ object CommandExecutor {
         )
     }
 
-    private fun getCommand(cmdPrefix: String): ChatCommand? {
+    fun getCommand(cmdPrefix: String): ChatCommand? {
         for (command in commands) {
             if (commandEquals(command, cmdPrefix)) {
                 return command

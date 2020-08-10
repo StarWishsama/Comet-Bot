@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.objects.group
 
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables
-import java.util.*
+import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 
 data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
 
@@ -10,31 +10,55 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
     var autoAccept: Boolean = false
 
     @SerializedName("group_helpers")
-    var helpers: HashSet<Long> = HashSet()
+    var helpers: MutableSet<Long> = hashSetOf()
 
+    /**
+     * 推文推送服务
+     */
     @SerializedName("twitter_push_function")
     var twitterPushEnabled: Boolean = false
 
+    /**
+     * Twitter 订阅列表
+     */
     @SerializedName("twitter_sub")
-    var twitterSubscribers: HashSet<String> = HashSet()
+    var twitterSubscribers: MutableSet<String> = hashSetOf()
 
+    /**
+     * bilibili 开播提醒服务
+     */
     @SerializedName("bili_push_function")
     var biliPushEnabled: Boolean = false
 
+    /**
+     * bilibili 订阅列表
+     */
     @SerializedName("bili_sub")
-    val biliSubscribers: HashSet<Long> = HashSet()
+    val biliSubscribers: MutableSet<Long> = hashSetOf()
 
+    /**
+     * Youtube 开播推送服务
+     */
     @SerializedName("youtube_push_function")
     var youtubePushEnabled: Boolean = false
 
+    /**
+     * Youtube 订阅列表
+     */
     @SerializedName("youtube_sub")
-    val youtubeSubscribers: HashSet<String> = HashSet()
+    val youtubeSubscribers: MutableSet<String> = hashSetOf()
 
     /**
      * 是否关闭对此群消息的复读
      */
     @SerializedName("repeat_function")
     var doRepeat: Boolean = true
+
+    /**
+     * 本群启用的命令
+     */
+    @SerializedName("disabled_commands")
+    val disabledCommands: MutableSet<ChatCommand> = hashSetOf()
 
     fun addHelper(id: Long): Boolean {
         if (isHelper(id)) return false
