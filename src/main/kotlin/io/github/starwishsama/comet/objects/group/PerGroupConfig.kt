@@ -82,6 +82,10 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
     }
 
     fun isDisabledCommand(command: ChatCommand): Boolean {
-        return disabledCommands.contains(command)
+        return try {
+            disabledCommands.contains(command)
+        } catch (npe: NullPointerException) {
+            false
+        }
     }
 }

@@ -161,6 +161,7 @@ object Comet {
                         TwitterCommand(),
                         VersionCommand(),
                         GroupConfigCommand(),
+                        RSPCommand(),
                         // Console Command
                         StopCommand(),
                         DebugCommand(),

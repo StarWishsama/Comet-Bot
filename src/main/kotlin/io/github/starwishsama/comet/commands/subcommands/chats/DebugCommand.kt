@@ -77,6 +77,8 @@ class DebugCommand : ChatCommand {
                         return YoutubeApi.getLiveStatusByResult(result).toMessageChain(event.subject)
                     }
                 }
+                "janken" -> {
+                }
                 else -> return "Bot > 命令不存在\n${getHelp()}".toMsgChain()
             }
         }
