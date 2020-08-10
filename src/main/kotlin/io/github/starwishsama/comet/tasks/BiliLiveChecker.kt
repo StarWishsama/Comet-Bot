@@ -40,7 +40,9 @@ object BiliLiveChecker : CometPusher {
                     for (i in pushedList.indices) {
                         if (pushedList[i].data.roomId == roomId) {
                             hasOldData = true
-                            if (data.code == 1) pushedList[i] = sli
+                            if (data.code == 1 &&
+                                    // 阿B的轮播也会算进来, 在测试的时候老大(夜霧)的直播推送好几遍了
+                                    !data.data.title.contains("的投稿视频")) pushedList[i] = sli
                             break
                         }
                     }
