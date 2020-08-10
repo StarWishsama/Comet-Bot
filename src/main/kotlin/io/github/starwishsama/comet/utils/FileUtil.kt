@@ -10,7 +10,6 @@ import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-@Synchronized
 fun File.writeClassToJson(context: Any) {
     if (!this.exists()) {
         this.createNewFile()
@@ -19,7 +18,6 @@ fun File.writeClassToJson(context: Any) {
     FileWriter.create(this).write(BotVariables.gson.toJson(context))
 }
 
-@Synchronized
 fun File.writeString(context: String) {
     if (!this.exists()) {
         this.createNewFile()
@@ -33,7 +31,7 @@ fun File.getContext(): String {
 }
 
 /**
- * 直接将文件内容转换为指定的类
+ * 直接将文件内容序列化为指定的类
  *
  * @param clazz 指定类
  * @return 指定类
@@ -58,7 +56,7 @@ object FileUtil {
     private fun getErrorReportFolder(): File = getChildFolder("error-reports")
 
     fun createErrorReportFile(type: String, t: Throwable, content: String, url: String) {
-        createErrorReportFile("发生了一个错误", type, t, content, url)
+        createErrorReportFile("发生了一个错误", type, t, content, "request url: $url")
     }
 
     fun createErrorReportFile(reason: String, type: String, t: Throwable, content: String, message: String) {

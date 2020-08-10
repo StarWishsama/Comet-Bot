@@ -2,19 +2,16 @@ package io.github.starwishsama.comet.file
 
 import cn.hutool.core.io.file.FileReader
 import com.charleskorn.kaml.Yaml
+import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.google.gson.reflect.TypeToken
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.Config
-import io.github.starwishsama.comet.objects.draw.ArkNightOperator
-import io.github.starwishsama.comet.objects.draw.PCRCharacter
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
-import io.github.starwishsama.comet.objects.group.Shop
 import io.github.starwishsama.comet.utils.*
 import java.io.File
 
@@ -62,37 +59,22 @@ object DataSetup {
     private fun load() {
         try {
             BotVariables.cfg = Yaml.default.parse(Config.serializer(), cfgFile.getContext())
-            BotVariables.users.addAll(gson.fromJson(
-                    userCfg.getContext(),
-                    object : TypeToken<List<BotUser>>() {}.type
-            ))
+            BotVariables.users.addAll(gson.fromJson<List<BotUser>>(userCfg.getContext()))
 
-            BotVariables.shop = gson.fromJson(
-                    shopItemCfg.getContext(),
-                    object : TypeToken<List<Shop>>() {}.type
-            )
+            BotVariables.shop = gson.fromJson(shopItemCfg.getContext())
 
             loadLang()
 
             if (pcrData.exists()) {
-                BotVariables.pcr = gson.fromJson(
-                    pcrData.getContext(),
-                    object : TypeToken<List<PCRCharacter>>() {}.type
-                )
+                BotVariables.pcr = gson.fromJson(pcrData.getContext())
             }
 
             if (arkNightData.exists()) {
-                BotVariables.arkNight = gson.fromJson(
-                    arkNightData.getContext(),
-                    object : TypeToken<List<ArkNightOperator>>() {}.type
-                )
+                BotVariables.arkNight = gson.fromJson(arkNightData.getContext())
             }
 
             if (!cacheCfg.exists()) {
-                val jsonObject = JsonObject()
-                jsonObject.addProperty("token", "")
-                jsonObject.addProperty("get_time", 0L)
-                cacheCfg.writeClassToJson(jsonObject)
+                cacheCfg.writeClassToJson(JsonObject())
             } else {
                 BotVariables.cache = JsonParser.parseString(cacheCfg.getContext()).asJsonObject
             }
@@ -119,10 +101,7 @@ object DataSetup {
             val lang: JsonElement =
                     JsonParser.parseString(langCfg.getContext())
             if (lang.isJsonArray) {
-                BotVariables.localMessage = gson.fromJson(
-                    FileReader.create(langCfg).readString(),
-                    object : TypeToken<List<BotLocalization>>() {}.type
-                )
+                BotVariables.localMessage = gson.fromJson(FileReader.create(langCfg).readString())
                 println("[配置] 成功载入多语言文件")
             } else {
                 System.err.println("[配置] 在读取时发生了问题, 非法的 JSON 文件")
@@ -169,7 +148,7 @@ object DataSetup {
             }
         }
 
-        BotVariables.logger.info("[群配置] 成功加载了 $count 个群配置")
+        BotVariables.logger.info("[配置] 成功加载了 $count 个群配置")
     }
 
     private fun savePerGroupSetting() {
