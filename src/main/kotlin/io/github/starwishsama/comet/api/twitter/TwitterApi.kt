@@ -150,7 +150,7 @@ object TwitterApi : ApiExecutor {
         return null
     }
 
-    fun getCachedTweet(username: String, index: Int = 0, max: Int = 10): TweetResponse {
+    fun getCachedTweet(username: String, index: Int = 0, max: Int = 10): TweetRetrieveResponse {
         val startTime = LocalDateTime.now()
         var tweet: Tweet? = null
 
@@ -163,7 +163,7 @@ object TwitterApi : ApiExecutor {
                     cachedTweet = getUserTweets(username, max)[index]
                 }
 
-                result = if (Duration.between(cachedTweet.getSentTime(), LocalDateTime.now()).toMinutes() <= 3
+                result = if (Duration.between(cachedTweet.getSentTime(), LocalDateTime.now()).toMinutes() <= 1
                 ) {
                     cachedTweet
                 } else {
@@ -176,12 +176,10 @@ object TwitterApi : ApiExecutor {
                 tweet = result
             } catch (x: TwitterApiException) {
                 logger.warning("[蓝鸟] 调用 API 时出现了问题", x)
-                    }
-                },
-                1
-        )
+            }
+        }, 1)
 
-        return TweetResponse(tweet, executedStatus)
+        return TweetRetrieveResponse(tweet, executedStatus)
     }
 
     @Synchronized
@@ -211,7 +209,7 @@ object TwitterApi : ApiExecutor {
         return parsedTweet
     }
 
-    data class TweetResponse(val tweet: Tweet?, val status: BotUtil.TaskStatus)
+    data class TweetRetrieveResponse(val tweet: Tweet?, val status: BotUtil.TaskStatus)
 
     override fun isReachLimit(): Boolean {
         return usedTime >= getLimitTime()

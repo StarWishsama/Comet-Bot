@@ -31,7 +31,7 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     val filePath: File = FileUtil.getJarLocation()
-    const val version = "0.4.3-DEV-4223159-20200810"
+    const val version = "0.4.3-DEV-a81e167-20200810"
     lateinit var bot: Bot
     lateinit var startTime: LocalDateTime
     var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
