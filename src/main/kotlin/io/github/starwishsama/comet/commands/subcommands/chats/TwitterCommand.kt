@@ -104,6 +104,7 @@ class TwitterCommand : ChatCommand {
                 BotUtil.TaskStatus.FAILED -> BotUtil.sendMessage("获取推文时出现了异常, 请联系管理员")
                 BotUtil.TaskStatus.TIMEOUT -> BotUtil.sendMessage("获取推文超时, 请稍后重试")
                 BotUtil.TaskStatus.CUSTOM -> BotUtil.sendMessage("已达到蓝鸟 API 请求上限啦, 请稍等一会再获取吧")
+                BotUtil.TaskStatus.OUT_LIMIT -> BotUtil.sendMessage("请求的下标越界了, 请检查后重试")
                 else -> BotUtil.sendMessage("获取推文时出现了异常")
             }
         }

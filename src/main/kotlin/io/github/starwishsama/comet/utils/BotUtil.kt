@@ -331,6 +331,6 @@ object BotUtil {
     }
 
     enum class TaskStatus {
-        SUCCESS, FAILED, TIMEOUT, CUSTOM
+        SUCCESS, FAILED, TIMEOUT, CUSTOM, OUT_LIMIT
     }
 }

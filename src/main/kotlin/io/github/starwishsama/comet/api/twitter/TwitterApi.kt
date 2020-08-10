@@ -127,7 +127,8 @@ object TwitterApi : ApiExecutor {
         val result = request.execute()
 
         if (result.isOk && result.isType(ContentType.JSON.value)) {
-            return parseJsonToTweet(result.body(), request.url).sortedByDescending { it.getSentTime() }
+            val tweetList = parseJsonToTweet(result.body(), request.url)
+            return if (tweetList.isNotEmpty()) tweetList.sortedByDescending { it.getSentTime() } else emptyList()
         }
 
         return tweets
@@ -144,7 +145,7 @@ object TwitterApi : ApiExecutor {
 
 
         if (response.isOk && response.isType(ContentType.JSON.value)) {
-            return parseJsonToTweet(response.body(), request.url)[0]
+            return if (parseJsonToTweet(response.body(), request.url).isNotEmpty()) parseJsonToTweet(response.body(), request.url)[0] else null
         }
 
         return null
@@ -154,20 +155,27 @@ object TwitterApi : ApiExecutor {
         val startTime = LocalDateTime.now()
         var tweet: Tweet? = null
 
+        if (index < 0 || index >= max) return TweetRetrieveResponse(tweet, BotUtil.TaskStatus.OUT_LIMIT)
+
         val executedStatus = BotUtil.executeWithRetry({
             try {
                 var cachedTweet = cacheTweet[username]
                 val result: Tweet?
 
                 if (cachedTweet == null) {
-                    cachedTweet = getUserTweets(username, max)[index]
+                    try {
+                        cachedTweet = getUserTweets(username, max)[index]
+                    } catch (t: ArrayIndexOutOfBoundsException) {
+                        return@executeWithRetry
+                    }
                 }
 
                 result = if (Duration.between(cachedTweet.getSentTime(), LocalDateTime.now()).toMinutes() <= 1
                 ) {
                     cachedTweet
                 } else {
-                    getUserTweets(username, max)[index]
+                    val list = getUserTweets(username, max)
+                    if (list.isNotEmpty()) list[index] else null
                 }
 
                 logger.debug(
