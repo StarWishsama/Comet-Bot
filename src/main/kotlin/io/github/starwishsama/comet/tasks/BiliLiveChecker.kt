@@ -47,7 +47,7 @@ object BiliLiveChecker : CometPusher {
                         }
                     }
 
-                    if (!hasOldData) {
+                    if (!hasOldData && data.code == 1) {
                         pushedList.add(sli)
                     }
                 }
