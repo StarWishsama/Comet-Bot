@@ -23,10 +23,9 @@ class RSPCommand : ChatCommand {
                     val systemInt = RandomUtil.randomInt(RockPaperScissors.values().size)
                     val system = RockPaperScissors.values()[systemInt]
                     event.reply("角卷猜拳... 开始!")
-                    event.reply("请稍等...wtm是弱弱回线")
-                    val gif = File(FileUtil.getChildFolder("img"), system.fileName).uploadAsImage(event.subject)
-                    event.reply(gif)
-                    delay(1_500)
+                    val img = File(FileUtil.getChildFolder("img"), system.fileName).uploadAsImage(event.subject)
+                    event.reply(img)
+                    delay(2_000)
                     return when (RockPaperScissors.isWin(player, system)) {
                         -1 -> BotUtil.sendMessage("平局! わため出的是${system.cnName}")
                         0 -> BotUtil.sendMessage("你输了! わため出的是${system.cnName}")
