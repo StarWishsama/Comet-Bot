@@ -4,11 +4,13 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.commands.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.commands.interfaces.SuspendCommand
+import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.toMsgChain
+import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.asHumanReadable
@@ -90,27 +92,30 @@ object CommandExecutor {
                     handleSession(event, executedTime)
                 }
 
-                if (isCommandPrefix(message)) {
-                    if (cmd != null) {
-                        val splitMessage = message.split(" ")
-                        BotVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.getProps().name}")
-                        var user = BotUser.getUser(senderId)
-                        if (user == null) {
-                            user = BotUser.quickRegister(senderId)
-                        }
+                if (cmd != null && event is GroupMessageEvent &&
+                        GroupConfigManager.getConfigSafely(event.group.id).isDisabledCommand(cmd)) {
+                    return ExecutedResult(EmptyMessageChain, cmd)
+                }
 
-                        val result: MessageChain = if (cmd.hasPermission(user, event)) {
-                            cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
-                        } else {
-                            BotUtil.sendMessage("你没有权限!")
-                        }
-                        val usedTime = Duration.between(executedTime, LocalDateTime.now())
-                        BotVariables.logger.debug(
-                                "[命令] 命令执行耗时 ${usedTime.toKotlinDuration().asHumanReadable}"
-                        )
-
-                        return ExecutedResult(result, cmd)
+                if (isCommandPrefix(message) && cmd != null) {
+                    val splitMessage = message.split(" ")
+                    BotVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.getProps().name}")
+                    var user = BotUser.getUser(senderId)
+                    if (user == null) {
+                        user = BotUser.quickRegister(senderId)
                     }
+
+                    val result: MessageChain = if (cmd.hasPermission(user, event)) {
+                        cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
+                    } else {
+                        BotUtil.sendMessage("你没有权限!")
+                    }
+                    val usedTime = Duration.between(executedTime, LocalDateTime.now())
+                    BotVariables.logger.debug(
+                            "[命令] 命令执行耗时 ${usedTime.toKotlinDuration().asHumanReadable}"
+                    )
+
+                    return ExecutedResult(result, cmd)
                 }
             } catch (t: Throwable) {
                 val msg = t.message

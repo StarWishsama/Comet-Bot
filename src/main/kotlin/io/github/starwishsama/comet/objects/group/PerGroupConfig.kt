@@ -80,4 +80,8 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
         BotVariables.perGroup.add(this)
         return this
     }
+
+    fun isDisabledCommand(command: ChatCommand): Boolean {
+        return disabledCommands.contains(command)
+    }
 }
