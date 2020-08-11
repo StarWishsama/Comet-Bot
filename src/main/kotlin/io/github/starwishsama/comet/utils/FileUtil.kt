@@ -4,9 +4,11 @@ import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
 import cn.hutool.core.net.URLDecoder
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -68,7 +70,7 @@ object FileUtil {
 
         val report = "Error occurred:\nExtra message: $message\n${getBeautyStackTrace(t)}\n\nRaw content:\n$content"
         location.writeString(report)
-        BotVariables.logger.debug("$reason, 错误报告已生成! 保存在 ${location.path}")
+        daemonLogger.debug("$reason, 错误报告已生成! 保存在 ${location.path}")
     }
 
     fun initLog() {
@@ -78,7 +80,7 @@ object FileUtil {
             BotVariables.log = File(parent, "log-${dateFormatter.format(initTime)}.log")
             BotVariables.log.createNewFile()
         } catch (e: IOException) {
-            error("尝试输出 Log 失败")
+            daemonLogger.error("尝试输出 Log 失败")
         }
     }
 
@@ -142,4 +144,15 @@ object FileUtil {
     fun createBlankFile(location: File) {
         if (!location.exists()) location.createNewFile()
     }
+
+    fun getFileAsStreamInJar(fileName: String): StreamWithName? {
+        val stream = Thread.currentThread().contextClassLoader.getResourceAsStream(fileName)
+        if (stream != null) {
+            return StreamWithName(stream, fileName)
+        }
+
+        return null
+    }
+
+    data class StreamWithName(val stream: InputStream, val name: String)
 }

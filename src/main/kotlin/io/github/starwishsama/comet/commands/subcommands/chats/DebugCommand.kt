@@ -43,7 +43,7 @@ class DebugCommand : ChatCommand {
                         if (sessions.isEmpty()) {
                             sb.append("无")
                         } else {
-                            var i = 1
+                            var i = 0
                             for (session in sessions) {
                                 sb.append(i + 1).append(" ").append(session.key.toString()).append("\n")
                                 i++
@@ -68,16 +68,12 @@ class DebugCommand : ChatCommand {
                         BotUtil.sendMessage("今日もかわいい!")
                     }
                 }
-                "tpush" -> {
-                    TweetUpdateChecker.retrieve()
-                }
+                "tpush" -> TweetUpdateChecker.retrieve()
                 "youtube" -> {
                     if (args.size > 1) {
                         val result = YoutubeApi.getChannelVideos(args[1], 10)
                         return YoutubeApi.getLiveStatusByResult(result).toMessageChain(event.subject)
                     }
-                }
-                "janken" -> {
                 }
                 else -> return "Bot > 命令不存在\n${getHelp()}".toMsgChain()
             }

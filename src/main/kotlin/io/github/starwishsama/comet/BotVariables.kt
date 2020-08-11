@@ -16,6 +16,7 @@ import io.github.starwishsama.comet.utils.FileUtil
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.utils.MiraiLogger
+import net.mamoe.mirai.utils.PlatformLogger
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
 import java.time.LocalDateTime
@@ -31,7 +32,7 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     val filePath: File = FileUtil.getJarLocation()
-    const val version = "0.4.3-DEV-2944190-20200810"
+    const val version = "0.5-DEV-9135135-20200811"
     lateinit var bot: Bot
     lateinit var startTime: LocalDateTime
     var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
@@ -44,6 +45,7 @@ object BotVariables {
                     }.build()
     )
     lateinit var logger: MiraiLogger
+    val daemonLogger: PlatformLogger = PlatformLogger("BotService")
     val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
     var rCon: Rcon? = null
     lateinit var log: File

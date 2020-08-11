@@ -20,41 +20,39 @@ import java.io.File
 class RSPCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(event.sender.id)) {
-            if (args.isNotEmpty()) {
-                event.reply("角卷猜拳... 开始! 你要出什么呢?")
-                SessionManager.addSession(Session(user.id, this))
-            } else {
-                return BotUtil.sendMessage(getHelp())
-            }
+            event.reply("角卷猜拳... 开始! 你要出什么呢?")
+            SessionManager.addSession(Session(this, user.id))
         }
         return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps = CommandProps("janken", arrayListOf("猜拳", "石头剪刀布", "rsp", "cq"), "石头剪刀布", "nbot.commands.rsp", UserLevel.USER)
 
-    override fun getHelp(): String = "/cq [石头/剪刀/布] 石头剪刀布"
+    override fun getHelp(): String = "/cq 石头剪刀布"
 
     override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
         val player = RockPaperScissors.getType(event.message.contentToString())
         if (player != null) {
             val systemInt = RandomUtil.randomInt(RockPaperScissors.values().size)
             val system = RockPaperScissors.values()[systemInt]
-            delay(3_000)
-            val img = File(FileUtil.getChildFolder("img"), system.fileName).uploadAsImage(event.subject)
+            delay(1_500)
+            val img = File(FileUtil.getChildFolder("res"), system.fileName).uploadAsImage(event.subject)
             event.reply(img)
             when (RockPaperScissors.isWin(player, system)) {
-                -1 -> event.reply(BotUtil.sendMessage("平局! わため出的是${system.cnName}"))
-                0 -> event.reply(BotUtil.sendMessage("你输了! わため出的是${system.cnName}"))
-                1 -> BotUtil.sendMessage("你赢了! わため出的是${system.cnName}")
-                else -> BotUtil.sendMessage("这合理吗?")
+                -1 -> event.reply(BotUtil.sendMessage("平局! わため出的是${system.cnName[0]}"))
+                0 -> event.reply(BotUtil.sendMessage("你输了! わため出的是${system.cnName[0]}"))
+                1 -> event.reply(BotUtil.sendMessage("你赢了! わため出的是${system.cnName[0]}"))
+                else -> event.reply(BotUtil.sendMessage("这合理吗?"))
             }
         } else {
             event.reply(BotUtil.sendMessage("你的拳法杂乱无章, 这合理吗?"))
         }
+
+        SessionManager.expireSession(session)
     }
 
     enum class RockPaperScissors(val cnName: Array<String>, val fileName: String) {
-        ROCK(arrayOf("石头", "石子", "拳头", "拳"), "rock.png"), SCISSORS(arrayOf("剪刀"), "scissor.png"), PAPER(arrayOf("布", "包布"), "paper.png");
+        ROCK(arrayOf("石头", "石子", "拳头", "拳", "👊"), "rock.png"), SCISSORS(arrayOf("剪刀", "✂"), "scissor.png"), PAPER(arrayOf("布", "包布"), "paper.png");
 
         companion object {
             fun getType(name: String): RockPaperScissors? {

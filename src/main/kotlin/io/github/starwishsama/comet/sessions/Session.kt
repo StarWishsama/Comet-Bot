@@ -14,6 +14,10 @@ open class Session(open var groupId: Long = 0, var command: ChatCommand) {
         putUser(id)
     }
 
+    override fun toString(): String {
+        return "Session#${hashCode()} {groupId=$groupId, command=${command.getProps().name}, users=${users}}"
+    }
+
     private fun putUser(id: Long) {
         users = users + SessionUser(id)
     }
