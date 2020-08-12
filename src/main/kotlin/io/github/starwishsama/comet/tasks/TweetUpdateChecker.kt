@@ -13,6 +13,7 @@ import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.uploadAsImage
 import java.time.Duration
+import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 import kotlin.time.ExperimentalTime
 
@@ -89,8 +90,12 @@ object TweetUpdateChecker : CometPusher {
     }
 
     private fun isOutdatedTweet(retrieve: Tweet, toCompare: Tweet?): Boolean {
-        if (toCompare == null) return false
-        if (Duration.between(toCompare.getSentTime(), retrieve.getSentTime()).toHours() >= 1) return true
-        return retrieve.contentEquals(toCompare)
+        val retrieveTime = Duration.between(retrieve.getSentTime(), LocalDateTime.now()).toMinutes()
+        if (retrieveTime >= 45 || (toCompare != null && Duration.between(
+                toCompare.getSentTime(),
+                retrieve.getSentTime()
+            ).toMinutes() >= 60)
+        ) return true
+        return toCompare?.let { retrieve.contentEquals(it) } ?: false
     }
 }

@@ -3,10 +3,7 @@ package io.github.starwishsama.comet
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
-import io.github.starwishsama.comet.objects.BotLocalization
-import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.Config
-import io.github.starwishsama.comet.objects.RandomResult
+import io.github.starwishsama.comet.objects.*
 import io.github.starwishsama.comet.objects.draw.ArkNightOperator
 import io.github.starwishsama.comet.objects.draw.PCRCharacter
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
@@ -32,7 +29,7 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     val filePath: File = FileUtil.getJarLocation()
-    const val version = "0.5-DEV-9135135-20200811"
+    const val version = "0.5-DEV-6cc8fa1-20200812"
     lateinit var bot: Bot
     lateinit var startTime: LocalDateTime
     var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
@@ -57,12 +54,12 @@ object BotVariables {
     var underCovers: MutableList<RandomResult> = LinkedList()
     var cache: JsonObject = JsonObject()
     val perGroup: MutableSet<PerGroupConfig> = HashSet()
+    var hitokoto: Hitokoto? = null
+    val rssItems: MutableList<RssItem> = mutableListOf()
 
     /** 明日方舟/PCR 卡池数据 */
     var arkNight: MutableList<ArkNightOperator> = LinkedList()
     var pcr: MutableList<PCRCharacter> = LinkedList()
-
-    var hitokoto: Hitokoto? = null
 
     var switch: Boolean = true
 

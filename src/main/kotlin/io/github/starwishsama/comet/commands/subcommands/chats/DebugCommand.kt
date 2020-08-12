@@ -12,6 +12,7 @@ import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.tasks.TweetUpdateChecker
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.RssUtil
 import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -73,6 +74,15 @@ class DebugCommand : ChatCommand {
                     if (args.size > 1) {
                         val result = YoutubeApi.getChannelVideos(args[1], 10)
                         return YoutubeApi.getLiveStatusByResult(result).toMessageChain(event.subject)
+                    }
+                }
+                "rss" -> {
+                    if (args.size > 1) {
+                        return RssUtil.simplifyHTML(
+                            RssUtil.getFromEntry(
+                                RssUtil.getEntryFromURL(args[1]) ?: return "Can't retrieve page content".toMsgChain()
+                            )
+                        ).toMsgChain()
                     }
                 }
                 else -> return "Bot > 命令不存在\n${getHelp()}".toMsgChain()

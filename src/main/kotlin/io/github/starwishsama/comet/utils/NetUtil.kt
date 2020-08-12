@@ -48,7 +48,7 @@ object NetUtil {
     }
 
     @Throws(HttpException::class)
-    fun doHttpRequestGet(url: String, timeout: Int): HttpRequest {
+    fun doHttpRequestGet(url: String, timeout: Int = 5000): HttpRequest {
         return doHttpRequest(url, timeout, BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort, Method.GET)
     }
 

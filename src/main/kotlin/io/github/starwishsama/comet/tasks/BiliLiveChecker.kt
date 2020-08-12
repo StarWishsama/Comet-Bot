@@ -33,14 +33,15 @@ object BiliLiveChecker : CometPusher {
             val data = runBlocking { FakeClientApi.getLiveRoom(roomId) }
             if (data != null) {
                 val sli = StoredLiveInfo(data.data, false)
-                if (pushedList.isEmpty()) {
+                if (pushedList.isEmpty() && data.data.liveStatus == 1) {
                     pushedList.plusAssign(sli)
                 } else {
                     var hasOldData = false
                     for (i in pushedList.indices) {
                         if (pushedList[i].data.roomId == roomId) {
                             hasOldData = true
-                            if (data.data.liveStatus == 1) pushedList[i] = sli
+                            if (pushedList[i].data.liveStatus == 0 && data.data.liveStatus == 1)
+                                pushedList[i] = sli
                             break
                         }
                     }
