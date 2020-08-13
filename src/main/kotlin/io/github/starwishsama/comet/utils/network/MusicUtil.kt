@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.utils
+package io.github.starwishsama.comet.utils.network
 
 import cn.hutool.http.HttpRequest
 import com.github.salomonbrys.kotson.get
@@ -21,10 +21,10 @@ object MusicUtil {
     fun searchNetEaseMusic(songName: String): MessageChain {
         try {
             val searchResponse = HttpRequest.get(
-                "http://${api4NetEase}/search?keywords=${URLEncoder.encode(
-                    songName,
-                    "UTF-8"
-                )}"
+                    "http://$api4NetEase/search?keywords=${URLEncoder.encode(
+                            songName,
+                            "UTF-8"
+                    )}"
             ).timeout(8000).executeAsync()
             if (searchResponse.isOk) {
                 val searchResult: JsonObject = JsonParser.parseString(searchResponse.body()) as JsonObject
@@ -32,7 +32,7 @@ object MusicUtil {
                     val musicId = searchResult.getAsJsonObject("result").getAsJsonArray("songs")[0]["id"].asInt
                     val musicUrl = "https://music.163.com/#/song?id=$musicId"
                     val songResult =
-                        HttpRequest.get("http://${api4NetEase}/song/detail?ids=$musicId").timeout(8000)
+                            HttpRequest.get("http://$api4NetEase/song/detail?ids=$musicId").timeout(8000)
                             .executeAsync()
                     if (songResult.isOk) {
                         val songJson = JsonParser.parseString(songResult.body())
@@ -50,7 +50,7 @@ object MusicUtil {
                             artistName = artistName.substring(0, artistName.length - 1)
 
                             val playResult =
-                                HttpRequest.get("http://${api4NetEase}/song/url?id=$musicId")
+                                    HttpRequest.get("http://$api4NetEase/song/url?id=$musicId")
                                     .timeout(8000).executeAsync()
                             if (playResult.isOk) {
                                 val playJson = JsonParser.parseString(playResult.body())

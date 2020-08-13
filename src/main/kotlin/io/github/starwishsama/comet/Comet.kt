@@ -162,6 +162,7 @@ object Comet {
                         VersionCommand(),
                         GroupConfigCommand(),
                         RSPCommand(),
+                        RollCommand(),
                         // Console Command
                         StopCommand(),
                         DebugCommand(),

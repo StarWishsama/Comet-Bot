@@ -54,7 +54,7 @@ object SessionManager {
         return getSession(id) != null
     }
 
-    private fun isValidSessionByGroup(groupId: Long): Boolean {
+    fun isValidSessionByGroup(groupId: Long): Boolean {
         return getSessionByGroup(groupId) != null
     }
 

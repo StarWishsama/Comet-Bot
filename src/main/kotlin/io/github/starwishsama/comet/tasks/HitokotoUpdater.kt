@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.tasks
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
-import io.github.starwishsama.comet.utils.NetUtil
+import io.github.starwishsama.comet.utils.network.NetUtil
 
 object HitokotoUpdater : Runnable {
     override fun run() {

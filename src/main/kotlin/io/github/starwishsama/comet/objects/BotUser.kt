@@ -107,5 +107,14 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
             }
             return null
         }
+
+        fun getUserSafely(qq: Long): BotUser {
+            for (user in BotVariables.users) {
+                if (user.id == qq) {
+                    return user
+                }
+            }
+            return quickRegister(qq)
+        }
     }
 }

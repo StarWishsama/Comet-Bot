@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
-import io.github.starwishsama.comet.utils.NetUtil
+import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.getGroupOrNull

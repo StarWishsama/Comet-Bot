@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.isLegitId
 import io.github.starwishsama.comet.utils.BotUtil.isNoCoolDown
-import io.github.starwishsama.comet.utils.R6SUtil.getR6SInfo
+import io.github.starwishsama.comet.utils.network.R6SUtil.getR6SInfo
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain

@@ -18,8 +18,8 @@ import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.FileUtil
-import io.github.starwishsama.comet.utils.NetUtil
 import io.github.starwishsama.comet.utils.isType
+import io.github.starwishsama.comet.utils.network.NetUtil
 import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime

@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.utils
+package io.github.starwishsama.comet.utils.network
 
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
@@ -24,8 +24,8 @@ object RssUtil {
     fun simplifyHTML(raw: String): String {
         var context = raw
         context =
-            context.replace("<br />".toRegex(), "\n").replace("<br>".toRegex(), "\n").replace("</p><p>".toRegex(), "\n")
-                .replace("	".toRegex(), "")
+                context.replace("<br />".toRegex(), "\n").replace("<br>".toRegex(), "\n").replace("</p><p>".toRegex(), "\n")
+                        .replace("	".toRegex(), "").replace("</li>".toRegex(), "\n")
         while (context.indexOf('<') != -1) {
             val l = context.indexOf('<')
             val r = context.indexOf('>')
@@ -37,7 +37,7 @@ object RssUtil {
         return context
     }
 
-    fun getRSSItems(address: String): List<SyndEntry> {
+    private fun getRSSItems(address: String): List<SyndEntry> {
         return try {
             val stream = NetUtil.doHttpRequestGet(address).executeAsync().bodyStream()
             val reader = XmlReader(stream)

@@ -12,7 +12,7 @@ import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.tasks.TweetUpdateChecker
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.RssUtil
+import io.github.starwishsama.comet.utils.network.RssUtil
 import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain

@@ -11,7 +11,7 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.NetUtil
+import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.MemberPermission

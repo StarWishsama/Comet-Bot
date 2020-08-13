@@ -8,7 +8,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.getRestString
-import io.github.starwishsama.comet.utils.MusicUtil
+import io.github.starwishsama.comet.utils.network.MusicUtil
 import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain

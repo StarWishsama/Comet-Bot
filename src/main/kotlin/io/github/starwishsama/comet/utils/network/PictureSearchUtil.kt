@@ -1,10 +1,11 @@
-package io.github.starwishsama.comet.utils
+package io.github.starwishsama.comet.utils.network
 
 import cn.hutool.core.util.URLUtil
 import cn.hutool.http.ContentType
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.pojo.PicSearchResult
+import io.github.starwishsama.comet.utils.FileUtil
 import org.jsoup.Jsoup
 
 object PictureSearchUtil {

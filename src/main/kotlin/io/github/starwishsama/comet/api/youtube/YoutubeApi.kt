@@ -9,7 +9,7 @@ import io.github.starwishsama.comet.objects.WrappedMessage
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
 import io.github.starwishsama.comet.objects.pojo.youtube.VideoType
 import io.github.starwishsama.comet.objects.pojo.youtube.YoutubeRequestError
-import io.github.starwishsama.comet.utils.NetUtil
+import io.github.starwishsama.comet.utils.network.NetUtil
 
 object YoutubeApi : ApiExecutor {
     private var searchApi = "https://www.googleapis.com/youtube/v3/search?order=date&part=snippet,"

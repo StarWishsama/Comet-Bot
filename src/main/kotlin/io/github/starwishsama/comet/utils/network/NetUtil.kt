@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.utils
+package io.github.starwishsama.comet.utils.network
 
 import cn.hutool.core.io.IORuntimeException
 import cn.hutool.http.HttpException
@@ -6,6 +6,7 @@ import cn.hutool.http.HttpRequest
 import cn.hutool.http.HttpResponse
 import cn.hutool.http.Method
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.utils.FileUtil
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.uploadAsImage

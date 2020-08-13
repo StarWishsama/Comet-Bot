@@ -10,7 +10,7 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.PictureSearchUtil
+import io.github.starwishsama.comet.utils.network.PictureSearchUtil
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.Image

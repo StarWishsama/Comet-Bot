@@ -6,6 +6,7 @@ import io.github.starwishsama.comet.commands.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.commands.interfaces.SuspendCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.sessions.DaemonSession
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
@@ -88,8 +89,9 @@ object CommandExecutor {
 
         if (BotVariables.switch || (cmd != null && cmd.getProps().name.contentEquals("debug"))) {
             try {
-                if (SessionManager.isValidSessionById(senderId)) {
-                    handleSession(event, executedTime)
+                val session = SessionManager.getSessionByEvent(event)
+                if (session != null && !handleSession(event, executedTime)) {
+                    return ExecutedResult(EmptyMessageChain, cmd)
                 }
 
                 if (cmd != null && event is GroupMessageEvent &&
@@ -153,28 +155,32 @@ object CommandExecutor {
         return ""
     }
 
+    /**
+     * 处理会话
+     * @return 是否为监听会话
+     */
     @ExperimentalTime
-    private suspend fun handleSession(event: MessageEvent, time: LocalDateTime) {
+    private suspend fun handleSession(event: MessageEvent, time: LocalDateTime): Boolean {
         val sender = event.sender
-        if (!isCommandPrefix(event.message.contentToString()) && SessionManager.isValidSessionById(sender.id)) {
+        if (!isCommandPrefix(event.message.contentToString())) {
             val session: Session? = SessionManager.getSessionByEvent(event)
             if (session != null) {
                 val command = session.command
                 if (command is SuspendCommand) {
-                    var user = BotUser.getUser(sender.id)
-                    if (user == null) {
-                        user = BotUser.quickRegister(sender.id)
-                    }
+                    val user = BotUser.getUserSafely(sender.id)
                     command.handleInput(event, user, session)
                 }
+
+                return session is DaemonSession
             }
         }
 
         val usedTime = Duration.between(time, LocalDateTime.now())
         BotVariables.logger.debug(
-            "[会话] 处理会话耗时 ${usedTime.toKotlinDuration().toLong(DurationUnit.SECONDS)}s${usedTime.toKotlinDuration()
-                .toLong(DurationUnit.MILLISECONDS)}ms"
+                "[会话] 处理会话耗时 ${usedTime.toKotlinDuration().toLong(DurationUnit.SECONDS)}s${usedTime.toKotlinDuration()
+                        .toLong(DurationUnit.MILLISECONDS)}ms"
         )
+        return true
     }
 
     fun getCommand(cmdPrefix: String): ChatCommand? {

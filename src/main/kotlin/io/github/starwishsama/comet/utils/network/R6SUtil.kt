@@ -1,5 +1,6 @@
-package io.github.starwishsama.comet.utils
+package io.github.starwishsama.comet.utils.network
 
+import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -7,6 +8,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.enums.R6Rank
 import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6Player
+import io.github.starwishsama.comet.utils.BotUtil
 import java.text.NumberFormat
 
 object R6SUtil {
@@ -26,10 +28,7 @@ object R6SUtil {
                 if (BotUtil.isValidJson(element)) {
                     val jsonObject: JsonObject = element.asJsonObject
                     val uuid: String = jsonObject.get(jsonObject.keySet().iterator().next()).asJsonObject.get("profile").asJsonObject.get("p_user").asString
-                    return gson.fromJson(
-                        NetUtil.getPageContent("https://r6.apitab.com/player/$uuid?cid=${BotVariables.cfg.r6tabKey}"),
-                        R6Player::class.java
-                    )
+                    return gson.fromJson(NetUtil.getPageContent("https://r6.apitab.com/player/$uuid?cid=${BotVariables.cfg.r6tabKey}"))
                 }
             }
         } catch (e: Exception) {

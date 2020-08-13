@@ -6,8 +6,8 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
 object TaskUtil {
-    fun runAsync(task: () -> Unit, delay: Long): ScheduledFuture<*> {
-        return BotVariables.service.schedule(task, delay, TimeUnit.SECONDS)
+    fun runAsync(task: () -> Unit, delay: Long, unit: TimeUnit = TimeUnit.SECONDS): ScheduledFuture<*> {
+        return BotVariables.service.schedule(task, delay, unit)
     }
 
     fun runScheduleTaskAsync(task: () -> Unit, firstTimeDelay: Long, period: Long, unit: TimeUnit): ScheduledFuture<*> {
@@ -15,11 +15,11 @@ object TaskUtil {
     }
 
     fun runScheduleTaskAsyncIf(
-        task: () -> Unit,
-        delay: Long,
-        period: Long,
-        unit: TimeUnit,
-        condition: Boolean
+            task: () -> Unit,
+            delay: Long,
+            period: Long,
+            unit: TimeUnit,
+            condition: Boolean
     ): ScheduledFuture<*> {
         Validate.isTrue(condition)
         return runScheduleTaskAsync(
