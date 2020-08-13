@@ -28,6 +28,7 @@ This bot is under heavy develop now, Many feature may not work as well.
 * 🐦 user's dynamic Pusher
 * RCON feature
 * Mute/Kick group member
+* Group drawing
 * WIP
 
 ## ☑ To-Do 

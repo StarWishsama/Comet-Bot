@@ -33,6 +33,7 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
 * 查询蓝🐦用户信息/推文
 * 自动推送最新推文到指定群聊
 * 禁言/踢出群员
+* 群抽奖
 * 还在开发中...
 
 ## ☑ To-Do 列表
