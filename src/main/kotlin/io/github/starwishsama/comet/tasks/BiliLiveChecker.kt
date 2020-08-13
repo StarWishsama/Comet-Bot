@@ -40,7 +40,7 @@ object BiliLiveChecker : CometPusher {
                     for (i in pushedList.indices) {
                         if (pushedList[i].data.roomId == roomId) {
                             hasOldData = true
-                            if (pushedList[i].data.liveStatus == 0 && data.data.liveStatus == 1)
+                            if (pushedList[i].data.liveStatus != data.data.liveStatus)
                                 pushedList[i] = sli
                             break
                         }
