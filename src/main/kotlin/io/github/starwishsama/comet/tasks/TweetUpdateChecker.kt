@@ -27,11 +27,6 @@ object TweetUpdateChecker : CometPusher {
     override fun retrieve() {
         if (!bot.isOnline) future?.cancel(false)
 
-        /** 检查是否有 Twitter Token, 如无则手动获取 */
-        if (TwitterApi.token == null) {
-            TwitterApi.getBearerToken()
-        }
-
         BotVariables.perGroup.parallelStream().forEach { cfg ->
             if (cfg.twitterPushEnabled) cfg.twitterSubscribers.forEach {
                 if (pushContent.containsKey(it)) {

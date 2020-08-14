@@ -6,33 +6,23 @@ import cn.hutool.http.HttpRequest
 import cn.hutool.http.HttpResponse
 import cn.hutool.http.Method
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.utils.FileUtil
-import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.message.data.Image
-import net.mamoe.mirai.message.uploadAsImage
 import java.io.*
 import java.net.Proxy
 import java.net.Socket
-
-
-suspend fun InputStream.uploadAsImageSafely(type: String, contact: Contact): Image? {
-    try {
-        if (type.contains("image")) {
-            return this.uploadAsImage(contact)
-        }
-    } catch (e: Exception) {
-        BotVariables.logger.warning("[网络] 在尝试上传图片时发生了问题", e)
-    }
-    return null
-}
 
 fun HttpResponse.getContentLength(): Int {
     return header("Content-Length").toIntOrNull() ?: -1
 }
 
+fun Socket.isUsable(timeout: Int = 1_000): Boolean {
+    return inetAddress.isReachable(timeout)
+}
+
 object NetUtil {
     const val defaultUA =
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
 
     fun getUrlInputStream(url: String?): InputStream? {
         if (url == null) return null
@@ -50,7 +40,7 @@ object NetUtil {
 
     @Throws(HttpException::class)
     fun doHttpRequestGet(url: String, timeout: Int = 5000): HttpRequest {
-        return doHttpRequest(url, timeout, BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort, Method.GET)
+        return doHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort, Method.GET)
     }
 
     @Throws(HttpException::class)
@@ -62,12 +52,10 @@ object NetUtil {
             .header("user-agent", defaultUA)
 
         if (proxyUrl.isNotEmpty() && proxyPort != -1) {
-            request.setProxy(
-                Proxy(
-                    Proxy.Type.HTTP,
-                    Socket(proxyUrl, proxyPort).remoteSocketAddress
-                )
-            )
+            val socket = Socket(proxyUrl, proxyPort)
+            if (socket.isUsable()) {
+                request.setProxy(Proxy(cfg.proxyType, socket.remoteSocketAddress))
+            }
         }
 
         return request

@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.objects
 import io.github.starwishsama.comet.enums.MusicApi
 import io.github.starwishsama.comet.enums.PicSearchApi
 import kotlinx.serialization.Serializable
+import java.net.Proxy
 
 //import net.mamoe.yamlkt.Comment
 
@@ -59,22 +60,25 @@ data class Config(
     //@Comment("用于获取 Twitter Token 的 Access Secret")
     var twitterAccessSecret: String? = null,
 
-    //@Comment("用于使用 Twitter Developer API 的 Token")
+        //@Comment("用于使用 Twitter Developer API 的 Token")
     var twitterToken: String? = null,
 
-    //@Comment("代理服务器地址, 目前仅支持 HTTP 代理")
+        //@Comment("代理服务器地址, 目前仅支持 HTTP 代理")
     var proxyUrl: String = "",
 
-    //@Comment("代理服务器端口, 目前仅支持 HTTP 代理")
+        //@Comment("代理服务器端口, 目前仅支持 HTTP 代理")
     var proxyPort: Int = 0,
 
-    //@Comment("Mirai 心跳周期, 单位分钟, 过长会导致被服务器断开连接")
+        //@Comment("代理类型, 支持 HTTP 和 SOCKS")
+    var proxyType: Proxy.Type = Proxy.Type.SOCKS,
+
+        //@Comment("Mirai 心跳周期, 单位分钟, 过长会导致被服务器断开连接")
     var heartBeatPeriod: Int = 2,
 
-    //@Comment("Youtube APIKey, 申请请见 https://developers.google.com/youtube/v3/getting-started")
+        //@Comment("Youtube APIKey, 申请请见 https://developers.google.com/youtube/v3/getting-started")
     var youtubeApiKey: String = "",
 
-    //@Comment("推文推送时候是否发送小图而不是原图")
+        //@Comment("推文推送时候是否发送小图而不是原图")
     var smallImageMode: Boolean = true,
 
     //@Comment("以图搜图 API 类型, 请使用 /ps source 命令修改")
