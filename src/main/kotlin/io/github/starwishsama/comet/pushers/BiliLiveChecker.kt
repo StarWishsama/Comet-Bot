@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.tasks
+package io.github.starwishsama.comet.pushers
 
 import com.hiczp.bilibili.api.live.model.RoomInfo
 import io.github.starwishsama.comet.BotVariables
@@ -10,6 +10,7 @@ import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.getGroupOrNull
+import net.mamoe.mirai.message.data.isContentNotEmpty
 import java.util.concurrent.ScheduledFuture
 
 object BiliLiveChecker : CometPusher {
@@ -78,14 +79,17 @@ object BiliLiveChecker : CometPusher {
         pushQueue.forEach { (info, pushGroups) ->
             if (!info.isPushed) {
                 val data = info.data
-                val msg = "单推助手 > \n${BiliBiliApi.getUserNameByMid(data.uid)} 开播了!" +
+                val msg = "单推助手 > \n${BiliBiliApi.getUserNameByMid(data.uid)} 正在直播!" +
                         "\n直播间标题: ${data.title}" +
                         "\n开播时间: ${data.liveTime}" +
                         "\n传送门: https://live.bilibili.com/${data.roomId}"
                 pushGroups.forEach {
-                    runBlocking {
-                        bot.getGroupOrNull(it)?.sendMessage(msg.toMsgChain().doFilter())
-                        delay(2_500)
+                    val filtered = msg.toMsgChain().doFilter()
+                    if (filtered.isContentNotEmpty()) {
+                        runBlocking {
+                            bot.getGroupOrNull(it)?.sendMessage(filtered)
+                            delay(2_500)
+                        }
                     }
                 }
                 info.isPushed = true

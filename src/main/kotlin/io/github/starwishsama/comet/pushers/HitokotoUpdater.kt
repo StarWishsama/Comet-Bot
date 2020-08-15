@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.tasks
+package io.github.starwishsama.comet.pushers
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.pojo.Hitokoto

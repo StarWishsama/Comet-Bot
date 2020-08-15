@@ -16,10 +16,10 @@ import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.ConvertLightAppListener
 import io.github.starwishsama.comet.listeners.RepeatListener
-import io.github.starwishsama.comet.tasks.BiliLiveChecker
-import io.github.starwishsama.comet.tasks.HitokotoUpdater
-import io.github.starwishsama.comet.tasks.TweetUpdateChecker
-import io.github.starwishsama.comet.tasks.YTBStreamChecker
+import io.github.starwishsama.comet.pushers.BiliLiveChecker
+import io.github.starwishsama.comet.pushers.HitokotoUpdater
+import io.github.starwishsama.comet.pushers.TweetUpdateChecker
+import io.github.starwishsama.comet.pushers.YTBStreamChecker
 import io.github.starwishsama.comet.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking

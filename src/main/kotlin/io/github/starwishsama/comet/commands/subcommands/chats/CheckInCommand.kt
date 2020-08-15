@@ -5,7 +5,7 @@ import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.tasks.HitokotoUpdater
+import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.User

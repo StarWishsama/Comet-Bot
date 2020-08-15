@@ -281,7 +281,7 @@ object CommandExecutor {
                         context = context.replace(it.toRegex(), " ")
                     }
 
-                    if (count > 3) {
+                    if (count > 5) {
                         return EmptyMessageChain
                     }
                 }

@@ -8,9 +8,9 @@ import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.pushers.HitokotoUpdater
+import io.github.starwishsama.comet.pushers.TweetUpdateChecker
 import io.github.starwishsama.comet.sessions.SessionManager
-import io.github.starwishsama.comet.tasks.HitokotoUpdater
-import io.github.starwishsama.comet.tasks.TweetUpdateChecker
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.network.RssUtil
 import io.github.starwishsama.comet.utils.toMsgChain

@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.tasks
+package io.github.starwishsama.comet.pushers
 
 import java.util.concurrent.ScheduledFuture
 
