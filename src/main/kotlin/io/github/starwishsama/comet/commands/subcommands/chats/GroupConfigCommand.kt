@@ -6,7 +6,6 @@ import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.utils.BotUtil
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.message.GroupMessageEvent
@@ -51,7 +50,27 @@ class GroupConfigCommand : ChatCommand {
                             BotUtil.sendMessage("已${if (cfg.autoAccept) "开启" else "关闭"}自动接受加群请求")
                         }
                     }
-                    "function", "fun", "func" -> disableCommand(cfg, args)
+                    "function", "fun", "func" -> {
+                        if (args.size < 2) {
+                            return BotUtil.sendMessage("""
+                现在支持禁用彗星 Bot 的命令功能了!
+                /gs function [命令名] 在本群禁用指定命令
+            """.trimIndent())
+                        }
+
+                        val command = CommandExecutor.getCommand(args[1])
+                        return if (command != null) {
+                            if (!cfg.disabledCommands.contains(command)) {
+                                cfg.disabledCommands.add(command)
+                                BotUtil.sendMessage("成功禁用该命令")
+                            } else {
+                                cfg.disabledCommands.remove(command)
+                                BotUtil.sendMessage("成功启用该命令")
+                            }
+                        } else {
+                            BotUtil.sendMessage("该命令不存在!")
+                        }
+                    }
                 }
             } else {
                 return BotUtil.sendMessage(getHelp())
@@ -67,6 +86,7 @@ class GroupConfigCommand : ChatCommand {
         /group helper [@/QQ] 添加/删除群助理
         /group repeat 开启/关闭本群机器人复读功能
         /group autojoin 开启/关闭本群机器人自动接受加群请求
+        /group func 启用/禁用本群可使用的命令
     """.trimIndent()
 
     override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean {
@@ -74,27 +94,5 @@ class GroupConfigCommand : ChatCommand {
         if (botUser.compareLevel(level)) return true
         if (e is GroupMessageEvent && e.sender.permission > MemberPermission.MEMBER) return true
         return false
-    }
-
-    private fun disableCommand(cfg: PerGroupConfig, args: List<String>): MessageChain {
-        if (args.size == 1) {
-            return BotUtil.sendMessage("""
-                现在支持禁用彗星 Bot 的命令功能了!
-                /gs function [命令名] 在本群禁用指定命令
-            """.trimIndent())
-        } else {
-            val command = CommandExecutor.getCommand(args[1])
-            return if (command != null) {
-                if (!cfg.disabledCommands.contains(command)) {
-                    cfg.disabledCommands.add(command)
-                    BotUtil.sendMessage("成功禁用该命令")
-                } else {
-                    cfg.disabledCommands.remove(command)
-                    BotUtil.sendMessage("成功启用该命令")
-                }
-            } else {
-                BotUtil.sendMessage("该命令不存在!")
-            }
-        }
     }
 }

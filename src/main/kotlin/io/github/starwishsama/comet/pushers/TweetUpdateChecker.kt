@@ -12,6 +12,7 @@ import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.isContentNotEmpty
 import net.mamoe.mirai.message.uploadAsImage
 import java.time.Duration
@@ -76,7 +77,8 @@ object TweetUpdateChecker : CometPusher {
                 val group = bot.getGroupOrNull(it)
                 if (group != null) {
                     val image = NetUtil.getUrlInputStream(content.getPictureUrl())?.uploadAsImage(group)
-                    val filtered = (content.getFullText().toMsgChain() + (image ?: EmptyMessageChain)).doFilter()
+                    val filtered = (PlainText("${content.user.name}\n") + content.getFullText().toMsgChain() + (image
+                            ?: EmptyMessageChain)).doFilter()
                     if (filtered.isContentNotEmpty()) group.sendMessage(filtered)
                 }
             }

@@ -58,7 +58,7 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
      * 本群启用的命令
      */
     @SerializedName("disabled_commands")
-    val disabledCommands: MutableSet<ChatCommand> = hashSetOf()
+    val disabledCommands: MutableSet<ChatCommand> = mutableSetOf()
 
     fun addHelper(id: Long): Boolean {
         if (isHelper(id)) return false
