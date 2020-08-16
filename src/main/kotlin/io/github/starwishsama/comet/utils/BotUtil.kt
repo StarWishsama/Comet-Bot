@@ -7,7 +7,7 @@ import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.coolDown
-import io.github.starwishsama.comet.BotVariables.logger
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.BotUser
@@ -67,7 +67,7 @@ fun kotlin.time.Duration.toFriendly(maxUnit: DurationUnit = TimeUnit.SECONDS): S
 }
 
 fun HttpResponse.isType(typeName: String): Boolean {
-    val contentType = this.header("content-type") ?: return false
+    val contentType = this.header("content-type") ?: return true
     return contentType.contains(typeName)
 }
 
@@ -312,7 +312,7 @@ object BotUtil {
                 when (t) {
                     is IORuntimeException -> {
                         initRetryTime++
-                        logger.debug("Retried failed, ${t.message}")
+                        daemonLogger.verbose("Retried failed, ${t.message}")
                         runTask()()
                     }
                     is RateLimitException -> {
@@ -320,6 +320,7 @@ object BotUtil {
                     }
                     else -> {
                         status = TaskStatus.FAILED
+                        daemonLogger.warning("在执行任务时发生异常", t)
                     }
                 }
             }

@@ -8,19 +8,32 @@ import cn.hutool.http.Method
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.network.NetUtil.proxyIsUsable
 import java.io.*
 import java.net.Proxy
 import java.net.Socket
+import java.net.URL
 
 fun HttpResponse.getContentLength(): Int {
     return header("Content-Length").toIntOrNull() ?: -1
 }
 
 fun Socket.isUsable(timeout: Int = 1_000): Boolean {
+    if (proxyIsUsable == 0) {
+        try {
+            val connection = URL("https://google.com").openConnection(Proxy(cfg.proxyType, this.remoteSocketAddress))
+            connection.connectTimeout = 5000
+            connection.connect()
+            proxyIsUsable = 1
+        } catch (t: Throwable) {
+            proxyIsUsable = -1
+        }
+    }
     return inetAddress.isReachable(timeout)
 }
 
 object NetUtil {
+    var proxyIsUsable = 0
     const val defaultUA =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
 
@@ -53,7 +66,7 @@ object NetUtil {
 
         if (proxyUrl.isNotEmpty() && proxyPort != -1) {
             val socket = Socket(proxyUrl, proxyPort)
-            if (socket.isUsable()) {
+            if (socket.isUsable() && proxyIsUsable > 0) {
                 request.setProxy(Proxy(cfg.proxyType, socket.remoteSocketAddress))
             }
         }

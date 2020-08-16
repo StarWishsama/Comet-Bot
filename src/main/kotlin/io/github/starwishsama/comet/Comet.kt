@@ -8,7 +8,6 @@ import io.github.starwishsama.comet.api.bilibili.FakeClientApi
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.api.youtube.YoutubeApi
 import io.github.starwishsama.comet.commands.CommandExecutor
-import io.github.starwishsama.comet.commands.CommandExecutor.doFilter
 import io.github.starwishsama.comet.commands.subcommands.chats.*
 import io.github.starwishsama.comet.commands.subcommands.console.DebugCommand
 import io.github.starwishsama.comet.commands.subcommands.console.StopCommand
@@ -200,12 +199,13 @@ object Comet {
                     if (this is GroupMessageEvent && group.isBotMuted) return@always
 
                     val result = CommandExecutor.execute(this)
+                    val filtered = result.msg
                     try {
-                        if (result.msg !is EmptyMessageChain && result.msg.isNotEmpty()) {
-                            reply(result.msg.doFilter())
+                        if (filtered !is EmptyMessageChain && filtered.isNotEmpty()) {
+                            reply(filtered)
                         }
                     } catch (e: IllegalArgumentException) {
-                        logger.warning("正在尝试发送空消息, 执行结果 $result")
+                        logger.warning("正在尝试发送空消息, 执行的命令为 $result")
                     }
                 }
             }

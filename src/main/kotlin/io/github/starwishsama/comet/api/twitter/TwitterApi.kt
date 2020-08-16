@@ -155,22 +155,16 @@ object TwitterApi : ApiExecutor {
         val startTime = LocalDateTime.now()
         var tweet: Tweet? = null
 
-        if (index < 0 || index >= max) return TweetRetrieveResponse(tweet, BotUtil.TaskStatus.OUT_LIMIT)
+        if (index < 0 || max <= index) {
+            return TweetRetrieveResponse(tweet, BotUtil.TaskStatus.OUT_LIMIT)
+        }
 
         val executedStatus = BotUtil.executeWithRetry({
             try {
-                var cachedTweet = cacheTweet[username]
+                val cachedTweet = cacheTweet[username]
                 val result: Tweet?
 
-                if (cachedTweet == null) {
-                    try {
-                        cachedTweet = getUserTweets(username, max)[index]
-                    } catch (t: ArrayIndexOutOfBoundsException) {
-                        return@executeWithRetry
-                    }
-                }
-
-                result = if (Duration.between(cachedTweet.getSentTime(), LocalDateTime.now()).toMinutes() <= 1
+                result = if (cachedTweet != null && Duration.between(cachedTweet.getSentTime(), LocalDateTime.now()).toMinutes() <= 1
                 ) {
                     cachedTweet
                 } else {

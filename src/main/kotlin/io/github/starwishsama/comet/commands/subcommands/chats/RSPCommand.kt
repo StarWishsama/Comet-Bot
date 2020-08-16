@@ -18,6 +18,7 @@ import net.mamoe.mirai.message.uploadAsImage
 import java.io.File
 
 class RSPCommand : ChatCommand, SuspendCommand {
+    val inProgressPlayer = mutableSetOf<Long>()
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(event.sender.id)) {
             event.reply("角卷猜拳... 开始! 你要出什么呢?")
@@ -31,24 +32,27 @@ class RSPCommand : ChatCommand, SuspendCommand {
     override fun getHelp(): String = "/cq 石头剪刀布"
 
     override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
-        val player = RockPaperScissors.getType(event.message.contentToString())
-        if (player != null) {
-            val systemInt = RandomUtil.randomInt(RockPaperScissors.values().size)
-            val system = RockPaperScissors.values()[systemInt]
-            delay(1_500)
-            val img = File(FileUtil.getChildFolder("res"), system.fileName).uploadAsImage(event.subject)
-            event.reply(img)
-            when (RockPaperScissors.isWin(player, system)) {
-                -1 -> event.reply(BotUtil.sendMessage("平局! わため出的是${system.cnName[0]}"))
-                0 -> event.reply(BotUtil.sendMessage("你输了! わため出的是${system.cnName[0]}"))
-                1 -> event.reply(BotUtil.sendMessage("你赢了! わため出的是${system.cnName[0]}"))
-                else -> event.reply(BotUtil.sendMessage("这合理吗?"))
+        if (!inProgressPlayer.contains(user.id)) {
+            val player = RockPaperScissors.getType(event.message.contentToString())
+            inProgressPlayer.add(user.id)
+            if (player != null) {
+                val systemInt = RandomUtil.randomInt(RockPaperScissors.values().size)
+                val system = RockPaperScissors.values()[systemInt]
+                delay(1_500)
+                val img = File(FileUtil.getChildFolder("res"), system.fileName).uploadAsImage(event.subject)
+                event.reply(img)
+                when (RockPaperScissors.isWin(player, system)) {
+                    -1 -> event.reply(BotUtil.sendMessage("平局! わため出的是${system.cnName[0]}"))
+                    0 -> event.reply(BotUtil.sendMessage("你输了! わため出的是${system.cnName[0]}"))
+                    1 -> event.reply(BotUtil.sendMessage("你赢了! わため出的是${system.cnName[0]}"))
+                    else -> event.reply(BotUtil.sendMessage("这合理吗?"))
+                }
+            } else {
+                event.reply(BotUtil.sendMessage("你的拳法杂乱无章, 这合理吗?"))
             }
-        } else {
-            event.reply(BotUtil.sendMessage("你的拳法杂乱无章, 这合理吗?"))
+            inProgressPlayer.remove(user.id)
+            SessionManager.expireSession(session)
         }
-
-        SessionManager.expireSession(session)
     }
 
     enum class RockPaperScissors(val cnName: Array<String>, val fileName: String) {

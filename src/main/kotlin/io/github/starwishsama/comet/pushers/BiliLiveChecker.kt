@@ -41,8 +41,7 @@ object BiliLiveChecker : CometPusher {
                     for (i in pushedList.indices) {
                         if (pushedList[i].data.roomId == roomId) {
                             hasOldData = true
-                            if (pushedList[i].data.liveStatus != data.data.liveStatus)
-                                pushedList[i] = sli
+                            if (pushedList[i].data.liveStatus != data.data.liveStatus) pushedList[i] = sli
                             break
                         }
                     }
@@ -79,16 +78,18 @@ object BiliLiveChecker : CometPusher {
         pushQueue.forEach { (info, pushGroups) ->
             if (!info.isPushed) {
                 val data = info.data
-                val msg = "单推助手 > \n${BiliBiliApi.getUserNameByMid(data.uid)} 正在直播!" +
-                        "\n直播间标题: ${data.title}" +
-                        "\n开播时间: ${data.liveTime}" +
-                        "\n传送门: https://live.bilibili.com/${data.roomId}"
-                pushGroups.forEach {
-                    val filtered = msg.toMsgChain().doFilter()
-                    if (filtered.isContentNotEmpty()) {
-                        runBlocking {
-                            bot.getGroupOrNull(it)?.sendMessage(filtered)
-                            delay(2_500)
+                if (data.liveStatus != 0) {
+                    val msg = "单推助手 > \n${BiliBiliApi.getUserNameByMid(data.uid)} 正在直播!" +
+                            "\n直播间标题: ${data.title}" +
+                            "\n开播时间: ${data.liveTime}" +
+                            "\n传送门: https://live.bilibili.com/${data.roomId}"
+                    pushGroups.forEach {
+                        val filtered = msg.toMsgChain().doFilter()
+                        if (filtered.isContentNotEmpty()) {
+                            runBlocking {
+                                bot.getGroupOrNull(it)?.sendMessage(filtered)
+                                delay(2_500)
+                            }
                         }
                     }
                 }
