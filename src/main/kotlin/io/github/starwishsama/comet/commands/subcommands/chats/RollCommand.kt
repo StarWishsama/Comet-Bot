@@ -12,8 +12,8 @@ import io.github.starwishsama.comet.sessions.SessionUser
 import io.github.starwishsama.comet.sessions.commands.roll.RollSession
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.TaskUtil
+import io.github.starwishsama.comet.utils.convertToChain
 import io.github.starwishsama.comet.utils.limitStringSize
-import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
@@ -34,7 +34,7 @@ class RollCommand : ChatCommand, SuspendCommand {
         val session = SessionManager.getSessionByGroup(event.group.id)
         if (session != null && session is RollSession) return BotUtil.sendMessage("该群已经有一个正在进行中的抽奖了!")
         if (args.size < 2) {
-            return getHelp().toMsgChain()
+            return getHelp().convertToChain()
         } else {
             val rollThing = args[0]
             val rollThingCount = args[1].toIntOrNull() ?: -1

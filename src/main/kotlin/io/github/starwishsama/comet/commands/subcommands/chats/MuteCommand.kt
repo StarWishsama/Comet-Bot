@@ -7,8 +7,8 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.convertToChain
 import io.github.starwishsama.comet.utils.isNumeric
-import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
@@ -40,12 +40,12 @@ class MuteCommand : ChatCommand {
                                     doRandomMute(event)
                                     BotUtil.sendMessage("下面将抽取一位幸运群友禁言")
                                 }
-                                else -> getHelp().toMsgChain()
+                                else -> getHelp().convertToChain()
                             }
                         }
                     }
                 } else {
-                    getHelp().toMsgChain()
+                    getHelp().convertToChain()
                 }
             } else {
                 BotUtil.sendMessage("我不是绿帽 我爬 我爬")

@@ -1,13 +1,12 @@
 package io.github.starwishsama.comet.api.twitter
 
 import cn.hutool.http.ContentType
-import cn.hutool.http.HttpException
-import cn.hutool.http.HttpResponse
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import com.roxstudio.utils.CUrl
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.api.ApiExecutor
@@ -34,7 +33,7 @@ object TwitterApi : ApiExecutor {
     // 蓝鸟 API 地址
     private const val twitterApiUrl = "https://api.twitter.com/1.1/"
 
-    // 使用 curl 获取 token, 请
+    // curl 获取 token, 请
     private const val twitterTokenGetUrl = "https://api.twitter.com/oauth2/token"
 
     // Bearer Token
@@ -45,15 +44,18 @@ object TwitterApi : ApiExecutor {
     // Api 调用次数
     override var usedTime: Int = 0
 
-    private const val apiReachLimit = "已达到 Twitter API调用上限"
+    private const val apiReachLimit = "已达到 Twitter API 调用上限"
 
+    /**
+     * 获取用于调用 Twitter API 的 Bearer Token
+     */
     fun getBearerToken() {
         try {
             val curl = CUrl(twitterTokenGetUrl).opt(
-                "-u",
-                "${BotVariables.cfg.twitterAccessToken}:${BotVariables.cfg.twitterAccessSecret}",
-                "--data",
-                "grant_type=client_credentials"
+                    "-u",
+                    "${BotVariables.cfg.twitterAccessToken}:${BotVariables.cfg.twitterAccessSecret}",
+                    "--data",
+                    "grant_type=client_credentials"
             )
 
             if (BotVariables.cfg.proxyUrl.isNotEmpty() && BotVariables.cfg.proxyPort != -1) {
@@ -72,8 +74,15 @@ object TwitterApi : ApiExecutor {
         }
     }
 
+    /**
+     * 获取推主的账号信息
+     *
+     * @throws RateLimitException
+     * @throws TwitterApiException
+     * @return 账号信息
+     */
     @Throws(RateLimitException::class, TwitterApiException::class)
-    fun getUserInfo(username: String): TwitterUser? {
+    fun getUserProfile(username: String): TwitterUser? {
         if (isReachLimit()) {
             throw RateLimitException(apiReachLimit)
         }
@@ -84,33 +93,32 @@ object TwitterApi : ApiExecutor {
         val url = "$twitterApiUrl/users/show.json?screen_name=$username&tweet_mode=extended"
         val conn = NetUtil.doHttpRequestGet(url, 12_000)
                 .header("authorization", "Bearer $token")
+        var bodyCopy = ""
 
-        var result: HttpResponse? = null
         try {
-            result = conn.executeAsync()
-        } catch (e: HttpException) {
-            logger.warning("[蓝鸟] 在获取用户信息时出现了问题", e)
-        }
+            val result = conn.executeAsync()
 
-        var tUser: TwitterUser? = null
-        val body = result?.body()
+            val body = result.body()
+            bodyCopy = body
 
-        if (body != null) {
-            try {
-                tUser = gson.fromJson(result?.body(), TwitterUser::class.java)
-            } catch (e: Throwable) {
-                FileUtil.createErrorReportFile("twitter", e, body, url)
+            return gson.fromJson(result.body(), TwitterUser::class.java)
+        } catch (t: Throwable) {
+            if (!NetUtil.printIfTimeout(t, "[蓝鸟] 在获取用户信息时连接超时")) {
+                FileUtil.createErrorReportFile("twitter", t, bodyCopy, url)
             }
         }
 
-        logger.debug("[蓝鸟] 查询用户信息耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
-        return tUser
+        daemonLogger.verbose("[蓝鸟] 查询用户信息耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+        return null
     }
 
+    /**
+     * 获取用户时间线上的推文, 最高可获取 3200 条
+     *
+     * @return 推文列表
+     */
     @Throws(RateLimitException::class, EmptyTweetException::class, TwitterApiException::class)
     fun getUserTweets(username: String, count: Int): List<Tweet> {
-        val tweets = mutableListOf<Tweet>()
-
         if (isReachLimit()) {
             throw RateLimitException(apiReachLimit)
         }
@@ -121,21 +129,28 @@ object TwitterApi : ApiExecutor {
         val request =
                 NetUtil.doHttpRequestGet(
                         "$twitterApiUrl/statuses/user_timeline.json?screen_name=$username&count=${count}&tweet_mode=extended",
-                        5_000
-                ).header("authorization", "Bearer $token").header("content-type", "application/json;charset=utf-8")
+                        5_000)
+                        .header("authorization", "Bearer $token")
+                        .header("content-type", "application/json;charset=utf-8")
 
-        val result = request.execute()
-
-        if (result.isOk && result.isType(ContentType.JSON.value)) {
-            val tweetList = parseJsonToTweet(result.body(), request.url)
-            return if (tweetList.isNotEmpty()) tweetList.sortedByDescending { it.getSentTime() } else emptyList()
+        val result = request.executeAsync()
+        val tweetList = parseJsonToTweet(result.body(), request.url)
+        return if (tweetList.isNotEmpty()) {
+            tweetList.sortedByDescending { it.getSentTime() }
+        } else {
+            throw EmptyTweetException()
         }
-
-        return tweets
     }
 
-    @Throws(RateLimitException::class)
-    fun getTweetById(id: Long): Tweet? {
+    /**
+     * 通过推文 ID 获取指定推文实体类
+     *
+     * @throws RateLimitException
+     * @throws EmptyTweetException
+     * @return 推文
+     */
+    @Throws(RateLimitException::class, EmptyTweetException::class)
+    fun getTweetById(id: Long): Tweet {
         if (isReachLimit()) {
             throw RateLimitException(apiReachLimit)
         }
@@ -143,33 +158,39 @@ object TwitterApi : ApiExecutor {
         val request = NetUtil.doHttpRequestGet("$twitterApiUrl/statuses/show.json?id=$id&tweet_mode=extended", 5_000).header("authorization", "Bearer $token")
         val response = request.executeAsync()
 
-
         if (response.isOk && response.isType(ContentType.JSON.value)) {
-            return if (parseJsonToTweet(response.body(), request.url).isNotEmpty()) parseJsonToTweet(response.body(), request.url)[0] else null
+            return if (parseJsonToTweet(response.body(), request.url).isNotEmpty()) parseJsonToTweet(response.body(), request.url)[0] else throw EmptyTweetException()
+        } else {
+            throw EmptyTweetException()
         }
-
-        return null
     }
 
-    fun getCachedTweet(username: String, index: Int = 0, max: Int = 10): TweetRetrieveResponse {
+    /**
+     * 推荐获取推文方式
+     * 优先获取缓存中的推文, 若缓存中推文过时则获取新推文
+     *
+     * 注意: 在重试时抛出的错误将会一并从该方法抛出 (除了超时和达到 API 调用上限)
+     *
+     * @return 推文, 可空
+     */
+    fun getCachedTweet(username: String, index: Int = 0, max: Int = 5): Tweet? {
         val startTime = LocalDateTime.now()
         var tweet: Tweet? = null
 
         if (index < 0 || max <= index) {
-            return TweetRetrieveResponse(tweet, BotUtil.TaskStatus.OUT_LIMIT)
+            return null
         }
 
-        val executedStatus = BotUtil.executeWithRetry({
+        val exception = BotUtil.executeWithRetry({
             try {
                 val cachedTweet = cacheTweet[username]
                 val result: Tweet?
 
-                result = if (cachedTweet != null && Duration.between(cachedTweet.getSentTime(), LocalDateTime.now()).toMinutes() <= 1
-                ) {
+                result = if (cachedTweet != null && Duration.between(cachedTweet.getSentTime(), LocalDateTime.now()).toMinutes() <= 2) {
                     cachedTweet
                 } else {
                     val list = getUserTweets(username, max)
-                    if (list.isNotEmpty()) list[index] else null
+                    if (list.isNotEmpty()) list[index] else throw EmptyTweetException("返回的推文列表为空")
                 }
 
                 logger.debug(
@@ -181,14 +202,25 @@ object TwitterApi : ApiExecutor {
             }
         }, 1)
 
-        return TweetRetrieveResponse(tweet, executedStatus)
+        if (exception != null) throw exception
+
+        return tweet
     }
 
-    @Synchronized
+    /**
+     * 添加缓存推文
+     * 将推文放入缓存池中
+     */
     fun addCacheTweet(username: String, tweet: Tweet) {
         cacheTweet[username] = tweet
     }
 
+    /**
+     * 将 json 解析为推文实体
+     * 支持多个推文和单个推文 (以 List 形式返回)
+     *
+     * @return 推文列表
+     */
     private fun parseJsonToTweet(json: String, url: String): List<Tweet> {
         val parsedTweet: List<Tweet> = try {
             listOf(gson.fromJson(json, Tweet::class.java))
@@ -210,8 +242,6 @@ object TwitterApi : ApiExecutor {
 
         return parsedTweet
     }
-
-    data class TweetRetrieveResponse(val tweet: Tweet?, val status: BotUtil.TaskStatus)
 
     override fun isReachLimit(): Boolean {
         return usedTime >= getLimitTime()

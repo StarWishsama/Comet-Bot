@@ -12,8 +12,8 @@ import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.pushers.TweetUpdateChecker
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.convertToChain
 import io.github.starwishsama.comet.utils.network.RssUtil
-import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -50,7 +50,7 @@ class DebugCommand : ChatCommand {
                                 i++
                             }
                         }
-                        return sb.toString().trim().toMsgChain()
+                        return sb.toString().trim().convertToChain()
                     }
                 }
                 "help" -> return getHelp().toMessage().asMessageChain()
@@ -58,8 +58,8 @@ class DebugCommand : ChatCommand {
                     return ("彗星 Bot ${BotVariables.version}\n" +
                             "今日もかわいい~\n" +
                             "已注册命令数: ${CommandExecutor.countCommands()}\n" +
-                            BotUtil.getMemoryUsage()).toMsgChain()
-                "hitokoto" -> return HitokotoUpdater.getHitokoto().toMsgChain()
+                            BotUtil.getMemoryUsage()).convertToChain()
+                "hitokoto" -> return HitokotoUpdater.getHitokoto().convertToChain()
                 "switch" -> {
                     BotVariables.switch = !BotVariables.switch
 
@@ -69,7 +69,10 @@ class DebugCommand : ChatCommand {
                         BotUtil.sendMessage("今日もかわいい!")
                     }
                 }
-                "tpush" -> TweetUpdateChecker.retrieve()
+                "tpush" -> {
+                    TweetUpdateChecker.retrieve()
+                    return BotUtil.sendMessage("Tweet retriever has been triggered and run~")
+                }
                 "youtube" -> {
                     if (args.size > 1) {
                         val result = YoutubeApi.getChannelVideos(args[1], 10)
@@ -79,13 +82,14 @@ class DebugCommand : ChatCommand {
                 "rss" -> {
                     if (args.size > 1) {
                         return RssUtil.simplifyHTML(
-                            RssUtil.getFromEntry(
-                                RssUtil.getEntryFromURL(args[1]) ?: return "Can't retrieve page content".toMsgChain()
-                            )
-                        ).toMsgChain()
+                                RssUtil.getFromEntry(
+                                        RssUtil.getEntryFromURL(args[1])
+                                                ?: return "Can't retrieve page content".convertToChain()
+                                )
+                        ).convertToChain()
                     }
                 }
-                else -> return "Bot > 命令不存在\n${getHelp()}".toMsgChain()
+                else -> return "Bot > 命令不存在\n${getHelp()}".convertToChain()
             }
         }
         return EmptyMessageChain

@@ -5,7 +5,7 @@ import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.utils.toMsgChain
+import io.github.starwishsama.comet.utils.convertToChain
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -30,9 +30,9 @@ class InfoCommand : ChatCommand {
                     }
 
                     if (event is GroupMessageEvent) {
-                        event.sender.at() + reply.toMsgChain()
+                        event.sender.at() + reply.convertToChain()
                     } else {
-                        reply.toMsgChain()
+                        reply.convertToChain()
                     }
                 }
             } else if (args.size == 1 && args[0].contentEquals("排行") || args[0].contentEquals("ph")) {
@@ -46,12 +46,12 @@ class InfoCommand : ChatCommand {
                                 .append(users[i].id)
                             .append(" ").append(String.format("%.1f", users[i].checkInPoint)).append("\n")
                     }
-                    (sb.toString().trim { it <= ' ' }).toMsgChain()
+                    (sb.toString().trim { it <= ' ' }).convertToChain()
                 } else {
-                    "数据不足".toMsgChain()
+                    "数据不足".convertToChain()
                 }
             } else {
-                return getHelp().toMsgChain()
+                return getHelp().convertToChain()
             }
         } catch (e: Exception) {
             BotVariables.logger.error(e)

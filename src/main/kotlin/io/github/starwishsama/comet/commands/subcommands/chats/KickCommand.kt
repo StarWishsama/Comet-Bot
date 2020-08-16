@@ -6,8 +6,8 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.convertToChain
 import io.github.starwishsama.comet.utils.isNumeric
-import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.isOperator
@@ -30,12 +30,12 @@ class KickCommand : ChatCommand {
                         if (args[0].isNumeric()) {
                             doKick(event, args[0].toLong(), "")
                         } else {
-                            getHelp().toMsgChain()
+                            getHelp().convertToChain()
                         }
 
                     }
                 } else {
-                    return getHelp().toMsgChain()
+                    return getHelp().convertToChain()
                 }
             } else {
                 BotUtil.sendMessage("我不是绿帽 我爬 我爬")

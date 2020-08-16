@@ -7,8 +7,8 @@ import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.CommandExecutor.doFilter
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
+import io.github.starwishsama.comet.utils.convertToChain
 import io.github.starwishsama.comet.utils.network.NetUtil
-import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -42,7 +42,7 @@ object TweetUpdateChecker : CometPusher {
 
         pushContent.forEach {
             try {
-                val tweet = TwitterApi.getCachedTweet(it.key, max = 1).tweet
+                val tweet = TwitterApi.getCachedTweet(it.key, max = 1)
                 val previousTweet = pushContent[it.key]?.tweet
 
                 if (tweet != null && !isOutdatedTweet(tweet, previousTweet)) {
@@ -50,11 +50,11 @@ object TweetUpdateChecker : CometPusher {
                     TwitterApi.addCacheTweet(it.key, tweet)
                 }
             } catch (t: Throwable) {
-                val message = t.message
-                when {
-                    t is RateLimitException -> logger.warning(t.message)
-                    message != null && message.contains("times") -> logger.verbose("[推文] 获取推文时连接超时")
-                    else -> logger.warning("[推文] 在尝试获取推文时出现了意外", t)
+                if (!NetUtil.printIfTimeout(t, "[推文] 获取推文时连接超时")) {
+                    when (t) {
+                        is RateLimitException -> logger.warning(t.message)
+                        else -> logger.warning("[推文] 在尝试获取推文时出现了意外", t)
+                    }
                 }
             }
         }
@@ -77,7 +77,7 @@ object TweetUpdateChecker : CometPusher {
                 val group = bot.getGroupOrNull(it)
                 if (group != null) {
                     val image = NetUtil.getUrlInputStream(content.getPictureUrl())?.uploadAsImage(group)
-                    val filtered = (PlainText("${content.user.name}\n") + content.getFullText().toMsgChain() + (image
+                    val filtered = (PlainText("${content.user.name}\n") + content.getFullText().convertToChain() + (image
                             ?: EmptyMessageChain)).doFilter()
                     if (filtered.isContentNotEmpty()) group.sendMessage(filtered)
                 }
@@ -92,10 +92,11 @@ object TweetUpdateChecker : CometPusher {
     private fun isOutdatedTweet(retrieve: Tweet, toCompare: Tweet?): Boolean {
         val retrieveTime = Duration.between(retrieve.getSentTime(), LocalDateTime.now()).toMinutes()
         if (retrieveTime >= 45 || (toCompare != null && Duration.between(
-                toCompare.getSentTime(),
-                retrieve.getSentTime()
-            ).toMinutes() >= 60)
+                        toCompare.getSentTime(),
+                        retrieve.getSentTime()
+                ).toMinutes() >= 15)
         ) return true
+        if (toCompare != null && retrieve.contentEquals(toCompare)) return true
         return toCompare?.let { retrieve.contentEquals(it) } ?: false
     }
 }

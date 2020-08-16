@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.ClockInManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.toMsgChain
+import io.github.starwishsama.comet.utils.convertToChain
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.message.GroupMessageEvent
@@ -24,7 +24,7 @@ class AdminCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(event.sender.id)) {
             if (args.isEmpty()) {
-                return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").toMsgChain()
+                return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").convertToChain()
             } else {
                 when (args[0]) {
                     "clockin", "dk", "打卡" -> {
@@ -42,7 +42,7 @@ class AdminCommand : ChatCommand {
                             BotUtil.sendMessage("该命令只能在群聊使用")
                         }
                     }
-                    "help", "帮助" -> return getHelp().toMsgChain()
+                    "help", "帮助" -> return getHelp().convertToChain()
                     "permlist", "权限列表", "qxlb" -> return permList(user, args, event)
                     "permadd", "添加权限", "tjqx" -> return permAdd(user, args, event)
                     "give", "增加次数" -> return giveCommandUseTime(event, args)

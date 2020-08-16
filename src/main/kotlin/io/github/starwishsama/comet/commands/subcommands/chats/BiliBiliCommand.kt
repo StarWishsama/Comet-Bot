@@ -9,8 +9,8 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.WrappedMessage
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.convertToChain
 import io.github.starwishsama.comet.utils.isNumeric
-import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.isOperator
@@ -24,7 +24,7 @@ class BiliBiliCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.id) && event is GroupMessageEvent) {
             if (args.isEmpty()) {
-                return getHelp().toMsgChain()
+                return getHelp().convertToChain()
             } else {
                 when (args[0]) {
                     "sub", "订阅" -> return advancedSubscribe(user, args, event)
@@ -44,11 +44,11 @@ class BiliBiliCommand : ChatCommand {
                                         "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
                                         "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") + "\n"
                                 val dynamic = BiliBiliApi.getDynamic(item.mid)
-                                before.toMsgChain() + getDynamicText(dynamic, event)
+                                before.convertToChain() + getDynamicText(dynamic, event)
                             } else {
                                 BotUtil.sendMessage("找不到对应的B站用户")
                             }
-                        } else getHelp().toMsgChain()
+                        } else getHelp().convertToChain()
                     }
                     "push" -> {
                         return if (user.isBotAdmin() || event.sender.isOperator()) {
@@ -59,7 +59,7 @@ class BiliBiliCommand : ChatCommand {
                             BotUtil.sendMessage(BotUtil.getLocalMessage("msg.no-permission"))
                         }
                     }
-                    else -> return getHelp().toMsgChain()
+                    else -> return getHelp().convertToChain()
                 }
             }
         }
@@ -144,7 +144,7 @@ class BiliBiliCommand : ChatCommand {
                 BotUtil.sendMessage("取消订阅直播间 ${args[1]} 成功")
             }
         } else {
-            return getHelp().toMsgChain()
+            return getHelp().convertToChain()
         }
     }
 
@@ -173,19 +173,19 @@ class BiliBiliCommand : ChatCommand {
                 )
             }
 
-            return subs.toString().trim().toMsgChain()
+            return subs.toString().trim().convertToChain()
         }
         return BotUtil.sendMessage("未订阅任何用户")
     }
 
     private suspend fun getDynamicText(dynamic: WrappedMessage?, event: MessageEvent): MessageChain {
         return if (dynamic == null) {
-            ("\n无最近动态").toMsgChain()
+            ("\n无最近动态").convertToChain()
         } else {
             if (dynamic.text != null) {
                 dynamic.toMessageChain(event.subject)
             } else {
-                ("\n无最近动态").toMsgChain()
+                ("\n无最近动态").convertToChain()
             }
         }
     }

@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.toMsgChain
+import io.github.starwishsama.comet.utils.convertToChain
 import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.GroupMessageEvent
@@ -24,7 +24,7 @@ class CheckInCommand : ChatCommand {
             return if (BotUtil.isChecked(user)) {
                 BotUtil.sendMessage("你今天已经签到过了! 输入 /cx 可查询签到信息")
             } else {
-                checkIn(event.sender, event, user).toMsgChain()
+                checkIn(event.sender, event, user).convertToChain()
             }
         }
         return EmptyMessageChain

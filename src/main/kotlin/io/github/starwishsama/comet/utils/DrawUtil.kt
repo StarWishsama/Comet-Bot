@@ -14,15 +14,15 @@ object DrawUtil {
     /**
      * 明日方舟
      */
-    private fun tenTimeDrawAr(): List<ArkNightOperator> {
+    private fun arkNightTenDraw(): List<ArkNightOperator> {
         val ops: MutableList<ArkNightOperator> = ArrayList()
         for (i in 0..9) {
-            ops.add(drawAr())
+            ops.add(arkNightDraw())
         }
         return ops
     }
 
-    private fun drawAr(): ArkNightOperator {
+    private fun arkNightDraw(): ArkNightOperator {
         val probability = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
         val rare: Int
         rare = when (probability) {
@@ -55,11 +55,11 @@ object DrawUtil {
             when (time) {
                 1 -> {
                     user.decreaseTime()
-                    val (name, _, rare) = drawAr()
+                    val (name, _, rare) = arkNightDraw()
                     return name + " " + getStar(rare)
                 }
                 10 -> {
-                    result.addAll(tenTimeDrawAr())
+                    result.addAll(arkNightTenDraw())
                     user.decreaseTime(10)
                     val sb = StringBuilder("十连结果:\n")
                     for ((name, _, rare) in result) {
@@ -78,7 +78,7 @@ object DrawUtil {
                             if (r6Time != 0 && i == r6Time) {
                                 result.add(getOperator(6))
                             } else {
-                                result.add(drawAr())
+                                result.add(arkNightDraw())
                             }
                         } else {
                             break

@@ -1,18 +1,18 @@
 package io.github.starwishsama.comet.utils
 
-import cn.hutool.core.io.IORuntimeException
 import cn.hutool.http.HttpResponse
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.coolDown
-import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.RateLimitException
+import io.github.starwishsama.comet.exceptions.ReachRetryLimitException
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotAdmin
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotOwner
+import io.github.starwishsama.comet.utils.network.NetUtil
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.asHumanReadable
@@ -27,7 +27,7 @@ import kotlin.time.toKotlinDuration
 /**
  * 将字符串转换为消息链
  */
-fun String.toMsgChain(): MessageChain {
+fun String.convertToChain(): MessageChain {
     return toMessage().asMessageChain()
 }
 
@@ -199,7 +199,7 @@ object BotUtil {
         val sb = StringBuilder()
         if (addPrefix) sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
         sb.append(otherText)
-        return sb.toString().trim { it <= ' ' }
+        return sb.toString().trim()
     }
 
     fun sendMessage(otherText: String?, addPrefix: Boolean = true): MessageChain {
@@ -207,18 +207,18 @@ object BotUtil {
         val sb = StringBuilder()
         if (addPrefix) sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
         sb.append(otherText)
-        return sb.toString().trim { it <= ' ' }.toMsgChain()
+        return sb.toString().trim().convertToChain()
     }
 
     fun sendMessage(vararg otherText: String?, addPrefix: Boolean): MessageChain {
-        if (!otherText.isNullOrEmpty()) return "".toMsgChain()
+        if (!otherText.isNullOrEmpty()) return "".convertToChain()
 
         val sb = StringBuilder()
         if (addPrefix) sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
         otherText.forEach {
             sb.append(it).append("\n")
         }
-        return sb.toString().trim { it <= ' ' }.toMsgChain()
+        return sb.toString().trim().convertToChain()
     }
 
     /**
@@ -297,41 +297,30 @@ object BotUtil {
         return element.isJsonObject || element.isJsonArray
     }
 
-    fun executeWithRetry(task: () -> Unit, retryTime: Int): TaskStatus {
-        var status = TaskStatus.TIMEOUT
-        if (retryTime >= 5) return TaskStatus.FAILED
+    fun executeWithRetry(task: () -> Unit, retryTime: Int): Throwable? {
+        if (retryTime >= 5) return ReachRetryLimitException()
 
         var initRetryTime = 0
-        fun runTask(): () -> Unit = {
+        fun runTask(): Throwable? {
             try {
                 if (initRetryTime <= retryTime) {
                     task()
-                    status = TaskStatus.SUCCESS
+                    return null
                 }
             } catch (t: Throwable) {
-                when (t) {
-                    is IORuntimeException -> {
-                        initRetryTime++
-                        daemonLogger.verbose("Retried failed, ${t.message}")
-                        runTask()()
-                    }
-                    is RateLimitException -> {
-                        status = TaskStatus.CUSTOM
-                    }
-                    else -> {
-                        status = TaskStatus.FAILED
-                        daemonLogger.warning("在执行任务时发生异常", t)
-                    }
+                if (NetUtil.printIfTimeout(t, "Retried failed, ${t.message}")) {
+                    initRetryTime++
+                    runTask()
+                } else {
+                    if (t !is RateLimitException) return t
                 }
             }
+
+            return null
         }
 
-        runTask()()
+        runTask()
 
-        return status
-    }
-
-    enum class TaskStatus {
-        SUCCESS, FAILED, TIMEOUT, CUSTOM, OUT_LIMIT
+        return null
     }
 }

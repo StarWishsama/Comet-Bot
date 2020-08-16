@@ -2,6 +2,8 @@
 
 项目名来源于 [星街彗星 (Hoshimati Suisei)](https://zh.moegirl.org.cn/%E6%98%9F%E8%A1%97%E5%BD%97%E6%98%9F)
 
+由高性能机器人框架 [Mirai](https://github.com/mamoe/mirai) 强力驱动
+
 本项目处于开发阶段, 部分功能可能无法使用 (除了写在下面的功能) ~~反正也没人用~~
 
 **一切开发旨在学习，请勿用于非法用途**
@@ -27,10 +29,11 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
 * 明日方舟 / 公主连结抽卡模拟器
 * 去你大爷的小程序 (将小程序转换为文本)
 * 单推小助手 
-  - 支持订阅 bilibili 用户动态/开播提醒
-  - 支持订阅蓝🐦用户最新消息
+  - 支持订阅 bilibili 用户动态(TODO)/开播提醒
+  - 支持订阅推特用户最新消息
+  - 支持订阅 Youtube 用户开播提醒 (实验性)
 * rCon 功能, 支持连接到可以使用 rCon 的游戏服务器
-* 查询蓝🐦用户信息/推文
+* 查询推特用户信息/推文
 * 自动推送最新推文到指定群聊
 * 禁言/踢出群员
 * 群抽奖
@@ -45,25 +48,25 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
 
 - 注意: 请使用 JDK 8 或更高版本打包
 
-1.1. Clone 或者下载这个项目.
+1. 编译
+ * Clone 或者下载这个项目.
 
-```bash
-git clone https://github.com/StarWishsama/Comet-Bot.git
-```
+ ```bash
+ git clone https://github.com/StarWishsama/Comet-Bot.git
+ ```
 
-1.2. 编译
-
-本项目使用 Gradle 作为包管理系统, 还使用了 ShadowJar 引入依赖, 请自行搜索 Gradle 如何打包
+ * 编译
+   本项目使用 Gradle 作为包管理系统, 还使用了 ShadowJar 引入依赖, 请自行搜索 Gradle 如何打包
 
 2. 使用 cmd 启动 Bot, 按照提示登录
-3. 提示启动完成后就可以开始使用了
+3. 提示启动完成后, 在机器人加入的群内发送 /help 就可开始了解 Comet 的各项功能了
 
 ## 📜 协议 
 **一切开发旨在学习，请勿用于非法用途**
 
 **本项目禁止被用于进行违反中华人民共和国法律法规的行为**
 
-本项目使用 [AGPL v3.0](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE) 协议
+本项目使用 [AGPLv3 with Mamoe Exceptions](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE) 协议
 
 ------
 

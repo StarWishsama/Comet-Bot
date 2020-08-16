@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.managers.ClockInManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.checkin.ClockInData
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.toMsgChain
+import io.github.starwishsama.comet.utils.convertToChain
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.GroupMessageEvent
@@ -33,7 +33,7 @@ class ClockInCommand : ChatCommand {
                         .asMessageChain()
                 }
             } else {
-                (BotUtil.getLocalMessage("msg.bot-prefix") + "没有正在进行的打卡").toMsgChain()
+                (BotUtil.getLocalMessage("msg.bot-prefix") + "没有正在进行的打卡").convertToChain()
             }
         }
         return EmptyMessageChain
@@ -74,7 +74,7 @@ class ClockInCommand : ChatCommand {
             }
 
             data.checkedUsers.add(sender)
-            return result.toMsgChain()
+            return result.convertToChain()
         } else {
             return data.viewData()
         }

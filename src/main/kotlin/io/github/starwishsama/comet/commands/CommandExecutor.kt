@@ -10,7 +10,7 @@ import io.github.starwishsama.comet.sessions.DaemonSession
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.toMsgChain
+import io.github.starwishsama.comet.utils.convertToChain
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
@@ -122,10 +122,10 @@ object CommandExecutor {
             } catch (t: Throwable) {
                 val msg = t.message
                 return if (msg != null && msg.contains("time")) {
-                    ExecutedResult("Bot > 在执行网络操作时连接超时".toMsgChain(), cmd)
+                    ExecutedResult("Bot > 在执行网络操作时连接超时".convertToChain(), cmd)
                 } else {
                     BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId", t)
-                    ExecutedResult("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain(), cmd)
+                    ExecutedResult("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".convertToChain(), cmd)
                 }
             }
         }

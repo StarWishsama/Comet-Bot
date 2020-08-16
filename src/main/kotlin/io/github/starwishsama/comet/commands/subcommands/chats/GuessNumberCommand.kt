@@ -12,8 +12,8 @@ import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.sessions.commands.guessnumber.GuessNumberSession
 import io.github.starwishsama.comet.sessions.commands.guessnumber.GuessNumberUser
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.convertToChain
 import io.github.starwishsama.comet.utils.isNumeric
-import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
@@ -55,7 +55,7 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
                         }
                     }
                     else -> {
-                        return getHelp().toMsgChain()
+                        return getHelp().convertToChain()
                     }
                 }
             } else {

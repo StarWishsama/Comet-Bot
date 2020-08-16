@@ -1,18 +1,19 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
-import cn.hutool.http.HttpException
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
+import io.github.starwishsama.comet.exceptions.RateLimitException
+import io.github.starwishsama.comet.exceptions.ReachRetryLimitException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.convertToChain
 import io.github.starwishsama.comet.utils.network.NetUtil
-import io.github.starwishsama.comet.utils.toMsgChain
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.message.GroupMessageEvent
@@ -32,7 +33,7 @@ class TwitterCommand : ChatCommand {
             }
 
             return if (args.isEmpty()) {
-                getHelp().toMsgChain()
+                getHelp().convertToChain()
             } else {
                 val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
 
@@ -42,14 +43,14 @@ class TwitterCommand : ChatCommand {
                     "unsub", "退订" -> unsubscribeUser(args, id)
                     "list" -> {
                         val list = GroupConfigManager.getConfigSafely(id).twitterSubscribers
-                        if (list.isEmpty()) "没有订阅任何蓝鸟用户".toMsgChain() else list.toString().toMsgChain()
+                        if (list.isEmpty()) "没有订阅任何蓝鸟用户".convertToChain() else list.toString().convertToChain()
                     }
                     "push" -> {
                         val cfg = GroupConfigManager.getConfigSafely(id)
                         cfg.twitterPushEnabled = !cfg.twitterPushEnabled
                         return BotUtil.sendMessage("蓝鸟动态推送已${if (cfg.twitterPushEnabled) "开启" else "关闭"}")
                     }
-                    else -> getHelp().toMsgChain()
+                    else -> getHelp().convertToChain()
                 }
             }
         }
@@ -82,30 +83,30 @@ class TwitterCommand : ChatCommand {
                 BotUtil.sendMessage("请输入有效数字")
             }
         } else {
-            getHelp().toMsgChain()
+            getHelp().convertToChain()
         }
     }
 
     @ExperimentalTime
     private suspend fun getTweetWithDesc(name: String, subject: Contact, index: Int = 1, max: Int = 10): MessageChain {
-        val response = TwitterApi.getCachedTweet(name, index, max)
-        val tweet: Tweet? = response.tweet
-        val status: BotUtil.TaskStatus = response.status
+        return try {
+            val tweet = TwitterApi.getCachedTweet(name, index, max)
+            if (tweet != null) {
+                val resultMessage = BotUtil.sendMessage("\n${tweet.user.name}\n${tweet.getFullText()}")
+                val imageUrl = tweet.getPictureUrl()
+                var image: Image? = null
+                if (imageUrl != null) image = NetUtil.getUrlInputStream(imageUrl)?.uploadAsImage(subject)
 
-        return if (tweet != null && status == BotUtil.TaskStatus.SUCCESS) {
-            val resultMessage = BotUtil.sendMessage("\n${tweet.user.name}\n${tweet.getFullText()}")
-            val imageUrl = tweet.getPictureUrl()
-            var image: Image? = null
-            if (imageUrl != null) image = NetUtil.getUrlInputStream(imageUrl)?.uploadAsImage(subject)
-
-            if (image != null) resultMessage + image else resultMessage
-        } else {
-            when (status) {
-                BotUtil.TaskStatus.FAILED -> BotUtil.sendMessage("获取推文时出现了异常, 请联系管理员")
-                BotUtil.TaskStatus.TIMEOUT -> BotUtil.sendMessage("获取推文超时, 请稍后重试")
-                BotUtil.TaskStatus.CUSTOM -> BotUtil.sendMessage("已达到蓝鸟 API 请求上限啦, 请稍等一会再获取吧")
-                BotUtil.TaskStatus.OUT_LIMIT -> BotUtil.sendMessage("请求的下标越界了, 请检查后重试")
-                else -> BotUtil.sendMessage("获取推文时出现了异常")
+                if (image != null) resultMessage + image else resultMessage
+            } else {
+                BotUtil.sendMessage("获取推文时出现了异常")
+            }
+        } catch (t: Throwable) {
+            if (NetUtil.isTimeout(t)) {
+                BotUtil.sendMessage("获取推文时连接超时")
+            } else {
+                if (t !is ReachRetryLimitException) daemonLogger.warning(t)
+                BotUtil.sendMessage("获取推文时出现了异常")
             }
         }
     }
@@ -117,9 +118,9 @@ class TwitterCommand : ChatCommand {
                 val twitter: TwitterUser?
 
                 try {
-                    twitter = TwitterApi.getUserInfo(args[1])
-                } catch (e: HttpException) {
-                    return BotUtil.sendMessage("连接至蓝鸟服务器超时, 等下再试试吧")
+                    twitter = TwitterApi.getUserProfile(args[1])
+                } catch (e: RateLimitException) {
+                    return BotUtil.sendMessage(e.message)
                 }
 
                 if (twitter != null) {
@@ -132,7 +133,7 @@ class TwitterCommand : ChatCommand {
                 return BotUtil.sendMessage("已经订阅过 @${args[1]} 了")
             }
         } else {
-            return getHelp().toMsgChain()
+            return getHelp().convertToChain()
         }
     }
 
@@ -149,7 +150,7 @@ class TwitterCommand : ChatCommand {
                 BotUtil.sendMessage("没有订阅过 @${args[1]}")
             }
         } else {
-            getHelp().toMsgChain()
+            getHelp().convertToChain()
         }
     }
 }

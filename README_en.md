@@ -1,8 +1,8 @@
 # Comet-Bot
 
-Just a bot.
+This project powered by high efficiency bot framework, [Mirai](https://github.com/mamoe/mirai).
 
-This bot is under heavy develop now, Many feature may not work as well.
+This bot is under heavy develop now, Many features may **not work as expected**.
 
 **All development is for learning, DO NOT use it for illegal purposes**
 
@@ -24,8 +24,8 @@ This bot is under heavy develop now, Many feature may not work as well.
 * Search music and share as LightApp style
 * Arknights / PCR draw simulator
 * Auto convert QQ LightApp message to text for PC user(s)
-* VTuber monitor (BiliBili/🐦)
-* 🐦 user's dynamic Pusher
+* VTuber monitor (BiliBili/Twitter)
+* Twitter user's dynamic Pusher
 * RCON feature
 * Mute/Kick group member
 * Group drawing

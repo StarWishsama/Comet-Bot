@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
 import io.github.starwishsama.comet.commands.CommandExecutor.doFilter
-import io.github.starwishsama.comet.utils.toMsgChain
+import io.github.starwishsama.comet.utils.convertToChain
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.getGroupOrNull
@@ -84,7 +84,7 @@ object BiliLiveChecker : CometPusher {
                             "\n开播时间: ${data.liveTime}" +
                             "\n传送门: https://live.bilibili.com/${data.roomId}"
                     pushGroups.forEach {
-                        val filtered = msg.toMsgChain().doFilter()
+                        val filtered = msg.convertToChain().doFilter()
                         if (filtered.isContentNotEmpty()) {
                             runBlocking {
                                 bot.getGroupOrNull(it)?.sendMessage(filtered)

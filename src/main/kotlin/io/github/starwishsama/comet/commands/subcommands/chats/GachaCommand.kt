@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.DrawUtil
-import io.github.starwishsama.comet.utils.toMsgChain
+import io.github.starwishsama.comet.utils.convertToChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -36,12 +36,12 @@ class GachaCommand : ChatCommand {
                                     if (StringUtils.isNumeric(args[1])) {
                                         BotUtil.sendMessage(DrawUtil.getArkDrawResult(user, args[1].toInt()))
                                     } else {
-                                        getHelp().toMsgChain()
+                                        getHelp().convertToChain()
                                     }
                                 }
                             }
                         } else {
-                            getHelp().toMsgChain()
+                            getHelp().convertToChain()
                         }
                     }
                     "公主连结", "pcr", "gzlj" -> {
@@ -53,19 +53,19 @@ class GachaCommand : ChatCommand {
                                     if (StringUtils.isNumeric(args[1])) {
                                         BotUtil.sendMessage(DrawUtil.getPCRResult(user, args[1].toInt()))
                                     } else {
-                                        getHelp().toMsgChain()
+                                        getHelp().convertToChain()
                                     }
                                 }
                             }
                         } else {
-                            return getHelp().toMsgChain()
+                            return getHelp().convertToChain()
                         }
                     }
                     "来一井" -> return BotUtil.sendMessage(DrawUtil.getPCRResult(user, 300))
-                    else -> return getHelp().toMsgChain()
+                    else -> return getHelp().convertToChain()
                 }
             } else {
-                return getHelp().toMsgChain()
+                return getHelp().convertToChain()
             }
         }
         return EmptyMessageChain

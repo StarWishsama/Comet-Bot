@@ -10,7 +10,7 @@ import io.github.starwishsama.comet.objects.RandomResult
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.getRestString
 import io.github.starwishsama.comet.utils.BotUtil.isNoCoolDown
-import io.github.starwishsama.comet.utils.toMsgChain
+import io.github.starwishsama.comet.utils.convertToChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -26,7 +26,7 @@ class DivineCommand : ChatCommand {
                         if (randomEventName.isNotBlank() && randomEventName.length < 30) {
                             val result = RandomResult(-1000, RandomUtil.randomDouble(0.0, 1.0), randomEventName)
                             user.decreaseTime()
-                            RandomResult.getChance(result).toMsgChain()
+                            RandomResult.getChance(result).convertToChain()
                         } else {
                             BotUtil.sendMessage("请检查需要占卜的字符是否超过上限或为空!")
                         }
@@ -35,10 +35,10 @@ class DivineCommand : ChatCommand {
                     }
                 } else {
                     BotVariables.underCovers.minusAssign(underCover)
-                    RandomResult.getChance(underCover).toMsgChain()
+                    RandomResult.getChance(underCover).convertToChain()
                 }
             } else {
-                return getHelp().toMsgChain()
+                return getHelp().convertToChain()
             }
         }
         return EmptyMessageChain

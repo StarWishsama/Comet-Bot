@@ -11,8 +11,8 @@ import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.getRestString
+import io.github.starwishsama.comet.utils.convertToChain
 import io.github.starwishsama.comet.utils.isNumeric
-import io.github.starwishsama.comet.utils.toMsgChain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.message.MessageEvent
@@ -26,7 +26,7 @@ class RConCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.id) && user.hasPermission(getProps().permission)) {
             if (args.isEmpty()) {
-                return getHelp().toMsgChain()
+                return getHelp().convertToChain()
             } else {
                 when (args[0]) {
                     "setup" -> {
@@ -39,7 +39,7 @@ class RConCommand : ChatCommand, SuspendCommand {
                             if (args.size > 1) {
                                 try {
                                     return withContext(Dispatchers.IO) {
-                                        return@withContext rCon.command(args.getRestString(1)).toMsgChain()
+                                        return@withContext rCon.command(args.getRestString(1)).convertToChain()
                                     }
                                 } catch (e: IOException) {
                                     BotVariables.logger.error("在连接到 rCon 服务器时发生了错误", e)
@@ -50,7 +50,7 @@ class RConCommand : ChatCommand, SuspendCommand {
                             return BotUtil.sendMessage("rCon 还没有设置\n你可以在支持 rCon 的游戏设置下打开 rCon 并设置地址&端口&密码")
                         }
                     }
-                    else -> getHelp().toMsgChain()
+                    else -> getHelp().convertToChain()
                 }
             }
         }

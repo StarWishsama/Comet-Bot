@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.toMsgChain
+import io.github.starwishsama.comet.utils.convertToChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -20,7 +20,7 @@ class VersionCommand : ChatCommand {
             return ("彗星 Bot " + BotVariables.version +
                     "\n已注册命令数: " + CommandExecutor.countCommands() +
                     "\n运行时长 ${BotUtil.getRunningTime()}" +
-                    "\nMade with ❤ & Mirai 1.1.3").toMsgChain()
+                    "\nMade with ❤ & Mirai 1.1.3").convertToChain()
         }
         return EmptyMessageChain
     }

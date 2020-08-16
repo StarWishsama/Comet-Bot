@@ -63,7 +63,11 @@ data class Tweet(
         }
 
         if (replyTweetId != null) {
-            val repliedTweet = TwitterApi.getTweetById(replyTweetId) ?: return text + extraText
+            val repliedTweet = try {
+                TwitterApi.getTweetById(replyTweetId)
+            } catch (t: Throwable) {
+                return text + extraText
+            }
             return "对于 ${repliedTweet.user.name} 的推文\n${repliedTweet.text}\n\n${user.name} 进行了回复\n$text" + extraText
         }
 

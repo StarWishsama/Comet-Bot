@@ -7,12 +7,14 @@ import cn.hutool.http.HttpResponse
 import cn.hutool.http.Method
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.network.NetUtil.proxyIsUsable
 import java.io.*
 import java.net.Proxy
 import java.net.Socket
 import java.net.URL
+import java.util.*
 
 fun HttpResponse.getContentLength(): Int {
     return header("Content-Length").toIntOrNull() ?: -1
@@ -122,5 +124,18 @@ object NetUtil {
 
     fun downloadFileToCache(url: String, fileName: String): File? {
         return downloadFile(FileUtil.getCacheFolder(), url, fileName)
+    }
+
+    fun isTimeout(t: Throwable): Boolean {
+        val msg = t.message ?: return false
+        return msg.toLowerCase(Locale.ROOT).contains("times out")
+    }
+
+    fun printIfTimeout(t: Throwable, message: String = "在执行网络操作时连接超时"): Boolean {
+        if (isTimeout(t)) {
+            daemonLogger.verbose(message)
+            return true
+        }
+        return false
     }
 }

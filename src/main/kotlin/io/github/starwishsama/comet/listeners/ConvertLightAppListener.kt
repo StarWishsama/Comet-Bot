@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.listeners
 
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.utils.toMsgChain
+import io.github.starwishsama.comet.utils.convertToChain
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.subscribeGroupMessages
@@ -42,7 +42,7 @@ object ConvertLightAppListener : NListener {
                                 "小程序Anti > 自动转换了小程序链接:\n" +
                                         "视频标题: $title\n" +
                                         "链接: $url"
-                                ).toMsgChain()
+                                ).convertToChain()
                     }
                 } catch (e: IllegalStateException) {
                     BotVariables.logger.warning("[监听器] 无法解析卡片消息", e)
