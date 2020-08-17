@@ -19,25 +19,27 @@ import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.isType
 import io.github.starwishsama.comet.utils.network.NetUtil
+import io.github.starwishsama.comet.utils.network.isUsable
 import java.io.IOException
+import java.net.Socket
 import java.time.Duration
 import java.time.LocalDateTime
 
 /**
  * Twitter API
  *
- * 支持获取蓝鸟用户信息 & 最新推文
+ * 支持获取蓝鸟用户信息 & 最新推文 & 推主时间线
  * @author Nameless
  */
 object TwitterApi : ApiExecutor {
-    // 蓝鸟 API 地址
+    // 蓝鸟 APIv1.1 地址
     private const val twitterApiUrl = "https://api.twitter.com/1.1/"
 
     // curl 获取 token, 请
     private const val twitterTokenGetUrl = "https://api.twitter.com/oauth2/token"
 
     // Bearer Token
-    var token = BotVariables.cfg.twitterToken
+    private var token = BotVariables.cfg.twitterToken
 
     private var cacheTweet = mutableMapOf<String, Tweet>()
 
@@ -46,10 +48,14 @@ object TwitterApi : ApiExecutor {
 
     private const val apiReachLimit = "已达到 Twitter API 调用上限"
 
+    private fun checkToken() {
+        if (token == null) getBearerToken()
+    }
+
     /**
      * 获取用于调用 Twitter API 的 Bearer Token
      */
-    fun getBearerToken() {
+    private fun getBearerToken() {
         try {
             val curl = CUrl(twitterTokenGetUrl).opt(
                     "-u",
@@ -58,7 +64,9 @@ object TwitterApi : ApiExecutor {
                     "grant_type=client_credentials"
             )
 
-            if (BotVariables.cfg.proxyUrl.isNotEmpty() && BotVariables.cfg.proxyPort != -1) {
+            val socket = Socket(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
+
+            if (BotVariables.cfg.proxyUrl.isNotEmpty() && BotVariables.cfg.proxyPort != -1 && socket.isUsable()) {
                 curl.proxy(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
             }
 
@@ -83,6 +91,8 @@ object TwitterApi : ApiExecutor {
      */
     @Throws(RateLimitException::class, TwitterApiException::class)
     fun getUserProfile(username: String): TwitterUser? {
+        checkToken()
+
         if (isReachLimit()) {
             throw RateLimitException(apiReachLimit)
         }
@@ -119,6 +129,8 @@ object TwitterApi : ApiExecutor {
      */
     @Throws(RateLimitException::class, EmptyTweetException::class, TwitterApiException::class)
     fun getUserTweets(username: String, count: Int): List<Tweet> {
+        checkToken()
+
         if (isReachLimit()) {
             throw RateLimitException(apiReachLimit)
         }
@@ -138,7 +150,7 @@ object TwitterApi : ApiExecutor {
         return if (tweetList.isNotEmpty()) {
             tweetList.sortedByDescending { it.getSentTime() }
         } else {
-            throw EmptyTweetException()
+            emptyList()
         }
     }
 
@@ -151,6 +163,8 @@ object TwitterApi : ApiExecutor {
      */
     @Throws(RateLimitException::class, EmptyTweetException::class)
     fun getTweetById(id: Long): Tweet {
+        checkToken()
+
         if (isReachLimit()) {
             throw RateLimitException(apiReachLimit)
         }
@@ -193,9 +207,7 @@ object TwitterApi : ApiExecutor {
                     if (list.isNotEmpty()) list[index] else throw EmptyTweetException("返回的推文列表为空")
                 }
 
-                logger.debug(
-                        "[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms"
-                )
+                logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
                 tweet = result
             } catch (x: TwitterApiException) {
                 logger.warning("[蓝鸟] 调用 API 时出现了问题", x)

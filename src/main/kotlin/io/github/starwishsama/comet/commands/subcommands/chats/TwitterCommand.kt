@@ -29,7 +29,7 @@ class TwitterCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.isNoCoolDown(user.id)) {
             if (BotVariables.cfg.twitterAccessToken == null) {
-                return BotUtil.sendMessage("请到配置文件中填写推特 Token")
+                return BotUtil.sendMessage("请到配置文件中填写 Twitter Token")
             }
 
             return if (args.isEmpty()) {
@@ -75,7 +75,7 @@ class TwitterCommand : ChatCommand {
     @ExperimentalTime
     private suspend fun getTweetToMessageChain(args: List<String>, event: MessageEvent): MessageChain {
         return if (args.size > 1) {
-            event.quoteReply(BotUtil.sendMessage("正在查询, 请稍等").contentToString())
+            event.quoteReply(BotUtil.sendMessage("正在查询, 请稍等"))
             try {
                 if (args.size > 2) getTweetWithDesc(args[1], event.subject, args[2].toInt(), 1 + args[2].toInt())
                 else getTweetWithDesc(args[1], event.subject, 0, 1)
@@ -95,17 +95,17 @@ class TwitterCommand : ChatCommand {
                 val resultMessage = BotUtil.sendMessage("\n${tweet.user.name}\n${tweet.getFullText()}")
                 val imageUrl = tweet.getPictureUrl()
                 var image: Image? = null
-                if (imageUrl != null) image = NetUtil.getUrlInputStream(imageUrl)?.uploadAsImage(subject)
 
+                if (imageUrl != null) image = NetUtil.getUrlInputStream(imageUrl)?.uploadAsImage(subject)
                 if (image != null) resultMessage + image else resultMessage
             } else {
-                BotUtil.sendMessage("获取推文时出现了异常")
+                BotUtil.sendMessage("获取到的推文为空")
             }
         } catch (t: Throwable) {
-            if (NetUtil.isTimeout(t)) {
+            if (NetUtil.isTimeout(t) || t is ReachRetryLimitException) {
                 BotUtil.sendMessage("获取推文时连接超时")
             } else {
-                if (t !is ReachRetryLimitException) daemonLogger.warning(t)
+                daemonLogger.warning(t)
                 BotUtil.sendMessage("获取推文时出现了异常")
             }
         }

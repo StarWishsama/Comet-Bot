@@ -6,6 +6,7 @@ import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.coolDown
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.exceptions.ReachRetryLimitException
@@ -305,22 +306,19 @@ object BotUtil {
             try {
                 if (initRetryTime <= retryTime) {
                     task()
-                    return null
                 }
             } catch (t: Throwable) {
-                if (NetUtil.printIfTimeout(t, "Retried failed, ${t.message}")) {
+                if (NetUtil.isTimeout(t)) {
                     initRetryTime++
+                    daemonLogger.verbose("Retried failed, ${t.message}")
                     runTask()
                 } else {
                     if (t !is RateLimitException) return t
                 }
             }
-
             return null
         }
 
-        runTask()
-
-        return null
+        return runTask()
     }
 }
