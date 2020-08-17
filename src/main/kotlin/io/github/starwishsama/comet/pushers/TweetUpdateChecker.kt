@@ -31,11 +31,13 @@ object TweetUpdateChecker : CometPusher {
         if (!bot.isOnline) future?.cancel(false)
 
         BotVariables.perGroup.parallelStream().forEach { cfg ->
-            if (cfg.twitterPushEnabled) cfg.twitterSubscribers.forEach {
-                if (pushContent.containsKey(it)) {
-                    pushContent[it]?.groupsToPush?.add(cfg.id)
-                } else {
-                    pushContent[it] = PushedTweet(mutableSetOf(cfg.id), false)
+            if (cfg.twitterPushEnabled) {
+                cfg.twitterSubscribers.forEach {
+                    if (pushContent.containsKey(it)) {
+                        pushContent[it]?.groupsToPush?.add(cfg.id)
+                    } else {
+                        pushContent[it] = PushedTweet(mutableSetOf(cfg.id), false)
+                    }
                 }
             }
         }
