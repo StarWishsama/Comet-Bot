@@ -66,7 +66,7 @@ object TweetUpdateChecker : CometPusher {
     override fun push() {
         pushContent.forEach { (_, pushObject) ->
             val tweet = pushObject.tweet
-            if (tweet != null) pushToGroups(pushObject.groupsToPush, tweet)
+            if (tweet != null && !pushObject.isPushed) pushToGroups(pushObject.groupsToPush, tweet)
         }
     }
 
@@ -90,13 +90,15 @@ object TweetUpdateChecker : CometPusher {
     }
 
     private fun isOutdatedTweet(retrieve: Tweet, toCompare: Tweet?): Boolean {
+        var rate = 0
         val retrieveTime = Duration.between(retrieve.getSentTime(), LocalDateTime.now()).toMinutes()
+        if (toCompare != null && retrieve.contentEquals(toCompare)) rate++
         if (retrieveTime >= 45 || (toCompare != null && Duration.between(
                         toCompare.getSentTime(),
                         retrieve.getSentTime()
                 ).toMinutes() >= 15)
-        ) return true
-        if (toCompare != null && retrieve.contentEquals(toCompare)) return true
-        return toCompare?.let { retrieve.contentEquals(it) } ?: false
+        ) rate++
+        if (toCompare?.let { retrieve.contentEquals(it) } == true) rate++
+        return rate > 1
     }
 }
