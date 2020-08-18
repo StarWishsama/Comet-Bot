@@ -5,8 +5,6 @@ import io.github.starwishsama.comet.enums.PicSearchApi
 import kotlinx.serialization.Serializable
 import java.net.Proxy
 
-//import net.mamoe.yamlkt.Comment
-
 @Serializable
 data class Config(
     //@Comment("机器人的账号")
