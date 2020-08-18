@@ -244,9 +244,12 @@ suspend fun main() {
         var command: String
         var isFailed = false
         while (scanner.hasNextLine()) {
-            if (bot.isOnline) {
-                scanner.close()
-                break
+            try {
+                if (bot.isOnline) {
+                    scanner.close()
+                    break
+                }
+            } catch (ignored: UninitializedPropertyAccessException) {
             }
 
             command = scanner.nextLine()
