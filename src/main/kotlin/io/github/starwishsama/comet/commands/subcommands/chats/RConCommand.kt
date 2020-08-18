@@ -11,8 +11,8 @@ import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.getRestString
-import io.github.starwishsama.comet.utils.convertToChain
-import io.github.starwishsama.comet.utils.isNumeric
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.message.MessageEvent
@@ -24,7 +24,7 @@ class RConCommand : ChatCommand, SuspendCommand {
     private val waitList = mutableMapOf<BotUser, Int>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.id) && user.hasPermission(getProps().permission)) {
+        if (BotUtil.hasNoCoolDown(user.id) && user.hasPermission(getProps().permission)) {
             if (args.isEmpty()) {
                 return getHelp().convertToChain()
             } else {
@@ -76,7 +76,7 @@ class RConCommand : ChatCommand, SuspendCommand {
         when (waitList[user] ?: 0) {
             0 -> {
                 BotVariables.cfg.rConUrl = event.message.contentToString()
-                event.reply(BotUtil.sendMessageToString("已设置 rCon 连接地址为 ${BotVariables.cfg.rConUrl}\n请在下一条消息发送 rCon 密码\n如果需要退出设置 请回复退出"))
+                event.reply(BotUtil.sendMessageAsString("已设置 rCon 连接地址为 ${BotVariables.cfg.rConUrl}\n请在下一条消息发送 rCon 密码\n如果需要退出设置 请回复退出"))
                 waitList[user] = 1
             }
             1 -> {

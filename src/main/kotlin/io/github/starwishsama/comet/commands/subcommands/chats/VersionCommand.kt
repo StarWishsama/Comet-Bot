@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -16,7 +16,7 @@ import kotlin.time.ExperimentalTime
 class VersionCommand : ChatCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(event.sender.id)) {
+        if (BotUtil.hasNoCoolDown(event.sender.id)) {
             return ("彗星 Bot " + BotVariables.version +
                     "\n已注册命令数: " + CommandExecutor.countCommands() +
                     "\n运行时长 ${BotUtil.getRunningTime()}" +

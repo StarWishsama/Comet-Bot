@@ -10,7 +10,7 @@ import io.github.starwishsama.comet.sessions.DaemonSession
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*

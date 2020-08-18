@@ -9,15 +9,15 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.RandomResult
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.getRestString
-import io.github.starwishsama.comet.utils.BotUtil.isNoCoolDown
-import io.github.starwishsama.comet.utils.convertToChain
+import io.github.starwishsama.comet.utils.BotUtil.hasNoCoolDown
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 
 class DivineCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (isNoCoolDown(event.sender.id)) {
+        if (hasNoCoolDown(event.sender.id)) {
             val underCover = getResultFromList(BotVariables.underCovers, event.sender.id)
             return if (args.isNotEmpty()) {
                 if (underCover == null) {

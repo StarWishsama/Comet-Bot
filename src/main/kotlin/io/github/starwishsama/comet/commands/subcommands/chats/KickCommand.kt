@@ -6,8 +6,8 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.convertToChain
-import io.github.starwishsama.comet.utils.isNumeric
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.isOperator
@@ -20,7 +20,7 @@ import net.mamoe.mirai.message.data.isContentNotEmpty
 
 class KickCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (event is GroupMessageEvent && (BotUtil.isNoCoolDown(user.id) || event.sender.permission != MemberPermission.MEMBER)) {
+        if (event is GroupMessageEvent && (BotUtil.hasNoCoolDown(user.id) || event.sender.permission != MemberPermission.MEMBER)) {
             if (event.group.botPermission.isOperator()) {
                 if (args.isNotEmpty()) {
                     val at = event.message[At]

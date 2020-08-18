@@ -9,7 +9,7 @@ import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
-import io.github.starwishsama.comet.utils.toFriendly
+import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime
@@ -83,7 +83,7 @@ data class Tweet(
         return twitterTimeFormat.parse(postTime).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
     }
 
-    suspend fun getPictureUrl(): String? {
+    fun getPictureUrl(): String? {
         val objects = entities
 
         if (objects != null) {
@@ -91,7 +91,7 @@ data class Tweet(
             if (media != null) {
                 try {
                     val image =
-                        gson.fromJson(objects["media"].asJsonArray[0].asJsonObject.toString(), Media::class.java)
+                            gson.fromJson(objects["media"].asJsonArray[0].asJsonObject.toString(), Media::class.java)
                     if (image.isSendableMedia()) {
                         return image.getImageUrl()
                     }

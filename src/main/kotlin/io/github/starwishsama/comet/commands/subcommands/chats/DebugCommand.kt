@@ -12,7 +12,7 @@ import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.pushers.TweetUpdateChecker
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.RssUtil
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -25,7 +25,7 @@ import kotlin.time.ExperimentalTime
 class DebugCommand : ChatCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (args.isNotEmpty() && BotUtil.isNoCoolDown(event.sender.id)) {
+        if (args.isNotEmpty() && BotUtil.hasNoCoolDown(event.sender.id)) {
             when (args[0]) {
                 "reload" -> {
                     if (user.isBotOwner()) {

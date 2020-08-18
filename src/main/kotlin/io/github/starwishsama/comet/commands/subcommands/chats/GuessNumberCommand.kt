@@ -12,8 +12,8 @@ import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.sessions.commands.guessnumber.GuessNumberSession
 import io.github.starwishsama.comet.sessions.commands.guessnumber.GuessNumberUser
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.convertToChain
-import io.github.starwishsama.comet.utils.isNumeric
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 
 class GuessNumberCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.id) && event is GroupMessageEvent) {
+        if (BotUtil.hasNoCoolDown(user.id) && event is GroupMessageEvent) {
             val session = SessionManager.getSessionByGroup(event.group.id)
             if (session == null) {
                 when {
@@ -94,11 +94,11 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
                     event.reply(BotUtil.sendMessage("你猜的数字大了").contentToString())
                 }
                 answerInInt < trueAnswer -> {
-                    event.reply(BotUtil.sendMessageToString("你猜的数字小了"))
+                    event.reply(BotUtil.sendMessageAsString("你猜的数字小了"))
                 }
                 answerInInt == trueAnswer -> {
                     session.usedTime = Duration.between(session.startTime, LocalDateTime.now())
-                    val sb = StringBuilder(BotUtil.sendMessageToString("${event.sender.nameCardOrNick} 猜对了!\n总用时: ${session.usedTime.seconds}s\n\n"))
+                    val sb = StringBuilder(BotUtil.sendMessageAsString("${event.sender.nameCardOrNick} 猜对了!\n总用时: ${session.usedTime.seconds}s\n\n"))
                     val list = session.users.sortedBy { (it as GuessNumberUser).guessTime }
                     list.forEach {
                         sb.append((it as GuessNumberUser).username).append(" ").append(it.guessTime).append("次\n")
@@ -111,7 +111,7 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
             when (answer) {
                 "不玩了", "结束游戏", "退出游戏" -> {
                     SessionManager.expireSession(session)
-                    event.reply(BotUtil.sendMessageToString("游戏已结束"))
+                    event.reply(BotUtil.sendMessageAsString("游戏已结束"))
                 }
             }
         }

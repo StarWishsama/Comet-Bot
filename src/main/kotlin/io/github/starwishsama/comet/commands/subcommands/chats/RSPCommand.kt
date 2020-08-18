@@ -20,7 +20,7 @@ import java.io.File
 class RSPCommand : ChatCommand, SuspendCommand {
     val inProgressPlayer = mutableSetOf<Long>()
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(event.sender.id)) {
+        if (BotUtil.hasNoCoolDown(event.sender.id)) {
             event.reply("角卷猜拳... 开始! 你要出什么呢?")
             SessionManager.addSession(Session(this, user.id))
         }

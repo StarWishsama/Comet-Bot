@@ -8,7 +8,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.getRestString
-import io.github.starwishsama.comet.utils.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.MusicUtil
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -17,7 +17,7 @@ import net.mamoe.mirai.message.data.MessageChain
 class MusicCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         val api = BotVariables.cfg.musicApi
-        if (BotUtil.isNoCoolDown(event.sender.id)) {
+        if (BotUtil.hasNoCoolDown(event.sender.id)) {
             if (args.isNotEmpty()) {
                 if (args[0].contentEquals("api")) {
                     if (args.size > 1) {

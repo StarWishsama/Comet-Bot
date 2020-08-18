@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.objects
 
-import io.github.starwishsama.comet.utils.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.NetUtil
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.EmptyMessageChain

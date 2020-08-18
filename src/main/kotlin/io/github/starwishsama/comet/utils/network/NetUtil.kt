@@ -29,6 +29,11 @@ fun Socket.isUsable(timeout: Int = 1_000): Boolean {
     return inetAddress.isReachable(timeout)
 }
 
+fun HttpResponse.isType(typeName: String): Boolean {
+    val contentType = this.header("content-type") ?: return true
+    return contentType.contains(typeName)
+}
+
 object NetUtil {
     var proxyIsUsable = 0
     const val defaultUA =

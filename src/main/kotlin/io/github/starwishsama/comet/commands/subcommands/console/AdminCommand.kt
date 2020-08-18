@@ -4,7 +4,7 @@ import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.utils.isNumeric
+import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 
 class AdminCommand : ConsoleCommand {
     override suspend fun execute(args: List<String>): String {

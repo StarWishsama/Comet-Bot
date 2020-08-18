@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.DrawUtil
-import io.github.starwishsama.comet.utils.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils
 
 class GachaCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.id)) {
+        if (BotUtil.hasNoCoolDown(user.id)) {
             if (args.isNotEmpty()) {
                 when (args[0]) {
                     "明日方舟", "舟游", "mrfz", "ak" -> {

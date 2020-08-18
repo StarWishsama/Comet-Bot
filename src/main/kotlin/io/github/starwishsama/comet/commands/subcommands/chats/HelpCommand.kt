@@ -6,16 +6,15 @@ import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.limitStringSize
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.message.data.toMessage
 
 class HelpCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(event.sender.id)) {
+        if (BotUtil.hasNoCoolDown(event.sender.id)) {
             val sb = StringBuilder()
             for (cmd in CommandExecutor.getCommands()) {
                 if (cmd.getProps().name.contentEquals("help") || !cmd.getProps().name.contentEquals("debug")) {
@@ -23,7 +22,7 @@ class HelpCommand : ChatCommand {
                 }
             }
 
-            return sb.toString().trim().limitStringSize(200).toMessage().asMessageChain()
+            return sb.toString().trim().limitStringSize(200).convertToChain()
         }
         return EmptyMessageChain
     }

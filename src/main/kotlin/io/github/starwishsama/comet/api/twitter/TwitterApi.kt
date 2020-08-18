@@ -15,10 +15,10 @@ import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.exceptions.TwitterApiException
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
-import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.FileUtil
-import io.github.starwishsama.comet.utils.isType
+import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
+import io.github.starwishsama.comet.utils.network.isType
 import io.github.starwishsama.comet.utils.network.isUsable
 import java.io.IOException
 import java.net.Socket
@@ -197,7 +197,7 @@ object TwitterApi : ApiExecutor {
             return null
         }
 
-        val exception = BotUtil.executeWithRetry({
+        val exception = TaskUtil.executeWithRetry({
             try {
                 val cachedTweet = cacheTweet[username]
                 val result: Tweet?

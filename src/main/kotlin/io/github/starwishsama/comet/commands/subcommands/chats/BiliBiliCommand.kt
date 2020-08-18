@@ -9,8 +9,8 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.WrappedMessage
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.convertToChain
-import io.github.starwishsama.comet.utils.isNumeric
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.isOperator
@@ -22,7 +22,7 @@ import org.apache.commons.lang3.Validate
 
 class BiliBiliCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.id) && event is GroupMessageEvent) {
+        if (BotUtil.hasNoCoolDown(user.id) && event is GroupMessageEvent) {
             if (args.isEmpty()) {
                 return getHelp().convertToChain()
             } else {
@@ -95,11 +95,11 @@ class BiliBiliCommand : ChatCommand {
             } else {
                 val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
                 val result = subscribe(args[1], id)
-                BotUtil.returnMsgIfElse(
-                    result is EmptyMessageChain,
-                    BotUtil.sendMessage("账号不存在", true),
+                if (result is EmptyMessageChain) {
+                    BotUtil.sendMessage("账号不存在")
+                } else {
                     result
-                )
+                }
             }
         } catch (e: IllegalArgumentException) {
             return BotUtil.sendMessage(e.message, true)
@@ -110,10 +110,9 @@ class BiliBiliCommand : ChatCommand {
         users.forEach {
             val result = subscribe(it, id)
             delay(500)
-            return BotUtil.returnMsgIf(
-                result is EmptyMessageChain,
-                BotUtil.sendMessage("账号 $it 不存在", true)
-            )
+            if (result is EmptyMessageChain) {
+                return BotUtil.sendMessage("账号 $it 不存在")
+            }
         }
         return null
     }

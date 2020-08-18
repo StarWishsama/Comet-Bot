@@ -20,7 +20,7 @@ import java.util.*
 
 class PictureSearch : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(event.sender.id)) {
+        if (BotUtil.hasNoCoolDown(event.sender.id)) {
             if (args.isEmpty() || SessionManager.isValidSessionById(event.sender.id)) {
                 if (!SessionManager.isValidSessionById(event.sender.id)) {
                     SessionManager.addSession(Session(this, user.id))

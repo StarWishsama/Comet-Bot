@@ -9,6 +9,7 @@ import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.enums.R6Rank
 import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6Player
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.StringUtil
 import java.text.NumberFormat
 
 object R6SUtil {
@@ -39,7 +40,7 @@ object R6SUtil {
 
     fun getR6SInfo(player: String): String {
         try {
-            if (BotUtil.isLegitId(player)) {
+            if (StringUtil.isLegitId(player)) {
                 val p: R6Player? = searchPlayer(player)
                 if (p != null && p.found) {
                     num.maximumIntegerDigits = 3

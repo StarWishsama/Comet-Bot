@@ -12,7 +12,7 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.NetUtil
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.MemberPermission
@@ -27,7 +27,7 @@ import kotlin.time.ExperimentalTime
 class TwitterCommand : ChatCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(user.id)) {
+        if (BotUtil.hasNoCoolDown(user.id)) {
             if (BotVariables.cfg.twitterAccessToken == null) {
                 return BotUtil.sendMessage("请到配置文件中填写 Twitter Token")
             }
