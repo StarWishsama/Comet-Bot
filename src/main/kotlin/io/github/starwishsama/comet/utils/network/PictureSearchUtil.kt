@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.utils.network
 
 import cn.hutool.core.util.URLUtil
 import cn.hutool.http.ContentType
+import cn.hutool.http.Header
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.pojo.PicSearchResult
@@ -21,7 +22,7 @@ object PictureSearchUtil {
         )
         val result = request.executeAsync()
 
-        if (result.isOk && result.header("Content-Type").contains(ContentType.JSON.value)) {
+        if (result.isOk && result.header(Header.CONTENT_TYPE).contains(ContentType.JSON.value)) {
             val body = result.body()
             try {
                 val resultBody = JsonParser.parseString(body)

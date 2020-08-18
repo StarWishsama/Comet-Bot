@@ -113,8 +113,10 @@ object TwitterApi : ApiExecutor {
 
             return gson.fromJson(result.body(), TwitterUser::class.java)
         } catch (t: Throwable) {
-            if (!NetUtil.printIfTimeout(t, "[蓝鸟] 在获取用户信息时连接超时")) {
+            if (!NetUtil.isTimeout(t)) {
                 FileUtil.createErrorReportFile("twitter", t, bodyCopy, url)
+            } else {
+                daemonLogger.verbose("[蓝鸟] 在获取用户信息时连接超时")
             }
         }
 

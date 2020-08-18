@@ -52,11 +52,13 @@ object TweetUpdateChecker : CometPusher {
                     TwitterApi.addCacheTweet(it.key, tweet)
                 }
             } catch (t: Throwable) {
-                if (!NetUtil.printIfTimeout(t, "[推文] 获取推文时连接超时")) {
+                if (!NetUtil.isTimeout(t)) {
                     when (t) {
                         is RateLimitException -> logger.warning(t.message)
                         else -> logger.warning("[推文] 在尝试获取推文时出现了意外", t)
                     }
+                } else {
+                    logger.verbose("[推文] 获取推文时连接超时")
                 }
             }
         }

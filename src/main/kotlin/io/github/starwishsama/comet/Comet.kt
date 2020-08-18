@@ -127,12 +127,8 @@ object Comet {
         config.heartbeatPeriodMillis = (BotVariables.cfg.heartBeatPeriod * 60).secondsToMillis
         config.fileBasedDeviceInfo()
         config.fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
-        try {
-            bot = Bot(qq = qqId, password = password, configuration = config)
-            bot.alsoLogin()
-        } catch (e: LoginFailedException) {
-            throw e
-        }
+        bot = Bot(qq = qqId, password = password, configuration = config)
+        bot.alsoLogin()
         logger = bot.logger
 
         DataSetup.initPerGroupSetting()

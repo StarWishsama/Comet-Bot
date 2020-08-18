@@ -82,7 +82,7 @@ dependencies {
     implementation 'com.hiczp:bilibili-api:0.2.0'
     // jsoup HTML parser library @ https://jsoup.org/
     implementation 'org.jsoup:jsoup:1.13.1'
-    // Rometool for RSS @ https://github.com/rometools/rome
+    // RomeTool for RSS @ https://github.com/rometools/rome
     implementation 'com.rometools:rome:1.15.0'
     implementation 'com.rometools:rome-utils:1.15.0'
     implementation 'com.rometools:rome-fetcher:1.15.0'
