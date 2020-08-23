@@ -54,7 +54,7 @@ class RollCommand : ChatCommand, SuspendCommand {
             )
 
             SessionManager.addSession(sessionToAdd)
-            TaskUtil.runAsync({
+            TaskUtil.runAsync(sessionToAdd.stopAfterMinute.toLong(), TimeUnit.MINUTES) {
                 SessionManager.expireSession(sessionToAdd)
                 val group = bot.getGroupOrNull(sessionToAdd.groupId) ?: return@runAsync
                 var winner = messageChainOf()
@@ -63,13 +63,14 @@ class RollCommand : ChatCommand, SuspendCommand {
                 }
                 runBlocking {
                     group.sendMessage(
-                            BotUtil.sendMessage(
-                                    "由${(sessionToAdd.rollStarter as Member).nameCardOrNick.limitStringSize(10)}发起的抽奖开奖了!\n" +
-                                            "奖品: ${sessionToAdd.rollItem}\n" +
-                                            "中奖者: " + winner)
+                        BotUtil.sendMessage(
+                            "由${(sessionToAdd.rollStarter as Member).nameCardOrNick.limitStringSize(10)}发起的抽奖开奖了!\n" +
+                                    "奖品: ${sessionToAdd.rollItem}\n" +
+                                    "中奖者: " + winner
+                        )
                     )
                 }
-            }, sessionToAdd.stopAfterMinute.toLong(), TimeUnit.MINUTES)
+            }
 
             return BotUtil.sendMessage("""
                 ${event.senderName} 发起了一个抽奖!

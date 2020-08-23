@@ -32,7 +32,7 @@ object DataSetup {
         daemonLogger.verbose("机器人文件路径在: " + BotVariables.filePath)
         if (!userCfg.exists() || !cfgFile.exists()) {
             try {
-                cfgFile.writeString(Yaml.default.stringify(Config.serializer(), Config()))
+                cfgFile.writeString(Yaml.default.encodeToString(Config.serializer(), Config()))
                 userCfg.writeClassToJson(BotVariables.users)
                 shopItemCfg.writeClassToJson(BotVariables.shop)
                 println("[配置] 已自动生成新的配置文件.")
@@ -46,7 +46,7 @@ object DataSetup {
 
     private fun saveCfg() {
         try {
-            cfgFile.writeString(Yaml.default.stringify(Config.serializer(), BotVariables.cfg))
+            cfgFile.writeString(Yaml.default.encodeToString(Config.serializer(), BotVariables.cfg))
             userCfg.writeClassToJson(BotVariables.users)
             shopItemCfg.writeClassToJson(BotVariables.shop)
             savePerGroupSetting()
@@ -58,7 +58,7 @@ object DataSetup {
 
     private fun load() {
         try {
-            BotVariables.cfg = Yaml.default.parse(Config.serializer(), cfgFile.getContext())
+            BotVariables.cfg = Yaml.default.decodeFromString(Config.serializer(), cfgFile.getContext())
             BotVariables.users.addAll(gson.fromJson<List<BotUser>>(userCfg.getContext()))
 
             BotVariables.shop = gson.fromJson(shopItemCfg.getContext())
