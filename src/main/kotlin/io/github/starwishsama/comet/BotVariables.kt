@@ -10,6 +10,8 @@ import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.objects.group.Shop
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.getContext
+import io.github.starwishsama.comet.utils.writeString
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.utils.MiraiLogger
@@ -33,16 +35,23 @@ object BotVariables {
     lateinit var bot: Bot
     lateinit var startTime: LocalDateTime
     var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
-            4,
-            BasicThreadFactory.Builder()
-                    .namingPattern("bot-service-%d")
-                    .daemon(true)
-                    .uncaughtExceptionHandler { thread, t ->
-                        daemonLogger.warning("线程 ${thread.name} 在运行时发生了错误", t)
-                    }.build()
+        4,
+        BasicThreadFactory.Builder()
+            .namingPattern("bot-service-%d")
+            .daemon(true)
+            .uncaughtExceptionHandler { thread, t ->
+                daemonLogger.warning("线程 ${thread.name} 在运行时发生了错误", t)
+            }.build()
     )
     lateinit var logger: MiraiLogger
-    val daemonLogger: PlatformLogger = PlatformLogger("BotService")
+    val daemonLogger: PlatformLogger = PlatformLogger("BotService", {
+        log.writeString(log.getContext() + "$it\n")
+        println(it)
+    })
+    val consoleCommandLogger: PlatformLogger = PlatformLogger("ConsoleCMD", {
+        log.writeString(log.getContext() + "$it\n")
+        println(it)
+    })
     val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
     var rCon: Rcon? = null
     lateinit var log: File

@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet
 
 import io.github.starwishsama.comet.BotVariables.bot
+import io.github.starwishsama.comet.BotVariables.consoleCommandLogger
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.BotVariables.startTime
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
@@ -87,7 +88,7 @@ object Comet {
                 runBlocking {
                     val result = CommandExecutor.dispatchConsoleCommand(command)
                     if (result.isNotEmpty()) {
-                        logger.info(result)
+                        consoleCommandLogger.info(result)
                     }
                 }
             }
