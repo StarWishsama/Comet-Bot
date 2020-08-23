@@ -39,7 +39,7 @@ class RSPCommand : ChatCommand, SuspendCommand {
                 val systemInt = RandomUtil.randomInt(RockPaperScissors.values().size)
                 val system = RockPaperScissors.values()[systemInt]
                 delay(1_500)
-                val img = File(FileUtil.getChildFolder("res"), system.fileName).uploadAsImage(event.subject)
+                val img = File(FileUtil.getResourceFolder(), system.fileName).uploadAsImage(event.subject)
                 event.reply(img)
                 when (RockPaperScissors.isWin(player, system)) {
                     -1 -> event.reply(BotUtil.sendMessage("平局! わため出的是${system.cnName[0]}"))

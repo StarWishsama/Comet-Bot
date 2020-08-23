@@ -55,6 +55,8 @@ object FileUtil {
 
     fun getCacheFolder(): File = getChildFolder("cache")
 
+    fun getResourceFolder(): File = getChildFolder("res")
+
     private fun getErrorReportFolder(): File = getChildFolder("error-reports")
 
     fun createErrorReportFile(type: String, t: Throwable, content: String, url: String) {

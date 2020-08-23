@@ -183,9 +183,9 @@ object DataSetup {
 
         files.forEach {
             if (it != null) {
-                val target = File(FileUtil.getChildFolder("res"), it.name)
+                val target = File(FileUtil.getResourceFolder(), it.name)
                 if (!target.exists()) {
-                    Files.copy(it.stream, File(FileUtil.getChildFolder("res"), it.name).toPath())
+                    Files.copy(it.stream, File(FileUtil.getResourceFolder(), it.name).toPath())
                 }
             }
         }
