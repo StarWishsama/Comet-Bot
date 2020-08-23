@@ -55,14 +55,11 @@ object Comet {
 
         /** 定时任务 */
         BackupHelper.scheduleBackup()
-        TaskUtil.runScheduleTaskAsync(
-            { BotVariables.users.forEach { it.addTime(100) } },
-            5,
-            5,
-            TimeUnit.HOURS
-        )
+        TaskUtil.runScheduleTaskAsync(5, 5, TimeUnit.HOURS) {
+            BotVariables.users.forEach { it.addTime(100) }
+        }
 
-        TaskUtil.runAsync({
+        TaskUtil.runAsync(5) {
             FakeClientApi.client.runCatching {
                 val pwd = BotVariables.cfg.biliPassword
                 val username = BotVariables.cfg.biliUserName
@@ -75,14 +72,14 @@ object Comet {
                     }
                 }
             }
-        }, 5)
+        }
 
-        TaskUtil.runScheduleTaskAsync({ apis.forEach { it.resetTime() } }, 25, 25, TimeUnit.MINUTES)
-        TaskUtil.runScheduleTaskAsync(HitokotoUpdater::run, 5, 60 * 60, TimeUnit.SECONDS)
+        TaskUtil.runScheduleTaskAsync(25, 25, TimeUnit.MINUTES) { apis.forEach { it.resetTime() } }
+        TaskUtil.runScheduleTaskAsync(5, 60 * 60, TimeUnit.SECONDS, HitokotoUpdater::run)
     }
 
     private fun handleConsoleCommand() {
-        TaskUtil.runAsync({
+        TaskUtil.runAsync {
             val scanner = Scanner(System.`in`)
             var command: String
             while (scanner.hasNextLine()) {
@@ -95,7 +92,7 @@ object Comet {
                 }
             }
             scanner.close()
-        }, 0)
+        }
     }
 
     fun setupRCon() {
@@ -109,7 +106,7 @@ object Comet {
     private fun startAllPusher() {
         val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker, YTBStreamChecker)
         pushers.forEach {
-            val future = TaskUtil.runScheduleTaskAsync(it::retrieve, it.delayTime, it.cycle, TimeUnit.MINUTES)
+            val future = TaskUtil.runScheduleTaskAsync(it.delayTime, it.cycle, TimeUnit.MINUTES, it::retrieve)
             it.future = future
         }
     }

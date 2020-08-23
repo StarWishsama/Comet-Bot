@@ -74,7 +74,8 @@ data class Tweet(
         return text + extraText
     }
 
-    fun contentEquals(tweet: Tweet): Boolean {
+    fun contentEquals(tweet: Tweet?): Boolean {
+        if (tweet == null) return false
         return text == tweet.text || getSentTime().isEqual(tweet.getSentTime())
     }
 

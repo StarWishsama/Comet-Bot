@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.pushers
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.bot
-import io.github.starwishsama.comet.BotVariables.logger
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.CommandExecutor.doFilter
 import io.github.starwishsama.comet.exceptions.RateLimitException
@@ -32,9 +32,11 @@ object TweetUpdateChecker : CometPusher {
 
         BotVariables.perGroup.parallelStream().forEach { cfg ->
             if (cfg.twitterPushEnabled) {
-                cfg.twitterSubscribers.forEach {
+                cfg.twitterSubscribers.forEach sub@{
                     if (pushContent.containsKey(it)) {
-                        pushContent[it]?.groupsToPush?.add(cfg.id)
+                        val groups = pushContent[it]?.groupsToPush
+                        if (groups == null || !groups.contains(cfg.id))
+                            pushContent[it]?.groupsToPush?.add(cfg.id)
                     } else {
                         pushContent[it] = PushedTweet(mutableSetOf(cfg.id), false)
                     }
@@ -47,18 +49,19 @@ object TweetUpdateChecker : CometPusher {
                 val tweet = TwitterApi.getCachedTweet(it.key, max = 1)
                 val previousTweet = pushContent[it.key]?.tweet
 
-                if (tweet != null && !isOutdatedTweet(tweet, previousTweet)) {
+                if (tweet != null && (!isOutdatedTweet(tweet, previousTweet) && !tweet.contentEquals(previousTweet))) {
                     it.value.tweet = tweet
+                    it.value.isPushed = false
                     TwitterApi.addCacheTweet(it.key, tweet)
                 }
             } catch (t: Throwable) {
                 if (!NetUtil.isTimeout(t)) {
                     when (t) {
-                        is RateLimitException -> logger.warning(t.message)
-                        else -> logger.warning("[推文] 在尝试获取推文时出现了意外", t)
+                        is RateLimitException -> daemonLogger.verbose(t.message)
+                        else -> daemonLogger.warning("[推文] 在尝试获取推文时出现了意外", t)
                     }
                 } else {
-                    logger.verbose("[推文] 获取推文时连接超时")
+                    daemonLogger.verbose("[推文] 获取推文时连接超时")
                 }
             }
         }
@@ -70,7 +73,9 @@ object TweetUpdateChecker : CometPusher {
     override fun push() {
         pushContent.forEach { (_, pushObject) ->
             val tweet = pushObject.tweet
-            if (tweet != null && !pushObject.isPushed) pushToGroups(pushObject.groupsToPush, tweet)
+            if (tweet != null && !pushObject.isPushed) {
+                pushToGroups(pushObject.groupsToPush, tweet)
+            }
         }
     }
 
@@ -89,20 +94,16 @@ object TweetUpdateChecker : CometPusher {
         }
     }
 
-    data class PushedTweet(val groupsToPush: MutableSet<Long>, var isPushed: Boolean) {
+    private data class PushedTweet(val groupsToPush: MutableSet<Long>, var isPushed: Boolean) {
         var tweet: Tweet? = null
     }
 
     private fun isOutdatedTweet(retrieve: Tweet, toCompare: Tweet?): Boolean {
-        var rate = 0
         val retrieveTime = Duration.between(retrieve.getSentTime(), LocalDateTime.now()).toMinutes()
-        if (toCompare != null && retrieve.contentEquals(toCompare)) rate++
-        if (retrieveTime >= 45 || (toCompare != null && Duration.between(
-                        toCompare.getSentTime(),
-                        retrieve.getSentTime()
-                ).toMinutes() >= 15)
-        ) rate++
-        if (toCompare?.let { retrieve.contentEquals(it) } == true) rate++
-        return rate > 1
+        return (retrieveTime >= 45 || (toCompare != null && Duration.between(
+                toCompare.getSentTime(),
+                retrieve.getSentTime()
+        ).toMinutes() >= 15)
+                )
     }
 }

@@ -30,7 +30,6 @@ object BackupHelper {
         }
     }
 
-    fun scheduleBackup() {
-        TaskUtil.runScheduleTaskAsync(BackupHelper::createBackup, 0, BotVariables.cfg.autoSaveTime, TimeUnit.MINUTES)
-    }
+    fun scheduleBackup() =
+        TaskUtil.runScheduleTaskAsync(0, BotVariables.cfg.autoSaveTime, TimeUnit.MINUTES, BackupHelper::createBackup)
 }

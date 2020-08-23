@@ -197,12 +197,14 @@ object TwitterApi : ApiExecutor {
             return null
         }
 
-        val exception = TaskUtil.executeWithRetry({
+        val exception = TaskUtil.executeWithRetry(1) {
             try {
                 val cachedTweet = cacheTweet[username]
                 val result: Tweet?
 
-                result = if (cachedTweet != null && Duration.between(cachedTweet.getSentTime(), LocalDateTime.now()).toMinutes() <= 2) {
+                result = if (cachedTweet != null && Duration.between(cachedTweet.getSentTime(), LocalDateTime.now())
+                        .toMinutes() <= 2
+                ) {
                     cachedTweet
                 } else {
                     val list = getUserTweets(username, max)
@@ -214,7 +216,7 @@ object TwitterApi : ApiExecutor {
             } catch (x: TwitterApiException) {
                 logger.warning("[蓝鸟] 调用 API 时出现了问题", x)
             }
-        }, 1)
+        }
 
         if (exception != null) throw exception
 

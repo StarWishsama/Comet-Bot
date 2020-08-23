@@ -18,16 +18,14 @@ object SessionManager {
     private val sessions: MutableMap<Session, LocalDateTime> = HashMap()
 
     init {
-        TaskUtil.runScheduleTaskAsync({
+        TaskUtil.runScheduleTaskAsync(3, 3, TimeUnit.MINUTES) {
             val timeNow = LocalDateTime.now()
             sessions.forEach { (session, time) ->
-                run {
-                    if (time.plusMinutes(3).isAfter(timeNow)) {
-                        this.expireSession(session)
-                    }
+                if (time.plusMinutes(3).isAfter(timeNow)) {
+                    this.expireSession(session)
                 }
             }
-        }, 3, 3, TimeUnit.MINUTES)
+        }
     }
 
     fun addSession(session: Session) {
@@ -51,7 +49,7 @@ object SessionManager {
     }
 
     fun isValidSessionById(id: Long): Boolean {
-        return getSession(id) != null
+        return getSession(id) != null || isValidSessionByGroup(id)
     }
 
     fun isValidSessionByGroup(groupId: Long): Boolean {

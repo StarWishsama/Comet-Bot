@@ -8,15 +8,15 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
 object TaskUtil {
-    fun runAsync(task: () -> Unit, delay: Long, unit: TimeUnit = TimeUnit.SECONDS): ScheduledFuture<*> {
+    fun runAsync(delay: Long = 0, unit: TimeUnit = TimeUnit.SECONDS, task: () -> Unit): ScheduledFuture<*> {
         return BotVariables.service.schedule(task, delay, unit)
     }
 
-    fun runScheduleTaskAsync(task: () -> Unit, firstTimeDelay: Long, period: Long, unit: TimeUnit): ScheduledFuture<*> {
+    fun runScheduleTaskAsync(firstTimeDelay: Long, period: Long, unit: TimeUnit, task: () -> Unit): ScheduledFuture<*> {
         return BotVariables.service.scheduleAtFixedRate(task, firstTimeDelay, period, unit)
     }
 
-    fun executeWithRetry(task: () -> Unit, retryTime: Int): Throwable? {
+    fun executeWithRetry(retryTime: Int, task: () -> Unit): Throwable? {
         if (retryTime >= 5) return ReachRetryLimitException()
 
         var initRetryTime = 0
