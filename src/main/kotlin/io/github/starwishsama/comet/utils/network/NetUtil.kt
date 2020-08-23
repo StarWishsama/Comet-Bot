@@ -4,6 +4,7 @@ import cn.hutool.core.io.IORuntimeException
 import cn.hutool.http.*
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.utils.network.NetUtil.proxyIsUsable
 import java.io.*
 import java.net.Proxy
@@ -15,8 +16,8 @@ fun HttpResponse.getContentLength(): Int {
     return header(Header.CONTENT_LENGTH).toIntOrNull() ?: -1
 }
 
-fun Socket.isUsable(timeout: Int = 1_000): Boolean {
-    if (proxyIsUsable == 0) {
+fun Socket.isUsable(timeout: Int = 1_000, isReloaded: Boolean = false): Boolean {
+    if (proxyIsUsable == 0 || isReloaded) {
         try {
             val connection = URL("https://google.com").openConnection(Proxy(cfg.proxyType, this.remoteSocketAddress))
             connection.connectTimeout = 5000
@@ -66,11 +67,13 @@ object NetUtil {
             .timeout(timeout)
             .header("user-agent", defaultUA)
 
-        if (proxyUrl.isNotEmpty() && proxyPort != -1) {
+        try {
             val socket = Socket(proxyUrl, proxyPort)
             if (socket.isUsable() && proxyIsUsable > 0) {
                 request.setProxy(Proxy(cfg.proxyType, socket.remoteSocketAddress))
             }
+        } catch (e: Exception) {
+            daemonLogger.verbose("无法连接到代理服务器, ${e.message}")
         }
 
         return request

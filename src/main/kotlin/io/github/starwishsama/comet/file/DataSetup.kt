@@ -7,6 +7,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.objects.BotLocalization
@@ -14,7 +15,9 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.Config
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.utils.*
+import io.github.starwishsama.comet.utils.network.isUsable
 import java.io.File
+import java.net.Socket
 import java.nio.file.Files
 
 object DataSetup {
@@ -46,7 +49,7 @@ object DataSetup {
 
     private fun saveCfg() {
         try {
-            cfgFile.writeString(Yaml.default.encodeToString(Config.serializer(), BotVariables.cfg))
+            cfgFile.writeString(Yaml.default.encodeToString(Config.serializer(), cfg))
             userCfg.writeClassToJson(BotVariables.users)
             shopItemCfg.writeClassToJson(BotVariables.shop)
             savePerGroupSetting()
@@ -58,7 +61,7 @@ object DataSetup {
 
     private fun load() {
         try {
-            BotVariables.cfg = Yaml.default.decodeFromString(Config.serializer(), cfgFile.getContext())
+            cfg = Yaml.default.decodeFromString(Config.serializer(), cfgFile.getContext())
             BotVariables.users.addAll(gson.fromJson<List<BotUser>>(userCfg.getContext()))
 
             BotVariables.shop = gson.fromJson(shopItemCfg.getContext())
@@ -123,7 +126,14 @@ object DataSetup {
 
     fun reload() {
         // 仅重载配置文件
-        BotVariables.cfg = cfgFile.parseAsClass(Config::class.java)
+        cfg = cfgFile.parseAsClass(Config::class.java)
+
+        try {
+            val socket = Socket(cfg.proxyUrl, cfg.proxyPort)
+            socket.isUsable()
+        } catch (e: Exception) {
+            daemonLogger.verbose("无法连接到代理服务器, ${e.message}")
+        }
     }
 
     fun initPerGroupSetting() {
