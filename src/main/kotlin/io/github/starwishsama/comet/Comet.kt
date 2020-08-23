@@ -85,7 +85,7 @@ object Comet {
             while (scanner.hasNextLine()) {
                 command = scanner.nextLine()
                 runBlocking {
-                    val result = CommandExecutor.executeConsole(command)
+                    val result = CommandExecutor.dispatchConsoleCommand(command)
                     if (result.isNotEmpty()) {
                         logger.info(result)
                     }
@@ -196,7 +196,7 @@ object Comet {
                 if (sender.id != 80000000L) {
                     if (this is GroupMessageEvent && group.isBotMuted) return@always
 
-                    val result = CommandExecutor.execute(this)
+                    val result = CommandExecutor.dispatchCommand(this)
                     val filtered = result.msg
                     try {
                         if (filtered !is EmptyMessageChain && filtered.isNotEmpty()) {

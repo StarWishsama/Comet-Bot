@@ -7,7 +7,6 @@ import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.coolDown
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.BotUser.Companion.isBotAdmin
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotOwner
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
@@ -44,41 +43,7 @@ object BotUtil {
     }
 
     /**
-     * 判断指定QQ号是否仍在冷却中
-     *
-     * @author NamelessSAMA
-     * @param qq 指定的QQ号
-     * @return 目标QQ号是否处于冷却状态
-     */
-    fun hasNoCoolDown(qq: Long): Boolean {
-        if (cfg.coolDownTime < 1) return true
-
-        val currentTime = System.currentTimeMillis()
-        if (qq == 80000000L) {
-            return false
-        }
-
-        if (qq == cfg.ownerId) {
-            return true
-        }
-
-        if (coolDown.containsKey(qq) && !isBotAdmin(qq)) {
-            val cd = coolDown[qq]
-            if (cd != null) {
-                if (currentTime - cd < cfg.coolDownTime * 1000) {
-                    return false
-                } else {
-                    coolDown.remove(qq)
-                }
-            }
-        } else {
-            coolDown[qq] = currentTime
-        }
-        return true
-    }
-
-    /**
-     * 判断指定QQ号是否仍在冷却中
+     * 判断指定QQ号是否仍在命令冷却中
      * (可以自定义命令冷却时间)
      *
      * @author Nameless
@@ -86,16 +51,12 @@ object BotUtil {
      * @param seconds 自定义冷却时间
      * @return 目标QQ号是否处于冷却状态
      */
-    fun hasNoCoolDown(qq: Long, seconds: Int): Boolean {
+    fun hasNoCoolDown(qq: Long, seconds: Int = cfg.coolDownTime): Boolean {
         if (seconds < 1) return true
 
         val currentTime = System.currentTimeMillis()
         if (qq == 80000000L) {
             return false
-        }
-
-        if (qq == cfg.ownerId) {
-            return true
         }
 
         if (coolDown.containsKey(qq) && !isBotOwner(qq)) {

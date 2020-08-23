@@ -81,7 +81,7 @@ object CommandExecutor {
      * @param event Mirai 消息命令 (聊天)
      */
     @ExperimentalTime
-    suspend fun execute(event: MessageEvent): ExecutedResult {
+    suspend fun dispatchCommand(event: MessageEvent): ExecutedResult {
         val executedTime = LocalDateTime.now()
         val senderId = event.sender.id
         val message = event.message.contentToString()
@@ -137,7 +137,7 @@ object CommandExecutor {
      *
      * @param content 纯文本命令 (后台)
      */
-    suspend fun executeConsole(content: String): String {
+    suspend fun dispatchConsoleCommand(content: String): String {
         try {
             if (isCommandPrefix(content)) {
                 val cmd = getConsoleCommand(getCommandName(content))

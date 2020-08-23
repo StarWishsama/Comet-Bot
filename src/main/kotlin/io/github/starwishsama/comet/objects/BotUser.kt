@@ -77,7 +77,7 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
     }
 
     fun isBotOwner(): Boolean {
-        return level == UserLevel.OWNER || BotVariables.cfg.ownerId == id
+        return level == UserLevel.OWNER
     }
 
     fun addPermission(permission: String) {
@@ -90,7 +90,7 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
         }
 
         fun isBotOwner(id: Long): Boolean {
-            return getLevel(id) == UserLevel.OWNER || BotVariables.cfg.ownerId == id
+            return getLevel(id) == UserLevel.OWNER
         }
 
         fun quickRegister(id: Long): BotUser {
