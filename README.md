@@ -54,9 +54,7 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
  ```bash
  git clone https://github.com/StarWishsama/Comet-Bot.git
  ```
-
- * 编译
-   本项目使用 Gradle 作为包管理系统, 还使用了 ShadowJar 引入依赖, 请自行搜索 Gradle 如何打包
+ 本项目使用 Gradle 作为包管理系统, 还使用了 ShadowJar 引入依赖, 请自行搜索 Gradle 如何打包
 
 2. 使用 cmd 启动 Bot, 按照提示登录
 3. 提示启动完成后, 在机器人加入的群内发送 /help 就可开始了解 Comet 的各项功能了
