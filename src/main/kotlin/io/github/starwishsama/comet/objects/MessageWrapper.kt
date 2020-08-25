@@ -8,18 +8,19 @@ import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.uploadAsImage
 
-data class WrappedMessage(var text: String?) {
-    var picture: String? = null
+open class MessageWrapper(var text: String?) {
+    var picUrl: String? = null
+    var context: Any? = null
 
     private suspend fun getPicture(contact: Contact): Image? {
-        if (picture != null) {
-            return picture?.let { NetUtil.getUrlInputStream(it)?.uploadAsImage(contact) }
+        if (picUrl != null) {
+            return picUrl?.let { NetUtil.getUrlInputStream(it)?.uploadAsImage(contact) }
         }
         return null
     }
 
-    fun plusImageUrl(url: String?): WrappedMessage {
-        this.picture = url
+    fun plusImageUrl(url: String?): MessageWrapper {
+        this.picUrl = url
         return this
     }
 
@@ -33,5 +34,9 @@ data class WrappedMessage(var text: String?) {
             return sText.convertToChain()
         }
         return EmptyMessageChain
+    }
+
+    override fun toString(): String {
+        return "MessageWrapper {text=$text, pictureUrl=$picUrl}"
     }
 }

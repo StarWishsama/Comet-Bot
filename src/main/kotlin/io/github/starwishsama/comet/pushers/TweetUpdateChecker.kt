@@ -2,18 +2,20 @@ package io.github.starwishsama.comet.pushers
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.bot
+import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.CommandExecutor.doFilter
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.getGroupOrNull
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.PlainText
-import net.mamoe.mirai.message.data.isContentNotEmpty
 import net.mamoe.mirai.message.uploadAsImage
 import java.time.Duration
 import java.time.LocalDateTime
@@ -21,9 +23,9 @@ import java.util.concurrent.ScheduledFuture
 import kotlin.time.ExperimentalTime
 
 object TweetUpdateChecker : CometPusher {
-    private val pushContent = mutableMapOf<String, PushedTweet>()
-    override val delayTime: Long = 5
-    override val cycle: Long = 10
+    private val pushPool = mutableMapOf<String, PushedTweet>()
+    override val delayTime: Long = cfg.twitterInterval
+    override val internal: Long = cfg.twitterInterval
     override var future: ScheduledFuture<*>? = null
 
     @ExperimentalTime
@@ -32,78 +34,94 @@ object TweetUpdateChecker : CometPusher {
 
         BotVariables.perGroup.parallelStream().forEach { cfg ->
             if (cfg.twitterPushEnabled) {
-                cfg.twitterSubscribers.forEach sub@{
-                    if (pushContent.containsKey(it)) {
-                        val groups = pushContent[it]?.groupsToPush
-                        if (groups == null || !groups.contains(cfg.id))
-                            pushContent[it]?.groupsToPush?.add(cfg.id)
+                cfg.twitterSubscribers.forEach {
+                    if (pushPool.containsKey(it)) {
+                        pushPool[it]?.groupsToPush?.add(cfg.id)
                     } else {
-                        pushContent[it] = PushedTweet(mutableSetOf(cfg.id), false)
+                        pushPool[it] = PushedTweet(mutableSetOf(cfg.id), false)
                     }
                 }
             }
         }
 
-        pushContent.forEach {
-            try {
-                val tweet = TwitterApi.getCachedTweet(it.key, max = 1)
-                val previousTweet = pushContent[it.key]?.tweet
+        var count = 0
 
-                if (tweet != null && (!isOutdatedTweet(tweet, previousTweet) && !tweet.contentEquals(previousTweet))) {
-                    it.value.tweet = tweet
-                    it.value.isPushed = false
-                    TwitterApi.addCacheTweet(it.key, tweet)
-                }
-            } catch (t: Throwable) {
-                if (!NetUtil.isTimeout(t)) {
-                    when (t) {
-                        is RateLimitException -> daemonLogger.verbose(t.message)
-                        else -> daemonLogger.warning("[推文] 在尝试获取推文时出现了意外", t)
+        pushPool.forEach { (userName, pushedTweet) ->
+            TaskUtil.executeWithRetry(2) {
+                try {
+                    val tweet = TwitterApi.getCachedTweet(username = userName, max = 1)
+
+                    if (tweet != null && !isOutdatedTweet(tweet, pushedTweet.tweet) && !tweet.contentEquals(pushedTweet.tweet)) {
+                        pushedTweet.tweet = tweet
+                        pushedTweet.hasPushed = false
+                        count++
                     }
-                } else {
-                    daemonLogger.verbose("[推文] 获取推文时连接超时")
+                } catch (t: Throwable) {
+                    if (!NetUtil.isTimeout(t)) {
+                        when (t) {
+                            is RateLimitException -> daemonLogger.verbose(t.message)
+                            else -> daemonLogger.verbose("[推文] 在尝试获取推文时出现了意外", t)
+                        }
+                    } else {
+                        daemonLogger.verbose("[推文] 获取推文时连接超时")
+                    }
                 }
             }
         }
+
+        if (count > 0) daemonLogger.verbose("Retrieve success, have collected $count tweet(s)!")
 
         push()
     }
 
     @ExperimentalTime
     override fun push() {
-        pushContent.forEach { (_, pushObject) ->
-            val tweet = pushObject.tweet
-            if (tweet != null && !pushObject.isPushed) {
-                pushToGroups(pushObject.groupsToPush, tweet)
-            }
-        }
-    }
+        var count = 0
 
-    @ExperimentalTime
-    private fun pushToGroups(groupsToPush: MutableSet<Long>, content: Tweet) {
-        groupsToPush.forEach {
-            runBlocking {
-                val group = bot.getGroupOrNull(it)
-                if (group != null) {
-                    val image = NetUtil.getUrlInputStream(content.getPictureUrl())?.uploadAsImage(group)
-                    val filtered = (PlainText("${content.user.name}\n") + content.getFullText().convertToChain() + (image
-                            ?: EmptyMessageChain)).doFilter()
-                    if (filtered.isContentNotEmpty()) group.sendMessage(filtered)
+        pushPool.forEach { (_, pushObject) ->
+            pushObject.tweet?.let {
+                GlobalScope.launch {
+                    count = pushToGroups(pushObject.groupsToPush, it)
                 }
             }
         }
+
+        if (count > 0) daemonLogger.verbose("Push success, have pushed $count group(s)!")
     }
 
-    private data class PushedTweet(val groupsToPush: MutableSet<Long>, var isPushed: Boolean) {
+    @ExperimentalTime
+    private suspend fun pushToGroups(groupsToPush: MutableSet<Long>, content: Tweet): Int {
+        var successCount = 0
+
+        groupsToPush.forEach {
+            val group = bot.getGroupOrNull(it)
+            if (group != null) {
+                val image = NetUtil.getUrlInputStream(content.getPictureUrl())?.uploadAsImage(group)
+                val filtered = PlainText("${content.user.name}\n") + content.getFullText().convertToChain().doFilter()
+                try {
+                    if (image != null) group.sendMessage(filtered + image)
+                    else group.sendMessage(filtered)
+                    successCount++
+                    delay(2_500)
+                } catch (t: Throwable) {
+                    daemonLogger.verbose("Push tweet failed, ${t.message}")
+                }
+            }
+        }
+
+        return successCount
+    }
+
+    private data class PushedTweet(val groupsToPush: MutableSet<Long>, var hasPushed: Boolean) {
         var tweet: Tweet? = null
     }
 
-    private fun isOutdatedTweet(retrieve: Tweet, toCompare: Tweet?): Boolean {
-        val retrieveTime = Duration.between(retrieve.getSentTime(), LocalDateTime.now()).toMinutes()
-        return (retrieveTime >= 45 || (toCompare != null && Duration.between(
-                toCompare.getSentTime(),
-                retrieve.getSentTime()
-        ).toMinutes() >= 15)
-                )
+    private fun isOutdatedTweet(retrieve: Tweet, previous: Tweet?): Boolean {
+        val isTooOld = Duration.between(retrieve.getSentTime(), LocalDateTime.now()).toMinutes() >= 30
+        var isShortInterval = false
+        previous?.let {
+            isShortInterval = Duration.between(it.getSentTime(), retrieve.getSentTime()).toMinutes() >= 5
+        }
+        return isTooOld && isShortInterval
     }
 }

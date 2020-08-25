@@ -5,7 +5,7 @@ import com.google.gson.JsonSyntaxException
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.ApiExecutor
 import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
-import io.github.starwishsama.comet.objects.WrappedMessage
+import io.github.starwishsama.comet.objects.MessageWrapper
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
 import io.github.starwishsama.comet.objects.pojo.youtube.VideoType
 import io.github.starwishsama.comet.objects.pojo.youtube.YoutubeRequestError
@@ -71,29 +71,29 @@ object YoutubeApi : ApiExecutor {
         return false
     }
 
-    fun getLiveStatusAsMessage(channelId: String): WrappedMessage? {
+    fun getLiveStatusAsMessage(channelId: String): MessageWrapper? {
         val result = getChannelVideos(channelId, 5)
         if (result != null) {
             return getLiveStatusByResult(result)
         }
 
-        return WrappedMessage("找不到对应ID的频道")
+        return MessageWrapper("找不到对应ID的频道")
     }
 
-    fun getLiveStatusByResult(result: SearchVideoResult?): WrappedMessage {
-        if (result == null) return WrappedMessage("找不到对应ID的频道")
+    fun getLiveStatusByResult(result: SearchVideoResult?): MessageWrapper {
+        if (result == null) return MessageWrapper("找不到对应ID的频道")
 
         val items = result.items
         items.forEach { item ->
             run {
                 if (item.snippet.getType() == VideoType.STREAMING) {
-                    return WrappedMessage("""${item.snippet.channelTitle} 正在直播!
+                    return MessageWrapper("""${item.snippet.channelTitle} 正在直播!
                                                   直播标题: ${item.snippet.videoTitle}
                                                   直播时间: ${item.snippet.publishTime}
                                                   直达链接: ${item.getVideoUrl()}""")
                             .plusImageUrl(item.snippet.getCoverImgUrl())
                 } else if (item.snippet.getType() == VideoType.UPCOMING) {
-                    return WrappedMessage("""
+                    return MessageWrapper("""
                                                             ${item.snippet.channelTitle} 有即将进行的直播!
                                                             直播标题: ${item.snippet.videoTitle}
                                                             开播时间请打开查看 ${item.getVideoUrl()}
@@ -102,7 +102,7 @@ object YoutubeApi : ApiExecutor {
             }
         }
 
-        return WrappedMessage("${result.items[0].snippet.channelTitle} 最近没有直播哦")
+        return MessageWrapper("${result.items[0].snippet.channelTitle} 最近没有直播哦")
     }
 
     override var usedTime: Int = 0

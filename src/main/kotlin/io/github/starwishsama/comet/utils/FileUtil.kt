@@ -39,6 +39,7 @@ fun File.getContext(): String {
  * @return 指定类
  */
 fun <T> File.parseAsClass(clazz: Class<T>): T {
+    require(exists())
     return BotVariables.gson.fromJson(getContext(), clazz)
 }
 
@@ -72,7 +73,8 @@ object FileUtil {
 
         val report = "Error occurred:\nExtra message: $message\n${getBeautyStackTrace(t)}\n\nRaw content:\n$content"
         location.writeString(report)
-        daemonLogger.debug("$reason, 错误报告已生成! 保存在 ${location.path}")
+        daemonLogger.info("$reason, 错误报告已生成! 保存在 ${location.path}")
+        daemonLogger.info("你可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")
     }
 
     fun initLog() {
@@ -82,7 +84,7 @@ object FileUtil {
             BotVariables.log = File(parent, "log-${dateFormatter.format(initTime)}.log")
             BotVariables.log.createNewFile()
         } catch (e: IOException) {
-            daemonLogger.error("尝试输出 Log 失败")
+            daemonLogger.error("初始化 Log 文件失败")
         }
     }
 
@@ -100,6 +102,8 @@ object FileUtil {
 
     /**
      * https://github.com/Polar-Pumpkin/ParrotX/blob/master/src/main/java/org/serverct/parrot/parrotx/utils/I18n.java#L328
+     *
+     * 更优雅的 StackTrace 输出.
      *
      * @author Polar-Pumpkin
      * @param exception Throwable 类型的异常。
@@ -136,11 +140,6 @@ object FileUtil {
         sb.append("========================= StackTrace =========================\n")
 
         return sb.toString()
-    }
-
-    fun createBlankFile(path: File, child: String) {
-        val file = File(path, child)
-        createBlankFile(file)
     }
 
     fun createBlankFile(location: File) {

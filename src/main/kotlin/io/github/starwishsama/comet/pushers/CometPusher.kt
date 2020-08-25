@@ -11,7 +11,7 @@ interface CometPusher {
     /**
      * 获取周期间隔时长, 单位分钟
      */
-    val cycle: Long
+    val internal: Long
 
     /**
      * 用于关闭当前推送器

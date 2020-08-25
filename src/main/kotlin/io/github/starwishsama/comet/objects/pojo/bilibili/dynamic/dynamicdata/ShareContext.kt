@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.dynamicdata
 
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.comet.objects.WrappedMessage
+import io.github.starwishsama.comet.objects.MessageWrapper
 import io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.DynamicData
 
 data class ShareContext(var vest: VestBean, var sketch: SketchBean) : DynamicData {
@@ -14,12 +14,12 @@ data class ShareContext(var vest: VestBean, var sketch: SketchBean) : DynamicDat
                           @SerializedName("target_url")
                           var targetUrl: String?)
 
-    override suspend fun getContact(): WrappedMessage {
-        val wrapped = WrappedMessage("分享了 ${vest.context}\n")
+    override suspend fun getContact(): MessageWrapper {
+        val wrapped = MessageWrapper("分享了 ${vest.context}\n")
         if (!sketch.coverUrl.isNullOrEmpty()) {
             sketch.coverUrl.let {
                 if (it != null) {
-                    wrapped.picture = it
+                    wrapped.picUrl = it
                 }
             }
         }

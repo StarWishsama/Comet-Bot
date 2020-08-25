@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.utils
 
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.exceptions.ReachRetryLimitException
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -19,7 +20,7 @@ object TaskUtil {
     fun executeWithRetry(retryTime: Int, task: () -> Unit): Throwable? {
         if (retryTime >= 5) return ReachRetryLimitException()
 
-        var initRetryTime = 0
+        var initRetryTime = 1
         fun runTask(): Throwable? {
             try {
                 if (initRetryTime <= retryTime) {
@@ -27,8 +28,8 @@ object TaskUtil {
                 }
             } catch (t: Throwable) {
                 if (NetUtil.isTimeout(t)) {
+                    daemonLogger.verbose("Retried $initRetryTime time(s), connect times out")
                     initRetryTime++
-                    BotVariables.daemonLogger.verbose("Retried failed, ${t.message}")
                     runTask()
                 } else {
                     if (t !is RateLimitException) return t

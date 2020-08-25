@@ -107,7 +107,7 @@ object Comet {
     private fun startAllPusher() {
         val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker, YTBStreamChecker)
         pushers.forEach {
-            val future = TaskUtil.runScheduleTaskAsync(it.delayTime, it.cycle, TimeUnit.MINUTES, it::retrieve)
+            val future = TaskUtil.runScheduleTaskAsync(it.delayTime, it.internal, TimeUnit.MINUTES, it::retrieve)
             it.future = future
         }
     }
@@ -116,13 +116,13 @@ object Comet {
     suspend fun startBot(qqId: Long, password: String) {
         val config = BotConfiguration.Default
         config.botLoggerSupplier = { it ->
-            PlatformLogger("Bot ${it.id}", {
+            PlatformLogger("Comet ${it.id}", {
                 BotVariables.log.writeString(BotVariables.log.getContext() + "$it\n")
                 println(it)
             })
         }
         config.networkLoggerSupplier = { it ->
-            PlatformLogger("BotNet ${it.id}", {
+            PlatformLogger("CometNet ${it.id}", {
                 BotVariables.log.writeString(BotVariables.log.getContext() + "$it\n")
                 println(it)
             })
@@ -198,10 +198,9 @@ object Comet {
                     if (this is GroupMessageEvent && group.isBotMuted) return@always
 
                     val result = CommandExecutor.dispatchCommand(this)
-                    val filtered = result.msg
                     try {
-                        if (filtered !is EmptyMessageChain && filtered.isNotEmpty()) {
-                            reply(filtered)
+                        if (result.msg !is EmptyMessageChain && result.msg.isNotEmpty()) {
+                            reply(result.msg)
                         }
                     } catch (e: IllegalArgumentException) {
                         logger.warning("正在尝试发送空消息, 执行的命令为 $result")
@@ -243,12 +242,9 @@ suspend fun main() {
         var command: String
         var isFailed = false
         while (scanner.hasNextLine()) {
-            try {
-                if (bot.isOnline) {
-                    scanner.close()
-                    break
-                }
-            } catch (ignored: UninitializedPropertyAccessException) {
+            if (BotVariables.isBotInitialized() && bot.isOnline) {
+                scanner.close()
+                break
             }
 
             command = scanner.nextLine()
@@ -266,7 +262,7 @@ suspend fun main() {
                 try {
                     Comet.startBot(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
                 } catch (e: LoginFailedException) {
-                    println("登录失败: $e\n如果是密码错误, 请重新输入密码")
+                    println("登录失败: ${e.message}\n如果是密码错误, 请重新输入密码")
                     isFailed = true
                     continue
                 }

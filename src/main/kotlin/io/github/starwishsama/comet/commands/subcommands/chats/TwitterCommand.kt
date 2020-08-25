@@ -7,7 +7,6 @@ import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.RateLimitException
-import io.github.starwishsama.comet.exceptions.ReachRetryLimitException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
@@ -102,7 +101,8 @@ class TwitterCommand : ChatCommand {
                 BotUtil.sendMessage("获取到的推文为空")
             }
         } catch (t: Throwable) {
-            if (NetUtil.isTimeout(t) || t is ReachRetryLimitException) {
+            if (NetUtil.isTimeout(t)) {
+                daemonLogger.error(t)
                 BotUtil.sendMessage("获取推文时连接超时")
             } else {
                 daemonLogger.warning(t)

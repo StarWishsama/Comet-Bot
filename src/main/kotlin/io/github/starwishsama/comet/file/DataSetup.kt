@@ -32,7 +32,6 @@ object DataSetup {
     private val perGroupFolder = FileUtil.getChildFolder("groups")
 
     fun init() {
-        daemonLogger.verbose("机器人文件路径在: " + BotVariables.filePath)
         if (!userCfg.exists() || !cfgFile.exists()) {
             try {
                 cfgFile.writeString(Yaml.default.encodeToString(Config.serializer(), Config()))
@@ -55,7 +54,7 @@ object DataSetup {
             savePerGroupSetting()
             cacheCfg.writeClassToJson(BotVariables.cache)
         } catch (e: Exception) {
-            daemonLogger.warning("[配置] 在保存配置文件时发生了问题, 错误信息: ", e)
+            daemonLogger.warning("[配置] 在保存配置文件时发生了问题", e)
         }
     }
 
@@ -113,14 +112,11 @@ object DataSetup {
         }
     }
 
-    private fun saveLang() {
-        langCfg.writeClassToJson(BotVariables.localMessage)
-    }
 
     fun saveFiles() {
         daemonLogger.info("[数据] 自动保存数据完成")
         saveCfg()
-        saveLang()
+        langCfg.writeClassToJson(BotVariables.localMessage)
         savePerGroupSetting()
     }
 
@@ -176,9 +172,9 @@ object DataSetup {
         val files = arrayOf(
                 FileUtil.getFileAsStreamInJar("ark.json"),
                 FileUtil.getFileAsStreamInJar("pcr.json"),
-                FileUtil.getFileAsStreamInJar("paper.png"),
-                FileUtil.getFileAsStreamInJar("rock.png"),
-                FileUtil.getFileAsStreamInJar("scissor.png")
+                FileUtil.getFileAsStreamInJar("img${File.separator}paper.png"),
+                FileUtil.getFileAsStreamInJar("img${File.separator}rock.png"),
+                FileUtil.getFileAsStreamInJar("img${File.separator}scissor.png")
         )
 
         files.forEach {

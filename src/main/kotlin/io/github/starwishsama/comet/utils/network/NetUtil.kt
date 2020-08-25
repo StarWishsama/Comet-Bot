@@ -42,7 +42,7 @@ object NetUtil {
 
     fun getUrlInputStream(url: String?): InputStream? {
         if (url == null) return null
-        return getUrlInputStream(url, 8000)
+        return getUrlInputStream(url, 4_000)
     }
 
     fun getUrlInputStream(url: String, timeout: Int): InputStream? {
@@ -55,25 +55,28 @@ object NetUtil {
     }
 
     @Throws(HttpException::class)
-    fun doHttpRequestGet(url: String, timeout: Int = 5000): HttpRequest {
+    fun doHttpRequestGet(url: String, timeout: Int = 4_000): HttpRequest {
         return doHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort, Method.GET)
     }
 
     @Throws(HttpException::class)
     fun doHttpRequest(url: String, timeout: Int, proxyUrl: String, proxyPort: Int, method: Method): HttpRequest {
         val request = HttpRequest(url)
-            .method(method)
-            .setFollowRedirects(true)
-            .timeout(timeout)
-            .header("user-agent", defaultUA)
+                .method(method)
+                .setFollowRedirects(true)
+                .timeout(timeout)
+                .header("user-agent", defaultUA)
 
-        try {
-            val socket = Socket(proxyUrl, proxyPort)
-            if (socket.isUsable() && proxyIsUsable > 0) {
-                request.setProxy(Proxy(cfg.proxyType, socket.remoteSocketAddress))
+
+        if (proxyIsUsable >= 0) {
+            try {
+                val socket = Socket(proxyUrl, proxyPort)
+                if (socket.isUsable()) {
+                    request.setProxy(Proxy(cfg.proxyType, socket.remoteSocketAddress))
+                }
+            } catch (e: Exception) {
+                daemonLogger.verbose("无法连接到代理服务器, ${e.message}")
             }
-        } catch (e: Exception) {
-            daemonLogger.verbose("无法连接到代理服务器, ${e.message}")
         }
 
         return request
@@ -126,7 +129,7 @@ object NetUtil {
     }
 
     fun isTimeout(t: Throwable): Boolean {
-        val msg = t.message ?: return false
-        return msg.toLowerCase(Locale.ROOT).contains("times out")
+        val msg = t.message?.toLowerCase(Locale.ROOT) ?: return false
+        return (msg.contains("time") && msg.contains("out")) || t.javaClass.simpleName.toLowerCase(Locale.ROOT).contains("timeout")
     }
 }

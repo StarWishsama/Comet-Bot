@@ -45,10 +45,6 @@ object StringUtil {
         return PlainText(this).asMessageChain()
     }
 
-    fun String.isOutRange(range: Int): Boolean {
-        return length > range
-    }
-
     /**
      * 判断字符串是否为整数
      * @return 是否为整数

@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.WrappedMessage
+import io.github.starwishsama.comet.objects.MessageWrapper
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
@@ -177,7 +177,7 @@ class BiliBiliCommand : ChatCommand {
         return BotUtil.sendMessage("未订阅任何用户")
     }
 
-    private suspend fun getDynamicText(dynamic: WrappedMessage?, event: MessageEvent): MessageChain {
+    private suspend fun getDynamicText(dynamic: MessageWrapper?, event: MessageEvent): MessageChain {
         return if (dynamic == null) {
             ("\n无最近动态").convertToChain()
         } else {

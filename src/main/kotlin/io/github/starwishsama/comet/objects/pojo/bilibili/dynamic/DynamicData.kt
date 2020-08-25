@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.objects.pojo.bilibili.dynamic
 
-import io.github.starwishsama.comet.objects.WrappedMessage
+import io.github.starwishsama.comet.objects.MessageWrapper
 
 interface DynamicData {
-    suspend fun getContact(): WrappedMessage
+    suspend fun getContact(): MessageWrapper
 }

@@ -3,6 +3,8 @@ package io.github.starwishsama.comet.pushers
 import com.hiczp.bilibili.api.live.model.RoomInfo
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.bot
+import io.github.starwishsama.comet.BotVariables.cfg
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
 import io.github.starwishsama.comet.api.bilibili.FakeClientApi
 import io.github.starwishsama.comet.commands.CommandExecutor.doFilter
@@ -15,12 +17,14 @@ import java.util.concurrent.ScheduledFuture
 
 object BiliLiveChecker : CometPusher {
     private val pushedList = mutableListOf<StoredLiveInfo>()
-    override val delayTime: Long = 1
-    override val cycle: Long = 1
+    override val delayTime: Long = cfg.biliInterval
+    override val internal: Long = cfg.biliInterval
     override var future: ScheduledFuture<*>? = null
 
     override fun retrieve() {
         if (!bot.isOnline) future?.cancel(false)
+
+        var count = 0
 
         val collectedUsers = mutableSetOf<Long>()
 
@@ -36,22 +40,31 @@ object BiliLiveChecker : CometPusher {
                 val sli = StoredLiveInfo(data.data, false)
                 if (pushedList.isEmpty() && data.data.liveStatus == 1) {
                     pushedList.plusAssign(sli)
+                    count++
                 } else {
                     var hasOldData = false
+
                     for (i in pushedList.indices) {
+                        val oldStatus = pushedList[i].data.liveStatus
+                        val currentStatus = data.data.liveStatus
                         if (pushedList[i].data.roomId == roomId) {
                             hasOldData = true
-                            if (pushedList[i].data.liveStatus != data.data.liveStatus) pushedList[i] = sli
+                            if (oldStatus != currentStatus && currentStatus == 1) {
+                                pushedList[i] = sli
+                            }
                             break
                         }
                     }
 
                     if (!hasOldData && data.data.liveStatus == 1) {
                         pushedList.add(sli)
+                        count++
                     }
                 }
             }
         }
+
+        if (count > 0) daemonLogger.verbose("Retrieve success, have collected $count liver(s)!")
 
         push()
     }
@@ -70,10 +83,13 @@ object BiliLiveChecker : CometPusher {
             }
         }
 
-        pushToGroups(liverToGroups)
+        val count = pushToGroups(liverToGroups)
+        if (count > 0) daemonLogger.verbose("Push bili info success, have pushed $count group(s)!")
     }
 
-    private fun pushToGroups(pushQueue: MutableMap<StoredLiveInfo, MutableSet<Long>>) {
+    private fun pushToGroups(pushQueue: MutableMap<StoredLiveInfo, MutableSet<Long>>): Int {
+        var count = 0
+
         /** 遍历推送列表推送开播消息 */
         pushQueue.forEach { (info, pushGroups) ->
             if (!info.isPushed) {
@@ -88,6 +104,7 @@ object BiliLiveChecker : CometPusher {
                         if (filtered.isContentNotEmpty()) {
                             runBlocking {
                                 bot.getGroupOrNull(it)?.sendMessage(filtered)
+                                count++
                                 delay(2_500)
                             }
                         }
@@ -96,6 +113,8 @@ object BiliLiveChecker : CometPusher {
                 info.isPushed = true
             }
         }
+
+        return count
     }
 
     data class StoredLiveInfo(val data: RoomInfo.Data, var isPushed: Boolean) {

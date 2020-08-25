@@ -56,7 +56,7 @@ class RSPCommand : ChatCommand, SuspendCommand {
     }
 
     enum class RockPaperScissors(val cnName: Array<String>, val fileName: String) {
-        ROCK(arrayOf("石头", "石子", "拳头", "拳", "👊"), "rock.png"), SCISSORS(arrayOf("剪刀", "✂"), "scissor.png"), PAPER(arrayOf("布", "包布"), "paper.png");
+        ROCK(arrayOf("石头", "石子", "拳头", "拳", "👊"), "img${File.separator}rock.png"), SCISSORS(arrayOf("剪刀", "✂"), "img${File.separator}scissor.png"), PAPER(arrayOf("布", "包布"), "img${File.separator}paper.png");
 
         companion object {
             fun getType(name: String): RockPaperScissors? {

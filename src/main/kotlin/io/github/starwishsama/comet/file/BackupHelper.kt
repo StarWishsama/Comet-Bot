@@ -2,13 +2,14 @@ package io.github.starwishsama.comet.file
 
 import cn.hutool.core.io.file.FileWriter
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.TaskUtil
 import java.io.File
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 object BackupHelper {
-    private val location: File = File(BotVariables.filePath.toString() + "/backups")
+    private val location: File = FileUtil.getChildFolder("backups")
 
     private fun createBackup(){
         try {
@@ -20,7 +21,7 @@ object BackupHelper {
             val backupName =
                     "backup-${backupTime.year}-${backupTime.month.value}-${backupTime.dayOfMonth}-${backupTime.hour}-${backupTime.minute}.json"
 
-            val backupFile = File(BotVariables.filePath.toString() + "/backups/${backupName}")
+            val backupFile = File(location, backupName)
             backupFile.createNewFile()
             FileWriter.create(backupFile, Charsets.UTF_8)
                 .write(BotVariables.gson.toJson(BotVariables.users))

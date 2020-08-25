@@ -16,7 +16,6 @@ import io.github.starwishsama.comet.exceptions.TwitterApiException
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
 import io.github.starwishsama.comet.utils.FileUtil
-import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.isType
 import io.github.starwishsama.comet.utils.network.isUsable
@@ -147,7 +146,7 @@ object TwitterApi : ApiExecutor {
                         .header("authorization", "Bearer $token")
                         .header("content-type", "application/json;charset=utf-8")
 
-        val result = request.executeAsync()
+        val result = request.execute()
         val tweetList = parseJsonToTweet(result.body(), request.url)
         return if (tweetList.isNotEmpty()) {
             tweetList.sortedByDescending { it.getSentTime() }
@@ -192,33 +191,34 @@ object TwitterApi : ApiExecutor {
     fun getCachedTweet(username: String, index: Int = 0, max: Int = 5): Tweet? {
         val startTime = LocalDateTime.now()
         var tweet: Tweet? = null
+        var isCache = false
 
         if (index < 0 || max <= index) {
             return null
         }
 
-        val exception = TaskUtil.executeWithRetry(1) {
-            try {
-                val cachedTweet = cacheTweet[username]
-                val result: Tweet?
 
-                result = if (cachedTweet != null && Duration.between(cachedTweet.getSentTime(), LocalDateTime.now())
-                        .toMinutes() <= 2
-                ) {
-                    cachedTweet
-                } else {
-                    val list = getUserTweets(username, max)
-                    if (list.isNotEmpty()) list[index] else throw EmptyTweetException("返回的推文列表为空")
-                }
+        try {
+            val cachedTweet = cacheTweet[username]
+            val result: Tweet?
 
-                logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
-                tweet = result
-            } catch (x: TwitterApiException) {
-                logger.warning("[蓝鸟] 调用 API 时出现了问题", x)
+            result = if (cachedTweet != null && Duration.between(cachedTweet.getSentTime(), LocalDateTime.now())
+                            .toMinutes() <= 1
+            ) {
+                isCache = true
+                cachedTweet
+            } else {
+                val list = getUserTweets(username, max)
+                if (list.isNotEmpty()) list[index] else throw EmptyTweetException("返回的推文列表为空")
             }
+
+            if (!isCache) logger.verbose("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+
+            tweet = result
+        } catch (x: TwitterApiException) {
+            logger.warning("[蓝鸟] 调用 API 时出现了问题", x)
         }
 
-        if (exception != null) throw exception
 
         return tweet
     }

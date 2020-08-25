@@ -12,19 +12,13 @@ import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.pushers.TweetUpdateChecker
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.RssUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.asMessageChain
-import java.io.File
-import java.io.FileInputStream
 import java.io.IOException
 import kotlin.time.ExperimentalTime
 
@@ -93,15 +87,6 @@ class DebugCommand : ChatCommand {
                                     ?: return "Can't retrieve page content".convertToChain()
                             )
                         ).convertToChain()
-                    }
-                }
-                "voice" -> {
-                    if (event is GroupMessageEvent) {
-                        withContext(Dispatchers.IO) {
-                            val testVoice = FileInputStream(File(FileUtil.getResourceFolder(), "tianqiu.amr"))
-                            event.reply(event.group.uploadVoice(testVoice))
-                            testVoice.close()
-                        }
                     }
                 }
                 else -> return "Bot > 命令不存在\n${getHelp()}".convertToChain()

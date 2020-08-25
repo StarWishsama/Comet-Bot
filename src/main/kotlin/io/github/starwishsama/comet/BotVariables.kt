@@ -31,24 +31,27 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     val filePath: File = FileUtil.getJarLocation()
-    const val version = "0.5.1-DEV-d855b1b-20200823"
+    const val version = "0.5.1-DEV-48b25e1-20200825"
     lateinit var bot: Bot
+
+    fun isBotInitialized(): Boolean = ::bot.isInitialized
+
     lateinit var startTime: LocalDateTime
     var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
-        4,
-        BasicThreadFactory.Builder()
-            .namingPattern("bot-service-%d")
-            .daemon(true)
-            .uncaughtExceptionHandler { thread, t ->
-                daemonLogger.warning("线程 ${thread.name} 在运行时发生了错误", t)
-            }.build()
+            4,
+            BasicThreadFactory.Builder()
+                    .namingPattern("comet-service-%d")
+                    .daemon(true)
+                    .uncaughtExceptionHandler { thread, t ->
+                        daemonLogger.warning("线程 ${thread.name} 在运行时发生了错误", t)
+                    }.build()
     )
     lateinit var logger: MiraiLogger
-    val daemonLogger: PlatformLogger = PlatformLogger("BotService", {
+    val daemonLogger: PlatformLogger = PlatformLogger("CometService", {
         log.writeString(log.getContext() + "$it\n")
         println(it)
     })
-    val consoleCommandLogger: PlatformLogger = PlatformLogger("ConsoleCMD", {
+    val consoleCommandLogger: PlatformLogger = PlatformLogger("CometConsole", {
         log.writeString(log.getContext() + "$it\n")
         println(it)
     })
