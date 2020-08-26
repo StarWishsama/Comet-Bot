@@ -17,33 +17,33 @@ class GachaCommand : ChatCommand {
         if (BotUtil.hasNoCoolDown(user.id)) {
             if (args.isNotEmpty()) {
                 when (args[0]) {
-                    "明日方舟", "舟游", "mrfz", "ak" -> {
-                        return if (args.size == 2) {
-                            when (args[1]) {
-                                "十连" -> BotUtil.sendMessage(
-                                        DrawUtil.getArkDrawResult(
-                                                user,
-                                                10
-                                        )
-                                )
-                                "单抽" -> BotUtil.sendMessage(
-                                        DrawUtil.getArkDrawResult(
-                                                user,
-                                                1
-                                        )
-                                )
-                                else -> {
-                                    if (StringUtils.isNumeric(args[1])) {
-                                        BotUtil.sendMessage(DrawUtil.getArkDrawResult(user, args[1].toInt()))
-                                    } else {
-                                        getHelp().convertToChain()
-                                    }
-                                }
-                            }
-                        } else {
-                            getHelp().convertToChain()
-                        }
-                    }
+//                    "明日方舟", "舟游", "mrfz", "ak" -> {
+//                        return if (args.size == 2) {
+//                            when (args[1]) {
+//                                "十连" -> BotUtil.sendMessage(
+//                                        DrawUtil.getArkDrawResult(
+//                                                user,
+//                                                10
+//                                        )
+//                                )
+//                                "单抽" -> BotUtil.sendMessage(
+//                                        DrawUtil.getArkDrawResult(
+//                                                user,
+//                                                1
+//                                        )
+//                                )
+//                                else -> {
+//                                    if (StringUtils.isNumeric(args[1])) {
+//                                        BotUtil.sendMessage(DrawUtil.getArkDrawResult(user, args[1].toInt()))
+//                                    } else {
+//                                        getHelp().convertToChain()
+//                                    }
+//                                }
+//                            }
+//                        } else {
+//                            getHelp().convertToChain()
+//                        }
+//                    }
                     "公主连结", "pcr", "gzlj" -> {
                         return if (args.size == 2){
                             when (args[1]) {

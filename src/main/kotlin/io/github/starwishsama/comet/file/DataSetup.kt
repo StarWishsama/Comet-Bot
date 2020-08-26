@@ -27,7 +27,8 @@ object DataSetup {
     private val langCfg: File = File(BotVariables.filePath, "lang.json")
     private val cacheCfg: File = File(BotVariables.filePath, "cache.json")
     private val pcrData = File(FileUtil.getChildFolder("res"), "pcr.json")
-    private val arkNightData = File(FileUtil.getChildFolder("res"), "ark.json")
+//    private val arkNightData = File(FileUtil.getChildFolder("res"), "ark.json")
+    private val arkNightData = File(FileUtil.getChildFolder("res"), "arkNights.json")
 
     private val perGroupFolder = FileUtil.getChildFolder("groups")
 
@@ -170,7 +171,8 @@ object DataSetup {
 
     private fun initResource() {
         val files = arrayOf(
-                FileUtil.getFileAsStreamInJar("ark.json"),
+//                FileUtil.getFileAsStreamInJar("ark.json"),
+                FileUtil.getFileAsStreamInJar("arkNights.json"),
                 FileUtil.getFileAsStreamInJar("pcr.json"),
                 FileUtil.getFileAsStreamInJar("img${File.separator}paper.png"),
                 FileUtil.getFileAsStreamInJar("img${File.separator}rock.png"),
