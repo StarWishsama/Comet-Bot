@@ -61,47 +61,14 @@ object DrawUtil {
                 1 -> {
                     user.decreaseTime()
                     var ark: ArkNightOperator = arkNightDraw()
-//                    return name + " " + getStar(rare)
                     result.add(ark)
                     return result
                 }
                 10 -> {
                     result.addAll(arkNightTenDraw())
                     user.decreaseTime(10)
-//                    val sb = StringBuilder("十连结果:\n")
-//                    for ((name, _, rare) in result) {
-//                        sb.append(name).append(" ").append(getStar(rare)).append(" ")
-//                    }
                     return result
                 }
-//                else -> {
-//                    for (i in 0 until time) {
-//                        if (user.commandTime >= 1 || user.compareLevel(UserLevel.ADMIN)) {
-//                            user.decreaseTime(1)
-//                            if (i == 50) {
-//                                r6Time = RandomUtil.randomInt(51, time - 1)
-//                            }
-//
-//                            if (r6Time != 0 && i == r6Time) {
-//                                result.add(getOperator(6))
-//                            } else {
-//                                result.add(arkNightDraw())
-//                            }
-//                        } else {
-//                            break
-//                        }
-//                    }
-//                    val r6Char = result.parallelStream().filter { it.rare == 6 }.collect(Collectors.toList())
-//                    val r6Text = StringBuilder()
-//                    r6Char.forEach { r6Text.append("${it.name} ${getStar(it.rare)} ") }
-//
-//                    return "抽卡结果:\n" +
-//                            "抽卡次数: ${result.size}\n" +
-//                            "六星: ${r6Text.toString().trim()}\n" +
-//                            "五星个数: ${result.stream().filter { it.rare == 5 }.count()}\n" +
-//                            "四星个数: ${result.stream().filter { it.rare == 4 }.count()}\n" +
-//                            "三星个数: ${result.stream().filter { it.rare == 3 }.count()}"
-//                }
             }
         }
         return result
@@ -126,11 +93,6 @@ object DrawUtil {
             val file = File(FileUtil.getChildFolder("res/" + i.rare), i.name + ".jpg")
             val inStream: InputStream = file.inputStream()
 
-//            val url = URL("http:" + i.icon)
-//            val conn: HttpURLConnection = url.openConnection() as HttpURLConnection
-//            conn.requestMethod = "GET"
-//            conn.connectTimeout = 5 * 1000
-//            val inStream: InputStream = conn.inputStream // 通过输入流获取图片数据
             val bufferedImage: BufferedImage = ImageIO.read(inStream)
 
             val w1 = bufferedImage.width/2
@@ -140,11 +102,6 @@ object DrawUtil {
 
             width += w1
 
-//            if (index == 4){
-//                //换行
-//                width = 0
-//                height += h1
-//            }
         }
 
         createGraphics.dispose()

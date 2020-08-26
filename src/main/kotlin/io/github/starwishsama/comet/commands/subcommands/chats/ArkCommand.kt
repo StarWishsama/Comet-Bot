@@ -65,7 +65,7 @@ class ArkCommand : ChatCommand {
 
     override fun getHelp(): String = """
          ============ 命令帮助 ============
-         /ck mrfz [十连/单抽/次数] 明日方舟抽卡
-         /ck pcr [十连/单抽/次数] 公主连结抽卡
+         /ark 单次寻访
+         /ark 十连寻访
     """.trimIndent()
 }
