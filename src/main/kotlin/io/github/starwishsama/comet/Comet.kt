@@ -147,7 +147,7 @@ object Comet {
                 ClockInCommand(),
                 io.github.starwishsama.comet.commands.subcommands.chats.DebugCommand(),
                 DivineCommand(),
-//                GachaCommand(),
+                GachaCommand(),
                 GuessNumberCommand(),
                 HelpCommand(),
                 InfoCommand(),
