@@ -79,10 +79,12 @@ object TweetUpdateChecker : CometPusher {
         var count = 0
 
         pushPool.forEach { (_, pushObject) ->
-            pushObject.tweet?.let {
-                GlobalScope.launch {
-                    count = pushToGroups(pushObject.groupsToPush, it)
-                    pushObject.hasPushed = true
+            if (!pushObject.hasPushed) {
+                pushObject.tweet?.let {
+                    GlobalScope.launch {
+                        count = pushToGroups(pushObject.groupsToPush, it)
+                        pushObject.hasPushed = true
+                    }
                 }
             }
         }
