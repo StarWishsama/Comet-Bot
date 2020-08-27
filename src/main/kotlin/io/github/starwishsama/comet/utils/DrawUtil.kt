@@ -100,7 +100,6 @@ object DrawUtil {
         var newBufferedImageHeight = 0
 
         for ((index, i) in list.withIndex()) {
-            FileUtil.getResourceFolder()
             val file = File(FileUtil.getChildFolder("res${File.separator}" + i.rare), i.name + ".jpg")
             val inStream: InputStream = file.inputStream()
 
