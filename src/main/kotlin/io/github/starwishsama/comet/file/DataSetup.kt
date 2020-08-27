@@ -29,14 +29,6 @@ object DataSetup {
     private val pcrData = File(FileUtil.getChildFolder("res"), "pcr.json")
 //    private val arkNightData = File(FileUtil.getChildFolder("res"), "ark.json")
     private val arkNightData = File(FileUtil.getChildFolder("res"), "arkNights.json")
-
-    //TODO 如果在这不加，会打不进去包，原因还在研究
-    private val initThree =  File(FileUtil.getChildFolder("res/3"),"安塞尔.jpg")
-    private val initFour =  File(FileUtil.getChildFolder("res/4"),"伊桑.jpg")
-    private val initFive =  File(FileUtil.getChildFolder("res/5"),"临光.jpg")
-    private val initSix =  File(FileUtil.getChildFolder("res/6"),"W.jpg")
-    private val initImg =  File(FileUtil.getChildFolder("res/img"),"paper.png")
-
     private val perGroupFolder = FileUtil.getChildFolder("groups")
 
     fun init() {

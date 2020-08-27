@@ -4410,49 +4410,49 @@
     "jp": "スカイフレア",
     "birthplace": "维多利亚"
   },
-  {
-    "name": "阿米娅",
-    "position": "远程位",
-    "en": "Amiya",
-    "sex": "女",
-    "tag": [
-      "输出"
-    ],
-    "race": [
-      "卡特斯",
-      "奇美拉"
-    ],
-    "rare": 5,
-    "class": "术师",
-    "approach": [
-      "主线剧情"
-    ],
-    "camp": "罗德岛",
-    "team": "无团队",
-    "des": "罗德岛公开领导人阿米娅，将与你并肩作战。",
-    "feature": "攻击造成<span style=\"color:#00B0FF;\">法术伤害</span>",
-    "str": "普通",
-    "flex": "标准",
-    "tolerance": "普通",
-    "plan": "优良",
-    "skill": "标准",
-    "adapt": "■■",
-    "moredes": "加油，博士。",
-    "icon": "//prts.wiki/images/3/36/%E5%A4%B4%E5%83%8F_%E9%98%BF%E7%B1%B3%E5%A8%85.png",
-    "half": "//prts.wiki/images/thumb/a/a0/%E5%8D%8A%E8%BA%AB%E5%83%8F_%E9%98%BF%E7%B1%B3%E5%A8%85_1.png/110px-%E5%8D%8A%E8%BA%AB%E5%83%8F_%E9%98%BF%E7%B1%B3%E5%A8%85_1.png",
-    "oriHp": "699",
-    "oriAtk": "276",
-    "oriDef": "48",
-    "oriRes": "10",
-    "oriDt": "70s",
-    "oriDc": "18→20",
-    "oriBlock": "1",
-    "oriCd": "1.6s",
-    "index": "R001",
-    "sort_id": "55",
-    "jp": "アーミヤ",
-    "birthplace": "雷姆必拓"
-  },
+//  {
+//    "name": "阿米娅",
+//    "position": "远程位",
+//    "en": "Amiya",
+//    "sex": "女",
+//    "tag": [
+//      "输出"
+//    ],
+//    "race": [
+//      "卡特斯",
+//      "奇美拉"
+//    ],
+//    "rare": 5,
+//    "class": "术师",
+//    "approach": [
+//      "主线剧情"
+//    ],
+//    "camp": "罗德岛",
+//    "team": "无团队",
+//    "des": "罗德岛公开领导人阿米娅，将与你并肩作战。",
+//    "feature": "攻击造成<span style=\"color:#00B0FF;\">法术伤害</span>",
+//    "str": "普通",
+//    "flex": "标准",
+//    "tolerance": "普通",
+//    "plan": "优良",
+//    "skill": "标准",
+//    "adapt": "■■",
+//    "moredes": "加油，博士。",
+//    "icon": "//prts.wiki/images/3/36/%E5%A4%B4%E5%83%8F_%E9%98%BF%E7%B1%B3%E5%A8%85.png",
+//    "half": "//prts.wiki/images/thumb/a/a0/%E5%8D%8A%E8%BA%AB%E5%83%8F_%E9%98%BF%E7%B1%B3%E5%A8%85_1.png/110px-%E5%8D%8A%E8%BA%AB%E5%83%8F_%E9%98%BF%E7%B1%B3%E5%A8%85_1.png",
+//    "oriHp": "699",
+//    "oriAtk": "276",
+//    "oriDef": "48",
+//    "oriRes": "10",
+//    "oriDt": "70s",
+//    "oriDc": "18→20",
+//    "oriBlock": "1",
+//    "oriCd": "1.6s",
+//    "index": "R001",
+//    "sort_id": "55",
+//    "jp": "アーミヤ",
+//    "birthplace": "雷姆必拓"
+//  },
   {
     "name": "陨星",
     "position": "远程位",

@@ -8,21 +8,13 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.ArkNightOperator
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.DrawUtil
-import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
-import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.upload
-import net.mamoe.mirai.message.uploadAsImage
 import org.apache.commons.lang3.StringUtils
 import java.awt.image.BufferedImage
-import java.io.File
-import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
-import javax.imageio.ImageIO
 
 
 class ArkCommand : ChatCommand {
@@ -33,23 +25,48 @@ class ArkCommand : ChatCommand {
             if (args.isNotEmpty()) {
                 when (args[0]) {
                     "单次寻访" -> {
-                        val list = DrawUtil.getArkDrawResult(user, 1)
-                        if (list.isNotEmpty()){
-                            val image: BufferedImage = DrawUtil.getImage(list)
-                            val result = image.upload(event.subject)
-                            event.reply(result)
+                        if (BotVariables.cfg.getArkDrawUseImage){
+                            val list = DrawUtil.getArkDrawResultToImage(user, 1)
+                            if (list.isNotEmpty()) {
+                                val image: BufferedImage = DrawUtil.getArkImage(list)
+                                val result = image.upload(event.subject)
+                                event.reply(result)
+                            } else {
+                                event.reply(overTimeMessage)
+                            }
                         }else{
-                            event.reply(overTimeMessage)
+                            event.reply(
+                                DrawUtil.getArkDrawResult(
+                                    user,
+                                    1
+                                )
+                            )
                         }
                     }
                     "十连寻访" -> {
-                        val list: List<ArkNightOperator> = DrawUtil.getArkDrawResult(user, 10)
-                        if (list.isNotEmpty()) {
-                            val image: BufferedImage = DrawUtil.getImage(list)
-                            val result = image.upload(event.subject)
-                            event.reply(result)
+                        if (BotVariables.cfg.getArkDrawUseImage){
+                            val list: List<ArkNightOperator> = DrawUtil.getArkDrawResultToImage(user, 10)
+                            if (list.isNotEmpty()) {
+                                val image: BufferedImage = DrawUtil.getArkImage(list)
+                                val result = image.upload(event.subject)
+                                event.reply(result)
+                            } else {
+                                event.reply(overTimeMessage)
+                            }
+                        }else{
+                            event.reply(
+                                DrawUtil.getArkDrawResult(
+                                    user,
+                                    10
+                                )
+                            )
+                        }
+                    }
+                    else -> {
+                        if (StringUtils.isNumeric(args[0])) {
+                            event.reply(DrawUtil.getArkDrawResult(user, args[0].toInt()))
                         } else {
-                            event.reply(overTimeMessage)
+                            getHelp().convertToChain()
                         }
                     }
                 }
@@ -65,7 +82,6 @@ class ArkCommand : ChatCommand {
 
     override fun getHelp(): String = """
          ============ 命令帮助 ============
-         /ark 单次寻访
-         /ark 十连寻访
+         /ark 单次寻访/十连寻访/[次数]
     """.trimIndent()
 }
