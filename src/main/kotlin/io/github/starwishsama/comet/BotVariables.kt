@@ -31,7 +31,7 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     val filePath: File = FileUtil.getJarLocation()
-    const val version = "0.5.1-DEV-3b01d0d-20200826"
+    const val version = "0.5.1-DEV-b01e399-20200827"
     lateinit var bot: Bot
 
     fun isBotInitialized(): Boolean = ::bot.isInitialized
