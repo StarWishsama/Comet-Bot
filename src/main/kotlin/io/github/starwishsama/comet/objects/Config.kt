@@ -85,4 +85,7 @@ data class Config(
         var biliInterval: Long = 2,
 
         var twitterInterval: Long = 4,
+
+        //@Comment("明日方舟抽卡模拟器是否使用图片")
+        var getArkDrawUseImage: Boolean = true
 )

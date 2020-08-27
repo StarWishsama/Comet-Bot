@@ -6,13 +6,10 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.ArkNightOperator
 import io.github.starwishsama.comet.objects.draw.PCRCharacter
-import net.mamoe.mirai.message.uploadAsImage
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStream
 import java.math.RoundingMode
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.*
 import java.util.stream.Collectors
 import javax.imageio.ImageIO
@@ -20,6 +17,10 @@ import javax.imageio.ImageIO
 object DrawUtil {
     /**
      * 明日方舟
+     */
+
+    /**
+     * 单抽
      */
     private fun arkNightTenDraw(): List<ArkNightOperator> {
         val ops: MutableList<ArkNightOperator> = ArrayList()
@@ -29,6 +30,9 @@ object DrawUtil {
         return ops
     }
 
+    /**
+     * 十连
+     */
     private fun arkNightDraw(): ArkNightOperator {
         val probability = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
         val rare: Int
@@ -41,6 +45,9 @@ object DrawUtil {
         return getOperator(rare)
     }
 
+    /**
+     * 抽卡方法
+     */
     private fun getOperator(rare: Int): ArkNightOperator {
         val ops: List<ArkNightOperator> = BotVariables.arkNight
         val tempOps: MutableList<ArkNightOperator> = LinkedList()
@@ -52,10 +59,11 @@ object DrawUtil {
         return tempOps[RandomUtil.randomInt(1, tempOps.size)]
     }
 
-    fun getArkDrawResult(user: BotUser, time: Int): LinkedList<ArkNightOperator> {
+    /**
+     * 明日方舟抽卡，返回图片
+     */
+    fun getArkDrawResultToImage(user: BotUser, time: Int): LinkedList<ArkNightOperator> {
         val result = LinkedList<ArkNightOperator>()
-        var r6Time = 0
-
         if (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000) {
             when (time) {
                 1 -> {
@@ -74,33 +82,36 @@ object DrawUtil {
         return result
     }
 
-    fun getImage(list: List<ArkNightOperator>): BufferedImage {
-        val newBufferedImage: BufferedImage
-
-        if (list.size == 1){
-            newBufferedImage = BufferedImage(256/2, 728/2, BufferedImage.TYPE_INT_RGB)
+    /**
+     * 根据抽卡结果合成图片
+     */
+    fun getArkImage(list: List<ArkNightOperator>): BufferedImage {
+        val zoom:Int = 2
+        //缩小图片大小，减少流量消耗
+        val newBufferedImage: BufferedImage = if (list.size == 1){
+            BufferedImage(256/zoom, 728/zoom, BufferedImage.TYPE_INT_RGB)
         }else{
-            newBufferedImage = BufferedImage(2560/2, 728/2, BufferedImage.TYPE_INT_RGB)
+            BufferedImage(2560/zoom, 728/zoom, BufferedImage.TYPE_INT_RGB)
         }
 
         val createGraphics = newBufferedImage.createGraphics()
 
-        var width = 0
-        var height = 0
+        var newBufferedImageWidth = 0
+        var newBufferedImageHeight = 0
 
         for ((index, i) in list.withIndex()) {
-
-            val file = File(FileUtil.getChildFolder("res/" + i.rare), i.name + ".jpg")
+            FileUtil.getResourceFolder()
+            val file = File(FileUtil.getChildFolder("res${File.separator}" + i.rare), i.name + ".jpg")
             val inStream: InputStream = file.inputStream()
 
             val bufferedImage: BufferedImage = ImageIO.read(inStream)
 
-            val w1 = bufferedImage.width/2
-            val h1 = bufferedImage.height/2
+            val imageWidth = bufferedImage.width/zoom
+            val imageHeight = bufferedImage.height/zoom
 
-            createGraphics.drawImage(bufferedImage.getScaledInstance(w1,h1,java.awt.Image.SCALE_SMOOTH), width, height, w1, h1, null)
+            createGraphics.drawImage(bufferedImage.getScaledInstance(imageWidth,imageHeight,java.awt.Image.SCALE_SMOOTH), newBufferedImageWidth, newBufferedImageHeight, imageWidth, imageHeight, null)
 
-            width += w1
+            newBufferedImageWidth += imageWidth
 
         }
 
@@ -109,6 +120,65 @@ object DrawUtil {
         return newBufferedImage
 
     }
+    /**
+     * 明日方舟抽卡，返回文字
+     */
+    fun getArkDrawResult(user: BotUser, time: Int): String {
+        val overTimeMessage = "今日命令条数已达上限, 请等待条数自动恢复哦~\n" +
+                "命令条数现在每小时会恢复100次, 封顶1000次"
+        val result = LinkedList<ArkNightOperator>()
+        var r6Time = 0
+
+        if (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000) {
+            when (time) {
+                1 -> {
+                    user.decreaseTime()
+                    val (name, _, rare) = arkNightDraw()
+                    return name + " " + getStar(rare)
+                }
+                10 -> {
+                    result.addAll(arkNightTenDraw())
+                    user.decreaseTime(10)
+                    val sb = StringBuilder("十连结果:\n")
+                    for ((name, _, rare) in result) {
+                        sb.append(name).append(" ").append(getStar(rare)).append(" ")
+                    }
+                    return sb.toString().trim()
+                }
+                else -> {
+                    for (i in 0 until time) {
+                        if (user.commandTime >= 1 || user.compareLevel(UserLevel.ADMIN)) {
+//                            user.decreaseTime(1)
+                            if (i == 50) {
+                                r6Time = RandomUtil.randomInt(51, time - 1)
+                            }
+
+                            if (r6Time != 0 && i == r6Time) {
+                                result.add(getOperator(6))
+                            } else {
+                                result.add(arkNightDraw())
+                            }
+                        } else {
+                            break
+                        }
+                    }
+                    val r6Char = result.parallelStream().filter { it.rare == 6 }.collect(Collectors.toList())
+                    val r6Text = StringBuilder()
+                    r6Char.forEach { r6Text.append("${it.name} ${getStar(it.rare)} ") }
+
+                    return "抽卡结果:\n" +
+                            "抽卡次数: ${result.size}\n" +
+                            "六星: ${r6Text.toString().trim()}\n" +
+                            "五星个数: ${result.stream().filter { it.rare == 5 }.count()}\n" +
+                            "四星个数: ${result.stream().filter { it.rare == 4 }.count()}\n" +
+                            "三星个数: ${result.stream().filter { it.rare == 3 }.count()}"
+                }
+            }
+        } else {
+            return overTimeMessage
+        }
+    }
+
 
     /**
      * 公主连结
