@@ -19,10 +19,14 @@ jar {
     manifest {
         attributes 'Main-Class': 'io.github.starwishsama.comet.CometKt'
     }
+
+    from 'resources', {
+        into 'resources'
+    }
 }
 
 def gitCommitId = 'git rev-parse --short HEAD'
-def versionCode = "0.5.1-DEV-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
+def versionCode = "0.5.2-DEV-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
 
 group 'io.github.starwishsama.comet'
 version versionCode
@@ -80,7 +84,7 @@ dependencies {
     implementation 'com.github.rockswang:java-curl:1.2.2.2'
 
     // BiliBili-Api @ https://github.com/czp3009/bilibili-api
-    implementation 'com.hiczp:bilibili-api:0.2.0'
+    compile 'com.hiczp:bilibili-api:0.2.0'
 
     // jsoup HTML parser library @ https://jsoup.org/
     implementation 'org.jsoup:jsoup:1.13.1'
@@ -95,7 +99,12 @@ dependencies {
 
 shadowJar {
     zip64 true
-    exclude("README", "README.md", "NOTICE.txt", "LICENSE", "LICENSE.txt", "CHANGES")
+    exclude("META-INF/README")
+    exclude("META-INF/NOTICE.txt")
+    exclude("META-INF/README.md")
+    exclude("META-INF/LICENSE")
+    exclude("META-INF/LICENSE.txt")
+    exclude("META-INF/CHANGES")
 }
 
 compileKotlin.kotlinOptions {

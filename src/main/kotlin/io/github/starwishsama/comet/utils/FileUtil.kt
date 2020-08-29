@@ -8,7 +8,9 @@ import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
 import java.io.File
 import java.io.IOException
-import java.io.InputStream
+import java.net.URL
+import java.nio.file.*
+import java.nio.file.attribute.BasicFileAttributes
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -142,18 +144,71 @@ object FileUtil {
         return sb.toString()
     }
 
-    fun createBlankFile(location: File) {
+    fun createBlankFile(location: File): File {
         if (!location.exists()) location.createNewFile()
+        return location
     }
 
-    fun getFileAsStreamInJar(fileName: String): StreamWithName? {
-        val stream = Thread.currentThread().contextClassLoader.getResourceAsStream(fileName)
-        if (stream != null) {
-            return StreamWithName(stream, fileName)
+    fun initResourceFile() {
+        val resourcePath = "resources"
+        val jarFile = File(Comet.javaClass.protectionDomain.codeSource.location.path)
+
+        if (jarFile.isFile) {
+            copyFromJar(jarFile.toPath(), resourcePath, getResourceFolder().toPath())
+        } else { // Run with IDE
+            val url: URL = Comet::class.java.getResource(resourcePath)
+            val apps = File(url.toURI())
+            for (app in apps.listFiles() ?: return) {
+                copyFolder(app, getResourceFolder())
+            }
         }
-
-        return null
     }
 
-    data class StreamWithName(val stream: InputStream, val name: String)
+    /**
+     * 复制文件/文件夹至目标位置
+     */
+    private fun copyFolder(source: File, target: File) {
+        if (source.isDirectory) {
+            if (!target.exists()) {
+                target.mkdir()
+            }
+
+            source.list()?.forEach { file ->
+                val srcFile = File(source, file)
+                val destFile = File(target, file)
+                // 递归复制
+                copyFolder(srcFile, destFile)
+            }
+        } else {
+            Files.copy(source.toPath(), target.toPath())
+        }
+    }
+
+    /**
+     * 从 jar 中取出文件/文件夹到指定位置
+     */
+    fun copyFromJar(jarFile: Path, source: String, target: Path) {
+        val fileSystem = FileSystems.newFileSystem(jarFile, null)
+        val jarPath: Path = fileSystem.getPath(source)
+
+        Files.walkFileTree(jarPath, object : SimpleFileVisitor<Path>() {
+            override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
+                val currentTarget = target.resolve(jarPath.relativize(dir).toString())
+                if (!currentTarget.toFile().exists()) {
+                    Files.createDirectories(currentTarget)
+                }
+                return FileVisitResult.CONTINUE
+            }
+
+            override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
+                val copyTarget = target.resolve(jarPath.relativize(file).toString())
+                if (!copyTarget.toFile().exists()) {
+                    Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
+                }
+                return FileVisitResult.CONTINUE
+            }
+        })
+
+        fileSystem.close()
+    }
 }

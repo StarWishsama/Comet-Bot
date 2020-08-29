@@ -18,7 +18,6 @@ import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.network.isUsable
 import java.io.File
 import java.net.Socket
-import java.nio.file.Files
 
 object DataSetup {
     private val userCfg: File = File(BotVariables.filePath, "users.json")
@@ -26,8 +25,8 @@ object DataSetup {
     private val cfgFile: File = File(BotVariables.filePath, "config.yml")
     private val langCfg: File = File(BotVariables.filePath, "lang.json")
     private val cacheCfg: File = File(BotVariables.filePath, "cache.json")
-    private val pcrData = File(FileUtil.getChildFolder("res"), "pcr.json")
-    private val arkNightData = File(FileUtil.getChildFolder("res"), "ark.json")
+    private val pcrData = File(FileUtil.getResourceFolder(), "pcr.json")
+    private val arkNightData = File(FileUtil.getResourceFolder(), "ark.json")
 
     private val perGroupFolder = FileUtil.getChildFolder("groups")
 
@@ -67,7 +66,7 @@ object DataSetup {
 
             loadLang()
 
-            initResource()
+            FileUtil.initResourceFile()
 
             if (pcrData.exists()) {
                 BotVariables.pcr = gson.fromJson(pcrData.getContext())
@@ -165,25 +164,6 @@ object DataSetup {
             val loc = File(perGroupFolder, "${it.id}.json")
             if (!loc.exists()) loc.createNewFile()
             loc.writeClassToJson(it)
-        }
-    }
-
-    private fun initResource() {
-        val files = arrayOf(
-                FileUtil.getFileAsStreamInJar("ark.json"),
-                FileUtil.getFileAsStreamInJar("pcr.json"),
-                FileUtil.getFileAsStreamInJar("img${File.separator}paper.png"),
-                FileUtil.getFileAsStreamInJar("img${File.separator}rock.png"),
-                FileUtil.getFileAsStreamInJar("img${File.separator}scissor.png")
-        )
-
-        files.forEach {
-            if (it != null) {
-                val target = File(FileUtil.getResourceFolder(), it.name)
-                if (!target.exists()) {
-                    Files.copy(it.stream, File(FileUtil.getResourceFolder(), it.name).toPath())
-                }
-            }
         }
     }
 }

@@ -9,7 +9,6 @@ import io.github.starwishsama.comet.objects.draw.PCRCharacter
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.objects.group.Shop
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
-import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.getContext
 import io.github.starwishsama.comet.utils.writeString
 import net.kronos.rkon.core.Rcon
@@ -30,21 +29,21 @@ import java.util.concurrent.ScheduledExecutorService
  */
 
 object BotVariables {
-    val filePath: File = FileUtil.getJarLocation()
-    const val version = "0.5.1-DEV-b01e399-20200827"
+    lateinit var filePath: File
+    const val version = "0.5.2-DEV-bd796e4-20200829"
     lateinit var bot: Bot
 
     fun isBotInitialized(): Boolean = ::bot.isInitialized
 
     lateinit var startTime: LocalDateTime
     var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
-            4,
-            BasicThreadFactory.Builder()
-                    .namingPattern("comet-service-%d")
-                    .daemon(true)
-                    .uncaughtExceptionHandler { thread, t ->
-                        daemonLogger.warning("线程 ${thread.name} 在运行时发生了错误", t)
-                    }.build()
+        4,
+        BasicThreadFactory.Builder()
+            .namingPattern("comet-service-%d")
+            .daemon(true)
+            .uncaughtExceptionHandler { thread, t ->
+                daemonLogger.warning("线程 ${thread.name} 在运行时发生了错误", t)
+            }.build()
     )
     lateinit var logger: MiraiLogger
     val daemonLogger: PlatformLogger = PlatformLogger("CometService", {

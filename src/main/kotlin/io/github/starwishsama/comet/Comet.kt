@@ -2,6 +2,7 @@ package io.github.starwishsama.comet
 
 import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.BotVariables.consoleCommandLogger
+import io.github.starwishsama.comet.BotVariables.filePath
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.BotVariables.startTime
 import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
@@ -218,6 +219,7 @@ object Comet {
 @ExperimentalStdlibApi
 @ExperimentalTime
 suspend fun main() {
+    filePath = FileUtil.getJarLocation()
     startTime = LocalDateTime.now()
     println(
             """
