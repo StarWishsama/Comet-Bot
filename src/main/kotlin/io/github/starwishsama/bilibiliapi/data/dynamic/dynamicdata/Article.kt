@@ -13,7 +13,7 @@ data class Article(@SerializedName("title")
                    @SerializedName("dynamic")
                    val context: String) : DynamicData {
     override suspend fun getContact(): MessageWrapper {
-        val wrapped = MessageWrapper("专栏 $title: $context\n查看全文: https://www.data.com/read/cv/$id\n")
+        val wrapped = MessageWrapper("专栏 $title: $context\n查看全文: https://www.bilibili.com/read/cv/$id\n")
         if (!imageURL.isNullOrEmpty()) {
             wrapped.picUrl = imageURL[0]
         }

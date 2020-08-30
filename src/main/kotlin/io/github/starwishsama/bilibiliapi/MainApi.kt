@@ -20,7 +20,6 @@ object MainApi : ApiExecutor {
     private var dynamicUrl =
         "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?visitor_uid=0&host_uid=%uid%&offset_dynamic_id=0&need_top=0"
     private const val infoUrl = "http://api.bilibili.com/x/space/acc/info?mid="
-    private const val liveUrl = "http://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid="
     private val agent = mutableMapOf("User-Agent" to "Nameless live status checker by StarWishsama")
     private const val apiRateLimit = "BiliBili API调用已达上限"
 
@@ -35,32 +34,6 @@ object MainApi : ApiExecutor {
             .addHeaders(agent)
             .executeAsync()
         return JsonParser.parseString(response.body()).asJsonObject["data"].asJsonObject["name"].asString
-    }
-
-    @Throws(RateLimitException::class)
-    fun getLiveStatus(mid: Long): Boolean {
-        if (isReachLimit()) {
-            throw RateLimitException(apiRateLimit)
-        }
-
-        usedTime++
-        val response = HttpRequest.get(liveUrl + mid).timeout(2000)
-            .addHeaders(agent)
-            .executeAsync()
-        return JsonParser.parseString(response.body()).asJsonObject["data"].asJsonObject["liveStatus"].asInt == 1
-    }
-
-    @Throws(RateLimitException::class)
-    fun getRoomIdByMid(mid: Long): Long {
-        if (isReachLimit()) {
-            throw RateLimitException(apiRateLimit)
-        }
-
-        usedTime++
-        val response = HttpRequest.get(liveUrl + mid).timeout(2000)
-            .addHeaders(agent)
-            .executeAsync()
-        return JsonParser.parseString(response.body()).asJsonObject["data"].asJsonObject["roomid"].asLong
     }
 
     @Throws(RateLimitException::class)

@@ -1,14 +1,15 @@
 package io.github.starwishsama.comet.pushers
 
-import com.hiczp.bilibili.api.live.model.RoomInfo
-import io.github.starwishsama.bilibiliapi.FakeClientApi
+import io.github.starwishsama.bilibiliapi.LiveApi
 import io.github.starwishsama.bilibiliapi.MainApi
+import io.github.starwishsama.bilibiliapi.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.commands.CommandExecutor.doFilter
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.verboseS
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.getGroupOrNull
@@ -35,7 +36,8 @@ object BiliLiveChecker : CometPusher {
         }
 
         collectedUsers.parallelStream().forEach { roomId ->
-            val data = runBlocking { FakeClientApi.getLiveRoom(roomId) }
+            val data = LiveApi.getLiveInfo(roomId)
+
             if (data != null) {
                 val sli = StoredLiveInfo(data.data, false)
                 if (pushedList.isEmpty() && data.data.liveStatus == 1) {
@@ -64,7 +66,7 @@ object BiliLiveChecker : CometPusher {
             }
         }
 
-        if (count > 0) daemonLogger.verbose("Retrieve success, have collected $count liver(s)!")
+        if (count > 0) daemonLogger.verboseS("Retrieve success, have collected $count liver(s)!")
 
         push()
     }
@@ -84,7 +86,7 @@ object BiliLiveChecker : CometPusher {
         }
 
         val count = pushToGroups(liverToGroups)
-        if (count > 0) daemonLogger.verbose("Push bili info success, have pushed $count group(s)!")
+        if (count > 0) daemonLogger.verboseS("Push bili info success, have pushed $count group(s)!")
     }
 
     private fun pushToGroups(pushQueue: MutableMap<StoredLiveInfo, MutableSet<Long>>): Int {
@@ -117,7 +119,7 @@ object BiliLiveChecker : CometPusher {
         return count
     }
 
-    data class StoredLiveInfo(val data: RoomInfo.Data, var isPushed: Boolean) {
+    data class StoredLiveInfo(val data: LiveRoomInfo.LiveRoomInfoData, var isPushed: Boolean) {
         fun getRoomId() = data.roomId
     }
 }

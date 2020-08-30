@@ -13,6 +13,8 @@ import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.asMessageChain
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -37,7 +39,8 @@ class AdminCommand : ChatCommand {
                     "showdata", "打卡数据", "dksj" -> {
                         return if (event is GroupMessageEvent) {
                             val data = ClockInManager.getNearestClockIn(event.group.id)
-                            data?.viewData() ?: BotUtil.sendMessage("本群没有正在进行的打卡")
+                            data?.viewData()?.text?.let { PlainText(it).asMessageChain() }
+                                    ?: BotUtil.sendMessage("本群没有正在进行的打卡")
                         } else {
                             BotUtil.sendMessage("该命令只能在群聊使用")
                         }

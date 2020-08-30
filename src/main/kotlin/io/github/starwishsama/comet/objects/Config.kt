@@ -87,4 +87,7 @@ data class Config(
 
         //@Comment("查询 Twitter 用户动态间隔时间")
         var twitterInterval: Long = 4,
+
+        //@Comment("调试模式")
+        var debugMode: Boolean = false
 )

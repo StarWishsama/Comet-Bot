@@ -14,6 +14,7 @@ import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.utils.MiraiLogger
 import org.apache.commons.lang3.StringUtils
 import java.time.Duration
 import java.time.LocalDateTime
@@ -26,6 +27,42 @@ import kotlin.time.toKotlinDuration
  *
  * @author Nameless
  */
+
+fun MiraiLogger.debugS(message: String?) {
+    if (cfg.debugMode) {
+        debug(message)
+    }
+}
+
+fun MiraiLogger.debugS(throwable: Throwable?) {
+    if (cfg.debugMode) {
+        debug(throwable)
+    }
+}
+
+fun MiraiLogger.debugS(message: String?, throwable: Throwable?) {
+    if (cfg.debugMode) {
+        verbose(message, throwable)
+    }
+}
+
+fun MiraiLogger.verboseS(message: String?) {
+    if (cfg.debugMode) {
+        verbose(message)
+    }
+}
+
+fun MiraiLogger.verboseS(throwable: Throwable?) {
+    if (cfg.debugMode) {
+        verbose(throwable)
+    }
+}
+
+fun MiraiLogger.verboseS(message: String?, throwable: Throwable?) {
+    if (cfg.debugMode) {
+        verbose(message, throwable)
+    }
+}
 
 object BotUtil {
     /**
