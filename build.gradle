@@ -30,9 +30,6 @@ jar {
     }
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
 def gitCommitId = 'git rev-parse --short HEAD'
 def versionCode = "0.5.2-DEV-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
 

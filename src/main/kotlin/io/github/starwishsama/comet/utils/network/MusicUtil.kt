@@ -5,10 +5,10 @@ import com.github.salomonbrys.kotson.get
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.message.data.toMessage
 import java.io.IOException
 import java.net.URLEncoder
 
@@ -89,7 +89,7 @@ object MusicUtil {
         } catch (e: IOException) {
             BotVariables.logger.error(e)
         }
-        return "找不到歌曲".toMessage().asMessageChain()
+        return "找不到歌曲".convertToChain()
     }
 
     fun searchQQMusic(name: String): MessageChain {
@@ -149,7 +149,7 @@ object MusicUtil {
         } catch (x: Exception) {
             BotVariables.logger.error("在通过 QQ 音乐搜索歌曲时发生了一个错误, ", x)
         }
-        return "找不到歌曲".toMessage().asMessageChain()
+        return "找不到歌曲".convertToChain()
     }
 
 }
