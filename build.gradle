@@ -84,6 +84,8 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
     // kaml @ https://github.com/charleskorn/kaml
     implementation 'com.charleskorn.kaml:kaml:0.19.0'
+    // kotson @ https://github.com/SalomonBrys/Kotson
+    implementation 'com.github.salomonbrys.kotson:kotson:2.5.0'
 
     // CUrl
     implementation 'com.github.rockswang:java-curl:1.2.2.2'
