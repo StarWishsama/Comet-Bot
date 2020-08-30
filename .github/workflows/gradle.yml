@@ -14,8 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: joschi/setup-jdk@v2
-      - name: Setup JDK
+      - name: Set up JDK 11
+        uses: joschi/setup-jdk@v2
         with:
           java-version: '11' # The OpenJDK version to make available on the path
           architecture: 'x64' # defaults to 'x64'
