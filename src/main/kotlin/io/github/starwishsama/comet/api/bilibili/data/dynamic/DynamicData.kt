@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects.pojo.bilibili.dynamic
+package io.github.starwishsama.comet.api.bilibili.data.dynamic
 
 import io.github.starwishsama.comet.objects.MessageWrapper
 

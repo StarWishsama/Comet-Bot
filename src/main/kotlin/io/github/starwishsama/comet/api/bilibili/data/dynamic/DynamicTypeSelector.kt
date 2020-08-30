@@ -1,6 +1,6 @@
-package io.github.starwishsama.comet.objects.pojo.bilibili.dynamic
+package io.github.starwishsama.comet.api.bilibili.data.dynamic
 
-import io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.dynamicdata.*
+import io.github.starwishsama.comet.api.bilibili.data.dynamic.dynamicdata.*
 
 object DynamicTypeSelector {
     fun getType(type: Int): Class<out DynamicData> {

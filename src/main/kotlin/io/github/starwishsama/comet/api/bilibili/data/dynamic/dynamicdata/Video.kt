@@ -1,8 +1,8 @@
-package io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.dynamicdata
+package io.github.starwishsama.comet.api.bilibili.data.dynamic.dynamicdata
 
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.comet.api.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.MessageWrapper
-import io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.DynamicData
 
 data class Video(var dynamic: String?,
                  var aid: Long?,
@@ -10,7 +10,7 @@ data class Video(var dynamic: String?,
                  var picURL: String?,
                  var title: String?) : DynamicData {
     override suspend fun getContact(): MessageWrapper {
-        val wrapped = MessageWrapper("发布了一个视频: $title\n直达链接: https://www.bilibili.com/video/av$aid\n")
+        val wrapped = MessageWrapper("发布了一个视频: $title\n直达链接: https://www.data.com/video/av$aid\n")
 
         if (picURL != null) {
             picURL.let {

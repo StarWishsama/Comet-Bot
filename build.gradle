@@ -22,9 +22,6 @@ jar {
     }
 }
 
-sourceCompatibility = 11
-targetCompatibility = 11
-
 def gitCommitId = 'git rev-parse --short HEAD'
 def versionCode = "0.5.2-DEV-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
 
@@ -92,6 +89,9 @@ dependencies {
     // jsoup HTML parser library @ https://jsoup.org/
     implementation 'org.jsoup:jsoup:1.13.1'
 
+    // Retrofit A type-safe HTTP client for Android and Java @ https://github.com/square/retrofit/
+    //implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+
     // RomeTool for RSS @ https://github.com/rometools/rome
     implementation 'com.rometools:rome:1.15.0'
     implementation 'com.rometools:rome-utils:1.15.0'
@@ -111,6 +111,6 @@ shadowJar {
 }
 
 compileKotlin.kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_11
+    jvmTarget = JavaVersion.VERSION_1_8
     freeCompilerArgs = ["-Xjvm-default=enable", "-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses"]
 }

@@ -4,10 +4,10 @@ import cn.hutool.http.HttpRequest
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.api.ApiExecutor
+import io.github.starwishsama.comet.api.bilibili.data.dynamic.DynamicTypeSelector
+import io.github.starwishsama.comet.api.bilibili.data.dynamic.dynamicdata.UnknownType
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.MessageWrapper
-import io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.DynamicTypeSelector
-import io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.dynamicdata.UnknownType
 
 /**
  * BiliBili 动态 API

@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects.pojo.bilibili.liveroom
+package io.github.starwishsama.comet.api.bilibili.data.liveroom
 
 import com.google.gson.annotations.SerializedName
 
@@ -21,7 +21,7 @@ data class RoomInfo(
     val title: String){
 
     fun getRoomURL(): String {
-        return "https://live.bilibili.com/$roomID"
+        return "https://live.data.com/$roomID"
     }
 
     enum class Status(var status: String) {
