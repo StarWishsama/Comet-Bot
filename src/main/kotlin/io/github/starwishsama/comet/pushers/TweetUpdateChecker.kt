@@ -126,6 +126,6 @@ object TweetUpdateChecker : CometPusher {
         previous?.let {
             isShortInterval = Duration.between(it.getSentTime(), retrieve.getSentTime()).toMinutes() >= 5
         }
-        return isTooOld && isShortInterval
+        return isTooOld || isShortInterval
     }
 }
