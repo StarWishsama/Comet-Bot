@@ -22,7 +22,7 @@ jar {
     }
 }
 
-sourceCompatibility = 8
+sourceCompatibility = 11
 targetCompatibility = 11
 
 def gitCommitId = 'git rev-parse --short HEAD'
@@ -111,6 +111,6 @@ shadowJar {
 }
 
 compileKotlin.kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_1_8
+    jvmTarget = JavaVersion.VERSION_11
     freeCompilerArgs = ["-Xjvm-default=enable", "-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses"]
 }
