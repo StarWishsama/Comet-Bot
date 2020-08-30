@@ -187,23 +187,31 @@ object FileUtil {
     /**
      * 从 jar 中取出文件/文件夹到指定位置
      */
-    fun copyFromJar(jarFile: Path, source: String, target: Path) {
+    private fun copyFromJar(jarFile: Path, source: String, target: Path) {
         val fileSystem = FileSystems.newFileSystem(jarFile, null)
         val jarPath: Path = fileSystem.getPath(source)
 
         Files.walkFileTree(jarPath, object : SimpleFileVisitor<Path>() {
             override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
-                val currentTarget = target.resolve(jarPath.relativize(dir).toString())
-                if (!currentTarget.toFile().exists()) {
-                    Files.createDirectories(currentTarget)
+                try {
+                    val currentTarget = target.resolve(jarPath.relativize(dir).toString())
+                    if (!currentTarget.toFile().exists()) {
+                        Files.createDirectories(currentTarget)
+                    }
+                } catch (e: IllegalArgumentException) {
+                    daemonLogger.debugS("Can't copy ${dir.fileName} from jar, ${e.message}")
                 }
                 return FileVisitResult.CONTINUE
             }
 
             override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
-                val copyTarget = target.resolve(jarPath.relativize(file).toString())
-                if (!copyTarget.toFile().exists()) {
-                    Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
+                try {
+                    val copyTarget = target.resolve(jarPath.relativize(file).toString())
+                    if (!copyTarget.toFile().exists()) {
+                        Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
+                    }
+                } catch (e: IllegalArgumentException) {
+                    daemonLogger.debugS("Can't copy ${file.fileName} from jar, ${e.message}")
                 }
                 return FileVisitResult.CONTINUE
             }

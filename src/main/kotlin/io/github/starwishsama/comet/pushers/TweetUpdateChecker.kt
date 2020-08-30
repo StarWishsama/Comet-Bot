@@ -101,7 +101,7 @@ object TweetUpdateChecker : CometPusher {
             val group = bot.getGroupOrNull(it)
             if (group != null) {
                 val image = NetUtil.getUrlInputStream(content.getPictureUrl())?.uploadAsImage(group)
-                val filtered = PlainText("${content.user.name}\n") + content.getFullText().convertToChain().doFilter()
+                val filtered = PlainText("${content.user.name} 发布了一条推文\n") + content.getFullText().convertToChain().doFilter()
                 try {
                     if (image != null) group.sendMessage(filtered + image)
                     else group.sendMessage(filtered)

@@ -10,7 +10,6 @@ import io.github.starwishsama.comet.utils.FileUtil
 
 object LiveApi : ApiExecutor {
     private const val liveUrl = "http://api.live.bilibili.com/room/v1/Room/get_info?id="
-    private val agent = mutableMapOf("User-Agent" to "Nameless live status checker by StarWishsama")
     private const val apiRateLimit = "BiliBili API调用已达上限"
 
     @Throws(RateLimitException::class)
@@ -21,7 +20,7 @@ object LiveApi : ApiExecutor {
 
         usedTime++
         val request = HttpRequest.get(liveUrl + roomId).timeout(500)
-                .addHeaders(agent)
+                .header("User-Agent", "Bili live status checker by StarWishsama")
         val response = request.executeAsync()
 
         return try {
