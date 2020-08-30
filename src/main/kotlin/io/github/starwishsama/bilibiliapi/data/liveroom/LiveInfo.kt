@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.api.bilibili.data.liveroom
+package io.github.starwishsama.bilibiliapi.data.liveroom
 
 import com.google.gson.annotations.SerializedName
 

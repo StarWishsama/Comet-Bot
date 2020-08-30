@@ -1,11 +1,11 @@
-package io.github.starwishsama.comet.api.bilibili
+package io.github.starwishsama.bilibiliapi
 
 import cn.hutool.http.HttpRequest
 import com.google.gson.JsonParser
+import io.github.starwishsama.bilibiliapi.data.dynamic.DynamicTypeSelector
+import io.github.starwishsama.bilibiliapi.data.dynamic.dynamicdata.UnknownType
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.api.ApiExecutor
-import io.github.starwishsama.comet.api.bilibili.data.dynamic.DynamicTypeSelector
-import io.github.starwishsama.comet.api.bilibili.data.dynamic.dynamicdata.UnknownType
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.MessageWrapper
 
@@ -16,7 +16,7 @@ import io.github.starwishsama.comet.objects.MessageWrapper
  * 支持多种格式
  * @author Nameless
  */
-object BiliBiliApi : ApiExecutor {
+object MainApi : ApiExecutor {
     private var dynamicUrl =
         "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?visitor_uid=0&host_uid=%uid%&offset_dynamic_id=0&need_top=0"
     private const val infoUrl = "http://api.bilibili.com/x/space/acc/info?mid="

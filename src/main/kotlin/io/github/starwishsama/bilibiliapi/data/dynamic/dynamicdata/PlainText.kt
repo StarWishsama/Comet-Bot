@@ -1,7 +1,7 @@
-package io.github.starwishsama.comet.api.bilibili.data.dynamic.dynamicdata
+package io.github.starwishsama.bilibiliapi.data.dynamic.dynamicdata
 
-import io.github.starwishsama.comet.api.bilibili.data.dynamic.DynamicData
-import io.github.starwishsama.comet.api.bilibili.data.user.UserProfile
+import io.github.starwishsama.bilibiliapi.data.dynamic.DynamicData
+import io.github.starwishsama.bilibiliapi.data.user.UserProfile
 import io.github.starwishsama.comet.objects.MessageWrapper
 
 data class PlainText(var item: ItemBean,

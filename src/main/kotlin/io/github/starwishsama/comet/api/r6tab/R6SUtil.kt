@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.utils.network
+package io.github.starwishsama.comet.api.r6tab
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.JsonElement
@@ -10,6 +10,7 @@ import io.github.starwishsama.comet.enums.R6Rank
 import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6Player
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil
+import io.github.starwishsama.comet.utils.network.NetUtil
 import java.text.NumberFormat
 
 object R6SUtil {

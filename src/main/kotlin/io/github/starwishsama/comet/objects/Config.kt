@@ -82,7 +82,9 @@ data class Config(
         //@Comment("以图搜图 API 类型, 请使用 /ps source 命令修改")
         var pictureSearchApi: PicSearchApi = PicSearchApi.SAUCENAO,
 
+        //@Comment("查询 BiliBili 主播开播动态间隔时间")
         var biliInterval: Long = 2,
 
+        //@Comment("查询 Twitter 用户动态间隔时间")
         var twitterInterval: Long = 4,
 )

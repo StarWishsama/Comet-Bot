@@ -1,9 +1,9 @@
-package io.github.starwishsama.comet.api.bilibili
+package io.github.starwishsama.bilibiliapi
 
 import com.github.salomonbrys.kotson.fromJson
+import io.github.starwishsama.bilibiliapi.data.login.GetKeyResponse
+import io.github.starwishsama.bilibiliapi.data.login.LoginResponse
 import io.github.starwishsama.comet.BotVariables.gson
-import io.github.starwishsama.comet.api.bilibili.data.login.GetKeyResponse
-import io.github.starwishsama.comet.api.bilibili.data.login.LoginResponse
 import io.github.starwishsama.comet.utils.network.NetUtil
 import java.security.KeyFactory
 import java.security.spec.X509EncodedKeySpec

@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.api.bilibili
+package io.github.starwishsama.bilibiliapi
 
 import com.hiczp.bilibili.api.BilibiliClient
 import com.hiczp.bilibili.api.app.model.SearchUserResult

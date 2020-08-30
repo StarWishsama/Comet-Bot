@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
-import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
-import io.github.starwishsama.comet.api.bilibili.FakeClientApi
+import io.github.starwishsama.bilibiliapi.FakeClientApi
+import io.github.starwishsama.bilibiliapi.MainApi
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -43,7 +43,7 @@ class BiliBiliCommand : ChatCommand {
                                 val before = item.title + "\n粉丝数: " + item.fans +
                                         "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
                                         "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") + "\n"
-                                val dynamic = BiliBiliApi.getDynamic(item.mid)
+                                val dynamic = MainApi.getDynamic(item.mid)
                                 before.convertToChain() + getDynamicText(dynamic, event)
                             } else {
                                 BotUtil.sendMessage("找不到对应的B站用户")
@@ -167,7 +167,7 @@ class BiliBiliCommand : ChatCommand {
 
             for (roomInfo in info) {
                 subs.append(
-                    "${BiliBiliApi.getUserNameByMid(roomInfo.data.uid)} " +
+                    "${MainApi.getUserNameByMid(roomInfo.data.uid)} " +
                             "${if (roomInfo.data.liveStatus == 1) "✔" else "✘"}\n"
                 )
             }
@@ -206,7 +206,7 @@ class BiliBiliCommand : ChatCommand {
             cfg.biliSubscribers.add(rid)
         }
 
-        return BotUtil.sendMessage("订阅 ${if (name.isNotBlank()) name else BiliBiliApi.getUserNameByMid(rid)}($rid) 成功")
+        return BotUtil.sendMessage("订阅 ${if (name.isNotBlank()) name else MainApi.getUserNameByMid(rid)}($rid) 成功")
     }
 
 }
