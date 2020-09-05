@@ -20,7 +20,7 @@ import io.github.starwishsama.comet.listeners.RepeatListener
 import io.github.starwishsama.comet.pushers.BiliLiveChecker
 import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.pushers.TweetUpdateChecker
-import io.github.starwishsama.comet.pushers.YTBStreamChecker
+import io.github.starwishsama.comet.pushers.YoutubeStreamingChecker
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
@@ -106,7 +106,7 @@ object Comet {
     }
 
     private fun startAllPusher() {
-        val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker, YTBStreamChecker)
+        val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker, YoutubeStreamingChecker)
         pushers.forEach {
             val future = TaskUtil.runScheduleTaskAsync(it.delayTime, it.internal, TimeUnit.MINUTES, it::retrieve)
             it.future = future

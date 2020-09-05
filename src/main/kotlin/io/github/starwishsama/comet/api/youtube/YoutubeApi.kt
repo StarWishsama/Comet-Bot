@@ -5,10 +5,10 @@ import com.google.gson.JsonSyntaxException
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.ApiExecutor
 import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
-import io.github.starwishsama.comet.objects.MessageWrapper
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
 import io.github.starwishsama.comet.objects.pojo.youtube.VideoType
 import io.github.starwishsama.comet.objects.pojo.youtube.YoutubeRequestError
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.network.NetUtil
 
 object YoutubeApi : ApiExecutor {

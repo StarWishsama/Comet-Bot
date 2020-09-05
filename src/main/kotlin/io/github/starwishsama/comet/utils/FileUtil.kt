@@ -79,15 +79,18 @@ object FileUtil {
         daemonLogger.info("你可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")
     }
 
-    fun initLog() {
+    fun initLog(): File? {
         try {
             val initTime = LocalDateTime.now()
             val parent = getChildFolder("logs")
             BotVariables.log = File(parent, "log-${dateFormatter.format(initTime)}.log")
             BotVariables.log.createNewFile()
+            return BotVariables.log
         } catch (e: IOException) {
             daemonLogger.error("初始化 Log 文件失败")
         }
+
+        return null
     }
 
     fun getJarLocation(): File {

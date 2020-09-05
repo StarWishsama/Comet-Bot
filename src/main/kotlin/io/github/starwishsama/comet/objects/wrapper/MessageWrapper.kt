@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects
+package io.github.starwishsama.comet.objects.wrapper
 
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -10,7 +10,8 @@ import net.mamoe.mirai.message.uploadAsImage
 
 open class MessageWrapper(var text: String?) {
     var picUrl: String? = null
-    var context: Any? = null
+    var senderId: Long = 0
+    var messageId: Long = 0
 
     private suspend fun getPicture(contact: Contact): Image? {
         if (picUrl != null) {
@@ -37,6 +38,6 @@ open class MessageWrapper(var text: String?) {
     }
 
     override fun toString(): String {
-        return "MessageWrapper {text=$text, pictureUrl=$picUrl}"
+        return "MessageWrapper {text=$text, pictureUrl=$picUrl}, senderId=${senderId}, messageId=${messageId}"
     }
 }

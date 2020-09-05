@@ -30,7 +30,7 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     lateinit var filePath: File
-    const val version = "0.5.3-DEV-7ff8ab2-20200830"
+    const val version = "0.5.3-DEV-ed0a1b6-20200830"
     lateinit var bot: Bot
 
     fun isBotInitialized(): Boolean = ::bot.isInitialized
@@ -57,6 +57,8 @@ object BotVariables {
     val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
     var rCon: Rcon? = null
     lateinit var log: File
+
+    fun isLogInitialized(): Boolean = ::log.isInitialized
 
     var shop: MutableList<Shop> = LinkedList()
     val users: MutableList<BotUser> = LinkedList()

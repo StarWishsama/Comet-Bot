@@ -6,7 +6,7 @@ import io.github.starwishsama.bilibiliapi.data.dynamic.DynamicTypeSelector
 import io.github.starwishsama.bilibiliapi.data.user.UserProfile
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.gson
-import io.github.starwishsama.comet.objects.MessageWrapper
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 data class Repost(@SerializedName("origin")
                   var originDynamic: String,

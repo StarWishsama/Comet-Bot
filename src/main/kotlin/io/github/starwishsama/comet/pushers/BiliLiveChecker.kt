@@ -36,11 +36,11 @@ object BiliLiveChecker : CometPusher {
         }
 
         collectedUsers.parallelStream().forEach { roomId ->
-            val data = LiveApi.getLiveInfo(roomId)
+            val data = LiveApi.getLiveInfo(roomId)?.data
 
             if (data != null) {
-                val sli = StoredLiveInfo(data.data, false)
-                if (pushedList.isEmpty() && data.data.liveStatus == 1) {
+                val sli = StoredLiveInfo(data, false)
+                if (pushedList.isEmpty() && data.isLiveNow()) {
                     pushedList.plusAssign(sli)
                     count++
                 } else {
@@ -48,17 +48,17 @@ object BiliLiveChecker : CometPusher {
 
                     for (i in pushedList.indices) {
                         val oldStatus = pushedList[i].data.liveStatus
-                        val currentStatus = data.data.liveStatus
+                        val currentStatus = data.liveStatus
                         if (pushedList[i].data.roomId == roomId) {
                             hasOldData = true
-                            if (oldStatus != currentStatus && currentStatus == 1) {
+                            if (oldStatus != currentStatus && data.isLiveNow()) {
                                 pushedList[i] = sli
                             }
                             break
                         }
                     }
 
-                    if (!hasOldData && data.data.liveStatus == 1) {
+                    if (!hasOldData && data.isLiveNow()) {
                         pushedList.add(sli)
                         count++
                     }
@@ -97,17 +97,21 @@ object BiliLiveChecker : CometPusher {
             if (!info.isPushed) {
                 val data = info.data
                 if (data.liveStatus != 0) {
-                    val msg = "单推助手 > \n${MainApi.getUserNameByMid(data.uid)} 正在直播!" +
+                    val msg = "单推助手 > ${MainApi.getUserNameByMid(data.uid)} 正在直播!" +
                             "\n直播间标题: ${data.title}" +
                             "\n开播时间: ${data.liveTime}" +
-                            "\n传送门: https://live.bilibili.com/${data.roomId}"
+                            "\n传送门: ${data.getRoomURL()}"
                     pushGroups.forEach {
                         val filtered = msg.convertToChain().doFilter()
                         if (filtered.isContentNotEmpty()) {
                             runBlocking {
-                                bot.getGroupOrNull(it)?.sendMessage(filtered)
-                                count++
-                                delay(2_500)
+                                try {
+                                    bot.getGroupOrNull(it)?.sendMessage(filtered)
+                                    count++
+                                    delay(2_500)
+                                } catch (t: Throwable) {
+                                    daemonLogger.verboseS("推送时出现了异常, ${t.message}")
+                                }
                             }
                         }
                     }

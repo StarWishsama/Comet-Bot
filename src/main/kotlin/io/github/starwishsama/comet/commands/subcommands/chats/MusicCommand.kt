@@ -22,8 +22,8 @@ class MusicCommand : ChatCommand {
                 if (args[0].contentEquals("api")) {
                     if (args.size > 1) {
                         when (args[1].toUpperCase()) {
-                            "QQ" -> BotVariables.cfg.musicApi = MusicApi.QQ
-                            "NETEASE", "网易" -> BotVariables.cfg.musicApi = MusicApi.NETEASE
+                            "QQ", "TX", "腾讯" -> BotVariables.cfg.musicApi = MusicApi.QQ
+                            "NETEASE", "网易", "WY" -> BotVariables.cfg.musicApi = MusicApi.NETEASE
                         }
                         return BotUtil.sendMessage("音乐API已修改为 ${BotVariables.cfg.musicApi}")
                     }

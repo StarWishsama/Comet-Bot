@@ -1,7 +1,7 @@
 package io.github.starwishsama.bilibiliapi.data.dynamic.dynamicdata
 
 import io.github.starwishsama.bilibiliapi.data.dynamic.DynamicData
-import io.github.starwishsama.comet.objects.MessageWrapper
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 class UnknownType : DynamicData {
     override suspend fun getContact(): MessageWrapper {

@@ -55,7 +55,7 @@ data class LiveRoomInfo(
             @SerializedName("keyframe")
             val keyFrameImageUrl: String,
             @SerializedName("is_strict_room")
-            val strictMode: Int,
+            val strictMode: Boolean,
             /**
              * 开播时间 格式 yyyy-MM-dd HH:mm:ss
              */
@@ -125,6 +125,8 @@ data class LiveRoomInfo(
                 @SerializedName("mobile_frame")
                 var mobileFrame: JsonElement?
         )
+
+        fun isLiveNow(): Boolean = liveStatus == 1
 
         fun getLiveTime(): LocalDateTime {
             return LocalDateTime.parse(liveTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))

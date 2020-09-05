@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.objects.checkin
 
-import io.github.starwishsama.comet.objects.MessageWrapper
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import java.time.LocalDateTime

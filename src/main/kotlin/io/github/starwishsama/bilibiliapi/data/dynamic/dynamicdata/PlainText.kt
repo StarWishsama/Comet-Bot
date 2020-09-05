@@ -2,7 +2,7 @@ package io.github.starwishsama.bilibiliapi.data.dynamic.dynamicdata
 
 import io.github.starwishsama.bilibiliapi.data.dynamic.DynamicData
 import io.github.starwishsama.bilibiliapi.data.user.UserProfile
-import io.github.starwishsama.comet.objects.MessageWrapper
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 data class PlainText(var item: ItemBean,
                      var user: UserProfile.Info) : DynamicData {
