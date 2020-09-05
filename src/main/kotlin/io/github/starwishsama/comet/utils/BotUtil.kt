@@ -27,6 +27,24 @@ import kotlin.time.toKotlinDuration
  * @author Nameless
  */
 
+fun MiraiLogger.warningS(message: String?) {
+    if (cfg.debugMode) {
+        warning(message)
+    }
+}
+
+fun MiraiLogger.warningS(message: String?, throwable: Throwable?) {
+    if (cfg.debugMode) {
+        warning(message, throwable)
+    }
+}
+
+fun MiraiLogger.warningS(throwable: Throwable?) {
+    if (cfg.debugMode) {
+        warning(throwable)
+    }
+}
+
 fun MiraiLogger.debugS(message: String?) {
     if (cfg.debugMode) {
         debug(message)

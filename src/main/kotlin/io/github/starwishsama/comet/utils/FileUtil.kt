@@ -14,6 +14,7 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+
 fun File.writeClassToJson(context: Any) {
     if (!this.exists()) {
         this.createNewFile()
@@ -73,7 +74,7 @@ object FileUtil {
 
         location.createNewFile()
 
-        val report = "Error occurred:\nExtra message: $message\n${getBeautyStackTrace(t)}\n\nRaw content:\n$content"
+        val report = "Error occurred:\n${getBeautyStackTrace(t)}\nExtra message: $message\n\nRaw content:\n$content"
         location.writeString(report)
         daemonLogger.info("$reason, 错误报告已生成! 保存在 ${location.path}")
         daemonLogger.info("你可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")
@@ -116,7 +117,7 @@ object FileUtil {
     private fun getBeautyStackTrace(exception: Throwable): String {
         val sb = StringBuilder()
         sb.append("========================= StackTrace =========================\n")
-        sb.append("Exception Type ▶\n")
+        sb.append("异常类型 ▶\n")
         sb.append(exception.toString() + "\n")
         sb.append("\n")
         var lastPackage = ""
@@ -137,9 +138,9 @@ object FileUtil {
             if (packageName.toString() != lastPackage) {
                 lastPackage = packageName.toString()
                 sb.append("\n")
-                sb.append("Package $packageName ▶\n")
+                sb.append("包名 $packageName ▶\n")
             }
-            sb.append("  ▶ at Class " + className + ", Method " + elem.methodName + ". (" + elem.fileName + ", Line " + elem.lineNumber + ")" + "\n")
+            sb.append("  ▶ 在类 " + className + ", 方法 " + elem.methodName + ". (" + elem.fileName + ", 行 " + elem.lineNumber + ")" + "\n")
 
         }
         sb.append("========================= StackTrace =========================\n")
@@ -153,17 +154,22 @@ object FileUtil {
     }
 
     fun initResourceFile() {
-        val resourcePath = "resources"
-        val jarFile = File(Comet.javaClass.protectionDomain.codeSource.location.path)
+        try {
+            val resourcePath = "resources"
+            val jarFile = File(Comet.javaClass.protectionDomain.codeSource.location.path)
 
-        if (jarFile.isFile) {
-            copyFromJar(jarFile.toPath(), resourcePath, getResourceFolder().toPath())
-        } else { // Run with IDE
-            val url: URL = Comet::class.java.getResource(resourcePath)
-            val apps = File(url.toURI())
-            for (app in apps.listFiles() ?: return) {
-                copyFolder(app, getResourceFolder())
+            if (jarFile.isFile) {
+                copyFromJar(jarFile = jarFile.toPath(), target = getResourceFolder().toPath())
+            } else { // Run with IDE
+                val url: URL = ClassLoader.getSystemResource("/$resourcePath")
+                val apps = File(url.toURI())
+                for (app in apps.listFiles() ?: return) {
+                    copyFolder(app, getResourceFolder())
+                }
             }
+        } catch (t: Throwable) {
+            daemonLogger.info("无法复制资源文件, 部分需要图片资源的功能将无法使用")
+            daemonLogger.warningS("Cannot copy resources files", t)
         }
     }
 
@@ -190,36 +196,34 @@ object FileUtil {
     /**
      * 从 jar 中取出文件/文件夹到指定位置
      */
-    private fun copyFromJar(jarFile: Path, source: String, target: Path) {
+    private fun copyFromJar(jarFile: Path, source: String = "resources", target: Path) {
         val fileSystem = FileSystems.newFileSystem(jarFile, null)
         val jarPath: Path = fileSystem.getPath(source)
 
         Files.walkFileTree(jarPath, object : SimpleFileVisitor<Path>() {
             override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
                 try {
-                    val currentTarget = target.resolve(jarPath.relativize(dir).toString())
-                    if (!currentTarget.toFile().exists()) {
-                        Files.createDirectories(currentTarget)
-                    }
+                    val relative = jarPath.relativize(dir)
+                    val currentTarget = target.resolve(relative.toString())
+                    Files.createDirectories(currentTarget)
                 } catch (e: IllegalArgumentException) {
-                    daemonLogger.debugS("Can't copy ${dir.fileName} from jar, ${e.message}")
+                    daemonLogger.warningS("Can't create dir ${dir.fileName} from jar", e)
+                } finally {
+                    return FileVisitResult.CONTINUE
                 }
-                return FileVisitResult.CONTINUE
             }
 
             override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
                 try {
-                    val copyTarget = target.resolve(jarPath.relativize(file).toString())
-                    if (!copyTarget.toFile().exists()) {
-                        Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
-                    }
+                    val relative = jarPath.relativize(file)
+                    val copyTarget = target.resolve(relative.toString())
+                    Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
                 } catch (e: IllegalArgumentException) {
-                    daemonLogger.debugS("Can't copy ${file.fileName} from jar, ${e.message}")
+                    daemonLogger.warningS("Can't copy ${file.fileName} from jar", e)
+                } finally {
+                    return FileVisitResult.CONTINUE
                 }
-                return FileVisitResult.CONTINUE
             }
         })
-
-        fileSystem.close()
     }
 }
