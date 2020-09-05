@@ -14,6 +14,7 @@ import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.RssUtil
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
@@ -62,7 +63,9 @@ class DebugCommand : ChatCommand {
                     return ("彗星 Bot ${BotVariables.version}\n" +
                             "今日もかわいい~\n" +
                             "已注册命令数: ${CommandExecutor.countCommands()}\n" +
-                            BotUtil.getMemoryUsage()).convertToChain()
+                            BotUtil.getMemoryUsage() + "\n" +
+                            "与服务器的延迟为 ${NetUtil.checkPingValue()} ms"
+                            ).convertToChain()
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().convertToChain()
                 "switch" -> {
                     BotVariables.switch = !BotVariables.switch

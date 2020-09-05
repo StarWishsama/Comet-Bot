@@ -10,6 +10,9 @@ import java.io.*
 import java.net.Proxy
 import java.net.Socket
 import java.net.URL
+import java.net.URLConnection
+import java.time.Duration
+import java.time.LocalDateTime
 import java.util.*
 
 fun HttpResponse.getContentLength(): Int {
@@ -131,5 +134,27 @@ object NetUtil {
     fun isTimeout(t: Throwable): Boolean {
         val msg = t.message?.toLowerCase(Locale.ROOT) ?: return false
         return (msg.contains("time") && msg.contains("out")) || t.javaClass.simpleName.toLowerCase(Locale.ROOT).contains("timeout")
+    }
+
+    fun checkPingValue(address: String = "https://google.com"): Long {
+        val startTime = LocalDateTime.now()
+
+        val socket = Socket(cfg.proxyUrl, cfg.proxyPort)
+        val proxy: Proxy? = if (socket.isUsable(300)) Proxy(cfg.proxyType, Socket(cfg.proxyUrl, cfg.proxyPort).remoteSocketAddress) else null
+
+        try {
+            val connection: URLConnection = if (proxy != null) {
+                URL(address).openConnection()
+            } else {
+                URL(address).openConnection(proxy)
+            }
+            connection.connectTimeout = 5000
+            connection.connect()
+            proxyIsUsable = 1
+        } catch (t: Throwable) {
+            proxyIsUsable = -1
+        }
+
+        return Duration.between(startTime, LocalDateTime.now()).toMillis()
     }
 }

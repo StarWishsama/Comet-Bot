@@ -195,6 +195,8 @@ object FileUtil {
 
     /**
      * 从 jar 中取出文件/文件夹到指定位置
+     *
+     * 注意: 该方法与部分 JDK 不兼容! (已知 Oracle JRE 8 @Windows Server 2019 会报错)
      */
     private fun copyFromJar(jarFile: Path, source: String = "resources", target: Path) {
         val fileSystem = FileSystems.newFileSystem(jarFile, null)
@@ -217,7 +219,7 @@ object FileUtil {
                 try {
                     val relative = jarPath.relativize(file)
                     val copyTarget = target.resolve(relative.toString())
-                    Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
+                    Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE)
                 } catch (e: IllegalArgumentException) {
                     daemonLogger.warningS("Can't copy ${file.fileName} from jar", e)
                 } finally {
