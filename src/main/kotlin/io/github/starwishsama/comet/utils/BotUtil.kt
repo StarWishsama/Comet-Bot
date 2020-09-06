@@ -182,11 +182,11 @@ object BotUtil {
     }
 
     fun List<String>.getRestString(startAt: Int): String {
-        return StringBuilder().apply {
-            if (size == 1) {
-                return this[0].toString().trim()
-            }
+        if (size == 1) {
+            return this[0].trim()
+        }
 
+        return StringBuilder().apply {
             for (index in startAt until size) {
                 append(this[index]).append(" ")
             }

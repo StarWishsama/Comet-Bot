@@ -30,20 +30,20 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     lateinit var filePath: File
-    const val version = "0.5.3-DEV-3bd8713-20200905"
+    const val version = "0.5.3-DEV-27904fa-20200906"
     lateinit var bot: Bot
 
     fun isBotInitialized(): Boolean = ::bot.isInitialized
 
     lateinit var startTime: LocalDateTime
     var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
-        4,
-        BasicThreadFactory.Builder()
-            .namingPattern("comet-service-%d")
-            .daemon(true)
-            .uncaughtExceptionHandler { thread, t ->
-                daemonLogger.warning("线程 ${thread.name} 在运行时发生了错误", t)
-            }.build()
+            8,
+            BasicThreadFactory.Builder()
+                    .namingPattern("comet-service-%d")
+                    .daemon(true)
+                    .uncaughtExceptionHandler { thread, throwable ->
+                        daemonLogger.warning("线程 ${thread.name} 在运行时发生了错误", throwable)
+                    }.build()
     )
     lateinit var logger: MiraiLogger
     val daemonLogger: PlatformLogger = PlatformLogger("CometService", {

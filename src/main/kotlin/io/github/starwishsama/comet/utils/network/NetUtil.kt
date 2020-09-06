@@ -43,12 +43,7 @@ object NetUtil {
     const val defaultUA =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
 
-    fun getUrlInputStream(url: String?): InputStream? {
-        if (url == null) return null
-        return getUrlInputStream(url, 4_000)
-    }
-
-    fun getUrlInputStream(url: String, timeout: Int): InputStream? {
+    fun getUrlInputStream(url: String, timeout: Int = 4_000): InputStream? {
         val response = doHttpRequestGet(url, timeout).executeAsync()
         val length = response.getContentLength()
         val bytes = response.bodyBytes()

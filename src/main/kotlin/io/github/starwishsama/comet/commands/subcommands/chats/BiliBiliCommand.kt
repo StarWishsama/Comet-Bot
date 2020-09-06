@@ -1,7 +1,9 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
 import io.github.starwishsama.bilibiliapi.FakeClientApi
+import io.github.starwishsama.bilibiliapi.LiveApi
 import io.github.starwishsama.bilibiliapi.MainApi
+import io.github.starwishsama.bilibiliapi.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -147,28 +149,28 @@ class BiliBiliCommand : ChatCommand {
         }
     }
 
-    private suspend fun getLiveStatus(event: MessageEvent): MessageChain {
+    private fun getLiveStatus(event: MessageEvent): MessageChain {
         if (event !is GroupMessageEvent) return BotUtil.sendMessage("只能在群里查看订阅列表")
 
         val subs = StringBuilder("监控室列表:\n")
-        val info = ArrayList<com.hiczp.bilibili.api.live.model.RoomInfo>()
+        val info = ArrayList<LiveRoomInfo.LiveRoomInfoData>()
 
         val cfg = GroupConfigManager.getConfigSafely(event.group.id)
 
         if (cfg.biliSubscribers.isNotEmpty()) {
             for (roomId in cfg.biliSubscribers) {
-                val room = FakeClientApi.getLiveRoom(roomId)
+                val room = LiveApi.getLiveInfo(roomId)
                 if (room != null) {
-                    info.add(room)
+                    info.add(room.data)
                 }
             }
 
-            info.sortByDescending { it.data.liveStatus == 1 }
+            info.sortByDescending { it.liveStatus == 1 }
 
             for (roomInfo in info) {
                 subs.append(
-                    "${MainApi.getUserNameByMid(roomInfo.data.uid)} " +
-                            "${if (roomInfo.data.liveStatus == 1) "✔" else "✘"}\n"
+                        "${MainApi.getUserNameByMid(roomInfo.uid)} " +
+                                "${if (roomInfo.isLiveNow()) "✔" else "✘"}\n"
                 )
             }
 

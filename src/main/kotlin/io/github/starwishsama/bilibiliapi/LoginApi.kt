@@ -29,8 +29,9 @@ object LoginApi {
             secCode: String? = null,
             validate: String? = null
     ) {
+        val path = "/api/oauth2/getKey"
         // 取得 hash 和 RSA 公钥
-        val passportAPI = NetUtil.getPageContent("$loginApi/api/oauth2/getKey")
+        val passportAPI = NetUtil.getPageContent("$loginApi$path")
         val keyResponse = gson.fromJson<GetKeyResponse>(passportAPI)
 
         val (hash, key) = keyResponse.data.let { data ->

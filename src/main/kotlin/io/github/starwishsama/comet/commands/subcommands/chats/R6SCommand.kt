@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
-import io.github.starwishsama.comet.api.r6tab.R6SUtil.getR6SInfo
+import io.github.starwishsama.comet.api.r6tab.R6TabApi.getR6SInfo
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel

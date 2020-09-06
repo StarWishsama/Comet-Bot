@@ -9,11 +9,14 @@ import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.commands.CommandExecutor.doFilter
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.verboseS
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.getGroupOrNull
+import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.isContentNotEmpty
+import net.mamoe.mirai.message.uploadAsImage
 import java.util.concurrent.ScheduledFuture
 
 object BiliLiveChecker : CometPusher {
@@ -106,7 +109,9 @@ object BiliLiveChecker : CometPusher {
                         if (filtered.isContentNotEmpty()) {
                             runBlocking {
                                 try {
-                                    bot.getGroupOrNull(it)?.sendMessage(filtered)
+                                    val group = bot.getGroupOrNull(it)
+                                    val image = group?.let { sendGroup -> NetUtil.getUrlInputStream(data.keyFrameImageUrl)?.uploadAsImage(sendGroup) }
+                                    group?.sendMessage(filtered + (image ?: PlainText("")))
                                     count++
                                     delay(2_500)
                                 } catch (t: Throwable) {
