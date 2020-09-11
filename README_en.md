@@ -51,7 +51,8 @@ Configurations for Gradle is well done. Double-click `gradlew.bat` in the root d
 ## 📜 License 
 **All development is for learning, DO NOT use it for illegal purposes**
 
-[AGPL v3.0](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE)
+This project uses [AGPL v3.0](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE)
+
 ------
 
     Copyright (C) 2018-2020 StarWishsama

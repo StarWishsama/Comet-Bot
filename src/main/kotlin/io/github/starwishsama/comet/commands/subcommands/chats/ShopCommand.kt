@@ -7,13 +7,12 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
-import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 class ShopCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        return "WIP".convertToChain()
+        TODO("Shop command's priority is ultra low, sry :/")
     }
 
     override fun getProps(): CommandProps =
@@ -26,7 +25,6 @@ class ShopCommand : ChatCommand, SuspendCommand {
     """.trimIndent()
 
     override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
-        event.reply("WIP")
         SessionManager.expireSession(session)
     }
 }

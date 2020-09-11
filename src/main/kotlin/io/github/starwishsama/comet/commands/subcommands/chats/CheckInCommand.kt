@@ -35,8 +35,6 @@ class CheckInCommand : ChatCommand {
 
     override fun getHelp(): String = ""
 
-    override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean = botUser.compareLevel(getProps().level)
-
     private fun checkIn(sender: User, msg: MessageEvent, user: BotUser): String {
         return run {
             val point = calculatePoint(user)

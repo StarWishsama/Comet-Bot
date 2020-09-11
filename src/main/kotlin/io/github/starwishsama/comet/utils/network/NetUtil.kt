@@ -10,6 +10,9 @@ import java.io.*
 import java.net.Proxy
 import java.net.Socket
 import java.net.URL
+import java.net.URLConnection
+import java.time.Duration
+import java.time.LocalDateTime
 import java.util.*
 
 fun HttpResponse.getContentLength(): Int {
@@ -40,12 +43,7 @@ object NetUtil {
     const val defaultUA =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
 
-    fun getUrlInputStream(url: String?): InputStream? {
-        if (url == null) return null
-        return getUrlInputStream(url, 4_000)
-    }
-
-    fun getUrlInputStream(url: String, timeout: Int): InputStream? {
+    fun getUrlInputStream(url: String, timeout: Int = 4_000): InputStream? {
         val response = doHttpRequestGet(url, timeout).executeAsync()
         val length = response.getContentLength()
         val bytes = response.bodyBytes()
@@ -82,10 +80,10 @@ object NetUtil {
         return request
     }
 
-    fun getPageContent(url: String): String {
-        val response = doHttpRequestGet(url, 8000).executeAsync()
-        return if (response.isOk) response.body() else response.status.toString()
-    }
+        fun getPageContent(url: String): String {
+            val response = doHttpRequestGet(url, 8000).executeAsync()
+            return if (response.isOk) response.body() else response.status.toString()
+        }
 
     /**
      * 下载文件
@@ -131,5 +129,27 @@ object NetUtil {
     fun isTimeout(t: Throwable): Boolean {
         val msg = t.message?.toLowerCase(Locale.ROOT) ?: return false
         return (msg.contains("time") && msg.contains("out")) || t.javaClass.simpleName.toLowerCase(Locale.ROOT).contains("timeout")
+    }
+
+    fun checkPingValue(address: String = "https://google.com"): Long {
+        val startTime = LocalDateTime.now()
+
+        val socket = Socket(cfg.proxyUrl, cfg.proxyPort)
+        val proxy: Proxy? = if (socket.isUsable(300)) Proxy(cfg.proxyType, Socket(cfg.proxyUrl, cfg.proxyPort).remoteSocketAddress) else null
+
+        try {
+            val connection: URLConnection = if (proxy != null) {
+                URL(address).openConnection()
+            } else {
+                URL(address).openConnection(proxy)
+            }
+            connection.connectTimeout = 5000
+            connection.connect()
+            proxyIsUsable = 1
+        } catch (t: Throwable) {
+            proxyIsUsable = -1
+        }
+
+        return Duration.between(startTime, LocalDateTime.now()).toMillis()
     }
 }

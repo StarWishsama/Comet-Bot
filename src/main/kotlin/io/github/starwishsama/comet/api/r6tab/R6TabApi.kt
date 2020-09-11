@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.utils.network
+package io.github.starwishsama.comet.api.r6tab
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.JsonElement
@@ -10,9 +10,11 @@ import io.github.starwishsama.comet.enums.R6Rank
 import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6Player
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil
+import io.github.starwishsama.comet.utils.network.NetUtil
 import java.text.NumberFormat
 
-object R6SUtil {
+object R6TabApi {
+    const val apiUrl = "https://r6.apitab.com/"
     private const val infoText = "=== 彩虹六号战绩查询 ===\n%s [%d级]" +
             "\n目前段位: %s current mmrchange" +
             "\nKD: %s" +
@@ -23,13 +25,13 @@ object R6SUtil {
     private fun searchPlayer(name: String): R6Player? {
         try {
             val body: String =
-                NetUtil.getPageContent("https://r6.apitab.com/search/uplay/$name?cid=${BotVariables.cfg.r6tabKey}")
+                    NetUtil.getPageContent("${apiUrl}search/uplay/$name?cid=${BotVariables.cfg.r6tabKey}")
             if (BotUtil.isValidJson(body)) {
                 val element: JsonElement = JsonParser.parseString(body).asJsonObject["players"]
                 if (BotUtil.isValidJson(element)) {
                     val jsonObject: JsonObject = element.asJsonObject
                     val uuid: String = jsonObject.get(jsonObject.keySet().iterator().next()).asJsonObject.get("profile").asJsonObject.get("p_user").asString
-                    return gson.fromJson(NetUtil.getPageContent("https://r6.apitab.com/player/$uuid?cid=${BotVariables.cfg.r6tabKey}"))
+                    return gson.fromJson(NetUtil.getPageContent("${apiUrl}player/$uuid?cid=${BotVariables.cfg.r6tabKey}"))
                 }
             }
         } catch (e: Exception) {

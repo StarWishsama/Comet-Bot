@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects.pojo.bilibili.user
+package io.github.starwishsama.bilibiliapi.data.user
 
 import com.google.gson.annotations.SerializedName
 

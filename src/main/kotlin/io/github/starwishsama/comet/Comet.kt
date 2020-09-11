@@ -1,11 +1,12 @@
 package io.github.starwishsama.comet
 
+import io.github.starwishsama.bilibiliapi.FakeClientApi
+import io.github.starwishsama.bilibiliapi.MainApi
 import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.BotVariables.consoleCommandLogger
+import io.github.starwishsama.comet.BotVariables.filePath
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.BotVariables.startTime
-import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
-import io.github.starwishsama.comet.api.bilibili.FakeClientApi
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.api.youtube.YoutubeApi
 import io.github.starwishsama.comet.commands.CommandExecutor
@@ -19,7 +20,7 @@ import io.github.starwishsama.comet.listeners.RepeatListener
 import io.github.starwishsama.comet.pushers.BiliLiveChecker
 import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.pushers.TweetUpdateChecker
-import io.github.starwishsama.comet.pushers.YTBStreamChecker
+import io.github.starwishsama.comet.pushers.YoutubeStreamingChecker
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
@@ -52,7 +53,7 @@ import kotlin.time.toKotlinDuration
 object Comet {
     @ExperimentalTime
     fun startUpTask() {
-        val apis = arrayOf(BiliBiliApi, TwitterApi, YoutubeApi)
+        val apis = arrayOf(MainApi, TwitterApi, YoutubeApi)
 
         /** 定时任务 */
         BackupHelper.scheduleBackup()
@@ -105,7 +106,7 @@ object Comet {
     }
 
     private fun startAllPusher() {
-        val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker, YTBStreamChecker)
+        val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker, YoutubeStreamingChecker)
         pushers.forEach {
             val future = TaskUtil.runScheduleTaskAsync(it.delayTime, it.internal, TimeUnit.MINUTES, it::retrieve)
             it.future = future
@@ -219,6 +220,7 @@ object Comet {
 @ExperimentalStdlibApi
 @ExperimentalTime
 suspend fun main() {
+    filePath = FileUtil.getJarLocation()
     startTime = LocalDateTime.now()
     println(
         """

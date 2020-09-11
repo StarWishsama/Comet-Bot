@@ -14,8 +14,6 @@ import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.message.data.toMessage
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -29,8 +27,7 @@ class ClockInCommand : ChatCommand {
                 if (isClockIn(data, event)) {
                     clockIn(event.sender, event, data)
                 } else {
-                    (BotUtil.getLocalMessage("msg.bot-prefix") + "你已经打卡过了!").toMessage()
-                        .asMessageChain()
+                    (BotUtil.getLocalMessage("msg.bot-prefix") + "你已经打卡过了!").convertToChain()
                 }
             } else {
                 (BotUtil.getLocalMessage("msg.bot-prefix") + "没有正在进行的打卡").convertToChain()
@@ -76,7 +73,7 @@ class ClockInCommand : ChatCommand {
             data.checkedUsers.add(sender)
             return result.convertToChain()
         } else {
-            return data.viewData()
+            return BotUtil.sendMessage(data.viewData().text)
         }
     }
 }

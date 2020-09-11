@@ -1,9 +1,9 @@
-package io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.dynamicdata
+package io.github.starwishsama.bilibiliapi.data.dynamic.dynamicdata
 
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.comet.objects.MessageWrapper
-import io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.DynamicData
-import io.github.starwishsama.comet.objects.pojo.bilibili.user.UserProfile
+import io.github.starwishsama.bilibiliapi.data.dynamic.DynamicData
+import io.github.starwishsama.bilibiliapi.data.user.UserProfile
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 class MiniVideo : DynamicData {
     var item: Item? = null

@@ -1,8 +1,8 @@
-package io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.dynamicdata
+package io.github.starwishsama.bilibiliapi.data.dynamic.dynamicdata
 
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.comet.objects.MessageWrapper
-import io.github.starwishsama.comet.objects.pojo.bilibili.dynamic.DynamicData
+import io.github.starwishsama.bilibiliapi.data.dynamic.DynamicData
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 data class TextWithPicture(var item: ItemBean?) : DynamicData {
     data class ItemBean(@SerializedName("description")

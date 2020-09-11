@@ -6,10 +6,12 @@ import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.TaskUtil
 import java.io.File
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
 object BackupHelper {
     private val location: File = FileUtil.getChildFolder("backups")
+    private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
 
     private fun createBackup(){
         try {
@@ -19,7 +21,7 @@ object BackupHelper {
 
             val backupTime = LocalDateTime.now()
             val backupName =
-                    "backup-${backupTime.year}-${backupTime.month.value}-${backupTime.dayOfMonth}-${backupTime.hour}-${backupTime.minute}.json"
+                    "backup-${dateFormatter.format(backupTime)}.json"
 
             val backupFile = File(location, backupName)
             backupFile.createNewFile()
@@ -27,7 +29,7 @@ object BackupHelper {
                 .write(BotVariables.gson.toJson(BotVariables.users))
             BotVariables.logger.info("[备份] 备份成功! 文件名是 $backupName")
         } catch (e: Exception) {
-            BotVariables.logger.error("[备份] 备份时出问题", e)
+            BotVariables.logger.error("[备份] 尝试备份时发生了异常", e)
         }
     }
 

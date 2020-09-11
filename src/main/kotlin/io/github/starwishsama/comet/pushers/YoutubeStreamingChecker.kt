@@ -2,9 +2,11 @@ package io.github.starwishsama.comet.pushers
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.bot
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.youtube.YoutubeApi
 import io.github.starwishsama.comet.api.youtube.YoutubeApi.getLiveItemOrNull
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
+import io.github.starwishsama.comet.utils.verboseS
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -12,7 +14,7 @@ import net.mamoe.mirai.getGroupOrNull
 import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 
-object YTBStreamChecker : CometPusher {
+object YoutubeStreamingChecker : CometPusher {
     override val delayTime: Long = 10
     override val internal: Long = 10
     override var future: ScheduledFuture<*>? = null
@@ -42,7 +44,7 @@ object YTBStreamChecker : CometPusher {
                     val now = result.getLiveItemOrNull()
                     if (now?.getChannelId() == history?.getChannelId() && now?.getVideoUrl() != history?.getVideoUrl()) {
                         pushHistory.add(PushObject(result, groups))
-                        return@forEach
+                        return@history
                     }
                 }
                 pushHistory.add(PushObject(result, groups))
@@ -58,8 +60,12 @@ object YTBStreamChecker : CometPusher {
                 val wrappedMessage = YoutubeApi.getLiveStatusByResult(pushObject.result)
                 val group = bot.getGroupOrNull(it)
                 GlobalScope.launch {
-                    group?.sendMessage(wrappedMessage.toMessageChain(group))
-                    delay(2_500)
+                    try {
+                        group?.sendMessage(wrappedMessage.toMessageChain(group))
+                        delay(2_500)
+                    } catch (t: Throwable) {
+                        daemonLogger.verboseS("Push youtube live status failed, ${t.message}")
+                    }
                 }
             }
             pushObject.isPushed = true

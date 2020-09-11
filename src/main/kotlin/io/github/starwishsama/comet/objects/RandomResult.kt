@@ -20,7 +20,7 @@ data class RandomResult (var id: Long, var chance: Double, var eventName: String
                 else -> EventRate.NEVER
             }
 
-            return "$randomResult ${eventName}\n结果: ${rateType.type} (${finalRate}%)"
+            return "$randomResult ${eventName}\n结果: ${rateType.type} (${finalRate})"
         }
 
         fun getChance(result: RandomResult): String {

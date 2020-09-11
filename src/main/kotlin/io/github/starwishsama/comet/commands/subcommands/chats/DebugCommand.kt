@@ -12,13 +12,18 @@ import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.pushers.TweetUpdateChecker
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.RssUtil
+import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.asMessageChain
+import net.mamoe.mirai.message.uploadAsGroupVoice
+import java.io.File
 import java.io.IOException
 import kotlin.time.ExperimentalTime
 
@@ -58,7 +63,9 @@ class DebugCommand : ChatCommand {
                     return ("彗星 Bot ${BotVariables.version}\n" +
                             "今日もかわいい~\n" +
                             "已注册命令数: ${CommandExecutor.countCommands()}\n" +
-                            BotUtil.getMemoryUsage()).convertToChain()
+                            BotUtil.getMemoryUsage() + "\n" +
+                            "与服务器的延迟为 ${NetUtil.checkPingValue()} ms"
+                            ).convertToChain()
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().convertToChain()
                 "switch" -> {
                     BotVariables.switch = !BotVariables.switch
@@ -82,12 +89,17 @@ class DebugCommand : ChatCommand {
                 "rss" -> {
                     if (args.size > 1) {
                         return RssUtil.simplifyHTML(
-                            RssUtil.getFromEntry(
-                                RssUtil.getEntryFromURL(args[1])
-                                    ?: return "Can't retrieve page content".convertToChain()
-                            )
+                                RssUtil.getFromEntry(
+                                        RssUtil.getEntryFromURL(args[1])
+                                                ?: return "Can't retrieve page content".convertToChain()
+                                )
                         ).convertToChain()
                     }
+                }
+                "watame" -> {
+                    val voice = File(FileUtil.getResourceFolder().toString() + "${File.separator}voice", "watame_janken.amr").inputStream()
+                    if (event is GroupMessageEvent)
+                        return voice.uploadAsGroupVoice(event.group).asMessageChain()
                 }
                 else -> return "Bot > 命令不存在\n${getHelp()}".convertToChain()
             }

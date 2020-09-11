@@ -12,8 +12,8 @@ import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.At
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.utils.MiraiLogger
 import org.apache.commons.lang3.StringUtils
 import java.time.Duration
 import java.time.LocalDateTime
@@ -26,6 +26,60 @@ import kotlin.time.toKotlinDuration
  *
  * @author Nameless
  */
+
+fun MiraiLogger.warningS(message: String?) {
+    if (cfg.debugMode) {
+        warning(message)
+    }
+}
+
+fun MiraiLogger.warningS(message: String?, throwable: Throwable?) {
+    if (cfg.debugMode) {
+        warning(message, throwable)
+    }
+}
+
+fun MiraiLogger.warningS(throwable: Throwable?) {
+    if (cfg.debugMode) {
+        warning(throwable)
+    }
+}
+
+fun MiraiLogger.debugS(message: String?) {
+    if (cfg.debugMode) {
+        debug(message)
+    }
+}
+
+fun MiraiLogger.debugS(throwable: Throwable?) {
+    if (cfg.debugMode) {
+        debug(throwable)
+    }
+}
+
+fun MiraiLogger.debugS(message: String?, throwable: Throwable?) {
+    if (cfg.debugMode) {
+        verbose(message, throwable)
+    }
+}
+
+fun MiraiLogger.verboseS(message: String?) {
+    if (cfg.debugMode) {
+        verbose(message)
+    }
+}
+
+fun MiraiLogger.verboseS(throwable: Throwable?) {
+    if (cfg.debugMode) {
+        verbose(throwable)
+    }
+}
+
+fun MiraiLogger.verboseS(message: String?, throwable: Throwable?) {
+    if (cfg.debugMode) {
+        verbose(message, throwable)
+    }
+}
 
 object BotUtil {
     /**
@@ -89,29 +143,27 @@ object BotUtil {
 
     fun sendMessageAsString(otherText: String?, addPrefix: Boolean = true): String {
         if (otherText.isNullOrEmpty()) return ""
-        val sb = StringBuilder()
-        if (addPrefix) sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
-        sb.append(otherText)
-        return sb.toString().trim()
+        return StringBuilder().apply {
+            if (addPrefix) {
+                append(getLocalMessage("msg.bot-prefix")).append(" ")
+            }
+            append(otherText)
+        }.toString().trim()
     }
 
-    fun sendMessage(otherText: String?, addPrefix: Boolean = true): MessageChain {
-        if (otherText.isNullOrEmpty()) return EmptyMessageChain
-        val sb = StringBuilder()
-        if (addPrefix) sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
-        sb.append(otherText)
-        return sb.toString().trim().convertToChain()
-    }
+    fun sendMessage(otherText: String?, addPrefix: Boolean = true): MessageChain = sendMessageAsString(otherText, addPrefix).convertToChain()
+
 
     fun sendMessage(vararg otherText: String?, addPrefix: Boolean): MessageChain {
         if (!otherText.isNullOrEmpty()) return "".convertToChain()
 
-        val sb = StringBuilder()
-        if (addPrefix) sb.append(getLocalMessage("msg.bot-prefix")).append(" ")
-        otherText.forEach {
-            sb.append(it).append("\n")
-        }
-        return sb.toString().trim().convertToChain()
+        return StringBuilder().apply {
+            if (addPrefix) append(getLocalMessage("msg.bot-prefix")).append(" ")
+            otherText.forEach {
+                append(it).append("\n")
+            }
+        }.toString().trim().convertToChain()
+
     }
 
     /**
@@ -130,15 +182,15 @@ object BotUtil {
     }
 
     fun List<String>.getRestString(startAt: Int): String {
-        val sb = StringBuilder()
-        if (this.size == 1) {
-            return this[0]
+        if (size == 1) {
+            return this[0].trim()
         }
 
-        for (index in startAt until this.size) {
-            sb.append(this[index]).append(" ")
-        }
-        return sb.toString().trim()
+        return StringBuilder().apply {
+            for (index in startAt until size) {
+                append(this[index]).append(" ")
+            }
+        }.toString().trim()
     }
 
     @ExperimentalTime

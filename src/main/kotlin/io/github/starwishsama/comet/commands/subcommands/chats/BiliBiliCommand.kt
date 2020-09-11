@@ -1,13 +1,15 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
-import io.github.starwishsama.comet.api.bilibili.BiliBiliApi
-import io.github.starwishsama.comet.api.bilibili.FakeClientApi
+import io.github.starwishsama.bilibiliapi.FakeClientApi
+import io.github.starwishsama.bilibiliapi.LiveApi
+import io.github.starwishsama.bilibiliapi.MainApi
+import io.github.starwishsama.bilibiliapi.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.MessageWrapper
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
@@ -43,7 +45,7 @@ class BiliBiliCommand : ChatCommand {
                                 val before = item.title + "\n粉丝数: " + item.fans +
                                         "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
                                         "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") + "\n"
-                                val dynamic = BiliBiliApi.getDynamic(item.mid)
+                                val dynamic = MainApi.getDynamic(item.mid)
                                 before.convertToChain() + getDynamicText(dynamic, event)
                             } else {
                                 BotUtil.sendMessage("找不到对应的B站用户")
@@ -147,28 +149,28 @@ class BiliBiliCommand : ChatCommand {
         }
     }
 
-    private suspend fun getLiveStatus(event: MessageEvent): MessageChain {
+    private fun getLiveStatus(event: MessageEvent): MessageChain {
         if (event !is GroupMessageEvent) return BotUtil.sendMessage("只能在群里查看订阅列表")
 
         val subs = StringBuilder("监控室列表:\n")
-        val info = ArrayList<com.hiczp.bilibili.api.live.model.RoomInfo>()
+        val info = ArrayList<LiveRoomInfo.LiveRoomInfoData>()
 
         val cfg = GroupConfigManager.getConfigSafely(event.group.id)
 
         if (cfg.biliSubscribers.isNotEmpty()) {
             for (roomId in cfg.biliSubscribers) {
-                val room = FakeClientApi.getLiveRoom(roomId)
+                val room = LiveApi.getLiveInfo(roomId)
                 if (room != null) {
-                    info.add(room)
+                    info.add(room.data)
                 }
             }
 
-            info.sortByDescending { it.data.liveStatus == 1 }
+            info.sortByDescending { it.liveStatus == 1 }
 
             for (roomInfo in info) {
                 subs.append(
-                    "${BiliBiliApi.getUserNameByMid(roomInfo.data.uid)} " +
-                            "${if (roomInfo.data.liveStatus == 1) "✔" else "✘"}\n"
+                        "${MainApi.getUserNameByMid(roomInfo.uid)} " +
+                                "${if (roomInfo.isLiveNow()) "✔" else "✘"}\n"
                 )
             }
 
@@ -206,7 +208,7 @@ class BiliBiliCommand : ChatCommand {
             cfg.biliSubscribers.add(rid)
         }
 
-        return BotUtil.sendMessage("订阅 ${if (name.isNotBlank()) name else BiliBiliApi.getUserNameByMid(rid)}($rid) 成功")
+        return BotUtil.sendMessage("订阅 ${if (name.isNotBlank()) name else MainApi.getUserNameByMid(rid)}($rid) 成功")
     }
 
 }

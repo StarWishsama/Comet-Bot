@@ -87,13 +87,19 @@ object CommandExecutor {
         val message = event.message.contentToString()
         val cmd = getCommand(getCommandName(message))
 
-        if (BotVariables.switch || (cmd != null && cmd.getProps().name.contentEquals("debug"))) {
+        if (BotVariables.switch || (cmd?.getProps()?.name?.contentEquals("debug") == true)) {
             try {
                 val session = SessionManager.getSessionByEvent(event)
+
+                /**
+                 * 如果不是监听会话, 则停止尝试执行可能的命令
+                 * 反之在监听时仍然可以执行命令
+                 */
                 if (session != null && !handleSession(event, executedTime)) {
                     return ExecutedResult(EmptyMessageChain, cmd)
                 }
 
+                /** 检查是否在尝试执行被禁用命令 */
                 if (cmd != null && event is GroupMessageEvent &&
                         GroupConfigManager.getConfigSafely(event.group.id).isDisabledCommand(cmd)) {
                     return ExecutedResult(EmptyMessageChain, cmd)
@@ -167,8 +173,7 @@ object CommandExecutor {
             if (session != null) {
                 val command = session.command
                 if (command is SuspendCommand) {
-                    val user = BotUser.getUserSafely(sender.id)
-                    command.handleInput(event, user, session)
+                    command.handleInput(event, BotUser.getUserSafely(sender.id), session)
                 }
 
                 return session is DaemonSession
@@ -184,10 +189,11 @@ object CommandExecutor {
     }
 
     fun getCommand(cmdPrefix: String): ChatCommand? {
-        for (command in commands) {
+        commands.forEach { command ->
             if (commandEquals(command, cmdPrefix)) {
                 return command
             }
+
         }
         return null
     }

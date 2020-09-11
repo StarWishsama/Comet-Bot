@@ -9,7 +9,6 @@ import io.github.starwishsama.comet.objects.draw.PCRCharacter
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.objects.group.Shop
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
-import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.getContext
 import io.github.starwishsama.comet.utils.writeString
 import net.kronos.rkon.core.Rcon
@@ -30,20 +29,20 @@ import java.util.concurrent.ScheduledExecutorService
  */
 
 object BotVariables {
-    val filePath: File = FileUtil.getJarLocation()
-    const val version = "0.5.1-DEV-f404bf6-20200827"
+    lateinit var filePath: File
+    const val version = "0.5.3-DEV-27904fa-20200906"
     lateinit var bot: Bot
 
     fun isBotInitialized(): Boolean = ::bot.isInitialized
 
     lateinit var startTime: LocalDateTime
     var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
-            4,
+            8,
             BasicThreadFactory.Builder()
                     .namingPattern("comet-service-%d")
                     .daemon(true)
-                    .uncaughtExceptionHandler { thread, t ->
-                        daemonLogger.warning("线程 ${thread.name} 在运行时发生了错误", t)
+                    .uncaughtExceptionHandler { thread, throwable ->
+                        daemonLogger.warning("线程 ${thread.name} 在运行时发生了错误", throwable)
                     }.build()
     )
     lateinit var logger: MiraiLogger
@@ -58,6 +57,8 @@ object BotVariables {
     val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
     var rCon: Rcon? = null
     lateinit var log: File
+
+    fun isLogInitialized(): Boolean = ::log.isInitialized
 
     var shop: MutableList<Shop> = LinkedList()
     val users: MutableList<BotUser> = LinkedList()

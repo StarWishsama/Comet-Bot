@@ -19,6 +19,7 @@ import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.isType
 import io.github.starwishsama.comet.utils.network.isUsable
+import io.github.starwishsama.comet.utils.verboseS
 import java.io.IOException
 import java.net.Socket
 import java.time.Duration
@@ -74,7 +75,7 @@ object TwitterApi : ApiExecutor {
             if (JsonParser.parseString(result).isJsonObject) {
                 // Get Token
                 token = JsonParser.parseString(result).asJsonObject["access_token"].asString
-                logger.debug("[蓝鸟] 成功获取 Access Token")
+                logger.info("[蓝鸟] 成功获取 Access Token")
             }
         } catch (e: IOException) {
             logger.warning("获取 Token 时出现问题", e)
@@ -115,11 +116,11 @@ object TwitterApi : ApiExecutor {
             if (!NetUtil.isTimeout(t)) {
                 FileUtil.createErrorReportFile("twitter", t, bodyCopy, url)
             } else {
-                daemonLogger.verbose("[蓝鸟] 在获取用户信息时连接超时")
+                daemonLogger.verboseS("[蓝鸟] 在获取用户信息时连接超时")
             }
         }
 
-        daemonLogger.verbose("[蓝鸟] 查询用户信息耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+        daemonLogger.verboseS("[蓝鸟] 查询用户信息耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
         return null
     }
 
@@ -212,7 +213,7 @@ object TwitterApi : ApiExecutor {
                 if (list.isNotEmpty()) list[index] else throw EmptyTweetException("返回的推文列表为空")
             }
 
-            if (!isCache) logger.verbose("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+            if (!isCache) logger.verboseS("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
 
             tweet = result
         } catch (x: TwitterApiException) {
@@ -244,8 +245,7 @@ object TwitterApi : ApiExecutor {
             try {
                 (gson.fromJson(json, object : TypeToken<List<Tweet>>() {}.type) as List<Tweet>)
             } catch (t: Throwable) {
-                logger.error("[推文] 在解析推文时出现了问题", t)
-                FileUtil.createErrorReportFile("tweet", t, json, url)
+                FileUtil.createErrorReportFile("在解析推文时出现了问题", "tweet", t, json, url)
                 return emptyList()
             }
         }

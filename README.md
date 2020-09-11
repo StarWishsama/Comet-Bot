@@ -64,7 +64,7 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
 
 **本项目禁止被用于进行违反中华人民共和国法律法规的行为**
 
-本项目使用 [AGPLv3 with Mamoe Exceptions](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE) 协议
+本项目使用 [AGPLv3](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE) 协议
 
 ------
 

@@ -8,8 +8,11 @@ package io.github.starwishsama.comet.api
  */
 interface ApiExecutor {
     var usedTime: Int
-    fun isReachLimit() : Boolean
-    fun getLimitTime() : Int
+    fun isReachLimit(): Boolean {
+        return usedTime > getLimitTime()
+    }
+
+    fun getLimitTime(): Int
     fun resetTime() {
         usedTime = 0
     }

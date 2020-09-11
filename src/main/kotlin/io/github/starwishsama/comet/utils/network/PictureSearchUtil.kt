@@ -53,7 +53,8 @@ object PictureSearchUtil {
         val sources = elements.select(".info-box")[1].select("a")
         val original: String
         try {
-            imgUrl = "https://ascii2d.net/" + elements.select(".image-box")[1].select("img")[0].attributes()["src"]
+            imgUrl =
+                "https://ascii2d.net/" + elements.select(".image-box")[1].select("img")[0].attributes()["src"]
             original = sources[0].attributes()["href"]
         } catch (ignored: IndexOutOfBoundsException) {
             return PicSearchResult.emptyResult()

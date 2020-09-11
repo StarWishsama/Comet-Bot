@@ -4,6 +4,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.asMessageChain
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 
@@ -23,7 +24,7 @@ object StringUtil {
      * 来自 Mirai 的 asHumanReadable
      */
     @ExperimentalTime
-    fun kotlin.time.Duration.toFriendly(maxUnit: DurationUnit = TimeUnit.SECONDS): String {
+    fun Duration.toFriendly(maxUnit: DurationUnit = TimeUnit.SECONDS): String {
         val days = toInt(DurationUnit.DAYS)
         val hours = toInt(DurationUnit.HOURS) % 24
         val minutes = toInt(DurationUnit.MINUTES) % 60
@@ -34,7 +35,7 @@ object StringUtil {
             if (hours != 0 && maxUnit >= TimeUnit.HOURS) append("${hours}时")
             if (minutes != 0 && maxUnit >= TimeUnit.MINUTES) append("${minutes}分")
             if (seconds != 0 && maxUnit >= TimeUnit.SECONDS) append("${seconds}秒")
-            append("${ms}毫秒")
+            if (maxUnit >= TimeUnit.MILLISECONDS) append("${ms}毫秒")
         }
     }
 

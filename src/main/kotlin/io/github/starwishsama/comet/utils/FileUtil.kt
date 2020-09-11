@@ -8,9 +8,12 @@ import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
 import java.io.File
 import java.io.IOException
-import java.io.InputStream
+import java.net.URL
+import java.nio.file.*
+import java.nio.file.attribute.BasicFileAttributes
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+
 
 fun File.writeClassToJson(context: Any) {
     if (!this.exists()) {
@@ -71,21 +74,24 @@ object FileUtil {
 
         location.createNewFile()
 
-        val report = "Error occurred:\nExtra message: $message\n${getBeautyStackTrace(t)}\n\nRaw content:\n$content"
+        val report = "Error occurred:\n${getBeautyStackTrace(t)}\nExtra message: $message\n\nRaw content:\n$content"
         location.writeString(report)
         daemonLogger.info("$reason, 错误报告已生成! 保存在 ${location.path}")
         daemonLogger.info("你可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")
     }
 
-    fun initLog() {
+    fun initLog(): File? {
         try {
             val initTime = LocalDateTime.now()
             val parent = getChildFolder("logs")
             BotVariables.log = File(parent, "log-${dateFormatter.format(initTime)}.log")
             BotVariables.log.createNewFile()
+            return BotVariables.log
         } catch (e: IOException) {
             daemonLogger.error("初始化 Log 文件失败")
         }
+
+        return null
     }
 
     fun getJarLocation(): File {
@@ -111,7 +117,7 @@ object FileUtil {
     private fun getBeautyStackTrace(exception: Throwable): String {
         val sb = StringBuilder()
         sb.append("========================= StackTrace =========================\n")
-        sb.append("Exception Type ▶\n")
+        sb.append("异常类型 ▶\n")
         sb.append(exception.toString() + "\n")
         sb.append("\n")
         var lastPackage = ""
@@ -132,9 +138,9 @@ object FileUtil {
             if (packageName.toString() != lastPackage) {
                 lastPackage = packageName.toString()
                 sb.append("\n")
-                sb.append("Package $packageName ▶\n")
+                sb.append("包名 $packageName ▶\n")
             }
-            sb.append("  ▶ at Class " + className + ", Method " + elem.methodName + ". (" + elem.fileName + ", Line " + elem.lineNumber + ")" + "\n")
+            sb.append("  ▶ 在类 " + className + ", 方法 " + elem.methodName + ". (" + elem.fileName + ", 行 " + elem.lineNumber + ")" + "\n")
 
         }
         sb.append("========================= StackTrace =========================\n")
@@ -142,18 +148,84 @@ object FileUtil {
         return sb.toString()
     }
 
-    fun createBlankFile(location: File) {
+    fun createBlankFile(location: File): File {
         if (!location.exists()) location.createNewFile()
+        return location
     }
 
-    fun getFileAsStreamInJar(fileName: String): StreamWithName? {
-        val stream = Thread.currentThread().contextClassLoader.getResourceAsStream(fileName)
-        if (stream != null) {
-            return StreamWithName(stream, fileName)
+    fun initResourceFile() {
+        try {
+            val resourcePath = "resources"
+            val jarFile = File(Comet.javaClass.protectionDomain.codeSource.location.path)
+
+            if (jarFile.isFile) {
+                copyFromJar(jarFile = jarFile.toPath(), target = getResourceFolder().toPath())
+            } else { // Run with IDE
+                val url: URL = ClassLoader.getSystemResource("/$resourcePath")
+                val apps = File(url.toURI())
+                for (app in apps.listFiles() ?: return) {
+                    copyFolder(app, getResourceFolder())
+                }
+            }
+        } catch (t: Throwable) {
+            daemonLogger.info("无法复制资源文件, 部分需要图片资源的功能将无法使用")
+            daemonLogger.warningS("Cannot copy resources files", t)
         }
-
-        return null
     }
 
-    data class StreamWithName(val stream: InputStream, val name: String)
+    /**
+     * 复制文件/文件夹至目标位置
+     */
+    private fun copyFolder(source: File, target: File) {
+        if (source.isDirectory) {
+            if (!target.exists()) {
+                target.mkdir()
+            }
+
+            source.list()?.forEach { file ->
+                val srcFile = File(source, file)
+                val destFile = File(target, file)
+                // 递归复制
+                copyFolder(srcFile, destFile)
+            }
+        } else {
+            Files.copy(source.toPath(), target.toPath())
+        }
+    }
+
+    /**
+     * 从 jar 中取出文件/文件夹到指定位置
+     *
+     * 注意: 该方法与部分 JDK 不兼容! (已知 Oracle JRE 8 @Windows Server 2019 会报错)
+     */
+    private fun copyFromJar(jarFile: Path, source: String = "resources", target: Path) {
+        val fileSystem = FileSystems.newFileSystem(jarFile, null)
+        val jarPath: Path = fileSystem.getPath(source)
+
+        Files.walkFileTree(jarPath, object : SimpleFileVisitor<Path>() {
+            override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
+                try {
+                    val relative = jarPath.relativize(dir)
+                    val currentTarget = target.resolve(relative.toString())
+                    Files.createDirectories(currentTarget)
+                } catch (e: IllegalArgumentException) {
+                    daemonLogger.warningS("Can't create dir ${dir.fileName} from jar", e)
+                } finally {
+                    return FileVisitResult.CONTINUE
+                }
+            }
+
+            override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
+                try {
+                    val relative = jarPath.relativize(file)
+                    val copyTarget = target.resolve(relative.toString())
+                    Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE)
+                } catch (e: IllegalArgumentException) {
+                    daemonLogger.warningS("Can't copy ${file.fileName} from jar", e)
+                } finally {
+                    return FileVisitResult.CONTINUE
+                }
+            }
+        })
+    }
 }

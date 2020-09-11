@@ -54,6 +54,7 @@ class KickCommand : ChatCommand {
 
     override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean {
         if (super.hasPermission(botUser, e)) return true
+
         if (e is GroupMessageEvent) {
             if (e.sender.permission > MemberPermission.MEMBER) return true
             val cfg = GroupConfigManager.getConfigSafely(e.group.id)

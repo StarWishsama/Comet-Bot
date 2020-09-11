@@ -1,16 +1,15 @@
 package io.github.starwishsama.comet.objects.checkin
 
-import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
-import net.mamoe.mirai.message.data.MessageChain
 import java.time.LocalDateTime
 
 class ClockInData(var startTime: LocalDateTime, var endTime: LocalDateTime, private var groupUsers: List<Member>) {
     var checkedUsers = arrayListOf<Member>()
     var lateUsers = arrayListOf<Member>()
 
-    fun viewData(): MessageChain {
+    fun viewData(): MessageWrapper {
         val checkedCount = checkedUsers.size
         var lateText = StringBuilder()
         var unCheckedText = StringBuilder()
@@ -39,6 +38,6 @@ class ClockInData(var startTime: LocalDateTime, var endTime: LocalDateTime, priv
             unCheckedText = StringBuilder("无")
         }
 
-        return BotUtil.sendMessage("最近一次打卡的数据:\n已打卡人数: $checkedCount\n迟到: $lateText\n未打卡: $unCheckedText")
+        return MessageWrapper("最近一次打卡的数据:\n已打卡人数: $checkedCount\n迟到: $lateText\n未打卡: $unCheckedText")
     }
 }

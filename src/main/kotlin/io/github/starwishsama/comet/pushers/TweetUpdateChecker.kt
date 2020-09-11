@@ -11,6 +11,7 @@ import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
+import io.github.starwishsama.comet.utils.verboseS
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -60,16 +61,16 @@ object TweetUpdateChecker : CometPusher {
                     if (!NetUtil.isTimeout(t)) {
                         when (t) {
                             is RateLimitException -> daemonLogger.verbose(t.message)
-                            else -> daemonLogger.verbose("[推文] 在尝试获取推文时出现了意外", t)
+                            else -> daemonLogger.verboseS("[推文] 在尝试获取推文时出现了意外", t)
                         }
                     } else {
-                        daemonLogger.verbose("[推文] 获取推文时连接超时")
+                        daemonLogger.verboseS("[推文] 获取推文时连接超时")
                     }
                 }
             }
         }
 
-        if (count > 0) daemonLogger.verbose("Retrieve success, have collected $count tweet(s)!")
+        if (count > 0) daemonLogger.verboseS("Retrieve success, have collected $count tweet(s)!")
 
         push()
     }
@@ -89,7 +90,7 @@ object TweetUpdateChecker : CometPusher {
             }
         }
 
-        if (count > 0) daemonLogger.verbose("Push success, have pushed $count group(s)!")
+        if (count > 0) daemonLogger.verboseS("Push success, have pushed $count group(s)!")
     }
 
     @ExperimentalTime
@@ -99,15 +100,15 @@ object TweetUpdateChecker : CometPusher {
         groupsToPush.forEach {
             val group = bot.getGroupOrNull(it)
             if (group != null) {
-                val image = NetUtil.getUrlInputStream(content.getPictureUrl())?.uploadAsImage(group)
-                val filtered = PlainText("${content.user.name}\n") + content.getFullText().convertToChain().doFilter()
+                val image = content.getPictureUrl()?.let { url -> NetUtil.getUrlInputStream(url)?.uploadAsImage(group) }
+                val filtered = PlainText("${content.user.name} 发布了一条推文\n") + content.getFullText().convertToChain().doFilter()
                 try {
                     if (image != null) group.sendMessage(filtered + image)
                     else group.sendMessage(filtered)
                     successCount++
                     delay(2_500)
                 } catch (t: Throwable) {
-                    daemonLogger.verbose("Push tweet failed, ${t.message}")
+                    daemonLogger.verboseS("Push tweet failed, ${t.message}")
                 }
             }
         }
@@ -125,6 +126,6 @@ object TweetUpdateChecker : CometPusher {
         previous?.let {
             isShortInterval = Duration.between(it.getSentTime(), retrieve.getSentTime()).toMinutes() >= 5
         }
-        return isTooOld && isShortInterval
+        return isTooOld || isShortInterval
     }
 }

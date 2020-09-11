@@ -2,6 +2,7 @@ buildscript {
     repositories {
         jcenter()
         mavenCentral()
+        google()
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
@@ -12,7 +13,7 @@ plugins {
     id 'java'
     id "com.github.johnrengelman.shadow" version "5.2.0"
     id 'org.jetbrains.kotlin.jvm' version "1.4.0"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.4.0"
+    id 'org.jetbrains.kotlin.plugin.serialization' version "1.4.0"
 }
 
 jar {
@@ -22,7 +23,7 @@ jar {
 }
 
 def gitCommitId = 'git rev-parse --short HEAD'
-def versionCode = "0.5.1-DEV-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
+def versionCode = "0.5.3-DEV-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
 
 group 'io.github.starwishsama.comet'
 version versionCode
@@ -33,6 +34,7 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     jcenter()
     mavenCentral()
+    google()
     mavenLocal()
 }
 
@@ -61,7 +63,7 @@ static def findOldVersionStr(path) {
 jar.dependsOn updateVersion
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
     implementation 'net.mamoe:mirai-core:1.2.2'
@@ -75,15 +77,22 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
     // kaml @ https://github.com/charleskorn/kaml
     implementation 'com.charleskorn.kaml:kaml:0.19.0'
+    // yamlkt @ https://github.com/him188/yamlkt
+    //implementation("net.mamoe.yamlkt:yamlkt:0.5.0")
+    // kotson @ https://github.com/SalomonBrys/Kotson
+    implementation 'com.github.salomonbrys.kotson:kotson:2.5.0'
 
     // CUrl
     implementation 'com.github.rockswang:java-curl:1.2.2.2'
 
     // BiliBili-Api @ https://github.com/czp3009/bilibili-api
-    implementation 'com.hiczp:bilibili-api:0.2.0'
+    api 'com.hiczp:bilibili-api:0.1.3'
 
     // jsoup HTML parser library @ https://jsoup.org/
     implementation 'org.jsoup:jsoup:1.13.1'
+
+    // Retrofit A type-safe HTTP client for Android and Java @ https://github.com/square/retrofit/
+    //implementation 'com.squareup.retrofit2:retrofit:2.9.0'
 
     // RomeTool for RSS @ https://github.com/rometools/rome
     implementation 'com.rometools:rome:1.15.0'
@@ -95,10 +104,17 @@ dependencies {
 
 shadowJar {
     zip64 true
-    exclude("README", "README.md", "NOTICE.txt", "LICENSE", "LICENSE.txt", "CHANGES")
+    exclude("META-INF/README")
+    exclude("META-INF/NOTICE.txt")
+    exclude("META-INF/README.md")
+    exclude("META-INF/LICENSE")
+    exclude("META-INF/LICENSE.txt")
+    exclude("META-INF/CHANGES")
 }
 
-compileKotlin.kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_1_8
-    freeCompilerArgs = ["-Xjvm-default=enable", "-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses"]
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+        freeCompilerArgs = ["-Xjvm-default=enable", "-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses"]
+    }
 }
