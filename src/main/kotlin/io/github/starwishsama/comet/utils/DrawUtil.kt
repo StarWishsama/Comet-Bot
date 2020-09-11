@@ -20,7 +20,7 @@ object DrawUtil {
      */
 
     /**
-     * 单抽
+     * 十连
      */
     private fun arkNightTenDraw(): List<ArkNightOperator> {
         val ops: MutableList<ArkNightOperator> = ArrayList()
@@ -31,7 +31,7 @@ object DrawUtil {
     }
 
     /**
-     * 十连
+     * 单抽
      */
     private fun arkNightDraw(): ArkNightOperator {
         val probability = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
@@ -68,7 +68,7 @@ object DrawUtil {
             when (time) {
                 1 -> {
                     user.decreaseTime()
-                    var ark: ArkNightOperator = arkNightDraw()
+                    val ark: ArkNightOperator = arkNightDraw()
                     result.add(ark)
                     return result
                 }
@@ -86,7 +86,7 @@ object DrawUtil {
      * 根据抽卡结果合成图片
      */
     fun getArkImage(list: List<ArkNightOperator>): BufferedImage {
-        val zoom:Int = 2
+        val zoom = 2
         //缩小图片大小，减少流量消耗
         val newBufferedImage: BufferedImage = if (list.size == 1){
             BufferedImage(256/zoom, 728/zoom, BufferedImage.TYPE_INT_RGB)
@@ -97,18 +97,18 @@ object DrawUtil {
         val createGraphics = newBufferedImage.createGraphics()
 
         var newBufferedImageWidth = 0
-        var newBufferedImageHeight = 0
+        val newBufferedImageHeight = 0
 
-        for ((index, i) in list.withIndex()) {
+        for (i in list) {
             val file = File(FileUtil.getChildFolder("res${File.separator}" + i.rare), i.name + ".jpg")
             val inStream: InputStream = file.inputStream()
 
             val bufferedImage: BufferedImage = ImageIO.read(inStream)
 
-            val imageWidth = bufferedImage.width/zoom
-            val imageHeight = bufferedImage.height/zoom
+            val imageWidth = bufferedImage.width / zoom
+            val imageHeight = bufferedImage.height / zoom
 
-            createGraphics.drawImage(bufferedImage.getScaledInstance(imageWidth,imageHeight,java.awt.Image.SCALE_SMOOTH), newBufferedImageWidth, newBufferedImageHeight, imageWidth, imageHeight, null)
+            createGraphics.drawImage(bufferedImage.getScaledInstance(imageWidth, imageHeight, java.awt.Image.SCALE_SMOOTH), newBufferedImageWidth, newBufferedImageHeight, imageWidth, imageHeight, null)
 
             newBufferedImageWidth += imageWidth
 

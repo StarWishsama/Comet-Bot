@@ -12,6 +12,7 @@ import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.upload
 import org.apache.commons.lang3.StringUtils
 import java.awt.image.BufferedImage
@@ -25,46 +26,36 @@ class ArkCommand : ChatCommand {
             if (args.isNotEmpty()) {
                 when (args[0]) {
                     "单次寻访" -> {
-                        if (BotVariables.cfg.getArkDrawUseImage){
+                        return if (BotVariables.cfg.arkDrawUseImage) {
                             val list = DrawUtil.getArkDrawResultToImage(user, 1)
                             if (list.isNotEmpty()) {
                                 val image: BufferedImage = DrawUtil.getArkImage(list)
                                 val result = image.upload(event.subject)
-                                event.reply(result)
+                                result.asMessageChain()
                             } else {
-                                event.reply(overTimeMessage)
+                                overTimeMessage.convertToChain()
                             }
-                        }else{
-                            event.reply(
-                                DrawUtil.getArkDrawResult(
-                                    user,
-                                    1
-                                )
-                            )
+                        } else {
+                            DrawUtil.getArkDrawResult(user, 1).convertToChain()
                         }
                     }
                     "十连寻访" -> {
-                        if (BotVariables.cfg.getArkDrawUseImage){
+                        return if (BotVariables.cfg.arkDrawUseImage) {
                             val list: List<ArkNightOperator> = DrawUtil.getArkDrawResultToImage(user, 10)
                             if (list.isNotEmpty()) {
                                 val image: BufferedImage = DrawUtil.getArkImage(list)
                                 val result = image.upload(event.subject)
-                                event.reply(result)
+                                result.asMessageChain()
                             } else {
-                                event.reply(overTimeMessage)
+                                overTimeMessage.convertToChain()
                             }
-                        }else{
-                            event.reply(
-                                DrawUtil.getArkDrawResult(
-                                    user,
-                                    10
-                                )
-                            )
+                        } else {
+                            DrawUtil.getArkDrawResult(user, 10).convertToChain()
                         }
                     }
                     else -> {
-                        if (StringUtils.isNumeric(args[0])) {
-                            event.reply(DrawUtil.getArkDrawResult(user, args[0].toInt()))
+                        return if (StringUtils.isNumeric(args[0])) {
+                            DrawUtil.getArkDrawResult(user, args[0].toInt()).convertToChain()
                         } else {
                             getHelp().convertToChain()
                         }
@@ -78,7 +69,7 @@ class ArkCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("arkNights", arrayListOf("ark", "xf", "方舟寻访"), "明日方舟寻访模拟器", "nbot.commands.draw", UserLevel.USER)
+            CommandProps("arkNights", arrayListOf("ark", "xf", "方舟寻访"), "明日方舟寻访模拟器", "nbot.commands.draw", UserLevel.USER)
 
     override fun getHelp(): String = """
          ============ 命令帮助 ============
