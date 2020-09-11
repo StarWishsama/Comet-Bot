@@ -88,6 +88,9 @@ data class Config(
         //@Comment("查询 Twitter 用户动态间隔时间")
         var twitterInterval: Long = 4,
 
+        //@Comment("明日方舟抽卡模拟器是否使用图片")
+        var getArkDrawUseImage: Boolean = true
+  
         //@Comment("调试模式")
         var debugMode: Boolean = false
 )

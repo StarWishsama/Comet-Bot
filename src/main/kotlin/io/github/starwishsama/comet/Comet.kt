@@ -140,33 +140,34 @@ object Comet {
         setupRCon()
 
         CommandExecutor.setupCommand(
-                arrayOf(
-                        AdminCommand(),
-                        BiliBiliCommand(),
-                        CheckInCommand(),
-                        ClockInCommand(),
-                        io.github.starwishsama.comet.commands.subcommands.chats.DebugCommand(),
-                        DivineCommand(),
-                        GachaCommand(),
-                        GuessNumberCommand(),
-                        HelpCommand(),
-                        InfoCommand(),
-                        MusicCommand(),
-                        MuteCommand(),
-                        PictureSearch(),
-                        R6SCommand(),
-                        RConCommand(),
-                        KickCommand(),
-                        TwitterCommand(),
-                        VersionCommand(),
-                        GroupConfigCommand(),
-                        RSPCommand(),
-                        RollCommand(),
-                        // Console Command
-                        StopCommand(),
-                        DebugCommand(),
-                        io.github.starwishsama.comet.commands.subcommands.console.AdminCommand()
-                )
+            arrayOf(
+                AdminCommand(),
+                ArkCommand(),
+                BiliBiliCommand(),
+                CheckInCommand(),
+                ClockInCommand(),
+                io.github.starwishsama.comet.commands.subcommands.chats.DebugCommand(),
+                DivineCommand(),
+                GachaCommand(),
+                GuessNumberCommand(),
+                HelpCommand(),
+                InfoCommand(),
+                MusicCommand(),
+                MuteCommand(),
+                PictureSearch(),
+                R6SCommand(),
+                RConCommand(),
+                KickCommand(),
+                TwitterCommand(),
+                VersionCommand(),
+                GroupConfigCommand(),
+                RSPCommand(),
+                RollCommand(),
+                // Console Command
+                StopCommand(),
+                DebugCommand(),
+                io.github.starwishsama.comet.commands.subcommands.console.AdminCommand()
+            )
         )
 
         logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
@@ -222,7 +223,7 @@ suspend fun main() {
     filePath = FileUtil.getJarLocation()
     startTime = LocalDateTime.now()
     println(
-            """
+        """
         
            ______                     __ 
           / ____/___  ____ ___  ___  / /_

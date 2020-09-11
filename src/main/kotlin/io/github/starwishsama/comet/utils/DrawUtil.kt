@@ -6,13 +6,21 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.ArkNightOperator
 import io.github.starwishsama.comet.objects.draw.PCRCharacter
+import java.awt.image.BufferedImage
+import java.io.File
+import java.io.InputStream
 import java.math.RoundingMode
 import java.util.*
 import java.util.stream.Collectors
+import javax.imageio.ImageIO
 
 object DrawUtil {
     /**
      * 明日方舟
+     */
+
+    /**
+     * 单抽
      */
     private fun arkNightTenDraw(): List<ArkNightOperator> {
         val ops: MutableList<ArkNightOperator> = ArrayList()
@@ -22,18 +30,24 @@ object DrawUtil {
         return ops
     }
 
+    /**
+     * 十连
+     */
     private fun arkNightDraw(): ArkNightOperator {
         val probability = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
         val rare: Int
         rare = when (probability) {
             in 0.48..0.50 -> 6
             in 0.0..0.08 -> 5
-            in 0.40..0.50 -> 4
+            in 0.40..0.90 -> 4
             else -> 3
         }
         return getOperator(rare)
     }
 
+    /**
+     * 抽卡方法
+     */
     private fun getOperator(rare: Int): ArkNightOperator {
         val ops: List<ArkNightOperator> = BotVariables.arkNight
         val tempOps: MutableList<ArkNightOperator> = LinkedList()
@@ -45,6 +59,69 @@ object DrawUtil {
         return tempOps[RandomUtil.randomInt(1, tempOps.size)]
     }
 
+    /**
+     * 明日方舟抽卡，返回图片
+     */
+    fun getArkDrawResultToImage(user: BotUser, time: Int): LinkedList<ArkNightOperator> {
+        val result = LinkedList<ArkNightOperator>()
+        if (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000) {
+            when (time) {
+                1 -> {
+                    user.decreaseTime()
+                    var ark: ArkNightOperator = arkNightDraw()
+                    result.add(ark)
+                    return result
+                }
+                10 -> {
+                    result.addAll(arkNightTenDraw())
+                    user.decreaseTime(10)
+                    return result
+                }
+            }
+        }
+        return result
+    }
+
+    /**
+     * 根据抽卡结果合成图片
+     */
+    fun getArkImage(list: List<ArkNightOperator>): BufferedImage {
+        val zoom:Int = 2
+        //缩小图片大小，减少流量消耗
+        val newBufferedImage: BufferedImage = if (list.size == 1){
+            BufferedImage(256/zoom, 728/zoom, BufferedImage.TYPE_INT_RGB)
+        }else{
+            BufferedImage(2560/zoom, 728/zoom, BufferedImage.TYPE_INT_RGB)
+        }
+
+        val createGraphics = newBufferedImage.createGraphics()
+
+        var newBufferedImageWidth = 0
+        var newBufferedImageHeight = 0
+
+        for ((index, i) in list.withIndex()) {
+            val file = File(FileUtil.getChildFolder("res${File.separator}" + i.rare), i.name + ".jpg")
+            val inStream: InputStream = file.inputStream()
+
+            val bufferedImage: BufferedImage = ImageIO.read(inStream)
+
+            val imageWidth = bufferedImage.width/zoom
+            val imageHeight = bufferedImage.height/zoom
+
+            createGraphics.drawImage(bufferedImage.getScaledInstance(imageWidth,imageHeight,java.awt.Image.SCALE_SMOOTH), newBufferedImageWidth, newBufferedImageHeight, imageWidth, imageHeight, null)
+
+            newBufferedImageWidth += imageWidth
+
+        }
+
+        createGraphics.dispose()
+
+        return newBufferedImage
+
+    }
+    /**
+     * 明日方舟抽卡，返回文字
+     */
     fun getArkDrawResult(user: BotUser, time: Int): String {
         val overTimeMessage = "今日命令条数已达上限, 请等待条数自动恢复哦~\n" +
                 "命令条数现在每小时会恢复100次, 封顶1000次"
@@ -70,7 +147,7 @@ object DrawUtil {
                 else -> {
                     for (i in 0 until time) {
                         if (user.commandTime >= 1 || user.compareLevel(UserLevel.ADMIN)) {
-                            user.decreaseTime(1)
+//                            user.decreaseTime(1)
                             if (i == 50) {
                                 r6Time = RandomUtil.randomInt(51, time - 1)
                             }
@@ -100,6 +177,7 @@ object DrawUtil {
             return overTimeMessage
         }
     }
+
 
     /**
      * 公主连结
