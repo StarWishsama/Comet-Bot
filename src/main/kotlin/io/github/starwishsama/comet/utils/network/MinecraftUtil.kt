@@ -52,7 +52,7 @@ object MinecraftUtil {
 
         /* 需要返回的状态 */
         if (id != 0x00) {
-            throw IOException("无效的数据包id")
+            throw IOException("无效的数据包 ID")
         }
         /* json 字符串长度 */
         val length = readVarInt(dataInputStream)

@@ -22,31 +22,25 @@ object DrawUtil {
     /**
      * 十连
      */
-    private fun arkNightTenDraw(): List<ArkNightOperator> {
-        val ops: MutableList<ArkNightOperator> = ArrayList()
-        for (i in 0..9) {
-            ops.add(arkNightDraw())
+    private fun arkNightDraw(time: Int = 1): List<ArkNightOperator> {
+        val result = mutableListOf<ArkNightOperator>()
+
+        repeat(time) {
+            val probability = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
+            val rare: Int
+            rare = when (probability) {
+                in 0.48..0.50 -> 6
+                in 0.0..0.08 -> 5
+                in 0.40..0.90 -> 4
+                else -> 3
+            }
+            result.add(getOperator(rare))
         }
-        return ops
+        return result
     }
 
     /**
-     * 单抽
-     */
-    private fun arkNightDraw(): ArkNightOperator {
-        val probability = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
-        val rare: Int
-        rare = when (probability) {
-            in 0.48..0.50 -> 6
-            in 0.0..0.08 -> 5
-            in 0.40..0.90 -> 4
-            else -> 3
-        }
-        return getOperator(rare)
-    }
-
-    /**
-     * 抽卡方法
+     * 抽取获取指定星级干员
      */
     private fun getOperator(rare: Int): ArkNightOperator {
         val ops: List<ArkNightOperator> = BotVariables.arkNight
@@ -56,7 +50,10 @@ object DrawUtil {
                 tempOps.add(op)
             }
         }
-        return tempOps[RandomUtil.randomInt(1, tempOps.size)]
+
+        val index = RandomUtil.randomInt(0, tempOps.size)
+
+        return tempOps[index]
     }
 
     /**
@@ -64,34 +61,36 @@ object DrawUtil {
      */
     fun getArkDrawResultToImage(user: BotUser, time: Int): LinkedList<ArkNightOperator> {
         val result = LinkedList<ArkNightOperator>()
+
         if (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000) {
-            when (time) {
-                1 -> {
-                    user.decreaseTime()
-                    val ark: ArkNightOperator = arkNightDraw()
-                    result.add(ark)
-                    return result
-                }
-                10 -> {
-                    result.addAll(arkNightTenDraw())
-                    user.decreaseTime(10)
-                    return result
-                }
+            val drawResult = arkNightDraw(time)
+
+            if (result.size < 2) {
+                result.add(drawResult[0])
+            } else {
+                result.addAll(drawResult)
             }
+
+            user.decreaseTime(time)
         }
+
         return result
     }
 
     /**
      * 根据抽卡结果合成图片
      */
-    fun getArkImage(list: List<ArkNightOperator>): BufferedImage {
+    fun combineArkOpImage(list: List<ArkNightOperator>): BufferedImage {
+        /**
+         * 缩小图片大小，减少流量消耗
+         */
         val zoom = 2
-        //缩小图片大小，减少流量消耗
-        val newBufferedImage: BufferedImage = if (list.size == 1){
-            BufferedImage(256/zoom, 728/zoom, BufferedImage.TYPE_INT_RGB)
-        }else{
-            BufferedImage(2560/zoom, 728/zoom, BufferedImage.TYPE_INT_RGB)
+        val height = 728 / zoom
+
+        val newBufferedImage: BufferedImage = if (list.size == 1) {
+            BufferedImage(256 / zoom, height, BufferedImage.TYPE_INT_RGB)
+        } else {
+            BufferedImage(2560 / zoom, height, BufferedImage.TYPE_INT_RGB)
         }
 
         val createGraphics = newBufferedImage.createGraphics()
@@ -132,11 +131,11 @@ object DrawUtil {
             when (time) {
                 1 -> {
                     user.decreaseTime()
-                    val (name, _, rare) = arkNightDraw()
+                    val (name, _, rare) = arkNightDraw(1)[0]
                     return name + " " + getStar(rare)
                 }
                 10 -> {
-                    result.addAll(arkNightTenDraw())
+                    result.addAll(arkNightDraw(10))
                     user.decreaseTime(10)
                     val sb = StringBuilder("十连结果:\n")
                     for ((name, _, rare) in result) {
@@ -155,7 +154,7 @@ object DrawUtil {
                             if (r6Time != 0 && i == r6Time) {
                                 result.add(getOperator(6))
                             } else {
-                                result.add(arkNightDraw())
+                                result.add(arkNightDraw(1)[0])
                             }
                         } else {
                             break

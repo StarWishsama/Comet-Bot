@@ -27,9 +27,10 @@ class ArkCommand : ChatCommand {
                 when (args[0]) {
                     "单次寻访" -> {
                         return if (BotVariables.cfg.arkDrawUseImage) {
+                            event.reply("请稍等...")
                             val list = DrawUtil.getArkDrawResultToImage(user, 1)
                             if (list.isNotEmpty()) {
-                                val image: BufferedImage = DrawUtil.getArkImage(list)
+                                val image: BufferedImage = DrawUtil.combineArkOpImage(list)
                                 val result = image.upload(event.subject)
                                 result.asMessageChain()
                             } else {
@@ -41,9 +42,10 @@ class ArkCommand : ChatCommand {
                     }
                     "十连寻访" -> {
                         return if (BotVariables.cfg.arkDrawUseImage) {
+                            event.reply("请稍等...")
                             val list: List<ArkNightOperator> = DrawUtil.getArkDrawResultToImage(user, 10)
                             if (list.isNotEmpty()) {
-                                val image: BufferedImage = DrawUtil.getArkImage(list)
+                                val image: BufferedImage = DrawUtil.combineArkOpImage(list)
                                 val result = image.upload(event.subject)
                                 result.asMessageChain()
                             } else {
@@ -69,7 +71,13 @@ class ArkCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-            CommandProps("arkNights", arrayListOf("ark", "xf", "方舟寻访"), "明日方舟寻访模拟器", "nbot.commands.draw", UserLevel.USER)
+        CommandProps(
+            "arkNights",
+            arrayListOf("ark", "xf", "方舟寻访"),
+            "明日方舟寻访模拟器",
+            "nbot.commands.arknight",
+            UserLevel.USER
+        )
 
     override fun getHelp(): String = """
          ============ 命令帮助 ============

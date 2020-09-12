@@ -26,8 +26,6 @@ object BiliLiveChecker : CometPusher {
     override var future: ScheduledFuture<*>? = null
 
     override fun retrieve() {
-        if (!bot.isOnline) future?.cancel(false)
-
         var count = 0
 
         val collectedUsers = mutableSetOf<Long>()

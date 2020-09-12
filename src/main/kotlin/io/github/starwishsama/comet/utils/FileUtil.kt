@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.utils
 import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
 import cn.hutool.core.net.URLDecoder
+import cn.hutool.crypto.SecureUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
@@ -13,7 +14,6 @@ import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
 
 fun File.writeClassToJson(context: Any) {
     if (!this.exists()) {
@@ -33,6 +33,11 @@ fun File.writeString(context: String) {
 
 fun File.getContext(): String {
     return FileReader.create(this).readString()
+}
+
+fun File.getMD5(): String {
+    require(exists())
+    return SecureUtil.md5(this)
 }
 
 /**
@@ -116,7 +121,7 @@ object FileUtil {
      */
     private fun getBeautyStackTrace(exception: Throwable): String {
         val sb = StringBuilder()
-        sb.append("========================= StackTrace =========================\n")
+        sb.append("========================= 栈轨迹 =========================\n")
         sb.append("异常类型 ▶\n")
         sb.append(exception.toString() + "\n")
         sb.append("\n")
@@ -143,7 +148,7 @@ object FileUtil {
             sb.append("  ▶ 在类 " + className + ", 方法 " + elem.methodName + ". (" + elem.fileName + ", 行 " + elem.lineNumber + ")" + "\n")
 
         }
-        sb.append("========================= StackTrace =========================\n")
+        sb.append("========================= 栈轨迹 =========================\n")
 
         return sb.toString()
     }
@@ -155,6 +160,7 @@ object FileUtil {
 
     fun initResourceFile() {
         try {
+            daemonLogger.info("正在加载资源文件...")
             val resourcePath = "resources"
             val jarFile = File(Comet.javaClass.protectionDomain.codeSource.location.path)
 
@@ -168,7 +174,7 @@ object FileUtil {
                 }
             }
         } catch (t: Throwable) {
-            daemonLogger.info("无法复制资源文件, 部分需要图片资源的功能将无法使用")
+            daemonLogger.info("加载资源文件失败, 部分需要图片资源的功能将无法使用")
             daemonLogger.warningS("Cannot copy resources files", t)
         }
     }
@@ -196,7 +202,7 @@ object FileUtil {
     /**
      * 从 jar 中取出文件/文件夹到指定位置
      *
-     * 注意: 该方法与部分 JDK 不兼容! (已知 Oracle JRE 8 @Windows Server 2019 会报错)
+     * 注意: 该方法可能与部分 JDK 不兼容! (已知 Oracle JRE 8 @Windows Server 2019 会报错)
      */
     private fun copyFromJar(jarFile: Path, source: String = "resources", target: Path) {
         val fileSystem = FileSystems.newFileSystem(jarFile, null)
@@ -207,7 +213,10 @@ object FileUtil {
                 try {
                     val relative = jarPath.relativize(dir)
                     val currentTarget = target.resolve(relative.toString())
-                    Files.createDirectories(currentTarget)
+                    if (!currentTarget.toFile().exists()) {
+                        Files.createDirectories(currentTarget)
+                        daemonLogger.debugS("Created directory $currentTarget successfully")
+                    }
                 } catch (e: IllegalArgumentException) {
                     daemonLogger.warningS("Can't create dir ${dir.fileName} from jar", e)
                 } finally {
@@ -219,13 +228,25 @@ object FileUtil {
                 try {
                     val relative = jarPath.relativize(file)
                     val copyTarget = target.resolve(relative.toString())
-                    Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE)
-                } catch (e: IllegalArgumentException) {
+                    try {
+                        if (!copyTarget.toFile().exists()) {
+                            Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
+                            daemonLogger.debugS("Copied file ${file.fileName}")
+                        }
+                    } catch (e: UnsupportedOperationException) {
+                        Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
+                    }
+                } catch (e: Throwable) {
                     daemonLogger.warningS("Can't copy ${file.fileName} from jar", e)
                 } finally {
                     return FileVisitResult.CONTINUE
                 }
             }
         })
+    }
+
+    fun isSameFile(file: File, toCompare: File): Boolean {
+        if (!file.exists() || !toCompare.exists()) return false
+        return file.getMD5() == toCompare.getMD5()
     }
 }

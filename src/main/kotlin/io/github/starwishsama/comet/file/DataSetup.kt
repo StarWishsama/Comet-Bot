@@ -69,10 +69,14 @@ object DataSetup {
 
             if (pcrData.exists()) {
                 BotVariables.pcr = gson.fromJson(pcrData.getContext())
+            } else {
+                daemonLogger.info("未检测到公主连结游戏数据, 抽卡模拟器将无法使用")
             }
 
             if (arkNightData.exists()) {
                 BotVariables.arkNight = gson.fromJson(arkNightData.getContext())
+            } else {
+                daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
             }
 
             if (!cacheCfg.exists()) {

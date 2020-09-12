@@ -108,7 +108,12 @@ object Comet {
     private fun startAllPusher() {
         val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker, YoutubeStreamingChecker)
         pushers.forEach {
-            val future = TaskUtil.runScheduleTaskAsync(it.delayTime, it.internal, TimeUnit.MINUTES, it::retrieve)
+            val future = TaskUtil.runScheduleTaskAsync(it.delayTime, it.internal, TimeUnit.MINUTES) {
+                // Bot 不处于在线状态, 等待下一次推送时再试
+                if (!bot.isOnline) return@runScheduleTaskAsync
+
+                it.retrieve()
+            }
             it.future = future
         }
     }

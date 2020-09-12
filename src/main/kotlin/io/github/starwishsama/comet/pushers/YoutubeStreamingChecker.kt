@@ -21,7 +21,6 @@ object YoutubeStreamingChecker : CometPusher {
     private val pushHistory = mutableListOf<PushObject>()
 
     override fun retrieve() {
-        if (!bot.isOnline) future?.cancel(true)
         val ytbLiverList = mutableMapOf<String, MutableList<Long>>()
 
         BotVariables.perGroup.parallelStream().forEach { config ->

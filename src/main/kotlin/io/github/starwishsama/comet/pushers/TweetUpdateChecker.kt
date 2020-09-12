@@ -31,8 +31,6 @@ object TweetUpdateChecker : CometPusher {
 
     @ExperimentalTime
     override fun retrieve() {
-        if (!bot.isOnline) future?.cancel(false)
-
         BotVariables.perGroup.parallelStream().forEach { cfg ->
             if (cfg.twitterPushEnabled) {
                 cfg.twitterSubscribers.forEach {
