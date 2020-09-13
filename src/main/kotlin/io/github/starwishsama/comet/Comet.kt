@@ -62,11 +62,11 @@ object Comet {
         }
 
         TaskUtil.runAsync(5) {
-            FakeClientApi.client.runCatching {
-                val pwd = BotVariables.cfg.biliPassword
-                val username = BotVariables.cfg.biliUserName
+            val pwd = BotVariables.cfg.biliPassword
+            val username = BotVariables.cfg.biliUserName
 
-                if (pwd != null && username != null) {
+            if (pwd != null && username != null) {
+                FakeClientApi.client.runCatching {
                     runBlocking {
                         withContext(Dispatchers.IO) {
                             login(username = username, password = pwd)
@@ -153,7 +153,7 @@ object Comet {
                 ClockInCommand(),
                 io.github.starwishsama.comet.commands.subcommands.chats.DebugCommand(),
                 DivineCommand(),
-                GachaCommand(),
+                PCRCommand(),
                 GuessNumberCommand(),
                 HelpCommand(),
                 InfoCommand(),

@@ -20,44 +20,42 @@ import java.awt.image.BufferedImage
 
 class ArkCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        val overTimeMessage = "今日命令条数已达上限, 请等待条数自动恢复哦~\n" +
-                "命令条数现在每小时会恢复100次, 封顶1000次"
         if (BotUtil.hasNoCoolDown(event.sender.id)) {
             if (args.isNotEmpty()) {
                 when (args[0]) {
                     "单次寻访" -> {
                         return if (BotVariables.cfg.arkDrawUseImage) {
                             event.reply("请稍等...")
-                            val list = DrawUtil.getArkDrawResultToImage(user, 1)
+                            val list = DrawUtil.getArkDrawResult(user)
                             if (list.isNotEmpty()) {
                                 val image: BufferedImage = DrawUtil.combineArkOpImage(list)
                                 val result = image.upload(event.subject)
                                 result.asMessageChain()
                             } else {
-                                overTimeMessage.convertToChain()
+                                DrawUtil.overTimeMessage.convertToChain()
                             }
                         } else {
-                            DrawUtil.getArkDrawResult(user, 1).convertToChain()
+                            DrawUtil.getArkDrawResultAsString(user, 1).convertToChain()
                         }
                     }
                     "十连寻访" -> {
                         return if (BotVariables.cfg.arkDrawUseImage) {
                             event.reply("请稍等...")
-                            val list: List<ArkNightOperator> = DrawUtil.getArkDrawResultToImage(user, 10)
+                            val list: List<ArkNightOperator> = DrawUtil.getArkDrawResult(user, 10)
                             if (list.isNotEmpty()) {
                                 val image: BufferedImage = DrawUtil.combineArkOpImage(list)
                                 val result = image.upload(event.subject)
                                 result.asMessageChain()
                             } else {
-                                overTimeMessage.convertToChain()
+                                DrawUtil.overTimeMessage.convertToChain()
                             }
                         } else {
-                            DrawUtil.getArkDrawResult(user, 10).convertToChain()
+                            DrawUtil.getArkDrawResultAsString(user, 10).convertToChain()
                         }
                     }
                     else -> {
                         return if (StringUtils.isNumeric(args[0])) {
-                            DrawUtil.getArkDrawResult(user, args[0].toInt()).convertToChain()
+                            DrawUtil.getArkDrawResultAsString(user, args[0].toInt()).convertToChain()
                         } else {
                             getHelp().convertToChain()
                         }

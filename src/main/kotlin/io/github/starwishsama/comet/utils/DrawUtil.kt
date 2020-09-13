@@ -19,13 +19,28 @@ object DrawUtil {
      * 明日方舟
      */
 
+    const val overTimeMessage = "你要抽卡的次数超过了你的命令条数, 可以少抽一点或者等待条数自动恢复哦~\n" +
+            "命令条数现在每小时会恢复100次, 封顶1000次"
+
     /**
-     * 十连
+     * 明日方舟抽卡方法
      */
     private fun arkNightDraw(time: Int = 1): List<ArkNightOperator> {
         val result = mutableListOf<ArkNightOperator>()
+        var r6Count = 0
 
         repeat(time) {
+            // 在五十连之后的保底
+            if (it == 50) {
+                r6Count = RandomUtil.randomInt(51, time - 1)
+            }
+
+            // 保底六星
+            if (r6Count != 0 && it == r6Count) {
+                result.add(getOperator(6))
+                return@repeat
+            }
+
             val probability = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
             val rare: Int
             rare = when (probability) {
@@ -40,7 +55,7 @@ object DrawUtil {
     }
 
     /**
-     * 抽取获取指定星级干员
+     * 随机抽取指定星级干员
      */
     private fun getOperator(rare: Int): ArkNightOperator {
         val ops: List<ArkNightOperator> = BotVariables.arkNight
@@ -56,26 +71,6 @@ object DrawUtil {
         return tempOps[index]
     }
 
-    /**
-     * 明日方舟抽卡，返回图片
-     */
-    fun getArkDrawResultToImage(user: BotUser, time: Int): LinkedList<ArkNightOperator> {
-        val result = LinkedList<ArkNightOperator>()
-
-        if (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000) {
-            val drawResult = arkNightDraw(time)
-
-            if (result.size < 2) {
-                result.add(drawResult[0])
-            } else {
-                result.addAll(drawResult)
-            }
-
-            user.decreaseTime(time)
-        }
-
-        return result
-    }
 
     /**
      * 根据抽卡结果合成图片
@@ -107,7 +102,13 @@ object DrawUtil {
             val imageWidth = bufferedImage.width / zoom
             val imageHeight = bufferedImage.height / zoom
 
-            createGraphics.drawImage(bufferedImage.getScaledInstance(imageWidth, imageHeight, java.awt.Image.SCALE_SMOOTH), newBufferedImageWidth, newBufferedImageHeight, imageWidth, imageHeight, null)
+            createGraphics.drawImage(
+                bufferedImage.getScaledInstance(
+                    imageWidth,
+                    imageHeight,
+                    java.awt.Image.SCALE_SMOOTH
+                ), newBufferedImageWidth, newBufferedImageHeight, imageWidth, imageHeight, null
+            )
 
             newBufferedImageWidth += imageWidth
 
@@ -118,58 +119,49 @@ object DrawUtil {
         return newBufferedImage
 
     }
+
     /**
      * 明日方舟抽卡，返回文字
      */
-    fun getArkDrawResult(user: BotUser, time: Int): String {
-        val overTimeMessage = "今日命令条数已达上限, 请等待条数自动恢复哦~\n" +
-                "命令条数现在每小时会恢复100次, 封顶1000次"
-        val result = LinkedList<ArkNightOperator>()
-        var r6Time = 0
+    fun getArkDrawResult(user: BotUser, time: Int = 1): List<ArkNightOperator> {
+        return if (checkHasGachaTime(user, time)) {
+            user.decreaseTime(time)
+            arkNightDraw(time)
+        } else {
+            emptyList()
+        }
+    }
 
-        if (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000) {
+    /**
+     * 明日方舟抽卡，返回文字
+     */
+    fun getArkDrawResultAsString(user: BotUser, time: Int): String {
+        val drawResult = getArkDrawResult(user, time)
+        if (drawResult.isNotEmpty()) {
             when (time) {
                 1 -> {
-                    user.decreaseTime()
-                    val (name, _, rare) = arkNightDraw(1)[0]
-                    return name + " " + getStar(rare)
+                    val (name, _, rare) = drawResult[0]
+                    return "单次寻访结果\n$name ${getStar(rare)}"
                 }
                 10 -> {
-                    result.addAll(arkNightDraw(10))
-                    user.decreaseTime(10)
-                    val sb = StringBuilder("十连结果:\n")
-                    for ((name, _, rare) in result) {
-                        sb.append(name).append(" ").append(getStar(rare)).append(" ")
-                    }
-                    return sb.toString().trim()
+                    return StringBuilder("十连寻访结果:\n").apply {
+                        for ((name, _, rare) in drawResult) {
+                            append(name).append(" ").append(getStar(rare)).append(" ")
+                        }
+                    }.trim().toString()
                 }
                 else -> {
-                    for (i in 0 until time) {
-                        if (user.commandTime >= 1 || user.compareLevel(UserLevel.ADMIN)) {
-//                            user.decreaseTime(1)
-                            if (i == 50) {
-                                r6Time = RandomUtil.randomInt(51, time - 1)
-                            }
+                    val r6Char = drawResult.parallelStream().filter { it.rare == 6 }.collect(Collectors.toList())
+                    val r6Text = StringBuilder().apply {
+                        r6Char.forEach { append("${it.name} ${getStar(it.rare)} ") }
+                    }.toString().trim()
 
-                            if (r6Time != 0 && i == r6Time) {
-                                result.add(getOperator(6))
-                            } else {
-                                result.add(arkNightDraw(1)[0])
-                            }
-                        } else {
-                            break
-                        }
-                    }
-                    val r6Char = result.parallelStream().filter { it.rare == 6 }.collect(Collectors.toList())
-                    val r6Text = StringBuilder()
-                    r6Char.forEach { r6Text.append("${it.name} ${getStar(it.rare)} ") }
-
-                    return "抽卡结果:\n" +
-                            "抽卡次数: ${result.size}\n" +
-                            "六星: ${r6Text.toString().trim()}\n" +
-                            "五星个数: ${result.stream().filter { it.rare == 5 }.count()}\n" +
-                            "四星个数: ${result.stream().filter { it.rare == 4 }.count()}\n" +
-                            "三星个数: ${result.stream().filter { it.rare == 3 }.count()}"
+                    return "寻访结果:\n" +
+                            "寻访次数: ${drawResult.size}\n" +
+                            "六星: ${r6Text}\n" +
+                            "五星个数: ${drawResult.parallelStream().filter { it.rare == 5 }.count()}\n" +
+                            "四星个数: ${drawResult.parallelStream().filter { it.rare == 4 }.count()}\n" +
+                            "三星个数: ${drawResult.parallelStream().filter { it.rare == 3 }.count()}"
                 }
             }
         } else {
@@ -186,34 +178,35 @@ object DrawUtil {
     private const val R2 = 200
     private const val R1 = 775
 
-    private fun drawPCR(): PCRCharacter {
+    private fun drawPCR(time: Int = 1): List<PCRCharacter> {
+        val drawResult = mutableListOf<PCRCharacter>()
         val chance = RandomUtil.randomInt(0, R1 + R2 + R3)
-        return when {
-            chance <= R3 -> {
-                getCharacter(3)
-            }
-            chance <= R2 + R3 -> {
-                getCharacter(2)
-            }
-            else -> {
-                getCharacter(1)
-            }
-        }
-    }
 
-    private fun tenTimesDrawPCR(): List<PCRCharacter> {
-        val result: MutableList<PCRCharacter> = LinkedList()
-        for (i in 0..9) {
-            result.add(drawPCR())
-        }
-        for (i in result.indices) {
-            if (result[i].star > 2) {
-                break
-            } else if (i == result.size - 1 && result[i].star < 2) {
-                result[i] = getCharacter(2)
+        repeat(time) {
+            if (it % 10 == 0) {
+                for (i in drawResult.indices) {
+                    // 十连保底
+                    if ((i + 1) % 10 == 0 && drawResult[i].star < 2) {
+                        drawResult[i] = getCharacter(2)
+                    }
+                }
+                return@repeat
+            }
+
+            when {
+                chance <= R3 -> {
+                    drawResult.add(getCharacter(3))
+                }
+                chance <= R2 + R3 -> {
+                    drawResult.add(getCharacter(2))
+                }
+                else -> {
+                    drawResult.add(getCharacter(1))
+                }
             }
         }
-        return result
+
+        return drawResult
     }
 
     private fun getCharacter(rare: Int): PCRCharacter {
@@ -227,70 +220,64 @@ object DrawUtil {
     }
 
     fun getPCRResult(user: BotUser, time: Int): String {
-        val reachMax = "今日抽卡次数已达上限, 别抽卡上头了"
-        return if (time == 10) {
-            if (user.commandTime >= 10) {
-                user.decreaseTime(10)
-                val ops: List<PCRCharacter> = tenTimesDrawPCR()
-                val sb = java.lang.StringBuilder("十连结果:\n")
-                for ((name, star) in ops) {
-                    sb.append(name).append(" ").append(getStar(star)).append(" ")
+        val startTime = System.currentTimeMillis()
+
+        if (checkHasGachaTime(user, time)) {
+            user.decreaseTime(time)
+            val gachaResult = drawPCR(time)
+
+            return when {
+                time <= 10 -> {
+                    StringBuilder("素敵な仲間が増えますよ!\n").apply {
+                        for ((name, star) in gachaResult) {
+                            append(name).append(" ").append(getStar(star)).append(" ")
+                        }
+                    }.toString().trim()
                 }
-                sb.toString().trim { it <= ' ' }
-            } else {
-                reachMax
-            }
-        } else if (time == 1) {
-            if (user.commandTime >= 1) {
-                user.decreaseTime()
-                val (name, star) = drawPCR()
-                name + " " + getStar(star)
-            } else {
-                reachMax
+                else -> {
+                    val r3s =
+                        gachaResult.parallelStream().filter { (_, star) -> star == 3 }.collect(Collectors.toList())
+
+                    val r3Character = StringBuilder().apply {
+                        for ((name) in r3s) {
+                            append(name).append(" ")
+                        }
+                    }.trim().toString()
+
+                    var firstTimeGetR3 = 0
+
+                    for (i in gachaResult.indices) {
+                        if (gachaResult[i].star == 3) {
+                            firstTimeGetR3 = i
+                            break
+                        }
+                    }
+
+                    """
+                        素敵な仲間が増えますよ！ 
+                        本次抽卡次数为 ${gachaResult.size}
+                        ${if (firstTimeGetR3 != 0) "第${firstTimeGetR3}抽获得三星角色" else "酋长, 我们回家吧"}
+                        $r3Character
+                        ★★★×${
+                        gachaResult.parallelStream().filter { (_, star) -> star == 3 }.count()
+                    } ★★×${
+                        gachaResult.parallelStream().filter { (_, star) -> star == 2 }.count()
+                    } ★×${gachaResult.parallelStream().filter { (_, star) -> star == 1 }.count()}
+                        ${if (BotVariables.cfg.debugMode) "耗时: ${System.currentTimeMillis() - startTime}ms" else ""}
+                    """.trimIndent()
+                }
             }
         } else {
-            if (user.commandTime >= time) {
-                val startTime = System.currentTimeMillis()
-                val ops: MutableList<PCRCharacter> = LinkedList()
-
-                for (i in 0 until time) {
-                    if (user.commandTime > 0) {
-                        user.decreaseTime()
-                        if (i % 10 == 0) {
-                            ops.add(getCharacter(2))
-                        } else {
-                            ops.add(drawPCR())
-                        }
-                    } else {
-                        break
-                    }
-                }
-
-                val r3s = ops.parallelStream().filter { (_, star) -> star == 3 }.collect(Collectors.toList())
-
-                val sb = StringBuilder()
-                for ((name) in r3s) {
-                    sb.append(name).append(" ")
-                }
-
-                return """
-            抽卡次数: ${ops.size}
-            三星角色: ${if (sb.toString().trim { it <= ' ' }.isEmpty()) "未抽到" else sb.toString().trim { it <= ' ' }}
-            二星角色数: ${ops.stream().filter { (_, star) -> star == 2 }.count()}
-            一星角色数: ${ops.stream().filter { (_, star) -> star == 1 }.count()}
-            耗时: ${System.currentTimeMillis() - startTime}ms
-            """.trimIndent()
-            } else {
-                return "你要抽卡的次数大于你的抽卡次数"
-            }
+            return overTimeMessage
         }
     }
 
-    private fun getStar(rare: Int): String {
-        val sb = StringBuilder("★")
-        for (i in 1 until rare) {
-            sb.append("★")
+    private fun getStar(rare: Int): String = StringBuilder().apply {
+        for (i in 0 until rare) {
+            append("★")
         }
-        return sb.toString()
-    }
+    }.toString()
+
+    private fun checkHasGachaTime(user: BotUser, time: Int): Boolean =
+        user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000
 }

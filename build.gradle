@@ -23,7 +23,7 @@ jar {
 }
 
 def gitCommitId = 'git rev-parse --short HEAD'
-def versionCode = "0.5.4-DEV-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
+def versionCode = "0.6-DEV-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
 
 group 'io.github.starwishsama.comet'
 version versionCode
@@ -68,6 +68,7 @@ dependencies {
 
     implementation 'net.mamoe:mirai-core:1.2.3'
     implementation 'net.mamoe:mirai-core-qqandroid:1.2.3'
+    //implementation("net.mamoe:mirai-console:1.0-M4")
 
     implementation 'cn.hutool:hutool-http:5.4.2'
     implementation 'cn.hutool:hutool-crypto:5.4.2'

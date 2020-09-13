@@ -12,30 +12,21 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import org.apache.commons.lang3.StringUtils
 
-class GachaCommand : ChatCommand {
+class PCRCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(user.id)) {
-            if (args.isNotEmpty()) {
-                when (args[0]) {
-                    "公主连结", "pcr", "gzlj" -> {
-                        return if (args.size == 2){
-                            when (args[1]) {
-                                "十连" -> BotUtil.sendMessage(DrawUtil.getPCRResult(user, 10))
-                                "单抽" -> BotUtil.sendMessage(DrawUtil.getPCRResult(user, 1))
-                                else -> {
-                                    if (StringUtils.isNumeric(args[1])) {
-                                        BotUtil.sendMessage(DrawUtil.getPCRResult(user, args[1].toInt()))
-                                    } else {
-                                        getHelp().convertToChain()
-                                    }
-                                }
-                            }
+            return if (args.size == 1) {
+                when (args[1]) {
+                    "十连" -> BotUtil.sendMessage(DrawUtil.getPCRResult(user, 10))
+                    "单抽" -> BotUtil.sendMessage(DrawUtil.getPCRResult(user, 1))
+                    "来一井" -> return BotUtil.sendMessage(DrawUtil.getPCRResult(user, 300))
+                    else -> {
+                        if (StringUtils.isNumeric(args[1])) {
+                            BotUtil.sendMessage(DrawUtil.getPCRResult(user, args[1].toInt()))
                         } else {
-                            return getHelp().convertToChain()
+                            getHelp().convertToChain()
                         }
                     }
-                    "来一井" -> return BotUtil.sendMessage(DrawUtil.getPCRResult(user, 300))
-                    else -> return getHelp().convertToChain()
                 }
             } else {
                 return getHelp().convertToChain()
@@ -45,7 +36,7 @@ class GachaCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-            CommandProps("gacha", arrayListOf("ck", "抽卡"), "公主链接抽卡模拟器", "nbot.commands.draw", UserLevel.USER)
+        CommandProps("pcr", arrayListOf("gzlj", "公主连结"), "公主链接抽卡模拟器", "nbot.commands.pcr", UserLevel.USER)
 
     override fun getHelp(): String = """
          ============ 命令帮助 ============
