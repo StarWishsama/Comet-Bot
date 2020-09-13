@@ -16,7 +16,7 @@ class PCRCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(user.id)) {
             return if (args.isNotEmpty()) {
-                when (args[1]) {
+                when (args[0]) {
                     "十连" -> BotUtil.sendMessage(DrawUtil.getPCRResult(user, 10))
                     "单抽" -> BotUtil.sendMessage(DrawUtil.getPCRResult(user, 1))
                     "来一井" -> return BotUtil.sendMessage(DrawUtil.getPCRResult(user, 300))
