@@ -20,7 +20,7 @@ class VersionCommand : ChatCommand {
             return ("彗星 Bot " + BotVariables.version +
                     "\n已注册命令数: " + CommandExecutor.countCommands() +
                     "\n运行时长 ${BotUtil.getRunningTime()}" +
-                    "\nMade with ❤ & Mirai 1.1.3").convertToChain()
+                    "\nMade with ❤ & Mirai 1.2.3").convertToChain()
         }
         return EmptyMessageChain
     }

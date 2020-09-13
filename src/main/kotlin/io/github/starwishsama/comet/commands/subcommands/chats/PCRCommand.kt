@@ -15,14 +15,14 @@ import org.apache.commons.lang3.StringUtils
 class PCRCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(user.id)) {
-            return if (args.size == 1) {
+            return if (args.isNotEmpty()) {
                 when (args[1]) {
                     "十连" -> BotUtil.sendMessage(DrawUtil.getPCRResult(user, 10))
                     "单抽" -> BotUtil.sendMessage(DrawUtil.getPCRResult(user, 1))
                     "来一井" -> return BotUtil.sendMessage(DrawUtil.getPCRResult(user, 300))
                     else -> {
                         if (StringUtils.isNumeric(args[1])) {
-                            BotUtil.sendMessage(DrawUtil.getPCRResult(user, args[1].toInt()))
+                            BotUtil.sendMessage(DrawUtil.getPCRResult(user, args[0].toInt()))
                         } else {
                             getHelp().convertToChain()
                         }
