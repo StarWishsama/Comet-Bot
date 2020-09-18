@@ -1,17 +1,20 @@
 package io.github.starwishsama.comet.objects.draw
 
+/**
+ * 明日方舟干员
+ */
 data class ArkNightOperator(
-    var name: String,
-    var des: String,
-    var rare: Int = 0,
-    var position: String,
-    var birthplace: String,
-    var camp: String,
-    var team: String,
-    var tag: List<String>,
-    var approach: List<String>,
-    var race: List<String>,
-)
+        override var name: String,
+        var des: String,
+        override var rare: Int = 0,
+        var position: String,
+        var birthplace: String,
+        var camp: String,
+        var team: String,
+        var tag: List<String>,
+        var approach: List<String>,
+        var race: List<String>,
+) : GachaItem
 
 /**
 "name": "森蚺",

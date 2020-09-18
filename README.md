@@ -46,7 +46,7 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
 
 ### 自编译
 
-- 注意: 请使用 JDK 8 或更高版本打包
+- 注意: 请使用 JDK 8 或更高版本打包, 推荐使用 AdoptOpenJDK 11
 
 1. 编译
  * Clone 或者下载这个项目.
@@ -54,7 +54,13 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
  ```bash
  git clone https://github.com/StarWishsama/Comet-Bot.git
  ```
- 本项目使用 Gradle 作为包管理系统, 还使用了 ShadowJar 引入依赖, 请自行搜索 Gradle 如何打包
+ 本项目使用 Gradle 作为包管理系统, 还使用了 ShadowJar 引入依赖.
+ 你可以在项目文件夹中打开终端/cmd/或其他等效软件 输入 ./gradlew shadowjar
+ 等待提示成功后, 可以在 ./build/libs 下找到编译成功的 jar
+
+### Releases 下载
+1. 在[此处](https://github.com/StarWishsama/Comet-Bot/releases)下载最新版本
+
 
 2. 使用 cmd 启动 Bot, 按照提示登录
 3. 提示启动完成后, 在机器人加入的群内发送 /help 就可开始了解 Comet 的各项功能了
@@ -83,4 +89,9 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+## 🔈 鸣谢
+> [IntelliJ IDEA](https://zh.wikipedia.org/zh-hans/IntelliJ_IDEA) 是一个功能强大、符合人体工程学且智能的 IDE, 适用于 JVM 平台语言的开发.
+
+特别感谢 [JetBrains](https://www.jetbrains.com/?from=comet-bot) 为开源项目提供免费的 [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=comet-bot) 等 IDE 的授权  
+[<img src=".github/jetbrains.png" width="200"/>](https://www.jetbrains.com/?from=comet-bot)
 

@@ -13,7 +13,6 @@ import io.github.starwishsama.comet.utils.getContext
 import io.github.starwishsama.comet.utils.writeString
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.PlatformLogger
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
@@ -30,7 +29,7 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     lateinit var filePath: File
-    const val version = "0.6-DEV-bccb86a-20200913"
+    const val version = "0.6-M1"
     lateinit var bot: Bot
 
     fun isBotInitialized(): Boolean = ::bot.isInitialized
@@ -45,7 +44,10 @@ object BotVariables {
                         daemonLogger.warning("线程 ${thread.name} 在运行时发生了错误", throwable)
                     }.build()
     )
-    lateinit var logger: MiraiLogger
+    val logger: PlatformLogger = PlatformLogger("CometBot", {
+        log.writeString(log.getContext() + "$it\n")
+        println(it)
+    })
     val daemonLogger: PlatformLogger = PlatformLogger("CometService", {
         log.writeString(log.getContext() + "$it\n")
         println(it)
@@ -57,8 +59,6 @@ object BotVariables {
     val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
     var rCon: Rcon? = null
     lateinit var log: File
-
-    fun isLogInitialized(): Boolean = ::log.isInitialized
 
     var shop: MutableList<Shop> = LinkedList()
     val users: MutableList<BotUser> = LinkedList()

@@ -39,7 +39,7 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
         }
     }
 
-    fun cost(point: Double) {
+    fun costPoint(point: Double) {
         checkInPoint -= point
     }
 
@@ -96,21 +96,10 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
         }
 
         fun getUser(qq: Long): BotUser? {
-            for (user in BotVariables.users) {
-                if (user.id == qq) {
-                    return user
-                }
-            }
-            return null
+            val user = BotVariables.users.parallelStream().filter { it.id == qq }.findFirst()
+            return if (user.isPresent) user.get() else null
         }
 
-        fun getUserSafely(qq: Long): BotUser {
-            for (user in BotVariables.users) {
-                if (user.id == qq) {
-                    return user
-                }
-            }
-            return quickRegister(qq)
-        }
+        fun getUserSafely(qq: Long): BotUser = getUser(qq) ?: quickRegister(qq)
     }
 }

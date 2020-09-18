@@ -186,7 +186,7 @@ object DrawUtil {
             if (it % 10 == 0) {
                 for (i in drawResult.indices) {
                     // 十连保底
-                    if ((i + 1) % 10 == 0 && drawResult[i].star < 2) {
+                    if ((i + 1) % 10 == 0 && drawResult[i].rare < 2) {
                         drawResult[i] = getCharacter(2)
                     }
                 }
@@ -212,7 +212,7 @@ object DrawUtil {
     private fun getCharacter(rare: Int): PCRCharacter {
         val temp: MutableList<PCRCharacter> = LinkedList()
         for (c in BotVariables.pcr) {
-            if (c.star == rare) {
+            if (c.rare == rare) {
                 temp.add(c)
             }
         }
@@ -247,7 +247,7 @@ object DrawUtil {
                     var firstTimeGetR3 = 0
 
                     for (i in gachaResult.indices) {
-                        if (gachaResult[i].star == 3) {
+                        if (gachaResult[i].rare == 3) {
                             firstTimeGetR3 = i
                             break
                         }

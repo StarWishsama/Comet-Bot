@@ -20,14 +20,13 @@ object BackupHelper {
             }
 
             val backupTime = LocalDateTime.now()
-            val backupName =
-                    "backup-${dateFormatter.format(backupTime)}.json"
+            val backupFileName = "backup-${dateFormatter.format(backupTime)}.json"
 
-            val backupFile = File(location, backupName)
+            val backupFile = File(location, backupFileName)
             backupFile.createNewFile()
             FileWriter.create(backupFile, Charsets.UTF_8)
-                .write(BotVariables.gson.toJson(BotVariables.users))
-            BotVariables.logger.info("[备份] 备份成功! 文件名是 $backupName")
+                    .write(BotVariables.gson.toJson(BotVariables.users))
+            BotVariables.logger.info("[备份] 备份成功! 文件名是 $backupFileName")
         } catch (e: Exception) {
             BotVariables.logger.error("[备份] 尝试备份时发生了异常", e)
         }

@@ -1,3 +1,3 @@
 package io.github.starwishsama.comet.objects.draw
 
-data class PCRCharacter(var name: String, var star: Int)
+data class PCRCharacter(override var name: String, override var rare: Int) : GachaItem

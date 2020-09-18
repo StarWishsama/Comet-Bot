@@ -138,7 +138,6 @@ object Comet {
         config.fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
         bot = Bot(qq = qqId, password = password, configuration = config)
         bot.alsoLogin()
-        logger = bot.logger
 
         DataSetup.initPerGroupSetting()
 
@@ -217,18 +216,14 @@ object Comet {
         }
 
         handleConsoleCommand()
-
-        bot.join() // 等待 Bot 离线, 避免主线程退出
     }
 }
 
-@ExperimentalStdlibApi
-@ExperimentalTime
-suspend fun main() {
+fun initResources() {
     filePath = FileUtil.getJarLocation()
     startTime = LocalDateTime.now()
     println(
-        """
+            """
         
            ______                     __ 
           / ____/___  ____ ___  ___  / /_
@@ -241,6 +236,12 @@ suspend fun main() {
     )
     FileUtil.initLog()
     DataSetup.init()
+}
+
+@ExperimentalStdlibApi
+@ExperimentalTime
+suspend fun main() {
+    initResources()
 
     val id = BotVariables.cfg.botId
 
@@ -269,6 +270,7 @@ suspend fun main() {
 
                 try {
                     Comet.startBot(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
+                    bot.join() // 等待 Bot 离线, 避免主线程退出
                 } catch (e: LoginFailedException) {
                     println("登录失败: ${e.message}\n如果是密码错误, 请重新输入密码")
                     isFailed = true

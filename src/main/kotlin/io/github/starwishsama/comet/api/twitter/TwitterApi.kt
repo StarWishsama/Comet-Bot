@@ -18,10 +18,8 @@ import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.isType
-import io.github.starwishsama.comet.utils.network.isUsable
 import io.github.starwishsama.comet.utils.verboseS
 import java.io.IOException
-import java.net.Socket
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -35,12 +33,13 @@ object TwitterApi : ApiExecutor {
     // 蓝鸟 APIv1.1 地址
     private const val twitterApiUrl = "https://api.twitter.com/1.1/"
 
-    // curl 获取 token, 请
+    // 获取 token 地址
     private const val twitterTokenGetUrl = "https://api.twitter.com/oauth2/token"
 
     // Bearer Token
     private var token = BotVariables.cfg.twitterToken
 
+    // 缓存的推文
     private var cacheTweet = mutableMapOf<String, Tweet>()
 
     // Api 调用次数
@@ -64,9 +63,7 @@ object TwitterApi : ApiExecutor {
                     "grant_type=client_credentials"
             )
 
-            val socket = Socket(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
-
-            if (BotVariables.cfg.proxyUrl.isNotEmpty() && BotVariables.cfg.proxyPort != -1 && socket.isUsable()) {
+            if (BotVariables.cfg.proxyUrl.isNotEmpty() && BotVariables.cfg.proxyPort != -1) {
                 curl.proxy(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
             }
 
@@ -101,7 +98,7 @@ object TwitterApi : ApiExecutor {
 
         val startTime = LocalDateTime.now()
         val url = "$twitterApiUrl/users/show.json?screen_name=$username&tweet_mode=extended"
-        val conn = NetUtil.doHttpRequestGet(url, 12_000)
+        val conn = NetUtil.doHttpRequestGet(url, 5_000)
                 .header("authorization", "Bearer $token")
         var bodyCopy = ""
 

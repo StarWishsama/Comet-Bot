@@ -34,19 +34,29 @@ This bot is under heavy develop now, Many features may **not work as expected**.
 ## ☑ To-Do 
 Development Roadmap: [Project Page](https://github.com/StarWishsama/Comet-Bot/projects/2)
 
-## 💽 How to Build 
+## 💽 How to use
 
-- Notice: You need use JDK 8+ to build it
+### Build it yourself
 
-1. Clone or download the repository to your local computer.
+- Attention: Please use JDK 8 or higher version to build, use AdoptOpenJDK 11 is recommended.
 
-```bash
-git clone https://github.com/StarWishsama/Comet-Bot.git
-```
+1. Compile
+ * do git clone or download it simply.
 
-2. Compile
+ ```bash
+ git clone https://github.com/StarWishsama/Comet-Bot.git
+ ```
 
-Configurations for Gradle is well done. Double-click `gradlew.bat` in the root directory to compile a jar file in folder `/build/libs`.
+ This project use [Gradle](https://gradle.org/) as build tool, and used shadowjar to compile dependencies.
+ You can do ./gradlew shadowjar in cmd or something else to build.
+ Until gradle shows build successful, You can find compiled jar in ./build/libs.
+
+### Download on Github Releases
+1. Click [here](https://github.com/StarWishsama/Comet-Bot/releases) to download latest version.
+
+
+2. Use cmd or something else to start Comet, Follow the instruction to log in.
+3. When Comet shows started success, Send /v in group which bot has joined to check whether it works properly.
 
 ## 📜 License 
 **All development is for learning, DO NOT use it for illegal purposes**
@@ -69,3 +79,9 @@ This project uses [AGPL v3.0](https://github.com/StarWishsama/Comet-Bot/blob/mas
     
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    
+## 🔈 Special Thanks
+> [IntelliJ IDEA](https://zh.wikipedia.org/zh-hans/IntelliJ_IDEA) is a capable, ergonomic and intelligent IDE, suitable for development of JVM platform language.
+
+Big thanks to [JetBrains](https://www.jetbrains.com/?from=comet-bot) for allocating free open-source licences for Jetbrains' IDEs such as [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=comet-bot) 
+[<img src=".github/jetbrains.png" width="200"/>](https://www.jetbrains.com/?from=comet-bot)

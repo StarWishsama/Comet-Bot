@@ -14,7 +14,7 @@ import io.github.starwishsama.comet.utils.network.NetUtil
 import java.text.NumberFormat
 
 object R6TabApi {
-    const val apiUrl = "https://r6.apitab.com/"
+    private const val apiUrl = "https://r6.apitab.com/"
     private const val infoText = "=== 彩虹六号战绩查询 ===\n%s [%d级]" +
             "\n目前段位: %s current mmrchange" +
             "\nKD: %s" +

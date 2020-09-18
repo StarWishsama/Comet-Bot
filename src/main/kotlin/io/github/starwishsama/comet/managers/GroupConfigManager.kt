@@ -1,16 +1,12 @@
 package io.github.starwishsama.comet.managers
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.perGroup
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 
 object GroupConfigManager {
     fun getConfig(groupId: Long): PerGroupConfig? {
-        BotVariables.perGroup.forEach {
-            if (it.id == groupId) {
-                return it
-            }
-        }
-        return null
+        val result = perGroup.parallelStream().filter { it.id == groupId }.findFirst()
+        return if (result.isPresent) result.get() else null
     }
 
     fun getConfigSafely(groupId: Long): PerGroupConfig {

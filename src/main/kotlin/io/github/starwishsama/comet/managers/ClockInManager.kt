@@ -8,6 +8,7 @@ import java.time.LocalDateTime
 object ClockInManager {
     private var clockInData = mutableMapOf<Long, List<ClockInData>>()
 
+    // 创建一个新的打卡
     fun newClockIn(groupId: Long, members: List<Member>, startTime: LocalDateTime, endTime: LocalDateTime) {
         var data = clockInData[groupId]
         data = if (data == null) {
@@ -19,22 +20,19 @@ object ClockInManager {
         clockInData[groupId] = data
     }
 
+    // 获取当前时间下时间最近的打卡
     fun getNearestClockIn(groupId: Long): ClockInData? {
         val executeTime = LocalDateTime.now()
 
-        clockInData[groupId]?.forEach {
-            if (clockInData[groupId]?.size == 1) {
-                return clockInData[groupId]?.get(0)
-            }
+        val result = clockInData[groupId]?.parallelStream()?.filter {
             val between = Duration.between(executeTime, it.endTime)
-            if (between.toMinutes() in -5..5) {
-                return it
-            }
-        }
+            between.toMinutes() in -5..5 || clockInData[groupId]?.size == 1
+        }?.findFirst()
 
-        return null
+        return result?.get()
     }
 
+    // 检测是否重复打卡
     fun isDuplicate(groupId: Long, duration: Long): Boolean {
         val executeTime = LocalDateTime.now()
 

@@ -124,7 +124,7 @@ object DataSetup {
 
     fun reload() {
         // 仅重载配置文件
-        cfg = cfgFile.parseAsClass(Config::class.java)
+        cfg = Yaml.default.decodeFromString(Config.serializer(), cfgFile.getContext())
 
         try {
             val socket = Socket(cfg.proxyUrl, cfg.proxyPort)
