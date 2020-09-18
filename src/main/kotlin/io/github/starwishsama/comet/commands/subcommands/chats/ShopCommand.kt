@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.commands.interfaces.SuspendCommand
@@ -10,6 +11,7 @@ import io.github.starwishsama.comet.sessions.SessionManager
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
+@CometCommand
 class ShopCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         TODO("Shop command's priority is ultra low, sry :/")

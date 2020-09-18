@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
 import cn.hutool.core.util.RandomUtil
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -17,6 +18,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.isContentNotEmpty
 
+@CometCommand
 class MuteCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (event is GroupMessageEvent && (BotUtil.hasNoCoolDown(user.id) || hasPermission(user, event))) {
@@ -31,10 +33,10 @@ class MuteCommand : ChatCommand {
                         } else {
                             when (args[0]) {
                                 "all", "全体", "全禁", "全体禁言" -> doMute(
-                                        event.group,
-                                        args[0].toLong(),
-                                        getMuteTime(args[1]),
-                                        false
+                                    event.group,
+                                    args[0].toLong(),
+                                    getMuteTime(args[1]),
+                                    false
                                 )
                                 "random", "rand", "随机", "抽奖" -> {
                                     doRandomMute(event)
@@ -55,7 +57,7 @@ class MuteCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-            CommandProps("mute", arrayListOf("jy", "禁言"), "禁言", "nbot.commands.mute", UserLevel.USER)
+        CommandProps("mute", arrayListOf("jy", "禁言"), "禁言", "nbot.commands.mute", UserLevel.USER)
 
     override fun getHelp(): String = """
         ======= 命令帮助 =======

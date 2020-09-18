@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
 import io.github.starwishsama.comet.BotVariables.bot
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.commands.interfaces.SuspendCommand
@@ -26,6 +27,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.messageChainOf
 import java.util.concurrent.TimeUnit
 
+@CometCommand
 class RollCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (!BotUtil.hasNoCoolDown(user.id)) return EmptyMessageChain
@@ -45,12 +47,12 @@ class RollCommand : ChatCommand, SuspendCommand {
             if (rollDelay != null && rollDelay >= 900) return BotUtil.sendMessage("开奖时间不得大于等于15分钟")
 
             val sessionToAdd = RollSession(
-                    groupId = event.group.id,
-                    rollStarter = event.sender,
-                    rollItem = rollThing,
-                    keyWord = rollKeyWord ?: "",
-                    stopAfterMinute = rollDelay ?: 5,
-                    count = rollThingCount
+                groupId = event.group.id,
+                rollStarter = event.sender,
+                rollItem = rollThing,
+                keyWord = rollKeyWord ?: "",
+                stopAfterMinute = rollDelay ?: 5,
+                count = rollThingCount
             )
 
             SessionManager.addSession(sessionToAdd)
@@ -66,8 +68,8 @@ class RollCommand : ChatCommand, SuspendCommand {
                         BotUtil.sendMessage(
                             "由${(sessionToAdd.rollStarter as Member).nameCardOrNick.limitStringSize(10)}发起的抽奖开奖了!\n" +
                                     "奖品: ${sessionToAdd.rollItem}\n" +
-                                    "中奖者: " + winner
-                        )
+                                    "中奖者: "
+                        ) + winner
                     )
                 }
             }
@@ -83,11 +85,11 @@ class RollCommand : ChatCommand, SuspendCommand {
     }
 
     override fun getProps(): CommandProps = CommandProps(
-            "roll",
-            arrayListOf("rl", "抽奖"),
-            "roll东西",
-            "nbot.commands.roll",
-            UserLevel.USER
+        "roll",
+        arrayListOf("rl", "抽奖"),
+        "roll东西",
+        "nbot.commands.roll",
+        UserLevel.USER
     )
 
     override fun getHelp(): String = """

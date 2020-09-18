@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -20,6 +21,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
+@CometCommand
 class AdminCommand : ChatCommand {
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
@@ -40,7 +42,7 @@ class AdminCommand : ChatCommand {
                         return if (event is GroupMessageEvent) {
                             val data = ClockInManager.getNearestClockIn(event.group.id)
                             data?.viewData()?.text?.let { PlainText(it).asMessageChain() }
-                                    ?: BotUtil.sendMessage("本群没有正在进行的打卡")
+                                ?: BotUtil.sendMessage("本群没有正在进行的打卡")
                         } else {
                             BotUtil.sendMessage("该命令只能在群聊使用")
                         }
@@ -57,7 +59,7 @@ class AdminCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-            CommandProps("admin", arrayListOf("管理", "管", "gl"), "机器人管理员命令", "nbot.commands.admin", UserLevel.ADMIN)
+        CommandProps("admin", arrayListOf("管理", "管", "gl"), "机器人管理员命令", "nbot.commands.admin", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
         ======= 命令帮助 =======
@@ -132,14 +134,14 @@ class AdminCommand : ChatCommand {
                         LocalTime.parse(args[1], dateFormatter)
                     )
                     endTime = LocalDateTime.of(
-                            LocalDate.now(),
+                        LocalDate.now(),
                         LocalTime.parse(args[2], dateFormatter)
                     )
                 }
                 2 -> {
                     startTime = LocalDateTime.now()
                     endTime = LocalDateTime.of(
-                            LocalDate.now(),
+                        LocalDate.now(),
                         LocalTime.parse(args[1], dateFormatter)
                     )
                 }

@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.commands.subcommands.chats
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.commands.interfaces.SuspendCommand
@@ -23,6 +24,7 @@ import net.mamoe.mirai.message.data.content
 import java.time.Duration
 import java.time.LocalDateTime
 
+@CometCommand
 class GuessNumberCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(user.id) && event is GroupMessageEvent) {
@@ -65,8 +67,8 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps
-            = CommandProps("guessnumber", arrayListOf("csz"), "猜数字", "nbot.commands.guessnumber", UserLevel.USER)
+    override fun getProps(): CommandProps =
+        CommandProps("guessnumber", arrayListOf("csz"), "猜数字", "nbot.commands.guessnumber", UserLevel.USER)
 
     override fun getHelp(): String = """
         /csz 猜数字

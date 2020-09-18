@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
 import cn.hutool.core.util.RandomUtil
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -18,6 +19,7 @@ import java.math.RoundingMode
 import java.time.Duration
 import java.time.LocalDateTime
 
+@CometCommand
 class CheckInCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(event.sender.id) && event is GroupMessageEvent) {
@@ -31,7 +33,7 @@ class CheckInCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-            CommandProps("checkin", arrayListOf("签到", "qd"), "签到命令", "nbot.commands.checkin", UserLevel.USER)
+        CommandProps("checkin", arrayListOf("签到", "qd"), "签到命令", "nbot.commands.checkin", UserLevel.USER)
 
     override fun getHelp(): String = ""
 

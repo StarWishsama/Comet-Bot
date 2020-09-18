@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.api.r6tab.R6TabApi.getR6SInfo
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
@@ -15,6 +16,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.at
 import java.util.*
 
+@CometCommand
 class R6SCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (hasNoCoolDown(event.sender.id) && event is GroupMessageEvent) {

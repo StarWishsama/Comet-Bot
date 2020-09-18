@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -18,6 +19,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+@CometCommand
 class ClockInCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (event is GroupMessageEvent) {
@@ -37,7 +39,7 @@ class ClockInCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-            CommandProps("clockin", arrayListOf("打卡", "dk"), "打卡命令", "nbot.commands.clockin", UserLevel.USER)
+        CommandProps("clockin", arrayListOf("打卡", "dk"), "打卡命令", "nbot.commands.clockin", UserLevel.USER)
 
     override fun getHelp(): String = ""
 
@@ -58,11 +60,13 @@ class ClockInCommand : ChatCommand {
         val checkInTime = LocalDateTime.now()
         if (Duration.between(data.endTime, checkInTime).toMinutes() <= 5) {
             var result =
-                    "Bot > ${msg.sender.nameCardOrNick} 打卡成功!\n打卡时间: ${checkInTime.format(
-                            DateTimeFormatter.ofPattern(
-                                    "yyyy-MM-dd HH:mm:ss"
-                            )
-                    )}"
+                "Bot > ${msg.sender.nameCardOrNick} 打卡成功!\n打卡时间: ${
+                    checkInTime.format(
+                        DateTimeFormatter.ofPattern(
+                            "yyyy-MM-dd HH:mm:ss"
+                        )
+                    )
+                }"
             result += if (checkInTime.isAfter(data.endTime)) {
                 data.lateUsers.add(sender)
                 "\n签到状态: 迟到"

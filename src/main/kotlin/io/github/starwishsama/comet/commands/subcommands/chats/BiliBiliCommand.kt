@@ -4,6 +4,7 @@ import io.github.starwishsama.bilibiliapi.FakeClientApi
 import io.github.starwishsama.bilibiliapi.LiveApi
 import io.github.starwishsama.bilibiliapi.MainApi
 import io.github.starwishsama.bilibiliapi.data.live.LiveRoomInfo
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -22,6 +23,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import org.apache.commons.lang3.Validate
 
+@CometCommand
 class BiliBiliCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(user.id) && event is GroupMessageEvent) {
@@ -69,7 +71,7 @@ class BiliBiliCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-            CommandProps("bili", arrayListOf(), "订阅B站主播/查询用户动态", "nbot.commands.bili", UserLevel.USER)
+        CommandProps("bili", arrayListOf(), "订阅B站主播/查询用户动态", "nbot.commands.bili", UserLevel.USER)
 
     override fun getHelp(): String = """
         /bili sub [用户名] 订阅用户相关信息
@@ -169,8 +171,8 @@ class BiliBiliCommand : ChatCommand {
 
             for (roomInfo in info) {
                 subs.append(
-                        "${MainApi.getUserNameByMid(roomInfo.uid)} " +
-                                "${if (roomInfo.isLiveNow()) "✔" else "✘"}\n"
+                    "${MainApi.getUserNameByMid(roomInfo.uid)} " +
+                            "${if (roomInfo.isLiveNow()) "✔" else "✘"}\n"
                 )
             }
 

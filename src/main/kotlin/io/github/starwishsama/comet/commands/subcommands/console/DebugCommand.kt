@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.commands.subcommands.console
 
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.commands.CommandExecutor
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ConsoleCommand
@@ -9,6 +10,7 @@ import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import kotlin.time.ExperimentalTime
 
+@CometCommand
 class DebugCommand : ConsoleCommand {
     @ExperimentalTime
     override suspend fun execute(args: List<String>): String {

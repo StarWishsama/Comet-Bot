@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -10,6 +11,7 @@ import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 
+@CometCommand
 class YoutubeCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(user.id)) {
@@ -29,13 +31,13 @@ class YoutubeCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-            CommandProps(
-                    name = "youtube",
-                    aliases = listOf("ytb", "y2b", "油管", "油土鳖"),
-                    description = "查询 Youtube 频道信息",
-                    permission = "nbot.commands.youtube",
-                    level = UserLevel.ADMIN
-            )
+        CommandProps(
+            name = "youtube",
+            aliases = listOf("ytb", "y2b", "油管", "油土鳖"),
+            description = "查询 Youtube 频道信息",
+            permission = "nbot.commands.youtube",
+            level = UserLevel.ADMIN
+        )
 
     override fun getHelp(): String = """
         /youtube info [频道ID] 查询某个频道的信息

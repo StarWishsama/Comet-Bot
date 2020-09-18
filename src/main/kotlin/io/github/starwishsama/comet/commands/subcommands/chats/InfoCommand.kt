@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -13,6 +14,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.at
 import java.time.format.DateTimeFormatter
 
+@CometCommand
 class InfoCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         try {
@@ -43,7 +45,7 @@ class InfoCommand : ChatCommand {
                 return if (users.size > 9) {
                     for (i in 0..9) {
                         sb.append(i + 1).append(" ")
-                                .append(users[i].id)
+                            .append(users[i].id)
                             .append(" ").append(String.format("%.1f", users[i].checkInPoint)).append("\n")
                     }
                     (sb.toString().trim { it <= ' ' }).convertToChain()

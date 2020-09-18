@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.commands.subcommands.chats
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
@@ -23,6 +24,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.uploadAsImage
 import kotlin.time.ExperimentalTime
 
+@CometCommand
 class TwitterCommand : ChatCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {

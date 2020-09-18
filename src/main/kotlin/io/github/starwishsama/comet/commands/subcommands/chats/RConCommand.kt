@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.commands.subcommands.chats
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.commands.interfaces.SuspendCommand
@@ -20,6 +21,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
 
+@CometCommand
 class RConCommand : ChatCommand, SuspendCommand {
     private val waitList = mutableMapOf<BotUser, Int>()
 

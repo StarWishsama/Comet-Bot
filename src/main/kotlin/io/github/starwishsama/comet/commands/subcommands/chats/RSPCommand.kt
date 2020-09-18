@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
 import cn.hutool.core.util.RandomUtil
+import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.commands.interfaces.SuspendCommand
@@ -17,8 +18,9 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.uploadAsImage
 import java.io.File
 
+@CometCommand
 class RSPCommand : ChatCommand, SuspendCommand {
-    val inProgressPlayer = mutableSetOf<Long>()
+    private val inProgressPlayer = mutableSetOf<Long>()
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(event.sender.id)) {
             event.reply("角卷猜拳... 开始! 你要出什么呢?")

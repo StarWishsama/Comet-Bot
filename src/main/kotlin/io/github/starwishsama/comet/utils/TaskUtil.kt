@@ -25,6 +25,8 @@ object TaskUtil {
             try {
                 if (initRetryTime <= retryTime) {
                     task()
+                } else {
+                    throw ReachRetryLimitException()
                 }
             } catch (t: Throwable) {
                 if (NetUtil.isTimeout(t)) {
