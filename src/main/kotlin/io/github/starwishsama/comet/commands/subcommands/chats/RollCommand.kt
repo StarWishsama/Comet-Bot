@@ -46,30 +46,30 @@ class RollCommand : ChatCommand, SuspendCommand {
             if (rollThingCount == -1 || (args.getOrNull(3) != null && rollDelay == null)) return BotUtil.sendMessage("请输入有效的数量!")
             if (rollDelay != null && rollDelay >= 900) return BotUtil.sendMessage("开奖时间不得大于等于15分钟")
 
-            val sessionToAdd = RollSession(
-                groupId = event.group.id,
-                rollStarter = event.sender,
-                rollItem = rollThing,
-                keyWord = rollKeyWord ?: "",
-                stopAfterMinute = rollDelay ?: 5,
-                count = rollThingCount
+            val rollSession = RollSession(
+                    groupId = event.group.id,
+                    rollStarter = event.sender,
+                    rollItem = rollThing,
+                    keyWord = rollKeyWord ?: "",
+                    stopAfterMinute = rollDelay ?: 3,
+                    count = rollThingCount
             )
 
-            SessionManager.addSession(sessionToAdd)
-            TaskUtil.runAsync(sessionToAdd.stopAfterMinute.toLong(), TimeUnit.MINUTES) {
-                SessionManager.expireSession(sessionToAdd)
-                val group = bot.getGroupOrNull(sessionToAdd.groupId) ?: return@runAsync
+            SessionManager.addSession(rollSession)
+            TaskUtil.runAsync(rollSession.stopAfterMinute.toLong(), TimeUnit.MINUTES) {
+                SessionManager.expireSession(rollSession)
+                val group = bot.getGroupOrNull(rollSession.groupId) ?: return@runAsync
                 var winner = messageChainOf()
-                sessionToAdd.getWinningUsers().forEach {
+                rollSession.getWinningUsers().forEach {
                     if (it.member != null) winner = winner.plus(At(it.member))
                 }
                 runBlocking {
                     group.sendMessage(
-                        BotUtil.sendMessage(
-                            "由${(sessionToAdd.rollStarter as Member).nameCardOrNick.limitStringSize(10)}发起的抽奖开奖了!\n" +
-                                    "奖品: ${sessionToAdd.rollItem}\n" +
-                                    "中奖者: "
-                        ) + winner
+                            BotUtil.sendMessage(
+                                    "由${(rollSession.rollStarter as Member).nameCardOrNick.limitStringSize(10)}发起的抽奖开奖了!\n" +
+                                            "奖品: ${rollSession.rollItem}\n" +
+                                            "中奖者: "
+                            ) + winner
                     )
                 }
             }
@@ -95,7 +95,7 @@ class RollCommand : ChatCommand, SuspendCommand {
     override fun getHelp(): String = """
         /roll [需roll的东西] [roll的个数] <roll关键词> <几分钟后开始roll>
         关键词不填则在群内发言的自动加入抽奖池,
-        抽奖延迟时间不填则自动设为 5 分钟.
+        抽奖延迟时间不填则自动设为 3 分钟.
     """.trimIndent()
 
     override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {

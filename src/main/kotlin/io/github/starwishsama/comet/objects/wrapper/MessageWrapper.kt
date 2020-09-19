@@ -26,13 +26,13 @@ open class MessageWrapper(var text: String?) {
     }
 
     suspend fun toMessageChain(contact: Contact): MessageChain {
-        val sText = text
-        if (sText != null) {
+        val textWrapper = text
+        if (textWrapper != null) {
             val image = getPicture(contact)
             if (image != null) {
-                return sText.convertToChain() + image
+                return textWrapper.convertToChain() + image
             }
-            return sText.convertToChain()
+            return textWrapper.convertToChain()
         }
         return EmptyMessageChain
     }

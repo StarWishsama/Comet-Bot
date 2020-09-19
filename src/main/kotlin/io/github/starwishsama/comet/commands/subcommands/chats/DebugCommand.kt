@@ -25,6 +25,7 @@ import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.uploadAsGroupVoice
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.concurrent.ThreadPoolExecutor
 import kotlin.time.ExperimentalTime
@@ -47,28 +48,36 @@ class DebugCommand : ChatCommand {
                 }
                 "session" -> {
                     if (user.isBotOwner()) {
-                        val sb = StringBuilder("目前活跃的会话列表: \n")
-                        val sessions = SessionManager.getSessions()
-                        if (sessions.isEmpty()) {
-                            sb.append("无")
-                        } else {
-                            var i = 0
-                            for (session in sessions) {
-                                sb.append(i + 1).append(" ").append(session.key.toString()).append("\n")
-                                i++
+                        val sb = StringBuilder("目前活跃的会话列表: \n").apply {
+                            val sessions = SessionManager.getSessions()
+
+                            if (sessions.isEmpty()) {
+                                append("无")
+                            } else {
+                                var i = 0
+                                for (session in sessions) {
+                                    append(i + 1).append(" ").append(session.key.toString()).append("\n")
+                                    i++
+                                }
                             }
                         }
                         return sb.toString().trim().convertToChain()
                     }
                 }
                 "help" -> return PlainText(getHelp()).asMessageChain()
-                "info" ->
+                "info" -> {
+                    val ping = try {
+                        NetUtil.checkPingValue()
+                    } catch (t: IOException) {
+                        -1L
+                    }
                     return ("彗星 Bot ${BotVariables.version}\n" +
                             "今日もかわいい~\n" +
                             "已注册命令数: ${CommandExecutor.countCommands()}\n" +
                             BotUtil.getMemoryUsage() + "\n" +
-                            "与服务器的延迟为 ${NetUtil.checkPingValue()} ms"
+                            "与服务器的延迟为 $ping ms"
                             ).convertToChain()
+                }
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().convertToChain()
                 "switch" -> {
                     BotVariables.switch = !BotVariables.switch
@@ -102,12 +111,12 @@ class DebugCommand : ChatCommand {
                 "watame" -> {
                     try {
                         val voice = File(
-                            FileUtil.getResourceFolder().toString() + "${File.separator}voice",
-                            "watame_janken.amr"
+                                FileUtil.getResourceFolder().toString() + "${File.separator}voice",
+                                "watame_janken.amr"
                         ).inputStream()
                         if (event is GroupMessageEvent)
                             return voice.uploadAsGroupVoice(event.group).asMessageChain()
-                    } catch (ignored: Throwable) {
+                    } catch (ignored: FileNotFoundException) {
                         return "File doesn't exists.".convertToChain()
                     }
                 }

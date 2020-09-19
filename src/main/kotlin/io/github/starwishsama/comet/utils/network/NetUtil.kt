@@ -7,10 +7,10 @@ import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.utils.network.NetUtil.proxyIsUsable
 import java.io.*
+import java.net.HttpURLConnection
 import java.net.Proxy
 import java.net.Socket
 import java.net.URL
-import java.net.URLConnection
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
@@ -139,17 +139,16 @@ object NetUtil {
         val socket = Socket(cfg.proxyUrl, cfg.proxyPort)
         val proxy: Proxy? = if (socket.isUsable(300)) Proxy(cfg.proxyType, Socket(cfg.proxyUrl, cfg.proxyPort).remoteSocketAddress) else null
 
+        val connection: HttpURLConnection = if (proxy != null) {
+            URL(address).openConnection() as HttpURLConnection
+        } else {
+            URL(address).openConnection(proxy) as HttpURLConnection
+        }
         try {
-            val connection: URLConnection = if (proxy != null) {
-                URL(address).openConnection()
-            } else {
-                URL(address).openConnection(proxy)
-            }
             connection.connectTimeout = 5000
             connection.connect()
-            proxyIsUsable = 1
-        } catch (t: Throwable) {
-            proxyIsUsable = -1
+        } finally {
+            connection.disconnect()
         }
 
         return Duration.between(startTime, LocalDateTime.now()).toMillis()
