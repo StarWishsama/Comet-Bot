@@ -216,8 +216,6 @@ object Comet {
         }
 
         handleConsoleCommand()
-
-        bot.join() // 等待 Bot 离线, 避免主线程退出
     }
 }
 
@@ -272,6 +270,7 @@ suspend fun main() {
 
                 try {
                     Comet.startBot(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
+                    bot.join() // 等待 Bot 离线, 避免主线程退出
                 } catch (e: LoginFailedException) {
                     println("登录失败: ${e.message}\n如果是密码错误, 请重新输入密码")
                     isFailed = true
@@ -283,5 +282,6 @@ suspend fun main() {
         scanner.close()
     } else {
         Comet.startBot(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
+        bot.join() // 等待 Bot 离线, 避免主线程退出
     }
 }
