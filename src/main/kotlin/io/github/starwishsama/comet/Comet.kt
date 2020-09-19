@@ -272,7 +272,6 @@ suspend fun main() {
 
                 try {
                     Comet.startBot(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
-
                 } catch (e: LoginFailedException) {
                     println("登录失败: ${e.message}\n如果是密码错误, 请重新输入密码")
                     isFailed = true
