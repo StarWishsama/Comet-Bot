@@ -39,5 +39,5 @@ class AdminCommand : ConsoleCommand {
         return ""
     }
 
-    override fun getProps(): CommandProps = CommandProps("admin", null, "", "", UserLevel.CONSOLE)
+    override fun getProps(): CommandProps = CommandProps("admin", mutableListOf(), "", "", UserLevel.CONSOLE)
 }

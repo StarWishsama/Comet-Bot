@@ -46,5 +46,5 @@ class DebugCommand : ConsoleCommand {
         return ""
     }
 
-    override fun getProps(): CommandProps = CommandProps("debug", null, "", "", UserLevel.CONSOLE)
+    override fun getProps(): CommandProps = CommandProps("debug", mutableListOf(), "", "", UserLevel.CONSOLE)
 }
