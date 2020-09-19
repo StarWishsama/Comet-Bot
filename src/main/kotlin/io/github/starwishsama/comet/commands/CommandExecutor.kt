@@ -11,6 +11,7 @@ import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.debugS
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
@@ -92,7 +93,7 @@ object CommandExecutor {
                 val session = SessionManager.getSessionByEvent(event)
 
                 /**
-                 * 如果不是监听会话, 则停止尝试执行可能的命令
+                 * 如果不是监听会话, 则停止尝试解析并执行可能的命令
                  * 反之在监听时仍然可以执行命令
                  */
                 if (session != null && !handleSession(event, executedTime)) {
@@ -113,13 +114,14 @@ object CommandExecutor {
                         user = BotUser.quickRegister(senderId)
                     }
 
+                    /** 检查是否有权限执行命令 */
                     val result: MessageChain = if (cmd.hasPermission(user, event)) {
                         cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
                     } else {
                         BotUtil.sendMessage("你没有权限!")
                     }
                     val usedTime = Duration.between(executedTime, LocalDateTime.now())
-                    BotVariables.logger.debug(
+                    BotVariables.logger.debugS(
                             "[命令] 命令执行耗时 ${usedTime.toKotlinDuration().asHumanReadable}"
                     )
 
@@ -189,13 +191,11 @@ object CommandExecutor {
     }
 
     fun getCommand(cmdPrefix: String): ChatCommand? {
-        commands.forEach { command ->
-            if (commandEquals(command, cmdPrefix)) {
-                return command
-            }
+        val command = commands.parallelStream().filter {
+            commandEquals(it, cmdPrefix)
+        }.findFirst()
 
-        }
-        return null
+        return if (command.isPresent) command.get() else null
     }
 
     private fun getConsoleCommand(cmdPrefix: String): ConsoleCommand? {
@@ -234,11 +234,10 @@ object CommandExecutor {
             props.name.contentEquals(cmdName) -> {
                 return true
             }
-            props.aliases != null -> {
-                props.aliases?.forEach {
-                    if (it.contentEquals(cmdName)) {
-                        return true
-                    }
+            props.aliases.isNotEmpty() -> {
+                val aliases = props.aliases.parallelStream().filter { it!!.contentEquals(cmdName) }.findFirst()
+                if (aliases.isPresent) {
+                    return true
                 }
             }
             else -> {
@@ -250,15 +249,15 @@ object CommandExecutor {
 
     private fun commandEquals(cmd: ConsoleCommand, cmdName: String): Boolean {
         val props = cmd.getProps()
+
         when {
             props.name.contentEquals(cmdName) -> {
                 return true
             }
-            props.aliases != null -> {
-                props.aliases?.forEach {
-                    if (it.contentEquals(cmdName)) {
-                        return true
-                    }
+            props.aliases.isNotEmpty() -> {
+                val name = props.aliases.parallelStream().filter { alias -> alias!!.contentEquals(cmdName) }.findFirst()
+                if (name.isPresent) {
+                    return true
                 }
             }
             else -> {

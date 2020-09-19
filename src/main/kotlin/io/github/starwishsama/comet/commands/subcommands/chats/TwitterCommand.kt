@@ -93,7 +93,7 @@ class TwitterCommand : ChatCommand {
         return try {
             val tweet = TwitterApi.getCachedTweet(name, index, max)
             if (tweet != null) {
-                val resultMessage = BotUtil.sendMessage("\n${tweet.user.name}\n${tweet.getFullText()}")
+                val resultMessage = BotUtil.sendMessage("\n${tweet.user.name}\n${tweet.convertToString()}")
                 val imageUrl = tweet.getPictureUrl()
                 var image: Image? = null
 

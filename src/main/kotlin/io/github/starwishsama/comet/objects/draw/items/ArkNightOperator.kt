@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects.draw
+package io.github.starwishsama.comet.objects.draw.items
 
 /**
  * 明日方舟干员
@@ -14,7 +14,7 @@ data class ArkNightOperator(
         var tag: List<String>,
         var approach: List<String>,
         var race: List<String>,
-) : GachaItem
+) : GachaItem()
 
 /**
 "name": "森蚺",

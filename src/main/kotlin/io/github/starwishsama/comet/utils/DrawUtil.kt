@@ -4,8 +4,8 @@ import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.draw.ArkNightOperator
-import io.github.starwishsama.comet.objects.draw.PCRCharacter
+import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
+import io.github.starwishsama.comet.objects.draw.items.PCRCharacter
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStream
@@ -57,7 +57,7 @@ object DrawUtil {
     /**
      * 随机抽取指定星级干员
      */
-    private fun getOperator(rare: Int): ArkNightOperator {
+    fun getOperator(rare: Int): ArkNightOperator {
         val ops: List<ArkNightOperator> = BotVariables.arkNight
         val tempOps: MutableList<ArkNightOperator> = LinkedList()
         for (op in ops) {
@@ -272,12 +272,12 @@ object DrawUtil {
         }
     }
 
-    private fun getStar(rare: Int): String = StringBuilder().apply {
+    fun getStar(rare: Int): String = StringBuilder().apply {
         for (i in 0 until rare) {
             append("★")
         }
     }.toString()
 
-    private fun checkHasGachaTime(user: BotUser, time: Int): Boolean =
-        user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000
+    fun checkHasGachaTime(user: BotUser, time: Int): Boolean =
+            user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000
 }

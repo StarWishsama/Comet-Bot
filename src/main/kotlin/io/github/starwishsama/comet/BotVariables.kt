@@ -4,8 +4,8 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import io.github.starwishsama.comet.objects.*
-import io.github.starwishsama.comet.objects.draw.ArkNightOperator
-import io.github.starwishsama.comet.objects.draw.PCRCharacter
+import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
+import io.github.starwishsama.comet.objects.draw.items.PCRCharacter
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.objects.group.Shop
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
@@ -20,6 +20,7 @@ import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
+import java.util.regex.Pattern
 
 /**
  * 机器人(几乎)所有数据的存放类
@@ -77,4 +78,6 @@ object BotVariables {
     var switch: Boolean = true
 
     val coolDown: MutableMap<Long, Long> = HashMap()
+
+    val tcoPattern: Pattern = Pattern.compile("https://t.co/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]")
 }

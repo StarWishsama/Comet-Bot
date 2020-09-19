@@ -14,7 +14,7 @@ interface CometPusher {
     val internal: Long
 
     /**
-     * 用于关闭当前推送器
+     * 获取该推送器的 Future
      */
     var future: ScheduledFuture<*>?
 
