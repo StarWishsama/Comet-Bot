@@ -19,12 +19,12 @@ import org.apache.commons.lang3.StringUtils
 import java.awt.image.BufferedImage
 
 @CometCommand
-class ArkCommand : ChatCommand {
+class ArkNightCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(event.sender.id)) {
             if (args.isNotEmpty()) {
                 when (args[0]) {
-                    "单次寻访" -> {
+                    "单次寻访", "1", "单抽" -> {
                         return if (BotVariables.cfg.arkDrawUseImage) {
                             event.reply("请稍等...")
                             val list = DrawUtil.getArkDrawResult(user)
@@ -39,7 +39,7 @@ class ArkCommand : ChatCommand {
                             DrawUtil.getArkDrawResultAsString(user, 1).convertToChain()
                         }
                     }
-                    "十连寻访" -> {
+                    "十连寻访", "10", "十连" -> {
                         return if (BotVariables.cfg.arkDrawUseImage) {
                             event.reply("请稍等...")
                             val list: List<ArkNightOperator> = DrawUtil.getArkDrawResult(user, 10)
@@ -71,11 +71,11 @@ class ArkCommand : ChatCommand {
 
     override fun getProps(): CommandProps =
         CommandProps(
-            "arkNights",
-            arrayListOf("ark", "xf", "方舟寻访"),
-            "明日方舟寻访模拟器",
-            "nbot.commands.arknight",
-            UserLevel.USER
+                "arknight",
+                arrayListOf("ark", "xf", "方舟寻访"),
+                "明日方舟寻访模拟器",
+                "nbot.commands.arknight",
+                UserLevel.USER
         )
 
     override fun getHelp(): String = """

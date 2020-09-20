@@ -43,8 +43,13 @@ class RollCommand : ChatCommand, SuspendCommand {
             val rollKeyWord = args.getOrNull(2)
             val rollDelay = args.getOrNull(3)?.toIntOrNull()
 
-            if (rollThingCount == -1 || (args.getOrNull(3) != null && rollDelay == null)) return BotUtil.sendMessage("请输入有效的数量!")
-            if (rollDelay != null && rollDelay >= 900) return BotUtil.sendMessage("开奖时间不得大于等于15分钟")
+            if (rollThingCount == -1 || (args.getOrNull(3) != null && rollDelay == null)) {
+                return BotUtil.sendMessage("请输入有效的物品数量!")
+            }
+
+            if (rollDelay != null && rollDelay !in 1..15) {
+                return BotUtil.sendMessage("开奖时间设置错误! 范围为 (0, 15] 分钟")
+            }
 
             val rollSession = RollSession(
                     groupId = event.group.id,
@@ -56,6 +61,7 @@ class RollCommand : ChatCommand, SuspendCommand {
             )
 
             SessionManager.addSession(rollSession)
+
             TaskUtil.runAsync(rollSession.stopAfterMinute.toLong(), TimeUnit.MINUTES) {
                 SessionManager.expireSession(rollSession)
                 val group = bot.getGroupOrNull(rollSession.groupId) ?: return@runAsync

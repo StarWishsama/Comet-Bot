@@ -9,6 +9,7 @@ import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
+import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime
@@ -16,6 +17,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.time.ExperimentalTime
+import kotlin.time.toKotlinDuration
 
 data class Tweet(
     @SerializedName("created_at")
@@ -55,11 +57,36 @@ data class Tweet(
                 "\n❤${likeCount?.getBetterNumber()} | \uD83D\uDD01${retweetCount} | 🕘${DateTimeFormatter.ofPattern("HH:mm:ss").format(getSentTime())}"
 
         if (retweetStatus != null) {
-            return "转发了 ${retweetStatus.user.name} 的推文\n${retweetStatus.text}" + extraText
+            var result = "转发了 ${retweetStatus.user.name} 的推文\n${retweetStatus.text}" + extraText
+
+            val tcoUrl = mutableListOf<String>()
+
+            BotVariables.tcoPattern.matcher(retweetStatus.text).run {
+                while (find()) {
+                    tcoUrl.add(group())
+                }
+            }
+
+            result = if (tcoUrl.isNotEmpty()) result.replace(tcoUrl.last(), "") else result
+            result = "$result\n\uD83D\uDD17 > https://twitter.com/${user.name}/status/$idAsString\n这条推文是 ${duration.toKotlinDuration().toFriendly()} 前发送的"
+
+            return result
         }
 
         if (isQuoted && quotedStatus != null) {
-            return "对于 ${quotedStatus.user.name} 的推文\n${quotedStatus.text}\n\n${user.name} 进行了评论\n$text" + extraText
+            var result = "对于 ${quotedStatus.user.name} 的推文\n${quotedStatus.text}\n\n${user.name} 进行了评论\n$text" + extraText
+            val tcoUrl = mutableListOf<String>()
+
+            BotVariables.tcoPattern.matcher(quotedStatus.text).run {
+                while (find()) {
+                    tcoUrl.add(group())
+                }
+            }
+
+            result = if (tcoUrl.isNotEmpty()) result.replace(tcoUrl.last(), "") else result
+            result = "$result\n\uD83D\uDD17 > https://twitter.com/${user.name}/status/$idAsString\n这条推文是 ${duration.toKotlinDuration().toFriendly()} 前发送的"
+
+            return result
         }
 
         if (replyTweetId != null) {
@@ -68,23 +95,35 @@ data class Tweet(
             } catch (t: Throwable) {
                 return text + extraText
             }
-            return "对于 ${repliedTweet.user.name} 的推文\n${repliedTweet.text}\n\n${user.name} 进行了回复\n$text" + extraText
+
+            var result = "对于 ${repliedTweet.user.name} 的推文\n${repliedTweet.text}\n\n${user.name} 进行了回复\n$text" + extraText
+
+            val tcoUrl = mutableListOf<String>()
+
+            BotVariables.tcoPattern.matcher(repliedTweet.text).run {
+                while (find()) {
+                    tcoUrl.add(group())
+                }
+            }
+
+            result = if (tcoUrl.isNotEmpty()) result.replace(tcoUrl.last(), "") else result
+            result = "$result\n\uD83D\uDD17 > https://twitter.com/${user.name}/status/$idAsString\n这条推文是 ${duration.toKotlinDuration().toFriendly()} 前发送的"
+
+            return result
         }
 
         var result = text + extraText
 
         val tcoUrl = mutableListOf<String>()
 
-        BotVariables.tcoPattern.matcher(result).run {
+        BotVariables.tcoPattern.matcher(text).run {
             while (find()) {
                 tcoUrl.add(group())
             }
         }
 
-        val tweetUrl = tcoUrl.last()
-
-        result = result.replace(tweetUrl, "")
-        result = "$result\n\uD83D\uDD17 > $tweetUrl\n这条推文是 $duration 前发送的"
+        result = if (tcoUrl.isNotEmpty()) result.replace(tcoUrl.last(), "") else result
+        result = "$result\n\uD83D\uDD17 > https://twitter.com/${user.twitterId}/status/$idAsString\n这条推文是 ${duration.toKotlinDuration().toFriendly()} 前发送的"
 
         return result
     }

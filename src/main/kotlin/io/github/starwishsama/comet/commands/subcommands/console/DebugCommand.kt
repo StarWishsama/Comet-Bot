@@ -17,18 +17,18 @@ class DebugCommand : ConsoleCommand {
         if (args.isNotEmpty()) {
             when (args[0]) {
                 "sessions" -> {
-                    val sb = StringBuilder("目前活跃的会话列表: \n")
                     val sessions = SessionManager.getSessions()
-                    if (sessions.isEmpty()) {
-                        sb.append("无")
-                    } else {
-                        var i = 1
-                        for (session in sessions) {
-                            sb.append(i + 1).append(" ").append(session.key.toString()).append("\n")
-                            i++
+                    return StringBuilder("目前活跃的会话列表: \n").apply {
+                        if (sessions.isEmpty()) {
+                            append("无")
+                        } else {
+                            var i = 1
+                            for (session in sessions) {
+                                append(i + 1).append(" ").append(session.key.toString()).append("\n")
+                                i++
+                            }
                         }
-                    }
-                    return sb.toString().trim()
+                    }.trim().toString()
                 }
                 "info" ->
                     return ("彗星 Bot ${BotVariables.version}\n已注册的命令个数: ${CommandExecutor.countCommands()}\n${BotUtil.getMemoryUsage()}")

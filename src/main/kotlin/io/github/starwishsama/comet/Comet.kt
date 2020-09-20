@@ -144,34 +144,34 @@ object Comet {
         setupRCon()
 
         CommandExecutor.setupCommand(
-            arrayOf(
-                AdminCommand(),
-                ArkCommand(),
-                BiliBiliCommand(),
-                CheckInCommand(),
-                ClockInCommand(),
-                io.github.starwishsama.comet.commands.subcommands.chats.DebugCommand(),
-                DivineCommand(),
-                PCRCommand(),
-                GuessNumberCommand(),
-                HelpCommand(),
-                InfoCommand(),
-                MusicCommand(),
-                MuteCommand(),
-                PictureSearch(),
-                R6SCommand(),
-                RConCommand(),
-                KickCommand(),
-                TwitterCommand(),
-                VersionCommand(),
-                GroupConfigCommand(),
-                RSPCommand(),
-                RollCommand(),
-                // Console Command
-                StopCommand(),
-                DebugCommand(),
-                io.github.starwishsama.comet.commands.subcommands.console.AdminCommand()
-            )
+                arrayOf(
+                        AdminCommand(),
+                        ArkNightCommand(),
+                        BiliBiliCommand(),
+                        CheckInCommand(),
+                        ClockInCommand(),
+                        io.github.starwishsama.comet.commands.subcommands.chats.DebugCommand(),
+                        DivineCommand(),
+                        PCRCommand(),
+                        GuessNumberCommand(),
+                        HelpCommand(),
+                        InfoCommand(),
+                        MusicCommand(),
+                        MuteCommand(),
+                        PictureSearch(),
+                        R6SCommand(),
+                        RConCommand(),
+                        KickCommand(),
+                        TwitterCommand(),
+                        VersionCommand(),
+                        GroupConfigCommand(),
+                        RSPCommand(),
+                        RollCommand(),
+                        // Console Command
+                        StopCommand(),
+                        DebugCommand(),
+                        io.github.starwishsama.comet.commands.subcommands.console.AdminCommand()
+                )
         )
 
         logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")

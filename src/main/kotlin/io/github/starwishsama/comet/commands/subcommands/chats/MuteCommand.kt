@@ -27,23 +27,21 @@ class MuteCommand : ChatCommand {
                     val at = event.message[At]
                     if (at != null && at.isContentNotEmpty()) {
                         doMute(event.group, at.target, getMuteTime(args[1]), false)
+                    } else if (args[0].isNumeric()) {
+                        doMute(event.group, args[0].toLong(), getMuteTime(args[1]), false)
                     } else {
-                        if (args[0].isNumeric()) {
-                            doMute(event.group, args[0].toLong(), getMuteTime(args[1]), false)
-                        } else {
-                            when (args[0]) {
-                                "all", "全体", "全禁", "全体禁言" -> doMute(
+                        when (args[0]) {
+                            "all", "全体", "全禁", "全体禁言" -> doMute(
                                     event.group,
                                     args[0].toLong(),
                                     getMuteTime(args[1]),
                                     false
-                                )
-                                "random", "rand", "随机", "抽奖" -> {
-                                    doRandomMute(event)
-                                    BotUtil.sendMessage("下面将抽取一位幸运群友禁言")
-                                }
-                                else -> getHelp().convertToChain()
+                            )
+                            "random", "rand", "随机", "抽奖" -> {
+                                doRandomMute(event)
+                                BotUtil.sendMessage("下面将抽取一位幸运群友禁言")
                             }
+                            else -> getHelp().convertToChain()
                         }
                     }
                 } else {

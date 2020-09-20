@@ -14,6 +14,7 @@ import io.github.starwishsama.comet.utils.network.MusicUtil
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import java.util.*
 
 @CometCommand
 class MusicCommand : ChatCommand {
@@ -21,13 +22,19 @@ class MusicCommand : ChatCommand {
         val api = BotVariables.cfg.musicApi
         if (BotUtil.hasNoCoolDown(event.sender.id)) {
             if (args.isNotEmpty()) {
-                if (args[0].contentEquals("api")) {
-                    if (args.size > 1) {
-                        when (args[1].toUpperCase()) {
-                            "QQ", "TX", "腾讯" -> BotVariables.cfg.musicApi = MusicApi.QQ
-                            "NETEASE", "网易", "WY" -> BotVariables.cfg.musicApi = MusicApi.NETEASE
+                if (args.size > 1) {
+                    when (args[0].toLowerCase(Locale.ROOT)) {
+                        "api" -> {
+                            if (args.size > 1) {
+                                when (args[1].toUpperCase()) {
+                                    "QQ", "TX", "腾讯" -> BotVariables.cfg.musicApi = MusicApi.QQ
+                                    "NETEASE", "网易", "WY" -> BotVariables.cfg.musicApi = MusicApi.NETEASE
+                                }
+                                return BotUtil.sendMessage("音乐API已修改为 ${BotVariables.cfg.musicApi}")
+                            }
                         }
-                        return BotUtil.sendMessage("音乐API已修改为 ${BotVariables.cfg.musicApi}")
+                        "QQ", "TX", "腾讯" -> MusicUtil.searchQQMusic(args.getRestString(1))
+                        "NETEASE", "网易", "WY" -> MusicUtil.searchNetEaseMusic(args.getRestString(1))
                     }
                 } else {
                     return when (api) {
