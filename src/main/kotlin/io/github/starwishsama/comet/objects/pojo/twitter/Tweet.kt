@@ -54,78 +54,61 @@ data class Tweet(
         val duration =
                 Duration.between(getSentTime(), LocalDateTime.now())
         val extraText =
-                "\n❤${likeCount?.getBetterNumber()} | \uD83D\uDD01${retweetCount} | 🕘${DateTimeFormatter.ofPattern("HH:mm:ss").format(getSentTime())}"
+                "❤${likeCount?.getBetterNumber()} | \uD83D\uDD01${retweetCount} | 🕘${DateTimeFormatter.ofPattern("HH:mm:ss").format(getSentTime())}"
 
         if (retweetStatus != null) {
-            var result = "转发了 ${retweetStatus.user.name} 的推文\n${retweetStatus.text}" + extraText
-
-            val tcoUrl = mutableListOf<String>()
-
-            BotVariables.tcoPattern.matcher(retweetStatus.text).run {
-                while (find()) {
-                    tcoUrl.add(group())
-                }
-            }
-
-            result = if (tcoUrl.isNotEmpty()) result.replace(tcoUrl.last(), "") else result
-            result = "$result\n\uD83D\uDD17 > https://twitter.com/${user.name}/status/$idAsString\n这条推文是 ${duration.toKotlinDuration().toFriendly()} 前发送的"
-
-            return result
+            return """
+                转发了 ${retweetStatus.user.name} 的推文
+                ${cleanShortUrlAtEnd(retweetStatus.text)}
+                $extraText
+                🔗 > https://twitter.com/${user.name}/status/$idAsString
+                在 ${duration.toKotlinDuration().toFriendly()} 前发送
+            """.trimIndent()
         }
 
         if (isQuoted && quotedStatus != null) {
-            var result = "对于 ${quotedStatus.user.name} 的推文\n${quotedStatus.text}\n\n${user.name} 进行了评论\n$text" + extraText
-            val tcoUrl = mutableListOf<String>()
-
-            BotVariables.tcoPattern.matcher(quotedStatus.text).run {
-                while (find()) {
-                    tcoUrl.add(group())
-                }
-            }
-
-            result = if (tcoUrl.isNotEmpty()) result.replace(tcoUrl.last(), "") else result
-            result = "$result\n\uD83D\uDD17 > https://twitter.com/${user.name}/status/$idAsString\n这条推文是 ${duration.toKotlinDuration().toFriendly()} 前发送的"
-
-            return result
+            return """
+                对于 ${quotedStatus.user.name} 的推文
+                ${cleanShortUrlAtEnd(quotedStatus.text)} 
+                
+                ${user.name} 进行了评论
+                ${cleanShortUrlAtEnd(text)}
+                $extraText
+                🔗 > https://twitter.com/${user.name}/status/$idAsString
+                在 ${duration.toKotlinDuration().toFriendly()} 前发送
+            """.trimIndent()
         }
 
         if (replyTweetId != null) {
             val repliedTweet = try {
                 TwitterApi.getTweetById(replyTweetId)
             } catch (t: Throwable) {
-                return text + extraText
+                return """
+            ${cleanShortUrlAtEnd(text)}
+            $extraText
+            🔗 > https://twitter.com/${user.name}/status/$idAsString
+            在 ${duration.toKotlinDuration().toFriendly()} 前发送
+        """.trimIndent()
             }
 
-            var result = "对于 ${repliedTweet.user.name} 的推文\n${repliedTweet.text}\n\n${user.name} 进行了回复\n$text" + extraText
-
-            val tcoUrl = mutableListOf<String>()
-
-            BotVariables.tcoPattern.matcher(repliedTweet.text).run {
-                while (find()) {
-                    tcoUrl.add(group())
-                }
-            }
-
-            result = if (tcoUrl.isNotEmpty()) result.replace(tcoUrl.last(), "") else result
-            result = "$result\n\uD83D\uDD17 > https://twitter.com/${user.name}/status/$idAsString\n这条推文是 ${duration.toKotlinDuration().toFriendly()} 前发送的"
-
-            return result
+            return """
+                对于 ${repliedTweet.user.name} 的推文:
+                ${cleanShortUrlAtEnd(repliedTweet.text)}
+                
+                ${user.name} 进行了回复
+                ${cleanShortUrlAtEnd(text)}
+                $extraText
+                🔗 > https://twitter.com/${user.name}/status/$idAsString
+                在 ${duration.toKotlinDuration().toFriendly()} 前发送
+            """.trimIndent()
         }
 
-        var result = text + extraText
-
-        val tcoUrl = mutableListOf<String>()
-
-        BotVariables.tcoPattern.matcher(text).run {
-            while (find()) {
-                tcoUrl.add(group())
-            }
-        }
-
-        result = if (tcoUrl.isNotEmpty()) result.replace(tcoUrl.last(), "") else result
-        result = "$result\n\uD83D\uDD17 > https://twitter.com/${user.twitterId}/status/$idAsString\n这条推文是 ${duration.toKotlinDuration().toFriendly()} 前发送的"
-
-        return result
+        return """
+            ${cleanShortUrlAtEnd(text)}
+            $extraText
+            🔗 > https://twitter.com/${user.name}/status/$idAsString
+            在 ${duration.toKotlinDuration().toFriendly()} 前发送
+        """.trimIndent()
     }
 
     /**
@@ -171,7 +154,7 @@ data class Tweet(
         }
 
         /**
-         * 如果推文中没有图片, 则尝试获取转发的推文中的图片
+         * 如果推文中没有图片, 则尝试获取转推中的图片
          */
         if (retweetStatus != null) {
             return retweetStatus.getPictureUrl()
@@ -185,5 +168,20 @@ data class Tweet(
         }
 
         return null
+    }
+
+    /**
+     * 清理推文中末尾的 t.co 短链
+     */
+    private fun cleanShortUrlAtEnd(tweet: String): String {
+        val tcoUrl = mutableListOf<String>()
+
+        BotVariables.tcoPattern.matcher(tweet).run {
+            while (find()) {
+                tcoUrl.add(group())
+            }
+        }
+
+        return if (tcoUrl.isNotEmpty()) tweet.replace(tcoUrl.last(), "") else tweet
     }
 }
