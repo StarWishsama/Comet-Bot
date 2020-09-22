@@ -40,6 +40,7 @@ class CheckInCommand : ChatCommand {
     private fun checkIn(sender: User, msg: MessageEvent, user: BotUser): String {
         return run {
             val point = calculatePoint(user)
+
             var extra = "\n连续签到 ${user.checkInTime} 天, 额外获得了 ${point[1]} 点积分~"
             if (user.checkInTime < 2 || point[1] == 0.0) {
                 extra = ""
@@ -75,10 +76,10 @@ class CheckInCommand : ChatCommand {
         user.lastCheckInTime = now
 
         // 只取小数点后一位，将最大奖励点数限制到 3 倍
-        // 你爆率写这么高干锤子
         val awardProp = 0.15 * (user.checkInTime - 1)
-        // 在吗 为什么不用新的随机数工具 自带的爆率好像有点高
+        // 使用随机数工具生成基础积分
         val basePoint = RandomUtil.randomDouble(0.0, 10.0, 1, RoundingMode.HALF_DOWN)
+        // 连续签到的奖励积分
         val awardPoint = (if (awardProp < 3) {
             String.format("%.1f", awardProp * basePoint).toDouble()
         } else {

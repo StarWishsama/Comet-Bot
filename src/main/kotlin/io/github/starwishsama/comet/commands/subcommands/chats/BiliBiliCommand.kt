@@ -21,7 +21,8 @@ import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import org.apache.commons.lang3.Validate
+import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.asMessageChain
 
 @CometCommand
 class BiliBiliCommand : ChatCommand {
@@ -44,11 +45,11 @@ class BiliBiliCommand : ChatCommand {
                             event.quoteReply("请稍等...")
                             val item = FakeClientApi.getUser(args[1])
                             if (item != null) {
-                                val before = item.title + "\n粉丝数: " + item.fans +
+                                val text = item.title + "\n粉丝数: " + item.fans +
                                         "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
                                         "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") + "\n"
                                 val dynamic = MainApi.getDynamic(item.mid)
-                                before.convertToChain() + getDynamicText(dynamic, event)
+                                text.convertToChain() + getDynamicText(dynamic, event)
                             } else {
                                 BotUtil.sendMessage("找不到对应的B站用户")
                             }
@@ -89,13 +90,16 @@ class BiliBiliCommand : ChatCommand {
 
     private suspend fun advancedSubscribe(user: BotUser, args: List<String>, event: MessageEvent): MessageChain {
         try {
-            Validate.isTrue(args.size > 1, getHelp())
-            Validate.isTrue((user.isBotAdmin() || (event is GroupMessageEvent && event.sender.isOperator())), BotUtil.getLocalMessage("msg.no-permission"))
+            if (args.size <= 1) return getHelp().convertToChain()
+
+            if (!hasPermission(user, event)) {
+                return BotUtil.getLocalMessage("msg.no-permission").convertToChain()
+            }
 
             return if (args[1].contains("|")) {
                 val users = args[1].split("|")
                 val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
-                subscribeUsers(users, id) ?: BotUtil.sendMessage("订阅多个直播间成功 你好D啊", true)
+                subscribeUsers(users, id) ?: BotUtil.sendMessage("订阅多个直播间成功", true)
             } else {
                 val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
                 val result = subscribe(args[1], id)
@@ -183,12 +187,12 @@ class BiliBiliCommand : ChatCommand {
 
     private suspend fun getDynamicText(dynamic: MessageWrapper?, event: MessageEvent): MessageChain {
         return if (dynamic == null) {
-            ("\n无最近动态").convertToChain()
+            PlainText("\n无最近动态").asMessageChain()
         } else {
             if (dynamic.text != null) {
                 dynamic.toMessageChain(event.subject)
             } else {
-                ("\n无最近动态").convertToChain()
+                PlainText("\n无最近动态").asMessageChain()
             }
         }
     }

@@ -37,7 +37,11 @@ class MiniVideo : DynamicData {
 
         item?.cover?.originImgURL.let {
             if (it != null) {
-                wrapped.picUrl = it
+                try {
+                    wrapped.plusImageUrl(it)
+                } catch (e: UnsupportedOperationException) {
+                    return@let
+                }
             }
         }
 

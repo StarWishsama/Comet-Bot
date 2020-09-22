@@ -36,7 +36,7 @@ class R6SCommand : ChatCommand {
                                 val result = getR6SInfo(args[1])
                                 event.sender.at() + ("\n" + result)
                             } else {
-                                BotUtil.sendMessage("你输入的 ID 名不符合育碧用户名规范!")
+                                BotUtil.sendMessage("你输入的 ID 不符合育碧用户名规范!")
                             }
                         }
                     }

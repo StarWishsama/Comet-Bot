@@ -15,7 +15,7 @@ data class Article(@SerializedName("title")
     override suspend fun getContact(): MessageWrapper {
         val wrapped = MessageWrapper("专栏 $title: $context\n查看全文: https://www.bilibili.com/read/cv/$id\n")
         if (!imageURL.isNullOrEmpty()) {
-            wrapped.picUrl = imageURL[0]
+            wrapped.plusImageUrl(imageURL[0])
         }
         return wrapped
     }

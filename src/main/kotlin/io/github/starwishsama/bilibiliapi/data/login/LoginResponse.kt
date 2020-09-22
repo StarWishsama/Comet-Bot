@@ -14,16 +14,16 @@ data class LoginResponse(
     var ts: Long // 1550219689
 ) {
     data class Data(
-        @SerializedName("cookie_info")
-        var cookieInfo: CookieInfo,
-        @SerializedName("sso")
-        var sso: List<String>,
-        @SerializedName("status")
-        var status: Int, // 0
-        @SerializedName("token_info")
-        var tokenInfo: TokenInfo,
-        @SerializedName("url")
-        var url: String
+            @SerializedName("cookie_info")
+            var cookieInfo: CookieInfo,
+            @SerializedName("sso")
+            var sso: List<String>,
+            @SerializedName("status")
+            var status: Int, // 0
+            @SerializedName("token_info")
+            var tokenInfo: TokenInfo,
+            @SerializedName("url")
+            var url: String?
     ) {
         data class CookieInfo(
             @SerializedName("cookies")

@@ -33,10 +33,22 @@ data class Repost(@SerializedName("origin")
     override suspend fun getContact(): MessageWrapper {
         val originalDynamic = item?.originType?.let { getOriginalDynamic(originDynamic, it) }
                 ?: return MessageWrapper("源动态已被删除")
-        val repostPicture = originalDynamic.picUrl
+        val repostPicture = originalDynamic.pictureUrl
         val msg = MessageWrapper("转发了 ${if (item == null || item?.isDeleted()!!) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item?.content}\n" +
                 "原动态信息: \n${originalDynamic.text}")
-        if (!repostPicture.isNullOrEmpty()) msg.plusImageUrl(repostPicture)
+
+        if (repostPicture.isNotEmpty()) {
+            repostPicture.forEach {
+                if (!repostPicture.isNullOrEmpty()) {
+                    try {
+                        msg.plusImageUrl(it)
+                    } catch (e: UnsupportedOperationException) {
+                        return@forEach
+                    }
+                }
+            }
+        }
+
         return msg
     }
 

@@ -5,18 +5,21 @@ import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import java.time.LocalDateTime
 
-class ClockInData(var startTime: LocalDateTime, var endTime: LocalDateTime, private var groupUsers: List<Member>) {
+data class ClockInData(val startTime: LocalDateTime, val endTime: LocalDateTime, private var groupUsers: List<Member>) {
     var checkedUsers = arrayListOf<Member>()
     var lateUsers = arrayListOf<Member>()
 
+    /**
+     * 查看打卡数据
+     */
     fun viewData(): MessageWrapper {
         val checkedCount = checkedUsers.size
         var lateText = StringBuilder()
         var unCheckedText = StringBuilder()
 
-        val unChecked = groupUsers.minus(checkedUsers).minus(lateUsers)
+        val unCheckedUsers = groupUsers.minus(checkedUsers).minus(lateUsers)
 
-        unChecked.forEach { member ->
+        unCheckedUsers.forEach { member ->
             run {
                 unCheckedText.append(member.nameCardOrNick).append(",")
             }

@@ -28,6 +28,7 @@ object YoutubeApi : ApiExecutor {
     @Throws(ApiKeyIsEmptyException::class, HttpException::class)
     fun getChannelVideos(channelId: String, count: Int = 5): SearchVideoResult? {
         if (!init) init()
+
         if (!searchApi.contains("key")) throw ApiKeyIsEmptyException("Youtube")
 
         val request = NetUtil.doHttpRequestGet("${searchApi}id&channelId=${channelId}$maxResult${count}", 5000)

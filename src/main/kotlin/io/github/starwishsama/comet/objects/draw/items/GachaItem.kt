@@ -7,11 +7,16 @@ abstract class GachaItem {
     /**
      * 物品名称
      */
-    abstract var name: String
+    abstract val name: String
 
     /**
      * 稀有度, 按照数字排列
      * 在不同游戏下有不同的规则
      */
-    abstract var rare: Int
+    abstract val rare: Int
+
+    /**
+     * 物品数量
+     */
+    abstract val count: Int
 }

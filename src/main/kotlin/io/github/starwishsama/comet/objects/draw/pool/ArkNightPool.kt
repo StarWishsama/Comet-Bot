@@ -5,17 +5,11 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
 import io.github.starwishsama.comet.utils.DrawUtil
-import io.github.starwishsama.comet.utils.FileUtil
-import java.awt.image.BufferedImage
-import java.io.File
-import java.io.InputStream
 import java.math.RoundingMode
 import java.util.*
 import java.util.stream.Collectors
-import javax.imageio.ImageIO
 
-class ArkNightPool : GachaPool() {
-    override val name: String = "ArkNight"
+class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
     override val tenjouCount: Int = -1
     override val tenjouRare: Int = -1
     override val poolItems: MutableList<ArkNightOperator> = BotVariables.arkNight
@@ -40,16 +34,18 @@ class ArkNightPool : GachaPool() {
 
             // 然后检查是否到了出 UP 角色的时候
             if (highProbabilityItems.isNotEmpty()) {
-                highProbabilityItems.forEach { (gachaItem, range) ->
-                    if (probability in range) {
-                        result.add(gachaItem as ArkNightOperator)
-                        return@repeat
-                    }
+                val targetUps = highProbabilityItems.keys.parallelStream().collect(Collectors.toList())
+                val targetUp = targetUps[RandomUtil.randomInt(0, targetUps.size - 1)]
+
+                val targetProbability = highProbabilityItems[targetUp]
+
+                if (targetProbability != null && probability in targetProbability) {
+                    result.add(targetUp as ArkNightOperator)
+                    return@repeat
                 }
             }
 
-            val rare: Int
-            rare = when (probability) {
+            val rare: Int = when (probability) {
                 in 0.48..0.50 -> 6
                 in 0.0..0.08 -> 5
                 in 0.40..0.90 -> 4
@@ -69,57 +65,6 @@ class ArkNightPool : GachaPool() {
         val index = RandomUtil.randomInt(0, rareItems.size)
 
         return rareItems[index]
-    }
-
-    /**
-     * 根据抽卡结果合成图片
-     */
-    fun combineArkOpImage(list: List<ArkNightOperator>): BufferedImage {
-        /**
-         * 缩小图片大小，减少流量消耗
-         */
-        val zoom = 2
-        val height = 728 / zoom
-
-        val newBufferedImage: BufferedImage = if (list.size == 1) {
-            BufferedImage(256 / zoom, height, BufferedImage.TYPE_INT_RGB)
-        } else {
-            BufferedImage(2560 / zoom, height, BufferedImage.TYPE_INT_RGB)
-        }
-
-        val createGraphics = newBufferedImage.createGraphics()
-
-        var newBufferedImageWidth = 0
-        val newBufferedImageHeight = 0
-
-        for (i in list) {
-            val file = File(FileUtil.getChildFolder(FileUtil.getResourceFolder().toString() + File.separator + i.rare), i.name + ".jpg")
-            // 判断对应图片文件是否存在
-            if (file.exists()) {
-                val inStream: InputStream = file.inputStream()
-
-                val bufferedImage: BufferedImage = ImageIO.read(inStream)
-
-                val imageWidth = bufferedImage.width / zoom
-                val imageHeight = bufferedImage.height / zoom
-
-                createGraphics.drawImage(
-                        bufferedImage.getScaledInstance(
-                                imageWidth,
-                                imageHeight,
-                                java.awt.Image.SCALE_SMOOTH
-                        ), newBufferedImageWidth, newBufferedImageHeight, imageWidth, imageHeight, null
-                )
-
-                newBufferedImageWidth += imageWidth
-            }
-
-        }
-
-        createGraphics.dispose()
-
-        return newBufferedImage
-
     }
 
     /**

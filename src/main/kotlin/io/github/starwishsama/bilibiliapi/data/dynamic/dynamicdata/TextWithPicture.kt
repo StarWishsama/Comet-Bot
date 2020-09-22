@@ -18,7 +18,7 @@ data class TextWithPicture(var item: ItemBean?) : DynamicData {
         val wrapped = MessageWrapper("发布了动态:\n ${item?.text}\n")
 
         if (!item?.pictures.isNullOrEmpty()) {
-            item?.pictures?.get(0)?.imgUrl?.let { wrapped.picUrl = it }
+            item?.pictures?.get(0)?.imgUrl?.let { wrapped.plusImageUrl(it) }
         }
 
         return wrapped

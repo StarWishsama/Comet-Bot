@@ -58,24 +58,24 @@ data class Tweet(
 
         if (retweetStatus != null) {
             return """
-                转发了 ${retweetStatus.user.name} 的推文
-                ${cleanShortUrlAtEnd(retweetStatus.text)}
-                $extraText
-                🔗 > https://twitter.com/${user.name}/status/$idAsString
-                在 ${duration.toKotlinDuration().toFriendly()} 前发送
+            转发了 ${retweetStatus.user.name} 的推文
+            ${cleanShortUrlAtEnd(retweetStatus.text)}
+            $extraText
+            🔗 > https://twitter.com/${user.twitterId}/status/$idAsString
+            在 ${duration.toKotlinDuration().toFriendly()} 前发送
             """.trimIndent()
         }
 
         if (isQuoted && quotedStatus != null) {
             return """
-                对于 ${quotedStatus.user.name} 的推文
-                ${cleanShortUrlAtEnd(quotedStatus.text)} 
+            对于 ${quotedStatus.user.name} 的推文
+            ${cleanShortUrlAtEnd(quotedStatus.text)} 
                 
-                ${user.name} 进行了评论
-                ${cleanShortUrlAtEnd(text)}
-                $extraText
-                🔗 > https://twitter.com/${user.name}/status/$idAsString
-                在 ${duration.toKotlinDuration().toFriendly()} 前发送
+            ${user.name} 进行了评论
+            ${cleanShortUrlAtEnd(text)}
+            $extraText
+            🔗 > https://twitter.com/${user.twitterId}/status/$idAsString
+            在 ${duration.toKotlinDuration().toFriendly()} 前发送
             """.trimIndent()
         }
 
@@ -86,28 +86,28 @@ data class Tweet(
                 return """
             ${cleanShortUrlAtEnd(text)}
             $extraText
-            🔗 > https://twitter.com/${user.name}/status/$idAsString
+            🔗 > https://twitter.com/${user.twitterId}/status/$idAsString
             在 ${duration.toKotlinDuration().toFriendly()} 前发送
-        """.trimIndent()
+            """.trimIndent()
             }
 
             return """
-                对于 ${repliedTweet.user.name} 的推文:
-                ${cleanShortUrlAtEnd(repliedTweet.text)}
+            对于 ${repliedTweet.user.name} 的推文:
+            ${cleanShortUrlAtEnd(repliedTweet.text)}
                 
-                ${user.name} 进行了回复
-                ${cleanShortUrlAtEnd(text)}
-                $extraText
-                🔗 > https://twitter.com/${user.name}/status/$idAsString
-                在 ${duration.toKotlinDuration().toFriendly()} 前发送
+            ${user.name} 进行了回复
+            ${cleanShortUrlAtEnd(text)}
+            $extraText
+            🔗 > https://twitter.com/${user.twitterId}/status/$idAsString
+            在 ${duration.toKotlinDuration().toFriendly()} 前发送
             """.trimIndent()
         }
 
         return """
-            ${cleanShortUrlAtEnd(text)}
-            $extraText
-            🔗 > https://twitter.com/${user.name}/status/$idAsString
-            在 ${duration.toKotlinDuration().toFriendly()} 前发送
+        ${cleanShortUrlAtEnd(text)}
+        $extraText
+        🔗 > https://twitter.com/${user.twitterId}/status/$idAsString
+        在 ${duration.toKotlinDuration().toFriendly()} 前发送
         """.trimIndent()
     }
 
@@ -116,7 +116,7 @@ data class Tweet(
      */
     fun contentEquals(tweet: Tweet?): Boolean {
         if (tweet == null) return false
-        return text == tweet.text || getSentTime().isEqual(tweet.getSentTime())
+        return id == tweet.id || text == tweet.text || getSentTime().isEqual(tweet.getSentTime())
     }
 
     /**
@@ -130,41 +130,43 @@ data class Tweet(
     /**
      * 获取推文中的第一张图片
      */
-    fun getPictureUrl(): String? {
+    fun getPictureUrl(nestedMode: Boolean = false): String? {
         val jsonEntities = entities
 
         /**
          * 从此推文中获取图片链接
          */
-        if (jsonEntities != null) {
-            val media = jsonEntities["media"]
-            if (media != null) {
-                try {
-                    val image =
-                            gson.fromJson(media.asJsonArray[0].asJsonObject.toString(), Media::class.java)
-                    if (image.isSendableMedia()) {
-                        return image.getImageUrl()
-                    }
-                } catch (e: JsonSyntaxException) {
-                    BotVariables.logger.warning("在获取推文下的图片链接时发生了问题", e)
-                } catch (e: HttpException) {
-                    BotVariables.logger.warning("在获取推文下的图片链接时发生了问题", e)
+
+        val media = jsonEntities?.get("media")
+        if (media != null) {
+            try {
+                val image =
+                        gson.fromJson(media.asJsonArray[0].asJsonObject.toString(), Media::class.java)
+                if (image.isSendableMedia()) {
+                    return image.getImageUrl()
                 }
+            } catch (e: JsonSyntaxException) {
+                BotVariables.logger.warning("在获取推文下的图片链接时发生了问题", e)
+            } catch (e: HttpException) {
+                BotVariables.logger.warning("在获取推文下的图片链接时发生了问题", e)
             }
         }
 
-        /**
-         * 如果推文中没有图片, 则尝试获取转推中的图片
-         */
-        if (retweetStatus != null) {
-            return retweetStatus.getPictureUrl()
-        }
+        // 避免套娃
+        if (!nestedMode) {
+            /**
+             * 如果推文中没有图片, 则尝试获取转推中的图片
+             */
+            if (retweetStatus != null) {
+                return retweetStatus.getPictureUrl(true)
+            }
 
-        /**
-         * 如果推文中没有图片, 则尝试获取引用回复推文中的图片
-         */
-        if (quotedStatus != null) {
-            return quotedStatus.getPictureUrl()
+            /**
+             * 如果推文中没有图片, 则尝试获取引用回复推文中的图片
+             */
+            if (quotedStatus != null) {
+                return quotedStatus.getPictureUrl(true)
+            }
         }
 
         return null

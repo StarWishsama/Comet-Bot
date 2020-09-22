@@ -66,11 +66,35 @@ object MainApi : ApiExecutor {
         return MessageWrapper("获取时出现问题")
     }
 
+    /**
+     * 搜索用户
+     *
+     * 上方搜索栏 -> 用户
+     *
+     * @param order 排序维度. totalrank 默认排序,fans 粉丝, level 等级.
+     * @param orderSort 排序顺序. 0 从高到低, 1 从低到高.
+     * @param userType 用户类型. 0 全部用户, 1 up主, 2 普通用户, 3 认证用户.
+     *
+     */
+    /**@Suppress("SpellCheckingInspection")
+    fun searchUser(
+    @Query("highlight") highlight: Int = 1,
+    @Query("keyword") keyword: String,
+    @Query("order") order: String = "totalrank",
+    @Query("order_sort") orderSort: Int? = null,
+    @Query("pn") pageNumber: Int = 1,
+    @Query("ps") pageSize: Int = 20,
+    @Query("type") type: Int = 2,
+    @Query("user_type") userType: Int = 0
+    ): SearchUserResult {
+    val requestUrl = "https://app.bilibili.com/x/v2/search/type"
+    }*/
+
     override var usedTime: Int = 0
 
-    override fun isReachLimit() : Boolean {
+    override fun isReachLimit(): Boolean {
         return usedTime > getLimitTime()
     }
 
-    override fun getLimitTime() : Int = 500
+    override fun getLimitTime(): Int = 500
 }

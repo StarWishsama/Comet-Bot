@@ -9,28 +9,44 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.uploadAsImage
 
 open class MessageWrapper(var text: String?) {
-    var picUrl: String? = null
+    val pictureUrl: MutableList<String> = mutableListOf()
     var senderId: Long = 0
     var messageId: Long = 0
 
-    private suspend fun getPicture(contact: Contact): Image? {
-        if (picUrl != null) {
-            return picUrl?.let { NetUtil.getUrlInputStream(it)?.uploadAsImage(contact) }
+    private suspend fun getPictures(contact: Contact): List<Image> {
+        val images = mutableListOf<Image>()
+
+        pictureUrl.forEach {
+            val uploadedImage = NetUtil.getUrlInputStream(it)?.uploadAsImage(contact)
+            if (uploadedImage != null) images.add(uploadedImage)
         }
-        return null
+
+        return images
     }
 
+    @Throws(UnsupportedOperationException::class)
     fun plusImageUrl(url: String?): MessageWrapper {
-        this.picUrl = url
-        return this
+        if (url == null) return this
+
+        if (pictureUrl.size <= 9) {
+            pictureUrl.add(url)
+            return this
+        } else {
+            throw UnsupportedOperationException("出于防刷屏考虑, 最多只能添加九张照片")
+        }
     }
 
     suspend fun toMessageChain(contact: Contact): MessageChain {
         val textWrapper = text
         if (textWrapper != null) {
-            val image = getPicture(contact)
-            if (image != null) {
-                return textWrapper.convertToChain() + image
+            val images = getPictures(contact)
+            if (images.isNotEmpty()) {
+                var result = textWrapper.convertToChain()
+
+                images.forEach {
+                    result += it
+                }
+                return result
             }
             return textWrapper.convertToChain()
         }
@@ -38,6 +54,6 @@ open class MessageWrapper(var text: String?) {
     }
 
     override fun toString(): String {
-        return "MessageWrapper {text=$text, pictureUrl=$picUrl}, senderId=${senderId}, messageId=${messageId}"
+        return "MessageWrapper {text=$text, pictureUrls=$pictureUrl, senderId=$senderId, messageId=$messageId}"
     }
 }

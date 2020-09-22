@@ -24,6 +24,8 @@ class DivineCommand : ChatCommand {
             return if (args.isNotEmpty()) {
                 if (underCover == null) {
                     if (user.commandTime > 0 || user.level != UserLevel.USER) {
+                        if (args.isEmpty()) return BotUtil.sendMessage("请检查需要占卜的字符是否超过上限或为空!")
+
                         val randomEventName = args.getRestString(0)
                         if (randomEventName.isNotBlank() && randomEventName.length < 30) {
                             val result = RandomResult(-1000, RandomUtil.randomDouble(0.0, 1.0), randomEventName)

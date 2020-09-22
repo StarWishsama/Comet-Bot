@@ -11,7 +11,7 @@ import io.github.starwishsama.comet.objects.draw.items.GachaItem
  */
 abstract class GachaPool {
     /**
-     * 游戏卡池名称. 为便于统一, 请使用英文名.
+     * 游戏卡池名称
      */
     abstract val name: String
 

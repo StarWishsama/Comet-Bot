@@ -15,7 +15,11 @@ data class Video(var dynamic: String?,
         if (picURL != null) {
             picURL.let {
                 if (it != null) {
-                    wrapped.picUrl = it
+                    try {
+                        wrapped.plusImageUrl(it)
+                    } catch (e: UnsupportedOperationException) {
+                        return@let
+                    }
                 }
             }
         }

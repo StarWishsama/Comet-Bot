@@ -22,25 +22,28 @@ import net.mamoe.mirai.message.data.isContentNotEmpty
 @CometCommand
 class KickCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (event is GroupMessageEvent && (BotUtil.hasNoCoolDown(user.id) || event.sender.permission != MemberPermission.MEMBER)) {
-            if (event.group.botPermission.isOperator()) {
-                if (args.isNotEmpty()) {
-                    val at = event.message[At]
-                    if (at != null && at.isContentNotEmpty()) {
-                        doKick(event, at.target, "")
-                    } else {
-                        if (args[0].isNumeric()) {
-                            doKick(event, args[0].toLong(), "")
+        if (event is GroupMessageEvent && BotUtil.hasNoCoolDown(user.id)) {
+            if (hasPermission(user, event)) {
+                if (event.group.botPermission.isOperator()) {
+                    if (args.isNotEmpty()) {
+                        val at = event.message[At]
+                        if (at != null && at.isContentNotEmpty()) {
+                            doKick(event, at.target, "")
                         } else {
-                            getHelp().convertToChain()
+                            if (args[0].isNumeric()) {
+                                doKick(event, args[0].toLong(), "")
+                            } else {
+                                getHelp().convertToChain()
+                            }
                         }
-
+                    } else {
+                        return getHelp().convertToChain()
                     }
                 } else {
-                    return getHelp().convertToChain()
+                    BotUtil.sendMessage("我不是绿帽 我爬 我爬")
                 }
             } else {
-                BotUtil.sendMessage("我不是绿帽 我爬 我爬")
+                BotUtil.sendMessage("你不是绿帽 你爬 你爬")
             }
         }
         return EmptyMessageChain

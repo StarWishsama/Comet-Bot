@@ -18,8 +18,6 @@ import kotlinx.coroutines.launch
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.uploadAsImage
-import java.time.Duration
-import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 import kotlin.time.ExperimentalTime
 
@@ -50,7 +48,7 @@ object TweetUpdateChecker : CometPusher {
                 try {
                     val tweet = TwitterApi.getCachedTweet(username = userName, max = 1)
 
-                    if (tweet != null && !isOutdatedTweet(tweet, pushedTweet.tweet) && !tweet.contentEquals(pushedTweet.tweet)) {
+                    if (tweet != null && !tweet.contentEquals(pushedTweet.tweet)) {
                         pushedTweet.tweet = tweet
                         pushedTweet.hasPushed = false
                         count++
@@ -116,14 +114,5 @@ object TweetUpdateChecker : CometPusher {
 
     private data class PushedTweet(val groupsToPush: MutableSet<Long>, var hasPushed: Boolean) {
         var tweet: Tweet? = null
-    }
-
-    private fun isOutdatedTweet(retrieve: Tweet, previous: Tweet?): Boolean {
-        val isTooOld = Duration.between(retrieve.getSentTime(), LocalDateTime.now()).toMinutes() >= 30
-        var isShortInterval = false
-        previous?.let {
-            isShortInterval = Duration.between(it.getSentTime(), retrieve.getSentTime()).toMinutes() >= 5
-        }
-        return isTooOld || isShortInterval
     }
 }

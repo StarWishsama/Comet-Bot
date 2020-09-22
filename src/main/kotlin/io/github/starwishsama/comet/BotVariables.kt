@@ -30,7 +30,7 @@ import java.util.regex.Pattern
 
 object BotVariables {
     lateinit var filePath: File
-    const val version = "0.6-M1"
+    const val version = "0.6-M1 (5cffdb2)"
     lateinit var bot: Bot
 
     fun isBotInitialized(): Boolean = ::bot.isInitialized

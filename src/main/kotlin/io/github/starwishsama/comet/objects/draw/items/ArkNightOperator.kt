@@ -4,16 +4,17 @@ package io.github.starwishsama.comet.objects.draw.items
  * 明日方舟干员
  */
 data class ArkNightOperator(
-        override var name: String,
-        var des: String,
-        override var rare: Int = 0,
-        var position: String,
-        var birthplace: String,
-        var camp: String,
-        var team: String,
-        var tag: List<String>,
-        var approach: List<String>,
-        var race: List<String>,
+        override val name: String,
+        val des: String,
+        override val rare: Int = 0,
+        val position: String,
+        val birthplace: String,
+        val camp: String,
+        val team: String,
+        val tag: List<String>,
+        val approach: List<String>,
+        val race: List<String>,
+        override val count: Int,
 ) : GachaItem()
 
 /**

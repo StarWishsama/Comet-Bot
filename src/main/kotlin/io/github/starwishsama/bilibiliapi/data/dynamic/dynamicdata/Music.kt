@@ -14,7 +14,11 @@ data class Music(var id: Long,
 
         coverURL.let {
             if (it != null) {
-                wrapped.picUrl = it
+                try {
+                    wrapped.plusImageUrl(it)
+                } catch (e: UnsupportedOperationException) {
+                    return@let
+                }
             }
         }
 

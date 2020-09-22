@@ -7,19 +7,24 @@ import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
+import io.github.starwishsama.comet.objects.draw.pool.ArkNightPool
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.DrawUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.upload
 import org.apache.commons.lang3.StringUtils
-import java.awt.image.BufferedImage
 
 @CometCommand
 class ArkNightCommand : ChatCommand {
+    // 这只是一个临时测试, 未来将放入卡池链表中
+    private val pool = ArkNightPool()
+
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(event.sender.id)) {
             if (args.isNotEmpty()) {
@@ -27,36 +32,34 @@ class ArkNightCommand : ChatCommand {
                     "单次寻访", "1", "单抽" -> {
                         return if (BotVariables.cfg.arkDrawUseImage) {
                             event.reply("请稍等...")
-                            val list = DrawUtil.getArkDrawResult(user)
+                            val list = pool.getArkDrawResult(user)
                             if (list.isNotEmpty()) {
-                                val image: BufferedImage = DrawUtil.combineArkOpImage(list)
-                                val result = image.upload(event.subject)
-                                result.asMessageChain()
+                                val gachaImage = withContext(Dispatchers.Default) { DrawUtil.combineArkOpImage(list).upload(event.subject) }
+                                gachaImage.asMessageChain()
                             } else {
                                 DrawUtil.overTimeMessage.convertToChain()
                             }
                         } else {
-                            DrawUtil.getArkDrawResultAsString(user, 1).convertToChain()
+                            pool.getArkDrawResultAsString(user, 1).convertToChain()
                         }
                     }
                     "十连寻访", "10", "十连" -> {
                         return if (BotVariables.cfg.arkDrawUseImage) {
                             event.reply("请稍等...")
-                            val list: List<ArkNightOperator> = DrawUtil.getArkDrawResult(user, 10)
+                            val list: List<ArkNightOperator> = pool.getArkDrawResult(user, 10)
                             if (list.isNotEmpty()) {
-                                val image: BufferedImage = DrawUtil.combineArkOpImage(list)
-                                val result = image.upload(event.subject)
-                                result.asMessageChain()
+                                val gachaImage = withContext(Dispatchers.Default) { DrawUtil.combineArkOpImage(list).upload(event.subject) }
+                                gachaImage.asMessageChain()
                             } else {
                                 DrawUtil.overTimeMessage.convertToChain()
                             }
                         } else {
-                            DrawUtil.getArkDrawResultAsString(user, 10).convertToChain()
+                            pool.getArkDrawResultAsString(user, 10).convertToChain()
                         }
                     }
                     else -> {
                         return if (StringUtils.isNumeric(args[0])) {
-                            DrawUtil.getArkDrawResultAsString(user, args[0].toInt()).convertToChain()
+                            pool.getArkDrawResultAsString(user, args[0].toInt()).convertToChain()
                         } else {
                             getHelp().convertToChain()
                         }

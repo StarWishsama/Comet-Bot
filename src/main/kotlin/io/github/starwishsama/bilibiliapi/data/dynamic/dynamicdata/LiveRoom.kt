@@ -18,7 +18,7 @@ data class LiveRoom(@SerializedName("round_status")
                 "直播状态: ${roomInfo.getStatus(roundStatus).status}\n" +
                 "直达链接: ${roomInfo.getRoomURL()}\n")
         if (roomInfo.backgroundImageUrl.isNotEmpty()) {
-            wrapped.picUrl = roomInfo.backgroundImageUrl
+            wrapped.plusImageUrl(roomInfo.backgroundImageUrl)
         }
         return wrapped
     }

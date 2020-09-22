@@ -6,6 +6,9 @@ import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 
 data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
 
+    /**
+     * 是否自动接受入群请求
+     */
     @SerializedName("auto_accept")
     var autoAccept: Boolean = false
 

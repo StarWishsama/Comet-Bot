@@ -23,9 +23,8 @@ jar {
     }
 }
 
-//def gitCommitId = 'git rev-parse --short HEAD'
-//def versionCode = "0.6-DEV-" + gitCommitId.execute().text.trim() + "-" + new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
-def versionCode = "0.6-M1"
+def gitCommitId = 'git rev-parse --short HEAD'
+def versionCode = "0.6-M1-" + gitCommitId.execute().text.trim()
 
 group 'io.github.starwishsama.comet'
 version versionCode
