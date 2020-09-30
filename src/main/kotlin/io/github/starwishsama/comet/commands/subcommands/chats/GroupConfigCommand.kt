@@ -91,9 +91,9 @@ class GroupConfigCommand : ChatCommand {
         /group func 启用/禁用本群可使用的命令
     """.trimIndent()
 
-    override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean {
+    override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
         val level = getProps().level
-        if (botUser.compareLevel(level)) return true
+        if (user.compareLevel(level)) return true
         if (e is GroupMessageEvent && e.sender.permission > MemberPermission.MEMBER) return true
         return false
     }

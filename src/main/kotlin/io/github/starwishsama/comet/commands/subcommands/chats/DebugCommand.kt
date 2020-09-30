@@ -8,9 +8,11 @@ import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
+import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.pushers.TweetUpdateChecker
+import io.github.starwishsama.comet.pushers.YoutubeStreamingChecker
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.FileUtil
@@ -65,6 +67,7 @@ class DebugCommand : ChatCommand {
                     }
                 }
                 "help" -> return PlainText(getHelp()).asMessageChain()
+                "commands", "cmds" -> return CommandExecutor.getCommands().toString().convertToChain()
                 "info" -> {
                     val ping = try {
                         NetUtil.checkPingValue()
@@ -92,19 +95,36 @@ class DebugCommand : ChatCommand {
                     TweetUpdateChecker.retrieve()
                     return BotUtil.sendMessage("Tweet retriever has been triggered and run~")
                 }
+                "ytbpush" -> {
+                    YoutubeStreamingChecker.retrieve()
+                    return BotUtil.sendMessage("Youtube retriever has been triggered and run~")
+                }
                 "youtube" -> {
                     if (args.size > 1) {
+                        if (event is GroupMessageEvent) {
+                            val cfg = GroupConfigManager.getConfigSafely(event.group.id)
+                            cfg.youtubePushEnabled = true
+                            cfg.youtubeSubscribers.add(args[1])
+                            return "订阅成功.".convertToChain()
+                        }
                         val result = YoutubeApi.getChannelVideos(args[1], 10)
                         return YoutubeApi.getLiveStatusByResult(result).toMessageChain(event.subject)
                     }
                 }
+                "twipool" -> {
+                    return StringBuilder().apply {
+                        TweetUpdateChecker.pushPool.forEach { (k, v) ->
+                            append(k).append(" ").append(v.groupsToPush).append("\n")
+                        }
+                    }.toString().trim().convertToChain()
+                }
                 "rss" -> {
                     if (args.size > 1) {
                         return RssUtil.simplifyHTML(
-                            RssUtil.getFromEntry(
-                                RssUtil.getEntryFromURL(args[1])
-                                    ?: return "Can't retrieve page content".convertToChain()
-                            )
+                                RssUtil.getFromEntry(
+                                        RssUtil.getEntryFromURL(args[1])
+                                                ?: return "Can't retrieve page content".convertToChain()
+                                )
                         ).convertToChain()
                     }
                 }

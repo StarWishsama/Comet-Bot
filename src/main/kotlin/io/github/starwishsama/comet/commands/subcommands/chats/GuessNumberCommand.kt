@@ -38,23 +38,19 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
                         return BotUtil.sendMessage("来猜个数字吧! 范围 [0, 100]")
                     }
                     args.size == 2 -> {
-                        try {
-                            val min = args[0].toInt()
-                            val max = args[1].toInt()
-                            if (min <= 0 || max <= 0) {
-                                throw NumberFormatException("不支持负数")
-                            }
-
-                            if (min >= max) {
-                                throw NumberFormatException("最小值不能大于等于最大值")
-                            }
-                            val answer = RandomUtil.randomInt(min, max + 1)
-                            BotVariables.logger.verbose("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
-                            SessionManager.addSession(GuessNumberSession(event.group.id, RandomUtil.randomInt(0, 100)))
-                            return BotUtil.sendMessage("猜一个数字吧! 范围 [$min, $max]")
-                        } catch (e: NumberFormatException) {
-                            return BotUtil.sendMessage("${e.message}")
+                        val min = args[0].toInt()
+                        val max = args[1].toInt()
+                        if (min <= 0 || max <= 0) {
+                            return BotUtil.sendMessage("不支持负数")
                         }
+
+                        if (min >= max) {
+                            return BotUtil.sendMessage("最小值不能大于等于最大值")
+                        }
+                        val answer = RandomUtil.randomInt(min, max + 1)
+                        BotVariables.logger.verbose("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
+                        SessionManager.addSession(GuessNumberSession(event.group.id, RandomUtil.randomInt(0, 100)))
+                        return BotUtil.sendMessage("猜一个数字吧! 范围 [$min, $max]")
                     }
                     else -> {
                         return getHelp().convertToChain()
@@ -93,10 +89,10 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
 
             when {
                 answerInInt > trueAnswer -> {
-                    event.reply(BotUtil.sendMessage("你猜的数字大了").contentToString())
+                    event.reply(BotUtil.sendMessage("你猜的数字大了"))
                 }
                 answerInInt < trueAnswer -> {
-                    event.reply(BotUtil.sendMessageAsString("你猜的数字小了"))
+                    event.reply(BotUtil.sendMessage("你猜的数字小了"))
                 }
                 answerInInt == trueAnswer -> {
                     session.usedTime = Duration.between(session.startTime, LocalDateTime.now())

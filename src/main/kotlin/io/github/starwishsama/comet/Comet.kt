@@ -21,12 +21,9 @@ import io.github.starwishsama.comet.pushers.BiliLiveChecker
 import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.pushers.TweetUpdateChecker
 import io.github.starwishsama.comet.pushers.YoutubeStreamingChecker
-import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
-import io.github.starwishsama.comet.utils.TaskUtil
-import io.github.starwishsama.comet.utils.getContext
-import io.github.starwishsama.comet.utils.writeString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -39,10 +36,7 @@ import net.mamoe.mirai.join
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.network.LoginFailedException
-import net.mamoe.mirai.utils.BotConfiguration
-import net.mamoe.mirai.utils.FileCacheStrategy
-import net.mamoe.mirai.utils.PlatformLogger
-import net.mamoe.mirai.utils.secondsToMillis
+import net.mamoe.mirai.utils.*
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
@@ -114,6 +108,7 @@ object Comet {
 
                 it.retrieve()
             }
+            it.bot = bot
             it.future = future
         }
     }
@@ -167,6 +162,7 @@ object Comet {
                         GroupConfigCommand(),
                         RSPCommand(),
                         RollCommand(),
+                        YoutubeCommand(),
                         // Console Command
                         StopCommand(),
                         DebugCommand(),
@@ -200,16 +196,28 @@ object Comet {
 
         bot.subscribeMessages {
             always {
+                val executedTime = LocalDateTime.now()
                 if (sender.id != 80000000L) {
                     if (this is GroupMessageEvent && group.isBotMuted) return@always
 
+                    val isCommand: Boolean
                     val result = CommandExecutor.dispatchCommand(this)
+
+                    isCommand = result.msg !is EmptyMessageChain
+
                     try {
-                        if (result.msg !is EmptyMessageChain && result.msg.isNotEmpty()) {
+                        if (isCommand && result.msg.isNotEmpty()) {
                             reply(result.msg)
                         }
                     } catch (e: IllegalArgumentException) {
                         logger.warning("正在尝试发送空消息, 执行的命令为 $result")
+                    }
+
+                    if (isCommand) {
+                        logger.debugS(
+                                "[命令] 命令执行耗时 ${Duration.between(executedTime, LocalDateTime.now()).toKotlinDuration().asHumanReadable}" +
+                                        if (result.result.isNotEmpty()) ", 执行结果: ${result.result}" else ""
+                        )
                     }
                 }
             }

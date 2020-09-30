@@ -55,7 +55,7 @@ class MuteCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("mute", arrayListOf("jy", "禁言"), "禁言", "nbot.commands.mute", UserLevel.USER)
+            CommandProps("mute", arrayListOf("jy", "禁言"), "禁言", "nbot.commands.mute", UserLevel.USER)
 
     override fun getHelp(): String = """
         ======= 命令帮助 =======
@@ -63,8 +63,8 @@ class MuteCommand : ChatCommand {
         时长为 0 时解禁
     """.trimIndent()
 
-    override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean {
-        if (super.hasPermission(botUser, e)) return true
+    override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
+        if (super.hasPermission(user, e)) return true
         if (e is GroupMessageEvent) {
             if (e.sender.permission >= MemberPermission.ADMINISTRATOR) return true
             val cfg = GroupConfigManager.getConfigSafely(e.group.id)
@@ -133,6 +133,7 @@ class MuteCommand : ChatCommand {
     /**
      * 这段代码看起来很神必
      * 但是 It just works.
+     * FIXME: 更换为正则表达式更优雅的处理
      */
     private fun getMuteTime(message: String): Long {
         var banTime = 0L

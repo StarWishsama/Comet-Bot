@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.pushers
 
+import net.mamoe.mirai.Bot
 import java.util.concurrent.ScheduledFuture
 
 interface CometPusher {
@@ -17,6 +18,11 @@ interface CometPusher {
      * 获取该推送器的 Future
      */
     var future: ScheduledFuture<*>?
+
+    /**
+     * 获取该推送器使用的 Bot 实例
+     */
+    var bot: Bot?
 
     /**
      * 获取逻辑

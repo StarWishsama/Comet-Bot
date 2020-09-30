@@ -11,17 +11,19 @@ import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
+import io.github.starwishsama.comet.pushers.TweetUpdateChecker
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.NetUtil
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
-import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.uploadAsImage
+import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.asMessageChain
 import kotlin.time.ExperimentalTime
 
 @CometCommand
@@ -51,6 +53,13 @@ class TwitterCommand : ChatCommand {
                         cfg.twitterPushEnabled = !cfg.twitterPushEnabled
                         return BotUtil.sendMessage("蓝鸟动态推送已${if (cfg.twitterPushEnabled) "开启" else "关闭"}")
                     }
+                    "id" -> {
+                        return if (args[1].isNumeric()) {
+                            getTweetByID(args[1].toLong(), event.subject)
+                        } else {
+                            "请输入有效数字".convertToChain()
+                        }
+                    }
                     else -> getHelp().convertToChain()
                 }
             }
@@ -67,8 +76,8 @@ class TwitterCommand : ChatCommand {
         /twit push 开启/关闭本群推文推送
     """.trimIndent()
 
-    override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean {
-        if (super.hasPermission(botUser, e)) return true
+    override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
+        if (super.hasPermission(user, e)) return true
         if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true
         return false
     }
@@ -89,16 +98,11 @@ class TwitterCommand : ChatCommand {
     }
 
     @ExperimentalTime
-    private suspend fun getTweetWithDesc(name: String, subject: Contact, index: Int = 1, max: Int = 10): MessageChain {
+    private fun getTweetWithDesc(name: String, subject: Contact, index: Int = 1, max: Int = 10): MessageChain {
         return try {
             val tweet = TwitterApi.getCachedTweet(name, index, max)
             if (tweet != null) {
-                val resultMessage = BotUtil.sendMessage("\n${tweet.user.name}\n${tweet.convertToString()}")
-                val imageUrl = tweet.getPictureUrl()
-                var image: Image? = null
-
-                if (imageUrl != null) image = NetUtil.getUrlInputStream(imageUrl)?.uploadAsImage(subject)
-                if (image != null) resultMessage + image else resultMessage
+                return BotUtil.sendMessage("\n${tweet.user.name}\n").plus(tweet.toMessageChain(subject))
             } else {
                 BotUtil.sendMessage("获取到的推文为空")
             }
@@ -143,10 +147,16 @@ class TwitterCommand : ChatCommand {
         val cfg = GroupConfigManager.getConfigSafely(groupId)
         return if (args.size > 1) {
             if (args[1] == "all" || args[1] == "全部") {
+
+                cfg.twitterSubscribers.forEach {
+                    clearUnsubscribeUsersInPool(groupId, it)
+                }
+
                 cfg.twitterSubscribers.clear()
-                BotUtil.sendMessage("退订全部成功")
+                BotUtil.sendMessage("退订全部用户成功")
             } else if (cfg.twitterSubscribers.contains(args[1])) {
                 cfg.twitterSubscribers.remove(args[1])
+                clearUnsubscribeUsersInPool(groupId, args[1])
                 BotUtil.sendMessage("退订 @${args[1]} 成功")
             } else {
                 BotUtil.sendMessage("没有订阅过 @${args[1]}")
@@ -155,4 +165,16 @@ class TwitterCommand : ChatCommand {
             getHelp().convertToChain()
         }
     }
+
+    private fun clearUnsubscribeUsersInPool(groupId: Long, userName: String) {
+        TweetUpdateChecker.pushPool.forEach { (username, cache) ->
+            if (username == userName && cache.groupsToPush.contains(groupId)) {
+                cache.groupsToPush.remove(groupId)
+            }
+        }
+    }
+
+    @ExperimentalTime
+    private fun getTweetByID(id: Long, target: Contact): MessageChain = TwitterApi.getTweetById(id)?.toMessageChain(target)
+            ?: PlainText("找不到对应ID的推文").asMessageChain()
 }

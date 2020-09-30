@@ -26,7 +26,8 @@ import java.time.LocalDateTime
 /**
  * Twitter API
  *
- * 支持获取蓝鸟用户信息 & 最新推文 & 推主时间线
+ * 支持获取蓝鸟用户信息 | 最新推文 | 推主时间线上推文
+ *
  * @author Nameless
  */
 object TwitterApi : ApiExecutor {
@@ -53,6 +54,8 @@ object TwitterApi : ApiExecutor {
 
     /**
      * 获取用于调用 Twitter API 的 Bearer Token
+     *
+     * 获取成功后可以在 [token] 下获取
      */
     private fun getBearerToken() {
         try {
@@ -81,6 +84,8 @@ object TwitterApi : ApiExecutor {
 
     /**
      * 获取推主的账号信息
+     *
+     * @param username 推特用户的用户名
      *
      * @throws RateLimitException
      * @throws TwitterApiException
@@ -124,6 +129,9 @@ object TwitterApi : ApiExecutor {
     /**
      * 获取用户时间线上的推文, 最高可获取 3200 条
      *
+     * @param username 推特用户的用户名
+     * @param count 获取时间线上推文的条数
+     *
      * @return 推文列表
      */
     @Throws(RateLimitException::class, EmptyTweetException::class, TwitterApiException::class)
@@ -156,12 +164,14 @@ object TwitterApi : ApiExecutor {
     /**
      * 通过推文 ID 获取指定推文实体类
      *
+     * @param id 推文 ID
+     *
      * @throws RateLimitException
      * @throws EmptyTweetException
      * @return 推文
      */
-    @Throws(RateLimitException::class, EmptyTweetException::class)
-    fun getTweetById(id: Long): Tweet {
+    @Throws(RateLimitException::class)
+    fun getTweetById(id: Long): Tweet? {
         checkToken()
 
         if (isReachLimit()) {
@@ -171,67 +181,69 @@ object TwitterApi : ApiExecutor {
         val request = NetUtil.doHttpRequestGet("$twitterApiUrl/statuses/show.json?id=$id&tweet_mode=extended", 5_000).header("authorization", "Bearer $token")
         val response = request.executeAsync()
 
-        if (response.isOk && response.isType(ContentType.JSON.value)) {
-            return if (parseJsonToTweet(response.body(), request.url).isNotEmpty()) parseJsonToTweet(response.body(), request.url)[0] else throw EmptyTweetException()
+        return if (response.isOk && response.isType(ContentType.JSON.value)) {
+            if (parseJsonToTweet(response.body(), request.url).isNotEmpty()) parseJsonToTweet(response.body(), request.url)[0] else throw EmptyTweetException()
         } else {
-            throw EmptyTweetException()
+            null
         }
     }
 
     /**
-     * 推荐获取推文方式
+     * 获取单条推文
+     *
      * 优先获取缓存中的推文, 若缓存中推文过时则获取新推文
      *
-     * 注意: 在重试时抛出的错误将会一并从该方法抛出 (除了超时和达到 API 调用上限)
+     * 注意: 在重试时抛出的错误将会一并从该方法抛出
      *
-     * @return 推文, 可空
+     * @param username 推特用户的用户名
+     * @param index 获取时间线上的第几条推文 (按照时间顺序排序)
+     * @param max 获取推文条数上限
+     *
+     * @return 推文, 若获取失败则返回空值
      */
     fun getCachedTweet(username: String, index: Int = 0, max: Int = 5): Tweet? {
         val startTime = LocalDateTime.now()
-        var tweet: Tweet? = null
         var isCache = false
 
         if (index < 0 || max <= index) {
             return null
         }
 
+        val cachedTweet = cacheTweet[username]
+        val result: Tweet?
 
-        try {
-            val cachedTweet = cacheTweet[username]
-            val result: Tweet?
-
-            result = if (cachedTweet != null && Duration.between(cachedTweet.getSentTime(), LocalDateTime.now())
-                            .toMinutes() <= 1
-            ) {
-                isCache = true
-                cachedTweet
-            } else {
-                val list = getUserTweets(username, max)
-                if (list.isNotEmpty()) list[index] else throw EmptyTweetException("返回的推文列表为空")
-            }
-
-            if (!isCache) logger.verboseS("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
-
-            tweet = result
-        } catch (x: TwitterApiException) {
-            logger.warning("[蓝鸟] 调用 API 时出现了问题", x)
+        result = if (cachedTweet != null && Duration.between(cachedTweet.getSentTime(), LocalDateTime.now())
+                        .toMinutes() <= 1
+        ) {
+            isCache = true
+            cachedTweet
+        } else {
+            val list = getUserTweets(username, max)
+            if (list.isNotEmpty()) list[index] else throw EmptyTweetException("返回的推文列表为空")
         }
 
+        if (!isCache) logger.verboseS("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
 
-        return tweet
+        return result
     }
 
     /**
      * 添加缓存推文
      * 将推文放入缓存池中
+     *
+     * @param username 推特用户的用户名
+     * @param tweet 推文实体
      */
-    fun addCacheTweet(username: String, tweet: Tweet) {
+    private fun addCacheTweet(username: String, tweet: Tweet) {
         cacheTweet[username] = tweet
     }
 
     /**
      * 将 json 解析为推文实体
-     * 支持多个推文和单个推文 (以 List 形式返回)
+     * 支持多个推文和单个推文 (以链表形式返回)
+     *
+     * @param json 从 Twitter API 中获取到的推文 json
+     * @param url 请求解析 json 的来源网站, 用于创建错误报告
      *
      * @return 推文列表
      */

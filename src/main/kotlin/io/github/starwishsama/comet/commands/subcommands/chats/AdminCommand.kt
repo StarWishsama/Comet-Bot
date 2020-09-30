@@ -69,9 +69,9 @@ class AdminCommand : ChatCommand {
         /admin give [用户] [命令条数] 给一个用户添加命令条数
     """.trimIndent()
 
-    override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean {
+    override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
         val bLevel = getProps().level
-        if (botUser.compareLevel(bLevel)) return true
+        if (user.compareLevel(bLevel)) return true
         if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true
         return false
     }

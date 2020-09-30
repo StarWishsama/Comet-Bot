@@ -1,6 +1,5 @@
 package io.github.starwishsama.comet.commands.subcommands.chats
 
-import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.annotations.CometCommand
 import io.github.starwishsama.comet.commands.CommandProps
 import io.github.starwishsama.comet.commands.interfaces.ChatCommand
@@ -64,7 +63,7 @@ class RollCommand : ChatCommand, SuspendCommand {
 
             TaskUtil.runAsync(rollSession.stopAfterMinute.toLong(), TimeUnit.MINUTES) {
                 SessionManager.expireSession(rollSession)
-                val group = bot.getGroupOrNull(rollSession.groupId) ?: return@runAsync
+                val group = event.bot.getGroupOrNull(rollSession.groupId) ?: return@runAsync
                 var winner = messageChainOf()
                 rollSession.getWinningUsers().forEach {
                     if (it.member != null) winner = winner.plus(At(it.member))

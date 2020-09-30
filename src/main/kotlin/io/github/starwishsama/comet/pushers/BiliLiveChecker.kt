@@ -4,7 +4,6 @@ import io.github.starwishsama.bilibiliapi.LiveApi
 import io.github.starwishsama.bilibiliapi.MainApi
 import io.github.starwishsama.bilibiliapi.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.commands.CommandExecutor.doFilter
@@ -13,6 +12,7 @@ import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.verboseS
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.isContentNotEmpty
@@ -24,6 +24,7 @@ object BiliLiveChecker : CometPusher {
     override val delayTime: Long = cfg.biliInterval
     override val internal: Long = cfg.biliInterval
     override var future: ScheduledFuture<*>? = null
+    override var bot: Bot? = null
 
     override fun retrieve() {
         var count = 0
@@ -107,7 +108,7 @@ object BiliLiveChecker : CometPusher {
                         if (filtered.isContentNotEmpty()) {
                             runBlocking {
                                 try {
-                                    val group = bot.getGroupOrNull(it)
+                                    val group = bot?.getGroupOrNull(it)
                                     val image = group?.let { sendGroup -> NetUtil.getUrlInputStream(data.keyFrameImageUrl)?.uploadAsImage(sendGroup) }
                                     group?.sendMessage(filtered + (image ?: PlainText("")))
                                     count++

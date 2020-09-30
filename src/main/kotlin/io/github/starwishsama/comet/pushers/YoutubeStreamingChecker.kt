@@ -1,52 +1,48 @@
 package io.github.starwishsama.comet.pushers
 
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.youtube.YoutubeApi
 import io.github.starwishsama.comet.api.youtube.YoutubeApi.getLiveItemOrNull
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
 import io.github.starwishsama.comet.utils.verboseS
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.getGroupOrNull
-import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 
 object YoutubeStreamingChecker : CometPusher {
     override val delayTime: Long = 10
     override val internal: Long = 10
     override var future: ScheduledFuture<*>? = null
-    private val pushHistory = mutableListOf<PushObject>()
+    override var bot: Bot? = null
+    val pushPool = mutableMapOf<String, PushObject>()
 
     override fun retrieve() {
-        val ytbLiverList = mutableMapOf<String, MutableList<Long>>()
-
-        BotVariables.perGroup.parallelStream().forEach { config ->
+        BotVariables.perGroup.forEach { config ->
             if (config.youtubePushEnabled && config.youtubeSubscribers.isNotEmpty()) {
                 config.youtubeSubscribers.forEach {
-                    if (ytbLiverList.containsKey(it)) {
-                        ytbLiverList[it]?.add(config.id)
+                    if (pushPool.containsKey(it)) {
+                        pushPool[it]!!.groups.add(config.id)
                     } else {
-                        ytbLiverList[it] = mutableListOf()
+                        pushPool[it] = PushObject(mutableListOf(config.id))
                     }
                 }
             }
         }
 
-        ytbLiverList.forEach { (name, groups) ->
-            val result = YoutubeApi.getChannelVideos(name)
-            if (result != null) {
-                pushHistory.forEach history@{
-                    val history = it.result.getLiveItemOrNull()
-                    val now = result.getLiveItemOrNull()
-                    if (now?.getChannelId() == history?.getChannelId() && now?.getVideoUrl() != history?.getVideoUrl()) {
-                        pushHistory.add(PushObject(result, groups))
-                        return@history
-                    }
+        pushPool.forEach { (chId, pushObj) ->
+            val channelInfo = YoutubeApi.getChannelVideos(chId)
+
+            if (channelInfo != null) {
+                val old = pushObj.result?.getLiveItemOrNull()
+                val now = channelInfo.getLiveItemOrNull()
+
+                if (old == null || old.getVideoUrl() != now?.getVideoUrl()) {
+                    pushObj.result = channelInfo
+                    pushObj.isPushed = false
                 }
-                pushHistory.add(PushObject(result, groups))
             }
         }
 
@@ -54,22 +50,26 @@ object YoutubeStreamingChecker : CometPusher {
     }
 
     override fun push() {
-        pushHistory.forEach { pushObject ->
-            pushObject.groups.forEach {
-                val wrappedMessage = YoutubeApi.getLiveStatusByResult(pushObject.result)
-                val group = bot.getGroupOrNull(it)
-                GlobalScope.launch {
-                    try {
-                        group?.sendMessage(wrappedMessage.toMessageChain(group))
-                        delay(2_500)
-                    } catch (t: Throwable) {
-                        daemonLogger.verboseS("Push youtube live status failed, ${t.message}")
+        pushPool.forEach { (_, pushObject) ->
+            if (!pushObject.isPushed) {
+                pushObject.groups.forEach {
+                    val wrappedMessage = YoutubeApi.getLiveStatusByResult(pushObject.result)
+                    val group = bot?.getGroupOrNull(it)
+                    runBlocking {
+                        try {
+                            group?.sendMessage(wrappedMessage.toMessageChain(group))
+                            delay(2_500)
+                        } catch (t: Throwable) {
+                            daemonLogger.verboseS("Push youtube live status failed, ${t.message}")
+                        }
                     }
                 }
+                pushObject.isPushed = true
             }
-            pushObject.isPushed = true
         }
     }
 
-    data class PushObject(val result: SearchVideoResult, val groups: MutableList<Long>, var isPushed: Boolean = false, val retrievedTime: LocalDateTime = LocalDateTime.now())
+    data class PushObject(val groups: MutableList<Long>, var isPushed: Boolean = false) {
+        var result: SearchVideoResult? = null
+    }
 }

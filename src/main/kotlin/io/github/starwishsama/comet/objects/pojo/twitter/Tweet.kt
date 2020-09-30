@@ -10,6 +10,12 @@ import io.github.starwishsama.comet.api.twitter.TwitterApi
 import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
+import io.github.starwishsama.comet.utils.network.NetUtil
+import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.contact.Contact
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.MessageChainBuilder
+import net.mamoe.mirai.message.uploadAsImage
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime
@@ -57,58 +63,39 @@ data class Tweet(
                 "❤${likeCount?.getBetterNumber()} | \uD83D\uDD01${retweetCount} | 🕘${DateTimeFormatter.ofPattern("HH:mm:ss").format(getSentTime())}"
 
         if (retweetStatus != null) {
-            return """
-            转发了 ${retweetStatus.user.name} 的推文
-            ${cleanShortUrlAtEnd(retweetStatus.text)}
-            $extraText
-            🔗 > https://twitter.com/${user.twitterId}/status/$idAsString
-            在 ${duration.toKotlinDuration().toFriendly()} 前发送
-            """.trimIndent()
+            return "转发了 ${retweetStatus.user.name} 的推文\n" +
+                    "${cleanShortUrlAtEnd(retweetStatus.text)}\n" +
+                    "$extraText\n" +
+                    "\uD83D\uDD17 > https://twitter.com/${user.twitterId}/status/$idAsString\n" +
+                    "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
         }
 
         if (isQuoted && quotedStatus != null) {
-            return """
-            对于 ${quotedStatus.user.name} 的推文
-            ${cleanShortUrlAtEnd(quotedStatus.text)} 
-                
-            ${user.name} 进行了评论
-            ${cleanShortUrlAtEnd(text)}
-            $extraText
-            🔗 > https://twitter.com/${user.twitterId}/status/$idAsString
-            在 ${duration.toKotlinDuration().toFriendly()} 前发送
-            """.trimIndent()
+            return "对于 ${quotedStatus.user.name} 的推文\n" +
+                    "${cleanShortUrlAtEnd(quotedStatus.text)}\n" +
+                    "\n${user.name} 进行了评论\n" +
+                    "${cleanShortUrlAtEnd(text)}\n" +
+                    "$extraText\n🔗 > https://twitter.com/${user.twitterId}/status/$idAsString\n" +
+                    "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
         }
 
         if (replyTweetId != null) {
-            val repliedTweet = try {
-                TwitterApi.getTweetById(replyTweetId)
-            } catch (t: Throwable) {
-                return """
-            ${cleanShortUrlAtEnd(text)}
-            $extraText
-            🔗 > https://twitter.com/${user.twitterId}/status/$idAsString
-            在 ${duration.toKotlinDuration().toFriendly()} 前发送
-            """.trimIndent()
-            }
+            val repliedTweet = TwitterApi.getTweetById(replyTweetId) ?: return "${cleanShortUrlAtEnd(text)}\n" +
+                    "$extraText\n" +
+                    "🔗 > https://twitter.com/${user.twitterId}/status/$idAsString\n" +
+                    "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
 
-            return """
-            对于 ${repliedTweet.user.name} 的推文:
-            ${cleanShortUrlAtEnd(repliedTweet.text)}
-                
-            ${user.name} 进行了回复
-            ${cleanShortUrlAtEnd(text)}
-            $extraText
-            🔗 > https://twitter.com/${user.twitterId}/status/$idAsString
-            在 ${duration.toKotlinDuration().toFriendly()} 前发送
-            """.trimIndent()
+            return "对于 ${repliedTweet.user.name} 的推文:\n" +
+                    "${cleanShortUrlAtEnd(repliedTweet.text)}\n\n" +
+                    "${user.name} 进行了回复\n${cleanShortUrlAtEnd(text)}\n" +
+                    "$extraText\n🔗 > https://twitter.com/${user.twitterId}/status/$idAsString\n" +
+                    "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
         }
 
-        return """
-        ${cleanShortUrlAtEnd(text)}
-        $extraText
-        🔗 > https://twitter.com/${user.twitterId}/status/$idAsString
-        在 ${duration.toKotlinDuration().toFriendly()} 前发送
-        """.trimIndent()
+        return "${cleanShortUrlAtEnd(text)}\n" +
+                "$extraText\n" +
+                "🔗 > https://twitter.com/${user.twitterId}/status/$idAsString\n" +
+                "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
     }
 
     /**
@@ -185,5 +172,19 @@ data class Tweet(
         }
 
         return if (tcoUrl.isNotEmpty()) tweet.replace(tcoUrl.last(), "") else tweet
+    }
+
+    @ExperimentalTime
+    fun toMessageChain(target: Contact): MessageChain {
+        return MessageChainBuilder().apply {
+            append(convertToString())
+            val url = getPictureUrl(true) ?: return this.asMessageChain()
+
+            val image = runBlocking { NetUtil.getUrlInputStream(url)?.uploadAsImage(target) }
+
+            if (image != null) {
+                append(image)
+            }
+        }.asMessageChain()
     }
 }

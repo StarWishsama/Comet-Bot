@@ -11,11 +11,10 @@ import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
-import io.github.starwishsama.comet.utils.debugS
+import io.github.starwishsama.comet.utils.network.NetUtil
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.utils.asHumanReadable
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
@@ -88,7 +87,9 @@ object CommandExecutor {
         val message = event.message.contentToString()
         val cmd = getCommand(getCommandName(message))
 
-        if (BotVariables.switch || (cmd?.getProps()?.name?.contentEquals("debug") == true)) {
+        val debug = cmd?.getProps()?.name?.contentEquals("debug") == true
+
+        if (BotVariables.switch || debug) {
             try {
                 val session = SessionManager.getSessionByEvent(event)
 
@@ -97,43 +98,43 @@ object CommandExecutor {
                  * 反之在监听时仍然可以执行命令
                  */
                 if (session != null && !handleSession(event, executedTime)) {
-                    return ExecutedResult(EmptyMessageChain, cmd)
+                    return ExecutedResult(EmptyMessageChain, cmd, "移交会话处理")
                 }
 
                 /** 检查是否在尝试执行被禁用命令 */
                 if (cmd != null && event is GroupMessageEvent &&
                         GroupConfigManager.getConfigSafely(event.group.id).isDisabledCommand(cmd)) {
-                    return ExecutedResult(EmptyMessageChain, cmd)
+                    return ExecutedResult(EmptyMessageChain, cmd, "命令已禁用")
                 }
 
                 if (isCommandPrefix(message) && cmd != null) {
                     val splitMessage = message.split(" ")
                     BotVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.getProps().name}")
+
                     var user = BotUser.getUser(senderId)
                     if (user == null) {
                         user = BotUser.quickRegister(senderId)
                     }
 
+                    val status: String
+
                     /** 检查是否有权限执行命令 */
                     val result: MessageChain = if (cmd.hasPermission(user, event)) {
+                        status = "成功"
                         cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
                     } else {
+                        status = "权限不足"
                         BotUtil.sendMessage("你没有权限!")
                     }
-                    val usedTime = Duration.between(executedTime, LocalDateTime.now())
-                    BotVariables.logger.debugS(
-                            "[命令] 命令执行耗时 ${usedTime.toKotlinDuration().asHumanReadable}"
-                    )
 
-                    return ExecutedResult(result, cmd)
+                    return ExecutedResult(result, cmd, status)
                 }
             } catch (t: Throwable) {
-                val msg = t.message
-                return if (msg != null && msg.contains("time")) {
+                return if (NetUtil.isTimeout(t)) {
                     ExecutedResult("Bot > 在执行网络操作时连接超时".convertToChain(), cmd)
                 } else {
                     BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId", t)
-                    ExecutedResult("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".convertToChain(), cmd)
+                    ExecutedResult("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".convertToChain(), cmd, "失败")
                 }
             }
         }
@@ -301,5 +302,5 @@ object CommandExecutor {
 
     fun getCommands() = commands
 
-    data class ExecutedResult(val msg: MessageChain, val cmd: ChatCommand?)
+    data class ExecutedResult(val msg: MessageChain, val cmd: ChatCommand?, val result: String = "")
 }

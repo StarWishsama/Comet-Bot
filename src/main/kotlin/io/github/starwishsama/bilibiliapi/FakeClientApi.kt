@@ -9,7 +9,7 @@ import io.github.starwishsama.comet.BotVariables
  * 调用 [BilibiliClient] 的辅助 API 类
  *
  */
-@Deprecated("We won't use 3rd party lib anymore")
+@Deprecated("To reduced the package size")
 object FakeClientApi {
     val client = BilibiliClient()
 

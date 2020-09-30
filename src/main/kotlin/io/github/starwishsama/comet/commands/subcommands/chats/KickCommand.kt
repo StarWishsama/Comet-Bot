@@ -50,20 +50,20 @@ class KickCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("mute", arrayListOf("jy", "禁言"), "禁言", "nbot.commands.mute", UserLevel.USER)
+            CommandProps("kick", arrayListOf("tr", "踢人"), "踢人", "nbot.commands.kick", UserLevel.USER)
 
     override fun getHelp(): String = """
         ======= 命令帮助 =======
         /kick [@/Q] (理由) 踢出一名非管理群员
     """.trimIndent()
 
-    override fun hasPermission(botUser: BotUser, e: MessageEvent): Boolean {
-        if (super.hasPermission(botUser, e)) return true
+    override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
+        if (super.hasPermission(user, e)) return true
 
         if (e is GroupMessageEvent) {
             if (e.sender.permission > MemberPermission.MEMBER) return true
             val cfg = GroupConfigManager.getConfigSafely(e.group.id)
-            if (cfg.isHelper(botUser.id)) return true
+            if (cfg.isHelper(user.id)) return true
         }
         return false
     }

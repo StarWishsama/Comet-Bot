@@ -98,7 +98,7 @@ object YoutubeApi : ApiExecutor {
                                                             ${item.snippet.channelTitle} 有即将进行的直播!
                                                             直播标题: ${item.snippet.videoTitle}
                                                             开播时间请打开查看 ${item.getVideoUrl()}
-                                                        """.trimIndent()).plusImageUrl(item.snippet.getCoverImgUrl())
+                                                        """).plusImageUrl(item.snippet.getCoverImgUrl())
                 }
             }
         }
@@ -108,9 +108,7 @@ object YoutubeApi : ApiExecutor {
 
     override var usedTime: Int = 0
 
-    override fun isReachLimit(): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun isReachLimit(): Boolean = usedTime > getLimitTime()
 
     override fun getLimitTime(): Int {
         TODO("Not yet implemented")

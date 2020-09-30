@@ -17,7 +17,6 @@ import net.mamoe.mirai.utils.MiraiLogger
 import org.apache.commons.lang3.StringUtils
 import java.time.Duration
 import java.time.LocalDateTime
-import java.util.concurrent.TimeUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
@@ -196,7 +195,7 @@ object BotUtil {
     @ExperimentalTime
     fun getRunningTime(): String {
         val remain = Duration.between(BotVariables.startTime, LocalDateTime.now())
-        return remain.toKotlinDuration().toFriendly(TimeUnit.DAYS)
+        return remain.toKotlinDuration().toFriendly()
     }
 
     fun getAt(event: MessageEvent, id: String) : BotUser? {

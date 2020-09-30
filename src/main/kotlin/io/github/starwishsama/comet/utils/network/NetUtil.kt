@@ -130,6 +130,7 @@ object NetUtil {
 
     fun isTimeout(t: Throwable): Boolean {
         val msg = t.message?.toLowerCase(Locale.ROOT) ?: return false
+        // FIXME: 这不是一个很好的识别方法
         return (msg.contains("time") && msg.contains("out")) || t.javaClass.simpleName.toLowerCase(Locale.ROOT).contains("timeout")
     }
 
