@@ -155,6 +155,7 @@ class DebugCommand : ChatCommand {
                         总线程数：$taskCount
                     """.trimIndent().convertToChain()
                 }
+                "panic" -> throw RuntimeException("好")
                 else -> return "Bot > 命令不存在\n${getHelp()}".convertToChain()
             }
         }

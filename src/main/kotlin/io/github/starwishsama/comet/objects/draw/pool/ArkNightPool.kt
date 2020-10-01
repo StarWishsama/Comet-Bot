@@ -100,7 +100,7 @@ class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
                 else -> {
                     val r6Char = drawResult.parallelStream().filter { it.rare == 6 }.collect(Collectors.toList())
                     val r6Text = StringBuilder().apply {
-                        r6Char.forEach { append("${it.name} ${DrawUtil.getStar(it.rare)} ") }
+                        r6Char.forEach { append("${it.name} ") }
                     }.toString().trim()
 
                     return "寻访结果:\n" +

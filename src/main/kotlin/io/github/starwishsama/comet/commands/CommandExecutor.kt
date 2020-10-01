@@ -89,6 +89,8 @@ object CommandExecutor {
 
         val debug = cmd?.getProps()?.name?.contentEquals("debug") == true
 
+        val user = BotUser.getUserSafely(senderId)
+
         if (BotVariables.switch || debug) {
             try {
                 val session = SessionManager.getSessionByEvent(event)
@@ -108,20 +110,17 @@ object CommandExecutor {
                 }
 
                 if (isCommandPrefix(message) && cmd != null) {
-                    val splitMessage = message.split(" ")
-                    BotVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.getProps().name}")
+                    var splitMessage = message.split(" ")
+                    splitMessage = splitMessage.subList(1, splitMessage.size)
 
-                    var user = BotUser.getUser(senderId)
-                    if (user == null) {
-                        user = BotUser.quickRegister(senderId)
-                    }
+                    BotVariables.logger.debug("[命令] $senderId 尝试执行命令: $message")
 
                     val status: String
 
                     /** 检查是否有权限执行命令 */
                     val result: MessageChain = if (cmd.hasPermission(user, event)) {
                         status = "成功"
-                        cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
+                        cmd.execute(event, splitMessage, user)
                     } else {
                         status = "权限不足"
                         BotUtil.sendMessage("你没有权限!")
@@ -133,8 +132,12 @@ object CommandExecutor {
                 return if (NetUtil.isTimeout(t)) {
                     ExecutedResult("Bot > 在执行网络操作时连接超时".convertToChain(), cmd)
                 } else {
-                    BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId", t)
-                    ExecutedResult("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".convertToChain(), cmd, "失败")
+                    BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message.split(" ")}, 发送者: $senderId", t)
+                    if (user.isBotOwner()) {
+                        ExecutedResult("Bot > 在试图执行命令时发生了一个错误\n简易报错信息 (如果有的话):\n${t.javaClass.simpleName}:${t.message}".convertToChain(), cmd, "失败")
+                    } else {
+                        ExecutedResult("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".convertToChain(), cmd, "失败")
+                    }
                 }
             }
         }

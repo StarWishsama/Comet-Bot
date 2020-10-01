@@ -181,15 +181,20 @@ object BotUtil {
     }
 
     fun List<String>.getRestString(startAt: Int): String {
-        if (size == 1) {
-            return this[0].trim()
+        if (isEmpty()) {
+            return "空"
         }
 
-        return StringBuilder().apply {
-            for (index in startAt until size) {
-                append(this[index]).append(" ")
+        if (size == 1) {
+            return this[0]
+        }
+
+        return buildString {
+            for (i in startAt until size) {
+                append(this@getRestString[i]).append(" ")
             }
-        }.toString().trim()
+            trim()
+        }
     }
 
     @ExperimentalTime

@@ -216,7 +216,8 @@ object DrawUtil {
                 temp.add(c)
             }
         }
-        return temp[RandomUtil.randomInt(0, 1.coerceAtLeast(temp.size))]
+
+        return temp[RandomUtil.randomInt(0, 1.coerceAtMost(temp.size))]
     }
 
     fun getPCRResult(user: BotUser, time: Int): String {
