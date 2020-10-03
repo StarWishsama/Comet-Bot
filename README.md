@@ -18,6 +18,8 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
 ![Stars](https://img.shields.io/github/stars/starwishsama/Comet-Bot)
 [![Release](https://img.shields.io/github/v/release/StarWishSama/Comet-Bot?include_prereleases)](https://github.com/StarWishsama/Comet-Bot/releases)
 
+Demo 群：725656262
+
 ## 🎉 它能干什么?
 * 以图搜图 (支持 ascii2d/SauceNao)
 * 彩虹六号战绩查询
