@@ -4,7 +4,7 @@ import cn.hutool.http.HttpRequest
 import com.github.salomonbrys.kotson.fromJson
 import io.github.starwishsama.bilibiliapi.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.BotVariables.gson
-import io.github.starwishsama.comet.api.ApiExecutor
+import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.utils.FileUtil
 

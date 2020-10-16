@@ -2,8 +2,8 @@ package io.github.starwishsama.comet.pushers
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.api.youtube.YoutubeApi
-import io.github.starwishsama.comet.api.youtube.YoutubeApi.getLiveItemOrNull
+import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
+import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi.getLiveItemOrNull
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
 import io.github.starwishsama.comet.utils.verboseS
 import kotlinx.coroutines.delay

@@ -36,7 +36,7 @@ fun File.getContext(): String {
 }
 
 fun File.getMD5(): String {
-    require(exists())
+    require(exists()) { "文件不存在" }
     return SecureUtil.md5(this)
 }
 
@@ -47,7 +47,7 @@ fun File.getMD5(): String {
  * @return 指定类
  */
 fun <T> File.parseAsClass(clazz: Class<T>): T {
-    require(exists())
+    require(exists()) { "文件不存在" }
     return BotVariables.gson.fromJson(getContext(), clazz)
 }
 
@@ -173,9 +173,9 @@ object FileUtil {
                     copyFolder(app, getResourceFolder())
                 }
             }
-        } catch (t: Throwable) {
+        } catch (e: IOException) {
             daemonLogger.info("加载资源文件失败, 部分需要图片资源的功能将无法使用")
-            daemonLogger.warningS("Cannot copy resources files", t)
+            daemonLogger.warningS("Cannot copy resources files", e)
         }
     }
 
@@ -217,7 +217,7 @@ object FileUtil {
                         Files.createDirectories(currentTarget)
                         daemonLogger.debugS("Created directory $currentTarget successfully")
                     }
-                } catch (e: IllegalArgumentException) {
+                } catch (e: IOException) {
                     daemonLogger.warningS("Can't create dir ${dir.fileName} from jar", e)
                 } finally {
                     return FileVisitResult.CONTINUE
@@ -236,7 +236,7 @@ object FileUtil {
                     } catch (e: UnsupportedOperationException) {
                         Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
                     }
-                } catch (e: Throwable) {
+                } catch (e: IOException) {
                     daemonLogger.warningS("Can't copy ${file.fileName} from jar", e)
                 } finally {
                     return FileVisitResult.CONTINUE

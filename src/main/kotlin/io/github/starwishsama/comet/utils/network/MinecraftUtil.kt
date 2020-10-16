@@ -90,23 +90,23 @@ object MinecraftUtil {
 
     @Throws(IOException::class)
     private fun writeVarInt(out: DataOutputStream, paramInt: Int) {
-        var paramInt = paramInt
+        var param = paramInt
         while (true) {
-            if (paramInt and -0x80 == 0) {
-                out.writeByte(paramInt)
+            if (param and -0x80 == 0) {
+                out.writeByte(param)
                 return
             }
-            out.writeByte(paramInt and 0x7F or 0x80)
-            paramInt = paramInt ushr 7
+            out.writeByte(param and 0x7F or 0x80)
+            param = param ushr 7
         }
     }
 
     @Throws(IOException::class)
-    fun readVarInt(`in`: DataInputStream): Int {
+    fun readVarInt(dis: DataInputStream): Int {
         var i = 0
         var j = 0
         while (true) {
-            val k = `in`.readByte().toInt()
+            val k = dis.readByte().toInt()
             i = i or (k and 0x7F shl j++ * 7)
             if (j > 5) {
                 throw RuntimeException("VarInt too big")

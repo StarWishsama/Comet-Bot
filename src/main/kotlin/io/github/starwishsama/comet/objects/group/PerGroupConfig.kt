@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.objects.group
 
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.commands.interfaces.ChatCommand
+import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 
 data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
 
@@ -61,7 +61,7 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
      * 本群启用的命令
      */
     @SerializedName("disabled_commands")
-    val disabledCommands: MutableSet<ChatCommand> = mutableSetOf()
+    val disabledCommands: MutableSet<String> = mutableSetOf()
 
     fun addHelper(id: Long): Boolean {
         if (isHelper(id)) return false
@@ -86,7 +86,7 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
 
     fun isDisabledCommand(command: ChatCommand): Boolean {
         return try {
-            disabledCommands.contains(command)
+            disabledCommands.contains(command.name)
         } catch (npe: NullPointerException) {
             false
         }

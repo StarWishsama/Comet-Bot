@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.objects
 
-import io.github.starwishsama.comet.enums.MusicApi
-import io.github.starwishsama.comet.enums.PicSearchApi
+import io.github.starwishsama.comet.enums.MusicApiType
+import io.github.starwishsama.comet.enums.PicSearchApiType
 import kotlinx.serialization.Serializable
 import java.net.Proxy
 
@@ -14,7 +14,7 @@ data class Config(
         var botPassword: String = "",
 
         //@Comment("自动保存数据周期, 单位分钟")
-        var autoSaveTime: Long = 60,
+        val autoSaveTime: Long = 60,
 
         //@Comment("RCON 服务器地址, 不使用 RCON 功能可不填")
         var rConUrl: String? = null,
@@ -26,16 +26,16 @@ data class Config(
         var rConPassword: String? = null,
 
         //@Comment("执行所有机器人命令的全局冷却时间, 单位秒")
-        var coolDownTime: Int = 5,
+        val coolDownTime: Int = 5,
 
         //@Comment("机器人发送消息需要屏蔽的字词")
-        var filterWords: MutableList<String> = mutableListOf(),
+        val filterWords: MutableList<String> = mutableListOf(),
 
         //@Comment("点歌 API 类型")
-        var musicApi: MusicApi = MusicApi.QQ,
+        var musicApi: MusicApiType = MusicApiType.QQ,
 
         //@Comment("命令前缀")
-        var commandPrefix: MutableList<String> = mutableListOf(".", "。", "#", "!", "/"),
+        val commandPrefix: MutableList<String> = mutableListOf(".", "。", "#", "!", "/"),
 
         //@Comment("BiliBili 账号, 使用开播提醒时必填")
         var biliUserName: String? = null,
@@ -47,10 +47,10 @@ data class Config(
         var ownerId: Long = 0L,
 
         //@Comment("SauceNao 以图搜图 APIKey, 不填亦可, 但可搜索次数会减少")
-        var sauceNaoApiKey: String? = null,
+        val sauceNaoApiKey: String? = null,
 
         //@Comment("彩虹六号玩家数据 API, 需要自行向 r6tab 作者申请")
-        var r6tabKey: String? = null,
+        val r6tabKey: String? = null,
 
         //@Comment("用于获取 Twitter Token 的 Access Token")
         var twitterAccessToken: String? = null,
@@ -80,13 +80,13 @@ data class Config(
         var smallImageMode: Boolean = true,
 
         //@Comment("以图搜图 API 类型, 请使用 /ps source 命令修改")
-        var pictureSearchApi: PicSearchApi = PicSearchApi.SAUCENAO,
+        var pictureSearchApi: PicSearchApiType = PicSearchApiType.SAUCENAO,
 
         //@Comment("查询 BiliBili 主播开播动态间隔时间")
-        var biliInterval: Long = 2,
+        val biliInterval: Long = 2,
 
         //@Comment("查询 Twitter 用户动态间隔时间")
-        var twitterInterval: Long = 4,
+        val twitterInterval: Long = 4,
 
         //@Comment("明日方舟抽卡模拟器是否使用图片")
         var arkDrawUseImage: Boolean = true,

@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.sessions.commands.roll
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.commands.subcommands.chats.RollCommand
+import io.github.starwishsama.comet.commands.chats.RollCommand
 import io.github.starwishsama.comet.sessions.DaemonSession
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionUser

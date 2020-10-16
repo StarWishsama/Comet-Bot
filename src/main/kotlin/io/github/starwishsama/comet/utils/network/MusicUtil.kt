@@ -12,7 +12,11 @@ import net.mamoe.mirai.message.data.asMessageChain
 import java.io.IOException
 import java.net.URLEncoder
 
-
+/**
+ * 搜索音乐工具类
+ *
+ * FIXME: 将搜索结果转换为 Bean, 减少繁琐的解析反解析
+ */
 object MusicUtil {
     /** 1分钟100次，10分钟500次，1小时2000次 */
     private const val api4qq = "https://api.qq.jsososo.com/song/urls?id="
@@ -87,7 +91,7 @@ object MusicUtil {
                 }
             }
         } catch (e: IOException) {
-            BotVariables.logger.error(e)
+            BotVariables.logger.warning("在获取网易云音乐时发生了问题", e)
         }
         return "找不到歌曲".convertToChain()
     }
@@ -145,9 +149,9 @@ object MusicUtil {
                         ).asMessageChain()
                     }
                 }
-            } else BotVariables.logger.debug("无法从 API 获取到歌曲信息, 响应码为 " + songResult.status)
-        } catch (x: Exception) {
-            BotVariables.logger.error("在通过 QQ 音乐搜索歌曲时发生了一个错误, ", x)
+            } else BotVariables.logger.warning("无法从 API 获取到歌曲信息, 响应码为 " + songResult.status)
+        } catch (e: IOException) {
+            BotVariables.logger.warning("在通过 QQ 音乐搜索歌曲时发生了一个错误, ", e)
         }
         return "找不到歌曲".convertToChain()
     }

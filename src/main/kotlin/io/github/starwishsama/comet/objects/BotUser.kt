@@ -3,7 +3,6 @@ package io.github.starwishsama.comet.objects
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.utils.BotUtil.getLevel
 import java.time.LocalDateTime
 
 class BotUser(@SerializedName("userQQ") var id: Long) {
@@ -86,7 +85,7 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
 
     companion object {
         fun isBotOwner(id: Long): Boolean {
-            return getLevel(id) == UserLevel.OWNER
+            return getUser(id)?.level == UserLevel.OWNER
         }
 
         fun quickRegister(id: Long): BotUser {

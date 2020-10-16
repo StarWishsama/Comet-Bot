@@ -5,7 +5,7 @@ import com.google.gson.JsonParser
 import io.github.starwishsama.bilibiliapi.data.dynamic.DynamicTypeSelector
 import io.github.starwishsama.bilibiliapi.data.dynamic.dynamicdata.UnknownType
 import io.github.starwishsama.comet.BotVariables.gson
-import io.github.starwishsama.comet.api.ApiExecutor
+import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 

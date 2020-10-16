@@ -7,6 +7,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.gson
@@ -16,6 +17,7 @@ import io.github.starwishsama.comet.objects.Config
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.network.isUsable
+import net.mamoe.mirai.Bot
 import java.io.File
 import java.net.Socket
 
@@ -36,7 +38,7 @@ object DataSetup {
                 userCfg.writeClassToJson(BotVariables.users)
                 shopItemCfg.writeClassToJson(BotVariables.shop)
                 println("[配置] 已自动生成新的配置文件.")
-            } catch (e: Exception) {
+            } catch (e: RuntimeException) {
                 daemonLogger.warning("[配置] 在生成配置文件时发生了错误", e)
             }
         }
@@ -69,12 +71,14 @@ object DataSetup {
 
             if (pcrData.exists()) {
                 BotVariables.pcr = gson.fromJson(pcrData.getContext())
+                daemonLogger.info("成功载入公主连结游戏数据")
             } else {
                 daemonLogger.info("未检测到公主连结游戏数据, 抽卡模拟器将无法使用")
             }
 
             if (arkNightData.exists()) {
-                BotVariables.arkNight = gson.fromJson(arkNightData.getContext())
+                arkNight = arkNightData.parseAsClass(arkNight::class.java)
+                daemonLogger.info("成功载入明日方舟游戏数据")
             } else {
                 daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
             }
@@ -134,14 +138,14 @@ object DataSetup {
         }
     }
 
-    fun initPerGroupSetting() {
+    fun initPerGroupSetting(bot: Bot) {
         if (!perGroupFolder.exists()) {
             perGroupFolder.mkdirs()
         }
 
         var count = 0
 
-        BotVariables.bot.groups.forEach {
+        bot.groups.forEach {
             val loc = File(perGroupFolder, "${it.id}.json")
             if (!loc.exists()) {
                 FileUtil.createBlankFile(loc)

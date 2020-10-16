@@ -1,13 +1,15 @@
 package io.github.starwishsama.comet.objects.group
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.shop
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.ShopItem
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 
-
+/**
+ * FIXME: 重构
+ */
 class Shop {
     var groupId: Long = 0
     val admins: MutableList<BotUser> = mutableListOf()
@@ -46,11 +48,11 @@ class Shop {
     companion object {
         fun getShopById(groupId: Long): Shop {
             val result = AtomicReference(Shop())
-            BotVariables.shop.forEach { shop ->
-                if (shop.groupId == groupId) {
-                    result.set(shop)
-                }
+
+            shop.forEach {
+                if (it.groupId == groupId) result.set(it)
             }
+
             return result.get()
         }
     }

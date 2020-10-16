@@ -1,12 +1,10 @@
 package io.github.starwishsama.comet.objects.pojo.twitter
 
-import cn.hutool.http.HttpException
 import com.google.gson.JsonObject
-import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.gson
-import io.github.starwishsama.comet.api.twitter.TwitterApi
+import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
@@ -117,7 +115,7 @@ data class Tweet(
     /**
      * 获取推文中的第一张图片
      */
-    fun getPictureUrl(nestedMode: Boolean = false): String? {
+    private fun getPictureUrl(nestedMode: Boolean = false): String? {
         val jsonEntities = entities
 
         /**
@@ -132,14 +130,13 @@ data class Tweet(
                 if (image.isSendableMedia()) {
                     return image.getImageUrl()
                 }
-            } catch (e: JsonSyntaxException) {
-                BotVariables.logger.warning("在获取推文下的图片链接时发生了问题", e)
-            } catch (e: HttpException) {
+            } catch (e: RuntimeException) {
                 BotVariables.logger.warning("在获取推文下的图片链接时发生了问题", e)
             }
         }
 
         // 避免套娃
+        // FIXME: 逻辑错误?
         if (!nestedMode) {
             /**
              * 如果推文中没有图片, 则尝试获取转推中的图片

@@ -7,12 +7,12 @@ import io.github.starwishsama.comet.BotVariables.consoleCommandLogger
 import io.github.starwishsama.comet.BotVariables.filePath
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.BotVariables.startTime
-import io.github.starwishsama.comet.api.twitter.TwitterApi
-import io.github.starwishsama.comet.api.youtube.YoutubeApi
-import io.github.starwishsama.comet.commands.CommandExecutor
-import io.github.starwishsama.comet.commands.subcommands.chats.*
-import io.github.starwishsama.comet.commands.subcommands.console.DebugCommand
-import io.github.starwishsama.comet.commands.subcommands.console.StopCommand
+import io.github.starwishsama.comet.api.command.CommandExecutor
+import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
+import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
+import io.github.starwishsama.comet.commands.chats.*
+import io.github.starwishsama.comet.commands.console.DebugCommand
+import io.github.starwishsama.comet.commands.console.StopCommand
 import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.ConvertLightAppListener
@@ -21,22 +21,24 @@ import io.github.starwishsama.comet.pushers.BiliLiveChecker
 import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.pushers.TweetUpdateChecker
 import io.github.starwishsama.comet.pushers.YoutubeStreamingChecker
-import io.github.starwishsama.comet.utils.*
+import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
+import io.github.starwishsama.comet.utils.TaskUtil
+import io.github.starwishsama.comet.utils.getContext
+import io.github.starwishsama.comet.utils.writeString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
-import net.mamoe.mirai.contact.isBotMuted
-import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.join
-import net.mamoe.mirai.message.GroupMessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.network.LoginFailedException
-import net.mamoe.mirai.utils.*
+import net.mamoe.mirai.utils.BotConfiguration
+import net.mamoe.mirai.utils.FileCacheStrategy
+import net.mamoe.mirai.utils.PlatformLogger
+import net.mamoe.mirai.utils.secondsToMillis
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
@@ -99,7 +101,7 @@ object Comet {
         }
     }
 
-    private fun startAllPusher() {
+    private fun startAllPusher(bot: Bot) {
         val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker, YoutubeStreamingChecker)
         pushers.forEach {
             val future = TaskUtil.runScheduleTaskAsync(it.delayTime, it.internal, TimeUnit.MINUTES) {
@@ -134,7 +136,7 @@ object Comet {
         bot = Bot(qq = qqId, password = password, configuration = config)
         bot.alsoLogin()
 
-        DataSetup.initPerGroupSetting()
+        DataSetup.initPerGroupSetting(bot)
 
         setupRCon()
 
@@ -145,7 +147,7 @@ object Comet {
                         BiliBiliCommand(),
                         CheckInCommand(),
                         ClockInCommand(),
-                        io.github.starwishsama.comet.commands.subcommands.chats.DebugCommand(),
+                        io.github.starwishsama.comet.commands.chats.DebugCommand(),
                         DivineCommand(),
                         PCRCommand(),
                         GuessNumberCommand(),
@@ -166,7 +168,7 @@ object Comet {
                         // Console Command
                         StopCommand(),
                         DebugCommand(),
-                        io.github.starwishsama.comet.commands.subcommands.console.AdminCommand()
+                        io.github.starwishsama.comet.commands.console.AdminCommand()
                 )
         )
 
@@ -181,7 +183,7 @@ object Comet {
         }
 
         startUpTask()
-        startAllPusher()
+        startAllPusher(bot)
 
         val duration = Duration.between(startTime, LocalDateTime.now())
 
@@ -194,34 +196,7 @@ object Comet {
             BotVariables.rCon?.disconnect()
         })
 
-        bot.subscribeMessages {
-            always {
-                val executedTime = LocalDateTime.now()
-                if (sender.id != 80000000L) {
-                    if (this is GroupMessageEvent && group.isBotMuted) return@always
-
-                    val isCommand: Boolean
-                    val result = CommandExecutor.dispatchCommand(this)
-
-                    isCommand = result.msg !is EmptyMessageChain
-
-                    try {
-                        if (isCommand && result.msg.isNotEmpty()) {
-                            reply(result.msg)
-                        }
-                    } catch (e: IllegalArgumentException) {
-                        logger.warning("正在尝试发送空消息, 执行的命令为 $result")
-                    }
-
-                    if (isCommand) {
-                        logger.debugS(
-                                "[命令] 命令执行耗时 ${Duration.between(executedTime, LocalDateTime.now()).toKotlinDuration().asHumanReadable}" +
-                                        if (result.result.isNotEmpty()) ", 执行结果: ${result.result}" else ""
-                        )
-                    }
-                }
-            }
-        }
+        CommandExecutor.startHandler(bot)
 
         handleConsoleCommand()
     }

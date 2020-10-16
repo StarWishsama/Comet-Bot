@@ -6,7 +6,7 @@ import io.github.starwishsama.bilibiliapi.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.commands.CommandExecutor.doFilter
+import io.github.starwishsama.comet.api.command.CommandExecutor.doFilter
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.verboseS

@@ -9,6 +9,11 @@ import io.github.starwishsama.comet.objects.pojo.PicSearchResult
 import io.github.starwishsama.comet.utils.FileUtil
 import org.jsoup.Jsoup
 
+/**
+ * 图片搜索工具类
+ *
+ * FIXME: 将搜索结果转换为 Bean, 减少繁琐的解析反解析
+ */
 object PictureSearchUtil {
     private const val sauceNaoApi = "https://saucenao.com/search.php?db=5&output_type=2&numres=3&url="
     private const val ascii2d = "https://ascii2d.net/search/url/"
@@ -17,8 +22,8 @@ object PictureSearchUtil {
         val encodedUrl = URLUtil.encode(url)
         val key = BotVariables.cfg.sauceNaoApiKey
         val request = NetUtil.doHttpRequestGet(
-            "$sauceNaoApi$encodedUrl${if (key != null && key.isNotEmpty()) "&api_key=$key" else ""}",
-            5000
+                "$sauceNaoApi$encodedUrl${if (key != null && key.isNotEmpty()) "&api_key=$key" else ""}",
+                5000
         )
         val result = request.executeAsync()
 
@@ -44,7 +49,7 @@ object PictureSearchUtil {
     fun ascii2dSearch(url: String): PicSearchResult {
         val request = Jsoup.connect("$ascii2d$url")
         request.header("user-agent", NetUtil.defaultUA).followRedirects(true)
-            .proxy(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
+                .proxy(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
         println("$ascii2d$url")
 
         val html = request.get()
@@ -54,7 +59,7 @@ object PictureSearchUtil {
         val original: String
         try {
             imgUrl =
-                "https://ascii2d.net/" + elements.select(".image-box")[1].select("img")[0].attributes()["src"]
+                    "https://ascii2d.net/" + elements.select(".image-box")[1].select("img")[0].attributes()["src"]
             original = sources[0].attributes()["href"]
         } catch (ignored: IndexOutOfBoundsException) {
             return PicSearchResult.emptyResult()

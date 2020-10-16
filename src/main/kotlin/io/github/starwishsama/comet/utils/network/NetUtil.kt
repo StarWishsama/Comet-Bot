@@ -22,11 +22,11 @@ fun HttpResponse.getContentLength(): Int {
 fun Socket.isUsable(timeout: Int = 1_000, isReloaded: Boolean = false): Boolean {
     if (proxyIsUsable == 0 || isReloaded) {
         try {
-            val connection = URL("https://google.com").openConnection(Proxy(cfg.proxyType, this.remoteSocketAddress))
-            connection.connectTimeout = 5000
+            val connection = (URL("https://www.gstatic.com/generate_204").openConnection(Proxy(cfg.proxyType, this.remoteSocketAddress))) as HttpURLConnection
+            connection.connectTimeout = 2000
             connection.connect()
             proxyIsUsable = 1
-        } catch (t: Throwable) {
+        } catch (t: IOException) {
             proxyIsUsable = -1
         } finally {
             close()
@@ -134,24 +134,15 @@ object NetUtil {
         return (msg.contains("time") && msg.contains("out")) || t.javaClass.simpleName.toLowerCase(Locale.ROOT).contains("timeout")
     }
 
-    fun checkPingValue(address: String = "https://google.com"): Long {
+    @Throws(HttpException::class)
+    fun checkPingValue(address: String = "https://www.gstatic.com/generate_204", timeout: Int = 3000): Long {
         val startTime = LocalDateTime.now()
 
-        val socket = Socket(cfg.proxyUrl, cfg.proxyPort)
-        val proxy: Proxy? = if (socket.isUsable(300)) Proxy(cfg.proxyType, Socket(cfg.proxyUrl, cfg.proxyPort).remoteSocketAddress) else null
-
-        val connection: HttpURLConnection = if (proxy != null) {
-            URL(address).openConnection() as HttpURLConnection
+        val conn = doHttpRequestGet(address, timeout).executeAsync()
+        return if (conn.isOk) {
+            Duration.between(startTime, LocalDateTime.now()).toMillis()
         } else {
-            URL(address).openConnection(proxy) as HttpURLConnection
+            -1L
         }
-        try {
-            connection.connectTimeout = 5000
-            connection.connect()
-        } finally {
-            connection.disconnect()
-        }
-
-        return Duration.between(startTime, LocalDateTime.now()).toMillis()
     }
 }

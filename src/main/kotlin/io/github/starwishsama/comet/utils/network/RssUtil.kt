@@ -46,9 +46,8 @@ object RssUtil {
             val feed: SyndFeed = input.build(reader)
             // 得到RSS源中子项列表
             feed.entries
-        } catch (t: Throwable) {
-            val msg = t.message
-            if (msg == null || !msg.contains("times")) {
+        } catch (t: RuntimeException) {
+            if (!NetUtil.isTimeout(t)) {
                 daemonLogger.warning("RSS | 在获取 RSS 信息时出现意外", t)
             }
             emptyList()

@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.sessions
 
-import io.github.starwishsama.comet.commands.interfaces.ChatCommand
+import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import net.mamoe.mirai.contact.Member
 import java.util.*
 

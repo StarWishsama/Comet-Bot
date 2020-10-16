@@ -5,7 +5,6 @@ import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.coolDown
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotOwner
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
@@ -152,7 +151,6 @@ object BotUtil {
 
     fun sendMessage(otherText: String?, addPrefix: Boolean = true): MessageChain = sendMessageAsString(otherText, addPrefix).convertToChain()
 
-
     fun sendMessage(vararg otherText: String?, addPrefix: Boolean): MessageChain {
         if (!otherText.isNullOrEmpty()) return "".convertToChain()
 
@@ -165,28 +163,9 @@ object BotUtil {
 
     }
 
-    /**
-     * 获取用户的权限组等级
-     *
-     * @author NamelessSAMA
-     * @param qq 指定用户的QQ号
-     * @return 权限组等级
-     */
-    fun getLevel(qq: Long): UserLevel {
-        val user = BotUser.getUser(qq)
-        if (user != null) {
-            return user.level
-        }
-        return UserLevel.USER
-    }
-
     fun List<String>.getRestString(startAt: Int): String {
         if (isEmpty()) {
             return "空"
-        }
-
-        if (size == 1) {
-            return this[0]
         }
 
         return buildString {
@@ -203,7 +182,7 @@ object BotUtil {
         return remain.toKotlinDuration().toFriendly()
     }
 
-    fun getAt(event: MessageEvent, id: String) : BotUser? {
+    fun parseAtAsBotUser(event: MessageEvent, id: String): BotUser? {
         val at = event.message[At]
 
         return if (at != null) {

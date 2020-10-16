@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.sessions.commands.guessnumber
 
-import io.github.starwishsama.comet.commands.subcommands.chats.GuessNumberCommand
+import io.github.starwishsama.comet.commands.chats.GuessNumberCommand
 import io.github.starwishsama.comet.sessions.Session
 import java.time.Duration
 import java.time.LocalDateTime
