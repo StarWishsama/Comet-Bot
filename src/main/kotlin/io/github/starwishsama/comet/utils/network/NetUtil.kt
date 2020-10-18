@@ -158,7 +158,30 @@ object NetUtil {
         }
     }
 
-    fun getScreenshot(address: String): File? {
+    /**
+     * 获取网页截图
+     *
+     * @param address 需截图的网页地址
+     * @param executeScript 执行的额外操作, 如执行脚本
+     */
+    fun getScreenshot(
+        address: String, executeScript: WebDriver.() -> Unit = {
+            val wait = WebDriverWait(this, 10, 1)
+
+            // 等待推文加载完毕再截图
+            wait.until(ExpectedCondition { webDriver ->
+                webDriver?.findElement(By.cssSelector("article"))
+            })
+
+            // 执行脚本获取合适的推文宽度
+            val jsExecutor = (this as JavascriptExecutor)
+            val width =
+                jsExecutor.executeScript("""return document.querySelector("section").getBoundingClientRect().bottom""") as Double
+
+            // 调整窗口大小
+            manage().window().size = Dimension(640, width.toInt())
+        }
+    ): File? {
         try {
             var isConnected = false
 
@@ -173,18 +196,7 @@ object NetUtil {
             // 避免重新获取徒增时长
             if (isConnected) driver.get(address)
 
-            val wait = WebDriverWait(driver, 10, 1)
-
-            // 等待推文加载完毕再截图
-            wait.until(ExpectedCondition { webDriver ->
-                webDriver?.findElement(By.cssSelector("article"))
-            })
-
-            // 执行脚本获取合适的推文宽度
-            val jsExecutor = (driver as JavascriptExecutor)
-            val width = jsExecutor.executeScript("""return document.querySelector("section").getBoundingClientRect().bottom""") as Double
-
-            driver.manage().window().size = Dimension(640, width.toInt())
+            driver.executeScript()
 
             return (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
         } catch (e: Exception) {
