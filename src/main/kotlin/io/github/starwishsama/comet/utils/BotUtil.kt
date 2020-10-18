@@ -141,12 +141,12 @@ object BotUtil {
 
     fun sendMessageAsString(otherText: String?, addPrefix: Boolean = true): String {
         if (otherText.isNullOrEmpty()) return ""
-        return StringBuilder().apply {
+        return buildString {
             if (addPrefix) {
                 append(getLocalMessage("msg.bot-prefix")).append(" ")
             }
             append(otherText)
-        }.toString().trim()
+        }.trim()
     }
 
     fun sendMessage(otherText: String?, addPrefix: Boolean = true): MessageChain = sendMessageAsString(otherText, addPrefix).convertToChain()
@@ -154,12 +154,12 @@ object BotUtil {
     fun sendMessage(vararg otherText: String?, addPrefix: Boolean): MessageChain {
         if (!otherText.isNullOrEmpty()) return "".convertToChain()
 
-        return StringBuilder().apply {
+        return buildString {
             if (addPrefix) append(getLocalMessage("msg.bot-prefix")).append(" ")
             otherText.forEach {
                 append(it).append("\n")
             }
-        }.toString().trim().convertToChain()
+        }.trim().convertToChain()
 
     }
 

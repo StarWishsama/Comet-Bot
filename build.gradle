@@ -3,9 +3,11 @@ buildscript {
         jcenter()
         mavenCentral()
         google()
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
+        classpath 'edu.sc.seis.gradle:launch4j:2.4.6'
     }
 }
 
@@ -15,12 +17,19 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version "1.4.10"
     id 'org.jetbrains.kotlin.plugin.serialization' version "1.4.10"
     id "org.jetbrains.kotlin.kapt" version "1.4.10"
+    id 'edu.sc.seis.launch4j' version '2.4.6'
 }
+
+def mainClass = 'io.github.starwishsama.comet.CometKt'
 
 jar {
     manifest {
-        attributes 'Main-Class': 'io.github.starwishsama.comet.CometKt'
+        attributes 'Main-Class': mainClass
     }
+}
+
+launch4j {
+    mainClassName = mainClass
 }
 
 def gitCommitId = 'git rev-parse --short HEAD'
@@ -112,6 +121,9 @@ dependencies {
 }
 
 shadowJar {
+
+    launch4j
+
     zip64 true
     exclude("META-INF/README")
     exclude("META-INF/NOTICE.txt")
