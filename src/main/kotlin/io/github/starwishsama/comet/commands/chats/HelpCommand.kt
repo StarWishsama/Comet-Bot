@@ -17,20 +17,26 @@ class HelpCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(event.sender.id)) {
             if (args.isEmpty()) {
-                val sb = StringBuilder()
-                for (cmd in CommandExecutor.getCommands()) {
-                    if (!cmd.isHidden) {
-                        sb.append("/").append(cmd.getProps().name).append(" ")
+                val sb = buildString {
+                    append(BotUtil.sendMessageAsString("可用的命令:\n"))
+
+                    for (cmd in CommandExecutor.getCommands()) {
+                        if (!cmd.isHidden) {
+                            append(cmd.getProps().name).append(",")
+                        }
                     }
+
+                    removeSuffix(",")
+                    append("]")
                 }
 
-                return sb.toString().trim().convertToChain()
+                return sb.trim().convertToChain()
             } else {
                 val cmd = CommandExecutor.getCommand(args[0])
                 return if (cmd != null) {
-                    "关于 /${cmd.name} 的帮助信息\n${cmd.getHelp()}".convertToChain()
+                    BotUtil.sendMessage("关于 /${cmd.name} 的帮助信息\n${cmd.getHelp()}")
                 } else {
-                    "该命令不存在哦".convertToChain()
+                    BotUtil.sendMessage("该命令不存在哦")
                 }
             }
         }
