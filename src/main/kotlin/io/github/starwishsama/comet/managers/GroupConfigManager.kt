@@ -10,6 +10,7 @@ object GroupConfigManager {
                 return it
             }
         }
+
         return null
     }
 
