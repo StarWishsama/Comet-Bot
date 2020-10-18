@@ -160,14 +160,18 @@ object NetUtil {
 
     fun getScreenshot(address: String): File? {
         try {
+            var isConnected = false
+
             // 检查驱动器是否正常, 如果不正常重新初始化
             try {
                 driver.get(address)
+                isConnected = true
             } catch (e: WebDriverException) {
                 initDriver()
             }
 
-            driver.get(address)
+            // 避免重新获取徒增时长
+            if (isConnected) driver.get(address)
 
             val wait = WebDriverWait(driver, 10, 1)
 
