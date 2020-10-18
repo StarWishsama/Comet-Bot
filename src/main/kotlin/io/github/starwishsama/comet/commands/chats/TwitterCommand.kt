@@ -67,7 +67,7 @@ class TwitterCommand : ChatCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps = CommandProps("twitter", arrayListOf("twit", "蓝鸟"), "查询/订阅蓝鸟账号", "nbot.commands.twitter", UserLevel.ADMIN)
+    override fun getProps(): CommandProps = CommandProps("twitter", arrayListOf("twit", "蓝鸟", "tt"), "查询/订阅蓝鸟账号", "nbot.commands.twitter", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
         /twit info [蓝鸟ID] 查询账号信息

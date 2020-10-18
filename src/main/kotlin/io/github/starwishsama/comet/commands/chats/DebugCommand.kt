@@ -6,6 +6,7 @@ import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
+import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
@@ -18,6 +19,7 @@ import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.RssUtil
 import net.mamoe.mirai.message.GroupMessageEvent
@@ -27,6 +29,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.uploadAsGroupVoice
+import net.mamoe.mirai.message.uploadAsImage
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -163,6 +166,23 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     """.trimIndent().convertToChain()
                 }
                 "panic" -> throw RuntimeException("好")
+                "twpic" -> {
+                    if (args.isEmpty()) return "/debug twpic [Tweet ID]".convertToChain()
+                    else {
+                        if (args[1].isNumeric()) {
+                            val tweet = TwitterApi.getTweetById(args[1].toLong())
+                            if (tweet != null) {
+                                val screenshot = NetUtil.getScreenshot(tweet.getTweetURL())
+                                        ?: return "Can't take screenshot :(".convertToChain()
+                                return screenshot.uploadAsImage(event.subject).asMessageChain()
+                            } else {
+                                return "The tweet of ${args[0]} seems doesn't exists.".convertToChain()
+                            }
+                        } else {
+                            return "NaN".convertToChain()
+                        }
+                    }
+                }
                 else -> return "Bot > 命令不存在\n${getHelp()}".convertToChain()
             }
         }

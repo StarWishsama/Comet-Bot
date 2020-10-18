@@ -92,5 +92,11 @@ data class Config(
         var arkDrawUseImage: Boolean = true,
 
         //@Comment("调试模式")
-        var debugMode: Boolean = false
+        var debugMode: Boolean = false,
+
+        //@Comment("WebDriver 使用的浏览器")
+        val webDriverName: String = "chrome",
+
+        //@Comment("WebDriver Remote 地址")
+        val remoteWebDriver: String = ""
 )

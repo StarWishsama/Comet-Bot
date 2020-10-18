@@ -64,7 +64,7 @@ data class Tweet(
             return "转发了 ${retweetStatus.user.name} 的推文\n" +
                     "${cleanShortUrlAtEnd(retweetStatus.text)}\n" +
                     "$extraText\n" +
-                    "\uD83D\uDD17 > https://twitter.com/${user.twitterId}/status/$idAsString\n" +
+                    "\uD83D\uDD17 > ${getTweetURL()}\n" +
                     "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
         }
 
@@ -73,26 +73,26 @@ data class Tweet(
                     "${cleanShortUrlAtEnd(quotedStatus.text)}\n" +
                     "\n${user.name} 进行了评论\n" +
                     "${cleanShortUrlAtEnd(text)}\n" +
-                    "$extraText\n🔗 > https://twitter.com/${user.twitterId}/status/$idAsString\n" +
+                    "$extraText\n🔗 > ${getTweetURL()}\n" +
                     "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
         }
 
         if (replyTweetId != null) {
             val repliedTweet = TwitterApi.getTweetById(replyTweetId) ?: return "${cleanShortUrlAtEnd(text)}\n" +
                     "$extraText\n" +
-                    "🔗 > https://twitter.com/${user.twitterId}/status/$idAsString\n" +
+                    "🔗 > ${getTweetURL()}\n" +
                     "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
 
             return "对于 ${repliedTweet.user.name} 的推文:\n" +
                     "${cleanShortUrlAtEnd(repliedTweet.text)}\n\n" +
                     "${user.name} 进行了回复\n${cleanShortUrlAtEnd(text)}\n" +
-                    "$extraText\n🔗 > https://twitter.com/${user.twitterId}/status/$idAsString\n" +
+                    "$extraText\n🔗 > ${getTweetURL()}\n" +
                     "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
         }
 
         return "${cleanShortUrlAtEnd(text)}\n" +
                 "$extraText\n" +
-                "🔗 > https://twitter.com/${user.twitterId}/status/$idAsString\n" +
+                "🔗 > ${getTweetURL()}\n" +
                 "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
     }
 
@@ -183,5 +183,9 @@ data class Tweet(
                 append(image)
             }
         }.asMessageChain()
+    }
+
+    fun getTweetURL(): String {
+        return "https://twitter.com/${user.twitterId}/status/$idAsString"
     }
 }

@@ -26,6 +26,7 @@ import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.getContext
+import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.writeString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -133,6 +134,7 @@ object Comet {
         config.heartbeatPeriodMillis = (BotVariables.cfg.heartBeatPeriod * 60).secondsToMillis
         config.fileBasedDeviceInfo()
         config.fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
+        config.protocol = BotConfiguration.MiraiProtocol.ANDROID_PHONE
         bot = Bot(qq = qqId, password = password, configuration = config)
         bot.alsoLogin()
 
@@ -199,6 +201,8 @@ object Comet {
         CommandExecutor.startHandler(bot)
 
         handleConsoleCommand()
+
+        bot.join() // 等待 Bot 离线, 避免主线程退出
     }
 }
 
@@ -215,10 +219,11 @@ fun initResources() {
         \____/\____/_/ /_/ /_/\___/\__/  
 
 
-    """.trimIndent()
+    """
     )
     FileUtil.initLog()
     DataSetup.init()
+    NetUtil.initDriver()
 }
 
 @ExperimentalStdlibApi
@@ -265,6 +270,5 @@ suspend fun main() {
         scanner.close()
     } else {
         Comet.startBot(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
-        bot.join() // 等待 Bot 离线, 避免主线程退出
     }
 }

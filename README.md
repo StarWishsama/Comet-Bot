@@ -61,11 +61,14 @@ Demo 群：725656262
  等待提示成功后, 可以在 ./build/libs 下找到编译成功的 jar
 
 ### Releases 下载
+
 1. 在[此处](https://github.com/StarWishsama/Comet-Bot/releases)下载最新版本
 
-
 2. 使用 cmd 启动 Bot, 按照提示登录
+```java -jar 下载jar的路径```
+
 3. 提示启动完成后, 在机器人加入的群内发送 /help 就可开始了解 Comet 的各项功能了
+
 
 ## 📜 协议 
 **一切开发旨在学习，请勿用于非法用途**

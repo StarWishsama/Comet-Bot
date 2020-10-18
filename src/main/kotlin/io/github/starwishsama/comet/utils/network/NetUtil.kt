@@ -6,6 +6,16 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.utils.network.NetUtil.proxyIsUsable
+import org.openqa.selenium.*
+import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.edge.EdgeDriver
+import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.ie.InternetExplorerDriver
+import org.openqa.selenium.opera.OperaDriver
+import org.openqa.selenium.remote.DesiredCapabilities
+import org.openqa.selenium.remote.RemoteWebDriver
+import org.openqa.selenium.support.ui.ExpectedCondition
+import org.openqa.selenium.support.ui.WebDriverWait
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.Proxy
@@ -42,6 +52,8 @@ fun HttpResponse.isType(typeName: String): Boolean {
 
 object NetUtil {
     var proxyIsUsable = 0
+    lateinit var driver: WebDriver
+
     const val defaultUA =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36"
 
@@ -143,6 +155,62 @@ object NetUtil {
             Duration.between(startTime, LocalDateTime.now()).toMillis()
         } else {
             -1L
+        }
+    }
+
+    fun getScreenshot(address: String): File? {
+        try {
+            // 检查驱动器是否正常, 如果不正常重新初始化
+            try {
+                driver.get(address)
+            } catch (e: WebDriverException) {
+                initDriver()
+            }
+
+            driver.get(address)
+
+            val wait = WebDriverWait(driver, 10, 1)
+
+            // 等待推文加载完毕再截图
+            wait.until(ExpectedCondition { webDriver ->
+                webDriver?.findElement(By.cssSelector("article"))
+            })
+
+            // 执行脚本获取合适的推文宽度
+            val jsExecutor = (driver as JavascriptExecutor)
+            val width = jsExecutor.executeScript("""return document.querySelector("section").getBoundingClientRect().bottom""") as Double
+
+            driver.manage().window().size = Dimension(640, width.toInt())
+
+            return (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
+        } catch (e: Exception) {
+            daemonLogger.warning("在调用 WebDriver 时出现异常", e)
+        }
+
+        return null
+    }
+
+    fun initDriver() {
+        var driverName = cfg.webDriverName
+
+        try {
+            driver = when (driverName.toLowerCase()) {
+                "chrome" -> ChromeDriver()
+                "edge" -> EdgeDriver()
+                "firefox" -> FirefoxDriver()
+                "ie", "internetexplorer" -> InternetExplorerDriver()
+                "opera" -> OperaDriver()
+                else -> {
+                    if (driverName.isNotEmpty()) {
+                        daemonLogger.warning("不支持的 WebDriver 类型: ${driverName}, Comet 支持 [Chrome, Edge, Firefox, IE, Opera]")
+                        return
+                    }
+                    driverName = "Remote"
+                    RemoteWebDriver(URL(cfg.remoteWebDriver), DesiredCapabilities.chrome())
+                }
+            }
+        } catch (e: RuntimeException) {
+            daemonLogger.warning("在尝试加载 WebDriver for $driverName 时出现问题", e)
         }
     }
 }

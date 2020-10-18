@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.utils
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
+import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStream
@@ -47,11 +48,11 @@ object DrawUtil {
             val imageHeight = bufferedImage.height / zoom
 
             createGraphics.drawImage(
-                bufferedImage.getScaledInstance(
-                    imageWidth,
-                    imageHeight,
-                    java.awt.Image.SCALE_SMOOTH
-                ), newBufferedImageWidth, newBufferedImageHeight, imageWidth, imageHeight, null
+                    bufferedImage.getScaledInstance(
+                            imageWidth,
+                            imageHeight,
+                            Image.SCALE_SMOOTH
+                    ), newBufferedImageWidth, newBufferedImageHeight, imageWidth, imageHeight, null
             )
 
             newBufferedImageWidth += imageWidth

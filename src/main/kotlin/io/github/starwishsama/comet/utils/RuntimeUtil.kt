@@ -4,7 +4,7 @@ import java.lang.management.ManagementFactory
 
 fun getOsInfo(): String {
     val osMX = ManagementFactory.getOperatingSystemMXBean()
-    return "${osMX.name}_${osMX.version} (${osMX.arch})"
+    return "${osMX.name} ${osMX.version} (${osMX.arch})"
 }
 
 fun getUsedMemory(): Long {

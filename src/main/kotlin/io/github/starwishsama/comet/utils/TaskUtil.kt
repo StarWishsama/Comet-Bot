@@ -20,26 +20,23 @@ object TaskUtil {
     fun executeWithRetry(retryTime: Int, task: () -> Unit): Throwable? {
         if (retryTime >= 5) return ReachRetryLimitException()
 
-        var initRetryTime = 1
-        fun runTask(): Throwable? {
+        repeat(retryTime) {
             try {
-                if (initRetryTime <= retryTime) {
+                if (it <= retryTime) {
                     task()
                 } else {
                     throw ReachRetryLimitException()
                 }
-            } catch (t: Throwable) {
-                if (NetUtil.isTimeout(t)) {
-                    daemonLogger.verbose("Retried $initRetryTime time(s), connect times out")
-                    initRetryTime++
-                    runTask()
+            } catch (e: RuntimeException) {
+                if (NetUtil.isTimeout(e)) {
+                    daemonLogger.verbose("Retried $it time(s), connect times out")
+                    return@repeat
                 } else {
-                    if (t !is RateLimitException) return t
+                    if (e !is RateLimitException) return e
                 }
             }
-            return null
         }
 
-        return runTask()
+        return null
     }
 }

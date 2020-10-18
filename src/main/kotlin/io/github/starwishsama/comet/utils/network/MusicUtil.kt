@@ -2,10 +2,10 @@ package io.github.starwishsama.comet.utils.network
 
 import cn.hutool.http.HttpRequest
 import com.github.salomonbrys.kotson.get
-import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
@@ -24,22 +24,22 @@ object MusicUtil {
 
     fun searchNetEaseMusic(songName: String): MessageChain {
         try {
-            val searchResponse = HttpRequest.get(
-                    "http://$api4NetEase/search?keywords=${URLEncoder.encode(
-                            songName,
-                            "UTF-8"
-                    )}"
-            ).timeout(8000).executeAsync()
-            if (searchResponse.isOk) {
-                val searchResult: JsonObject = JsonParser.parseString(searchResponse.body()) as JsonObject
+
+            val searchMusicResult = NetUtil.getPageContent("http://$api4NetEase/search?keywords=${
+                URLEncoder.encode(
+                        songName,
+                        "UTF-8"
+                )
+            }")
+
+            if (!searchMusicResult.isNumeric()) {
+                val searchResult = JsonParser.parseString(searchMusicResult)
                 if (searchResult.isJsonObject) {
-                    val musicId = searchResult.getAsJsonObject("result").getAsJsonArray("songs")[0]["id"].asInt
+                    val musicId = searchResult.asJsonObject["result"].asJsonArray["songs"][0]["id"].asInt
                     val musicUrl = "https://music.163.com/#/song?id=$musicId"
-                    val songResult =
-                            HttpRequest.get("http://$api4NetEase/song/detail?ids=$musicId").timeout(8000)
-                            .executeAsync()
-                    if (songResult.isOk) {
-                        val songJson = JsonParser.parseString(songResult.body())
+                    val songResult = NetUtil.getPageContent("http://$api4NetEase/song/detail?ids=$musicId")
+                    if (!songResult.isNumeric()) {
+                        val songJson = JsonParser.parseString(songResult)
                         if (songJson.isJsonObject) {
                             val albumUrl = songJson.asJsonObject["songs"].asJsonArray[0].asJsonObject["al"]["picUrl"].asString
                             val name = songJson.asJsonObject["songs"].asJsonArray[0].asJsonObject["name"].asString
