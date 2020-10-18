@@ -165,22 +165,23 @@ object NetUtil {
      * @param executeScript 执行的额外操作, 如执行脚本
      */
     fun getScreenshot(
-        address: String, executeScript: WebDriver.() -> Unit = {
-            val wait = WebDriverWait(this, 10, 1)
+            address: String, executeScript: WebDriver.() -> Unit = {
+                // 获取推文使用, 如有其他需求请自行重载
+                val wait = WebDriverWait(this, 10, 1)
 
-            // 等待推文加载完毕再截图
-            wait.until(ExpectedCondition { webDriver ->
-                webDriver?.findElement(By.cssSelector("article"))
-            })
+                // 等待推文加载完毕再截图
+                wait.until(ExpectedCondition { webDriver ->
+                    webDriver?.findElement(By.cssSelector("article"))
+                })
 
-            // 执行脚本获取合适的推文宽度
-            val jsExecutor = (this as JavascriptExecutor)
-            val width =
-                jsExecutor.executeScript("""return document.querySelector("section").getBoundingClientRect().bottom""") as Double
+                // 执行脚本获取合适的推文宽度
+                val jsExecutor = (this as JavascriptExecutor)
+                val width =
+                        jsExecutor.executeScript("""return document.querySelector("section").getBoundingClientRect().bottom""") as Double
 
-            // 调整窗口大小
-            manage().window().size = Dimension(640, width.toInt())
-        }
+                // 调整窗口大小
+                manage().window().size = Dimension(640, width.toInt())
+            }
     ): File? {
         try {
             var isConnected = false

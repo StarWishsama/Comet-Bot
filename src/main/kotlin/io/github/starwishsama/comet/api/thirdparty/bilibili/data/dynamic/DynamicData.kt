@@ -1,6 +1,6 @@
-package io.github.starwishsama.bilibiliapi.data.dynamic
+package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic
 
-import io.github.starwishsama.bilibiliapi.data.dynamic.dynamicdata.*
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata.*
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 interface DynamicData {

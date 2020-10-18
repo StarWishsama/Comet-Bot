@@ -5,8 +5,12 @@ import io.github.starwishsama.comet.objects.group.PerGroupConfig
 
 object GroupConfigManager {
     fun getConfig(groupId: Long): PerGroupConfig? {
-        val result = perGroup.parallelStream().filter { it.id == groupId }.findFirst()
-        return if (result.isPresent) result.get() else null
+        perGroup.forEach {
+            if (it.id == groupId) {
+                return it
+            }
+        }
+        return null
     }
 
     fun getConfigSafely(groupId: Long): PerGroupConfig {

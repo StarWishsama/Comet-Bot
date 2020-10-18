@@ -1,12 +1,12 @@
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.bilibiliapi.FakeClientApi
-import io.github.starwishsama.bilibiliapi.LiveApi
-import io.github.starwishsama.bilibiliapi.MainApi
-import io.github.starwishsama.bilibiliapi.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser

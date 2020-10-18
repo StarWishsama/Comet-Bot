@@ -1,4 +1,4 @@
-package io.github.starwishsama.bilibiliapi.data.search
+package io.github.starwishsama.comet.api.thirdparty.bilibili.data.search
 
 import com.google.gson.annotations.SerializedName
 

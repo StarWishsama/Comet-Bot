@@ -1,13 +1,13 @@
 package io.github.starwishsama.comet
 
-import io.github.starwishsama.bilibiliapi.FakeClientApi
-import io.github.starwishsama.bilibiliapi.MainApi
 import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.BotVariables.consoleCommandLogger
 import io.github.starwishsama.comet.BotVariables.filePath
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.BotVariables.startTime
 import io.github.starwishsama.comet.api.command.CommandExecutor
+import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.commands.chats.*
