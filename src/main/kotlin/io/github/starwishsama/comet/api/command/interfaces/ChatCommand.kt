@@ -30,4 +30,7 @@ interface ChatCommand {
 
     val isHidden: Boolean
         get() = false
+
+    val canRegister: () -> Boolean
+        get() = { true }
 }

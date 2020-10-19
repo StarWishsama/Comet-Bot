@@ -197,4 +197,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
 
     override val isHidden: Boolean
         get() = true
+
+    override val canRegister: () -> Boolean
+        get() = { BotVariables.cfg.debugMode }
 }

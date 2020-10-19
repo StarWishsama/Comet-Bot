@@ -43,7 +43,7 @@ object CommandExecutor {
      * @param command 要注册的命令
      */
     private fun setupCommand(command: ChatCommand) {
-        if (!commands.contains(command)) {
+        if (!commands.contains(command) && command.canRegister()) {
             commands.add(command)
         } else {
             BotVariables.logger.warning("[命令] 正在尝试注册已有命令 ${command.getProps().name}")
@@ -57,7 +57,7 @@ object CommandExecutor {
      */
     fun setupCommand(commands: Array<ChatCommand>) {
         commands.forEach {
-            if (!CommandExecutor.commands.contains(it)) {
+            if (!CommandExecutor.commands.contains(it) && it.canRegister()) {
                 CommandExecutor.commands.add(it)
             }
         }
