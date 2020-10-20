@@ -58,14 +58,13 @@ class KickCommand : ChatCommand {
     """.trimIndent()
 
     override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
-        if (super.hasPermission(user, e)) return true
-
         if (e is GroupMessageEvent) {
-            if (e.sender.permission > MemberPermission.MEMBER) return true
+            if (e.sender.permission == MemberPermission.MEMBER) return false
             val cfg = GroupConfigManager.getConfigSafely(e.group.id)
             if (cfg.isHelper(user.id)) return true
         }
-        return false
+
+        return user.hasPermission(getProps().permission)
     }
 
     private fun doKick(event: GroupMessageEvent, target: Long, reason: String) {
