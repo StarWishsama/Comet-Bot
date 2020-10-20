@@ -7,7 +7,6 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.gson
@@ -77,7 +76,7 @@ object DataSetup {
             }
 
             if (arkNightData.exists()) {
-                arkNight = arkNightData.parseAsClass(arkNight::class.java)
+                BotVariables.arkNight = gson.fromJson(arkNightData.getContext())
                 daemonLogger.info("成功载入明日方舟游戏数据")
             } else {
                 daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
@@ -155,8 +154,8 @@ object DataSetup {
                 try {
                     BotVariables.perGroup.add(loc.parseAsClass(PerGroupConfig::class.java))
                     count++
-                } catch (t: Throwable) {
-                    BotVariables.logger.warning("[配置] 在加载分群配置时出现了问题", t)
+                } catch (e: Exception) {
+                    BotVariables.logger.warning("[配置] 在加载分群配置时出现了问题", e)
                 }
             }
         }

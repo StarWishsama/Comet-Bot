@@ -225,7 +225,11 @@ object NetUtil {
                 "ie", "internetexplorer" -> driver = InternetExplorerDriver()
                 "opera" -> driver = OperaDriver()
                 "remote" -> driver = RemoteWebDriver(URL(cfg.remoteWebDriver), DesiredCapabilities.chrome())
-                else -> daemonLogger.warning("不支持的 WebDriver 类型: ${cfg.webDriverName}, Comet 支持 [Chrome, Edge, Firefox, IE, Opera]")
+                else -> {
+                    if (cfg.webDriverName.isNotEmpty()) {
+                        daemonLogger.warning("不支持的 WebDriver 类型: ${cfg.webDriverName}, Comet 支持 [Chrome, Edge, Firefox, IE, Opera]")
+                    }
+                }
             }
         } catch (e: RuntimeException) {
             daemonLogger.warning("在尝试加载 WebDriver for ${cfg.webDriverName} 时出现问题", e)

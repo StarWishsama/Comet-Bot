@@ -189,14 +189,12 @@ object CommandExecutor {
      */
     suspend fun dispatchConsoleCommand(content: String): String {
         try {
-            if (isCommandPrefix(content)) {
-                val cmd = getConsoleCommand(getCommandName(content))
-                if (cmd != null) {
-                    val splitMessage = content.split(" ")
-                    val splitCommand = splitMessage.subList(1, splitMessage.size)
-                    BotVariables.logger.debug("[命令] 后台尝试执行命令: " + cmd.getProps().name)
-                    return cmd.execute(splitCommand)
-                }
+            val cmd = getConsoleCommand(getCommandName(content))
+            if (cmd != null) {
+                val splitMessage = content.split(" ")
+                val splitCommand = splitMessage.subList(1, splitMessage.size)
+                BotVariables.logger.debug("[命令] 后台尝试执行命令: " + cmd.getProps().name)
+                return cmd.execute(splitCommand)
             }
         } catch (t: Throwable) {
             BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $content", t)

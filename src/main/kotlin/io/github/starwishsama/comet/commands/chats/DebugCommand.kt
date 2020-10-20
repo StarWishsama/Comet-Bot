@@ -166,6 +166,10 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     """.trimIndent().convertToChain()
                 }
                 "panic" -> throw RuntimeException("好")
+                "ark" -> {
+                    return BotVariables.arkNight.size.toString().convertToChain()
+                }
+                "pcr" -> return BotVariables.pcr.size.toString().convertToChain()
                 "twpic" -> {
                     if (args.isEmpty()) return "/debug twpic [Tweet ID]".convertToChain()
                     else {

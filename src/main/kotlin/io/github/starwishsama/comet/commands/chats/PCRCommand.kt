@@ -45,6 +45,6 @@ class PCRCommand : ChatCommand {
 
     override fun getHelp(): String = """
          ============ 命令帮助 ============
-         /ck pcr [十连/单抽/次数] 公主连结抽卡
+         /pcr [十连/单抽/次数] 公主连结抽卡
     """.trimIndent()
 }
