@@ -66,7 +66,7 @@ object BotVariables {
     var shop: MutableList<Shop> = LinkedList()
     val users: MutableList<BotUser> = LinkedList()
     var localMessage: MutableList<BotLocalization> = ArrayList()
-    var cfg = Config()
+    var cfg = CometConfig()
     var underCovers: MutableList<RandomResult> = LinkedList()
     var cache: JsonObject = JsonObject()
     val perGroup: MutableSet<PerGroupConfig> = HashSet()

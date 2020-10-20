@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import java.net.Proxy
 
 @Serializable
-data class Config(
+data class CometConfig(
         //@Comment("机器人的账号")
         var botId: Long = 0,
 
@@ -95,7 +95,7 @@ data class Config(
         var debugMode: Boolean = false,
 
         //@Comment("WebDriver 使用的浏览器")
-        val webDriverName: String = "chrome",
+        val webDriverName: String = "",
 
         //@Comment("WebDriver Remote 地址")
         val remoteWebDriver: String = ""

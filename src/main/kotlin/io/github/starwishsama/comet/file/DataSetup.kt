@@ -13,7 +13,7 @@ import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.Config
+import io.github.starwishsama.comet.objects.CometConfig
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.network.isUsable
@@ -34,7 +34,7 @@ object DataSetup {
     fun init() {
         if (!userCfg.exists() || !cfgFile.exists()) {
             try {
-                cfgFile.writeString(Yaml.default.encodeToString(Config.serializer(), Config()))
+                cfgFile.writeString(Yaml.default.encodeToString(CometConfig.serializer(), CometConfig()))
                 userCfg.writeClassToJson(BotVariables.users)
                 shopItemCfg.writeClassToJson(BotVariables.shop)
                 println("[配置] 已自动生成新的配置文件.")
@@ -48,7 +48,7 @@ object DataSetup {
 
     private fun saveCfg() {
         try {
-            cfgFile.writeString(Yaml.default.encodeToString(Config.serializer(), cfg))
+            cfgFile.writeString(Yaml.default.encodeToString(CometConfig.serializer(), cfg))
             userCfg.writeClassToJson(BotVariables.users)
             shopItemCfg.writeClassToJson(BotVariables.shop)
             savePerGroupSetting()
@@ -60,7 +60,7 @@ object DataSetup {
 
     private fun load() {
         try {
-            cfg = Yaml.default.decodeFromString(Config.serializer(), cfgFile.getContext())
+            cfg = Yaml.default.decodeFromString(CometConfig.serializer(), cfgFile.getContext())
             BotVariables.users.addAll(gson.fromJson<List<BotUser>>(userCfg.getContext()))
 
             BotVariables.shop = gson.fromJson(shopItemCfg.getContext())
@@ -128,7 +128,7 @@ object DataSetup {
 
     fun reload() {
         // 仅重载配置文件
-        cfg = Yaml.default.decodeFromString(Config.serializer(), cfgFile.getContext())
+        cfg = Yaml.default.decodeFromString(CometConfig.serializer(), cfgFile.getContext())
 
         try {
             val socket = Socket(cfg.proxyUrl, cfg.proxyPort)
