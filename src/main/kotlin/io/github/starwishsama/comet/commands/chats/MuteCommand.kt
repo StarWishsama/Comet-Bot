@@ -65,13 +65,12 @@ class MuteCommand : ChatCommand {
     """.trimIndent()
 
     override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
-        if (super.hasPermission(user, e)) return true
         if (e is GroupMessageEvent) {
             if (e.sender.permission >= MemberPermission.ADMINISTRATOR) return true
             val cfg = GroupConfigManager.getConfigSafely(e.group.id)
             if (cfg.isHelper(e.sender.id)) return true
         }
-        return false
+        return user.hasPermission(getProps().permission)
     }
 
     private suspend fun doRandomMute(event: GroupMessageEvent) {
