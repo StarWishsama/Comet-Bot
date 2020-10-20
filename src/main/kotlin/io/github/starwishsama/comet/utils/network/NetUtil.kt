@@ -141,9 +141,9 @@ object NetUtil {
     }
 
     fun isTimeout(t: Throwable): Boolean {
-        val msg = t.message?.toLowerCase(Locale.ROOT) ?: return false
+        val msg = t.message?.toLowerCase(Locale.ROOT) ?: return t is IOException
         // FIXME: 这不是一个很好的识别方法
-        return (msg.contains("time") && msg.contains("out")) || t.javaClass.simpleName.toLowerCase(Locale.ROOT).contains("timeout")
+        return t is IOException || (msg.contains("time") && msg.contains("out")) || t.javaClass.simpleName.toLowerCase(Locale.ROOT).contains("timeout")
     }
 
     @Throws(HttpException::class)
@@ -162,16 +162,23 @@ object NetUtil {
      * 获取网页截图
      *
      * @param address 需截图的网页地址
-     * @param executeScript 执行的额外操作, 如执行脚本
+     * @param extraExecute 执行的额外操作, 如执行脚本
      */
     fun getScreenshot(
-            address: String, executeScript: WebDriver.() -> Unit = {
+            address: String, extraExecute: WebDriver.() -> Unit = {
                 // 获取推文使用, 如有其他需求请自行重载
-                val wait = WebDriverWait(this, 10, 1)
+                val wait = WebDriverWait(this, 50, 1)
 
                 // 等待推文加载完毕再截图
                 wait.until(ExpectedCondition { webDriver ->
                     webDriver?.findElement(By.cssSelector("article"))
+                    var tag: By? = null
+                    try {
+                        tag = By.tagName("img")
+                    } catch (ignored: IllegalArgumentException) {
+                        // 部分推文是没有图片的
+                    }
+                    tag?.let { webDriver?.findElement(it) }
                 })
 
                 // 执行脚本获取合适的推文宽度
@@ -184,6 +191,8 @@ object NetUtil {
             }
     ): File? {
         try {
+            if (!::driver.isInitialized) return null
+
             var isConnected = false
 
             // 检查驱动器是否正常, 如果不正常重新初始化
@@ -197,7 +206,7 @@ object NetUtil {
             // 避免重新获取徒增时长
             if (isConnected) driver.get(address)
 
-            driver.executeScript()
+            driver.extraExecute()
 
             return (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
         } catch (e: Exception) {
@@ -208,26 +217,18 @@ object NetUtil {
     }
 
     fun initDriver() {
-        var driverName = cfg.webDriverName
-
         try {
-            driver = when (driverName.toLowerCase()) {
-                "chrome" -> ChromeDriver()
-                "edge" -> EdgeDriver()
-                "firefox" -> FirefoxDriver()
-                "ie", "internetexplorer" -> InternetExplorerDriver()
-                "opera" -> OperaDriver()
-                else -> {
-                    if (driverName.isNotEmpty()) {
-                        daemonLogger.warning("不支持的 WebDriver 类型: ${driverName}, Comet 支持 [Chrome, Edge, Firefox, IE, Opera]")
-                        return
-                    }
-                    driverName = "Remote"
-                    RemoteWebDriver(URL(cfg.remoteWebDriver), DesiredCapabilities.chrome())
-                }
+            when (cfg.webDriverName.toLowerCase()) {
+                "chrome" -> driver = ChromeDriver()
+                "edge" -> driver = EdgeDriver()
+                "firefox" -> driver = FirefoxDriver()
+                "ie", "internetexplorer" -> driver = InternetExplorerDriver()
+                "opera" -> driver = OperaDriver()
+                "remote" -> driver = RemoteWebDriver(URL(cfg.remoteWebDriver), DesiredCapabilities.chrome())
+                else -> daemonLogger.warning("不支持的 WebDriver 类型: ${cfg.webDriverName}, Comet 支持 [Chrome, Edge, Firefox, IE, Opera]")
             }
         } catch (e: RuntimeException) {
-            daemonLogger.warning("在尝试加载 WebDriver for $driverName 时出现问题", e)
+            daemonLogger.warning("在尝试加载 WebDriver for ${cfg.webDriverName} 时出现问题", e)
         }
     }
 }

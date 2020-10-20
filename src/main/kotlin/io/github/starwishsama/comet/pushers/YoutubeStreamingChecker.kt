@@ -24,7 +24,7 @@ object YoutubeStreamingChecker : CometPusher {
             if (config.youtubePushEnabled && config.youtubeSubscribers.isNotEmpty()) {
                 config.youtubeSubscribers.forEach {
                     if (pushPool.containsKey(it)) {
-                        pushPool[it]!!.groups.add(config.id)
+                        pushPool[it]?.groups?.add(config.id)
                     } else {
                         pushPool[it] = PushObject(mutableListOf(config.id))
                     }
@@ -52,8 +52,8 @@ object YoutubeStreamingChecker : CometPusher {
     override fun push() {
         pushPool.forEach { (_, pushObject) ->
             if (!pushObject.isPushed) {
+                val wrappedMessage = YoutubeApi.getLiveStatusByResult(pushObject.result)
                 pushObject.groups.forEach {
-                    val wrappedMessage = YoutubeApi.getLiveStatusByResult(pushObject.result)
                     val group = bot?.getGroupOrNull(it)
                     runBlocking {
                         try {

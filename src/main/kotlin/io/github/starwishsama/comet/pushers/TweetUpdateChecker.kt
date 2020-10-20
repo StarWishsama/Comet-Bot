@@ -96,8 +96,10 @@ object TweetUpdateChecker : CometPusher {
         groupsToPush.forEach {
             val group = bot?.getGroupOrNull(it)
             if (group != null) {
+                val msg = (PlainText("${content.user.name} 发布了一条推文\n") + content.toMessageChain(group)).doFilter()
+
                 try {
-                    group.sendMessage((PlainText("${content.user.name} 发布了一条推文\n") + content.toMessageChain(group)).doFilter())
+                    group.sendMessage(msg)
                     successCount++
                     delay(2_500)
                 } catch (t: EventCancelledException) {

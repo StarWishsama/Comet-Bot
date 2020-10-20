@@ -9,6 +9,9 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.isNumeric
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
@@ -18,7 +21,7 @@ import net.mamoe.mirai.message.data.MessageChain
 @CometCommand
 class MuteCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (event is GroupMessageEvent && (BotUtil.hasNoCoolDown(user.id) || hasPermission(user, event))) {
+        if (event is GroupMessageEvent && hasPermission(user, event)) {
             return if (event.group.botPermission.isOperator()) {
                 if (args.isNotEmpty()) {
                     val at = BotUtil.parseAtAsBotUser(event, args[0])
@@ -28,12 +31,15 @@ class MuteCommand : ChatCommand {
                         when (args[0]) {
                             "all", "全体", "全禁", "全体禁言" -> doMute(
                                     event.group,
-                                    args[0].toLong(),
-                                    getMuteTime(args[1]),
-                                    false
+                                    -1,
+                                    -1,
+                                    true
                             )
                             "random", "rand", "随机", "抽奖" -> {
-                                doRandomMute(event)
+                                GlobalScope.run {
+                                    delay(1_500)
+                                    doRandomMute(event)
+                                }
                                 BotUtil.sendMessage("下面将抽取一位幸运群友禁言")
                             }
                             else -> getHelp().convertToChain()
@@ -129,6 +135,8 @@ class MuteCommand : ChatCommand {
      * FIXME: 更换为正则表达式更优雅的处理
      */
     private fun getMuteTime(message: String): Long {
+        if (message.isNumeric()) return message.toLong()
+
         var banTime = 0L
         var tempTime: String = message
         if (tempTime.indexOf('d') != -1) {
