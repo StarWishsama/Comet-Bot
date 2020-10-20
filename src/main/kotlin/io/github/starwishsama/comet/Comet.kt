@@ -134,7 +134,6 @@ object Comet {
         config.heartbeatPeriodMillis = (BotVariables.cfg.heartBeatPeriod * 60).secondsToMillis
         config.fileBasedDeviceInfo()
         config.fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
-        config.protocol = BotConfiguration.MiraiProtocol.ANDROID_PHONE
         bot = Bot(qq = qqId, password = password, configuration = config)
         bot.alsoLogin()
 
