@@ -26,7 +26,7 @@ class PCRCommand : ChatCommand {
                     "单抽" -> BotUtil.sendMessage(pool.getPCRResult(user, 1))
                     "来一井" -> return BotUtil.sendMessage(pool.getPCRResult(user, 300))
                     else -> {
-                        if (StringUtils.isNumeric(args[1])) {
+                        if (StringUtils.isNumeric(args[0])) {
                             BotUtil.sendMessage(pool.getPCRResult(user, args[0].toInt()))
                         } else {
                             getHelp().convertToChain()
