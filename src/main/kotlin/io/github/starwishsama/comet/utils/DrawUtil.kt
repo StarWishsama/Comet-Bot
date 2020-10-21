@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.utils
 
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
@@ -40,23 +41,29 @@ object DrawUtil {
 
         for (i in list) {
             val file = File(FileUtil.getChildFolder("res${File.separator}" + i.rare), i.name + ".jpg")
-            val inStream: InputStream = file.inputStream()
 
-            val bufferedImage: BufferedImage = ImageIO.read(inStream)
+            if (!file.exists()) {
+                daemonLogger.warning("明日方舟: 干员 ${i.name} 的图片不存在")
+            } else {
 
-            val imageWidth = bufferedImage.width / zoom
-            val imageHeight = bufferedImage.height / zoom
+                val inStream: InputStream = file.inputStream()
 
-            createGraphics.drawImage(
-                    bufferedImage.getScaledInstance(
-                            imageWidth,
-                            imageHeight,
-                            Image.SCALE_SMOOTH
-                    ), newBufferedImageWidth, newBufferedImageHeight, imageWidth, imageHeight, null
-            )
+                val bufferedImage: BufferedImage = ImageIO.read(inStream)
 
-            newBufferedImageWidth += imageWidth
+                val imageWidth = bufferedImage.width / zoom
+                val imageHeight = bufferedImage.height / zoom
 
+                createGraphics.drawImage(
+                        bufferedImage.getScaledInstance(
+                                imageWidth,
+                                imageHeight,
+                                Image.SCALE_SMOOTH
+                        ), newBufferedImageWidth, newBufferedImageHeight, imageWidth, imageHeight, null
+                )
+
+                newBufferedImageWidth += imageWidth
+
+            }
         }
 
         createGraphics.dispose()

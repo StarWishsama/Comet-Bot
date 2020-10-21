@@ -59,7 +59,7 @@ open class PCRPool(override val name: String = "白金寻访",
 
         if (temp.size == 0) throw NullPointerException("角色列表为空")
 
-        return temp[RandomUtil.randomInt(0, temp.size.coerceAtLeast(1))]
+        return temp[RandomUtil.randomInt(0, temp.size)]
     }
 
     open fun getPCRResult(user: BotUser, time: Int): String {
