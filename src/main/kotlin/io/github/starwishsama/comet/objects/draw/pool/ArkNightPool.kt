@@ -6,7 +6,6 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
 import io.github.starwishsama.comet.utils.DrawUtil
 import java.math.RoundingMode
-import java.util.*
 import java.util.stream.Collectors
 
 class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
@@ -57,14 +56,8 @@ class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
     }
 
     override fun getGachaItem(rare: Int): ArkNightOperator {
-        val rareItems: MutableList<ArkNightOperator> = LinkedList()
-        val operators = poolItems.parallelStream().filter { it.rare == rare }.collect(Collectors.toList())
-
-        rareItems.addAll(operators)
-
-        val index = RandomUtil.randomInt(0, rareItems.size)
-
-        return rareItems[index]
+        val rareItems = poolItems.parallelStream().filter { it.rare == rare }.collect(Collectors.toList())
+        return rareItems[RandomUtil.randomInt(0, rareItems.size)]
     }
 
     /**

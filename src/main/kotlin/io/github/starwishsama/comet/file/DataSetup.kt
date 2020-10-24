@@ -70,14 +70,14 @@ object DataSetup {
 
             if (pcrData.exists()) {
                 BotVariables.pcr = gson.fromJson(pcrData.getContext())
-                daemonLogger.info("成功载入公主连结游戏数据")
+                daemonLogger.info("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个")
             } else {
                 daemonLogger.info("未检测到公主连结游戏数据, 抽卡模拟器将无法使用")
             }
 
             if (arkNightData.exists()) {
                 BotVariables.arkNight = gson.fromJson(arkNightData.getContext())
-                daemonLogger.info("成功载入明日方舟游戏数据")
+                daemonLogger.info("成功载入明日方舟游戏数据, 共 ${BotVariables.arkNight.size} 个")
             } else {
                 daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
             }

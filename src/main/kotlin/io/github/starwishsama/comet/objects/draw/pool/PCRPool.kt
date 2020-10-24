@@ -2,17 +2,17 @@ package io.github.starwishsama.comet.objects.draw.pool
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.pcr
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.items.GachaItem
 import io.github.starwishsama.comet.objects.draw.items.PCRCharacter
 import io.github.starwishsama.comet.utils.DrawUtil
-import java.util.*
 import java.util.stream.Collectors
 
 open class PCRPool(override val name: String = "白金寻访",
                    override val tenjouCount: Int = 300,
                    override val tenjouRare: Int = -1,
-                   override val poolItems: MutableList<out GachaItem> = BotVariables.pcr) : GachaPool() {
+                   override val poolItems: MutableList<out GachaItem> = pcr) : GachaPool() {
 
     private val R3 = 25
     private val R2 = 200
@@ -50,16 +50,11 @@ open class PCRPool(override val name: String = "白金寻访",
     }
 
     override fun getGachaItem(rare: Int): PCRCharacter {
-        val temp: MutableList<PCRCharacter> = LinkedList()
-        for (c in BotVariables.pcr) {
-            if (c.rare == rare) {
-                temp.add(c)
-            }
-        }
+        val rareList = poolItems.parallelStream().filter { it.rare == rare }.collect(Collectors.toList())
 
-        if (temp.size == 0) throw NullPointerException("角色列表为空")
+        if (rareList.isEmpty()) throw NullPointerException("角色列表为空")
 
-        return temp[RandomUtil.randomInt(0, temp.size)]
+        return rareList[RandomUtil.randomInt(0, rareList.size)] as PCRCharacter
     }
 
     open fun getPCRResult(user: BotUser, time: Int): String {

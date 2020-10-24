@@ -1,3 +1,5 @@
 package io.github.starwishsama.comet.objects.draw.items
 
-data class PCRCharacter(override val name: String, override val rare: Int, override val count: Int) : GachaItem()
+import com.google.gson.annotations.SerializedName
+
+data class PCRCharacter(override val name: String, @SerializedName("star") override val rare: Int, override val count: Int) : GachaItem()

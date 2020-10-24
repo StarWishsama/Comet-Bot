@@ -5,6 +5,12 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 interface DynamicData {
     suspend fun getContact(): MessageWrapper
+    suspend fun compare(other: Any?): Boolean {
+        if (other == null) return false
+        if (other !is DynamicData) return false
+
+        return getContact().text == other.getContact().text
+    }
 }
 
 object DynamicTypeSelector {
