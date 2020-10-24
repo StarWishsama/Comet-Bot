@@ -10,7 +10,6 @@ import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
-import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.pushers.TweetUpdateChecker
@@ -71,13 +70,6 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     }
                 }
                 "help" -> return PlainText(getHelp()).asMessageChain()
-                "cmdtest" -> {
-                    if (args.size > 1) {
-                        val cmd = CommandExecutor.getCommand(args[1])
-                                ?: return PlainText("Not a command").asMessageChain()
-                        return PlainText((cmd is UnDisableableCommand).toString()).asMessageChain()
-                    }
-                }
                 "info" -> {
                     val ping = try {
                         NetUtil.checkPingValue()
@@ -111,12 +103,6 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                 }
                 "youtube" -> {
                     if (args.size > 1) {
-                        if (event is GroupMessageEvent) {
-                            val cfg = GroupConfigManager.getConfigSafely(event.group.id)
-                            cfg.youtubePushEnabled = true
-                            cfg.youtubeSubscribers.add(args[1])
-                            return "订阅成功.".convertToChain()
-                        }
                         val result = YoutubeApi.getChannelVideos(args[1], 10)
                         return YoutubeApi.getLiveStatusByResult(result).toMessageChain(event.subject)
                     }
@@ -166,10 +152,6 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     """.trimIndent().convertToChain()
                 }
                 "panic" -> throw RuntimeException("好")
-                "ark" -> {
-                    return BotVariables.arkNight.size.toString().convertToChain()
-                }
-                "pcr" -> return BotVariables.pcr.size.toString().convertToChain()
                 "twpic" -> {
                     if (args.isEmpty()) return "/debug twpic [Tweet ID]".convertToChain()
                     else {
@@ -177,10 +159,10 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                             val tweet = TwitterApi.getTweetById(args[1].toLong())
                             if (tweet != null) {
                                 val screenshot = NetUtil.getScreenshot(tweet.getTweetURL())
-                                        ?: return "Can't take screenshot :(".convertToChain()
+                                        ?: return "Can't take screenshot, See console for more info :(".convertToChain()
                                 return screenshot.uploadAsImage(event.subject).asMessageChain()
                             } else {
-                                return "The tweet of ${args[0]} seems doesn't exists.".convertToChain()
+                                return "Can't found tweet which id is ${args[0]}.".convertToChain()
                             }
                         } else {
                             return "NaN".convertToChain()
