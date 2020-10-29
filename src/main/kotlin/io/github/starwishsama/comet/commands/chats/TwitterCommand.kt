@@ -11,7 +11,6 @@ import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
-import io.github.starwishsama.comet.pushers.TweetUpdateChecker
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
@@ -100,7 +99,7 @@ class TwitterCommand : ChatCommand {
     @ExperimentalTime
     private fun getTweetWithDesc(name: String, subject: Contact, index: Int = 1, max: Int = 10): MessageChain {
         return try {
-            val tweet = TwitterApi.getCachedTweet(name, index, max)
+            val tweet = TwitterApi.getTweetInTimeline(name, index, max, false)
             if (tweet != null) {
                 return BotUtil.sendMessage("\n${tweet.user.name}\n") + tweet.toMessageChain(subject)
             } else {
@@ -147,30 +146,16 @@ class TwitterCommand : ChatCommand {
         val cfg = GroupConfigManager.getConfigSafely(groupId)
         return if (args.size > 1) {
             if (args[1] == "all" || args[1] == "全部") {
-
-                cfg.twitterSubscribers.forEach {
-                    clearUnsubscribeUsersInPool(groupId, it)
-                }
-
                 cfg.twitterSubscribers.clear()
                 BotUtil.sendMessage("退订全部用户成功")
             } else if (cfg.twitterSubscribers.contains(args[1])) {
                 cfg.twitterSubscribers.remove(args[1])
-                clearUnsubscribeUsersInPool(groupId, args[1])
                 BotUtil.sendMessage("退订 @${args[1]} 成功")
             } else {
                 BotUtil.sendMessage("没有订阅过 @${args[1]}")
             }
         } else {
             getHelp().convertToChain()
-        }
-    }
-
-    private fun clearUnsubscribeUsersInPool(groupId: Long, userName: String) {
-        TweetUpdateChecker.pushPool.forEach { (username, cache) ->
-            if (username == userName && cache.groupsToPush.contains(groupId)) {
-                cache.groupsToPush.remove(groupId)
-            }
         }
     }
 

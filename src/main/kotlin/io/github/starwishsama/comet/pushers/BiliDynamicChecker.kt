@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.pushers
 
+import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
@@ -13,7 +14,8 @@ object BiliDynamicChecker : CometPusher {
     override var bot: Bot? = null
 
     override fun retrieve() {
-        TODO("Not yet implemented")
+        runBlocking { MainApi.getDynamic(-1) }
+
         push()
     }
 

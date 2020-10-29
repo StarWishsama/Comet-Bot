@@ -8,6 +8,9 @@ import io.github.starwishsama.comet.utils.DrawUtil
 import java.math.RoundingMode
 import java.util.stream.Collectors
 
+/**
+ * Picture & Operator info from http://prts.wiki/
+ */
 class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
     override val tenjouCount: Int = -1
     override val tenjouRare: Int = -1

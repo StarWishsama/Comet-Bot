@@ -21,7 +21,7 @@ import java.util.concurrent.ScheduledFuture
 import kotlin.time.ExperimentalTime
 
 object TweetUpdateChecker : CometPusher {
-    val pushPool = mutableMapOf<String, PushedTweet>()
+    private val pushPool = mutableMapOf<String, PushedTweet>()
     override val delayTime: Long = cfg.twitterInterval
     override val internal: Long = cfg.twitterInterval
     override var future: ScheduledFuture<*>? = null
@@ -35,7 +35,7 @@ object TweetUpdateChecker : CometPusher {
                     if (pushPool.containsKey(it)) {
                         pushPool[it]?.groupsToPush?.add(cfg.id)
                     } else {
-                        pushPool[it] = PushedTweet(mutableSetOf(cfg.id), false)
+                        pushPool[it] = PushedTweet(mutableSetOf(cfg.id))
                     }
                 }
             }
@@ -46,11 +46,12 @@ object TweetUpdateChecker : CometPusher {
         pushPool.forEach { (userName, pushedTweet) ->
             TaskUtil.executeWithRetry(2) {
                 try {
-                    val tweet = TwitterApi.getCachedTweet(username = userName, max = 1)
+                    val cache = TwitterApi.getCacheTweet(userName)
 
-                    if (tweet != null && !tweet.contentEquals(pushedTweet.tweet)) {
+                    val tweet = TwitterApi.getTweetInTimeline(username = userName, max = 1)
+
+                    if (tweet != null && !tweet.contentEquals(cache)) {
                         pushedTweet.tweet = tweet
-                        pushedTweet.hasPushed = false
                         count++
                     }
                 } catch (t: Throwable) {
@@ -76,15 +77,14 @@ object TweetUpdateChecker : CometPusher {
         var count = 0
 
         pushPool.forEach { (_, pushObject) ->
-            if (!pushObject.hasPushed) {
-                pushObject.tweet?.let {
-                    GlobalScope.launch {
-                        count = pushToGroups(pushObject.groupsToPush, it)
-                        pushObject.hasPushed = true
-                    }
+            pushObject.tweet?.let {
+                GlobalScope.launch {
+                    count = pushToGroups(pushObject.groupsToPush, it)
                 }
             }
         }
+
+        pushPool.clear()
 
         if (count > 0) daemonLogger.verboseS("Push success, have pushed $count group(s)!")
     }
@@ -111,7 +111,7 @@ object TweetUpdateChecker : CometPusher {
         return successCount
     }
 
-    data class PushedTweet(val groupsToPush: MutableSet<Long>, var hasPushed: Boolean) {
+    data class PushedTweet(val groupsToPush: MutableSet<Long>) {
         var tweet: Tweet? = null
     }
 }

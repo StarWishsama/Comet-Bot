@@ -30,18 +30,17 @@ open class PCRPool(override val name: String = "白金寻访",
                         drawResult[i] = getGachaItem(2)
                     }
                 }
-                return@repeat
-            }
-
-            when {
-                chance <= R3 -> {
-                    drawResult.add(getGachaItem(3))
-                }
-                chance <= R2 + R3 -> {
-                    drawResult.add(getGachaItem(2))
-                }
-                else -> {
-                    drawResult.add(getGachaItem(1))
+            } else {
+                when {
+                    chance <= R3 -> {
+                        drawResult.add(getGachaItem(3))
+                    }
+                    chance <= R2 + R3 -> {
+                        drawResult.add(getGachaItem(2))
+                    }
+                    else -> {
+                        drawResult.add(getGachaItem(1))
+                    }
                 }
             }
         }
@@ -60,53 +59,57 @@ open class PCRPool(override val name: String = "白金寻访",
     open fun getPCRResult(user: BotUser, time: Int): String {
         val startTime = System.currentTimeMillis()
 
-        if (DrawUtil.checkHasGachaTime(user, time)) {
+        return if (DrawUtil.checkHasGachaTime(user, time)) {
             user.decreaseTime(time)
             val gachaResult = doDraw(time)
 
-            return when {
-                time <= 10 -> {
-                    StringBuilder("素敵な仲間が増えますよ!\n").apply {
-                        for ((name, star) in gachaResult) {
-                            append(name).append(" ").append(DrawUtil.getStar(star)).append(" ")
-                        }
-                    }.toString().trim()
-                }
-                else -> {
-                    val r3s =
-                            gachaResult.parallelStream().filter { (_, star) -> star == 3 }.collect(Collectors.toList())
+            getGachaResultAsString(gachaResult, time, startTime)
+        } else {
+            DrawUtil.overTimeMessage
+        }
+    }
 
-                    val r3Character = StringBuilder().apply {
-                        for ((name) in r3s) {
-                            append(name).append(" ")
-                        }
-                    }.trim().toString()
-
-                    var firstTimeGetR3 = 0
-
-                    for (i in gachaResult.indices) {
-                        if (gachaResult[i].rare == 3) {
-                            firstTimeGetR3 = i
-                            break
-                        }
+    fun getGachaResultAsString(gachaResult: List<PCRCharacter>, time: Int, startTime: Long): String {
+        return when {
+            time <= 10 -> {
+                StringBuilder("素敵な仲間が増えますよ!\n").apply {
+                    for ((name, star) in gachaResult) {
+                        append(name).append(" ").append(DrawUtil.getStar(star)).append(" ")
                     }
+                }.toString().trim()
+            }
+            else -> {
+                val r3s =
+                        gachaResult.parallelStream().filter { (_, star) -> star == 3 }.collect(Collectors.toList())
 
-                    """
+                val r3Character = StringBuilder().apply {
+                    for ((name) in r3s) {
+                        append(name).append(" ")
+                    }
+                }.trim().toString()
+
+                var firstTimeGetR3 = 0
+
+                for (i in gachaResult.indices) {
+                    if (gachaResult[i].rare == 3) {
+                        firstTimeGetR3 = i
+                        break
+                    }
+                }
+
+                """
                         素敵な仲間が増えますよ！ 
                         本次抽卡次数为 ${gachaResult.size}
                         ${if (firstTimeGetR3 != 0) "第${firstTimeGetR3}抽获得三星角色" else "酋长, 我们回家吧"}
                         $r3Character
                         ★★★×${
-                        gachaResult.parallelStream().filter { (_, star) -> star == 3 }.count()
-                    } ★★×${
-                        gachaResult.parallelStream().filter { (_, star) -> star == 2 }.count()
-                    } ★×${gachaResult.parallelStream().filter { (_, star) -> star == 1 }.count()}
+                    gachaResult.parallelStream().filter { (_, star) -> star == 3 }.count()
+                } ★★×${
+                    gachaResult.parallelStream().filter { (_, star) -> star == 2 }.count()
+                } ★×${gachaResult.parallelStream().filter { (_, star) -> star == 1 }.count()}
                         ${if (BotVariables.cfg.debugMode) "耗时: ${System.currentTimeMillis() - startTime}ms" else ""}
                     """.trimIndent()
-                }
             }
-        } else {
-            return DrawUtil.overTimeMessage
         }
     }
 }

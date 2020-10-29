@@ -199,7 +199,7 @@ object TwitterApi : ApiExecutor {
      *
      * @return 推文, 若获取失败则返回空值
      */
-    fun getCachedTweet(username: String, index: Int = 0, max: Int = 5): Tweet? {
+    fun getTweetInTimeline(username: String, index: Int = 0, max: Int = 5, needCache: Boolean = true): Tweet? {
         val startTime = LocalDateTime.now()
         val isCache: Boolean
 
@@ -207,10 +207,8 @@ object TwitterApi : ApiExecutor {
             return null
         }
 
-        val cachedTweet = cacheTweet[username]
-        val result: Tweet?
-
-        result = if (cachedTweet != null && Duration.between(cachedTweet.getSentTime(), LocalDateTime.now())
+        val cachedTweet = getCacheTweet(username)
+        val result: Tweet? = if (cachedTweet != null && Duration.between(cachedTweet.getSentTime(), LocalDateTime.now())
                         .toMinutes() <= 1
         ) {
             isCache = true
@@ -218,7 +216,15 @@ object TwitterApi : ApiExecutor {
         } else {
             isCache = false
             val list = getUserTweets(username, max)
-            if (list.isNotEmpty()) list[index] else throw EmptyTweetException("返回的推文列表为空")
+            if (list.isNotEmpty()) {
+                // 只对获取最新推文时才缓存
+                if (needCache && index == 0) {
+                    addCacheTweet(username, list[index])
+                }
+                list[index]
+            } else {
+                throw EmptyTweetException("返回的推文列表为空")
+            }
         }
 
         if (!isCache) logger.verboseS("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
@@ -247,7 +253,7 @@ object TwitterApi : ApiExecutor {
      * @return 推文列表
      */
     private fun parseJsonToTweet(json: String, url: String): List<Tweet> {
-        val parsedTweet: List<Tweet> = try {
+        return try {
             listOf(gson.fromJson(json, Tweet::class.java))
         } catch (e: JsonSyntaxException) {
             try {
@@ -257,13 +263,9 @@ object TwitterApi : ApiExecutor {
                 return emptyList()
             }
         }
-
-        parsedTweet.parallelStream().forEach {
-            addCacheTweet(it.user.name, it)
-        }
-
-        return parsedTweet
     }
+
+    fun getCacheTweet(username: String): Tweet? = cacheTweet[username]
 
     override fun isReachLimit(): Boolean {
         return usedTime >= getLimitTime()

@@ -79,5 +79,5 @@ object DrawUtil {
     }.toString()
 
     fun checkHasGachaTime(user: BotUser, time: Int): Boolean =
-            user.commandTime >= time || user.compareLevel(UserLevel.ADMIN) && time <= 10000
+            (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
 }
