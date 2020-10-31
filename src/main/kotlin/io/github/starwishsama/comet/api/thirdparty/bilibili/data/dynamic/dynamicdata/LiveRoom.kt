@@ -1,18 +1,11 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 data class LiveRoom(
-    @SerializedName("round_status")
-    val roundStatus: Int,
-    @SerializedName("roomid")
-    val roomID: Long,
-    @SerializedName("room_info")
-    val roomInfo: LiveRoomInfoData
-) : DynamicData {
-    data class LiveRoomInfoData(
         /** 直播间 ID, 例如 21396545 */
         @SerializedName("roomid")
         val roomID: Long,
@@ -94,32 +87,31 @@ data class LiveRoom(
         val broadcastType: Int,
         @SerializedName("face")
         val face: String
-    ) {
-        fun getRoomURL(): String = "https://live.bilibili.com/$roomID"
+) : DynamicData {
+    fun getRoomURL(): String = "https://live.bilibili.com/$roomID"
 
-        enum class Status(var status: String) {
-            NoStreaming("闲置"), Streaming("直播中"), PlayingVideo("轮播中"), Unknown("未知");
-        }
+    enum class Status(var status: String) {
+        NoStreaming("闲置"), Streaming("直播中"), PlayingVideo("轮播中"), Unknown("未知");
+    }
 
-        fun getStatus(roundStatus: Int): Status {
-            return when (roundStatus) {
-                0 -> Status.NoStreaming
-                1 -> Status.Streaming
-                2 -> Status.PlayingVideo
-                else -> Status.Unknown
-            }
+    fun getStatus(roundStatus: Int): Status {
+        return when (roundStatus) {
+            0 -> Status.NoStreaming
+            1 -> Status.Streaming
+            2 -> Status.PlayingVideo
+            else -> Status.Unknown
         }
     }
 
     override suspend fun getContact(): MessageWrapper {
         val wrapped = MessageWrapper(
-            "的直播间\n" +
-                    "直播间标题:${roomInfo.title}\n" +
-                    "直播状态: ${roomInfo.getStatus(roundStatus).status}\n" +
-                    "直达链接: ${roomInfo.getRoomURL()}\n"
+                "${MainApi.getUserNameByMid(uid)}的直播间\n" +
+                        "直播间标题: ${title}\n" +
+                        "直播状态: ${getStatus(roundStatus).status}\n" +
+                        "直达链接: ${getRoomURL()}\n"
         )
-        if (roomInfo.coverImg.isNotEmpty()) {
-            wrapped.plusImageUrl(roomInfo.coverImg)
+        if (coverImg.isNotEmpty()) {
+            wrapped.plusImageUrl(coverImg)
         }
         return wrapped
     }

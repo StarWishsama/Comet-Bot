@@ -1,12 +1,12 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicTypeSelector
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.utils.FileUtil
 
 data class Repost(@SerializedName("origin")
                   var originDynamic: String,
@@ -56,6 +56,8 @@ data class Repost(@SerializedName("origin")
         try {
             val dynamicType = DynamicTypeSelector.getType(type)
             if (dynamicType != UnknownType::class.java) {
+                println("contact:")
+                println(contact)
                 val info = gson.fromJson(contact, dynamicType)
                 if (info != null) {
                     return info.getContact()
@@ -63,7 +65,13 @@ data class Repost(@SerializedName("origin")
             }
             return MessageWrapper("无法解析此动态消息, 你还是另请高明吧")
         } catch (e: Exception) {
-            BotVariables.logger.error("在处理时遇到了问题\n原动态内容: $contact\n动态类型: $type", e)
+            FileUtil.createErrorReportFile(
+                    "在解析动态时出现了异常",
+                    "bilibili",
+                    e,
+                    contact,
+                    "None"
+            )
         }
         return MessageWrapper("在获取时遇到了错误")
     }
