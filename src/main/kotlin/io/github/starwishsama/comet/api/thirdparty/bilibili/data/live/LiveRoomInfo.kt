@@ -52,7 +52,8 @@ data class LiveRoomInfo(
         val oldAreaId: Int,
         @SerializedName("background")
         val backgroundImageUrl: String,
-        val title: String,
+        @SerializedName("title")
+        val title: String?,
         @SerializedName("user_cover")
         val liveRoomCoverImageUrl: String,
         /**

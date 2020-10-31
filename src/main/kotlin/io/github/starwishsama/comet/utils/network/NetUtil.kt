@@ -217,6 +217,8 @@ object NetUtil {
     }
 
     fun initDriver() {
+        if (cfg.webDriverName.isBlank()) return
+
         try {
             when (cfg.webDriverName.toLowerCase()) {
                 "chrome" -> driver = ChromeDriver()
