@@ -30,6 +30,7 @@ jar {
 
 launch4j {
     mainClassName = mainClass
+    copyright = "StarWishsama"
 }
 
 def gitCommitId = 'git rev-parse --short HEAD'
@@ -121,9 +122,6 @@ dependencies {
 }
 
 shadowJar {
-
-    launch4j
-
     zip64 true
     exclude("META-INF/README")
     exclude("META-INF/NOTICE.txt")
