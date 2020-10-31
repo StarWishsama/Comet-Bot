@@ -37,15 +37,21 @@ object BiliDynamicChecker : CometPusher {
                     pushedList.plusAssign(PushDynamicHistory(uid, data))
                     count++
                 } else {
-                    val oldData =
-                        pushedList.parallelStream().filter { it.uid == uid && data.text == it.pushContent.text }
-                            .findFirst()
+                    val isExist = pushedList.parallelStream().filter { it.uid == uid }.findFirst().isPresent
 
-                    if (!oldData.isPresent) {
-                        pushedList.parallelStream().forEach {
-                            if (it.uid == uid) {
-                                it.pushContent = data
-                                it.isPushed = false
+                    if (!isExist) {
+                        pushedList.plusAssign(PushDynamicHistory(uid, data))
+                    } else {
+                        val oldData =
+                                pushedList.parallelStream().filter { it.uid == uid && data.text == it.pushContent.text }
+                                        .findFirst()
+
+                        if (!oldData.isPresent) {
+                            pushedList.parallelStream().forEach {
+                                if (it.uid == uid) {
+                                    it.pushContent = data
+                                    it.isPushed = false
+                                }
                             }
                         }
                     }
@@ -61,7 +67,7 @@ object BiliDynamicChecker : CometPusher {
             perGroup.parallelStream().forEach { cfg ->
                 if (cfg.biliPushEnabled) {
                     cfg.biliSubscribers.parallelStream().forEach { uid ->
-                        if (uid == pdh.uid) {
+                        if (pdh.uid == uid) {
                             pdh.target.plusAssign(cfg.id)
                         }
                     }
@@ -70,7 +76,7 @@ object BiliDynamicChecker : CometPusher {
         }
 
         val count = pushToGroups()
-        if (count > 0) BotVariables.daemonLogger.verboseS("Push bili info success, have pushed $count group(s)!")
+        if (count > 0) BotVariables.daemonLogger.verboseS("Push bili dynamic success, have pushed $count group(s)!")
     }
 
     private fun pushToGroups(): Int {
