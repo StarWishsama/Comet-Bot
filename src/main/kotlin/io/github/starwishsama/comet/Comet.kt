@@ -17,10 +17,7 @@ import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.ConvertLightAppListener
 import io.github.starwishsama.comet.listeners.RepeatListener
-import io.github.starwishsama.comet.pushers.BiliLiveChecker
-import io.github.starwishsama.comet.pushers.HitokotoUpdater
-import io.github.starwishsama.comet.pushers.TweetUpdateChecker
-import io.github.starwishsama.comet.pushers.YoutubeStreamingChecker
+import io.github.starwishsama.comet.pushers.*
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
@@ -103,15 +100,15 @@ object Comet {
     }
 
     private fun startAllPusher(bot: Bot) {
-        val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker, YoutubeStreamingChecker)
+        val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker, YoutubeStreamingChecker, BiliDynamicChecker)
         pushers.forEach {
+            if (it.bot == null) it.bot = bot
             val future = TaskUtil.runScheduleTaskAsync(it.delayTime, it.internal, TimeUnit.MINUTES) {
                 // Bot 不处于在线状态, 等待下一次推送时再试
                 if (!bot.isOnline) return@runScheduleTaskAsync
 
                 it.retrieve()
             }
-            it.bot = bot
             it.future = future
         }
     }
