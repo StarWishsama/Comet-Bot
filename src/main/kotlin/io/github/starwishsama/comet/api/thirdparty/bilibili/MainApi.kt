@@ -54,15 +54,15 @@ object MainApi : ApiExecutor {
                         return if (dynamicType != UnknownType::class) {
                             gson.fromJson(card.card, dynamicType).getContact()
                         } else {
-                            MessageWrapper("错误: 不支持的动态类型")
+                            MessageWrapper("错误: 不支持的动态类型", false)
                         }
                     }
                 } catch (e: IllegalStateException) {
-                    return MessageWrapper("没有发过动态")
+                    return MessageWrapper("没有发过动态", false)
                 }
             }
         }
-        return MessageWrapper("获取时出现问题")
+        return MessageWrapper("获取时出现问题", false)
     }
 
     /**

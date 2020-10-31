@@ -37,7 +37,11 @@ class TwitterCommand : ChatCommand {
             return if (args.isEmpty()) {
                 getHelp().convertToChain()
             } else {
-                val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
+                val id: Long = when {
+                    event is GroupMessageEvent -> event.group.id
+                    args.size > 1 -> args[2].toLong()
+                    else -> -1
+                }
 
                 when (args[0]) {
                     "info", "cx", "推文", "tweet", "查推" -> getTweetToMessageChain(args, event)
@@ -73,6 +77,9 @@ class TwitterCommand : ChatCommand {
         /twit sub [蓝鸟ID] 订阅用户的推文
         /twit unsub [蓝鸟ID] 取消订阅用户的推文
         /twit push 开启/关闭本群推文推送
+        /twit id [推文ID] 通过推文ID查询推文
+        
+        命令别名: /蓝鸟 /tt /twitter
     """.trimIndent()
 
     override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
@@ -101,13 +108,12 @@ class TwitterCommand : ChatCommand {
         return try {
             val tweet = TwitterApi.getTweetInTimeline(name, index, max, false)
             if (tweet != null) {
-                return BotUtil.sendMessage("\n${tweet.user.name}\n") + tweet.toMessageChain(subject)
+                return BotUtil.sendMessage("\n${tweet.user.name}\n\n") + tweet.toMessageChain(subject)
             } else {
                 BotUtil.sendMessage("获取到的推文为空")
             }
         } catch (t: Throwable) {
             if (NetUtil.isTimeout(t)) {
-                daemonLogger.error(t)
                 BotUtil.sendMessage("获取推文时连接超时")
             } else {
                 daemonLogger.warning(t)
@@ -117,45 +123,53 @@ class TwitterCommand : ChatCommand {
     }
 
     private fun subscribeUser(args: List<String>, groupId: Long): MessageChain {
-        val cfg = GroupConfigManager.getConfigSafely(groupId)
-        if (args.size > 1) {
-            if (!cfg.twitterSubscribers.contains(args[1])) {
-                val twitter: TwitterUser?
+        if (groupId > 0) {
+            val cfg = GroupConfigManager.getConfigSafely(groupId)
+            if (args.size > 1) {
+                if (!cfg.twitterSubscribers.contains(args[1])) {
+                    val twitter: TwitterUser?
 
-                try {
-                    twitter = TwitterApi.getUserProfile(args[1])
-                } catch (e: RateLimitException) {
-                    return BotUtil.sendMessage(e.message)
+                    try {
+                        twitter = TwitterApi.getUserProfile(args[1])
+                    } catch (e: RateLimitException) {
+                        return BotUtil.sendMessage(e.message)
+                    }
+
+                    if (twitter != null) {
+                        cfg.twitterSubscribers.add(args[1])
+                        return BotUtil.sendMessage("订阅 @${args[1]} 成功")
+                    }
+
+                    return BotUtil.sendMessage("订阅 @${args[1]} 失败")
+                } else {
+                    return BotUtil.sendMessage("已经订阅过 @${args[1]} 了")
                 }
-
-                if (twitter != null) {
-                    cfg.twitterSubscribers.add(args[1])
-                    return BotUtil.sendMessage("订阅 @${args[1]} 成功")
-                }
-
-                return BotUtil.sendMessage("订阅 @${args[1]} 失败")
             } else {
-                return BotUtil.sendMessage("已经订阅过 @${args[1]} 了")
+                return getHelp().convertToChain()
             }
         } else {
-            return getHelp().convertToChain()
+            return BotUtil.sendMessage("请填写正确的群号!")
         }
     }
 
     private fun unsubscribeUser(args: List<String>, groupId: Long): MessageChain {
-        val cfg = GroupConfigManager.getConfigSafely(groupId)
-        return if (args.size > 1) {
-            if (args[1] == "all" || args[1] == "全部") {
-                cfg.twitterSubscribers.clear()
-                BotUtil.sendMessage("退订全部用户成功")
-            } else if (cfg.twitterSubscribers.contains(args[1])) {
-                cfg.twitterSubscribers.remove(args[1])
-                BotUtil.sendMessage("退订 @${args[1]} 成功")
+        if (groupId > 0) {
+            val cfg = GroupConfigManager.getConfigSafely(groupId)
+            return if (args.size > 1) {
+                if (args[1] == "all" || args[1] == "全部") {
+                    cfg.twitterSubscribers.clear()
+                    BotUtil.sendMessage("退订全部用户成功")
+                } else if (cfg.twitterSubscribers.contains(args[1])) {
+                    cfg.twitterSubscribers.remove(args[1])
+                    BotUtil.sendMessage("退订 @${args[1]} 成功")
+                } else {
+                    BotUtil.sendMessage("没有订阅过 @${args[1]}")
+                }
             } else {
-                BotUtil.sendMessage("没有订阅过 @${args[1]}")
+                getHelp().convertToChain()
             }
         } else {
-            getHelp().convertToChain()
+            return BotUtil.sendMessage("请填写正确的群号!")
         }
     }
 

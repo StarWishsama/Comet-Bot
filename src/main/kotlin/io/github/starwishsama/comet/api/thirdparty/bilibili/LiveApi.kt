@@ -2,14 +2,17 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili
 
 import cn.hutool.http.HttpRequest
 import com.github.salomonbrys.kotson.fromJson
+import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.network.NetUtil
 
 object LiveApi : ApiExecutor {
     private const val liveUrl = "http://api.live.bilibili.com/room/v1/Room/get_info?id="
+    private const val liveOldUrl = "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid="
     private const val apiRateLimit = "BiliBili API调用已达上限"
 
     @Throws(RateLimitException::class)
@@ -36,10 +39,19 @@ object LiveApi : ApiExecutor {
         return info?.data?.liveStatus == 1
     }
 
-    @Throws(RateLimitException::class)
-    fun getRoomIdByMid(mid: Long): Long {
-        val info = getLiveInfo(mid)
-        return info?.data?.roomId ?: -1
+    fun getRoomIDByUID(uid: Long): Long {
+        val result =
+            NetUtil.doHttpRequestGet(liveOldUrl + uid).header("User-Agent", "Bili live status checker by StarWishsama")
+                .executeAsync()
+
+        if (result.isOk) {
+            val info = gson.fromJson<OldLiveInfo>(result.body())
+            if (info.code != 0) {
+                return info.data.roomId
+            }
+        }
+
+        return -1
     }
 
     override fun isReachLimit(): Boolean {
@@ -51,4 +63,27 @@ object LiveApi : ApiExecutor {
     override var usedTime: Int = 0
 
     override fun getLimitTime(): Int = 1500
+
+    private data class OldLiveInfo(
+        val code: Int,
+        val message: String,
+        val ttl: Int,
+        val data: LiveInfoData
+    ) {
+        data class LiveInfoData(
+            val roomStatus: Int,
+            val roundStatus: Int,
+            val liveStatus: Int,
+            val url: String,
+            val title: String,
+            val cover: String,
+            val online: Int,
+            @SerializedName("roomid")
+            val roomId: Long,
+            @SerializedName("broadcast_type")
+            val broadcastType: Int,
+            @SerializedName("online_hidden")
+            val onlineHidden: Int
+        )
+    }
 }

@@ -15,6 +15,8 @@ object GroupConfigManager {
     }
 
     fun getConfigSafely(groupId: Long): PerGroupConfig {
+        if (groupId <= 0) throw RuntimeException("群号不允许小于0")
+
         val cfg = getConfig(groupId)
         return cfg ?: PerGroupConfig(groupId).init()
     }

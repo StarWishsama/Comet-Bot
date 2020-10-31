@@ -37,32 +37,35 @@ object BiliLiveChecker : CometPusher {
             }
         }
 
-        collectedUsers.parallelStream().forEach { roomId ->
-            val data = LiveApi.getLiveInfo(roomId)?.data
+        collectedUsers.parallelStream().forEach { uid ->
+            val roomId = LiveApi.getRoomIDByUID(uid)
+            if (roomId > 0) {
+                val data = LiveApi.getLiveInfo(roomId)?.data
 
-            if (data != null) {
-                val sli = StoredLiveInfo(data, false)
-                if (pushedList.isEmpty() && data.isLiveNow()) {
-                    pushedList.plusAssign(sli)
-                    count++
-                } else {
-                    var hasOldData = false
-
-                    for (i in pushedList.indices) {
-                        val oldStatus = pushedList[i].data.liveStatus
-                        val currentStatus = data.liveStatus
-                        if (pushedList[i].data.roomId == roomId) {
-                            hasOldData = true
-                            if (oldStatus != currentStatus && data.isLiveNow()) {
-                                pushedList[i] = sli
-                            }
-                            break
-                        }
-                    }
-
-                    if (!hasOldData && data.isLiveNow()) {
-                        pushedList.add(sli)
+                if (data != null) {
+                    val sli = StoredLiveInfo(data, false)
+                    if (pushedList.isEmpty() && data.isLiveNow()) {
+                        pushedList.plusAssign(sli)
                         count++
+                    } else {
+                        var hasOldData = false
+
+                        for (i in pushedList.indices) {
+                            val oldStatus = pushedList[i].data.liveStatus
+                            val currentStatus = data.liveStatus
+                            if (pushedList[i].data.roomId == uid) {
+                                hasOldData = true
+                                if (oldStatus != currentStatus && data.isLiveNow()) {
+                                    pushedList[i] = sli
+                                }
+                                break
+                            }
+                        }
+
+                        if (!hasOldData && data.isLiveNow()) {
+                            pushedList.add(sli)
+                            count++
+                        }
                     }
                 }
             }

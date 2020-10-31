@@ -5,6 +5,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.enums.R6Rank
 import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6Player
@@ -16,21 +17,27 @@ import java.text.NumberFormat
 object R6TabApi {
     private const val apiUrl = "https://r6.apitab.com/"
     private const val infoText = "=== 彩虹六号战绩查询 ===\n%s [%d级]" +
-            "\n目前段位: %s current mmrchange" +
-            "\nKD: %s" +
-            "\n爆头率: %s"
+            "\n▷ 目前段位: %s current mmrchange" +
+            "\n▷ KD: %s" +
+            "\n▷ 爆头率: %s"
     private val num = NumberFormat.getPercentInstance()
-    private val gson = BotVariables.gson
+
+    init {
+        num.maximumIntegerDigits = 3
+        num.maximumFractionDigits = 2
+    }
 
     private fun searchPlayer(name: String): R6Player? {
         try {
             val body: String =
-                    NetUtil.getPageContent("${apiUrl}search/uplay/$name?cid=${BotVariables.cfg.r6tabKey}")
+                NetUtil.getPageContent("${apiUrl}search/uplay/$name?cid=${BotVariables.cfg.r6tabKey}")
             if (BotUtil.isValidJson(body)) {
                 val element: JsonElement = JsonParser.parseString(body).asJsonObject["players"]
                 if (BotUtil.isValidJson(element)) {
                     val jsonObject: JsonObject = element.asJsonObject
-                    val uuid: String = jsonObject.get(jsonObject.keySet().iterator().next()).asJsonObject.get("profile").asJsonObject.get("p_user").asString
+                    val uuid: String = jsonObject.get(
+                        jsonObject.keySet().iterator().next()
+                    ).asJsonObject.get("profile").asJsonObject.get("p_user").asString
                     return gson.fromJson(NetUtil.getPageContent("${apiUrl}player/$uuid?cid=${BotVariables.cfg.r6tabKey}"))
                 }
             }
@@ -45,8 +52,6 @@ object R6TabApi {
             if (StringUtil.isLegitId(player)) {
                 val p: R6Player? = searchPlayer(player)
                 if (p != null && p.found) {
-                    num.maximumIntegerDigits = 3
-                    num.maximumFractionDigits = 2
                     var response = String.format(
                             infoText,
                             p.player?.playerName,
@@ -72,6 +77,8 @@ object R6TabApi {
                         } else {
                             response.replace("mmrchange".toRegex(), "" + mmrChange)
                         }
+                    } else {
+                        response.replace(" mmrchange".toRegex(), "")
                     }
                     return response
                 }

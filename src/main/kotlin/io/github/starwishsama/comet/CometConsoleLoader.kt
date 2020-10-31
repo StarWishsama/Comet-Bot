@@ -19,10 +19,11 @@ import kotlin.time.ExperimentalTime
  */
 @AutoService(JvmPlugin::class)
 object CometConsoleLoader : KotlinPlugin(
-        JvmPluginDescription(
-                id = "io.github.starwishsama.comet",
-                version = "0.6-M2",
-        )) {
+    JvmPluginDescription(
+        id = "io.github.starwishsama.comet",
+        version = "0.6-M2",
+    )
+) {
 
     @ExperimentalTime
     override fun onEnable() {

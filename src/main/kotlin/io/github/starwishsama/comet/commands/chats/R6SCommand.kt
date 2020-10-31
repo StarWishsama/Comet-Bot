@@ -14,7 +14,6 @@ import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.at
-import java.util.*
 
 @CometCommand
 class R6SCommand : ChatCommand {
@@ -23,8 +22,8 @@ class R6SCommand : ChatCommand {
             if (args.isEmpty()) {
                 return BotUtil.sendMessage(getHelp(), true)
             } else {
-                when (args[0].toLowerCase(Locale.ROOT)) {
-                    "info", "查询" -> {
+                when (args[0].toLowerCase()) {
+                    "info", "查询", "cx" -> {
                         val account = user.r6sAccount
                         return if (args.size <= 1 && account != null) {
                             event.reply(BotUtil.sendMessage("查询中..."))

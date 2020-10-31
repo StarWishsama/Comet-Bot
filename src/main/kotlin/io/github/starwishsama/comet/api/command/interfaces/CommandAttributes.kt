@@ -14,3 +14,8 @@ interface SuspendCommand {
     /** 处理用户输入内容 */
     suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session)
 }
+
+/**
+ * 用于标记不可被禁用的命令
+ */
+interface UnDisableableCommand

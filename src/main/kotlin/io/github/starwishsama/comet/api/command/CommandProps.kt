@@ -3,9 +3,9 @@ package io.github.starwishsama.comet.api.command
 import io.github.starwishsama.comet.enums.UserLevel
 
 data class CommandProps(
-        var name: String,
-        var aliases: List<String> = mutableListOf(),
-        var description: String,
-        var permission: String,
-        var level: UserLevel
+        val name: String,
+        val aliases: List<String> = mutableListOf(),
+        val description: String,
+        val permission: String,
+        val level: UserLevel
 )
