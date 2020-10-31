@@ -19,7 +19,7 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
  * @author Nameless
  */
 object MainApi : ApiExecutor {
-    private var dynamicUrl =
+    private val dynamicUrl =
         "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?visitor_uid=0&host_uid=%uid%&offset_dynamic_id=0&need_top=0"
     private const val infoUrl = "http://api.bilibili.com/x/space/acc/info?mid="
     private val agent = mutableMapOf("User-Agent" to "Nameless live status checker by StarWishsama")
