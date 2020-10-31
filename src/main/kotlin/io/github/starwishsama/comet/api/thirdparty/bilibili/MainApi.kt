@@ -1,9 +1,11 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili
 
 import cn.hutool.http.HttpRequest
+import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicTypeSelector
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata.UnknownType
 import io.github.starwishsama.comet.exceptions.RateLimitException
@@ -29,7 +31,6 @@ object MainApi : ApiExecutor {
             throw RateLimitException(apiRateLimit)
         }
 
-        usedTime++
         val response = HttpRequest.get(infoUrl + mid).timeout(2000)
             .addHeaders(agent)
             .executeAsync()
@@ -41,19 +42,17 @@ object MainApi : ApiExecutor {
         if (isReachLimit()) {
             throw RateLimitException(apiRateLimit)
         }
-        usedTime++
         val response = HttpRequest.get(dynamicUrl.replace("%uid%", mid.toString())).executeAsync()
         if (response.isOk) {
             val dynamicObject = JsonParser.parseString(response.body())
             if (dynamicObject.isJsonObject) {
                 try {
-                    val entity = dynamicObject.asJsonObject["data"].asJsonObject["cards"].asJsonArray[0]
-                    val dynamicInfo = entity.asJsonObject["card"].asString
-                    val singleDynamicObject = JsonParser.parseString(dynamicInfo)
+                    val card = gson.fromJson<Dynamic>(dynamicObject.asJsonObject["data"].asJsonObject["cards"].asJsonArray[0])
+                    val singleDynamicObject = JsonParser.parseString(card.card)
                     if (singleDynamicObject.isJsonObject) {
-                        val dynamicType = DynamicTypeSelector.getType(entity.asJsonObject["desc"].asJsonObject["type"].asInt)
-                        return if (dynamicType.typeName != UnknownType::javaClass.name) {
-                            gson.fromJson(dynamicInfo, dynamicType).getContact()
+                        val dynamicType = DynamicTypeSelector.getType(card.description.type)
+                        return if (dynamicType != UnknownType::class) {
+                            gson.fromJson(card.card, dynamicType).getContact()
                         } else {
                             MessageWrapper("错误: 不支持的动态类型")
                         }
@@ -93,7 +92,9 @@ object MainApi : ApiExecutor {
     override var usedTime: Int = 0
 
     override fun isReachLimit(): Boolean {
-        return usedTime > getLimitTime()
+        val result = usedTime > getLimitTime()
+        if (!result) usedTime++
+        return result
     }
 
     override fun getLimitTime(): Int = 500

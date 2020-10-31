@@ -25,7 +25,6 @@ import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.uploadAsGroupVoice
 import net.mamoe.mirai.message.uploadAsImage
@@ -69,7 +68,6 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                         return sb.toString().trim().convertToChain()
                     }
                 }
-                "help" -> return PlainText(getHelp()).asMessageChain()
                 "info" -> {
                     val ping = try {
                         NetUtil.checkPingValue()
@@ -106,13 +104,6 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                         val result = YoutubeApi.getChannelVideos(args[1], 10)
                         return YoutubeApi.getLiveStatusByResult(result).toMessageChain(event.subject)
                     }
-                }
-                "twipool" -> {
-                    return StringBuilder().apply {
-                        TweetUpdateChecker.pushPool.forEach { (k, v) ->
-                            append(k).append(" ").append(v.groupsToPush).append("\n")
-                        }
-                    }.toString().trim().convertToChain()
                 }
                 "rss" -> {
                     if (args.size > 1) {

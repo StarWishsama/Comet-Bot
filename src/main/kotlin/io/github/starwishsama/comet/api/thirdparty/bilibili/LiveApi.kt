@@ -18,7 +18,6 @@ object LiveApi : ApiExecutor {
             throw RateLimitException(apiRateLimit)
         }
 
-        usedTime++
         val request = HttpRequest.get(liveUrl + roomId).timeout(500)
                 .header("User-Agent", "Bili live status checker by StarWishsama")
         val response = request.executeAsync()
@@ -41,6 +40,12 @@ object LiveApi : ApiExecutor {
     fun getRoomIdByMid(mid: Long): Long {
         val info = getLiveInfo(mid)
         return info?.data?.roomId ?: -1
+    }
+
+    override fun isReachLimit(): Boolean {
+        val result = MainApi.usedTime > MainApi.getLimitTime()
+        if (!result) MainApi.usedTime++
+        return result
     }
 
     override var usedTime: Int = 0

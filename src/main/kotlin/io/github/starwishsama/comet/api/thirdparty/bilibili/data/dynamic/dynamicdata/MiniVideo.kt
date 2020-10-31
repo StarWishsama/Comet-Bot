@@ -2,21 +2,19 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynami
 
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 class MiniVideo : DynamicData {
     var item: Item? = null
     var user: AuthorProfile? = null
 
-    class AuthorProfile : UserProfile.Info() {
-        @SerializedName("name")
-        override var userName: String = ""
-
-        @SerializedName("head_url")
-        override var avatarImgURL: String = ""
-
-    }
+    data class AuthorProfile(
+            val uid: Int,
+            @SerializedName("name")
+            val userName: String?,
+            @SerializedName("head_url")
+            val avatarImgURL: String?
+    )
 
     class Item {
         var id: Long = 0

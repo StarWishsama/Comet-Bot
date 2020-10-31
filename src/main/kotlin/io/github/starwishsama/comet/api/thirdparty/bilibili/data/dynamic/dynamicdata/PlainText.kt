@@ -6,9 +6,9 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 data class PlainText(var item: ItemBean,
                      var user: UserProfile.Info) : DynamicData {
-    data class ItemBean(var context: String)
+    data class ItemBean(var context: String?)
 
     override suspend fun getContact(): MessageWrapper {
-        return MessageWrapper("发布了动态: \n${item.context}\n")
+        return MessageWrapper("发布了动态: \n${item.context ?: "无"}\n")
     }
 }
