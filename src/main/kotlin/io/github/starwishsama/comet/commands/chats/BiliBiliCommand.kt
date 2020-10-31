@@ -4,9 +4,7 @@ import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
@@ -38,7 +36,7 @@ class BiliBiliCommand : ChatCommand {
                     }
                     "list" -> {
                         event.reply("请稍等...")
-                        return getLiveStatus(event)
+                        return getSubList(event)
                     }
                     "info", "查询", "cx" -> {
                         return if (args.size > 1) {
@@ -159,32 +157,19 @@ class BiliBiliCommand : ChatCommand {
         }
     }
 
-    private fun getLiveStatus(event: MessageEvent): MessageChain {
+    private fun getSubList(event: MessageEvent): MessageChain {
         if (event !is GroupMessageEvent) return BotUtil.sendMessage("只能在群里查看订阅列表")
+        val list = GroupConfigManager.getConfig(event.group.id)?.biliSubscribers
 
-        val subs = StringBuilder("监控室列表:\n")
-        val info = ArrayList<LiveRoomInfo.LiveRoomInfoData>()
-
-        val cfg = GroupConfigManager.getConfigSafely(event.group.id)
-
-        if (cfg.biliSubscribers.isNotEmpty()) {
-            for (roomId in cfg.biliSubscribers) {
-                val room = LiveApi.getLiveInfo(roomId)
-                if (room != null) {
-                    info.add(room.data)
+        if (list?.isNotEmpty() == true) {
+            val subs = buildString {
+                append("监控室列表:\n")
+                list.forEach {
+                    append(MainApi.getUserNameByMid(it) + " $it\n")
+                    trim()
                 }
             }
-
-            info.sortByDescending { it.liveStatus == 1 }
-
-            for (roomInfo in info) {
-                subs.append(
-                    "${MainApi.getUserNameByMid(roomInfo.uid)} " +
-                            "${if (roomInfo.isLiveNow()) "✔" else "✘"}\n"
-                )
-            }
-
-            return subs.toString().trim().convertToChain()
+            return BotUtil.sendMessage(subs)
         }
         return BotUtil.sendMessage("未订阅任何用户")
     }
