@@ -201,17 +201,17 @@ class BiliBiliCommand : ChatCommand {
         }
     }
 
-    private suspend fun subscribe(roomId: String, groupId: Long): MessageChain {
+    private suspend fun subscribe(uid: String, groupId: Long): MessageChain {
         val cfg = GroupConfigManager.getConfigSafely(groupId)
         val rid: Long
         var name = ""
-        rid = if (roomId.isNumeric()) {
-            roomId.toLong()
+        rid = if (uid.isNumeric()) {
+            uid.toLong()
         } else {
-            val item = FakeClientApi.getUser(roomId)
+            val item = FakeClientApi.getUser(uid)
             val title = item?.title
             if (title != null) name = title
-            item?.roomid ?: return EmptyMessageChain
+            item?.mid ?: return EmptyMessageChain
         }
 
         if (!cfg.biliSubscribers.contains(rid)) {
