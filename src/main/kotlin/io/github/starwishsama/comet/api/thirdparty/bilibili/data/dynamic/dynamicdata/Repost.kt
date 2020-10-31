@@ -56,8 +56,6 @@ data class Repost(@SerializedName("origin")
         try {
             val dynamicType = DynamicTypeSelector.getType(type)
             if (dynamicType != UnknownType::class.java) {
-                println("contact:")
-                println(contact)
                 val info = gson.fromJson(contact, dynamicType)
                 if (info != null) {
                     return info.getContact()
