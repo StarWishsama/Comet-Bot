@@ -70,7 +70,7 @@ data class Repost(@SerializedName("origin")
                     contact,
                     "None"
             )
+            return MessageWrapper("在获取时遇到了错误")
         }
-        return MessageWrapper("在获取时遇到了错误")
     }
 }
