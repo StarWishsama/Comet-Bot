@@ -4,6 +4,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.perGroup
 import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.verboseS
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -81,7 +82,11 @@ object BiliDynamicChecker : CometPusher {
                 pdh.target.forEach { gid ->
                     runBlocking {
                         val group = bot?.getGroup(gid)
-                        group?.sendMessage(pdh.pushContent.toMessageChain(group))
+                        group?.sendMessage(
+                            "${MainApi.getUserNameByMid(pdh.uid)} ".convertToChain() + pdh.pushContent.toMessageChain(
+                                group
+                            )
+                        )
                         count++
                         delay(1_500)
                     }
