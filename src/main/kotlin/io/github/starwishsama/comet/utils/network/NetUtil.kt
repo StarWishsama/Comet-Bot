@@ -94,10 +94,10 @@ object NetUtil {
         return request
     }
 
-        fun getPageContent(url: String): String {
-            val response = doHttpRequestGet(url, 8000).executeAsync()
-            return if (response.isOk) response.body() else response.status.toString()
-        }
+    fun getPageContent(url: String): String {
+        val response = doHttpRequestGet(url, 8000).executeAsync()
+        return if (response.isOk) response.body() else ""
+    }
 
     /**
      * 下载文件

@@ -61,7 +61,7 @@ class BiliBiliCommand : ChatCommand {
                         return if (user.isBotAdmin() || event.sender.isOperator()) {
                             val cfg = GroupConfigManager.getConfigSafely(event.group.id)
                             cfg.biliPushEnabled = !cfg.biliPushEnabled
-                            BotUtil.sendMessage("B站开播提醒功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}")
+                            BotUtil.sendMessage("B站动态推送功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}")
                         } else {
                             BotUtil.sendMessage(BotUtil.getLocalMessage("msg.no-permission"))
                         }
@@ -74,7 +74,7 @@ class BiliBiliCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("bili", arrayListOf(), "订阅B站主播/查询用户动态", "nbot.commands.bili", UserLevel.USER)
+        CommandProps("bili", arrayListOf(), "订阅查询B站主播/用户动态", "nbot.commands.bili", UserLevel.USER)
 
     override fun getHelp(): String = """
         /bili sub [用户名] 订阅用户相关信息
@@ -101,7 +101,7 @@ class BiliBiliCommand : ChatCommand {
             return if (args[1].contains("|")) {
                 val users = args[1].split("|")
                 val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
-                subscribeUsers(users, id) ?: BotUtil.sendMessage("订阅多个直播间成功", true)
+                subscribeUsers(users, id) ?: BotUtil.sendMessage("订阅多个用户成功", true)
             } else {
                 val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
                 val result = subscribe(args[1], id)
@@ -147,10 +147,10 @@ class BiliBiliCommand : ChatCommand {
 
 
             return if (!cfg.biliSubscribers.contains(roomId)) {
-                BotUtil.sendMessage("你还没订阅直播间 ${args[1]}")
+                BotUtil.sendMessage("你还没订阅用户 ${args[1]}")
             } else {
                 cfg.biliSubscribers.remove(args[1].toLong())
-                BotUtil.sendMessage("取消订阅直播间 ${args[1]} 成功")
+                BotUtil.sendMessage("取消订阅用户 ${args[1]} 成功")
             }
         } else {
             return getHelp().convertToChain()
