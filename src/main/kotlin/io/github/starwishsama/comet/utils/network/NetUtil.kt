@@ -80,7 +80,7 @@ object NetUtil {
                 .header("user-agent", defaultUA)
 
 
-        if (proxyIsUsable >= 0) {
+        if (proxyIsUsable > 0 && proxyUrl.isNotBlank() && proxyPort > 0) {
             try {
                 val socket = Socket(proxyUrl, proxyPort)
                 if (socket.isUsable()) {

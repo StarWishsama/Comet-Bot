@@ -1,8 +1,9 @@
 package io.github.starwishsama.comet.pushers
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.perGroup
 import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
+import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.verboseS
@@ -30,9 +31,18 @@ object BiliDynamicChecker : CometPusher {
         }
 
         collectedUsers.parallelStream().forEach { uid ->
-            val data = runBlocking { MainApi.getDynamic(uid) }
+            val data: MessageWrapper? = runBlocking {
+                try {
+                    MainApi.getDynamic(uid)
+                } catch (e: RuntimeException) {
+                    if (e !is ApiException) {
+                        daemonLogger.warning("在获取动态时出现了异常", e)
+                    }
+                    return@runBlocking null
+                }
+            }
 
-            if (data.success) {
+            if (data != null && data.success) {
                 if (pushedList.isEmpty()) {
                     pushedList.plusAssign(PushDynamicHistory(uid, data))
                     count++
@@ -72,7 +82,7 @@ object BiliDynamicChecker : CometPusher {
         }
 
         val count = pushToGroups()
-        if (count > 0) BotVariables.daemonLogger.verboseS("Push bili dynamic success, have pushed $count group(s)!")
+        if (count > 0) daemonLogger.verboseS("Push bili dynamic success, have pushed $count group(s)!")
     }
 
     private fun pushToGroups(): Int {

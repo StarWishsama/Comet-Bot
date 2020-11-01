@@ -40,13 +40,13 @@ object BotVariables {
 
     lateinit var startTime: LocalDateTime
     var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
-            8,
-            BasicThreadFactory.Builder()
-                    .namingPattern("comet-service-%d")
-                    .daemon(true)
-                    .uncaughtExceptionHandler { thread, throwable ->
-                        daemonLogger.warning("线程 ${thread.name} 在运行时发生了错误", throwable)
-                    }.build()
+        8,
+        BasicThreadFactory.Builder()
+            .namingPattern("comet-service-%d")
+            .daemon(true)
+            .uncaughtExceptionHandler { thread, t ->
+                daemonLogger.warning("线程 ${thread.name} 在执行任务时发生了错误", t)
+            }.build()
     )
     val logger: PlatformLogger = PlatformLogger("CometBot", {
         log.writeString(log.getContext() + "$it\n")
