@@ -1,9 +1,11 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.comet.BotVariables.hmsPattern
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 
 data class PlainText(
     val user: UserProfile.Info,
@@ -27,6 +29,10 @@ data class PlainText(
     )
 
     override suspend fun getContact(): MessageWrapper {
-        return MessageWrapper("发布了动态: \n${item.context ?: "获取失败"}\n")
+        return MessageWrapper(
+            "发布了动态: \n" +
+                    "${item.context ?: "获取失败"}\n\n" +
+                    "🕘 ${hmsPattern.format(item.sentTimestamp.toLocalDateTime())}"
+        )
     }
 }

@@ -1,5 +1,9 @@
 package io.github.starwishsama.comet.utils
 
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+
 object NumberUtil {
     fun Long.getBetterNumber(): String {
         return when {
@@ -8,4 +12,7 @@ object NumberUtil {
             else -> toString()
         }
     }
+
+    fun Long.toLocalDateTime(): LocalDateTime =
+        Instant.ofEpochMilli(this * 1000).atZone(ZoneId.systemDefault()).toLocalDateTime()
 }

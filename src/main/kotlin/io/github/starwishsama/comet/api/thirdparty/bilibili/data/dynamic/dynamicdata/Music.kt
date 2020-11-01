@@ -10,7 +10,7 @@ data class Music(var id: Long,
                  @SerializedName("intro")
                  var dynamic: String?) : DynamicData {
     override suspend fun getContact(): MessageWrapper {
-        val wrapped = MessageWrapper("发布了音乐 ${dynamic ?: "无"}\n")
+        val wrapped = MessageWrapper("发布了音乐 ${dynamic ?: "获取失败"}\n")
 
         coverURL.let {
             if (it != null) {

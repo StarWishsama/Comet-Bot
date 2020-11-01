@@ -4,6 +4,7 @@ import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.gson
+import io.github.starwishsama.comet.BotVariables.hmsPattern
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
@@ -18,7 +19,6 @@ import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
@@ -58,7 +58,7 @@ data class Tweet(
         val duration =
                 Duration.between(getSentTime(), LocalDateTime.now())
         val extraText =
-                "❤${likeCount?.getBetterNumber()} | \uD83D\uDD01${retweetCount} | 🕘${DateTimeFormatter.ofPattern("HH:mm:ss").format(getSentTime())}"
+            "❤${likeCount?.getBetterNumber()} | \uD83D\uDD01${retweetCount} | 🕘${hmsPattern.format(getSentTime())}"
 
         if (retweetStatus != null) {
             return "转发了 ${retweetStatus.user.name} 的推文\n" +

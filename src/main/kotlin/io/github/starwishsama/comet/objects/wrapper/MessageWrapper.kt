@@ -28,7 +28,7 @@ open class MessageWrapper(var text: String?, val success: Boolean = true) {
     fun plusImageUrl(url: String?): MessageWrapper {
         if (url == null) return this
 
-        if (pictureUrl.size <= 9) {
+        if (pictureUrl.size <= 9 && !pictureUrl.contains(url)) {
             pictureUrl.add(url)
             return this
         } else {
@@ -48,7 +48,8 @@ open class MessageWrapper(var text: String?, val success: Boolean = true) {
                 }
                 return result
             }
-            return textWrapper.convertToChain()
+
+            return textWrapper.trim().convertToChain()
         }
         return EmptyMessageChain
     }

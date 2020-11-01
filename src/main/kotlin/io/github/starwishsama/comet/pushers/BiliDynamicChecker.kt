@@ -37,22 +37,18 @@ object BiliDynamicChecker : CometPusher {
                     pushedList.plusAssign(PushDynamicHistory(uid, data))
                     count++
                 } else {
-                    val isExist = pushedList.parallelStream().filter { it.uid == uid }.findFirst().isPresent
+                    val target = pushedList.parallelStream().filter { it.uid == uid }.findFirst()
 
-                    if (!isExist) {
+                    if (!target.isPresent) {
                         pushedList.plusAssign(PushDynamicHistory(uid, data))
                     } else {
                         val oldData =
-                                pushedList.parallelStream().filter { it.uid == uid && data.text == it.pushContent.text }
-                                        .findFirst()
+                            pushedList.parallelStream().filter { it.uid == uid && data.text == it.pushContent.text }
+                                .findFirst()
 
-                        if (!oldData.isPresent) {
-                            pushedList.parallelStream().forEach {
-                                if (it.uid == uid) {
-                                    it.pushContent = data
-                                    it.isPushed = false
-                                }
-                            }
+                        if (!oldData.isPresent && target.isPresent) {
+                            target.get().pushContent = data
+                            target.get().isPushed = false
                         }
                     }
                 }
@@ -110,9 +106,5 @@ object BiliDynamicChecker : CometPusher {
         var pushContent: MessageWrapper,
         val target: MutableSet<Long> = mutableSetOf(),
         var isPushed: Boolean = false
-    ) {
-        fun compare(other: MessageWrapper): Boolean {
-            return pushContent.text == other.text
-        }
-    }
+    )
 }

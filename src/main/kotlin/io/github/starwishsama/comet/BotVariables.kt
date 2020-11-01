@@ -17,6 +17,7 @@ import net.mamoe.mirai.utils.PlatformLogger
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -82,4 +83,6 @@ object BotVariables {
     val coolDown: MutableMap<Long, Long> = HashMap()
 
     val tcoPattern: Pattern = Pattern.compile("https://t.co/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]")
+
+    val hmsPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 }

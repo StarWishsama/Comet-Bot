@@ -30,14 +30,15 @@ object RepeatListener : NListener {
             if (count <= 1L) {
                 val msgChain = ArrayList<Message>()
 
-                event.message.forEach { msgChain.add(it) }
-
-                for (i in 0 until msgChain.size) {
-                    val chain = msgChain[i]
-                    if (chain is PlainText) {
-                        msgChain[i] = PlainText(chain.content.replace("我", "你"))
+                event.message.forEach {
+                    val msg: SingleMessage = if (it is PlainText) {
+                        PlainText(it.content.replace("我".toRegex(), "你"))
+                    } else {
+                        it
                     }
+                    msgChain.add(msg)
                 }
+
                 event.reply(msgChain.asMessageChain())
             }
         }

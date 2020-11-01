@@ -15,7 +15,7 @@ data class TextWithPicture(var item: ItemBean?) : DynamicData {
     }
 
     override suspend fun getContact(): MessageWrapper {
-        val wrapped = MessageWrapper("发布了动态:\n ${item?.text ?: "无"}\n")
+        val wrapped = MessageWrapper("发布了动态:\n ${item?.text ?: "获取失败"}\n")
 
         if (!item?.pictures.isNullOrEmpty()) {
             item?.pictures?.get(0)?.imgUrl?.let { wrapped.plusImageUrl(it) }

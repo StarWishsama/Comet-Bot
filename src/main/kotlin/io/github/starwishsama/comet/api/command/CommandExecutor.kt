@@ -81,6 +81,9 @@ object CommandExecutor {
     }
 
 
+    /**
+     * FIXME: 考虑多个 Comet 机器人在群内的问题, 优先处理原则
+     */
     @ExperimentalTime
     fun startHandler(bot: Bot) {
         bot.subscribeMessages {
@@ -104,8 +107,8 @@ object CommandExecutor {
 
                     if (isCommand) {
                         BotVariables.logger.debugS(
-                                "[命令] 命令执行耗时 ${Duration.between(executedTime, LocalDateTime.now()).toKotlinDuration().asHumanReadable}" +
-                                        if (result.result.isNotEmpty()) ", 执行结果: ${result.result}" else ""
+                            "[命令] 命令执行耗时 ${Duration.between(executedTime, LocalDateTime.now()).toKotlinDuration().asHumanReadable}" +
+                                    if (result.result.isNotEmpty()) ", 执行结果: ${result.result}" else ""
                         )
                     }
                 }

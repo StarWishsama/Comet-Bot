@@ -25,6 +25,7 @@ def mainClass = 'io.github.starwishsama.comet.CometKt'
 jar {
     manifest {
         attributes 'Main-Class': mainClass
+        attributes 'Author': "StarWishsama"
     }
 }
 
@@ -46,7 +47,6 @@ repositories {
     jcenter()
     mavenCentral()
     google()
-    mavenLocal()
 }
 
 task updateVersion {

@@ -88,13 +88,13 @@ data class LiveRoom(
         @SerializedName("face")
         val face: String
 ) : DynamicData {
-    fun getRoomURL(): String = "https://live.bilibili.com/$roomID"
+    private fun getRoomURL(): String = "https://live.bilibili.com/$roomID"
 
     enum class Status(var status: String) {
         NoStreaming("闲置"), Streaming("直播中"), PlayingVideo("轮播中"), Unknown("未知");
     }
 
-    fun getStatus(roundStatus: Int): Status {
+    private fun getStatus(roundStatus: Int): Status {
         return when (roundStatus) {
             0 -> Status.NoStreaming
             1 -> Status.Streaming
