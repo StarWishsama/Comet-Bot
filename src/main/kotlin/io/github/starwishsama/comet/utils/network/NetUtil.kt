@@ -217,6 +217,7 @@ object NetUtil {
     }
 
     fun initDriver() {
+        if (!cfg.debugMode) return
         if (cfg.webDriverName.isBlank()) return
 
         try {

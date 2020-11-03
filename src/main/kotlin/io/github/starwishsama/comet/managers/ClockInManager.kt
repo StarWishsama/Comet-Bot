@@ -6,7 +6,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 object ClockInManager {
-    private var clockInData = mutableMapOf<Long, List<ClockInData>>()
+    private val clockInData = mutableMapOf<Long, List<ClockInData>>()
 
     // 创建一个新的打卡
     fun newClockIn(groupId: Long, members: List<Member>, startTime: LocalDateTime, endTime: LocalDateTime) {

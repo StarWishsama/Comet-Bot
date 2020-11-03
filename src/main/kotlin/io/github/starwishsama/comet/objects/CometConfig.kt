@@ -89,7 +89,7 @@ data class CometConfig(
         val twitterInterval: Long = 4,
 
         //@Comment("明日方舟抽卡模拟器是否使用图片")
-        var arkDrawUseImage: Boolean = true,
+        var arkDrawUseImage: Boolean = false,
 
         //@Comment("调试模式")
         var debugMode: Boolean = false,
