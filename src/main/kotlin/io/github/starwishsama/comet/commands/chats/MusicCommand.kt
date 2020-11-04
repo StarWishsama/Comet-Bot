@@ -43,7 +43,7 @@ class MusicCommand : ChatCommand {
                     }
                 }
             } else {
-                getHelp().convertToChain()
+                return getHelp().convertToChain()
             }
         }
         return EmptyMessageChain

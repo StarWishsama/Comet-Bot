@@ -5,6 +5,7 @@ import cn.hutool.http.*
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.utils.debugS
 import io.github.starwishsama.comet.utils.network.NetUtil.proxyIsUsable
 import org.openqa.selenium.*
 import org.openqa.selenium.chrome.ChromeDriver
@@ -24,6 +25,7 @@ import java.net.URL
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.time.ExperimentalTime
 
 fun HttpResponse.getContentLength(): Int {
     return header(Header.CONTENT_LENGTH).toIntOrNull() ?: -1
@@ -57,7 +59,7 @@ object NetUtil {
     const val defaultUA =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36"
 
-    fun getUrlInputStream(url: String, timeout: Int = 4_000): InputStream? {
+    fun getUrlInputStream(url: String, timeout: Int = 2_000): InputStream? {
         val response = doHttpRequestGet(url, timeout).executeAsync()
         val length = response.getContentLength()
         val bytes = response.bodyBytes()
@@ -67,35 +69,42 @@ object NetUtil {
     }
 
     @Throws(HttpException::class)
-    fun doHttpRequestGet(url: String, timeout: Int = 4_000): HttpRequest {
+    fun doHttpRequestGet(url: String, timeout: Int = 2_000): HttpRequest {
         return doHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort, Method.GET)
     }
 
+    @OptIn(ExperimentalTime::class)
     @Throws(HttpException::class)
     fun doHttpRequest(url: String, timeout: Int, proxyUrl: String, proxyPort: Int, method: Method): HttpRequest {
-        val request = HttpRequest(url)
-                .method(method)
-                .setFollowRedirects(true)
-                .timeout(timeout)
-                .header("user-agent", defaultUA)
+        val startTime = System.nanoTime()
+
+        try {
+            val request = HttpRequest(url)
+                    .method(method)
+                    .setFollowRedirects(true)
+                    .timeout(timeout)
+                    .header("user-agent", defaultUA)
 
 
-        if (proxyIsUsable > 0 && proxyUrl.isNotBlank() && proxyPort > 0) {
-            try {
-                val socket = Socket(proxyUrl, proxyPort)
-                if (socket.isUsable()) {
-                    request.setProxy(Proxy(cfg.proxyType, Socket(proxyUrl, proxyPort).remoteSocketAddress))
+            if (proxyIsUsable > 0 && proxyUrl.isNotBlank() && proxyPort > 0) {
+                try {
+                    val socket = Socket(proxyUrl, proxyPort)
+                    if (socket.isUsable()) {
+                        request.setProxy(Proxy(cfg.proxyType, Socket(proxyUrl, proxyPort).remoteSocketAddress))
+                    }
+                } catch (e: Exception) {
+                    daemonLogger.verbose("无法连接到代理服务器, ${e.message}")
                 }
-            } catch (e: Exception) {
-                daemonLogger.verbose("无法连接到代理服务器, ${e.message}")
             }
-        }
 
-        return request
+            return request
+        } finally {
+            daemonLogger.debugS("执行网络操作用时 ${(System.nanoTime() - startTime).toDouble() / 1_000_000}ms")
+        }
     }
 
     fun getPageContent(url: String): String {
-        val response = doHttpRequestGet(url, 8000).executeAsync()
+        val response = doHttpRequestGet(url, 1000).executeAsync()
         return if (response.isOk) response.body() else ""
     }
 
@@ -108,7 +117,7 @@ object NetUtil {
     fun downloadFile(fileFolder: File, address: String, fileName: String): File? {
         val file = File(fileFolder, fileName)
         try {
-            val response = doHttpRequestGet(address, 5000).executeAsync()
+            val response = doHttpRequestGet(address, 2000).executeAsync()
 
             if (response.isOk) {
                 val `in` = BufferedInputStream(response.bodyStream())
@@ -147,7 +156,7 @@ object NetUtil {
     }
 
     @Throws(HttpException::class)
-    fun checkPingValue(address: String = "https://www.gstatic.com/generate_204", timeout: Int = 3000): Long {
+    fun checkPingValue(address: String = "https://www.gstatic.com/generate_204", timeout: Int = 2000): Long {
         val startTime = LocalDateTime.now()
 
         val conn = doHttpRequestGet(address, timeout).executeAsync()
