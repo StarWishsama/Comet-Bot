@@ -4,17 +4,23 @@ import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
+import io.github.starwishsama.comet.objects.draw.items.GachaItem
 import io.github.starwishsama.comet.utils.DrawUtil
 import java.math.RoundingMode
 import java.util.stream.Collectors
 
 /**
- * Picture & Operator info from http://prts.wiki/
+ * Operator info from https://amiya.xyz/
+ *
+ * Operator Picture from http://prts.wiki/
  */
-class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
+abstract class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
     override val tenjouCount: Int = -1
     override val tenjouRare: Int = -1
-    override val poolItems: MutableList<ArkNightOperator> = BotVariables.arkNight
+    override val poolItems: MutableList<ArkNightOperator> =
+            BotVariables.arkNight.parallelStream().filter {
+                it.obtain.contains("标准寻访") && it.obtain.contains("限定寻访")
+            }.collect(Collectors.toList())
 
     override fun doDraw(time: Int): List<ArkNightOperator> {
         val result = mutableListOf<ArkNightOperator>()
@@ -26,39 +32,42 @@ class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
                 r6Count = RandomUtil.randomInt(51, time - 1)
             }
 
+            val probability = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
+
             // 首先检查是否到了出保底六星的时候
             if (r6Count != 0 && it == r6Count) {
-                result.add(getGachaItem(6))
+                result.add(getGachaItem(6, probability))
                 return@repeat
             }
 
-            val probability = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
-
-            // 然后检查是否到了出 UP 角色的时候
-            if (highProbabilityItems.isNotEmpty()) {
-                val targetUps = highProbabilityItems.keys.parallelStream().collect(Collectors.toList())
-                val targetUp = targetUps[RandomUtil.randomInt(0, targetUps.size - 1)]
-
-                val targetProbability = highProbabilityItems[targetUp]
-
-                if (targetProbability != null && probability in targetProbability) {
-                    result.add(targetUp as ArkNightOperator)
-                    return@repeat
-                }
-            }
-
+            // 最后按默认抽卡规则抽出对应星级干员
             val rare: Int = when (probability) {
                 in 0.48..0.50 -> 6
                 in 0.0..0.08 -> 5
                 in 0.40..0.90 -> 4
                 else -> 3
             }
-            result.add(getGachaItem(rare))
+            result.add(getGachaItem(rare, probability))
         }
         return result
     }
 
-    override fun getGachaItem(rare: Int): ArkNightOperator {
+    abstract override fun getGachaItem(rare: Int): GachaItem
+
+    // 使用自定义抽卡方式
+    private fun getGachaItem(rare: Int, probability: Double): ArkNightOperator {
+        // 然后检查是否到了出 UP 角色的时候
+        if (highProbabilityItems.isNotEmpty()) {
+            val targetUps = highProbabilityItems.keys.parallelStream().collect(Collectors.toList())
+            val targetUp = targetUps[RandomUtil.randomInt(0, targetUps.size - 1)]
+
+            val targetProbability = highProbabilityItems[targetUp]
+
+            if (targetProbability != null && probability in targetProbability) {
+                return targetUp as ArkNightOperator
+            }
+        }
+
         val rareItems = poolItems.parallelStream().filter { it.rare == rare }.collect(Collectors.toList())
         return rareItems[RandomUtil.randomInt(0, rareItems.size)]
     }

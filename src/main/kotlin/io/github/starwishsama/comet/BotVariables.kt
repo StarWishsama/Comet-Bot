@@ -74,8 +74,10 @@ object BotVariables {
     var hitokoto: Hitokoto? = null
     val rssItems: MutableList<RssItem> = mutableListOf()
 
-    /** 明日方舟/PCR 卡池数据 */
+    /** 明日方舟卡池数据 */
     var arkNight: MutableList<ArkNightOperator> = LinkedList()
+
+    /** 公主链接卡池数据 */
     var pcr: MutableList<PCRCharacter> = LinkedList()
 
     var switch: Boolean = true
