@@ -8,6 +8,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.hasNoCoolDown
+import io.github.starwishsama.comet.utils.IDGuidelineType
 import io.github.starwishsama.comet.utils.StringUtil.isLegitId
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
@@ -30,7 +31,7 @@ class R6SCommand : ChatCommand {
                             val result = getR6SInfo(account)
                             event.sender.at() + ("\n" + result)
                         } else {
-                            if (isLegitId(args[1])) {
+                            if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
                                 event.reply(BotUtil.sendMessage("查询中..."))
                                 val result = getR6SInfo(args[1])
                                 event.sender.at() + ("\n" + result)
@@ -41,7 +42,7 @@ class R6SCommand : ChatCommand {
                     }
                     "bind", "绑定" ->
                         if (args[1].isNotEmpty() && args.size > 1) {
-                            if (isLegitId(args[1])) {
+                            if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
                                 val botUser1 = BotUser.getUser(event.sender.id)
                                 if (botUser1 != null) {
                                     botUser1.r6sAccount = args[1]

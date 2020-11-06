@@ -7,6 +7,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.gson
@@ -76,8 +77,9 @@ object DataSetup {
             }
 
             if (arkNightData.exists()) {
-                BotVariables.arkNight = gson.fromJson(arkNightData.getContext())
-                daemonLogger.info("成功载入明日方舟游戏数据, 共 ${BotVariables.arkNight.size} 个")
+                arkNight = gson.fromJson(arkNightData.getContext())
+
+                daemonLogger.info("成功载入明日方舟游戏数据, 共 ${arkNight.size} 个")
                 if (cfg.arkDrawUseImage) {
                     DrawUtil.downloadArkNightsFile()
                 }

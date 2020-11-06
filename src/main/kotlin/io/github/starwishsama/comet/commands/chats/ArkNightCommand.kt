@@ -34,7 +34,15 @@ class ArkNightCommand : ChatCommand {
                             event.reply("请稍等...")
                             val list = pool.getArkDrawResult(user)
                             if (list.isNotEmpty()) {
-                                val gachaImage = withContext(Dispatchers.Default) { DrawUtil.combineArkOpImage(list).upload(event.subject) }
+                                val result = DrawUtil.combineArkOpImage(list)
+                                event.quoteReply(BotUtil.sendMessage("由于缺失资源文件, 以下干员无法显示 :(\n" +
+                                        buildString {
+                                            result.lostOps.forEach {
+                                                append("${it.name},")
+                                            }
+                                            removeSuffix(",")
+                                        }))
+                                val gachaImage = withContext(Dispatchers.Default) { result.image.upload(event.subject) }
                                 gachaImage.asMessageChain()
                             } else {
                                 DrawUtil.overTimeMessage.convertToChain()
@@ -48,7 +56,15 @@ class ArkNightCommand : ChatCommand {
                             event.reply("请稍等...")
                             val list: List<ArkNightOperator> = pool.getArkDrawResult(user, 10)
                             if (list.isNotEmpty()) {
-                                val gachaImage = withContext(Dispatchers.Default) { DrawUtil.combineArkOpImage(list).upload(event.subject) }
+                                val result = DrawUtil.combineArkOpImage(list)
+                                event.quoteReply(BotUtil.sendMessage("由于缺失资源文件, 以下干员无法显示 :(\n" +
+                                        buildString {
+                                            result.lostOps.forEach {
+                                                append("${it.name},")
+                                            }
+                                            removeSuffix(",")
+                                        }))
+                                val gachaImage = withContext(Dispatchers.Default) { result.image.upload(event.subject) }
                                 gachaImage.asMessageChain()
                             } else {
                                 DrawUtil.overTimeMessage.convertToChain()

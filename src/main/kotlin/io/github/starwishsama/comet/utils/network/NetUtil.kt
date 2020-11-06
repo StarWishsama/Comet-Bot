@@ -1,8 +1,6 @@
 package io.github.starwishsama.comet.utils.network
 
-import cn.hutool.core.io.IORuntimeException
 import cn.hutool.http.*
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.utils.debugS
@@ -24,7 +22,6 @@ import java.net.Socket
 import java.net.URL
 import java.time.Duration
 import java.time.LocalDateTime
-import java.util.*
 import kotlin.time.ExperimentalTime
 
 fun HttpResponse.getContentLength(): Int {
@@ -117,43 +114,38 @@ object NetUtil {
      */
     fun downloadFile(fileFolder: File, address: String, fileName: String): File? {
         val file = File(fileFolder, fileName)
-        try {
-            val response = doHttpRequestGet(address, 2000).executeAsync()
 
-            if (response.isOk) {
-                val `in` = BufferedInputStream(response.bodyStream())
-                if (!file.exists()) file.createNewFile()
-                val fos = FileOutputStream(file)
-                val bos = BufferedOutputStream(fos, 2048)
-                val data = ByteArray(2048)
-                var x: Int
-                while (`in`.read(data, 0, 2048).also { x = it } >= 0) {
-                    bos.write(data, 0, x)
-                }
-                bos.close()
-                `in`.close()
-                fos.close()
-            } else {
-                BotVariables.logger.error("在下载时发生了错误, 响应码 ${response.status}")
+        val conn = URL(address)
+
+        val connUrl = conn.openConnection() as HttpURLConnection
+        connUrl.doOutput = true
+        connUrl.instanceFollowRedirects = true
+        connUrl.connect()
+
+        if (connUrl.responseCode in 200..300) {
+            val `in` = BufferedInputStream(connUrl.inputStream)
+            if (!file.exists()) file.createNewFile()
+            val fos = FileOutputStream(file)
+            val bos = BufferedOutputStream(fos, 2048)
+            val data = ByteArray(2048)
+            var x: Int
+            while (`in`.read(data, 0, 2048).also { x = it } >= 0) {
+                bos.write(data, 0, x)
             }
-        } catch (e: Exception) {
-            if (!file.delete()) {
-                BotVariables.logger.error("无法删除损坏文件: $fileName")
-            }
-            if (e.cause is IORuntimeException) {
-                BotVariables.logger.error("在下载时发生了错误: 连接超时")
-                return null
-            }
-            BotVariables.logger.error("在下载时发生了错误")
+            bos.close()
+            `in`.close()
+            fos.close()
+        } else {
+            throw RuntimeException("在下载时发生了错误, 响应码 ${connUrl.responseCode}")
         }
 
         return file
     }
 
     fun isTimeout(t: Throwable): Boolean {
-        val msg = t.message?.toLowerCase(Locale.ROOT) ?: return t is IOException
+        val msg = t.message?.toLowerCase() ?: return t is IOException
         // FIXME: 这不是一个很好的识别方法
-        return t is IOException || (msg.contains("time") && msg.contains("out")) || t.javaClass.simpleName.toLowerCase(Locale.ROOT).contains("timeout")
+        return (msg.contains("time") && msg.contains("out")) || t.javaClass.simpleName.toLowerCase().contains("timeout")
     }
 
     @Throws(HttpException::class)

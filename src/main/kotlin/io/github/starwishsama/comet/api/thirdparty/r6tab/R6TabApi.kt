@@ -10,6 +10,7 @@ import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.enums.R6Rank
 import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6Player
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.IDGuidelineType
 import io.github.starwishsama.comet.utils.StringUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import java.text.NumberFormat
@@ -49,7 +50,7 @@ object R6TabApi {
 
     fun getR6SInfo(player: String): String {
         try {
-            if (StringUtil.isLegitId(player)) {
+            if (StringUtil.isLegitId(player, IDGuidelineType.UBISOFT)) {
                 val p: R6Player? = searchPlayer(player)
                 if (p != null && p.found) {
                     var response = String.format(

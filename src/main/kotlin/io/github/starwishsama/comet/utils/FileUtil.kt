@@ -67,6 +67,14 @@ fun File.isEmpty(): Boolean {
     return files.isEmpty()
 }
 
+fun File.filesCount(): Int {
+    if (!isDirectory) return -1
+
+    val files = listFiles() ?: return -1
+
+    return files.size
+}
+
 object FileUtil {
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
 

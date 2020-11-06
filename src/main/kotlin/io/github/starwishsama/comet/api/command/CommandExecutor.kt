@@ -11,6 +11,7 @@ import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
 import io.github.starwishsama.comet.utils.debugS
 import io.github.starwishsama.comet.utils.network.NetUtil
 import net.mamoe.mirai.Bot
@@ -19,13 +20,10 @@ import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.utils.asHumanReadable
-import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
-import kotlin.time.DurationUnit
+import java.util.concurrent.TimeUnit
 import kotlin.time.ExperimentalTime
-import kotlin.time.toKotlinDuration
 
 /**
  * 彗星 Bot 命令处理器
@@ -107,8 +105,8 @@ object CommandExecutor {
 
                     if (isCommand) {
                         BotVariables.logger.debugS(
-                            "[命令] 命令执行耗时 ${Duration.between(executedTime, LocalDateTime.now()).toKotlinDuration().asHumanReadable}" +
-                                    if (result.result.isNotEmpty()) ", 执行结果: ${result.result}" else ""
+                                "[命令] 命令执行耗时 ${executedTime.getLastingTime(builtInMethod = true)}" +
+                                        if (result.result.isNotEmpty()) ", 执行结果: ${result.result}" else ""
                         )
                     }
                 }
@@ -225,10 +223,8 @@ object CommandExecutor {
             }
         }
 
-        val usedTime = Duration.between(time, LocalDateTime.now())
         BotVariables.logger.debug(
-                "[会话] 处理会话耗时 ${usedTime.toKotlinDuration().toLong(DurationUnit.SECONDS)}s${usedTime.toKotlinDuration()
-                        .toLong(DurationUnit.MILLISECONDS)}ms"
+                "[会话] 处理会话耗时 ${time.getLastingTime(unit = TimeUnit.SECONDS, msMode = true)}"
         )
         return true
     }

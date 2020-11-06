@@ -20,7 +20,7 @@ import net.mamoe.mirai.message.data.queryUrl
 import java.util.*
 
 @CometCommand
-class PictureSearch : ChatCommand, SuspendCommand {
+class PictureSearchCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(event.sender.id)) {
             if (args.isEmpty() || SessionManager.isValidSessionById(event.sender.id)) {

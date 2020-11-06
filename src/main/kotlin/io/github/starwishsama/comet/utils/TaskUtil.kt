@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.utils
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.exceptions.RateLimitException
+import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.exceptions.ReachRetryLimitException
 import io.github.starwishsama.comet.utils.network.NetUtil
 import java.util.concurrent.ScheduledFuture
@@ -27,12 +27,12 @@ object TaskUtil {
                 } else {
                     throw ReachRetryLimitException()
                 }
-            } catch (e: RuntimeException) {
+            } catch (e: Exception) {
                 if (NetUtil.isTimeout(e)) {
                     daemonLogger.verbose("Retried $it time(s), connect times out")
                     return@repeat
-                } else {
-                    if (e !is RateLimitException) return e
+                } else if (e !is ApiException) {
+                    return e
                 }
             }
         }

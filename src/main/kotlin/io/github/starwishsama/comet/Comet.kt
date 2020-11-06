@@ -19,8 +19,8 @@ import io.github.starwishsama.comet.listeners.ConvertLightAppListener
 import io.github.starwishsama.comet.listeners.RepeatListener
 import io.github.starwishsama.comet.pushers.*
 import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
-import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.getContext
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -37,12 +37,10 @@ import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.PlatformLogger
 import net.mamoe.mirai.utils.secondsToMillis
-import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.time.ExperimentalTime
-import kotlin.time.toKotlinDuration
 
 object Comet {
     @ExperimentalTime
@@ -153,7 +151,7 @@ object Comet {
                         InfoCommand(),
                         MusicCommand(),
                         MuteCommand(),
-                        PictureSearch(),
+                        PictureSearchCommand(),
                         R6SCommand(),
                         RConCommand(),
                         KickCommand(),
@@ -183,9 +181,7 @@ object Comet {
         startUpTask()
         startAllPusher(bot)
 
-        val duration = Duration.between(startTime, LocalDateTime.now())
-
-        logger.info("彗星 Bot 启动成功, 耗时 ${duration.toKotlinDuration().toFriendly()}")
+        logger.info("彗星 Bot 启动成功, 耗时 ${startTime.getLastingTime()}")
 
         Runtime.getRuntime().addShutdownHook(Thread {
             logger.info("[Bot] 正在关闭 Bot...")

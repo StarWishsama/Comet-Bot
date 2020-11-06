@@ -1,12 +1,21 @@
 package io.github.starwishsama.comet.utils
 
+import io.github.starwishsama.comet.utils.IDGuidelineType.MINECRAFT
+import io.github.starwishsama.comet.utils.IDGuidelineType.UBISOFT
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.asMessageChain
+import net.mamoe.mirai.utils.asHumanReadable
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
+import kotlin.time.toKotlinDuration
+
+enum class IDGuidelineType {
+    MINECRAFT, UBISOFT
+}
 
 object StringUtil {
     /**
@@ -16,14 +25,18 @@ object StringUtil {
      * @param username 用户名
      * @return 是否符合规范
      */
-    fun isLegitId(username: String): Boolean {
-        return username.matches(Regex("[a-zA-Z0-9_.-]*"))
+    fun isLegitId(username: String, type: IDGuidelineType): Boolean {
+        return when (type) {
+            UBISOFT -> username.matches(Regex("[a-zA-Z0-9_.-]*"))
+            MINECRAFT -> username.matches(Regex("[a-zA-Z0-9_-]*"))
+        }
     }
 
     /**
      * 来自 Mirai 的 asHumanReadable
      */
-    @ExperimentalTime
+
+    @OptIn(ExperimentalTime::class)
     fun Duration.toFriendly(maxUnit: DurationUnit = TimeUnit.DAYS, msMode: Boolean = true): String {
         val days = toInt(DurationUnit.DAYS)
         val hours = toInt(DurationUnit.HOURS) % 24
@@ -56,5 +69,17 @@ object StringUtil {
 
     fun String.limitStringSize(size: Int): String {
         return if (length <= size) this else substring(0, size) + "..."
+    }
+
+    /**
+     * 获取该 [LocalDateTime] 距今的时间并转换为友好的字符串
+     *
+     * @param msMode 是否精准到毫秒
+     * @param builtInMethod 是否使用 Mirai 的 [Duration.asHumanReadable]
+     */
+    @OptIn(ExperimentalTime::class)
+    fun LocalDateTime.getLastingTime(unit: TimeUnit = TimeUnit.SECONDS, msMode: Boolean = false, builtInMethod: Boolean = false): String {
+        val duration = java.time.Duration.between(this, LocalDateTime.now()).toKotlinDuration()
+        return if (builtInMethod) duration.asHumanReadable else duration.toFriendly(maxUnit = unit, msMode = msMode)
     }
 }

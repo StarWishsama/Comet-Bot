@@ -11,6 +11,7 @@ import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
 import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.pushers.TweetUpdateChecker
 import io.github.starwishsama.comet.pushers.YoutubeStreamingChecker
@@ -143,6 +144,20 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     """.trimIndent().convertToChain()
                 }
                 "panic" -> throw RuntimeException("好")
+                "ark" -> {
+                    var op: ArkNightOperator? = null
+
+                    if (args.size > 1) {
+                        BotVariables.arkNight.parallelStream().forEach {
+                            if (args[1] == it.name) {
+                                op = it
+                                return@forEach
+                            }
+                        }
+                    }
+
+                    return op.toString().convertToChain()
+                }
                 "twpic" -> {
                     if (args.isEmpty()) return "/debug twpic [Tweet ID]".convertToChain()
                     else {
