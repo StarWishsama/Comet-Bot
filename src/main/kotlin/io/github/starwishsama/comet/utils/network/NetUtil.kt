@@ -112,6 +112,7 @@ object NetUtil {
      * 下载文件
      *
      * @param address  下载地址
+     * @param fileFolder 下载文件储存的文件夹
      * @param fileName 下载文件的名称
      */
     fun downloadFile(fileFolder: File, address: String, fileName: String): File? {

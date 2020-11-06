@@ -78,6 +78,9 @@ object DataSetup {
             if (arkNightData.exists()) {
                 BotVariables.arkNight = gson.fromJson(arkNightData.getContext())
                 daemonLogger.info("成功载入明日方舟游戏数据, 共 ${BotVariables.arkNight.size} 个")
+                if (cfg.arkDrawUseImage) {
+                    DrawUtil.downloadArkNightsFile()
+                }
             } else {
                 daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
             }

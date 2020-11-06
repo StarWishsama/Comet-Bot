@@ -51,16 +51,26 @@ fun <T> File.parseAsClass(clazz: Class<T>): T {
     return BotVariables.gson.fromJson(getContext(), clazz)
 }
 
+fun File.getChildFolder(folderName: String): File {
+    val childFolder = File(this, folderName)
+    if (!childFolder.exists()) {
+        childFolder.mkdirs()
+    }
+    return childFolder
+}
+
+fun File.isEmpty(): Boolean {
+    if (!isDirectory) return false
+
+    val files = listFiles() ?: return false
+
+    return files.isEmpty()
+}
+
 object FileUtil {
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
 
-    fun getChildFolder(childName: String): File {
-        val childFolder = File(BotVariables.filePath.path + File.separator + childName)
-        if (!childFolder.exists()) {
-            childFolder.mkdirs()
-        }
-        return childFolder
-    }
+    fun getChildFolder(childName: String): File = BotVariables.filePath.getChildFolder(childName)
 
     fun getCacheFolder(): File = getChildFolder("cache")
 
