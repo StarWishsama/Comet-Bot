@@ -14,7 +14,7 @@ import java.util.stream.Collectors
  *
  * Operator Picture from http://prts.wiki/
  */
-abstract class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
+class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
     override val tenjouCount: Int = -1
     override val tenjouRare: Int = -1
     override val poolItems: MutableList<ArkNightOperator> =
@@ -52,7 +52,9 @@ abstract class ArkNightPool(override val name: String = "标准寻访") : GachaP
         return result
     }
 
-    abstract override fun getGachaItem(rare: Int): GachaItem
+    override fun getGachaItem(rare: Int): GachaItem {
+        throw UnsupportedOperationException()
+    }
 
     // 使用自定义抽卡方式
     private fun getGachaItem(rare: Int, probability: Double): ArkNightOperator {
