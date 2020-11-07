@@ -25,7 +25,7 @@ object DrawUtil {
     const val overTimeMessage = "抽卡次数到上限了, 可以少抽一点或者等待条数自动恢复哦~\n" +
             "命令条数现在每小时会恢复100次, 封顶1000次"
 
-    // 干员名称/干员名称.png
+    // 资源下载链接, 文件位置: 干员名称/干员名称.png
     private const val resourceUrl = "https://cdn.jsdelivr.net/gh/godofhuaye/arknight-assets@master/cg"
 
     /**
@@ -82,17 +82,20 @@ object DrawUtil {
             val lostOps: List<ArkNightOperator>
     )
 
-    fun getStar(rare: Int): String = StringBuilder().apply {
+    fun getStar(rare: Int): String = buildString {
         for (i in 0 until rare) {
             append("★")
         }
-    }.toString()
+    }
 
     fun checkHasGachaTime(user: BotUser, time: Int): Boolean =
             (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
 
     fun downloadArkNightsFile() {
-        if (FileUtil.getResourceFolder().getChildFolder("ark").filesCount() < arkNight.size) {
+        // 安塞尔的资源不知为何没有
+        val actualSize = arkNight.size - 1
+
+        if (FileUtil.getResourceFolder().getChildFolder("ark").filesCount() < actualSize) {
             val startTime = LocalDateTime.now()
             daemonLogger.info("正在下载 明日方舟图片资源文件")
 
@@ -115,6 +118,8 @@ object DrawUtil {
                 } catch (e: Exception) {
                     if (e !is ApiException)
                         daemonLogger.warning("下载 $fileName 时出现了意外", e)
+                    else
+                        daemonLogger.warning("下载异常: ${e.message ?: "无信息"}")
                     return@forEach
                 } finally {
                     if (successCount > 0 && successCount % 10 == 0) {
@@ -122,7 +127,7 @@ object DrawUtil {
                     }
                 }
             }
-            daemonLogger.info("明日方舟 > 资源文件下载成功, 耗时 ${startTime.getLastingTime()}")
+            daemonLogger.info("明日方舟 > 资源文件下载成功 [$successCount/${actualSize}], 耗时 ${startTime.getLastingTime()}")
         }
     }
 }

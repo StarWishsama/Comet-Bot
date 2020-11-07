@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.utils.network
 import cn.hutool.http.*
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.utils.debugS
 import io.github.starwishsama.comet.utils.network.NetUtil.proxyIsUsable
 import org.openqa.selenium.*
@@ -136,7 +137,7 @@ object NetUtil {
             `in`.close()
             fos.close()
         } else {
-            throw RuntimeException("在下载时发生了错误, 响应码 ${connUrl.responseCode}")
+            throw ApiException("在下载时发生了错误, 响应码 ${connUrl.responseCode}")
         }
 
         return file

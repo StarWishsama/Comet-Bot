@@ -35,13 +35,14 @@ class ArkNightCommand : ChatCommand {
                             val list = pool.getArkDrawResult(user)
                             if (list.isNotEmpty()) {
                                 val result = DrawUtil.combineArkOpImage(list)
-                                event.quoteReply(BotUtil.sendMessage("由于缺失资源文件, 以下干员无法显示 :(\n" +
-                                        buildString {
-                                            result.lostOps.forEach {
-                                                append("${it.name},")
-                                            }
-                                            removeSuffix(",")
-                                        }))
+                                if (result.lostOps.isNotEmpty())
+                                    event.quoteReply(BotUtil.sendMessage("由于缺失资源文件, 以下干员无法显示 :(\n" +
+                                            buildString {
+                                                result.lostOps.forEach {
+                                                    append("${it.name},")
+                                                }
+                                                removeSuffix(",")
+                                            }))
                                 val gachaImage = withContext(Dispatchers.Default) { result.image.upload(event.subject) }
                                 gachaImage.asMessageChain()
                             } else {
@@ -57,13 +58,14 @@ class ArkNightCommand : ChatCommand {
                             val list: List<ArkNightOperator> = pool.getArkDrawResult(user, 10)
                             if (list.isNotEmpty()) {
                                 val result = DrawUtil.combineArkOpImage(list)
-                                event.quoteReply(BotUtil.sendMessage("由于缺失资源文件, 以下干员无法显示 :(\n" +
-                                        buildString {
-                                            result.lostOps.forEach {
-                                                append("${it.name},")
-                                            }
-                                            removeSuffix(",")
-                                        }))
+                                if (result.lostOps.isNotEmpty())
+                                    event.quoteReply(BotUtil.sendMessage("由于缺失资源文件, 以下干员无法显示 :(\n" +
+                                            buildString {
+                                                result.lostOps.forEach {
+                                                    append("${it.name},")
+                                                }
+                                                removeSuffix(",")
+                                            }))
                                 val gachaImage = withContext(Dispatchers.Default) { result.image.upload(event.subject) }
                                 gachaImage.asMessageChain()
                             } else {
