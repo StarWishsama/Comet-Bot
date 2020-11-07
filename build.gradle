@@ -55,6 +55,7 @@ task updateVersion {
     def newVersionStr = "    const val version = \"" + versionCode + "\""
     def updatedContent = new File(versionFileDir).getText('UTF-8').replaceAll(oldVersionStr, newVersionStr)
     new File(versionFileDir).write(updatedContent, 'UTF-8')
+    println "Successfully update version inside Comet~"
 }
 
 static def findOldVersionStr(path) {
