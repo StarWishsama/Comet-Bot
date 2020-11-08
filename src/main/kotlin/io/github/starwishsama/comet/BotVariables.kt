@@ -31,7 +31,8 @@ import java.util.regex.Pattern
 
 object BotVariables {
     lateinit var filePath: File
-    const val version = "0.6-M2"
+    const val version = "0.6-M2-53df5f3"
+    const val buildTime = "2020/11/8 12:30:54"
 
     /** 作为独立运行时使用的变量, 除 [Comet] 外禁止调用 */
     lateinit var bot: Bot
@@ -40,13 +41,13 @@ object BotVariables {
 
     lateinit var startTime: LocalDateTime
     var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
-        8,
-        BasicThreadFactory.Builder()
-            .namingPattern("comet-service-%d")
-            .daemon(true)
-            .uncaughtExceptionHandler { thread, t ->
-                daemonLogger.warning("线程 ${thread.name} 在执行任务时发生了错误", t)
-            }.build()
+            8,
+            BasicThreadFactory.Builder()
+                    .namingPattern("comet-service-%d")
+                    .daemon(true)
+                    .uncaughtExceptionHandler { thread, t ->
+                        daemonLogger.warning("线程 ${thread.name} 在执行任务时发生了错误", t)
+                    }.build()
     )
     val logger: PlatformLogger = PlatformLogger("CometBot", {
         log.writeString(log.getContext() + "$it\n")
