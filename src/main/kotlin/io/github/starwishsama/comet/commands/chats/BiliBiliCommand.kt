@@ -130,9 +130,9 @@ class BiliBiliCommand : ChatCommand {
     private suspend fun unsubscribe(args: List<String>, groupId: Long): MessageChain {
         if (args.size > 1) {
             val cfg = GroupConfigManager.getConfigSafely(groupId)
-            var roomId = 0L
+            var uid = 0L
             if (args[1].isNumeric()) {
-                roomId = args[1].toLong()
+                uid = args[1].toLong()
             } else {
                 if (args[1] == "all" || args[1] == "全部") {
                     cfg.twitterSubscribers.clear()
@@ -141,13 +141,13 @@ class BiliBiliCommand : ChatCommand {
 
                 val item = FakeClientApi.getUser(args[1])
                 if (item != null) {
-                    roomId = item.roomid
+                    uid = item.roomid
                 }
             }
 
 
-            return if (!cfg.biliSubscribers.contains(roomId)) {
-                BotUtil.sendMessage("你还没订阅用户 ${args[1]}")
+            return if (!cfg.biliSubscribers.contains(uid)) {
+                BotUtil.sendMessage("你还没订阅用户 ${args[1]}\n注意: 退订时必须使用 UID 退订\n你可以在 /bili list 中查看")
             } else {
                 cfg.biliSubscribers.remove(args[1].toLong())
                 BotUtil.sendMessage("取消订阅用户 ${args[1]} 成功")

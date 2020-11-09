@@ -51,18 +51,20 @@ repositories {
 
 task updateVersion {
     def versionFileDir = projectDir.getAbsolutePath() + File.separatorChar + 'src' + File.separatorChar + 'main' + File.separatorChar + 'kotlin' + File.separatorChar + 'io' + File.separatorChar + 'github' + File.separatorChar + 'starwishsama' + File.separatorChar + 'comet' + File.separatorChar + 'BotVariables.kt'
-    def oldVersionStr = findOldVersionStr(versionFileDir)
+    def oldVersionStr = findOldStr(versionFileDir, "version")
     def newVersionStr = "    const val version = \"" + versionCode + "\""
-    def updatedContent = new File(versionFileDir).getText('UTF-8').replaceAll(oldVersionStr, newVersionStr)
+    def oldBuildTimeStr = findOldStr(versionFileDir, "buildTime")
+    def newBuildTimeStr = "    const val buildTime = \"2020/11/8 12:30:54\""
+    def updatedContent = new File(versionFileDir).getText('UTF-8').replaceAll(oldVersionStr, newVersionStr).replaceAll(oldBuildTimeStr, newBuildTimeStr)
     new File(versionFileDir).write(updatedContent, 'UTF-8')
-    println "Successfully update version inside Comet~"
+    println "Successfully update info inside Comet~"
 }
 
-static def findOldVersionStr(path) {
+static def findOldStr(String path, String location) {
     def readerString = ""
     new File(path).withReader('UTF-8') { reader ->
         reader.eachLine {
-            if (it.contains("version")) {
+            if (it.contains(location)) {
                 readerString <<= it
                 return readerString
             }

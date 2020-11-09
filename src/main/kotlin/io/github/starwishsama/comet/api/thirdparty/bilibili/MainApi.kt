@@ -2,7 +2,10 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili
 
 import cn.hutool.http.HttpRequest
 import com.github.salomonbrys.kotson.fromJson
+import com.google.gson.JsonParseException
 import com.google.gson.JsonParser
+import com.google.gson.JsonSyntaxException
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
@@ -10,6 +13,9 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata.UnknownType
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.network.NetUtil
+import java.io.IOException
 
 /**
  * BiliBili 动态 API
@@ -42,12 +48,19 @@ object MainApi : ApiExecutor {
         if (isReachLimit()) {
             throw RateLimitException(apiRateLimit)
         }
-        val response = HttpRequest.get(dynamicUrl.replace("%uid%", mid.toString())).executeAsync()
-        if (response.isOk) {
-            val dynamicObject = JsonParser.parseString(response.body())
-            if (dynamicObject.isJsonObject) {
-                try {
-                    val card = gson.fromJson<Dynamic>(dynamicObject.asJsonObject["data"].asJsonObject["cards"].asJsonArray[0])
+
+        val request = NetUtil.doHttpRequestGet(dynamicUrl.replace("%uid%", mid.toString()))
+        val response = request.executeAsync()
+
+        try {
+            if (response.isOk) {
+                val dynamicObject = JsonParser.parseString(response.body())
+                if (dynamicObject.isJsonObject) {
+                    val cards = dynamicObject.asJsonObject["data"].asJsonObject["cards"]
+
+                    if (!cards.isJsonArray) return MessageWrapper("没有发过动态", false)
+
+                    val card = gson.fromJson<Dynamic>(cards.asJsonArray[0])
                     val singleDynamicObject = JsonParser.parseString(card.card)
                     if (singleDynamicObject.isJsonObject) {
                         val dynamicType = DynamicTypeSelector.getType(card.description.type)
@@ -57,12 +70,17 @@ object MainApi : ApiExecutor {
                             MessageWrapper("错误: 不支持的动态类型", false)
                         }
                     }
-                } catch (e: IllegalStateException) {
-                    return MessageWrapper("没有发过动态", false)
                 }
             }
+        } catch (e: Exception) {
+            if (e is JsonSyntaxException || e is JsonParseException || e !is IOException) {
+                FileUtil.createErrorReportFile("解析动态失败", "bilibili", e, response.body(), "请求 URL 为: ${request.url}")
+                return MessageWrapper("解析动态失败", false)
+            } else {
+                daemonLogger.warning("解析动态时出现异常", e)
+            }
         }
-        return MessageWrapper("获取时出现问题", false)
+        return MessageWrapper("无法获取动态", false)
     }
 
     /**

@@ -31,7 +31,7 @@ import java.util.regex.Pattern
 
 object BotVariables {
     lateinit var filePath: File
-    const val version = "0.6-M2-53df5f3"
+    const val version = "0.6-M2-b51ea62"
     const val buildTime = "2020/11/8 12:30:54"
 
     /** 作为独立运行时使用的变量, 除 [Comet] 外禁止调用 */
@@ -50,15 +50,15 @@ object BotVariables {
                     }.build()
     )
     val logger: PlatformLogger = PlatformLogger("CometBot", {
-        log.writeString(log.getContext() + "$it\n")
+        log.writeString(log.getContext() + "$it\n", true)
         println(it)
     })
     val daemonLogger: PlatformLogger = PlatformLogger("CometService", {
-        log.writeString(log.getContext() + "$it\n")
+        log.writeString(log.getContext() + "$it\n", true)
         println(it)
     })
     val consoleCommandLogger: PlatformLogger = PlatformLogger("CometConsole", {
-        log.writeString(log.getContext() + "$it\n")
+        log.writeString(log.getContext() + "$it\n", true)
         println(it)
     })
     val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()

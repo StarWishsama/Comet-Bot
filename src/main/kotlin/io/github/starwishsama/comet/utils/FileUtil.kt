@@ -1,13 +1,15 @@
 package io.github.starwishsama.comet.utils
 
-import cn.hutool.core.io.file.FileReader
+import cn.hutool.core.io.IORuntimeException
 import cn.hutool.core.io.file.FileWriter
 import cn.hutool.core.net.URLDecoder
+import cn.hutool.core.util.StrUtil
 import cn.hutool.crypto.SecureUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
 import java.io.File
+import java.io.FileInputStream
 import java.io.IOException
 import java.net.URL
 import java.nio.file.*
@@ -15,6 +17,7 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+@Synchronized
 fun File.writeClassToJson(context: Any) {
     if (!this.exists()) {
         this.createNewFile()
@@ -23,16 +26,39 @@ fun File.writeClassToJson(context: Any) {
     FileWriter.create(this).write(BotVariables.gson.toJson(context))
 }
 
-fun File.writeString(context: String) {
+@Synchronized
+fun File.writeString(context: String, append: Boolean = false) {
     if (!this.exists()) {
         this.createNewFile()
     }
 
-    FileWriter.create(this).write(context)
+    FileWriter.create(this).write(context, append)
 }
 
+@Synchronized
 fun File.getContext(): String {
-    return FileReader.create(this).readString()
+    val len: Long = length()
+
+    if (len >= Int.MAX_VALUE) {
+        throw IORuntimeException("File is larger then max array size")
+    }
+
+    val bytes = ByteArray(len.toInt())
+    var fis: FileInputStream? = null
+    val readLength: Int
+    try {
+        fis = FileInputStream(this)
+        readLength = fis.read(bytes)
+        if (readLength < len) {
+            throw IOException(StrUtil.format("The length of [{}] is [{}] but read [{}]!", this.name, len, readLength))
+        }
+    } catch (e: Exception) {
+        throw RuntimeException(e)
+    } finally {
+        fis?.close()
+    }
+
+    return bytes.toString(Charsets.UTF_8)
 }
 
 fun File.getMD5(): String {
@@ -59,12 +85,13 @@ fun File.getChildFolder(folderName: String): File {
     return childFolder
 }
 
+/**
+ * 检测 [File] 为文件夹时是否为空
+ *
+ * 注意：如果 [File] 不是文件夹, 会返回 false
+ */
 fun File.isEmpty(): Boolean {
-    if (!isDirectory) return false
-
-    val files = listFiles() ?: return false
-
-    return files.isEmpty()
+    return this.filesCount() != -1 || this.filesCount() > 0
 }
 
 fun File.filesCount(): Int {
@@ -97,7 +124,7 @@ object FileUtil {
 
         location.createNewFile()
 
-        val report = "Error occurred:\n${getBeautyStackTrace(t)}\nExtra message: $message\n\nRaw content:\n$content"
+        val report = "发生了一个错误:\n${getBeautyStackTrace(t)}\n可能有用的信息: $message\n\n原始获取内容:\n$content"
         location.writeString(report)
         daemonLogger.info("$reason, 错误报告已生成! 保存在 ${location.path}")
         daemonLogger.info("你可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")

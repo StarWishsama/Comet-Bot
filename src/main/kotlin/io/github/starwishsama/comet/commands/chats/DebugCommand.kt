@@ -13,6 +13,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
+import io.github.starwishsama.comet.pushers.BiliDynamicChecker
 import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.pushers.TweetUpdateChecker
 import io.github.starwishsama.comet.pushers.YoutubeStreamingChecker
@@ -94,13 +95,24 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                         BotUtil.sendMessage("今日もかわいい!")
                     }
                 }
-                "tpush" -> {
-                    TweetUpdateChecker.retrieve()
-                    return BotUtil.sendMessage("Tweet retriever has been triggered and run~")
-                }
-                "ytbpush" -> {
-                    YoutubeStreamingChecker.retrieve()
-                    return BotUtil.sendMessage("Youtube retriever has been triggered and run~")
+                "push" -> {
+                    if (args.size > 1) {
+                        return when (args[1].toLowerCase()) {
+                            "twit", "twitter", "推特", "蓝鸟", "twi" -> {
+                                TweetUpdateChecker.retrieve()
+                                BotUtil.sendMessage("Tweet retriever has been triggered and run~")
+                            }
+                            "ytb", "y2b", "youtube", "油管" -> {
+                                YoutubeStreamingChecker.retrieve()
+                                BotUtil.sendMessage("Youtube retriever has been triggered and run~")
+                            }
+                            "bilibili", "bili", "哔哩哔哩", "b站" -> {
+                                BiliDynamicChecker.retrieve()
+                                BotUtil.sendMessage("Youtube retriever has been triggered and run~")
+                            }
+                            else -> BotUtil.sendMessage("Unknown retriever type.")
+                        }
+                    }
                 }
                 "youtube" -> {
                     if (args.size > 1) {
