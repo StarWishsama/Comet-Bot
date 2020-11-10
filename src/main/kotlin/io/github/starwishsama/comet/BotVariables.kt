@@ -49,15 +49,15 @@ object BotVariables {
                     }.build()
     )
     val logger: PlatformLogger = PlatformLogger("CometBot", {
-        log.writeString(log.getContext() + "$it\n", true)
+        log.writeString(log.getContext() + "$it\n")
         println(it)
     })
     val daemonLogger: PlatformLogger = PlatformLogger("CometService", {
-        log.writeString(log.getContext() + "$it\n", true)
+        log.writeString(log.getContext() + "$it\n")
         println(it)
     })
     val consoleCommandLogger: PlatformLogger = PlatformLogger("CometConsole", {
-        log.writeString(log.getContext() + "$it\n", true)
+        log.writeString(log.getContext() + "$it\n")
         println(it)
     })
     val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()

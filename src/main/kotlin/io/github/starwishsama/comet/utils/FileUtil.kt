@@ -25,12 +25,12 @@ fun File.writeClassToJson(context: Any) {
 }
 
 @Synchronized
-fun File.writeString(context: String, append: Boolean = false) {
+fun File.writeString(context: String) {
     if (!this.exists()) {
         this.createNewFile()
     }
 
-    FileWriter.create(this).write(context, append)
+    FileWriter.create(this).write(context)
 }
 
 @Synchronized
