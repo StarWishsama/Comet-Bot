@@ -31,7 +31,12 @@ class DebugCommand : ConsoleCommand {
                     }.trim().toString()
                 }
                 "info" ->
-                    return ("彗星 Bot ${BotVariables.version}\n已注册的命令个数: ${CommandExecutor.countCommands()}\n${BotUtil.getMemoryUsage()}")
+                    return ("彗星 Bot ${BotVariables.version}\n" +
+                            "今日もかわいい~\n" +
+                            "已注册命令数: ${CommandExecutor.countCommands()}\n" +
+                            BotUtil.getMemoryUsage() + "\n" +
+                            "构建时间: ${BotVariables.buildTime}"
+                            )
                 "switch" -> {
                     BotVariables.switch = !BotVariables.switch
 

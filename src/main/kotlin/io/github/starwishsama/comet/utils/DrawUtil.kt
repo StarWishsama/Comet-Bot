@@ -109,7 +109,7 @@ object DrawUtil {
                 try {
                     val file = File(arkLoc, fileName)
                     if (!file.exists()) {
-                        val result = TaskUtil.executeWithRetry(3) {
+                        val result = TaskUtil.executeRetry(3) {
                             NetUtil.downloadFile(arkLoc, "$resourceUrl/$pathName", fileName)
                             successCount++
                         }

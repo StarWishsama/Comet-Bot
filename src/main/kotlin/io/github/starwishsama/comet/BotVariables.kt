@@ -21,7 +21,6 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
-import java.util.regex.Pattern
 
 /**
  * 机器人(几乎)所有数据的存放类
@@ -31,7 +30,7 @@ import java.util.regex.Pattern
 
 object BotVariables {
     lateinit var filePath: File
-    const val version = "0.6-M2-b51ea62"
+    const val version = "0.6-M2-feca69e"
     const val buildTime = "2020/11/8 12:30:54"
 
     /** 作为独立运行时使用的变量, 除 [Comet] 外禁止调用 */
@@ -84,8 +83,6 @@ object BotVariables {
     var switch: Boolean = true
 
     val coolDown: MutableMap<Long, Long> = HashMap()
-
-    val tcoPattern: Pattern = Pattern.compile("https://t.co/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]")
 
     val hmsPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 }

@@ -1,15 +1,13 @@
 package io.github.starwishsama.comet.utils
 
-import cn.hutool.core.io.IORuntimeException
+import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
 import cn.hutool.core.net.URLDecoder
-import cn.hutool.core.util.StrUtil
 import cn.hutool.crypto.SecureUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
 import java.io.File
-import java.io.FileInputStream
 import java.io.IOException
 import java.net.URL
 import java.nio.file.*
@@ -36,30 +34,7 @@ fun File.writeString(context: String, append: Boolean = false) {
 }
 
 @Synchronized
-fun File.getContext(): String {
-    val len: Long = length()
-
-    if (len >= Int.MAX_VALUE) {
-        throw IORuntimeException("File is larger then max array size")
-    }
-
-    val bytes = ByteArray(len.toInt())
-    var fis: FileInputStream? = null
-    val readLength: Int
-    try {
-        fis = FileInputStream(this)
-        readLength = fis.read(bytes)
-        if (readLength < len) {
-            throw IOException(StrUtil.format("The length of [{}] is [{}] but read [{}]!", this.name, len, readLength))
-        }
-    } catch (e: Exception) {
-        throw RuntimeException(e)
-    } finally {
-        fis?.close()
-    }
-
-    return bytes.toString(Charsets.UTF_8)
-}
+fun File.getContext(): String = FileReader.create(this, Charsets.UTF_8).readString()
 
 fun File.getMD5(): String {
     require(exists()) { "文件不存在" }
@@ -77,8 +52,11 @@ fun <T> File.parseAsClass(clazz: Class<T>): T {
     return BotVariables.gson.fromJson(getContext(), clazz)
 }
 
-fun File.getChildFolder(folderName: String): File {
+fun File.getChildFolder(folderName: String, createIfNotExists: Boolean = true): File {
     val childFolder = File(this, folderName)
+
+    if (!createIfNotExists) return childFolder
+
     if (!childFolder.exists()) {
         childFolder.mkdirs()
     }
@@ -90,9 +68,7 @@ fun File.getChildFolder(folderName: String): File {
  *
  * 注意：如果 [File] 不是文件夹, 会返回 false
  */
-fun File.isEmpty(): Boolean {
-    return this.filesCount() != -1 || this.filesCount() > 0
-}
+fun File.isEmpty(): Boolean = this.filesCount() != -1 || this.filesCount() > 0
 
 fun File.filesCount(): Int {
     if (!isDirectory) return -1
@@ -113,11 +89,7 @@ object FileUtil {
 
     private fun getErrorReportFolder(): File = getChildFolder("error-reports")
 
-    fun createErrorReportFile(type: String, t: Throwable, content: String, url: String) {
-        createErrorReportFile("发生了一个错误", type, t, content, "request url: $url")
-    }
-
-    fun createErrorReportFile(reason: String, type: String, t: Throwable, content: String, message: String) {
+    fun createErrorReportFile(reason: String = "发生了一个错误", type: String, t: Throwable, content: String, message: String) {
         val fileName = "$type-${dateFormatter.format(LocalDateTime.now())}.txt"
         val location = File(getErrorReportFolder(), fileName)
         if (location.exists()) return

@@ -1,7 +1,5 @@
 package io.github.starwishsama.comet.utils
 
-import io.github.starwishsama.comet.utils.IDGuidelineType.MINECRAFT
-import io.github.starwishsama.comet.utils.IDGuidelineType.UBISOFT
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.asMessageChain
@@ -13,8 +11,8 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
-enum class IDGuidelineType {
-    MINECRAFT, UBISOFT
+enum class IDGuidelineType(val rule: Regex) {
+    MINECRAFT(Regex("[a-zA-Z0-9_-]*")), UBISOFT(Regex("[a-zA-Z0-9_.-]*"))
 }
 
 object StringUtil {
@@ -25,12 +23,7 @@ object StringUtil {
      * @param username 用户名
      * @return 是否符合规范
      */
-    fun isLegitId(username: String, type: IDGuidelineType): Boolean {
-        return when (type) {
-            UBISOFT -> username.matches(Regex("[a-zA-Z0-9_.-]*"))
-            MINECRAFT -> username.matches(Regex("[a-zA-Z0-9_-]*"))
-        }
-    }
+    fun isLegitId(username: String, type: IDGuidelineType): Boolean = type.rule.matches(username)
 
     /**
      * 来自 Mirai 的 asHumanReadable

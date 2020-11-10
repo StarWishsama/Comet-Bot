@@ -17,7 +17,7 @@ object TaskUtil {
         return BotVariables.service.scheduleAtFixedRate(task, firstTimeDelay, period, unit)
     }
 
-    fun executeWithRetry(retryTime: Int, task: () -> Unit): Throwable? {
+    fun executeRetry(retryTime: Int, task: () -> Unit): Throwable? {
         if (retryTime >= 5) return ReachRetryLimitException()
 
         repeat(retryTime) {

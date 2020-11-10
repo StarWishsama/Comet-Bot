@@ -115,7 +115,7 @@ object TwitterApi : ApiExecutor {
             return gson.fromJson(result.body())
         } catch (e: IOException) {
             if (!NetUtil.isTimeout(e)) {
-                FileUtil.createErrorReportFile("twitter", e, bodyCopy, url)
+                FileUtil.createErrorReportFile(type = "twitter", t = e, content = bodyCopy, message = "Request URL: $url")
             } else {
                 daemonLogger.verboseS("[蓝鸟] 在获取用户信息时连接超时")
             }

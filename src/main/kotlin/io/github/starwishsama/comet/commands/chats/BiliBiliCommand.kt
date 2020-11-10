@@ -186,24 +186,23 @@ class BiliBiliCommand : ChatCommand {
         }
     }
 
-    private suspend fun subscribe(uid: String, groupId: Long): MessageChain {
+    private suspend fun subscribe(target: String, groupId: Long): MessageChain {
         val cfg = GroupConfigManager.getConfigSafely(groupId)
-        val rid: Long
         var name = ""
-        rid = if (uid.isNumeric()) {
-            uid.toLong()
+        val uid: Long = if (target.isNumeric()) {
+            target.toLong()
         } else {
-            val item = FakeClientApi.getUser(uid)
+            val item = FakeClientApi.getUser(target)
             val title = item?.title
             if (title != null) name = title
             item?.mid ?: return EmptyMessageChain
         }
 
-        if (!cfg.biliSubscribers.contains(rid)) {
-            cfg.biliSubscribers.add(rid)
+        if (!cfg.biliSubscribers.contains(uid)) {
+            cfg.biliSubscribers.add(uid)
         }
 
-        return BotUtil.sendMessage("订阅 ${if (name.isNotBlank()) name else MainApi.getUserNameByMid(rid)}($rid) 成功")
+        return BotUtil.sendMessage("订阅 ${if (name.isNotBlank()) name else MainApi.getUserNameByMid(uid)}($uid) 成功")
     }
 
 }

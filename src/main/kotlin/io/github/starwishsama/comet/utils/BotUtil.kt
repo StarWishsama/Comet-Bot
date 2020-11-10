@@ -112,7 +112,7 @@ object BotUtil {
         }
 
         if (coolDown.containsKey(qq) && !isBotOwner(qq)) {
-            if (currentTime - coolDown[qq]!! < seconds * 1000) {
+            if (currentTime - (coolDown[qq] ?: return false) < seconds * 1000) {
                 return false
             } else {
                 coolDown.remove(qq)

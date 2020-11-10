@@ -44,7 +44,7 @@ object TweetUpdateChecker : CometPusher {
         var count = 0
 
         pushPool.forEach { (userName, pushedTweet) ->
-            TaskUtil.executeWithRetry(2) {
+            TaskUtil.executeRetry(2) {
                 try {
                     val cache = TwitterApi.getCacheTweet(userName)
 

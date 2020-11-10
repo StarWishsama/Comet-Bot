@@ -145,7 +145,11 @@ object CommandExecutor {
                 /** 检查是否在尝试执行被禁用命令 */
                 if (cmd != null && event is GroupMessageEvent &&
                         GroupConfigManager.getConfigSafely(event.group.id).isDisabledCommand(cmd)) {
-                    return ExecutedResult(EmptyMessageChain, cmd, "命令已禁用")
+                    return if (BotUtil.hasNoCoolDown(user.id)) {
+                        ExecutedResult(BotUtil.sendMessage("该命令已被管理员禁用"), cmd, "命令已禁用")
+                    } else {
+                        ExecutedResult(EmptyMessageChain, cmd, "命令已禁用")
+                    }
                 }
 
                 if (isCommandPrefix(message) && cmd != null) {
@@ -173,9 +177,9 @@ object CommandExecutor {
                 } else {
                     BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message.split(" ")}, 发送者: $senderId", t)
                     if (user.isBotOwner()) {
-                        ExecutedResult("Bot > 在试图执行命令时发生了一个错误\n简易报错信息 (如果有的话):\n${t.javaClass.simpleName}:${t.message}".convertToChain(), cmd, "失败")
+                        ExecutedResult(BotUtil.sendMessage("在试图执行命令时发生了一个错误\n简易报错信息 (如果有的话):\n${t.javaClass.name}: ${t.message}"), cmd, "失败")
                     } else {
-                        ExecutedResult("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".convertToChain(), cmd, "失败")
+                        ExecutedResult(BotUtil.sendMessage("在试图执行命令时发生了一个错误, 请联系管理员"), cmd, "失败")
                     }
                 }
             }
