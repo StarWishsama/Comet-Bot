@@ -54,7 +54,7 @@ task updateVersion {
     def oldVersionStr = findOldStr(versionFileDir, "version")
     def newVersionStr = "    const val version = \"" + versionCode + "\""
     def oldBuildTimeStr = findOldStr(versionFileDir, "buildTime")
-    def newBuildTimeStr = "    const val buildTime = \"2020/11/8 12:30:54\""
+    def newBuildTimeStr = "    const val buildTime = \"2020/11/11 12:35:05\""
     def updatedContent = new File(versionFileDir).getText('UTF-8').replaceAll(oldVersionStr, newVersionStr).replaceAll(oldBuildTimeStr, newBuildTimeStr)
     new File(versionFileDir).write(updatedContent, 'UTF-8')
     println "Successfully update info inside Comet~"
@@ -111,7 +111,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.13.1'
 
     // Retrofit A type-safe HTTP client for Android and Java @ https://github.com/square/retrofit/
-    //implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
 
     // RomeTool for RSS @ https://github.com/rometools/rome
     implementation 'com.rometools:rome:1.15.0'

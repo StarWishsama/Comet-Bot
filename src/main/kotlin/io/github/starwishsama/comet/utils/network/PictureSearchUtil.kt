@@ -2,7 +2,6 @@ package io.github.starwishsama.comet.utils.network
 
 import cn.hutool.core.util.URLUtil
 import cn.hutool.http.ContentType
-import cn.hutool.http.Header
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.pojo.PicSearchResult
@@ -21,14 +20,14 @@ object PictureSearchUtil {
     fun sauceNaoSearch(url: String): PicSearchResult {
         val encodedUrl = URLUtil.encode(url)
         val key = BotVariables.cfg.sauceNaoApiKey
-        val request = NetUtil.doHttpRequestGet(
-                "$sauceNaoApi$encodedUrl${if (key != null && key.isNotEmpty()) "&api_key=$key" else ""}",
-                5000
-        )
-        val result = request.executeAsync()
 
-        if (result.isOk && result.header(Header.CONTENT_TYPE).contains(ContentType.JSON.value)) {
-            val body = result.body()
+        val response = NetUtil.executeHttpRequest(
+                url = "$sauceNaoApi$encodedUrl${if (key != null && key.isNotEmpty()) "&api_key=$key" else ""}",
+                timeout = 5
+        )
+
+        if (response.isSuccessful && response.isType(ContentType.JSON.value)) {
+            val body = response.body()?.string() ?: return PicSearchResult.emptyResult()
             try {
                 val resultBody = JsonParser.parseString(body)
                 if (resultBody.isJsonObject) {
@@ -36,11 +35,11 @@ object PictureSearchUtil {
                     val similarity = resultJson["header"].asJsonObject["similarity"].asDouble
                     val pictureUrl = resultJson["header"].asJsonObject["thumbnail"].asString
                     val originalUrl = resultJson["data"].asJsonObject["ext_urls"].asJsonArray[0].asString
-                    return PicSearchResult(pictureUrl, originalUrl, similarity, request.url)
+                    return PicSearchResult(pictureUrl, originalUrl, similarity, response.request().url().toString())
                 }
             } catch (e: Exception) {
                 BotVariables.logger.error("[以图搜图] 在解析 API 传回的 json 时出现了问题", e)
-                FileUtil.createErrorReportFile(type = "picsearch", t = e, content = body, message = "Request URL: ${request.url}")
+                FileUtil.createErrorReportFile(type = "picsearch", t = e, content = body, message = "Request URL: ${response.request().url()}")
             }
         }
         return PicSearchResult.emptyResult()

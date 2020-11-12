@@ -8,7 +8,6 @@ import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
-import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
@@ -35,13 +34,13 @@ object MusicUtil {
                 )
             }")
 
-            if (!searchMusicResult.isNumeric()) {
+            if (searchMusicResult?.isNotEmpty() == true) {
                 val searchResult = JsonParser.parseString(searchMusicResult)
                 if (searchResult.isJsonObject) {
                     val musicId = searchResult.asJsonObject["result"].asJsonArray["songs"][0]["id"].asInt
                     val musicUrl = "https://music.163.com/#/song?id=$musicId"
                     val songResult = NetUtil.getPageContent("http://$api4NetEase/song/detail?ids=$musicId")
-                    if (!songResult.isNumeric()) {
+                    if (songResult?.isNotEmpty() == true) {
                         val songJson = JsonParser.parseString(songResult)
                         if (songJson.isJsonObject) {
                             val albumUrl = songJson.asJsonObject["songs"].asJsonArray[0].asJsonObject["al"]["picUrl"].asString
@@ -101,9 +100,10 @@ object MusicUtil {
 
     fun searchQQMusic(name: String): MessageChain {
         try {
-            val songResult = NetUtil.getPageContent("https://c.y.qq.com/soso/fcgi-bin/client_search_cp?g_tk=5381&p=1&n=20&w=${URLEncoder.encode(name, "UTF-8")}&format=json&loginUin=0&hostUin=0&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0&remoteplace=txt.yqq.song&t=0&aggr=1&cr=1&catZhida=0&flag_qc=0")
+            val songResult =
+                    NetUtil.getPageContent("https://c.y.qq.com/soso/fcgi-bin/client_search_cp?g_tk=5381&p=1&n=20&w=${URLEncoder.encode(name, "UTF-8")}&format=json&loginUin=0&hostUin=0&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0&remoteplace=txt.yqq.song&t=0&aggr=1&cr=1&catZhida=0&flag_qc=0")
 
-            if (songResult.isNotBlank()) {
+            if (songResult?.isNotBlank() == true) {
                 val searchResult = gson.fromJson<QQMusicSearchResult>(songResult)
 
                 val song = searchResult.data.songs.songList[0]
@@ -115,7 +115,7 @@ object MusicUtil {
                     removeSuffix("/")
                 }
                 val playResult = NetUtil.getPageContent("$api4qq${song.songMid}")
-                if (playResult.isNotBlank()) {
+                if (playResult?.isNotBlank() == true) {
                     val playUrl = JsonParser.parseString(playResult).asJsonObject["data"].asJsonObject[song.songMid].asString
 
                     val json = "{\n	\"app\": \"com.tencent.structmsg\",\n	\"desc\": \"com.tencent.structmsg\",\n	\"view\": \"music\",\n	\"ver\": \"0.0.0.1\",\n	\"prompt\": \"[应用]${song.songName}\",\n	\"appID\": \"\",\n	\"sourceName\": \"\",\n	\"sourceUrl\": \"\",\n	\"meta\": {\n		\"music\": {\n			\"title\": \"${song.songName}\",\n			\"musicUrl\": \"$playUrl\",\n			\"desc\": \"$artistName\",\n			\"preview\": \"http:\\/\\/imgcache.qq.com\\/music\\/photo\\/album_300\\/17\\/300_albumpic_\"${song.albumId}\"_0.jpg\",\n			\"tag\": \"QQ音乐\",\n			\"jumpUrl\": \"web.p.qq.com\\/qqmpmobile\\/aio\\/app.html?id=${song.songId}\",\n			\"appid\": 100497308,\n			\"app_type\": 1\n		}\n	},\n	\"config\": {\n		\"forward\": 1,\n		\"autosize\": 1,\n		\"type\": \"normal\"\n	},\n	\"text\": \"\",\n	\"sourceAd\": \"\",\n	\"extra\": \"\"\n}"

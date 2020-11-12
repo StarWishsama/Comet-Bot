@@ -1,11 +1,14 @@
 package io.github.starwishsama.comet.utils.network
 
-import cn.hutool.http.*
+import cn.hutool.http.HttpException
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.utils.debugS
 import io.github.starwishsama.comet.utils.network.NetUtil.proxyIsUsable
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import org.openqa.selenium.*
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.edge.EdgeDriver
@@ -23,11 +26,9 @@ import java.net.Socket
 import java.net.URL
 import java.time.Duration
 import java.time.LocalDateTime
-import kotlin.time.ExperimentalTime
+import java.util.concurrent.TimeUnit
 
-fun HttpResponse.getContentLength(): Int {
-    return header(Header.CONTENT_LENGTH).toIntOrNull() ?: -1
-}
+fun Response.isType(typeName: String): Boolean = headers()["content-type"]?.contains(typeName) == true
 
 fun Socket.isUsable(timeout: Int = 1_000, isReloaded: Boolean = false): Boolean {
     if (proxyIsUsable == 0 || isReloaded) {
@@ -45,11 +46,6 @@ fun Socket.isUsable(timeout: Int = 1_000, isReloaded: Boolean = false): Boolean 
     return inetAddress.isReachable(timeout)
 }
 
-fun HttpResponse.isType(typeName: String): Boolean {
-    val contentType = this.header("content-type") ?: return true
-    return contentType.contains(typeName)
-}
-
 object NetUtil {
     var proxyIsUsable = 0
     lateinit var driver: WebDriver
@@ -57,53 +53,59 @@ object NetUtil {
     const val defaultUA =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36"
 
-    fun getUrlInputStream(url: String, timeout: Int = 2_000): InputStream? {
-        val response = doHttpRequestGet(url, timeout).executeAsync()
-        val length = response.getContentLength()
-        val bytes = response.bodyBytes()
-        if (bytes.size < length) return null
-
-        return ByteArrayInputStream(bytes)
-    }
-
-    @Throws(HttpException::class)
-    fun doHttpRequestGet(url: String, timeout: Int = 2_000): HttpRequest {
-        return doHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort, Method.GET)
-    }
-
-    @OptIn(ExperimentalTime::class)
-    @Throws(HttpException::class)
-    fun doHttpRequest(url: String, timeout: Int, proxyUrl: String, proxyPort: Int, method: Method): HttpRequest {
+    /**
+     * 执行 Http 请求 (Get)
+     *
+     * @param url 请求的地址
+     * @param timeout 超时时间, 单位为秒
+     * @param proxyUrl 代理地址 (如果需要使用的话)
+     * @param proxyPort 代理端口 (如果需要使用的话)
+     * @param call 执行请求前的额外操作, 如添加 header 等. 详见 [Request.Builder]
+     */
+    fun executeHttpRequest(url: String,
+                           timeout: Long = 2,
+                           proxyUrl: String = cfg.proxyUrl,
+                           proxyPort: Int = cfg.proxyPort,
+                           call: Request.Builder.() -> Request.Builder = {
+                               header("user-agent", defaultUA)
+                           }
+    ): Response {
         val startTime = System.nanoTime()
 
         try {
-            val request = HttpRequest(url)
-                    .method(method)
-                    .setFollowRedirects(true)
-                    .timeout(timeout)
-                    .header("user-agent", defaultUA)
-
+            val builder = OkHttpClient().newBuilder()
+                    .connectTimeout(timeout, TimeUnit.SECONDS)
+                    .followRedirects(true)
+                    .readTimeout(timeout, TimeUnit.SECONDS)
 
             if (proxyIsUsable > 0 && proxyUrl.isNotBlank() && proxyPort > 0) {
                 try {
                     val socket = Socket(proxyUrl, proxyPort)
                     if (socket.isUsable()) {
-                        request.setProxy(Proxy(cfg.proxyType, Socket(proxyUrl, proxyPort).remoteSocketAddress))
+                        builder.proxy(Proxy(cfg.proxyType, Socket(proxyUrl, proxyPort).remoteSocketAddress))
                     }
                 } catch (e: Exception) {
                     daemonLogger.verbose("无法连接到代理服务器, ${e.message}")
                 }
             }
-
-            return request
+            val client = builder.build()
+            val request = Request.Builder().url(url).call().build()
+            return client.newCall(request).execute()
         } finally {
             daemonLogger.debugS("执行网络操作用时 ${(System.nanoTime() - startTime).toDouble() / 1_000_000}ms")
         }
     }
 
-    fun getPageContent(url: String): String {
-        val response = doHttpRequestGet(url, 1000).executeAsync()
-        return if (response.isOk) response.body() else ""
+    fun getHttpRequestStream(url: String, timeout: Long = 2): InputStream? {
+        val res = executeHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort)
+        if (!res.isSuccessful) return null
+        return res.body()?.byteStream()
+    }
+
+    fun getPageContent(url: String, timeout: Long = 2): String? {
+        val res = executeHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort)
+        if (res.body()?.contentType()?.type() != "text") throw ApiException("获取到的内容不是纯文字")
+        return res.body()?.string()
     }
 
     /**
@@ -115,29 +117,32 @@ object NetUtil {
      */
     fun downloadFile(fileFolder: File, address: String, fileName: String): File? {
         val file = File(fileFolder, fileName)
+        val url = URL(address)
+        val conn = url.openConnection() as HttpURLConnection
 
-        val conn = URL(address)
+        try {
+            conn.doOutput = true
+            conn.instanceFollowRedirects = true
+            conn.connect()
 
-        val connUrl = conn.openConnection() as HttpURLConnection
-        connUrl.doOutput = true
-        connUrl.instanceFollowRedirects = true
-        connUrl.connect()
-
-        if (connUrl.responseCode in 200..300) {
-            val `in` = BufferedInputStream(connUrl.inputStream)
-            if (!file.exists()) file.createNewFile()
-            val fos = FileOutputStream(file)
-            val bos = BufferedOutputStream(fos, 2048)
-            val data = ByteArray(2048)
-            var x: Int
-            while (`in`.read(data, 0, 2048).also { x = it } >= 0) {
-                bos.write(data, 0, x)
+            if (conn.responseCode in 200..300) {
+                val `in` = BufferedInputStream(conn.inputStream)
+                if (!file.exists()) file.createNewFile()
+                val fos = FileOutputStream(file)
+                val bos = BufferedOutputStream(fos, 2048)
+                val data = ByteArray(2048)
+                var x: Int
+                while (`in`.read(data, 0, 2048).also { x = it } >= 0) {
+                    bos.write(data, 0, x)
+                }
+                bos.close()
+                `in`.close()
+                fos.close()
+            } else {
+                throw ApiException("在下载时发生了错误, 响应码 ${conn.responseCode}")
             }
-            bos.close()
-            `in`.close()
-            fos.close()
-        } else {
-            throw ApiException("在下载时发生了错误, 响应码 ${connUrl.responseCode}")
+        } finally {
+            conn.disconnect()
         }
 
         return file
@@ -150,11 +155,11 @@ object NetUtil {
     }
 
     @Throws(HttpException::class)
-    fun checkPingValue(address: String = "https://www.gstatic.com/generate_204", timeout: Int = 2000): Long {
+    fun checkPingValue(address: String = "https://www.gstatic.com/generate_204", timeout: Long = 2000): Long {
         val startTime = LocalDateTime.now()
 
-        val conn = doHttpRequestGet(address, timeout).executeAsync()
-        return if (conn.isOk) {
+        val conn = executeHttpRequest(address, timeout)
+        return if (conn.isSuccessful) {
             Duration.between(startTime, LocalDateTime.now()).toMillis()
         } else {
             -1L

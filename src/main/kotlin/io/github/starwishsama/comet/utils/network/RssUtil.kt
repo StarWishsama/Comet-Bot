@@ -39,13 +39,17 @@ object RssUtil {
 
     private fun getRSSItems(address: String): List<SyndEntry> {
         return try {
-            val stream = NetUtil.doHttpRequestGet(address).executeAsync().bodyStream()
-            val reader = XmlReader(stream)
-            val input = SyndFeedInput()
-            // 得到SyndFeed对象，即得到RSS源里的所有信息
-            val feed: SyndFeed = input.build(reader)
-            // 得到RSS源中子项列表
-            feed.entries
+            val stream = NetUtil.getHttpRequestStream(address)
+            if (stream != null) {
+                val reader = XmlReader(stream)
+                val input = SyndFeedInput()
+                // 得到SyndFeed对象，即得到RSS源里的所有信息
+                val feed: SyndFeed = input.build(reader)
+                // 得到RSS源中子项列表
+                feed.entries
+            } else {
+                emptyList()
+            }
         } catch (t: RuntimeException) {
             if (!NetUtil.isTimeout(t)) {
                 daemonLogger.warning("RSS | 在获取 RSS 信息时出现意外", t)

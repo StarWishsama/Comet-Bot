@@ -34,7 +34,7 @@ object LoginApi {
         val path = "/api/oauth2/getKey"
         // 取得 hash 和 RSA 公钥
         val passportAPI = NetUtil.getPageContent("$loginApi$path")
-        val keyResponse = gson.fromJson<GetKeyResponse>(passportAPI)
+        val keyResponse = passportAPI?.let { gson.fromJson<GetKeyResponse>(it) } ?: return
 
         val (hash, key) = keyResponse.data.let { data ->
             data.hash to data.key.split('\n').filterNot { it.startsWith('-') }.joinToString(separator = "")
@@ -55,7 +55,7 @@ object LoginApi {
         }
 
         val doLogin = NetUtil.getPageContent("$loginApi/api/v3/oauth2/login?username=$username&password=$cipheredPassword&challenge=$challenge&seccode=$secCode&validate=$validate")
-        val response = gson.fromJson<LoginResponse>(doLogin)
+        val response = gson.fromJson<LoginResponse>(doLogin ?: return)
 
         if (response.code != -105) {
             loginResponse = response

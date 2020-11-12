@@ -7,7 +7,8 @@ import java.net.Socket
  * 查询 Minecraft 服务器信息
  *
  * @author LovesAsuna
- * Source from: https://github.com/LovesAsuna/Mirai-Bot/blob/master/src/main/java/me/lovesasuna/bot/util/protocol/QueryUtil.kt
+ * Source from:
+ * https://github.com/LovesAsuna/Mirai-Bot/blob/master/src/main/kotlin/me/lovesasuna/bot/util/protocol/QueryUtil.kt
  */
 object MinecraftUtil {
     fun query(host: String, port: Int): String {

@@ -37,11 +37,13 @@ object YoutubeApi : ApiExecutor {
 
         if (!searchApi.contains("key")) throw ApiKeyIsEmptyException("Youtube")
 
-        val request = NetUtil.doHttpRequestGet("${searchApi}id&channelId=${channelId}$maxResult${count}", 5000)
+        val response = NetUtil.executeHttpRequest(
+                url = "${searchApi}id&channelId=${channelId}$maxResult${count}",
+                timeout = 5
+        )
 
-        val response = request.executeAsync()
-        if (response.isOk) {
-            val body = response.body()
+        if (response.isSuccessful) {
+            val body = response.body()?.string() ?: return null
             /** @TODO 类型自动选择, 类似于 BiliBili 的动态解析 */
             try {
                 return BotVariables.gson.fromJson(body, SearchVideoResult::class.java)

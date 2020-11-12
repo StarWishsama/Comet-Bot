@@ -180,7 +180,7 @@ data class Tweet(
             append(convertToString())
             val url = getPictureUrl(true) ?: return this.asMessageChain()
 
-            val image = runBlocking { NetUtil.getUrlInputStream(url)?.uploadAsImage(target) }
+            val image = runBlocking { NetUtil.getHttpRequestStream(url)?.uploadAsImage(target) }
 
             if (image != null) {
                 append(image)

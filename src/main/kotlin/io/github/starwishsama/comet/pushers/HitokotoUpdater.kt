@@ -8,9 +8,11 @@ import io.github.starwishsama.comet.utils.verboseS
 object HitokotoUpdater : Runnable {
     override fun run() {
         try {
-            val hitokotoJson: String = NetUtil.getPageContent("https://v1.hitokoto.cn/")
-            BotVariables.hitokoto = BotVariables.gson.fromJson(hitokotoJson, Hitokoto::class.java)
-            BotVariables.logger.verboseS("已获取到今日一言")
+            val hitokotoJson = NetUtil.getPageContent("https://v1.hitokoto.cn/")
+            if (hitokotoJson != null) {
+                BotVariables.hitokoto = BotVariables.gson.fromJson(hitokotoJson, Hitokoto::class.java)
+                BotVariables.logger.verboseS("已获取到今日一言")
+            }
         } catch (e: Throwable) {
             BotVariables.logger.warning("在获取一言时发生了问题", e)
         }
