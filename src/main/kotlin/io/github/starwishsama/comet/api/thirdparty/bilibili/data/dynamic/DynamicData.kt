@@ -34,85 +34,121 @@ object DynamicTypeSelector {
     }
 }
 
+// Suitable for get_dynamic_detail
 data class Dynamic(
-    @SerializedName("desc")
-    val description: DynamicDesc,
-    @SerializedName("card")
-    val card: String,
-    @SerializedName("extend_json")
-    val extendJson: String,
-    @SerializedName("extra")
-    val extraJson: JsonObject?,
-    @SerializedName("display")
-    val displayJson: DynamicDisplay
+        val code: Int,
+        @SerializedName("msg")
+        val msg: String,
+        @SerializedName("message")
+        val message: String,
+        @SerializedName("data")
+        val data: Data
+) {
+    data class Data(
+            /** space_history Only */
+            @SerializedName("has_more")
+            val hasMoreInfo: Int?,
+            @SerializedName("card")
+            val card: Card?,
+            /** space_history Only */
+            @SerializedName("cards")
+            val cards: List<Card>?,
+            @SerializedName("result")
+            val result: Int,
+            @SerializedName("attentions")
+            val attentions: Attentions,
+            /** space_history Only */
+            @SerializedName("next_offset")
+            val nextOffset: Int?,
+            @SerializedName("_gt_")
+            val gtNumber: Int
+    ) {
+        data class Attentions(
+                @SerializedName("uids")
+                val uidList: List<Long>
+        )
+    }
+}
+
+data class Card(
+        @SerializedName("desc")
+        val description: DynamicDesc,
+        @SerializedName("card")
+        val card: String,
+        @SerializedName("extend_json")
+        val extendJson: String,
+        @SerializedName("extra")
+        val extraJson: JsonObject?,
+        @SerializedName("display")
+        val displayJson: DynamicDisplay
 ) {
     data class DynamicDesc(
-        val uid: Int,
-        val type: Int,
-        val rid: Long,
-        val acl: Int,
-        @SerializedName("view")
-        val viewCount: Int,
-        @SerializedName("repost")
-        val repostCount: Int,
-        @SerializedName("like")
-        val likeCount: Int,
-        @SerializedName("is_liked")
-        val liveStatus: Int,
-        @SerializedName("dynamic_id")
-        val dynamicId: Long,
-        @SerializedName("timestamp")
-        val timeStamp: Long,
+            val uid: Int,
+            val type: Int,
+            val rid: Long,
+            val acl: Int,
+            @SerializedName("view")
+            val viewCount: Int,
+            @SerializedName("repost")
+            val repostCount: Int,
+            @SerializedName("like")
+            val likeCount: Int,
+            @SerializedName("is_liked")
+            val liveStatus: Int,
+            @SerializedName("dynamic_id")
+            val dynamicId: Long,
+            @SerializedName("timestamp")
+            val timeStamp: Long,
 
-        /** 转发的动态ID, 无转发为0 */
-        @SerializedName("pre_dy_id")
-        val repostDynamicId: Long,
+            /** 转发的动态ID, 无转发为0 */
+            @SerializedName("pre_dy_id")
+            val repostDynamicId: Long,
 
-        /** 转发的起始动态ID, 无转发为0 */
-        @SerializedName("orig_dy_id")
-        val originalDynamicId: Long,
+            /** 转发的起始动态ID, 无转发为0 */
+            @SerializedName("orig_dy_id")
+            val originalDynamicId: Long,
 
-        @SerializedName("orig_type")
-        val originalType: Int,
+            @SerializedName("orig_type")
+            val originalType: Int,
 
-        @SerializedName("user_profile")
-        val userProfile: UserProfile,
+            @SerializedName("user_profile")
+            val userProfile: UserProfile,
 
-        @SerializedName("uid_type")
-        val uidType: Int,
+            @SerializedName("uid_type")
+            val uidType: Int,
 
-        @SerializedName("status")
-        val dynamicStatus: Int,
+            @SerializedName("status")
+            val dynamicStatus: Int,
 
-        @SerializedName("dynamic_id_str")
-        val dynamicIdAsString: String,
+            @SerializedName("dynamic_id_str")
+            val dynamicIdAsString: String,
 
-        @SerializedName("pre_dy_id_str")
-        val previousDynamicIdAsString: String,
+            @SerializedName("pre_dy_id_str")
+            val previousDynamicIdAsString: String,
 
-        @SerializedName("orig_dy_id_str")
-        val originalDynamicIdAsString: String,
+            @SerializedName("orig_dy_id_str")
+            val originalDynamicIdAsString: String,
 
-        @SerializedName("rid_str")
-        val ridAsString: String,
+            @SerializedName("rid_str")
+            val ridAsString: String,
 
-        val origin: JsonObject
+            val origin: JsonObject
     )
 
     data class DynamicDisplay(
-        val origin: JsonObject?,
-        val relation: JsonObject?,
-        @SerializedName("comment_info")
-        val hotComment: HotComments?
+            val origin: JsonObject?,
+            val relation: JsonObject?,
+            @SerializedName("comment_info")
+            val hotComment: HotComments?
     ) {
         data class HotComments(
-            val comments: HotComment
+                val comments: HotComment
         ) {
             data class HotComment(
-                val uid: Int,
-                @SerializedName("name")
-                val name: String,
-                val content: String
+                    val uid: Int,
+                    @SerializedName("name")
+                    val name: String,
+                    val content: String
             )
         }
     }

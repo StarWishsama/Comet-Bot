@@ -26,8 +26,10 @@ import java.io.IOException
  */
 object MainApi : ApiExecutor {
     private val dynamicUrl =
-        "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?visitor_uid=0&host_uid=%uid%&offset_dynamic_id=0&need_top=0"
+            "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?visitor_uid=0&host_uid=%uid%&offset_dynamic_id=0&need_top=0"
     private const val infoUrl = "http://api.bilibili.com/x/space/acc/info?mid="
+    private val dynamicByIdUrl =
+            "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id="
     private val agent = mutableMapOf("User-Agent" to "Nameless live status checker by StarWishsama")
     private const val apiRateLimit = "BiliBili API调用已达上限"
 
@@ -57,13 +59,12 @@ object MainApi : ApiExecutor {
         try {
             if (response.isSuccessful) {
                 val body = response.body()?.string() ?: return MessageWrapper("无法获取动态", false)
-                val dynamicObject = JsonParser.parseString(body)
-                if (dynamicObject.isJsonObject) {
-                    val cards = dynamicObject.asJsonObject["data"].asJsonObject["cards"]
+                val dynamicList = gson.fromJson<Dynamic>(body)
 
-                    if (!cards.isJsonArray) return MessageWrapper("没有发过动态", false)
+                if (dynamicList.data.cards != null) {
+                    if (dynamicList.data.cards.isEmpty()) return MessageWrapper("没有发过动态", false)
 
-                    val card = gson.fromJson<Dynamic>(cards.asJsonArray[0])
+                    val card = dynamicList.data.cards[0]
                     val singleDynamicObject = JsonParser.parseString(card.card)
                     if (singleDynamicObject.isJsonObject) {
                         val dynamicType = DynamicTypeSelector.getType(card.description.type)
