@@ -2,11 +2,14 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynami
 
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables.gson
+import io.github.starwishsama.comet.BotVariables.hmsPattern
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicTypeSelector
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
+import java.time.LocalDateTime
 
 data class Repost(@SerializedName("origin")
                   var originDynamic: String,
@@ -16,18 +19,20 @@ data class Repost(@SerializedName("origin")
                   var originUser: UserProfile?,
                   var item: ItemBean?,
                   @SerializedName("user")
-                  val profile: UserProfile.Info?) : DynamicData {
-    data class ItemBean(@SerializedName("content")
-                        val content: String,
-                        @SerializedName("miss")
-                        val deleted: Int,
-                        @SerializedName("tips")
-                        val tips: String?,
-                        @SerializedName("orig_type")
-                        val originType: Int?) {
-        fun isDeleted(): Boolean {
-            return deleted == 1
-        }
+                  val profile: UserProfile.Info) : DynamicData {
+    data class ItemBean(
+            @SerializedName("content")
+            val content: String,
+            @SerializedName("orig_dy_id")
+            val originDynamicId: Long,
+            @SerializedName("pre_dy_id")
+            val previousDynamicId: Long,
+            @SerializedName("timestamp")
+            val sentTime: Long,
+            @SerializedName("orig_type")
+            val originType: Int
+    ) {
+        fun getSentTime(): LocalDateTime = sentTime.toLocalDateTime()
     }
 
     override suspend fun getContact(): MessageWrapper {
@@ -35,8 +40,8 @@ data class Repost(@SerializedName("origin")
                 ?: return MessageWrapper("源动态已被删除")
         val repostPicture = originalDynamic.pictureUrl
         val msg = MessageWrapper(
-            "转发了 ${if (item == null || item?.isDeleted() == true) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item?.content}\n" +
-                    "原动态信息: \n${originalDynamic.text}"
+                "转发了 ${if (item == null || item?.content?.isEmpty() == true) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item?.content}\n" +
+                        "原动态信息: \n${originalDynamic.text}" + "🕘 ${hmsPattern.format(item?.getSentTime())}\n"
         )
 
         if (repostPicture.isNotEmpty()) {

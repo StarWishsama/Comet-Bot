@@ -35,7 +35,6 @@ object DynamicTypeSelector {
     }
 }
 
-// Suitable for get_dynamic_detail
 data class Dynamic(
         val code: Int,
         @SerializedName("msg")

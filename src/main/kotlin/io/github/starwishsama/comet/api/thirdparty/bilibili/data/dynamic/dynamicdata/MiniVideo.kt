@@ -16,18 +16,19 @@ class MiniVideo : DynamicData {
             val avatarImgURL: String?
     )
 
-    class Item {
-        var id: Long = 0
-        var description: String? = null
-        var cover: Cover? = null
-
-        class Cover {
-            @SerializedName("default")
-            var defaultImgURL: String? = null
-
-            @SerializedName("unclipped")
-            var originImgURL: String? = null
-        }
+    data class Item(
+            var id: Long,
+            var description: String?,
+            var cover: Cover?,
+            @SerializedName("timestamp")
+            val sentTimestamp: Long
+    ) {
+        data class Cover(
+                @SerializedName("default")
+                val defaultImgURL: String?,
+                @SerializedName("unclipped")
+                val originImgURL: String?
+        )
     }
 
     override suspend fun getContact(): MessageWrapper {

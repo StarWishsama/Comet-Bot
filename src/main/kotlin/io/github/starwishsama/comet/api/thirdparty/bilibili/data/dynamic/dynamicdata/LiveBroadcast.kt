@@ -65,8 +65,8 @@ data class LiveBroadcast(
 
     override suspend fun getContact(): MessageWrapper {
         val wrapped = MessageWrapper(
-                "${MainApi.getUserNameByMid(livePlayInfo.uid)} 正在直播\n" +
-                        "直播间标题: ${livePlayInfo.liveTitle}\n" +
+                "${MainApi.getUserNameByMid(livePlayInfo.uid)} 正在直播!\n" +
+                        "标题: ${livePlayInfo.liveTitle}\n" +
                         "开播时间: ${BotVariables.yyMMddPattern.format(livePlayInfo.getLiveStartTime())}\n" +
                         "直达链接: ${livePlayInfo.link}\n"
         )
