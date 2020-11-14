@@ -30,7 +30,7 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     lateinit var filePath: File
-    const val version = "0.6-M2-1178094"
+    const val version = "0.6-M2-913c02c"
     const val buildTime = "2020/11/11 12:35:05"
 
     /** 作为独立运行时使用的变量, 除 [Comet] 外禁止调用 */
@@ -85,4 +85,6 @@ object BotVariables {
     val coolDown: MutableMap<Long, Long> = HashMap()
 
     val hmsPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+
+    val yyMMddPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 }

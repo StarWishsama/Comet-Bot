@@ -65,7 +65,9 @@ data class TextWithPicture(
         val wrapped = MessageWrapper("发布了动态:\n ${item.text ?: "获取失败"}\n")
 
         if (!item.pictures.isNullOrEmpty()) {
-            item.pictures[0].imgUrl.let { wrapped.plusImageUrl(it) }
+            item.pictures.forEach {
+                wrapped.plusImageUrl(it.imgUrl)
+            }
         }
 
         return wrapped

@@ -9,11 +9,56 @@ data class UserProfile(
         @SerializedName("vip")
         val vipInfo: VipInfo,
         val pendant: Pendant,
+        @SerializedName("decorate_card")
+        val decorateCard: DecorateCard?,
         val rank: Int,
         val sign: String,
         @SerializedName("level_info")
         val levelInfo: LevelInfo
 ) {
+    data class DecorateCard(
+            val mid: Long,
+            val id: Int,
+            @SerializedName("card_url")
+            val cardUrl: String,
+            @SerializedName("card_type")
+            val cardType: Int,
+            @SerializedName("name")
+            val cardName: String,
+            /** 永久挂件为0 */
+            @SerializedName("expire_time")
+            val expireTime: Long,
+            /** 卡片分类，如大会员 */
+            @SerializedName("card_type_name")
+            val cardTypeName: String,
+            @SerializedName("uid")
+            val uid: Long,
+            @SerializedName("item_id")
+            val itemId: Int,
+            @SerializedName("item_type")
+            val itemType: Int,
+            @SerializedName("big_card_url")
+            val bigCardUrl: String,
+            @SerializedName("jump_url")
+            val jumpUrL: String,
+            /** 粉丝挂件，如湊-阿库娅 */
+            @SerializedName("fan")
+            val fan: Fan,
+            @SerializedName("image_enhance")
+            val enhancedImage: String
+    ) {
+        data class Fan(
+                @SerializedName("is_fan")
+                val isFan: Int,
+                @SerializedName("number")
+                val number: Int,
+                @SerializedName("color")
+                val color: String,
+                @SerializedName("num_desc")
+                val numberDescription: String
+        )
+    }
+
     data class Info(
             var uid: Int = 0,
             @SerializedName("uname")

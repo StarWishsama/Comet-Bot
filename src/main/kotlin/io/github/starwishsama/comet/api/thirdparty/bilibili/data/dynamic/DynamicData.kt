@@ -29,6 +29,7 @@ object DynamicTypeSelector {
             256 -> Music::class.java
             2048 -> ShareContext::class.java
             4200 -> LiveRoom::class.java
+            4308 -> LiveBroadcast::class.java
             else -> UnknownType::class.java
         }
     }
@@ -45,19 +46,19 @@ data class Dynamic(
         val data: Data
 ) {
     data class Data(
-            /** space_history Only */
+            /** /space_history Only */
             @SerializedName("has_more")
             val hasMoreInfo: Int?,
             @SerializedName("card")
             val card: Card?,
-            /** space_history Only */
+            /** /space_history Only */
             @SerializedName("cards")
             val cards: List<Card>?,
             @SerializedName("result")
             val result: Int,
             @SerializedName("attentions")
             val attentions: Attentions,
-            /** space_history Only */
+            /** /space_history Only */
             @SerializedName("next_offset")
             val nextOffset: Int?,
             @SerializedName("_gt_")
