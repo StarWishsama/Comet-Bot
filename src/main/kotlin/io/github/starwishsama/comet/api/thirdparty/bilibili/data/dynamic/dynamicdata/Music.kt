@@ -1,27 +1,37 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 
-data class Music(var id: Long,
-                 @SerializedName("cover")
-                 var coverURL: String?,
-                 @SerializedName("intro")
-                 var dynamic: String?) : DynamicData {
+data class Music(
+        @SerializedName("id")
+        val id: Long,
+        @SerializedName("upId")
+        val upId: Long,
+        @SerializedName("title")
+        val songName: String,
+        @SerializedName("upper")
+        val uploader: String,
+        @SerializedName("cover")
+        val coverURL: String?,
+        @SerializedName("author")
+        val author: String,
+        @SerializedName("ctime")
+        val uploadTime: Long,
+        @SerializedName("intro")
+        val dynamic: String?,
+        @SerializedName("replyCnt")
+        val replyCount: Long,
+        @SerializedName("playCnt")
+        val playCount: Long
+) : DynamicData {
     override suspend fun getContact(): MessageWrapper {
-        val wrapped = MessageWrapper("发布了音乐 ${dynamic ?: "获取失败"}\n")
-
-        coverURL.let {
-            if (it != null) {
-                try {
-                    wrapped.plusImageUrl(it)
-                } catch (e: UnsupportedOperationException) {
-                    return@let
-                }
-            }
-        }
-
-        return wrapped
+        return MessageWrapper("${dynamic ?: "获取失败"}\n" +
+                "发布了音乐: $songName\n" +
+                "🕘 ${BotVariables.yyMMddPattern.format(uploadTime.toLocalDateTime())}")
+                .plusImageUrl(coverURL)
     }
 }

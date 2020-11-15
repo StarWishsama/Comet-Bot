@@ -86,5 +86,5 @@ object BotVariables {
 
     val hmsPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 
-    val yyMMddPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    val yyMMddPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
 }

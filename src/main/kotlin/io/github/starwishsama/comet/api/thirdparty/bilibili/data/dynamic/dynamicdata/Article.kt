@@ -41,7 +41,7 @@ data class Article(
                 "发布了一篇专栏 $title:\n" +
                         "$summary\n" +
                         "查看全文: https://www.bilibili.com/read/cv/$id\n" +
-                        "🕘 ${hmsPattern.format(publishTime.toLocalDateTime())}")
+                        "\uD83D\uDC4D ${stats.like}|\uD83D\uDD01 ${stats.share}|🕘 ${hmsPattern.format(publishTime.toLocalDateTime())}")
         if (!imageURL.isNullOrEmpty()) {
             wrapped.plusImageUrl(imageURL[0])
         }
