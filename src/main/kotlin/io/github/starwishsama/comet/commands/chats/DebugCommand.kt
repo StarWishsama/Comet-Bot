@@ -202,6 +202,12 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     else {
                         if (args[1].isNumeric()) {
                             val dynamic = MainApi.getDynamicById(args[1].toLong())
+
+
+                            if (!NetUtil.driverUsable()) {
+                                return "The driver doesn't enabled or unusable!".convertToChain()
+                            }
+
                             try {
                                 val screenshot = NetUtil.getScreenshot(
                                         "https://t.bilibili.com/${dynamic?.data?.card?.description?.dynamicId}"
@@ -219,12 +225,11 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
 
                                     // 执行脚本获取合适的推文宽度
                                     val jsExecutor = (this as JavascriptExecutor)
-                                    jsExecutor.executeScript("var div = document.getElementById(\"app\").getElementsByClassName(\"main-content\")[1]")
                                     val width = jsExecutor.executeScript(
-                                            """return div.getBoundingClientRect().width""") as Double
+                                            """return document.getElementById("app").getElementsByClassName("main-content")[1].getBoundingClientRect().width""") as Double
                                     val height =
                                             jsExecutor.executeScript(
-                                                    """return div.getBoundingClientRect().height""") as Double
+                                                    """return document.getElementById("app").getElementsByClassName("main-content")[1].getBoundingClientRect().height""") as Double
 
                                     // 调整窗口大小
                                     manage().window().size = Dimension(width.toInt(), height.toInt())

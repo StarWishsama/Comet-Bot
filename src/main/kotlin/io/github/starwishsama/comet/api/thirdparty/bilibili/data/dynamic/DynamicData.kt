@@ -60,7 +60,7 @@ data class Dynamic(
             val attentions: Attentions,
             /** /space_history Only */
             @SerializedName("next_offset")
-            val nextOffset: Int?,
+            val nextOffset: Long?,
             @SerializedName("_gt_")
             val gtNumber: Int,
             @SerializedName("extension")

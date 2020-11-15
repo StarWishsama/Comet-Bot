@@ -185,6 +185,7 @@ object Comet {
 
         Runtime.getRuntime().addShutdownHook(Thread {
             logger.info("[Bot] 正在关闭 Bot...")
+            NetUtil.closeDriver()
             DataSetup.saveFiles()
             BotVariables.service.shutdown()
             BotVariables.rCon?.disconnect()

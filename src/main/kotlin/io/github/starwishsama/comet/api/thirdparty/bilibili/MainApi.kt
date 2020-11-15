@@ -74,9 +74,11 @@ object MainApi : ApiExecutor {
         NetUtil.executeHttpRequest(
                 url = dynamicUrl.replace("%uid%", mid.toString())
         ).use { response ->
+            val url = response.request().url().toString()
+            var body = ""
             try {
                 if (response.isSuccessful) {
-                    val body = response.body()?.string() ?: return MessageWrapper("无法获取动态", false)
+                    body = response.body()?.string() ?: return MessageWrapper("无法获取动态", false)
                     val dynamicList = gson.fromJson<Dynamic>(body)
 
                     if (dynamicList.data.cards != null) {
@@ -96,8 +98,7 @@ object MainApi : ApiExecutor {
                 }
             } catch (e: Exception) {
                 if (e is JsonSyntaxException || e is JsonParseException || e !is IOException) {
-                    FileUtil.createErrorReportFile("解析动态失败", "bilibili", e, response.body()?.string()
-                            ?: "", "请求 URL 为: ${response.request().url()}")
+                    FileUtil.createErrorReportFile("解析动态失败", "bilibili", e, body, "请求 URL 为: $url")
                     return MessageWrapper("解析动态失败", false)
                 } else {
                     daemonLogger.warning("解析动态时出现异常", e)

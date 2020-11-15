@@ -59,6 +59,10 @@ object NetUtil {
      *
      * 注意：响应需要使用 [Response.close] 关闭或使用 [use], 否则会导致泄漏
      *
+     * 获取后的 [Response] 为异步, 响应完全读取 (如使用 [Response.body] 获取响应体字符串)后会失效
+     *
+     * 并且**不可再使用**, 否则抛出 [IllegalStateException]
+     *
      * @param url 请求的地址
      * @param timeout 超时时间, 单位为秒
      * @param proxyUrl 代理地址 (如果需要使用的话)
@@ -248,4 +252,10 @@ object NetUtil {
             daemonLogger.warning("在尝试加载 WebDriver for ${cfg.webDriverName} 时出现问题", e)
         }
     }
+
+    fun closeDriver() {
+        if (driverUsable()) driver.close()
+    }
+
+    fun driverUsable(): Boolean = ::driver.isInitialized
 }
