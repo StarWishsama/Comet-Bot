@@ -15,6 +15,7 @@ interface DynamicData {
 
         return getContact().text == other.getContact().text
     }
+
 }
 
 object DynamicTypeSelector {
@@ -61,7 +62,11 @@ data class Dynamic(
             @SerializedName("next_offset")
             val nextOffset: Int?,
             @SerializedName("_gt_")
-            val gtNumber: Int
+            val gtNumber: Int,
+            @SerializedName("extension")
+            val extension: JsonObject,
+            @SerializedName("extend_json")
+            val extendJson: String
     ) {
         data class Attentions(
                 @SerializedName("uids")
@@ -152,85 +157,4 @@ data class Card(
             )
         }
     }
-}
-
-data class DynamicCard(
-    /** 发送者信息 */
-    val user: DynamicUser,
-    /** 动态信息 */
-    val item: DynamicItem,
-    /** 视频 AV 号 */
-    val aid: Int,
-    val attribute: Int?,
-    val cid: Int?,
-
-    // 以下仅限视频类动态可以获取
-
-    /* 视频是否受版权保护 */
-    @SerializedName("copyright")
-    val copyRight: Int?,
-    /** 视频上传时间戳 */
-    @SerializedName("ctime")
-    val uploadTime: Long?,
-    /** 视频描述 */
-    @SerializedName("desc")
-    val videoDesc: String?,
-
-    val dimension: JsonObject?,
-
-    val duration: Int?,
-
-    @SerializedName("dynamic")
-    val tags: String?,
-
-    @SerializedName("jump_url")
-    val jumpUrl: String?,
-
-    val owner: JsonObject,
-
-    /** 视频封面 */
-    @SerializedName("pic")
-    val videoPic: String?,
-
-    /** 视频标题 */
-    val videoTitle: String?
-) {
-    data class DynamicUser(
-        /** 用户 UID */
-        val uid: Int,
-
-        /** 用户名 */
-        @SerializedName("uname")
-        val userName: String,
-
-        @SerializedName("face")
-        val avatarImg: String
-    )
-
-    data class DynamicItem(
-        @SerializedName("rp_id")
-        val rpId: Int?,
-
-        @SerializedName("uid")
-        val uid: Int,
-
-        /** 动态内容 */
-        val content: String,
-
-        /** 转发的起始动态ID, 无转发为0 */
-        @SerializedName("orig_dy_id")
-        val originalDynamicId: Long,
-
-        /** 转发的动态ID, 无转发为0 */
-        @SerializedName("pre_dy_id")
-        val repostDynamicId: Long,
-
-        /** 发送动态的时间戳 */
-        @SerializedName("timestamp")
-        val sentTime: Long,
-
-        /** 动态回复数 */
-        @SerializedName("reply")
-        val replyCount: Int
-    )
 }

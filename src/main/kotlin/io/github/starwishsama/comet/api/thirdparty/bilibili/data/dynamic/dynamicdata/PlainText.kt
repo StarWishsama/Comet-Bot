@@ -8,8 +8,8 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 
 data class PlainText(
-    val user: UserProfile.Info,
-    val item: ItemBean
+        val user: UserProfile.Info,
+        val item: ItemBean
 ) : DynamicData {
     data class ItemBean(
         @SerializedName("rp_id")
