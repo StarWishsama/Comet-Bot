@@ -37,22 +37,23 @@ object YoutubeApi : ApiExecutor {
 
         if (!searchApi.contains("key")) throw ApiKeyIsEmptyException("Youtube")
 
-        val response = NetUtil.executeHttpRequest(
+        NetUtil.executeHttpRequest(
                 url = "${searchApi}id&channelId=${channelId}$maxResult${count}",
                 timeout = 5
-        )
+        ).use { response ->
 
-        if (response.isSuccessful) {
-            val body = response.body()?.string() ?: return null
-            /** @TODO 类型自动选择, 类似于 BiliBili 的动态解析 */
-            try {
-                return BotVariables.gson.fromJson(body, SearchVideoResult::class.java)
-            } catch (e: JsonSyntaxException) {
+            if (response.isSuccessful) {
+                val body = response.body()?.string() ?: return null
+                /** @TODO 类型自动选择, 类似于 BiliBili 的动态解析 */
                 try {
-                    val error = BotVariables.gson.fromJson(body, YoutubeRequestError::class.java)
-                    BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.code}, 信息: ${error.message}")
+                    return BotVariables.gson.fromJson(body, SearchVideoResult::class.java)
                 } catch (e: JsonSyntaxException) {
-                    BotVariables.logger.warning("[YTB] 无法解析 API 传入的 json", e)
+                    try {
+                        val error = BotVariables.gson.fromJson(body, YoutubeRequestError::class.java)
+                        BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.code}, 信息: ${error.message}")
+                    } catch (e: JsonSyntaxException) {
+                        BotVariables.logger.warning("[YTB] 无法解析 API 传入的 json", e)
+                    }
                 }
             }
         }

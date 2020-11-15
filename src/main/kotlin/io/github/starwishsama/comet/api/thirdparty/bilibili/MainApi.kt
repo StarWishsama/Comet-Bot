@@ -11,6 +11,7 @@ import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicTypeSelector
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata.UnknownType
+import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.FileUtil
@@ -45,44 +46,62 @@ object MainApi : ApiExecutor {
         return JsonParser.parseString(response.body()).asJsonObject["data"].asJsonObject["name"].asString
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
-    @Throws(RateLimitException::class)
-    suspend fun getDynamic(mid: Long): MessageWrapper {
+    @Throws(ApiException::class)
+    fun getDynamicById(id: Long): Dynamic? {
         if (isReachLimit()) {
             throw RateLimitException(apiRateLimit)
         }
 
-        val response = NetUtil.executeHttpRequest(
+        NetUtil.executeHttpRequest(
+                url = dynamicByIdUrl + id.toString()
+        ).use { res ->
+            if (res.isSuccessful) {
+                val body = res.body()?.string() ?: throw ApiException("无法获取动态页面")
+                return gson.fromJson(body)
+            } else {
+                throw ApiException("无法获取动态页面, 状态码 ${res.code()}")
+            }
+        }
+    }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    @Throws(ApiException::class)
+    suspend fun getUserDynamicTimeline(mid: Long): MessageWrapper {
+        if (isReachLimit()) {
+            throw RateLimitException(apiRateLimit)
+        }
+
+        NetUtil.executeHttpRequest(
                 url = dynamicUrl.replace("%uid%", mid.toString())
-        )
+        ).use { response ->
+            try {
+                if (response.isSuccessful) {
+                    val body = response.body()?.string() ?: return MessageWrapper("无法获取动态", false)
+                    val dynamicList = gson.fromJson<Dynamic>(body)
 
-        try {
-            if (response.isSuccessful) {
-                val body = response.body()?.string() ?: return MessageWrapper("无法获取动态", false)
-                val dynamicList = gson.fromJson<Dynamic>(body)
+                    if (dynamicList.data.cards != null) {
+                        if (dynamicList.data.cards.isEmpty()) return MessageWrapper("没有发过动态", false)
 
-                if (dynamicList.data.cards != null) {
-                    if (dynamicList.data.cards.isEmpty()) return MessageWrapper("没有发过动态", false)
-
-                    val card = dynamicList.data.cards[0]
-                    val singleDynamicObject = JsonParser.parseString(card.card)
-                    if (singleDynamicObject.isJsonObject) {
-                        val dynamicType = DynamicTypeSelector.getType(card.description.type)
-                        return if (dynamicType != UnknownType::class) {
-                            gson.fromJson(card.card, dynamicType).getContact()
-                        } else {
-                            MessageWrapper("错误: 不支持的动态类型", false)
+                        val card = dynamicList.data.cards[0]
+                        val singleDynamicObject = JsonParser.parseString(card.card)
+                        if (singleDynamicObject.isJsonObject) {
+                            val dynamicType = DynamicTypeSelector.getType(card.description.type)
+                            return if (dynamicType != UnknownType::class) {
+                                gson.fromJson(card.card, dynamicType).getContact()
+                            } else {
+                                MessageWrapper("错误: 不支持的动态类型", false)
+                            }
                         }
                     }
                 }
-            }
-        } catch (e: Exception) {
-            if (e is JsonSyntaxException || e is JsonParseException || e !is IOException) {
-                FileUtil.createErrorReportFile("解析动态失败", "bilibili", e, response.body()?.string()
-                        ?: "", "请求 URL 为: ${response.request().url()}")
-                return MessageWrapper("解析动态失败", false)
-            } else {
-                daemonLogger.warning("解析动态时出现异常", e)
+            } catch (e: Exception) {
+                if (e is JsonSyntaxException || e is JsonParseException || e !is IOException) {
+                    FileUtil.createErrorReportFile("解析动态失败", "bilibili", e, response.body()?.string()
+                            ?: "", "请求 URL 为: ${response.request().url()}")
+                    return MessageWrapper("解析动态失败", false)
+                } else {
+                    daemonLogger.warning("解析动态时出现异常", e)
+                }
             }
         }
         return MessageWrapper("无法获取动态", false)

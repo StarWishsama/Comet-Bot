@@ -33,7 +33,7 @@ object BiliDynamicChecker : CometPusher {
         collectedUsers.parallelStream().forEach { uid ->
             val data: MessageWrapper? = runBlocking {
                 try {
-                    MainApi.getDynamic(uid)
+                    MainApi.getUserDynamicTimeline(uid)
                 } catch (e: RuntimeException) {
                     if (e !is ApiException) {
                         daemonLogger.warning("在获取动态时出现了异常", e)

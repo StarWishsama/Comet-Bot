@@ -2,14 +2,17 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.buildTime
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
+import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.enums.UserLevel
+import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
@@ -31,6 +34,11 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.uploadAsGroupVoice
 import net.mamoe.mirai.message.uploadAsImage
+import org.openqa.selenium.By
+import org.openqa.selenium.Dimension
+import org.openqa.selenium.JavascriptExecutor
+import org.openqa.selenium.support.ui.ExpectedCondition
+import org.openqa.selenium.support.ui.WebDriverWait
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -183,6 +191,52 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                 return screenshot.uploadAsImage(event.subject).asMessageChain()
                             } else {
                                 return "Can't found tweet which id is ${args[0]}.".convertToChain()
+                            }
+                        } else {
+                            return "NaN".convertToChain()
+                        }
+                    }
+                }
+                "bilipic" -> {
+                    if (args.isEmpty()) return "/debug bilipic [Dynamic ID]".convertToChain()
+                    else {
+                        if (args[1].isNumeric()) {
+                            val dynamic = MainApi.getDynamicById(args[1].toLong())
+                            try {
+                                val screenshot = NetUtil.getScreenshot(
+                                        "https://t.bilibili.com/${dynamic?.data?.card?.description?.dynamicId}"
+                                ) {
+                                    val wait = WebDriverWait(this, 50, 1)
+
+                                    // 等待动态加载完毕再截图
+                                    wait.until(ExpectedCondition { webDriver ->
+                                        try {
+                                            webDriver?.findElement(By.id("app"))
+                                        } catch (e: Exception) {
+                                            daemonLogger.warning("获取网页元素时出现异常", e)
+                                        }
+                                    })
+
+                                    // 执行脚本获取合适的推文宽度
+                                    val jsExecutor = (this as JavascriptExecutor)
+                                    jsExecutor.executeScript("var div = document.getElementById(\"app\").getElementsByClassName(\"main-content\")[1]")
+                                    val width = jsExecutor.executeScript(
+                                            """return div.getBoundingClientRect().width""") as Double
+                                    val height =
+                                            jsExecutor.executeScript(
+                                                    """return div.getBoundingClientRect().height""") as Double
+
+                                    // 调整窗口大小
+                                    manage().window().size = Dimension(width.toInt(), height.toInt())
+                                }
+                                        ?: return "Can't take screenshot, See console for more info :(".convertToChain()
+                                return screenshot.uploadAsImage(event.subject).asMessageChain()
+                            } catch (e: Exception) {
+                                if (e is ApiException) {
+                                    return "Can't found bili dynamic which id is ${args[0]}.".convertToChain()
+                                }
+
+                                daemonLogger.warning("Can't retrieve bilibili dynamic", e)
                             }
                         } else {
                             return "NaN".convertToChain()

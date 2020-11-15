@@ -102,30 +102,31 @@ object TwitterApi : ApiExecutor {
 
         val startTime = LocalDateTime.now()
         val url = "$twitterApiUrl/users/show.json?screen_name=$username&tweet_mode=extended"
-        val conn = NetUtil.executeHttpRequest(
+       NetUtil.executeHttpRequest(
                 url = url,
                 timeout = 5,
                 call = {
                     header("authorization", "Bearer $token")
                 }
-        )
+        ).use { conn ->
 
-        var bodyCopy = ""
+            var bodyCopy = ""
 
-        try {
-            val result = conn.body()
+            try {
+                val result = conn.body()
 
-            val body = result?.string()
-            if (body != null) {
-                bodyCopy = body
-            }
+                val body = result?.string()
+                if (body != null) {
+                    bodyCopy = body
+                }
 
-            return gson.fromJson(bodyCopy)
-        } catch (e: IOException) {
-            if (!NetUtil.isTimeout(e)) {
-                FileUtil.createErrorReportFile(type = "twitter", t = e, content = bodyCopy, message = "Request URL: $url")
-            } else {
-                daemonLogger.verboseS("[蓝鸟] 在获取用户信息时连接超时")
+                return gson.fromJson(bodyCopy)
+            } catch (e: IOException) {
+                if (!NetUtil.isTimeout(e)) {
+                    FileUtil.createErrorReportFile(type = "twitter", t = e, content = bodyCopy, message = "Request URL: $url")
+                } else {
+                    daemonLogger.verboseS("[蓝鸟] 在获取用户信息时连接超时")
+                }
             }
         }
 
@@ -150,24 +151,25 @@ object TwitterApi : ApiExecutor {
 
         usedTime++
 
-        val request = NetUtil.executeHttpRequest(
+        NetUtil.executeHttpRequest(
                 url = "$twitterApiUrl/statuses/user_timeline.json?screen_name=$username&count=${count}&tweet_mode=extended",
                 timeout = 5,
                 call = {
                     header("authorization", "Bearer $token")
                     header("content-type", "application/json;charset=utf-8")
                 }
-        )
-
-        if (request.isSuccessful) {
-            val tweetList = parseJsonToTweet(request.body()?.string()
-                    ?: return emptyList(), request.request().url().toString())
-            return if (tweetList.isNotEmpty()) {
-                tweetList.sortedByDescending { it.getSentTime() }
-            } else {
-                emptyList()
+        ).use { request ->
+            if (request.isSuccessful) {
+                val tweetList = parseJsonToTweet(request.body()?.string()
+                        ?: return emptyList(), request.request().url().toString())
+                return if (tweetList.isNotEmpty()) {
+                    tweetList.sortedByDescending { it.getSentTime() }
+                } else {
+                    emptyList()
+                }
             }
         }
+
         return emptyList()
     }
 
@@ -185,23 +187,24 @@ object TwitterApi : ApiExecutor {
         checkToken()
         checkRateLimit(apiReachLimit)
 
-        val request = NetUtil.executeHttpRequest(
+        NetUtil.executeHttpRequest(
                 url = "$twitterApiUrl/statuses/show.json?id=$id&tweet_mode=extended",
                 timeout = 5,
                 call = {
                     header("authorization", "Bearer $token")
                 }
-        )
-
-        return if (request.isSuccessful && request.isType(ContentType.JSON.value)) {
-            val tweet = parseJsonToTweet(request.body()?.string() ?: return null, request.request().url().toString())
-            if (tweet.isNotEmpty()) {
-                tweet[0]
+        ).use { request ->
+            return if (request.isSuccessful && request.isType(ContentType.JSON.value)) {
+                val tweet = parseJsonToTweet(request.body()?.string()
+                        ?: return null, request.request().url().toString())
+                if (tweet.isNotEmpty()) {
+                    tweet[0]
+                } else {
+                    throw EmptyTweetException()
+                }
             } else {
-                throw EmptyTweetException()
+                null
             }
-        } else {
-            null
         }
     }
 

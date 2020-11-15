@@ -75,4 +75,16 @@ object StringUtil {
         val duration = java.time.Duration.between(this, LocalDateTime.now()).toKotlinDuration()
         return if (builtInMethod) duration.asHumanReadable else duration.toFriendly(maxUnit = unit, msMode = msMode)
     }
+
+    fun String.containsEtc(strict: Boolean = true, vararg string: String): Boolean {
+        string.forEach {
+            if (this.contains(it)) {
+                if (!strict) return true
+            } else {
+                return false
+            }
+        }
+
+        return true
+    }
 }

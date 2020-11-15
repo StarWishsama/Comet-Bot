@@ -4,6 +4,7 @@ import cn.hutool.http.HttpException
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.exceptions.ApiException
+import io.github.starwishsama.comet.utils.StringUtil.containsEtc
 import io.github.starwishsama.comet.utils.debugS
 import io.github.starwishsama.comet.utils.network.NetUtil.proxyIsUsable
 import okhttp3.OkHttpClient
@@ -56,6 +57,8 @@ object NetUtil {
     /**
      * 执行 Http 请求 (Get)
      *
+     * 注意：响应需要使用 [Response.close] 关闭或使用 [use], 否则会导致泄漏
+     *
      * @param url 请求的地址
      * @param timeout 超时时间, 单位为秒
      * @param proxyUrl 代理地址 (如果需要使用的话)
@@ -97,15 +100,14 @@ object NetUtil {
     }
 
     fun getHttpRequestStream(url: String, timeout: Long = 2): InputStream? {
-        val res = executeHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort)
-        if (!res.isSuccessful) return null
-        return res.body()?.byteStream()
+        executeHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort).use {res ->
+            if (!res.isSuccessful) return null
+            return res.body()?.byteStream()
+        }
     }
 
-    fun getPageContent(url: String, timeout: Long = 2): String? {
-        val res = executeHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort)
-        if (res.body()?.contentType()?.type() != "text") throw ApiException("获取到的内容不是纯文字")
-        return res.body()?.string()
+    fun getPageContent(url: String, timeout: Long = 2): String? = executeHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort).use {
+        return it.body()?.string()
     }
 
     /**
@@ -151,18 +153,19 @@ object NetUtil {
     fun isTimeout(t: Throwable): Boolean {
         val msg = t.message?.toLowerCase() ?: return t is IOException
         // FIXME: 这不是一个很好的识别方法
-        return (msg.contains("time") && msg.contains("out")) || t.javaClass.simpleName.toLowerCase().contains("timeout")
+        return msg.containsEtc(false, "time", "out") || t.javaClass.simpleName.toLowerCase().contains("timeout")
     }
 
     @Throws(HttpException::class)
     fun checkPingValue(address: String = "https://www.gstatic.com/generate_204", timeout: Long = 2000): Long {
         val startTime = LocalDateTime.now()
 
-        val conn = executeHttpRequest(address, timeout)
-        return if (conn.isSuccessful) {
-            Duration.between(startTime, LocalDateTime.now()).toMillis()
-        } else {
-            -1L
+        executeHttpRequest(address, timeout).use { conn ->
+            return if (conn.isSuccessful) {
+                Duration.between(startTime, LocalDateTime.now()).toMillis()
+            } else {
+                -1L
+            }
         }
     }
 
