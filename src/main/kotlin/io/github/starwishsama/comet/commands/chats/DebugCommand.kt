@@ -15,7 +15,6 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
 import io.github.starwishsama.comet.pushers.BiliDynamicChecker
 import io.github.starwishsama.comet.pushers.HitokotoUpdater
 import io.github.starwishsama.comet.pushers.TweetUpdateChecker
@@ -167,18 +166,12 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                 }
                 "panic" -> throw RuntimeException("好")
                 "ark" -> {
-                    var op: ArkNightOperator? = null
-
                     if (args.size > 1) {
-                        BotVariables.arkNight.parallelStream().forEach {
-                            if (args[1] == it.name) {
-                                op = it
-                                return@forEach
-                            }
+                        val op = BotVariables.arkNight.parallelStream().filter { it.name == args[1] }.findFirst()
+                        if (op.isPresent) {
+                            return op.toString().convertToChain()
                         }
                     }
-
-                    return op.toString().convertToChain()
                 }
                 "twpic" -> {
                     if (args.isEmpty()) return "/debug twpic [Tweet ID]".convertToChain()
@@ -226,13 +219,13 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                     // 执行脚本获取合适的推文宽度
                                     val jsExecutor = (this as JavascriptExecutor)
                                     val width = jsExecutor.executeScript(
-                                            """return document.getElementById("app").getElementsByClassName("main-content")[1].getBoundingClientRect().width""") as Double
+                                            """return document.getElementById("app").getElementsByClassName("main-content")[1].offsetWidth""") as Int
                                     val height =
                                             jsExecutor.executeScript(
-                                                    """return document.getElementById("app").getElementsByClassName("main-content")[1].getBoundingClientRect().height""") as Double
+                                                    """return document.getElementById("app").getElementsByClassName("main-content")[1].offsetHeight""") as Int
 
                                     // 调整窗口大小
-                                    manage().window().size = Dimension(width.toInt(), height.toInt())
+                                    manage().window().size = Dimension(width, height)
                                 }
                                         ?: return "Can't take screenshot, See console for more info :(".convertToChain()
                                 return screenshot.uploadAsImage(event.subject).asMessageChain()
