@@ -93,6 +93,7 @@ object BiliDynamicChecker : CometPusher {
             if (!pdh.isPushed) {
                 pdh.target.forEach { gid ->
                     runBlocking {
+                        try {
                         val group = bot?.getGroup(gid)
                         group?.sendMessage(
                             "${MainApi.getUserNameByMid(pdh.uid)} ".convertToChain() + pdh.pushContent.toMessageChain(
@@ -100,6 +101,9 @@ object BiliDynamicChecker : CometPusher {
                             )
                         )
                         count++
+                        } catch (e: Exception) {
+                            return@forEach
+                        }
                         delay(1_500)
                     }
                 }
