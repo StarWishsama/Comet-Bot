@@ -29,7 +29,7 @@ data class CometConfig(
         @Comment("执行所有机器人命令的全局冷却时间, 单位秒")
         val coolDownTime: Int = 5,
 
-        @Comment("机器人发送消息需要屏蔽的字词")
+        @Comment("机器人发送消息需要屏蔽的词汇")
         val filterWords: MutableList<String> = mutableListOf(),
 
         @Comment("点歌 API 类型")
@@ -38,14 +38,11 @@ data class CometConfig(
         @Comment("命令前缀")
         val commandPrefix: MutableList<String> = mutableListOf(".", "。", "#", "!", "/"),
 
-        @Comment("BiliBili 账号, 使用开播提醒时必填")
+        @Comment("BiliBili 账号, 使用搜索功能 (如 /bili info) 时必填")
         var biliUserName: String? = null,
 
-        @Comment("BiliBili 账号密码, 使用开播提醒时必填")
+        @Comment("BiliBili 账号密码, 使用搜索功能 (如 /bili info) 时必填")
         var biliPassword: String? = null,
-
-        @Comment("机器人主人QQ号, 对应的用户将自动获得 OWNER 权限组")
-        var ownerId: Long = 0L,
 
         @Comment("SauceNao 以图搜图 APIKey, 不填亦可, 但可搜索次数会减少")
         val sauceNaoApiKey: String? = null,
@@ -53,28 +50,28 @@ data class CometConfig(
         @Comment("彩虹六号玩家数据 API, 需要自行向 r6tab 作者申请")
         val r6tabKey: String? = null,
 
-        @Comment("用于获取 Twitter Token 的 Access Token")
+        @Comment("用于获取 Twitter Token 的 Access Token, 使用 Twitter 推送必填")
         var twitterAccessToken: String? = null,
 
-        @Comment("用于获取 Twitter Token 的 Access Secret")
+        @Comment("用于获取 Twitter Token 的 Access Secret, 使用 Twitter 推送必填")
         var twitterAccessSecret: String? = null,
 
-        @Comment("用于使用 Twitter Developer API 的 Token")
+        @Comment("用于使用 Twitter Developer API 的 Token, 无需填写")
         var twitterToken: String? = null,
 
-        @Comment("代理服务器地址, 目前仅支持 HTTP 代理")
+        @Comment("本地代理服务器地址, 目前仅支持 HTTP 代理")
         var proxyUrl: String = "",
 
-        @Comment("代理服务器端口, 目前仅支持 HTTP 代理")
+        @Comment("本地代理服务器端口, 目前仅支持 HTTP 代理")
         var proxyPort: Int = 0,
 
         @Comment("代理类型, 支持 HTTP 和 SOCKS")
-        var proxyType: Proxy.Type = Proxy.Type.SOCKS,
+        var proxyType: Proxy.Type = Proxy.Type.HTTP,
 
         @Comment("Mirai 心跳周期, 单位分钟, 过长会导致被服务器断开连接")
-        var heartBeatPeriod: Int = 2,
+        var heartBeatPeriod: Int = 1,
 
-        @Comment("Youtube APIKey, 申请请见 https://developers.google.com/youtube/v3/getting-started")
+        @Comment("Youtube APIKey, 使用 Youtube 推送必填\n申请请见 https://developers.google.com/youtube/v3/getting-started")
         var youtubeApiKey: String = "",
 
         @Comment("推文推送时候是否发送小图而不是原图")
@@ -92,12 +89,12 @@ data class CometConfig(
         @Comment("明日方舟抽卡模拟器是否使用图片")
         var arkDrawUseImage: Boolean = false,
 
-        @Comment("调试模式")
+        @Comment("调试模式, 打开后会有更多 Log 和调试功能")
         var debugMode: Boolean = false,
 
-        @Comment("WebDriver 使用的浏览器")
+        @Comment("WebDriver 使用的浏览器, 留空为关闭")
         val webDriverName: String = "",
 
-        @Comment("WebDriver Remote 地址")
+        @Comment("WebDriver Remote 地址, 留空为关闭")
         val remoteWebDriver: String = ""
 )

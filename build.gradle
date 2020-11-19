@@ -1,3 +1,6 @@
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 buildscript {
     repositories {
         jcenter()
@@ -42,23 +45,26 @@ repositories {
 }
 
 task updateVersion {
-    def versionFileDir = projectDir.getAbsolutePath() + File.separatorChar + 'src' + File.separatorChar + 'main' + File.separatorChar + 'kotlin' + File.separatorChar + 'io' + File.separatorChar + 'github' + File.separatorChar + 'starwishsama' + File.separatorChar + 'comet' + File.separatorChar + 'BotVariables.kt'
-    if (new File(versionFileDir).exists()) {
-        def oldVersionStr = findOldStr(versionFileDir, "version")
+    def versionFile = new File(projectDir.getAbsolutePath() + File.separatorChar + 'src' + File.separatorChar + 'main' + File.separatorChar + 'kotlin' + File.separatorChar + 'io' + File.separatorChar + 'github' + File.separatorChar + 'starwishsama' + File.separatorChar + 'comet' + File.separatorChar + 'BotVariables.kt')
+    if (versionFile.exists()) {
+        def oldVersionStr = findOldStr(versionFile, "version")
         def newVersionStr = "    const val version = \"" + versionCode + "\""
-        def oldBuildTimeStr = findOldStr(versionFileDir, "buildTime")
-        def newBuildTimeStr = "    const val buildTime = \"" + new Date() + "\""
-        def updatedContent = new File(versionFileDir).getText('UTF-8').replace(oldVersionStr, newVersionStr).replace(oldBuildTimeStr, newBuildTimeStr)
-        new File(versionFileDir).write(updatedContent, 'UTF-8')
+        def oldBuildTimeStr = findOldStr(versionFile, "buildTime")
+
+        def buildTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
+
+        def newBuildTimeStr = "    const val buildTime = \"" + buildTime + "\""
+        def updatedContent = versionFile.getText('UTF-8').replace(oldVersionStr, newVersionStr).replace(oldBuildTimeStr, newBuildTimeStr)
+        versionFile.write(updatedContent, 'UTF-8')
         println "Successfully update info inside Comet~"
     } else {
         println "Can't found project dir."
     }
 }
 
-static def findOldStr(String path, String location) {
+static def findOldStr(File file, String location) {
     def readerString = ""
-    new File(path).withReader('UTF-8') { reader ->
+    file.withReader('UTF-8') { reader ->
         reader.eachLine {
             if (it.contains(location)) {
                 readerString <<= it
