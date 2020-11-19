@@ -6,6 +6,8 @@
 
 本项目处于开发阶段, 部分功能可能无法使用 (除了写在下面的功能) ~~反正也没人用~~
 
+交流群：725656262
+
 **一切开发旨在学习，请勿用于非法用途**
 
 English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/README_en.md)
@@ -17,8 +19,6 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
 [![Issues](https://img.shields.io/github/issues/StarWishsama/Comet-Bot.svg?style=popout)](https://github.com/StarWishsama/Comet-Bot/issues)
 ![Stars](https://img.shields.io/github/stars/starwishsama/Comet-Bot)
 [![Release](https://img.shields.io/github/v/release/StarWishSama/Comet-Bot?include_prereleases)](https://github.com/StarWishsama/Comet-Bot/releases)
-
-Demo 群：725656262
 
 ## 🎉 它能干什么?
 * 以图搜图 (支持 ascii2d/SauceNao)
@@ -34,7 +34,7 @@ Demo 群：725656262
   - 支持订阅 bilibili 用户动态/开播提醒
   - 支持订阅推特用户最新消息
   - 支持订阅 Youtube 用户开播提醒 (实验性)
-* rCon 功能, 支持连接到可以使用 rCon 的游戏服务器
+* rCon 功能, 支持连接到有 rCon 功能的游戏
 * 查询推特用户信息/推文
 * 自动推送最新推文到指定群聊
 * 禁言/踢出群员
@@ -48,7 +48,7 @@ Demo 群：725656262
 
 ### 自编译
 
-- 注意: 请使用 JDK 8 或更高版本打包, 推荐使用 AdoptOpenJDK 11
+- 注意: 请使用 JDK 8 或更高版本打包, **推荐**使用 AdoptOpenJDK 11
 
 1. 编译
  * Clone 或者下载这个项目.
@@ -65,7 +65,7 @@ Demo 群：725656262
 1. 在[此处](https://github.com/StarWishsama/Comet-Bot/releases)下载最新版本
 
 2. 使用 cmd 启动 Bot, 按照提示登录
-```java -jar 下载jar的路径```
+```java -jar jar的路径```
 
 3. 提示启动完成后, 在机器人加入的群内发送 /help 就可开始了解 Comet 的各项功能了
 
