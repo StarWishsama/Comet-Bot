@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.exceptions
 
-open class ApiException(reason: String = "") : RuntimeException(reason)
+open class ApiException(reason: String = "", cause: Exception? = null) : RuntimeException(reason, cause)
 
 /**
  * API 调用达到上限

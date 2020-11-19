@@ -5,11 +5,10 @@ import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.utils.StringUtil.containsEtc
+import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.debugS
 import io.github.starwishsama.comet.utils.network.NetUtil.proxyIsUsable
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
+import okhttp3.*
 import org.openqa.selenium.*
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.edge.EdgeDriver
@@ -54,6 +53,7 @@ object NetUtil {
     const val defaultUA =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36"
 
+
     /**
      * 执行 Http 请求 (Get)
      *
@@ -69,44 +69,88 @@ object NetUtil {
      * @param proxyPort 代理端口 (如果需要使用的话)
      * @param call 执行请求前的额外操作, 如添加 header 等. 详见 [Request.Builder]
      */
+    private fun executeRequest(url: String,
+                               timeout: Long = 2,
+                               proxyUrl: String = cfg.proxyUrl,
+                               proxyPort: Int = cfg.proxyPort,
+                               call: Request.Builder.() -> Request.Builder = {
+                               header("user-agent", defaultUA)
+                           }
+    ): Call {
+        val builder = OkHttpClient().newBuilder()
+                .connectTimeout(timeout, TimeUnit.SECONDS)
+                .followRedirects(true)
+                .readTimeout(timeout, TimeUnit.SECONDS)
+
+        if (proxyIsUsable > 0 && proxyUrl.isNotBlank() && proxyPort > 0) {
+            try {
+                val socket = Socket(proxyUrl, proxyPort)
+                if (socket.isUsable()) {
+                    builder.proxy(Proxy(cfg.proxyType, Socket(proxyUrl, proxyPort).remoteSocketAddress))
+                }
+            } catch (e: Exception) {
+                daemonLogger.verbose("无法连接到代理服务器, ${e.message}")
+            }
+        }
+        val client = builder.build()
+        val request = Request.Builder().url(url).call().build()
+        return client.newCall(request)
+    }
+
+    /**
+     * 执行 Http 请求 (Get)
+     *
+     * 注意：响应需要使用 [Response.close] 关闭或使用 [use], 否则会导致泄漏
+     *
+     * 获取后的 [Response] 为异步, 响应完全读取后会失效
+     *
+     * 并且**不可再使用**, 否则抛出 [IllegalStateException]
+     *
+     * 附上执行后响应会失效的方法：
+     * [Response.close]
+     * Response.body.close()
+     * Response.body().source().close()
+     * Response.body().charStream().close()
+     * Response.body().byteString().close()
+     * Response.body().bytes()
+     * Response.body().string()
+     *
+     * @param url 请求的地址
+     * @param timeout 超时时间, 单位为秒
+     * @param proxyUrl 代理地址 (如果需要使用的话)
+     * @param proxyPort 代理端口 (如果需要使用的话)
+     * @param call 执行请求前的额外操作, 如添加 header 等. 详见 [Request.Builder]
+     * @param autoClose 是否自动关闭 [ResponseBody], 适用于需要使用 bodyStream 等环境
+     * @param autoCloseDelay 自动关闭 [ResponseBody] 的延迟秒数
+     */
     fun executeHttpRequest(url: String,
                            timeout: Long = 2,
                            proxyUrl: String = cfg.proxyUrl,
                            proxyPort: Int = cfg.proxyPort,
                            call: Request.Builder.() -> Request.Builder = {
                                header("user-agent", defaultUA)
-                           }
+                           },
+                           autoClose: Boolean = false,
+                           autoCloseDelay: Long = 15
     ): Response {
         val startTime = System.nanoTime()
 
-        try {
-            val builder = OkHttpClient().newBuilder()
-                    .connectTimeout(timeout, TimeUnit.SECONDS)
-                    .followRedirects(true)
-                    .readTimeout(timeout, TimeUnit.SECONDS)
+        var result: Response? = null
 
-            if (proxyIsUsable > 0 && proxyUrl.isNotBlank() && proxyPort > 0) {
-                try {
-                    val socket = Socket(proxyUrl, proxyPort)
-                    if (socket.isUsable()) {
-                        builder.proxy(Proxy(cfg.proxyType, Socket(proxyUrl, proxyPort).remoteSocketAddress))
-                    }
-                } catch (e: Exception) {
-                    daemonLogger.verbose("无法连接到代理服务器, ${e.message}")
-                }
-            }
-            val client = builder.build()
-            val request = Request.Builder().url(url).call().build()
-            return client.newCall(request).execute()
+        try {
+           result = executeRequest(url, timeout, proxyUrl, proxyPort, call).execute()
         } finally {
             daemonLogger.debugS("执行网络操作用时 ${(System.nanoTime() - startTime).toDouble() / 1_000_000}ms")
-        }
-    }
 
-    fun getHttpRequestStream(url: String, timeout: Long = 2): InputStream? {
-        executeHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort).use {res ->
-            if (!res.isSuccessful) return null
-            return res.body()?.byteStream()
+            if (autoClose) {
+                TaskUtil.runAsync(autoCloseDelay) {
+                    if (result?.body() != null) {
+                        result.close()
+                    }
+                }
+            }
+
+            return result ?: throw ApiException("执行网络操作失败")
         }
     }
 

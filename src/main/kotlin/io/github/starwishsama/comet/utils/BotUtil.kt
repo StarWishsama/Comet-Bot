@@ -33,13 +33,13 @@ fun MiraiLogger.warningS(message: String?) {
 
 fun MiraiLogger.warningS(message: String?, throwable: Throwable?) {
     if (cfg.debugMode) {
-        warning(message, throwable)
+        warning(message + "\n" + throwable?.stackTraceToString())
     }
 }
 
 fun MiraiLogger.warningS(throwable: Throwable?) {
     if (cfg.debugMode) {
-        warning(throwable)
+        warning(throwable?.stackTraceToString())
     }
 }
 
@@ -51,7 +51,7 @@ fun MiraiLogger.debugS(message: String?) {
 
 fun MiraiLogger.debugS(throwable: Throwable?) {
     if (cfg.debugMode) {
-        debug(throwable)
+        debug(throwable?.stackTraceToString())
     }
 }
 
@@ -69,13 +69,13 @@ fun MiraiLogger.verboseS(message: String?) {
 
 fun MiraiLogger.verboseS(throwable: Throwable?) {
     if (cfg.debugMode) {
-        verbose(throwable)
+        verbose(throwable?.stackTraceToString())
     }
 }
 
 fun MiraiLogger.verboseS(message: String?, throwable: Throwable?) {
     if (cfg.debugMode) {
-        verbose(message, throwable)
+        verbose(message + "\n" + throwable?.stackTraceToString())
     }
 }
 

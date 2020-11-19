@@ -116,7 +116,7 @@ class TwitterCommand : ChatCommand {
             if (NetUtil.isTimeout(t)) {
                 BotUtil.sendMessage("获取推文时连接超时")
             } else {
-                daemonLogger.warning(t)
+                daemonLogger.warning(t.stackTraceToString())
                 BotUtil.sendMessage("获取推文时出现了异常")
             }
         }

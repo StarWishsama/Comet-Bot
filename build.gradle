@@ -7,7 +7,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
-        classpath 'edu.sc.seis.gradle:launch4j:2.4.6'
     }
 }
 
@@ -16,8 +15,6 @@ plugins {
     id "com.github.johnrengelman.shadow" version "5.2.0"
     id 'org.jetbrains.kotlin.jvm' version "1.4.10"
     id 'org.jetbrains.kotlin.plugin.serialization' version "1.4.10"
-    id "org.jetbrains.kotlin.kapt" version "1.4.10"
-    id 'edu.sc.seis.launch4j' version '2.4.6'
 }
 
 def mainClass = 'io.github.starwishsama.comet.CometKt'
@@ -27,11 +24,6 @@ jar {
         attributes 'Main-Class': mainClass
         attributes 'Author': "StarWishsama"
     }
-}
-
-launch4j {
-    mainClassName = mainClass
-    copyright = "StarWishsama"
 }
 
 def gitCommitId = 'git rev-parse --short HEAD'
@@ -51,13 +43,17 @@ repositories {
 
 task updateVersion {
     def versionFileDir = projectDir.getAbsolutePath() + File.separatorChar + 'src' + File.separatorChar + 'main' + File.separatorChar + 'kotlin' + File.separatorChar + 'io' + File.separatorChar + 'github' + File.separatorChar + 'starwishsama' + File.separatorChar + 'comet' + File.separatorChar + 'BotVariables.kt'
-    def oldVersionStr = findOldStr(versionFileDir, "version")
-    def newVersionStr = "    const val version = \"" + versionCode + "\""
-    def oldBuildTimeStr = findOldStr(versionFileDir, "buildTime")
-    def newBuildTimeStr = "    const val buildTime = \"2020/11/11 12:35:05\""
-    def updatedContent = new File(versionFileDir).getText('UTF-8').replaceAll(oldVersionStr, newVersionStr).replaceAll(oldBuildTimeStr, newBuildTimeStr)
-    new File(versionFileDir).write(updatedContent, 'UTF-8')
-    println "Successfully update info inside Comet~"
+    if (new File(versionFileDir).exists()) {
+        def oldVersionStr = findOldStr(versionFileDir, "version")
+        def newVersionStr = "    const val version = \"" + versionCode + "\""
+        def oldBuildTimeStr = findOldStr(versionFileDir, "buildTime")
+        def newBuildTimeStr = "    const val buildTime = \"" + new Date() + "\""
+        def updatedContent = new File(versionFileDir).getText('UTF-8').replace(oldVersionStr, newVersionStr).replace(oldBuildTimeStr, newBuildTimeStr)
+        new File(versionFileDir).write(updatedContent, 'UTF-8')
+        println "Successfully update info inside Comet~"
+    } else {
+        println "Can't found project dir."
+    }
 }
 
 static def findOldStr(String path, String location) {
@@ -77,15 +73,11 @@ static def findOldStr(String path, String location) {
 jar.dependsOn updateVersion
 
 dependencies {
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
-    implementation 'net.mamoe:mirai-core:1.3.2'
-    implementation 'net.mamoe:mirai-core-qqandroid:1.3.2'
-    implementation 'net.mamoe:mirai-console:1.0-RC'
-
-    kapt 'com.google.auto.service:auto-service:1.0-rc7'
-    compileOnly 'com.google.auto.service:auto-service-annotations:1.0-rc7'
+    implementation 'net.mamoe:mirai-core:1.3.3'
+    implementation 'net.mamoe:mirai-core-qqandroid:1.3.3'
 
     implementation 'cn.hutool:hutool-http:5.4.2'
     implementation 'cn.hutool:hutool-crypto:5.4.2'
@@ -94,10 +86,8 @@ dependencies {
     implementation 'org.apache.commons:commons-io:1.3.2'
 
     implementation 'com.google.code.gson:gson:2.8.6'
-    // kaml @ https://github.com/charleskorn/kaml
-    implementation 'com.charleskorn.kaml:kaml:0.19.0'
     // yamlkt @ https://github.com/him188/yamlkt
-    //implementation("net.mamoe.yamlkt:yamlkt:0.5.0")
+    implementation("net.mamoe.yamlkt:yamlkt:0.7.3")
     // kotson @ https://github.com/SalomonBrys/Kotson
     implementation 'com.github.salomonbrys.kotson:kotson:2.5.0'
 

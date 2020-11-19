@@ -1,7 +1,6 @@
 package io.github.starwishsama.comet.file
 
 import cn.hutool.core.io.file.FileReader
-import com.charleskorn.kaml.Yaml
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -18,6 +17,7 @@ import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.network.isUsable
 import net.mamoe.mirai.Bot
+import net.mamoe.yamlkt.Yaml
 import java.io.File
 import java.net.Socket
 
@@ -34,7 +34,7 @@ object DataSetup {
     fun init() {
         if (!userCfg.exists() || !cfgFile.exists()) {
             try {
-                cfgFile.writeString(Yaml.default.encodeToString(CometConfig.serializer(), CometConfig()))
+                cfgFile.writeString(Yaml.default.encodeToString(CometConfig()))
                 userCfg.writeClassToJson(BotVariables.users)
                 shopItemCfg.writeClassToJson(BotVariables.shop)
                 println("[配置] 已自动生成新的配置文件.")

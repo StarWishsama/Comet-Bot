@@ -39,8 +39,10 @@ object RssUtil {
 
     private fun getRSSItems(address: String): List<SyndEntry> {
         return try {
-            val stream = NetUtil.getHttpRequestStream(address)
-            if (stream != null) {
+            val response = NetUtil.executeHttpRequest(address, autoClose = true).body()
+            val stream = response?.byteStream()
+
+            if (response != null && stream != null) {
                 val reader = XmlReader(stream)
                 val input = SyndFeedInput()
                 // 得到SyndFeed对象，即得到RSS源里的所有信息

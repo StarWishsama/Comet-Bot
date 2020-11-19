@@ -112,7 +112,7 @@ object BiliLiveChecker : CometPusher {
                             runBlocking {
                                 try {
                                     val group = bot?.getGroupOrNull(it)
-                                    val image = group?.let { sendGroup -> NetUtil.getHttpRequestStream(data.keyFrameImageUrl)?.uploadAsImage(sendGroup) }
+                                    val image = group?.let { sendGroup -> NetUtil.executeHttpRequest(url = data.keyFrameImageUrl, autoClose = true).body()?.byteStream()?.uploadAsImage(sendGroup) }
                                     group?.sendMessage(filtered + (image ?: PlainText("")))
                                     count++
                                     delay(2_500)

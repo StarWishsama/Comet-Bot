@@ -17,8 +17,12 @@ open class MessageWrapper(var text: String?, val success: Boolean = true) {
         val images = mutableListOf<Image>()
 
         pictureUrl.forEach {
-            val uploadedImage = NetUtil.getHttpRequestStream(it)?.uploadAsImage(contact)
-            if (uploadedImage != null) images.add(uploadedImage)
+            val result = NetUtil.executeHttpRequest(url = it, autoClose = true).body()
+            if (result != null) {
+                val uploadedImage = result.byteStream().uploadAsImage(contact)
+                images.add(uploadedImage)
+                result.close()
+            }
         }
 
         return images

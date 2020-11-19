@@ -91,20 +91,21 @@ object BiliDynamicChecker : CometPusher {
         /** 遍历推送列表推送开播消息 */
         pushedList.parallelStream().forEach { pdh ->
             if (!pdh.isPushed) {
-                pdh.target.forEach { gid ->
-                    runBlocking {
-                        try {
-                        val group = bot?.getGroup(gid)
-                        group?.sendMessage(
-                            "${MainApi.getUserNameByMid(pdh.uid)} ".convertToChain() + pdh.pushContent.toMessageChain(
-                                group
+                pdh.target.forEach target@ { gid ->
+                    try {
+                        runBlocking {
+                            val group = bot?.getGroup(gid)
+                            group?.sendMessage(
+                                    "${MainApi.getUserNameByMid(pdh.uid)} ".convertToChain() + pdh.pushContent.toMessageChain(
+                                            group
+                                    )
                             )
-                        )
-                        count++
-                        } catch (e: Exception) {
-                            return@forEach
+                            count++
+                            delay(1_500)
                         }
-                        delay(1_500)
+                    } catch (e: RuntimeException) {
+                        daemonLogger.warning("[推送] 将动态推送至 $gid 时发生意外", e)
+                        return@target
                     }
                 }
 
