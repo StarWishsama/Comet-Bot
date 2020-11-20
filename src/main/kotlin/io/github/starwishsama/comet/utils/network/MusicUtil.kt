@@ -112,15 +112,26 @@ object MusicUtil {
                     song.singer.forEach {
                         append(it.name + "/")
                     }
-                    removeSuffix("/")
+                    substring(0, length - 1)
                 }
                 val playResult = NetUtil.getPageContent("$api4qq${song.songMid}")
                 if (playResult?.isNotBlank() == true) {
                     val playUrl = JsonParser.parseString(playResult).asJsonObject["data"].asJsonObject[song.songMid].asString
 
-                    val json = "{\n	\"app\": \"com.tencent.structmsg\",\n	\"desc\": \"com.tencent.structmsg\",\n	\"view\": \"music\",\n	\"ver\": \"0.0.0.1\",\n	\"prompt\": \"[应用]${song.songName}\",\n	\"appID\": \"\",\n	\"sourceName\": \"\",\n	\"sourceUrl\": \"\",\n	\"meta\": {\n		\"music\": {\n			\"title\": \"${song.songName}\",\n			\"musicUrl\": \"$playUrl\",\n			\"desc\": \"$artistName\",\n			\"preview\": \"http:\\/\\/imgcache.qq.com\\/music\\/photo\\/album_300\\/17\\/300_albumpic_\"${song.albumId}\"_0.jpg\",\n			\"tag\": \"QQ音乐\",\n			\"jumpUrl\": \"web.p.qq.com\\/qqmpmobile\\/aio\\/app.html?id=${song.songId}\",\n			\"appid\": 100497308,\n			\"app_type\": 1\n		}\n	},\n	\"config\": {\n		\"forward\": 1,\n		\"autosize\": 1,\n		\"type\": \"normal\"\n	},\n	\"text\": \"\",\n	\"sourceAd\": \"\",\n	\"extra\": \"\"\n}"
+                    val meta = QQCard.Meta(
+                            QQCard.Meta.Music(
+                                    jumpUrl = "https://y.qq.com/n/yqq/song/${song.songMid}.html?ADTAG=h5_playsong&no_redirect=1",
+                                    playMusicUrl = playUrl,
+                                    previewImageUrl = "http://imgcache.qq.com/music/photo/album_300/17/300_albumpic_${song.albumId}_0.jpg",
+                                    singerName = artistName,
+                                    title = song.songName
+                            )
+                    )
 
-                    return LightApp(json).asMessageChain()
+                    val card = QQCard(meta = meta)
+                    card.prompt = "[分享]${song.songName}"
+
+                    return LightApp(gson.toJson(card)).asMessageChain()
                 }
             } else {
                 logger.warning("无法从 QQ API 获取到歌曲信息")
@@ -267,6 +278,88 @@ object MusicUtil {
                 }
             }
         }
+    }
+    
+    data class QQCard(
+            @SerializedName("app")
+            val app: String = "com.tencent.structmsg",
+            @SerializedName("desc")
+            val description: String = "音乐",
+            @SerializedName("view")
+            val viewType: String = "music",
+            @SerializedName("ver")
+            val version: String = "0.0.0.1",
+            /** 展示为纯文本消息时的样式 */
+            @SerializedName("prompt")
+            var prompt: String = "[分享]",
+            @SerializedName("appID")
+            val appID: String = "",
+            @SerializedName("sourceName")
+            val sourceName: String = "",
+            @SerializedName("actionData")
+            val actionData: String = "",
+            @SerializedName("actionData_A")
+            val actionDataA: String = "",
+            @SerializedName("sourceUrl")
+            val sourceUrl: String = "",
+            @SerializedName("meta")
+            val meta: Meta,
+            @SerializedName("config")
+            val config: Config = Config(),
+            @SerializedName("text")
+            val text: String = "",
+            @SerializedName("sourceAd")
+            val sourceAd: String = "",
+            /** msg_seq 不可修改 */
+            @SerializedName("extra")
+            val extra: String = """{"app_type":1,"appid":100497308,"msg_seq":6897056676240247867,"uin":1}"""
+    ) {
+        data class Meta(
+                val music: Music
+        ) {
+            data class Music(
+                    val action: String = "",
+                    @SerializedName("android_pkg_name")
+                    val androidPkgName: String = "",
+                    @SerializedName("app_type")
+                    val appType: Int = 1,
+                    @SerializedName("appid")
+                    val appId: Long = 100497308,
+                    @SerializedName("desc")
+                    val singerName: String,
+                    @SerializedName("jumpUrl")
+                    val jumpUrl: String,
+                    @SerializedName("musicUrl")
+                    val playMusicUrl: String,
+                    @SerializedName("preview")
+                    val previewImageUrl: String,
+                    @SerializedName("sourceMsgId")
+                    val sourceMsgId: String = "0",
+                    @SerializedName("source_icon")
+                    val sourceIcon: String = "",
+                    @SerializedName("source_url")
+                    val sourceUrl: String = "",
+                    @SerializedName("tag")
+                    val tag: String = "QQ音乐",
+                    @SerializedName("title")
+                    val title: String
+            )
+        }
+
+        data class Config (
+                @SerializedName("autosize")
+                val autoSize: Boolean = true,
+                /** 不可修改, 可能会失效 */
+                @SerializedName("ctime")
+                val currentTime: Long = 1605846146,
+                @SerializedName("forward")
+                val forward: Boolean = true,
+                /** 不可修改, 可能会失效 */
+                @SerializedName("token")
+                var token: String = "966baea0ff335c8c8fcea318b6baaf3e",
+                @SerializedName("type")
+                val type: String = "normal"
+        )
     }
 
 }

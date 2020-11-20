@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet
 
 import io.github.starwishsama.comet.BotVariables.bot
+import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.consoleCommandLogger
 import io.github.starwishsama.comet.BotVariables.filePath
 import io.github.starwishsama.comet.BotVariables.logger
@@ -16,6 +17,7 @@ import io.github.starwishsama.comet.commands.console.StopCommand
 import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.ConvertLightAppListener
+import io.github.starwishsama.comet.listeners.GroupRelatedListener
 import io.github.starwishsama.comet.listeners.RepeatListener
 import io.github.starwishsama.comet.pushers.*
 import io.github.starwishsama.comet.utils.FileUtil
@@ -54,8 +56,8 @@ object Comet {
         }
 
         TaskUtil.runAsync(5) {
-            val pwd = BotVariables.cfg.biliPassword
-            val username = BotVariables.cfg.biliUserName
+            val pwd = cfg.biliPassword
+            val username = cfg.biliUserName
 
             if (pwd != null && username != null) {
                 FakeClientApi.client.runCatching {
@@ -90,10 +92,10 @@ object Comet {
     }
 
     fun setupRCon() {
-        val url = BotVariables.cfg.rConUrl
-        val pwd = BotVariables.cfg.rConPassword
+        val url = cfg.rConUrl
+        val pwd = cfg.rConPassword
         if (url != null && pwd != null && BotVariables.rCon == null) {
-            BotVariables.rCon = Rcon(url, BotVariables.cfg.rConPort, pwd.toByteArray())
+            BotVariables.rCon = Rcon(url, cfg.rConPort, pwd.toByteArray())
         }
     }
 
@@ -126,8 +128,9 @@ object Comet {
                 println(it)
             })
         }
-        config.heartbeatPeriodMillis = (BotVariables.cfg.heartBeatPeriod * 60).secondsToMillis
+        config.heartbeatPeriodMillis = (cfg.heartBeatPeriod * 60).secondsToMillis
         config.fileBasedDeviceInfo()
+        config.protocol = cfg.botProtocol
         config.fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
         bot = Bot(qq = qqId, password = password, configuration = config)
         bot.alsoLogin()
@@ -171,7 +174,7 @@ object Comet {
         logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
 
         /** 监听器 */
-        val listeners = arrayOf(ConvertLightAppListener, RepeatListener)
+        val listeners = arrayOf(ConvertLightAppListener, RepeatListener, GroupRelatedListener)
 
         listeners.forEach {
             it.register(bot)
@@ -224,7 +227,7 @@ fun initResources() {
 suspend fun main() {
     initResources()
 
-    val id = BotVariables.cfg.botId
+    val id = cfg.botId
 
     if (id == 0L) {
         println("请输入欲登录的机器人账号")
@@ -238,19 +241,19 @@ suspend fun main() {
             }
 
             command = scanner.nextLine()
-            if (BotVariables.cfg.botId == 0L && command.isNumeric()) {
-                BotVariables.cfg.botId = command.toLong()
-                println("成功设置账号为 ${BotVariables.cfg.botId}")
+            if (cfg.botId == 0L && command.isNumeric()) {
+                cfg.botId = command.toLong()
+                println("成功设置账号为 ${cfg.botId}")
                 println("请输入欲登录的机器人密码")
-            } else if (BotVariables.cfg.botPassword.isEmpty() || isFailed) {
-                BotVariables.cfg.botPassword = command
+            } else if (cfg.botPassword.isEmpty() || isFailed) {
+                cfg.botPassword = command
                 println("成功设置密码, 按下 Enter 启动机器人")
                 isFailed = false
-            } else if (BotVariables.cfg.botId != 0L && BotVariables.cfg.botPassword.isNotEmpty()) {
+            } else if (cfg.botId != 0L && cfg.botPassword.isNotEmpty()) {
                 println("请稍等...")
 
                 try {
-                    Comet.startBot(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
+                    Comet.startBot(cfg.botId, cfg.botPassword)
                     bot.join() // 等待 Bot 离线, 避免主线程退出
                 } catch (e: LoginFailedException) {
                     println("登录失败: ${e.message}\n如果是密码错误, 请重新输入密码")
@@ -262,6 +265,6 @@ suspend fun main() {
         }
         scanner.close()
     } else {
-        Comet.startBot(BotVariables.cfg.botId, BotVariables.cfg.botPassword)
+        Comet.startBot(cfg.botId, cfg.botPassword)
     }
 }

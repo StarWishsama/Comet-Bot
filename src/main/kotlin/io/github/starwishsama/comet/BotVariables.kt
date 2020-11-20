@@ -30,8 +30,8 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     lateinit var filePath: File
-    const val version = "0.6-M2-853af47"
-    const val buildTime = "2020/11/19 12:51:32"
+    const val version = "0.6-M2-36d9084"
+    const val buildTime = "2020/11/20 13:38:32"
 
     /** 作为独立运行时使用的变量, 除 [Comet] 外禁止调用 */
     lateinit var bot: Bot

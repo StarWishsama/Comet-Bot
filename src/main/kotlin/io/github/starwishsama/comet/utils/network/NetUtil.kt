@@ -69,7 +69,7 @@ object NetUtil {
      * @param proxyPort 代理端口 (如果需要使用的话)
      * @param call 执行请求前的额外操作, 如添加 header 等. 详见 [Request.Builder]
      */
-    private fun executeRequest(url: String,
+    fun executeRequest(url: String,
                                timeout: Long = 2,
                                proxyUrl: String = cfg.proxyUrl,
                                proxyPort: Int = cfg.proxyPort,
@@ -81,6 +81,7 @@ object NetUtil {
                 .connectTimeout(timeout, TimeUnit.SECONDS)
                 .followRedirects(true)
                 .readTimeout(timeout, TimeUnit.SECONDS)
+                .hostnameVerifier { _, _ -> true }
 
         if (proxyIsUsable > 0 && proxyUrl.isNotBlank() && proxyPort > 0) {
             try {
@@ -139,6 +140,8 @@ object NetUtil {
 
         try {
            result = executeRequest(url, timeout, proxyUrl, proxyPort, call).execute()
+        } catch (e: IOException) {
+            daemonLogger.warning("执行网络操作失败\n" + e.stackTraceToString())
         } finally {
             daemonLogger.debugS("执行网络操作用时 ${(System.nanoTime() - startTime).toDouble() / 1_000_000}ms")
 
@@ -150,13 +153,15 @@ object NetUtil {
                 }
             }
 
-            return result ?: throw ApiException("执行网络操作失败")
+            if (result != null) {
+                return result
+            } else {
+                throw ApiException("执行网络操作失败")
+            }
         }
     }
 
-    fun getPageContent(url: String, timeout: Long = 2): String? = executeHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort).use {
-        return it.body()?.string()
-    }
+    fun getPageContent(url: String, timeout: Long = 2): String? = executeHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort).body()?.string()
 
     /**
      * 下载文件

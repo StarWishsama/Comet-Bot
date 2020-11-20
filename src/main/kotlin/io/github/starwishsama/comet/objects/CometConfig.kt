@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.objects
 import io.github.starwishsama.comet.enums.MusicApiType
 import io.github.starwishsama.comet.enums.PicSearchApiType
 import kotlinx.serialization.Serializable
+import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.yamlkt.Comment
 import java.net.Proxy
 
@@ -96,5 +97,8 @@ data class CometConfig(
         val webDriverName: String = "",
 
         @Comment("WebDriver Remote 地址, 留空为关闭")
-        val remoteWebDriver: String = ""
+        val remoteWebDriver: String = "",
+
+        @Comment("机器人使用的登录协议")
+        val botProtocol: BotConfiguration.MiraiProtocol = BotConfiguration.MiraiProtocol.ANDROID_PHONE
 )

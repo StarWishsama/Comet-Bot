@@ -18,6 +18,10 @@ object GroupConfigManager {
         if (groupId <= 0) throw RuntimeException("群号不允许小于0")
 
         val cfg = getConfig(groupId)
-        return cfg ?: PerGroupConfig(groupId).init()
+        return cfg ?: createNewConfig(groupId)
+    }
+
+    fun createNewConfig(groupId: Long): PerGroupConfig {
+        return PerGroupConfig(groupId).init()
     }
 }

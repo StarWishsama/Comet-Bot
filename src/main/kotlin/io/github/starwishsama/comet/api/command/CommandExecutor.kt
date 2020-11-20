@@ -175,7 +175,7 @@ object CommandExecutor {
                 return if (NetUtil.isTimeout(t)) {
                     ExecutedResult("Bot > 在执行网络操作时连接超时".convertToChain(), cmd)
                 } else {
-                    BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message.split(" ")}, 发送者: $senderId", t)
+                    BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message.split(" ")}, 发送者: $senderId\n${t.stackTraceToString()}")
                     if (user.isBotOwner()) {
                         ExecutedResult(BotUtil.sendMessage("在试图执行命令时发生了一个错误\n简易报错信息 (如果有的话):\n${t.javaClass.name}: ${t.message}"), cmd, "失败")
                     } else {

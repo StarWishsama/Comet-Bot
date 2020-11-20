@@ -21,6 +21,7 @@ import io.github.starwishsama.comet.pushers.TweetUpdateChecker
 import io.github.starwishsama.comet.pushers.YoutubeStreamingChecker
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.BotUtil.getRestString
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
@@ -29,6 +30,7 @@ import io.github.starwishsama.comet.utils.network.RssUtil
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.uploadAsGroupVoice
@@ -240,6 +242,9 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                             return "NaN".convertToChain()
                         }
                     }
+                }
+                "json" -> {
+                    return LightApp(args.getRestString(1)).asMessageChain()
                 }
                 else -> return "Bot > 命令不存在\n${getHelp()}".convertToChain()
             }

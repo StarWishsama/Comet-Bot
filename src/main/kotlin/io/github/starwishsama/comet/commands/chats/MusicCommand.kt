@@ -35,6 +35,10 @@ class MusicCommand : ChatCommand {
                         }
                         "QQ", "TX", "腾讯" -> MusicUtil.searchQQMusic(args.getRestString(1))
                         "NETEASE", "网易", "WY" -> MusicUtil.searchNetEaseMusic(args.getRestString(1))
+                        else -> return when (api) {
+                            MusicApiType.QQ -> MusicUtil.searchQQMusic(args.getRestString(0))
+                            MusicApiType.NETEASE -> MusicUtil.searchNetEaseMusic(args.getRestString(0))
+                        }
                     }
                 } else {
                     return when (api) {

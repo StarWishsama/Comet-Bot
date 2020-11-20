@@ -9,6 +9,13 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomIn
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
+import retrofit2.Call
+import retrofit2.http.GET
+
+interface LiveApiTest {
+    @GET("room/v1/Room/get_info")
+    fun getLiveInfo(roomId: Long): Call<LiveRoomInfo>
+}
 
 object LiveApi : ApiExecutor {
     private const val liveUrl = "http://api.live.bilibili.com/room/v1/Room/get_info?id="
