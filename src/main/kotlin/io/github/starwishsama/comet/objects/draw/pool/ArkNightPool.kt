@@ -17,7 +17,8 @@ import java.util.stream.Collectors
 class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
     override val tenjouCount: Int = -1
     override val tenjouRare: Int = -1
-    override val poolItems: MutableList<ArkNightOperator> = BotVariables.arkNight
+    override val poolItems: MutableList<ArkNightOperator> =
+            BotVariables.arkNight.filter { it.obtain.contains("标准寻访") } as MutableList<ArkNightOperator>
 
     override fun doDraw(time: Int): List<ArkNightOperator> {
         val result = mutableListOf<ArkNightOperator>()
@@ -42,7 +43,9 @@ class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
 
             when {
                 // 如果在保底的基础上抽到了六星, 则重置加倍概率
-                rare == 6 && r6UpRate > 0 -> r6UpRate = 0.0
+                r6UpRate > 0 -> {
+                    if (rare == 6) r6UpRate = 0.0 else r6UpRate += 0.02
+                }
                 // 究极非酋之后必爆一个六星
                 rare != 6 && r6UpRate > 0.5 -> {
                     result.add(getGachaItem(6, r6UpRate))
@@ -57,7 +60,7 @@ class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
     }
 
     override fun getGachaItem(rare: Int): GachaItem {
-        throw UnsupportedOperationException("Please use #getGachaItem(Int, Double) instead!")
+        return getGachaItem(rare, -1.0)
     }
 
     // 使用自定义抽卡方式
