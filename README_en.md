@@ -89,3 +89,5 @@ Big thanks to [JetBrains](https://www.jetbrains.com/?from=comet-bot) for allocat
 > [PRTS Wiki](http://prts.wiki/) A Chinese ArkNights wiki built by players freely
 
 Big thanks to PRTS Wiki for providing ArkNights operator data and art
+
+![](http://prts.wiki/ak.png?8efd0)

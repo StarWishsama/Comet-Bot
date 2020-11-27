@@ -26,7 +26,6 @@ object MusicUtil {
 
     fun searchNetEaseMusic(songName: String): MessageChain {
         try {
-
             val searchMusicResult = NetUtil.getPageContent("$api4NetEase/search?keywords=${URLEncoder.encode(songName, "UTF-8")}")
 
             if (searchMusicResult?.isNotEmpty() == true) {

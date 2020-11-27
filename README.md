@@ -104,3 +104,5 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
 
 特别感谢 PRTS Wiki 提供的干员数据以及干员立绘
 
+![](http://prts.wiki/ak.png?8efd0)
+

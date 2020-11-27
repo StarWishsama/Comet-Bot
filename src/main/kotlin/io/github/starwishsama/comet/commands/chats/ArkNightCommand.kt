@@ -41,12 +41,11 @@ class ArkNightCommand : ChatCommand {
                                                 result.lostOps.forEach {
                                                     append("${it.name},")
                                                 }
-                                                removeSuffix(",")
-                                            }))
+                                            }.removeSuffix(",")))
                                 val gachaImage = withContext(Dispatchers.Default) { result.image.upload(event.subject) }
                                 gachaImage.asMessageChain()
                             } else {
-                                DrawUtil.overTimeMessage.convertToChain()
+                                (DrawUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}").convertToChain()
                             }
                         } else {
                             pool.getArkDrawResultAsString(user, 1).convertToChain()
@@ -64,9 +63,8 @@ class ArkNightCommand : ChatCommand {
                                                 result.lostOps.forEach {
                                                     append("${it.name},")
                                                 }
-                                                removeSuffix(",")
-                                            }))
-                                val gachaImage = withContext(Dispatchers.Default) { result.image.upload(event.subject) }
+                                            }.removeSuffix(",")))
+                                val gachaImage = withContext(Dispatchers.IO) { result.image.upload(event.subject) }
                                 gachaImage.asMessageChain()
                             } else {
                                 (DrawUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}").convertToChain()
