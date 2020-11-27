@@ -15,13 +15,10 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.pushers.BiliDynamicChecker
-import io.github.starwishsama.comet.pushers.HitokotoUpdater
-import io.github.starwishsama.comet.pushers.TweetUpdateChecker
-import io.github.starwishsama.comet.pushers.YoutubeStreamingChecker
+import io.github.starwishsama.comet.pushers.*
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.getRestString
+import io.github.starwishsama.comet.utils.BotUtil.sendMessage
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
@@ -30,7 +27,6 @@ import io.github.starwishsama.comet.utils.network.RssUtil
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
-import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.uploadAsGroupVoice
@@ -56,9 +52,9 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     if (user.isBotOwner()) {
                         return try {
                             DataSetup.reload()
-                            BotUtil.sendMessage("重载成功.")
+                            sendMessage("重载成功.")
                         } catch (e: IOException) {
-                            BotUtil.sendMessage("在重载时发生了异常.")
+                            sendMessage("在重载时发生了异常.")
                         }
                     }
                 }
@@ -99,9 +95,9 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     BotVariables.switch = !BotVariables.switch
 
                     return if (!BotVariables.switch) {
-                        BotUtil.sendMessage("おつまち~")
+                        sendMessage("おつまち~")
                     } else {
-                        BotUtil.sendMessage("今日もかわいい!")
+                        sendMessage("今日もかわいい!")
                     }
                 }
                 "push" -> {
@@ -109,17 +105,28 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                         return when (args[1].toLowerCase()) {
                             "twit", "twitter", "推特", "蓝鸟", "twi" -> {
                                 TweetUpdateChecker.retrieve()
-                                BotUtil.sendMessage("Tweet retriever has been triggered and run~")
+                                sendMessage("Tweet retriever has been triggered and run~")
                             }
                             "ytb", "y2b", "youtube", "油管" -> {
                                 YoutubeStreamingChecker.retrieve()
-                                BotUtil.sendMessage("Youtube retriever has been triggered and run~")
+                                sendMessage("Youtube retriever has been triggered and run~")
                             }
                             "bilibili", "bili", "哔哩哔哩", "b站" -> {
                                 BiliDynamicChecker.retrieve()
-                                BotUtil.sendMessage("Youtube retriever has been triggered and run~")
+                                sendMessage("Youtube retriever has been triggered and run~")
                             }
-                            else -> BotUtil.sendMessage("Unknown retriever type.")
+                            "status" -> {
+                                val ps = listOf(TweetUpdateChecker, BiliDynamicChecker, BiliLiveChecker)
+                                buildString {
+                                    ps.forEach {
+                                        append(it::class.java.simpleName + "\n")
+                                        append("上次推送了 ${it.pushCount} 次\n")
+                                        append("上次推送于 ${BotVariables.yyMMddPattern.format(it.lastPushTime)}\n")
+                                    }
+                                    trim()
+                                }.sendMessage()
+                            }
+                            else -> sendMessage("Unknown retriever type.")
                         }
                     }
                 }
@@ -205,7 +212,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
 
                             try {
                                 val screenshot = NetUtil.getScreenshot(
-                                        "https://t.bilibili.com/${dynamic?.data?.card?.description?.dynamicId}"
+                                        "https://t.bilibili.com/${dynamic.data.card?.description?.dynamicId}"
                                 ) {
                                     val wait = WebDriverWait(this, 50, 1)
 
@@ -213,12 +220,13 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                     wait.until(ExpectedCondition { webDriver ->
                                         try {
                                             webDriver?.findElement(By.id("app"))
+                                            webDriver?.findElement(By.className("main-content"))
                                         } catch (e: Exception) {
                                             daemonLogger.warning("获取网页元素时出现异常", e)
                                         }
                                     })
 
-                                    // 执行脚本获取合适的推文宽度
+                                    // 执行脚本获取合适的动态宽度
                                     val jsExecutor = (this as JavascriptExecutor)
                                     val width = jsExecutor.executeScript(
                                             """return document.getElementById("app").getElementsByClassName("main-content")[1].offsetWidth""") as Int
@@ -242,9 +250,6 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                             return "NaN".convertToChain()
                         }
                     }
-                }
-                "json" -> {
-                    return LightApp(args.getRestString(1)).asMessageChain()
                 }
                 else -> return "Bot > 命令不存在\n${getHelp()}".convertToChain()
             }

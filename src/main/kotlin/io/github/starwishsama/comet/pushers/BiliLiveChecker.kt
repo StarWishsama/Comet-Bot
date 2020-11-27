@@ -17,6 +17,7 @@ import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.isContentNotEmpty
 import net.mamoe.mirai.message.uploadAsImage
+import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 
 object BiliLiveChecker : CometPusher {
@@ -25,10 +26,10 @@ object BiliLiveChecker : CometPusher {
     override val internal: Long = cfg.biliInterval
     override var future: ScheduledFuture<*>? = null
     override var bot: Bot? = null
+    override var pushCount: Int = 0
+    override var lastPushTime: LocalDateTime = LocalDateTime.now()
 
     override fun retrieve() {
-        var count = 0
-
         val collectedUsers = mutableSetOf<Long>()
 
         BotVariables.perGroup.parallelStream().forEach {
@@ -46,7 +47,7 @@ object BiliLiveChecker : CometPusher {
                     val sli = StoredLiveInfo(data, false)
                     if (pushedList.isEmpty() && data.isLiveNow()) {
                         pushedList.plusAssign(sli)
-                        count++
+                        pushCount++
                     } else {
                         var hasOldData = false
 
@@ -64,14 +65,17 @@ object BiliLiveChecker : CometPusher {
 
                         if (!hasOldData && data.isLiveNow()) {
                             pushedList.add(sli)
-                            count++
+                            pushCount++
                         }
                     }
                 }
             }
         }
 
-        if (count > 0) daemonLogger.verboseS("Retrieve success, have collected $count liver(s)!")
+        if (pushCount > 0) {
+            daemonLogger.verboseS("Retrieve success, have collected $pushCount liver(s)!")
+            pushCount = 0
+        }
 
         push()
     }
@@ -126,6 +130,8 @@ object BiliLiveChecker : CometPusher {
                 info.isPushed = true
             }
         }
+
+        lastPushTime = LocalDateTime.now()
 
         return count
     }

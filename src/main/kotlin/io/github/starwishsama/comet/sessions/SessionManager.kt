@@ -28,8 +28,17 @@ object SessionManager {
         }
     }
 
-    fun addSession(session: Session) {
+    fun addSession(session: Session): Session {
         sessions[session] = LocalDateTime.now()
+        return session
+    }
+
+    fun addAutoCloseSession(session: Session, closeAfterMinute: Int) {
+        sessions[session] = LocalDateTime.now()
+        TaskUtil.runAsync(closeAfterMinute.toLong(), TimeUnit.MINUTES) {
+            session.beforeExpired
+            sessions.remove(session)
+        }
     }
 
     fun addSession(session: Session, time: LocalDateTime) {

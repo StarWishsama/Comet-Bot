@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.commands.chats
 
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
@@ -13,8 +14,8 @@ import io.github.starwishsama.comet.sessions.commands.roll.RollSession
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
-import io.github.starwishsama.comet.utils.TaskUtil
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.getGroupOrNull
@@ -24,7 +25,6 @@ import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.messageChainOf
-import java.util.concurrent.TimeUnit
 
 @CometCommand
 class RollCommand : ChatCommand, SuspendCommand {
@@ -57,38 +57,43 @@ class RollCommand : ChatCommand, SuspendCommand {
                     keyWord = rollKeyWord ?: "",
                     stopAfterMinute = rollDelay ?: 3,
                     count = rollThingCount
-            )
+            ) {
+                if (this is RollSession) {
+                    val group = event.bot.getGroupOrNull(groupId)
 
-            SessionManager.addSession(rollSession)
-
-            TaskUtil.runAsync(rollSession.stopAfterMinute.toLong(), TimeUnit.MINUTES) {
-                SessionManager.expireSession(rollSession)
-                val group = event.bot.getGroupOrNull(rollSession.groupId) ?: return@runAsync
-                var winner = messageChainOf()
-                rollSession.getWinningUsers().forEach {
-                    if (it.member != null) winner = winner.plus(At(it.member))
-                }
-                runBlocking {
-                    group.sendMessage(
-                            BotUtil.sendMessage(
-                                    "由${(rollSession.rollStarter as Member).nameCardOrNick.limitStringSize(10)}发起的抽奖开奖了!\n" +
-                                            "奖品: ${rollSession.rollItem}\n" +
-                                            "中奖者: "
-                            ) + winner
-                    )
+                    if (group == null) {
+                        daemonLogger.warning("推送开奖消息失败: 找不到对应的群[${groupId}]")
+                    } else {
+                        var winner = messageChainOf()
+                        getWinningUsers().forEach { su ->
+                            if (su.member != null) winner = winner.plus(At(su.member))
+                        }
+                        GlobalScope.launch {
+                            group.sendMessage(
+                                    BotUtil.sendMessage(
+                                            "由${(rollStarter as Member).nameCardOrNick.limitStringSize(10)}发起的抽奖开奖了!\n" +
+                                                    "奖品: ${rollItem}\n" +
+                                                    "中奖者: "
+                                    ) + winner
+                            )
+                        }
+                    }
                 }
             }
 
+            SessionManager.addAutoCloseSession(rollSession, rollSession.stopAfterMinute)
+
             return BotUtil.sendMessage("""
                 ${event.senderName} 发起了一个抽奖!
-                抽奖物品: $rollThing
-                抽奖人数: $rollThingCount
-                参与方式: ${if (rollKeyWord == null) "在群内发送任意消息" else "发送 $rollKeyWord"}
-                将会在 ${rollDelay ?: 5} 分钟后开奖
+                抽奖物品: ${rollSession.rollItem}
+                抽奖人数: ${rollSession.count}
+                参与方式: ${if (rollSession.keyWord.isEmpty()) "在群内发送任意消息" else "发送 ${rollSession.keyWord}"}
+                将会在 ${rollSession.stopAfterMinute} 分钟后开奖
             """.trimIndent())
         }
     }
 
+    @Suppress("SpellCheckingInspection")
     override fun getProps(): CommandProps = CommandProps(
         "roll",
         arrayListOf("rl", "抽奖"),

@@ -15,14 +15,14 @@ import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.PlainText
-import net.mamoe.mirai.message.data.asMessageChain
+
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @CometCommand
+@Suppress("SpellCheckingInspection")
 class AdminCommand : ChatCommand, UnDisableableCommand {
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
@@ -42,7 +42,7 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
                     "showdata", "打卡数据", "dksj" -> {
                         return if (event is GroupMessageEvent) {
                             val data = ClockInManager.getNearestClockIn(event.group.id)
-                            data?.viewData()?.text?.let { PlainText(it).asMessageChain() }
+                            data?.viewData()?.toMessageChain(event.subject)
                                 ?: BotUtil.sendMessage("本群没有正在进行的打卡")
                         } else {
                             BotUtil.sendMessage("该命令只能在群聊使用")

@@ -39,13 +39,13 @@ class RConCommand : ChatCommand, SuspendCommand {
                         val rCon = BotVariables.rCon
                         if (rCon != null) {
                             if (args.size > 1) {
-                                try {
-                                    return withContext(Dispatchers.IO) {
-                                        return@withContext rCon.command(args.getRestString(1)).convertToChain()
+                                return try {
+                                    withContext(Dispatchers.IO) {
+                                        rCon.command(args.getRestString(1)).convertToChain()
                                     }
                                 } catch (e: IOException) {
                                     BotVariables.logger.error("在连接到 rCon 服务器时发生了错误", e)
-                                    return BotUtil.sendMessage("在连接到 rCon 服务器时发生了错误")
+                                    BotUtil.sendMessage("在连接到 rCon 服务器时发生了错误")
                                 }
                             }
                         } else {

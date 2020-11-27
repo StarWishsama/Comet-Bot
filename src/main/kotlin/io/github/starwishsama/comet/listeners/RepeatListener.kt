@@ -23,7 +23,7 @@ object RepeatListener : NListener {
     }
 
     private suspend fun handleRepeat(event: GroupMessageEvent, chance: Double) {
-        if (event.message[QuoteReply] == null && chance in 0.90..0.9009) {
+        if (event.message[QuoteReply] == null && chance in 0.50..0.508) {
             // 避免复读过多图片刷屏
             val count = event.message.parallelStream().filter { it is Image }.count()
 

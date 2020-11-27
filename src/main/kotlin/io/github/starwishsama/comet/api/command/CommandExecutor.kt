@@ -32,8 +32,8 @@ import kotlin.time.ExperimentalTime
  * @author Nameless
  */
 object CommandExecutor {
-    private var commands: MutableSet<ChatCommand> = mutableSetOf()
-    private var consoleCommands = mutableListOf<ConsoleCommand>()
+    private val commands: MutableSet<ChatCommand> = mutableSetOf()
+    private val consoleCommands = mutableListOf<ConsoleCommand>()
 
     /**
      * 注册命令
@@ -53,6 +53,7 @@ object CommandExecutor {
      *
      * @param commands 要注册的命令集合
      */
+    @Suppress("unused")
     fun setupCommand(commands: Array<ChatCommand>) {
         commands.forEach {
             if (!CommandExecutor.commands.contains(it) && it.canRegister()) {
@@ -106,7 +107,7 @@ object CommandExecutor {
                     if (isCommand) {
                         BotVariables.logger.debugS(
                                 "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(builtInMethod = true)}" +
-                                        if (result.result.isNotEmpty()) ", 执行结果: ${result.result}" else ""
+                                        if (result.result.isOk()) ", 执行结果: ${result.result.name}" else ""
                         )
                     }
                 }
@@ -139,16 +140,16 @@ object CommandExecutor {
                  * 反之在监听时仍然可以执行命令
                  */
                 if (session != null && !handleSession(event, executedTime)) {
-                    return ExecutedResult(EmptyMessageChain, cmd, "移交会话处理")
+                    return ExecutedResult(EmptyMessageChain, cmd, CommandStatus.MoveToSession())
                 }
 
                 /** 检查是否在尝试执行被禁用命令 */
                 if (cmd != null && event is GroupMessageEvent &&
                         GroupConfigManager.getConfigSafely(event.group.id).isDisabledCommand(cmd)) {
                     return if (BotUtil.hasNoCoolDown(user.id)) {
-                        ExecutedResult(BotUtil.sendMessage("该命令已被管理员禁用"), cmd, "命令已禁用")
+                        ExecutedResult(BotUtil.sendMessage("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
                     } else {
-                        ExecutedResult(EmptyMessageChain, cmd, "命令已禁用")
+                        ExecutedResult(EmptyMessageChain, cmd, CommandStatus.Disabled())
                     }
                 }
 
@@ -158,14 +159,14 @@ object CommandExecutor {
 
                     BotVariables.logger.debug("[命令] $senderId 尝试执行命令: $message")
 
-                    val status: String
+                    val status: CommandStatus
 
                     /** 检查是否有权限执行命令 */
                     val result: MessageChain = if (cmd.hasPermission(user, event)) {
-                        status = "成功"
+                        status = CommandStatus.Success()
                         cmd.execute(event, splitMessage, user)
                     } else {
-                        status = "权限不足"
+                        status = CommandStatus.NoPermission()
                         BotUtil.sendMessage("你没有权限!")
                     }
 
@@ -178,9 +179,9 @@ object CommandExecutor {
                 } else {
                     BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message.split(" ")}, 发送者: $senderId\n${t.stackTraceToString()}")
                     if (user.isBotOwner()) {
-                        ExecutedResult(BotUtil.sendMessage("在试图执行命令时发生了一个错误\n简易报错信息 (如果有的话):\n${t.javaClass.name}: ${t.message}"), cmd, "失败")
+                        ExecutedResult(BotUtil.sendMessage("在试图执行命令时发生了一个错误\n简易报错信息 (如果有的话):\n${t.javaClass.name}: ${t.message}"), cmd, CommandStatus.Failed())
                     } else {
-                        ExecutedResult(BotUtil.sendMessage("在试图执行命令时发生了一个错误, 请联系管理员"), cmd, "失败")
+                        ExecutedResult(BotUtil.sendMessage("在试图执行命令时发生了一个错误, 请联系管理员"), cmd, CommandStatus.Failed())
                     }
                 }
             }
@@ -345,5 +346,15 @@ object CommandExecutor {
 
     fun getCommands() = commands
 
-    data class ExecutedResult(val msg: MessageChain, val cmd: ChatCommand?, val result: String = "")
+    data class ExecutedResult(val msg: MessageChain, val cmd: ChatCommand?, val result: CommandStatus = CommandStatus.Success())
+
+    sealed class CommandStatus(val name: String) {
+        class Success: CommandStatus("成功")
+        class NoPermission: CommandStatus("无权限")
+        class Failed: CommandStatus("失败")
+        class Disabled: CommandStatus("命令被禁用")
+        class MoveToSession: CommandStatus("移交会话处理")
+
+        fun isOk(): Boolean = this == Success()
+    }
 }

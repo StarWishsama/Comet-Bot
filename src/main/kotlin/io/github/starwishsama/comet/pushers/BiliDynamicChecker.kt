@@ -24,10 +24,10 @@ object BiliDynamicChecker : CometPusher {
     override val internal: Long = 3
     override var future: ScheduledFuture<*>? = null
     override var bot: Bot? = null
+    override var pushCount: Int = 0
+    override var lastPushTime: LocalDateTime = LocalDateTime.now()
 
     override fun retrieve() {
-        var count = 0
-
         val collectedUsers = mutableSetOf<Long>()
 
         perGroup.parallelStream().forEach {
@@ -59,7 +59,7 @@ object BiliDynamicChecker : CometPusher {
 
                 if (pushedList.isEmpty()) {
                     pushedList.plusAssign(pushDynamic)
-                    count++
+                    pushCount++
                 } else {
                     val target = pushedList.parallelStream().filter { it.uid == uid }.findFirst()
 
@@ -78,6 +78,11 @@ object BiliDynamicChecker : CometPusher {
                     }
                 }
             }
+        }
+
+        if (pushCount > 0) {
+            daemonLogger.verboseS("Collected bili dynamic success, have collected $pushCount dynamic!")
+            pushCount = 0
         }
 
         push()
@@ -127,6 +132,8 @@ object BiliDynamicChecker : CometPusher {
                 pdh.isPushed = true
             }
         }
+
+        lastPushTime = LocalDateTime.now()
 
         return count
     }

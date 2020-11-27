@@ -17,6 +17,7 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.events.EventCancelledException
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.PlainText
+import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 import kotlin.time.ExperimentalTime
 
@@ -26,6 +27,8 @@ object TweetUpdateChecker : CometPusher {
     override val internal: Long = cfg.twitterInterval
     override var future: ScheduledFuture<*>? = null
     override var bot: Bot? = null
+    override var pushCount: Int = 0
+    override var lastPushTime: LocalDateTime = LocalDateTime.now()
 
     @ExperimentalTime
     override fun retrieve() {
@@ -41,8 +44,6 @@ object TweetUpdateChecker : CometPusher {
             }
         }
 
-        var count = 0
-
         pushPool.forEach { (userName, pushedTweet) ->
             TaskUtil.executeRetry(2) {
                 try {
@@ -52,7 +53,7 @@ object TweetUpdateChecker : CometPusher {
 
                     if (tweet != null && !tweet.contentEquals(cache)) {
                         pushedTweet.tweet = tweet
-                        count++
+                        pushCount++
                     }
                 } catch (t: Throwable) {
                     if (!NetUtil.isTimeout(t)) {
@@ -67,7 +68,7 @@ object TweetUpdateChecker : CometPusher {
             }
         }
 
-        if (count > 0) daemonLogger.verboseS("Retrieve success, have collected $count tweet(s)!")
+        if (checkCount()) daemonLogger.verboseS("Retrieve success, have collected $pushCount tweet(s)!")
 
         push()
     }
@@ -108,10 +109,18 @@ object TweetUpdateChecker : CometPusher {
             }
         }
 
+        lastPushTime = LocalDateTime.now()
+
         return successCount
     }
 
     data class PushedTweet(val groupsToPush: MutableSet<Long>) {
         var tweet: Tweet? = null
+    }
+
+    private fun checkCount(): Boolean = try {
+        pushCount > 0
+    } finally {
+        pushCount = 0
     }
 }

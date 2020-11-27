@@ -19,16 +19,12 @@ class HelpCommand : ChatCommand {
             if (args.isEmpty()) {
                 val sb = buildString {
                     append(BotUtil.sendMessageAsString("可用的命令:\n"))
-
                     for (cmd in CommandExecutor.getCommands()) {
                         if (!cmd.isHidden) {
-                            append(cmd.getProps().name).append(",")
+                            append("/").append(cmd.getProps().name).append(",")
                         }
                     }
-
-                    removeSuffix(",")
-                    append("]")
-                }
+                }.removeSuffix(",").plus("]")
 
                 return sb.trim().convertToChain()
             } else {

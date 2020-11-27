@@ -151,17 +151,8 @@ object BotUtil {
 
     fun sendMessage(otherText: String?, addPrefix: Boolean = true): MessageChain = sendMessageAsString(otherText, addPrefix).convertToChain()
 
-    fun sendMessage(vararg otherText: String?, addPrefix: Boolean): MessageChain {
-        if (!otherText.isNullOrEmpty()) return "".convertToChain()
-
-        return buildString {
-            if (addPrefix) append(getLocalMessage("msg.bot-prefix")).append(" ")
-            otherText.forEach {
-                append(it).append("\n")
-            }
-        }.trim().convertToChain()
-
-    }
+    @JvmName("stringAsChain")
+    fun String.sendMessage(addPrefix: Boolean = true): MessageChain = sendMessage(this, addPrefix)
 
     fun List<String>.getRestString(startAt: Int): String {
         if (isEmpty()) {

@@ -21,14 +21,17 @@ import net.mamoe.mirai.message.upload
 import org.apache.commons.lang3.StringUtils
 
 @CometCommand
+@Suppress("SpellCheckingInspection")
 class ArkNightCommand : ChatCommand {
-    // 这只是一个临时测试, 未来将放入卡池链表中
     private val pool = ArkNightPool()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(event.sender.id)) {
             if (args.isNotEmpty()) {
                 when (args[0]) {
+                    "卡池", "kc", "pool" -> {
+                        // @TODO
+                    }
                     "单次寻访", "1", "单抽" -> {
                         return if (BotVariables.cfg.arkDrawUseImage) {
                             event.reply("请稍等...")

@@ -21,9 +21,9 @@ interface ChatCommand {
     /** 命令帮助文本 必填 */
     fun getHelp(): String
 
+    /** 判断用户是否有权限使用该命令, 有必要时可以重载 */
     fun hasPermission(user: BotUser, e: MessageEvent): Boolean =
             user.compareLevel(getProps().level) || user.hasPermission(getProps().permission)
-
 
     val name: String
         get() = getProps().name

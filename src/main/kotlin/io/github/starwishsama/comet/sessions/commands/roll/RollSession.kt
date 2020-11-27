@@ -7,7 +7,15 @@ import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionUser
 import net.mamoe.mirai.contact.Contact
 
-class RollSession(override var groupId: Long, val rollItem: String, val stopAfterMinute: Int, val keyWord: String, val rollStarter: Contact, val count: Int) : Session(groupId, RollCommand()), DaemonSession {
+class RollSession(
+        override var groupId: Long,
+        val rollItem: String,
+        val stopAfterMinute: Int,
+        val keyWord: String,
+        val rollStarter: Contact,
+        val count: Int,
+        beforeExpired: Session.() -> Unit
+) : Session(groupId, RollCommand(), beforeExpired), DaemonSession {
     fun getRandomUser(): SessionUser {
         val index = RandomUtil.randomInt(users.size)
         val user = users[index]

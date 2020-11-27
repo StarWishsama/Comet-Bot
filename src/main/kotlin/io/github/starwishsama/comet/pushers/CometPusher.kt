@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.pushers
 
 import net.mamoe.mirai.Bot
+import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 
 interface CometPusher {
@@ -23,6 +24,10 @@ interface CometPusher {
      * 获取该推送器使用的 Bot 实例
      */
     var bot: Bot?
+
+    var pushCount: Int
+
+    var lastPushTime: LocalDateTime
 
     /**
      * 获取逻辑

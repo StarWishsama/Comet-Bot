@@ -6,6 +6,7 @@ import com.google.gson.JsonObject
 import io.github.starwishsama.comet.objects.*
 import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.draw.items.PCRCharacter
+import io.github.starwishsama.comet.objects.draw.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.objects.group.Shop
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
@@ -30,8 +31,8 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     lateinit var filePath: File
-    const val version = "0.6-M2-39ef220"
-    const val buildTime = "2020/11/27 18:20:17"
+    const val version = "0.6-M2-8a114fb"
+    const val buildTime = "2020/11/27 22:56:57"
 
     /** 作为独立运行时使用的变量, 除 [Comet] 外禁止调用 */
     lateinit var bot: Bot
@@ -87,4 +88,6 @@ object BotVariables {
     val hmsPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 
     val yyMMddPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
+
+    val arkNightPools = mutableListOf(ArkNightPool())
 }

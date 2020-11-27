@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.getGroupOrNull
+import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 
 object YoutubeStreamingChecker : CometPusher {
@@ -17,6 +18,8 @@ object YoutubeStreamingChecker : CometPusher {
     override val internal: Long = 10
     override var future: ScheduledFuture<*>? = null
     override var bot: Bot? = null
+    override var pushCount: Int = 0
+    override var lastPushTime: LocalDateTime = LocalDateTime.now()
     val pushPool = mutableMapOf<String, PushObject>()
 
     override fun retrieve() {
