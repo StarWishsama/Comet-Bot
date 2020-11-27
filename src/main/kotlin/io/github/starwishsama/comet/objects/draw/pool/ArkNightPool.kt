@@ -21,36 +21,43 @@ class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
 
     override fun doDraw(time: Int): List<ArkNightOperator> {
         val result = mutableListOf<ArkNightOperator>()
-        var r6Count = 0
+        var r6UpRate = 0.00
 
         repeat(time) {
             // 在五十连之后的保底
-            if (it == 50) {
-                r6Count = RandomUtil.randomInt(51, time - 1)
+            if (it >= 50 && r6UpRate == 0.0) {
+                r6UpRate += 0.02
             }
 
             val probability = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
 
-            // 首先检查是否到了出保底六星的时候
-            if (r6Count != 0 && it == r6Count) {
-                result.add(getGachaItem(6, probability))
-                return@repeat
+            // 按默认抽卡规则抽出对应星级干员, 超过五十连后保底机制启用
+
+            val rare: Int =  when (probability) {
+                in 0.50..0.52 + r6UpRate -> 6 // 2%
+                in 0.0..0.08 -> 5 // 8%
+                in 0.09..0.49 -> 4 // 40%
+                else -> 3 // 50%
             }
 
-            // 最后按默认抽卡规则抽出对应星级干员
-            val rare: Int = when (probability) {
-                in 0.48..0.50 -> 6
-                in 0.0..0.08 -> 5
-                in 0.40..0.90 -> 4
-                else -> 3
+            when {
+                // 如果在保底的基础上抽到了六星, 则重置加倍概率
+                rare == 6 && r6UpRate > 0 -> r6UpRate = 0.0
+                // 究极非酋之后必爆一个六星
+                rare != 6 && r6UpRate > 0.5 -> {
+                    result.add(getGachaItem(6, r6UpRate))
+                    r6UpRate = 0.0
+                    return@repeat
+                }
             }
+
             result.add(getGachaItem(rare, probability))
         }
         return result
     }
 
     override fun getGachaItem(rare: Int): GachaItem {
-        throw UnsupportedOperationException()
+        throw UnsupportedOperationException("Please use #getGachaItem(Int, Double) instead!")
     }
 
     // 使用自定义抽卡方式
@@ -103,6 +110,7 @@ class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
                 }
                 else -> {
                     val r6Char = drawResult.parallelStream().filter { it.rare == 6 }.collect(Collectors.toList())
+
                     val r6Text = StringBuilder().apply {
                         r6Char.forEach { append("${it.name} ") }
                     }.toString().trim()
@@ -112,11 +120,12 @@ class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
                             "六星: ${r6Text}\n" +
                             "五星个数: ${drawResult.parallelStream().filter { it.rare == 5 }.count()}\n" +
                             "四星个数: ${drawResult.parallelStream().filter { it.rare == 4 }.count()}\n" +
-                            "三星个数: ${drawResult.parallelStream().filter { it.rare == 3 }.count()}"
+                            "三星个数: ${drawResult.parallelStream().filter { it.rare == 3 }.count()}\n\n" +
+                            "使用合成玉 ${drawResult.size * 600}"
                 }
             }
         } else {
-            return DrawUtil.overTimeMessage
+            return DrawUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}"
         }
     }
 }

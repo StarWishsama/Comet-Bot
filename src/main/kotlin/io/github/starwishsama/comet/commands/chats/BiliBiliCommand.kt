@@ -47,7 +47,7 @@ class BiliBiliCommand : ChatCommand {
                                     val text = item.title + "\n粉丝数: " + item.fans +
                                             "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
                                             "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") + "\n"
-                                    val dynamic = MainApi.getUserDynamicTimeline(item.mid)
+                                    val dynamic = MainApi.getWrappedDynamicTimeline(item.mid)
                                     text.convertToChain() + getDynamicText(dynamic, event)
                                 } else {
                                     BotUtil.sendMessage("找不到对应的B站用户")

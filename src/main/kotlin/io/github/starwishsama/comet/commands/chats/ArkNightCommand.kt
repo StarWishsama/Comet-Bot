@@ -69,7 +69,7 @@ class ArkNightCommand : ChatCommand {
                                 val gachaImage = withContext(Dispatchers.Default) { result.image.upload(event.subject) }
                                 gachaImage.asMessageChain()
                             } else {
-                                DrawUtil.overTimeMessage.convertToChain()
+                                (DrawUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}").convertToChain()
                             }
                         } else {
                             pool.getArkDrawResultAsString(user, 10).convertToChain()
@@ -77,7 +77,12 @@ class ArkNightCommand : ChatCommand {
                     }
                     else -> {
                         return if (StringUtils.isNumeric(args[0])) {
-                            pool.getArkDrawResultAsString(user, args[0].toInt()).convertToChain()
+                            val gachaTime: Int = try {
+                                args[0].toInt()
+                            } catch (e: NumberFormatException) {
+                                return getHelp().convertToChain()
+                            }
+                            pool.getArkDrawResultAsString(user, gachaTime).convertToChain()
                         } else {
                             getHelp().convertToChain()
                         }

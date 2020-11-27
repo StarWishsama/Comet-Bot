@@ -6,6 +6,8 @@ import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
+import java.time.LocalDateTime
 
 data class TextWithPicture(
         val item: Item,
@@ -72,4 +74,6 @@ data class TextWithPicture(
 
         return wrapped
     }
+
+    override fun getSentTime(): LocalDateTime = item.uploadTime.toLocalDateTime()
 }

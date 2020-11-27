@@ -65,14 +65,23 @@ object StringUtil {
     }
 
     /**
+     * 获取该 [LocalDateTime] 距今的时间
+     *
+     */
+    @OptIn(ExperimentalTime::class)
+    fun LocalDateTime.getLastingTime(): Duration {
+        return java.time.Duration.between(this, LocalDateTime.now()).toKotlinDuration()
+    }
+
+    /**
      * 获取该 [LocalDateTime] 距今的时间并转换为友好的字符串
      *
      * @param msMode 是否精准到毫秒
      * @param builtInMethod 是否使用 Mirai 的 [Duration.asHumanReadable]
      */
     @OptIn(ExperimentalTime::class)
-    fun LocalDateTime.getLastingTime(unit: TimeUnit = TimeUnit.SECONDS, msMode: Boolean = false, builtInMethod: Boolean = false): String {
-        val duration = java.time.Duration.between(this, LocalDateTime.now()).toKotlinDuration()
+    fun LocalDateTime.getLastingTimeAsString(unit: TimeUnit = TimeUnit.SECONDS, msMode: Boolean = false, builtInMethod: Boolean = false): String {
+        val duration = getLastingTime()
         return if (builtInMethod) duration.asHumanReadable else duration.toFriendly(maxUnit = unit, msMode = msMode)
     }
 

@@ -75,4 +75,6 @@ data class LiveBroadcast(
 
         return wrapped
     }
+
+    override fun getSentTime(): LocalDateTime = livePlayInfo.getLiveStartTime()
 }

@@ -21,7 +21,7 @@ import io.github.starwishsama.comet.listeners.GroupRelatedListener
 import io.github.starwishsama.comet.listeners.RepeatListener
 import io.github.starwishsama.comet.pushers.*
 import io.github.starwishsama.comet.utils.FileUtil
-import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
+import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.getContext
@@ -184,7 +184,7 @@ object Comet {
         startUpTask()
         startAllPusher(bot)
 
-        logger.info("彗星 Bot 启动成功, 耗时 ${startTime.getLastingTime()}")
+        logger.info("彗星 Bot 启动成功, 耗时 ${startTime.getLastingTimeAsString()}")
 
         Runtime.getRuntime().addShutdownHook(Thread {
             logger.info("[Bot] 正在关闭 Bot...")

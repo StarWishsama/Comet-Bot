@@ -3,14 +3,20 @@ package io.github.starwishsama.comet.pushers
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.perGroup
 import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertDynamic
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToDynamicData
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
 import io.github.starwishsama.comet.utils.verboseS
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
+import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
+import kotlin.time.ExperimentalTime
 
 object BiliDynamicChecker : CometPusher {
     private val pushedList = mutableSetOf<PushDynamicHistory>()
@@ -31,7 +37,7 @@ object BiliDynamicChecker : CometPusher {
         }
 
         collectedUsers.parallelStream().forEach { uid ->
-            val data: MessageWrapper? = runBlocking {
+            val dynamic: Dynamic? = runBlocking {
                 try {
                     MainApi.getUserDynamicTimeline(uid)
                 } catch (e: RuntimeException) {
@@ -42,15 +48,23 @@ object BiliDynamicChecker : CometPusher {
                 }
             }
 
-            if (data != null && data.success) {
+            val data = runBlocking { dynamic?.convertDynamic() }
+
+            if (dynamic != null && data != null && data.success) {
+                val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@forEach
+                val pushDynamic = PushDynamicHistory(uid = uid, pushContent = data, sentTime = sentTime)
+
+                // 检查是否火星了
+                if (isOutdated(pushDynamic)) return@forEach
+
                 if (pushedList.isEmpty()) {
-                    pushedList.plusAssign(PushDynamicHistory(uid, data))
+                    pushedList.plusAssign(pushDynamic)
                     count++
                 } else {
                     val target = pushedList.parallelStream().filter { it.uid == uid }.findFirst()
 
                     if (!target.isPresent) {
-                        pushedList.plusAssign(PushDynamicHistory(uid, data))
+                        pushedList.plusAssign(pushDynamic)
                     } else {
                         val oldData =
                             pushedList.parallelStream().filter { it.uid == uid && data.text == it.pushContent.text }
@@ -59,6 +73,7 @@ object BiliDynamicChecker : CometPusher {
                         if (!oldData.isPresent && target.isPresent) {
                             target.get().pushContent = data
                             target.get().isPushed = false
+                            target.get().sentTime = sentTime
                         }
                     }
                 }
@@ -104,7 +119,7 @@ object BiliDynamicChecker : CometPusher {
                             delay(1_500)
                         }
                     } catch (e: RuntimeException) {
-                        daemonLogger.warning("[推送] 将动态推送至 $gid 时发生意外", e)
+                        daemonLogger.warning("[推送] 将动态推送至 $gid 时发生意外 ${e.stackTraceToString()}")
                         return@target
                     }
                 }
@@ -120,6 +135,15 @@ object BiliDynamicChecker : CometPusher {
         val uid: Long,
         var pushContent: MessageWrapper,
         val target: MutableSet<Long> = mutableSetOf(),
+        var sentTime: LocalDateTime,
         var isPushed: Boolean = false
     )
+
+    @OptIn(ExperimentalTime::class)
+    private fun isOutdated(history: PushDynamicHistory?): Boolean {
+        if (history == null) return true
+        if (history.sentTime == LocalDateTime.MIN) return false
+
+        return history.sentTime.getLastingTime().inMinutes >= 30
+    }
 }

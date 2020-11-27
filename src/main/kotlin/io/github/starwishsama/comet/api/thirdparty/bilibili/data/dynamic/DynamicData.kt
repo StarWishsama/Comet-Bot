@@ -1,10 +1,13 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic
 
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata.*
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import java.time.LocalDateTime
 
 interface DynamicData {
     suspend fun getContact(): MessageWrapper
@@ -16,6 +19,7 @@ interface DynamicData {
         return getContact().text == other.getContact().text
     }
 
+    fun getSentTime(): LocalDateTime
 }
 
 object DynamicTypeSelector {
@@ -155,6 +159,33 @@ data class Card(
                     val name: String,
                     val content: String
             )
+        }
+    }
+}
+
+fun Dynamic.convertToDynamicData(): DynamicData? {
+    if (data.cards != null) {
+        val card = data.cards[0]
+        val singleDynamicObject = JsonParser.parseString(card.card)
+        if (singleDynamicObject.isJsonObject) {
+            val dynamicType = DynamicTypeSelector.getType(card.description.type)
+            if (dynamicType != UnknownType::class) {
+                return BotVariables.gson.fromJson(card.card, dynamicType)
+            }
+        }
+    }
+    return null
+}
+
+suspend fun Dynamic.convertDynamic(): MessageWrapper {
+    return try {
+        val data = convertToDynamicData()
+        data?.getContact() ?: MessageWrapper("错误: 不支持的动态类型", false)
+    } catch (e: Exception) {
+        if (e is ArrayIndexOutOfBoundsException) {
+            MessageWrapper("没有发过动态", false)
+        } else {
+            MessageWrapper("解析动态失败", false)
         }
     }
 }

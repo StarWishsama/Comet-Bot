@@ -1,19 +1,19 @@
 package io.github.starwishsama.comet.utils
 
-import cn.hutool.core.net.URLEncoder
+import cn.hutool.core.net.URLDecoder
 import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
-import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
+import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.network.NetUtil
+import org.jsoup.Jsoup
 import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStream
-import java.nio.charset.Charset
 import java.time.LocalDateTime
 import javax.imageio.ImageIO
 
@@ -25,9 +25,6 @@ object DrawUtil {
     const val overTimeMessage = "抽卡次数到上限了, 可以少抽一点或者等待条数自动恢复哦~\n" +
             "命令条数现在每小时会恢复100次, 封顶1000次"
 
-    // 资源下载链接, 文件位置: 干员名称/干员名称.png
-    private const val resourceUrl = "https://cdn.jsdelivr.net/gh/godofhuaye/arknight-assets@master/cg"
-
     /**
      * 根据抽卡结果合成图片
      */
@@ -38,7 +35,9 @@ object DrawUtil {
 
         val picSize = 180
 
-        val newBufferedImage = BufferedImage(picSize * ops.size, picSize, BufferedImage.TYPE_INT_RGB)
+        val picHeight = 380
+
+        val newBufferedImage = BufferedImage(picSize * ops.size, picHeight, BufferedImage.TYPE_INT_RGB)
 
         val createGraphics = newBufferedImage.createGraphics()
 
@@ -92,10 +91,7 @@ object DrawUtil {
             (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
 
     fun downloadArkNightsFile() {
-        // 安塞尔的资源不知为何没有
-        val actualSize = arkNight.size - 1
-
-        if (FileUtil.getResourceFolder().getChildFolder("ark").filesCount() < actualSize) {
+        if (FileUtil.getResourceFolder().getChildFolder("ark").filesCount() < arkNight.size) {
             val startTime = LocalDateTime.now()
             daemonLogger.info("正在下载 明日方舟图片资源文件")
 
@@ -103,31 +99,48 @@ object DrawUtil {
 
             var successCount = 0
 
-            arkNight.forEach {
-                val fileName = "${it.name}.png"
-                val pathName = URLEncoder.createDefault().encode("${it.name}/$fileName", Charset.forName("UTF-8"))
-                try {
-                    val file = File(arkLoc, fileName)
-                    if (!file.exists()) {
-                        val result = TaskUtil.executeRetry(3) {
-                            NetUtil.downloadFile(arkLoc, "$resourceUrl/$pathName", fileName)
+            val downloadList = mutableSetOf<String>()
+
+            val ele = Jsoup.connect(
+                    "http://prts.wiki/w/PRTS:%E6%96%87%E4%BB%B6%E4%B8%80%E8%A7%88/%E5%B9%B2%E5%91%98%E7%B2%BE%E8%8B%B10%E5%8D%8A%E8%BA%AB%E5%83%8F"
+            ).get().getElementsByClass("mw-parser-output")[0].select("a")
+
+
+            ele.forEach {
+                val doc2 = Jsoup.connect("http://prts.wiki/" + it.attr("href")).get()
+                downloadList.plusAssign(doc2.getElementsByClass("fullImageLink")[0].select("a").attr("href"))
+            }
+
+            // [http://prts.wiki]/images/f/ff/半身像_诗怀雅_1.png
+
+            downloadList.parallelStream().forEach { url ->
+                val opName = URLDecoder.decode(url.split("/")[4].split("_")[1], Charsets.UTF_8)
+
+                if (arkNight.stream().filter { it.name == opName }.findFirst().isPresent) {
+                    try {
+                        val file = File(arkLoc, url)
+                        if (!file.exists()) {
+                            val result = TaskUtil.executeRetry(3) {
+                                NetUtil.downloadFile(arkLoc, "http://prts.wiki$url", "$opName.png")
+                            }
+                            if (result != null) throw result
                             successCount++
                         }
-                        if (result != null) throw result
-                    }
-                } catch (e: Exception) {
-                    if (e !is ApiException)
-                        daemonLogger.warning("下载 $fileName 时出现了意外", e)
-                    else
-                        daemonLogger.warning("下载异常: ${e.message ?: "无信息"}")
-                    return@forEach
-                } finally {
-                    if (successCount > 0 && successCount % 10 == 0) {
-                        daemonLogger.info("明日方舟 > 已下载 $successCount/${arkNight.size}")
+                    } catch (e: Exception) {
+                        if (e !is ApiException)
+                            daemonLogger.warning("下载 $url 时出现了意外", e)
+                        else
+                            daemonLogger.warning("下载异常: ${e.message ?: "无信息"}")
+                        return@forEach
+                    } finally {
+                        if (successCount > 0 && successCount % 10 == 0) {
+                            daemonLogger.info("明日方舟 > 已下载 $successCount/${arkNight.size}")
+                        }
                     }
                 }
             }
-            daemonLogger.info("明日方舟 > 资源文件下载成功 [$successCount/${actualSize}], 耗时 ${startTime.getLastingTime()}")
+
+            daemonLogger.info("明日方舟 > 缺失资源文件下载成功 [$successCount/${arkNight.size}], 耗时 ${startTime.getLastingTimeAsString()}")
         }
     }
 }

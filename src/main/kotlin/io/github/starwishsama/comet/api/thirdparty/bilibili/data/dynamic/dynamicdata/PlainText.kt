@@ -6,6 +6,7 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
+import java.time.LocalDateTime
 
 data class PlainText(
         val user: UserProfile.Info,
@@ -35,4 +36,6 @@ data class PlainText(
                     "🕘 ${hmsPattern.format(item.sentTimestamp.toLocalDateTime())}"
         )
     }
+
+    override fun getSentTime(): LocalDateTime = item.sentTimestamp.toLocalDateTime()
 }

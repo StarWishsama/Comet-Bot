@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynami
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import java.time.LocalDateTime
 
 data class ShareContext(var vest: VestBean, var sketch: SketchBean) : DynamicData {
     data class VestBean(var uid: Long, var context: String)
@@ -28,5 +29,9 @@ data class ShareContext(var vest: VestBean, var sketch: SketchBean) : DynamicDat
             }
         }
         return wrapped
+    }
+
+    override fun getSentTime(): LocalDateTime {
+        TODO("Not yet implemented")
     }
 }

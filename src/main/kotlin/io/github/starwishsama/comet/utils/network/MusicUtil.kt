@@ -5,7 +5,6 @@ import com.github.salomonbrys.kotson.fromJson
 import com.github.salomonbrys.kotson.get
 import com.google.gson.*
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.message.data.LightApp
@@ -22,17 +21,13 @@ import java.net.URLEncoder
 object MusicUtil {
     /** 1分钟100次，10分钟500次，1小时2000次 */
     private const val api4qq = "https://api.qq.jsososo.com/song/urls?id="
-    private const val api4NetEase = "http://musicapi.leanapp.cn/"
+    private const val api4NetEase = "https://musicapi.leanapp.cn"
+    private val gson = GsonBuilder().serializeNulls().setLenient().disableHtmlEscaping().create()
 
     fun searchNetEaseMusic(songName: String): MessageChain {
         try {
 
-            val searchMusicResult = NetUtil.getPageContent("http://$api4NetEase/search?keywords=${
-                URLEncoder.encode(
-                        songName,
-                        "UTF-8"
-                )
-            }")
+            val searchMusicResult = NetUtil.getPageContent("$api4NetEase/search?keywords=${URLEncoder.encode(songName, "UTF-8")}")
 
             if (searchMusicResult?.isNotEmpty() == true) {
                 val searchResult = JsonParser.parseString(searchMusicResult)
@@ -57,35 +52,26 @@ object MusicUtil {
 
                             val playResult =
                                     HttpRequest.get("http://$api4NetEase/song/url?id=$musicId")
-                                    .timeout(8000).executeAsync()
+                                    .timeout(3_000).executeAsync()
                             if (playResult.isOk) {
                                 val playJson = JsonParser.parseString(playResult.body())
                                 if (playJson.isJsonObject) {
                                     val playUrl = playJson["data"].asJsonArray[0]["url"].asString
-                                    return LightApp("{\n" +
-                                            "    \"app\":\"com.tencent.structmsg\",\n" +
-                                            "    \"desc\":\"音乐\",\n" +
-                                            "    \"meta\":{\n" +
-                                            "    \"music\":{\n" +
-                                            "        \"action\":\"\",\n" +
-                                            "        \"android_pkg_name\":\"\",\n" +
-                                            "        \"app_type\":1,\n" +
-                                            "        \"appid\":\"100495085\",\n" +
-                                            "        \"desc\":\"$artistName\",\n" +
-                                            "        \"jumpUrl\":\"$musicUrl\",\n" +
-                                            "        \"musicUrl\":\"$playUrl\",\n" +
-                                            "        \"preview\":\"$albumUrl\",\n" +
-                                            "        \"sourceMsgId\":0,\n" +
-                                            "        \"source_icon\":\"\",\n" +
-                                            "        \"source_url\":\"\",\n" +
-                                            "        \"tag\":\"网易云音乐\",\n" +
-                                            "        \"title\":\"$name\"\n" +
-                                            "    }\n" +
-                                            "},\n" +
-                                            "\"prompt\":\"[分享 $name]\",\n" +
-                                            "\"ver\":\"0.0.0.1\",\n" +
-                                            "\"view\":\"music\"\n" +
-                                            "}").asMessageChain()
+
+                                    val music = MusicCard.Meta.Music(
+                                            jumpUrl = musicUrl,
+                                            playMusicUrl = playUrl,
+                                            previewImageUrl = albumUrl,
+                                            singerName = artistName,
+                                            title = name
+                                    )
+                                    val card = MusicCard(meta = MusicCard.Meta(music))
+                                    card.prompt = "[分享]${name}"
+                                    card.config.currentTime = 1605934298
+                                    card.config.token = "66483da4edc6ea53a0646e4e60bb8a89"
+                                    card.extra = "{\\\"app_type\\\":1,\\\"appid\\\":100495085,\\\"msg_seq\\\":6897435295466737212,\\\"uin\\\":1}"
+
+                                    return LightApp(gson.toJson(card)).asMessageChain()
                                 }
                             }
                         }
@@ -118,8 +104,8 @@ object MusicUtil {
                 if (playResult?.isNotBlank() == true) {
                     val playUrl = JsonParser.parseString(playResult).asJsonObject["data"].asJsonObject[song.songMid].asString
 
-                    val meta = QQCard.Meta(
-                            QQCard.Meta.Music(
+                    val meta = MusicCard.Meta(
+                            MusicCard.Meta.Music(
                                     jumpUrl = "https://y.qq.com/n/yqq/song/${song.songMid}.html?ADTAG=h5_playsong&no_redirect=1",
                                     playMusicUrl = playUrl,
                                     previewImageUrl = "http://imgcache.qq.com/music/photo/album_300/17/300_albumpic_${song.albumId}_0.jpg",
@@ -128,7 +114,7 @@ object MusicUtil {
                             )
                     )
 
-                    val card = QQCard(meta = meta)
+                    val card = MusicCard(meta = meta)
                     card.prompt = "[分享]${song.songName}"
 
                     return LightApp(gson.toJson(card)).asMessageChain()
@@ -280,7 +266,7 @@ object MusicUtil {
         }
     }
     
-    data class QQCard(
+    data class MusicCard(
             @SerializedName("app")
             val app: String = "com.tencent.structmsg",
             @SerializedName("desc")
@@ -312,7 +298,7 @@ object MusicUtil {
             val sourceAd: String = "",
             /** msg_seq 不可修改 */
             @SerializedName("extra")
-            val extra: String = """{"app_type":1,"appid":100497308,"msg_seq":6897056676240247867,"uin":1}"""
+            var extra: String = "{\\\"app_type\\\":1,\\\"appid\\\":100497308,\\\"msg_seq\\\":6897056676240247867,\\\"uin\\\":1}"
     ) {
         data class Meta(
                 val music: Music
@@ -324,7 +310,7 @@ object MusicUtil {
                     @SerializedName("app_type")
                     val appType: Int = 1,
                     @SerializedName("appid")
-                    val appId: Long = 100497308,
+                    var appId: Long = 100497308,
                     @SerializedName("desc")
                     val singerName: String,
                     @SerializedName("jumpUrl")
@@ -340,7 +326,7 @@ object MusicUtil {
                     @SerializedName("source_url")
                     val sourceUrl: String = "",
                     @SerializedName("tag")
-                    val tag: String = "QQ音乐",
+                    var tag: String = "QQ音乐",
                     @SerializedName("title")
                     val title: String
             )
@@ -351,7 +337,7 @@ object MusicUtil {
                 val autoSize: Boolean = true,
                 /** 不可修改, 可能会失效 */
                 @SerializedName("ctime")
-                val currentTime: Long = 1605846146,
+                var currentTime: Long = 1605846146,
                 @SerializedName("forward")
                 val forward: Boolean = true,
                 /** 不可修改, 可能会失效 */

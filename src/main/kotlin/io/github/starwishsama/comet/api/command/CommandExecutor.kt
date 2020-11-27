@@ -11,7 +11,7 @@ import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
-import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
+import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.debugS
 import io.github.starwishsama.comet.utils.network.NetUtil
 import net.mamoe.mirai.Bot
@@ -105,7 +105,7 @@ object CommandExecutor {
 
                     if (isCommand) {
                         BotVariables.logger.debugS(
-                                "[命令] 命令执行耗时 ${executedTime.getLastingTime(builtInMethod = true)}" +
+                                "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(builtInMethod = true)}" +
                                         if (result.result.isNotEmpty()) ", 执行结果: ${result.result}" else ""
                         )
                     }
@@ -173,7 +173,8 @@ object CommandExecutor {
                 }
             } catch (t: Throwable) {
                 return if (NetUtil.isTimeout(t)) {
-                    ExecutedResult("Bot > 在执行网络操作时连接超时".convertToChain(), cmd)
+                    BotVariables.logger.warning("疑似连接超时: \n${t.stackTraceToString()}")
+                    ExecutedResult("Bot > 在执行网络操作时连接超时: ${t.message ?: ""}".convertToChain(), cmd)
                 } else {
                     BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message.split(" ")}, 发送者: $senderId\n${t.stackTraceToString()}")
                     if (user.isBotOwner()) {
@@ -228,7 +229,7 @@ object CommandExecutor {
         }
 
         BotVariables.logger.debug(
-                "[会话] 处理会话耗时 ${time.getLastingTime(unit = TimeUnit.SECONDS, msMode = true)}"
+                "[会话] 处理会话耗时 ${time.getLastingTimeAsString(unit = TimeUnit.SECONDS, msMode = true)}"
         )
         return true
     }

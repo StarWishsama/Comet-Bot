@@ -8,7 +8,9 @@ import net.mamoe.mirai.event.subscribeAlways
 object GroupRelatedListener: NListener {
     override fun register(bot: Bot) {
         bot.subscribeAlways<BotJoinGroupEvent> {
-            GroupConfigManager.createNewConfig(group.id)
+            if (GroupConfigManager.getConfig(group.id) == null) {
+                GroupConfigManager.createNewConfig(group.id)
+            }
         }
     }
 

@@ -47,7 +47,7 @@ object MainApi : ApiExecutor {
     }
 
     @Throws(ApiException::class)
-    fun getDynamicById(id: Long): Dynamic? {
+    fun getDynamicById(id: Long): Dynamic {
         if (isReachLimit()) {
             throw RateLimitException(apiRateLimit)
         }
@@ -66,7 +66,7 @@ object MainApi : ApiExecutor {
 
     @Suppress("BlockingMethodInNonBlockingContext")
     @Throws(ApiException::class)
-    suspend fun getUserDynamicTimeline(mid: Long): MessageWrapper {
+    fun getUserDynamicTimeline(mid: Long): Dynamic? {
         if (isReachLimit()) {
             throw RateLimitException(apiRateLimit)
         }
@@ -78,34 +78,46 @@ object MainApi : ApiExecutor {
             var body = ""
             try {
                 if (response.isSuccessful) {
-                    body = response.body()?.string() ?: return MessageWrapper("无法获取动态", false)
-                    val dynamicList = gson.fromJson<Dynamic>(body)
-
-                    if (dynamicList.data.cards != null) {
-                        if (dynamicList.data.cards.isEmpty()) return MessageWrapper("没有发过动态", false)
-
-                        val card = dynamicList.data.cards[0]
-                        val singleDynamicObject = JsonParser.parseString(card.card)
-                        if (singleDynamicObject.isJsonObject) {
-                            val dynamicType = DynamicTypeSelector.getType(card.description.type)
-                            return if (dynamicType != UnknownType::class) {
-                                gson.fromJson(card.card, dynamicType).getContact()
-                            } else {
-                                MessageWrapper("错误: 不支持的动态类型", false)
-                            }
-                        }
-                    }
+                    body = response.body()?.string() ?: return null
+                    return gson.fromJson(body)
                 }
             } catch (e: Exception) {
                 if (e is JsonSyntaxException || e is JsonParseException || e !is IOException) {
                     FileUtil.createErrorReportFile("解析动态失败", "bilibili", e, body, "请求 URL 为: $url")
-                    return MessageWrapper("解析动态失败", false)
+                    throw ApiException("解析动态失败")
                 } else {
                     daemonLogger.warning("解析动态时出现异常", e)
                 }
             }
         }
-        return MessageWrapper("无法获取动态", false)
+        throw ApiException("无法获取动态")
+    }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    @Throws(ApiException::class)
+    suspend fun getWrappedDynamicTimeline(mid: Long): MessageWrapper {
+        val dynamic = getUserDynamicTimeline(mid) ?: return MessageWrapper("获取动态失败", false)
+
+        try {
+            if (dynamic.data.cards != null) {
+                if (dynamic.data.cards.isEmpty()) return MessageWrapper("没有发过动态", false)
+
+                val card = dynamic.data.cards[0]
+                val singleDynamicObject = JsonParser.parseString(card.card)
+                if (singleDynamicObject.isJsonObject) {
+                    val dynamicType = DynamicTypeSelector.getType(card.description.type)
+                    return if (dynamicType != UnknownType::class) {
+                        gson.fromJson(card.card, dynamicType).getContact()
+                    } else {
+                        MessageWrapper("错误: 不支持的动态类型", false)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            return MessageWrapper("解析动态失败", false)
+        }
+
+        return MessageWrapper("获取动态失败", false)
     }
 
     /**
@@ -113,9 +125,9 @@ object MainApi : ApiExecutor {
      *
      * 上方搜索栏 -> 用户
      *
-     * @param order 排序维度. totalrank 默认排序,fans 粉丝, level 等级.
-     * @param orderSort 排序顺序. 0 从高到低, 1 从低到高.
-     * @param userType 用户类型. 0 全部用户, 1 up主, 2 普通用户, 3 认证用户.
+     *  order 排序维度. totalrank 默认排序,fans 粉丝, level 等级.
+     *  orderSort 排序顺序. 0 从高到低, 1 从低到高.
+     *  userType 用户类型. 0 全部用户, 1 up主, 2 普通用户, 3 认证用户.
      *
      */
     /**@Suppress("SpellCheckingInspection")

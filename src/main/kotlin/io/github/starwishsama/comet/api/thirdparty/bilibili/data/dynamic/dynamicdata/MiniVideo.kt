@@ -3,11 +3,13 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynami
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
+import java.time.LocalDateTime
 
-class MiniVideo : DynamicData {
-    var item: Item? = null
-    var user: AuthorProfile? = null
-
+data class MiniVideo(
+        val item: Item?,
+        val user: AuthorProfile
+) : DynamicData {
     data class AuthorProfile(
             val uid: Int,
             @SerializedName("name")
@@ -46,4 +48,6 @@ class MiniVideo : DynamicData {
 
         return wrapped
     }
+
+    override fun getSentTime(): LocalDateTime = item?.sentTimestamp?.toLocalDateTime() ?: LocalDateTime.MIN
 }

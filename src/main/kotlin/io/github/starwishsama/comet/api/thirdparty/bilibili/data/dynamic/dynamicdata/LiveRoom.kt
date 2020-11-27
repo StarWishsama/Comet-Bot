@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 data class LiveRoom(
         /** 直播间 ID, 例如 21396545 */
@@ -88,6 +90,8 @@ data class LiveRoom(
         @SerializedName("face")
         val face: String
 ) : DynamicData {
+    val yyMMddPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+
     private fun getRoomURL(): String = "https://live.bilibili.com/$roomID"
 
     enum class Status(var status: String) {
@@ -115,4 +119,6 @@ data class LiveRoom(
         }
         return wrapped
     }
+
+    override fun getSentTime(): LocalDateTime = LocalDateTime.from(yyMMddPattern.parse(liveTime))
 }

@@ -170,7 +170,7 @@ object NetUtil {
      * @param fileFolder 下载文件储存的文件夹
      * @param fileName 下载文件的名称
      */
-    fun downloadFile(fileFolder: File, address: String, fileName: String): File? {
+    fun downloadFile(fileFolder: File, address: String, fileName: String): File {
         val file = File(fileFolder, fileName)
         val url = URL(address)
         val conn = url.openConnection() as HttpURLConnection
@@ -204,7 +204,7 @@ object NetUtil {
     }
 
     fun isTimeout(t: Throwable): Boolean {
-        val msg = t.message?.toLowerCase() ?: return t is IOException
+        val msg = t.message?.toLowerCase() ?: return false
         // FIXME: 这不是一个很好的识别方法
         return msg.containsEtc(false, "time", "out") || t.javaClass.simpleName.toLowerCase().contains("timeout")
     }
