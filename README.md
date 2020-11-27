@@ -100,3 +100,7 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
 特别感谢 [JetBrains](https://www.jetbrains.com/?from=comet-bot) 为开源项目提供免费的 [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=comet-bot) 等 IDE 的授权  
 [<img src=".github/jetbrains.png" width="200"/>](https://www.jetbrains.com/?from=comet-bot)
 
+> [PRTS Wiki](http://prts.wiki/) 玩家自由构筑的明日方舟中文 Wiki
+
+特别感谢 PRTS Wiki 提供的干员数据以及干员立绘
+

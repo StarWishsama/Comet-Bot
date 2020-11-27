@@ -85,3 +85,7 @@ This project uses [AGPL v3.0](https://github.com/StarWishsama/Comet-Bot/blob/mas
 
 Big thanks to [JetBrains](https://www.jetbrains.com/?from=comet-bot) for allocating free open-source licences for Jetbrains' IDEs such as [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=comet-bot) 
 [<img src=".github/jetbrains.png" width="200"/>](https://www.jetbrains.com/?from=comet-bot)
+
+> [PRTS Wiki](http://prts.wiki/) A Chinese ArkNights wiki built by players freely
+
+Big thanks to PRTS Wiki for providing ArkNights operator data and art
