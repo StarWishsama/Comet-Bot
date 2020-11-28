@@ -64,7 +64,7 @@ object MusicUtil {
                                             singerName = artistName,
                                             title = name
                                     )
-                                    val card = MusicCard(meta = MusicCard.Meta(music))
+                                    val card = MusicCard(meta = MusicCard.Meta(music), version = "0.0.0.1")
                                     card.prompt = "[分享]${name}"
                                     card.config.currentTime = 1605934298
                                     card.config.token = "66483da4edc6ea53a0646e4e60bb8a89"
@@ -113,7 +113,7 @@ object MusicUtil {
                             )
                     )
 
-                    val card = MusicCard(meta = meta)
+                    val card = MusicCard(meta = meta, version = "0.0.0.1")
                     card.prompt = "[分享]${song.songName}"
 
                     return LightApp(gson.toJson(card)).asMessageChain()
@@ -273,7 +273,7 @@ object MusicUtil {
             @SerializedName("view")
             val viewType: String = "music",
             @SerializedName("ver")
-            val version: String = "0.0.0.1",
+            val version: String,
             /** 展示为纯文本消息时的样式 */
             @SerializedName("prompt")
             var prompt: String = "[分享]",
