@@ -7,6 +7,7 @@ import cn.hutool.crypto.SecureUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
+import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import java.io.File
 import java.io.IOException
 import java.net.URL
@@ -246,9 +247,17 @@ object FileUtil {
                     val relative = jarPath.relativize(file)
                     val copyTarget = target.resolve(relative.toString())
                     try {
-                        if (!copyTarget.toFile().exists()) {
+                        val f = copyTarget.toFile()
+
+                        if (!f.exists()) {
                             Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
                             daemonLogger.debugS("Copied file ${file.fileName}")
+                        } else {
+                            // 更新资源文件
+                            if (f.lastModified().toLocalDateTime() > file.toFile().lastModified().toLocalDateTime()) {
+                                Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
+                                daemonLogger.debugS("Copied file ${file.fileName}")
+                            }
                         }
                     } catch (e: UnsupportedOperationException) {
                         Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)

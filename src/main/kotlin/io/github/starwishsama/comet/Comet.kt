@@ -3,6 +3,7 @@ package io.github.starwishsama.comet
 import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.consoleCommandLogger
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.filePath
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.BotVariables.startTime
@@ -34,15 +35,19 @@ import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.join
+import net.mamoe.mirai.network.ForceOfflineException
 import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.PlatformLogger
 import net.mamoe.mirai.utils.secondsToMillis
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.time.ExperimentalTime
+
 
 object Comet {
     @ExperimentalTime
@@ -76,18 +81,17 @@ object Comet {
 
     private fun handleConsoleCommand() {
         TaskUtil.runAsync {
-            val scanner = Scanner(System.`in`)
-            var command: String
-            while (scanner.hasNextLine()) {
-                command = scanner.nextLine()
-                runBlocking {
-                    val result = CommandExecutor.dispatchConsoleCommand(command)
-                    if (result.isNotEmpty()) {
-                        consoleCommandLogger.info(result)
+            BufferedReader(InputStreamReader(System.`in`)).use { br ->
+                var line: String
+                while (br.readLine().also { line = it } != null) {
+                    runBlocking {
+                        val result = CommandExecutor.dispatchConsoleCommand(line)
+                        if (result.isNotEmpty()) {
+                            consoleCommandLogger.info(result)
+                        }
                     }
                 }
             }
-            scanner.close()
         }
     }
 
@@ -115,25 +119,25 @@ object Comet {
 
     @ExperimentalTime
     suspend fun startBot(qqId: Long, password: String) {
-        val config = BotConfiguration.Default
-        config.botLoggerSupplier = { it ->
-            PlatformLogger("Comet ${it.id}", {
-                BotVariables.log.writeString(BotVariables.log.getContext() + "$it\n")
-                println(it)
-            })
+        val config = BotConfiguration.Default.apply {
+            botLoggerSupplier = { it ->
+                PlatformLogger("Comet ${it.id}", {
+                    BotVariables.log.writeString(BotVariables.log.getContext() + "$it\n")
+                    println(it)
+                })
+            }
+            networkLoggerSupplier = { it ->
+                PlatformLogger("CometNet ${it.id}", {
+                    BotVariables.log.writeString(BotVariables.log.getContext() + "$it\n")
+                    println(it)
+                })
+            }
+            heartbeatPeriodMillis = (cfg.heartBeatPeriod * 60).secondsToMillis
+            fileBasedDeviceInfo()
+            protocol = cfg.botProtocol
+            fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
         }
-        config.networkLoggerSupplier = { it ->
-            PlatformLogger("CometNet ${it.id}", {
-                BotVariables.log.writeString(BotVariables.log.getContext() + "$it\n")
-                println(it)
-            })
-        }
-        config.heartbeatPeriodMillis = (cfg.heartBeatPeriod * 60).secondsToMillis
-        config.fileBasedDeviceInfo()
-        config.protocol = cfg.botProtocol
-        config.fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
-        bot = Bot(qq = qqId, password = password, configuration = config)
-        bot.alsoLogin()
+        bot = Bot(qq = qqId, password = password, configuration = config).alsoLogin()
 
         DataSetup.initPerGroupSetting(bot)
 
@@ -186,19 +190,19 @@ object Comet {
 
         logger.info("彗星 Bot 启动成功, 耗时 ${startTime.getLastingTimeAsString()}")
 
-        Runtime.getRuntime().addShutdownHook(Thread {
-            logger.info("[Bot] 正在关闭 Bot...")
-            NetUtil.closeDriver()
-            DataSetup.saveFiles()
-            BotVariables.service.shutdown()
-            BotVariables.rCon?.disconnect()
-        })
+        Runtime.getRuntime().addShutdownHook(Thread { invokeWhenClose() })
 
         CommandExecutor.startHandler(bot)
 
         handleConsoleCommand()
 
-        bot.join() // 等待 Bot 离线, 避免主线程退出
+        try {
+            bot.join() // 等待 Bot 离线, 避免主线程退出
+        } catch (e: ForceOfflineException) {
+            daemonLogger.warning("账号被强制下线")
+            invokeWhenClose()
+            startBot(cfg.botId, cfg.botPassword)
+        }
     }
 }
 
@@ -229,42 +233,47 @@ suspend fun main() {
 
     val id = cfg.botId
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     if (id == 0L) {
-        println("请输入欲登录的机器人账号")
-        val scanner = Scanner(System.`in`)
-        var command: String
-        var isFailed = false
-        while (scanner.hasNextLine()) {
-            if (BotVariables.isBotInitialized() && bot.isOnline) {
-                scanner.close()
-                break
-            }
-
-            command = scanner.nextLine()
-            if (cfg.botId == 0L && command.isNumeric()) {
-                cfg.botId = command.toLong()
-                println("成功设置账号为 ${cfg.botId}")
-                println("请输入欲登录的机器人密码")
-            } else if (cfg.botPassword.isEmpty() || isFailed) {
-                cfg.botPassword = command
-                println("成功设置密码, 按下 Enter 启动机器人")
-                isFailed = false
-            } else if (cfg.botId != 0L && cfg.botPassword.isNotEmpty()) {
-                println("请稍等...")
-
-                try {
-                    Comet.startBot(cfg.botId, cfg.botPassword)
-                    bot.join() // 等待 Bot 离线, 避免主线程退出
-                } catch (e: LoginFailedException) {
-                    println("登录失败: ${e.message}\n如果是密码错误, 请重新输入密码")
-                    isFailed = true
-                    continue
+        daemonLogger.info("请输入欲登录的机器人账号")
+        BufferedReader(InputStreamReader(System.`in`)).use { br ->
+            var command: String
+            var isFailed = false
+            while (br.readLine().also { command = it } != null) {
+                if (BotVariables.isBotInitialized() && bot.isOnline) {
+                    break
                 }
-                break
+                if (cfg.botId == 0L && command.isNumeric()) {
+                    cfg.botId = command.toLong()
+                    daemonLogger.info("成功设置账号为 ${cfg.botId}")
+                    daemonLogger.info("请输入欲登录的机器人密码")
+                } else if (cfg.botPassword.isEmpty() || isFailed) {
+                    cfg.botPassword = command
+                    daemonLogger.info("成功设置密码, 按下 Enter 启动机器人")
+                    isFailed = false
+                } else if (cfg.botId != 0L && cfg.botPassword.isNotEmpty()) {
+                    daemonLogger.info("请稍等...")
+                    try {
+                        Comet.startBot(cfg.botId, cfg.botPassword)
+                    } catch (e: LoginFailedException) {
+                        println("登录失败: ${e.message}\n如果是密码错误, 请重新输入密码")
+                        isFailed = true
+                        continue
+                    }
+                    break
+                }
             }
         }
-        scanner.close()
     } else {
+        daemonLogger.info("检测到登录数据, 正在自动登录账号 ${cfg.botId}")
         Comet.startBot(cfg.botId, cfg.botPassword)
     }
+}
+
+private fun invokeWhenClose(){
+    logger.info("[Bot] 正在关闭 Bot...")
+    NetUtil.closeDriver()
+    DataSetup.saveFiles()
+    BotVariables.service.shutdown()
+    BotVariables.rCon?.disconnect()
 }

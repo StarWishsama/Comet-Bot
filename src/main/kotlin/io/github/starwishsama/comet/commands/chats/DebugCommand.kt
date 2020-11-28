@@ -19,25 +19,20 @@ import io.github.starwishsama.comet.pushers.*
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.sendMessage
-import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.RssUtil
-import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.message.uploadAsGroupVoice
 import net.mamoe.mirai.message.uploadAsImage
 import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.support.ui.ExpectedCondition
 import org.openqa.selenium.support.ui.WebDriverWait
-import java.io.File
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.concurrent.ThreadPoolExecutor
 import kotlin.time.ExperimentalTime
@@ -144,18 +139,6 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                                 ?: return "Can't retrieve page content".convertToChain()
                                 )
                         ).convertToChain()
-                    }
-                }
-                "watame" -> {
-                    try {
-                        val voice = File(
-                                FileUtil.getResourceFolder().toString() + "${File.separator}voice",
-                                "watame_janken.amr"
-                        ).inputStream()
-                        if (event is GroupMessageEvent)
-                            return voice.uploadAsGroupVoice(event.group).asMessageChain()
-                    } catch (ignored: FileNotFoundException) {
-                        return "File doesn't exists.".convertToChain()
                     }
                 }
                 "executors" -> {

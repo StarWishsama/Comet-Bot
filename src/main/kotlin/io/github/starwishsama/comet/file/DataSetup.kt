@@ -147,25 +147,21 @@ object DataSetup {
             perGroupFolder.mkdirs()
         }
 
-        var count = 0
-
         bot.groups.forEach {
             val loc = File(perGroupFolder, "${it.id}.json")
             if (!loc.exists()) {
                 FileUtil.createBlankFile(loc)
                 BotVariables.perGroup.add(PerGroupConfig(it.id))
-                count++
             } else {
                 try {
                     BotVariables.perGroup.add(loc.parseAsClass(PerGroupConfig::class.java))
-                    count++
                 } catch (e: Exception) {
                     BotVariables.logger.warning("[配置] 在加载分群配置时出现了问题", e)
                 }
             }
         }
 
-        BotVariables.logger.info("[配置] 成功加载了 $count 个群配置")
+        BotVariables.logger.info("[配置] 成功加载了 ${BotVariables.perGroup.size} 个群配置")
     }
 
     private fun savePerGroupSetting() {
