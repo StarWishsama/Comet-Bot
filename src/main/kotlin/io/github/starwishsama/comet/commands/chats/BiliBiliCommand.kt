@@ -10,6 +10,7 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import kotlinx.coroutines.delay
@@ -44,7 +45,7 @@ class BiliBiliCommand : ChatCommand {
                                 event.quoteReply("请稍等...")
                                 val item = FakeClientApi.getUser(args[1])
                                 if (item != null) {
-                                    val text = item.title + "\n粉丝数: " + item.fans +
+                                    val text = item.title + "\n粉丝数: " + item.fans.getBetterNumber() +
                                             "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
                                             "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") + "\n"
                                     val dynamic = MainApi.getWrappedDynamicTimeline(item.mid)

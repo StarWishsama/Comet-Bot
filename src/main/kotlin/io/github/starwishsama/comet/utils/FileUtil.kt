@@ -246,21 +246,18 @@ object FileUtil {
                 try {
                     val relative = jarPath.relativize(file)
                     val copyTarget = target.resolve(relative.toString())
-                    try {
-                        val f = copyTarget.toFile()
 
-                        if (!f.exists()) {
+                    val f = copyTarget.toFile()
+
+                    if (!f.exists()) {
+                        Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
+                        daemonLogger.debugS("Copied file ${file.fileName}")
+                    } else {
+                        // 更新资源文件
+                        if (f.lastModified().toLocalDateTime() > file.toFile().lastModified().toLocalDateTime()) {
                             Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
                             daemonLogger.debugS("Copied file ${file.fileName}")
-                        } else {
-                            // 更新资源文件
-                            if (f.lastModified().toLocalDateTime() > file.toFile().lastModified().toLocalDateTime()) {
-                                Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
-                                daemonLogger.debugS("Copied file ${file.fileName}")
-                            }
                         }
-                    } catch (e: UnsupportedOperationException) {
-                        Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
                     }
                 } catch (e: IOException) {
                     daemonLogger.warningS("Can't copy ${file.fileName} from jar", e)
