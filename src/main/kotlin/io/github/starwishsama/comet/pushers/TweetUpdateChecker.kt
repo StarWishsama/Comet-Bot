@@ -32,6 +32,8 @@ object TweetUpdateChecker : CometPusher {
 
     @ExperimentalTime
     override fun retrieve() {
+        pushCount = 0
+
         BotVariables.perGroup.parallelStream().forEach { cfg ->
             if (cfg.twitterPushEnabled) {
                 cfg.twitterSubscribers.forEach {
@@ -68,7 +70,7 @@ object TweetUpdateChecker : CometPusher {
             }
         }
 
-        if (checkCount()) daemonLogger.verboseS("Retrieve success, have collected $pushCount tweet(s)!")
+        if (pushCount > 0) daemonLogger.verboseS("Retrieve success, have collected $pushCount tweet(s)!")
 
         push()
     }
@@ -116,11 +118,5 @@ object TweetUpdateChecker : CometPusher {
 
     data class PushedTweet(val groupsToPush: MutableSet<Long>) {
         var tweet: Tweet? = null
-    }
-
-    private fun checkCount(): Boolean = try {
-        pushCount > 0
-    } finally {
-        pushCount = 0
     }
 }

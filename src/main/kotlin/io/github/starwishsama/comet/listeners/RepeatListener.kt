@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.listeners
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
@@ -23,7 +24,13 @@ object RepeatListener : NListener {
     }
 
     private suspend fun handleRepeat(event: GroupMessageEvent, chance: Double) {
-        if (event.message[QuoteReply] == null && chance in 0.50..0.508) {
+        if (event.message[QuoteReply] == null && chance in 0.50..0.505) {
+            cfg.commandPrefix.forEach {
+                if (event.message.contentToString().startsWith(it)) {
+                    return
+                }
+            }
+
             // 避免复读过多图片刷屏
             val count = event.message.parallelStream().filter { it is Image }.count()
 

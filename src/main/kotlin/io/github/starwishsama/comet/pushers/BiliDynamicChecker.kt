@@ -28,6 +28,8 @@ object BiliDynamicChecker : CometPusher {
     override var lastPushTime: LocalDateTime = LocalDateTime.now()
 
     override fun retrieve() {
+        pushCount = 0
+
         val collectedUsers = mutableSetOf<Long>()
 
         perGroup.parallelStream().forEach {
@@ -82,7 +84,6 @@ object BiliDynamicChecker : CometPusher {
 
         if (pushCount > 0) {
             daemonLogger.verboseS("Collected bili dynamic success, have collected $pushCount dynamic!")
-            pushCount = 0
         }
 
         push()

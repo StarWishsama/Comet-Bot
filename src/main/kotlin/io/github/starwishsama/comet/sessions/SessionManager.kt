@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.sessions
 
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.utils.TaskUtil
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
@@ -36,6 +37,7 @@ object SessionManager {
     fun addAutoCloseSession(session: Session, closeAfterMinute: Int) {
         sessions[session] = LocalDateTime.now()
         TaskUtil.runAsync(closeAfterMinute.toLong(), TimeUnit.MINUTES) {
+            daemonLogger.info("自动关闭会话 ${session::class.java.simpleName + "#" + session.hashCode()} 中")
             session.beforeExpired
             sessions.remove(session)
         }
@@ -61,7 +63,7 @@ object SessionManager {
         return getSession(id) != null || isValidSessionByGroup(id)
     }
 
-    fun isValidSessionByGroup(groupId: Long): Boolean {
+    private fun isValidSessionByGroup(groupId: Long): Boolean {
         return getSessionByGroup(groupId) != null
     }
 
@@ -76,9 +78,9 @@ object SessionManager {
         return null
     }
 
-    fun getSessionByGroup(id: Long): Session? {
+    fun getSessionByGroup(id: Long, type: Class<out Session>? = null): Session? {
         for (session in sessions) {
-            if (session.key.groupId == id) {
+            if (session.key.groupId == id && session::class == type) {
                 return session.key
             }
         }

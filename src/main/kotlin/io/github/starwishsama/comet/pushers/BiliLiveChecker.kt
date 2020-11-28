@@ -30,6 +30,8 @@ object BiliLiveChecker : CometPusher {
     override var lastPushTime: LocalDateTime = LocalDateTime.now()
 
     override fun retrieve() {
+        pushCount = 0
+
         val collectedUsers = mutableSetOf<Long>()
 
         BotVariables.perGroup.parallelStream().forEach {
@@ -74,7 +76,6 @@ object BiliLiveChecker : CometPusher {
 
         if (pushCount > 0) {
             daemonLogger.verboseS("Retrieve success, have collected $pushCount liver(s)!")
-            pushCount = 0
         }
 
         push()

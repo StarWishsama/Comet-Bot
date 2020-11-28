@@ -226,47 +226,52 @@ fun initResources() {
     NetUtil.initDriver()
 }
 
+@OptIn(ExperimentalTime::class)
 @ExperimentalStdlibApi
-@ExperimentalTime
 suspend fun main() {
     initResources()
 
     val id = cfg.botId
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     if (id == 0L) {
-        daemonLogger.info("请输入欲登录的机器人账号")
-        BufferedReader(InputStreamReader(System.`in`)).use { br ->
-            var command: String
-            var isFailed = false
-            while (br.readLine().also { command = it } != null) {
-                if (BotVariables.isBotInitialized() && bot.isOnline) {
-                    break
-                }
-                if (cfg.botId == 0L && command.isNumeric()) {
-                    cfg.botId = command.toLong()
-                    daemonLogger.info("成功设置账号为 ${cfg.botId}")
-                    daemonLogger.info("请输入欲登录的机器人密码")
-                } else if (cfg.botPassword.isEmpty() || isFailed) {
-                    cfg.botPassword = command
-                    daemonLogger.info("成功设置密码, 按下 Enter 启动机器人")
-                    isFailed = false
-                } else if (cfg.botId != 0L && cfg.botPassword.isNotEmpty()) {
-                    daemonLogger.info("请稍等...")
-                    try {
-                        Comet.startBot(cfg.botId, cfg.botPassword)
-                    } catch (e: LoginFailedException) {
-                        println("登录失败: ${e.message}\n如果是密码错误, 请重新输入密码")
-                        isFailed = true
-                        continue
-                    }
-                    break
-                }
-            }
-        }
+        handleLogIn()
     } else {
         daemonLogger.info("检测到登录数据, 正在自动登录账号 ${cfg.botId}")
         Comet.startBot(cfg.botId, cfg.botPassword)
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+@Suppress("BlockingMethodInNonBlockingContext")
+private suspend fun handleLogIn() {
+    daemonLogger.info("请输入欲登录的机器人账号")
+    BufferedReader(InputStreamReader(System.`in`)).use { br ->
+        var command: String
+        var isFailed = false
+        while (br.readLine().also { command = it } != null) {
+            if (BotVariables.isBotInitialized() && bot.isOnline) {
+                break
+            }
+            if (cfg.botId == 0L && command.isNumeric()) {
+                cfg.botId = command.toLong()
+                daemonLogger.info("成功设置账号为 ${cfg.botId}")
+                daemonLogger.info("请输入欲登录的机器人密码")
+            } else if (cfg.botPassword.isEmpty() || isFailed) {
+                cfg.botPassword = command
+                daemonLogger.info("成功设置密码, 按下 Enter 启动机器人")
+                isFailed = false
+            } else if (cfg.botId != 0L && cfg.botPassword.isNotEmpty()) {
+                daemonLogger.info("请稍等...")
+                try {
+                    Comet.startBot(cfg.botId, cfg.botPassword)
+                } catch (e: LoginFailedException) {
+                    println("登录失败: ${e.message}\n如果是密码错误, 请重新输入密码")
+                    isFailed = true
+                    continue
+                }
+                break
+            }
+        }
     }
 }
 
