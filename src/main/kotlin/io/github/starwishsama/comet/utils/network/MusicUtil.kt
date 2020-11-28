@@ -23,6 +23,7 @@ object MusicUtil {
     private const val api4qq = "https://api.qq.jsososo.com/song/urls?id="
     private const val api4NetEase = "https://musicapi.leanapp.cn"
     private val gson = GsonBuilder().serializeNulls().setLenient().disableHtmlEscaping().create()
+    private const val versionCode = ".0.0.1"
 
     fun searchNetEaseMusic(songName: String): MessageChain {
         try {
@@ -64,7 +65,7 @@ object MusicUtil {
                                             singerName = artistName,
                                             title = name
                                     )
-                                    val card = MusicCard(meta = MusicCard.Meta(music), version = "0.0.0.1")
+                                    val card = MusicCard(meta = MusicCard.Meta(music))
                                     card.prompt = "[分享]${name}"
                                     card.config.currentTime = 1605934298
                                     card.config.token = "66483da4edc6ea53a0646e4e60bb8a89"
@@ -113,7 +114,7 @@ object MusicUtil {
                             )
                     )
 
-                    val card = MusicCard(meta = meta, version = "0.0.0.1")
+                    val card = MusicCard(meta = meta)
                     card.prompt = "[分享]${song.songName}"
 
                     return LightApp(gson.toJson(card)).asMessageChain()
@@ -273,7 +274,7 @@ object MusicUtil {
             @SerializedName("view")
             val viewType: String = "music",
             @SerializedName("ver")
-            val version: String,
+            val version: String = "0$versionCode",
             /** 展示为纯文本消息时的样式 */
             @SerializedName("prompt")
             var prompt: String = "[分享]",
