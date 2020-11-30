@@ -7,6 +7,11 @@ fun getOsInfo(): String {
     return "${osMX.name} ${osMX.version} (${osMX.arch})"
 }
 
+fun isWindows(): Boolean {
+    val osMX = ManagementFactory.getOperatingSystemMXBean()
+    return osMX.name.toLowerCase().contains("win")
+}
+
 fun getUsedMemory(): Long {
     return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576
 }

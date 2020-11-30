@@ -5,12 +5,21 @@ import com.github.salomonbrys.kotson.fromJson
 import com.github.salomonbrys.kotson.get
 import com.google.gson.*
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.logger
+import io.github.starwishsama.comet.utils.BotUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
+import net.mamoe.mirai.message.uploadAsImage
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Response
 import java.io.IOException
+import java.io.InputStream
 import java.net.URLEncoder
 
 /**
@@ -84,14 +93,50 @@ object MusicUtil {
         return "找不到歌曲".convertToChain()
     }
 
-    fun searchQQMusic(name: String): MessageChain {
+    fun searchQQMusic(name: String, useCard: Boolean = false, contact: Contact): MessageChain {
+        if (useCard) {
+            return getQQMusicCard(name)
+        }
+
+        val searchResult = getQQMusicSearchResult(name) ?: return "找不到歌曲".sendMessage()
+        val song = searchResult.data.songs.songList[0]
+
+        val artistName = buildString {
+            song.singer.forEach {
+                append(it.name + "/")
+            }
+        }.removeSuffix("/")
+
+        val previewImageUrl = "http://imgcache.qq.com/music/photo/album_300/17/300_albumpic_${song.albumId}_0.jpg"
+        var picIs: InputStream? = null
+
+        NetUtil.executeRequest(url = previewImageUrl).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                daemonLogger.warning("在执行网络操作时出现异常", e)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                picIs = response.body()?.byteStream()
+            }
+
+        })
+
+        val result = "${song.songName}\nby $artistName\n🔗 > https://y.qq.com/n/yqq/song/${song.songMid}.html"
+
+        return if (picIs == null) {
+            result.sendMessage()
+        } else {
+            runBlocking {
+                picIs!!.uploadAsImage(contact).plus(result)
+            }
+        }
+    }
+
+    private fun getQQMusicCard(name: String): MessageChain {
         try {
-            val songResult =
-                    NetUtil.getPageContent("https://c.y.qq.com/soso/fcgi-bin/client_search_cp?g_tk=5381&p=1&n=20&w=${URLEncoder.encode(name, "UTF-8")}&format=json&loginUin=0&hostUin=0&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0&remoteplace=txt.yqq.song&t=0&aggr=1&cr=1&catZhida=0&flag_qc=0")
+            val searchResult = getQQMusicSearchResult(name)
 
-            if (songResult?.isNotBlank() == true) {
-                val searchResult = gson.fromJson<QQMusicSearchResult>(songResult)
-
+            if (searchResult != null) {
                 val song = searchResult.data.songs.songList[0]
 
                 val artistName = buildString {
@@ -129,8 +174,13 @@ object MusicUtil {
         } catch (e: JsonSyntaxException) {
             logger.warning("解析 QQ 音乐 json 失败", e)
         }
-
         return "找不到歌曲".convertToChain()
+    }
+
+    private fun getQQMusicSearchResult(name: String): QQMusicSearchResult? {
+        val songResult =
+                NetUtil.getPageContent("https://c.y.qq.com/soso/fcgi-bin/client_search_cp?g_tk=5381&p=1&n=20&w=${URLEncoder.encode(name, "UTF-8")}&format=json&loginUin=0&hostUin=0&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0&remoteplace=txt.yqq.song&t=0&aggr=1&cr=1&catZhida=0&flag_qc=0")
+        return gson.fromJson(songResult ?: return null)
     }
 
     private data class QQMusicSearchResult(
@@ -164,6 +214,7 @@ object MusicUtil {
                     @SerializedName("list")
                     val songList: List<QQMusicSong>
             ) {
+                @Suppress("unused")
                 data class QQMusicSong(
                         @SerializedName("albumid")
                         val albumId: Int,

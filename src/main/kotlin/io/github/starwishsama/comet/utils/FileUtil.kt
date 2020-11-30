@@ -8,13 +8,19 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
+import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
+import net.mamoe.mirai.utils.asHumanReadable
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.net.URL
-import java.nio.file.*
-import java.nio.file.attribute.BasicFileAttributes
+import java.nio.file.Files
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.jar.JarFile
+import kotlin.time.ExperimentalTime
+
 
 @Synchronized
 fun File.writeClassToJson(context: Any) {
@@ -117,6 +123,7 @@ object FileUtil {
         return null
     }
 
+    @Suppress("SpellCheckingInspection")
     fun getJarLocation(): File {
         var path: String = Comet::class.java.protectionDomain.codeSource.location.path
         if (System.getProperty("os.name").toLowerCase().contains("dows")) {
@@ -176,14 +183,16 @@ object FileUtil {
         return location
     }
 
+    @OptIn(ExperimentalTime::class)
     fun initResourceFile() {
+        val startTime = LocalDateTime.now()
         try {
             daemonLogger.info("正在加载资源文件...")
             val resourcePath = "resources"
             val jarFile = File(Comet.javaClass.protectionDomain.codeSource.location.path)
 
             if (jarFile.isFile) {
-                copyFromJar(jarFile = jarFile.toPath(), target = getResourceFolder().toPath())
+                copyFromJar(jarFile, resourcePath)
             } else { // Run with IDE
                 val url: URL = ClassLoader.getSystemResource("/$resourcePath")
                 val apps = File(url.toURI())
@@ -191,9 +200,11 @@ object FileUtil {
                     copyFolder(app, getResourceFolder())
                 }
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             daemonLogger.info("加载资源文件失败, 部分需要图片资源的功能将无法使用")
             daemonLogger.warningS("Cannot copy resources files", e)
+        } finally {
+            daemonLogger.info("尝试加载资源文件用时 ${startTime.getLastingTime().asHumanReadable}")
         }
     }
 
@@ -220,56 +231,58 @@ object FileUtil {
     /**
      * 从 jar 中取出文件/文件夹到指定位置
      *
-     * 注意: 该方法可能与部分 JDK 不兼容! (已知 Oracle JRE 8 @Windows Server 2019 会报错)
+     * 使用 [JarFile]
+     *
+     * @param jarFile jar 文件路径
+     * @param resourcePath 取出文件的路径
      */
-    private fun copyFromJar(jarFile: Path, source: String = "resources", target: Path) {
-        val fileSystem = FileSystems.newFileSystem(jarFile, null)
-        val jarPath: Path = fileSystem.getPath(source)
+    @Suppress("SameParameterValue")
+    private fun copyFromJar(jarFile: File, resourcePath: String) {
+        var isInsideResource = false
 
-        Files.walkFileTree(jarPath, object : SimpleFileVisitor<Path>() {
-            override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
-                try {
-                    val relative = jarPath.relativize(dir)
-                    val currentTarget = target.resolve(relative.toString())
-                    if (!currentTarget.toFile().exists()) {
-                        Files.createDirectories(currentTarget)
-                        daemonLogger.debugS("Created directory $currentTarget successfully")
-                    }
-                } catch (e: IOException) {
-                    daemonLogger.warningS("Can't create dir ${dir.fileName} from jar", e)
-                } finally {
-                    return FileVisitResult.CONTINUE
-                }
-            }
+        JarFile(jarFile).use { jar ->
+            val entries = jar.entries()
 
-            override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
-                try {
-                    val relative = jarPath.relativize(file)
-                    val copyTarget = target.resolve(relative.toString())
+            while (entries.hasMoreElements()) {
+                val entry = entries.nextElement()
+                val entryName = entry.name
 
-                    val f = copyTarget.toFile()
+                if (entryName.startsWith("$resourcePath/")) {
+                    if (!isInsideResource) isInsideResource = true
 
-                    if (!f.exists()) {
-                        Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
-                        daemonLogger.debugS("Copied file ${file.fileName}")
-                    } else {
-                        // 更新资源文件
-                        if (f.lastModified().toLocalDateTime() > file.toFile().lastModified().toLocalDateTime()) {
-                            Files.copy(file, copyTarget, StandardCopyOption.REPLACE_EXISTING)
-                            daemonLogger.debugS("Copied file ${file.fileName}")
+                    val actualName = entryName.replace("${resourcePath}/", "").removeSuffix("/")
+
+                    if (actualName.isNotEmpty()) {
+                        if (entry.isDirectory && entryName != "$resourcePath/") {
+                            File(getResourceFolder(), "$actualName/").mkdirs()
+                        } else {
+                           val f = File(getResourceFolder(), actualName)
+
+                            if (!f.exists()) {
+                                f.createNewFile()
+                            }
+
+                            if (f.lastModified().toLocalDateTime() >
+                                    entry.lastModifiedTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()) {
+                                FileOutputStream(f).use { fos ->
+                                    val byteArray = ByteArray(1024)
+                                    var i: Int
+                                    javaClass.classLoader.getResourceAsStream(entryName).use { fis ->
+                                        if (fis != null) {
+                                            //While the input stream has bytes
+                                            while (fis.read(byteArray).also { i = it } > 0) {
+                                                fos.write(byteArray, 0, i)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-                } catch (e: IOException) {
-                    daemonLogger.warningS("Can't copy ${file.fileName} from jar", e)
-                } finally {
-                    return FileVisitResult.CONTINUE
+                } else if (isInsideResource) {
+                    break
                 }
             }
-        })
-    }
-
-    fun isSameFile(file: File, toCompare: File): Boolean {
-        if (!file.exists() || !toCompare.exists()) return false
-        return file.getMD5() == toCompare.getMD5()
+        }
     }
 }

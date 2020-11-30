@@ -28,11 +28,11 @@ object NumberUtil {
         }
         return when {
             value < 1000.0 -> {
-                // Below 1K
+                // 小于一千
                 DECIMAL_FORMAT.format(value)
             }
             value < 1000000.0 -> {
-                // Thousands
+                // 千
                 DECIMAL_FORMAT.format(value / 1000.0) + 'K'
             }
             value < 1000000000.0 -> {
