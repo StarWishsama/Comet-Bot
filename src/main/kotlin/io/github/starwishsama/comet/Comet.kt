@@ -13,6 +13,7 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.commands.chats.*
+import io.github.starwishsama.comet.commands.console.BroadcastCommand
 import io.github.starwishsama.comet.commands.console.DebugCommand
 import io.github.starwishsama.comet.commands.console.StopCommand
 import io.github.starwishsama.comet.file.BackupHelper
@@ -171,7 +172,8 @@ object Comet {
                         // Console Command
                         StopCommand(),
                         DebugCommand(),
-                        io.github.starwishsama.comet.commands.console.AdminCommand()
+                        io.github.starwishsama.comet.commands.console.AdminCommand(),
+                        BroadcastCommand()
                 )
         )
 
