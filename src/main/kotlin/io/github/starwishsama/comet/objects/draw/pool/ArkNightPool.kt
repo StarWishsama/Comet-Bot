@@ -96,10 +96,9 @@ class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
     /**
      * 明日方舟抽卡，返回文字
      */
-    fun getArkDrawResultAsString(user: BotUser, time: Int): String {
-        val drawResult = getArkDrawResult(user, time)
+    fun getArkDrawResultAsString(user: BotUser, drawResult: List<ArkNightOperator>): String {
         if (drawResult.isNotEmpty()) {
-            when (time) {
+            when (drawResult.size) {
                 1 -> {
                     val (name, _, rare) = drawResult[0]
                     return "单次寻访结果\n$name ${DrawUtil.getStar(rare)}"
@@ -112,18 +111,16 @@ class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
                     }.trim().toString()
                 }
                 else -> {
-                    val r6Char = drawResult.parallelStream().filter { it.rare == 6 }.collect(Collectors.toList())
+                    val resultStream = drawResult.parallelStream()
 
-                    val r6Text = StringBuilder().apply {
-                        r6Char.forEach { append("${it.name} ") }
-                    }.toString().trim()
+                    val r6Count = resultStream.filter { it.rare == 6 }.count()
+                    val r5Count = resultStream.filter { it.rare == 5 }.count()
+                    val r4Count = resultStream.filter { it.rare == 4 }.count()
+                    val r3Count = drawResult.size - r6Count - r5Count - r4Count
 
                     return "寻访结果:\n" +
                             "寻访次数: ${drawResult.size}\n" +
-                            "六星: ${r6Text}\n" +
-                            "五星个数: ${drawResult.parallelStream().filter { it.rare == 5 }.count()}\n" +
-                            "四星个数: ${drawResult.parallelStream().filter { it.rare == 4 }.count()}\n" +
-                            "三星个数: ${drawResult.parallelStream().filter { it.rare == 3 }.count()}\n\n" +
+                            "结果: ${r6Count}|${r5Count}|${r4Count}|${r3Count}\n" +
                             "使用合成玉 ${drawResult.size * 600}"
                 }
             }
@@ -131,4 +128,9 @@ class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
             return DrawUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}"
         }
     }
+
+    /**
+     * 明日方舟抽卡，返回文字
+     */
+    fun getArkDrawResultAsString(user: BotUser, time: Int): String = getArkDrawResultAsString(user, getArkDrawResult(user, time))
 }

@@ -5,7 +5,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.enums.UserLevel
 import java.time.LocalDateTime
 
-class BotUser(@SerializedName("userQQ") var id: Long) {
+class BotUser(@SerializedName("userQQ") val id: Long) {
     var lastCheckInTime: LocalDateTime = LocalDateTime.now().minusDays(1)
     var checkInPoint: Double = 0.0
     var checkInTime: Int = 0
@@ -14,7 +14,7 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
     var level: UserLevel = UserLevel.USER
     var commandTime: Int = 100
     var checkInGroup: Long = 0
-    private var permissions: List<String> = ArrayList()
+    private val permissions = mutableListOf<String>()
 
     fun decreaseTime() {
         if (level <= UserLevel.VIP) {
@@ -33,7 +33,7 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
     }
 
     fun addTime(time: Int) {
-        if (level == UserLevel.USER) {
+        if (level == UserLevel.USER && commandTime <= 300) {
             commandTime += time
         }
     }
@@ -54,14 +54,11 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
         return permissions.contains(permission) || isBotOwner()
     }
 
-    fun getPermissions() : String {
-        var permissions = ""
-        this.permissions.forEach {
-            permissions = "$permissions$it "
+    fun getPermissions() : String = buildString {
+        this@BotUser.permissions.forEach {
+            append("$it ")
         }
-
-        return permissions.trim()
-    }
+    }.trim()
 
     /**
      * 比较权限组
@@ -80,7 +77,7 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
     }
 
     fun addPermission(permission: String) {
-        permissions = permissions + permission
+        permissions.plusAssign(permission)
     }
 
     companion object {
@@ -96,7 +93,7 @@ class BotUser(@SerializedName("userQQ") var id: Long) {
 
         fun getUser(qq: Long): BotUser? {
             val user = BotVariables.users.parallelStream().filter { it.id == qq }.findFirst()
-            return if (user.isPresent) user.get() else null
+            return user.orElseGet { null }
         }
 
         fun getUserSafely(qq: Long): BotUser = getUser(qq) ?: quickRegister(qq)

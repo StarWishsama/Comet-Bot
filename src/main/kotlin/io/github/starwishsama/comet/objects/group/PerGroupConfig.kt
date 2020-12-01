@@ -2,7 +2,9 @@ package io.github.starwishsama.comet.objects.group
 
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 
 data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
 
@@ -90,5 +92,31 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
         } catch (npe: NullPointerException) {
             false
         }
+    }
+
+    fun disableCommand(commandName: String): ConfigureCommandStatus {
+        val command = CommandExecutor.getCommand(commandName)
+        if (command != null) {
+            if (command is UnDisableableCommand) {
+                return ConfigureCommandStatus.UnDisabled()
+            }
+
+            return if (!disabledCommands.contains(command.name)) {
+                disabledCommands.add(command.name)
+                ConfigureCommandStatus.Disabled()
+            } else {
+                disabledCommands.remove(command.name)
+                ConfigureCommandStatus.Enabled()
+            }
+        } else {
+            return ConfigureCommandStatus.NotExist()
+        }
+    }
+
+    sealed class ConfigureCommandStatus(val msg: String) {
+        class UnDisabled: ConfigureCommandStatus("该命令无法被禁用!")
+        class Enabled: ConfigureCommandStatus("成功启用该命令")
+        class Disabled: ConfigureCommandStatus("成功禁用该命令")
+        class NotExist: ConfigureCommandStatus("该命令不存在!")
     }
 }

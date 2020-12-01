@@ -7,7 +7,10 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.draw.pool.PCRPool
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.BotUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import net.mamoe.mirai.contact.isAdministrator
+import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -19,17 +22,26 @@ class PCRCommand : ChatCommand {
     private val pool = PCRPool()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.hasNoCoolDown(user.id)) {
+        if (BotUtil.hasNoCoolDown(user.id, 60)) {
             return if (args.isNotEmpty()) {
                 when (args[0]) {
-                    "十连" -> BotUtil.sendMessage(pool.getPCRResult(user, 10))
-                    "单抽" -> BotUtil.sendMessage(pool.getPCRResult(user, 1))
-                    "来一井" -> return BotUtil.sendMessage(pool.getPCRResult(user, 300))
+                    "十连" -> pool.getPCRResult(user, 10).sendMessage()
+                    "单抽" -> pool.getPCRResult(user, 1).sendMessage()
+                    "来一井" -> pool.getPCRResult(user, 300).sendMessage()
                     else -> {
-                        if (StringUtils.isNumeric(args[0])) {
-                            BotUtil.sendMessage(pool.getPCRResult(user, args[0].toInt()))
+                        if (user.isBotAdmin() || (event is GroupMessageEvent && event.sender.isAdministrator())) {
+                            if (StringUtils.isNumeric(args[0])) {
+                                val gachaTime: Int = try {
+                                    args[0].toInt()
+                                } catch (e: NumberFormatException) {
+                                    return getHelp().convertToChain()
+                                }
+                                pool.getPCRResult(user, gachaTime).sendMessage()
+                            } else {
+                                getHelp().convertToChain()
+                            }
                         } else {
-                            getHelp().convertToChain()
+                            "次数抽卡功能已停用, 请使用单抽/十连/一井的方式抽卡!".sendMessage()
                         }
                     }
                 }

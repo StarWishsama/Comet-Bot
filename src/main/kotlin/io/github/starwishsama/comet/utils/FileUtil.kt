@@ -18,9 +18,9 @@ import java.nio.file.Files
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import kotlin.time.ExperimentalTime
-
 
 @Synchronized
 fun File.writeClassToJson(context: Any) {
@@ -75,7 +75,8 @@ fun File.getChildFolder(folderName: String, createIfNotExists: Boolean = true): 
  *
  * 注意：如果 [File] 不是文件夹, 会返回 false
  */
-fun File.isEmpty(): Boolean = this.filesCount() != -1 || this.filesCount() > 0
+@Suppress("unused")
+fun File.folderIsEmpty(): Boolean = this.filesCount() != -1 || this.filesCount() > 0
 
 fun File.filesCount(): Int {
     if (!isDirectory) return -1
@@ -252,35 +253,42 @@ object FileUtil {
 
                     val actualName = entryName.replace("${resourcePath}/", "").removeSuffix("/")
 
-                    if (actualName.isNotEmpty()) {
-                        if (entry.isDirectory && entryName != "$resourcePath/") {
-                            File(getResourceFolder(), "$actualName/").mkdirs()
-                        } else {
-                           val f = File(getResourceFolder(), actualName)
+                    handleResourceFile(entry, actualName)
+                } else if (isInsideResource) {
+                    break
+                }
+            }
+        }
+    }
 
-                            if (!f.exists()) {
-                                f.createNewFile()
-                            }
+    private fun handleResourceFile(entry: JarEntry, fileName: String) {
+        if (fileName.isEmpty()) return
 
-                            if (f.lastModified().toLocalDateTime() >
-                                    entry.lastModifiedTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()) {
-                                FileOutputStream(f).use { fos ->
-                                    val byteArray = ByteArray(1024)
-                                    var i: Int
-                                    javaClass.classLoader.getResourceAsStream(entryName).use { fis ->
-                                        if (fis != null) {
-                                            //While the input stream has bytes
-                                            while (fis.read(byteArray).also { i = it } > 0) {
-                                                fos.write(byteArray, 0, i)
-                                            }
-                                        }
-                                    }
-                                }
+        val entryName = entry.name
+        val resourcePath = "resources"
+
+        if (entry.isDirectory && entryName != "$resourcePath/") {
+            File(getResourceFolder(), "$fileName/").mkdirs()
+        } else {
+            val f = File(getResourceFolder(), fileName)
+
+            if (!f.exists()) {
+                f.createNewFile()
+            }
+
+            if (f.lastModified().toLocalDateTime() >
+                    entry.lastModifiedTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()) {
+                FileOutputStream(f).use { fos ->
+                    val byteArray = ByteArray(1024)
+                    var i: Int
+                    javaClass.classLoader.getResourceAsStream(entryName).use { fis ->
+                        if (fis != null) {
+                            // While the input stream has bytes
+                            while (fis.read(byteArray).also { i = it } > 0) {
+                                fos.write(byteArray, 0, i)
                             }
                         }
                     }
-                } else if (isInsideResource) {
-                    break
                 }
             }
         }
