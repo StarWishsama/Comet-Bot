@@ -71,7 +71,7 @@ object BiliDynamicChecker : CometPusher {
                     }
 
                     target.ifPresent {
-                        if (it.pushContent.text != data.text) {
+                        if (data.text != it.pushContent.text ) {
                             it.pushContent = data
                             it.isPushed = false
                             it.sentTime = sentTime
