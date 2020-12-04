@@ -67,7 +67,7 @@ class MuteCommand : ChatCommand {
     override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
         if (e is GroupMessageEvent) {
             if (e.sender.permission >= MemberPermission.ADMINISTRATOR) return true
-            val cfg = GroupConfigManager.getConfigSafely(e.group.id)
+            val cfg = GroupConfigManager.getConfigOrNew(e.group.id)
             if (cfg.isHelper(e.sender.id)) return true
         }
         return user.hasPermission(getProps().permission)

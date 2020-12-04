@@ -21,7 +21,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(user.id) && event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
-                val cfg = GroupConfigManager.getConfigSafely(event.group.id)
+                val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
                 when (args[0].toLowerCase(Locale.ROOT)) {
                     "helper", "群管" -> {
                         return if (args.size == 2) {

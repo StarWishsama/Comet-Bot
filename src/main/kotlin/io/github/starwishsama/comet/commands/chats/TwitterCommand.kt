@@ -48,11 +48,11 @@ class TwitterCommand : ChatCommand {
                     "sub", "订阅" -> subscribeUser(args, id)
                     "unsub", "退订" -> unsubscribeUser(args, id)
                     "list" -> {
-                        val list = GroupConfigManager.getConfigSafely(id).twitterSubscribers
+                        val list = GroupConfigManager.getConfigOrNew(id).twitterSubscribers
                         if (list.isEmpty()) "没有订阅任何蓝鸟用户".convertToChain() else list.toString().convertToChain()
                     }
                     "push" -> {
-                        val cfg = GroupConfigManager.getConfigSafely(id)
+                        val cfg = GroupConfigManager.getConfigOrNew(id)
                         cfg.twitterPushEnabled = !cfg.twitterPushEnabled
                         return BotUtil.sendMessage("蓝鸟动态推送已${if (cfg.twitterPushEnabled) "开启" else "关闭"}")
                     }
@@ -124,7 +124,7 @@ class TwitterCommand : ChatCommand {
 
     private fun subscribeUser(args: List<String>, groupId: Long): MessageChain {
         if (groupId > 0) {
-            val cfg = GroupConfigManager.getConfigSafely(groupId)
+            val cfg = GroupConfigManager.getConfigOrNew(groupId)
             if (args.size > 1) {
                 if (!cfg.twitterSubscribers.contains(args[1])) {
                     val twitter: TwitterUser?
@@ -154,7 +154,7 @@ class TwitterCommand : ChatCommand {
 
     private fun unsubscribeUser(args: List<String>, groupId: Long): MessageChain {
         if (groupId > 0) {
-            val cfg = GroupConfigManager.getConfigSafely(groupId)
+            val cfg = GroupConfigManager.getConfigOrNew(groupId)
             return if (args.size > 1) {
                 if (args[1] == "all" || args[1] == "全部") {
                     cfg.twitterSubscribers.clear()

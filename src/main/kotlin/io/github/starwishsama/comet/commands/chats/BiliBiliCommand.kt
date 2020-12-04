@@ -60,7 +60,7 @@ class BiliBiliCommand : ChatCommand {
                     }
                     "push" -> {
                         return if (user.isBotAdmin() || event.sender.isOperator()) {
-                            val cfg = GroupConfigManager.getConfigSafely(event.group.id)
+                            val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
                             cfg.biliPushEnabled = !cfg.biliPushEnabled
                             BotUtil.sendMessage("B站动态推送功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}")
                         } else {
@@ -130,7 +130,7 @@ class BiliBiliCommand : ChatCommand {
 
     private suspend fun unsubscribe(args: List<String>, groupId: Long): MessageChain {
         if (args.size > 1) {
-            val cfg = GroupConfigManager.getConfigSafely(groupId)
+            val cfg = GroupConfigManager.getConfigOrNew(groupId)
             var uid = 0L
             if (args[1].isNumeric()) {
                 uid = args[1].toLong()
@@ -188,7 +188,7 @@ class BiliBiliCommand : ChatCommand {
     }
 
     private suspend fun subscribe(target: String, groupId: Long): MessageChain {
-        val cfg = GroupConfigManager.getConfigSafely(groupId)
+        val cfg = GroupConfigManager.getConfigOrNew(groupId)
         var name = ""
         val uid: Long = if (target.isNumeric()) {
             target.toLong()

@@ -91,11 +91,11 @@ object DrawUtil {
             (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
 
     fun downloadArkNightsFile() {
-        if (FileUtil.getResourceFolder().getChildFolder("ark").filesCount() < arkNight.size) {
+        val arkLoc = FileUtil.getResourceFolder().getChildFolder("ark")
+
+        if (arkNight.size > arkLoc.filesCount()) {
             val startTime = LocalDateTime.now()
             daemonLogger.info("正在下载 明日方舟图片资源文件")
-
-            val arkLoc = FileUtil.getResourceFolder().getChildFolder("ark")
 
             var successCount = 0
 
@@ -140,7 +140,7 @@ object DrawUtil {
                 }
             }
 
-            daemonLogger.info("明日方舟 > 缺失资源文件下载成功 [$successCount/${arkNight.size}], 耗时 ${startTime.getLastingTimeAsString()}")
+            daemonLogger.info("明日方舟 > 缺失资源文件下载完成 [$successCount/${arkNight.size}], 耗时 ${startTime.getLastingTimeAsString()}")
         }
     }
 }

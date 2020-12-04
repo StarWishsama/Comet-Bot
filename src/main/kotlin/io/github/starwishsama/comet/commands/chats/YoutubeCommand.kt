@@ -60,7 +60,7 @@ class YoutubeCommand : ChatCommand {
     """.trimIndent()
 
     private fun subscribeUser(args: List<String>, groupId: Long): MessageChain {
-        val cfg = GroupConfigManager.getConfigSafely(groupId)
+        val cfg = GroupConfigManager.getConfigOrNew(groupId)
         if (args.size > 1) {
             if (!cfg.youtubeSubscribers.contains(args[1])) {
                 val youtubeUserInfo: SearchVideoResult?
@@ -86,7 +86,7 @@ class YoutubeCommand : ChatCommand {
     }
 
     private fun unsubscribeUser(args: List<String>, groupId: Long): MessageChain {
-        val cfg = GroupConfigManager.getConfigSafely(groupId)
+        val cfg = GroupConfigManager.getConfigOrNew(groupId)
         return if (args.size > 1) {
             if (args[1] == "all" || args[1] == "全部") {
 

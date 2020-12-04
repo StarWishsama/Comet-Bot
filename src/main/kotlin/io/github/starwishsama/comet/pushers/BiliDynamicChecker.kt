@@ -67,15 +67,14 @@ object BiliDynamicChecker : CometPusher {
 
                     if (!target.isPresent) {
                         pushedList.plusAssign(pushDynamic)
-                    } else {
-                        val oldData =
-                            pushedList.parallelStream().filter { it.uid == uid && data.text == it.pushContent.text }
-                                .findFirst()
+                        return@forEach
+                    }
 
-                        if (!oldData.isPresent && target.isPresent) {
-                            target.get().pushContent = data
-                            target.get().isPushed = false
-                            target.get().sentTime = sentTime
+                    target.ifPresent {
+                        if (it.pushContent.text != data.text) {
+                            it.pushContent = data
+                            it.isPushed = false
+                            it.sentTime = sentTime
                         }
                     }
                 }

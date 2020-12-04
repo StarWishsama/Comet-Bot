@@ -98,25 +98,25 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
         val command = CommandExecutor.getCommand(commandName)
         if (command != null) {
             if (command is UnDisableableCommand) {
-                return ConfigureCommandStatus.UnDisabled()
+                return ConfigureCommandStatus.UnDisabled
             }
 
             return if (!disabledCommands.contains(command.name)) {
                 disabledCommands.add(command.name)
-                ConfigureCommandStatus.Disabled()
+                ConfigureCommandStatus.Disabled
             } else {
                 disabledCommands.remove(command.name)
-                ConfigureCommandStatus.Enabled()
+                ConfigureCommandStatus.Enabled
             }
         } else {
-            return ConfigureCommandStatus.NotExist()
+            return ConfigureCommandStatus.NotExist
         }
     }
 
     sealed class ConfigureCommandStatus(val msg: String) {
-        class UnDisabled: ConfigureCommandStatus("该命令无法被禁用!")
-        class Enabled: ConfigureCommandStatus("成功启用该命令")
-        class Disabled: ConfigureCommandStatus("成功禁用该命令")
-        class NotExist: ConfigureCommandStatus("该命令不存在!")
+        object UnDisabled: ConfigureCommandStatus("该命令无法被禁用!")
+        object Enabled: ConfigureCommandStatus("成功启用该命令")
+        object Disabled: ConfigureCommandStatus("成功禁用该命令")
+        object NotExist: ConfigureCommandStatus("该命令不存在!")
     }
 }

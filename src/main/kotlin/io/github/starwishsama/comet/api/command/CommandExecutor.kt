@@ -145,7 +145,7 @@ object CommandExecutor {
 
                 /** 检查是否在尝试执行被禁用命令 */
                 if (cmd != null && event is GroupMessageEvent &&
-                        GroupConfigManager.getConfigSafely(event.group.id).isDisabledCommand(cmd)) {
+                        GroupConfigManager.getConfigOrNew(event.group.id).isDisabledCommand(cmd)) {
                     return if (BotUtil.hasNoCoolDown(user.id)) {
                         ExecutedResult(BotUtil.sendMessage("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
                     } else {

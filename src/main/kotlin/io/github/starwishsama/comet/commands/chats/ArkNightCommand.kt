@@ -17,9 +17,9 @@ import kotlinx.coroutines.withContext
 import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.upload
 import org.apache.commons.lang3.StringUtils
 
@@ -29,72 +29,29 @@ class ArkNightCommand : ChatCommand {
     private val pool = ArkNightPool()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.hasNoCoolDown(event.sender.id, 60)) {
+        if (BotUtil.hasNoCoolDown(event.sender.id, 15)) {
             if (args.isNotEmpty()) {
                 when (args[0]) {
                     "单次寻访", "1", "单抽" -> {
+                        val list = pool.getArkDrawResult(user)
                         return if (BotVariables.cfg.arkDrawUseImage) {
-                            event.reply("请稍等...")
-                            val list = pool.getArkDrawResult(user)
-                            if (list.isNotEmpty()) {
-                                val result = DrawUtil.combineArkOpImage(list)
-                                if (result.lostOps.isNotEmpty())
-                                    event.quoteReply(sendMessage("由于缺失资源文件, 以下干员无法显示 :(\n" +
-                                            buildString {
-                                                result.lostOps.forEach {
-                                                    append("${it.name},")
-                                                }
-                                            }.removeSuffix(",")))
-                                val gachaImage = withContext(Dispatchers.Default) { result.image.upload(event.subject) }
-                                gachaImage.asMessageChain()
-                            } else {
-                                (DrawUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}").convertToChain()
-                            }
+                            generatePictureGachaResult(event, user, list)
                         } else {
-                            pool.getArkDrawResultAsString(user, 1).convertToChain()
+                            pool.getArkDrawResultAsString(user, list).sendMessage()
                         }
                     }
                     "十连寻访", "10", "十连" -> {
+                        val list: List<ArkNightOperator> = pool.getArkDrawResult(user, 10)
                         return if (BotVariables.cfg.arkDrawUseImage) {
-                            event.reply("请稍等...")
-                            val list: List<ArkNightOperator> = pool.getArkDrawResult(user, 10)
-                            if (list.isNotEmpty()) {
-                                val result = DrawUtil.combineArkOpImage(list)
-                                if (result.lostOps.isNotEmpty())
-                                    event.quoteReply(sendMessage("由于缺失资源文件, 以下干员无法显示 :(\n" +
-                                            buildString {
-                                                result.lostOps.forEach {
-                                                    append("${it.name},")
-                                                }
-                                            }.removeSuffix(",")))
-                                val gachaImage = withContext(Dispatchers.IO) { result.image.upload(event.subject) }
-                                gachaImage.asMessageChain()
-                            } else {
-                                (DrawUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}").convertToChain()
-                            }
+                            generatePictureGachaResult(event, user, list)
                         } else {
-                            pool.getArkDrawResultAsString(user, 10).convertToChain()
+                            pool.getArkDrawResultAsString(user, list).sendMessage()
                         }
                     }
                     "一井", "300", "来一井" -> {
                         val list: List<ArkNightOperator> = pool.getArkDrawResult(user, 300)
                         return if (BotVariables.cfg.arkDrawUseImage) {
-                            event.reply("请稍等...")
-
-                            if (list.isNotEmpty()) {
-                                val result = DrawUtil.combineArkOpImage(list.subList(289, 299))
-                                if (result.lostOps.isNotEmpty())
-                                    event.quoteReply(sendMessage("由于缺失资源文件, 以下干员无法显示 :(\n" +
-                                            buildString {
-                                                result.lostOps.forEach {
-                                                    append("${it.name},")
-                                                }
-                                            }.removeSuffix(",")))
-                                val gachaImage = withContext(Dispatchers.IO) { result.image.upload(event.subject) }
-                                gachaImage.plus("\n").plus(pool.getArkDrawResultAsString(user, list))
-                            } else {
-                                (DrawUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}").convertToChain()
-                            }
+                            generatePictureGachaResult(event, user, list)
                         } else {
                             pool.getArkDrawResultAsString(user, list).sendMessage()
                         }
@@ -107,7 +64,13 @@ class ArkNightCommand : ChatCommand {
                                 } catch (e: NumberFormatException) {
                                     return getHelp().convertToChain()
                                 }
-                                pool.getArkDrawResultAsString(user, gachaTime).convertToChain()
+
+                                val list: List<ArkNightOperator> = pool.getArkDrawResult(user, gachaTime)
+                                return if (BotVariables.cfg.arkDrawUseImage) {
+                                    generatePictureGachaResult(event, user, list)
+                                } else {
+                                    pool.getArkDrawResultAsString(user, list).sendMessage()
+                                }
                             } else {
                                 getHelp().convertToChain()
                             }
@@ -136,4 +99,27 @@ class ArkNightCommand : ChatCommand {
          ============ 命令帮助 ============
          /ark 单次寻访/十连寻访/[次数]
     """.trimIndent()
+
+    private suspend fun generatePictureGachaResult(event: MessageEvent, user: BotUser, ops: List<ArkNightOperator>): MessageChain {
+        event.reply("请稍等...")
+
+        return if (ops.isNotEmpty()) {
+            // 只获取最后十个
+            val result = DrawUtil.combineArkOpImage(if (ops.size <= 10) ops else ops.subList(ops.size - 11, ops.size - 1))
+            if (result.lostOps.isNotEmpty())
+                event.quoteReply(sendMessage("由于缺失资源文件, 以下干员无法显示 :(\n" +
+                        buildString {
+                            result.lostOps.forEach {
+                                append("${it.name},")
+                            }
+                        }.removeSuffix(",")))
+            val gachaImage = withContext(Dispatchers.IO) { result.image.upload(event.subject) }
+
+            val reply = gachaImage.plus("\n").plus(pool.getArkDrawResultAsString(user, ops))
+
+            if (event is GroupMessageEvent) At(event.sender).plus("\n").plus(reply) else reply
+        } else {
+            (DrawUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}").convertToChain()
+        }
+    }
 }

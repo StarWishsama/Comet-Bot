@@ -37,7 +37,7 @@ object R6TabApi {
                 if (BotUtil.isValidJson(element)) {
                     val jsonObject: JsonObject = element.asJsonObject
                     val uuid: String = jsonObject.get(
-                            jsonObject.keySet().iterator().next()
+                        jsonObject.keySet().iterator().next()
                     ).asJsonObject.get("profile").asJsonObject.get("p_user").asString
                     return gson.fromJson(NetUtil.getPageContent("${apiUrl}player/$uuid?cid=${BotVariables.cfg.r6tabKey}")
                             ?: return null)
@@ -64,6 +64,8 @@ object R6TabApi {
                                     p.stats?.generalKills?.toDouble()?.let { p.stats?.generalHeadShot?.div(it) }
                             )
                     )
+
+                    // 覆写当前段位
                     response = if (p.ranked?.asRank?.let { R6Rank.getRank(it) } != R6Rank.UNRANKED) {
                         response.replace(
                                 "current".toRegex(), p.ranked?.asMMR
@@ -72,6 +74,8 @@ object R6TabApi {
                     } else {
                         response.replace("current".toRegex(), "")
                     }
+
+                    // 覆写 MMR 升降状态
                     val mmrChange: Int? = p.ranked?.asMMRChange
                     if (mmrChange != null && mmrChange != 0) {
                         response = if (mmrChange > 0) {
@@ -79,9 +83,8 @@ object R6TabApi {
                         } else {
                             response.replace("mmrchange".toRegex(), "" + mmrChange)
                         }
-                    } else {
-                        response.replace(" mmrchange".toRegex(), "")
                     }
+                    response = response.replace(" mmrchange".toRegex(), "")
                     return response
                 }
             }
