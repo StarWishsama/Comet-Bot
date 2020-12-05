@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.commands.console
 
 import io.github.starwishsama.comet.BotVariables.bot
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -28,7 +29,8 @@ class BroadcastCommand: ConsoleCommand {
                 g.sendMessage(String(message.toByteArray(Charset.forName("GBK")), StandardCharsets.UTF_8).trim())
                 return@runBlocking "发送成功!"
             } catch (e: RuntimeException) {
-                return@runBlocking "发送失败, ${e.message}"
+                daemonLogger.warning(e.stackTraceToString())
+                return@runBlocking "发送失败, 错误信息: ${e.message}"
             }
         }
     }
