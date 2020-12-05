@@ -33,7 +33,7 @@ class BotUser(@SerializedName("userQQ") val id: Long) {
     }
 
     fun addTime(time: Int) {
-        if (level == UserLevel.USER && commandTime <= 300) {
+        if (level == UserLevel.USER && commandTime <= 1000) {
             commandTime += time
         }
     }
@@ -78,6 +78,19 @@ class BotUser(@SerializedName("userQQ") val id: Long) {
 
     fun addPermission(permission: String) {
         permissions.plusAssign(permission)
+    }
+
+    /**
+     * 判断是否签到过了
+     *
+     * @author NamelessSAMA
+     * @return 是否签到
+     */
+    fun isChecked(): Boolean {
+        val now = LocalDateTime.now()
+        val period = lastCheckInTime.toLocalDate().until(now.toLocalDate())
+
+        return period.days == 0
     }
 
     companion object {

@@ -38,7 +38,7 @@ object SessionManager {
         sessions[session] = LocalDateTime.now()
         TaskUtil.runAsync(closeAfterMinute.toLong(), TimeUnit.MINUTES) {
             daemonLogger.info("自动关闭会话 ${session::class.java.simpleName + "#" + session.hashCode()} 中")
-            session.beforeExpired
+            session.beforeExpiredAction
             sessions.remove(session)
         }
     }

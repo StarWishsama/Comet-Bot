@@ -67,13 +67,13 @@ object NetUtil {
      * @param timeout 超时时间, 单位为秒
      * @param proxyUrl 代理地址 (如果需要使用的话)
      * @param proxyPort 代理端口 (如果需要使用的话)
-     * @param call 执行请求前的额外操作, 如添加 header 等. 详见 [Request.Builder]
+     * @param action 执行请求前的额外操作, 如添加 header 等. 详见 [Request.Builder]
      */
     fun executeRequest(url: String,
-                               timeout: Long = 2,
-                               proxyUrl: String = cfg.proxyUrl,
-                               proxyPort: Int = cfg.proxyPort,
-                               call: Request.Builder.() -> Request.Builder = {
+                       timeout: Long = 2,
+                       proxyUrl: String = cfg.proxyUrl,
+                       proxyPort: Int = cfg.proxyPort,
+                       action: Request.Builder.() -> Request.Builder = {
                                header("user-agent", defaultUA)
                            }
     ): Call {
@@ -89,12 +89,14 @@ object NetUtil {
                 if (socket.isUsable()) {
                     builder.proxy(Proxy(cfg.proxyType, Socket(proxyUrl, proxyPort).remoteSocketAddress))
                 }
+                daemonLogger.verbose("使用代理连接")
             } catch (e: Exception) {
                 daemonLogger.verbose("无法连接到代理服务器, ${e.message}")
             }
         }
+
         val client = builder.build()
-        val request = Request.Builder().url(url).call().build()
+        val request = Request.Builder().url(url).action().build()
         return client.newCall(request)
     }
 
@@ -152,13 +154,9 @@ object NetUtil {
                     }
                 }
             }
-
-            if (result != null) {
-                return result
-            } else {
-                throw ApiException("执行网络操作失败")
-            }
         }
+
+        return result ?: throw ApiException("执行网络操作失败")
     }
 
     fun getPageContent(url: String, timeout: Long = 2): String? = executeHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort).body()?.string()

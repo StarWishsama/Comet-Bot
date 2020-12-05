@@ -81,20 +81,6 @@ fun MiraiLogger.verboseS(message: String?, throwable: Throwable?) {
 
 object BotUtil {
     /**
-     * 判断是否签到过了
-     *
-     * @author NamelessSAMA
-     * @param user 机器人账号
-     * @return 是否签到
-     */
-    fun isChecked(user: BotUser): Boolean {
-        val now = LocalDateTime.now()
-        val period = user.lastCheckInTime.toLocalDate().until(now.toLocalDate())
-
-        return period.days == 0
-    }
-
-    /**
      * 判断指定QQ号是否仍在命令冷却中
      * (可以自定义命令冷却时间)
      *
@@ -152,7 +138,7 @@ object BotUtil {
     fun sendMessage(otherText: String?, addPrefix: Boolean = true): MessageChain = sendMessageAsString(otherText, addPrefix).convertToChain()
 
     @JvmName("stringAsChain")
-    fun String.sendMessage(addPrefix: Boolean = true): MessageChain = sendMessage(this, addPrefix)
+    fun String?.sendMessage(addPrefix: Boolean = true): MessageChain = sendMessage(this, addPrefix)
 
     fun List<String>.getRestString(startAt: Int): String {
         if (isEmpty()) {

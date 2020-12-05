@@ -18,17 +18,18 @@ class DebugCommand : ConsoleCommand {
             when (args[0]) {
                 "sessions" -> {
                     val sessions = SessionManager.getSessions()
-                    return StringBuilder("目前活跃的会话列表: \n").apply {
+                    return buildString {
+                        append("目前活跃的会话列表: \n")
                         if (sessions.isEmpty()) {
                             append("无")
-                        } else {
-                            var i = 1
-                            for (session in sessions) {
-                                append(i + 1).append(" ").append(session.key.toString()).append("\n")
-                                i++
-                            }
+                            return@buildString
                         }
-                    }.trim().toString()
+                        var i = 1
+                        sessions.forEach { (s, _) ->
+                            append(i + 1).append(" ").append(s.toString()).append("\n")
+                            i++
+                        }
+                    }.trim()
                 }
                 "info" ->
                     return ("彗星 Bot ${BotVariables.version}\n" +
@@ -39,12 +40,7 @@ class DebugCommand : ConsoleCommand {
                             )
                 "switch" -> {
                     BotVariables.switch = !BotVariables.switch
-
-                    return if (!BotVariables.switch) {
-                        "Bot > おつまち~"
-                    } else {
-                        "今日もかわいい!"
-                    }
+                    return "Bot > 维护模式已${if (!BotVariables.switch) "开启" else "关闭"}"
                 }
             }
         }

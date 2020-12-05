@@ -8,6 +8,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.ClockInManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.BotUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
@@ -24,35 +25,35 @@ import java.time.format.DateTimeFormatter
 @CometCommand
 @Suppress("SpellCheckingInspection")
 class AdminCommand : ChatCommand, UnDisableableCommand {
-    private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    private val hourMinuteFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(event.sender.id)) {
             if (args.isEmpty()) {
-                return (BotUtil.getLocalMessage("msg.bot-prefix") + "命令不存在, 使用 /admin help 查看更多").convertToChain()
+                return "命令不存在, 使用 /admin help 查看更多".sendMessage()
             } else {
                 when (args[0]) {
                     "clockin", "dk", "打卡" -> {
                         return if (event is GroupMessageEvent) {
                             clockIn(args, event)
                         } else {
-                            BotUtil.sendMessage("该命令只能在群聊使用")
+                            "该命令只能在群聊使用".sendMessage()
                         }
                     }
                     "showdata", "打卡数据", "dksj" -> {
                         return if (event is GroupMessageEvent) {
                             val data = ClockInManager.getNearestClockIn(event.group.id)
                             data?.viewData()?.toMessageChain(event.subject)
-                                ?: BotUtil.sendMessage("本群没有正在进行的打卡")
+                                ?: "本群没有正在进行的打卡".sendMessage()
                         } else {
-                            BotUtil.sendMessage("该命令只能在群聊使用")
+                           "该命令只能在群聊使用".sendMessage()
                         }
                     }
                     "help", "帮助" -> return getHelp().convertToChain()
                     "permlist", "权限列表", "qxlb" -> return permList(user, args, event)
                     "permadd", "添加权限", "tjqx" -> return permAdd(user, args, event)
                     "give", "增加次数" -> return giveCommandUseTime(event, args)
-                    else -> return BotUtil.sendMessage("命令不存在, 使用 /admin help 查看更多")
+                    else -> return "命令不存在, 使用 /admin help 查看更多".sendMessage()
                 }
             }
         }
@@ -82,12 +83,12 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
             val target: BotUser? = BotUtil.parseAtAsBotUser(event, args[1])
             val permission = target?.getPermissions()
             if (permission != null) {
-                BotUtil.sendMessage(permission)
+                sendMessage(permission)
             } else {
-                BotUtil.sendMessage("该用户没有任何权限")
+                sendMessage("该用户没有任何权限")
             }
         } else {
-            BotUtil.sendMessage(user.getPermissions())
+            sendMessage(user.getPermissions())
         }
     }
 
@@ -97,10 +98,10 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
                 val target: BotUser? = BotUtil.parseAtAsBotUser(event, args[1])
 
                 target?.addPermission(args[2])
-                return BotUtil.sendMessage("添加权限成功")
+                return sendMessage("添加权限成功")
             }
         } else {
-            return BotUtil.sendMessage("你没有权限")
+            return sendMessage("你没有权限")
         }
         return EmptyMessageChain
     }
@@ -112,12 +113,12 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
             return if (target != null) {
                 if (args[2].toInt() <= 1000000) {
                     target.addTime(args[2].toInt())
-                    BotUtil.sendMessage("成功为 $target 添加 ${args[2]} 次命令条数")
+                    sendMessage("成功为 $target 添加 ${args[2]} 次命令条数")
                 } else {
-                    BotUtil.sendMessage("给予的次数超过系统限制上限")
+                    sendMessage("给予的次数超过系统限制上限")
                 }
             } else {
-                BotUtil.sendMessage("找不到此用户")
+                sendMessage("找不到此用户")
             }
         }
         return EmptyMessageChain
@@ -132,39 +133,39 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
                 3 -> {
                     startTime = LocalDateTime.of(
                         LocalDate.now(),
-                        LocalTime.parse(args[1], dateFormatter)
+                        LocalTime.parse(args[1], hourMinuteFormatter)
                     )
                     endTime = LocalDateTime.of(
                         LocalDate.now(),
-                        LocalTime.parse(args[2], dateFormatter)
+                        LocalTime.parse(args[2], hourMinuteFormatter)
                     )
                 }
                 2 -> {
                     startTime = LocalDateTime.now()
                     endTime = LocalDateTime.of(
                         LocalDate.now(),
-                        LocalTime.parse(args[1], dateFormatter)
+                        LocalTime.parse(args[1], hourMinuteFormatter)
                     )
                 }
                 else -> {
-                    return BotUtil.sendMessage("/admin dk (开始时间) [结束时间])")
+                    return sendMessage("/admin dk (开始时间) [结束时间])")
                 }
             }
 
             val usersList = arrayListOf<Member>()
 
             return if (endTime.isBefore(startTime) || endTime.isEqual(startTime)) {
-                BotUtil.sendMessage("在吗 为什么时间穿越")
+                sendMessage("在吗 为什么时间穿越")
             } else {
                 for (member in message.group.members) {
                     usersList.add(member)
                 }
 
                 ClockInManager.newClockIn(message.group.id, usersList, startTime, endTime)
-                BotUtil.sendMessage("打卡已开启 请发送 /dk 来打卡")
+                sendMessage("打卡已开启 请发送 /dk 来打卡")
             }
         } else {
-            return BotUtil.sendMessage("10 分钟内还有一个打卡未结束")
+            return sendMessage("10 分钟内还有一个打卡未结束")
         }
     }
 }

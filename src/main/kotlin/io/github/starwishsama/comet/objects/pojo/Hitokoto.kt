@@ -9,4 +9,8 @@ data class Hitokoto(
         val source: String?,
         @SerializedName("from_who")
         val author: String?
-)
+) {
+        override fun toString(): String {
+                return "今日一言:\n" + "$content ——${author ?: "无"}(${source ?: "无"})"
+        }
+}

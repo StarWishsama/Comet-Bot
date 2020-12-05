@@ -38,10 +38,7 @@ import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.join
 import net.mamoe.mirai.network.ForceOfflineException
 import net.mamoe.mirai.network.LoginFailedException
-import net.mamoe.mirai.utils.BotConfiguration
-import net.mamoe.mirai.utils.FileCacheStrategy
-import net.mamoe.mirai.utils.PlatformLogger
-import net.mamoe.mirai.utils.secondsToMillis
+import net.mamoe.mirai.utils.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.time.LocalDateTime
@@ -119,6 +116,63 @@ object Comet {
     }
 
     @ExperimentalTime
+    fun invokePostTask(bot: Bot, logger: MiraiLogger = BotVariables.logger) {
+        DataSetup.initPerGroupSetting(bot)
+
+        setupRCon()
+
+        CommandExecutor.setupCommand(
+            arrayOf(
+                AdminCommand(),
+                ArkNightCommand(),
+                BiliBiliCommand(),
+                CheckInCommand(),
+                ClockInCommand(),
+                io.github.starwishsama.comet.commands.chats.DebugCommand(),
+                DivineCommand(),
+                PCRCommand(),
+                GuessNumberCommand(),
+                HelpCommand(),
+                InfoCommand(),
+                MusicCommand(),
+                MuteCommand(),
+                PictureSearchCommand(),
+                R6SCommand(),
+                RConCommand(),
+                KickCommand(),
+                TwitterCommand(),
+                VersionCommand(),
+                GroupConfigCommand(),
+                RSPCommand(),
+                RollCommand(),
+                YoutubeCommand(),
+                // Console Command
+                StopCommand(),
+                DebugCommand(),
+                io.github.starwishsama.comet.commands.console.AdminCommand(),
+                BroadcastCommand()
+            )
+        )
+
+        logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
+
+        /** 监听器 */
+        val listeners = arrayOf(ConvertLightAppListener, RepeatListener, GroupRelatedListener)
+
+        listeners.forEach {
+            it.register(bot)
+            logger.info("[监听器] 已注册 ${it.getName()} 监听器")
+        }
+
+        startUpTask()
+        startAllPusher(bot)
+
+        logger.info("彗星 Bot 启动成功, 耗时 ${startTime.getLastingTimeAsString()}")
+
+        CommandExecutor.startHandler(bot)
+    }
+
+    @ExperimentalTime
     suspend fun startBot(qqId: Long, password: String) {
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
@@ -140,61 +194,9 @@ object Comet {
         }
         bot = Bot(qq = qqId, password = password, configuration = config).alsoLogin()
 
-        DataSetup.initPerGroupSetting(bot)
-
-        setupRCon()
-
-        CommandExecutor.setupCommand(
-                arrayOf(
-                        AdminCommand(),
-                        ArkNightCommand(),
-                        BiliBiliCommand(),
-                        CheckInCommand(),
-                        ClockInCommand(),
-                        io.github.starwishsama.comet.commands.chats.DebugCommand(),
-                        DivineCommand(),
-                        PCRCommand(),
-                        GuessNumberCommand(),
-                        HelpCommand(),
-                        InfoCommand(),
-                        MusicCommand(),
-                        MuteCommand(),
-                        PictureSearchCommand(),
-                        R6SCommand(),
-                        RConCommand(),
-                        KickCommand(),
-                        TwitterCommand(),
-                        VersionCommand(),
-                        GroupConfigCommand(),
-                        RSPCommand(),
-                        RollCommand(),
-                        YoutubeCommand(),
-                        // Console Command
-                        StopCommand(),
-                        DebugCommand(),
-                        io.github.starwishsama.comet.commands.console.AdminCommand(),
-                        BroadcastCommand()
-                )
-        )
-
-        logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
-
-        /** 监听器 */
-        val listeners = arrayOf(ConvertLightAppListener, RepeatListener, GroupRelatedListener)
-
-        listeners.forEach {
-            it.register(bot)
-            logger.info("[监听器] 已注册 ${it.getName()} 监听器")
-        }
-
-        startUpTask()
-        startAllPusher(bot)
-
-        logger.info("彗星 Bot 启动成功, 耗时 ${startTime.getLastingTimeAsString()}")
+        invokePostTask(bot)
 
         Runtime.getRuntime().addShutdownHook(Thread { invokeWhenClose() })
-
-        CommandExecutor.startHandler(bot)
 
         handleConsoleCommand()
 
@@ -277,7 +279,7 @@ private suspend fun handleLogIn() {
     }
 }
 
-private fun invokeWhenClose(){
+fun invokeWhenClose(){
     logger.info("[Bot] 正在关闭 Bot...")
     NetUtil.closeDriver()
     DataSetup.saveFiles()

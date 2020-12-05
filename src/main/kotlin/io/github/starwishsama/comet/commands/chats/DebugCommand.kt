@@ -47,9 +47,9 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     if (user.isBotOwner()) {
                         return try {
                             DataSetup.reload()
-                            sendMessage("重载成功.")
+                            "重载成功.".sendMessage()
                         } catch (e: IOException) {
-                            sendMessage("在重载时发生了异常.")
+                            "在重载时发生了异常.".sendMessage()
                         }
                     }
                 }
@@ -68,7 +68,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                 }
                             }
                         }
-                        return sb.toString().trim().convertToChain()
+                        return sb.toString().trim().sendMessage()
                     }
                 }
                 "info" -> {
@@ -83,17 +83,12 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                             BotUtil.getMemoryUsage() + "\n" +
                             "与服务器的延迟为 $ping ms\n" +
                             "构建时间: $buildTime"
-                            ).convertToChain()
+                            ).sendMessage()
                 }
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().convertToChain()
                 "switch" -> {
                     BotVariables.switch = !BotVariables.switch
-
-                    return if (!BotVariables.switch) {
-                        sendMessage("おつまち~")
-                    } else {
-                        sendMessage("今日もかわいい!")
-                    }
+                    return "维护模式已${if (!BotVariables.switch) "开启" else "关闭"}".sendMessage()
                 }
                 "push" -> {
                     if (args.size > 1) {

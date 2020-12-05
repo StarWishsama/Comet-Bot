@@ -8,7 +8,7 @@ import java.util.*
 /**
  * @author Nameless
  */
-open class Session(open var groupId: Long = 0, var command: ChatCommand, val beforeExpired: Session.() -> Unit = {}) {
+open class Session(open var groupId: Long = 0, var command: ChatCommand, val beforeExpiredAction: Session.() -> Unit = {}) {
     val users: MutableList<SessionUser> = LinkedList()
 
     constructor(command: ChatCommand, id: Long) : this(0, command) {
