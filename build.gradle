@@ -16,7 +16,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version "1.4.10"
     //id 'net.mamoe.mirai-console' version '1.1.0'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
-    id 'org.jetbrains.kotlin.kapt' version '1.4.0'
+    //id 'org.jetbrains.kotlin.kapt' version '1.4.0'
 }
 
 def mainClass = 'io.github.starwishsama.comet.CometKt'
@@ -117,12 +117,12 @@ dependencies {
     // Selenium WebDriver @ https://www.selenium.dev/
     implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
 
-    def autoService = '1.0-rc7'
-    kapt "com.google.auto.service:auto-service:$autoService"
-    compileOnly "com.google.auto.service:auto-service-annotations:$autoService"
+    //def autoService = '1.0-rc7'
+    //kapt "com.google.auto.service:auto-service:$autoService"
+    //compileOnly "com.google.auto.service:auto-service-annotations:$autoService"
 
-    def console = '1.1.0'
-    compileOnly("net.mamoe:mirai-console:$console")
+    //def console = '1.1.0'
+    //compileOnly("net.mamoe:mirai-console:$console")
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
