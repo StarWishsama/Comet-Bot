@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.objects.wrapper
 
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.NetUtil
+import kotlinx.coroutines.delay
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.Image
@@ -17,11 +18,12 @@ open class MessageWrapper(var text: String?, val success: Boolean = true) {
         val images = mutableListOf<Image>()
 
         pictureUrl.forEach {
-            val result = NetUtil.executeHttpRequest(url = it, autoClose = true).body()
-            if (result != null) {
-                val uploadedImage = result.byteStream().uploadAsImage(contact)
-                images.add(uploadedImage)
-                result.close()
+            NetUtil.executeHttpRequest(url = it, autoClose = true).body().use { result ->
+                if (result != null) {
+                    val uploadedImage = result.byteStream().uploadAsImage(contact)
+                    images.add(uploadedImage)
+                    delay(500)
+                }
             }
         }
 
