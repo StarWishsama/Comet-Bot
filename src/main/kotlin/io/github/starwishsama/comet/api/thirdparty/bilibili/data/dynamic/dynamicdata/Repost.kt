@@ -41,7 +41,7 @@ data class Repost(@SerializedName("origin")
         val repostPicture = originalDynamic.pictureUrl
         val msg = MessageWrapper(
                 "转发了 ${if (item.content.isEmpty()) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item.content}"
-                        + "\uD83D\uDD58 ${hmsPattern.format(item.getSentTime())}\n" + "原动态信息: \n${originalDynamic.text}"
+                        + "\n\uD83D\uDD58 ${hmsPattern.format(item.getSentTime())}\n" + "原动态信息: \n${originalDynamic.text}"
         )
 
         if (repostPicture.isNotEmpty()) {
