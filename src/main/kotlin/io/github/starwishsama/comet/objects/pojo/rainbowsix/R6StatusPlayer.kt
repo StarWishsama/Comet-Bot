@@ -2,11 +2,12 @@ package io.github.starwishsama.comet.objects.pojo.rainbowsix
 
 import com.google.gson.annotations.SerializedName
 
-data class R6Player(var status : Int, var found : Boolean,
-        var player: PlayerBean? = null, var custom: CustomBean? = null,
-        var refresh: RefreshBean? = null,
-        var stats: StatsBean? = null,
-        var ranked: RankedBean? = null) {
+@Deprecated("Move to R6Stats API")
+data class R6StatusPlayer(var status : Int, var found : Boolean,
+                          var player: PlayerBean? = null, var custom: CustomBean? = null,
+                          var refresh: RefreshBean? = null,
+                          var stats: StatsBean? = null,
+                          var ranked: RankedBean? = null) {
 
     data class PlayerBean (
             @SerializedName("p_id")

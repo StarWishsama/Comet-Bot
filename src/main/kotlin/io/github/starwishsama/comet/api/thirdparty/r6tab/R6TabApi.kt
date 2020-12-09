@@ -8,7 +8,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.enums.R6Rank
-import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6Player
+import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6StatusPlayer
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.IDGuidelineType
 import io.github.starwishsama.comet.utils.StringUtil
@@ -28,7 +28,7 @@ object R6TabApi {
         num.maximumFractionDigits = 2
     }
 
-    private fun searchPlayer(name: String): R6Player? {
+    private fun searchPlayer(name: String): R6StatusPlayer? {
         try {
             val body: String =
                 NetUtil.getPageContent("${apiUrl}search/uplay/$name?cid=${BotVariables.cfg.r6tabKey}") ?: return null
@@ -52,7 +52,7 @@ object R6TabApi {
     fun getR6SInfo(player: String): String {
         try {
             if (StringUtil.isLegitId(player, IDGuidelineType.UBISOFT)) {
-                val p: R6Player? = searchPlayer(player)
+                val p: R6StatusPlayer? = searchPlayer(player)
                 if (p != null && p.found) {
                     var response = String.format(
                             infoText,

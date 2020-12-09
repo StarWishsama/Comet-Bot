@@ -65,6 +65,9 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
     @SerializedName("disabled_commands")
     val disabledCommands: MutableSet<String> = mutableSetOf()
 
+    @SerializedName("filter_words")
+    val groupFilterWords: MutableList<String> = mutableListOf()
+
     fun addHelper(id: Long): Boolean {
         if (isHelper(id)) return false
         helpers.add(id)
