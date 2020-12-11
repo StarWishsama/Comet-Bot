@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.net.URLDecoder
 import io.github.starwishsama.comet.BotVariables.arkNight
+import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.ApiException
@@ -24,6 +25,7 @@ object DrawUtil {
 
     const val overTimeMessage = "抽卡次数到上限了, 可以少抽一点或者等待条数自动恢复哦~\n" +
             "命令条数现在每小时会恢复100次, 封顶1000次"
+    var pictureReady = false
 
     /**
      * 根据抽卡结果合成图片
@@ -142,5 +144,9 @@ object DrawUtil {
 
             daemonLogger.info("明日方舟 > 缺失资源文件下载完成 [$successCount/${arkNight.size}], 耗时 ${startTime.getLastingTimeAsString()}")
         }
+
+        pictureReady = true
     }
+
+    fun arkPictureIsUsable(): Boolean = cfg.arkDrawUseImage && pictureReady
 }

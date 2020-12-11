@@ -41,9 +41,7 @@ object CommandExecutor {
      * @param command 要注册的命令
      */
     private fun setupCommand(command: ChatCommand) {
-        if (!commands.contains(command) && command.canRegister()) {
-            commands.add(command)
-        } else {
+        if (command.canRegister() && !commands.add(command)) {
             BotVariables.logger.warning("[命令] 正在尝试注册已有命令 ${command.getProps().name}")
         }
     }
@@ -70,7 +68,7 @@ object CommandExecutor {
                     if (!consoleCommands.contains(it)) {
                         consoleCommands.plusAssign(it)
                     } else {
-                        BotVariables.logger.warning("[命令] 正在尝试注册已有命令 ${it.getProps().name}")
+                        BotVariables.logger.warning("[命令] 正在尝试注册已有后台命令 ${it.getProps().name}")
                     }
                 else -> {
                     BotVariables.logger.warning("[命令] 正在尝试注册非命令类 ${it.javaClass.simpleName}")

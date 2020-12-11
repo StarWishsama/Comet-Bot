@@ -16,6 +16,9 @@ import io.github.starwishsama.comet.objects.CometConfig
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.network.isUsable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import net.mamoe.mirai.Bot
 import net.mamoe.yamlkt.Yaml
 import java.io.File
@@ -81,7 +84,13 @@ object DataSetup {
 
                 daemonLogger.info("成功载入明日方舟游戏数据, 共 ${arkNight.size} 个")
                 if (cfg.arkDrawUseImage) {
-                    DrawUtil.downloadArkNightsFile()
+                    TaskUtil.runAsync {
+                        runBlocking {
+                            withContext(Dispatchers.IO) {
+                                DrawUtil.downloadArkNightsFile()
+                            }
+                        }
+                    }
                 }
             } else {
                 daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")

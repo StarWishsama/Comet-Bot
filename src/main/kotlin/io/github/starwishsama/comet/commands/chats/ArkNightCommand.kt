@@ -1,6 +1,5 @@
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
@@ -34,7 +33,7 @@ class ArkNightCommand : ChatCommand {
                 when (args[0]) {
                     "单次寻访", "1", "单抽" -> {
                         val list = pool.getArkDrawResult(user)
-                        return if (BotVariables.cfg.arkDrawUseImage) {
+                        return if (DrawUtil.arkPictureIsUsable()) {
                             generatePictureGachaResult(event, user, list)
                         } else {
                             pool.getArkDrawResultAsString(user, list).sendMessage()
@@ -42,7 +41,7 @@ class ArkNightCommand : ChatCommand {
                     }
                     "十连寻访", "10", "十连" -> {
                         val list: List<ArkNightOperator> = pool.getArkDrawResult(user, 10)
-                        return if (BotVariables.cfg.arkDrawUseImage) {
+                        return if (DrawUtil.arkPictureIsUsable()) {
                             generatePictureGachaResult(event, user, list)
                         } else {
                             pool.getArkDrawResultAsString(user, list).sendMessage()
@@ -50,7 +49,7 @@ class ArkNightCommand : ChatCommand {
                     }
                     "一井", "300", "来一井" -> {
                         val list: List<ArkNightOperator> = pool.getArkDrawResult(user, 300)
-                        return if (BotVariables.cfg.arkDrawUseImage) {
+                        return if (DrawUtil.arkPictureIsUsable()) {
                             generatePictureGachaResult(event, user, list)
                         } else {
                             pool.getArkDrawResultAsString(user, list).sendMessage()
@@ -66,7 +65,7 @@ class ArkNightCommand : ChatCommand {
                                 }
 
                                 val list: List<ArkNightOperator> = pool.getArkDrawResult(user, gachaTime)
-                                return if (BotVariables.cfg.arkDrawUseImage) {
+                                return if (DrawUtil.arkPictureIsUsable()) {
                                     generatePictureGachaResult(event, user, list)
                                 } else {
                                     pool.getArkDrawResultAsString(user, list).sendMessage()
