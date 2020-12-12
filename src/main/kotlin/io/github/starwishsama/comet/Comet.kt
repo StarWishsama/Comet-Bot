@@ -34,7 +34,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.join
 import net.mamoe.mirai.network.ForceOfflineException
 import net.mamoe.mirai.network.LoginFailedException
@@ -192,7 +191,9 @@ object Comet {
             protocol = cfg.botProtocol
             fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
         }
-        bot = Bot(qq = qqId, password = password, configuration = config).alsoLogin()
+        bot = Bot(qq = qqId, password = password, configuration = config)
+        logger.info("登录中... 使用协议 ${bot.configuration.protocol.name}")
+        bot.login()
 
         invokePostTask(bot)
 
@@ -269,7 +270,7 @@ private suspend fun handleLogIn() {
                 try {
                     Comet.startBot(cfg.botId, cfg.botPassword)
                 } catch (e: LoginFailedException) {
-                    println("登录失败: ${e.message}\n如果是密码错误, 请重新输入密码")
+                    println("登录失败, 如果是密码错误, 请重新输入密码")
                     isFailed = true
                     continue
                 }

@@ -100,5 +100,5 @@ data class CometConfig(
         val remoteWebDriver: String = "",
 
         @Comment("机器人使用的登录协议")
-        val botProtocol: BotConfiguration.MiraiProtocol = BotConfiguration.MiraiProtocol.ANDROID_PHONE
+        val botProtocol: BotConfiguration.MiraiProtocol = BotConfiguration.MiraiProtocol.ANDROID_PAD
 )

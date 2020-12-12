@@ -93,7 +93,7 @@ object BiliDynamicChecker : CometPusher {
             perGroup.parallelStream().forEach { cfg ->
                 if (cfg.biliPushEnabled) {
                     cfg.biliSubscribers.parallelStream().forEach { uid ->
-                        if (pdh.uid == uid) {
+                        if (pdh.uid == uid && !pdh.target.contains(cfg.id)) {
                             pdh.target.plusAssign(cfg.id)
                         }
                     }
