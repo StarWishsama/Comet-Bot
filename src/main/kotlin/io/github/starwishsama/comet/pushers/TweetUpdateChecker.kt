@@ -7,7 +7,6 @@ import io.github.starwishsama.comet.api.command.CommandExecutor.doFilter
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
-import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.verboseS
 import kotlinx.coroutines.GlobalScope
@@ -47,25 +46,23 @@ object TweetUpdateChecker : CometPusher {
         }
 
         pushPool.forEach { (userName, pushedTweet) ->
-            TaskUtil.executeRetry(2) {
-                try {
-                    val cache = TwitterApi.getCacheTweet(userName)
+            try {
+                val cache = TwitterApi.getCacheTweet(userName)
 
-                    val tweet = TwitterApi.getTweetInTimeline(username = userName, max = 1)
+                val tweet = TwitterApi.getTweetInTimeline(username = userName, max = 1)
 
-                    if (tweet != null && !tweet.contentEquals(cache)) {
-                        pushedTweet.tweet = tweet
-                        pushCount++
+                if (tweet != null && !tweet.contentEquals(cache)) {
+                    pushedTweet.tweet = tweet
+                    pushCount++
+                }
+            } catch (t: Throwable) {
+                if (!NetUtil.isTimeout(t)) {
+                    when (t) {
+                        is RateLimitException -> daemonLogger.verbose(t.message)
+                        else -> daemonLogger.verboseS("[推文] 在尝试获取推文时出现了意外", t)
                     }
-                } catch (t: Throwable) {
-                    if (!NetUtil.isTimeout(t)) {
-                        when (t) {
-                            is RateLimitException -> daemonLogger.verbose(t.message)
-                            else -> daemonLogger.verboseS("[推文] 在尝试获取推文时出现了意外", t)
-                        }
-                    } else {
-                        daemonLogger.verboseS("[推文] 获取推文时连接超时")
-                    }
+                } else {
+                    daemonLogger.verboseS("[推文] 获取推文时连接超时")
                 }
             }
         }
