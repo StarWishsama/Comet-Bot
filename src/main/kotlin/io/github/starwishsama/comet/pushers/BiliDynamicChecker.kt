@@ -11,15 +11,14 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
 import io.github.starwishsama.comet.utils.verboseS
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
 import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 import kotlin.time.ExperimentalTime
 
 object BiliDynamicChecker : CometPusher {
-    private val pushedList = mutableSetOf<PushDynamicHistory>()
+    private val pushPool = mutableSetOf<PushDynamicHistory>()
     override val delayTime: Long = 3
     override val internal: Long = 3
     override var future: ScheduledFuture<*>? = null
@@ -30,66 +29,81 @@ object BiliDynamicChecker : CometPusher {
     override fun retrieve() {
         pushCount = 0
 
-        val collectedUsers = mutableSetOf<Long>()
+        val collectedUID = mutableSetOf<Long>()
 
-        perGroup.parallelStream().forEach {
-            if (it.biliPushEnabled) {
-                collectedUsers.plusAssign(it.biliSubscribers)
+        collectedUID.apply {
+            perGroup.forEach {
+                if (it.biliPushEnabled) {
+                    plusAssign(it.biliSubscribers)
+                }
             }
         }
 
-        collectedUsers.parallelStream().forEach { uid ->
-            val dynamic: Dynamic? = runBlocking {
-                try {
-                    MainApi.getUserDynamicTimeline(uid)
-                } catch (e: RuntimeException) {
-                    if (e !is ApiException) {
-                        daemonLogger.warning("在获取动态时出现了异常", e)
-                    }
-                    return@runBlocking null
-                }
-            }
+        collectedUID.forEach { uid ->
+            runBlocking {
+                val job = launch {
+                    val dynamic: Dynamic? =
+                        withContext(Dispatchers.IO) {
+                            try {
+                                MainApi.getUserDynamicTimeline(uid)
+                            } catch (e: RuntimeException) {
+                                if (e !is ApiException) {
+                                    daemonLogger.warning("在获取动态时出现了异常", e)
+                                }
+                                null
+                            }
+                        }
 
-            val data = runBlocking { dynamic?.convertDynamic() }
+                    val data = dynamic?.convertDynamic()
 
-            if (dynamic != null && data != null && data.success) {
-                val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@forEach
-                val pushDynamic = PushDynamicHistory(uid = uid, pushContent = data, sentTime = sentTime)
+                    if (dynamic != null && data != null && data.success) {
+                        val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@launch
 
-                // 检查是否火星了
-                if (isOutdated(pushDynamic)) return@forEach
+                        // 检查是否火星了
+                        if (isOutdated(sentTime)) return@launch
 
-                if (pushedList.isEmpty()) {
-                    pushedList.plusAssign(pushDynamic)
-                    pushCount++
-                } else {
-                    val target = pushedList.parallelStream().filter { it.uid == uid }.findFirst()
+                        if (pushPool.isEmpty()) {
+                            pushPool.plusAssign(
+                                PushDynamicHistory(
+                                    uid = uid,
+                                    pushContent = data,
+                                    sentTime = sentTime
+                                )
+                            )
+                            pushCount++
+                        } else {
+                            val target = pushPool.parallelStream().filter { it.uid == uid }.findFirst()
 
-                    if (!target.isPresent) {
-                        pushedList.plusAssign(pushDynamic)
-                        return@forEach
-                    }
+                            if (!target.isPresent) {
+                                pushPool.plusAssign(
+                                    PushDynamicHistory(
+                                        uid = uid,
+                                        pushContent = data,
+                                        sentTime = sentTime
+                                    )
+                                )
+                                return@launch
+                            }
 
-                    target.ifPresent {
-                        if (data.text != it.pushContent.text ) {
-                            it.pushContent = data
-                            it.isPushed = false
-                            it.sentTime = sentTime
+                            target.ifPresent {
+                                if (data.text != it.pushContent.text) {
+                                    it.pushContent = data
+                                    it.isPushed = false
+                                    it.sentTime = sentTime
+                                }
+                            }
                         }
                     }
                 }
+                job.start()
             }
         }
 
-        if (pushCount > 0) {
-            daemonLogger.verboseS("Collected bili dynamic success, have collected $pushCount dynamic!")
-        }
-
-        push()
+        collectedUID.clear()
     }
 
     override fun push() {
-        pushedList.parallelStream().forEach { pdh ->
+        pushPool.parallelStream().forEach { pdh ->
             perGroup.parallelStream().forEach { cfg ->
                 if (cfg.biliPushEnabled) {
                     cfg.biliSubscribers.parallelStream().forEach { uid ->
@@ -109,19 +123,19 @@ object BiliDynamicChecker : CometPusher {
         var count = 0
 
         /** 遍历推送列表推送开播消息 */
-        pushedList.parallelStream().forEach { pdh ->
+        pushPool.parallelStream().forEach { pdh ->
             if (!pdh.isPushed) {
-                pdh.target.forEach target@ { gid ->
+                pdh.target.forEach target@{ gid ->
                     try {
                         runBlocking {
                             val group = bot?.getGroup(gid)
                             group?.sendMessage(
-                                    "${MainApi.getUserNameByMid(pdh.uid)} ".convertToChain() + pdh.pushContent.toMessageChain(
-                                            group
-                                    )
+                                "${MainApi.getUserNameByMid(pdh.uid)} ".convertToChain() + pdh.pushContent.toMessageChain(
+                                    group
+                                )
                             )
                             count++
-                            delay(1_500)
+                            delay(2_000)
                         }
                     } catch (e: RuntimeException) {
                         daemonLogger.warning("[推送] 将动态推送至 $gid 时发生意外 ${e.stackTraceToString()}")
@@ -138,7 +152,7 @@ object BiliDynamicChecker : CometPusher {
         return count
     }
 
-    private data class PushDynamicHistory(
+    data class PushDynamicHistory(
         val uid: Long,
         var pushContent: MessageWrapper,
         val target: MutableSet<Long> = mutableSetOf(),
@@ -147,10 +161,14 @@ object BiliDynamicChecker : CometPusher {
     )
 
     @OptIn(ExperimentalTime::class)
-    private fun isOutdated(history: PushDynamicHistory?): Boolean {
-        if (history == null) return true
-        if (history.sentTime == LocalDateTime.MIN) return false
+    private fun isOutdated(sentTime: LocalDateTime?): Boolean {
+        if (sentTime == null) return true
+        if (sentTime == LocalDateTime.MIN) return false
 
-        return history.sentTime.getLastingTime().inMinutes >= 30
+        return sentTime.getLastingTime().inMinutes >= 30
+    }
+
+    fun getPool(): MutableSet<PushDynamicHistory> {
+        return pushPool
     }
 }

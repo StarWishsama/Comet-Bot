@@ -33,16 +33,16 @@ data class CometConfig(
         @Comment("机器人发送消息需要屏蔽的词汇")
         val filterWords: MutableList<String> = mutableListOf(),
 
-        @Comment("点歌 API 类型")
+        @Comment("点歌 API 类型, 可选的有 QQ, NETEASE")
         var musicApi: MusicApiType = MusicApiType.QQ,
 
         @Comment("命令前缀")
         val commandPrefix: MutableList<String> = mutableListOf(".", "。", "#", "!", "/"),
 
-        @Comment("BiliBili 账号, 使用搜索功能 (如 /bili info) 时必填")
+        @Comment("哔哩哔哩账号用户名, 调用需鉴权API功能 (如 /bili info) 时必填")
         var biliUserName: String? = null,
 
-        @Comment("BiliBili 账号密码, 使用搜索功能 (如 /bili info) 时必填")
+        @Comment("哔哩哔哩账号密码, 调用需鉴权API功能 (如 /bili info) 时必填")
         var biliPassword: String? = null,
 
         @Comment("SauceNao 以图搜图 APIKey, 不填亦可, 但可搜索次数会减少")
@@ -57,8 +57,11 @@ data class CometConfig(
         @Comment("用于获取 Twitter Token 的 Access Secret, 使用 Twitter 推送必填")
         var twitterAccessSecret: String? = null,
 
-        @Comment("用于使用 Twitter Developer API 的 Token, 无需填写")
+        @Comment("用于使用 Twitter API 的 Token, 无需填写会自动获取")
         var twitterToken: String? = null,
+
+        @Comment("是否启用代理, 启用后以下两项才可使用")
+        var proxySwitch: Boolean = true,
 
         @Comment("本地代理服务器地址, 目前仅支持 HTTP 代理")
         var proxyUrl: String = "",
@@ -81,7 +84,7 @@ data class CometConfig(
         @Comment("以图搜图 API 类型, 请使用 /ps source 命令修改")
         var pictureSearchApi: PicSearchApiType = PicSearchApiType.SAUCENAO,
 
-        @Comment("查询 BiliBili 主播开播动态间隔时间")
+        @Comment("查询哔哩哔哩用户动态间隔时间")
         val biliInterval: Long = 2,
 
         @Comment("查询 Twitter 用户动态间隔时间")
@@ -99,6 +102,6 @@ data class CometConfig(
         @Comment("WebDriver Remote 地址, 留空为关闭")
         val remoteWebDriver: String = "",
 
-        @Comment("机器人使用的登录协议")
+        @Comment("机器人使用的登录协议, 可选的有 ANDROID_PHONE, ANDROID_PAD 和 ANDROID_WATCH")
         val botProtocol: BotConfiguration.MiraiProtocol = BotConfiguration.MiraiProtocol.ANDROID_PAD
 )

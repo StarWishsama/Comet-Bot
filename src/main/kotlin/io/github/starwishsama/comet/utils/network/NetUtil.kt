@@ -7,7 +7,6 @@ import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.utils.StringUtil.containsEtc
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.debugS
-import io.github.starwishsama.comet.utils.network.NetUtil.proxyIsUsable
 import okhttp3.*
 import org.openqa.selenium.*
 import org.openqa.selenium.chrome.ChromeDriver
@@ -30,24 +29,7 @@ import java.util.concurrent.TimeUnit
 
 fun Response.isType(typeName: String): Boolean = headers()["content-type"]?.contains(typeName) == true
 
-fun Socket.isUsable(timeout: Int = 1_000, isReloaded: Boolean = false): Boolean {
-    if (proxyIsUsable == 0 || isReloaded) {
-        try {
-            val connection = (URL("https://www.gstatic.com/generate_204").openConnection(Proxy(cfg.proxyType, this.remoteSocketAddress))) as HttpURLConnection
-            connection.connectTimeout = 2000
-            connection.connect()
-            proxyIsUsable = 1
-        } catch (t: IOException) {
-            proxyIsUsable = -1
-        } finally {
-            close()
-        }
-    }
-    return inetAddress.isReachable(timeout)
-}
-
 object NetUtil {
-    var proxyIsUsable = 0
     lateinit var driver: WebDriver
 
     const val defaultUA =
@@ -83,16 +65,14 @@ object NetUtil {
                 .readTimeout(timeout, TimeUnit.SECONDS)
                 .hostnameVerifier { _, _ -> true }
 
-        if (proxyIsUsable > 0 && proxyUrl.isNotBlank() && proxyPort > 0) {
-            try {
-                val socket = Socket(proxyUrl, proxyPort)
-                if (socket.isUsable()) {
-                    builder.proxy(Proxy(cfg.proxyType, Socket(proxyUrl, proxyPort).remoteSocketAddress))
-                }
+
+        try {
+            if (checkProxyUsable()) {
+                builder.proxy(Proxy(cfg.proxyType, Socket(proxyUrl, proxyPort).remoteSocketAddress))
                 daemonLogger.verbose("使用代理连接")
-            } catch (e: Exception) {
-                daemonLogger.verbose("无法连接到代理服务器, ${e.message}")
             }
+        } catch (e: Exception) {
+            daemonLogger.verbose("无法连接到代理服务器, ${e.message}")
         }
 
         val client = builder.build()
@@ -305,4 +285,20 @@ object NetUtil {
     }
 
     fun driverUsable(): Boolean = ::driver.isInitialized
+
+    fun checkProxyUsable(customUrl: String = "https://www.gstatic.com/generate_204", timeout: Int = 2_000): Boolean {
+        if (!cfg.proxySwitch || cfg.proxyUrl.isEmpty() || cfg.proxyPort <= 0) return false
+
+        Socket(cfg.proxyUrl, cfg.proxyPort).use {
+            try {
+                val connection = (URL(customUrl).openConnection(Proxy(cfg.proxyType, it.remoteSocketAddress))) as HttpURLConnection
+                connection.connectTimeout = 2000
+                connection.connect()
+
+            } catch (t: IOException) {
+                return false
+            }
+            return it.inetAddress.isReachable(timeout)
+        }
+    }
 }

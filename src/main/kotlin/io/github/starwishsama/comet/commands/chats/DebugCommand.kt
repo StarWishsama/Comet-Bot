@@ -152,13 +152,8 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     """.trimIndent().convertToChain()
                 }
                 "panic" -> throw RuntimeException("好")
-                "ark" -> {
-                    if (args.size > 1) {
-                        val op = BotVariables.arkNight.parallelStream().filter { it.name == args[1] }.findFirst()
-                        if (op.isPresent) {
-                            return op.toString().convertToChain()
-                        }
-                    }
+                "pushpool" -> {
+                    return BiliDynamicChecker.getPool().toString().sendMessage()
                 }
                 "twpic" -> {
                     if (args.isEmpty()) return "/debug twpic [Tweet ID]".convertToChain()

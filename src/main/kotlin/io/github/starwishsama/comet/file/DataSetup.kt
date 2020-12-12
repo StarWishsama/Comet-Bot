@@ -15,14 +15,12 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.CometConfig
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.utils.*
-import io.github.starwishsama.comet.utils.network.isUsable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.Bot
 import net.mamoe.yamlkt.Yaml
 import java.io.File
-import java.net.Socket
 
 object DataSetup {
     private val userCfg: File = File(BotVariables.filePath, "users.json")
@@ -84,6 +82,10 @@ object DataSetup {
 
                 daemonLogger.info("成功载入明日方舟游戏数据, 共 ${arkNight.size} 个")
                 if (cfg.arkDrawUseImage) {
+                    if (getOsName().toLowerCase().contains("linux")) {
+                        System.setProperty("java.awt.headless", "true")
+                    }
+
                     TaskUtil.runAsync {
                         runBlocking {
                             withContext(Dispatchers.IO) {
@@ -142,13 +144,6 @@ object DataSetup {
     fun reload() {
         // 仅重载配置文件
         cfg = Yaml.default.decodeFromString(CometConfig.serializer(), cfgFile.getContext())
-
-        try {
-            val socket = Socket(cfg.proxyUrl, cfg.proxyPort)
-            socket.isUsable()
-        } catch (e: Exception) {
-            daemonLogger.verbose("无法连接到代理服务器, ${e.message}")
-        }
     }
 
     fun initPerGroupSetting(bot: Bot) {
