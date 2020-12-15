@@ -7,6 +7,7 @@ import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.filePath
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.BotVariables.startTime
+import io.github.starwishsama.comet.Comet.isFailed
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
@@ -38,15 +39,20 @@ import net.mamoe.mirai.join
 import net.mamoe.mirai.network.ForceOfflineException
 import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.*
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import org.jline.reader.LineReader
+import org.jline.reader.LineReaderBuilder
+import org.jline.terminal.TerminalBuilder
+import java.io.EOFException
 import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.time.ExperimentalTime
 
-
 object Comet {
+    val console: LineReader = LineReaderBuilder
+        .builder().terminal(TerminalBuilder.builder().system(true).build()).appName("Comet").build()
+    var isFailed = false
+
     @ExperimentalTime
     fun startUpTask() {
         val apis = arrayOf(MainApi, TwitterApi, YoutubeApi)
@@ -66,9 +72,12 @@ object Comet {
                     runBlocking {
                         withContext(Dispatchers.IO) {
                             login(username = username, password = pwd)
+                            daemonLogger.info("成功登录哔哩哔哩账号")
                         }
                     }
                 }
+            } else {
+                daemonLogger.info("未登录哔哩哔哩账号, 部分哔哩哔哩相关功能可能受限")
             }
         }
 
@@ -78,14 +87,14 @@ object Comet {
 
     private fun handleConsoleCommand() {
         TaskUtil.runAsync {
-            BufferedReader(InputStreamReader(System.`in`)).use { br ->
+            while (true) {
                 var line: String
-                while (br.readLine().also { line = it } != null) {
-                    runBlocking {
-                        val result = CommandExecutor.dispatchConsoleCommand(line)
-                        if (result.isNotEmpty()) {
-                            consoleCommandLogger.info(result)
-                        }
+
+                runBlocking {
+                    line = console.readLine()
+                    val result = CommandExecutor.dispatchConsoleCommand(line)
+                    if (result.isNotEmpty()) {
+                        consoleCommandLogger.info(result)
                     }
                 }
             }
@@ -173,6 +182,7 @@ object Comet {
 
     @ExperimentalTime
     suspend fun startBot(qqId: Long, password: String) {
+        daemonLogger.info("正在设置登录配置...")
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
                 PlatformLogger("Comet ${it.id}", {
@@ -193,11 +203,16 @@ object Comet {
         }
         bot = Bot(qq = qqId, password = password, configuration = config)
         logger.info("登录中... 使用协议 ${bot.configuration.protocol.name}")
-        bot.login()
+        try {
+            bot.login()
+        } catch (e: LoginFailedException) {
+            daemonLogger.info("登录失败, 如果是密码错误, 请重新输入密码")
+            isFailed = true
+            handleLogin()
+            return
+        }
 
         invokePostTask(bot)
-
-        Runtime.getRuntime().addShutdownHook(Thread { invokeWhenClose() })
 
         handleConsoleCommand()
 
@@ -236,10 +251,10 @@ fun initResources() {
 suspend fun main() {
     initResources()
 
-    val id = cfg.botId
+    Runtime.getRuntime().addShutdownHook(Thread { invokeWhenClose() })
 
-    if (id == 0L) {
-        handleLogIn()
+    if (cfg.botId == 0L) {
+        handleLogin()
     } else {
         daemonLogger.info("检测到登录数据, 正在自动登录账号 ${cfg.botId}")
         Comet.startBot(cfg.botId, cfg.botPassword)
@@ -247,35 +262,33 @@ suspend fun main() {
 }
 
 @OptIn(ExperimentalTime::class)
-@Suppress("BlockingMethodInNonBlockingContext")
-private suspend fun handleLogIn() {
+private suspend fun handleLogin() {
     daemonLogger.info("请输入欲登录的机器人账号")
-    BufferedReader(InputStreamReader(System.`in`)).use { br ->
-        var command: String
-        var isFailed = false
-        while (br.readLine().also { command = it } != null) {
+    while (true) {
+        try {
+            var command: String
+
             if (BotVariables.isBotInitialized() && bot.isOnline) {
                 break
             }
-            if (cfg.botId == 0L && command.isNumeric()) {
-                cfg.botId = command.toLong()
-                daemonLogger.info("成功设置账号为 ${cfg.botId}")
-                daemonLogger.info("请输入欲登录的机器人密码")
+
+            if (cfg.botId == 0L) {
+                command = Comet.console.readLine()
+                if (command.isNumeric()) {
+                    cfg.botId = command.toLong()
+                    daemonLogger.info("成功设置账号为 ${cfg.botId}")
+                    daemonLogger.info("请输入欲登录的机器人密码")
+                }
             } else if (cfg.botPassword.isEmpty() || isFailed) {
+                command = Comet.console.readLine('*')
                 cfg.botPassword = command
                 daemonLogger.info("成功设置密码, 按下 Enter 启动机器人")
-                isFailed = false
             } else if (cfg.botId != 0L && cfg.botPassword.isNotEmpty()) {
-                daemonLogger.info("请稍等...")
-                try {
-                    Comet.startBot(cfg.botId, cfg.botPassword)
-                } catch (e: LoginFailedException) {
-                    println("登录失败, 如果是密码错误, 请重新输入密码")
-                    isFailed = true
-                    continue
-                }
-                break
+                daemonLogger.info("正在启动 Comet...")
+                Comet.startBot(cfg.botId, cfg.botPassword)
             }
+        } catch (e: EOFException) {
+            return
         }
     }
 }

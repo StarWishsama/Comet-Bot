@@ -29,7 +29,7 @@ jar {
 }
 
 def gitCommitId = 'git rev-parse --short HEAD'
-def versionCode = "0.6-M2-" + gitCommitId.execute().text.trim()
+String versionCode = "0.6-M2-" + gitCommitId.execute().text.trim()
 
 group 'io.github.starwishsama.comet'
 version versionCode
@@ -55,7 +55,7 @@ task updateVersion {
         def newBuildTimeStr = "    const val buildTime = \"" + buildTime + "\""
         def updatedContent = versionFile.getText('UTF-8').replace(oldVersionStr, newVersionStr).replace(oldBuildTimeStr, newBuildTimeStr)
         versionFile.write(updatedContent, 'UTF-8')
-        println "Successfully update info inside Comet~"
+        println "Successfully update info inside Comet~ Current version: $versionCode"
     } else {
         println "Can't found project dir."
     }
@@ -123,6 +123,10 @@ dependencies {
 
     //def console = '1.1.0'
     //compileOnly("net.mamoe:mirai-console:$console")
+    
+    // Jline a Java library for handling console input @ https://github.com/jline/jline3
+    implementation 'org.jline:jline:3.18.0'
+    compile group: 'org.fusesource.jansi', name: 'jansi', version: '2.1.0'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

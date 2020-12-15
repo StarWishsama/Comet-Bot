@@ -41,28 +41,40 @@ object BiliDynamicChecker : CometPusher {
 
         collectedUID.forEach { uid ->
             runBlocking {
-                val job = launch {
-                    val dynamic: Dynamic? =
-                        withContext(Dispatchers.IO) {
-                            try {
-                                MainApi.getUserDynamicTimeline(uid)
-                            } catch (e: RuntimeException) {
-                                if (e !is ApiException) {
-                                    daemonLogger.warning("在获取动态时出现了异常", e)
-                                }
-                                null
+
+                val dynamic: Dynamic? =
+                    withContext(Dispatchers.IO) {
+                        try {
+                            MainApi.getUserDynamicTimeline(uid)
+                        } catch (e: RuntimeException) {
+                            if (e !is ApiException) {
+                                daemonLogger.warning("在获取动态时出现了异常", e)
                             }
+                            null
                         }
+                    }
 
-                    val data = dynamic?.convertDynamic()
+                val data = dynamic?.convertDynamic()
 
-                    if (dynamic != null && data != null && data.success) {
-                        val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@launch
+                if (dynamic != null && data != null && data.success) {
+                    val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@runBlocking
 
-                        // 检查是否火星了
-                        if (isOutdated(sentTime)) return@launch
+                    // 检查是否火星了
+                    if (isOutdated(sentTime)) return@runBlocking
 
-                        if (pushPool.isEmpty()) {
+                    if (pushPool.isEmpty()) {
+                        pushPool.plusAssign(
+                            PushDynamicHistory(
+                                uid = uid,
+                                pushContent = data,
+                                sentTime = sentTime
+                            )
+                        )
+                        pushCount++
+                    } else {
+                        val target = pushPool.parallelStream().filter { it.uid == uid }.findFirst()
+
+                        if (!target.isPresent) {
                             pushPool.plusAssign(
                                 PushDynamicHistory(
                                     uid = uid,
@@ -70,32 +82,18 @@ object BiliDynamicChecker : CometPusher {
                                     sentTime = sentTime
                                 )
                             )
-                            pushCount++
-                        } else {
-                            val target = pushPool.parallelStream().filter { it.uid == uid }.findFirst()
+                            return@runBlocking
+                        }
 
-                            if (!target.isPresent) {
-                                pushPool.plusAssign(
-                                    PushDynamicHistory(
-                                        uid = uid,
-                                        pushContent = data,
-                                        sentTime = sentTime
-                                    )
-                                )
-                                return@launch
-                            }
-
-                            target.ifPresent {
-                                if (data.text != it.pushContent.text) {
-                                    it.pushContent = data
-                                    it.isPushed = false
-                                    it.sentTime = sentTime
-                                }
+                        target.ifPresent {
+                            if (data.text != it.pushContent.text) {
+                                it.pushContent = data
+                                it.isPushed = false
+                                it.sentTime = sentTime
                             }
                         }
                     }
                 }
-                job.start()
             }
         }
 

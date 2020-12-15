@@ -28,7 +28,7 @@ class ArkNightCommand : ChatCommand {
     private val pool = ArkNightPool()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.hasNoCoolDown(event.sender.id, 15)) {
+        if (BotUtil.hasNoCoolDown(event.sender.id, 30)) {
             if (args.isNotEmpty()) {
                 when (args[0]) {
                     "单次寻访", "1", "单抽" -> {

@@ -14,7 +14,7 @@ class Rcon(host: String, port: Int, password: ByteArray?) {
         private set
     var socket: Socket? = null
         private set
-    var charset: Charset
+    var charset: Charset = Charset.forName("UTF-8")
 
     /**
      * Connect to a rcon server
@@ -94,7 +94,6 @@ class Rcon(host: String, port: Int, password: ByteArray?) {
 
     init {
         // Default charset is utf8
-        charset = Charset.forName("UTF-8")
 
         // Connect to host
         connect(host, port, password)
