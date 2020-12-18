@@ -81,11 +81,11 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
-    def miraiCore = '1.3.3'
-    //implementation "net.mamoe:mirai-core:$miraiCore"
+    def miraiCore = '2.0-M1-dev-1'
+    implementation "net.mamoe:mirai-core-all:$miraiCore"
     //implementation "net.mamoe:mirai-core-qqandroid:$miraiCore"
 
-    implementation fileTree(dir: 'libs', includes: ['*.jar'])
+    //implementation fileTree(dir: 'libs', includes: ['*.jar'])
 
     implementation 'cn.hutool:hutool-http:5.4.2'
     implementation 'cn.hutool:hutool-crypto:5.4.2'
