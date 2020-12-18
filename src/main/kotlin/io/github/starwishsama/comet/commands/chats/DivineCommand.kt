@@ -12,7 +12,7 @@ import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.getRestString
 import io.github.starwishsama.comet.utils.BotUtil.hasNoCoolDown
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
-import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 

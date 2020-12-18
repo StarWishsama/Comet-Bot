@@ -9,7 +9,6 @@ import io.github.starwishsama.comet.utils.verboseS
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.getGroupOrNull
 import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 
@@ -57,7 +56,7 @@ object YoutubeStreamingChecker : CometPusher {
             if (!pushObject.isPushed) {
                 val wrappedMessage = YoutubeApi.getLiveStatusByResult(pushObject.result)
                 pushObject.groups.forEach {
-                    val group = bot?.getGroupOrNull(it)
+                    val group = bot?.getGroup(it)
                     runBlocking {
                         try {
                             group?.sendMessage(wrappedMessage.toMessageChain(group))

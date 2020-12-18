@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.api.command.interfaces
 
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
-import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.event.events.MessageEvent
 
 /**
  * 阻塞命令

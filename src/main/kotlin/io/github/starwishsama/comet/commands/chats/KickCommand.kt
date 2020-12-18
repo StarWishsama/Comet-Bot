@@ -8,16 +8,13 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
-import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.isOperator
-import net.mamoe.mirai.message.GroupMessageEvent
-import net.mamoe.mirai.message.MessageEvent
-import net.mamoe.mirai.message.data.At
+import net.mamoe.mirai.event.events.GroupMessageEvent
+import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.isContentNotEmpty
 
 @CometCommand
 class KickCommand : ChatCommand {
@@ -26,15 +23,11 @@ class KickCommand : ChatCommand {
             if (hasPermission(user, event)) {
                 if (event.group.botPermission.isOperator()) {
                     if (args.isNotEmpty()) {
-                        val at = event.message[At]
-                        if (at != null && at.isContentNotEmpty()) {
-                            doKick(event, at.target, "")
+                        val at = BotUtil.parseAtToId(event, args[0])
+                        if (at > -1) {
+                            doKick(event, at, "")
                         } else {
-                            if (args[0].isNumeric()) {
-                                doKick(event, args[0].toLong(), "")
-                            } else {
-                                getHelp().convertToChain()
-                            }
+                            getHelp().convertToChain()
                         }
                     } else {
                         return getHelp().convertToChain()

@@ -13,10 +13,9 @@ import io.github.starwishsama.comet.utils.verboseS
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.isContentNotEmpty
-import net.mamoe.mirai.message.uploadAsImage
+import net.mamoe.mirai.utils.uploadAsImage
 import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 
@@ -116,7 +115,7 @@ object BiliLiveChecker : CometPusher {
                         if (filtered.isContentNotEmpty()) {
                             runBlocking {
                                 try {
-                                    val group = bot?.getGroupOrNull(it)
+                                    val group = bot?.getGroup(it)
                                     val image = group?.let { sendGroup -> NetUtil.executeHttpRequest(url = data.keyFrameImageUrl, autoClose = true).body()?.byteStream()?.uploadAsImage(sendGroup) }
                                     group?.sendMessage(filtered + (image ?: PlainText("")))
                                     count++

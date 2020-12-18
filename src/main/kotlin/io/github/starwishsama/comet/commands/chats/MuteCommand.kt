@@ -13,8 +13,8 @@ import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.contact.*
-import net.mamoe.mirai.message.GroupMessageEvent
-import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.event.events.GroupMessageEvent
+import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 
@@ -89,10 +89,10 @@ class MuteCommand : ChatCommand {
             }
             index++
         }
-        doMute(event.group, target, RandomUtil.randomLong(1, 2592000), false)
+        doMute(event.group, target, RandomUtil.randomLong(1, 2592000).toInt(), false)
     }
 
-    private suspend fun doMute(group: Group, id: Long, muteTime: Long, isAll: Boolean): MessageChain {
+    private suspend fun doMute(group: Group, id: Long, muteTime: Int, isAll: Boolean): MessageChain {
         if (group.botAsMember.isOperator()) {
             if (isAll) {
                 group.settings.isMuteAll = !group.settings.isMuteAll
@@ -112,7 +112,7 @@ class MuteCommand : ChatCommand {
                                 member.mute(muteTime)
                                 BotUtil.sendMessage("禁言 ${member.nameCardOrNick} 成功")
                             }
-                            0L -> {
+                            0 -> {
                                 member.unmute()
                                 BotUtil.sendMessage("解禁 ${member.nameCardOrNick} 成功")
                             }
@@ -133,8 +133,8 @@ class MuteCommand : ChatCommand {
      * 但是 It just works.
      * FIXME: 更换为正则表达式更优雅的处理
      */
-    private fun getMuteTime(message: String): Long {
-        if (message.isNumeric()) return message.toLong()
+    private fun getMuteTime(message: String): Int {
+        if (message.isNumeric()) return message.toInt()
 
         var banTime = 0L
         var tempTime: String = message
@@ -161,6 +161,6 @@ class MuteCommand : ChatCommand {
         } else if (tempTime.contains("分钟")) {
             banTime += tempTime.substring(0, tempTime.indexOf("分钟")).toInt() * 60
         }
-        return banTime
+        return banTime.toInt()
     }
 }

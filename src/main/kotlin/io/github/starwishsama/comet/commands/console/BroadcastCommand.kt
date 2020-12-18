@@ -8,7 +8,6 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.utils.BotUtil.getRestString
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.getGroupOrNull
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
@@ -22,7 +21,7 @@ class BroadcastCommand: ConsoleCommand {
     }
 
     private fun sendMessage(groupId: Long, message: String): String {
-        val g = bot.getGroupOrNull(groupId) ?: return "找不到群号对应的群"
+        val g = bot.getGroup(groupId) ?: return "找不到群号对应的群"
 
         return runBlocking {
             try {

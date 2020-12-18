@@ -23,19 +23,16 @@ import io.github.starwishsama.comet.listeners.ConvertLightAppListener
 import io.github.starwishsama.comet.listeners.GroupRelatedListener
 import io.github.starwishsama.comet.listeners.RepeatListener
 import io.github.starwishsama.comet.pushers.*
-import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
-import io.github.starwishsama.comet.utils.TaskUtil
-import io.github.starwishsama.comet.utils.getContext
 import io.github.starwishsama.comet.utils.network.NetUtil
-import io.github.starwishsama.comet.utils.writeString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.join
+import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.network.ForceOfflineException
 import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.*
@@ -83,6 +80,12 @@ object Comet {
 
         TaskUtil.runScheduleTaskAsync(25, 25, TimeUnit.MINUTES) { apis.forEach { it.resetTime() } }
         TaskUtil.runScheduleTaskAsync(5, 60 * 60, TimeUnit.SECONDS, HitokotoUpdater::run)
+        TaskUtil.runScheduleTaskAsync(3, 3, TimeUnit.HOURS) {
+            val usedMemoryBefore: Long = getUsedMemory()
+            System.runFinalization()
+            System.gc()
+            daemonLogger.verbose("GC 清理成功 (${usedMemoryBefore - getUsedMemory()}) MB")
+        }
     }
 
     private fun handleConsoleCommand() {
@@ -91,7 +94,7 @@ object Comet {
                 var line: String
 
                 runBlocking {
-                    line = console.readLine()
+                    line = console.readLine(">")
                     val result = CommandExecutor.dispatchConsoleCommand(line)
                     if (result.isNotEmpty()) {
                         consoleCommandLogger.info(result)
@@ -185,24 +188,25 @@ object Comet {
         daemonLogger.info("正在设置登录配置...")
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
-                PlatformLogger("Comet ${it.id}", {
+                PlatformLogger("Comet ${it.id}") {
                     BotVariables.log.writeString(BotVariables.log.getContext() + "$it\n")
                     println(it)
-                })
+                }
             }
             networkLoggerSupplier = { it ->
-                PlatformLogger("CometNet ${it.id}", {
+                PlatformLogger("CometNet ${it.id}") {
                     BotVariables.log.writeString(BotVariables.log.getContext() + "$it\n")
                     println(it)
-                })
+                }
             }
-            heartbeatPeriodMillis = (cfg.heartBeatPeriod * 60).secondsToMillis
+            heartbeatPeriodMillis = (cfg.heartBeatPeriod * 60).minutesToMillis
             fileBasedDeviceInfo()
             protocol = cfg.botProtocol
             fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
         }
-        bot = Bot(qq = qqId, password = password, configuration = config)
+        bot = BotFactory.newBot(qq = qqId, password = password, configuration = config)
         logger.info("登录中... 使用协议 ${bot.configuration.protocol.name}")
+
         try {
             bot.login()
         } catch (e: LoginFailedException) {
@@ -229,7 +233,9 @@ object Comet {
 fun initResources() {
     filePath = FileUtil.getJarLocation()
     startTime = LocalDateTime.now()
-    println(
+    FileUtil.initLog()
+
+    daemonLogger.info(
             """
         
            ______                     __ 
@@ -241,7 +247,6 @@ fun initResources() {
 
     """
     )
-    FileUtil.initLog()
     DataSetup.init()
     NetUtil.initDriver()
 }
@@ -273,14 +278,14 @@ private suspend fun handleLogin() {
             }
 
             if (cfg.botId == 0L) {
-                command = Comet.console.readLine()
+                command = Comet.console.readLine(">")
                 if (command.isNumeric()) {
                     cfg.botId = command.toLong()
                     daemonLogger.info("成功设置账号为 ${cfg.botId}")
                     daemonLogger.info("请输入欲登录的机器人密码")
                 }
             } else if (cfg.botPassword.isEmpty() || isFailed) {
-                command = Comet.console.readLine('*')
+                command = Comet.console.readLine(">", '*')
                 cfg.botPassword = command
                 daemonLogger.info("成功设置密码, 按下 Enter 启动机器人")
             } else if (cfg.botId != 0L && cfg.botPassword.isNotEmpty()) {

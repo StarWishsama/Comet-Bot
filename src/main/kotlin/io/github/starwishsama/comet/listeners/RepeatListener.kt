@@ -6,12 +6,13 @@ import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
+import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.subscribeGroupMessages
-import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
 import kotlin.time.ExperimentalTime
 
 object RepeatListener : NListener {
+    @ExperimentalMessageKey
     @ExperimentalTime
     override fun register(bot: Bot) {
         bot.subscribeGroupMessages {
@@ -23,6 +24,7 @@ object RepeatListener : NListener {
         }
     }
 
+    @ExperimentalMessageKey
     private suspend fun handleRepeat(event: GroupMessageEvent, chance: Double) {
         if (event.message[QuoteReply] == null && chance in 0.50..0.505) {
             cfg.commandPrefix.forEach {

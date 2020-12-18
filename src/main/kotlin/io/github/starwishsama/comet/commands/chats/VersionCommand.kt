@@ -9,7 +9,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
-import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import kotlin.time.ExperimentalTime
@@ -22,13 +22,13 @@ class VersionCommand : ChatCommand {
             return ("彗星 Bot " + BotVariables.version +
                     "\n已注册命令数: " + CommandExecutor.countCommands() +
                     "\n运行时长 ${BotUtil.getRunningTime()}" +
-                    "\nMade with ❤ & Mirai 1.3.1").convertToChain()
+                    "\nMade with ❤ & Mirai 2.0-M1").convertToChain()
         }
         return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps {
-        return CommandProps("version", arrayListOf("v", "版本"), "查看版本号", "nbot.commands.version", UserLevel.USER)
+        return CommandProps("version", arrayListOf("v", "版本", "bot"), "查看版本号", "nbot.commands.version", UserLevel.USER)
     }
 
     override fun getHelp(): String = ""

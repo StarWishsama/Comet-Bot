@@ -6,10 +6,11 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.coolDown
 import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.BotUser.Companion.getUser
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotOwner
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
-import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.utils.MiraiLogger
@@ -159,19 +160,21 @@ object BotUtil {
         return remain.toKotlinDuration().toFriendly()
     }
 
-    fun parseAtAsBotUser(event: MessageEvent, id: String): BotUser? {
-        val at = event.message[At]
-
-        return if (at != null) {
-            BotUser.getUser(at.target)
-        } else {
-            if (StringUtils.isNumeric(id)) {
-                BotUser.getUser(id.toLong())
-            } else {
-                null
+    fun parseAtToId(event: MessageEvent, possibleID: String): Long {
+        event.message.forEach {
+            if (it is At) {
+                return it.target
             }
         }
+
+        return if (StringUtils.isNumeric(possibleID)) {
+           possibleID.toLong()
+        } else {
+            -1
+        }
     }
+
+    fun parseAtAsBotUser(event: MessageEvent, id: String): BotUser? = getUser(parseAtToId(event, id))
 
     @ExperimentalTime
     fun getMemoryUsage(): String =

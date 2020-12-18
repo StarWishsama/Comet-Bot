@@ -12,10 +12,10 @@ import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.FileUtil
 import kotlinx.coroutines.delay
-import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.uploadAsImage
+import net.mamoe.mirai.utils.uploadAsImage
 import java.io.File
 
 @CometCommand

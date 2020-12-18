@@ -14,7 +14,7 @@ import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.message.uploadAsImage
+import net.mamoe.mirai.utils.uploadAsImage
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response

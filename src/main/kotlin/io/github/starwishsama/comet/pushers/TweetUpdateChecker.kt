@@ -14,7 +14,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.events.EventCancelledException
-import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.PlainText
 import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
@@ -94,7 +93,7 @@ object TweetUpdateChecker : CometPusher {
         var successCount = 0
 
         groupsToPush.forEach {
-            val group = bot?.getGroupOrNull(it)
+            val group = bot?.getGroup(it)
             if (group != null) {
                 val msg = (PlainText("${content.user.name} 发布了一条推文\n") + content.toMessageChain(group)).doFilter()
 

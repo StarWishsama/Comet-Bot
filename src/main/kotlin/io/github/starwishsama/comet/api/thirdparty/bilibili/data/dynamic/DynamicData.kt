@@ -16,7 +16,7 @@ interface DynamicData {
         if (other == null) return false
         if (other !is DynamicData) return false
 
-        return getContact().text == other.getContact().text
+        return getContact().text == other.getContact().text && getSentTime() == other.getSentTime()
     }
 
     fun getSentTime(): LocalDateTime

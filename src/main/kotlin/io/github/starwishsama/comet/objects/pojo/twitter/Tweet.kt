@@ -14,7 +14,7 @@ import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageChainBuilder
-import net.mamoe.mirai.message.uploadAsImage
+import net.mamoe.mirai.utils.uploadAsImage
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime

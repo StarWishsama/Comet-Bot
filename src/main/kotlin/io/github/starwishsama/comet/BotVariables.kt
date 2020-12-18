@@ -31,8 +31,8 @@ import java.util.concurrent.ScheduledExecutorService
 
 object BotVariables {
     lateinit var filePath: File
-    const val version = "0.6-M2-bb25573"
-    const val buildTime = "2020/12/15 12:48:59"
+    const val version = "0.6-M2-7f0cc02"
+    const val buildTime = "2020/12/18 12:50:31"
 
     /** 作为独立运行时使用的变量, 除 [Comet] 外禁止调用 */
     lateinit var bot: Bot
@@ -49,18 +49,18 @@ object BotVariables {
                         daemonLogger.warning("线程 ${thread.name} 在执行任务时发生了错误", t)
                     }.build()
     )
-    val logger: PlatformLogger = PlatformLogger("CometBot", {
-        log.writeString(log.getContext() + "$it\n")
+    val logger: PlatformLogger = PlatformLogger("CometBot") {
         println(it)
-    })
-    val daemonLogger: PlatformLogger = PlatformLogger("CometService", {
         log.writeString(log.getContext() + "$it\n")
+    }
+    val daemonLogger: PlatformLogger = PlatformLogger("CometService") {
         println(it)
-    })
-    val consoleCommandLogger: PlatformLogger = PlatformLogger("CometConsole", {
         log.writeString(log.getContext() + "$it\n")
+    }
+    val consoleCommandLogger: PlatformLogger = PlatformLogger("CometConsole") {
         println(it)
-    })
+        log.writeString(log.getContext() + "$it\n")
+    }
     val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
     var rCon: Rcon? = null
     lateinit var log: File

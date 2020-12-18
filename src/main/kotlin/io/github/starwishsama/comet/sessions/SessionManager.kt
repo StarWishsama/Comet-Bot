@@ -2,8 +2,8 @@ package io.github.starwishsama.comet.sessions
 
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.utils.TaskUtil
-import net.mamoe.mirai.message.GroupMessageEvent
-import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.event.events.GroupMessageEvent
+import net.mamoe.mirai.event.events.MessageEvent
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 

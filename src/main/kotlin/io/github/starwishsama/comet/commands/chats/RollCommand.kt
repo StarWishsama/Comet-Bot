@@ -18,9 +18,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
-import net.mamoe.mirai.getGroupOrNull
-import net.mamoe.mirai.message.GroupMessageEvent
-import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.event.events.GroupMessageEvent
+import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -60,7 +59,7 @@ class RollCommand : ChatCommand, SuspendCommand {
                     count = rollThingCount
             ) {
                 if (this is RollSession) {
-                    val group = event.bot.getGroupOrNull(groupId)
+                    val group = event.bot.getGroup(groupId)
 
                     if (group == null) {
                         daemonLogger.warning("推送开奖消息失败: 找不到对应的群[${groupId}]")

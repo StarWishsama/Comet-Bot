@@ -16,9 +16,9 @@ import io.github.starwishsama.comet.utils.debugS
 import io.github.starwishsama.comet.utils.network.NetUtil
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
+import net.mamoe.mirai.event.events.GroupMessageEvent
+import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.event.subscribeMessages
-import net.mamoe.mirai.message.GroupMessageEvent
-import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
 import java.time.LocalDateTime
 import java.util.*
