@@ -236,7 +236,7 @@ fun initResources() {
     startTime = LocalDateTime.now()
     FileUtil.initLog()
 
-    daemonLogger.info(
+    println(
             """
         
            ______                     __ 
@@ -248,7 +248,13 @@ fun initResources() {
 
     """
     )
-    DataSetup.init()
+
+    try {
+        DataSetup.init()
+    } catch (e: RuntimeException) {
+        e.message?.let { FileUtil.createErrorReportFile("加载配置文件失败", "resource", e, "", it) }
+        daemonLogger.warningS(e)
+    }
     NetUtil.initDriver()
 }
 

@@ -22,6 +22,8 @@ import kotlinx.coroutines.withContext
 import net.mamoe.mirai.Bot
 import net.mamoe.yamlkt.Yaml
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 object DataSetup {
     private val userCfg: File = File(BotVariables.filePath, "users.json")
@@ -63,52 +65,55 @@ object DataSetup {
     private fun load() {
         try {
             cfg = Yaml.default.decodeFromString(CometConfig.serializer(), cfgFile.getContext())
-            BotVariables.users.addAll(gson.fromJson<List<BotUser>>(userCfg.getContext()))
+        } catch (e: RuntimeException) {
+            val fallback = File(BotVariables.filePath, "config.yml.backup")
+            Files.copy(cfgFile.toPath(), fallback.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            throw e
+        }
 
-            BotVariables.shop = gson.fromJson(shopItemCfg.getContext())
+        BotVariables.users.addAll(gson.fromJson<List<BotUser>>(userCfg.getContext()))
+        BotVariables.shop = gson.fromJson(shopItemCfg.getContext())
 
-            loadLang()
+        loadLang()
 
-            FileUtil.initResourceFile()
+        FileUtil.initResourceFile()
 
-            if (pcrData.exists()) {
-                BotVariables.pcr = gson.fromJson(pcrData.getContext())
-                daemonLogger.info("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个")
-            } else {
-                daemonLogger.info("未检测到公主连结游戏数据, 抽卡模拟器将无法使用")
-            }
+        if (pcrData.exists()) {
+            BotVariables.pcr = gson.fromJson(pcrData.getContext())
+            daemonLogger.info("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个")
+        } else {
+            daemonLogger.info("未检测到公主连结游戏数据, 抽卡模拟器将无法使用")
+        }
 
-            if (arkNightData.exists()) {
-                arkNight = gson.fromJson(arkNightData.getContext())
+        if (arkNightData.exists()) {
+            arkNight = gson.fromJson(arkNightData.getContext())
 
-                daemonLogger.info("成功载入明日方舟游戏数据, 共 ${arkNight.size} 个")
-                if (cfg.arkDrawUseImage) {
-                    if (getOsName().toLowerCase().contains("linux")) {
-                        System.setProperty("java.awt.headless", "true")
-                    }
+            daemonLogger.info("成功载入明日方舟游戏数据, 共 ${arkNight.size} 个")
+            if (cfg.arkDrawUseImage) {
+                if (System.getProperty("java.awt.headless") != "true" && getOsName().toLowerCase().contains("linux")) {
+                    daemonLogger.info("检测到类 Unix 系统, 正在启用 Headless 模式")
+                    System.setProperty("java.awt.headless", "true")
+                }
 
-                    TaskUtil.runAsync {
-                        runBlocking {
-                            withContext(Dispatchers.IO) {
-                                DrawUtil.downloadArkNightsFile()
-                            }
+                TaskUtil.runAsync {
+                    runBlocking {
+                        withContext(Dispatchers.IO) {
+                            DrawUtil.downloadArkNightsFile()
                         }
                     }
                 }
-            } else {
-                daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
             }
-
-            if (!cacheCfg.exists()) {
-                cacheCfg.writeClassToJson(JsonObject())
-            } else {
-                BotVariables.cache = JsonParser.parseString(cacheCfg.getContext()).asJsonObject
-            }
-
-            daemonLogger.info("[配置] 成功载入配置文件")
-        } catch (e: Exception) {
-            daemonLogger.warning("[配置] 在加载配置文件时发生了问题", e)
+        } else {
+            daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
         }
+
+        if (!cacheCfg.exists()) {
+            cacheCfg.writeClassToJson(JsonObject())
+        } else {
+            BotVariables.cache = JsonParser.parseString(cacheCfg.getContext()).asJsonObject
+        }
+
+        daemonLogger.info("[配置] 成功载入配置文件")
     }
 
     private fun loadLang() {
