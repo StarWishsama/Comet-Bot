@@ -1,30 +1,30 @@
 package io.github.starwishsama.comet.utils
 
 import java.lang.management.ManagementFactory
+import java.lang.management.OperatingSystemMXBean
 
-fun getOsInfo(): String {
-    val osMX = ManagementFactory.getOperatingSystemMXBean()
-    return "${osMX.name} ${osMX.version} (${osMX.arch})"
-}
+object RuntimeUtil {
+    fun getOperatingSystemBean(): OperatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean()
 
-fun getOsName(): String {
-    val osMX = ManagementFactory.getOperatingSystemMXBean()
-    return osMX.name
-}
+    fun getOsInfo(): String {
+        val osMX = getOperatingSystemBean()
+        return "${osMX.name} ${osMX.version} (${osMX.arch})"
+    }
 
-fun isWindows(): Boolean {
-    val osMX = ManagementFactory.getOperatingSystemMXBean()
-    return osMX.name.toLowerCase().contains("win")
-}
+    fun getOsName(): String {
+        val osMX = getOperatingSystemBean()
+        return osMX.name
+    }
 
-fun getUsedMemory(): Long {
-    return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576
-}
+    fun getUsedMemory(): Long {
+        return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576
+    }
 
-fun getMaxMemory(): Long {
-    return Runtime.getRuntime().maxMemory() / 1048576
-}
+    fun getMaxMemory(): Long {
+        return Runtime.getRuntime().maxMemory() / 1048576
+    }
 
-fun getJVMVersion(): String? {
-    return ManagementFactory.getRuntimeMXBean().vmVersion
+    fun getJVMVersion(): String? {
+        return ManagementFactory.getRuntimeMXBean().vmVersion
+    }
 }

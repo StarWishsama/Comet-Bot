@@ -1,6 +1,8 @@
 package io.github.starwishsama.comet.commands.console
 
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.bot
+import io.github.starwishsama.comet.Versions
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
@@ -8,6 +10,7 @@ import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.RuntimeUtil
 import kotlin.time.ExperimentalTime
 
 @CometCommand
@@ -32,11 +35,12 @@ class DebugCommand : ConsoleCommand {
                     }.trim()
                 }
                 "info" ->
-                    return ("彗星 Bot ${BotVariables.version}\n" +
-                            "今日もかわいい~\n" +
+                    return ("彗星 Bot ${Versions.version}\n" +
+                            "Comet 状态: ${bot.isOnline} | ${BotVariables.switch}\n" +
                             "已注册命令数: ${CommandExecutor.countCommands()}\n" +
                             BotUtil.getMemoryUsage() + "\n" +
-                            "构建时间: ${BotVariables.buildTime}"
+                            "CPU 负载: ${RuntimeUtil.getOperatingSystemBean().systemLoadAverage}\n" +
+                            "构建时间: ${Versions.buildTime}"
                             )
                 "switch" -> {
                     BotVariables.switch = !BotVariables.switch

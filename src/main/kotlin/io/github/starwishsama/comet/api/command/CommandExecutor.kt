@@ -104,7 +104,7 @@ object CommandExecutor {
 
                     if (isCommand) {
                         BotVariables.logger.debugS(
-                                "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(builtInMethod = true)}" +
+                                "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(TimeUnit.SECONDS)}" +
                                         if (result.result.isOk()) ", 执行结果: ${result.result.name}" else ""
                         )
                     }

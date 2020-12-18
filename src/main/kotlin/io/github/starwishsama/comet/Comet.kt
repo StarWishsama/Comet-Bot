@@ -24,6 +24,7 @@ import io.github.starwishsama.comet.listeners.GroupRelatedListener
 import io.github.starwishsama.comet.listeners.RepeatListener
 import io.github.starwishsama.comet.pushers.*
 import io.github.starwishsama.comet.utils.*
+import io.github.starwishsama.comet.utils.RuntimeUtil.getUsedMemory
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -199,7 +200,7 @@ object Comet {
                     println(it)
                 }
             }
-            heartbeatPeriodMillis = (cfg.heartBeatPeriod * 60).minutesToMillis
+            heartbeatPeriodMillis = cfg.heartBeatPeriod * 60 * 1000
             fileBasedDeviceInfo()
             protocol = cfg.botProtocol
             fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())

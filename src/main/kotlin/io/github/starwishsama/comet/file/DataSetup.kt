@@ -15,6 +15,7 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.CometConfig
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.utils.*
+import io.github.starwishsama.comet.utils.RuntimeUtil.getOsName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext

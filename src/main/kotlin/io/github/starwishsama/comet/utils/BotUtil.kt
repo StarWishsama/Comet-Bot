@@ -8,6 +8,10 @@ import io.github.starwishsama.comet.BotVariables.coolDown
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.BotUser.Companion.getUser
 import io.github.starwishsama.comet.objects.BotUser.Companion.isBotOwner
+import io.github.starwishsama.comet.utils.RuntimeUtil.getJVMVersion
+import io.github.starwishsama.comet.utils.RuntimeUtil.getMaxMemory
+import io.github.starwishsama.comet.utils.RuntimeUtil.getOsInfo
+import io.github.starwishsama.comet.utils.RuntimeUtil.getUsedMemory
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import net.mamoe.mirai.event.events.MessageEvent
@@ -26,6 +30,7 @@ import kotlin.time.toKotlinDuration
  * @author Nameless
  */
 
+@Suppress("unused")
 fun MiraiLogger.warningS(message: String?) {
     if (cfg.debugMode) {
         warning(message)
@@ -34,13 +39,14 @@ fun MiraiLogger.warningS(message: String?) {
 
 fun MiraiLogger.warningS(message: String?, throwable: Throwable?) {
     if (cfg.debugMode) {
-        warning(message + "\n" + throwable?.stackTraceToString())
+        warning(message, throwable)
     }
 }
 
+@Suppress("unused")
 fun MiraiLogger.warningS(throwable: Throwable?) {
     if (cfg.debugMode) {
-        warning(throwable?.stackTraceToString())
+        warning(throwable)
     }
 }
 
@@ -50,12 +56,14 @@ fun MiraiLogger.debugS(message: String?) {
     }
 }
 
+@Suppress("unused")
 fun MiraiLogger.debugS(throwable: Throwable?) {
     if (cfg.debugMode) {
-        debug(throwable?.stackTraceToString())
+        debug(throwable)
     }
 }
 
+@Suppress("unused")
 fun MiraiLogger.debugS(message: String?, throwable: Throwable?) {
     if (cfg.debugMode) {
         verbose(message, throwable)
@@ -68,15 +76,16 @@ fun MiraiLogger.verboseS(message: String?) {
     }
 }
 
+@Suppress("unused")
 fun MiraiLogger.verboseS(throwable: Throwable?) {
     if (cfg.debugMode) {
-        verbose(throwable?.stackTraceToString())
+        verbose(throwable)
     }
 }
 
 fun MiraiLogger.verboseS(message: String?, throwable: Throwable?) {
     if (cfg.debugMode) {
-        verbose(message + "\n" + throwable?.stackTraceToString())
+        verbose(message, throwable)
     }
 }
 

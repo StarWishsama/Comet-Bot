@@ -9,7 +9,7 @@ import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
-import net.mamoe.mirai.utils.asHumanReadable
+import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -18,6 +18,7 @@ import java.nio.file.Files
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.TimeUnit
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import kotlin.time.ExperimentalTime
@@ -205,7 +206,7 @@ object FileUtil {
             daemonLogger.info("加载资源文件失败, 部分需要图片资源的功能将无法使用")
             daemonLogger.warningS("Cannot copy resources files", e)
         } finally {
-            daemonLogger.info("尝试加载资源文件用时 ${startTime.getLastingTime().asHumanReadable}")
+            daemonLogger.info("尝试加载资源文件用时 ${startTime.getLastingTime().toFriendly(TimeUnit.SECONDS)}")
         }
     }
 

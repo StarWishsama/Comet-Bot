@@ -3,7 +3,6 @@ package io.github.starwishsama.comet.utils
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.utils.asHumanReadable
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
@@ -77,12 +76,11 @@ object StringUtil {
      * 获取该 [LocalDateTime] 距今的时间并转换为友好的字符串
      *
      * @param msMode 是否精准到毫秒
-     * @param builtInMethod 是否使用 Mirai 的 [Duration.asHumanReadable]
      */
     @OptIn(ExperimentalTime::class)
-    fun LocalDateTime.getLastingTimeAsString(unit: TimeUnit = TimeUnit.SECONDS, msMode: Boolean = false, builtInMethod: Boolean = false): String {
+    fun LocalDateTime.getLastingTimeAsString(unit: TimeUnit = TimeUnit.SECONDS, msMode: Boolean = false): String {
         val duration = getLastingTime()
-        return if (builtInMethod) duration.asHumanReadable else duration.toFriendly(maxUnit = unit, msMode = msMode)
+        return duration.toFriendly(maxUnit = unit, msMode = msMode)
     }
 
     fun String.containsEtc(strict: Boolean = true, vararg string: String): Boolean {

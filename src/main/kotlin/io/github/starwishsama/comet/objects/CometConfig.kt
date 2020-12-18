@@ -73,7 +73,7 @@ data class CometConfig(
         var proxyType: Proxy.Type = Proxy.Type.HTTP,
 
         @Comment("Mirai 心跳周期, 单位分钟, 过长会导致被服务器断开连接")
-        var heartBeatPeriod: Int = 1,
+        var heartBeatPeriod: Long = 1,
 
         @Comment("Youtube APIKey, 使用 Youtube 推送必填\n申请请见 https://developers.google.com/youtube/v3/getting-started")
         var youtubeApiKey: String = "",
