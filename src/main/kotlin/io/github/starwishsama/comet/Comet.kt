@@ -250,12 +250,7 @@ fun initResources() {
     """
     )
 
-    try {
-        DataSetup.init()
-    } catch (e: RuntimeException) {
-        e.message?.let { FileUtil.createErrorReportFile("加载配置文件失败", "resource", e, "", it) }
-        daemonLogger.warningS(e)
-    }
+    DataSetup.init()
     NetUtil.initDriver()
 }
 
@@ -309,7 +304,7 @@ private suspend fun handleLogin() {
 fun invokeWhenClose(){
     logger.info("[Bot] 正在关闭 Bot...")
     NetUtil.closeDriver()
-    DataSetup.saveFiles()
+    DataSetup.saveAllResources()
     BotVariables.service.shutdown()
     BotVariables.rCon?.disconnect()
 }

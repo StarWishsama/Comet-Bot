@@ -15,6 +15,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.net.URL
 import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -85,6 +86,14 @@ fun File.filesCount(): Int {
     val files = listFiles() ?: return -1
 
     return files.size
+}
+
+fun File.createBackupFile() {
+    if (isDirectory) return
+
+    val backup = File(parent, "$name.backup")
+    backup.createNewFile()
+    Files.copy(toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING)
 }
 
 object FileUtil {

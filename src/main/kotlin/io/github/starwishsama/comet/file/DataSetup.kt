@@ -3,7 +3,6 @@ package io.github.starwishsama.comet.file
 import cn.hutool.core.io.file.FileReader
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.JsonElement
-import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.arkNight
@@ -22,18 +21,16 @@ import kotlinx.coroutines.withContext
 import net.mamoe.mirai.Bot
 import net.mamoe.yamlkt.Yaml
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
 
 object DataSetup {
     private val userCfg: File = File(BotVariables.filePath, "users.json")
     private val shopItemCfg: File = File(BotVariables.filePath, "items.json")
     private val cfgFile: File = File(BotVariables.filePath, "config.yml")
     private val langCfg: File = File(BotVariables.filePath, "lang.json")
-    private val cacheCfg: File = File(BotVariables.filePath, "cache.json")
     private val pcrData = File(FileUtil.getResourceFolder(), "pcr.json")
     private val arkNightData = File(FileUtil.getResourceFolder(), "arkNights.json")
     private val perGroupFolder = FileUtil.getChildFolder("groups")
+    private var brokenConfig = false
 
     fun init() {
         if (!userCfg.exists() || !cfgFile.exists()) {
@@ -47,7 +44,19 @@ object DataSetup {
             }
         }
 
-        load()
+        try {
+            load()
+        } catch (e: RuntimeException) {
+            brokenConfig = true
+            e.message?.let { FileUtil.createErrorReportFile("加载配置文件失败, 部分配置文件将会立即创建备份\n", "resource", e, "", it) }
+            daemonLogger.warningS(e)
+        } finally {
+            if (brokenConfig) {
+                cfgFile.createBackupFile()
+                userCfg.createBackupFile()
+                shopItemCfg.createBackupFile()
+            }
+        }
     }
 
     private fun saveCfg() {
@@ -56,22 +65,16 @@ object DataSetup {
             userCfg.writeClassToJson(BotVariables.users)
             shopItemCfg.writeClassToJson(BotVariables.shop)
             savePerGroupSetting()
-            cacheCfg.writeClassToJson(BotVariables.cache)
         } catch (e: Exception) {
             daemonLogger.warning("[配置] 在保存配置文件时发生了问题", e)
         }
     }
 
     private fun load() {
-        try {
-            cfg = Yaml.default.decodeFromString(CometConfig.serializer(), cfgFile.getContext())
-        } catch (e: RuntimeException) {
-            val fallback = File(BotVariables.filePath, "config.yml.backup")
-            Files.copy(cfgFile.toPath(), fallback.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            throw e
-        }
+        cfg = Yaml.default.decodeFromString(CometConfig.serializer(), cfgFile.getContext())
 
         BotVariables.users.addAll(gson.fromJson<List<BotUser>>(userCfg.getContext()))
+
         BotVariables.shop = gson.fromJson(shopItemCfg.getContext())
 
         loadLang()
@@ -107,12 +110,6 @@ object DataSetup {
             daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
         }
 
-        if (!cacheCfg.exists()) {
-            cacheCfg.writeClassToJson(JsonObject())
-        } else {
-            BotVariables.cache = JsonParser.parseString(cacheCfg.getContext()).asJsonObject
-        }
-
         daemonLogger.info("[配置] 成功载入配置文件")
     }
 
@@ -140,7 +137,7 @@ object DataSetup {
     }
 
 
-    fun saveFiles() {
+    fun saveAllResources() {
         daemonLogger.info("[数据] 自动保存数据完成")
         saveCfg()
         langCfg.writeClassToJson(BotVariables.localMessage)

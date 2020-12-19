@@ -2,7 +2,6 @@ package io.github.starwishsama.comet
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
 import io.github.starwishsama.comet.objects.*
 import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.draw.items.PCRCharacter
@@ -73,7 +72,6 @@ object BotVariables {
     var localMessage: MutableList<BotLocalization> = ArrayList()
     var cfg = CometConfig()
     var underCovers: MutableList<RandomResult> = LinkedList()
-    var cache: JsonObject = JsonObject()
     val perGroup: MutableSet<PerGroupConfig> = HashSet()
     var hitokoto: Hitokoto? = null
     val rssItems: MutableList<RssItem> = mutableListOf()
