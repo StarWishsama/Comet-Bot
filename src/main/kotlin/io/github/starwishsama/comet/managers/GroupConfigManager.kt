@@ -6,8 +6,10 @@ import io.github.starwishsama.comet.objects.group.PerGroupConfig
 
 object GroupConfigManager {
     fun getConfig(groupId: Long): PerGroupConfig? {
+        if (perGroup.isEmpty()) return null
+
         perGroup.forEach {
-            if (it.id == groupId) {
+            if (groupId == it.id) {
                 return it
             }
         }
