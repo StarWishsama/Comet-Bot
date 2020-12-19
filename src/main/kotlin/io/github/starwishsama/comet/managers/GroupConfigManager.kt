@@ -28,4 +28,8 @@ object GroupConfigManager {
     fun createNewConfig(groupId: Long): PerGroupConfig {
         return PerGroupConfig(groupId).init()
     }
+
+    fun expireConfig(groupId: Long) {
+        perGroup.removeIf { groupId == it.id }
+    }
 }
