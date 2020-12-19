@@ -7,6 +7,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata.*
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 
 interface DynamicData {
@@ -177,10 +178,10 @@ fun Dynamic.convertToDynamicData(): DynamicData? {
     return null
 }
 
-suspend fun Dynamic.convertDynamic(): MessageWrapper {
+fun Dynamic.convertDynamic(): MessageWrapper {
     return try {
         val data = convertToDynamicData()
-        data?.getContact() ?: MessageWrapper("错误: 不支持的动态类型", false)
+        runBlocking { data?.getContact() ?: MessageWrapper("错误: 不支持的动态类型", false) }
     } catch (e: Exception) {
         if (e is ArrayIndexOutOfBoundsException) {
             MessageWrapper("没有发过动态", false)

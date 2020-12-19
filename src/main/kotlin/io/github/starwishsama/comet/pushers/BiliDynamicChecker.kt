@@ -40,27 +40,24 @@ object BiliDynamicChecker : CometPusher {
         }
 
         collectedUID.forEach { uid ->
-            runBlocking {
 
-                val dynamic: Dynamic? =
-                    withContext(Dispatchers.IO) {
-                        try {
-                            MainApi.getUserDynamicTimeline(uid)
-                        } catch (e: RuntimeException) {
-                            if (e !is ApiException) {
-                                daemonLogger.warning("在获取动态时出现了异常", e)
-                            }
-                            null
-                        }
+
+                val dynamic: Dynamic? = try {
+                    MainApi.getUserDynamicTimeline(uid)
+                } catch (e: RuntimeException) {
+                    if (e !is ApiException) {
+                        daemonLogger.warning("在获取动态时出现了异常", e)
                     }
+                    null
+                }
 
                 val data = dynamic?.convertDynamic()
 
                 if (dynamic != null && data != null && data.success) {
-                    val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@runBlocking
+                    val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@forEach
 
                     // 检查是否火星了
-                    if (isOutdated(sentTime)) return@runBlocking
+                    if (isOutdated(sentTime)) return@forEach
 
                     if (pushPool.isEmpty()) {
                         pushPool.plusAssign(
@@ -82,7 +79,7 @@ object BiliDynamicChecker : CometPusher {
                                     sentTime = sentTime
                                 )
                             )
-                            return@runBlocking
+                            return@forEach
                         }
 
                         target.ifPresent {
@@ -93,7 +90,6 @@ object BiliDynamicChecker : CometPusher {
                             }
                         }
                     }
-                }
             }
         }
 
