@@ -127,9 +127,6 @@ dependencies {
 
 shadowJar {
     zip64 true
-    dependencies {
-        exclude(dependency('org.bouncycastle:*:.*'))
-    }
 }
 
 compileKotlin {
