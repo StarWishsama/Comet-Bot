@@ -60,7 +60,7 @@ class CheckInCommand : ChatCommand {
                 "获得了 ${point[0]} 点积分$extra\n目前积分数: ${String.format("%.1f", user.checkInPoint)}."
             }
 
-            text + HitokotoUpdater.getHitokoto()
+            "$text\n${HitokotoUpdater.getHitokoto(false)}"
         }
     }
 
