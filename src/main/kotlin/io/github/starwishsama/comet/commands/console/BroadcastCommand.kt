@@ -8,8 +8,6 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.utils.BotUtil.getRestString
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import kotlinx.coroutines.runBlocking
-import java.nio.charset.Charset
-import java.nio.charset.StandardCharsets
 
 class BroadcastCommand: ConsoleCommand {
     override suspend fun execute(args: List<String>): String {
@@ -25,7 +23,7 @@ class BroadcastCommand: ConsoleCommand {
 
         return runBlocking {
             try {
-                g.sendMessage(String(message.toByteArray(Charset.forName("GBK")), StandardCharsets.UTF_8).trim())
+                g.sendMessage(message)
                 return@runBlocking "发送成功!"
             } catch (e: RuntimeException) {
                 daemonLogger.warning(e.stackTraceToString())

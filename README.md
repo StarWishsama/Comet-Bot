@@ -1,6 +1,6 @@
 ## 彗星 Bot (Comet)
 
-项目名来源于 [星街彗星 (Hoshimati Suisei)](https://zh.moegirl.org.cn/%E6%98%9F%E8%A1%97%E5%BD%97%E6%98%9F)
+项目名来源于 [彗星](https://music.163.com/#/song?id=22717199) ~~[星街彗星 (Hoshimati Suisei)](https://zh.moegirl.org.cn/%E6%98%9F%E8%A1%97%E5%BD%97%E6%98%9F)~~
 
 由高性能机器人框架 [Mirai](https://github.com/mamoe/mirai) 强力驱动
 

@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.utils.StringUtil.containsEtc
 import io.github.starwishsama.comet.utils.TaskUtil
-import io.github.starwishsama.comet.utils.debugS
+import io.github.starwishsama.comet.utils.verboseS
 import okhttp3.*
 import org.openqa.selenium.*
 import org.openqa.selenium.chrome.ChromeDriver
@@ -125,7 +125,7 @@ object NetUtil {
         } catch (e: IOException) {
             daemonLogger.warning("执行网络操作失败\n" + e.stackTraceToString())
         } finally {
-            daemonLogger.debugS("执行网络操作用时 ${(System.nanoTime() - startTime).toDouble() / 1_000_000}ms")
+            daemonLogger.verboseS("执行网络操作用时 ${(System.nanoTime() - startTime).toDouble() / 1_000_000}ms")
 
             if (autoClose) {
                 TaskUtil.runAsync(autoCloseDelay) {

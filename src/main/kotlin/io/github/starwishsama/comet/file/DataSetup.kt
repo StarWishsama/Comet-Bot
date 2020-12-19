@@ -154,11 +154,11 @@ object DataSetup {
             perGroupFolder.mkdirs()
         }
 
-        bot.groups.forEach {
-            val loc = File(perGroupFolder, "${it.id}.json")
+        bot.groups.forEach { group ->
+            val loc = File(perGroupFolder, "${group.id}.json")
             if (!loc.exists()) {
                 FileUtil.createBlankFile(loc)
-                BotVariables.perGroup.add(PerGroupConfig(it.id))
+                BotVariables.perGroup.add(PerGroupConfig(group.id).also { it.init() })
             } else {
                 try {
                     BotVariables.perGroup.add(loc.parseAsClass(PerGroupConfig::class.java))

@@ -9,7 +9,7 @@ object GroupConfigManager {
         if (perGroup.isEmpty()) return null
 
         perGroup.forEach {
-            if (groupId == it.id) {
+            if (groupId == it.id ) {
                 return it
             }
         }
@@ -26,7 +26,7 @@ object GroupConfigManager {
     }
 
     fun createNewConfig(groupId: Long): PerGroupConfig {
-        return PerGroupConfig(groupId).init()
+        return PerGroupConfig(groupId).also { it.init() }
     }
 
     fun expireConfig(groupId: Long) {
