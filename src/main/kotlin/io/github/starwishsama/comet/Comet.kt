@@ -48,7 +48,7 @@ import kotlin.time.ExperimentalTime
 
 object Comet {
     val console: LineReader = LineReaderBuilder
-        .builder().terminal(TerminalBuilder.builder().system(true).build()).appName("Comet").build()
+        .builder().terminal(TerminalBuilder.builder().encoding(Charsets.UTF_8).build()).appName("Comet").build()
         .apply {
             setOpt(LineReader.Option.DISABLE_EVENT_EXPANSION)
             unsetOpt(LineReader.Option.INSERT_TAB)
