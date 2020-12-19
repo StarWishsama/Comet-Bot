@@ -27,12 +27,12 @@ class R6SCommand : ChatCommand {
                     "info", "查询", "cx" -> {
                         val account = user.r6sAccount
                         return if (args.size <= 1 && account != null) {
-                            event.reply(BotUtil.sendMessage("查询中..."))
+                            event.subject.sendMessage(BotUtil.sendMessage("查询中..."))
                             val result = getR6SInfo(account)
                             event.sender.at() + ("\n" + result)
                         } else {
                             if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
-                                event.reply(BotUtil.sendMessage("查询中..."))
+                                event.subject.sendMessage(BotUtil.sendMessage("查询中..."))
                                 val result = getR6SInfo(args[1])
                                 event.sender.at() + ("\n" + result)
                             } else {

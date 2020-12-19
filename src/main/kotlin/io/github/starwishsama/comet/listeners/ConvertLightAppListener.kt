@@ -11,9 +11,11 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.ExperimentalMessageKey
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.utils.MiraiExperimentalApi
 import kotlin.time.ExperimentalTime
 
 object ConvertLightAppListener : NListener {
+    @MiraiExperimentalApi
     @ExperimentalMessageKey
     @ExperimentalTime
     override fun register(bot: Bot) {
@@ -23,7 +25,7 @@ object ConvertLightAppListener : NListener {
                     val lightApp = message[LightApp]
                     if (lightApp != null) {
                         val result = parseJsonMessage(lightApp)
-                        if (result !is EmptyMessageChain) reply(result)
+                        if (result !is EmptyMessageChain) subject.sendMessage(result)
                     }
                 }
             }

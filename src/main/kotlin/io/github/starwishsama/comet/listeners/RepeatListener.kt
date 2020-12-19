@@ -51,7 +51,7 @@ object RepeatListener : NListener {
                     msgChain.add(msg)
                 }
 
-                event.reply(msgChain.asMessageChain())
+                event.subject.sendMessage(msgChain.asMessageChain())
             }
         }
     }

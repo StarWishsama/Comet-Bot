@@ -21,6 +21,7 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.asMessageChain
 
@@ -43,7 +44,7 @@ class BiliBiliCommand : ChatCommand {
                     "info", "查询", "cx" -> {
                         return if (args.size > 1) {
                             if (!FakeClientApi.client.isLogin) {
-                                event.quoteReply("请稍等...")
+                                event.subject.sendMessage(event.message.quote() + "请稍等...")
                                 val item = FakeClientApi.getUser(args[1])
                                 if (item != null) {
                                     val text = item.title + "\n粉丝数: " + item.fans.getBetterNumber() +
