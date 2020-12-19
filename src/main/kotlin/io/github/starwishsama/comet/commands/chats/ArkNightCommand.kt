@@ -100,7 +100,7 @@ class ArkNightCommand : ChatCommand {
     """.trimIndent()
 
     private suspend fun generatePictureGachaResult(event: MessageEvent, user: BotUser, ops: List<ArkNightOperator>): MessageChain {
-        event.reply("请稍等...")
+        event.subject.sendMessage("请稍等...")
 
         return if (ops.isNotEmpty()) {
             // 只获取最后十个

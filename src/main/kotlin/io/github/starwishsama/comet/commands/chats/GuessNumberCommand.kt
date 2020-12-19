@@ -89,10 +89,10 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
 
             when {
                 answerInInt > trueAnswer -> {
-                    event.reply(BotUtil.sendMessage("你猜的数字大了"))
+                    event.subject.sendMessage(BotUtil.sendMessage("你猜的数字大了"))
                 }
                 answerInInt < trueAnswer -> {
-                    event.reply(BotUtil.sendMessage("你猜的数字小了"))
+                    event.subject.sendMessage(BotUtil.sendMessage("你猜的数字小了"))
                 }
                 answerInInt == trueAnswer -> {
                     session.usedTime = Duration.between(session.startTime, LocalDateTime.now())
@@ -101,7 +101,7 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
                     list.forEach {
                         sb.append((it as GuessNumberUser).username).append(" ").append(it.guessTime).append("次\n")
                     }
-                    event.reply(sb.toString().trim())
+                    event.subject.sendMessage(sb.toString().trim())
                     SessionManager.expireSession(session)
                 }
             }
@@ -109,7 +109,7 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
             when (answer) {
                 "不玩了", "结束游戏", "退出游戏" -> {
                     SessionManager.expireSession(session)
-                    event.reply(BotUtil.sendMessageAsString("游戏已结束"))
+                    event.subject.sendMessage(BotUtil.sendMessageAsString("游戏已结束"))
                 }
             }
         }

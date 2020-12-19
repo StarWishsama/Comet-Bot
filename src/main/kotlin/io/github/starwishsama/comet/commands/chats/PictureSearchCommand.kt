@@ -63,37 +63,37 @@ class PictureSearchCommand : ChatCommand, SuspendCommand {
         SessionManager.expireSession(session)
         val image = event.message[Image]
         if (image != null) {
-            event.reply("请稍等...")
+            event.subject.sendMessage("请稍等...")
             when (BotVariables.cfg.pictureSearchApi) {
                 PicSearchApiType.SAUCENAO -> {
                     val result = PictureSearchUtil.sauceNaoSearch(image.queryUrl())
                     when {
                         result.similarity >= 52.5 -> {
-                            event.reply("相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n")
+                            event.subject.sendMessage("相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n")
                         }
                         result.similarity == -1.0 -> {
-                            event.reply("在识图时发生了问题, 请联系管理员")
+                            event.subject.sendMessage("在识图时发生了问题, 请联系管理员")
                         }
                         else -> {
-                            event.reply("相似度过低 (${result.similarity}%), 请尝试更换图片重试")
+                            event.subject.sendMessage("相似度过低 (${result.similarity}%), 请尝试更换图片重试")
                         }
                     }
                 }
                 PicSearchApiType.ASCII2D -> {
                     val result = PictureSearchUtil.ascii2dSearch(image.queryUrl())
                     if (result.isNotEmpty()) {
-                        event.reply("已找到可能相似的图片\n图片来源${result.originalUrl}\n打开 ascii2d 页面查看更多\n${result.openUrl}")
+                        event.subject.sendMessage("已找到可能相似的图片\n图片来源${result.originalUrl}\n打开 ascii2d 页面查看更多\n${result.openUrl}")
                     } else {
-                        event.reply("找不到相似的图片")
+                        event.subject.sendMessage("找不到相似的图片")
                     }
                 }
                 PicSearchApiType.BAIDU -> {
-                    event.reply("点击下方链接查看\n" +
+                    event.subject.sendMessage("点击下方链接查看\n" +
                             "https://graph.baidu.com/details?isfromtusoupc=1&tn=pc&carousel=0&promotion_name=pc_image_shituindex&extUiData%5bisLogoShow%5d=1&image=${image.queryUrl()}")
                 }
             }
         } else {
-            event.reply("请发送图片!")
+            event.subject.sendMessage("请发送图片!")
         }
     }
 }

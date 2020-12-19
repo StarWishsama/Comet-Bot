@@ -37,7 +37,7 @@ class BiliBiliCommand : ChatCommand {
                         return unsubscribe(args, event.group.id)
                     }
                     "list" -> {
-                        event.reply("请稍等...")
+                        event.subject.sendMessage("请稍等...")
                         return getSubList(event)
                     }
                     "info", "查询", "cx" -> {

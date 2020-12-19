@@ -23,7 +23,7 @@ class RSPCommand : ChatCommand, SuspendCommand {
     private val inProgressPlayer = mutableSetOf<Long>()
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(event.sender.id)) {
-            event.reply("角卷猜拳... 开始! 你要出什么呢?")
+            event.subject.sendMessage("角卷猜拳... 开始! 你要出什么呢?")
             SessionManager.addSession(Session(this, user.id))
         }
         return EmptyMessageChain
@@ -42,15 +42,15 @@ class RSPCommand : ChatCommand, SuspendCommand {
                 val system = RockPaperScissors.values()[systemInt]
                 delay(1_500)
                 val img = File(FileUtil.getResourceFolder(), system.fileName).uploadAsImage(event.subject)
-                event.reply(img)
+                event.subject.sendMessage(img)
                 when (RockPaperScissors.isWin(player, system)) {
-                    -1 -> event.reply(BotUtil.sendMessage("平局! わため出的是${system.cnName[0]}"))
-                    0 -> event.reply(BotUtil.sendMessage("你输了! わため出的是${system.cnName[0]}"))
-                    1 -> event.reply(BotUtil.sendMessage("你赢了! わため出的是${system.cnName[0]}"))
-                    else -> event.reply(BotUtil.sendMessage("这合理吗?"))
+                    -1 -> event.subject.sendMessage(BotUtil.sendMessage("平局! わため出的是${system.cnName[0]}"))
+                    0 -> event.subject.sendMessage(BotUtil.sendMessage("你输了! わため出的是${system.cnName[0]}"))
+                    1 -> event.subject.sendMessage(BotUtil.sendMessage("你赢了! わため出的是${system.cnName[0]}"))
+                    else -> event.subject.sendMessage(BotUtil.sendMessage("这合理吗?"))
                 }
             } else {
-                event.reply(BotUtil.sendMessage("你的拳法杂乱无章, 这合理吗?"))
+                event.subject.sendMessage(BotUtil.sendMessage("你的拳法杂乱无章, 这合理吗?"))
             }
             inProgressPlayer.remove(user.id)
             SessionManager.expireSession(session)

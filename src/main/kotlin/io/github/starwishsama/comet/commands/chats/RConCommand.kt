@@ -78,24 +78,24 @@ class RConCommand : ChatCommand, SuspendCommand {
         when (waitList[user] ?: 0) {
             0 -> {
                 BotVariables.cfg.rConUrl = event.message.contentToString()
-                event.reply(BotUtil.sendMessageAsString("已设置 rCon 连接地址为 ${BotVariables.cfg.rConUrl}\n请在下一条消息发送 rCon 密码\n如果需要退出设置 请回复退出"))
+                event.subject.sendMessage(BotUtil.sendMessageAsString("已设置 rCon 连接地址为 ${BotVariables.cfg.rConUrl}\n请在下一条消息发送 rCon 密码\n如果需要退出设置 请回复退出"))
                 waitList[user] = 1
             }
             1 -> {
                 val port = event.message.contentToString()
                 if (port.isNumeric()) {
                     BotVariables.cfg.rConPort = event.message.contentToString().toInt()
-                    event.reply(BotUtil.sendMessage("设置密码成功!\n请在下一条消息发送 rCon 密码\n" +
+                    event.subject.sendMessage(BotUtil.sendMessage("设置密码成功!\n请在下一条消息发送 rCon 密码\n" +
                             "如果需要退出设置 请回复退出"))
                     waitList[user] = 2
                 } else {
-                    event.reply(BotUtil.sendMessage("不是有效的端口\n" +
+                    event.subject.sendMessage(BotUtil.sendMessage("不是有效的端口\n" +
                             "如果需要退出设置 请回复退出"))
                 }
             }
             2 -> {
                 BotVariables.cfg.rConPassword = event.message.contentToString()
-                event.reply(BotUtil.sendMessage("设置 rCon 完成!"))
+                event.subject.sendMessage(BotUtil.sendMessage("设置 rCon 完成!"))
                 Comet.setupRCon()
                 waitList.remove(user)
                 SessionManager.expireSession(session)
