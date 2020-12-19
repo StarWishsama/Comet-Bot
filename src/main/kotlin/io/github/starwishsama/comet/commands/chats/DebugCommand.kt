@@ -8,7 +8,7 @@ import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
-import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.enums.UserLevel
@@ -176,7 +176,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     if (args.isEmpty()) return "/debug bilipic [Dynamic ID]".convertToChain()
                     else {
                         if (args[1].isNumeric()) {
-                            val dynamic = MainApi.getDynamicById(args[1].toLong())
+                            val dynamic = BiliBiliMainApi.getDynamicById(args[1].toLong())
 
 
                             if (!NetUtil.driverUsable()) {

@@ -9,8 +9,8 @@ import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.BotVariables.startTime
 import io.github.starwishsama.comet.Comet.isFailed
 import io.github.starwishsama.comet.api.command.CommandExecutor
+import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.commands.chats.*
@@ -57,7 +57,7 @@ object Comet {
 
     @ExperimentalTime
     fun startUpTask() {
-        val apis = arrayOf(MainApi, TwitterApi, YoutubeApi)
+        val apis = arrayOf(BiliBiliMainApi, TwitterApi, YoutubeApi)
 
         /** 定时任务 */
         BackupHelper.scheduleBackup()

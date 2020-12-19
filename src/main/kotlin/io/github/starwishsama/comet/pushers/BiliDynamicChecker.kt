@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.pushers
 
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.perGroup
-import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertDynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToDynamicData
@@ -43,7 +43,7 @@ object BiliDynamicChecker : CometPusher {
 
 
                 val dynamic: Dynamic? = try {
-                    MainApi.getUserDynamicTimeline(uid)
+                    BiliBiliMainApi.getUserDynamicTimeline(uid)
                 } catch (e: RuntimeException) {
                     if (e !is ApiException) {
                         daemonLogger.warning("在获取动态时出现了异常", e)
@@ -124,7 +124,7 @@ object BiliDynamicChecker : CometPusher {
                         runBlocking {
                             val group = bot?.getGroup(gid)
                             group?.sendMessage(
-                                "${MainApi.getUserNameByMid(pdh.uid)} ".convertToChain() + pdh.pushContent.toMessageChain(
+                                "${BiliBiliMainApi.getUserNameByMid(pdh.uid)} ".convertToChain() + pdh.pushContent.toMessageChain(
                                     group
                                 )
                             )

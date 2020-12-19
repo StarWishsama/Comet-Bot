@@ -3,7 +3,7 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynami
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
@@ -65,7 +65,7 @@ data class LiveBroadcast(
 
     override suspend fun getContact(): MessageWrapper {
         val wrapped = MessageWrapper(
-                "${MainApi.getUserNameByMid(livePlayInfo.uid)} 正在直播!\n" +
+                "${BiliBiliMainApi.getUserNameByMid(livePlayInfo.uid)} 正在直播!\n" +
                         "标题: ${livePlayInfo.liveTitle}\n" +
                         "开播时间: ${BotVariables.yyMMddPattern.format(livePlayInfo.getLiveStartTime())}\n" +
                         "直达链接: ${livePlayInfo.link}\n"

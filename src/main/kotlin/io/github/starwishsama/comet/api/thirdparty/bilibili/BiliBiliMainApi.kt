@@ -25,11 +25,11 @@ import java.io.IOException
  * 支持多种格式
  * @author Nameless
  */
-object MainApi : ApiExecutor {
-    private val dynamicUrl =
+object BiliBiliMainApi : ApiExecutor {
+    private const val dynamicUrl =
             "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?visitor_uid=0&host_uid=%uid%&offset_dynamic_id=0&need_top=0"
     private const val infoUrl = "http://api.bilibili.com/x/space/acc/info?mid="
-    private val dynamicByIdUrl =
+    private const val dynamicByIdUrl =
             "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id="
     private val agent = mutableMapOf("User-Agent" to "Nameless live status checker by StarWishsama")
     private const val apiRateLimit = "BiliBili API调用已达上限"

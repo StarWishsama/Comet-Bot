@@ -60,8 +60,8 @@ object LiveApi : ApiExecutor {
     }
 
     override fun isReachLimit(): Boolean {
-        val result = MainApi.usedTime > MainApi.getLimitTime()
-        if (!result) MainApi.usedTime++
+        val result = BiliBiliMainApi.usedTime > BiliBiliMainApi.getLimitTime()
+        if (!result) BiliBiliMainApi.usedTime++
         return result
     }
 

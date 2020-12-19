@@ -160,10 +160,20 @@ object DataSetup {
                 FileUtil.createBlankFile(loc)
                 BotVariables.perGroup.add(PerGroupConfig(group.id).also { it.init() })
             } else {
+                val cfg: PerGroupConfig = if (loc.getContext().isEmpty()) {
+                    daemonLogger.warning("检测到 ${group.id} 的群配置异常, 正在重新生成...")
+                    PerGroupConfig(group.id).also {
+                        it.init()
+                        loc.writeClassToJson(it)
+                    }
+                } else {
+                    loc.parseAsClass(PerGroupConfig::class.java)
+                }
+
                 try {
-                    BotVariables.perGroup.add(loc.parseAsClass(PerGroupConfig::class.java))
-                } catch (e: Exception) {
-                    BotVariables.logger.warning("[配置] 在加载分群配置时出现了问题", e)
+                    BotVariables.perGroup.add(cfg)
+                } catch (e: RuntimeException) {
+                    BotVariables.logger.warning("[配置] 在加载 ${group.id} 的分群配置时出现了问题", e)
                 }
             }
         }

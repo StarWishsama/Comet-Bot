@@ -3,8 +3,8 @@ package io.github.starwishsama.comet.commands.chats
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
@@ -50,7 +50,7 @@ class BiliBiliCommand : ChatCommand {
                                     val text = item.title + "\n粉丝数: " + item.fans.getBetterNumber() +
                                             "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
                                             "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") + "\n"
-                                    val dynamic = MainApi.getWrappedDynamicTimeline(item.mid)
+                                    val dynamic = BiliBiliMainApi.getWrappedDynamicTimeline(item.mid)
                                     text.convertToChain() + getDynamicText(dynamic, event)
                                 } else {
                                     "找不到对应的B站用户".sendMessage()
@@ -168,7 +168,7 @@ class BiliBiliCommand : ChatCommand {
             val subs = buildString {
                 append("监控室列表:\n")
                 list.forEach {
-                    append(MainApi.getUserNameByMid(it) + " $it\n")
+                    append(BiliBiliMainApi.getUserNameByMid(it) + " $it\n")
                     trim()
                 }
             }
@@ -205,7 +205,7 @@ class BiliBiliCommand : ChatCommand {
             cfg.biliSubscribers.add(uid)
         }
 
-        return sendMessage("订阅 ${if (name.isNotBlank()) name else MainApi.getUserNameByMid(uid)}($uid) 成功")
+        return sendMessage("订阅 ${if (name.isNotBlank()) name else BiliBiliMainApi.getUserNameByMid(uid)}($uid) 成功")
     }
 
 }

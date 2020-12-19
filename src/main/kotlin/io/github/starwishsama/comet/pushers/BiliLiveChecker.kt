@@ -4,8 +4,8 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.command.CommandExecutor.doFilter
+import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.MainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -106,7 +106,7 @@ object BiliLiveChecker : CometPusher {
             if (!info.isPushed) {
                 val data = info.data
                 if (data.liveStatus != 0) {
-                    val msg = "单推助手 > ${MainApi.getUserNameByMid(data.uid)} 正在直播!" +
+                    val msg = "单推助手 > ${BiliBiliMainApi.getUserNameByMid(data.uid)} 正在直播!" +
                             "\n直播间标题: ${data.title}" +
                             "\n开播时间: ${data.liveTime}" +
                             "\n传送门: ${data.getRoomURL()}"
