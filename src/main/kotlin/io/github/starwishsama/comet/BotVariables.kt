@@ -14,6 +14,8 @@ import io.github.starwishsama.comet.utils.getContext
 import io.github.starwishsama.comet.utils.writeString
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.utils.MiraiInternalApi
+import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.PlatformLogger
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
@@ -29,6 +31,7 @@ import java.util.concurrent.ScheduledExecutorService
  * @author Nameless
  */
 
+@OptIn(MiraiInternalApi::class)
 object BotVariables {
     lateinit var filePath: File
 
@@ -38,6 +41,7 @@ object BotVariables {
     fun isBotInitialized(): Boolean = ::bot.isInitialized
 
     lateinit var startTime: LocalDateTime
+
     var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
             8,
             BasicThreadFactory.Builder()
@@ -47,15 +51,16 @@ object BotVariables {
                         daemonLogger.warning("线程 ${thread.name} 在执行任务时发生了错误", t)
                     }.build()
     )
-    val logger: PlatformLogger = PlatformLogger("CometBot") {
+
+    val logger: MiraiLogger = PlatformLogger("CometBot") {
         println(it)
         log.writeString(log.getContext() + "$it\n")
     }
-    val daemonLogger: PlatformLogger = PlatformLogger("CometService") {
+    val daemonLogger: MiraiLogger = PlatformLogger("CometService") {
         println(it)
         log.writeString(log.getContext() + "$it\n")
     }
-    val consoleCommandLogger: PlatformLogger = PlatformLogger("CometConsole") {
+    val consoleCommandLogger: MiraiLogger = PlatformLogger("CometConsole") {
         println(it)
         log.writeString(log.getContext() + "$it\n")
     }

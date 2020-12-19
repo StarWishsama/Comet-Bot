@@ -29,7 +29,7 @@ class AdminCommand : ConsoleCommand {
                         if (targetLevel > UserLevel.values().size) {
                             target.level = UserLevel.USER
                         } else {
-                            target.level = UserLevel.values()[target + 1]
+                            target.level = UserLevel.values()[targetLevel + 1]
                         }
 
                         return "成功将 ${target.id} 设为 ${target.level.name}"

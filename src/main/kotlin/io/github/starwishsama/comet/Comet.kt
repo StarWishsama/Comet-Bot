@@ -184,6 +184,7 @@ object Comet {
         CommandExecutor.startHandler(bot)
     }
 
+    @OptIn(MiraiExperimentalApi::class, MiraiInternalApi::class)
     @ExperimentalTime
     suspend fun startBot(qqId: Long, password: String) {
         daemonLogger.info("正在设置登录配置...")
