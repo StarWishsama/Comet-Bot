@@ -48,6 +48,7 @@ data class CometConfig(
         @Comment("SauceNao 以图搜图 APIKey, 不填亦可, 但可搜索次数会减少")
         val sauceNaoApiKey: String? = null,
 
+        @Deprecated("Replaced with r6StatsKey")
         @Comment("彩虹六号玩家数据 API, 需要自行向 r6tab 作者申请")
         val r6tabKey: String? = null,
 
@@ -61,7 +62,7 @@ data class CometConfig(
         var twitterToken: String? = null,
 
         @Comment("是否启用代理, 启用后以下两项才可使用")
-        var proxySwitch: Boolean = true,
+        var proxySwitch: Boolean = false,
 
         @Comment("本地代理服务器地址, 目前仅支持 HTTP 代理")
         var proxyUrl: String = "",

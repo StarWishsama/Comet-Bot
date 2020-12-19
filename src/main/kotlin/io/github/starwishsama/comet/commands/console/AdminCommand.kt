@@ -24,11 +24,14 @@ class AdminCommand : ConsoleCommand {
                             target = BotUser.quickRegister(args[1].toLong())
                         }
 
-                        if (target.level < UserLevel.ADMIN) {
+                        val targetLevel = target.level.ordinal + 1
+
+                        if (targetLevel > UserLevel.values().size) {
                             target.level = UserLevel.USER
                         } else {
-                            target.level = UserLevel.ADMIN
+                            target.level = UserLevel.values()[target + 1]
                         }
+
                         return "成功将 ${target.id} 设为 ${target.level.name}"
                     }
                 }
