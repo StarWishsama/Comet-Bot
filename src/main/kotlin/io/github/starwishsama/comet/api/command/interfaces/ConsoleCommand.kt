@@ -14,4 +14,6 @@ interface ConsoleCommand {
 
     /** 命令属性 */
     fun getProps(): CommandProps
+
+    fun getHelp(): String
 }

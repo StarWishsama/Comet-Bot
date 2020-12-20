@@ -14,7 +14,7 @@ class BroadcastCommand: ConsoleCommand {
         return if (args[0].isNumeric() && args.size > 1) {
             sendMessage(args[0].toLong(), args.getRestString(1))
         } else {
-            "/bc [群号] [发送内容]"
+            getHelp()
         }
     }
 
@@ -33,4 +33,8 @@ class BroadcastCommand: ConsoleCommand {
     }
 
     override fun getProps(): CommandProps = CommandProps("broadcast", mutableListOf("bc"), "", "", UserLevel.CONSOLE)
+
+    override fun getHelp(): String {
+        return "/bc [群号] [发送内容]"
+    }
 }

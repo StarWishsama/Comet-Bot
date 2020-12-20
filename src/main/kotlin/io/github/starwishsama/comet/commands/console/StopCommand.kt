@@ -13,4 +13,6 @@ class StopCommand : ConsoleCommand {
     }
 
     override fun getProps(): CommandProps = CommandProps("stop", mutableListOf(), "", "", UserLevel.CONSOLE)
+
+    override fun getHelp(): String = ""
 }

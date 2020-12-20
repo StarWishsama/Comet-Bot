@@ -46,10 +46,13 @@ class DebugCommand : ConsoleCommand {
                     BotVariables.switch = !BotVariables.switch
                     return "Bot > 维护模式已${if (!BotVariables.switch) "开启" else "关闭"}"
                 }
+                else -> return getHelp()
             }
         }
         return ""
     }
 
     override fun getProps(): CommandProps = CommandProps("debug", mutableListOf(), "", "", UserLevel.CONSOLE)
+
+    override fun getHelp(): String = "请自行查阅代码"
 }

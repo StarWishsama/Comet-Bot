@@ -18,28 +18,35 @@ class AdminCommand : ConsoleCommand {
         if (args.isNotEmpty()) {
             when (args[0]) {
                 "upgrade" -> {
-                    if (args.size > 1 && args[1].isNumeric()) {
-                        var target = BotUser.getUser(args[1].toLong())
-                        if (target == null) {
-                            target = BotUser.quickRegister(args[1].toLong())
+                    when (args.size) {
+                        2 -> {
+                            if (args[1].isNumeric()) {
+                                val target = BotUser.getUser(args[1].toLong()) ?: return "目标没有使用过 Comet"
+
+                                val targetLevel = target.level.ordinal + 1
+
+                                if (targetLevel > UserLevel.values().size) {
+                                    target.level = UserLevel.USER
+                                } else {
+                                    target.level = UserLevel.values()[targetLevel + 1]
+                                }
+
+                                return "成功将 ${target.id} 设为 ${target.level.name}"
+                            }
                         }
+                        3 -> {
+                            if (args[1].isNumeric()) {
+                                try {
+                                    val target = BotUser.getUser(args[1].toLong()) ?: return "目标没有使用过 Comet"
+                                    val level = UserLevel.valueOf(args[2])
+                                    target.level = level
 
-                        val targetLevel = target.level.ordinal + 1
-
-                        if (targetLevel > UserLevel.values().size) {
-                            target.level = UserLevel.USER
-                        } else {
-                            target.level = UserLevel.values()[targetLevel + 1]
+                                    return "成功将 ${target.id} 设为 ${target.level.name}"
+                                } catch (e: IllegalArgumentException) {
+                                    return "不是有效的等级名字, 可用等级名: ${UserLevel.values()}"
+                                }
+                            }
                         }
-
-                        return "成功将 ${target.id} 设为 ${target.level.name}"
-                    }
-                }
-                "setowner" -> {
-                    if (args.size > 1 && args[1].isNumeric()) {
-                        val target = BotUser.getUserSafely(args[1].toLong())
-                        target.level = UserLevel.OWNER
-                        return "成功将 ${target.id} 设为 ${target.level.name}"
                     }
                 }
                 "reload" -> {
@@ -77,10 +84,20 @@ class AdminCommand : ConsoleCommand {
                         return GroupConfigManager.getConfig(gid)?.disableCommand(args[2])?.msg ?:"输入的群号没有配置文件或不存在!"
                     }
                 }
+                else -> return getHelp()
             }
+        } else {
+            return getHelp()
         }
         return ""
     }
 
     override fun getProps(): CommandProps = CommandProps("admin", mutableListOf(), "", "", UserLevel.CONSOLE)
+
+    override fun getHelp(): String = """
+        /admin upgrade [ID] (权限组名) 修改权限组
+        /admin reload 重载配置文件
+        /admin rp [积分] 重置所有账号的积分为指定积分数
+        /admin cmd [群号] 在指定群禁用命令
+    """.trimIndent()
 }
