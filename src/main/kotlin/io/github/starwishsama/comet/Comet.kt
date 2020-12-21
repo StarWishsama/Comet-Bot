@@ -39,6 +39,8 @@ import net.mamoe.mirai.network.ForceOfflineException
 import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.*
 import org.hydev.logger.HyLogger
+import org.hydev.logger.HyLoggerConfig
+import org.hydev.logger.coloring.GradientPresets.BPR
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
 import org.jline.terminal.TerminalBuilder
@@ -243,7 +245,7 @@ fun initResources() {
     startTime = LocalDateTime.now()
     FileUtil.initLog()
 
-    println(
+    logger.fancy.gradient(
     """
         
            ______                     __ 
@@ -253,10 +255,11 @@ fun initResources() {
         \____/\____/_/ /_/ /_/\___/\__/  
 
 
-    """
+    """, BPR, 15.0
     )
 
     DataSetup.init()
+    HyLoggerConfig.debug = cfg.debugMode
     NetUtil.initDriver()
 }
 

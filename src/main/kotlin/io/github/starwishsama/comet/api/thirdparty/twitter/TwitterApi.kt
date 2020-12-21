@@ -230,9 +230,7 @@ object TwitterApi : ApiExecutor {
         }
 
         val cachedTweet = getCacheTweet(username)
-        val result: Tweet? = if (cachedTweet != null && Duration.between(cachedTweet.getSentTime(), LocalDateTime.now())
-                        .toMinutes() <= 1
-        ) {
+        val result: Tweet = if (cachedTweet != null && Duration.between(cachedTweet.getSentTime(), LocalDateTime.now()).toMinutes() <= 1) {
             isCache = true
             cachedTweet
         } else {
@@ -270,7 +268,7 @@ object TwitterApi : ApiExecutor {
      * 支持多个推文和单个推文 (以链表形式返回)
      *
      * @param json 从 Twitter API 中获取到的推文 json
-     * @param url 请求解析 json 的来源网站, 用于创建错误报告
+     * @param url 请求解析 json 的推文, 用于创建错误报告
      *
      * @return 推文列表
      */
