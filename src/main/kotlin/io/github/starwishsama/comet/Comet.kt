@@ -59,6 +59,9 @@ object Comet {
         }
     var isFailed = false
 
+    private lateinit var botLogger: HyLogger
+    private lateinit var botNetworkLogger: HyLogger
+
     @ExperimentalTime
     fun startUpTask() {
         val apis = arrayOf(BiliBiliMainApi, TwitterApi, YoutubeApi)
@@ -196,17 +199,20 @@ object Comet {
     @ExperimentalTime
     suspend fun startBot(qqId: Long, password: String) {
         daemonLogger.log("正在设置登录配置...")
+
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
-                PlatformLogger("Comet ${it.id}") {
-                    BotVariables.log.writeString(BotVariables.log.getContext() + "$it\n")
-                    println(it)
+                if (!::botLogger.isInitialized) botLogger = HyLogger("Comet ${it.id}")
+
+                SimpleLogger("Comet ${it.id}") { priority, message, e ->
+                    handleLogLevel(botLogger, priority, message, e)
                 }
             }
             networkLoggerSupplier = { it ->
-                PlatformLogger("CometNet ${it.id}") {
-                    BotVariables.log.writeString(BotVariables.log.getContext() + "$it\n")
-                    println(it)
+                if (!::botNetworkLogger.isInitialized) botNetworkLogger = HyLogger("CometNet ${it.id}")
+
+                SimpleLogger("CometNet ${it.id}") { priority, message, e ->
+                    handleLogLevel(botNetworkLogger, priority, message, e)
                 }
             }
             heartbeatPeriodMillis = cfg.heartBeatPeriod * 60 * 1000
@@ -318,4 +324,41 @@ fun invokeWhenClose(){
     DataSetup.saveAllResources()
     BotVariables.service.shutdown()
     BotVariables.rCon?.disconnect()
+}
+
+private fun handleLogLevel(logger: HyLogger, priority: SimpleLogger.LogPriority, message: String?, e: Throwable?) {
+    when (priority) {
+        SimpleLogger.LogPriority.INFO, SimpleLogger.LogPriority.VERBOSE -> {
+            if (message != null) {
+                if (e != null) {
+                    logger.log(message + "\n" + e.stackTraceToString())
+                }
+                logger.log(message)
+            }
+        }
+        SimpleLogger.LogPriority.WARNING -> {
+            if (message != null) {
+                if (e != null) {
+                    logger.warning(message + "\n" + e.stackTraceToString())
+                }
+                logger.warning(message)
+            }
+        }
+        SimpleLogger.LogPriority.ERROR -> {
+            if (message != null) {
+                if (e != null) {
+                    logger.error(message + "\n" + e.stackTraceToString())
+                }
+                logger.error(message)
+            }
+        }
+        SimpleLogger.LogPriority.DEBUG -> {
+            if (message != null) {
+                if (e != null) {
+                    logger.debug(message + "\n" + e.stackTraceToString())
+                }
+                logger.debug(message)
+            }
+        }
+    }
 }
