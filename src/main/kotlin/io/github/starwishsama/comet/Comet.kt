@@ -19,6 +19,7 @@ import io.github.starwishsama.comet.commands.console.DebugCommand
 import io.github.starwishsama.comet.commands.console.StopCommand
 import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
+import io.github.starwishsama.comet.listeners.BotStatusListener
 import io.github.starwishsama.comet.listeners.ConvertLightAppListener
 import io.github.starwishsama.comet.listeners.GroupRelatedListener
 import io.github.starwishsama.comet.listeners.RepeatListener
@@ -173,7 +174,7 @@ object Comet {
         logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
 
         /** 监听器 */
-        val listeners = arrayOf(ConvertLightAppListener, RepeatListener, GroupRelatedListener)
+        val listeners = arrayOf(ConvertLightAppListener, RepeatListener, GroupRelatedListener, BotStatusListener)
 
         listeners.forEach {
             it.register(bot)
@@ -242,7 +243,7 @@ fun initResources() {
     FileUtil.initLog()
 
     println(
-            """
+    """
         
            ______                     __ 
           / ____/___  ____ ___  ___  / /_
@@ -297,12 +298,14 @@ private suspend fun handleLogin() {
                 daemonLogger.info("成功设置密码, 按下 Enter 启动机器人")
             } else if (cfg.botId != 0L && cfg.botPassword.isNotEmpty()) {
                 daemonLogger.info("正在启动 Comet...")
-                Comet.startBot(cfg.botId, cfg.botPassword)
+                break
             }
         } catch (e: EOFException) {
             return
         }
     }
+
+    Comet.startBot(cfg.botId, cfg.botPassword)
 }
 
 fun invokeWhenClose(){
