@@ -17,8 +17,8 @@ import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.utils.MiraiLogger
 import org.apache.commons.lang3.StringUtils
+import org.hydev.logger.HyLogger
 import java.time.Duration
 import java.time.LocalDateTime
 import kotlin.time.ExperimentalTime
@@ -31,61 +31,61 @@ import kotlin.time.toKotlinDuration
  */
 
 @Suppress("unused")
-fun MiraiLogger.warningS(message: String?) {
+fun HyLogger.warningS(message: String?) {
     if (cfg.debugMode) {
-        warning(message)
+        warning(message ?: return)
     }
 }
 
-fun MiraiLogger.warningS(message: String?, throwable: Throwable?) {
+fun HyLogger.warningS(message: String?, throwable: Throwable?) {
     if (cfg.debugMode) {
-        warning(message, throwable)
-    }
-}
-
-@Suppress("unused")
-fun MiraiLogger.warningS(throwable: Throwable?) {
-    if (cfg.debugMode) {
-        warning(throwable)
-    }
-}
-
-fun MiraiLogger.debugS(message: String?) {
-    if (cfg.debugMode) {
-        debug(message)
+        warning((message ?: return) + "\n" + throwable?.stackTraceToString())
     }
 }
 
 @Suppress("unused")
-fun MiraiLogger.debugS(throwable: Throwable?) {
+fun HyLogger.warningS(throwable: Throwable?) {
     if (cfg.debugMode) {
-        debug(throwable)
+        warning(throwable?.stackTraceToString() ?: return)
+    }
+}
+
+fun HyLogger.debugS(message: String?) {
+    if (cfg.debugMode) {
+        debug(message ?: "null")
     }
 }
 
 @Suppress("unused")
-fun MiraiLogger.debugS(message: String?, throwable: Throwable?) {
+fun HyLogger.debugS(throwable: Throwable?) {
     if (cfg.debugMode) {
-        verbose(message, throwable)
-    }
-}
-
-fun MiraiLogger.verboseS(message: String?) {
-    if (cfg.debugMode) {
-        verbose(message)
+        debug(throwable?.stackTraceToString() ?: return)
     }
 }
 
 @Suppress("unused")
-fun MiraiLogger.verboseS(throwable: Throwable?) {
+fun HyLogger.debugS(message: String?, throwable: Throwable?) {
     if (cfg.debugMode) {
-        verbose(throwable)
+        debug(message ?: "null" + "\n" + throwable?.stackTraceToString())
     }
 }
 
-fun MiraiLogger.verboseS(message: String?, throwable: Throwable?) {
+fun HyLogger.verboseS(message: String?) {
     if (cfg.debugMode) {
-        verbose(message, throwable)
+        log(message ?: "null")
+    }
+}
+
+@Suppress("unused")
+fun HyLogger.verboseS(throwable: Throwable?) {
+    if (cfg.debugMode) {
+        log(throwable?.stackTraceToString() ?: return)
+    }
+}
+
+fun HyLogger.verboseS(message: String?, throwable: Throwable?) {
+    if (cfg.debugMode) {
+        log((message ?: "null") + throwable?.stackTraceToString())
     }
 }
 

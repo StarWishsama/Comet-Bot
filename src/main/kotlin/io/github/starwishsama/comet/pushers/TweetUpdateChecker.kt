@@ -57,7 +57,7 @@ object TweetUpdateChecker : CometPusher {
             } catch (t: Throwable) {
                 if (!NetUtil.isTimeout(t)) {
                     when (t) {
-                        is RateLimitException -> daemonLogger.verbose(t.message)
+                        is RateLimitException -> daemonLogger.log(t.message ?: "")
                         else -> daemonLogger.verboseS("[推文] 在尝试获取推文时出现了意外", t)
                     }
                 } else {

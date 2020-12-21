@@ -116,8 +116,8 @@ object FileUtil {
 
         val report = "发生了一个错误:\n${getBeautyStackTrace(t)}\n可能有用的信息: $message\n\n原始获取内容:\n$content"
         location.writeString(report)
-        daemonLogger.info("$reason, 错误报告已生成! 保存在 ${location.path}")
-        daemonLogger.info("你可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")
+        daemonLogger.log("$reason, 错误报告已生成! 保存在 ${location.path}")
+        daemonLogger.log("你可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")
     }
 
     fun initLog(): File? {
@@ -198,7 +198,7 @@ object FileUtil {
     fun initResourceFile() {
         val startTime = LocalDateTime.now()
         try {
-            daemonLogger.info("正在加载资源文件...")
+            daemonLogger.log("正在加载资源文件...")
             val resourcePath = "resources"
             val jarFile = File(Comet.javaClass.protectionDomain.codeSource.location.path)
 
@@ -212,10 +212,10 @@ object FileUtil {
                 }
             }
         } catch (e: Exception) {
-            daemonLogger.info("加载资源文件失败, 部分需要图片资源的功能将无法使用")
+            daemonLogger.log("加载资源文件失败, 部分需要图片资源的功能将无法使用")
             daemonLogger.warningS("Cannot copy resources files", e)
         } finally {
-            daemonLogger.info("尝试加载资源文件用时 ${startTime.getLastingTime().toFriendly(TimeUnit.SECONDS)}")
+            daemonLogger.log("尝试加载资源文件用时 ${startTime.getLastingTime().toFriendly(TimeUnit.SECONDS)}")
         }
     }
 

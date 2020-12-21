@@ -38,6 +38,7 @@ import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.network.ForceOfflineException
 import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.*
+import org.hydev.logger.HyLogger
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
 import org.jline.terminal.TerminalBuilder
@@ -75,12 +76,12 @@ object Comet {
                     runBlocking {
                         withContext(Dispatchers.IO) {
                             login(username = username, password = pwd)
-                            daemonLogger.info("成功登录哔哩哔哩账号")
+                            daemonLogger.log("成功登录哔哩哔哩账号")
                         }
                     }
                 }
             } else {
-                daemonLogger.info("未登录哔哩哔哩账号, 部分哔哩哔哩相关功能可能受限")
+                daemonLogger.log("未登录哔哩哔哩账号, 部分哔哩哔哩相关功能可能受限")
             }
         }
 
@@ -90,7 +91,7 @@ object Comet {
             val usedMemoryBefore: Long = getUsedMemory()
             System.runFinalization()
             System.gc()
-            daemonLogger.verbose("GC 清理成功 (${usedMemoryBefore - getUsedMemory()}) MB")
+            daemonLogger.log("GC 清理成功 (${usedMemoryBefore - getUsedMemory()}) MB")
         }
     }
 
@@ -103,7 +104,7 @@ object Comet {
                     line = console.readLine(">")
                     val result = CommandExecutor.dispatchConsoleCommand(line)
                     if (result.isNotEmpty()) {
-                        consoleCommandLogger.info(result)
+                        consoleCommandLogger.log(result)
                     }
                 }
             }
@@ -133,7 +134,7 @@ object Comet {
     }
 
     @ExperimentalTime
-    fun invokePostTask(bot: Bot, logger: MiraiLogger = BotVariables.logger) {
+    fun invokePostTask(bot: Bot, logger: HyLogger = BotVariables.logger) {
         DataSetup.initPerGroupSetting(bot)
 
         setupRCon()
@@ -171,20 +172,20 @@ object Comet {
             )
         )
 
-        logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
+        logger.log("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
 
         /** 监听器 */
         val listeners = arrayOf(ConvertLightAppListener, RepeatListener, GroupRelatedListener, BotStatusListener)
 
         listeners.forEach {
             it.register(bot)
-            logger.info("[监听器] 已注册 ${it.getName()} 监听器")
+            logger.log("[监听器] 已注册 ${it.getName()} 监听器")
         }
 
         startUpTask()
         startAllPusher(bot)
 
-        logger.info("彗星 Bot 启动成功, 耗时 ${startTime.getLastingTimeAsString()}")
+        logger.log("彗星 Bot 启动成功, 耗时 ${startTime.getLastingTimeAsString()}")
 
         CommandExecutor.startHandler(bot)
     }
@@ -192,7 +193,7 @@ object Comet {
     @OptIn(MiraiExperimentalApi::class, MiraiInternalApi::class)
     @ExperimentalTime
     suspend fun startBot(qqId: Long, password: String) {
-        daemonLogger.info("正在设置登录配置...")
+        daemonLogger.log("正在设置登录配置...")
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
                 PlatformLogger("Comet ${it.id}") {
@@ -212,12 +213,12 @@ object Comet {
             fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
         }
         bot = BotFactory.newBot(qq = qqId, password = password, configuration = config)
-        logger.info("登录中... 使用协议 ${bot.configuration.protocol.name}")
+        logger.log("登录中... 使用协议 ${bot.configuration.protocol.name}")
 
         try {
             bot.login()
         } catch (e: LoginFailedException) {
-            daemonLogger.info("登录失败, 如果是密码错误, 请重新输入密码")
+            daemonLogger.log("登录失败, 如果是密码错误, 请重新输入密码")
             isFailed = true
             handleLogin()
             return
@@ -269,14 +270,14 @@ suspend fun main() {
     if (cfg.botId == 0L) {
         handleLogin()
     } else {
-        daemonLogger.info("检测到登录数据, 正在自动登录账号 ${cfg.botId}")
+        daemonLogger.log("检测到登录数据, 正在自动登录账号 ${cfg.botId}")
         Comet.startBot(cfg.botId, cfg.botPassword)
     }
 }
 
 @OptIn(ExperimentalTime::class)
 private suspend fun handleLogin() {
-    daemonLogger.info("请输入欲登录的机器人账号")
+    daemonLogger.log("请输入欲登录的机器人账号")
     while (true) {
         try {
             var command: String
@@ -289,15 +290,15 @@ private suspend fun handleLogin() {
                 command = Comet.console.readLine(">")
                 if (command.isNumeric()) {
                     cfg.botId = command.toLong()
-                    daemonLogger.info("成功设置账号为 ${cfg.botId}")
-                    daemonLogger.info("请输入欲登录的机器人密码")
+                    daemonLogger.log("成功设置账号为 ${cfg.botId}")
+                    daemonLogger.log("请输入欲登录的机器人密码")
                 }
             } else if (cfg.botPassword.isEmpty() || isFailed) {
                 command = Comet.console.readLine(">", '*')
                 cfg.botPassword = command
-                daemonLogger.info("成功设置密码, 按下 Enter 启动机器人")
+                daemonLogger.log("成功设置密码, 按下 Enter 启动机器人")
             } else if (cfg.botId != 0L && cfg.botPassword.isNotEmpty()) {
-                daemonLogger.info("正在启动 Comet...")
+                daemonLogger.log("正在启动 Comet...")
                 break
             }
         } catch (e: EOFException) {
@@ -309,7 +310,7 @@ private suspend fun handleLogin() {
 }
 
 fun invokeWhenClose(){
-    logger.info("[Bot] 正在关闭 Bot...")
+    logger.log("[Bot] 正在关闭 Bot...")
     NetUtil.closeDriver()
     DataSetup.saveAllResources()
     BotVariables.service.shutdown()

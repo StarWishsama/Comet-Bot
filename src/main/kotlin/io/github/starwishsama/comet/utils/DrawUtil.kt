@@ -97,7 +97,7 @@ object DrawUtil {
 
         if (arkNight.size > arkLoc.filesCount()) {
             val startTime = LocalDateTime.now()
-            daemonLogger.info("正在下载 明日方舟图片资源文件")
+            daemonLogger.log("正在下载 明日方舟图片资源文件")
 
             var successCount = 0
 
@@ -136,13 +136,13 @@ object DrawUtil {
                         return@forEach
                     } finally {
                         if (successCount > 0 && successCount % 10 == 0) {
-                            daemonLogger.info("明日方舟 > 已下载 $successCount/${arkNight.size}")
+                            daemonLogger.log("明日方舟 > 已下载 $successCount/${arkNight.size}")
                         }
                     }
                 }
             }
 
-            daemonLogger.info("明日方舟 > 缺失资源文件下载完成 [$successCount/${arkNight.size}], 耗时 ${startTime.getLastingTimeAsString()}")
+            daemonLogger.log("明日方舟 > 缺失资源文件下载完成 [$successCount/${arkNight.size}], 耗时 ${startTime.getLastingTimeAsString()}")
         }
 
         pictureReady = true

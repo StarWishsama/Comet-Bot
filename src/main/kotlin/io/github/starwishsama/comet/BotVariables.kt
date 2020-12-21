@@ -9,14 +9,11 @@ import io.github.starwishsama.comet.objects.draw.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.objects.group.Shop
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
-import io.github.starwishsama.comet.utils.getContext
-import io.github.starwishsama.comet.utils.writeString
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.utils.MiraiInternalApi
-import net.mamoe.mirai.utils.MiraiLogger
-import net.mamoe.mirai.utils.PlatformLogger
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
+import org.hydev.logger.HyLogger
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -51,18 +48,12 @@ object BotVariables {
                     }.build()
     )
 
-    val logger: MiraiLogger = PlatformLogger("CometBot") {
-        println(it)
-        log.writeString(log.getContext() + "$it\n")
-    }
-    val daemonLogger: MiraiLogger = PlatformLogger("CometService") {
-        println(it)
-        log.writeString(log.getContext() + "$it\n")
-    }
-    val consoleCommandLogger: MiraiLogger = PlatformLogger("CometConsole") {
-        println(it)
-        log.writeString(log.getContext() + "$it\n")
-    }
+    val logger: HyLogger = HyLogger("CometBot")
+
+    val daemonLogger: HyLogger = HyLogger("CometService")
+
+    val consoleCommandLogger: HyLogger = HyLogger("CometConsole")
+
     val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
     var rCon: Rcon? = null
     lateinit var log: File

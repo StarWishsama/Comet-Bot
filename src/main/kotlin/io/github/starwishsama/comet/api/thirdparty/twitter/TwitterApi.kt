@@ -77,7 +77,7 @@ object TwitterApi : ApiExecutor {
             if (JsonParser.parseString(result).isJsonObject) {
                 // Get Token
                 token = JsonParser.parseString(result).asJsonObject["access_token"].asString
-                logger.info("[蓝鸟] 成功获取 Access Token")
+                logger.log("[蓝鸟] 成功获取 Access Token")
             }
         } catch (e: IOException) {
             logger.warning("获取 Token 时出现问题", e)

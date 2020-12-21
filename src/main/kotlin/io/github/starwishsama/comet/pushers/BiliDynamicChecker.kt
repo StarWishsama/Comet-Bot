@@ -29,9 +29,9 @@ object BiliDynamicChecker : CometPusher {
     override fun retrieve() {
         pushCount = 0
 
-        val collectedUID = mutableSetOf<Long>()
+        pushPool.forEach { it.target.clear() }
 
-        collectedUID.apply {
+        val collectedUID = mutableSetOf<Long>().apply {
             perGroup.forEach {
                 if (it.biliPushEnabled) {
                     plusAssign(it.biliSubscribers)
@@ -40,26 +40,36 @@ object BiliDynamicChecker : CometPusher {
         }
 
         collectedUID.forEach { uid ->
-
-
-                val dynamic: Dynamic? = try {
-                    BiliBiliMainApi.getUserDynamicTimeline(uid)
-                } catch (e: RuntimeException) {
-                    if (e !is ApiException) {
-                        daemonLogger.warning("在获取动态时出现了异常", e)
-                    }
-                    null
+            val dynamic: Dynamic? = try {
+                BiliBiliMainApi.getUserDynamicTimeline(uid)
+            } catch (e: RuntimeException) {
+                if (e !is ApiException) {
+                    daemonLogger.warning("在获取动态时出现了异常", e)
                 }
+                null
+            }
 
-                val data = dynamic?.convertDynamic()
+            val data = dynamic?.convertDynamic()
 
-                if (dynamic != null && data != null && data.success) {
-                    val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@forEach
+            if (dynamic != null && data != null && data.success) {
+                val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@forEach
 
-                    // 检查是否火星了
-                    if (isOutdated(sentTime)) return@forEach
+                // 检查是否火星了
+                if (isOutdated(sentTime)) return@forEach
 
-                    if (pushPool.isEmpty()) {
+                if (pushPool.isEmpty()) {
+                    pushPool.plusAssign(
+                        PushDynamicHistory(
+                            uid = uid,
+                            pushContent = data,
+                            sentTime = sentTime
+                        )
+                    )
+                    pushCount++
+                } else {
+                    val target = pushPool.parallelStream().filter { it.uid == uid }.findFirst()
+
+                    if (!target.isPresent) {
                         pushPool.plusAssign(
                             PushDynamicHistory(
                                 uid = uid,
@@ -67,29 +77,17 @@ object BiliDynamicChecker : CometPusher {
                                 sentTime = sentTime
                             )
                         )
-                        pushCount++
-                    } else {
-                        val target = pushPool.parallelStream().filter { it.uid == uid }.findFirst()
+                        return@forEach
+                    }
 
-                        if (!target.isPresent) {
-                            pushPool.plusAssign(
-                                PushDynamicHistory(
-                                    uid = uid,
-                                    pushContent = data,
-                                    sentTime = sentTime
-                                )
-                            )
-                            return@forEach
-                        }
-
-                        target.ifPresent {
-                            if (data.text != it.pushContent.text) {
-                                it.pushContent = data
-                                it.isPushed = false
-                                it.sentTime = sentTime
-                            }
+                    target.ifPresent {
+                        if (data.text != it.pushContent.text) {
+                            it.pushContent = data
+                            it.isPushed = false
+                            it.sentTime = sentTime
                         }
                     }
+                }
             }
         }
 

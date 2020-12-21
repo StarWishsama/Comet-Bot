@@ -119,8 +119,9 @@ dependencies {
     
     // Jline a Java library for handling console input @ https://github.com/jline/jline3
     implementation 'org.jline:jline:3.18.0'
-    // Jansi
-    compile group: 'org.fusesource.jansi', name: 'jansi', version: '2.1.0'
+
+    // HyLogger RGB, even in the console outputs! @ https://github.com/HyDevelop/HyLogger
+    compile group: 'org.hydev', name: 'HyLogger', version: '2.1.0.378'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
