@@ -6,7 +6,7 @@ import net.mamoe.mirai.event.events.BotJoinGroupEvent
 import net.mamoe.mirai.event.events.BotLeaveEvent
 import net.mamoe.mirai.event.subscribeAlways
 
-object GroupRelatedListener: NListener {
+object BotGroupStatusListener: NListener {
     override fun register(bot: Bot) {
         bot.subscribeAlways<BotJoinGroupEvent> {
             if (GroupConfigManager.getConfig(group.id) == null) {

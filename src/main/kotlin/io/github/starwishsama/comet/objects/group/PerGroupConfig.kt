@@ -5,6 +5,8 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import java.util.regex.Pattern
 
 data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
 
@@ -68,6 +70,9 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
     @SerializedName("filter_words")
     val groupFilterWords: MutableList<String> = mutableListOf()
 
+    @SerializedName("keyword_reply")
+    val keyWordReply: MutableList<ReplyKeyWord> = mutableListOf()
+
     fun addHelper(id: Long): Boolean {
         if (isHelper(id)) return false
         helpers.add(id)
@@ -127,4 +132,10 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
         object Disabled: ConfigureCommandStatus("成功禁用该命令")
         object NotExist: ConfigureCommandStatus("该命令不存在!")
     }
+
+    data class ReplyKeyWord(
+        val keyWords: List<String>,
+        val pattern: List<Pattern>,
+        val reply: MessageWrapper
+    )
 }

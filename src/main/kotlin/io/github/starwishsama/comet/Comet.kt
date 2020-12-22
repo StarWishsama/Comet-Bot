@@ -19,9 +19,9 @@ import io.github.starwishsama.comet.commands.console.DebugCommand
 import io.github.starwishsama.comet.commands.console.StopCommand
 import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
+import io.github.starwishsama.comet.listeners.BotGroupStatusListener
 import io.github.starwishsama.comet.listeners.BotStatusListener
 import io.github.starwishsama.comet.listeners.ConvertLightAppListener
-import io.github.starwishsama.comet.listeners.GroupRelatedListener
 import io.github.starwishsama.comet.listeners.RepeatListener
 import io.github.starwishsama.comet.pushers.*
 import io.github.starwishsama.comet.utils.*
@@ -180,7 +180,7 @@ object Comet {
         logger.log("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
 
         /** 监听器 */
-        val listeners = arrayOf(ConvertLightAppListener, RepeatListener, GroupRelatedListener, BotStatusListener)
+        val listeners = arrayOf(ConvertLightAppListener, RepeatListener, BotGroupStatusListener, BotStatusListener)
 
         listeners.forEach {
             it.register(bot)

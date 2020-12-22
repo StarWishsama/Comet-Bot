@@ -11,8 +11,6 @@ import net.mamoe.mirai.utils.uploadAsImage
 
 open class MessageWrapper(var text: String?, val success: Boolean = true) {
     val pictureUrl: MutableList<String> = mutableListOf()
-    var senderId: Long = 0
-    var messageId: Long = 0
 
     private suspend fun getPictures(contact: Contact): List<Image> {
         val images = mutableListOf<Image>()
@@ -61,6 +59,6 @@ open class MessageWrapper(var text: String?, val success: Boolean = true) {
     }
 
     override fun toString(): String {
-        return "MessageWrapper {text=$text, pictureUrls=$pictureUrl, senderId=$senderId, messageId=$messageId}"
+        return "MessageWrapper {text=$text, pictureUrls=$pictureUrl}"
     }
 }
