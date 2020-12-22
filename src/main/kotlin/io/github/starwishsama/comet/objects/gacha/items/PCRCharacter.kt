@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects.draw.items
+package io.github.starwishsama.comet.objects.gacha.items
 
 import com.google.gson.annotations.SerializedName
 

@@ -1,6 +1,6 @@
-package io.github.starwishsama.comet.objects.draw.pool
+package io.github.starwishsama.comet.objects.gacha.pool
 
-import io.github.starwishsama.comet.objects.draw.items.GachaItem
+import io.github.starwishsama.comet.objects.gacha.items.GachaItem
 
 /**
  * 抽卡模拟器中的卡池, 与大部分手游相同

@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects.draw.items
+package io.github.starwishsama.comet.objects.gacha.items
 
 /**
  * 抽卡模拟器中产出的物品. 可以是角色, 装备等.

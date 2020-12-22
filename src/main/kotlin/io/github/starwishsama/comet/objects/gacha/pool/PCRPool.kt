@@ -1,11 +1,11 @@
-package io.github.starwishsama.comet.objects.draw.pool
+package io.github.starwishsama.comet.objects.gacha.pool
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.pcr
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.draw.items.GachaItem
-import io.github.starwishsama.comet.objects.draw.items.PCRCharacter
+import io.github.starwishsama.comet.objects.gacha.items.GachaItem
+import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.utils.DrawUtil
 import java.util.stream.Collectors
 

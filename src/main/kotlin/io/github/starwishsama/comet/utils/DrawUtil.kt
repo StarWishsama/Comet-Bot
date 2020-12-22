@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
+import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.network.NetUtil
 import org.jsoup.Jsoup

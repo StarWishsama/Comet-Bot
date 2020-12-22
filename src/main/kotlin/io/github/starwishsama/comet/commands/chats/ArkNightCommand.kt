@@ -5,8 +5,8 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
-import io.github.starwishsama.comet.objects.draw.pool.ArkNightPool
+import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
+import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.sendMessage
 import io.github.starwishsama.comet.utils.DrawUtil
@@ -16,9 +16,9 @@ import kotlinx.coroutines.withContext
 import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.at
 import net.mamoe.mirai.utils.upload
 import org.apache.commons.lang3.StringUtils
 
@@ -100,7 +100,7 @@ class ArkNightCommand : ChatCommand {
     """.trimIndent()
 
     private suspend fun generatePictureGachaResult(event: MessageEvent, user: BotUser, ops: List<ArkNightOperator>): MessageChain {
-        event.subject.sendMessage("请稍等...")
+        event.reply("请稍等...")
 
         return if (ops.isNotEmpty()) {
             // 只获取最后十个
@@ -116,7 +116,7 @@ class ArkNightCommand : ChatCommand {
 
             val reply = gachaImage.plus("\n").plus(pool.getArkDrawResultAsString(user, ops))
 
-            if (event is GroupMessageEvent) At(event.sender).plus("\n").plus(reply) else reply
+            if (event is GroupMessageEvent) event.sender.at().plus("\n").plus(reply) else reply
         } else {
             (DrawUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}").convertToChain()
         }

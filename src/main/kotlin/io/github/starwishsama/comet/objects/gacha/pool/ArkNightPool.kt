@@ -1,10 +1,10 @@
-package io.github.starwishsama.comet.objects.draw.pool
+package io.github.starwishsama.comet.objects.gacha.pool
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.draw.items.ArkNightOperator
-import io.github.starwishsama.comet.objects.draw.items.GachaItem
+import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
+import io.github.starwishsama.comet.objects.gacha.items.GachaItem
 import io.github.starwishsama.comet.utils.DrawUtil
 import java.math.RoundingMode
 import java.util.stream.Collectors
