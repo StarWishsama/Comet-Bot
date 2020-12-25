@@ -19,6 +19,7 @@ import io.github.starwishsama.comet.commands.console.BroadcastCommand
 import io.github.starwishsama.comet.commands.console.DebugCommand
 import io.github.starwishsama.comet.commands.console.StopCommand
 import io.github.starwishsama.comet.file.BackupHelper
+import io.github.starwishsama.comet.file.CustomFileAppender
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.BotGroupStatusListener
 import io.github.starwishsama.comet.listeners.BotStatusListener
@@ -41,7 +42,6 @@ import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.*
 import org.hydev.logger.HyLogger
 import org.hydev.logger.HyLoggerConfig
-import org.hydev.logger.appenders.FileAppender
 import org.hydev.logger.coloring.GradientPresets.BPR
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
@@ -253,7 +253,7 @@ fun initResources() {
     filePath = FileUtil.getJarLocation()
     startTime = LocalDateTime.now()
     FileUtil.initLog()
-    HyLoggerConfig.appenders.add(FileAppender(log))
+    HyLoggerConfig.appenders.add(CustomFileAppender(log))
 
     logger.fancy.gradient(
     """
