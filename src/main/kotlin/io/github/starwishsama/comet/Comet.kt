@@ -19,6 +19,7 @@ import io.github.starwishsama.comet.commands.console.BroadcastCommand
 import io.github.starwishsama.comet.commands.console.DebugCommand
 import io.github.starwishsama.comet.commands.console.StopCommand
 import io.github.starwishsama.comet.file.BackupHelper
+import io.github.starwishsama.comet.file.CustomConsoleAppender
 import io.github.starwishsama.comet.file.CustomFileAppender
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.BotGroupStatusListener
@@ -253,7 +254,11 @@ fun initResources() {
     filePath = FileUtil.getJarLocation()
     startTime = LocalDateTime.now()
     FileUtil.initLog()
-    HyLoggerConfig.appenders.add(CustomFileAppender(log))
+    HyLoggerConfig.appenders.apply {
+        clear()
+        add(CustomFileAppender(log))
+        add(CustomConsoleAppender())
+    }
 
     logger.fancy.gradient(
     """
