@@ -5,6 +5,7 @@ import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.consoleCommandLogger
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.filePath
+import io.github.starwishsama.comet.BotVariables.log
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.BotVariables.startTime
 import io.github.starwishsama.comet.Comet.isFailed
@@ -40,6 +41,7 @@ import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.*
 import org.hydev.logger.HyLogger
 import org.hydev.logger.HyLoggerConfig
+import org.hydev.logger.appenders.FileAppender
 import org.hydev.logger.coloring.GradientPresets.BPR
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
@@ -48,6 +50,7 @@ import java.io.EOFException
 import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 import kotlin.time.ExperimentalTime
 
 object Comet {
@@ -250,6 +253,7 @@ fun initResources() {
     filePath = FileUtil.getJarLocation()
     startTime = LocalDateTime.now()
     FileUtil.initLog()
+    HyLoggerConfig.appenders.add(FileAppender(log))
 
     logger.fancy.gradient(
     """
@@ -297,6 +301,9 @@ private suspend fun handleLogin() {
 
             if (cfg.botId == 0L) {
                 command = Comet.console.readLine(">")
+
+                if (command == "stop") exitProcess(0)
+
                 if (command.isNumeric()) {
                     cfg.botId = command.toLong()
                     daemonLogger.log("成功设置账号为 ${cfg.botId}")
@@ -305,6 +312,7 @@ private suspend fun handleLogin() {
             } else if (cfg.botPassword.isEmpty() || isFailed) {
                 command = Comet.console.readLine(">", '*')
                 cfg.botPassword = command
+                isFailed = false
                 daemonLogger.log("成功设置密码, 按下 Enter 启动机器人")
             } else if (cfg.botId != 0L && cfg.botPassword.isNotEmpty()) {
                 daemonLogger.log("正在启动 Comet...")
