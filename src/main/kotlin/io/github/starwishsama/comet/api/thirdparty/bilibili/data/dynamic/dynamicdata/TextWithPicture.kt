@@ -54,12 +54,12 @@ data class TextWithPicture(
         data class Picture(
                 @SerializedName("img_src")
                 var imgUrl: String,
-                @SerializedName("img_width")
+                /**@SerializedName("img_width")
                 val imgWidth: Int,
                 @SerializedName("img_height")
                 val imgHeight: Int,
                 @SerializedName("img_size")
-                val imgSize: Double
+                val imgSize: Double*/
         )
     }
 
