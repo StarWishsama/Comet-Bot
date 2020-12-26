@@ -9,7 +9,7 @@ object GroupConfigManager {
         if (perGroup.isEmpty()) return null
 
         perGroup.forEach {
-            if (groupId == it.id ) {
+            if (it != null && groupId == it.id) {
                 return it
             }
         }

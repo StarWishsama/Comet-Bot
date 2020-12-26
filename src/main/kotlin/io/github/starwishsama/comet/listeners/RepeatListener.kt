@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.listeners
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
@@ -57,7 +58,12 @@ object RepeatListener : NListener {
     }
 
     private fun canRepeat(groupId: Long): Boolean {
-        return GroupConfigManager.getConfig(groupId)?.doRepeat ?: true
+        return try {
+            GroupConfigManager.getConfig(groupId)?.doRepeat ?: true
+        } catch (e: NullPointerException) {
+            daemonLogger.warning("检测到群 $groupId 的配置文件异常无法获取, 请及时查看!")
+            false
+        }
     }
 
     override fun getName(): String = "复读机"
