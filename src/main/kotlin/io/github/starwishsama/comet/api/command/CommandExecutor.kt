@@ -143,7 +143,7 @@ object CommandExecutor {
 
                 /** 检查是否在尝试执行被禁用命令 */
                 if (cmd != null && event is GroupMessageEvent &&
-                        GroupConfigManager.getConfigOrNew(event.group.id).isDisabledCommand(cmd)) {
+                        GroupConfigManager.getConfig(event.group.id)?.isDisabledCommand(cmd) == true) {
                     return if (BotUtil.hasNoCoolDown(user.id)) {
                         ExecutedResult(BotUtil.sendMessage("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
                     } else {
@@ -151,8 +151,10 @@ object CommandExecutor {
                     }
                 }
 
-                if (isCommandPrefix(message) && cmd != null) {
-                    var splitMessage = message.split(" ")
+                val prefix = isCommandPrefix(message)
+
+                if (prefix.isNotEmpty() && cmd != null) {
+                    var splitMessage = message.replace(prefix, "").split(" ")
                     splitMessage = splitMessage.subList(1, splitMessage.size)
 
                     BotVariables.logger.debug("[命令] $senderId 尝试执行命令: $message")
@@ -215,7 +217,7 @@ object CommandExecutor {
     @ExperimentalTime
     private suspend fun handleSession(event: MessageEvent, time: LocalDateTime): Boolean {
         val sender = event.sender
-        if (!isCommandPrefix(event.message.contentToString())) {
+        if (isCommandPrefix(event.message.contentToString()).isEmpty()) {
             val session: Session? = SessionManager.getSessionByEvent(event)
             if (session != null) {
                 val command = session.command
@@ -235,7 +237,7 @@ object CommandExecutor {
 
     fun getCommand(cmdPrefix: String): ChatCommand? {
         val command = commands.parallelStream().filter {
-            commandEquals(it, cmdPrefix)
+            isCommandNameEquals(it, cmdPrefix)
         }.findFirst()
 
         return if (command.isPresent) command.get() else null
@@ -243,7 +245,7 @@ object CommandExecutor {
 
     private fun getConsoleCommand(cmdPrefix: String): ConsoleCommand? {
         for (command in consoleCommands) {
-            if (commandEquals(command, cmdPrefix)) {
+            if (isCommandNameEquals(command, cmdPrefix)) {
                 return command
             }
         }
@@ -259,19 +261,24 @@ object CommandExecutor {
         return cmdPrefix.split(" ")[0]
     }
 
-    private fun isCommandPrefix(message: String): Boolean {
+    /**
+     * 消息开头是否为命令前缀
+     *
+     * @return 消息前缀, 不匹配返回空
+     */
+    private fun isCommandPrefix(message: String): String {
         if (message.isNotEmpty()) {
             BotVariables.cfg.commandPrefix.forEach {
                 if (message.startsWith(it)) {
-                    return true
+                    return it
                 }
             }
         }
 
-        return false
+        return ""
     }
 
-    private fun commandEquals(cmd: ChatCommand, cmdName: String): Boolean {
+    private fun isCommandNameEquals(cmd: ChatCommand, cmdName: String): Boolean {
         val props = cmd.getProps()
         when {
             props.name.contentEquals(cmdName) -> {
@@ -290,7 +297,7 @@ object CommandExecutor {
         return false
     }
 
-    private fun commandEquals(cmd: ConsoleCommand, cmdName: String): Boolean {
+    private fun isCommandNameEquals(cmd: ConsoleCommand, cmdName: String): Boolean {
         val props = cmd.getProps()
 
         when {

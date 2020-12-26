@@ -71,7 +71,7 @@ object SessionManager {
     private fun getSession(id: Long): Session? {
         if (sessions.isNotEmpty()) {
             for (session in sessions) {
-                if (session.key.getUserById(id) != null) {
+                if (session.key.getUserByID(id) != null) {
                     return session.key
                 }
             }
@@ -81,7 +81,7 @@ object SessionManager {
 
     fun getSessionByGroup(id: Long, type: Class<out Session>? = null): Session? {
         for (session in sessions) {
-            if (session.key.groupId == id && session::class == type) {
+            if (session.key.groupId == id && (session::class == type || type == null)) {
                 return session.key
             }
         }

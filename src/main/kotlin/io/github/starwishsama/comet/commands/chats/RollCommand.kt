@@ -113,14 +113,14 @@ class RollCommand : ChatCommand, SuspendCommand {
             if (session.rollStarter.id == event.sender.id) return
 
             if (session.keyWord.isEmpty()) {
-                session.putUser(event.sender.id, event.sender.nameCardOrNick, event.sender)
+                session.addUser(event.sender.id, event.sender.nameCardOrNick, event.sender)
                 return
             }
 
             val message = event.message.contentToString()
 
             if (session.keyWord == message) {
-                session.putUser(event.sender.id, event.sender.nameCardOrNick, event.sender)
+                session.addUser(event.sender.id, event.sender.nameCardOrNick, event.sender)
             }
         }
     }
