@@ -59,7 +59,7 @@ data class TextWithPicture(
                 @SerializedName("img_height")
                 val imgHeight: Int,
                 @SerializedName("img_size")
-                val imgSize: Int
+                val imgSize: Double
         )
     }
 

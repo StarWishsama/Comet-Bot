@@ -10,9 +10,13 @@ import java.math.RoundingMode
 import java.util.stream.Collectors
 
 /**
- * Operator info from https://amiya.xyz/
+ * Operator info from https://github.com/Kengxxiao/ArknightsGameData/
  *
  * Operator Picture from http://prts.wiki/
+ *
+ * You can download here: https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json
+ *
+ * @author Nameless
  */
 class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
     override val tenjouCount: Int = -1
