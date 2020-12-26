@@ -12,6 +12,7 @@ import io.github.starwishsama.comet.Comet.isFailed
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.commands.chats.*
@@ -68,7 +69,7 @@ object Comet {
 
     @ExperimentalTime
     fun startUpTask() {
-        val apis = arrayOf(BiliBiliMainApi, TwitterApi, YoutubeApi)
+        val apis = arrayOf(BiliBiliMainApi, TwitterApi, YoutubeApi, VideoApi)
 
         /** 定时任务 */
         BackupHelper.scheduleBackup()
@@ -345,32 +346,36 @@ private fun handleLogLevel(logger: HyLogger, priority: SimpleLogger.LogPriority,
             if (message != null) {
                 if (e != null) {
                     logger.log(message + "\n" + e.stackTraceToString())
+                } else {
+                    logger.log(message)
                 }
-                logger.log(message)
             }
         }
         SimpleLogger.LogPriority.WARNING -> {
             if (message != null) {
                 if (e != null) {
                     logger.warning(message + "\n" + e.stackTraceToString())
+                } else {
+                    logger.warning(message)
                 }
-                logger.warning(message)
             }
         }
         SimpleLogger.LogPriority.ERROR -> {
             if (message != null) {
                 if (e != null) {
                     logger.error(message + "\n" + e.stackTraceToString())
+                } else {
+                    logger.error(message)
                 }
-                logger.error(message)
             }
         }
         SimpleLogger.LogPriority.DEBUG -> {
             if (message != null) {
                 if (e != null) {
                     logger.debug(message + "\n" + e.stackTraceToString())
+                } else {
+                    logger.debug(message)
                 }
-                logger.debug(message)
             }
         }
     }
