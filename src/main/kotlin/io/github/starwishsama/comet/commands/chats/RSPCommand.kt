@@ -10,20 +10,21 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.FileUtil
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.utils.uploadAsImage
-import java.io.File
 
 @CometCommand
 class RSPCommand : ChatCommand, SuspendCommand {
+    /**
+     * 储存正在石头剪刀布的用户
+     */
     private val inProgressPlayer = mutableSetOf<Long>()
+
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(event.sender.id)) {
-            event.subject.sendMessage("角卷猜拳... 开始! 你要出什么呢?")
+            event.subject.sendMessage("石头剪刀布... 开始! 你要出什么呢?")
             SessionManager.addSession(Session(this, user.id))
         }
         return EmptyMessageChain
@@ -41,12 +42,10 @@ class RSPCommand : ChatCommand, SuspendCommand {
                 val systemInt = RandomUtil.randomInt(RockPaperScissors.values().size)
                 val system = RockPaperScissors.values()[systemInt]
                 delay(1_500)
-                val img = File(FileUtil.getResourceFolder(), system.fileName).uploadAsImage(event.subject)
-                event.subject.sendMessage(img)
                 when (RockPaperScissors.isWin(player, system)) {
-                    -1 -> event.subject.sendMessage(BotUtil.sendMessage("平局! わため出的是${system.cnName[0]}"))
-                    0 -> event.subject.sendMessage(BotUtil.sendMessage("你输了! わため出的是${system.cnName[0]}"))
-                    1 -> event.subject.sendMessage(BotUtil.sendMessage("你赢了! わため出的是${system.cnName[0]}"))
+                    -1 -> event.subject.sendMessage(BotUtil.sendMessage("平局! 我出的是${system.cnName[0]}"))
+                    0 -> event.subject.sendMessage(BotUtil.sendMessage("你输了! 我出的是${system.cnName[0]}"))
+                    1 -> event.subject.sendMessage(BotUtil.sendMessage("你赢了! 我出的是${system.cnName[0]}"))
                     else -> event.subject.sendMessage(BotUtil.sendMessage("这合理吗?"))
                 }
             } else {
@@ -57,8 +56,8 @@ class RSPCommand : ChatCommand, SuspendCommand {
         }
     }
 
-    enum class RockPaperScissors(val cnName: Array<String>, val fileName: String) {
-        ROCK(arrayOf("石头", "石子", "拳头", "拳", "👊"), "img${File.separator}rock.png"), SCISSORS(arrayOf("剪刀", "✂"), "img${File.separator}scissor.png"), PAPER(arrayOf("布", "包布"), "img${File.separator}paper.png");
+    enum class RockPaperScissors(val cnName: Array<String>) {
+        ROCK(arrayOf("石头", "石子", "拳头", "拳", "👊")), SCISSORS(arrayOf("剪刀", "✂")), PAPER(arrayOf("布", "包布"));
 
         companion object {
             fun getType(name: String): RockPaperScissors? {
