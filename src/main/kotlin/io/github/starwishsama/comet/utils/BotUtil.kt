@@ -30,60 +30,64 @@ import kotlin.time.toKotlinDuration
  * @author Nameless
  */
 
-@Suppress("unused")
-fun HyLogger.warningS(message: String?) {
+@Suppress("unused", "NOTHING_TO_INLINE")
+inline fun HyLogger.warningS(message: String?) {
     if (cfg.debugMode) {
         warning(message ?: return)
     }
 }
 
-fun HyLogger.warningS(message: String?, throwable: Throwable?) {
+@Suppress("unused", "NOTHING_TO_INLINE")
+inline fun HyLogger.warningS(message: String?, throwable: Throwable?) {
     if (cfg.debugMode) {
         warning((message ?: return) + "\n" + throwable?.stackTraceToString())
     }
 }
 
-@Suppress("unused")
-fun HyLogger.warningS(throwable: Throwable?) {
+@Suppress("unused", "NOTHING_TO_INLINE")
+inline fun HyLogger.warningS(throwable: Throwable?) {
     if (cfg.debugMode) {
         warning(throwable?.stackTraceToString() ?: return)
     }
 }
 
-fun HyLogger.debugS(message: String?) {
+@Suppress("unused", "NOTHING_TO_INLINE")
+inline fun HyLogger.debugS(message: String?) {
     if (cfg.debugMode) {
         debug(message ?: "null")
     }
 }
 
-@Suppress("unused")
-fun HyLogger.debugS(throwable: Throwable?) {
+@Suppress("unused", "NOTHING_TO_INLINE")
+inline fun HyLogger.debugS(throwable: Throwable?) {
     if (cfg.debugMode) {
         debug(throwable?.stackTraceToString() ?: return)
     }
 }
 
-@Suppress("unused")
-fun HyLogger.debugS(message: String?, throwable: Throwable?) {
+@Suppress("unused", "NOTHING_TO_INLINE")
+inline fun HyLogger.debugS(message: String?, throwable: Throwable?) {
     if (cfg.debugMode) {
         debug(message ?: "null" + "\n" + throwable?.stackTraceToString())
     }
 }
 
-fun HyLogger.verboseS(message: String?) {
+@Suppress("unused", "NOTHING_TO_INLINE")
+inline fun HyLogger.verboseS(message: String?) {
     if (cfg.debugMode) {
         log(message ?: "null")
     }
 }
 
-@Suppress("unused")
-fun HyLogger.verboseS(throwable: Throwable?) {
+@Suppress("unused", "NOTHING_TO_INLINE")
+inline fun HyLogger.verboseS(throwable: Throwable?) {
     if (cfg.debugMode) {
         log(throwable?.stackTraceToString() ?: return)
     }
 }
 
-fun HyLogger.verboseS(message: String?, throwable: Throwable?) {
+@Suppress("unused", "NOTHING_TO_INLINE")
+inline fun HyLogger.verboseS(message: String?, throwable: Throwable?) {
     if (cfg.debugMode) {
         log((message ?: "null") + throwable?.stackTraceToString())
     }

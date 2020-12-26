@@ -210,14 +210,14 @@ object Comet {
                 if (!::botLogger.isInitialized) botLogger = HyLogger("Comet ${it.id}")
 
                 SimpleLogger("Comet ${it.id}") { priority, message, e ->
-                    handleLogLevel(botLogger, priority, message, e)
+                    miraiLog(botLogger, priority, message, e)
                 }
             }
             networkLoggerSupplier = { it ->
                 if (!::botNetworkLogger.isInitialized) botNetworkLogger = HyLogger("CometNet ${it.id}")
 
                 SimpleLogger("CometNet ${it.id}") { priority, message, e ->
-                    handleLogLevel(botNetworkLogger, priority, message, e)
+                    miraiLog(botNetworkLogger, priority, message, e)
                 }
             }
             heartbeatPeriodMillis = cfg.heartBeatPeriod * 60 * 1000
@@ -340,7 +340,7 @@ fun invokeWhenClose(){
     BotVariables.rCon?.disconnect()
 }
 
-private fun handleLogLevel(logger: HyLogger, priority: SimpleLogger.LogPriority, message: String?, e: Throwable?) {
+private fun miraiLog(logger: HyLogger, priority: SimpleLogger.LogPriority, message: String?, e: Throwable?) {
     when (priority) {
         SimpleLogger.LogPriority.INFO, SimpleLogger.LogPriority.VERBOSE -> {
             if (message != null) {

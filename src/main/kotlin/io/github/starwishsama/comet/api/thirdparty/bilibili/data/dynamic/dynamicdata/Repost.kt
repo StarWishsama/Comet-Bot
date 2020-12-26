@@ -62,8 +62,9 @@ data class Repost(@SerializedName("origin")
     override fun getSentTime(): LocalDateTime = item?.getSentTime() ?: LocalDateTime.MIN
 
     private suspend fun getOriginalDynamic(contact: String, type: Int): MessageWrapper {
+        val dynamicType = DynamicTypeSelector.getType(type)
+
         try {
-            val dynamicType = DynamicTypeSelector.getType(type)
             if (dynamicType != UnknownType::class.java) {
                 val info = gson.fromJson(contact, dynamicType)
                 if (info != null) {
@@ -77,7 +78,7 @@ data class Repost(@SerializedName("origin")
                     "bilibili",
                     e,
                     contact,
-                    "None"
+                    "Excepted type: $dynamicType"
             )
             return MessageWrapper("在获取时遇到了错误")
         }

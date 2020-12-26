@@ -13,7 +13,7 @@ object VideoApi: ApiExecutor {
 
     init {
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.github.com/")
+            .baseUrl("https://api.bilibili.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         videoService = retrofit.create(IVideoApi::class.java)
@@ -26,4 +26,7 @@ object VideoApi: ApiExecutor {
 interface IVideoApi {
     @GET("/x/web-interface/view")
     fun getVideoInfo(@Query("aid") aid: Long): Call<VideoInfo>
+
+    @GET("/x/web-interface/view")
+    fun getVideoInfoByBID(@Query("bvid") bvID: String): Call<VideoInfo>
 }
