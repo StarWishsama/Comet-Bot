@@ -69,10 +69,10 @@ object NetUtil {
         try {
             if (checkProxyUsable()) {
                 builder.proxy(Proxy(cfg.proxyType, Socket(proxyUrl, proxyPort).remoteSocketAddress))
-                daemonLogger.log("使用代理连接")
+                daemonLogger.verbose("使用代理连接")
             }
         } catch (e: Exception) {
-            daemonLogger.log("无法连接到代理服务器, ${e.message}")
+            daemonLogger.info("无法连接到代理服务器, ${e.message}")
         }
 
         val client = builder.build()

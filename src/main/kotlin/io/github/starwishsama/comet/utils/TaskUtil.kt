@@ -29,7 +29,7 @@ object TaskUtil {
                 }
             } catch (e: Exception) {
                 if (NetUtil.isTimeout(e)) {
-                    daemonLogger.log("Retried $it time(s), connect times out")
+                    daemonLogger.info("Retried $it time(s), connect times out")
                     return@repeat
                 } else if (e !is ApiException) {
                     return e

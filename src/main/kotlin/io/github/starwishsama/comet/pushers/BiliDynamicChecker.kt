@@ -55,7 +55,10 @@ object BiliDynamicChecker : CometPusher {
                 val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@forEach
 
                 // 检查是否火星了
-                if (isOutdated(sentTime)) return@forEach
+                if (isOutdated(sentTime)) {
+                    daemonLogger.debug("is outdated: $sentTime")
+                    return@forEach
+                }
 
                 if (pushPool.isEmpty()) {
                     pushPool.plusAssign(

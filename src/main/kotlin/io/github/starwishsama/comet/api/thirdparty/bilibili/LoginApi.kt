@@ -60,9 +60,9 @@ object LoginApi {
         if (response.code != -105) {
             loginResponse = response
         } else {
-            daemonLogger.log("登入哔哩哔哩账号失败! 错误码 ${response.code}, 错误信息 ${response.message}")
+            daemonLogger.info("登入哔哩哔哩账号失败! 错误码 ${response.code}, 错误信息 ${response.message}")
             if (response.data.url != null) {
-                daemonLogger.log("GeeTest url is ${response.data.url}, after verified, please use validate to relogin")
+                daemonLogger.info("GeeTest url is ${response.data.url}, after verified, please use validate to relogin")
             }
         }
     }

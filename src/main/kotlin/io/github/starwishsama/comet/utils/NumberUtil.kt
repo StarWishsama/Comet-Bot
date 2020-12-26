@@ -23,9 +23,10 @@ object NumberUtil {
      */
     private fun getCompactDouble(value: Double): String {
         if (value < 0) {
-            // Negative numbers are a special case
+            // 处理负数
             return '-'.toString() + getCompactDouble(-value)
         }
+
         return when {
             value < 1000.0 -> {
                 // 小于一千
@@ -55,7 +56,7 @@ object NumberUtil {
     }
 
     /**
-     * 时间戳转换为 [LocalDateTime]
+     * 时间戳 (秒) 转换为 [LocalDateTime]
      */
     fun Long.toLocalDateTime(): LocalDateTime =
             Instant.ofEpochMilli(this * 1000).atZone(ZoneId.systemDefault()).toLocalDateTime()

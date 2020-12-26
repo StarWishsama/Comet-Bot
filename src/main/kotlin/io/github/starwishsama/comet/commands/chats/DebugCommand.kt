@@ -95,7 +95,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                         return when (args[1].toLowerCase()) {
                             "twit", "twitter", "推特", "蓝鸟", "twi" -> {
                                 TweetUpdateChecker.retrieve()
-                                sendMessage("Tweet retriever has been triggered and run~")
+                                sendMessage("Twitter retriever has been triggered and run~")
                             }
                             "ytb", "y2b", "youtube", "油管" -> {
                                 YoutubeStreamingChecker.retrieve()
@@ -103,7 +103,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                             }
                             "bilibili", "bili", "哔哩哔哩", "b站" -> {
                                 BiliDynamicChecker.retrieve()
-                                sendMessage("bilibili retriever has been triggered and run~")
+                                sendMessage("Bilibili retriever has been triggered and run~")
                             }
                             "status" -> {
                                 val ps = listOf(TweetUpdateChecker, BiliDynamicChecker, BiliLiveChecker)
@@ -122,8 +122,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                 }
                 "youtube" -> {
                     if (args.size > 1) {
-                        val result = YoutubeApi.getChannelVideos(args[1], 10)
-                        return YoutubeApi.getLiveStatusByResult(result).toMessageChain(event.subject)
+                        return YoutubeApi.getLiveStatusByResult(YoutubeApi.getChannelVideos(args[1], 10)).toMessageChain(event.subject)
                     }
                 }
                 "rss" -> {
@@ -151,7 +150,6 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                         总线程数：$taskCount
                     """.trimIndent().convertToChain()
                 }
-                "panic" -> throw RuntimeException("好")
                 "pushpool" -> {
                     return BiliDynamicChecker.getPool().toString().sendMessage()
                 }
@@ -192,8 +190,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                     // 等待动态加载完毕再截图
                                     wait.until(ExpectedCondition { webDriver ->
                                         try {
-                                            webDriver?.findElement(By.id("app"))
-                                            webDriver?.findElement(By.className("main-content"))
+                                            webDriver?.findElement(By.className("content-full"))
                                         } catch (e: Exception) {
                                             daemonLogger.warning("获取网页元素时出现异常", e)
                                         }
@@ -202,10 +199,10 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                     // 执行脚本获取合适的动态宽度
                                     val jsExecutor = (this as JavascriptExecutor)
                                     val width = jsExecutor.executeScript(
-                                            """return document.getElementById("app").getElementsByClassName("main-content")[1].offsetWidth""") as Int
+                                            """return document.getElementsByClassName("main-content")[1].offsetWidth""") as Int
                                     val height =
                                             jsExecutor.executeScript(
-                                                    """return document.getElementById("app").getElementsByClassName("main-content")[1].offsetHeight""") as Int
+                                                    """return document.getElementsByClassName("main-content")[1].offsetHeight""") as Int
 
                                     // 调整窗口大小
                                     manage().window().size = Dimension(width, height)
@@ -234,7 +231,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
         return CommandProps("debug", mutableListOf(), "Debug", "nbot.commands.debug", UserLevel.ADMIN)
     }
 
-    override fun getHelp(): String = "Debug 中的命令会随时变动, 请自行查阅代码"
+    override fun getHelp(): String = "调试命令会随时变动, 请自行查阅代码"
 
     override val isHidden: Boolean
         get() = true

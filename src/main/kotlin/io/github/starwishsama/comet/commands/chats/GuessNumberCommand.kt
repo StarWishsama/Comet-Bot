@@ -33,7 +33,7 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
                 when {
                     args.isEmpty() -> {
                         val answer = RandomUtil.randomInt(0, 100)
-                        BotVariables.logger.log("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
+                        BotVariables.logger.info("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
                         SessionManager.addSession(GuessNumberSession(event.group.id, RandomUtil.randomInt(0, 101)))
                         return BotUtil.sendMessage("来猜个数字吧! 范围 [0, 100]")
                     }
@@ -48,7 +48,7 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
                             return BotUtil.sendMessage("最小值不能大于等于最大值")
                         }
                         val answer = RandomUtil.randomInt(min, max + 1)
-                        BotVariables.logger.log("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
+                        BotVariables.logger.info("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
                         SessionManager.addSession(GuessNumberSession(event.group.id, RandomUtil.randomInt(0, 100)))
                         return BotUtil.sendMessage("猜一个数字吧! 范围 [$min, $max]")
                     }

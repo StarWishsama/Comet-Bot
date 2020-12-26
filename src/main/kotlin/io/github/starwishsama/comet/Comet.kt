@@ -20,8 +20,6 @@ import io.github.starwishsama.comet.commands.console.BroadcastCommand
 import io.github.starwishsama.comet.commands.console.DebugCommand
 import io.github.starwishsama.comet.commands.console.StopCommand
 import io.github.starwishsama.comet.file.BackupHelper
-import io.github.starwishsama.comet.file.CustomConsoleAppender
-import io.github.starwishsama.comet.file.CustomFileAppender
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.BotGroupStatusListener
 import io.github.starwishsama.comet.listeners.BotStatusListener
@@ -42,9 +40,6 @@ import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.network.ForceOfflineException
 import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.*
-import org.hydev.logger.HyLogger
-import org.hydev.logger.HyLoggerConfig
-import org.hydev.logger.coloring.GradientPresets.BPR
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
 import org.jline.terminal.TerminalBuilder
@@ -63,9 +58,6 @@ object Comet {
             unsetOpt(LineReader.Option.INSERT_TAB)
         }
     var isFailed = false
-
-    private lateinit var botLogger: HyLogger
-    private lateinit var botNetworkLogger: HyLogger
 
     @ExperimentalTime
     fun startUpTask() {
@@ -86,12 +78,12 @@ object Comet {
                     runBlocking {
                         withContext(Dispatchers.IO) {
                             login(username = username, password = pwd)
-                            daemonLogger.log("成功登录哔哩哔哩账号")
+                            daemonLogger.info("成功登录哔哩哔哩账号")
                         }
                     }
                 }
             } else {
-                daemonLogger.log("未登录哔哩哔哩账号, 部分哔哩哔哩相关功能可能受限")
+                daemonLogger.info("未登录哔哩哔哩账号, 部分哔哩哔哩相关功能可能受限")
             }
         }
 
@@ -101,7 +93,7 @@ object Comet {
             val usedMemoryBefore: Long = getUsedMemory()
             System.runFinalization()
             System.gc()
-            daemonLogger.log("GC 清理成功 (${usedMemoryBefore - getUsedMemory()}) MB")
+            daemonLogger.info("GC 清理成功 (${usedMemoryBefore - getUsedMemory()}) MB")
         }
     }
 
@@ -114,7 +106,7 @@ object Comet {
                     line = console.readLine(">")
                     val result = CommandExecutor.dispatchConsoleCommand(line)
                     if (result.isNotEmpty()) {
-                        consoleCommandLogger.log(result)
+                        consoleCommandLogger.info(result)
                     }
                 }
             }
@@ -144,7 +136,7 @@ object Comet {
     }
 
     @ExperimentalTime
-    fun invokePostTask(bot: Bot, logger: HyLogger = BotVariables.logger) {
+    fun invokePostTask(bot: Bot) {
         DataSetup.initPerGroupSetting(bot)
 
         setupRCon()
@@ -182,20 +174,20 @@ object Comet {
             )
         )
 
-        logger.log("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
+        logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
 
         /** 监听器 */
         val listeners = arrayOf(ConvertLightAppListener, RepeatListener, BotGroupStatusListener, BotStatusListener)
 
         listeners.forEach {
             it.register(bot)
-            logger.log("[监听器] 已注册 ${it.getName()} 监听器")
+            logger.info("[监听器] 已注册 ${it.getName()} 监听器")
         }
 
         startUpTask()
         startAllPusher(bot)
 
-        logger.log("彗星 Bot 启动成功, 耗时 ${startTime.getLastingTimeAsString()}")
+        logger.info("彗星 Bot 启动成功, 耗时 ${startTime.getLastingTimeAsString()}")
 
         CommandExecutor.startHandler(bot)
     }
@@ -203,21 +195,19 @@ object Comet {
     @OptIn(MiraiExperimentalApi::class, MiraiInternalApi::class)
     @ExperimentalTime
     suspend fun startBot(qqId: Long, password: String) {
-        daemonLogger.log("正在设置登录配置...")
+        daemonLogger.info("正在设置登录配置...")
 
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
-                if (!::botLogger.isInitialized) botLogger = HyLogger("Comet ${it.id}")
-
-                SimpleLogger("Comet ${it.id}") { priority, message, e ->
-                    miraiLog(botLogger, priority, message, e)
+                PlatformLogger("Comet ${it.id}") {
+                    println(it)
+                    log.writeString(it, true)
                 }
             }
             networkLoggerSupplier = { it ->
-                if (!::botNetworkLogger.isInitialized) botNetworkLogger = HyLogger("CometNet ${it.id}")
-
-                SimpleLogger("CometNet ${it.id}") { priority, message, e ->
-                    miraiLog(botNetworkLogger, priority, message, e)
+                PlatformLogger("CometNet ${it.id}") {
+                    println(it)
+                    log.writeString(it, true)
                 }
             }
             heartbeatPeriodMillis = cfg.heartBeatPeriod * 60 * 1000
@@ -226,12 +216,12 @@ object Comet {
             fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
         }
         bot = BotFactory.newBot(qq = qqId, password = password, configuration = config)
-        logger.log("登录中... 使用协议 ${bot.configuration.protocol.name}")
+        logger.info("登录中... 使用协议 ${bot.configuration.protocol.name}")
 
         try {
             bot.login()
         } catch (e: LoginFailedException) {
-            daemonLogger.log("登录失败, 如果是密码错误, 请重新输入密码")
+            daemonLogger.info("登录失败, 如果是密码错误, 请重新输入密码")
             isFailed = true
             handleLogin()
             return
@@ -255,13 +245,8 @@ fun initResources() {
     filePath = FileUtil.getJarLocation()
     startTime = LocalDateTime.now()
     FileUtil.initLog()
-    HyLoggerConfig.appenders.apply {
-        clear()
-        add(CustomFileAppender(log))
-        add(CustomConsoleAppender())
-    }
 
-    logger.fancy.gradient(
+    logger.info(
     """
         
            ______                     __ 
@@ -271,11 +256,10 @@ fun initResources() {
         \____/\____/_/ /_/ /_/\___/\__/  
 
 
-    """, BPR, 15.0
+    """
     )
 
     DataSetup.init()
-    HyLoggerConfig.debug = cfg.debugMode
     NetUtil.initDriver()
 }
 
@@ -289,14 +273,14 @@ suspend fun main() {
     if (cfg.botId == 0L) {
         handleLogin()
     } else {
-        daemonLogger.log("检测到登录数据, 正在自动登录账号 ${cfg.botId}")
+        daemonLogger.info("检测到登录数据, 正在自动登录账号 ${cfg.botId}")
         Comet.startBot(cfg.botId, cfg.botPassword)
     }
 }
 
 @OptIn(ExperimentalTime::class)
 private suspend fun handleLogin() {
-    daemonLogger.log("请输入欲登录的机器人账号")
+    daemonLogger.info("请输入欲登录的机器人账号")
     while (true) {
         try {
             var command: String
@@ -312,16 +296,16 @@ private suspend fun handleLogin() {
 
                 if (command.isNumeric()) {
                     cfg.botId = command.toLong()
-                    daemonLogger.log("成功设置账号为 ${cfg.botId}")
-                    daemonLogger.log("请输入欲登录的机器人密码")
+                    daemonLogger.info("成功设置账号为 ${cfg.botId}")
+                    daemonLogger.info("请输入欲登录的机器人密码")
                 }
             } else if (cfg.botPassword.isEmpty() || isFailed) {
                 command = Comet.console.readLine(">", '*')
                 cfg.botPassword = command
                 isFailed = false
-                daemonLogger.log("成功设置密码, 按下 Enter 启动机器人")
+                daemonLogger.info("成功设置密码, 按下 Enter 启动机器人")
             } else if (cfg.botId != 0L && cfg.botPassword.isNotEmpty()) {
-                daemonLogger.log("正在启动 Comet...")
+                daemonLogger.info("正在启动 Comet...")
                 break
             }
         } catch (e: EOFException) {
@@ -333,50 +317,9 @@ private suspend fun handleLogin() {
 }
 
 fun invokeWhenClose(){
-    logger.log("[Bot] 正在关闭 Bot...")
+    logger.info("[Bot] 正在关闭 Bot...")
     NetUtil.closeDriver()
     DataSetup.saveAllResources()
     BotVariables.service.shutdown()
     BotVariables.rCon?.disconnect()
-}
-
-private fun miraiLog(logger: HyLogger, priority: SimpleLogger.LogPriority, message: String?, e: Throwable?) {
-    when (priority) {
-        SimpleLogger.LogPriority.INFO, SimpleLogger.LogPriority.VERBOSE -> {
-            if (message != null) {
-                if (e != null) {
-                    logger.log(message + "\n" + e.stackTraceToString())
-                } else {
-                    logger.log(message)
-                }
-            }
-        }
-        SimpleLogger.LogPriority.WARNING -> {
-            if (message != null) {
-                if (e != null) {
-                    logger.warning(message + "\n" + e.stackTraceToString())
-                } else {
-                    logger.warning(message)
-                }
-            }
-        }
-        SimpleLogger.LogPriority.ERROR -> {
-            if (message != null) {
-                if (e != null) {
-                    logger.error(message + "\n" + e.stackTraceToString())
-                } else {
-                    logger.error(message)
-                }
-            }
-        }
-        SimpleLogger.LogPriority.DEBUG -> {
-            if (message != null) {
-                if (e != null) {
-                    logger.debug(message + "\n" + e.stackTraceToString())
-                } else {
-                    logger.debug(message)
-                }
-            }
-        }
-    }
 }

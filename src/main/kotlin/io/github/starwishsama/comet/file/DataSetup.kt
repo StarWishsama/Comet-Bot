@@ -83,18 +83,18 @@ object DataSetup {
 
         if (pcrData.exists()) {
             BotVariables.pcr = gson.fromJson(pcrData.getContext())
-            daemonLogger.log("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个")
+            daemonLogger.info("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个")
         } else {
-            daemonLogger.log("未检测到公主连结游戏数据, 抽卡模拟器将无法使用")
+            daemonLogger.info("未检测到公主连结游戏数据, 抽卡模拟器将无法使用")
         }
 
         if (arkNightData.exists()) {
             arkNight = gson.fromJson(arkNightData.getContext())
 
-            daemonLogger.log("成功载入明日方舟游戏数据, 共 ${arkNight.size} 个")
+            daemonLogger.info("成功载入明日方舟游戏数据, 共 ${arkNight.size} 个")
             if (cfg.arkDrawUseImage) {
                 if (System.getProperty("java.awt.headless") != "true" && getOsName().toLowerCase().contains("linux")) {
-                    daemonLogger.log("检测到类 Unix 系统, 正在启用 Headless 模式")
+                    daemonLogger.info("检测到类 Unix 系统, 正在启用 Headless 模式")
                     System.setProperty("java.awt.headless", "true")
                 }
 
@@ -107,10 +107,10 @@ object DataSetup {
                 }
             }
         } else {
-            daemonLogger.log("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
+            daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
         }
 
-        daemonLogger.log("[配置] 成功载入配置文件")
+        daemonLogger.info("[配置] 成功载入配置文件")
     }
 
     private fun loadLang() {
@@ -129,7 +129,7 @@ object DataSetup {
                     JsonParser.parseString(langCfg.getContext())
             if (lang.isJsonArray) {
                 BotVariables.localMessage = gson.fromJson(FileReader.create(langCfg).readString())
-                daemonLogger.log("[配置] 成功载入多语言文件")
+                daemonLogger.info("[配置] 成功载入多语言文件")
             } else {
                 daemonLogger.warning("[配置] 在读取时发生了问题, 非法的 JSON 文件")
             }
@@ -138,7 +138,7 @@ object DataSetup {
 
 
     fun saveAllResources() {
-        daemonLogger.log("[数据] 自动保存数据完成")
+        daemonLogger.info("[数据] 自动保存数据完成")
         saveCfg()
         langCfg.writeClassToJson(BotVariables.localMessage)
         savePerGroupSetting()
@@ -178,7 +178,7 @@ object DataSetup {
             }
         }
 
-        BotVariables.logger.log("[配置] 成功加载了 ${BotVariables.perGroup.size} 个群配置")
+        BotVariables.logger.info("[配置] 成功加载了 ${BotVariables.perGroup.size} 个群配置")
     }
 
     private fun savePerGroupSetting() {
