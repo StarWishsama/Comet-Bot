@@ -56,7 +56,6 @@ object BiliDynamicChecker : CometPusher {
 
                 // 检查是否火星了
                 if (isOutdated(sentTime)) {
-                    daemonLogger.debug("is outdated: $sentTime")
                     return@forEach
                 }
 
@@ -160,7 +159,7 @@ object BiliDynamicChecker : CometPusher {
         if (sentTime == null) return true
         if (sentTime == LocalDateTime.MIN) return false
 
-        return sentTime.getLastingTime().inMinutes >= 30
+        return sentTime.getLastingTime().inHours >= 5
     }
 
     fun getPool(): MutableSet<PushDynamicHistory> {

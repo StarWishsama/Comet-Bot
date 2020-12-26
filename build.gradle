@@ -79,7 +79,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
-    def miraiCore = '2.0-M2-dev-4'
+    def miraiCore = '2.0-M2-dev-5'
     implementation "net.mamoe:mirai-core-all:$miraiCore"
 
     implementation 'cn.hutool:hutool-http:5.4.2'
