@@ -30,12 +30,11 @@ object SessionManager {
     }
 
     fun addSession(session: Session): Session {
-        sessions[session] = LocalDateTime.now()
-        return session
+        return addSession(session, LocalDateTime.now())
     }
 
     fun addAutoCloseSession(session: Session, closeAfterMinute: Int) {
-        sessions[session] = LocalDateTime.now()
+        addSession(session)
         TaskUtil.runAsync(closeAfterMinute.toLong(), TimeUnit.MINUTES) {
             daemonLogger.info("自动关闭会话 ${session::class.java.simpleName + "#" + session.hashCode()} 中")
             session.beforeExpiredAction
@@ -43,14 +42,16 @@ object SessionManager {
         }
     }
 
-    fun addSession(session: Session, time: LocalDateTime) {
+    private fun addSession(session: Session, time: LocalDateTime): Session {
         sessions[session] = time
+        return session
     }
 
     fun expireSession(session: Session) {
         sessions.remove(session)
     }
 
+    @Suppress("unused")
     fun expireSession(id: Long): Boolean {
         if (isValidSessionById(id)) {
             sessions.remove(getSession(id))

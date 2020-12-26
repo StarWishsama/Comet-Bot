@@ -301,4 +301,12 @@ object NetUtil {
             return it.inetAddress.isReachable(timeout)
         }
     }
+
+    fun getRedirectedURL(origin: String): String {
+        val request = executeHttpRequest(origin)
+
+        if (request.priorResponse()?.isRedirect == false) return origin
+
+        return request.priorResponse()?.request()?.url().toString()
+    }
 }

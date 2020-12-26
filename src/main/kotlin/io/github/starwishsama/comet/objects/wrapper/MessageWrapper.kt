@@ -40,16 +40,23 @@ open class MessageWrapper(var text: String?, val success: Boolean = true) {
         }
     }
 
-    suspend fun toMessageChain(contact: Contact): MessageChain {
+    suspend fun toMessageChain(contact: Contact, pictureAtTop: Boolean = false): MessageChain {
         val textWrapper = text
         if (textWrapper != null) {
             val images = getPictures(contact)
             if (images.isNotEmpty()) {
                 var result = textWrapper.convertToChain()
 
-                images.forEach {
-                    result += it
+                if (pictureAtTop) {
+                    images.forEach {
+                        result += it
+                    }
+                } else {
+                    images.forEach {
+                        result = it + result
+                    }
                 }
+
                 return result
             }
 

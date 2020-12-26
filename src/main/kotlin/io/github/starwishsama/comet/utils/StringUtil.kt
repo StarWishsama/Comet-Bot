@@ -94,4 +94,9 @@ object StringUtil {
 
         return true
     }
+
+    fun parseVideoIDFromBili(url: String): String {
+        val videoID = url.substring(0, url.indexOf("?")).replace("https", "").replace("https", "").split("/")
+        return videoID.last()
+    }
 }

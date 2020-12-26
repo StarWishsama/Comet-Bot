@@ -18,13 +18,14 @@ class HelpCommand : ChatCommand {
         if (BotUtil.hasNoCoolDown(event.sender.id)) {
             if (args.isEmpty()) {
                 val sb = buildString {
-                    append(BotUtil.sendMessageAsString("可用的命令:\n"))
+                    append(BotUtil.sendMessageAsString("可用的命令:"))
+                    append("\n[")
                     for (cmd in CommandExecutor.getCommands()) {
                         if (!cmd.isHidden) {
-                            append("/").append(cmd.getProps().name).append(",")
+                            append(cmd.getProps().name).append(", ")
                         }
                     }
-                }.removeSuffix(",").plus("]")
+                }.removeSuffix(", ").plus("]")
 
                 return sb.trim().convertToChain()
             } else {

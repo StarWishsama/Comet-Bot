@@ -9,7 +9,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 object VideoApi: ApiExecutor {
-    private val videoService: IVideoApi
+    val videoService: IVideoApi
 
     init {
         val retrofit = Retrofit.Builder()
@@ -25,7 +25,7 @@ object VideoApi: ApiExecutor {
 
 interface IVideoApi {
     @GET("/x/web-interface/view")
-    fun getVideoInfo(@Query("aid") aid: Long): Call<VideoInfo>
+    fun getVideoInfo(@Query("aid") aid: String): Call<VideoInfo>
 
     @GET("/x/web-interface/view")
     fun getVideoInfoByBID(@Query("bvid") bvID: String): Call<VideoInfo>
