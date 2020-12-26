@@ -17,7 +17,7 @@ object RepeatListener : NListener {
     @ExperimentalMessageKey
     @ExperimentalTime
     override fun register(bot: Bot) {
-        bot.subscribeGroupMessages {
+        bot.eventChannel.subscribeGroupMessages {
             always {
                 if (BotVariables.switch && !group.isBotMuted && canRepeat(group.id)) {
                     handleRepeat(this, RandomUtil.randomDouble())

@@ -83,7 +83,7 @@ object CommandExecutor {
      */
     @ExperimentalTime
     fun startHandler(bot: Bot) {
-        bot.subscribeMessages {
+        bot.eventChannel.subscribeMessages {
             always {
                 val executedTime = LocalDateTime.now()
                 if (sender.id != 80000000L) {

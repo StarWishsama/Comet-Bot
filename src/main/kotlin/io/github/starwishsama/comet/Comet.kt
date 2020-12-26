@@ -37,6 +37,7 @@ import kotlinx.coroutines.withContext
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
+import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.network.ForceOfflineException
 import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.*
@@ -213,9 +214,9 @@ object Comet {
             heartbeatPeriodMillis = cfg.heartBeatPeriod * 60 * 1000
             fileBasedDeviceInfo()
             protocol = cfg.botProtocol
-            fileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
         }
         bot = BotFactory.newBot(qq = qqId, password = password, configuration = config)
+        Mirai.FileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
         logger.info("登录中... 使用协议 ${bot.configuration.protocol.name}")
 
         try {

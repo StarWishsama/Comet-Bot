@@ -6,6 +6,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
+import net.mamoe.mirai.event.globalEventChannel
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.ExperimentalMessageKey
@@ -19,7 +20,7 @@ object ConvertLightAppListener : NListener {
     @ExperimentalMessageKey
     @ExperimentalTime
     override fun register(bot: Bot) {
-        bot.subscribeGroupMessages {
+        bot.globalEventChannel().subscribeGroupMessages {
             always {
                 if (BotVariables.switch && !this.group.isBotMuted) {
                     val lightApp = message[LightApp]

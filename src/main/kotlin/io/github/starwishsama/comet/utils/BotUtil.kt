@@ -14,15 +14,25 @@ import io.github.starwishsama.comet.utils.RuntimeUtil.getOsInfo
 import io.github.starwishsama.comet.utils.RuntimeUtil.getUsedMemory
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
+import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.At
+import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.utils.MiraiLogger
+import net.mamoe.mirai.utils.uploadAsImage
 import org.apache.commons.lang3.StringUtils
+import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import java.time.Duration
 import java.time.LocalDateTime
+import javax.imageio.ImageIO
 import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
+
 
 /**
  * 用于辅助机器人运行的各种工具方法
@@ -91,6 +101,14 @@ fun MiraiLogger.verboseS(message: String?, throwable: Throwable?) {
     if (cfg.debugMode) {
         verbose(message, throwable)
     }
+}
+
+fun BufferedImage.uploadAsImage(contact: Contact): Image {
+    val os = ByteArrayOutputStream()
+    ImageIO.write(this, "png", os)
+
+    val inputStream: InputStream = ByteArrayInputStream(os.toByteArray())
+    return runBlocking { inputStream.uploadAsImage(contact) }
 }
 
 object BotUtil {

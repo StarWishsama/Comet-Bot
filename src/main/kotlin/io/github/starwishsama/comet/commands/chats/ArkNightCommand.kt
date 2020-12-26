@@ -11,6 +11,7 @@ import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.BotUtil.sendMessage
 import io.github.starwishsama.comet.utils.DrawUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.uploadAsImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.contact.isOperator
@@ -19,7 +20,6 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.at
-import net.mamoe.mirai.utils.upload
 import org.apache.commons.lang3.StringUtils
 
 @CometCommand
@@ -112,7 +112,7 @@ class ArkNightCommand : ChatCommand {
                                 append("${it.name},")
                             }
                         }.removeSuffix(",")))
-            val gachaImage = withContext(Dispatchers.IO) { result.image.upload(event.subject) }
+            val gachaImage = withContext(Dispatchers.IO) { result.image.uploadAsImage(event.subject) }
 
             val reply = gachaImage.plus("\n").plus(pool.getArkDrawResultAsString(user, ops))
 

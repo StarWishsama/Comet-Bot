@@ -6,7 +6,7 @@ import net.mamoe.mirai.event.subscribeGroupMessages
 
 object AutoReplyListener : NListener {
     override fun register(bot: Bot) {
-        bot.subscribeGroupMessages {
+        bot.eventChannel.subscribeGroupMessages {
             always {
                 val cfg = GroupConfigManager.getConfig(group.id) ?: return@always
 
