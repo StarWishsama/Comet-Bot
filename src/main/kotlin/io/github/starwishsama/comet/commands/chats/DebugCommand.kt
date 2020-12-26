@@ -103,7 +103,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                             }
                             "bilibili", "bili", "哔哩哔哩", "b站" -> {
                                 BiliDynamicChecker.retrieve()
-                                sendMessage("Youtube retriever has been triggered and run~")
+                                sendMessage("bilibili retriever has been triggered and run~")
                             }
                             "status" -> {
                                 val ps = listOf(TweetUpdateChecker, BiliDynamicChecker, BiliLiveChecker)
