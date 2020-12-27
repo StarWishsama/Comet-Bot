@@ -20,8 +20,8 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.MiraiLogger
-import net.mamoe.mirai.utils.uploadAsImage
 import org.apache.commons.lang3.StringUtils
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream

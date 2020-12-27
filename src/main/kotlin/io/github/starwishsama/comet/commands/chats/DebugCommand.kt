@@ -27,7 +27,7 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.utils.uploadAsImage
+import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
 import org.openqa.selenium.JavascriptExecutor

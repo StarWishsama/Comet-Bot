@@ -7,7 +7,8 @@ import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.utils.uploadAsImage
+import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
+
 
 open class MessageWrapper(var text: String?, val success: Boolean = true) {
     val pictureUrl: MutableList<String> = mutableListOf()
