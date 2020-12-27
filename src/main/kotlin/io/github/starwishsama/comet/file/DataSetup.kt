@@ -7,12 +7,14 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.arkNight
+import io.github.starwishsama.comet.BotVariables.arkNightPools
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.CometConfig
+import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.RuntimeUtil.getOsName
@@ -111,6 +113,8 @@ object DataSetup {
                     }
                 }
             }
+
+            arkNightPools.add(ArkNightPool(poolItems = arkNight))
         } else {
             daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
         }

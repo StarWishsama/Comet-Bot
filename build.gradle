@@ -1,5 +1,6 @@
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import org.apache.tools.ant.filters.ReplaceTokens
 
 buildscript {
     repositories {
@@ -32,39 +33,19 @@ String versionCode = "0.6-M2-" + gitCommitId.execute().text.trim()
 group 'io.github.starwishsama.comet'
 version versionCode
 
-task updateVersion {
-    def versionFile = new File(projectDir.getAbsolutePath() + File.separatorChar + 'src' + File.separatorChar + 'main' + File.separatorChar + 'kotlin' + File.separatorChar + 'io' + File.separatorChar + 'github' + File.separatorChar + 'starwishsama' + File.separatorChar + 'comet' + File.separatorChar + 'Versions.kt')
-    if (versionFile.exists()) {
-        def oldVersionStr = findOldStr(versionFile, "version")
-        def newVersionStr = "    const val version = \"" + versionCode + "\""
-        def oldBuildTimeStr = findOldStr(versionFile, "buildTime")
+processResources {
+    def buildTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
 
-        def buildTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
+    println "Processing version code and other stuffs....."
 
-        def newBuildTimeStr = "    const val buildTime = \"" + buildTime + "\""
-        def updatedContent = versionFile.getText('UTF-8').replace(oldVersionStr, newVersionStr).replace(oldBuildTimeStr, newBuildTimeStr)
-        versionFile.write(updatedContent, 'UTF-8')
-        println "Welcome to Comet! Current build version: $versionCode"
-    } else {
-        println "Can't found project dir."
+    from (sourceSets.main.kotlin) {
+        include 'io/github/starwishsama/comet/Versions.kt'
+        filter(ReplaceTokens, tokens: ['@version@' : project.version])
+        filter(ReplaceTokens, tokens: ['@buildTime@' : buildTime])
     }
 }
 
-static String findOldStr(File file, String regex) {
-    String current = ""
-    file.withReader('UTF-8') { reader ->
-        reader.eachLine {
-            if (it.contains(regex)) {
-                current <<= it
-                return current
-            }
-            return void
-        }
-        return current
-    }
-}
-
-jar.dependsOn updateVersion
+jar.dependsOn processResources
 
 repositories {
     maven { url 'https://jitpack.io' }

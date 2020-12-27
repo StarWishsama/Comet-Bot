@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.commands.chats
 
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
@@ -25,16 +26,15 @@ import org.apache.commons.lang3.StringUtils
 @CometCommand
 @Suppress("SpellCheckingInspection")
 class ArkNightCommand : ChatCommand {
-    private val pool = ArkNightPool()
-
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+        val pool = BotVariables.arkNightPools[0]
         if (BotUtil.hasNoCoolDown(event.sender.id, 30)) {
             if (args.isNotEmpty()) {
                 when (args[0]) {
                     "单次寻访", "1", "单抽" -> {
                         val list = pool.getArkDrawResult(user)
                         return if (DrawUtil.arkPictureIsUsable()) {
-                            generatePictureGachaResult(event, user, list)
+                            generatePictureGachaResult(pool, event, user, list)
                         } else {
                             pool.getArkDrawResultAsString(user, list).sendMessage()
                         }
@@ -42,7 +42,7 @@ class ArkNightCommand : ChatCommand {
                     "十连寻访", "10", "十连" -> {
                         val list: List<ArkNightOperator> = pool.getArkDrawResult(user, 10)
                         return if (DrawUtil.arkPictureIsUsable()) {
-                            generatePictureGachaResult(event, user, list)
+                            generatePictureGachaResult(pool, event, user, list)
                         } else {
                             pool.getArkDrawResultAsString(user, list).sendMessage()
                         }
@@ -50,7 +50,7 @@ class ArkNightCommand : ChatCommand {
                     "一井", "300", "来一井" -> {
                         val list: List<ArkNightOperator> = pool.getArkDrawResult(user, 300)
                         return if (DrawUtil.arkPictureIsUsable()) {
-                            generatePictureGachaResult(event, user, list)
+                            generatePictureGachaResult(pool, event, user, list)
                         } else {
                             pool.getArkDrawResultAsString(user, list).sendMessage()
                         }
@@ -66,7 +66,7 @@ class ArkNightCommand : ChatCommand {
 
                                 val list: List<ArkNightOperator> = pool.getArkDrawResult(user, gachaTime)
                                 return if (DrawUtil.arkPictureIsUsable()) {
-                                    generatePictureGachaResult(event, user, list)
+                                    generatePictureGachaResult(pool, event, user, list)
                                 } else {
                                     pool.getArkDrawResultAsString(user, list).sendMessage()
                                 }
@@ -99,7 +99,7 @@ class ArkNightCommand : ChatCommand {
          /ark 单次寻访/十连寻访/[次数]
     """.trimIndent()
 
-    private suspend fun generatePictureGachaResult(event: MessageEvent, user: BotUser, ops: List<ArkNightOperator>): MessageChain {
+    private suspend fun generatePictureGachaResult(pool: ArkNightPool, event: MessageEvent, user: BotUser, ops: List<ArkNightOperator>): MessageChain {
         event.reply("请稍等...")
 
         return if (ops.isNotEmpty()) {
