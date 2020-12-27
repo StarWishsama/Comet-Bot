@@ -19,6 +19,8 @@ plugins {
 }
 
 def mainClass = 'io.github.starwishsama.comet.CometKt'
+def miraiVersion = '2.0-M2-dev-11'
+String buildTime
 
 jar {
     manifest {
@@ -34,14 +36,12 @@ group 'io.github.starwishsama.comet'
 version versionCode
 
 processResources {
-    def buildTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
-
+    buildTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
     println "Processing version code and other stuffs....."
 
     from (sourceSets.main.kotlin) {
         include 'io/github/starwishsama/comet/Versions.kt'
-        filter(ReplaceTokens, tokens: ['@version@' : project.version])
-        filter(ReplaceTokens, tokens: ['@buildTime@' : buildTime])
+        filter(ReplaceTokens, tokens: [VERSION : project.version, BUILDTIME: buildTime, MIRAIVERSION: miraiVersion])
     }
 }
 
@@ -60,8 +60,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
-    def miraiCore = '2.0-M2-dev-11'
-    implementation "net.mamoe:mirai-core-all:$miraiCore"
+    implementation "net.mamoe:mirai-core-all:$miraiVersion"
 
     implementation 'cn.hutool:hutool-http:5.4.2'
     implementation 'cn.hutool:hutool-crypto:5.4.2'
