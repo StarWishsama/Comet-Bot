@@ -35,38 +35,41 @@ class RSPCommand : ChatCommand, SuspendCommand {
 
     override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
         if (!inProgressPlayer.contains(user.id)) {
-            val player = RockPaperScissors.getType(event.message.contentToString())
-            inProgressPlayer.add(user.id)
-            if (player != null) {
-                val systemInt = RandomUtil.randomInt(RockPaperScissors.values().size)
-                val system = RockPaperScissors.values()[systemInt]
+            try {
+                val player = RockPaperScissors.getType(event.message.contentToString())
+                inProgressPlayer.add(user.id)
+                if (player != null) {
+                    val systemInt = RandomUtil.randomInt(RockPaperScissors.values().size)
+                    val system = RockPaperScissors.values()[systemInt]
 
-                val gameStatus = RockPaperScissors.isWin(player, system)
+                    val gameStatus = RockPaperScissors.isWin(player, system)
 
-                when (RockPaperScissors.isWin(player, system)) {
-                    -1 -> event.quoteReply(BotUtil.sendMessage("平局! 我出的是${system.cnName[0]}"))
-                    0 -> event.quoteReply(BotUtil.sendMessage("你输了! 我出的是${system.cnName[0]}"))
-                    1 -> event.quoteReply(BotUtil.sendMessage("你赢了! 我出的是${system.cnName[0]}"))
-                    else -> event.quoteReply(BotUtil.sendMessage("这合理吗?"))
+                    when (RockPaperScissors.isWin(player, system)) {
+                        -1 -> event.quoteReply(BotUtil.sendMessage("平局! 我出的是${system.display[0]}"))
+                        0 -> event.quoteReply(BotUtil.sendMessage("你输了! 我出的是${system.display[0]}"))
+                        1 -> event.quoteReply(BotUtil.sendMessage("你赢了! 我出的是${system.display[0]}"))
+                        else -> event.quoteReply(BotUtil.sendMessage("这合理吗?"))
+                    }
+
+                    if (gameStatus in -1..1) {
+                        SessionManager.expireSession(session)
+                    }
+                } else {
+                    event.quoteReply(BotUtil.sendMessage("你的拳法杂乱无章, 这合理吗?"))
                 }
-
-                if (gameStatus in -1..1) {
-                    SessionManager.expireSession(session)
-                }
-            } else {
-                event.quoteReply(BotUtil.sendMessage("你的拳法杂乱无章, 这合理吗?"))
+            } finally {
+                inProgressPlayer.remove(user.id)
             }
-            inProgressPlayer.remove(user.id)
         }
     }
 
-    enum class RockPaperScissors(val cnName: Array<String>) {
+    enum class RockPaperScissors(val display: Array<String>) {
         ROCK(arrayOf("石头", "石子", "拳头", "拳", "👊")), SCISSORS(arrayOf("剪刀", "✂")), PAPER(arrayOf("布", "包布"));
 
         companion object {
             fun getType(name: String): RockPaperScissors? {
                 values().forEach {
-                    for (s in it.cnName) {
+                    for (s in it.display) {
                         if (s == name) return it
                     }
                 }

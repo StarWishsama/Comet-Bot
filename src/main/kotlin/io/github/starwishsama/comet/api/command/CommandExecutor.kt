@@ -12,8 +12,11 @@ import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
+import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import io.github.starwishsama.comet.utils.debugS
 import io.github.starwishsama.comet.utils.network.NetUtil
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -92,7 +95,7 @@ object CommandExecutor {
                     val isCommand: Boolean
                     val result = dispatchCommand(this)
 
-                    isCommand = result.msg !is EmptyMessageChain
+                    isCommand = result.status.isOk()
 
                     try {
                         if (isCommand && result.msg.isNotEmpty()) {
@@ -105,7 +108,7 @@ object CommandExecutor {
                     if (isCommand) {
                         BotVariables.logger.debugS(
                                 "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(TimeUnit.SECONDS)}" +
-                                        if (result.result.isOk()) ", 执行结果: ${result.result.name}" else ""
+                                        if (result.status.isOk()) ", 执行结果: ${result.status.name}" else ""
                         )
                     }
                 }
@@ -154,7 +157,10 @@ object CommandExecutor {
                 val prefix = isCommandPrefix(message)
 
                 if (prefix.isNotEmpty() && cmd != null) {
-                    var splitMessage = message.replace(prefix, "").split(" ")
+                    // 前缀末尾下标
+                    val index = message.indexOf(prefix) + prefix.length
+
+                    var splitMessage = message.substring(index, message.length).split(" ")
                     splitMessage = splitMessage.subList(1, splitMessage.size)
 
                     BotVariables.logger.debug("[命令] $senderId 尝试执行命令: $message")
@@ -174,12 +180,12 @@ object CommandExecutor {
                 }
             } catch (t: Throwable) {
                 return if (NetUtil.isTimeout(t)) {
-                    BotVariables.logger.warning("疑似连接超时: \n${t.stackTraceToString()}")
+                    BotVariables.logger.warning("执行网络操作失败: ", t)
                     ExecutedResult("Bot > 在执行网络操作时连接超时: ${t.message ?: ""}".convertToChain(), cmd)
                 } else {
-                    BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message.split(" ")}, 发送者: $senderId\n${t.stackTraceToString()}")
+                    BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message}, 发送者: $senderId", t)
                     if (user.isBotOwner()) {
-                        ExecutedResult(BotUtil.sendMessage("在试图执行命令时发生了一个错误\n简易报错信息 (如果有的话):\n${t.javaClass.name}: ${t.message}"), cmd, CommandStatus.Failed())
+                        ExecutedResult(BotUtil.sendMessage("在试图执行命令时发生了一个错误\n简易报错信息 (如果有的话):\n${t.javaClass.name}: ${t.message?.limitStringSize(30)}"), cmd, CommandStatus.Failed())
                     } else {
                         ExecutedResult(BotUtil.sendMessage("在试图执行命令时发生了一个错误, 请联系管理员"), cmd, CommandStatus.Failed())
                     }
@@ -221,14 +227,23 @@ object CommandExecutor {
         if (isCommandPrefix(event.message.contentToString()).isEmpty()) {
             val session: SessionGetResult = SessionManager.getSessionByEvent(event)
             if (session.exists()) {
-                session.sessionList.forEach { current ->
-                    val command = current.command
-                    if (command is SuspendCommand) {
-                        command.handleInput(event, BotUser.getUserSafely(sender.id), current)
-                    }
+                val hasDaemonSession = session.sessionList.parallelStream().filter { it is DaemonSession }.findAny()
+                hasDaemonSession.ifPresent {
+                    GlobalScope.run {
+                        session.sessionList.forEach { current ->
+                            if (current is DaemonSession) {
+                                return@forEach
+                            }
 
-                    return current is DaemonSession
+                            val command = current.command
+                            if (command is SuspendCommand) {
+                                runBlocking { command.handleInput(event, BotUser.getUserSafely(sender.id), current) }
+                            }
+                        }
+                    }
                 }
+
+                return hasDaemonSession.isPresent
             }
         }
 
@@ -354,7 +369,7 @@ object CommandExecutor {
 
     fun getCommands() = commands
 
-    data class ExecutedResult(val msg: MessageChain, val cmd: ChatCommand?, val result: CommandStatus = CommandStatus.Success())
+    data class ExecutedResult(val msg: MessageChain, val cmd: ChatCommand?, val status: CommandStatus = CommandStatus.Success())
 
     sealed class CommandStatus(val name: String) {
         class Success: CommandStatus("成功")
