@@ -1,10 +1,12 @@
 package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.net.URLDecoder
+import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.yyMMddPattern
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.ApiException
@@ -158,20 +160,28 @@ object DrawUtil {
     }
 
     fun arkNightDataCheck(location: File) {
+        var isOld = false
+        try {
+            gson.fromJson<List<ArkNightOperator>>(location.getContext())
+        } catch (ignored: Exception) {
+            isOld = true
+        }
+
         if (!location.exists()) {
             daemonLogger.info("正在下载 明日方舟干员数据")
             NetUtil.downloadFile(location, arkNightData)
         }
 
         val result = JsonParser.parseString(NetUtil.executeHttpRequest(arkNightDataApi).body()?.string())
-
         val updateTime = LocalDateTime.parse(result.asJsonObject["updated_at"].asString, DateTimeFormatter.ISO_DATE_TIME)
 
-        if (location.lastModified().toLocalDateTime() < updateTime) {
+        if (location.lastModified().toLocalDateTime() < updateTime || isOld) {
             daemonLogger.info("明日方舟干员数据有更新 (${yyMMddPattern.format(updateTime)}), 正在下载")
             val data = NetUtil.downloadFile(FileUtil.getCacheFolder(), arkNightData, location.name)
             Files.copy(data.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)
             data.delete()
+        } else {
+            daemonLogger.info("明日方舟干员数据为最新版本: ${yyMMddPattern.format(updateTime)}")
         }
     }
 

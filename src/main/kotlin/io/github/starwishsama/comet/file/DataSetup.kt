@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.file
 
 import cn.hutool.core.io.file.FileReader
+import com.github.salomonbrys.kotson.forEach
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
@@ -88,10 +89,12 @@ object DataSetup {
             daemonLogger.info("未检测到公主连结游戏数据, 抽卡模拟器将无法使用")
         }
 
-        if (arkNightData.exists()) {
-            DrawUtil.arkNightDataCheck(arkNightData)
+        DrawUtil.arkNightDataCheck(arkNightData)
 
-            arkNight = gson.fromJson(arkNightData.getContext())
+        if (arkNightData.exists()) {
+            JsonParser.parseString(arkNightData.getContext()).asJsonObject.forEach { _, e ->
+                arkNight.add(gson.fromJson(e))
+            }
 
             daemonLogger.info("成功载入明日方舟游戏数据, 共 ${arkNight.size} 个")
             if (cfg.arkDrawUseImage) {
