@@ -52,17 +52,17 @@ object BotVariables {
 
     val logger: MiraiLogger = PlatformLogger("CometBot") {
         println(it)
-        log.writeString(it, true)
+        log.writeString(it)
     }
 
     val daemonLogger: MiraiLogger = PlatformLogger("CometService") {
         println(it)
-        log.writeString(it, true)
+        log.writeString(it)
     }
 
     val consoleCommandLogger: MiraiLogger = PlatformLogger("CometConsole") {
         println(it)
-        log.writeString(it, true)
+        log.writeString(it)
     }
 
     val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()

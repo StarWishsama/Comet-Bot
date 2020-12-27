@@ -10,7 +10,6 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
-import kotlinx.coroutines.delay
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -25,7 +24,7 @@ class RSPCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(event.sender.id)) {
             event.subject.sendMessage("石头剪刀布... 开始! 你要出什么呢?")
-            SessionManager.addSession(Session(this, user.id))
+            SessionManager.addAutoCloseSession(Session(this, user.id), 1)
         }
         return EmptyMessageChain
     }
@@ -41,18 +40,23 @@ class RSPCommand : ChatCommand, SuspendCommand {
             if (player != null) {
                 val systemInt = RandomUtil.randomInt(RockPaperScissors.values().size)
                 val system = RockPaperScissors.values()[systemInt]
-                delay(1_500)
+
+                val gameStatus = RockPaperScissors.isWin(player, system)
+
                 when (RockPaperScissors.isWin(player, system)) {
-                    -1 -> event.subject.sendMessage(BotUtil.sendMessage("平局! 我出的是${system.cnName[0]}"))
-                    0 -> event.subject.sendMessage(BotUtil.sendMessage("你输了! 我出的是${system.cnName[0]}"))
-                    1 -> event.subject.sendMessage(BotUtil.sendMessage("你赢了! 我出的是${system.cnName[0]}"))
-                    else -> event.subject.sendMessage(BotUtil.sendMessage("这合理吗?"))
+                    -1 -> event.quoteReply(BotUtil.sendMessage("平局! 我出的是${system.cnName[0]}"))
+                    0 -> event.quoteReply(BotUtil.sendMessage("你输了! 我出的是${system.cnName[0]}"))
+                    1 -> event.quoteReply(BotUtil.sendMessage("你赢了! 我出的是${system.cnName[0]}"))
+                    else -> event.quoteReply(BotUtil.sendMessage("这合理吗?"))
+                }
+
+                if (gameStatus in -1..1) {
+                    SessionManager.expireSession(session)
                 }
             } else {
-                event.subject.sendMessage(BotUtil.sendMessage("你的拳法杂乱无章, 这合理吗?"))
+                event.quoteReply(BotUtil.sendMessage("你的拳法杂乱无章, 这合理吗?"))
             }
             inProgressPlayer.remove(user.id)
-            SessionManager.expireSession(session)
         }
     }
 

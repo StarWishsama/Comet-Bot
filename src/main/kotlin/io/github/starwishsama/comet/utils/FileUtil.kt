@@ -26,25 +26,22 @@ import kotlin.time.ExperimentalTime
 
 @Synchronized
 fun File.writeClassToJson(context: Any) {
-    if (!this.exists()) {
-        this.createNewFile()
-    }
-
     FileWriter.create(this).write(BotVariables.gson.toJson(context))
 }
 
 @Synchronized
 fun File.writeString(context: String, autoWrap: Boolean = true, isAppend: Boolean = false) {
-    if (!this.exists()) {
-        this.createNewFile()
+    if (isAppend) {
+        FileWriter.create(this).write(if (autoWrap) context + "\n" else context, isAppend)
+    } else {
+        FileWriter.create(this).write(getContext() + if (autoWrap) context + "\n" else context, isAppend)
     }
-
-    FileWriter.create(this).write(if (autoWrap) context + "\n" else context, isAppend)
 }
 
 @Synchronized
 fun File.getContext(): String = FileReader.create(this, Charsets.UTF_8).readString()
 
+@Suppress("unused")
 fun File.getMD5(): String {
     require(exists()) { "文件不存在" }
     return SecureUtil.md5(this)

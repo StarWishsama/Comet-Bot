@@ -27,10 +27,9 @@ class DebugCommand : ConsoleCommand {
                             append("无")
                             return@buildString
                         }
-                        var i = 1
-                        sessions.forEach { (s, _) ->
-                            append(i + 1).append(" ").append(s.toString()).append("\n")
-                            i++
+
+                        for ((i, session) in sessions.withIndex()) {
+                            append(i + 1).append(" ").append(session.toString()).append("\n")
                         }
                     }.trim()
                 }

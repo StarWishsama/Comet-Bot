@@ -94,7 +94,7 @@ object Comet {
             val usedMemoryBefore: Long = getUsedMemory()
             System.runFinalization()
             System.gc()
-            daemonLogger.info("GC 清理成功 (${usedMemoryBefore - getUsedMemory()}) MB")
+            daemonLogger.info("GC 清理成功 (${usedMemoryBefore - getUsedMemory()} MB)")
         }
     }
 
@@ -188,7 +188,7 @@ object Comet {
         startUpTask()
         startAllPusher(bot)
 
-        logger.info("彗星 Bot 启动成功, 耗时 ${startTime.getLastingTimeAsString()}")
+        logger.info("彗星 Bot 启动成功, 版本 ${Versions.version}, 耗时 ${startTime.getLastingTimeAsString()}")
 
         CommandExecutor.startHandler(bot)
     }
@@ -202,13 +202,13 @@ object Comet {
             botLoggerSupplier = { it ->
                 PlatformLogger("Comet ${it.id}") {
                     println(it)
-                    log.writeString(it, true)
+                    log.writeString(it)
                 }
             }
             networkLoggerSupplier = { it ->
                 PlatformLogger("CometNet ${it.id}") {
                     println(it)
-                    log.writeString(it, true)
+                    log.writeString(it)
                 }
             }
             heartbeatPeriodMillis = cfg.heartBeatPeriod * 60 * 1000

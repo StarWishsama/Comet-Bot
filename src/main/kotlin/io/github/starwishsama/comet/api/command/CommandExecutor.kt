@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.api.command.interfaces.SuspendCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.DaemonSession
-import io.github.starwishsama.comet.sessions.Session
+import io.github.starwishsama.comet.sessions.SessionGetResult
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
@@ -137,7 +137,7 @@ object CommandExecutor {
                  * 如果不是监听会话, 则停止尝试解析并执行可能的命令
                  * 反之在监听时仍然可以执行命令
                  */
-                if (session != null && !handleSession(event, executedTime)) {
+                if (session.exists() && !handleSession(event, executedTime)) {
                     return ExecutedResult(EmptyMessageChain, cmd, CommandStatus.MoveToSession())
                 }
 
@@ -217,15 +217,18 @@ object CommandExecutor {
     @ExperimentalTime
     private suspend fun handleSession(event: MessageEvent, time: LocalDateTime): Boolean {
         val sender = event.sender
-        if (isCommandPrefix(event.message.contentToString()).isEmpty()) {
-            val session: Session? = SessionManager.getSessionByEvent(event)
-            if (session != null) {
-                val command = session.command
-                if (command is SuspendCommand) {
-                    command.handleInput(event, BotUser.getUserSafely(sender.id), session)
-                }
 
-                return session is DaemonSession
+        if (isCommandPrefix(event.message.contentToString()).isEmpty()) {
+            val session: SessionGetResult = SessionManager.getSessionByEvent(event)
+            if (session.exists()) {
+                session.sessionList.forEach { current ->
+                    val command = current.command
+                    if (command is SuspendCommand) {
+                        command.handleInput(event, BotUser.getUserSafely(sender.id), current)
+                    }
+
+                    return current is DaemonSession
+                }
             }
         }
 

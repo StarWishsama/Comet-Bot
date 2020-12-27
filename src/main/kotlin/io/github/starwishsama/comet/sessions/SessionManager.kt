@@ -4,7 +4,6 @@ import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.utils.TaskUtil
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
-import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 /**
@@ -16,79 +15,80 @@ object SessionManager {
     /**
      * 会话列表
      */
-    private val sessions: MutableMap<Session, LocalDateTime> = HashMap()
-
-    init {
-        TaskUtil.runScheduleTaskAsync(3, 3, TimeUnit.MINUTES) {
-            val timeNow = LocalDateTime.now()
-            sessions.forEach { (session, time) ->
-                if (time.plusMinutes(3).isAfter(timeNow)) {
-                    this.expireSession(session)
-                }
-            }
-        }
-    }
+    private val sessions: MutableList<Session> = mutableListOf()
 
     fun addSession(session: Session): Session {
-        return addSession(session, LocalDateTime.now())
+        sessions.add(session)
+        return session
     }
 
     fun addAutoCloseSession(session: Session, closeAfterMinute: Int) {
         addSession(session)
         TaskUtil.runAsync(closeAfterMinute.toLong(), TimeUnit.MINUTES) {
-            daemonLogger.info("自动关闭会话 ${session::class.java.simpleName + "#" + session.hashCode()} 中")
-            session.beforeExpiredAction
-            sessions.remove(session)
+            session.beforeExpiredAction(session)
+            daemonLogger.info("自动关闭会话 ${session::class.java.simpleName + "#" + session.hashCode()}, 结果: ${sessions.remove(session)}")
         }
     }
 
-    private fun addSession(session: Session, time: LocalDateTime): Session {
-        sessions[session] = time
-        return session
-    }
-
     fun expireSession(session: Session) {
-        sessions.remove(session)
+        daemonLogger.info("关闭会话 ${session::class.java.simpleName + "#" + session.hashCode()}, 结果: ${sessions.remove(session)}")
     }
 
     @Suppress("unused")
     fun expireSession(id: Long): Boolean {
         if (isValidSessionById(id)) {
-            sessions.remove(getSession(id))
+            getSession(id).sessionList.forEach {
+                sessions.remove(it)
+            }
             return true
         }
         return false
     }
 
     fun isValidSessionById(id: Long): Boolean {
-        return getSession(id) != null || isValidSessionByGroup(id)
+        return getSession(id).exists() || isValidSessionByGroup(id)
     }
 
     private fun isValidSessionByGroup(groupId: Long): Boolean {
-        return getSessionByGroup(groupId) != null
+        return getSessionByGroup(groupId).exists()
     }
 
-    private fun getSession(id: Long): Session? {
-        if (sessions.isNotEmpty()) {
-            for (session in sessions) {
-                if (session.key.getUserByID(id) != null) {
-                    return session.key
-                }
+    private fun getSession(id: Long): SessionGetResult {
+        val result = SessionGetResult()
+
+        sessions.forEach { session ->
+            if (session.getUserByID(id) != null) {
+                result.addSession(session)
             }
         }
-        return null
+
+        return result
     }
 
-    fun getSessionByGroup(id: Long, type: Class<out Session>? = null): Session? {
+    /**
+     * 通过群号获取会话
+     *
+     * FIXME: 未考虑多个会话情况
+     *
+     * @param id 群ID
+     * @param type 会话类型
+     *
+     * @return 会话, 若无则为 null
+     */
+    fun getSessionByGroup(id: Long, type: Class<out Session>? = null): SessionGetResult {
+        val result = SessionGetResult()
+
         for (session in sessions) {
-            if (session.key.groupId == id && (session::class == type || type == null)) {
-                return session.key
+            // 未指定类型时也会返回
+            if (session.groupId == id && (session::class == type || type == null)) {
+                result.addSession(session)
             }
         }
-        return null
+
+        return result
     }
 
-    fun getSessionByEvent(event: MessageEvent): Session? {
+    fun getSessionByEvent(event: MessageEvent): SessionGetResult {
         return when (event) {
             is GroupMessageEvent -> {
                 if (isValidSessionByGroup(event.group.id)) {
@@ -101,7 +101,27 @@ object SessionManager {
         }
     }
 
-    fun getSessions(): Map<Session, LocalDateTime> {
+    fun getSessions(): MutableList<Session> {
         return sessions
+    }
+}
+
+data class SessionGetResult(val sessionList: MutableList<Session> = mutableListOf()) {
+    fun addSession(session: Session) {
+        sessionList.add(session)
+    }
+
+    fun exists(): Boolean {
+        return sessionList.size > 0
+    }
+
+    fun hasType(type: Class<out Session>): Boolean {
+        sessionList.forEach { session ->
+            if (session::class.java == type::class.java) {
+                return true
+            }
+        }
+
+        return false
     }
 }

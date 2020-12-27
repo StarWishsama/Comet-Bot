@@ -61,10 +61,8 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                             if (sessions.isEmpty()) {
                                 append("无")
                             } else {
-                                var i = 0
-                                for (session in sessions) {
-                                    append(i + 1).append(" ").append(session.key.toString()).append("\n")
-                                    i++
+                                for ((i, session) in sessions.withIndex()) {
+                                    append(i + 1).append(" ").append(session.toString()).append("\n")
                                 }
                             }
                         }

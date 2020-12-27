@@ -32,7 +32,9 @@ class RollCommand : ChatCommand, SuspendCommand {
         if (event !is GroupMessageEvent) return BotUtil.sendMessage("本命令仅限群聊使用")
 
         val session = SessionManager.getSessionByGroup(event.group.id, RollSession::class.java)
-        if (session != null && session is RollSession) return BotUtil.sendMessage("该群已经有一个正在进行中的抽奖了!")
+        if (session.exists() && session.hasType(RollSession::class.java)) {
+            return BotUtil.sendMessage("该群已经有一个正在进行中的抽奖了!")
+        }
 
         if (args.size < 2) {
             return getHelp().convertToChain()

@@ -29,7 +29,7 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(user.id) && event is GroupMessageEvent) {
             val session = SessionManager.getSessionByGroup(event.group.id, GuessNumberSession::class.java)
-            if (session == null) {
+            if (session.exists()) {
                 when {
                     args.isEmpty() -> {
                         val answer = RandomUtil.randomInt(0, 100)
