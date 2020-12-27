@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import java.time.Duration
 import java.time.LocalDateTime
 import javax.imageio.ImageIO
@@ -104,11 +103,10 @@ fun MiraiLogger.verboseS(message: String?, throwable: Throwable?) {
 }
 
 fun BufferedImage.uploadAsImage(contact: Contact): Image {
-    val os = ByteArrayOutputStream()
-    ImageIO.write(this, "png", os)
-
-    val inputStream: InputStream = ByteArrayInputStream(os.toByteArray())
-    return runBlocking { inputStream.uploadAsImage(contact) }
+    ByteArrayOutputStream().use { os ->
+        ImageIO.write(this, "jpeg", os)
+        return runBlocking { ByteArrayInputStream(os.toByteArray()).use { it.uploadAsImage(contact) } }
+    }
 }
 
 object BotUtil {

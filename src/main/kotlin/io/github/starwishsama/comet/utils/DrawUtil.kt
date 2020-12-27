@@ -1,13 +1,16 @@
 package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.net.URLDecoder
+import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.BotVariables.yyMMddPattern
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
+import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.network.NetUtil
 import org.jsoup.Jsoup
@@ -15,7 +18,10 @@ import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStream
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.imageio.ImageIO
 
 object DrawUtil {
@@ -26,6 +32,9 @@ object DrawUtil {
     const val overTimeMessage = "抽卡次数到上限了, 可以少抽一点或者等待条数自动恢复哦~\n" +
             "命令条数现在每小时会恢复100次, 封顶1000次"
     var pictureReady = false
+
+    private const val arkNightDataApi = "https://api.github.com/repos/Kengxxiao/ArknightsGameData"
+    private const val arkNightData = "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json"
 
     /**
      * 根据抽卡结果合成图片
@@ -146,6 +155,24 @@ object DrawUtil {
         }
 
         pictureReady = true
+    }
+
+    fun arkNightDataCheck(location: File) {
+        if (!location.exists()) {
+            daemonLogger.info("正在下载 明日方舟干员数据")
+            NetUtil.downloadFile(location, arkNightData)
+        }
+
+        val result = JsonParser.parseString(NetUtil.executeHttpRequest(arkNightDataApi).body()?.string())
+
+        val updateTime = LocalDateTime.parse(result.asJsonObject["updated_at"].asString, DateTimeFormatter.ISO_DATE_TIME)
+
+        if (location.lastModified().toLocalDateTime() < updateTime) {
+            daemonLogger.info("明日方舟干员数据有更新 (${yyMMddPattern.format(updateTime)}), 正在下载")
+            val data = NetUtil.downloadFile(FileUtil.getCacheFolder(), arkNightData, location.name)
+            Files.copy(data.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            data.delete()
+        }
     }
 
     fun arkPictureIsUsable(): Boolean = cfg.arkDrawUseImage && pictureReady

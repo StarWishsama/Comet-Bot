@@ -145,11 +145,9 @@ object NetUtil {
      * 下载文件
      *
      * @param address  下载地址
-     * @param fileFolder 下载文件储存的文件夹
-     * @param fileName 下载文件的名称
+     * @param downloadPath 下载文件储存的文件夹
      */
-    fun downloadFile(fileFolder: File, address: String, fileName: String): File {
-        val file = File(fileFolder, fileName)
+    fun downloadFile(downloadPath: File, address: String): File {
         val url = URL(address)
         val conn = url.openConnection() as HttpURLConnection
 
@@ -160,8 +158,8 @@ object NetUtil {
 
             if (conn.responseCode in 200..300) {
                 val `in` = BufferedInputStream(conn.inputStream)
-                if (!file.exists()) file.createNewFile()
-                val fos = FileOutputStream(file)
+                if (!downloadPath.exists()) downloadPath.createNewFile()
+                val fos = FileOutputStream(downloadPath)
                 val bos = BufferedOutputStream(fos, 2048)
                 val data = ByteArray(2048)
                 var x: Int
@@ -178,7 +176,18 @@ object NetUtil {
             conn.disconnect()
         }
 
-        return file
+        return downloadPath
+    }
+
+    /**
+     * 下载文件
+     *
+     * @param address 下载地址
+     * @param downloadPath 下载文件储存的文件夹
+     * @param fileName 下载文件名
+     */
+    fun downloadFile(downloadPath: File, address: String, fileName: String): File {
+        return downloadFile(File(downloadPath, fileName), address)
     }
 
     fun isTimeout(t: Throwable): Boolean {

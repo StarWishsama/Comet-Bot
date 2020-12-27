@@ -89,6 +89,8 @@ object DataSetup {
         }
 
         if (arkNightData.exists()) {
+            DrawUtil.arkNightDataCheck(arkNightData)
+
             arkNight = gson.fromJson(arkNightData.getContext())
 
             daemonLogger.info("成功载入明日方舟游戏数据, 共 ${arkNight.size} 个")

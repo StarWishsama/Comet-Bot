@@ -115,9 +115,9 @@ class ArkNightPool(override val name: String = "标准寻访") : GachaPool() {
                     }.trim().toString()
                 }
                 else -> {
-                    val r6Count = drawResult.parallelStream().filter { it.rare == 6 }.count()
-                    val r5Count = drawResult.parallelStream().filter { it.rare == 5 }.count()
-                    val r4Count = drawResult.parallelStream().filter { it.rare == 4 }.count()
+                    val r6Count = drawResult.parallelStream().filter { it.rare + 1 == 6 }.count()
+                    val r5Count = drawResult.parallelStream().filter { it.rare + 1 == 4 }.count()
+                    val r4Count = drawResult.parallelStream().filter { it.rare + 1 == 3 }.count()
                     val r3Count = drawResult.size - r6Count - r5Count - r4Count
 
                     return "寻访结果:\n" +
