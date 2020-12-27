@@ -162,8 +162,10 @@ object DrawUtil {
     fun arkNightDataCheck(location: File) {
         var isOld = false
         try {
+            daemonLogger.info("明日方舟 > 检查是否为旧版本数据...")
             gson.fromJson<List<ArkNightOperator>>(location.getContext())
         } catch (ignored: Exception) {
+            daemonLogger.info("明日方舟 > 你正在使用旧版本的数据, 正在自动下载新数据")
             isOld = true
         }
 
@@ -175,7 +177,7 @@ object DrawUtil {
         val result = JsonParser.parseString(NetUtil.executeHttpRequest(arkNightDataApi).body()?.string())
         val updateTime = LocalDateTime.parse(result.asJsonObject["updated_at"].asString, DateTimeFormatter.ISO_DATE_TIME)
 
-        if (location.lastModified().toLocalDateTime() < updateTime || isOld) {
+        if (isOld || location.lastModified().toLocalDateTime() < updateTime) {
             daemonLogger.info("明日方舟干员数据有更新 (${yyMMddPattern.format(updateTime)}), 正在下载")
             val data = NetUtil.downloadFile(FileUtil.getCacheFolder(), arkNightData, location.name)
             Files.copy(data.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)
