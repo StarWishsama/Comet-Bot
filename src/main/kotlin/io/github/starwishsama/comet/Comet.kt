@@ -33,6 +33,7 @@ import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.withContext
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
@@ -242,6 +243,23 @@ object Comet {
     }
 }
 
+@OptIn(ExperimentalTime::class)
+@ExperimentalStdlibApi
+suspend fun main() {
+    initResources()
+
+    Runtime.getRuntime().addShutdownHook(Thread{ invokeWhenClose() })
+
+    if (cfg.botId == 0L) {
+        handleLogin()
+    } else {
+        daemonLogger.info("检测到登录数据, 正在自动登录账号 ${cfg.botId}")
+        Comet.startBot(cfg.botId, cfg.botPassword)
+    }
+
+    select<String> {  }
+}
+
 fun initResources() {
     filePath = FileUtil.getJarLocation()
     startTime = LocalDateTime.now()
@@ -262,21 +280,6 @@ fun initResources() {
 
     DataSetup.init()
     NetUtil.initDriver()
-}
-
-@OptIn(ExperimentalTime::class)
-@ExperimentalStdlibApi
-suspend fun main() {
-    initResources()
-
-    Runtime.getRuntime().addShutdownHook(Thread { invokeWhenClose() })
-
-    if (cfg.botId == 0L) {
-        handleLogin()
-    } else {
-        daemonLogger.info("检测到登录数据, 正在自动登录账号 ${cfg.botId}")
-        Comet.startBot(cfg.botId, cfg.botPassword)
-    }
 }
 
 @OptIn(ExperimentalTime::class)
