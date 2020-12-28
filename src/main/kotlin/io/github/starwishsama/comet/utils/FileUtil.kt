@@ -9,6 +9,7 @@ import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
+import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import java.io.File
 import java.io.FileOutputStream
@@ -111,7 +112,7 @@ object FileUtil {
 
         location.createNewFile()
 
-        val report = "发生了一个错误:\n${getBeautyStackTrace(t)}\n可能有用的信息: $message\n\n原始获取内容:\n$content"
+        val report = "发生了一个错误:\n${getBeautyStackTrace(t)}\n可能有用的信息: ${message.limitStringSize(150)}\n\n原始获取内容:\n$content"
         location.writeString(report)
         daemonLogger.warning("$reason, 错误报告已生成! 保存在 ${location.path}")
         daemonLogger.warning("你可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")

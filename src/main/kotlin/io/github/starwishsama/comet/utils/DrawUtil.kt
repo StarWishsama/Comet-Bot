@@ -1,12 +1,10 @@
 package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.net.URLDecoder
-import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.yyMMddPattern
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.ApiException
@@ -160,13 +158,14 @@ object DrawUtil {
     }
 
     fun arkNightDataCheck(location: File) {
-        var isOld = false
-        try {
-            daemonLogger.info("明日方舟 > 检查是否为旧版本数据...")
-            gson.fromJson<List<ArkNightOperator>>(location.getContext())
-        } catch (ignored: Exception) {
+        val isOld: Boolean
+
+        daemonLogger.info("明日方舟 > 检查是否为旧版本数据...")
+        if (!JsonParser.parseString(location.getContext()).isJsonObject) {
             daemonLogger.info("明日方舟 > 你正在使用旧版本的数据, 正在自动下载新数据")
             isOld = true
+        } else {
+            return
         }
 
         if (!location.exists()) {

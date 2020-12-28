@@ -18,6 +18,7 @@ import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.RuntimeUtil.getOsName
+import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -52,7 +53,7 @@ object DataSetup {
         } catch (e: RuntimeException) {
             brokenConfig = true
             e.message?.let { FileUtil.createErrorReportFile("加载配置文件失败, 部分配置文件将会立即创建备份\n", "resource", e, "", it) }
-            daemonLogger.warningS(e)
+            daemonLogger.warningS(e.stackTraceToString().limitStringSize(300))
         } finally {
             if (brokenConfig) {
                 cfgFile.createBackupFile()
