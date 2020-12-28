@@ -53,7 +53,7 @@ object DataSetup {
         } catch (e: RuntimeException) {
             brokenConfig = true
             e.message?.let { FileUtil.createErrorReportFile("加载配置文件失败, 部分配置文件将会立即创建备份\n", "resource", e, "", it) }
-            daemonLogger.warningS(e.stackTraceToString().limitStringSize(300))
+            daemonLogger.warningS(e.stackTraceToString().replace(e.message ?: "", e.message?.limitStringSize(50) ?: ""))
         } finally {
             if (brokenConfig) {
                 cfgFile.createBackupFile()
