@@ -17,7 +17,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
-def mainClass = 'io.github.starwishsama.comet.CometKt'
+def mainClass = 'io.github.starwishsama.comet.Comet'
 def miraiVersion = '2.0-M2-dev-11'
 String buildTime
 

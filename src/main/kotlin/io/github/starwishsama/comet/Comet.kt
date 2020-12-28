@@ -31,6 +31,7 @@ import io.github.starwishsama.comet.utils.RuntimeUtil.getUsedMemory
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.NetUtil
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -59,6 +60,29 @@ object Comet {
             unsetOpt(LineReader.Option.INSERT_TAB)
         }
     var isFailed = false
+
+    @JvmStatic
+    @OptIn(ExperimentalTime::class)
+    @ExperimentalStdlibApi
+    fun main(args: Array<String>) {
+        initResources()
+
+        Runtime.getRuntime().addShutdownHook(Thread { invokeWhenClose() })
+
+        try {
+            runBlocking {
+                if (cfg.botId == 0L) {
+                    handleLogin()
+                } else {
+                    daemonLogger.info("检测到登录数据, 正在自动登录账号 ${cfg.botId}")
+                    startBot(cfg.botId, cfg.botPassword)
+                }
+            }
+        } catch (e: CancellationException) {
+            // 忽略
+        }
+    }
+
 
     @ExperimentalTime
     fun startUpTask() {
@@ -240,23 +264,6 @@ object Comet {
             startBot(cfg.botId, cfg.botPassword)
         }
     }
-}
-
-@OptIn(ExperimentalTime::class)
-@ExperimentalStdlibApi
-suspend fun main() {
-    initResources()
-
-    Runtime.getRuntime().addShutdownHook(Thread{ invokeWhenClose() })
-
-    if (cfg.botId == 0L) {
-        handleLogin()
-    } else {
-        daemonLogger.info("检测到登录数据, 正在自动登录账号 ${cfg.botId}")
-        Comet.startBot(cfg.botId, cfg.botPassword)
-    }
-
-    while (true) {}
 }
 
 fun initResources() {
