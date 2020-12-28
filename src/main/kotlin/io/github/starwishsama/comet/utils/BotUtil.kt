@@ -103,9 +103,11 @@ fun MiraiLogger.verboseS(message: String?, throwable: Throwable?) {
 }
 
 fun BufferedImage.uploadAsImage(contact: Contact): Image {
-    ByteArrayOutputStream().use { os ->
-        ImageIO.write(this, "jpeg", os)
-        return runBlocking { ByteArrayInputStream(os.toByteArray()).use { it.uploadAsImage(contact) } }
+    ByteArrayOutputStream().use { byteOS ->
+        ImageIO.createImageOutputStream(byteOS).use { imOS ->
+            ImageIO.write(this, "png", imOS)
+            return runBlocking { ByteArrayInputStream(byteOS.toByteArray()).use { it.uploadAsImage(contact) } }
+        }
     }
 }
 

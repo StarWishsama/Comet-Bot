@@ -32,6 +32,7 @@ object DrawUtil {
     const val overTimeMessage = "抽卡次数到上限了, 可以少抽一点或者等待条数自动恢复哦~\n" +
             "命令条数现在每小时会恢复100次, 封顶1000次"
     var pictureReady = false
+    const val pictureCount = 181
 
     private const val arkNightDataApi = "https://api.github.com/repos/Kengxxiao/ArknightsGameData"
     private const val arkNightData = "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json"
@@ -104,7 +105,7 @@ object DrawUtil {
     fun downloadArkNightsFile() {
         val arkLoc = FileUtil.getResourceFolder().getChildFolder("ark")
 
-        if (arkNight.size > arkLoc.filesCount()) {
+        if (pictureCount > arkLoc.filesCount()) {
             val startTime = LocalDateTime.now()
             daemonLogger.info("正在下载 明日方舟图片资源文件")
 
