@@ -92,22 +92,19 @@ object CommandExecutor {
                 if (sender.id != 80000000L) {
                     if (this is GroupMessageEvent && group.isBotMuted) return@always
 
-                    val isCommand: Boolean
                     val result = dispatchCommand(this)
 
-                    isCommand = result.status.isOk()
-
                     try {
-                        if (isCommand && result.msg.isNotEmpty()) {
+                        if (result.status.isOk() && result.msg !is EmptyMessageChain) {
                             this.subject.sendMessage(result.msg)
                         }
                     } catch (e: IllegalArgumentException) {
                         BotVariables.logger.warning("正在尝试发送空消息, 执行的命令为 $result")
                     }
 
-                    if (isCommand) {
+                    if (result.status.isOk()) {
                         BotVariables.logger.debugS(
-                                "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(TimeUnit.SECONDS)}" +
+                                "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(msMode = true)}" +
                                         if (result.status.isOk()) ", 执行结果: ${result.status.name}" else ""
                         )
                     }
@@ -126,6 +123,7 @@ object CommandExecutor {
         val executedTime = LocalDateTime.now()
         val senderId = event.sender.id
         val message = event.message.contentToString()
+
         val cmd = getCommand(getCommandName(message))
 
         val debug = cmd?.getProps()?.name?.contentEquals("debug") == true
@@ -144,7 +142,9 @@ object CommandExecutor {
                     return ExecutedResult(EmptyMessageChain, cmd, CommandStatus.MoveToSession())
                 }
 
-                /** 检查是否在尝试执行被禁用命令 */
+                /**
+                 * 检查是否在尝试执行被禁用命令
+                 */
                 if (cmd != null && event is GroupMessageEvent &&
                         GroupConfigManager.getConfig(event.group.id)?.isDisabledCommand(cmd) == true) {
                     return if (BotUtil.hasNoCoolDown(user.id)) {
@@ -163,7 +163,7 @@ object CommandExecutor {
                     var splitMessage = message.substring(index, message.length).split(" ")
                     splitMessage = splitMessage.subList(1, splitMessage.size)
 
-                    BotVariables.logger.debug("[命令] $senderId 尝试执行命令: $message")
+                    BotVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.name} (原始消息: ${message})")
 
                     val status: CommandStatus
 
@@ -270,13 +270,12 @@ object CommandExecutor {
         return null
     }
 
-    private fun getCommandName(command: String): String {
-        var cmdPrefix = command
-        for (string: String in BotVariables.cfg.commandPrefix) {
-            cmdPrefix = cmdPrefix.replace(string, "")
-        }
+    private fun getCommandName(message: String): String {
+        val cmdPrefix = isCommandPrefix(message)
 
-        return cmdPrefix.split(" ")[0]
+        val index = message.indexOf(cmdPrefix) + cmdPrefix.length
+
+        return message.substring(index, message.length).split(" ")[0]
     }
 
     /**
@@ -369,7 +368,7 @@ object CommandExecutor {
 
     fun getCommands() = commands
 
-    data class ExecutedResult(val msg: MessageChain, val cmd: ChatCommand?, val status: CommandStatus = CommandStatus.Success())
+    data class ExecutedResult(val msg: MessageChain, val cmd: ChatCommand?, val status: CommandStatus = CommandStatus.NotACommand())
 
     sealed class CommandStatus(val name: String) {
         class Success: CommandStatus("成功")
@@ -377,7 +376,8 @@ object CommandExecutor {
         class Failed: CommandStatus("失败")
         class Disabled: CommandStatus("命令被禁用")
         class MoveToSession: CommandStatus("移交会话处理")
+        class NotACommand: CommandStatus("非命令")
 
-        fun isOk(): Boolean = this == Success()
+        fun isOk(): Boolean = this is Success || this is NoPermission
     }
 }

@@ -13,16 +13,15 @@ import io.github.starwishsama.comet.sessions.SessionUser
 import io.github.starwishsama.comet.sessions.commands.roll.RollSession
 import io.github.starwishsama.comet.utils.BotUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
-import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.at
 import net.mamoe.mirai.message.data.messageChainOf
 
 @CometCommand
@@ -68,12 +67,12 @@ class RollCommand : ChatCommand, SuspendCommand {
                     } else {
                         var winner = messageChainOf()
                         getWinningUsers().forEach { su ->
-                            if (su.member != null) winner = winner.plus(At(su.member))
+                            if (su.member != null) winner = winner.plus(su.member.at())
                         }
                         GlobalScope.launch {
                             group.sendMessage(
                                     BotUtil.sendMessage(
-                                            "由${(rollStarter as Member).nameCardOrNick.limitStringSize(10)}发起的抽奖开奖了!\n" +
+                                            "由${(rollStarter as Member).nameCardOrNick}发起的抽奖开奖了!\n" +
                                                     "奖品: ${rollItem}\n" +
                                                     "中奖者: "
                                     ) + winner

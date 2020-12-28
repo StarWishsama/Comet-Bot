@@ -18,7 +18,7 @@ object SessionManager {
     private val sessions: MutableList<Session> = mutableListOf()
 
     fun addSession(session: Session): Session {
-        sessions.add(session)
+        daemonLogger.verbose("创建会话 ${session::class.java.simpleName + "#" + session.hashCode()}, 结果: ${sessions.add(session)}")
         return session
     }
 
@@ -26,12 +26,12 @@ object SessionManager {
         addSession(session)
         TaskUtil.runAsync(closeAfterMinute.toLong(), TimeUnit.MINUTES) {
             session.beforeExpiredAction(session)
-            daemonLogger.info("自动关闭会话 ${session::class.java.simpleName + "#" + session.hashCode()}, 结果: ${sessions.remove(session)}")
+            daemonLogger.verbose("自动关闭会话 ${session::class.java.simpleName + "#" + session.hashCode()}, 结果: ${sessions.remove(session)}")
         }
     }
 
     fun expireSession(session: Session) {
-        daemonLogger.info("关闭会话 ${session::class.java.simpleName + "#" + session.hashCode()}, 结果: ${sessions.remove(session)}")
+        daemonLogger.verbose("关闭会话 ${session::class.java.simpleName + "#" + session.hashCode()}, 结果: ${sessions.remove(session)}")
     }
 
     @Suppress("unused")

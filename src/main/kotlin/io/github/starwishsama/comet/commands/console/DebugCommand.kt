@@ -45,6 +45,20 @@ class DebugCommand : ConsoleCommand {
                     BotVariables.switch = !BotVariables.switch
                     return "Bot > 维护模式已${if (!BotVariables.switch) "开启" else "关闭"}"
                 }
+                "session" -> {
+                    val sb = StringBuilder("目前活跃的会话列表: \n").apply {
+                        val sessions = SessionManager.getSessions()
+
+                        if (sessions.isEmpty()) {
+                            append("无")
+                        } else {
+                            for ((i, session) in sessions.withIndex()) {
+                                append(i + 1).append(" ").append(session.toString()).append("\n")
+                            }
+                        }
+                    }
+                    return sb.toString().trim()
+                }
                 else -> return getHelp()
             }
         }
