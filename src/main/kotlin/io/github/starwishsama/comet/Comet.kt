@@ -33,7 +33,6 @@ import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.withContext
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
@@ -257,7 +256,7 @@ suspend fun main() {
         Comet.startBot(cfg.botId, cfg.botPassword)
     }
 
-    select<String> {  }
+    while (true) {}
 }
 
 fun initResources() {

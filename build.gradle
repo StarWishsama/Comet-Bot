@@ -1,6 +1,5 @@
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import org.apache.tools.ant.filters.ReplaceTokens
 
 buildscript {
     repositories {
@@ -30,7 +29,7 @@ jar {
 }
 
 def gitCommitId = 'git rev-parse --short HEAD'
-String versionCode = "0.6-M2-" + gitCommitId.execute().text.trim()
+String versionCode = "0.6-M3-" + gitCommitId.execute().text.trim()
 
 group 'io.github.starwishsama.comet'
 version versionCode
@@ -39,10 +38,11 @@ processResources {
     buildTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
     println "Processing version code and other stuffs....."
 
-    from (sourceSets.main.kotlin) {
-        include 'io/github/starwishsama/comet/Versions.kt'
-        filter(ReplaceTokens, tokens: [VERSION : project.version, BUILDTIME: buildTime, MIRAIVERSION: miraiVersion])
-    }
+
+    def versionFile = 'src/main/kotlin/io/github/starwishsama/comet/Versions.kt'
+    ant.replace(file: versionFile, token: '@VERSION@', value: version)
+    ant.replace(file: versionFile, token: '@BUILDTIME@', value: buildTime)
+    ant.replace(file: versionFile, token: '@MIRAI@', value: miraiVersion)
 }
 
 jar.dependsOn processResources
