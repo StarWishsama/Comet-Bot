@@ -22,7 +22,7 @@ import java.util.stream.Collectors
 class ArkNightPool(override val name: String = "标准寻访" ) : GachaPool() {
     override val tenjouCount: Int = -1
     override val tenjouRare: Int = -1
-    override val poolItems: MutableList<ArkNightOperator> = BotVariables.arkNight.filter { hiddenOperators.contains(it.obtain ?: "") }.toMutableList()
+    override val poolItems: MutableList<ArkNightOperator> = BotVariables.arkNight.filter { !hiddenOperators.contains(it.obtain ?: return@filter false) }.toMutableList()
 
     override fun doDraw(time: Int): List<ArkNightOperator> {
         val result = mutableListOf<ArkNightOperator>()
@@ -82,7 +82,8 @@ class ArkNightPool(override val name: String = "标准寻访" ) : GachaPool() {
         }
 
         val rareItems = poolItems.parallelStream().filter { it.rare == (rare - 1) }.collect(Collectors.toList())
-        return rareItems[RandomUtil.randomInt(0, rareItems.size)]
+        require(rareItems.isNotEmpty()) { "获取干员列表失败: 空列表. 等级为 ${rare - 1}, 池内干员数 ${poolItems.size}" }
+        return rareItems[RandomUtil.randomInt(0, rareItems.size - 1)]
     }
 
     /**
