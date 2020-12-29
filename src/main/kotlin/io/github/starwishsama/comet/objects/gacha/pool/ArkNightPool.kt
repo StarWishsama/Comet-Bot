@@ -81,7 +81,7 @@ class ArkNightPool(override val name: String = "标准寻访" ) : GachaPool() {
             }
         }
 
-        val rareItems = poolItems.parallelStream().filter { it.rare == rare }.collect(Collectors.toList())
+        val rareItems = poolItems.parallelStream().filter { it.rare == (rare - 1) }.collect(Collectors.toList())
         return rareItems[RandomUtil.randomInt(0, rareItems.size)]
     }
 
