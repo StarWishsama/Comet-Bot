@@ -93,4 +93,6 @@ object BotVariables {
     val yyMMddPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
 
     val arkNightPools = mutableListOf<ArkNightPool>()
+
+    var hiddenOperators = mutableListOf<String>()
 }

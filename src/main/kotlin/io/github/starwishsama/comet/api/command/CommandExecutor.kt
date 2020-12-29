@@ -378,6 +378,6 @@ object CommandExecutor {
         class MoveToSession: CommandStatus("移交会话处理")
         class NotACommand: CommandStatus("非命令")
 
-        fun isOk(): Boolean = this is Success || this is NoPermission
+        fun isOk(): Boolean = this is Success || this is NoPermission || this is Failed
     }
 }

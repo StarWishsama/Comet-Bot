@@ -280,12 +280,14 @@ object FileUtil {
         } else {
             val f = File(getResourceFolder(), fileName)
 
-            if (!f.exists()) {
-                f.createNewFile()
-            }
 
             if (f.lastModified().toLocalDateTime() >
-                    entry.lastModifiedTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()) {
+                    entry.lastModifiedTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime() || !f.exists()) {
+
+                if (!f.exists()) {
+                    f.createNewFile()
+                }
+
                 FileOutputStream(f).use { fos ->
                     val byteArray = ByteArray(1024)
                     var i: Int

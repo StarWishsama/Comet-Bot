@@ -11,6 +11,7 @@ import io.github.starwishsama.comet.BotVariables.arkNightPools
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.gson
+import io.github.starwishsama.comet.BotVariables.hiddenOperators
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.CometConfig
@@ -95,6 +96,10 @@ object DataSetup {
         DrawUtil.arkNightDataCheck(arkNightData)
 
         if (arkNightData.exists()) {
+
+            @Suppress("UNCHECKED_CAST")
+            hiddenOperators = Yaml.default.decodeMapFromString(File(FileUtil.getResourceFolder(), "hidden_operators.yml").getContext())["hiddenOperators"] as MutableList<String>
+
             JsonParser.parseString(arkNightData.getContext()).asJsonObject.forEach { _, e ->
                 arkNight.add(gson.fromJson(e))
             }
@@ -115,7 +120,7 @@ object DataSetup {
                 }
             }
 
-            arkNightPools.add(ArkNightPool(poolItems = arkNight))
+            arkNightPools.add(ArkNightPool())
         } else {
             daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
         }

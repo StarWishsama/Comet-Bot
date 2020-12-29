@@ -1,6 +1,8 @@
 package io.github.starwishsama.comet.objects.gacha.pool
 
 import cn.hutool.core.util.RandomUtil
+import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.hiddenOperators
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.GachaItem
@@ -17,9 +19,10 @@ import java.util.stream.Collectors
  *
  * @author Nameless
  */
-class ArkNightPool(override val name: String = "标准寻访", override val poolItems: MutableList<ArkNightOperator>) : GachaPool() {
+class ArkNightPool(override val name: String = "标准寻访" ) : GachaPool() {
     override val tenjouCount: Int = -1
     override val tenjouRare: Int = -1
+    override val poolItems: MutableList<ArkNightOperator> = BotVariables.arkNight.filter { hiddenOperators.contains(it.obtain ?: "") }.toMutableList()
 
     override fun doDraw(time: Int): List<ArkNightOperator> {
         val result = mutableListOf<ArkNightOperator>()
@@ -78,7 +81,7 @@ class ArkNightPool(override val name: String = "标准寻访", override val pool
             }
         }
 
-        val rareItems = poolItems.parallelStream().filter { it.obtain.contains("标准寻访") && it.rare == rare }.collect(Collectors.toList())
+        val rareItems = poolItems.parallelStream().filter { it.rare == rare }.collect(Collectors.toList())
         return rareItems[RandomUtil.randomInt(0, rareItems.size)]
     }
 
