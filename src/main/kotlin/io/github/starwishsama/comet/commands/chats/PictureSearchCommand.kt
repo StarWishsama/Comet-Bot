@@ -15,7 +15,6 @@ import io.github.starwishsama.comet.utils.BotUtil.sendMessage
 import io.github.starwishsama.comet.utils.network.PictureSearchUtil
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
-import net.mamoe.mirai.message.data.ExperimentalMessageKey
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.message.data.MessageChain
@@ -25,7 +24,7 @@ import java.util.*
 @CometCommand
 class PictureSearchCommand : ChatCommand, SuspendCommand {
 
-    @OptIn(MiraiExperimentalApi::class, ExperimentalMessageKey::class)
+    @OptIn(MiraiExperimentalApi::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotUtil.hasNoCoolDown(event.sender.id)) {
             if (args.isEmpty()) {
@@ -67,15 +66,15 @@ class PictureSearchCommand : ChatCommand, SuspendCommand {
         /ytst source [API名称] 修改搜图源
     """.trimIndent()
 
-    @OptIn(MiraiExperimentalApi::class, ExperimentalMessageKey::class)
+    @OptIn(MiraiExperimentalApi::class)
     override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
         SessionManager.expireSession(session)
         val image = event.message[Image]
         if (image != null) {
-            event.reply("请稍等...")
-            event.reply(handlePicSearch(image.queryUrl()))
+            event.subject.sendMessage("请稍等...")
+            event.subject.sendMessage(handlePicSearch(image.queryUrl()))
         } else {
-            event.reply("请发送图片!")
+            event.subject.sendMessage("请发送图片!")
         }
     }
 

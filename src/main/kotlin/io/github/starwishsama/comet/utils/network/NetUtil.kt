@@ -27,13 +27,13 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
-fun Response.isType(typeName: String): Boolean = headers()["content-type"]?.contains(typeName) == true
+fun Response.isType(typeName: String): Boolean = headers["content-type"]?.contains(typeName) == true
 
 object NetUtil {
     lateinit var driver: WebDriver
 
     const val defaultUA =
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36"
 
 
     /**
@@ -51,19 +51,20 @@ object NetUtil {
      * @param proxyPort 代理端口 (如果需要使用的话)
      * @param action 执行请求前的额外操作, 如添加 header 等. 详见 [Request.Builder]
      */
-    fun executeRequest(url: String,
-                       timeout: Long = 2,
-                       proxyUrl: String = cfg.proxyUrl,
-                       proxyPort: Int = cfg.proxyPort,
-                       action: Request.Builder.() -> Request.Builder = {
-                               header("user-agent", defaultUA)
-                           }
+    fun executeRequest(
+        url: String,
+        timeout: Long = 2,
+        proxyUrl: String = cfg.proxyUrl,
+        proxyPort: Int = cfg.proxyPort,
+        action: Request.Builder.() -> Request.Builder = {
+            header("user-agent", defaultUA)
+        }
     ): Call {
         val builder = OkHttpClient().newBuilder()
-                .connectTimeout(timeout, TimeUnit.SECONDS)
-                .followRedirects(true)
-                .readTimeout(timeout, TimeUnit.SECONDS)
-                .hostnameVerifier { _, _ -> true }
+            .connectTimeout(timeout, TimeUnit.SECONDS)
+            .followRedirects(true)
+            .readTimeout(timeout, TimeUnit.SECONDS)
+            .hostnameVerifier { _, _ -> true }
 
 
         try {
@@ -106,22 +107,23 @@ object NetUtil {
      * @param autoClose 是否自动关闭 [ResponseBody], 适用于需要使用 bodyStream 等环境
      * @param autoCloseDelay 自动关闭 [ResponseBody] 的延迟秒数
      */
-    fun executeHttpRequest(url: String,
-                           timeout: Long = 2,
-                           proxyUrl: String = cfg.proxyUrl,
-                           proxyPort: Int = cfg.proxyPort,
-                           call: Request.Builder.() -> Request.Builder = {
-                               header("user-agent", defaultUA)
-                           },
-                           autoClose: Boolean = false,
-                           autoCloseDelay: Long = 15
+    fun executeHttpRequest(
+        url: String,
+        timeout: Long = 2,
+        proxyUrl: String = cfg.proxyUrl,
+        proxyPort: Int = cfg.proxyPort,
+        call: Request.Builder.() -> Request.Builder = {
+            header("user-agent", defaultUA)
+        },
+        autoClose: Boolean = false,
+        autoCloseDelay: Long = 15
     ): Response {
         val startTime = System.nanoTime()
 
         var result: Response? = null
 
         try {
-           result = executeRequest(url, timeout, proxyUrl, proxyPort, call).execute()
+            result = executeRequest(url, timeout, proxyUrl, proxyPort, call).execute()
         } catch (e: IOException) {
             daemonLogger.warning("执行网络操作失败\n" + e.stackTraceToString())
         } finally {
@@ -129,7 +131,7 @@ object NetUtil {
 
             if (autoClose) {
                 TaskUtil.runAsync(autoCloseDelay) {
-                    if (result?.body() != null) {
+                    if (result?.body != null) {
                         result.close()
                     }
                 }
@@ -139,7 +141,8 @@ object NetUtil {
         return result ?: throw ApiException("执行网络操作失败")
     }
 
-    fun getPageContent(url: String, timeout: Long = 2): String? = executeHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort).body()?.string()
+    fun getPageContent(url: String, timeout: Long = 2): String? =
+        executeHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort).body?.string()
 
     /**
      * 下载文件
@@ -216,30 +219,30 @@ object NetUtil {
      * @param extraExecute 执行的额外操作, 如执行脚本
      */
     fun getScreenshot(
-            address: String, extraExecute: WebDriver.() -> Unit = {
-                // 获取推文使用, 如有其他需求请自行重载
-                val wait = WebDriverWait(this, 50, 1)
+        address: String, extraExecute: WebDriver.() -> Unit = {
+            // 获取推文使用, 如有其他需求请自行重载
+            val wait = WebDriverWait(this, 50, 1)
 
-                // 等待推文加载完毕再截图
-                wait.until(ExpectedCondition { webDriver ->
-                    webDriver?.findElement(By.cssSelector("article"))
-                    var tag: By? = null
-                    try {
-                        tag = By.tagName("img")
-                    } catch (ignored: IllegalArgumentException) {
-                        // 部分推文是没有图片的
-                    }
-                    tag?.let { webDriver?.findElement(it) }
-                })
+            // 等待推文加载完毕再截图
+            wait.until(ExpectedCondition { webDriver ->
+                webDriver?.findElement(By.cssSelector("article"))
+                var tag: By? = null
+                try {
+                    tag = By.tagName("img")
+                } catch (ignored: IllegalArgumentException) {
+                    // 部分推文是没有图片的
+                }
+                tag?.let { webDriver?.findElement(it) }
+            })
 
-                // 执行脚本获取合适的推文宽度
-                val jsExecutor = (this as JavascriptExecutor)
-                val width =
-                        jsExecutor.executeScript("""return document.querySelector("section").getBoundingClientRect().bottom""") as Double
+            // 执行脚本获取合适的推文宽度
+            val jsExecutor = (this as JavascriptExecutor)
+            val width =
+                jsExecutor.executeScript("""return document.querySelector("section").getBoundingClientRect().bottom""") as Double
 
-                // 调整窗口大小
-                manage().window().size = Dimension(640, width.toInt())
-            }
+            // 调整窗口大小
+            manage().window().size = Dimension(640, width.toInt())
+        }
     ): File? {
         try {
             if (!::driver.isInitialized) return null
@@ -300,7 +303,8 @@ object NetUtil {
 
         Socket(cfg.proxyUrl, cfg.proxyPort).use {
             try {
-                val connection = (URL(customUrl).openConnection(Proxy(cfg.proxyType, it.remoteSocketAddress))) as HttpURLConnection
+                val connection =
+                    (URL(customUrl).openConnection(Proxy(cfg.proxyType, it.remoteSocketAddress))) as HttpURLConnection
                 connection.connectTimeout = 2000
                 connection.connect()
 
@@ -314,8 +318,8 @@ object NetUtil {
     fun getRedirectedURL(origin: String): String {
         val request = executeHttpRequest(origin)
 
-        if (request.priorResponse()?.isRedirect == false) return origin
+        if (request.priorResponse?.isRedirect == false) return origin
 
-        return request.priorResponse()?.request()?.url().toString()
+        return request.priorResponse?.request?.url.toString()
     }
 }

@@ -116,7 +116,7 @@ object MusicUtil {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                picIs = response.body()?.byteStream()
+                picIs = response.body?.byteStream()
             }
 
         })

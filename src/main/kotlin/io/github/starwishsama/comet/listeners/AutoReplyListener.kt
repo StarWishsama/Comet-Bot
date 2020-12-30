@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.listeners
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
+import net.mamoe.mirai.message.data.MessageSource.Key.quote
 
 object AutoReplyListener : NListener {
     override fun register(bot: Bot) {
@@ -16,14 +17,14 @@ object AutoReplyListener : NListener {
                 cfg.keyWordReply.forEach {
                     it.keyWords.forEach { keyWord ->
                         if (messageContent.contains(keyWord)) {
-                            quoteReply(it.reply.toMessageChain(subject))
+                            subject.sendMessage(message.quote() + it.reply.toMessageChain(subject))
                             return@always
                         }
                     }
 
                     it.pattern.forEach { pattern ->
                         if (pattern.matcher(messageContent).find()) {
-                            quoteReply(it.reply.toMessageChain(subject))
+                            subject.sendMessage(message.quote() + it.reply.toMessageChain(subject))
                             return@always
                         }
                     }

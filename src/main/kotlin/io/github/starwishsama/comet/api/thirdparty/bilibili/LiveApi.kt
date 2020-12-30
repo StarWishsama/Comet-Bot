@@ -49,7 +49,7 @@ object LiveApi : ApiExecutor {
 
         result.use {
             if (result.isSuccessful) {
-                val info = result.body()?.string()?.let { gson.fromJson<OldLiveInfo>(it) }
+                val info = result.body?.string()?.let { gson.fromJson<OldLiveInfo>(it) }
                 if (info?.code != 0) {
                     return info?.data?.roomId ?: -1
                 }

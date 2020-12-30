@@ -174,7 +174,7 @@ object DrawUtil {
             NetUtil.downloadFile(location, arkNightData)
         }
 
-        val result = JsonParser.parseString(NetUtil.executeHttpRequest(arkNightDataApi).body()?.string())
+        val result = JsonParser.parseString(NetUtil.executeHttpRequest(arkNightDataApi).body?.string())
         val updateTime = LocalDateTime.parse(result.asJsonObject["updated_at"].asString, DateTimeFormatter.ISO_DATE_TIME)
 
         if (isOld || location.lastModified().toLocalDateTime() < updateTime) {

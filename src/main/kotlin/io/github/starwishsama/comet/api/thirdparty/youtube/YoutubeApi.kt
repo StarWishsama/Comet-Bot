@@ -43,7 +43,7 @@ object YoutubeApi : ApiExecutor {
         ).use { response ->
 
             if (response.isSuccessful) {
-                val body = response.body()?.string() ?: return null
+                val body = response.body?.string() ?: return null
                 /** @TODO 类型自动选择, 类似于 BiliBili 的动态解析 */
                 try {
                     return BotVariables.gson.fromJson(body, SearchVideoResult::class.java)

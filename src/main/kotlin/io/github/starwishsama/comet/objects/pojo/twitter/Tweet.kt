@@ -181,7 +181,7 @@ data class Tweet(
             val url = getPictureUrl(true) ?: return this.asMessageChain()
 
             val image = runBlocking {
-                val execute = NetUtil.executeHttpRequest(url).body()
+                val execute = NetUtil.executeHttpRequest(url).body
                 execute?.byteStream()?.uploadAsImage(target)
             }
 

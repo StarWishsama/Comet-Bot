@@ -13,6 +13,7 @@ import io.github.starwishsama.comet.utils.BotUtil
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.MessageSource.Key.quote
 
 @CometCommand
 class RSPCommand : ChatCommand, SuspendCommand {
@@ -45,17 +46,17 @@ class RSPCommand : ChatCommand, SuspendCommand {
                     val gameStatus = RockPaperScissors.isWin(player, system)
 
                     when (RockPaperScissors.isWin(player, system)) {
-                        -1 -> event.quoteReply(BotUtil.sendMessage("平局! 我出的是${system.display[0]}"))
-                        0 -> event.quoteReply(BotUtil.sendMessage("你输了! 我出的是${system.display[0]}"))
-                        1 -> event.quoteReply(BotUtil.sendMessage("你赢了! 我出的是${system.display[0]}"))
-                        else -> event.quoteReply(BotUtil.sendMessage("这合理吗?"))
+                        -1 -> event.subject.sendMessage(event.message.quote() + BotUtil.sendMessage("平局! 我出的是${system.display[0]}"))
+                        0 -> event.subject.sendMessage(event.message.quote() + BotUtil.sendMessage("你输了! 我出的是${system.display[0]}"))
+                        1 -> event.subject.sendMessage(event.message.quote() + BotUtil.sendMessage("你赢了! 我出的是${system.display[0]}"))
+                        else -> event.subject.sendMessage(event.message.quote() + BotUtil.sendMessage("这合理吗?"))
                     }
 
                     if (gameStatus in -1..1) {
                         SessionManager.expireSession(session)
                     }
                 } else {
-                    event.quoteReply(BotUtil.sendMessage("你的拳法杂乱无章, 这合理吗?"))
+                    event.subject.sendMessage(event.message.quote() + BotUtil.sendMessage("你的拳法杂乱无章, 这合理吗?"))
                 }
             } finally {
                 inProgressPlayer.remove(user.id)

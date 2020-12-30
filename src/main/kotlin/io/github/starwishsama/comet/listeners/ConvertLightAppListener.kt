@@ -13,7 +13,6 @@ import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.globalEventChannel
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.EmptyMessageChain
-import net.mamoe.mirai.message.data.ExperimentalMessageKey
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.utils.MiraiExperimentalApi
@@ -21,7 +20,6 @@ import kotlin.time.ExperimentalTime
 
 object ConvertLightAppListener : NListener {
     @MiraiExperimentalApi
-    @ExperimentalMessageKey
     @ExperimentalTime
     override fun register(bot: Bot) {
         bot.globalEventChannel().subscribeGroupMessages {

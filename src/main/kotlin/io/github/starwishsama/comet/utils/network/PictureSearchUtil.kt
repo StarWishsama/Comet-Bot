@@ -26,7 +26,7 @@ object PictureSearchUtil {
                 timeout = 5
         ).use {response ->
             if (response.isSuccessful && response.isType(ContentType.JSON.value)) {
-                val body = response.body()?.string() ?: return PicSearchResult.emptyResult()
+                val body = response.body?.string() ?: return PicSearchResult.emptyResult()
                 try {
                     val resultBody = JsonParser.parseString(body)
                     if (resultBody.isJsonObject) {
@@ -34,11 +34,12 @@ object PictureSearchUtil {
                         val similarity = resultJson["header"].asJsonObject["similarity"].asDouble
                         val pictureUrl = resultJson["header"].asJsonObject["thumbnail"].asString
                         val originalUrl = resultJson["data"].asJsonObject["ext_urls"].asJsonArray[0].asString
-                        return PicSearchResult(pictureUrl, originalUrl, similarity, response.request().url().toString())
+                        return PicSearchResult(pictureUrl, originalUrl, similarity, response.request.url.toString())
                     }
                 } catch (e: Exception) {
                     BotVariables.logger.error("[以图搜图] 在解析 API 传回的 json 时出现了问题", e)
-                    FileUtil.createErrorReportFile(type = "picsearch", t = e, content = body, message = "Request URL: ${response.request().url()}")
+                    FileUtil.createErrorReportFile(type = "picsearch", t = e, content = body,
+                        message = "Request URL: ${response.request.url}")
                 }
             }
         }

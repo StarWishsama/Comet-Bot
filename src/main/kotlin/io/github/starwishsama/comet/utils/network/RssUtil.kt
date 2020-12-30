@@ -39,7 +39,7 @@ object RssUtil {
 
     private fun getRSSItems(address: String): List<SyndEntry> {
         return try {
-            val response = NetUtil.executeHttpRequest(address, autoClose = true).body()
+            val response = NetUtil.executeHttpRequest(address, autoClose = true).body
             val stream = response?.byteStream()
 
             if (response != null && stream != null) {

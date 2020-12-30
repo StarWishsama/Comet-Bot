@@ -15,7 +15,6 @@ import kotlin.time.ExperimentalTime
 
 object RepeatListener : NListener {
     @MiraiExperimentalApi
-    @ExperimentalMessageKey
     @ExperimentalTime
     override fun register(bot: Bot) {
         bot.eventChannel.subscribeGroupMessages {
@@ -28,7 +27,6 @@ object RepeatListener : NListener {
     }
 
     @MiraiExperimentalApi
-    @ExperimentalMessageKey
     private suspend fun handleRepeat(event: GroupMessageEvent, chance: Double) {
         if (event.message[QuoteReply] == null && chance in 0.50..0.505) {
             cfg.commandPrefix.forEach {

@@ -21,6 +21,7 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.asMessageChain
 import kotlin.time.ExperimentalTime
@@ -91,7 +92,7 @@ class TwitterCommand : ChatCommand {
     @ExperimentalTime
     private suspend fun getTweetToMessageChain(args: List<String>, event: MessageEvent): MessageChain {
         return if (args.size > 1) {
-            event.quoteReply(BotUtil.sendMessage("正在查询, 请稍等"))
+            event.subject.sendMessage(event.message.quote() + BotUtil.sendMessage("正在查询, 请稍等"))
             try {
                 if (args.size > 2) getTweetWithDesc(args[1], event.subject, args[2].toInt(), 1 + args[2].toInt())
                 else getTweetWithDesc(args[1], event.subject, 0, 1)

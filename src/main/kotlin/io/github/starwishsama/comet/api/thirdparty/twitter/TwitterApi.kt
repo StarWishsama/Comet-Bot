@@ -113,7 +113,7 @@ object TwitterApi : ApiExecutor {
             var bodyCopy = ""
 
             try {
-                val result = conn.body()
+                val result = conn.body
 
                 val body = result?.string()
                 if (body != null) {
@@ -160,8 +160,9 @@ object TwitterApi : ApiExecutor {
                 }
         ).use { request ->
             if (request.isSuccessful) {
-                val tweetList = parseJsonToTweet(request.body()?.string()
-                        ?: return emptyList(), request.request().url().toString())
+                val tweetList = parseJsonToTweet(
+                    request.body?.string()
+                        ?: return emptyList(), request.request.url.toString())
                 return if (tweetList.isNotEmpty()) {
                     tweetList.sortedByDescending { it.getSentTime() }
                 } else {
@@ -195,8 +196,9 @@ object TwitterApi : ApiExecutor {
                 }
         ).use { request ->
             return if (request.isSuccessful && request.isType(ContentType.JSON.value)) {
-                val tweet = parseJsonToTweet(request.body()?.string()
-                        ?: return null, request.request().url().toString())
+                val tweet = parseJsonToTweet(
+                    request.body?.string()
+                        ?: return null, request.request.url.toString())
                 if (tweet.isNotEmpty()) {
                     tweet[0]
                 } else {

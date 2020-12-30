@@ -20,6 +20,7 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.at
 import org.apache.commons.lang3.StringUtils
 
@@ -100,18 +101,20 @@ class ArkNightCommand : ChatCommand {
     """.trimIndent()
 
     private suspend fun generatePictureGachaResult(pool: ArkNightPool, event: MessageEvent, user: BotUser, ops: List<ArkNightOperator>): MessageChain {
-        event.reply("请稍等...")
+        event.subject.sendMessage("请稍等...")
 
         return if (ops.isNotEmpty()) {
             // 只获取最后十个
             val result = DrawUtil.combineArkOpImage(if (ops.size <= 10) ops else ops.subList(ops.size - 11, ops.size - 1))
             if (result.lostOps.isNotEmpty())
-                event.quoteReply(sendMessage("由于缺失资源文件, 以下干员无法显示 :(\n" +
-                        buildString {
-                            result.lostOps.forEach {
-                                append("${it.name},")
-                            }
-                        }.removeSuffix(",")))
+                event.subject.sendMessage(
+                    event.message.quote() + sendMessage("由于缺失资源文件, 以下干员无法显示 :(\n" +
+                            buildString {
+                                result.lostOps.forEach {
+                                    append("${it.name},")
+                                }
+                            }.removeSuffix(","))
+                )
             val gachaImage = withContext(Dispatchers.IO) { result.image.uploadAsImage(event.subject) }
 
             val reply = gachaImage.plus("\n").plus(pool.getArkDrawResultAsString(user, ops))

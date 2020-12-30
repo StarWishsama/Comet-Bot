@@ -56,10 +56,10 @@ object BiliBiliMainApi : ApiExecutor {
                 url = dynamicByIdUrl + id.toString()
         ).use { res ->
             if (res.isSuccessful) {
-                val body = res.body()?.string() ?: throw ApiException("无法获取动态页面")
+                val body = res.body?.string() ?: throw ApiException("无法获取动态页面")
                 return gson.fromJson(body)
             } else {
-                throw ApiException("无法获取动态页面, 状态码 ${res.code()}")
+                throw ApiException("无法获取动态页面, 状态码 ${res.code}")
             }
         }
     }
@@ -74,11 +74,11 @@ object BiliBiliMainApi : ApiExecutor {
         NetUtil.executeHttpRequest(
                 url = dynamicUrl.replace("%uid%", mid.toString())
         ).use { response ->
-            val url = response.request().url().toString()
+            val url = response.request.url.toString()
             var body = ""
             try {
                 if (response.isSuccessful) {
-                    body = response.body()?.string() ?: return null
+                    body = response.body?.string() ?: return null
                     return gson.fromJson(body)
                 }
             } catch (e: Exception) {
