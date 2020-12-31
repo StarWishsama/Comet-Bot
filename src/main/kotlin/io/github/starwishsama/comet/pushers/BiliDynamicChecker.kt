@@ -96,9 +96,10 @@ object BiliDynamicChecker : CometPusher {
     }
 
     override fun push() {
-        pushPool.forEach { pdh ->
-            perGroup.forEach { cfg ->
-                cfg.biliSubscribers.forEach bili@ { uid ->
+
+        perGroup.forEach { cfg ->
+            cfg.biliSubscribers.forEach { uid ->
+                getHistoryByUID(uid).forEach bili@ { pdh ->
                     if (pdh.target.contains(cfg.id) && !cfg.biliPushEnabled) {
                         pdh.target.remove(cfg.id)
                         return@bili
@@ -111,8 +112,7 @@ object BiliDynamicChecker : CometPusher {
             }
         }
 
-        val count = pushToGroups()
-        if (count > 0) daemonLogger.verboseS("Push bili dynamic success, have pushed $count group(s)!")
+        daemonLogger.verboseS("Push bili dynamic success, have pushed ${pushToGroups()} group(s)!")
 
         lastPushTime = LocalDateTime.now()
     }
@@ -167,4 +167,6 @@ object BiliDynamicChecker : CometPusher {
     fun getPool(): MutableSet<PushDynamicHistory> {
         return pushPool
     }
+
+    private fun getHistoryByUID(uid: Long): List<PushDynamicHistory> = pushPool.filter { it.uid == uid }
 }
