@@ -23,6 +23,7 @@ import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.RssUtil
+import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -217,6 +218,11 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                         } else {
                             return "NaN".convertToChain()
                         }
+                    }
+                }
+                "quit" -> {
+                    if (event is GroupMessageEvent) {
+                        event.group.quit()
                     }
                 }
                 else -> return "Bot > 命令不存在\n${getHelp()}".convertToChain()
