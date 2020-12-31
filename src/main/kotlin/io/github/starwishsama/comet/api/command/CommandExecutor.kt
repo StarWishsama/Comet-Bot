@@ -9,7 +9,7 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.DaemonSession
 import io.github.starwishsama.comet.sessions.SessionGetResult
 import io.github.starwishsama.comet.sessions.SessionManager
-import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
@@ -147,8 +147,8 @@ object CommandExecutor {
                  */
                 if (cmd != null && event is GroupMessageEvent &&
                         GroupConfigManager.getConfig(event.group.id)?.isDisabledCommand(cmd) == true) {
-                    return if (BotUtil.hasNoCoolDown(user.id)) {
-                        ExecutedResult(BotUtil.sendMessage("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
+                    return if (CometUtil.isNoCoolDown(user.id)) {
+                        ExecutedResult(CometUtil.sendMessage("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
                     } else {
                         ExecutedResult(EmptyMessageChain, cmd, CommandStatus.Disabled())
                     }
@@ -173,7 +173,7 @@ object CommandExecutor {
                         cmd.execute(event, splitMessage, user)
                     } else {
                         status = CommandStatus.NoPermission()
-                        BotUtil.sendMessage("你没有权限!")
+                        CometUtil.sendMessage("你没有权限!")
                     }
 
                     return ExecutedResult(result, cmd, status)
@@ -185,9 +185,9 @@ object CommandExecutor {
                 } else {
                     BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message}, 发送者: $senderId", t)
                     if (user.isBotOwner()) {
-                        ExecutedResult(BotUtil.sendMessage("在试图执行命令时发生了一个错误\n简易报错信息 (如果有的话):\n${t.javaClass.name}: ${t.message?.limitStringSize(30)}"), cmd, CommandStatus.Failed())
+                        ExecutedResult(CometUtil.sendMessage("在试图执行命令时发生了一个错误\n简易报错信息 (如果有的话):\n${t.javaClass.name}: ${t.message?.limitStringSize(30)}"), cmd, CommandStatus.Failed())
                     } else {
-                        ExecutedResult(BotUtil.sendMessage("在试图执行命令时发生了一个错误, 请联系管理员"), cmd, CommandStatus.Failed())
+                        ExecutedResult(CometUtil.sendMessage("在试图执行命令时发生了一个错误, 请联系管理员"), cmd, CommandStatus.Failed())
                     }
                 }
             }

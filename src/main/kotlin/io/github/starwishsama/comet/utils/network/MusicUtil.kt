@@ -7,7 +7,7 @@ import com.google.gson.*
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.logger
-import io.github.starwishsama.comet.utils.BotUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact

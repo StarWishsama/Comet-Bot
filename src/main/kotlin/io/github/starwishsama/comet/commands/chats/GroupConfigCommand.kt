@@ -7,8 +7,8 @@ import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -19,13 +19,13 @@ import java.util.*
 @CometCommand
 class GroupConfigCommand : ChatCommand, UnDisableableCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.hasNoCoolDown(user.id) && event is GroupMessageEvent) {
+        if (CometUtil.isNoCoolDown(user.id) && event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
                 val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
                 when (args[0].toLowerCase(Locale.ROOT)) {
                     "helper", "群管" -> {
                         return if (args.size == 2) {
-                            val target = BotUtil.parseAtAsBotUser(event, args[1])
+                            val target = CometUtil.parseAtAsBotUser(event, args[1])
                             if (target != null) {
                                 if (cfg.isHelper(target.id)) {
                                     cfg.removeHelper(target.id)

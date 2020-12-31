@@ -1,6 +1,6 @@
 package net.kronos.rkon.core
 
-import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.CometUtil
 import net.kronos.rkon.core.ex.AuthenticationException
 import java.io.IOException
 import java.net.Socket
@@ -82,7 +82,7 @@ class Rcon(host: String, port: Int, password: ByteArray?) {
         require(payload.trim { it <= ' ' }.isNotEmpty()) { "Payload can't be null or empty" }
         val response = send(RconPacket.SERVERDATA_EXECCOMMAND, payload.toByteArray())
         if (response != null) {
-            return BotUtil.sendMessage(String(response.payload, charset)).contentToString()
+            return CometUtil.sendMessage(String(response.payload, charset)).contentToString()
         }
         return "发生异常"
     }

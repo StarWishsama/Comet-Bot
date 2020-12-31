@@ -7,8 +7,8 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.pushers.HitokotoUpdater
-import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.contact.nameCardOrNick
@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 @CometCommand
 class CheckInCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.hasNoCoolDown(event.sender.id) && event is GroupMessageEvent) {
+        if (CometUtil.isNoCoolDown(event.sender.id) && event is GroupMessageEvent) {
             return if (user.isChecked()) {
                 "你今天已经签到过了! 输入 /cx 可查询签到信息".sendMessage()
             } else {

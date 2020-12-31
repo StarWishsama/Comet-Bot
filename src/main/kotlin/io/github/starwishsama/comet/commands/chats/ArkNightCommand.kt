@@ -8,8 +8,8 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
-import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.DrawUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.uploadAsImage
@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils
 class ArkNightCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         val pool = BotVariables.arkNightPools[0]
-        if (BotUtil.hasNoCoolDown(event.sender.id, 30)) {
+        if (CometUtil.isNoCoolDown(event.sender.id, 30)) {
             if (args.isNotEmpty()) {
                 when (args[0]) {
                     "单次寻访", "1", "单抽" -> {

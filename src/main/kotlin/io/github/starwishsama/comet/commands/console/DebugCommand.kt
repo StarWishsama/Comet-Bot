@@ -9,7 +9,7 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.sessions.SessionManager
-import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.RuntimeUtil
 import kotlin.time.ExperimentalTime
 
@@ -37,7 +37,7 @@ class DebugCommand : ConsoleCommand {
                     return ("彗星 Bot ${Versions.version}\n" +
                             "Comet 状态: ${bot.isOnline} | ${BotVariables.switch}\n" +
                             "已注册命令数: ${CommandExecutor.countCommands()}\n" +
-                            BotUtil.getMemoryUsage() + "\n" +
+                            CometUtil.getMemoryUsage() + "\n" +
                             "CPU 负载: ${RuntimeUtil.getOperatingSystemBean().systemLoadAverage}\n" +
                             "构建时间: ${Versions.buildTime}"
                             )

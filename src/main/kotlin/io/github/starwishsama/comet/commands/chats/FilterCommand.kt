@@ -7,8 +7,8 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.group.PerGroupConfig
-import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -17,7 +17,7 @@ import net.mamoe.mirai.message.data.MessageChain
 
 class FilterCommand: ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.hasNoCoolDown(user.id)) {
+        if (CometUtil.isNoCoolDown(user.id)) {
             if (args.isEmpty()) return getHelp().sendMessage()
             return when (args[0]) {
                 "add", "tj", "添加", "加" -> {

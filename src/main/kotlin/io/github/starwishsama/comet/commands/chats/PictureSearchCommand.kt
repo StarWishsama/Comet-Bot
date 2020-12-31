@@ -10,8 +10,8 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
-import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.network.PictureSearchUtil
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -26,7 +26,7 @@ class PictureSearchCommand : ChatCommand, SuspendCommand {
 
     @OptIn(MiraiExperimentalApi::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.hasNoCoolDown(event.sender.id)) {
+        if (CometUtil.isNoCoolDown(event.sender.id)) {
             if (args.isEmpty()) {
                 if (!SessionManager.isValidSessionById(event.sender.id)) {
                     SessionManager.addSession(Session(this, user.id))

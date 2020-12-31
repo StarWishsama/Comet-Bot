@@ -7,8 +7,8 @@ import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.ClockInManager
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
@@ -28,7 +28,7 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
     private val hourMinuteFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.hasNoCoolDown(event.sender.id)) {
+        if (CometUtil.isNoCoolDown(event.sender.id)) {
             if (args.isEmpty()) {
                 return "命令不存在, 使用 /admin help 查看更多".sendMessage()
             } else {
@@ -80,7 +80,7 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
 
     private fun permList(user: BotUser, args: List<String>, event: MessageEvent): MessageChain {
         return if (args.size > 1) {
-            val target: BotUser? = BotUtil.parseAtAsBotUser(event, args[1])
+            val target: BotUser? = CometUtil.parseAtAsBotUser(event, args[1])
             val permission = target?.getPermissions()
             if (permission != null) {
                 sendMessage(permission)
@@ -95,7 +95,7 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
     private fun permAdd(user: BotUser, args: List<String>, event: MessageEvent): MessageChain {
         if (user.isBotOwner()) {
             if (args.size > 1) {
-                val target: BotUser? = BotUtil.parseAtAsBotUser(event, args[1])
+                val target: BotUser? = CometUtil.parseAtAsBotUser(event, args[1])
 
                 target?.addPermission(args[2])
                 return sendMessage("添加权限成功")
@@ -108,7 +108,7 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
 
     private fun giveCommandUseTime(event: MessageEvent, args: List<String>): MessageChain {
         if (args.size > 1) {
-            val target: BotUser? = BotUtil.parseAtAsBotUser(event, args[1])
+            val target: BotUser? = CometUtil.parseAtAsBotUser(event, args[1])
 
             return if (target != null) {
                 if (args[2].toInt() <= 1000000) {

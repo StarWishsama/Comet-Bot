@@ -10,7 +10,7 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
 import io.github.starwishsama.comet.pushers.YoutubeStreamingChecker
-import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -20,7 +20,7 @@ import net.mamoe.mirai.message.data.MessageChain
 @CometCommand
 class YoutubeCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.hasNoCoolDown(user.id)) {
+        if (CometUtil.isNoCoolDown(user.id)) {
             if (args.isEmpty()) {
                 return getHelp().convertToChain()
             } else {
@@ -68,17 +68,17 @@ class YoutubeCommand : ChatCommand {
                 try {
                     youtubeUserInfo = YoutubeApi.getChannelVideos(args[1])
                 } catch (e: RateLimitException) {
-                    return BotUtil.sendMessage(e.message)
+                    return CometUtil.sendMessage(e.message)
                 }
 
                 if (youtubeUserInfo != null) {
                     cfg.youtubeSubscribers.add(args[1])
-                    return BotUtil.sendMessage("订阅 ${youtubeUserInfo.items[0].snippet.channelTitle} 成功")
+                    return CometUtil.sendMessage("订阅 ${youtubeUserInfo.items[0].snippet.channelTitle} 成功")
                 }
 
-                return BotUtil.sendMessage("订阅 ${args[1]} 失败")
+                return CometUtil.sendMessage("订阅 ${args[1]} 失败")
             } else {
-                return BotUtil.sendMessage("已经订阅过频道ID为 ${args[1]} 的频道了")
+                return CometUtil.sendMessage("已经订阅过频道ID为 ${args[1]} 的频道了")
             }
         } else {
             return getHelp().convertToChain()
@@ -95,13 +95,13 @@ class YoutubeCommand : ChatCommand {
                 }
 
                 cfg.youtubeSubscribers.clear()
-                BotUtil.sendMessage("退订全部用户成功")
+                CometUtil.sendMessage("退订全部用户成功")
             } else if (cfg.youtubeSubscribers.contains(args[1])) {
                 cfg.youtubeSubscribers.remove(args[1])
                 clearUnsubscribeUsersInPool(groupId, args[1])
-                BotUtil.sendMessage("退订 @${args[1]} 成功")
+                CometUtil.sendMessage("退订 @${args[1]} 成功")
             } else {
-                BotUtil.sendMessage("没有订阅过 @${args[1]}")
+                CometUtil.sendMessage("没有订阅过 @${args[1]}")
             }
         } else {
             getHelp().convertToChain()

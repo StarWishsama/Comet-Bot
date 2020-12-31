@@ -6,8 +6,8 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.pool.PCRPool
-import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.contact.isAdministrator
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -22,7 +22,7 @@ class PCRCommand : ChatCommand {
     private val pool = PCRPool()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.hasNoCoolDown(user.id, 60)) {
+        if (CometUtil.isNoCoolDown(user.id, 60)) {
             return if (args.isNotEmpty()) {
                 when (args[0]) {
                     "十连" -> pool.getPCRResult(user, 10).sendMessage()

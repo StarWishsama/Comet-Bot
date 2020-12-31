@@ -6,8 +6,8 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.r6tab.R6TabApi.getR6SInfo
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.hasNoCoolDown
+import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.isNoCoolDown
 import io.github.starwishsama.comet.utils.IDGuidelineType
 import io.github.starwishsama.comet.utils.StringUtil.isLegitId
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -19,24 +19,24 @@ import net.mamoe.mirai.message.data.at
 @CometCommand
 class R6SCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (hasNoCoolDown(event.sender.id) && event is GroupMessageEvent) {
+        if (isNoCoolDown(event.sender.id) && event is GroupMessageEvent) {
             if (args.isEmpty()) {
-                return BotUtil.sendMessage(getHelp(), true)
+                return CometUtil.sendMessage(getHelp(), true)
             } else {
                 when (args[0].toLowerCase()) {
                     "info", "查询", "cx" -> {
                         val account = user.r6sAccount
                         return if (args.size <= 1 && account != null) {
-                            event.subject.sendMessage(BotUtil.sendMessage("查询中..."))
+                            event.subject.sendMessage(CometUtil.sendMessage("查询中..."))
                             val result = getR6SInfo(account)
                             event.sender.at() + ("\n" + result)
                         } else {
                             if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
-                                event.subject.sendMessage(BotUtil.sendMessage("查询中..."))
+                                event.subject.sendMessage(CometUtil.sendMessage("查询中..."))
                                 val result = getR6SInfo(args[1])
                                 event.sender.at() + ("\n" + result)
                             } else {
-                                BotUtil.sendMessage("你输入的 ID 不符合育碧用户名规范!")
+                                CometUtil.sendMessage("你输入的 ID 不符合育碧用户名规范!")
                             }
                         }
                     }
@@ -46,14 +46,14 @@ class R6SCommand : ChatCommand {
                                 val botUser1 = BotUser.getUser(event.sender.id)
                                 if (botUser1 != null) {
                                     botUser1.r6sAccount = args[1]
-                                    return BotUtil.sendMessage("绑定成功!")
+                                    return CometUtil.sendMessage("绑定成功!")
                                 }
                             } else {
-                                return BotUtil.sendMessage("ID 格式有误!")
+                                return CometUtil.sendMessage("ID 格式有误!")
                             }
                         }
                     else -> {
-                        return BotUtil.sendMessage("/r6s info [Uplay账号名]")
+                        return CometUtil.sendMessage("/r6s info [Uplay账号名]")
                     }
                 }
             }

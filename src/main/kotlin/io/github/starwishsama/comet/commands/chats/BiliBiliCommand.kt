@@ -9,8 +9,8 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
@@ -28,7 +28,7 @@ import net.mamoe.mirai.message.data.asMessageChain
 @CometCommand
 class BiliBiliCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.hasNoCoolDown(user.id) && event is GroupMessageEvent) {
+        if (CometUtil.isNoCoolDown(user.id) && event is GroupMessageEvent) {
             if (args.isEmpty()) {
                 return getHelp().convertToChain()
             } else {
@@ -66,7 +66,7 @@ class BiliBiliCommand : ChatCommand {
                             cfg.biliPushEnabled = !cfg.biliPushEnabled
                             "B站动态推送功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}".sendMessage()
                         } else {
-                            BotUtil.getLocalMessage("msg.no-permission").sendMessage()
+                            CometUtil.getLocalMessage("msg.no-permission").sendMessage()
                         }
                     }
                     else -> return getHelp().convertToChain()
@@ -98,7 +98,7 @@ class BiliBiliCommand : ChatCommand {
             if (args.size <= 1) return getHelp().convertToChain()
 
             if (!hasPermission(user, event)) {
-                return BotUtil.getLocalMessage("msg.no-permission").convertToChain()
+                return CometUtil.getLocalMessage("msg.no-permission").convertToChain()
             }
 
             return if (args[1].contains("|")) {

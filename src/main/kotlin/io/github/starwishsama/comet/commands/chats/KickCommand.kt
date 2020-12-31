@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.MemberPermission
@@ -19,11 +19,11 @@ import net.mamoe.mirai.message.data.MessageChain
 @CometCommand
 class KickCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (event is GroupMessageEvent && BotUtil.hasNoCoolDown(user.id)) {
+        if (event is GroupMessageEvent && CometUtil.isNoCoolDown(user.id)) {
             if (hasPermission(user, event)) {
                 if (event.group.botPermission.isOperator()) {
                     if (args.isNotEmpty()) {
-                        val at = BotUtil.parseAtToId(event, args[0])
+                        val at = CometUtil.parseAtToId(event, args[0])
                         if (at > -1) {
                             doKick(event, at, "")
                         } else {
@@ -33,10 +33,10 @@ class KickCommand : ChatCommand {
                         return getHelp().convertToChain()
                     }
                 } else {
-                    BotUtil.sendMessage("我不是绿帽 我爬 我爬")
+                    CometUtil.sendMessage("我不是绿帽 我爬 我爬")
                 }
             } else {
-                BotUtil.sendMessage("你不是绿帽 你爬 你爬")
+                CometUtil.sendMessage("你不是绿帽 你爬 你爬")
             }
         }
         return EmptyMessageChain

@@ -11,7 +11,7 @@ import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
-import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -30,9 +30,9 @@ import kotlin.time.ExperimentalTime
 class TwitterCommand : ChatCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.hasNoCoolDown(user.id)) {
+        if (CometUtil.isNoCoolDown(user.id)) {
             if (BotVariables.cfg.twitterAccessToken == null) {
-                return BotUtil.sendMessage("蓝鸟推送未被正确设置, 请联系机器人管理员")
+                return CometUtil.sendMessage("蓝鸟推送未被正确设置, 请联系机器人管理员")
             }
 
             return if (args.isEmpty()) {
@@ -55,7 +55,7 @@ class TwitterCommand : ChatCommand {
                     "push" -> {
                         val cfg = GroupConfigManager.getConfigOrNew(id)
                         cfg.twitterPushEnabled = !cfg.twitterPushEnabled
-                        return BotUtil.sendMessage("蓝鸟动态推送已${if (cfg.twitterPushEnabled) "开启" else "关闭"}")
+                        return CometUtil.sendMessage("蓝鸟动态推送已${if (cfg.twitterPushEnabled) "开启" else "关闭"}")
                     }
                     "id" -> {
                         return if (args[1].isNumeric()) {
@@ -92,12 +92,12 @@ class TwitterCommand : ChatCommand {
     @ExperimentalTime
     private suspend fun getTweetToMessageChain(args: List<String>, event: MessageEvent): MessageChain {
         return if (args.size > 1) {
-            event.subject.sendMessage(event.message.quote() + BotUtil.sendMessage("正在查询, 请稍等"))
+            event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("正在查询, 请稍等"))
             try {
                 if (args.size > 2) getTweetWithDesc(args[1], event.subject, args[2].toInt(), 1 + args[2].toInt())
                 else getTweetWithDesc(args[1], event.subject, 0, 1)
             } catch (e: NumberFormatException) {
-                BotUtil.sendMessage("请输入有效数字")
+                CometUtil.sendMessage("请输入有效数字")
             }
         } else {
             getHelp().convertToChain()
@@ -109,16 +109,16 @@ class TwitterCommand : ChatCommand {
         return try {
             val tweet = TwitterApi.getTweetInTimeline(name, index, max, false)
             if (tweet != null) {
-                return BotUtil.sendMessage("\n${tweet.user.name}\n\n") + tweet.toMessageChain(subject)
+                return CometUtil.sendMessage("\n${tweet.user.name}\n\n") + tweet.toMessageChain(subject)
             } else {
-                BotUtil.sendMessage("获取到的推文为空")
+                CometUtil.sendMessage("获取到的推文为空")
             }
         } catch (t: Throwable) {
             if (NetUtil.isTimeout(t)) {
-                BotUtil.sendMessage("获取推文时连接超时")
+                CometUtil.sendMessage("获取推文时连接超时")
             } else {
                 daemonLogger.warning(t.stackTraceToString())
-                BotUtil.sendMessage("获取推文时出现了异常")
+                CometUtil.sendMessage("获取推文时出现了异常")
             }
         }
     }
@@ -133,23 +133,23 @@ class TwitterCommand : ChatCommand {
                     try {
                         twitter = TwitterApi.getUserProfile(args[1])
                     } catch (e: RateLimitException) {
-                        return BotUtil.sendMessage(e.message)
+                        return CometUtil.sendMessage(e.message)
                     }
 
                     if (twitter != null) {
                         cfg.twitterSubscribers.add(args[1])
-                        return BotUtil.sendMessage("订阅 @${args[1]} 成功")
+                        return CometUtil.sendMessage("订阅 @${args[1]} 成功")
                     }
 
-                    return BotUtil.sendMessage("订阅 @${args[1]} 失败")
+                    return CometUtil.sendMessage("订阅 @${args[1]} 失败")
                 } else {
-                    return BotUtil.sendMessage("已经订阅过 @${args[1]} 了")
+                    return CometUtil.sendMessage("已经订阅过 @${args[1]} 了")
                 }
             } else {
                 return getHelp().convertToChain()
             }
         } else {
-            return BotUtil.sendMessage("请填写正确的群号!")
+            return CometUtil.sendMessage("请填写正确的群号!")
         }
     }
 
@@ -159,18 +159,18 @@ class TwitterCommand : ChatCommand {
             return if (args.size > 1) {
                 if (args[1] == "all" || args[1] == "全部") {
                     cfg.twitterSubscribers.clear()
-                    BotUtil.sendMessage("退订全部用户成功")
+                    CometUtil.sendMessage("退订全部用户成功")
                 } else if (cfg.twitterSubscribers.contains(args[1])) {
                     cfg.twitterSubscribers.remove(args[1])
-                    BotUtil.sendMessage("退订 @${args[1]} 成功")
+                    CometUtil.sendMessage("退订 @${args[1]} 成功")
                 } else {
-                    BotUtil.sendMessage("没有订阅过 @${args[1]}")
+                    CometUtil.sendMessage("没有订阅过 @${args[1]}")
                 }
             } else {
                 getHelp().convertToChain()
             }
         } else {
-            return BotUtil.sendMessage("请填写正确的群号!")
+            return CometUtil.sendMessage("请填写正确的群号!")
         }
     }
 

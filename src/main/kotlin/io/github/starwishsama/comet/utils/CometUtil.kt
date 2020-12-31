@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import java.time.Duration
 import java.time.LocalDateTime
 import javax.imageio.ImageIO
@@ -102,16 +103,22 @@ fun MiraiLogger.verboseS(message: String?, throwable: Throwable?) {
     }
 }
 
-fun BufferedImage.uploadAsImage(contact: Contact): Image {
+fun BufferedImage.toInputStream(formatName: String = "png"): InputStream {
     ByteArrayOutputStream().use { byteOS ->
+        if (ImageIO.getUseCache()) ImageIO.setUseCache(false)
+
         ImageIO.createImageOutputStream(byteOS).use { imOS ->
-            ImageIO.write(this, "png", imOS)
-            return runBlocking { ByteArrayInputStream(byteOS.toByteArray()).use { it.uploadAsImage(contact) } }
+            ImageIO.write(this, formatName, imOS)
+            return ByteArrayInputStream(byteOS.toByteArray())
         }
     }
 }
 
-object BotUtil {
+fun BufferedImage.uploadAsImage(contact: Contact): Image {
+    return runBlocking { toInputStream().use { it.uploadAsImage(contact) } }
+}
+
+object CometUtil {
     /**
      * 判断指定QQ号是否仍在命令冷却中
      * (可以自定义命令冷却时间)
@@ -119,9 +126,11 @@ object BotUtil {
      * @author Nameless
      * @param qq 要检测的QQ号
      * @param seconds 自定义冷却时间
+     * @param checkOnly 是否在检查后立即进入冷却
+     *
      * @return 目标QQ号是否处于冷却状态
      */
-    fun hasNoCoolDown(qq: Long, seconds: Int = cfg.coolDownTime): Boolean {
+    fun isNoCoolDown(qq: Long, seconds: Int = cfg.coolDownTime, checkOnly: Boolean = false): Boolean {
         if (seconds < 1) return true
 
         val currentTime = System.currentTimeMillis()
@@ -136,7 +145,9 @@ object BotUtil {
                 coolDown.remove(qq)
             }
         } else {
-            coolDown[qq] = currentTime
+            if (!checkOnly) {
+                coolDown[qq] = currentTime
+            }
         }
         return true
     }

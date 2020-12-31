@@ -9,7 +9,7 @@ import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.enums.R6Rank
 import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6StatusPlayer
-import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.IDGuidelineType
 import io.github.starwishsama.comet.utils.StringUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -32,9 +32,9 @@ object R6TabApi {
         try {
             val body: String =
                 NetUtil.getPageContent("${apiUrl}search/uplay/$name?cid=${BotVariables.cfg.r6tabKey}") ?: return null
-            if (BotUtil.isValidJson(body)) {
+            if (CometUtil.isValidJson(body)) {
                 val element: JsonElement = JsonParser.parseString(body).asJsonObject["players"]
-                if (BotUtil.isValidJson(element)) {
+                if (CometUtil.isValidJson(element)) {
                     val jsonObject: JsonObject = element.asJsonObject
                     val uuid: String = jsonObject.get(
                         jsonObject.keySet().iterator().next()

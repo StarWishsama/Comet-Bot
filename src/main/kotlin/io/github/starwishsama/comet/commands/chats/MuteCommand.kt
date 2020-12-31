@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.utils.BotUtil
+import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import kotlinx.coroutines.GlobalScope
@@ -24,7 +24,7 @@ class MuteCommand : ChatCommand {
         if (event is GroupMessageEvent && hasPermission(user, event)) {
             return if (event.group.botPermission.isOperator()) {
                 if (args.isNotEmpty()) {
-                    val at = BotUtil.parseAtAsBotUser(event, args[0])
+                    val at = CometUtil.parseAtAsBotUser(event, args[0])
                     if (at != null) {
                         doMute(event.group, at.id, getMuteTime(args[1]), false)
                     } else {
@@ -40,7 +40,7 @@ class MuteCommand : ChatCommand {
                                     delay(1_500)
                                     doRandomMute(event)
                                 }
-                                BotUtil.sendMessage("下面将抽取一位幸运群友禁言")
+                                CometUtil.sendMessage("下面将抽取一位幸运群友禁言")
                             }
                             else -> getHelp().convertToChain()
                         }
@@ -49,7 +49,7 @@ class MuteCommand : ChatCommand {
                     getHelp().convertToChain()
                 }
             } else {
-                BotUtil.sendMessage("我不是绿帽 我爬 我爬")
+                CometUtil.sendMessage("我不是绿帽 我爬 我爬")
             }
         }
         return EmptyMessageChain
@@ -97,34 +97,34 @@ class MuteCommand : ChatCommand {
             if (isAll) {
                 group.settings.isMuteAll = !group.settings.isMuteAll
                 return if (group.settings.isMuteAll) {
-                    BotUtil.sendMessage("The World!")
+                    CometUtil.sendMessage("The World!")
                 } else {
-                    BotUtil.sendMessage("然后时间开始流动")
+                    CometUtil.sendMessage("然后时间开始流动")
                 }
             } else {
-                if (group.botAsMember.id == id) BotUtil.sendMessage("不能踢出机器人")
+                if (group.botAsMember.id == id) CometUtil.sendMessage("不能踢出机器人")
 
                 for (member in group.members) {
                     if (member.id == id) {
-                        if (member.isOperator()) BotUtil.sendMessage("不能踢出管理员")
+                        if (member.isOperator()) CometUtil.sendMessage("不能踢出管理员")
                         return when (muteTime) {
                             in 1..2592000 -> {
                                 member.mute(muteTime)
-                                BotUtil.sendMessage("禁言 ${member.nameCardOrNick} 成功")
+                                CometUtil.sendMessage("禁言 ${member.nameCardOrNick} 成功")
                             }
                             0 -> {
                                 member.unmute()
-                                BotUtil.sendMessage("解禁 ${member.nameCardOrNick} 成功")
+                                CometUtil.sendMessage("解禁 ${member.nameCardOrNick} 成功")
                             }
-                            else -> BotUtil.sendMessage("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]")
+                            else -> CometUtil.sendMessage("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]")
                         }
                     }
                 }
             }
 
-            return BotUtil.sendMessage("找不到此用户")
+            return CometUtil.sendMessage("找不到此用户")
         } else {
-            return BotUtil.sendMessage("我不是绿帽 我爬 我爬")
+            return CometUtil.sendMessage("我不是绿帽 我爬 我爬")
         }
     }
 

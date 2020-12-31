@@ -8,9 +8,9 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.RandomResult
-import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.getRestString
-import io.github.starwishsama.comet.utils.BotUtil.hasNoCoolDown
+import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.getRestString
+import io.github.starwishsama.comet.utils.CometUtil.isNoCoolDown
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -19,12 +19,12 @@ import net.mamoe.mirai.message.data.MessageChain
 @CometCommand
 class DivineCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (hasNoCoolDown(event.sender.id)) {
+        if (isNoCoolDown(event.sender.id)) {
             val underCover = getResultFromList(BotVariables.underCovers, event.sender.id)
             return if (args.isNotEmpty()) {
                 if (underCover == null) {
                     if (user.commandTime > 0 || user.level != UserLevel.USER) {
-                        if (args.isEmpty()) return BotUtil.sendMessage("请检查需要占卜的字符是否超过上限或为空!")
+                        if (args.isEmpty()) return CometUtil.sendMessage("请检查需要占卜的字符是否超过上限或为空!")
 
                         val randomEventName = args.getRestString(0)
                         if (randomEventName.isNotBlank() && randomEventName.length < 30) {
@@ -32,10 +32,10 @@ class DivineCommand : ChatCommand {
                             user.decreaseTime()
                             RandomResult.getChance(result).convertToChain()
                         } else {
-                            BotUtil.sendMessage("请检查需要占卜的字符是否超过上限或为空!")
+                            CometUtil.sendMessage("请检查需要占卜的字符是否超过上限或为空!")
                         }
                     } else {
-                        BotUtil.sendMessage("今日命令条数已达上限, 请等待条数自动恢复哦~\n命令条数现在每小时会恢复100次, 封顶1000次")
+                        CometUtil.sendMessage("今日命令条数已达上限, 请等待条数自动恢复哦~\n命令条数现在每小时会恢复100次, 封顶1000次")
                     }
                 } else {
                     BotVariables.underCovers.minusAssign(underCover)

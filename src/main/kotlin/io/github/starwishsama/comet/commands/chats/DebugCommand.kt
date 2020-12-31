@@ -17,8 +17,8 @@ import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.pushers.*
 import io.github.starwishsama.comet.sessions.SessionManager
-import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -41,7 +41,7 @@ import kotlin.time.ExperimentalTime
 class DebugCommand : ChatCommand, UnDisableableCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (args.isNotEmpty() && BotUtil.hasNoCoolDown(event.sender.id)) {
+        if (args.isNotEmpty() && CometUtil.isNoCoolDown(event.sender.id)) {
             when (args[0]) {
                 "reload" -> {
                     if (user.isBotOwner()) {
@@ -78,7 +78,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     return ("彗星 Bot ${Versions.version}\n" +
                             "今日もかわいい~\n" +
                             "已注册命令数: ${CommandExecutor.countCommands()}\n" +
-                            BotUtil.getMemoryUsage() + "\n" +
+                            CometUtil.getMemoryUsage() + "\n" +
                             "与服务器的延迟为 $ping ms\n" +
                             "构建时间: ${Versions.buildTime}"
                             ).sendMessage()

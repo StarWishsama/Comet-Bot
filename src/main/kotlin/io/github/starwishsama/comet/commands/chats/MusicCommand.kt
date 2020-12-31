@@ -7,8 +7,8 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.MusicApiType
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.utils.BotUtil
-import io.github.starwishsama.comet.utils.BotUtil.getRestString
+import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.MusicUtil
 import net.mamoe.mirai.event.events.MessageEvent
@@ -20,7 +20,7 @@ import java.util.*
 class MusicCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         val api = BotVariables.cfg.musicApi
-        if (BotUtil.hasNoCoolDown(event.sender.id)) {
+        if (CometUtil.isNoCoolDown(event.sender.id)) {
             if (args.isNotEmpty()) {
                 if (args.size > 1) {
                     when (args[0].toLowerCase(Locale.ROOT)) {
@@ -30,7 +30,7 @@ class MusicCommand : ChatCommand {
                                     "QQ", "TX", "腾讯" -> BotVariables.cfg.musicApi = MusicApiType.QQ
                                     "NETEASE", "网易", "WY" -> BotVariables.cfg.musicApi = MusicApiType.NETEASE
                                 }
-                                return BotUtil.sendMessage("音乐API已修改为 ${BotVariables.cfg.musicApi}")
+                                return CometUtil.sendMessage("音乐API已修改为 ${BotVariables.cfg.musicApi}")
                             }
                         }
                         "QQ", "TX", "腾讯" -> MusicUtil.searchQQMusic(args.getRestString(1), false, event.subject)
