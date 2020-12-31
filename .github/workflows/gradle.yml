@@ -5,9 +5,9 @@ name: Kotlin Gradle
 
 on:
   push:
-    branches: [ hoshimati ]
+    branches: [ dev, stable ]
   pull_request:
-    branches: [ hoshimati ]
+    branches: [ dev, stable ]
 
 jobs:
   build:
