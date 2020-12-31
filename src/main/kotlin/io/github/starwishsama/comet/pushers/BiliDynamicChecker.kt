@@ -93,10 +93,11 @@ object BiliDynamicChecker : CometPusher {
         }
 
         daemonLogger.verboseS("Collected bili dynamic success, have retrieved $pushCount dynamic(s)!")
+
+        push()
     }
 
     override fun push() {
-
         perGroup.forEach { cfg ->
             cfg.biliSubscribers.forEach { uid ->
                 getHistoryByUID(uid).forEach bili@ { pdh ->
