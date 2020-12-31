@@ -92,7 +92,9 @@ object BiliDynamicChecker : CometPusher {
             }
         }
 
-        daemonLogger.verboseS("Collected bili dynamic success, have retrieved $pushCount dynamic(s)!")
+        pushCount.apply {
+            if (this > 0) daemonLogger.verboseS("Collected bili dynamic success, have retrieved $pushCount dynamic(s)!")
+        }
 
         push()
     }
@@ -113,7 +115,9 @@ object BiliDynamicChecker : CometPusher {
             }
         }
 
-        daemonLogger.verboseS("Push bili dynamic success, have pushed ${pushToGroups()} group(s)!")
+        pushToGroups().apply {
+            if (this > 0) daemonLogger.verboseS("Push bili dynamic success, have pushed $this group(s)!")
+        }
 
         lastPushTime = LocalDateTime.now()
     }
