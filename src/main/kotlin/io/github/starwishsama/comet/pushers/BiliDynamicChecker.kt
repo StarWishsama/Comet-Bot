@@ -159,7 +159,7 @@ object BiliDynamicChecker : CometPusher {
         if (sentTime == null) return false
         if (sentTime == LocalDateTime.MIN) return false
 
-        return sentTime.getLastingTime().inHours >= 5
+        return sentTime.getLastingTime().inMinutes >= 30.0
     }
 
     fun getPool(): MutableSet<PushDynamicHistory> {
