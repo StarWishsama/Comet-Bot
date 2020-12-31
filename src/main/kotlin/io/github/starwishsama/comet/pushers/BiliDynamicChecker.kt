@@ -156,7 +156,7 @@ object BiliDynamicChecker : CometPusher {
 
     @OptIn(ExperimentalTime::class)
     private fun isOutdated(sentTime: LocalDateTime?): Boolean {
-        if (sentTime == null) return true
+        if (sentTime == null) return false
         if (sentTime == LocalDateTime.MIN) return false
 
         return sentTime.getLastingTime().inHours >= 5
