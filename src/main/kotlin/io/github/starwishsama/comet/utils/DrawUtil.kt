@@ -161,10 +161,8 @@ object DrawUtil {
     fun arkNightDataCheck(location: File) {
         val isOld: Boolean
 
-        if (!location.exists()) location.createNewFile()
-
         daemonLogger.info("明日方舟 > 检查是否为旧版本数据...")
-        if (!JsonParser.parseString(location.getContext()).isJsonObject) {
+        if (!location.exists() || !JsonParser.parseString(location.getContext()).isJsonObject) {
             daemonLogger.info("明日方舟 > 你正在使用旧版本的数据, 正在自动下载新数据")
             isOld = true
         } else {
