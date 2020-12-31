@@ -34,24 +34,24 @@ object BiliDynamicChecker : CometPusher {
         val collectedUID = mutableSetOf<Long>().apply {
             perGroup.forEach {
                 if (it.biliPushEnabled) {
-                    plusAssign(it.biliSubscribers)
+                    addAll(it.biliSubscribers)
                 }
             }
         }
 
         collectedUID.forEach { uid ->
-            val dynamic: Dynamic? = try {
+            val dynamic: Dynamic = try {
                 BiliBiliMainApi.getUserDynamicTimeline(uid)
             } catch (e: RuntimeException) {
                 if (e !is ApiException) {
                     daemonLogger.warning("在获取动态时出现了异常", e)
                 }
                 null
-            }
+            } ?: return@forEach
 
-            val data = dynamic?.convertDynamic()
+            val data = dynamic.convertDynamic()
 
-            if (dynamic != null && data != null && data.success) {
+            if (data.success) {
                 val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@forEach
 
                 // 检查是否火星了
@@ -71,7 +71,15 @@ object BiliDynamicChecker : CometPusher {
                 } else {
                     val target = pushPool.parallelStream().filter { it.uid == uid }.findFirst()
 
-                    if (!target.isPresent) {
+                    if (target.isPresent) {
+                        target.get().apply {
+                            if (data.text != pushContent.text) {
+                                pushContent = data
+                                isPushed = false
+                                this.sentTime = sentTime
+                            }
+                        }
+                    } else {
                         pushPool.plusAssign(
                             PushDynamicHistory(
                                 uid = uid,
@@ -79,31 +87,25 @@ object BiliDynamicChecker : CometPusher {
                                 sentTime = sentTime
                             )
                         )
-                        return@forEach
-                    }
-
-                    target.ifPresent {
-                        if (data.text != it.pushContent.text) {
-                            it.pushContent = data
-                            it.isPushed = false
-                            it.sentTime = sentTime
-                        }
                     }
                 }
             }
         }
 
-        collectedUID.clear()
+        daemonLogger.verboseS("Collected bili dynamic success, have retrieved $pushCount dynamic(s)!")
     }
 
     override fun push() {
-        pushPool.parallelStream().forEach { pdh ->
-            perGroup.parallelStream().forEach { cfg ->
-                if (cfg.biliPushEnabled) {
-                    cfg.biliSubscribers.parallelStream().forEach { uid ->
-                        if (pdh.uid == uid && !pdh.target.contains(cfg.id)) {
-                            pdh.target.plusAssign(cfg.id)
-                        }
+        pushPool.forEach { pdh ->
+            perGroup.forEach { cfg ->
+                cfg.biliSubscribers.forEach bili@ { uid ->
+                    if (pdh.target.contains(cfg.id) && !cfg.biliPushEnabled) {
+                        pdh.target.remove(cfg.id)
+                        return@bili
+                    }
+
+                    if (!pdh.target.contains(cfg.id) && pdh.uid == uid) {
+                        pdh.target.add(cfg.id)
                     }
                 }
             }
@@ -111,15 +113,17 @@ object BiliDynamicChecker : CometPusher {
 
         val count = pushToGroups()
         if (count > 0) daemonLogger.verboseS("Push bili dynamic success, have pushed $count group(s)!")
+
+        lastPushTime = LocalDateTime.now()
     }
 
     private fun pushToGroups(): Int {
         var count = 0
 
         /** 遍历推送列表推送开播消息 */
-        pushPool.parallelStream().forEach { pdh ->
+        pushPool.forEach { pdh ->
             if (!pdh.isPushed) {
-                pdh.target.forEach target@{ gid ->
+                pdh.target.forEach push@{ gid ->
                     try {
                         runBlocking {
                             val group = bot?.getGroup(gid)
@@ -129,19 +133,17 @@ object BiliDynamicChecker : CometPusher {
                                 )
                             )
                             count++
-                            delay(2_000)
+                            delay(1_500)
                         }
                     } catch (e: RuntimeException) {
-                        daemonLogger.warning("[推送] 将动态推送至 $gid 时发生意外 ${e.stackTraceToString()}")
-                        return@target
+                        daemonLogger.warning("[推送] 将动态推送至 $gid 时发生意外", e)
+                        return@push
                     }
                 }
 
                 pdh.isPushed = true
             }
         }
-
-        lastPushTime = LocalDateTime.now()
 
         return count
     }

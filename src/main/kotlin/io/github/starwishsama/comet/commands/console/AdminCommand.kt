@@ -73,6 +73,22 @@ class AdminCommand : ConsoleCommand {
                         }
                     }
                 }
+                "give" -> {
+                    if (args.size > 1 && args[1].isNumeric()) {
+                        val time = try {
+                            args[1].toInt()
+                        } catch (e: NumberFormatException) {
+                            return "输入的数字不合法! 范围: (0, 10000]"
+                        }
+
+                        return if (time in 1..10000) {
+                            users.parallelStream().forEach { it.commandTime += time }
+                            "成功给予所有 BotUser 积分 $time 点"
+                        } else {
+                            "输入的数字错误! 范围: (0, 10000]"
+                        }
+                    }
+                }
                 "cmd" -> {
                     if (args.size > 2 && args[1].isNumeric()) {
                         val gid = try {

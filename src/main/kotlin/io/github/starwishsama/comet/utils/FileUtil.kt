@@ -53,10 +53,10 @@ fun File.getMD5(): String {
 }
 
 /**
- * 直接将文件内容序列化为指定的类
+ * 直接将文件内容 (json) 序列化为指定的类
  *
  * @param clazz 指定类
- * @return 指定类
+ * @return T
  */
 fun <T> File.parseAsClass(clazz: Class<T>): T {
     require(exists()) { "文件不存在" }
