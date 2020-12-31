@@ -35,7 +35,7 @@ object DrawUtil {
     const val pictureCount = 181
 
     private const val arkNightDataApi = "https://api.github.com/repos/Kengxxiao/ArknightsGameData"
-    private const val arkNightData = "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json"
+    const val arkNightData = "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json"
 
     /**
      * 根据抽卡结果合成图片

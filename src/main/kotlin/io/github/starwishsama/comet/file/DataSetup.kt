@@ -93,10 +93,13 @@ object DataSetup {
             daemonLogger.info("未检测到公主连结游戏数据, 抽卡模拟器将无法使用")
         }
 
-        DrawUtil.arkNightDataCheck(arkNightData)
+        try {
+            DrawUtil.arkNightDataCheck(arkNightData)
+        } catch (e: RuntimeException) {
+            daemonLogger.warning("下载明日方舟游戏数据失败, ${e.message}\n注意: 数据来源于 Github, 国内用户无法下载请自行下载替换\n链接: ${DrawUtil.arkNightData}")
+        }
 
         if (arkNightData.exists()) {
-
             @Suppress("UNCHECKED_CAST")
             hiddenOperators = Yaml.default.decodeMapFromString(File(FileUtil.getResourceFolder(), "hidden_operators.yml").getContext())["hiddenOperators"] as MutableList<String>
 
