@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.video
 import com.google.gson.annotations.SerializedName
 import com.hiczp.bilibili.api.app.model.View
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.utils.FileUtil
 
 data class VideoInfo(
     val code: Int,
@@ -10,14 +11,22 @@ data class VideoInfo(
     val ttl: Int,
     val data: Data
 ) {
-    fun toMessageWrapper(): MessageWrapper {
-        return MessageWrapper("""
+    fun toMessageWrapper(): MessageWrapper? {
+        try {
+            return MessageWrapper(
+                """
                 ${data.title}
                 > ${data.uploader.userName}
                 > ${data.description}
                 👍 ${data.stats.like} 💴 ${data.stats.coin} ⭐ ${data.stats.favorite}
                 ${if (data.stats.historyRank > 0) "本站最高日排行第${data.stats.historyRank}名" else ""}
-            """.trimIndent()).plusImageUrl(data.coverImg)
+            """.trimIndent()
+            ).plusImageUrl(data.coverImg)
+        } catch (e: Exception) {
+            FileUtil.createErrorReportFile("解析视频消息失败", "bilibili", e, this.toString(), "")
+        }
+
+        return null
     }
 
     data class Data(
@@ -45,7 +54,7 @@ data class VideoInfo(
         @SerializedName("pic")
         val coverImg: String,
         @SerializedName("title")
-        val title: String,
+        val title: String?,
         @SerializedName("pubdate")
         val publishTime: Long,
         @SerializedName("desc")

@@ -64,7 +64,7 @@ object ConvertLightAppListener : NListener {
             }.execute().body() ?: return EmptyMessageChain
 
 
-            return runBlocking { videoInfo.toMessageWrapper().toMessageChain(subject, true) }
+            return runBlocking { (videoInfo.toMessageWrapper() ?: return@runBlocking EmptyMessageChain).toMessageChain(subject, true) }
         } catch (e: IllegalStateException) {
             BotVariables.logger.warning("[监听器] 无法解析卡片消息", e)
             EmptyMessageChain
