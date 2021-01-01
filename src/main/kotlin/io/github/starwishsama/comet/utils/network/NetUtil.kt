@@ -316,10 +316,10 @@ object NetUtil {
     }
 
     fun getRedirectedURL(origin: String): String {
-        val request = executeHttpRequest(origin)
+        executeHttpRequest(origin).use { request ->
+            if (request.priorResponse?.isRedirect == false) return origin
 
-        if (request.priorResponse?.isRedirect == false) return origin
-
-        return request.priorResponse?.request?.url.toString()
+            return request.priorResponse?.request?.url.toString()
+        }
     }
 }
