@@ -46,7 +46,7 @@ open class MessageWrapper(var text: String?, val success: Boolean = true) {
         if (textWrapper != null) {
             val images = getPictures(contact)
             if (images.isNotEmpty()) {
-                var result = textWrapper.convertToChain()
+                var result = textWrapper.trim().convertToChain()
 
                 if (pictureAtTop) {
                     images.forEach {
