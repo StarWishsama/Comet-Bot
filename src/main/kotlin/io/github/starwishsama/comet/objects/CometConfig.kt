@@ -48,6 +48,10 @@ data class CometConfig(
         @Comment("SauceNao 以图搜图 APIKey, 不填亦可, 但可搜索次数会减少")
         val sauceNaoApiKey: String? = null,
 
+        @Deprecated("Replaced with r6StatsKey")
+        @Comment("彩虹六号玩家数据 API, 目前已停止使用")
+        val r6tabKey: String? = null,
+
         @Comment("彩虹六号玩家数据 API, 需要自行在 R6Stats Discord 群中申请\n" +
                 "详见: https://discordapp.com/channels/293848587391991836/575341069399752715/741297488543219712")
         val r6StatsKey: String? = null,
@@ -94,7 +98,7 @@ data class CometConfig(
         @Comment("明日方舟抽卡模拟器是否使用图片")
         var arkDrawUseImage: Boolean = false,
 
-        @Comment("调试模式, 打开后会有更多 Log 和调试功能")
+        @Comment("调试模式, 打开后会有更多 Log 并启用调试功能")
         var debugMode: Boolean = false,
 
         @Comment("WebDriver 使用的浏览器, 留空为关闭")

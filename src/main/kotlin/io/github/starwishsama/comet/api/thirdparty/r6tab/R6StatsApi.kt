@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.api.thirdparty.r6tab
 
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
+import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
 import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6TabGenericStat
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -28,6 +29,10 @@ object R6StatsApi: ApiExecutor {
     override fun getLimitTime(): Int = 60
 
     fun getR6StatsAPI(): IR6StatsAPI {
+        if (cfg.r6StatsKey == null) {
+            throw ApiKeyIsEmptyException("未填写 R6Stats API")
+        }
+
         checkRateLimit("R6Stats API 调用已达上限")
         return api
     }
@@ -36,4 +41,7 @@ object R6StatsApi: ApiExecutor {
 interface IR6StatsAPI {
     @GET("{username}/{platform}/generic")
     fun getGenericInfo(@Path("username") userName: String, @Path("platform") platform: String = "pc", @HeaderMap headerMap: Map<String, String> = mapOf(Pair("Authorization", "Bearer ${cfg.r6StatsKey}"))): Call<R6TabGenericStat>
+
+    @GET("{username}/{platform}/seasonal")
+    fun getSeasonalInfo(@Path("username") userName: String, @Path("platform") platform: String = "pc", @HeaderMap headerMap: Map<String, String> = mapOf(Pair("Authorization", "Bearer ${cfg.r6StatsKey}"))): Call<R6TabGenericStat>
 }

@@ -139,4 +139,11 @@ data class R6TabGenericStat(
             val lastUpdatedTime: String
         )
     }
+
+    fun getFancyInfo(): String {
+        return """
+            ♦ $username [${levelInfo.level}]
+            ▶
+        """.trimIndent()
+    }
 }
