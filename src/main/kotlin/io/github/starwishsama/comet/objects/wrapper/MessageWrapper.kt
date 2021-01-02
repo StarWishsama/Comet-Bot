@@ -42,11 +42,11 @@ open class MessageWrapper(var text: String?, val success: Boolean = true) {
     }
 
     suspend fun toMessageChain(contact: Contact, pictureAtTop: Boolean = false): MessageChain {
-        val textWrapper = text
+        val textWrapper = text?.trim()
         if (textWrapper != null) {
             val images = getPictures(contact)
             if (images.isNotEmpty()) {
-                var result = textWrapper.trim().convertToChain()
+                var result = textWrapper.convertToChain()
 
                 if (pictureAtTop) {
                     images.forEach {
@@ -61,7 +61,7 @@ open class MessageWrapper(var text: String?, val success: Boolean = true) {
                 return result
             }
 
-            return textWrapper.trim().convertToChain()
+            return textWrapper.convertToChain()
         }
         return EmptyMessageChain
     }
