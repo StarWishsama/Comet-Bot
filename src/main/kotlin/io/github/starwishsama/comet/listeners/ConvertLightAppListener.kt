@@ -56,7 +56,7 @@ object ConvertLightAppListener : NListener {
         return try {
             val url = meta["qqdocurl"].asString
 
-            val videoID = StringUtil.parseVideoIDFromBili(NetUtil.getRedirectedURL(url))
+            val videoID = StringUtil.parseVideoIDFromBili(NetUtil.getRedirectedURL(url) ?: return EmptyMessageChain)
             val videoInfo = if (videoID.contains("bv")) {
                 VideoApi.videoService.getVideoInfoByBID(videoID)
             } else {
@@ -64,7 +64,14 @@ object ConvertLightAppListener : NListener {
             }.execute().body() ?: return EmptyMessageChain
 
 
-            return runBlocking { (videoInfo.toMessageWrapper() ?: return@runBlocking EmptyMessageChain).toMessageChain(subject, true) }
+            return runBlocking {
+                val wrapper = videoInfo.toMessageWrapper()
+                return@runBlocking if (!wrapper.success) {
+                    EmptyMessageChain
+                } else {
+                    wrapper.toMessageChain(subject, true)
+                }
+            }
         } catch (e: IllegalStateException) {
             BotVariables.logger.warning("[监听器] 无法解析卡片消息", e)
             EmptyMessageChain

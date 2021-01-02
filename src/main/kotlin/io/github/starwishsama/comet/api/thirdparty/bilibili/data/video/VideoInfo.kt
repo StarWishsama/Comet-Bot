@@ -9,10 +9,13 @@ data class VideoInfo(
     val code: Int,
     val message: String,
     val ttl: Int,
-    val data: Data
+    val data: Data?
 ) {
-    fun toMessageWrapper(): MessageWrapper? {
+    fun toMessageWrapper(): MessageWrapper {
         try {
+
+            if (data == null) return MessageWrapper(text = null, success = false)
+
             return MessageWrapper(
                 """
                 ${data.title}
@@ -26,7 +29,7 @@ data class VideoInfo(
             FileUtil.createErrorReportFile("解析视频消息失败", "bilibili", e, this.toString(), "")
         }
 
-        return null
+        return MessageWrapper(text = null, success = false)
     }
 
     data class Data(
