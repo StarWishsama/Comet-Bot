@@ -10,6 +10,8 @@ import io.github.starwishsama.comet.exceptions.RateLimitException
  */
 interface ApiExecutor {
     var usedTime: Int
+    val duration: Int
+
     fun isReachLimit(): Boolean {
         return usedTime > getLimitTime()
     }

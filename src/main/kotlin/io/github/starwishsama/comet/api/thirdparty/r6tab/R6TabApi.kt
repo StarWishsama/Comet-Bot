@@ -31,7 +31,7 @@ object R6TabApi {
     private fun searchPlayer(name: String): R6StatusPlayer? {
         try {
             val body: String =
-                NetUtil.getPageContent("${apiUrl}search/uplay/$name?cid=${BotVariables.cfg.r6tabKey}") ?: return null
+                NetUtil.getPageContent("${apiUrl}search/uplay/$name?cid=${BotVariables.cfg.r6StatsKey}") ?: return null
             if (CometUtil.isValidJson(body)) {
                 val element: JsonElement = JsonParser.parseString(body).asJsonObject["players"]
                 if (CometUtil.isValidJson(element)) {
@@ -39,7 +39,7 @@ object R6TabApi {
                     val uuid: String = jsonObject.get(
                         jsonObject.keySet().iterator().next()
                     ).asJsonObject.get("profile").asJsonObject.get("p_user").asString
-                    return gson.fromJson(NetUtil.getPageContent("${apiUrl}player/$uuid?cid=${BotVariables.cfg.r6tabKey}")
+                    return gson.fromJson(NetUtil.getPageContent("${apiUrl}player/$uuid?cid=${BotVariables.cfg.r6StatsKey}")
                             ?: return null)
                 }
             }

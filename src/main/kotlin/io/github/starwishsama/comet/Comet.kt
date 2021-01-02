@@ -112,13 +112,18 @@ object Comet {
             }
         }
 
-        TaskUtil.runScheduleTaskAsync(25, 25, TimeUnit.MINUTES) { apis.forEach { it.resetTime() } }
+        apis.forEach {
+            TaskUtil.runScheduleTaskAsync(it.duration.toLong(), it.duration.toLong(), TimeUnit.HOURS) {
+                it.resetTime()
+            }
+        }
+
         TaskUtil.runScheduleTaskAsync(5, 60 * 60, TimeUnit.SECONDS, HitokotoUpdater::run)
         TaskUtil.runScheduleTaskAsync(3, 3, TimeUnit.HOURS) {
             val usedMemoryBefore: Long = getUsedMemory()
             System.runFinalization()
             System.gc()
-            daemonLogger.info("GC 清理成功 (${usedMemoryBefore - getUsedMemory()} MB)")
+            daemonLogger.info("定时 GC 清理成功 (-${usedMemoryBefore - getUsedMemory()} MB)")
         }
     }
 

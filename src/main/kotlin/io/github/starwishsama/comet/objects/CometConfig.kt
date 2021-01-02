@@ -37,7 +37,7 @@ data class CometConfig(
         var musicApi: MusicApiType = MusicApiType.QQ,
 
         @Comment("命令前缀")
-        val commandPrefix: MutableList<String> = mutableListOf(".", "。", "#", "!", "/"),
+        val commandPrefix: MutableList<String> = mutableListOf(".", "。", "#", "!", "/", "！"),
 
         @Comment("哔哩哔哩账号用户名, 调用需鉴权API功能 (如 /bili info) 时必填")
         var biliUserName: String? = null,
@@ -48,9 +48,9 @@ data class CometConfig(
         @Comment("SauceNao 以图搜图 APIKey, 不填亦可, 但可搜索次数会减少")
         val sauceNaoApiKey: String? = null,
 
-        @Deprecated("Replaced with r6StatsKey")
-        @Comment("彩虹六号玩家数据 API, 需要自行向 r6tab 作者申请")
-        val r6tabKey: String? = null,
+        @Comment("彩虹六号玩家数据 API, 需要自行在 R6Stats Discord 群中申请\n" +
+                "详见: https://discordapp.com/channels/293848587391991836/575341069399752715/741297488543219712")
+        val r6StatsKey: String? = null,
 
         @Comment("用于获取 Twitter Token 的 Access Token, 使用 Twitter 推送必填")
         var twitterAccessToken: String? = null,
@@ -70,7 +70,7 @@ data class CometConfig(
         @Comment("本地代理服务器端口, 目前仅支持 HTTP 代理")
         var proxyPort: Int = 0,
 
-        @Comment("代理类型, 支持 HTTP 和 SOCKS")
+        @Comment("本地代理类型, 支持 HTTP 和 SOCKS")
         var proxyType: Proxy.Type = Proxy.Type.HTTP,
 
         @Comment("Mirai 心跳周期, 单位分钟, 过长会导致被服务器断开连接")

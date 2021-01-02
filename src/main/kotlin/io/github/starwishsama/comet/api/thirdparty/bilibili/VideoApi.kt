@@ -19,6 +19,7 @@ object VideoApi: ApiExecutor {
         videoService = retrofit.create(IVideoApi::class.java)
     }
     override var usedTime: Int = 0
+    override val duration: Int = 3
 
     override fun getLimitTime(): Int = 2500
 }

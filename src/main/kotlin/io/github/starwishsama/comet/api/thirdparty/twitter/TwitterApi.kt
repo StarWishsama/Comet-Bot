@@ -47,6 +47,7 @@ object TwitterApi : ApiExecutor {
 
     // Api 调用次数
     override var usedTime: Int = 0
+    override val duration: Int = 5
 
     private const val apiReachLimit = "已达到 Twitter API 调用上限"
 

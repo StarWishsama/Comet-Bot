@@ -145,6 +145,7 @@ object BiliBiliMainApi : ApiExecutor {
     }*/
 
     override var usedTime: Int = 0
+    override val duration: Int = 3
 
     override fun isReachLimit(): Boolean {
         val result = usedTime > getLimitTime()
