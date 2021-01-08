@@ -18,7 +18,6 @@ import java.net.URL
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import java.util.jar.JarEntry
@@ -31,20 +30,15 @@ fun File.writeClassToJson(context: Any) {
 }
 
 @Synchronized
-fun File.writeString(context: String, autoWrap: Boolean = true, isAppend: Boolean = false, newIfNotExists: Boolean = true, needReplace: Boolean = false) {
+fun File.writeString(context: String, autoWrap: Boolean = true, isAppend: Boolean = false, newIfNotExists: Boolean = true) {
     if (!exists() && newIfNotExists) {
         createNewFile()
     }
 
-    if (needReplace) {
-        FileWriter.create(this).write(context)
-        return
-    }
-
     if (isAppend) {
-        FileWriter.create(this).write(if (autoWrap) context + "\n" else context, isAppend)
-    } else {
         FileWriter.create(this).write(getContext() + if (autoWrap) context + "\n" else context, isAppend)
+    } else {
+        FileWriter.create(this).write(if (autoWrap) context + "\n" else context, isAppend)
     }
 }
 
@@ -112,7 +106,7 @@ object FileUtil {
 
     fun getResourceFolder(): File = getChildFolder("res")
 
-    private fun getErrorReportFolder(): File = getChildFolder("error-reports")
+    fun getErrorReportFolder(): File = getChildFolder("error-reports")
 
     fun createErrorReportFile(reason: String = "发生了一个错误", type: String, t: Throwable, content: String, message: String) {
         val fileName = "$type-${dateFormatter.format(LocalDateTime.now())}.txt"
@@ -127,6 +121,11 @@ object FileUtil {
         daemonLogger.warning("你可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")
     }
 
+    /**
+     * 初始化 Log 文件
+     *
+     * @return log 文件位置
+     */
     fun initLog(): File? {
         try {
             val initTime = LocalDateTime.now()
@@ -141,6 +140,9 @@ object FileUtil {
         return null
     }
 
+    /**
+     * 获取当前 jar 文件绝对位置
+     */
     @Suppress("SpellCheckingInspection")
     fun getJarLocation(): File {
         var path: String = Comet::class.java.protectionDomain.codeSource.location.path
@@ -157,10 +159,12 @@ object FileUtil {
     /**
      * https://github.com/Polar-Pumpkin/ParrotX/blob/master/src/main/java/org/serverct/parrot/parrotx/utils/I18n.java#L328
      *
-     * 更优雅的 StackTrace 输出.
+     * 更优雅的堆栈跟踪输出.
      *
      * @author Polar-Pumpkin
-     * @param exception Throwable 类型的异常。
+     * @param exception Throwable 类型的异常
+     *
+     * @return 格式化后的栈轨迹报告
      */
     private fun getBeautyStackTrace(exception: Throwable): String {
         val sb = StringBuilder()
@@ -196,11 +200,21 @@ object FileUtil {
         return sb.toString()
     }
 
+    /**
+     * 在指定位置创建新的空文件
+     *
+     * @param location 位置
+     *
+     * @return 返回对应位置的 [File]
+     */
     fun createBlankFile(location: File): File {
         if (!location.exists()) location.createNewFile()
         return location
     }
 
+    /**
+     * 初始化资源文件
+     */
     @OptIn(ExperimentalTime::class)
     fun initResourceFile() {
         val startTime = LocalDateTime.now()
@@ -219,7 +233,7 @@ object FileUtil {
                 }
             }
         } catch (e: Exception) {
-            daemonLogger.info("加载资源文件失败, 部分需要图片资源的功能将无法使用")
+            daemonLogger.info("加载资源文件失败, 部分需要资源的功能将无法使用")
             daemonLogger.warningS("Cannot copy resources files", e)
         } finally {
             daemonLogger.info("尝试加载资源文件用时 ${startTime.getLastingTime().toFriendly(TimeUnit.SECONDS)}")
@@ -260,7 +274,6 @@ object FileUtil {
 
         JarFile(jarFile).use { jar ->
             val entries = jar.entries()
-
             while (entries.hasMoreElements()) {
                 val entry = entries.nextElement()
                 val entryName = entry.name
@@ -290,8 +303,8 @@ object FileUtil {
             val f = File(getResourceFolder(), fileName)
 
 
-            if (f.lastModified().toLocalDateTime() >
-                    entry.lastModifiedTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime() || !f.exists()) {
+            if (!f.exists() || f.lastModified().toLocalDateTime() >
+                    entry.lastModifiedTime.toMillis().toLocalDateTime(true)) {
 
                 if (!f.exists()) {
                     f.createNewFile()

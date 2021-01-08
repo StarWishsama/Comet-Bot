@@ -40,7 +40,7 @@ object DataSetup {
     fun init() {
         if (!userCfg.exists() || !cfgFile.exists()) {
             try {
-                cfgFile.writeString(Yaml.default.encodeToString(CometConfig()), needReplace = true)
+                cfgFile.writeString(Yaml.default.encodeToString(CometConfig()), isAppend = false)
                 userCfg.writeClassToJson(BotVariables.users)
                 shopItemCfg.writeClassToJson(BotVariables.shop)
                 println("[配置] 已自动生成新的配置文件.")
@@ -66,7 +66,7 @@ object DataSetup {
 
     private fun saveCfg() {
         try {
-            cfgFile.writeString(Yaml.default.encodeToString(CometConfig.serializer(), cfg), needReplace = true)
+            cfgFile.writeString(Yaml.default.encodeToString(CometConfig.serializer(), cfg), isAppend = true)
             userCfg.writeClassToJson(BotVariables.users)
             shopItemCfg.writeClassToJson(BotVariables.shop)
             savePerGroupSetting()

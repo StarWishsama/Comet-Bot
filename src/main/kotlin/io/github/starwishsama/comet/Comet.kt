@@ -125,6 +125,8 @@ object Comet {
             System.gc()
             daemonLogger.info("定时 GC 清理成功 (-${usedMemoryBefore - getUsedMemory()} MB)")
         }
+
+        TaskUtil.runAsync { BackupHelper.checkOldFiles() }
     }
 
     private fun handleConsoleCommand() {

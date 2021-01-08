@@ -7,7 +7,7 @@ import java.net.Socket
 import java.nio.charset.Charset
 import java.util.*
 
-class Rcon(host: String, port: Int, password: ByteArray?) {
+class Rcon(host: String, port: Int, password: ByteArray) {
     private val sync = Any()
     private val rand = Random()
     var requestId = 0

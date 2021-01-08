@@ -58,6 +58,6 @@ object NumberUtil {
     /**
      * 时间戳 (秒) 转换为 [LocalDateTime]
      */
-    fun Long.toLocalDateTime(): LocalDateTime =
-            Instant.ofEpochMilli(this * 1000).atZone(ZoneId.systemDefault()).toLocalDateTime()
+    fun Long.toLocalDateTime(isMillis: Boolean = false): LocalDateTime =
+            Instant.ofEpochMilli(if (isMillis) this else this * 1000).atZone(ZoneId.systemDefault()).toLocalDateTime()
 }

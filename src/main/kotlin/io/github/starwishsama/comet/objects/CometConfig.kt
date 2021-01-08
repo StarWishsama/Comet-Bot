@@ -108,5 +108,8 @@ data class CometConfig(
         val remoteWebDriver: String = "",
 
         @Comment("机器人使用的登录协议, 可选的有 ANDROID_PHONE, ANDROID_PAD 和 ANDROID_WATCH")
-        val botProtocol: BotConfiguration.MiraiProtocol = BotConfiguration.MiraiProtocol.ANDROID_PAD
+        val botProtocol: BotConfiguration.MiraiProtocol = BotConfiguration.MiraiProtocol.ANDROID_PAD,
+
+        @Comment("自动清理过时文件间隔 (如 Log, 错误报告等), 单位为天")
+        val autoCleanDuration: Int = 15
 )
