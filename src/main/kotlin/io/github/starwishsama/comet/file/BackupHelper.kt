@@ -43,6 +43,8 @@ object BackupHelper {
 
     @OptIn(ExperimentalTime::class)
     fun checkOldFiles() {
+        if (cfg.autoCleanDuration < 1) return
+
         var counter = 0
         var totalSize = 0L
 
