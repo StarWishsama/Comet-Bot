@@ -3,7 +3,7 @@ package io.github.starwishsama.comet.api.thirdparty.r6tab
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
-import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6TabGenericStat
+import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6StatsGenericStat
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -40,8 +40,8 @@ object R6StatsApi: ApiExecutor {
 
 interface IR6StatsAPI {
     @GET("{username}/{platform}/generic")
-    fun getGenericInfo(@Path("username") userName: String, @Path("platform") platform: String = "pc", @HeaderMap headerMap: Map<String, String> = mapOf(Pair("Authorization", "Bearer ${cfg.r6StatsKey}"))): Call<R6TabGenericStat>
+    fun getGenericInfo(@Path("username") userName: String, @Path("platform") platform: String = "pc", @HeaderMap headerMap: Map<String, String> = mapOf(Pair("Authorization", "Bearer ${cfg.r6StatsKey}"))): Call<R6StatsGenericStat>
 
     @GET("{username}/{platform}/seasonal")
-    fun getSeasonalInfo(@Path("username") userName: String, @Path("platform") platform: String = "pc", @HeaderMap headerMap: Map<String, String> = mapOf(Pair("Authorization", "Bearer ${cfg.r6StatsKey}"))): Call<R6TabGenericStat>
+    fun getSeasonalInfo(@Path("username") userName: String, @Path("platform") platform: String = "pc", @HeaderMap headerMap: Map<String, String> = mapOf(Pair("Authorization", "Bearer ${cfg.r6StatsKey}"))): Call<R6StatsGenericStat>
 }

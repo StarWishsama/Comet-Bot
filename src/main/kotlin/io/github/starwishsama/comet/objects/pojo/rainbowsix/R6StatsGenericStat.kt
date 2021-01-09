@@ -12,7 +12,7 @@ import com.google.gson.annotations.SerializedName
  *
  * @author Nameless
  */
-data class R6TabGenericStat(
+data class R6StatsGenericStat(
     @SerializedName("username")
     val username: String,
     @SerializedName("platform")

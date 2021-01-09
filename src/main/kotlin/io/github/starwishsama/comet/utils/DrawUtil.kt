@@ -93,8 +93,9 @@ object DrawUtil {
             val lostOps: List<ArkNightOperator>
     )
 
-    fun getStar(rare: Int): String = buildString {
-        for (i in 0 until rare) {
+    fun getStar(rare: Int, isArkNight: Boolean = false): String = buildString {
+        val trueRare = if (isArkNight) rare + 1 else rare
+        for (i in 0 until trueRare) {
             append("★")
         }
     }

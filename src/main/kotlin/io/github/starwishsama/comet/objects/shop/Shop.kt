@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects.group
+package io.github.starwishsama.comet.objects.shop
 
 import io.github.starwishsama.comet.BotVariables.shop
 import io.github.starwishsama.comet.objects.BotUser

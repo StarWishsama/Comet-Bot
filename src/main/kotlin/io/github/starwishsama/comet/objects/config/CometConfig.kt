@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects
+package io.github.starwishsama.comet.objects.config
 
 import io.github.starwishsama.comet.enums.MusicApiType
 import io.github.starwishsama.comet.enums.PicSearchApiType

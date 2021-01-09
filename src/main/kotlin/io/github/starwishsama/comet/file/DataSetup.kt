@@ -14,9 +14,9 @@ import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.hiddenOperators
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.CometConfig
+import io.github.starwishsama.comet.objects.config.CometConfig
+import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
-import io.github.starwishsama.comet.objects.group.PerGroupConfig
 import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.RuntimeUtil.getOsName
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize

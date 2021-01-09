@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects.group
+package io.github.starwishsama.comet.objects.config
 
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables

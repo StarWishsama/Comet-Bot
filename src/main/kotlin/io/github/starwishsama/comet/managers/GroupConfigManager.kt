@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.managers
 
 import io.github.starwishsama.comet.BotVariables.bot
 import io.github.starwishsama.comet.BotVariables.perGroup
-import io.github.starwishsama.comet.objects.group.PerGroupConfig
+import io.github.starwishsama.comet.objects.config.PerGroupConfig
 
 object GroupConfigManager {
     fun getConfig(groupId: Long): PerGroupConfig? {
