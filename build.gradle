@@ -75,7 +75,7 @@ dependencies {
     implementation 'com.github.salomonbrys.kotson:kotson:2.5.0'
 
     // CUrl
-    implementation 'com.github.rockswang:java-curl:1.2.2.2'
+    implementation 'com.github.rockswang:java-curl:1.2.2.190107'
 
     // BiliBili-Api @ https://github.com/czp3009/bilibili-api
     api 'com.hiczp:bilibili-api:0.1.3'
