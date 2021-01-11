@@ -22,7 +22,7 @@ import java.util.stream.Collectors
 class ArkNightPool(override val name: String = "标准寻访" ) : GachaPool() {
     override val tenjouCount: Int = -1
     override val tenjouRare: Int = -1
-    override val poolItems: MutableList<ArkNightOperator> = BotVariables.arkNight.filter { !hiddenOperators.contains(it.obtain ?: return@filter false) }.toMutableList()
+    override val poolItems: MutableList<ArkNightOperator> = BotVariables.arkNight.stream().filter { !hiddenOperators.contains(it.obtain) }.collect(Collectors.toList())
 
     override fun doDraw(time: Int): List<ArkNightOperator> {
         val result = mutableListOf<ArkNightOperator>()

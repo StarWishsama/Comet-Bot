@@ -107,7 +107,7 @@ object DataSetup {
                 arkNight.add(gson.fromJson(e))
             }
 
-            daemonLogger.info("成功载入明日方舟游戏数据, 共 ${arkNight.size} 个")
+            daemonLogger.info("成功载入明日方舟游戏数据, 共 (${arkNight.size - hiddenOperators.size}/${arkNight.size} 个")
             if (cfg.arkDrawUseImage) {
                 if (System.getProperty("java.awt.headless") != "true" && getOsName().toLowerCase().contains("linux")) {
                     daemonLogger.info("检测到类 Unix 系统, 正在启用 Headless 模式")

@@ -5,8 +5,8 @@ import io.github.starwishsama.comet.BotVariables.yyMMddPattern
 import io.github.starwishsama.comet.enums.UserLevel
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.event.ConcurrencyKind
 import net.mamoe.mirai.event.EventPriority
-import net.mamoe.mirai.event.Listener
 import net.mamoe.mirai.event.events.BotOnlineEvent
 import net.mamoe.mirai.event.globalEventChannel
 import java.time.LocalDateTime
@@ -17,7 +17,7 @@ object BotStatusListener: NListener {
         bot.globalEventChannel().subscribeAlways(
             BotOnlineEvent::class,
             EmptyCoroutineContext,
-            Listener.ConcurrencyKind.CONCURRENT,
+            ConcurrencyKind.CONCURRENT,
             EventPriority.NORMAL
         ) {
             users.stream().filter { it.level == UserLevel.OWNER }.findFirst().ifPresent {
