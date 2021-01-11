@@ -21,6 +21,7 @@ import java.util.*
 
 @CometCommand
 class GroupConfigCommand : ChatCommand, UnDisableableCommand {
+    // TODO 适配私聊设置
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (CometUtil.isNoCoolDown(user.id) && event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
