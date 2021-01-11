@@ -14,7 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.message.data.PlainText
-import net.mamoe.mirai.message.data.isContentNotEmpty
+import net.mamoe.mirai.message.data.isContentEmpty
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
@@ -112,7 +112,7 @@ object BiliLiveChecker : CometPusher {
                             "\n传送门: ${data.getRoomURL()}"
                     pushGroups.forEach {
                         val filtered = msg.convertToChain().doFilter()
-                        if (filtered.isContentNotEmpty()) {
+                        if (!filtered.isContentEmpty()) {
                             runBlocking {
                                 try {
                                     val group = bot?.getGroup(it)

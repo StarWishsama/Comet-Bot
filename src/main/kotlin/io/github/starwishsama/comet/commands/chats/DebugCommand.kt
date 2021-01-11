@@ -27,7 +27,7 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.asMessageChain
+import net.mamoe.mirai.message.data.toMessageChain
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
@@ -159,8 +159,8 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                             val tweet = TwitterApi.getTweetById(args[1].toLong())
                             if (tweet != null) {
                                 val screenshot = NetUtil.getScreenshot(tweet.getTweetURL())
-                                        ?: return "Can't take screenshot, See console for more info :(".convertToChain()
-                                return screenshot.uploadAsImage(event.subject).asMessageChain()
+                                    ?: return "Can't take screenshot, See console for more info :(".convertToChain()
+                                return screenshot.uploadAsImage(event.subject).toMessageChain()
                             } else {
                                 return "Can't found tweet which id is ${args[0]}.".convertToChain()
                             }
@@ -182,7 +182,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
 
                             try {
                                 val screenshot = NetUtil.getScreenshot(
-                                        "https://t.bilibili.com/${dynamic.data.card?.description?.dynamicId}"
+                                    "https://t.bilibili.com/${dynamic.data.card?.description?.dynamicId}"
                                 ) {
                                     val wait = WebDriverWait(this, 50, 1)
 
@@ -198,16 +198,18 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                     // 执行脚本获取合适的动态宽度
                                     val jsExecutor = (this as JavascriptExecutor)
                                     val width = jsExecutor.executeScript(
-                                            """return document.getElementsByClassName("main-content")[1].offsetWidth""") as Int
+                                        """return document.getElementsByClassName("main-content")[1].offsetWidth"""
+                                    ) as Int
                                     val height =
-                                            jsExecutor.executeScript(
-                                                    """return document.getElementsByClassName("main-content")[1].offsetHeight""") as Int
+                                        jsExecutor.executeScript(
+                                            """return document.getElementsByClassName("main-content")[1].offsetHeight"""
+                                        ) as Int
 
                                     // 调整窗口大小
                                     manage().window().size = Dimension(width, height)
                                 }
-                                        ?: return "Can't take screenshot, See console for more info :(".convertToChain()
-                                return screenshot.uploadAsImage(event.subject).asMessageChain()
+                                    ?: return "Can't take screenshot, See console for more info :(".convertToChain()
+                                return screenshot.uploadAsImage(event.subject).toMessageChain()
                             } catch (e: Exception) {
                                 if (e is ApiException) {
                                     return "Can't found bili dynamic which id is ${args[0]}.".convertToChain()

@@ -23,7 +23,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.PlainText
-import net.mamoe.mirai.message.data.asMessageChain
+import net.mamoe.mirai.message.data.toMessageChain
 
 @CometCommand
 class BiliBiliCommand : ChatCommand {
@@ -179,12 +179,12 @@ class BiliBiliCommand : ChatCommand {
 
     private suspend fun getDynamicText(dynamic: MessageWrapper?, event: MessageEvent): MessageChain {
         return if (dynamic == null) {
-            PlainText("\n无最近动态").asMessageChain()
+            PlainText("\n无最近动态").toMessageChain()
         } else {
             if (dynamic.text != null) {
                 dynamic.toMessageChain(event.subject)
             } else {
-                PlainText("\n无最近动态").asMessageChain()
+                PlainText("\n无最近动态").toMessageChain()
             }
         }
     }

@@ -23,7 +23,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.PlainText
-import net.mamoe.mirai.message.data.asMessageChain
+import net.mamoe.mirai.message.data.toMessageChain
 import kotlin.time.ExperimentalTime
 
 @CometCommand
@@ -71,7 +71,8 @@ class TwitterCommand : ChatCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps = CommandProps("twitter", arrayListOf("twit", "蓝鸟", "tt"), "查询/订阅蓝鸟账号", "nbot.commands.twitter", UserLevel.ADMIN)
+    override fun getProps(): CommandProps =
+        CommandProps("twitter", arrayListOf("twit", "蓝鸟", "tt"), "查询/订阅蓝鸟账号", "nbot.commands.twitter", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
         /twit info [蓝鸟ID] 查询账号信息
@@ -175,6 +176,7 @@ class TwitterCommand : ChatCommand {
     }
 
     @ExperimentalTime
-    private fun getTweetByID(id: Long, target: Contact): MessageChain = TwitterApi.getTweetById(id)?.toMessageChain(target)
-            ?: PlainText("找不到对应ID的推文").asMessageChain()
+    private fun getTweetByID(id: Long, target: Contact): MessageChain =
+        TwitterApi.getTweetById(id)?.toMessageChain(target)
+            ?: PlainText("找不到对应ID的推文").toMessageChain()
 }

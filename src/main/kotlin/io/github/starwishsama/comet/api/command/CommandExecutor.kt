@@ -361,7 +361,7 @@ object CommandExecutor {
             }
         }
 
-        return revampChain.asMessageChain()
+        return revampChain.toMessageChain()
     }
 
     fun countCommands(): Int = commands.size + consoleCommands.size

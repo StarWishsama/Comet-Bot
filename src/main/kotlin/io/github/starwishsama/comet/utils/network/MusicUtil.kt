@@ -13,7 +13,7 @@ import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.asMessageChain
+import net.mamoe.mirai.message.data.toMessageChain
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import okhttp3.Call
 import okhttp3.Callback
@@ -68,19 +68,20 @@ object MusicUtil {
                                     val playUrl = playJson["data"].asJsonArray[0]["url"].asString
 
                                     val music = MusicCard.Meta.Music(
-                                            jumpUrl = musicUrl,
-                                            playMusicUrl = playUrl,
-                                            previewImageUrl = albumUrl,
-                                            singerName = artistName,
-                                            title = name
+                                        jumpUrl = musicUrl,
+                                        playMusicUrl = playUrl,
+                                        previewImageUrl = albumUrl,
+                                        singerName = artistName,
+                                        title = name
                                     )
                                     val card = MusicCard(meta = MusicCard.Meta(music))
                                     card.prompt = "[分享]${name}"
                                     card.config.currentTime = 1605934298
                                     card.config.token = "66483da4edc6ea53a0646e4e60bb8a89"
-                                    card.extra = "{\\\"app_type\\\":1,\\\"appid\\\":100495085,\\\"msg_seq\\\":6897435295466737212,\\\"uin\\\":1}"
+                                    card.extra =
+                                        "{\\\"app_type\\\":1,\\\"appid\\\":100495085,\\\"msg_seq\\\":6897435295466737212,\\\"uin\\\":1}"
 
-                                    return LightApp(gson.toJson(card)).asMessageChain()
+                                    return LightApp(gson.toJson(card)).toMessageChain()
                                 }
                             }
                         }
@@ -147,22 +148,23 @@ object MusicUtil {
                 }
                 val playResult = NetUtil.getPageContent("$api4qq${song.songMid}")
                 if (playResult?.isNotBlank() == true) {
-                    val playUrl = JsonParser.parseString(playResult).asJsonObject["data"].asJsonObject[song.songMid].asString
+                    val playUrl =
+                        JsonParser.parseString(playResult).asJsonObject["data"].asJsonObject[song.songMid].asString
 
                     val meta = MusicCard.Meta(
-                            MusicCard.Meta.Music(
-                                    jumpUrl = "https://y.qq.com/n/yqq/song/${song.songMid}.html?ADTAG=h5_playsong&no_redirect=1",
-                                    playMusicUrl = playUrl,
-                                    previewImageUrl = "http://imgcache.qq.com/music/photo/album_300/17/300_albumpic_${song.albumId}_0.jpg",
-                                    singerName = artistName,
-                                    title = song.songName
-                            )
+                        MusicCard.Meta.Music(
+                            jumpUrl = "https://y.qq.com/n/yqq/song/${song.songMid}.html?ADTAG=h5_playsong&no_redirect=1",
+                            playMusicUrl = playUrl,
+                            previewImageUrl = "http://imgcache.qq.com/music/photo/album_300/17/300_albumpic_${song.albumId}_0.jpg",
+                            singerName = artistName,
+                            title = song.songName
+                        )
                     )
 
                     val card = MusicCard(meta = meta)
                     card.prompt = "[分享]${song.songName}"
 
-                    return LightApp(gson.toJson(card)).asMessageChain()
+                    return LightApp(gson.toJson(card)).toMessageChain()
                 }
             } else {
                 logger.warning("无法从 QQ API 获取到歌曲信息")

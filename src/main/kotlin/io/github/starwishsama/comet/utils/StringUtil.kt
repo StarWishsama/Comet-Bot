@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.utils
 
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.PlainText
-import net.mamoe.mirai.message.data.asMessageChain
+import net.mamoe.mirai.message.data.toMessageChain
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
@@ -48,7 +48,7 @@ object StringUtil {
      * 将字符串转换为消息链
      */
     fun String.convertToChain(): MessageChain {
-        return PlainText(this).asMessageChain()
+        return PlainText(this).toMessageChain()
     }
 
     /**
