@@ -239,28 +239,26 @@ object CometUtil {
         return element.isJsonObject || element.isJsonArray
     }
 
-    fun getNickNameByQID(qid: Long): Long {
+    fun getNickNameByQID(qid: Long): String {
         NetUtil.executeHttpRequest("https://r.qzone.qq.com/fcg-bin/cgi_get_portrait.fcg?g_tk=1518561325&uins=$qid").body.use {
             val response = it?.string()
 
             if (response != null) {
                 if (!response.startsWith("portraitCallBack(")) {
-                    return 0
+                    return "无"
                 }
 
                 val jsonObject =
                     JsonParser.parseString(response.replace("portraitCallBack(", "").removeSuffix(")"))
 
                 if (!jsonObject.isJsonObject) {
-                    return 0
+                    return "无"
                 }
 
-                jsonObject.asJsonObject[qid.toString()].asJsonArray[6].asString
+                return jsonObject.asJsonObject[qid.toString()].asJsonArray[6].asString
             } else {
-                return 0
+                return "无"
             }
         }
-
-        return 0
     }
 }
