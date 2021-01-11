@@ -255,8 +255,7 @@ object CometUtil {
                     return 0
                 }
 
-
-                jsonObject.asJsonObject[qid.toString()].asString.split(", ")[6]
+                jsonObject.asJsonObject[qid.toString()].asJsonArray[6].asString
             } else {
                 return 0
             }
