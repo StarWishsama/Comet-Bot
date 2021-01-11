@@ -28,6 +28,7 @@ import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.nio.charset.Charset
 import java.time.Duration
 import java.time.LocalDateTime
 import javax.imageio.ImageIO
@@ -256,7 +257,7 @@ object CometUtil {
                         return "无"
                     }
 
-                    return jsonObject.asJsonObject[qid.toString()].asJsonArray[6].asString
+                    return String(jsonObject.asJsonObject[qid.toString()].asJsonArray[6].asString.toByteArray(Charset.forName("GB2312")), Charsets.UTF_8)
                 } else {
                     return "无"
                 }
