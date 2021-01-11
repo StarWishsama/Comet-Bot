@@ -1,7 +1,19 @@
 package io.github.starwishsama.comet.utils.network
 
+import com.github.salomonbrys.kotson.fromJson
+import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.comet.BotVariables.cfg
+import io.github.starwishsama.comet.BotVariables.gson
+import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
+import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
+import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
+import org.xbill.DNS.Lookup
+import org.xbill.DNS.SRVRecord
+import org.xbill.DNS.Type
 import java.io.*
+import java.net.Proxy
 import java.net.Socket
+import java.util.concurrent.TimeUnit
 
 /**
  * 查询 Minecraft 服务器信息
@@ -11,94 +23,106 @@ import java.net.Socket
  * https://github.com/LovesAsuna/Mirai-Bot/blob/master/src/main/kotlin/me/lovesasuna/bot/util/protocol/QueryUtil.kt
  */
 object MinecraftUtil {
-    fun query(host: String, port: Int): String {
-        val socket = Socket(host, port)
-        socket.soTimeout = 10_000
-        val socketOutStream = socket.getOutputStream()
-        val dataOutputStream = DataOutputStream(socketOutStream)
-        val socketInStream = socket.getInputStream()
-        val inputStreamReader = InputStreamReader(socketInStream)
-        val b = ByteArrayOutputStream()
-        val handshakePacket = DataOutputStream(b)
-        /* 握手数据包 ID */
-        handshakePacket.writeByte(0x00)
-        /* 协议版本 */
-        writeVarInt(handshakePacket, 578)
-        /* 主机地址长度 */
-        writeVarInt(handshakePacket, host.length)
-        /* 主机地址 */
-        handshakePacket.writeBytes(host)
-        /* 端口 */
-        handshakePacket.writeShort(25565)
-        /* 状态 (握手是 1) */
-        writeVarInt(handshakePacket, 1)
+    @Throws(IOException::class)
+    fun query(host: String, port: Int): QueryInfo {
+        val socket: Socket
+        if (cfg.proxySwitch) {
+            socket = Socket(Proxy(cfg.proxyType, Socket(cfg.proxyUrl, cfg.proxyPort).remoteSocketAddress))
+            socket.connect(Socket(host, port).remoteSocketAddress)
+        } else {
+            socket = Socket(host, port)
+        }
 
-        /* 发送的握手数据包大小 */
+        socket.soTimeout = 10 * 1000
+
+        val outputStream = socket.getOutputStream()
+        val dataOutputStream = DataOutputStream(outputStream)
+        val inputStream = socket.getInputStream()
+        val inputStreamReader = InputStreamReader(inputStream)
+        val b = ByteArrayOutputStream()
+        val handshake = DataOutputStream(b)
+        /*握手数据包id*/
+        handshake.writeByte(0x00)
+        /*协议版本*/
+        writeVarInt(handshake, 578)
+        /*主机地址长度*/
+        writeVarInt(handshake, host.length)
+        /*主机地址*/
+        handshake.writeBytes(host)
+        /*端口*/
+        handshake.writeShort(25565)
+        /*状态(握手是1)*/
+        writeVarInt(handshake, 1)
+
+        /*发送的握手数据包大小*/
         writeVarInt(dataOutputStream, b.size())
-        /* 发送握手数据包 */
+        /*发送握手数据包*/
         dataOutputStream.write(b.toByteArray())
 
-        /* 大小为1 */
+        /*大小为1*/
         dataOutputStream.writeByte(0x01)
-        /* ping 的数据包 ID */
+        /*ping的数据包id*/
         dataOutputStream.writeByte(0x00)
-        val dataInputStream = DataInputStream(socketInStream)
-        /* 返回的数据包大小 */
-        val size = readVarInt(dataInputStream)
-        /* 返回的数据包id */
+        val dataInputStream = DataInputStream(inputStream)
+        /*返回的数据包大小*/
+        readVarInt(dataInputStream)
+        /*返回的数据包id*/
         var id = readVarInt(dataInputStream)
         if (id == -1) {
             throw IOException("数据流过早结束")
         }
 
-        /* 需要返回的状态 */
+        /*需要返回的状态*/
         if (id != 0x00) {
             throw IOException("无效的数据包 ID")
         }
-        /* json 字符串长度 */
+        /*json字符串长度*/
         val length = readVarInt(dataInputStream)
-        when (length) {
-            -1 -> throw IOException("数据流过早结束")
-            0 -> throw IOException("无效的 json 字符串长度")
+        if (length == -1) {
+            throw IOException("数据流过早结束")
         }
-
-        val `in` = ByteArray(length)
-        /* 读取 json 字符串 */
-        dataInputStream.readFully(`in`)
-        val json = String(`in`, Charsets.UTF_8)
+        if (length == 0) {
+            throw IOException("无效的 json 字符串长度")
+        }
+        val jsonString = ByteArray(length)
+        /* 读取json字符串 */
+        dataInputStream.readFully(jsonString)
+        val json = String(jsonString, Charsets.UTF_8)
         val now = System.currentTimeMillis()
         /* 数据包大小 */
         dataOutputStream.writeByte(0x09)
         /* ping 0x01 */
         dataOutputStream.writeByte(0x01)
-        /* 时间 */
+        /*时间*/
         dataOutputStream.writeLong(now)
         readVarInt(dataInputStream)
         id = readVarInt(dataInputStream)
-        when (id) {
-            -1 -> throw IOException("数据流过早结束")
-            0x01 -> throw IOException("无效的数据包 ID")
+        if (id == -1) {
+            throw IOException("数据流过早结束")
         }
-        /* 读取回应 */
-        val pingValue = dataInputStream.readLong()
+        if (id != 0x01) {
+            throw IOException("无效的数据包 ID")
+        }
+        /* 读取回应 (pingtime) */
+        val pingTime = dataInputStream.readLong()
         dataOutputStream.close()
-        socketOutStream.close()
+        outputStream.close()
         inputStreamReader.close()
-        socketInStream.close()
+        inputStream.close()
         socket.close()
-        return json
+        return QueryInfo(json, pingTime)
     }
 
     @Throws(IOException::class)
     private fun writeVarInt(out: DataOutputStream, paramInt: Int) {
-        var param = paramInt
+        var int = paramInt
         while (true) {
-            if (param and -0x80 == 0) {
-                out.writeByte(param)
+            if (int and -0x80 == 0) {
+                out.writeByte(int)
                 return
             }
-            out.writeByte(param and 0x7F or 0x80)
-            param = param ushr 7
+            out.writeByte(int and 0x7F or 0x80)
+            int = int ushr 7
         }
     }
 
@@ -117,5 +141,86 @@ object MinecraftUtil {
             }
         }
         return i
+    }
+
+    fun convert(host: String): SRVConvertResult {
+        return try {
+            val records = Lookup("_minecraft._tcp.$host", Type.SRV).run()
+            if (records != null && records.isNotEmpty()) {
+                val result = records[0] as SRVRecord
+                SRVConvertResult(result.target.toString().replaceFirst(Regex("\\.$"), ""), result.port, true)
+            } else {
+                SRVConvertResult("", -1)
+            }
+        } catch (e: Exception) {
+            SRVConvertResult("", -1)
+        }
+    }
+}
+
+data class SRVConvertResult(
+    val host: String,
+    val port: Int,
+    val success: Boolean = false
+) {
+    fun isEmpty(): Boolean {
+        return host.isEmpty() || port < 0
+    }
+}
+
+data class QueryInfo(
+    val json: String,
+    val usedTime: Long
+) {
+    private fun parseJson(): MinecraftServerInfo {
+        return gson.fromJson(json)
+    }
+
+    override fun toString(): String {
+        val info = parseJson()
+
+        return """
+            > 在线玩家 ${info.players.onlinePlayer}/${info.players.maxPlayer}
+            > MOTD ${info.motd.limitStringSize(20)}
+            > 服务器版本 ${info.version.protocolName}
+            > 延迟 ${usedTime.toLocalDateTime().getLastingTimeAsString(TimeUnit.SECONDS, true)}
+        """.trimIndent()
+    }
+}
+
+data class MinecraftServerInfo(
+    val version: Version,
+    val players: PlayerInfo,
+    @SerializedName("description")
+    val motd: String,
+    val favicon: String,
+    @SerializedName("modinfo")
+    val modInfo: ModInfo?
+) {
+    data class Version (
+        @SerializedName("name")
+        val protocolName: String,
+        @SerializedName("protocol")
+        val protocolVersion: Int
+    )
+
+    data class PlayerInfo(
+        @SerializedName("max")
+        val maxPlayer: Int,
+        @SerializedName("online")
+        val onlinePlayer: Int
+    )
+
+    data class ModInfo(
+        val type: String,
+        @SerializedName("modList")
+        val modList: List<Mod>
+    ) {
+        data class Mod(
+            @SerializedName("modid")
+            val modID: String,
+            @SerializedName("version")
+            val version: String
+        )
     }
 }

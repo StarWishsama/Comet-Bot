@@ -198,6 +198,7 @@ object Comet {
                 RSPCommand(),
                 RollCommand(),
                 YoutubeCommand(),
+                MinecraftCommand(),
                 // Console Command
                 StopCommand(),
                 DebugCommand(),
