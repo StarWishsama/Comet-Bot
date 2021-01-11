@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.utils.network
 
 import com.github.salomonbrys.kotson.fromJson
+import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.gson
@@ -180,7 +181,10 @@ data class QueryInfo(
 
         return """
             > 在线玩家 ${info.players.onlinePlayer}/${info.players.maxPlayer}
-            > MOTD ${info.motd.limitStringSize(20)}
+            > MOTD ${if (info.motd.isJsonObject) 
+                info.motd.asJsonObject["extra"].asJsonObject["text"].asString.trim().limitStringSize(20)
+                else info.motd.asString.trim().limitStringSize(20)
+            }
             > 服务器版本 ${info.version.protocolName}
             > 延迟 ${usedTime.toLocalDateTime().getLastingTimeAsString(TimeUnit.SECONDS, true)}
         """.trimIndent()
@@ -191,8 +195,7 @@ data class MinecraftServerInfo(
     val version: Version,
     val players: PlayerInfo,
     @SerializedName("description")
-    val motd: String,
-    val favicon: String,
+    val motd: JsonElement,
     @SerializedName("modinfo")
     val modInfo: ModInfo?
 ) {
