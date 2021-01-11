@@ -7,7 +7,10 @@ import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.config.PerGroupConfig
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -62,6 +65,31 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                         }
 
                         return cfg.disableCommand(args[1]).msg.sendMessage()
+                    }
+                    "autoreply", "ar", "自动回复", "关键词", "keyword", "kw" -> {
+                        if (args.size == 1) {
+                            return "/group ar [关键词] [回复内容]".sendMessage()
+                        } else {
+                            val keyWord = args[2]
+                            val reply = args.getRestString(3)
+
+                            cfg.keyWordReply.forEach {
+                                if (it.reply.text == reply) {
+                                    it.keyWords.add(keyWord)
+                                    return "已发现现有配置, 成功添加关键词".sendMessage()
+                                }
+                            }
+
+                            return if (cfg.keyWordReply.add(PerGroupConfig.ReplyKeyWord(
+                                    mutableListOf(keyWord),
+                                    mutableListOf(),
+                                    MessageWrapper(reply)
+                                ))) {
+                                "添加关键词成功".sendMessage()
+                            } else {
+                                "添加关键词失败".sendMessage()
+                            }
+                        }
                     }
                 }
             } else {

@@ -134,8 +134,8 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
     }
 
     data class ReplyKeyWord(
-        val keyWords: List<String>,
-        val pattern: List<Pattern>,
+        val keyWords: MutableList<String>,
+        val pattern: MutableList<Pattern> = mutableListOf(),
         val reply: MessageWrapper
     )
 }
