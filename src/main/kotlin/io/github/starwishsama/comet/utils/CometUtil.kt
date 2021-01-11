@@ -14,6 +14,7 @@ import io.github.starwishsama.comet.utils.RuntimeUtil.getOsInfo
 import io.github.starwishsama.comet.utils.RuntimeUtil.getUsedMemory
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
+import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.event.events.MessageEvent
@@ -236,5 +237,31 @@ object CometUtil {
 
     fun isValidJson(element: JsonElement): Boolean {
         return element.isJsonObject || element.isJsonArray
+    }
+
+    fun getNickNameByQID(qid: Long): Long {
+        NetUtil.executeHttpRequest("https://r.qzone.qq.com/fcg-bin/cgi_get_portrait.fcg?g_tk=1518561325&uins=$qid").body.use {
+            val response = it?.string()
+
+            if (response != null) {
+                if (!response.startsWith("portraitCallBack(")) {
+                    return 0
+                }
+
+                val jsonObject =
+                    JsonParser.parseString(response.replace("portraitCallBack(", "").removeSuffix(")"))
+
+                if (!jsonObject.isJsonObject) {
+                    return 0
+                }
+
+
+                jsonObject.asJsonObject[qid.toString()].asString.split(", ")[6]
+            } else {
+                return 0
+            }
+        }
+
+        return 0
     }
 }

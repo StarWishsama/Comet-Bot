@@ -174,25 +174,25 @@ object DataSetup {
 
         bot.groups.forEach { group ->
             val loc = File(perGroupFolder, "${group.id}.json")
-            if (!loc.exists()) {
-                FileUtil.createBlankFile(loc)
-                BotVariables.perGroup.add(PerGroupConfig(group.id).also { it.init() })
-            } else {
-                val cfg: PerGroupConfig = if (loc.getContext().isEmpty()) {
-                    daemonLogger.warning("检测到 ${group.id} 的群配置异常, 正在重新生成...")
-                    PerGroupConfig(group.id).also {
-                        it.init()
-                        loc.writeClassToJson(it)
-                    }
+            try {
+                if (!loc.exists()) {
+                    FileUtil.createBlankFile(loc)
+                    BotVariables.perGroup.add(PerGroupConfig(group.id).also { it.init() })
                 } else {
-                    loc.parseAsClass(PerGroupConfig::class.java)
-                }
-
-                try {
+                    val cfg: PerGroupConfig = if (loc.getContext().isEmpty()) {
+                        daemonLogger.warning("检测到 ${group.id} 的群配置异常, 正在重新生成...")
+                        PerGroupConfig(group.id).also {
+                            it.init()
+                            loc.writeClassToJson(it)
+                        }
+                    } else {
+                        loc.parseAsClass(PerGroupConfig::class.java)
+                    }
                     BotVariables.perGroup.add(cfg)
-                } catch (e: RuntimeException) {
-                    BotVariables.logger.warning("[配置] 在加载 ${group.id} 的分群配置时出现了问题", e)
                 }
+            }
+            catch (e: RuntimeException) {
+                BotVariables.logger.warning("[配置] 在加载 ${group.id} 的分群配置时出现了问题", e)
             }
         }
 

@@ -6,7 +6,9 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import kotlinx.coroutines.delay
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -44,9 +46,10 @@ class InfoCommand : ChatCommand {
                 return if (users.size > 9) {
                     for (i in 0..9) {
                         sb.append(i + 1).append(" ")
-                            .append(users[i].id)
+                            .append(CometUtil.getNickNameByQID(users[i].id))
                             .append(" ").append(String.format("%.1f", users[i].checkInPoint)).append("\n")
                     }
+                    delay(500)
                     (sb.toString().trim { it <= ' ' }).convertToChain()
                 } else {
                     "数据不足".convertToChain()
