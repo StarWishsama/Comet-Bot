@@ -24,7 +24,7 @@ class MinecraftCommand: ChatCommand {
             when (args.size) {
                 1 -> {
                     val convert = MinecraftUtil.convert(args[0])
-                    return if (!convert.success) {
+                    return if (convert.isEmpty()) {
                         "无法连接至服务器".sendMessage()
                     } else {
                         try {

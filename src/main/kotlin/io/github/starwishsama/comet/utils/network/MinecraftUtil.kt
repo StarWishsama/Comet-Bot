@@ -148,7 +148,7 @@ object MinecraftUtil {
             val records = Lookup("_minecraft._tcp.$host", Type.SRV).run()
             if (records != null && records.isNotEmpty()) {
                 val result = records[0] as SRVRecord
-                SRVConvertResult(result.target.toString().replaceFirst(Regex("\\.$"), ""), result.port, true)
+                SRVConvertResult(result.target.toString().replaceFirst(Regex("\\.$"), ""), result.port)
             } else {
                 SRVConvertResult("", -1)
             }
@@ -161,7 +161,6 @@ object MinecraftUtil {
 data class SRVConvertResult(
     val host: String,
     val port: Int,
-    val success: Boolean = false
 ) {
     fun isEmpty(): Boolean {
         return host.isEmpty() || port < 0

@@ -59,7 +59,7 @@ class RConCommand : ChatCommand, SuspendCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps = CommandProps("rcon", arrayListOf("执行命令", "mc"), "远程遥控MC服务器", "nbot.commands.rcon", UserLevel.USER)
+    override fun getProps(): CommandProps = CommandProps("rcon", arrayListOf("执行命令"), "远程遥控MC服务器", "nbot.commands.rcon", UserLevel.USER)
 
     override fun getHelp(): String = """
         /rcon setup(设置) 设置 rCon 参数

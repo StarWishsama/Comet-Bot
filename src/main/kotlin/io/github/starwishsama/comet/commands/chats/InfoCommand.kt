@@ -38,8 +38,7 @@ class InfoCommand : ChatCommand {
                     }
                 }
             } else if (args.size == 1 && args[0].contentEquals("排行") || args[0].contentEquals("ph")) {
-                val users = BotVariables.users
-                users.sortedByDescending { it.checkInPoint }
+                val users = BotVariables.users.sortedByDescending { it.checkInPoint }
                 val sb = StringBuilder()
                 sb.append("积分排行榜").append("\n")
                 return if (users.size > 9) {
@@ -56,7 +55,7 @@ class InfoCommand : ChatCommand {
                 return getHelp().convertToChain()
             }
         } catch (e: Exception) {
-            BotVariables.logger.error(e)
+            BotVariables.logger.warning(e)
         }
         return EmptyMessageChain
     }
