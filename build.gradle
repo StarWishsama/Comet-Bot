@@ -104,7 +104,7 @@ dependencies {
     implementation 'org.fusesource.jansi:jansi:1.18'
 
     // DNSJava used to srv lookup
-    implementation 'dnsjava:dnsjava:3.2.2'
+    implementation 'dnsjava:dnsjava:3.3.1'
 }
 
 shadowJar {
