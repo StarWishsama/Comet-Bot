@@ -57,7 +57,7 @@ object RepeatListener : NListener {
 
     private fun canRepeat(groupId: Long): Boolean {
         return try {
-            GroupConfigManager.getConfig(groupId)?.doRepeat ?: true
+            GroupConfigManager.getConfigOrNew(groupId).doRepeat
         } catch (e: NullPointerException) {
             daemonLogger.warning("检测到群 $groupId 的配置文件异常无法获取, 请及时查看!")
             false

@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.listeners
 
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
@@ -31,6 +32,7 @@ object AutoReplyListener : NListener {
                         }
                     }
                 } catch (e: NullPointerException) {
+                    BotVariables.daemonLogger.warning("检测到群 ${group.id} 的配置文件异常无法获取, 请及时查看!")
                     return@always
                 }
             }
