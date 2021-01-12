@@ -23,28 +23,21 @@ class MinecraftCommand: ChatCommand {
 
             when (args.size) {
                 1 -> {
+                    if (args[0].contains(":")) {
+                        val split = args[0].split(":")
+                        return query(split[0], split[1].toIntOrNull())
+                    }
+
                     val convert = MinecraftUtil.convert(args[0])
                     return if (convert.isEmpty()) {
                         "无法连接至服务器".sendMessage()
                     } else {
-                        try {
-                            val result =  MinecraftUtil.query(convert.host, convert.port)
-                            result.toString().sendMessage()
-                        } catch (e: Exception) {
-                            "查询失败, 服务器可能不在线, 请稍后再试.".sendMessage()
-                        }
+                        query(convert.host, convert.port)
                     }
                 }
                 2 -> {
                     return if (args[1].isNumeric()) {
-                        try {
-                            val result = MinecraftUtil.query(args[0], args[1].toInt())
-                            result.toString().sendMessage()
-                        } catch (e: IOException) {
-                            "查询失败, 服务器可能不在线, 请稍后再试.".sendMessage()
-                        } catch (e: NumberFormatException) {
-                            "输入的端口号不合法.".sendMessage()
-                        }
+                        query(args[0], args[1].toIntOrNull())
                     } else {
                         "输入的端口号不合法.".sendMessage()
                     }
@@ -67,4 +60,16 @@ class MinecraftCommand: ChatCommand {
         /mc [服务器地址] [服务器端口] 查询服务器信息
         /mc [服务器地址] 查询服务器信息 (使用 SRV)
     """.trimIndent()
+
+    private fun query(ip: String, port: Int?): MessageChain {
+        return try {
+            if (port == null) {
+                return "输入的端口号不合法.".sendMessage()
+            }
+            val result = MinecraftUtil.query(ip, port)
+            result.toString().sendMessage()
+        } catch (e: IOException) {
+            "查询失败, 服务器可能不在线, 请稍后再试.".sendMessage()
+        }
+    }
 }
