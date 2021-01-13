@@ -80,7 +80,7 @@ class FilterCommand: ChatCommand {
             }
         } else {
             words.forEach { word ->
-                if (!groupCfg.groupFilterWords.add(word)) {
+                if (groupCfg.groupFilterWords.add(word)) {
                     counter++
                 }
             }

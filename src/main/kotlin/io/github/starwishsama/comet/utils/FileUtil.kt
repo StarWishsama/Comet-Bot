@@ -4,6 +4,7 @@ import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
 import cn.hutool.core.net.URLDecoder
 import cn.hutool.crypto.SecureUtil
+import com.google.gson.Gson
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
@@ -57,9 +58,9 @@ fun File.getMD5(): String {
  * @param clazz 指定类
  * @return T
  */
-fun <T> File.parseAsClass(clazz: Class<T>): T {
+fun <T> File.parseAsClass(clazz: Class<T>, customParser: Gson = BotVariables.gson): T {
     require(exists()) { "文件不存在" }
-    return BotVariables.gson.fromJson(getContext(), clazz)
+    return customParser.fromJson(getContext(), clazz)
 }
 
 fun File.getChildFolder(folderName: String, createIfNotExists: Boolean = true): File {

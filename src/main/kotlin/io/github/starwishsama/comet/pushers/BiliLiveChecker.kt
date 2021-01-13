@@ -1,8 +1,8 @@
 package io.github.starwishsama.comet.pushers
 
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.BotVariables.perGroup
 import io.github.starwishsama.comet.api.command.CommandExecutor.doFilter
 import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
@@ -13,15 +13,17 @@ import io.github.starwishsama.comet.utils.verboseS
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.isContentEmpty
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 
 object BiliLiveChecker : CometPusher {
-    private val pushedList = mutableListOf<StoredLiveInfo>()
+    private val pendingPushContents = mutableSetOf<StoredLiveInfo>()
+    @Suppress("DEPRECATION")
     override val delayTime: Long = cfg.biliInterval
+    @Suppress("DEPRECATION")
     override val internal: Long = cfg.biliInterval
     override var future: ScheduledFuture<*>? = null
     override var bot: Bot? = null
@@ -33,40 +35,32 @@ object BiliLiveChecker : CometPusher {
 
         val collectedUsers = mutableSetOf<Long>()
 
-        BotVariables.perGroup.parallelStream().forEach {
+        perGroup.forEach {
             if (it.biliPushEnabled) {
-                collectedUsers.plusAssign(it.biliSubscribers)
+                collectedUsers.addAll(it.biliSubscribers)
             }
         }
 
-        collectedUsers.parallelStream().forEach { uid ->
+        collectedUsers.forEach { uid ->
             val roomId = LiveApi.getRoomIDByUID(uid)
             if (roomId > 0) {
-                val data = LiveApi.getLiveInfo(roomId)?.data
+                val data = LiveApi.getLiveInfo(roomId)?.data ?: return@forEach
 
-                if (data != null) {
-                    val sli = StoredLiveInfo(data, false)
-                    if (pushedList.isEmpty() && data.isLiveNow()) {
-                        pushedList.plusAssign(sli)
-                        pushCount++
-                    } else {
-                        var hasOldData = false
-
-                        for (i in pushedList.indices) {
-                            val oldStatus = pushedList[i].data.liveStatus
-                            val currentStatus = data.liveStatus
-                            if (pushedList[i].data.roomId == uid) {
-                                hasOldData = true
-                                if (oldStatus != currentStatus && data.isLiveNow()) {
-                                    pushedList[i] = sli
-                                }
-                                break
+                val sli = StoredLiveInfo(data, false)
+                if (pendingPushContents.isEmpty() && data.isLiveNow()) {
+                    pendingPushContents.plusAssign(sli)
+                    pushCount++
+                } else {
+                    pendingPushContents.forEach pushList@ {
+                        val oldStatus = it.data.liveStatus
+                        val currentStatus = data.liveStatus
+                        if (it.data.roomId == uid) {
+                            if (oldStatus != currentStatus && data.isLiveNow()) {
+                                it.data = sli.data
+                                it.isPushed = false
+                                pendingPushContents.add(sli)
+                                pushCount++
                             }
-                        }
-
-                        if (!hasOldData && data.isLiveNow()) {
-                            pushedList.add(sli)
-                            pushCount++
                         }
                     }
                 }
@@ -82,13 +76,13 @@ object BiliLiveChecker : CometPusher {
 
     override fun push() {
         val liverToGroups = mutableMapOf<StoredLiveInfo, MutableSet<Long>>()
-        pushedList.parallelStream().forEach { liverToGroups.plusAssign(it to mutableSetOf()) }
+        pendingPushContents.forEach { liverToGroups.plusAssign(it to mutableSetOf()) }
 
-        BotVariables.perGroup.parallelStream().forEach { cfg ->
+        perGroup.forEach { cfg ->
             if (cfg.biliPushEnabled) {
-                liverToGroups.forEach {
-                    if (cfg.biliSubscribers.contains(it.key.getRoomId())) {
-                        it.value.plusAssign(cfg.id)
+                liverToGroups.forEach { (slf, groups) ->
+                    if (cfg.biliSubscribers.contains(slf.getRoomId())) {
+                        groups.add(cfg.id)
                     }
                 }
             }
@@ -121,10 +115,10 @@ object BiliLiveChecker : CometPusher {
                                             url = data.keyFrameImageUrl,
                                             autoClose = true
                                         ).body?.byteStream()?.uploadAsImage(sendGroup) }
-                                    group?.sendMessage(filtered + (image ?: PlainText("")))
+                                    group?.sendMessage(filtered + (image ?: EmptyMessageChain))
                                     count++
                                     delay(2_500)
-                                } catch (t: Throwable) {
+                                } catch (t: Exception) {
                                     daemonLogger.verboseS("推送时出现了异常, ${t.message}")
                                 }
                             }
@@ -140,7 +134,7 @@ object BiliLiveChecker : CometPusher {
         return count
     }
 
-    data class StoredLiveInfo(val data: LiveRoomInfo.LiveRoomInfoData, var isPushed: Boolean) {
+    data class StoredLiveInfo(var data: LiveRoomInfo.LiveRoomInfoData, var isPushed: Boolean) {
         fun getRoomId() = data.roomId
     }
 }

@@ -10,10 +10,10 @@ object AutoReplyListener : NListener {
     override fun register(bot: Bot) {
         bot.eventChannel.subscribeGroupMessages {
             always {
-                try {
-                    val cfg = GroupConfigManager.getConfigOrNew(group.id)
+                val cfg = GroupConfigManager.getConfig(group.id)
 
-                    if (cfg.keyWordReply.isEmpty()) return@always
+                try {
+                    if (cfg?.keyWordReply == null || cfg.keyWordReply.isEmpty()) return@always
 
                     val messageContent = message.contentToString()
                     cfg.keyWordReply.forEach {
@@ -32,7 +32,8 @@ object AutoReplyListener : NListener {
                         }
                     }
                 } catch (e: NullPointerException) {
-                    BotVariables.daemonLogger.warning("检测到群 ${group.id} 的配置文件异常无法获取, 请及时查看!")
+
+                    BotVariables.daemonLogger.warning("检测到群 ${group.id} 的配置文件异常, 已修复!")
                     return@always
                 }
             }
