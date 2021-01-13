@@ -18,7 +18,7 @@ plugins {
 }
 
 def mainClass = 'io.github.starwishsama.comet.Comet'
-def miraiVersion = '2.0-RC'
+def miraiVersion = '2.0.0-dev-2'
 String buildTime
 
 jar {
