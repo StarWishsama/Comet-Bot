@@ -29,7 +29,7 @@ jar {
 }
 
 def gitCommitId = 'git rev-parse --short HEAD'
-String versionCode = "0.6-M3-" + gitCommitId.execute().text.trim()
+String versionCode = "0.6.0"
 
 group 'io.github.starwishsama.comet'
 version versionCode
