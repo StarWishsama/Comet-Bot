@@ -16,11 +16,12 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.21'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
     id("com.github.gmazzo.buildconfig") version("2.0.2")
+    id 'net.mamoe.mirai-console' version '2.0.0'
+    id 'org.jetbrains.kotlin.kapt' version '1.4.0'
 }
 
 def mainClass = 'io.github.starwishsama.comet.Comet'
-def miraiVersion = '2.0.0-dev-2'
-String buildTime
+def miraiVersion = '2.0.0'
 
 jar {
     manifest {
@@ -29,8 +30,7 @@ jar {
     }
 }
 
-def gitCommitId = 'git rev-parse --short HEAD'
-String versionCode = "0.6.0"
+String versionCode = "0.6.1-dev"
 
 group 'io.github.starwishsama.comet'
 version versionCode
@@ -39,25 +39,14 @@ tasks {
     buildConfig {
         println "Processing version code and other stuffs....."
 
+        String gitCommitId = 'git rev-parse --short HEAD'
+
         packageName("io.github.starwishsama.comet")
-        buildConfigField("String", "version", "\"$versionCode\"")
+        buildConfigField("String", "version", "\"${versionCode}-${gitCommitId}\"")
         buildConfigField("String", "buildTime", "\"${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))}\"")
         buildConfigField("String", "miraiVersion", "\"$miraiVersion\"")
     }
 }
-
-/**processResources {
-    buildTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
-    println "Processing version code and other stuffs....."
-
-
-    def versionFile = 'src/main/kotlin/io/github/starwishsama/comet/Versions.kt'
-    ant.replace(file: versionFile, token: '@VERSION@', value: version)
-    ant.replace(file: versionFile, token: '@BUILDTIME@', value: buildTime)
-    ant.replace(file: versionFile, token: '@MIRAI@', value: miraiVersion)
-}
-
-jar.dependsOn processResources*/
 
 repositories {
     maven { url 'https://jitpack.io' }
@@ -72,7 +61,9 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
-    implementation "net.mamoe:mirai-core-all:$miraiVersion"
+    def autoService = '1.0-rc7'
+    kapt "com.google.auto.service:auto-service:$autoService"
+    compileOnly "com.google.auto.service:auto-service-annotations:$autoService"
 
     implementation 'cn.hutool:hutool-http:5.5.7'
     implementation 'cn.hutool:hutool-crypto:5.5.7'
@@ -106,9 +97,6 @@ dependencies {
     // Selenium WebDriver @ https://www.selenium.dev/
     implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
 
-    //def console = '1.1.0'
-    //compileOnly("net.mamoe:mirai-console:$console")
-    
     // Jline a Java library for handling console input @ https://github.com/jline/jline3
     implementation 'org.jline:jline:3.18.0'
 
