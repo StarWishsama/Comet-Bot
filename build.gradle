@@ -38,7 +38,7 @@ tasks {
     buildConfig {
         println "Processing version code and other stuffs....."
 
-        String gitCommitId = 'git rev-parse --short HEAD'.execute()
+        String gitCommitId = 'git rev-parse --short HEAD'.execute().text.trim()
 
         packageName("io.github.starwishsama.comet")
         buildConfigField("String", "version", "\"${versionCode}-${gitCommitId}\"")
