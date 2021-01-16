@@ -15,6 +15,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.4.21'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.21'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id("com.github.gmazzo.buildconfig") version("2.0.2")
 }
 
 def mainClass = 'io.github.starwishsama.comet.Comet'
@@ -34,7 +35,18 @@ String versionCode = "0.6.0"
 group 'io.github.starwishsama.comet'
 version versionCode
 
-processResources {
+tasks {
+    buildConfig {
+        println "Processing version code and other stuffs....."
+
+        packageName("io.github.starwishsama.comet")
+        buildConfigField("String", "version", "\"$versionCode\"")
+        buildConfigField("String", "buildTime", "\"${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))}\"")
+        buildConfigField("String", "miraiVersion", "\"$miraiVersion\"")
+    }
+}
+
+/**processResources {
     buildTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
     println "Processing version code and other stuffs....."
 
@@ -45,7 +57,7 @@ processResources {
     ant.replace(file: versionFile, token: '@MIRAI@', value: miraiVersion)
 }
 
-jar.dependsOn processResources
+jar.dependsOn processResources*/
 
 repositories {
     maven { url 'https://jitpack.io' }
@@ -108,6 +120,7 @@ dependencies {
 }
 
 shadowJar {
+    dependsOn(generateBuildConfig)
     zip64 true
 }
 

@@ -217,7 +217,7 @@ object Comet {
         startUpTask()
         startAllPusher(bot)
 
-        logger.info("彗星 Bot 启动成功, 版本 ${Versions.version}, 耗时 ${startTime.getLastingTimeAsString()}")
+        logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${startTime.getLastingTimeAsString()}")
 
         CommandExecutor.startHandler(bot)
     }

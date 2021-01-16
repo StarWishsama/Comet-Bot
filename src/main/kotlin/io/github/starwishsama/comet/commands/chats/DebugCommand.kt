@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.Versions
+import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
@@ -76,12 +76,12 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     } catch (t: IOException) {
                         -1L
                     }
-                    return ("彗星 Bot ${Versions.version}\n" +
+                    return ("彗星 Bot ${BuildConfig.version}\n" +
                             "今日もかわいい~\n" +
                             "已注册命令数: ${CommandExecutor.countCommands()}\n" +
                             CometUtil.getMemoryUsage() + "\n" +
                             "与服务器的延迟为 $ping ms\n" +
-                            "构建时间: ${Versions.buildTime}"
+                            "构建时间: ${BuildConfig.buildTime}"
                             ).sendMessage()
                 }
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().convertToChain()
