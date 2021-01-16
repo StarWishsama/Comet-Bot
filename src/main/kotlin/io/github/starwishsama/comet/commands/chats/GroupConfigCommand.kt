@@ -85,7 +85,8 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                                     mutableListOf(keyWord),
                                     mutableListOf(),
                                     MessageWrapper(reply)
-                                )) == true) {
+                                ))
+                            ) {
                                 "添加关键词成功".sendMessage()
                             } else {
                                 "添加关键词失败".sendMessage()
