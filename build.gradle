@@ -28,7 +28,8 @@ jar {
     }
 }
 
-String versionCode = "0.6.1-dev"
+String gitCommitId = 'git rev-parse --short HEAD'.execute().text.trim()
+String versionCode = "0.6.1-dev-" + gitCommitId
 
 group 'io.github.starwishsama.comet'
 version versionCode
@@ -37,10 +38,8 @@ tasks {
     buildConfig {
         println "Processing version code and other stuffs....."
 
-        String gitCommitId = 'git rev-parse --short HEAD'.execute().text.trim()
-
         packageName("io.github.starwishsama.comet")
-        buildConfigField("String", "version", "\"${versionCode}-${gitCommitId}\"")
+        buildConfigField("String", "version", "\"${versionCode}\"")
         buildConfigField("String", "buildTime", "\"${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))}\"")
         buildConfigField("String", "miraiVersion", "\"$miraiVersion\"")
     }
