@@ -16,7 +16,6 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.21'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
     id("com.github.gmazzo.buildconfig") version("2.0.2")
-    id 'net.mamoe.mirai-console' version '2.0.0'
     id 'org.jetbrains.kotlin.kapt' version '1.4.0'
 }
 
@@ -39,7 +38,7 @@ tasks {
     buildConfig {
         println "Processing version code and other stuffs....."
 
-        String gitCommitId = 'git rev-parse --short HEAD'
+        String gitCommitId = 'git rev-parse --short HEAD'.execute()
 
         packageName("io.github.starwishsama.comet")
         buildConfigField("String", "version", "\"${versionCode}-${gitCommitId}\"")
@@ -61,9 +60,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
-    def autoService = '1.0-rc7'
-    kapt "com.google.auto.service:auto-service:$autoService"
-    compileOnly "com.google.auto.service:auto-service-annotations:$autoService"
+    implementation("net.mamoe:mirai-core-all:$miraiVersion")
 
     implementation 'cn.hutool:hutool-http:5.5.7'
     implementation 'cn.hutool:hutool-crypto:5.5.7'
