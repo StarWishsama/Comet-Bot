@@ -26,8 +26,8 @@ import java.util.jar.JarFile
 import kotlin.time.ExperimentalTime
 
 @Synchronized
-fun File.writeClassToJson(context: Any) {
-    FileWriter.create(this).write(BotVariables.gson.toJson(context))
+fun File.writeClassToJson(context: Any, gson: Gson = BotVariables.gson) {
+    FileWriter.create(this).write(gson.toJson(context))
 }
 
 @Synchronized

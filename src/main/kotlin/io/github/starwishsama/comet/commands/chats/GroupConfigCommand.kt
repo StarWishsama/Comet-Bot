@@ -81,11 +81,11 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                                 }
                             }
 
-                            return if (cfg.keyWordReply.add(PerGroupConfig.ReplyKeyWord(
-                                    mutableListOf(keyWord),
-                                    mutableListOf(),
-                                    MessageWrapper(reply)
-                                ))
+                            return if (cfg.keyWordReply.add(
+                                    PerGroupConfig.ReplyKeyWord(
+                                        mutableListOf(keyWord),
+                                        MessageWrapper(reply)
+                                    ))
                             ) {
                                 "添加关键词成功".sendMessage()
                             } else {

@@ -127,7 +127,7 @@ object NetUtil {
         } catch (e: IOException) {
             daemonLogger.warning("执行网络操作失败\n" + e.stackTraceToString())
         } finally {
-            daemonLogger.verboseS("执行网络操作用时 ${(System.nanoTime() - startTime).toDouble() / 1_000_000}ms")
+            daemonLogger.verboseS("执行网络操作用时 ${(System.nanoTime() - startTime).toDouble() / 1_000_000}ms ($url)")
 
             if (autoClose) {
                 TaskUtil.runAsync(autoCloseDelay) {

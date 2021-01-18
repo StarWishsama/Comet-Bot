@@ -6,7 +6,6 @@ import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import java.util.regex.Pattern
 
 data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
 
@@ -135,7 +134,6 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
 
     data class ReplyKeyWord(
         val keyWords: MutableList<String> = mutableListOf(),
-        val pattern: MutableList<Pattern> = mutableListOf(),
         val reply: MessageWrapper
     )
 }

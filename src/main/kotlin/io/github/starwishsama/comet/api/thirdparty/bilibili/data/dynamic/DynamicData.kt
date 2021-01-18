@@ -181,7 +181,7 @@ fun Dynamic.convertToDynamicData(): DynamicData? {
 fun Dynamic.convertDynamic(): MessageWrapper {
     return try {
         val data = convertToDynamicData()
-        runBlocking { data?.getContact() ?: MessageWrapper("错误: 不支持的动态类型", false) }
+        runBlocking { data?.getContact() ?: MessageWrapper("错误: 不支持的动态类型", false) }.also { it.uniqueId = this.data.card?.description?.dynamicId ?: 0 }
     } catch (e: Exception) {
         if (e is ArrayIndexOutOfBoundsException) {
             MessageWrapper("没有发过动态", false)

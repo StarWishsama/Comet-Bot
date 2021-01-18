@@ -38,6 +38,7 @@ object DataSetup {
     private val arkNightData = File(FileUtil.getResourceFolder(), "arkNights.json")
     private val perGroupFolder = FileUtil.getChildFolder("groups")
     private var brokenConfig = false
+    private val nonNullGson: Gson = GsonBuilder().setPrettyPrinting().create()
 
     fun init() {
         if (!userCfg.exists() || !cfgFile.exists()) {
@@ -170,8 +171,6 @@ object DataSetup {
     }
 
     fun initPerGroupSetting(bot: Bot) {
-        val nonNullGson: Gson = GsonBuilder().setPrettyPrinting().create()
-
         if (!perGroupFolder.exists()) {
             perGroupFolder.mkdirs()
         }
@@ -218,7 +217,7 @@ object DataSetup {
         BotVariables.perGroup.forEach {
             val loc = File(perGroupFolder, "${it.id}.json")
             if (!loc.exists()) loc.createNewFile()
-            loc.writeClassToJson(it)
+            loc.writeClassToJson(it, nonNullGson)
         }
     }
 }

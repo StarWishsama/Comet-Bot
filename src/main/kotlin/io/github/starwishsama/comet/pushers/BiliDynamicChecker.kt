@@ -73,7 +73,7 @@ object BiliDynamicChecker : CometPusher {
 
                     if (target.isPresent) {
                         target.get().apply {
-                            if (data.text != pushContent.text) {
+                            if (data.uniqueId != pushContent.uniqueId && data.text != pushContent.text) {
                                 pushContent = data
                                 isPushed = false
                                 this.sentTime = sentTime
