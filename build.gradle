@@ -93,7 +93,7 @@ dependencies {
     implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
 
     // Jline a Java library for handling console input @ https://github.com/jline/jline3
-    implementation 'org.jline:jline:3.18.0'
+    implementation 'org.jline:jline:3.19.0'
 
     // Jansi needed by JLine
     implementation 'org.fusesource.jansi:jansi:2.1.1'
