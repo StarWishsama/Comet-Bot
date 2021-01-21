@@ -19,7 +19,7 @@ plugins {
 }
 
 def mainClass = 'io.github.starwishsama.comet.Comet'
-def miraiVersion = '2.0.0'
+def miraiVersion = '2.1.0-dev-1'
 
 jar {
     manifest {
