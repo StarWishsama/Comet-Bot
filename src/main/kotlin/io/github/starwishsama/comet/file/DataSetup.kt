@@ -69,7 +69,7 @@ object DataSetup {
 
     private fun saveCfg() {
         try {
-            cfgFile.writeString(Yaml.default.encodeToString(CometConfig.serializer(), cfg), isAppend = true)
+            cfgFile.writeString(Yaml.default.encodeToString(CometConfig.serializer(), cfg), isAppend = false)
             userCfg.writeClassToJson(BotVariables.users)
             shopItemCfg.writeClassToJson(BotVariables.shop)
             savePerGroupSetting()
