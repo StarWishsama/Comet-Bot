@@ -33,16 +33,16 @@ class MusicCommand : ChatCommand {
                                 return CometUtil.sendMessage("音乐API已修改为 ${BotVariables.cfg.musicApi}")
                             }
                         }
-                        "QQ", "TX", "腾讯" -> MusicUtil.searchQQMusic(args.getRestString(1), false, event.subject)
+                        "QQ", "TX", "腾讯" -> MusicUtil.searchQQMusic(args.getRestString(1), true, event.subject)
                         "NETEASE", "网易", "WY" -> MusicUtil.searchNetEaseMusic(args.getRestString(1))
                         else -> return when (api) {
-                            MusicApiType.QQ -> MusicUtil.searchQQMusic(args.getRestString(0), false, event.subject)
+                            MusicApiType.QQ -> MusicUtil.searchQQMusic(args.getRestString(0), true, event.subject)
                             MusicApiType.NETEASE -> MusicUtil.searchNetEaseMusic(args.getRestString(0))
                         }
                     }
                 } else {
                     return when (api) {
-                        MusicApiType.QQ -> MusicUtil.searchQQMusic(args.getRestString(0), false, event.subject)
+                        MusicApiType.QQ -> MusicUtil.searchQQMusic(args.getRestString(0), true, event.subject)
                         MusicApiType.NETEASE -> MusicUtil.searchNetEaseMusic(args.getRestString(0))
                     }
                 }

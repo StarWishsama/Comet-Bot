@@ -11,8 +11,9 @@ import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.MusicKind
+import net.mamoe.mirai.message.data.MusicShare
 import net.mamoe.mirai.message.data.toMessageChain
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import okhttp3.Call
@@ -67,21 +68,14 @@ object MusicUtil {
                                 if (playJson.isJsonObject) {
                                     val playUrl = playJson["data"].asJsonArray[0]["url"].asString
 
-                                    val music = MusicCard.Meta.Music(
+                                    return MusicShare(
+                                        MusicKind.NeteaseCloudMusic,
+                                        name,
+                                        artistName,
                                         jumpUrl = musicUrl,
-                                        playMusicUrl = playUrl,
-                                        previewImageUrl = albumUrl,
-                                        singerName = artistName,
-                                        title = name
-                                    )
-                                    val card = MusicCard(meta = MusicCard.Meta(music))
-                                    card.prompt = "[分享]${name}"
-                                    card.config.currentTime = 1605934298
-                                    card.config.token = "66483da4edc6ea53a0646e4e60bb8a89"
-                                    card.extra =
-                                        "{\\\"app_type\\\":1,\\\"appid\\\":100495085,\\\"msg_seq\\\":6897435295466737212,\\\"uin\\\":1}"
-
-                                    return LightApp(gson.toJson(card)).toMessageChain()
+                                        pictureUrl = albumUrl,
+                                        playUrl
+                                    ).toMessageChain()
                                 }
                             }
                         }
@@ -151,20 +145,14 @@ object MusicUtil {
                     val playUrl =
                         JsonParser.parseString(playResult).asJsonObject["data"].asJsonObject[song.songMid].asString
 
-                    val meta = MusicCard.Meta(
-                        MusicCard.Meta.Music(
-                            jumpUrl = "https://y.qq.com/n/yqq/song/${song.songMid}.html?ADTAG=h5_playsong&no_redirect=1",
-                            playMusicUrl = playUrl,
-                            previewImageUrl = "http://imgcache.qq.com/music/photo/album_300/17/300_albumpic_${song.albumId}_0.jpg",
-                            singerName = artistName,
-                            title = song.songName
-                        )
-                    )
-
-                    val card = MusicCard(meta = meta)
-                    card.prompt = "[分享]${song.songName}"
-
-                    return LightApp(gson.toJson(card)).toMessageChain()
+                    return MusicShare(
+                        kind = MusicKind.QQMusic,
+                        title = song.songName,
+                        summary = artistName,
+                        jumpUrl = "https://y.qq.com/n/yqq/song/${song.songMid}.html?ADTAG=h5_playsong&no_redirect=1",
+                        pictureUrl = "http://imgcache.qq.com/music/photo/album_300/17/300_albumpic_${song.albumId}_0.jpg",
+                        musicUrl = playUrl
+                    ).toMessageChain()
                 }
             } else {
                 logger.warning("无法从 QQ API 获取到歌曲信息")
@@ -318,87 +306,4 @@ object MusicUtil {
             }
         }
     }
-    
-    data class MusicCard(
-            @SerializedName("app")
-            val app: String = "com.tencent.structmsg",
-            @SerializedName("desc")
-            val description: String = "音乐",
-            @SerializedName("view")
-            val viewType: String = "music",
-            @SerializedName("ver")
-            val version: String = "0$versionCode",
-            /** 展示为纯文本消息时的样式 */
-            @SerializedName("prompt")
-            var prompt: String = "[分享]",
-            @SerializedName("appID")
-            val appID: String = "",
-            @SerializedName("sourceName")
-            val sourceName: String = "",
-            @SerializedName("actionData")
-            val actionData: String = "",
-            @SerializedName("actionData_A")
-            val actionDataA: String = "",
-            @SerializedName("sourceUrl")
-            val sourceUrl: String = "",
-            @SerializedName("meta")
-            val meta: Meta,
-            @SerializedName("config")
-            val config: Config = Config(),
-            @SerializedName("text")
-            val text: String = "",
-            @SerializedName("sourceAd")
-            val sourceAd: String = "",
-            /** msg_seq 不可修改 */
-            @SerializedName("extra")
-            var extra: String = "{\\\"app_type\\\":1,\\\"appid\\\":100497308,\\\"msg_seq\\\":6897056676240247867,\\\"uin\\\":1}"
-    ) {
-        data class Meta(
-                val music: Music
-        ) {
-            data class Music(
-                    val action: String = "",
-                    @SerializedName("android_pkg_name")
-                    val androidPkgName: String = "",
-                    @SerializedName("app_type")
-                    val appType: Int = 1,
-                    @SerializedName("appid")
-                    var appId: Long = 100497308,
-                    @SerializedName("desc")
-                    val singerName: String,
-                    @SerializedName("jumpUrl")
-                    val jumpUrl: String,
-                    @SerializedName("musicUrl")
-                    val playMusicUrl: String,
-                    @SerializedName("preview")
-                    val previewImageUrl: String,
-                    @SerializedName("sourceMsgId")
-                    val sourceMsgId: String = "0",
-                    @SerializedName("source_icon")
-                    val sourceIcon: String = "",
-                    @SerializedName("source_url")
-                    val sourceUrl: String = "",
-                    @SerializedName("tag")
-                    var tag: String = "QQ音乐",
-                    @SerializedName("title")
-                    val title: String
-            )
-        }
-
-        data class Config (
-                @SerializedName("autosize")
-                val autoSize: Boolean = true,
-                /** 不可修改, 可能会失效 */
-                @SerializedName("ctime")
-                var currentTime: Long = 1605846146,
-                @SerializedName("forward")
-                val forward: Boolean = true,
-                /** 不可修改, 可能会失效 */
-                @SerializedName("token")
-                var token: String = "966baea0ff335c8c8fcea318b6baaf3e",
-                @SerializedName("type")
-                val type: String = "normal"
-        )
-    }
-
 }
