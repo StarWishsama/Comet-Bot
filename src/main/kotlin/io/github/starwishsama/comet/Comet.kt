@@ -7,6 +7,7 @@ import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.filePath
 import io.github.starwishsama.comet.BotVariables.log
 import io.github.starwishsama.comet.BotVariables.logger
+import io.github.starwishsama.comet.BotVariables.loggerAppender
 import io.github.starwishsama.comet.BotVariables.startTime
 import io.github.starwishsama.comet.Comet.isFailed
 import io.github.starwishsama.comet.api.command.CommandExecutor
@@ -275,6 +276,7 @@ fun initResources() {
     filePath = FileUtil.getJarLocation()
     startTime = LocalDateTime.now()
     FileUtil.initLog()
+    loggerAppender = LoggerAppender(log)
 
     logger.info(
     """

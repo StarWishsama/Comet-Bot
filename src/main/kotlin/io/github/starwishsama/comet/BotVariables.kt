@@ -13,7 +13,7 @@ import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.objects.shop.Shop
-import io.github.starwishsama.comet.utils.writeString
+import io.github.starwishsama.comet.utils.LoggerAppender
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.utils.MiraiInternalApi
@@ -40,6 +40,8 @@ object BotVariables {
     /** 作为独立运行时使用的变量, 除 [Comet] 外禁止调用 */
     lateinit var bot: Bot
 
+    lateinit var loggerAppender: LoggerAppender
+
     fun isBotInitialized(): Boolean = ::bot.isInitialized
 
     lateinit var startTime: LocalDateTime
@@ -56,17 +58,17 @@ object BotVariables {
 
     val logger: MiraiLogger = PlatformLogger("CometBot") {
         println(it)
-        log.writeString(it)
+        loggerAppender.appendLog(it)
     }
 
     val daemonLogger: MiraiLogger = PlatformLogger("CometService") {
         println(it)
-        log.writeString(it)
+        loggerAppender.appendLog(it)
     }
 
     val consoleCommandLogger: MiraiLogger = PlatformLogger("CometConsole") {
         println(it)
-        log.writeString(it)
+        loggerAppender.appendLog(it)
     }
 
     val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
