@@ -138,8 +138,8 @@ object MusicUtil {
                     song.singer.forEach {
                         append(it.name + "/")
                     }
-                    substring(0, length - 1)
-                }
+                }.removeSuffix("/")
+
                 val playResult = NetUtil.getPageContent("$api4qq${song.songMid}")
                 if (playResult?.isNotBlank() == true) {
                     val playUrl =

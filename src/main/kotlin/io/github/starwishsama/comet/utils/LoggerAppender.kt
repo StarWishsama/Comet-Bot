@@ -1,15 +1,20 @@
 package io.github.starwishsama.comet.utils
 
 import java.io.File
-import java.io.PrintWriter
+import java.io.FileWriter
 
+/**
+ * [LoggerAppender]
+ *
+ * Logger 写入文件使用的类
+ */
 class LoggerAppender(file: File) {
-    private val fileWriter: PrintWriter
+    private val fileWriter: FileWriter
 
     init {
         if (!file.exists()) file.createNewFile()
 
-        fileWriter = file.printWriter()
+        fileWriter = FileWriter(file)
 
         Runtime.getRuntime().addShutdownHook(Thread {
             fileWriter.flush()
@@ -17,8 +22,9 @@ class LoggerAppender(file: File) {
         })
     }
 
+    @Synchronized
     fun appendLog(log: String) {
-        fileWriter.write(log + "\n")
+        fileWriter.append(log.replace("\u001B\\[0m".toRegex(), "") + "\n")
         fileWriter.flush()
     }
 }

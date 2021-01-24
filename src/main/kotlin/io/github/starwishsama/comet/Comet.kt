@@ -9,7 +9,7 @@ import io.github.starwishsama.comet.BotVariables.log
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.BotVariables.loggerAppender
 import io.github.starwishsama.comet.BotVariables.startTime
-import io.github.starwishsama.comet.Comet.isFailed
+import io.github.starwishsama.comet.Comet.currentStep
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
@@ -56,7 +56,7 @@ object Comet {
             setOpt(LineReader.Option.DISABLE_EVENT_EXPANSION)
             unsetOpt(LineReader.Option.INSERT_TAB)
         }
-    var isFailed = false
+    var currentStep = -1
 
     @JvmStatic
     @OptIn(ExperimentalTime::class)
@@ -231,13 +231,13 @@ object Comet {
             botLoggerSupplier = { it ->
                 PlatformLogger("Comet ${it.id}") {
                     println(it)
-                    log.writeString(it)
+                    loggerAppender.appendLog(it)
                 }
             }
             networkLoggerSupplier = { it ->
                 PlatformLogger("CometNet ${it.id}") {
                     println(it)
-                    log.writeString(it)
+                    loggerAppender.appendLog(it)
                 }
             }
             heartbeatPeriodMillis = cfg.heartBeatPeriod * 60 * 1000
@@ -252,7 +252,7 @@ object Comet {
             bot.login()
         } catch (e: LoginFailedException) {
             daemonLogger.info("登录失败, 如果是密码错误, 请重新输入密码")
-            isFailed = true
+            currentStep = 2
             handleLogin()
             return
         }
@@ -295,7 +295,6 @@ fun initResources() {
 
 @OptIn(ExperimentalTime::class)
 private suspend fun handleLogin() {
-    daemonLogger.info("请输入欲登录的机器人账号")
     while (true) {
         try {
             var command: String
@@ -304,7 +303,8 @@ private suspend fun handleLogin() {
                 break
             }
 
-            if (cfg.botId == 0L) {
+            if (cfg.botId == 0L || currentStep == -1) {
+                daemonLogger.info("请输入欲登录的机器人账号")
                 command = Comet.console.readLine(">")
 
                 if (command == "stop") exitProcess(0)
@@ -312,12 +312,15 @@ private suspend fun handleLogin() {
                 if (command.isNumeric()) {
                     cfg.botId = command.toLong()
                     daemonLogger.info("成功设置账号为 ${cfg.botId}")
-                    daemonLogger.info("请输入欲登录的机器人密码")
+                    currentStep = 0
+                } else {
+                    daemonLogger.info("请输入正确的账号")
                 }
-            } else if (cfg.botPassword.isEmpty() || isFailed) {
+            } else if (cfg.botPassword.isEmpty() || currentStep == 2) {
+                daemonLogger.info("请输入欲登录的机器人密码")
                 command = Comet.console.readLine(">", '*')
                 cfg.botPassword = command
-                isFailed = false
+                currentStep = 1
                 daemonLogger.info("成功设置密码, 按下 Enter 启动机器人")
             } else if (cfg.botId != 0L && cfg.botPassword.isNotEmpty()) {
                 daemonLogger.info("正在启动 Comet...")
