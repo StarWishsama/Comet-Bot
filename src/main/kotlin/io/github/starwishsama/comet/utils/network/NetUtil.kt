@@ -8,16 +8,6 @@ import io.github.starwishsama.comet.utils.StringUtil.containsEtc
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.verboseS
 import okhttp3.*
-import org.openqa.selenium.*
-import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.edge.EdgeDriver
-import org.openqa.selenium.firefox.FirefoxDriver
-import org.openqa.selenium.ie.InternetExplorerDriver
-import org.openqa.selenium.opera.OperaDriver
-import org.openqa.selenium.remote.DesiredCapabilities
-import org.openqa.selenium.remote.RemoteWebDriver
-import org.openqa.selenium.support.ui.ExpectedCondition
-import org.openqa.selenium.support.ui.WebDriverWait
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.Proxy
@@ -30,11 +20,8 @@ import java.util.concurrent.TimeUnit
 fun Response.isType(typeName: String): Boolean = headers["content-type"]?.contains(typeName) == true
 
 object NetUtil {
-    lateinit var driver: WebDriver
-
     const val defaultUA =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36"
-
 
     /**
      * 执行 Http 请求 (Get)
@@ -211,92 +198,6 @@ object NetUtil {
             }
         }
     }
-
-    /**
-     * 获取网页截图
-     *
-     * @param address 需截图的网页地址
-     * @param extraExecute 执行的额外操作, 如执行脚本
-     */
-    fun getScreenshot(
-        address: String, extraExecute: WebDriver.() -> Unit = {
-            // 获取推文使用, 如有其他需求请自行重载
-            val wait = WebDriverWait(this, 50, 1)
-
-            // 等待推文加载完毕再截图
-            wait.until(ExpectedCondition { webDriver ->
-                webDriver?.findElement(By.cssSelector("article"))
-                var tag: By? = null
-                try {
-                    tag = By.tagName("img")
-                } catch (ignored: IllegalArgumentException) {
-                    // 部分推文是没有图片的
-                }
-                tag?.let { webDriver?.findElement(it) }
-            })
-
-            // 执行脚本获取合适的推文宽度
-            val jsExecutor = (this as JavascriptExecutor)
-            val width =
-                jsExecutor.executeScript("""return document.querySelector("section").getBoundingClientRect().bottom""") as Double
-
-            // 调整窗口大小
-            manage().window().size = Dimension(640, width.toInt())
-        }
-    ): File? {
-        try {
-            if (!::driver.isInitialized) return null
-
-            var isConnected = false
-
-            // 检查驱动器是否正常, 如果不正常重新初始化
-            try {
-                driver.get(address)
-                isConnected = true
-            } catch (e: WebDriverException) {
-                initDriver()
-            }
-
-            // 避免重新获取徒增时长
-            if (isConnected) driver.get(address)
-
-            driver.extraExecute()
-
-            return (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
-        } catch (e: Exception) {
-            daemonLogger.warning("在调用 WebDriver 时出现异常", e)
-        }
-
-        return null
-    }
-
-    fun initDriver() {
-        if (!cfg.debugMode || cfg.webDriverName.isBlank()) return
-
-        try {
-            when (cfg.webDriverName.toLowerCase()) {
-                "chrome" -> driver = ChromeDriver()
-                "edge" -> driver = EdgeDriver()
-                "firefox" -> driver = FirefoxDriver()
-                "ie", "internetexplorer" -> driver = InternetExplorerDriver()
-                "opera" -> driver = OperaDriver()
-                "remote" -> driver = RemoteWebDriver(URL(cfg.remoteWebDriver), DesiredCapabilities.chrome())
-                else -> {
-                    if (cfg.webDriverName.isNotEmpty()) {
-                        daemonLogger.warning("不支持的 WebDriver 类型: ${cfg.webDriverName}, Comet 支持 [Chrome, Edge, Firefox, IE, Opera]")
-                    }
-                }
-            }
-        } catch (e: RuntimeException) {
-            daemonLogger.warning("在尝试加载 WebDriver for ${cfg.webDriverName} 时出现问题", e)
-        }
-    }
-
-    fun closeDriver() {
-        if (driverUsable()) driver.close()
-    }
-
-    fun driverUsable(): Boolean = ::driver.isInitialized
 
     fun checkProxyUsable(customUrl: String = "https://www.gstatic.com/generate_204", timeout: Int = 2_000): Boolean {
         if (!cfg.proxySwitch || cfg.proxyUrl.isEmpty() || cfg.proxyPort <= 0) return false

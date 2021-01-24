@@ -28,7 +28,6 @@ import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.RuntimeUtil.getUsedMemory
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
-import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -292,7 +291,6 @@ fun initResources() {
     )
 
     DataSetup.init()
-    NetUtil.initDriver()
 }
 
 @OptIn(ExperimentalTime::class)
@@ -335,7 +333,6 @@ private suspend fun handleLogin() {
 
 fun invokeWhenClose(){
     logger.info("[Bot] 正在关闭 Bot...")
-    NetUtil.closeDriver()
     DataSetup.saveAllResources()
     BotVariables.service.shutdown()
     BotVariables.rCon?.disconnect()

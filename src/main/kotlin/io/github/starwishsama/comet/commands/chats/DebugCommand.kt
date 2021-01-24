@@ -1,18 +1,14 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
-import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
-import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.pushers.*
@@ -20,20 +16,12 @@ import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
-import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.RssUtil
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.toMessageChain
-import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
-import org.openqa.selenium.By
-import org.openqa.selenium.Dimension
-import org.openqa.selenium.JavascriptExecutor
-import org.openqa.selenium.support.ui.ExpectedCondition
-import org.openqa.selenium.support.ui.WebDriverWait
 import java.io.IOException
 import java.util.concurrent.ThreadPoolExecutor
 import kotlin.time.ExperimentalTime
@@ -151,76 +139,6 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                 }
                 "pushpool" -> {
                     return BiliDynamicChecker.getPool().toString().sendMessage()
-                }
-                "twpic" -> {
-                    if (args.isEmpty()) return "/debug twpic [Tweet ID]".convertToChain()
-                    else {
-                        if (args[1].isNumeric()) {
-                            val tweet = TwitterApi.getTweetById(args[1].toLong())
-                            if (tweet != null) {
-                                val screenshot = NetUtil.getScreenshot(tweet.getTweetURL())
-                                    ?: return "Can't take screenshot, See console for more info :(".convertToChain()
-                                return screenshot.uploadAsImage(event.subject).toMessageChain()
-                            } else {
-                                return "Can't found tweet which id is ${args[0]}.".convertToChain()
-                            }
-                        } else {
-                            return "NaN".convertToChain()
-                        }
-                    }
-                }
-                "bilipic" -> {
-                    if (args.isEmpty()) return "/debug bilipic [Dynamic ID]".convertToChain()
-                    else {
-                        if (args[1].isNumeric()) {
-                            val dynamic = BiliBiliMainApi.getDynamicById(args[1].toLong())
-
-
-                            if (!NetUtil.driverUsable()) {
-                                return "The driver doesn't enabled or unusable!".convertToChain()
-                            }
-
-                            try {
-                                val screenshot = NetUtil.getScreenshot(
-                                    "https://t.bilibili.com/${dynamic.data.card?.description?.dynamicId}"
-                                ) {
-                                    val wait = WebDriverWait(this, 50, 1)
-
-                                    // 等待动态加载完毕再截图
-                                    wait.until(ExpectedCondition { webDriver ->
-                                        try {
-                                            webDriver?.findElement(By.className("content-full"))
-                                        } catch (e: Exception) {
-                                            daemonLogger.warning("获取网页元素时出现异常", e)
-                                        }
-                                    })
-
-                                    // 执行脚本获取合适的动态宽度
-                                    val jsExecutor = (this as JavascriptExecutor)
-                                    val width = jsExecutor.executeScript(
-                                        """return document.getElementsByClassName("main-content")[1].offsetWidth"""
-                                    ) as Int
-                                    val height =
-                                        jsExecutor.executeScript(
-                                            """return document.getElementsByClassName("main-content")[1].offsetHeight"""
-                                        ) as Int
-
-                                    // 调整窗口大小
-                                    manage().window().size = Dimension(width, height)
-                                }
-                                    ?: return "Can't take screenshot, See console for more info :(".convertToChain()
-                                return screenshot.uploadAsImage(event.subject).toMessageChain()
-                            } catch (e: Exception) {
-                                if (e is ApiException) {
-                                    return "Can't found bili dynamic which id is ${args[0]}.".convertToChain()
-                                }
-
-                                daemonLogger.warning("Can't retrieve bilibili dynamic", e)
-                            }
-                        } else {
-                            return "NaN".convertToChain()
-                        }
-                    }
                 }
                 "quit" -> {
                     if (event is GroupMessageEvent) {
