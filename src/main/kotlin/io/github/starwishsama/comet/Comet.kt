@@ -207,7 +207,7 @@ object Comet {
         logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
 
         /** 监听器 */
-        val listeners = arrayOf(ConvertLightAppListener, RepeatListener, BotGroupStatusListener, BotStatusListener, AutoReplyListener)
+        val listeners = arrayOf(ConvertLightAppListener, RepeatListener, BotGroupStatusListener, AutoReplyListener)
 
         listeners.forEach {
             it.register(bot)
