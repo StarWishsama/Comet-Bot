@@ -336,8 +336,8 @@ private suspend fun handleLogin() {
 
 fun invokeWhenClose(){
     logger.info("[Bot] 正在关闭 Bot...")
-    loggerAppender.close()
     DataSetup.saveAllResources()
     BotVariables.service.shutdown()
     BotVariables.rCon?.disconnect()
+    loggerAppender.close()
 }
