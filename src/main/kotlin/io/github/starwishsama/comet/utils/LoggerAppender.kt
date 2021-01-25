@@ -10,6 +10,7 @@ import java.io.FileWriter
  */
 class LoggerAppender(file: File) {
     private val fileWriter: FileWriter
+    private var isClosed = false
 
     init {
         if (!file.exists()) file.createNewFile()
@@ -18,13 +19,16 @@ class LoggerAppender(file: File) {
 
         Runtime.getRuntime().addShutdownHook(Thread {
             fileWriter.flush()
+            isClosed = true
             fileWriter.close()
         })
     }
 
     @Synchronized
     fun appendLog(log: String) {
-        fileWriter.append(log.replace("\u001B\\[0m".toRegex(), "") + "\n")
-        fileWriter.flush()
+        if (isClosed) {
+            fileWriter.append(log.replace("\u001B\\[0m".toRegex(), "") + "\n")
+            fileWriter.flush()
+        }
     }
 }
