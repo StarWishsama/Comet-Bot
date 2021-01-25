@@ -8,13 +8,16 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import kotlinx.coroutines.delay
+import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.at
+import net.mamoe.mirai.utils.MiraiExperimentalApi
 import java.time.format.DateTimeFormatter
 
+@OptIn(MiraiExperimentalApi::class)
 @CometCommand
 class InfoCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
@@ -45,7 +48,7 @@ class InfoCommand : ChatCommand {
                 return if (users.size > 9) {
                     for (i in 0..9) {
                         sb.append(i + 1).append(" ")
-                            .append(users[i].id)
+                            .append(Mirai.queryProfile(event.bot, users[i].id).nickname)
                             .append(" ").append(String.format("%.1f", users[i].checkInPoint)).append("\n")
                     }
                     delay(500)
