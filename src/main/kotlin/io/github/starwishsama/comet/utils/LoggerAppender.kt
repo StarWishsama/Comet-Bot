@@ -14,14 +14,7 @@ class LoggerAppender(file: File) {
 
     init {
         if (!file.exists()) file.createNewFile()
-
         fileWriter = FileWriter(file)
-
-        Runtime.getRuntime().addShutdownHook(Thread {
-            fileWriter.flush()
-            isClosed = true
-            fileWriter.close()
-        })
     }
 
     @Synchronized
@@ -30,5 +23,11 @@ class LoggerAppender(file: File) {
             fileWriter.append(log.replace("\u001B\\[0m".toRegex(), "") + "\n")
             fileWriter.flush()
         }
+    }
+
+    fun close() {
+        isClosed = true
+        fileWriter.flush()
+        fileWriter.close()
     }
 }
