@@ -12,6 +12,7 @@ import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.sessions.SessionUser
 import io.github.starwishsama.comet.sessions.commands.roll.RollSession
 import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -28,11 +29,11 @@ import net.mamoe.mirai.message.data.messageChainOf
 class RollCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (!CometUtil.isNoCoolDown(user.id)) return EmptyMessageChain
-        if (event !is GroupMessageEvent) return CometUtil.sendMessage("本命令仅限群聊使用")
+        if (event !is GroupMessageEvent) return "本命令仅限群聊使用".sendMessage()
 
         val session = SessionManager.getSessionByGroup(event.group.id, RollSession::class.java)
         if (session.exists() && session.hasType(RollSession::class.java)) {
-            return CometUtil.sendMessage("该群已经有一个正在进行中的抽奖了!")
+            return "该群已经有一个正在进行中的抽奖了!".sendMessage()
         }
 
         if (args.size < 2) {
@@ -44,11 +45,11 @@ class RollCommand : ChatCommand, SuspendCommand {
             val rollDelay = args.getOrNull(3)?.toIntOrNull()
 
             if (rollThingCount == -1 || (args.getOrNull(3) != null && rollDelay == null)) {
-                return CometUtil.sendMessage("请输入有效的物品数量!")
+                return "请输入有效的物品数量!".sendMessage()
             }
 
             if (rollDelay != null && rollDelay !in 1..15) {
-                return CometUtil.sendMessage("开奖时间设置错误! 范围为 (0, 15] 分钟")
+                return "开奖时间设置错误! 范围为 (0, 15] 分钟".sendMessage()
             }
 
             val rollSession = RollSession(
@@ -71,7 +72,7 @@ class RollCommand : ChatCommand, SuspendCommand {
                         }
                         GlobalScope.launch {
                             group.sendMessage(
-                                    CometUtil.sendMessage(
+                                    sendMessage(
                                             "由${(rollStarter as Member).nameCardOrNick}发起的抽奖开奖了!\n" +
                                                     "奖品: ${rollItem}\n" +
                                                     "中奖者: "
@@ -84,7 +85,7 @@ class RollCommand : ChatCommand, SuspendCommand {
 
             SessionManager.addAutoCloseSession(rollSession, rollSession.stopAfterMinute)
 
-            return CometUtil.sendMessage("""
+            return sendMessage("""
                 ${event.senderName} 发起了一个抽奖!
                 抽奖物品: ${rollSession.rollItem}
                 抽奖人数: ${rollSession.count}

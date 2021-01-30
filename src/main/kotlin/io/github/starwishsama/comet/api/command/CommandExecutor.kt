@@ -15,7 +15,6 @@ import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import io.github.starwishsama.comet.utils.debugS
 import io.github.starwishsama.comet.utils.network.NetUtil
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
@@ -229,16 +228,14 @@ object CommandExecutor {
             if (session.exists()) {
                 val hasDaemonSession = session.sessionList.parallelStream().filter { it is DaemonSession }.findAny()
                 hasDaemonSession.ifPresent {
-                    GlobalScope.run {
-                        session.sessionList.forEach { current ->
-                            if (current is DaemonSession) {
-                                return@forEach
-                            }
+                    session.sessionList.forEach { current ->
+                        if (current is DaemonSession) {
+                            return@forEach
+                        }
 
-                            val command = current.command
-                            if (command is SuspendCommand) {
-                                runBlocking { command.handleInput(event, BotUser.getUserSafely(sender.id), current) }
-                            }
+                        val command = current.command
+                        if (command is SuspendCommand) {
+                            runBlocking { command.handleInput(event, BotUser.getUserSafely(sender.id), current) }
                         }
                     }
                 }

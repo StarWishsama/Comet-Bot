@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.pushers
+package io.github.starwishsama.comet.service.pushers
 
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger

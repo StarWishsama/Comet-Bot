@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.pushers
+package io.github.starwishsama.comet.service.pushers
 
 import net.mamoe.mirai.Bot
 import java.time.LocalDateTime

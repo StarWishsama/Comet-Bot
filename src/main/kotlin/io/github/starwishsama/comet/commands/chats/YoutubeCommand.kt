@@ -9,7 +9,7 @@ import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
-import io.github.starwishsama.comet.pushers.YoutubeStreamingChecker
+import io.github.starwishsama.comet.service.pushers.YoutubeStreamingChecker
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.GroupMessageEvent

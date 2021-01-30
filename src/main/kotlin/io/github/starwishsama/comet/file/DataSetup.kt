@@ -33,7 +33,7 @@ object DataSetup {
     private val userCfg: File = File(BotVariables.filePath, "users.json")
     private val shopItemCfg: File = File(BotVariables.filePath, "items.json")
     private val cfgFile: File = File(BotVariables.filePath, "config.yml")
-    private val langCfg: File = File(BotVariables.filePath, "lang.json")
+    private val langCfg: File = File(FileUtil.getResourceFolder(), "i18n.yml")
     private val pcrData = File(FileUtil.getResourceFolder(), "pcr.json")
     private val arkNightData = File(FileUtil.getResourceFolder(), "arkNights.json")
     private val perGroupFolder = FileUtil.getChildFolder("groups")
@@ -137,9 +137,9 @@ object DataSetup {
     private fun loadLang() {
         if (!langCfg.exists()) {
             val default = arrayOf(BotLocalization("msg.bot-prefix", "Bot > "),
-                    BotLocalization("msg.no-permission", "你没有权限"),
-                    BotLocalization("msg.bind-success", "绑定账号 %s 成功!"),
-                    BotLocalization("checkin.first-time", "你还没有签到过, 先用 /qd 签到一次吧~")
+                BotLocalization("msg.no-permission", "你没有权限"),
+                BotLocalization("msg.bind-success", "绑定账号 %s 成功!"),
+                BotLocalization("checkin.first-time", "你还没有签到过, 先用 /qd 签到一次吧~")
             )
             for (text in default) {
                 BotVariables.localMessage.plusAssign(text)
@@ -152,7 +152,7 @@ object DataSetup {
                 BotVariables.localMessage = gson.fromJson(FileReader.create(langCfg).readString())
                 daemonLogger.info("[配置] 成功载入多语言文件")
             } else {
-                daemonLogger.warning("[配置] 在读取时发生了问题, 非法的 JSON 文件")
+                daemonLogger.warning("[配置] 在读取多语言文件时发生异常")
             }
         }
     }

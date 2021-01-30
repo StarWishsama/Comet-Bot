@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.pushers
+package io.github.starwishsama.comet.service.pushers
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
@@ -61,7 +61,7 @@ object YoutubeStreamingChecker : CometPusher {
                         try {
                             group?.sendMessage(wrappedMessage.toMessageChain(group))
                             delay(2_500)
-                        } catch (t: Throwable) {
+                        } catch (t: Exception) {
                             daemonLogger.verboseS("Push youtube live status failed, ${t.message}")
                         }
                     }
