@@ -71,8 +71,8 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                         if (args.size == 1) {
                             return "/group ar [关键词] [回复内容]".sendMessage()
                         } else {
-                            val keyWord = args[2]
-                            val reply = args.getRestString(3)
+                            val keyWord = args[1]
+                            val reply = args.getRestString(2)
 
                             cfg.keyWordReply.forEach {
                                 if (it.reply.text == reply) {

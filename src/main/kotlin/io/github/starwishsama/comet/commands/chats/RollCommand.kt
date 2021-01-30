@@ -60,21 +60,21 @@ class RollCommand : ChatCommand, SuspendCommand {
                     stopAfterMinute = rollDelay ?: 3,
                     count = rollThingCount
             ) {
-                if (this is RollSession) {
-                    val group = event.bot.getGroup(groupId)
+                if (it is RollSession) {
+                    val group = event.bot.getGroup(it.groupId)
 
                     if (group == null) {
-                        daemonLogger.warning("推送开奖消息失败: 找不到对应的群[${groupId}]")
+                        daemonLogger.warning("推送开奖消息失败: 找不到对应的群[${group}]")
                     } else {
                         var winner = messageChainOf()
-                        getWinningUsers().forEach { su ->
+                        it.getWinningUsers().forEach { su ->
                             if (su.member != null) winner = winner.plus(su.member.at())
                         }
                         GlobalScope.launch {
                             group.sendMessage(
                                     sendMessage(
-                                            "由${(rollStarter as Member).nameCardOrNick}发起的抽奖开奖了!\n" +
-                                                    "奖品: ${rollItem}\n" +
+                                            "由${(it.rollStarter as Member).nameCardOrNick}发起的抽奖开奖了!\n" +
+                                                    "奖品: ${it.rollItem}\n" +
                                                     "中奖者: "
                                     ) + winner
                             )
@@ -110,7 +110,8 @@ class RollCommand : ChatCommand, SuspendCommand {
         抽奖延迟时间不填则自动设为 3 分钟.
     """.trimIndent()
 
-    override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
+    override fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
+        println("handling roll session: $session, ${session is RollSession}")
         if (session is RollSession && event is GroupMessageEvent) {
             if (session.rollStarter.id == event.sender.id) return
 

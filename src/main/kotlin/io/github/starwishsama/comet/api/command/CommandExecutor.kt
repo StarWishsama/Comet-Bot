@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.api.command.interfaces.SuspendCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.DaemonSession
-import io.github.starwishsama.comet.sessions.SessionGetResult
+import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
@@ -15,7 +15,6 @@ import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import io.github.starwishsama.comet.utils.debugS
 import io.github.starwishsama.comet.utils.network.NetUtil
-import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -137,7 +136,7 @@ object CommandExecutor {
                  * 如果不是监听会话, 则停止尝试解析并执行可能的命令
                  * 反之在监听时仍然可以执行命令
                  */
-                if (session.exists() && !handleSession(event, executedTime)) {
+                if (session.exists() && !handleSession(session.sessionList, event, executedTime, user)) {
                     return ExecutedResult(EmptyMessageChain, cmd, CommandStatus.MoveToSession())
                 }
 
@@ -153,7 +152,7 @@ object CommandExecutor {
                     }
                 }
 
-                val prefix = isCommandPrefix(message)
+                val prefix = hasCommandPrefix(message)
 
                 if (prefix.isNotEmpty() && cmd != null) {
                     // 前缀末尾下标
@@ -220,28 +219,23 @@ object CommandExecutor {
      * @return 是否为监听会话
      */
     @ExperimentalTime
-    private suspend fun handleSession(event: MessageEvent, time: LocalDateTime): Boolean {
-        val sender = event.sender
+    private fun handleSession(sessions: List<Session>, event: MessageEvent, time: LocalDateTime, user: BotUser): Boolean {
+        if (hasCommandPrefix(event.message.contentToString()).isEmpty()) {
+            val hasDaemonSession = sessions.parallelStream().filter { it is DaemonSession }.findAny()
+            hasDaemonSession.ifPresent {
+                sessions.forEach { current ->
+                    if (current !is DaemonSession) {
+                        return@forEach
+                    }
 
-        if (isCommandPrefix(event.message.contentToString()).isEmpty()) {
-            val session: SessionGetResult = SessionManager.getSessionByEvent(event)
-            if (session.exists()) {
-                val hasDaemonSession = session.sessionList.parallelStream().filter { it is DaemonSession }.findAny()
-                hasDaemonSession.ifPresent {
-                    session.sessionList.forEach { current ->
-                        if (current is DaemonSession) {
-                            return@forEach
-                        }
-
-                        val command = current.command
-                        if (command is SuspendCommand) {
-                            runBlocking { command.handleInput(event, BotUser.getUserSafely(sender.id), current) }
-                        }
+                    val command = current.command
+                    if (command is SuspendCommand) {
+                        command.handleInput(event, user, current)
                     }
                 }
-
-                return hasDaemonSession.isPresent
             }
+
+            return hasDaemonSession.isPresent
         }
 
         BotVariables.logger.debug(
@@ -268,7 +262,7 @@ object CommandExecutor {
     }
 
     private fun getCommandName(message: String): String {
-        val cmdPrefix = isCommandPrefix(message)
+        val cmdPrefix = hasCommandPrefix(message)
 
         val index = message.indexOf(cmdPrefix) + cmdPrefix.length
 
@@ -280,7 +274,7 @@ object CommandExecutor {
      *
      * @return 消息前缀, 不匹配返回空
      */
-    private fun isCommandPrefix(message: String): String {
+    private fun hasCommandPrefix(message: String): String {
         if (message.isNotEmpty()) {
             BotVariables.cfg.commandPrefix.forEach {
                 if (message.startsWith(it)) {

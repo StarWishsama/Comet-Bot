@@ -26,7 +26,7 @@ object SessionManager {
         addSession(session)
         TaskUtil.runAsync(closeAfterMinute.toLong(), TimeUnit.MINUTES) {
             session.beforeExpiredAction(session)
-            daemonLogger.verbose("自动关闭会话 ${session::class.java.simpleName + "#" + session.hashCode()}, 结果: ${sessions.remove(session)}")
+            expireSession(session)
         }
     }
 

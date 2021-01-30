@@ -13,7 +13,7 @@ import net.mamoe.mirai.event.events.MessageEvent
  */
 interface SuspendCommand {
     /** 处理用户输入内容 */
-    suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session)
+    fun handleInput(event: MessageEvent, user: BotUser, session: Session)
 }
 
 /**

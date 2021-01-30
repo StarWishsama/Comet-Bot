@@ -26,7 +26,7 @@ class ShopCommand : ChatCommand, SuspendCommand {
         /shop put 上架商品
     """.trimIndent()
 
-    override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
+    override fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
         SessionManager.expireSession(session)
     }
 }

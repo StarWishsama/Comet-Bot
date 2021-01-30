@@ -2,14 +2,13 @@ package io.github.starwishsama.comet.sessions
 
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import net.mamoe.mirai.contact.Member
-import java.time.LocalDateTime
 import java.util.*
 
 
 /**
  * @author Nameless
  */
-open class Session(open var groupId: Long = 0, var command: ChatCommand, val beforeExpiredAction: Session.() -> Unit = {}, val createdTime: LocalDateTime = LocalDateTime.now()) {
+open class Session(open var groupId: Long = 0, var command: ChatCommand, val beforeExpiredAction: (Session) -> Unit = {}) {
     val users: MutableList<SessionUser> = LinkedList()
 
     constructor(command: ChatCommand, id: Long) : this(-1, command) {

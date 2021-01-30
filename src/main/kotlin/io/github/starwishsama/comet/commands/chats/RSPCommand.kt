@@ -10,6 +10,7 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.CometUtil
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -34,7 +35,7 @@ class RSPCommand : ChatCommand, SuspendCommand {
 
     override fun getHelp(): String = "/cq 石头剪刀布"
 
-    override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
+    override fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
         if (!inProgressPlayer.contains(user.id)) {
             try {
                 val player = RockPaperScissors.getType(event.message.contentToString())
@@ -45,18 +46,20 @@ class RSPCommand : ChatCommand, SuspendCommand {
 
                     val gameStatus = RockPaperScissors.isWin(player, system)
 
-                    when (RockPaperScissors.isWin(player, system)) {
-                        -1 -> event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("平局! 我出的是${system.display[0]}"))
-                        0 -> event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("你输了! 我出的是${system.display[0]}"))
-                        1 -> event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("你赢了! 我出的是${system.display[0]}"))
-                        else -> event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("这合理吗?"))
+                    runBlocking {
+                        when (RockPaperScissors.isWin(player, system)) {
+                            -1 -> event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("平局! 我出的是${system.display[0]}"))
+                            0 -> event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("你输了! 我出的是${system.display[0]}"))
+                            1 -> event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("你赢了! 我出的是${system.display[0]}"))
+                            else -> event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("这合理吗?"))
+                        }
                     }
 
                     if (gameStatus in -1..1) {
                         SessionManager.expireSession(session)
                     }
                 } else {
-                    event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("你的拳法杂乱无章, 这合理吗?"))
+                    runBlocking { event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("你的拳法杂乱无章, 这合理吗?")) }
                 }
             } finally {
                 inProgressPlayer.remove(user.id)

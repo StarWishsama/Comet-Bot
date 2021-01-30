@@ -13,6 +13,7 @@ import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.network.PictureSearchUtil
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.Image
@@ -67,14 +68,16 @@ class PictureSearchCommand : ChatCommand, SuspendCommand {
     """.trimIndent()
 
     @OptIn(MiraiExperimentalApi::class)
-    override suspend fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
+    override fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
         SessionManager.expireSession(session)
         val image = event.message[Image]
-        if (image != null) {
-            event.subject.sendMessage("请稍等...")
-            event.subject.sendMessage(handlePicSearch(image.queryUrl()))
-        } else {
-            event.subject.sendMessage("请发送图片!")
+        runBlocking {
+            if (image != null) {
+                event.subject.sendMessage("请稍等...")
+                event.subject.sendMessage(handlePicSearch(image.queryUrl()))
+            } else {
+                event.subject.sendMessage("请发送图片!")
+            }
         }
     }
 
