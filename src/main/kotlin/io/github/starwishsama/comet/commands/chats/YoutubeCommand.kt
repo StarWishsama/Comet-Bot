@@ -11,6 +11,7 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
 import io.github.starwishsama.comet.service.pushers.YoutubeStreamingChecker
 import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -25,14 +26,30 @@ class YoutubeCommand : ChatCommand {
                 return getHelp().convertToChain()
             } else {
                 when (args[0]) {
-                    "info" -> TODO("Youtube command haven't been implemented")
+                    "info" -> return if (event is GroupMessageEvent) {
+                        val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
+                        cfg.youtubeSubscribers.toString().sendMessage()
+                    } else {
+                        "该功能仅限群聊使用".sendMessage()
+                    }
                     "sub" -> if (event is GroupMessageEvent) {
                         subscribeUser(args, event.group.id)
+                    } else {
+                        return "该功能仅限群聊使用".sendMessage()
                     }
                     "unsub" -> if (event is GroupMessageEvent) {
                         unsubscribeUser(args, event.group.id)
+                    } else {
+                        return "该功能仅限群聊使用".sendMessage()
                     }
-                    "push" -> TODO("Youtube command haven't been implemented")
+                    "push" -> return if (event is GroupMessageEvent) {
+                        val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
+                        cfg.youtubePushEnabled = !cfg.youtubePushEnabled
+
+                        "Youtube 推送状态: ${cfg.youtubePushEnabled}".sendMessage()
+                    } else {
+                        "该功能仅限群聊使用".sendMessage()
+                    }
                     else -> getHelp().convertToChain()
                 }
             }
@@ -43,7 +60,7 @@ class YoutubeCommand : ChatCommand {
     override fun getProps(): CommandProps =
         CommandProps(
                 name = "youtube",
-                aliases = listOf("ytb", "y2b", "油管", "油土鳖"),
+                aliases = listOf("ytb", "y2b", "油管"),
                 description = "查询 Youtube 频道信息",
                 permission = "nbot.commands.youtube",
                 level = UserLevel.ADMIN
@@ -68,17 +85,17 @@ class YoutubeCommand : ChatCommand {
                 try {
                     youtubeUserInfo = YoutubeApi.getChannelVideos(args[1])
                 } catch (e: RateLimitException) {
-                    return CometUtil.sendMessage(e.message)
+                    return sendMessage(e.message)
                 }
 
                 if (youtubeUserInfo != null) {
                     cfg.youtubeSubscribers.add(args[1])
-                    return CometUtil.sendMessage("订阅 ${youtubeUserInfo.items[0].snippet.channelTitle} 成功")
+                    return sendMessage("订阅 ${youtubeUserInfo.items[0].snippet.channelTitle} 成功")
                 }
 
-                return CometUtil.sendMessage("订阅 ${args[1]} 失败")
+                return sendMessage("订阅 ${args[1]} 失败")
             } else {
-                return CometUtil.sendMessage("已经订阅过频道ID为 ${args[1]} 的频道了")
+                return sendMessage("已经订阅过频道ID为 ${args[1]} 的频道了")
             }
         } else {
             return getHelp().convertToChain()
@@ -95,13 +112,13 @@ class YoutubeCommand : ChatCommand {
                 }
 
                 cfg.youtubeSubscribers.clear()
-                CometUtil.sendMessage("退订全部用户成功")
+                sendMessage("退订全部用户成功")
             } else if (cfg.youtubeSubscribers.contains(args[1])) {
                 cfg.youtubeSubscribers.remove(args[1])
                 clearUnsubscribeUsersInPool(groupId, args[1])
-                CometUtil.sendMessage("退订 @${args[1]} 成功")
+                sendMessage("退订 @${args[1]} 成功")
             } else {
-                CometUtil.sendMessage("没有订阅过 @${args[1]}")
+                sendMessage("没有订阅过 @${args[1]}")
             }
         } else {
             getHelp().convertToChain()
