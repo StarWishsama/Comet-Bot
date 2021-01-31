@@ -1,10 +1,12 @@
 package io.github.starwishsama.comet.api.thirdparty.youtube
 
 import cn.hutool.http.HttpException
+import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.JsonSyntaxException
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
+import io.github.starwishsama.comet.objects.pojo.youtube.SearchChannelResult
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
 import io.github.starwishsama.comet.objects.pojo.youtube.VideoType
 import io.github.starwishsama.comet.objects.pojo.youtube.YoutubeRequestError
@@ -14,6 +16,7 @@ import io.github.starwishsama.comet.utils.network.NetUtil
 object YoutubeApi : ApiExecutor {
     private var searchApi = "https://www.googleapis.com/youtube/v3/search?order=date&part=snippet,"
     private const val searchByUserName = "contentDetails,statistics&forUsername="
+    private const val channelGetApi = "https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id="
     private const val maxResult = "&maxResults="
     private var init = false
 
@@ -26,6 +29,34 @@ object YoutubeApi : ApiExecutor {
                     "https://www.googleapis.com/youtube/v3/search?key=${BotVariables.cfg.youtubeApiKey}&order=date&part=snippet,"
         }
         init = true
+    }
+
+    /**
+     * 通过 Youtube 频道 ID 获取频道信息
+     */
+    @Throws(ApiKeyIsEmptyException::class, HttpException::class)
+    fun getChannelByID(channelId: String): SearchChannelResult? {
+        if (!init) init()
+
+        if (!searchApi.contains("key")) throw ApiKeyIsEmptyException("Youtube")
+
+        NetUtil.executeHttpRequest(channelGetApi + channelId).use {
+            if (it.isSuccessful) {
+                val body = it.body?.string() ?: return null
+                try {
+                    return BotVariables.gson.fromJson(body)
+                } catch (e: JsonSyntaxException) {
+                    try {
+                        val error = BotVariables.gson.fromJson(body, YoutubeRequestError::class.java)
+                        BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.code}, 信息: ${error.message}")
+                    } catch (e: JsonSyntaxException) {
+                        BotVariables.logger.warning("[YTB] 无法解析 API 传入的 json", e)
+                    }
+                }
+            }
+        }
+
+        return null
     }
 
     /**

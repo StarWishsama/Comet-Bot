@@ -25,10 +25,10 @@ object YoutubeStreamingChecker : CometPusher {
         BotVariables.perGroup.forEach { config ->
             if (config.youtubePushEnabled && config.youtubeSubscribers.isNotEmpty()) {
                 config.youtubeSubscribers.forEach {
-                    if (pushPool.containsKey(it)) {
-                        pushPool[it]?.groups?.add(config.id)
+                    if (pushPool.containsKey(it.id)) {
+                        pushPool[it.id]?.groups?.add(config.id)
                     } else {
-                        pushPool[it] = PushObject(mutableListOf(config.id))
+                        pushPool[it.id] = PushObject(mutableListOf(config.id))
                     }
                 }
             }

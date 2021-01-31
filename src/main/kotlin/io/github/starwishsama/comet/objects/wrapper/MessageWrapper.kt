@@ -16,13 +16,11 @@ open class MessageWrapper(var text: String?, val success: Boolean = true, var un
     private suspend fun getPictures(contact: Contact): List<Image> {
         val images = mutableListOf<Image>()
 
-        pictureUrl.forEach {
-            NetUtil.executeHttpRequest(url = it, autoClose = true).body.use { result ->
-                if (result != null) {
-                    val uploadedImage = result.byteStream().uploadAsImage(contact)
-                    images.add(uploadedImage)
-                    delay(500)
-                }
+        pictureUrl.forEach { url ->
+            NetUtil.getInputStream(url)?.use {
+                val uploadedImage = it.uploadAsImage(contact)
+                images.add(uploadedImage)
+                delay(500)
             }
         }
 

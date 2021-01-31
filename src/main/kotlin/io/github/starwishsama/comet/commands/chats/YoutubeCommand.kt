@@ -4,19 +4,23 @@ import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
+import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeUser
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.service.pushers.YoutubeStreamingChecker
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import java.util.*
 
 @CometCommand
 class YoutubeCommand : ChatCommand {
@@ -26,14 +30,10 @@ class YoutubeCommand : ChatCommand {
                 return getHelp().convertToChain()
             } else {
                 when (args[0]) {
-                    "info" -> return if (event is GroupMessageEvent) {
-                        val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
-                        cfg.youtubeSubscribers.toString().sendMessage()
-                    } else {
-                        "该功能仅限群聊使用".sendMessage()
-                    }
+                    "info" ->
+                        return checkInfo(args[1]).toMessageChain(event.subject, true)
                     "sub" -> if (event is GroupMessageEvent) {
-                        subscribeUser(args, event.group.id)
+                        subscribeUser(args[1], event.group.id)
                     } else {
                         return "该功能仅限群聊使用".sendMessage()
                     }
@@ -76,29 +76,26 @@ class YoutubeCommand : ChatCommand {
         频道 ID 即为频道链接 channel 后面的一串字
     """.trimIndent()
 
-    private fun subscribeUser(args: List<String>, groupId: Long): MessageChain {
+    private fun subscribeUser(channelID: String, groupId: Long): MessageChain {
         val cfg = GroupConfigManager.getConfigOrNew(groupId)
-        if (args.size > 1) {
-            if (!cfg.youtubeSubscribers.contains(args[1])) {
-                val youtubeUserInfo: SearchVideoResult?
 
-                try {
-                    youtubeUserInfo = YoutubeApi.getChannelVideos(args[1])
-                } catch (e: RateLimitException) {
-                    return sendMessage(e.message)
-                }
+        if (hasSubscribed(cfg.youtubeSubscribers, channelID).isPresent) {
+            val youtubeUserInfo: SearchVideoResult?
 
-                if (youtubeUserInfo != null) {
-                    cfg.youtubeSubscribers.add(args[1])
-                    return sendMessage("订阅 ${youtubeUserInfo.items[0].snippet.channelTitle} 成功")
-                }
-
-                return sendMessage("订阅 ${args[1]} 失败")
-            } else {
-                return sendMessage("已经订阅过频道ID为 ${args[1]} 的频道了")
+            try {
+                youtubeUserInfo = YoutubeApi.getChannelVideos(channelID)
+            } catch (e: RateLimitException) {
+                return sendMessage(e.message)
             }
+
+            if (youtubeUserInfo != null) {
+                cfg.youtubeSubscribers.add(YoutubeUser(channelID, youtubeUserInfo.items[0].snippet.channelTitle))
+                return sendMessage("订阅 ${youtubeUserInfo.items[0].snippet.channelTitle} 成功")
+            }
+
+            return sendMessage("订阅 $channelID 失败")
         } else {
-            return getHelp().convertToChain()
+            return sendMessage("已经订阅过频道ID为 $channelID 的频道了")
         }
     }
 
@@ -106,17 +103,16 @@ class YoutubeCommand : ChatCommand {
         val cfg = GroupConfigManager.getConfigOrNew(groupId)
         return if (args.size > 1) {
             if (args[1] == "all" || args[1] == "全部") {
-
                 cfg.youtubeSubscribers.forEach {
-                    clearUnsubscribeUsersInPool(groupId, it)
+                    clearUnsubscribeUsersInPool(groupId, it.id)
                 }
-
                 cfg.youtubeSubscribers.clear()
                 sendMessage("退订全部用户成功")
-            } else if (cfg.youtubeSubscribers.contains(args[1])) {
-                cfg.youtubeSubscribers.remove(args[1])
+            } else if (hasSubscribed(cfg.youtubeSubscribers, args[1]).isPresent) {
+                val sub = hasSubscribed(cfg.youtubeSubscribers, args[1]).get()
+                cfg.youtubeSubscribers.remove(sub)
                 clearUnsubscribeUsersInPool(groupId, args[1])
-                sendMessage("退订 @${args[1]} 成功")
+                sendMessage("退订 ${sub.userName} 成功")
             } else {
                 sendMessage("没有订阅过 @${args[1]}")
             }
@@ -131,5 +127,23 @@ class YoutubeCommand : ChatCommand {
                 cache.groups.remove(groupId)
             }
         }
+    }
+
+    private fun checkInfo(channelID: String): MessageWrapper {
+        val result = YoutubeApi.getChannelByID(channelID) ?: return MessageWrapper("找不到该频道")
+        val item = result.items[0]
+        val text = """
+            ${item.snippet.title}
+            > ${item.statistics.subscriberCount.getBetterNumber()}位订阅者 | ${item.statistics.viewCount}次观看
+            > ${item.snippet.description}
+        """.trimIndent()
+        val wrapper = MessageWrapper(text)
+
+        wrapper.plusImageUrl(item.snippet.thumbnails.asJsonObject["default"].asJsonObject["url"].asString)
+        return wrapper
+    }
+
+    private fun hasSubscribed(subscribers: MutableSet<YoutubeUser>, channelID: String): Optional<YoutubeUser> {
+        return subscribers.parallelStream().filter { it.id == channelID }.findAny()
     }
 }

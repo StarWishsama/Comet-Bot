@@ -5,6 +5,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
+import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
@@ -52,7 +53,7 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
      * Youtube 订阅列表
      */
     @SerializedName("youtube_sub")
-    val youtubeSubscribers: MutableSet<String> = hashSetOf()
+    val youtubeSubscribers: MutableSet<YoutubeUser> = hashSetOf()
 
     /**
      * 是否关闭对此群消息的复读
