@@ -91,7 +91,7 @@ class YoutubeCommand : ChatCommand {
     private fun subscribeUser(channelID: String, groupId: Long): MessageChain {
         val cfg = GroupConfigManager.getConfigOrNew(groupId)
 
-        if (hasSubscribed(cfg.youtubeSubscribers, channelID).isPresent) {
+        if (!hasSubscribed(cfg.youtubeSubscribers, channelID).isPresent) {
             val youtubeUserInfo: SearchVideoResult?
 
             try {

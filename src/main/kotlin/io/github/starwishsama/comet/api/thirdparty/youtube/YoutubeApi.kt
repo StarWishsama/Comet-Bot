@@ -141,9 +141,9 @@ object YoutubeApi : ApiExecutor {
             run {
                 if (item.snippet.getType() == VideoType.STREAMING) {
                     return MessageWrapper("""${item.snippet.channelTitle} 正在直播!
-                                                  直播标题: ${item.snippet.videoTitle}
-                                                  直播时间: ${item.snippet.publishTime}
-                                                  直达链接: ${item.getVideoUrl()}""")
+直播标题: ${item.snippet.videoTitle}
+直播时间: ${item.snippet.publishTime}
+直达链接: ${item.getVideoUrl()}""")
                             .plusImageUrl(item.snippet.getCoverImgUrl())
                 } else if (item.snippet.getType() == VideoType.UPCOMING) {
                     return MessageWrapper("""
