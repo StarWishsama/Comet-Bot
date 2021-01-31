@@ -105,8 +105,7 @@ fun MiraiLogger.verboseS(message: String?, throwable: Throwable?) {
 
 fun BufferedImage.toInputStream(formatName: String = "png"): InputStream {
     ByteArrayOutputStream().use { byteOS ->
-        if (ImageIO.getUseCache()) ImageIO.setUseCache(false)
-
+        ImageIO.setUseCache(false)
         ImageIO.createImageOutputStream(byteOS).use { imOS ->
             ImageIO.write(this, formatName, imOS)
             return ByteArrayInputStream(byteOS.toByteArray())

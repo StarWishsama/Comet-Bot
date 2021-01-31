@@ -230,13 +230,13 @@ object Comet {
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
                 PlatformLogger("Comet ${it.id}") {
-                    println(it)
+                    console.printAbove(it)
                     loggerAppender.appendLog(it)
                 }
             }
             networkLoggerSupplier = { it ->
                 PlatformLogger("CometNet ${it.id}") {
-                    println(it)
+                    console.printAbove(it)
                     loggerAppender.appendLog(it)
                 }
             }
