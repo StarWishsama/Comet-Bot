@@ -19,7 +19,7 @@ class LoggerAppender(file: File) {
 
     @Synchronized
     fun appendLog(log: String) {
-        if (isClosed) {
+        if (!isClosed) {
             fileWriter.append(log.replace("\u001B\\[0m".toRegex(), "") + "\n")
             fileWriter.flush()
         }
