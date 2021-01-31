@@ -57,17 +57,17 @@ object BotVariables {
     )
 
     val logger: MiraiLogger = PlatformLogger("CometBot") {
-        println(it)
+        Comet.console.printAbove(it)
         loggerAppender.appendLog(it)
     }
 
     val daemonLogger: MiraiLogger = PlatformLogger("CometService") {
-        println(it)
+        Comet.console.printAbove(it)
         loggerAppender.appendLog(it)
     }
 
     val consoleCommandLogger: MiraiLogger = PlatformLogger("CometConsole") {
-        println(it)
+        Comet.console.printAbove(it)
         loggerAppender.appendLog(it)
     }
 
