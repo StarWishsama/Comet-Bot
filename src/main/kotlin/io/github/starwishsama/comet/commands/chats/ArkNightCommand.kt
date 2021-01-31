@@ -10,7 +10,7 @@ import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
-import io.github.starwishsama.comet.utils.DrawUtil
+import io.github.starwishsama.comet.utils.GachaUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.uploadAsImage
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +34,7 @@ class ArkNightCommand : ChatCommand {
                 when (args[0]) {
                     "单次寻访", "1", "单抽" -> {
                         val list = pool.getArkDrawResult(user)
-                        return if (DrawUtil.arkPictureIsUsable()) {
+                        return if (GachaUtil.arkPictureIsUsable()) {
                             generatePictureGachaResult(pool, event, user, list)
                         } else {
                             pool.getArkDrawResultAsString(user, list).sendMessage()
@@ -42,7 +42,7 @@ class ArkNightCommand : ChatCommand {
                     }
                     "十连寻访", "10", "十连" -> {
                         val list: List<ArkNightOperator> = pool.getArkDrawResult(user, 10)
-                        return if (DrawUtil.arkPictureIsUsable()) {
+                        return if (GachaUtil.arkPictureIsUsable()) {
                             generatePictureGachaResult(pool, event, user, list)
                         } else {
                             pool.getArkDrawResultAsString(user, list).sendMessage()
@@ -50,7 +50,7 @@ class ArkNightCommand : ChatCommand {
                     }
                     "一井", "300", "来一井" -> {
                         val list: List<ArkNightOperator> = pool.getArkDrawResult(user, 300)
-                        return if (DrawUtil.arkPictureIsUsable()) {
+                        return if (GachaUtil.arkPictureIsUsable()) {
                             generatePictureGachaResult(pool, event, user, list)
                         } else {
                             pool.getArkDrawResultAsString(user, list).sendMessage()
@@ -66,7 +66,7 @@ class ArkNightCommand : ChatCommand {
                                 }
 
                                 val list: List<ArkNightOperator> = pool.getArkDrawResult(user, gachaTime)
-                                return if (DrawUtil.arkPictureIsUsable()) {
+                                return if (GachaUtil.arkPictureIsUsable()) {
                                     generatePictureGachaResult(pool, event, user, list)
                                 } else {
                                     pool.getArkDrawResultAsString(user, list).sendMessage()
@@ -105,12 +105,12 @@ class ArkNightCommand : ChatCommand {
 
         return if (ops.isNotEmpty()) {
             // 只获取最后十个
-            val result = DrawUtil.combineArkOpImage(if (ops.size <= 10) ops else ops.subList(ops.size - 11, ops.size - 1))
-            if (result.lostOps.isNotEmpty())
+            val result = GachaUtil.combineGachaImage(if (ops.size <= 10) ops else ops.subList(ops.size - 11, ops.size - 1), pool)
+            if (result.lostItem.isNotEmpty())
                 event.subject.sendMessage(
                     event.message.quote() + sendMessage("由于缺失资源文件, 以下干员无法显示 :(\n" +
                             buildString {
-                                result.lostOps.forEach {
+                                result.lostItem.forEach {
                                     append("${it.name},")
                                 }
                             }.removeSuffix(","))
@@ -121,7 +121,7 @@ class ArkNightCommand : ChatCommand {
 
             if (event is GroupMessageEvent) event.sender.at().plus("\n").plus(reply) else reply
         } else {
-            (DrawUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}").convertToChain()
+            (GachaUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}").convertToChain()
         }
     }
 }

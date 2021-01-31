@@ -97,9 +97,9 @@ object DataSetup {
         }
 
         try {
-            DrawUtil.arkNightDataCheck(arkNightData)
+            GachaUtil.arkNightDataCheck(arkNightData)
         } catch (e: Exception) {
-            daemonLogger.warning("下载明日方舟游戏数据失败, ${e.message}\n注意: 数据来源于 Github, 国内用户无法下载请自行下载替换\n链接: ${DrawUtil.arkNightData}")
+            daemonLogger.warning("下载明日方舟游戏数据失败, ${e.message}\n注意: 数据来源于 Github, 国内用户无法下载请自行下载替换\n链接: ${GachaUtil.arkNightData}")
         }
 
         if (arkNightData.exists()) {
@@ -120,7 +120,7 @@ object DataSetup {
                 TaskUtil.runAsync {
                     runBlocking {
                         withContext(Dispatchers.IO) {
-                            DrawUtil.downloadArkNightsFile()
+                            GachaUtil.downloadArkNightsFile()
                         }
                     }
                 }

@@ -10,6 +10,11 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
+import io.github.starwishsama.comet.objects.gacha.items.GachaItem
+import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
+import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
+import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
+import io.github.starwishsama.comet.objects.gacha.pool.PCRPool
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -24,7 +29,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.imageio.ImageIO
 
-object DrawUtil {
+object GachaUtil {
     /**
      * 明日方舟
      */
@@ -32,10 +37,24 @@ object DrawUtil {
     const val overTimeMessage = "抽卡次数到上限了, 可以少抽一点或者等待条数自动恢复哦~\n" +
             "命令条数现在每小时会恢复100次, 封顶1000次"
     var pictureReady = false
-    const val pictureCount = 181
+    const val arkNightPictureCount = 181
 
     private const val arkNightDataApi = "https://api.github.com/repos/Kengxxiao/ArknightsGameData"
     const val arkNightData = "https://raw.fastgit.org/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json"
+
+    fun combineGachaImage(gachaResult: List<GachaItem>, poolType: GachaPool): CombinedResult {
+        require(gachaResult.isNotEmpty()) { "传入的抽卡结果列表不能为空!" }
+
+        return when (poolType) {
+            is ArkNightPool -> combineArkOpImage(gachaResult as List<ArkNightOperator>)
+            is PCRPool -> combinePCRImage(gachaResult as List<PCRCharacter>)
+            else -> throw UnsupportedOperationException("暂不支持合成该卡池图片")
+        }
+    }
+
+    fun combinePCRImage(chars: List<PCRCharacter>): CombinedResult {
+        return CombinedResult(BufferedImage(1, 1, 1), listOf())
+    }
 
     /**
      * 根据抽卡结果合成图片
@@ -89,8 +108,8 @@ object DrawUtil {
     }
 
     data class CombinedResult(
-            val image: BufferedImage,
-            val lostOps: List<ArkNightOperator>
+        val image: BufferedImage,
+        val lostItem: List<out GachaItem>
     )
 
     fun getStar(rare: Int, isArkNight: Boolean = false): String = buildString {
@@ -106,7 +125,7 @@ object DrawUtil {
     fun downloadArkNightsFile() {
         val arkLoc = FileUtil.getResourceFolder().getChildFolder("ark")
 
-        if (pictureCount > arkLoc.filesCount()) {
+        if (arkNightPictureCount > arkLoc.filesCount()) {
             val startTime = LocalDateTime.now()
             daemonLogger.info("正在下载 明日方舟图片资源文件")
 

@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.BotVariables.hiddenOperators
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.GachaItem
-import io.github.starwishsama.comet.utils.DrawUtil
+import io.github.starwishsama.comet.utils.GachaUtil
 import java.math.RoundingMode
 import java.util.stream.Collectors
 
@@ -90,7 +90,7 @@ class ArkNightPool(override val name: String = "标准寻访" ) : GachaPool() {
      * 明日方舟抽卡结果
      */
     fun getArkDrawResult(user: BotUser, time: Int = 1): List<ArkNightOperator> {
-        return if (DrawUtil.checkHasGachaTime(user, time)) {
+        return if (GachaUtil.checkHasGachaTime(user, time)) {
             user.decreaseTime(time)
             doDraw(time)
         } else {
@@ -106,12 +106,12 @@ class ArkNightPool(override val name: String = "标准寻访" ) : GachaPool() {
             when (drawResult.size) {
                 1 -> {
                     val (name, _, rare) = drawResult[0]
-                    return "单次寻访结果\n$name ${DrawUtil.getStar(rare, true)}"
+                    return "单次寻访结果\n$name ${GachaUtil.getStar(rare, true)}"
                 }
                 10 -> {
                     return StringBuilder("十连寻访结果:\n").apply {
                         for ((name, _, rare) in drawResult) {
-                            append(name).append(" ").append(DrawUtil.getStar(rare, true)).append(" ")
+                            append(name).append(" ").append(GachaUtil.getStar(rare, true)).append(" ")
                         }
                     }.trim().toString()
                 }
@@ -128,7 +128,7 @@ class ArkNightPool(override val name: String = "标准寻访" ) : GachaPool() {
                 }
             }
         } else {
-            return DrawUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}"
+            return GachaUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}"
         }
     }
 

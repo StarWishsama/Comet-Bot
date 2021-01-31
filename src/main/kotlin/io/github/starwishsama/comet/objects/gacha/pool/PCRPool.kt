@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.BotVariables.pcr
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.items.GachaItem
 import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
-import io.github.starwishsama.comet.utils.DrawUtil
+import io.github.starwishsama.comet.utils.GachaUtil
 import java.util.stream.Collectors
 
 class PCRPool(override val name: String = "白金寻访",
@@ -57,11 +57,11 @@ class PCRPool(override val name: String = "白金寻访",
 
         if (user == null) return getGachaResultAsString(doDraw(time), startTime)
 
-        return if (DrawUtil.checkHasGachaTime(user, time)) {
+        return if (GachaUtil.checkHasGachaTime(user, time)) {
             user.decreaseTime(time)
             getGachaResultAsString(doDraw(time), startTime)
         } else {
-            DrawUtil.overTimeMessage
+            GachaUtil.overTimeMessage
         }
     }
 
@@ -73,7 +73,7 @@ class PCRPool(override val name: String = "白金寻访",
                 buildString {
                     append("素敵な仲間が増えますよ!\n")
                     for ((name, star) in gachaResult) {
-                        append(name).append(" ").append(DrawUtil.getStar(star)).append(" ")
+                        append(name).append(" ").append(GachaUtil.getStar(star)).append(" ")
                     }
                 }.trim()
             }

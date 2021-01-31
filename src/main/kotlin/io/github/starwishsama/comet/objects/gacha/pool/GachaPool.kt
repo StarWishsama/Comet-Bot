@@ -48,7 +48,7 @@ abstract class GachaPool {
     /**
      * 抽卡实现方法
      */
-    abstract fun doDraw(time: Int = 1): List<GachaItem>
+    abstract fun doDraw(time: Int = 1): List<out GachaItem>
 
     /**
      * 获取指定稀有度的物品
