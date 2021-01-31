@@ -147,10 +147,10 @@ object YoutubeApi : ApiExecutor {
                             .plusImageUrl(item.snippet.getCoverImgUrl())
                 } else if (item.snippet.getType() == VideoType.UPCOMING) {
                     return MessageWrapper("""
-                                                            ${item.snippet.channelTitle} 有即将进行的直播!
-                                                            直播标题: ${item.snippet.videoTitle}
-                                                            开播时间请打开查看 ${item.getVideoUrl()}
-                                                        """).plusImageUrl(item.snippet.getCoverImgUrl())
+${item.snippet.channelTitle} 有即将进行的直播!
+直播标题: ${item.snippet.videoTitle}
+开播时间请打开查看 ${item.getVideoUrl()}
+""").plusImageUrl(item.snippet.getCoverImgUrl())
                 }
             }
         }
