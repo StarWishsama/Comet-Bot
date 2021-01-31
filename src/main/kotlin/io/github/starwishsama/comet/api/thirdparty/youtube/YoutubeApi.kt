@@ -98,8 +98,8 @@ object YoutubeApi : ApiExecutor {
     fun SearchVideoResult.getLiveItemOrNull(): SearchVideoResult.SearchResultItem? {
         val items = items
         items.forEach { item ->
-            run {
-                if (item.snippet.getType() == VideoType.STREAMING) return item
+            if (item.snippet.getType() == VideoType.STREAMING) {
+                return item
             }
         }
         return null
@@ -111,8 +111,8 @@ object YoutubeApi : ApiExecutor {
     fun getLiveStatus(result: SearchVideoResult): Boolean {
         val items = result.items
         items.forEach { item ->
-            run {
-                if (item.snippet.getType() == VideoType.STREAMING) return true
+            if (item.snippet.getType() == VideoType.STREAMING) {
+                return true
             }
         }
         return false

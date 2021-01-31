@@ -41,7 +41,7 @@ object YoutubeStreamingChecker : CometPusher {
                 val old = pushObj.result?.getLiveItemOrNull()
                 val now = channelInfo.getLiveItemOrNull()
 
-                if (old == null || old.getVideoUrl() != now?.getVideoUrl()) {
+                if (now != null && (old == null || old.id.videoId != now.id.videoId)) {
                     pushObj.result = channelInfo
                     pushObj.isPushed = false
                 }
