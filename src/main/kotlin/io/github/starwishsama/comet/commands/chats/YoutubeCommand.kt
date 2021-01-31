@@ -33,21 +33,32 @@ class YoutubeCommand : ChatCommand {
                 when (args[0]) {
                     "info" ->
                         return checkInfo(args[1]).toMessageChain(event.subject, true)
-                    "sub" -> if (event is GroupMessageEvent) {
+                    "sub" -> return if (event is GroupMessageEvent) {
                         subscribeUser(args[1], event.group.id)
                     } else {
-                        return "该功能仅限群聊使用".sendMessage()
+                        "该功能仅限群聊使用".sendMessage()
                     }
-                    "unsub" -> if (event is GroupMessageEvent) {
+                    "unsub" -> return if (event is GroupMessageEvent) {
                         unsubscribeUser(args, event.group.id)
                     } else {
-                        return "该功能仅限群聊使用".sendMessage()
+                        "该功能仅限群聊使用".sendMessage()
                     }
                     "push" -> return if (event is GroupMessageEvent) {
                         val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
                         cfg.youtubePushEnabled = !cfg.youtubePushEnabled
 
                         "Youtube 推送状态: ${cfg.youtubePushEnabled}".sendMessage()
+                    } else {
+                        "该功能仅限群聊使用".sendMessage()
+                    }
+                    "list" -> return if (event is GroupMessageEvent) {
+                        val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
+                        buildString {
+                            append("已订阅账号: ")
+                            cfg.youtubeSubscribers.forEach {
+                                append(it.userName + "(" + it.id + ")").append(",")
+                            }
+                        }.removeSuffix(",").sendMessage()
                     } else {
                         "该功能仅限群聊使用".sendMessage()
                     }
