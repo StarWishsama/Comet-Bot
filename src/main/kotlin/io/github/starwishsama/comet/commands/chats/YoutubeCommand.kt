@@ -135,8 +135,8 @@ class YoutubeCommand : ChatCommand {
         val item = result.items[0]
         val text = """
         ${item.snippet.title}
-        > ${item.statistics.subscriberCount.getBetterNumber()}位订阅者 | ${item.statistics.viewCount.getBetterNumber()}次观看
-        > ${item.snippet.description.limitStringSize(50)}
+> ${item.statistics.subscriberCount.getBetterNumber()}位订阅者 | ${item.statistics.viewCount.getBetterNumber()}次观看
+> ${item.snippet.description.limitStringSize(50)}
         """.trimIndent()
         val wrapper = MessageWrapper(text)
 
