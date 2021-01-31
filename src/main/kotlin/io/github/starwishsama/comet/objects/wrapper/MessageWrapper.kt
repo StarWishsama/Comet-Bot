@@ -20,7 +20,7 @@ open class MessageWrapper(var text: String?, val success: Boolean = true, var un
             NetUtil.getInputStream(url)?.use {
                 val uploadedImage = it.uploadAsImage(contact)
                 images.add(uploadedImage)
-                delay(500)
+                delay(1000)
             }
         }
 

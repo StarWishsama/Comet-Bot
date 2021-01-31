@@ -200,13 +200,8 @@ object NetUtil {
     }
 
     fun getInputStream(url: String, timeout: Long = 3): InputStream? {
-        executeHttpRequest(url = url, timeout = timeout, autoClose = true).body.use { result ->
-            if (result != null) {
-                return result.byteStream()
-            }
-        }
-
-        return null
+        val body = executeHttpRequest(url = url, timeout = timeout, autoClose = true, autoCloseDelay = 30).body
+        return body?.byteStream()
     }
 
     fun checkProxyUsable(customUrl: String = "https://www.gstatic.com/generate_204", timeout: Int = 2_000): Boolean {

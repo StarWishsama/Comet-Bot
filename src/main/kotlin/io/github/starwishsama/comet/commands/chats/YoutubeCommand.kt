@@ -16,6 +16,7 @@ import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -133,9 +134,9 @@ class YoutubeCommand : ChatCommand {
         val result = YoutubeApi.getChannelByID(channelID) ?: return MessageWrapper("找不到该频道")
         val item = result.items[0]
         val text = """
-            ${item.snippet.title}
-            > ${item.statistics.subscriberCount.getBetterNumber()}位订阅者 | ${item.statistics.viewCount}次观看
-            > ${item.snippet.description}
+        ${item.snippet.title}
+        > ${item.statistics.subscriberCount.getBetterNumber()}位订阅者 | ${item.statistics.viewCount.getBetterNumber()}次观看
+        > ${item.snippet.description.limitStringSize(50)}
         """.trimIndent()
         val wrapper = MessageWrapper(text)
 
