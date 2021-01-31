@@ -55,18 +55,20 @@ object YoutubeStreamingChecker : CometPusher {
         pushPool.forEach { (_, pushObject) ->
             if (!pushObject.isPushed) {
                 val wrappedMessage = YoutubeApi.getLiveStatusByResult(pushObject.result)
-                pushObject.groups.forEach {
-                    val group = bot?.getGroup(it)
-                    runBlocking {
-                        try {
-                            group?.sendMessage(wrappedMessage.toMessageChain(group))
-                            delay(2_500)
-                        } catch (t: Exception) {
-                            daemonLogger.verboseS("Push youtube live status failed, ${t.message}")
+                if (wrappedMessage.success) {
+                    pushObject.groups.forEach {
+                        val group = bot?.getGroup(it)
+                        runBlocking {
+                            try {
+                                group?.sendMessage(wrappedMessage.toMessageChain(group))
+                                delay(2_500)
+                            } catch (t: Exception) {
+                                daemonLogger.verboseS("Push youtube live status failed, ${t.message}")
+                            }
                         }
                     }
+                    pushObject.isPushed = true
                 }
-                pushObject.isPushed = true
             }
         }
     }

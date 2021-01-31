@@ -155,7 +155,7 @@ ${item.snippet.channelTitle} 有即将进行的直播!
             }
         }
 
-        return MessageWrapper("${result.items[0].snippet.channelTitle} 最近没有直播哦")
+        return MessageWrapper("${result.items[0].snippet.channelTitle} 最近没有直播哦", false)
     }
 
     override var usedTime: Int = 0
