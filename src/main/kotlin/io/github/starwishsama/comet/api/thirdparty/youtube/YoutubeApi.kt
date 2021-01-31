@@ -40,7 +40,7 @@ object YoutubeApi : ApiExecutor {
 
         if (!searchApi.contains("key")) throw ApiKeyIsEmptyException("Youtube")
 
-        NetUtil.executeHttpRequest(channelGetApi + channelId).use {
+        NetUtil.executeHttpRequest(channelGetApi + channelId + "&key=${BotVariables.cfg.youtubeApiKey}").use {
             if (it.isSuccessful) {
                 val body = it.body?.string() ?: return null
                 try {
