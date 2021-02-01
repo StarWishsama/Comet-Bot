@@ -134,7 +134,7 @@ object YoutubeApi : ApiExecutor {
      * 通过 [SearchVideoResult] 获取直播状态, 并将其转换为 [MessageWrapper]
      */
     fun getLiveStatusByResult(result: SearchVideoResult?): MessageWrapper {
-        if (result == null) return MessageWrapper("找不到对应ID的频道", false)
+        if (result == null) return MessageWrapper("无直播数据", false)
 
         val items = result.items
         items.forEach { item ->
