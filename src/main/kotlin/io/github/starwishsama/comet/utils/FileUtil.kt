@@ -292,11 +292,10 @@ object FileUtil {
         }
     }
 
-    private fun handleResourceFile(entry: JarEntry, fileName: String) {
+    private fun handleResourceFile(entry: JarEntry, fileName: String, resourcePath: String = "resources") {
         if (fileName.isEmpty()) return
 
         val entryName = entry.name
-        val resourcePath = "resources"
 
         if (entry.isDirectory && entryName != "$resourcePath/") {
             File(getResourceFolder(), "$fileName/").mkdirs()
@@ -325,5 +324,28 @@ object FileUtil {
                 }
             }
         }
+    }
+
+
+    inline fun <reified T> convertToEntity(file: File, type: ConfigType, writeTo: T) {
+        TODO()
+        /**require(writeTo != null) { "writeTo cannot be null" }
+        when (type) {
+            is ConfigType.Yaml -> {
+                val serializer = writeTo::class.java.getDeclaredMethod("serializer")
+
+                if (serializer.invoke(Unit) is KSerializer<*>) {
+                    writeTo = Yaml.default.decodeFromString(serializer.invoke(Unit) as KSerializer<*>, file.getContext()) as T
+                }
+            }
+            is ConfigType.Json -> {
+                writeTo = gson.fromJson(file.getContext(), T::class.java)
+            }
+        }*/
+    }
+
+    sealed class ConfigType {
+        object Yaml: ConfigType()
+        object Json: ConfigType()
     }
 }
