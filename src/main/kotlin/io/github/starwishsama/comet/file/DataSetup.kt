@@ -12,8 +12,8 @@ import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.arkNightPools
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.hiddenOperators
+import io.github.starwishsama.comet.BotVariables.nullableGson
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.CometConfig
@@ -81,16 +81,16 @@ object DataSetup {
     private fun load() {
         cfg = Yaml.default.decodeFromString(CometConfig.serializer(), cfgFile.getContext())
 
-        BotVariables.users.addAll(gson.fromJson<List<BotUser>>(userCfg.getContext()))
+        BotVariables.users.addAll(nullableGson.fromJson<List<BotUser>>(userCfg.getContext()))
 
-        BotVariables.shop = gson.fromJson(shopItemCfg.getContext())
+        BotVariables.shop = nullableGson.fromJson(shopItemCfg.getContext())
 
         loadLang()
 
         FileUtil.initResourceFile()
 
         if (pcrData.exists()) {
-            BotVariables.pcr = gson.fromJson(pcrData.getContext())
+            BotVariables.pcr = nullableGson.fromJson(pcrData.getContext())
             daemonLogger.info("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个")
         } else {
             daemonLogger.info("未检测到公主连结游戏数据, 抽卡模拟器将无法使用")
@@ -107,7 +107,7 @@ object DataSetup {
             hiddenOperators = Yaml.default.decodeMapFromString(File(FileUtil.getResourceFolder(), "hidden_operators.yml").getContext())["hiddenOperators"] as MutableList<String>
 
             JsonParser.parseString(arkNightData.getContext()).asJsonObject.forEach { _, e ->
-                arkNight.add(gson.fromJson(e))
+                arkNight.add(nullableGson.fromJson(e))
             }
 
             daemonLogger.info("成功载入明日方舟游戏数据, 共 (${arkNight.size - hiddenOperators.size}/${arkNight.size}) 个")
@@ -149,7 +149,7 @@ object DataSetup {
             val lang: JsonElement =
                     JsonParser.parseString(langCfg.getContext())
             if (lang.isJsonArray) {
-                BotVariables.localMessage = gson.fromJson(FileReader.create(langCfg).readString())
+                BotVariables.localMessage = nullableGson.fromJson(FileReader.create(langCfg).readString())
                 daemonLogger.info("[配置] 成功载入多语言文件")
             } else {
                 daemonLogger.warning("[配置] 在读取多语言文件时发生异常")

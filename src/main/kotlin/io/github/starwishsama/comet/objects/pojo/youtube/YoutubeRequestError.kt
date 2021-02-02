@@ -1,12 +1,16 @@
 package io.github.starwishsama.comet.objects.pojo.youtube
 
 data class YoutubeRequestError(
-    val code: Int,
-    val message: String?,
-    val errors: List<YoutubeError>,
-    val status: String
+    val error: Error
 ) {
-    data class YoutubeError(
+    data class Error(
+        val code: Int,
+        val message: String?,
+        val errors: List<ErrorDetail>,
+        val status: String?
+    )
+
+    data class ErrorDetail(
         val message: String,
         val domain: String,
         val reason: String?,

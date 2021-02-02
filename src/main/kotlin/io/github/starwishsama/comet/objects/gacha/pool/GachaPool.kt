@@ -16,9 +16,14 @@ abstract class GachaPool {
     abstract val name: String
 
     /**
+     * 游戏卡池描述
+     */
+    abstract val description: String
+
+    /**
      * 概率UP的物品, 将会在选择卡池时展示给用户
      */
-    val highProbabilityItems: MutableMap<out GachaItem, ClosedFloatingPointRange<Double>> = mutableMapOf()
+    val highProbabilityItems: MutableMap<GachaItem, Double> = mutableMapOf()
 
     /**
      * 天井, 亦称保底次数
@@ -48,7 +53,7 @@ abstract class GachaPool {
     /**
      * 抽卡实现方法
      */
-    abstract fun doDraw(time: Int = 1): List<out GachaItem>
+    abstract fun doDraw(time: Int = 1): List<GachaItem>
 
     /**
      * 获取指定稀有度的物品

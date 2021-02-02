@@ -1,6 +1,5 @@
 package io.github.starwishsama.comet.objects.gacha.custom
 
-import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
 import kotlinx.serialization.Serializable
 import net.mamoe.yamlkt.Comment
 
@@ -30,14 +29,9 @@ data class CustomPool(
     data class ModifiedGachaItem(
         @Comment("修改数据的卡池物品名称")
         val name: String,
-        @Comment("该物品的概率提升或降低值")
+        @Comment("该物品的概率提升或降低值, 设为 0 不调整")
         val probability: Double,
         @Comment("是否从卡池中移除该物品, 若不则填 false")
         val isHidden: Boolean
     )
-
-    @Suppress("unused")
-    fun toGachaPool(): GachaPool {
-        TODO()
-    }
 }

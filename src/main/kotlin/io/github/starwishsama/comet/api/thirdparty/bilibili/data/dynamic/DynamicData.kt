@@ -171,7 +171,7 @@ fun Dynamic.convertToDynamicData(): DynamicData? {
         if (singleDynamicObject.isJsonObject) {
             val dynamicType = DynamicTypeSelector.getType(card.description.type)
             if (dynamicType != UnknownType::class) {
-                return BotVariables.gson.fromJson(card.card, dynamicType)
+                return BotVariables.nullableGson.fromJson(card.card, dynamicType)
             }
         }
     }

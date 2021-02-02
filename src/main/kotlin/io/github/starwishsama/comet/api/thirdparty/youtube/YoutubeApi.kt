@@ -13,9 +13,14 @@ import io.github.starwishsama.comet.objects.pojo.youtube.YoutubeRequestError
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.network.NetUtil
 
+/**
+ * FIXME: 需要重构
+ */
 object YoutubeApi : ApiExecutor {
+    // 100 Unit
     private var searchApi = "https://www.googleapis.com/youtube/v3/search?order=date&part=snippet,"
     private const val searchByUserName = "contentDetails,statistics&forUsername="
+    // 1 Unit
     private const val channelGetApi = "https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id="
     private const val maxResult = "&maxResults="
     private var init = false
@@ -44,11 +49,11 @@ object YoutubeApi : ApiExecutor {
             if (it.isSuccessful) {
                 val body = it.body?.string() ?: return null
                 try {
-                    return BotVariables.gson.fromJson(body)
+                    return BotVariables.nullableGson.fromJson(body)
                 } catch (e: JsonSyntaxException) {
                     try {
-                        val error = BotVariables.gson.fromJson(body, YoutubeRequestError::class.java)
-                        BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.code}, 信息: ${error.message}")
+                        val error = BotVariables.nullableGson.fromJson(body, YoutubeRequestError::class.java)
+                        BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.error.code}, 信息: ${error.error.message}")
                     } catch (e: JsonSyntaxException) {
                         BotVariables.logger.warning("[YTB] 无法解析 API 传入的 json", e)
                     }
@@ -77,11 +82,11 @@ object YoutubeApi : ApiExecutor {
                 val body = response.body?.string() ?: return null
                 /** @TODO 类型自动选择, 类似于 BiliBili 的动态解析 */
                 try {
-                    return BotVariables.gson.fromJson(body, SearchVideoResult::class.java)
+                    return BotVariables.nullableGson.fromJson(body, SearchVideoResult::class.java)
                 } catch (e: JsonSyntaxException) {
                     try {
-                        val error = BotVariables.gson.fromJson(body, YoutubeRequestError::class.java)
-                        BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.code}, 信息: ${error.message}")
+                        val error = BotVariables.nullableGson.fromJson(body, YoutubeRequestError::class.java)
+                        BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.error.code}, 信息: ${error.error.message}")
                     } catch (e: JsonSyntaxException) {
                         BotVariables.logger.warning("[YTB] 无法解析 API 传入的 json", e)
                     }
@@ -134,7 +139,7 @@ object YoutubeApi : ApiExecutor {
      * 通过 [SearchVideoResult] 获取直播状态, 并将其转换为 [MessageWrapper]
      */
     fun getLiveStatusByResult(result: SearchVideoResult?): MessageWrapper {
-        if (result == null) return MessageWrapper("找不到对应ID的频道")
+        if (result == null) return MessageWrapper("无直播数据", false)
 
         val items = result.items
         items.forEach { item ->
@@ -159,11 +164,9 @@ ${item.snippet.channelTitle} 有即将进行的直播!
     }
 
     override var usedTime: Int = 0
-    override val duration: Int = 3
+    override val duration: Int = 24
 
     override fun isReachLimit(): Boolean = usedTime > getLimitTime()
 
-    override fun getLimitTime(): Int {
-        TODO("Not yet implemented")
-    }
+    override fun getLimitTime(): Int = 10000
 }

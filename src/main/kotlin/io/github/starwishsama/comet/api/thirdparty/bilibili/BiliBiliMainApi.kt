@@ -6,7 +6,7 @@ import com.google.gson.JsonParseException
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.gson
+import io.github.starwishsama.comet.BotVariables.nullableGson
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicTypeSelector
@@ -57,7 +57,7 @@ object BiliBiliMainApi : ApiExecutor {
         ).use { res ->
             if (res.isSuccessful) {
                 val body = res.body?.string() ?: throw ApiException("无法获取动态页面")
-                return gson.fromJson(body)
+                return nullableGson.fromJson(body)
             } else {
                 throw ApiException("无法获取动态页面, 状态码 ${res.code}")
             }
@@ -79,7 +79,7 @@ object BiliBiliMainApi : ApiExecutor {
             try {
                 if (response.isSuccessful) {
                     body = response.body?.string() ?: return null
-                    return gson.fromJson(body)
+                    return nullableGson.fromJson(body)
                 }
             } catch (e: Exception) {
                 if (e is JsonSyntaxException || e is JsonParseException || e !is IOException) {
@@ -107,7 +107,7 @@ object BiliBiliMainApi : ApiExecutor {
                 if (singleDynamicObject.isJsonObject) {
                     val dynamicType = DynamicTypeSelector.getType(card.description.type)
                     return if (dynamicType != UnknownType::class) {
-                        gson.fromJson(card.card, dynamicType).getContact()
+                        nullableGson.fromJson(card.card, dynamicType).getContact()
                     } else {
                         MessageWrapper("错误: 不支持的动态类型", false)
                     }

@@ -142,7 +142,7 @@ class YoutubeCommand : ChatCommand {
     }
 
     private fun checkInfo(channelID: String): MessageWrapper {
-        val result = YoutubeApi.getChannelByID(channelID) ?: return MessageWrapper("找不到该频道")
+        val result = YoutubeApi.getChannelByID(channelID) ?: return MessageWrapper("找不到该频道, 可能是 API 调用已达到上限?")
         val item = result.items[0]
         val text = """
         ${item.snippet.title}
