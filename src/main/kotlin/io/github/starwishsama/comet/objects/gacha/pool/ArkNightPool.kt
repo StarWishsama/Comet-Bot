@@ -24,7 +24,8 @@ class ArkNightPool(
     override val description: String = "适合多种场合的强力干员",
     val condition: ArkNightOperator.() -> Boolean = {
         !hiddenOperators.contains(name) && obtain?.contains("招募寻访") == true
-    }) : GachaPool() {
+    }
+) : GachaPool() {
     override val tenjouCount: Int = -1
     override val tenjouRare: Int = -1
     override val poolItems: MutableList<ArkNightOperator> = BotVariables.arkNight.stream().filter { condition(it) }.collect(Collectors.toList())

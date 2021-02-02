@@ -48,7 +48,7 @@ object YoutubeApi : ApiExecutor {
                 } catch (e: JsonSyntaxException) {
                     try {
                         val error = BotVariables.nullableGson.fromJson(body, YoutubeRequestError::class.java)
-                        BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.code}, 信息: ${error.message}")
+                        BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.error.code}, 信息: ${error.error.message}")
                     } catch (e: JsonSyntaxException) {
                         BotVariables.logger.warning("[YTB] 无法解析 API 传入的 json", e)
                     }
@@ -81,7 +81,7 @@ object YoutubeApi : ApiExecutor {
                 } catch (e: JsonSyntaxException) {
                     try {
                         val error = BotVariables.nullableGson.fromJson(body, YoutubeRequestError::class.java)
-                        BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.code}, 信息: ${error.message}")
+                        BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.error.code}, 信息: ${error.error.message}")
                     } catch (e: JsonSyntaxException) {
                         BotVariables.logger.warning("[YTB] 无法解析 API 传入的 json", e)
                     }
