@@ -4,7 +4,7 @@ import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables.cfg
-import io.github.starwishsama.comet.BotVariables.gson
+import io.github.starwishsama.comet.BotVariables.nullableGson
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
@@ -173,7 +173,7 @@ data class QueryInfo(
     val usedTime: Long
 ) {
     private fun parseJson(): MinecraftServerInfo {
-        return gson.fromJson(json)
+        return nullableGson.fromJson(json)
     }
 
     override fun toString(): String {

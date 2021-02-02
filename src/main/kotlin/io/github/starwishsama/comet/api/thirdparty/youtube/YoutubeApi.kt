@@ -44,10 +44,10 @@ object YoutubeApi : ApiExecutor {
             if (it.isSuccessful) {
                 val body = it.body?.string() ?: return null
                 try {
-                    return BotVariables.gson.fromJson(body)
+                    return BotVariables.nullableGson.fromJson(body)
                 } catch (e: JsonSyntaxException) {
                     try {
-                        val error = BotVariables.gson.fromJson(body, YoutubeRequestError::class.java)
+                        val error = BotVariables.nullableGson.fromJson(body, YoutubeRequestError::class.java)
                         BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.code}, 信息: ${error.message}")
                     } catch (e: JsonSyntaxException) {
                         BotVariables.logger.warning("[YTB] 无法解析 API 传入的 json", e)
@@ -77,10 +77,10 @@ object YoutubeApi : ApiExecutor {
                 val body = response.body?.string() ?: return null
                 /** @TODO 类型自动选择, 类似于 BiliBili 的动态解析 */
                 try {
-                    return BotVariables.gson.fromJson(body, SearchVideoResult::class.java)
+                    return BotVariables.nullableGson.fromJson(body, SearchVideoResult::class.java)
                 } catch (e: JsonSyntaxException) {
                     try {
-                        val error = BotVariables.gson.fromJson(body, YoutubeRequestError::class.java)
+                        val error = BotVariables.nullableGson.fromJson(body, YoutubeRequestError::class.java)
                         BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.code}, 信息: ${error.message}")
                     } catch (e: JsonSyntaxException) {
                         BotVariables.logger.warning("[YTB] 无法解析 API 传入的 json", e)

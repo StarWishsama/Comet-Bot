@@ -7,8 +7,8 @@ import com.google.gson.JsonSyntaxException
 import com.roxstudio.utils.CUrl
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.logger
+import io.github.starwishsama.comet.BotVariables.nullableGson
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.exceptions.EmptyTweetException
 import io.github.starwishsama.comet.exceptions.RateLimitException
@@ -121,7 +121,7 @@ object TwitterApi : ApiExecutor {
                     bodyCopy = body
                 }
 
-                return gson.fromJson(bodyCopy)
+                return nullableGson.fromJson(bodyCopy)
             } catch (e: IOException) {
                 if (!NetUtil.isTimeout(e)) {
                     FileUtil.createErrorReportFile(type = "twitter", t = e, content = bodyCopy, message = "Request URL: $url")
@@ -277,10 +277,10 @@ object TwitterApi : ApiExecutor {
      */
     private fun parseJsonToTweet(json: String, url: String): List<Tweet> {
         return try {
-            listOf(gson.fromJson(json, Tweet::class.java))
+            listOf(nullableGson.fromJson(json, Tweet::class.java))
         } catch (e: JsonSyntaxException) {
             try {
-                gson.fromJson(json)
+                nullableGson.fromJson(json)
             } catch (e: RuntimeException) {
                 FileUtil.createErrorReportFile("在解析推文时出现了问题", "tweet", e, json, url)
                 return emptyList()

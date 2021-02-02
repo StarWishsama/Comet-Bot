@@ -26,7 +26,7 @@ import java.util.jar.JarFile
 import kotlin.time.ExperimentalTime
 
 @Synchronized
-fun File.writeClassToJson(context: Any, gson: Gson = BotVariables.gson) {
+fun File.writeClassToJson(context: Any, gson: Gson = BotVariables.nullableGson) {
     FileWriter.create(this).write(gson.toJson(context))
 }
 
@@ -58,7 +58,7 @@ fun File.getMD5(): String {
  * @param clazz 指定类
  * @return T
  */
-fun <T> File.parseAsClass(clazz: Class<T>, customParser: Gson = BotVariables.gson): T {
+fun <T> File.parseAsClass(clazz: Class<T>, customParser: Gson = BotVariables.nullableGson): T {
     require(exists()) { "文件不存在" }
     return customParser.fromJson(getContext(), clazz)
 }

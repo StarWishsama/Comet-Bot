@@ -5,8 +5,8 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.logger
+import io.github.starwishsama.comet.BotVariables.nullableGson
 import io.github.starwishsama.comet.enums.R6Rank
 import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6StatusPlayer
 import io.github.starwishsama.comet.utils.CometUtil
@@ -39,7 +39,7 @@ object R6TabApi {
                     val uuid: String = jsonObject.get(
                         jsonObject.keySet().iterator().next()
                     ).asJsonObject.get("profile").asJsonObject.get("p_user").asString
-                    return gson.fromJson(NetUtil.getPageContent("${apiUrl}player/$uuid?cid=${BotVariables.cfg.r6tabKey}")
+                    return nullableGson.fromJson(NetUtil.getPageContent("${apiUrl}player/$uuid?cid=${BotVariables.cfg.r6tabKey}")
                         ?: return null)
                 }
             }

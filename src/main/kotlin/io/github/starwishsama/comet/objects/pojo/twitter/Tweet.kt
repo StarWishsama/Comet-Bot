@@ -3,8 +3,8 @@ package io.github.starwishsama.comet.objects.pojo.twitter
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.hmsPattern
+import io.github.starwishsama.comet.BotVariables.nullableGson
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
@@ -129,7 +129,7 @@ data class Tweet(
         if (media != null) {
             try {
                 val image =
-                        gson.fromJson(media.asJsonArray[0].asJsonObject.toString(), Media::class.java)
+                        nullableGson.fromJson(media.asJsonArray[0].asJsonObject.toString(), Media::class.java)
                 if (image.isSendableMedia()) {
                     return image.getImageUrl()
                 }

@@ -19,10 +19,19 @@ import java.util.stream.Collectors
  *
  * @author Nameless
  */
-class ArkNightPool(override val name: String = "标准寻访" ) : GachaPool() {
+class ArkNightPool(
+    override val name: String = "标准寻访",
+    override val description: String = "适合多种场合的强力干员",
+    val condition: ArkNightOperator.() -> Boolean = {
+        !hiddenOperators.contains(name) && obtain?.contains("招募寻访") == true
+    }) : GachaPool() {
     override val tenjouCount: Int = -1
     override val tenjouRare: Int = -1
-    override val poolItems: MutableList<ArkNightOperator> = BotVariables.arkNight.stream().filter { !hiddenOperators.contains(it.name) && it.obtain?.contains("招募寻访") == true }.collect(Collectors.toList())
+    override val poolItems: MutableList<ArkNightOperator> = BotVariables.arkNight.stream().filter { condition(it) }.collect(Collectors.toList())
+
+    private val r6Range = 0.50..0.52
+    private val r5Range = 0.0..0.08
+    private val r4Range = 0.09..0.49
 
     override fun doDraw(time: Int): List<ArkNightOperator> {
         val result = mutableListOf<ArkNightOperator>()
@@ -39,9 +48,9 @@ class ArkNightPool(override val name: String = "标准寻访" ) : GachaPool() {
             // 按默认抽卡规则抽出对应星级干员, 超过五十连后保底机制启用
 
             val rare: Int =  when (probability) {
-                in 0.50..0.52 + r6UpRate -> 6 // 2%
-                in 0.0..0.08 -> 5 // 8%
-                in 0.09..0.49 -> 4 // 40%
+                in r6Range.start..r6Range.endInclusive + r6UpRate -> 6 // 2%
+                in r5Range -> 5 // 8%
+                in r4Range -> 4 // 40%
                 else -> 3 // 50%
             }
 
@@ -74,9 +83,20 @@ class ArkNightPool(override val name: String = "标准寻访" ) : GachaPool() {
             val targetUps = highProbabilityItems.keys.parallelStream().collect(Collectors.toList())
             val targetUp = targetUps[RandomUtil.randomInt(0, targetUps.size - 1)]
 
-            val targetProbability = highProbabilityItems[targetUp]
+            val targetProbability = when (targetUp.rare) {
+                6 -> {
+                    r6Range.start..r6Range.endInclusive.plus(highProbabilityItems[targetUp] ?: 0.0)
+                }
+                5 -> {
+                    r5Range.start..r5Range.endInclusive.plus(highProbabilityItems[targetUp] ?: 0.0)
+                }
+                4 -> {
+                    r4Range.start..r4Range.endInclusive.plus(highProbabilityItems[targetUp] ?: 0.0)
+                }
+                else -> r4Range
+            }
 
-            if (targetProbability != null && probability in targetProbability) {
+            if (probability in targetProbability) {
                 return targetUp as ArkNightOperator
             }
         }
@@ -102,14 +122,15 @@ class ArkNightPool(override val name: String = "标准寻访" ) : GachaPool() {
      * 明日方舟抽卡，返回文字
      */
     fun getArkDrawResultAsString(user: BotUser, drawResult: List<ArkNightOperator>): String {
+        val currentPool = "目前卡池为: $name\n"
         if (drawResult.isNotEmpty()) {
             when (drawResult.size) {
                 1 -> {
                     val (name, _, rare) = drawResult[0]
-                    return "单次寻访结果\n$name ${GachaUtil.getStar(rare, true)}"
+                    return currentPool + "单次寻访结果\n$name ${GachaUtil.getStar(rare, true)}"
                 }
                 10 -> {
-                    return StringBuilder("十连寻访结果:\n").apply {
+                    return StringBuilder(currentPool + "十连寻访结果:\n").apply {
                         for ((name, _, rare) in drawResult) {
                             append(name).append(" ").append(GachaUtil.getStar(rare, true)).append(" ")
                         }
@@ -121,7 +142,7 @@ class ArkNightPool(override val name: String = "标准寻访" ) : GachaPool() {
                     val r4Count = drawResult.parallelStream().filter { it.rare + 1 == 3 }.count()
                     val r3Count = drawResult.size - r6Count - r5Count - r4Count
 
-                    return "寻访结果:\n" +
+                    return currentPool + "寻访结果:\n" +
                             "寻访次数: ${drawResult.size}\n" +
                             "结果: ${r6Count}|${r5Count}|${r4Count}|${r3Count}\n" +
                             "使用合成玉 ${drawResult.size * 600}"

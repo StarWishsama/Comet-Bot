@@ -30,6 +30,9 @@ import java.util.concurrent.ScheduledExecutorService
 /**
  * 机器人(几乎)所有数据的存放类
  * 可以直接访问数据
+ *
+ * FIXME: 不应该在初始化时 init 这么多变量, 应当分担到各自所需类中 (即懒处理它们)
+ *
  * @author Nameless
  */
 
@@ -71,7 +74,8 @@ object BotVariables {
         loggerAppender.appendLog(it)
     }
 
-    val gson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
+    val nullableGson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
+    val gson: Gson = GsonBuilder().setPrettyPrinting().setLenient().create()
     var rCon: Rcon? = null
     lateinit var log: File
 
