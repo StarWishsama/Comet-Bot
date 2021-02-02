@@ -5,9 +5,11 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
@@ -131,32 +133,34 @@ class BiliBiliCommand : ChatCommand {
     }
 
     private suspend fun unsubscribe(args: List<String>, groupId: Long): MessageChain {
-        if (args.size > 1) {
+        return if (args.size > 1) {
             val cfg = GroupConfigManager.getConfigOrNew(groupId)
-            var uid = 0L
-            if (args[1].isNumeric()) {
-                uid = args[1].toLong()
-            } else {
-                if (args[1] == "all" || args[1] == "全部") {
-                    cfg.twitterSubscribers.clear()
-                    return sendMessage("退订全部成功")
-                }
 
-                val item = FakeClientApi.getUser(args[1])
-                if (item != null) {
-                    uid = item.roomid
-                }
+            if (args[1] == "all" || args[1] == "全部") {
+                cfg.biliSubscribers.clear()
+                return sendMessage("退订全部成功")
             }
 
+            val item = if (args[1].isNumeric()) {
+                val item = cfg.biliSubscribers.parallelStream().filter { it.uid == args[1].toLong() }.findFirst()
+                if (!item.isPresent) {
+                    return "找不到你要退订的用户".sendMessage()
+                }
 
-            return if (!cfg.biliSubscribers.contains(uid)) {
-                sendMessage("你还没订阅用户 ${args[1]}\n注意: 退订时必须使用 UID 退订\n你可以在 /bili list 中查看")
+                item.get()
             } else {
-                cfg.biliSubscribers.remove(args[1].toLong())
-                sendMessage("取消订阅用户 ${args[1]} 成功")
+                val item = cfg.biliSubscribers.parallelStream().filter { it.userName == args[1] }.findFirst()
+                if (!item.isPresent) {
+                    return "找不到你要退订的用户".sendMessage()
+                }
+
+                item.get()
             }
+
+            cfg.biliSubscribers.remove(item)
+            sendMessage("取消订阅用户 ${item.userName} 成功")
         } else {
-            return getHelp().convertToChain()
+            getHelp().convertToChain()
         }
     }
 
@@ -168,7 +172,7 @@ class BiliBiliCommand : ChatCommand {
             val subs = buildString {
                 append("监控室列表:\n")
                 list.forEach {
-                    append(BiliBiliMainApi.getUserNameByMid(it) + " $it\n")
+                    append(it.userName + " (${it.uid})\n")
                     trim()
                 }
             }
@@ -193,6 +197,7 @@ class BiliBiliCommand : ChatCommand {
         val cfg = GroupConfigManager.getConfigOrNew(groupId)
         var name = ""
         val uid: Long = if (target.isNumeric()) {
+            name = BiliBiliMainApi.getUserNameByMid(target.toLong())
             target.toLong()
         } else {
             val item = FakeClientApi.getUser(target)
@@ -201,11 +206,13 @@ class BiliBiliCommand : ChatCommand {
             item?.mid ?: return EmptyMessageChain
         }
 
-        if (!cfg.biliSubscribers.contains(uid)) {
-            cfg.biliSubscribers.add(uid)
+        val roomNumber = LiveApi.getRoomIDByUID(uid)
+
+        if (!cfg.biliSubscribers.stream().filter { it.uid == uid }.findAny().isPresent) {
+            cfg.biliSubscribers.add(BiliBiliUser(uid, roomNumber, name))
         }
 
-        return sendMessage("订阅 ${if (name.isNotBlank()) name else BiliBiliMainApi.getUserNameByMid(uid)}($uid) 成功")
+        return sendMessage("订阅 ${name}($uid) 成功")
     }
 
 }

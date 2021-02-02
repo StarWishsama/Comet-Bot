@@ -64,7 +64,7 @@ data class Video(
             val name: String
     )
 
-    override suspend fun getContact(): MessageWrapper {
+    override fun getContact(): MessageWrapper {
         return MessageWrapper("投递了一个视频: $title\n" +
                 "发布时间: ${BotVariables.yyMMddPattern.format(publishTime.toLocalDateTime())}\n" +
                 "直达链接: https://www.bilibili.com/video/av$avId\n")

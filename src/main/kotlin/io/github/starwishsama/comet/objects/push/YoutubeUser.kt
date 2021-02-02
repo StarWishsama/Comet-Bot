@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.api.thirdparty.youtube
+package io.github.starwishsama.comet.objects.push
 
 data class YoutubeUser(
     val id: String,

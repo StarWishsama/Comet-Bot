@@ -1,10 +1,10 @@
-package io.github.starwishsama.comet.service.pushers
+package io.github.starwishsama.comet.service.oldpushers
 
 import net.mamoe.mirai.Bot
 import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 
-interface CometPusher {
+interface OldPusher {
     /**
      * 首次获取前延迟的时间, 单位分钟
      */

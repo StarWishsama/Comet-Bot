@@ -1,11 +1,11 @@
-package io.github.starwishsama.comet.service.pushers
+package io.github.starwishsama.comet.service.oldpushers
 
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.command.CommandExecutor.doFilter
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.exceptions.RateLimitException
+import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.verboseS
@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 import kotlin.time.ExperimentalTime
 
-object TweetUpdateChecker : CometPusher {
+object TweetUpdateChecker : OldPusher {
     private val pushPool = mutableMapOf<String, PushedTweet>()
     override val delayTime: Long = cfg.twitterInterval
     override val internal: Long = cfg.twitterInterval
@@ -32,7 +32,7 @@ object TweetUpdateChecker : CometPusher {
     override fun retrieve() {
         pushCount = 0
 
-        BotVariables.perGroup.parallelStream().forEach { cfg ->
+        GroupConfigManager.getAllConfigs().parallelStream().forEach { cfg ->
             if (cfg.twitterPushEnabled) {
                 cfg.twitterSubscribers.forEach {
                     if (pushPool.containsKey(it)) {

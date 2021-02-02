@@ -1,12 +1,12 @@
-package io.github.starwishsama.comet.service.pushers
+package io.github.starwishsama.comet.service.oldpushers
 
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.perGroup
 import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertDynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToDynamicData
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToWrapper
 import io.github.starwishsama.comet.exceptions.ApiException
+import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
@@ -15,9 +15,10 @@ import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
 import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
+import kotlin.streams.toList
 import kotlin.time.ExperimentalTime
 
-object BiliDynamicChecker : CometPusher {
+object BiliDynamicChecker : OldPusher {
     private val pushPool = mutableSetOf<PushDynamicHistory>()
     override val delayTime: Long = 3
     override val internal: Long = 3
@@ -32,9 +33,9 @@ object BiliDynamicChecker : CometPusher {
         pushPool.forEach { it.target.clear() }
 
         val collectedUID = mutableSetOf<Long>().apply {
-            perGroup.forEach {
-                if (it.biliPushEnabled) {
-                    addAll(it.biliSubscribers)
+            GroupConfigManager.getAllConfigs().forEach { cfg ->
+                if (cfg.biliPushEnabled) {
+                    addAll(cfg.biliSubscribers.parallelStream().map { it.uid }.toList())
                 }
             }
         }
@@ -49,7 +50,7 @@ object BiliDynamicChecker : CometPusher {
                 null
             } ?: return@forEach
 
-            val data = dynamic.convertDynamic()
+            val data = dynamic.convertToWrapper()
 
             if (data.success) {
                 val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@forEach
@@ -100,15 +101,15 @@ object BiliDynamicChecker : CometPusher {
     }
 
     override fun push() {
-        perGroup.forEach { cfg ->
-            cfg.biliSubscribers.forEach { uid ->
-                getHistoryByUID(uid).forEach bili@ { pdh ->
+        GroupConfigManager.getAllConfigs().forEach { cfg ->
+            cfg.biliSubscribers.forEach { user ->
+                getHistoryByUID(user.uid).forEach bili@ { pdh ->
                     if (pdh.target.contains(cfg.id) && !cfg.biliPushEnabled) {
                         pdh.target.remove(cfg.id)
                         return@bili
                     }
 
-                    if (!pdh.target.contains(cfg.id) && pdh.uid == uid) {
+                    if (!pdh.target.contains(cfg.id) && pdh.uid == user.uid) {
                         pdh.target.add(cfg.id)
                     }
                 }

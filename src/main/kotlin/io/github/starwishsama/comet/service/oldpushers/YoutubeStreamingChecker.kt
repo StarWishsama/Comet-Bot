@@ -1,9 +1,9 @@
-package io.github.starwishsama.comet.service.pushers
+package io.github.starwishsama.comet.service.oldpushers
 
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi.getLiveItemOrNull
+import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
 import io.github.starwishsama.comet.utils.verboseS
 import kotlinx.coroutines.delay
@@ -12,7 +12,7 @@ import net.mamoe.mirai.Bot
 import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 
-object YoutubeStreamingChecker : CometPusher {
+object YoutubeStreamingChecker : OldPusher {
     override val delayTime: Long = 10
     override val internal: Long = 10
     override var future: ScheduledFuture<*>? = null
@@ -22,7 +22,7 @@ object YoutubeStreamingChecker : CometPusher {
     val pushPool = mutableMapOf<String, PushObject>()
 
     override fun retrieve() {
-        BotVariables.perGroup.forEach { config ->
+        GroupConfigManager.getAllConfigs().forEach { config ->
             if (config.youtubePushEnabled && config.youtubeSubscribers.isNotEmpty()) {
                 config.youtubeSubscribers.forEach {
                     if (pushPool.containsKey(it.id)) {

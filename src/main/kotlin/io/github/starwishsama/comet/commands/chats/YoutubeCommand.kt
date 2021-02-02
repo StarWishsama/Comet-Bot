@@ -4,14 +4,14 @@ import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
-import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeUser
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
+import io.github.starwishsama.comet.objects.push.YoutubeUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import io.github.starwishsama.comet.service.pushers.YoutubeStreamingChecker
+import io.github.starwishsama.comet.service.oldpushers.YoutubeStreamingChecker
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber

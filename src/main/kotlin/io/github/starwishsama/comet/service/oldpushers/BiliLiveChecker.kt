@@ -1,11 +1,9 @@
-package io.github.starwishsama.comet.service.pushers
+package io.github.starwishsama.comet.service.oldpushers
 
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.perGroup
 import io.github.starwishsama.comet.api.command.CommandExecutor.doFilter
 import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -19,7 +17,7 @@ import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import java.time.LocalDateTime
 import java.util.concurrent.ScheduledFuture
 
-object BiliLiveChecker : CometPusher {
+object BiliLiveChecker : OldPusher {
     private val pendingPushContents = mutableSetOf<StoredLiveInfo>()
     @Suppress("DEPRECATION")
     override val delayTime: Long = cfg.biliInterval
@@ -31,7 +29,7 @@ object BiliLiveChecker : CometPusher {
     override var lastPushTime: LocalDateTime = LocalDateTime.now()
 
     override fun retrieve() {
-        pushCount = 0
+        /**pushCount = 0
 
         val collectedUsers = mutableSetOf<Long>()
 
@@ -71,11 +69,11 @@ object BiliLiveChecker : CometPusher {
             daemonLogger.verboseS("Retrieve success, have collected $pushCount liver(s)!")
         }
 
-        push()
+        push()*/
     }
 
     override fun push() {
-        val liverToGroups = mutableMapOf<StoredLiveInfo, MutableSet<Long>>()
+        /*val liverToGroups = mutableMapOf<StoredLiveInfo, MutableSet<Long>>()
         pendingPushContents.forEach { liverToGroups.plusAssign(it to mutableSetOf()) }
 
         perGroup.forEach { cfg ->
@@ -89,7 +87,7 @@ object BiliLiveChecker : CometPusher {
         }
 
         val count = pushToGroups(liverToGroups)
-        if (count > 0) daemonLogger.verboseS("Push bili info success, have pushed $count group(s)!")
+        if (count > 0) daemonLogger.verboseS("Push bili info success, have pushed $count group(s)!")*/
     }
 
     private fun pushToGroups(pushQueue: MutableMap<StoredLiveInfo, MutableSet<Long>>): Int {
