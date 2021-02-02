@@ -13,9 +13,14 @@ import io.github.starwishsama.comet.objects.pojo.youtube.YoutubeRequestError
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.network.NetUtil
 
+/**
+ * FIXME: 需要重构
+ */
 object YoutubeApi : ApiExecutor {
+    // 100 Unit
     private var searchApi = "https://www.googleapis.com/youtube/v3/search?order=date&part=snippet,"
     private const val searchByUserName = "contentDetails,statistics&forUsername="
+    // 1 Unit
     private const val channelGetApi = "https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id="
     private const val maxResult = "&maxResults="
     private var init = false
@@ -159,11 +164,9 @@ ${item.snippet.channelTitle} 有即将进行的直播!
     }
 
     override var usedTime: Int = 0
-    override val duration: Int = 3
+    override val duration: Int = 24
 
     override fun isReachLimit(): Boolean = usedTime > getLimitTime()
 
-    override fun getLimitTime(): Int {
-        TODO("Not yet implemented")
-    }
+    override fun getLimitTime(): Int = 10000
 }
