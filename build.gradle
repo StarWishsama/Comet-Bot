@@ -28,8 +28,10 @@ jar {
     }
 }
 
-String gitCommitId = 'git rev-parse --short HEAD'.execute().text.trim()
-String versionCode = "0.6.1-dev-" + gitCommitId
+String branchName = 'git symbolic-ref --short -q HEAD'.execute().text.trim()
+String gitBranchName = "-" + (branchName == null && branchName.isEmpty() ? "Unknown" : branchName)
+String gitCommitId = "-" + 'git rev-parse --short HEAD'.execute().text.trim()
+String versionCode = "0.6.1" + gitBranchName + gitCommitId
 
 group 'io.github.starwishsama.comet'
 version versionCode
