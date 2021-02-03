@@ -74,7 +74,7 @@ object BiliDynamicChecker : OldPusher {
 
                     if (target.isPresent) {
                         target.get().apply {
-                            if (data.uniqueId != pushContent.uniqueId && data.text != pushContent.text) {
+                            if (data.text != pushContent.text) {
                                 pushContent = data
                                 isPushed = false
                                 this.sentTime = sentTime

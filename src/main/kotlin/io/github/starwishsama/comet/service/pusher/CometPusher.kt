@@ -2,14 +2,16 @@ package io.github.starwishsama.comet.service.pusher
 
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
+import io.github.starwishsama.comet.service.pusher.context.PushContext
 import io.github.starwishsama.comet.utils.TaskUtil
+import net.mamoe.mirai.Bot
 import java.util.concurrent.TimeUnit
 
 /**
  * [CometPusher]
  */
-abstract class CometPusher(val name: String, val config: PusherConfig) {
-    abstract val cachePool: MutableList<PushContext<*>>
+abstract class CometPusher(val bot: Bot, val name: String, val config: PusherConfig) {
+    abstract val cachePool: MutableList<out PushContext>
 
     val duration: Long = config.interval
 
