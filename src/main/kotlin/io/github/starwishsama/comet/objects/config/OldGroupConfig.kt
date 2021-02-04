@@ -1,13 +1,9 @@
 package io.github.starwishsama.comet.objects.config
 
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.comet.api.command.CommandExecutor
-import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.objects.push.YoutubeUser
 
 data class OldGroupConfig(@SerializedName("group_id") val id: Long) {
-
     /**
      * 是否自动接受入群请求
      */
@@ -70,47 +66,4 @@ data class OldGroupConfig(@SerializedName("group_id") val id: Long) {
 
     @SerializedName("keyword_reply")
     val keyWordReply: MutableList<PerGroupConfig.ReplyKeyWord> = mutableListOf()
-
-    fun addHelper(id: Long): Boolean {
-        if (isHelper(id)) return false
-        helpers.add(id)
-        return true
-    }
-
-    fun removeHelper(id: Long): Boolean {
-        if (!isHelper(id)) return false
-        helpers.remove(id)
-        return true
-    }
-
-    fun isHelper(id: Long): Boolean {
-        return helpers.contains(id)
-    }
-
-    fun isDisabledCommand(command: ChatCommand): Boolean {
-        return try {
-            disabledCommands.contains(command.name)
-        } catch (npe: NullPointerException) {
-            false
-        }
-    }
-
-    fun disableCommand(commandName: String): PerGroupConfig.ConfigureCommandStatus {
-        val command = CommandExecutor.getCommand(commandName)
-        if (command != null) {
-            if (command is UnDisableableCommand) {
-                return PerGroupConfig.ConfigureCommandStatus.UnDisabled
-            }
-
-            return if (!disabledCommands.contains(command.name)) {
-                disabledCommands.add(command.name)
-                PerGroupConfig.ConfigureCommandStatus.Disabled
-            } else {
-                disabledCommands.remove(command.name)
-                PerGroupConfig.ConfigureCommandStatus.Enabled
-            }
-        } else {
-            return PerGroupConfig.ConfigureCommandStatus.NotExist
-        }
-    }
 }
