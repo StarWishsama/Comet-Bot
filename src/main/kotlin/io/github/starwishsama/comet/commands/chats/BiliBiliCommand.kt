@@ -132,7 +132,7 @@ class BiliBiliCommand : ChatCommand {
         return null
     }
 
-    private suspend fun unsubscribe(args: List<String>, groupId: Long): MessageChain {
+    private fun unsubscribe(args: List<String>, groupId: Long): MessageChain {
         return if (args.size > 1) {
             val cfg = GroupConfigManager.getConfigOrNew(groupId)
 
@@ -142,7 +142,7 @@ class BiliBiliCommand : ChatCommand {
             }
 
             val item = if (args[1].isNumeric()) {
-                val item = cfg.biliSubscribers.parallelStream().filter { it.uid == args[1].toLong() }.findFirst()
+                val item = cfg.biliSubscribers.parallelStream().filter { it.id == args[1] }.findFirst()
                 if (!item.isPresent) {
                     return "找不到你要退订的用户".sendMessage()
                 }
@@ -172,7 +172,7 @@ class BiliBiliCommand : ChatCommand {
             val subs = buildString {
                 append("监控室列表:\n")
                 list.forEach {
-                    append(it.userName + " (${it.uid})\n")
+                    append(it.userName + " (${it.id})\n")
                     trim()
                 }
             }
@@ -208,8 +208,8 @@ class BiliBiliCommand : ChatCommand {
 
         val roomNumber = LiveApi.getRoomIDByUID(uid)
 
-        if (!cfg.biliSubscribers.stream().filter { it.uid == uid }.findAny().isPresent) {
-            cfg.biliSubscribers.add(BiliBiliUser(uid, roomNumber, name))
+        if (!cfg.biliSubscribers.stream().filter { it.id.toLong() == uid }.findAny().isPresent) {
+            cfg.biliSubscribers.add(BiliBiliUser(uid.toString(), roomNumber, name))
         }
 
         return sendMessage("订阅 ${name}($uid) 成功")

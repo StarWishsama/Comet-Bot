@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.objects.push
 
 data class BiliBiliUser(
-    val uid: Long,
+    override val id: String,
     val roomID: Long,
-    val userName: String
-)
+    override val userName: String
+): PushUser(id, userName)

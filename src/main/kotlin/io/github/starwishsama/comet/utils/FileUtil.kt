@@ -335,11 +335,11 @@ object FileUtil {
                 val serializer = writeTo::class.java.getDeclaredMethod("serializer")
 
                 if (serializer.invoke(Unit) is KSerializer<*>) {
-                    writeTo = Yaml.default.decodeFromString(serializer.invoke(Unit) as KSerializer<*>, file.getContext()) as T
+                    writeTo = Yaml.default.decodeFromString(serializer.invoke(Unit) as KSerializer<*>, file.io.github.starwishsama.comet.service.pusher.context.getContext()) as T
                 }
             }
             is ConfigType.Json -> {
-                writeTo = gson.fromJson(file.getContext(), T::class.java)
+                writeTo = gson.fromJson(file.io.github.starwishsama.comet.service.pusher.context.getContext(), T::class.java)
             }
         }*/
     }

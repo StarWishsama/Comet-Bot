@@ -36,6 +36,6 @@ class BiliBiliLiveContext(
 }
 
 fun Collection<BiliBiliLiveContext>.getContextByUID(uid: Long): BiliBiliLiveContext? {
-    val result = this.parallelStream().filter { uid == it.pushUser.uid }.findFirst()
+    val result = this.parallelStream().filter { uid == it.pushUser.id.toLong() }.findFirst()
     return if (result.isPresent) result.get() else null
 }

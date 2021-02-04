@@ -8,9 +8,9 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 class BiliBiliDynamicContext(
     pushTarget: MutableList<Long>,
     retrieveTime: Long,
-    status: PushStatus,
-    private val pushUser: BiliBiliUser,
-    val dynamic: Dynamic
+    override var status: PushStatus = PushStatus.READY,
+    val pushUser: BiliBiliUser,
+    var dynamic: Dynamic
 ) : PushContext(pushTarget, retrieveTime, status) {
 
     override fun toMessageWrapper(): MessageWrapper {
@@ -28,4 +28,9 @@ class BiliBiliDynamicContext(
         return (dynamic.data.card?.description?.dynamicId == other.dynamic.data.card?.description?.dynamicId)
                 || (dynamic.data.cards?.get(0)?.description?.dynamicId == other.dynamic.data.cards?.get(0)?.description?.dynamicId)
     }
+}
+
+fun Collection<BiliBiliDynamicContext>.getContextByUID(uid: Long): BiliBiliDynamicContext? {
+    val result = this.parallelStream().filter { uid == it.pushUser.id.toLong() }.findFirst()
+    return if (result.isPresent) result.get() else null
 }

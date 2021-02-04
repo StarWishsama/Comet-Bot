@@ -1,14 +1,8 @@
 package io.github.starwishsama.comet.service.pusher.config
 
-data class PusherConfig(
-    /**
-     * 用户名, 为B站推送使用
-     */
-    val userName: String?,
-    val passWord: String?,
-    val accessToken: String?,
-    val secret: String?,
-    var token: String?,
+import io.github.starwishsama.comet.service.pusher.context.PushContext
+
+open class PusherConfig(
     /**
      * 推送间隔, 单位毫秒
      */
@@ -18,7 +12,13 @@ data class PusherConfig(
      */
     val resetInterval: Long,
     /**
-     * 周期内最大可调用次数
+     * 缓存池
      */
-    val maxCallTime: Long
+    val cachePool: MutableList<out PushContext>
+)
+
+class EmptyPusherConfig: PusherConfig(
+    -1,
+    -1,
+    mutableListOf()
 )

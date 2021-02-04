@@ -9,8 +9,8 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
  */
 abstract class PushContext(
     private val pushTarget: MutableList<Long>,
-    val retrieveTime: Long,
-    open val status: PushStatus
+    var retrieveTime: Long,
+    open var status: PushStatus
 ) {
     abstract fun toMessageWrapper(): MessageWrapper
 

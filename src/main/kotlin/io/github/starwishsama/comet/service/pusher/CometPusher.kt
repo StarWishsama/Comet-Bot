@@ -1,17 +1,24 @@
 package io.github.starwishsama.comet.service.pusher
 
-import io.github.starwishsama.comet.exceptions.RateLimitException
+import cn.hutool.core.util.RandomUtil
+import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.service.pusher.config.EmptyPusherConfig
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.context.PushContext
+import io.github.starwishsama.comet.service.pusher.context.PushStatus
 import io.github.starwishsama.comet.utils.TaskUtil
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import java.util.concurrent.TimeUnit
 
 /**
  * [CometPusher]
  */
-abstract class CometPusher(val bot: Bot, val name: String, val config: PusherConfig) {
-    abstract val cachePool: MutableList<out PushContext>
+abstract class CometPusher(val bot: Bot, val name: String) {
+    open var config: PusherConfig = EmptyPusherConfig()
+
+    abstract val cachePool: MutableList<PushContext>
 
     val duration: Long = config.interval
 
@@ -19,24 +26,34 @@ abstract class CometPusher(val bot: Bot, val name: String, val config: PusherCon
 
     var pushTime: Int = 0
 
-    open fun isReachApiLimit(): Boolean {
-        return callTime > config.maxCallTime
-    }
-
     abstract fun retrieve()
 
-    abstract fun push()
+    open fun push() {
+        cachePool.forEach { context ->
+            if (context.status == PushStatus.READY) {
+                context.getPushTarget().forEach group@{
+                    try {
+                        val group = bot.getGroup(it) ?: return@group
+
+                        runBlocking {
+                            group.sendMessage(context.toMessageWrapper().toMessageChain(group))
+                            delay(RandomUtil.randomLong(1000, 2000))
+                        }
+                    } catch (e: Exception) {
+                        BotVariables.daemonLogger.warning("在推送开播消息至群 $it 时出现异常", e)
+                    }
+                }
+
+                context.clearPushTarget()
+                context.status = PushStatus.FINISHED
+            }
+        }
+    }
 
     fun start() {
         TaskUtil.runScheduleTaskAsync(duration, duration, TimeUnit.SECONDS) {
             retrieve()
             push()
-        }
-    }
-
-    fun checkReachLimit() {
-        if (!isReachApiLimit()) {
-            throw RateLimitException("$name 已达到 API 调用次数上限")
         }
     }
 
