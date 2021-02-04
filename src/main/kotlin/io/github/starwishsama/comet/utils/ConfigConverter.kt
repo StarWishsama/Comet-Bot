@@ -1,10 +1,12 @@
 package io.github.starwishsama.comet.utils
 
+import com.google.gson.JsonSyntaxException
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.nullableGson
 import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.objects.config.BiliConfigTestObject
 import io.github.starwishsama.comet.objects.config.OldGroupConfig
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
@@ -14,8 +16,10 @@ object ConfigConverter {
     fun convertOldGroupConfig(cfgFile: File): Boolean {
         lateinit var cfg: OldGroupConfig
         try {
-            cfg = nullableGson.fromJson(cfgFile.getContext(), OldGroupConfig::class.java)
-        } catch (e: Exception) {
+            val context = cfgFile.getContext()
+            nullableGson.fromJson(context, BiliConfigTestObject::class.java)
+            cfg = nullableGson.fromJson(context, OldGroupConfig::class.java)
+        } catch (e: JsonSyntaxException) {
             return false
         }
 
@@ -41,6 +45,7 @@ object ConfigConverter {
             this.youtubeSubscribers.addAll(cfg.youtubeSubscribers)
             this.doRepeat = cfg.doRepeat
             this.groupFilterWords.addAll(cfg.groupFilterWords)
+            this.disabledCommands.addAll(cfg.disabledCommands)
         }
 
         GroupConfigManager.addConfig(new)

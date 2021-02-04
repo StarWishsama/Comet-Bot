@@ -3,6 +3,14 @@ package io.github.starwishsama.comet.objects.config
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.objects.push.YoutubeUser
 
+data class BiliConfigTestObject(
+    /**
+     * bilibili 订阅列表
+     */
+    @SerializedName("bili_sub")
+    val biliSubscribers: MutableSet<Long> = hashSetOf()
+)
+
 data class OldGroupConfig(@SerializedName("group_id") val id: Long) {
     /**
      * 是否自动接受入群请求

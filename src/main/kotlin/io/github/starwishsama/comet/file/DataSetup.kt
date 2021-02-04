@@ -191,13 +191,14 @@ object DataSetup {
                         }
                     } else {
                         try {
-                            if (!ConfigConverter.convertOldGroupConfig(loc)) {
-                                loc.parseAsClass(PerGroupConfig::class.java, nonNullGson)
-                            } else {
+                            if (ConfigConverter.convertOldGroupConfig(loc)) {
                                 return@forEach
+                            } else {
+                                loc.parseAsClass(PerGroupConfig::class.java, nonNullGson)
                             }
                         } catch (e: Exception) {
                             daemonLogger.warning("检测到 ${group.id} 的群配置异常, 正在重新生成...")
+                            daemonLogger.warningS(e)
                             loc.createBackupFile().also { loc.delete() }
                             PerGroupConfig(group.id).also {
                                 it.init()
