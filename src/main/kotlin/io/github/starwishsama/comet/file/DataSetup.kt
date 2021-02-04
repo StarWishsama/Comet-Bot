@@ -3,8 +3,6 @@ package io.github.starwishsama.comet.file
 import cn.hutool.core.io.file.FileReader
 import com.github.salomonbrys.kotson.forEach
 import com.github.salomonbrys.kotson.fromJson
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
@@ -12,8 +10,10 @@ import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.arkNightPools
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.hiddenOperators
 import io.github.starwishsama.comet.BotVariables.nullableGson
+import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.CometConfig
@@ -38,7 +38,6 @@ object DataSetup {
     private val arkNightData = File(FileUtil.getResourceFolder(), "arkNights.json")
     private val perGroupFolder = FileUtil.getChildFolder("groups")
     private var brokenConfig = false
-    private val nonNullGson: Gson = GsonBuilder().setPrettyPrinting().create()
 
     fun init() {
         if (!userCfg.exists() || !cfgFile.exists()) {
@@ -180,7 +179,7 @@ object DataSetup {
             try {
                 if (!loc.exists()) {
                     FileUtil.createBlankFile(loc)
-                    BotVariables.perGroup.add(PerGroupConfig(group.id).also { it.init() })
+                    GroupConfigManager.addConfig(PerGroupConfig(group.id).also { it.init() })
                 } else {
                     val cfg: PerGroupConfig = if (loc.getContext().isEmpty()) {
                         daemonLogger.warning("检测到 ${group.id} 的群配置异常, 正在重新生成...")
@@ -190,9 +189,14 @@ object DataSetup {
                         }
                     } else {
                         try {
-                            loc.parseAsClass(PerGroupConfig::class.java, nonNullGson)
+                            if (ConfigConverter.convertOldGroupConfig(loc)) {
+                                return@forEach
+                            } else {
+                                loc.parseAsClass(PerGroupConfig::class.java, gson)
+                            }
                         } catch (e: Exception) {
                             daemonLogger.warning("检测到 ${group.id} 的群配置异常, 正在重新生成...")
+                            daemonLogger.warningS(e)
                             loc.createBackupFile().also { loc.delete() }
                             PerGroupConfig(group.id).also {
                                 it.init()
@@ -200,7 +204,7 @@ object DataSetup {
                             }
                         }
                     }
-                    BotVariables.perGroup.add(cfg)
+                    GroupConfigManager.addConfig(cfg)
                 }
             }
             catch (e: RuntimeException) {
@@ -208,16 +212,16 @@ object DataSetup {
             }
         }
 
-        BotVariables.logger.info("[配置] 成功加载了 ${BotVariables.perGroup.size} 个群配置")
+        BotVariables.logger.info("[配置] 成功加载了 ${GroupConfigManager.getAllConfigs().size} 个群配置")
     }
 
     private fun savePerGroupSetting() {
         if (!perGroupFolder.exists()) return
 
-        BotVariables.perGroup.forEach {
+        GroupConfigManager.getAllConfigs().forEach {
             val loc = File(perGroupFolder, "${it.id}.json")
             if (!loc.exists()) loc.createNewFile()
-            loc.writeClassToJson(it, nonNullGson)
+            loc.writeClassToJson(it, gson)
         }
     }
 }

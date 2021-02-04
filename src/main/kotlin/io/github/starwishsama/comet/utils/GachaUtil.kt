@@ -37,7 +37,7 @@ object GachaUtil {
     const val overTimeMessage = "抽卡次数到上限了, 可以少抽一点或者等待条数自动恢复哦~\n" +
             "命令条数现在每小时会恢复100次, 封顶1000次"
     var pictureReady = false
-    const val arkNightPictureCount = 181
+    private const val arkNightPictureCount = 185
 
     private const val arkNightDataApi = "https://api.github.com/repos/Kengxxiao/ArknightsGameData"
     const val arkNightData = "https://raw.fastgit.org/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json"
@@ -125,7 +125,7 @@ object GachaUtil {
     fun downloadArkNightsFile() {
         val arkLoc = FileUtil.getResourceFolder().getChildFolder("ark")
 
-        if (arkNightPictureCount > arkLoc.filesCount()) {
+        if (arkLoc.filesCount() < arkNightPictureCount) {
             val startTime = LocalDateTime.now()
             daemonLogger.info("正在下载 明日方舟图片资源文件")
 
@@ -179,25 +179,18 @@ object GachaUtil {
     }
 
     fun arkNightDataCheck(location: File) {
-        val isOld: Boolean
+        var isOld = false
 
         daemonLogger.info("明日方舟 > 检查是否为旧版本数据...")
         if (!location.exists() || !JsonParser.parseString(location.getContext()).isJsonObject) {
-            daemonLogger.info("明日方舟 > 你正在使用旧版本的数据, 正在自动下载新数据")
+            daemonLogger.info("明日方舟 > 你还没有卡池数据, 正在自动下载新数据")
             isOld = true
-        } else {
-            return
-        }
-
-        if (!location.exists()) {
-            daemonLogger.info("正在下载 明日方舟干员数据")
-            NetUtil.downloadFile(location, arkNightData)
         }
 
         val result = JsonParser.parseString(NetUtil.executeHttpRequest(arkNightDataApi).body?.string())
         val updateTime = LocalDateTime.parse(result.asJsonObject["updated_at"].asString, DateTimeFormatter.ISO_DATE_TIME)
 
-        if (isOld || location.lastModified().toLocalDateTime() < updateTime) {
+        if (isOld || (location.exists() && location.lastModified().toLocalDateTime() < updateTime)) {
             daemonLogger.info("明日方舟干员数据有更新 (${yyMMddPattern.format(updateTime)}), 正在下载")
             val data = NetUtil.downloadFile(FileUtil.getCacheFolder(), arkNightData, location.name)
             Files.copy(data.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)

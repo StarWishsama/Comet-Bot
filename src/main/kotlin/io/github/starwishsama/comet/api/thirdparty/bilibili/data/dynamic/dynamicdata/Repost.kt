@@ -35,7 +35,7 @@ data class Repost(@SerializedName("origin")
         fun getSentTime(): LocalDateTime = sentTime.toLocalDateTime()
     }
 
-    override suspend fun getContact(): MessageWrapper {
+    override fun getContact(): MessageWrapper {
         val originalDynamic = item?.originType?.let { getOriginalDynamic(originDynamic, it) }
                 ?: return MessageWrapper("源动态已被删除")
         val repostPicture = originalDynamic.pictureUrl
@@ -61,7 +61,7 @@ data class Repost(@SerializedName("origin")
 
     override fun getSentTime(): LocalDateTime = item?.getSentTime() ?: LocalDateTime.MIN
 
-    private suspend fun getOriginalDynamic(contact: String, type: Int): MessageWrapper {
+    private fun getOriginalDynamic(contact: String, type: Int): MessageWrapper {
         val dynamicType = DynamicTypeSelector.getType(type)
 
         try {

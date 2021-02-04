@@ -7,7 +7,6 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.RandomResult
 import io.github.starwishsama.comet.objects.RssItem
 import io.github.starwishsama.comet.objects.config.CometConfig
-import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
@@ -84,7 +83,6 @@ object BotVariables {
     var localMessage: MutableList<BotLocalization> = ArrayList()
     var cfg = CometConfig()
     var underCovers: MutableList<RandomResult> = LinkedList()
-    val perGroup: MutableSet<PerGroupConfig> = HashSet()
     var hitokoto: Hitokoto? = null
     val rssItems: MutableList<RssItem> = mutableListOf()
 

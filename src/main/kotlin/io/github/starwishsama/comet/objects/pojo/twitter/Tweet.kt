@@ -7,14 +7,12 @@ import io.github.starwishsama.comet.BotVariables.hmsPattern
 import io.github.starwishsama.comet.BotVariables.nullableGson
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
-import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.MessageChainBuilder
-import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime
@@ -56,7 +54,7 @@ data class Tweet(
     /**
      * 格式化输出推文
      */
-    @ExperimentalTime
+    @OptIn(ExperimentalTime::class)
     fun convertToString(): String {
         val duration =
                 Duration.between(getSentTime(), LocalDateTime.now())
@@ -174,21 +172,12 @@ data class Tweet(
         return if (tcoUrl.isNotEmpty()) tweet.replace(tcoUrl.last(), "") else tweet
     }
 
-    @ExperimentalTime
+    fun toMessageWrapper(): MessageWrapper {
+        return MessageWrapper(convertToString()).plusImageUrl(getPictureUrl())
+    }
+
     fun toMessageChain(target: Contact): MessageChain {
-        return MessageChainBuilder().apply {
-            append(convertToString())
-            val url = getPictureUrl(true) ?: return this.asMessageChain()
-
-            val image = runBlocking {
-                val execute = NetUtil.executeHttpRequest(url).body
-                execute?.byteStream()?.uploadAsImage(target)
-            }
-
-            if (image != null) {
-                append(image)
-            }
-        }.asMessageChain()
+        return runBlocking { toMessageWrapper().toMessageChain(target) }
     }
 
     fun getTweetURL(): String {

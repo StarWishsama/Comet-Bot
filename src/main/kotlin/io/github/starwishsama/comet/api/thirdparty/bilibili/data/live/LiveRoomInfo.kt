@@ -69,7 +69,7 @@ data class LiveRoomInfo(
         @SerializedName("live_time")
         val liveTime: String,
         /**
-         * 直播间 Tag, 例如 "润羽露西娅,潤羽るしあ,VTuber,hololive,虚拟UP主"
+         * 直播间 Tag
          */
         val tags: String,
         /**
@@ -133,7 +133,7 @@ data class LiveRoomInfo(
                 var mobileFrame: JsonElement?
         )
 
-        fun isLiveNow(): Boolean = liveStatus == 1
+        fun isLiveNow(): Boolean = getStatus() == Status.Streaming
 
         fun getLiveTime(): LocalDateTime {
             return LocalDateTime.parse(liveTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
@@ -148,8 +148,8 @@ data class LiveRoomInfo(
         }
 
 
-        fun getStatus(roundStatus: Int): Status {
-            return when (roundStatus) {
+        fun getStatus(): Status {
+            return when (liveStatus) {
                 0 -> Status.NoStreaming
                 1 -> Status.Streaming
                 2 -> Status.PlayingVideo

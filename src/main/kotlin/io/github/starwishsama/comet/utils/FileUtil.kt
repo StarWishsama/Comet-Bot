@@ -27,13 +27,18 @@ import kotlin.time.ExperimentalTime
 
 @Synchronized
 fun File.writeClassToJson(context: Any, gson: Gson = BotVariables.nullableGson) {
+    require(exists()) { "$name 不存在" }
     FileWriter.create(this).write(gson.toJson(context))
 }
 
 @Synchronized
 fun File.writeString(context: String, autoWrap: Boolean = true, isAppend: Boolean = false, newIfNotExists: Boolean = true) {
-    if (!exists() && newIfNotExists) {
-        createNewFile()
+    if (!exists()) {
+        if (newIfNotExists) {
+            createNewFile()
+        } else {
+            throw RuntimeException("$name 不存在")
+        }
     }
 
     if (isAppend) {
@@ -44,59 +49,71 @@ fun File.writeString(context: String, autoWrap: Boolean = true, isAppend: Boolea
 }
 
 @Synchronized
-fun File.getContext(): String = FileReader.create(this, Charsets.UTF_8).readString()
-
-@Suppress("unused")
-fun File.getMD5(): String {
-    require(exists()) { "文件不存在" }
-    return SecureUtil.md5(this)
+fun File.getContext(): String {
+    require(exists()) { "$name 不存在" }
+    return FileReader.create(this, Charsets.UTF_8).readString()
 }
 
-/**
- * 直接将文件内容 (json) 序列化为指定的类
- *
- * @param clazz 指定类
- * @return T
- */
-fun <T> File.parseAsClass(clazz: Class<T>, customParser: Gson = BotVariables.nullableGson): T {
-    require(exists()) { "文件不存在" }
-    return customParser.fromJson(getContext(), clazz)
-}
-
-fun File.getChildFolder(folderName: String, createIfNotExists: Boolean = true): File {
-    val childFolder = File(this, folderName)
-
-    if (!createIfNotExists) return childFolder
-
-    if (!childFolder.exists()) {
-        childFolder.mkdirs()
+    @Suppress("unused")
+    fun File.getMD5(): String {
+        require(exists()) { "$name 不存在" }
+        return SecureUtil.md5(this)
     }
-    return childFolder
-}
 
-/**
- * 检测 [File] 为文件夹时是否为空
- *
- * 注意：如果 [File] 不是文件夹, 会返回 false
- */
-@Suppress("unused")
-fun File.folderIsEmpty(): Boolean = this.filesCount() != -1 || this.filesCount() > 0
+    /**
+     * 直接将文件内容 (json) 序列化为指定的类
+     *
+     * @param clazz 指定类
+     * @return T
+     */
+    fun <T> File.parseAsClass(clazz: Class<T>, customParser: Gson = BotVariables.nullableGson): T {
+        require(exists()) { "$name 不存在" }
+        return customParser.fromJson(getContext(), clazz)
+    }
 
-fun File.filesCount(): Int {
-    if (!isDirectory) return -1
+    fun File.getChildFolder(folderName: String, createIfNotExists: Boolean = true): File {
+        require(exists()) { "$name 不存在" }
 
-    val files = listFiles() ?: return -1
+        val childFolder = File(this, folderName)
 
-    return files.size
-}
+        if (!createIfNotExists) return childFolder
 
-fun File.createBackupFile() {
-    if (isDirectory) return
+        if (!childFolder.exists()) {
+            childFolder.mkdirs()
+        }
+        return childFolder
+    }
 
-    val backup = File(parent, "$name.backup")
-    backup.createNewFile()
-    Files.copy(toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING)
-}
+    /**
+     * 检测 [File] 为文件夹时是否为空
+     *
+     * 注意：如果 [File] 不是文件夹, 会返回 false
+     */
+    @Suppress("unused")
+    fun File.folderIsEmpty(): Boolean {
+        require(exists()) { "$name 不存在" }
+        return this.filesCount() != -1 || this.filesCount() > 0
+    }
+
+    fun File.filesCount(): Int {
+        require(exists()) { "$name 不存在" }
+
+        if (!isDirectory) return -1
+
+        val files = listFiles() ?: return -1
+
+        return files.size
+    }
+
+    fun File.createBackupFile() {
+        require(exists()) { "$name 不存在" }
+
+        if (isDirectory) return
+
+        val backup = File(parent, "$name.backup")
+        backup.createNewFile()
+        Files.copy(toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING)
+    }
 
 object FileUtil {
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
@@ -304,7 +321,7 @@ object FileUtil {
 
 
             if (!f.exists() || f.lastModified().toLocalDateTime() >
-                    entry.lastModifiedTime.toMillis().toLocalDateTime(true)) {
+                entry.lastModifiedTime.toMillis().toLocalDateTime(true)) {
 
                 if (!f.exists()) {
                     f.createNewFile()
@@ -331,16 +348,16 @@ object FileUtil {
         TODO()
         /**require(writeTo != null) { "writeTo cannot be null" }
         when (type) {
-            is ConfigType.Yaml -> {
-                val serializer = writeTo::class.java.getDeclaredMethod("serializer")
+        is ConfigType.Yaml -> {
+        val serializer = writeTo::class.java.getDeclaredMethod("serializer")
 
-                if (serializer.invoke(Unit) is KSerializer<*>) {
-                    writeTo = Yaml.default.decodeFromString(serializer.invoke(Unit) as KSerializer<*>, file.getContext()) as T
-                }
-            }
-            is ConfigType.Json -> {
-                writeTo = gson.fromJson(file.getContext(), T::class.java)
-            }
+        if (serializer.invoke(Unit) is KSerializer<*>) {
+        writeTo = Yaml.default.decodeFromString(serializer.invoke(Unit) as KSerializer<*>, file.io.github.starwishsama.comet.service.pusher.context.getContext()) as T
+        }
+        }
+        is ConfigType.Json -> {
+        writeTo = gson.fromJson(file.io.github.starwishsama.comet.service.pusher.context.getContext(), T::class.java)
+        }
         }*/
     }
 

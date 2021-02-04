@@ -25,10 +25,10 @@ class AdminCommand : ConsoleCommand {
 
                                 val targetLevel = target.level.ordinal + 1
 
-                                if (targetLevel > UserLevel.values().size) {
+                                if (targetLevel >= UserLevel.values().size) {
                                     target.level = UserLevel.USER
                                 } else {
-                                    target.level = UserLevel.values()[targetLevel + 1]
+                                    target.level = UserLevel.values()[targetLevel]
                                 }
 
                                 return "成功将 ${target.id} 设为 ${target.level.name}"

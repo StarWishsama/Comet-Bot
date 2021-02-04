@@ -22,12 +22,17 @@ import io.github.starwishsama.comet.commands.console.DebugCommand
 import io.github.starwishsama.comet.commands.console.StopCommand
 import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
-import io.github.starwishsama.comet.listeners.*
-import io.github.starwishsama.comet.service.pushers.*
-import io.github.starwishsama.comet.utils.*
+import io.github.starwishsama.comet.listeners.AutoReplyListener
+import io.github.starwishsama.comet.listeners.BotGroupStatusListener
+import io.github.starwishsama.comet.listeners.ConvertLightAppListener
+import io.github.starwishsama.comet.listeners.RepeatListener
+import io.github.starwishsama.comet.service.pusher.PusherManager
+import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.RuntimeUtil.getUsedMemory
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
+import io.github.starwishsama.comet.utils.TaskUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -44,7 +49,6 @@ import org.jline.reader.LineReaderBuilder
 import org.jline.terminal.TerminalBuilder
 import java.io.EOFException
 import java.time.LocalDateTime
-import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 import kotlin.time.ExperimentalTime
@@ -115,7 +119,6 @@ object Comet {
             }
         }
 
-        TaskUtil.runScheduleTaskAsync(5, 60 * 60, TimeUnit.SECONDS, HitokotoUpdater::run)
         TaskUtil.runScheduleTaskAsync(3, 3, TimeUnit.HOURS) {
             val usedMemoryBefore: Long = getUsedMemory()
             System.runFinalization()
@@ -147,20 +150,6 @@ object Comet {
         val pwd = cfg.rConPassword
         if (url != null && pwd != null && BotVariables.rCon == null) {
             BotVariables.rCon = Rcon(url, cfg.rConPort, pwd.toByteArray())
-        }
-    }
-
-    private fun startAllPusher(bot: Bot) {
-        val pushers = arrayOf(BiliLiveChecker, TweetUpdateChecker, YoutubeStreamingChecker, BiliDynamicChecker)
-        pushers.forEach {
-            if (it.bot == null) it.bot = bot
-            val future = TaskUtil.runScheduleTaskAsync(it.delayTime, it.internal, TimeUnit.MINUTES) {
-                // Bot 不处于在线状态, 等待下一次推送时再试
-                if (!bot.isOnline) return@runScheduleTaskAsync
-
-                it.retrieve()
-            }
-            it.future = future
         }
     }
 
@@ -215,7 +204,8 @@ object Comet {
         }
 
         startUpTask()
-        startAllPusher(bot)
+
+        PusherManager.initPushers(bot)
 
         logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${startTime.getLastingTimeAsString()}")
 
@@ -337,6 +327,7 @@ private suspend fun handleLogin() {
 fun invokeWhenClose(){
     logger.info("[Bot] 正在关闭 Bot...")
     DataSetup.saveAllResources()
+    PusherManager.savePushers()
     BotVariables.service.shutdown()
     BotVariables.rCon?.disconnect()
     loggerAppender.close()

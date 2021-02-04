@@ -1,14 +1,15 @@
 package io.github.starwishsama.comet.objects.config
 
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
-import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeUser
+import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.objects.push.BiliBiliUser
+import io.github.starwishsama.comet.objects.push.YoutubeUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
-data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
+data class PerGroupConfig(@SerializedName("group_id") val id: Long, @SerializedName("version") val version: String = "2") {
 
     /**
      * 是否自动接受入群请求
@@ -41,7 +42,7 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
      * bilibili 订阅列表
      */
     @SerializedName("bili_sub")
-    val biliSubscribers: MutableSet<Long> = hashSetOf()
+    val biliSubscribers: MutableSet<BiliBiliUser> = hashSetOf()
 
     /**
      * Youtube 开播推送服务
@@ -90,13 +91,13 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
     }
 
     fun init() {
-        BotVariables.perGroup.forEach {
+        GroupConfigManager.getAllConfigs().forEach {
             if (it.id == id) {
                 return
             }
         }
 
-        BotVariables.perGroup.add(this)
+        GroupConfigManager.addConfig(this)
     }
 
     fun isDisabledCommand(command: ChatCommand): Boolean {

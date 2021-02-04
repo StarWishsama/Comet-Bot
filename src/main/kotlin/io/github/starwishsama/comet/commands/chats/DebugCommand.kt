@@ -11,7 +11,8 @@ import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.service.pushers.*
+import io.github.starwishsama.comet.service.pusher.PusherManager
+import io.github.starwishsama.comet.service.task.HitokotoUpdater
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
@@ -81,24 +82,23 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     if (args.size > 1) {
                         return when (args[1].toLowerCase()) {
                             "twit", "twitter", "推特", "蓝鸟", "twi" -> {
-                                TweetUpdateChecker.retrieve()
+                                PusherManager.getPusherByName("twitter")?.execute()
                                 sendMessage("Twitter retriever has been triggered and run~")
                             }
                             "ytb", "y2b", "youtube", "油管" -> {
-                                YoutubeStreamingChecker.retrieve()
-                                sendMessage("Youtube retriever has been triggered and run~")
+                                sendMessage("Youtube retriever is in WIP status.")
                             }
                             "bilibili", "bili", "哔哩哔哩", "b站" -> {
-                                BiliDynamicChecker.retrieve()
+                                PusherManager.getPusherByName("bili_dynamic")?.execute() ?: return "Can't found pusher".sendMessage()
                                 sendMessage("Bilibili retriever has been triggered and run~")
                             }
                             "status" -> {
-                                val ps = listOf(TweetUpdateChecker, BiliDynamicChecker, BiliLiveChecker)
+                                val ps = PusherManager.getPushers()
                                 buildString {
                                     ps.forEach {
                                         append(it::class.java.simpleName + "\n")
-                                        append("上次推送了 ${it.pushCount} 次\n")
-                                        append("上次推送于 ${BotVariables.yyMMddPattern.format(it.lastPushTime)}\n")
+                                        append("上次推送了 ${it.pushTime} 次\n")
+                                        append("上次推送于 ${BotVariables.yyMMddPattern.format(it.latestPushTime)}\n")
                                     }
                                     trim()
                                 }.sendMessage()
@@ -136,9 +136,6 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                         执行完成线程数： $completedTaskCount
                         总线程数：$taskCount
                     """.trimIndent().convertToChain()
-                }
-                "pushpool" -> {
-                    return BiliDynamicChecker.getPool().toString().sendMessage()
                 }
                 "quit" -> {
                     if (event is GroupMessageEvent) {
