@@ -37,7 +37,7 @@ object GachaUtil {
     const val overTimeMessage = "抽卡次数到上限了, 可以少抽一点或者等待条数自动恢复哦~\n" +
             "命令条数现在每小时会恢复100次, 封顶1000次"
     var pictureReady = false
-    private const val arkNightPictureCount = 198
+    private const val arkNightPictureCount = 185
 
     private const val arkNightDataApi = "https://api.github.com/repos/Kengxxiao/ArknightsGameData"
     const val arkNightData = "https://raw.fastgit.org/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json"
