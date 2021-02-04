@@ -11,9 +11,9 @@ import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 
 interface DynamicData {
-    suspend fun getContact(): MessageWrapper
+    fun getContact(): MessageWrapper
 
-    suspend fun compare(other: Any?): Boolean {
+    fun compare(other: Any?): Boolean {
         if (other == null) return false
         if (other !is DynamicData) return false
 
@@ -178,10 +178,10 @@ fun Dynamic.convertToDynamicData(): DynamicData? {
     return null
 }
 
-fun Dynamic.convertDynamic(): MessageWrapper {
+fun Dynamic.convertToWrapper(): MessageWrapper {
     return try {
         val data = convertToDynamicData()
-        runBlocking { data?.getContact() ?: MessageWrapper("错误: 不支持的动态类型", false) }.also { it.uniqueId = this.data.card?.description?.dynamicId ?: 0 }
+        runBlocking { data?.getContact() ?: MessageWrapper("错误: 不支持的动态类型", false) }
     } catch (e: Exception) {
         if (e is ArrayIndexOutOfBoundsException) {
             MessageWrapper("没有发过动态", false)

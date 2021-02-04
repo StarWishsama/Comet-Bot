@@ -1,14 +1,15 @@
 package io.github.starwishsama.comet.managers
 
 import io.github.starwishsama.comet.BotVariables.bot
-import io.github.starwishsama.comet.BotVariables.perGroup
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 
 object GroupConfigManager {
-    fun getConfig(groupId: Long): PerGroupConfig? {
-        if (perGroup.isEmpty()) return null
+    private val groupConfigs: MutableSet<PerGroupConfig> = HashSet()
 
-        perGroup.forEach {
+    fun getConfig(groupId: Long): PerGroupConfig? {
+        if (groupConfigs.isEmpty()) return null
+
+        groupConfigs.forEach {
             if (groupId == it.id) {
                 return it
             }
@@ -30,6 +31,16 @@ object GroupConfigManager {
     }
 
     fun expireConfig(groupId: Long) {
-        perGroup.removeIf { groupId == it.id }
+        groupConfigs.removeIf { groupId == it.id }
     }
+
+    fun addConfig(config: PerGroupConfig) {
+        groupConfigs.add(config)
+    }
+
+    fun removeConfig(config: PerGroupConfig) {
+        groupConfigs.remove(config)
+    }
+
+    fun getAllConfigs(): Set<PerGroupConfig> = groupConfigs
 }

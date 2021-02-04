@@ -14,6 +14,7 @@ import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.hiddenOperators
 import io.github.starwishsama.comet.BotVariables.nullableGson
+import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.CometConfig
@@ -180,7 +181,7 @@ object DataSetup {
             try {
                 if (!loc.exists()) {
                     FileUtil.createBlankFile(loc)
-                    BotVariables.perGroup.add(PerGroupConfig(group.id).also { it.init() })
+                    GroupConfigManager.addConfig(PerGroupConfig(group.id).also { it.init() })
                 } else {
                     val cfg: PerGroupConfig = if (loc.getContext().isEmpty()) {
                         daemonLogger.warning("检测到 ${group.id} 的群配置异常, 正在重新生成...")
@@ -200,7 +201,7 @@ object DataSetup {
                             }
                         }
                     }
-                    BotVariables.perGroup.add(cfg)
+                    GroupConfigManager.addConfig(cfg)
                 }
             }
             catch (e: RuntimeException) {
@@ -208,13 +209,13 @@ object DataSetup {
             }
         }
 
-        BotVariables.logger.info("[配置] 成功加载了 ${BotVariables.perGroup.size} 个群配置")
+        BotVariables.logger.info("[配置] 成功加载了 ${GroupConfigManager.getAllConfigs().size} 个群配置")
     }
 
     private fun savePerGroupSetting() {
         if (!perGroupFolder.exists()) return
 
-        BotVariables.perGroup.forEach {
+        GroupConfigManager.getAllConfigs().forEach {
             val loc = File(perGroupFolder, "${it.id}.json")
             if (!loc.exists()) loc.createNewFile()
             loc.writeClassToJson(it, nonNullGson)

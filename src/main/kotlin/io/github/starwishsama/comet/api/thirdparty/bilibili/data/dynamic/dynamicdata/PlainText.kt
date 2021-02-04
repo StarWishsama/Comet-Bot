@@ -29,7 +29,7 @@ data class PlainText(
         val replyCount: Int
     )
 
-    override suspend fun getContact(): MessageWrapper {
+    override fun getContact(): MessageWrapper {
         return MessageWrapper(
             "发布了动态: \n" +
                     "${item.context ?: "获取失败"}\n\n" +

@@ -57,7 +57,7 @@ data class TextWithPicture(
         )
     }
 
-    override suspend fun getContact(): MessageWrapper {
+    override fun getContact(): MessageWrapper {
         val wrapped = MessageWrapper("发布了动态:\n ${item.text ?: "获取失败"}\n")
 
         if (!item.pictures.isNullOrEmpty()) {

@@ -63,7 +63,7 @@ data class LiveBroadcast(
         fun getLiveStartTime(): LocalDateTime = liveStartTime.toLocalDateTime()
     }
 
-    override suspend fun getContact(): MessageWrapper {
+    override fun getContact(): MessageWrapper {
         val wrapped = MessageWrapper(
                 "${BiliBiliMainApi.getUserNameByMid(livePlayInfo.uid)} 正在直播!\n" +
                         "标题: ${livePlayInfo.liveTitle}\n" +

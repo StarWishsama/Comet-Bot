@@ -107,7 +107,7 @@ data class LiveRoom(
         }
     }
 
-    override suspend fun getContact(): MessageWrapper {
+    override fun getContact(): MessageWrapper {
         val wrapped = MessageWrapper(
                 "${BiliBiliMainApi.getUserNameByMid(uid)}的直播间\n" +
                         "直播间标题: ${title}\n" +

@@ -29,7 +29,7 @@ data class Music(
         @SerializedName("playCnt")
         val playCount: Long
 ) : DynamicData {
-    override suspend fun getContact(): MessageWrapper {
+    override fun getContact(): MessageWrapper {
         return MessageWrapper("${dynamic ?: "获取失败"}\n" +
                 "发布了音乐: $songName\n" +
                 "🕘 ${BotVariables.yyMMddPattern.format(uploadTime.toLocalDateTime())}")
