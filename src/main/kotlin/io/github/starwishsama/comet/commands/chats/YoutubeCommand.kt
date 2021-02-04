@@ -11,7 +11,6 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
 import io.github.starwishsama.comet.objects.push.YoutubeUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import io.github.starwishsama.comet.service.oldpushers.YoutubeStreamingChecker
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
@@ -134,11 +133,12 @@ class YoutubeCommand : ChatCommand {
     }
 
     private fun clearUnsubscribeUsersInPool(groupId: Long, userName: String) {
-        YoutubeStreamingChecker.pushPool.forEach { (username, cache) ->
+        return
+        /**YoutubeStreamingChecker.pushPool.forEach { (username, cache) ->
             if (username == userName && cache.groups.contains(groupId)) {
                 cache.groups.remove(groupId)
             }
-        }
+        }*/
     }
 
     private fun checkInfo(channelID: String): MessageWrapper {

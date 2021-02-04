@@ -29,6 +29,8 @@ object PusherManager {
                 cfgFile.createNewFile()
                 cfgFile.writeClassToJson(it.config)
             }
+
+            it.start()
         }
     }
 
@@ -40,5 +42,19 @@ object PusherManager {
 
             cfgFile.writeClassToJson(it.config)
         }
+    }
+
+    fun getPushers(): MutableList<CometPusher> {
+        return usablePusher
+    }
+
+    fun getPusherByName(name: String): CometPusher? {
+        getPushers().forEach {
+            if (it.name == name) {
+                return it
+            }
+        }
+
+        return null
     }
 }
