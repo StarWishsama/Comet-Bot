@@ -3,8 +3,6 @@ package io.github.starwishsama.comet.file
 import cn.hutool.core.io.file.FileReader
 import com.github.salomonbrys.kotson.forEach
 import com.github.salomonbrys.kotson.fromJson
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
@@ -12,6 +10,7 @@ import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.arkNightPools
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.hiddenOperators
 import io.github.starwishsama.comet.BotVariables.nullableGson
 import io.github.starwishsama.comet.managers.GroupConfigManager
@@ -39,7 +38,6 @@ object DataSetup {
     private val arkNightData = File(FileUtil.getResourceFolder(), "arkNights.json")
     private val perGroupFolder = FileUtil.getChildFolder("groups")
     private var brokenConfig = false
-    private val nonNullGson: Gson = GsonBuilder().setPrettyPrinting().create()
 
     fun init() {
         if (!userCfg.exists() || !cfgFile.exists()) {
@@ -194,7 +192,7 @@ object DataSetup {
                             if (ConfigConverter.convertOldGroupConfig(loc)) {
                                 return@forEach
                             } else {
-                                loc.parseAsClass(PerGroupConfig::class.java, nonNullGson)
+                                loc.parseAsClass(PerGroupConfig::class.java, gson)
                             }
                         } catch (e: Exception) {
                             daemonLogger.warning("检测到 ${group.id} 的群配置异常, 正在重新生成...")
@@ -223,7 +221,7 @@ object DataSetup {
         GroupConfigManager.getAllConfigs().forEach {
             val loc = File(perGroupFolder, "${it.id}.json")
             if (!loc.exists()) loc.createNewFile()
-            loc.writeClassToJson(it, nonNullGson)
+            loc.writeClassToJson(it, gson)
         }
     }
 }

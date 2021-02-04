@@ -27,13 +27,18 @@ import kotlin.time.ExperimentalTime
 
 @Synchronized
 fun File.writeClassToJson(context: Any, gson: Gson = BotVariables.nullableGson) {
+    require(exists()) { "$name 不存在" }
     FileWriter.create(this).write(gson.toJson(context))
 }
 
 @Synchronized
 fun File.writeString(context: String, autoWrap: Boolean = true, isAppend: Boolean = false, newIfNotExists: Boolean = true) {
-    if (!exists() && newIfNotExists) {
-        createNewFile()
+    if (!exists()) {
+        if (newIfNotExists) {
+            createNewFile()
+        } else {
+            throw RuntimeException("$name 不存在")
+        }
     }
 
     if (isAppend) {
@@ -62,11 +67,13 @@ fun File.getContext(): String {
      * @return T
      */
     fun <T> File.parseAsClass(clazz: Class<T>, customParser: Gson = BotVariables.nullableGson): T {
-        require(exists()) { "文件不存在" }
+        require(exists()) { "$name 不存在" }
         return customParser.fromJson(getContext(), clazz)
     }
 
     fun File.getChildFolder(folderName: String, createIfNotExists: Boolean = true): File {
+        require(exists()) { "$name 不存在" }
+
         val childFolder = File(this, folderName)
 
         if (!createIfNotExists) return childFolder
@@ -83,9 +90,14 @@ fun File.getContext(): String {
      * 注意：如果 [File] 不是文件夹, 会返回 false
      */
     @Suppress("unused")
-    fun File.folderIsEmpty(): Boolean = this.filesCount() != -1 || this.filesCount() > 0
+    fun File.folderIsEmpty(): Boolean {
+        require(exists()) { "$name 不存在" }
+        return this.filesCount() != -1 || this.filesCount() > 0
+    }
 
     fun File.filesCount(): Int {
+        require(exists()) { "$name 不存在" }
+
         if (!isDirectory) return -1
 
         val files = listFiles() ?: return -1
@@ -94,6 +106,8 @@ fun File.getContext(): String {
     }
 
     fun File.createBackupFile() {
+        require(exists()) { "$name 不存在" }
+
         if (isDirectory) return
 
         val backup = File(parent, "$name.backup")

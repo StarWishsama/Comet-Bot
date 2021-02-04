@@ -3,12 +3,12 @@ package io.github.starwishsama.comet.objects.config
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.objects.push.YoutubeUser
 
-data class BiliConfigTestObject(
+data class OldVersionTestObject(
     /**
      * bilibili 订阅列表
      */
-    @SerializedName("bili_sub")
-    val biliSubscribers: MutableSet<Long> = hashSetOf()
+    @SerializedName("version")
+    val version: String
 )
 
 data class OldGroupConfig(@SerializedName("group_id") val id: Long) {

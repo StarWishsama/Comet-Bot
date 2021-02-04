@@ -9,7 +9,7 @@ import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.push.YoutubeUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
-data class PerGroupConfig(@SerializedName("group_id") val id: Long) {
+data class PerGroupConfig(@SerializedName("group_id") val id: Long, @SerializedName("version") val version: String = "2") {
 
     /**
      * 是否自动接受入群请求

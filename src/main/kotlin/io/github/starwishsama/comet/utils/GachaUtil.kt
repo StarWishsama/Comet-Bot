@@ -125,7 +125,7 @@ object GachaUtil {
     fun downloadArkNightsFile() {
         val arkLoc = FileUtil.getResourceFolder().getChildFolder("ark")
 
-        if (arkNightPictureCount > arkLoc.filesCount()) {
+        if (arkLoc.filesCount() < arkNightPictureCount) {
             val startTime = LocalDateTime.now()
             daemonLogger.info("正在下载 明日方舟图片资源文件")
 
