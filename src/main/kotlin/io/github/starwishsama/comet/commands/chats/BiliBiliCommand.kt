@@ -209,7 +209,7 @@ class BiliBiliCommand : ChatCommand {
         val roomNumber = LiveApi.getRoomIDByUID(uid)
 
         if (!cfg.biliSubscribers.stream().filter { it.id.toLong() == uid }.findAny().isPresent) {
-            cfg.biliSubscribers.add(BiliBiliUser(uid.toString(), roomNumber, name))
+            cfg.biliSubscribers.add(BiliBiliUser(uid.toString(), name, roomNumber))
         }
 
         return sendMessage("订阅 ${name}($uid) 成功")

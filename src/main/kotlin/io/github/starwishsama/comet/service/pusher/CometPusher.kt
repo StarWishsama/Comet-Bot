@@ -22,8 +22,6 @@ abstract class CometPusher(val bot: Bot, val name: String) {
 
     abstract val cachePool: MutableList<PushContext>
 
-    val duration: Long = config.interval
-
     var pushTime: Int = 0
 
     var latestPushTime: LocalDateTime = LocalDateTime.now()
@@ -66,7 +64,7 @@ abstract class CometPusher(val bot: Bot, val name: String) {
     }
 
     fun start() {
-        TaskUtil.runScheduleTaskAsync(duration, duration, TimeUnit.SECONDS) {
+        TaskUtil.runScheduleTaskAsync(config.interval, config.interval, TimeUnit.SECONDS) {
             execute()
         }
     }

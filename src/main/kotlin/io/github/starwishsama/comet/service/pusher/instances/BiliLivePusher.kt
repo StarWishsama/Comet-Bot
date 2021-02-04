@@ -14,7 +14,6 @@ import net.mamoe.mirai.Bot
 class BiliLivePusher(bot: Bot): CometPusher(bot, "bili_live") {
     override var config: PusherConfig = PusherConfig(
         30_0000L,
-        360_0000L,
         mutableListOf()
     )
     override val cachePool: MutableList<PushContext> = mutableListOf()

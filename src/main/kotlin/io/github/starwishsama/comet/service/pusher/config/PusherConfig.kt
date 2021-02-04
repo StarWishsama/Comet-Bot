@@ -8,17 +8,12 @@ open class PusherConfig(
      */
     val interval: Long,
     /**
-     * 重置调用次数间隔, 单位毫秒
-     */
-    val resetInterval: Long,
-    /**
      * 缓存池
      */
     val cachePool: MutableList<out PushContext>
 )
 
 class EmptyPusherConfig: PusherConfig(
-    -1,
     -1,
     mutableListOf()
 )

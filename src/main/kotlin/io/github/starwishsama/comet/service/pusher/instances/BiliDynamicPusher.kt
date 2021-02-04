@@ -17,7 +17,6 @@ import net.mamoe.mirai.Bot
 class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
     override var config: PusherConfig = PusherConfig(
         30_0000L,
-        360_0000L,
         mutableListOf()
     )
 

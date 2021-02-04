@@ -89,7 +89,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                 sendMessage("Youtube retriever is in WIP status.")
                             }
                             "bilibili", "bili", "哔哩哔哩", "b站" -> {
-                                PusherManager.getPusherByName("bili_dynamic")?.execute()
+                                PusherManager.getPusherByName("bili_dynamic")?.execute() ?: return "Can't found pusher".sendMessage()
                                 sendMessage("Bilibili retriever has been triggered and run~")
                             }
                             "status" -> {

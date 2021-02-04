@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.objects.push
 
-data class YoutubeUser(
-    override val id: String,
-    override val userName: String
+class YoutubeUser(
+    id: String,
+    userName: String
 ): PushUser(id, userName)

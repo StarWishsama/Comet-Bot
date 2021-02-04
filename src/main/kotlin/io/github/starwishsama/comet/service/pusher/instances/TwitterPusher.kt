@@ -14,7 +14,6 @@ import net.mamoe.mirai.Bot
 class TwitterPusher(bot: Bot): CometPusher(bot, "twitter") {
     override var config: PusherConfig = PusherConfig(
         30_0000L,
-        90_0000L,
         mutableListOf()
     )
 
