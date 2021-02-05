@@ -40,6 +40,8 @@ object PusherManager {
 
             if (!cfgFile.exists()) cfgFile.createNewFile()
 
+            it.config.cachePool.addAll(it.cachePool)
+
             cfgFile.writeClassToJson(it.config)
         }
     }
