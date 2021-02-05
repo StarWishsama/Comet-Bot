@@ -66,10 +66,10 @@ abstract class CometPusher(val bot: Bot, val name: String) {
     }
 
     fun start() {
-        val f = TaskUtil.runScheduleTaskAsync(config.interval, config.interval, TimeUnit.MILLISECONDS) {
+        TaskUtil.runScheduleTaskAsync(config.interval, config.interval, TimeUnit.MILLISECONDS) {
             execute()
         }
-        daemonLogger.info("$name 推送器已启动, $f")
+        daemonLogger.info("$name 推送器已启动")
     }
 
     fun addPushTime(){
