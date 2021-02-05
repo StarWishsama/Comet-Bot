@@ -1,11 +1,13 @@
 package io.github.starwishsama.comet.service.pusher.context
 
+import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 class TwitterContext(
     pushTarget: MutableList<Long>,
     retrieveTime: Long,
+    @SerializedName("custom_status")
     override var status: PushStatus = PushStatus.READY,
     val twitterUserName: String,
     var tweet: Tweet

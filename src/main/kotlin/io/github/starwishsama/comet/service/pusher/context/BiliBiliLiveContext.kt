@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.service.pusher.context
 
+import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
@@ -7,6 +8,7 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 class BiliBiliLiveContext(
     pushTarget: MutableList<Long>,
     retrieveTime: Long,
+    @SerializedName("custom_status")
     override var status: PushStatus = PushStatus.READY,
     val pushUser: BiliBiliUser,
     var liveStatus: LiveRoomInfo,
