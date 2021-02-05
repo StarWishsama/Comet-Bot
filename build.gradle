@@ -48,12 +48,15 @@ tasks {
 }
 
 repositories {
+    maven { url 'https://repo.huaweicloud.com/repository/maven/' }
+    maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     jcenter()
     mavenCentral()
     google()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
