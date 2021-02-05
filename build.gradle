@@ -7,6 +7,8 @@ buildscript {
         mavenCentral()
         google()
         maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+        maven { url 'https://repo.huaweicloud.com/repository/maven/' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
     }
 }
 

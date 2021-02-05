@@ -24,6 +24,9 @@ class BiliLivePusher(bot: Bot): CometPusher(bot, "bili_live") {
             if (!cfg.biliPushEnabled || cfg.biliSubscribers.isEmpty()) return@cfg
 
             cfg.biliSubscribers.forEach user@ { user ->
+                if (user.roomID < 0L) {
+                    return@user
+                }
                 val status = LiveApi.getLiveInfo(user.roomID) ?: return@user
                 val time = System.currentTimeMillis()
                 val cache = (cachePool as MutableList<BiliBiliLiveContext>).getContextByUID(user.id.toLong())

@@ -130,11 +130,19 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     val completedTaskCount: Long = executor.completedTaskCount
                     val taskCount: Long = executor.taskCount
 
+                    val tasks = buildString {
+                        append("任务列表:\n")
+                        executor.queue.forEach {
+                            append(it.toString()).append(" ")
+                        }
+                    }.trim()
+
                     return """
                         当前排队线程数：$queueSize
                         当前活动线程数：$activeCount
                         执行完成线程数： $completedTaskCount
                         总线程数：$taskCount
+                        $tasks
                     """.trimIndent().convertToChain()
                 }
                 "quit" -> {
