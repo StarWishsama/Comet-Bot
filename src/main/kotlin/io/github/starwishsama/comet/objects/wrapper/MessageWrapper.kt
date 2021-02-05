@@ -47,11 +47,11 @@ open class MessageWrapper(var text: String?, val success: Boolean = true): Clone
 
                 if (pictureAtTop) {
                     images.forEach {
-                        result += it
+                        result = it + result
                     }
                 } else {
                     images.forEach {
-                        result = it + result
+                        result += it
                     }
                 }
 
