@@ -45,6 +45,7 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
 
                     if (cache == null) {
                         cachePool.add(current)
+                        addRetrieveTime()
                         return@user
                     } else if (!cache.compareTo(current)) {
                         cache.apply {
@@ -53,9 +54,16 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
                             this.status = PushStatus.READY
                             addPushTarget(cfg.id)
                         }
+
+                        addRetrieveTime()
                     }
                 }
             }
+        }
+
+        if (retrieveTime > 0) {
+            BotVariables.daemonLogger.verbose("已获取了 $retrieveTime 个动态")
+            resetRetrieveTime()
         }
     }
 }

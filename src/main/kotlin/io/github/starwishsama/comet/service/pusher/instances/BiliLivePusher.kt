@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.service.pusher.instances
 
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.CometPusher
@@ -35,6 +36,7 @@ class BiliLivePusher(bot: Bot): CometPusher(bot, "bili_live") {
 
                 if (cache == null) {
                     cachePool.add(current)
+                    addRetrieveTime()
                     return@user
                 } else if (!cache.compareTo(current)){
                     cache.apply {
@@ -43,8 +45,14 @@ class BiliLivePusher(bot: Bot): CometPusher(bot, "bili_live") {
                         this.status = PushStatus.READY
                         addPushTarget(cfg.id)
                     }
+                    addRetrieveTime()
                 }
             }
+        }
+
+        if (retrieveTime > 0) {
+            daemonLogger.verbose("已获取了 $retrieveTime 个开播消息")
+            resetRetrieveTime()
         }
     }
 }

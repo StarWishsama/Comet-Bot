@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.service.pusher
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.service.pusher.config.EmptyPusherConfig
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.context.PushContext
@@ -21,6 +21,8 @@ abstract class CometPusher(val bot: Bot, val name: String) {
     open var config: PusherConfig = EmptyPusherConfig()
 
     abstract val cachePool: MutableList<PushContext>
+
+    var retrieveTime: Int = 0
 
     var pushTime: Int = 0
 
@@ -42,18 +44,18 @@ abstract class CometPusher(val bot: Bot, val name: String) {
 
                         addPushTime()
                     } catch (e: Exception) {
-                        BotVariables.daemonLogger.warning("在推送开播消息至群 $it 时出现异常", e)
+                        daemonLogger.warning("在推送开播消息至群 $it 时出现异常", e)
                     }
                 }
 
-                latestPushTime = LocalDateTime.now()
                 context.clearPushTarget()
                 context.status = PushStatus.FINISHED
             }
         }
 
         if (pushTime > 0) {
-            BotVariables.daemonLogger.verboseS("$name 已成功推送消息至 $pushTime 个群")
+            latestPushTime = LocalDateTime.now()
+            daemonLogger.verboseS("$name 已成功推送消息至 $pushTime 个群")
             resetPushTime()
         }
     }
@@ -64,9 +66,10 @@ abstract class CometPusher(val bot: Bot, val name: String) {
     }
 
     fun start() {
-        TaskUtil.runScheduleTaskAsync(config.interval, config.interval, TimeUnit.SECONDS) {
+        val f = TaskUtil.runScheduleTaskAsync(config.interval, config.interval, TimeUnit.SECONDS) {
             execute()
         }
+        daemonLogger.info("$name 推送器已启动, $f")
     }
 
     fun addPushTime(){
@@ -75,5 +78,13 @@ abstract class CometPusher(val bot: Bot, val name: String) {
 
     fun resetPushTime() {
         pushTime = 0
+    }
+
+    fun addRetrieveTime() {
+        retrieveTime += 1
+    }
+
+    fun resetRetrieveTime() {
+        retrieveTime = 0
     }
 }

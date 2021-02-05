@@ -10,11 +10,23 @@ import java.util.concurrent.TimeUnit
 
 object TaskUtil {
     fun runAsync(delay: Long = 0, unit: TimeUnit = TimeUnit.SECONDS, task: () -> Unit): ScheduledFuture<*> {
-        return BotVariables.service.schedule(task, delay, unit)
+        return BotVariables.service.schedule({
+            try {
+                task()
+            } catch (e: Throwable) {
+                daemonLogger.warning("执行任务时遇到了意外", e)
+            }
+        }, delay, unit)
     }
 
     fun runScheduleTaskAsync(firstTimeDelay: Long, period: Long, unit: TimeUnit, task: () -> Unit): ScheduledFuture<*> {
-        return BotVariables.service.scheduleAtFixedRate(task, firstTimeDelay, period, unit)
+        return BotVariables.service.scheduleAtFixedRate({
+            try {
+                task()
+            } catch (e: Throwable) {
+                daemonLogger.warning("执行任务时遇到了意外", e)
+            }
+        }, firstTimeDelay, period, unit)
     }
 
     fun executeRetry(retryTime: Int, task: () -> Unit): Throwable? {

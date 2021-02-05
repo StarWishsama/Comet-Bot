@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.service.pusher.instances
 
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.CometPusher
@@ -29,6 +30,7 @@ class TwitterPusher(bot: Bot): CometPusher(bot, "twitter") {
 
                     if (cache == null) {
                         cachePool.add(TwitterContext(mutableListOf(cfg.id), time, PushStatus.READY, user, tweet))
+                        addRetrieveTime()
                         return@forEach
                     } else if (!tweet.contentEquals(cache.tweet)) {
                         cache.apply {
@@ -36,9 +38,15 @@ class TwitterPusher(bot: Bot): CometPusher(bot, "twitter") {
                             this.tweet = tweet
                             this.status = PushStatus.READY
                         }
+                        addRetrieveTime()
                     }
                 }
             }
+        }
+
+        if (retrieveTime > 0) {
+            BotVariables.daemonLogger.verbose("已获取了 $retrieveTime 条推文")
+            resetRetrieveTime()
         }
     }
 }
