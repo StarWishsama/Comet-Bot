@@ -133,16 +133,16 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     val tasks = buildString {
                         append("任务列表:\n")
                         executor.queue.forEach {
-                            append(it.toString()).append(" ")
+                            append((it.hashCode())).append(" ")
                         }
                     }.trim()
 
                     return """
-                        当前排队线程数：$queueSize
-                        当前活动线程数：$activeCount
-                        执行完成线程数： $completedTaskCount
-                        总线程数：$taskCount
-                        $tasks
+当前排队线程数：$queueSize
+当前活动线程数：$activeCount
+执行完成线程数： $completedTaskCount
+总线程数：$taskCount
+$tasks
                     """.trimIndent().convertToChain()
                 }
                 "quit" -> {
