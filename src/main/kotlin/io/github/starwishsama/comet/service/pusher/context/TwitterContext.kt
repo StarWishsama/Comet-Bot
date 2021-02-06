@@ -11,7 +11,7 @@ class TwitterContext(
     override var status: PushStatus = PushStatus.READY,
     val twitterUserName: String,
     var tweet: Tweet
-) : PushContext(pushTarget, retrieveTime, status) {
+) : PushContext(pushTarget, retrieveTime, status), Pushable {
 
     override fun toMessageWrapper(): MessageWrapper {
         val original = tweet.toMessageWrapper()
@@ -23,7 +23,7 @@ class TwitterContext(
     override fun compareTo(other: PushContext): Boolean {
         if (other !is TwitterContext) return false
 
-        return tweet.postTime == other.tweet.postTime
+        return tweet.id == other.tweet.id
     }
 }
 

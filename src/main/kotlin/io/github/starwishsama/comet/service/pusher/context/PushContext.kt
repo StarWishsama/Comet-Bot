@@ -7,15 +7,11 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
  *
  * 推送内容
  */
-abstract class PushContext(
+open class PushContext(
     private val pushTarget: MutableList<Long>,
     var retrieveTime: Long,
     open var status: PushStatus
-) {
-    abstract fun toMessageWrapper(): MessageWrapper
-
-    abstract fun compareTo(other: PushContext): Boolean
-
+): Pushable {
     fun addPushTarget(id: Long) {
         if (!pushTarget.contains(id)) {
             pushTarget.add(id)
@@ -27,6 +23,14 @@ abstract class PushContext(
     }
 
     fun getPushTarget(): MutableList<Long> = pushTarget
+
+    override fun toMessageWrapper(): MessageWrapper {
+        throw UnsupportedOperationException("Base PushContext can't convert to MessageWrapper")
+    }
+
+    override fun compareTo(other: PushContext): Boolean {
+        return this == other
+    }
 }
 
 enum class PushStatus {

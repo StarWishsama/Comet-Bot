@@ -13,7 +13,7 @@ class BiliBiliDynamicContext(
     override var status: PushStatus = PushStatus.READY,
     val pushUser: BiliBiliUser,
     var dynamic: Dynamic
-) : PushContext(pushTarget, retrieveTime, status) {
+) : PushContext(pushTarget, retrieveTime, status), Pushable {
 
     override fun toMessageWrapper(): MessageWrapper {
         val before = dynamic.convertToWrapper()
@@ -28,7 +28,7 @@ class BiliBiliDynamicContext(
         if (other !is BiliBiliDynamicContext) return false
 
         return (dynamic.data.card?.description?.dynamicId == other.dynamic.data.card?.description?.dynamicId)
-                || (dynamic.data.cards?.get(0)?.description?.dynamicId == other.dynamic.data.cards?.get(0)?.description?.dynamicId)
+                || (dynamic.data.cards != null && dynamic.data.cards?.get(0)?.description?.dynamicId == other.dynamic.data.cards?.get(0)?.description?.dynamicId)
     }
 }
 

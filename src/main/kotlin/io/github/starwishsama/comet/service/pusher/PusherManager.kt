@@ -1,5 +1,7 @@
 package io.github.starwishsama.comet.service.pusher
 
+import com.github.salomonbrys.kotson.fromJson
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.nullableGson
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.instances.BiliDynamicPusher
@@ -18,19 +20,23 @@ object PusherManager {
     fun initPushers(bot: Bot) {
         usablePusher.addAll(listOf(BiliDynamicPusher(bot), BiliLivePusher(bot), TwitterPusher(bot)))
 
-        usablePusher.forEach {
-            val cfgFile = File(pusherFolder, "${it.name}.json")
+        try {
+            usablePusher.forEach {
+                val cfgFile = File(pusherFolder, "${it.name}.json")
 
-            if (cfgFile.exists()) {
-                val cfg = nullableGson.fromJson(cfgFile.getContext(), PusherConfig::class.java)
-                it.config = cfg
-                it.cachePool.addAll(cfg.cachePool)
-            } else {
-                cfgFile.createNewFile()
-                cfgFile.writeClassToJson(it.config)
+                if (cfgFile.exists()) {
+                    val cfg = nullableGson.fromJson<PusherConfig>(cfgFile.getContext())
+                    it.config = cfg
+                    it.cachePool.addAll(cfg.cachePool)
+                } else {
+                    cfgFile.createNewFile()
+                    cfgFile.writeClassToJson(it.config)
+                }
+
+                it.start()
             }
-
-            it.start()
+        } catch (e: Exception) {
+            daemonLogger.warning("在初始化推送器时遇到了问题", e)
         }
     }
 

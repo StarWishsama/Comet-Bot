@@ -12,7 +12,7 @@ class BiliBiliLiveContext(
     override var status: PushStatus = PushStatus.READY,
     val pushUser: BiliBiliUser,
     var liveStatus: LiveRoomInfo,
-): PushContext(pushTarget, retrieveTime, status) {
+): PushContext(pushTarget, retrieveTime, status), Pushable {
 
     override fun toMessageWrapper(): MessageWrapper {
         val data = liveStatus.data
@@ -34,6 +34,7 @@ class BiliBiliLiveContext(
         if (other !is BiliBiliLiveContext) return false
 
         return liveStatus.data.liveTime == other.liveStatus.data.liveTime
+                && liveStatus.data.getStatus() == other.liveStatus.data.getStatus()
     }
 }
 
