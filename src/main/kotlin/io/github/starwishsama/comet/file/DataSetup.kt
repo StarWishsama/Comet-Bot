@@ -26,7 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.Bot
-import net.mamoe.yamlkt.Yaml
+import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
 
 object DataSetup {
@@ -42,7 +42,7 @@ object DataSetup {
     fun init() {
         if (!userCfg.exists() || !cfgFile.exists()) {
             try {
-                cfgFile.writeString(Yaml.default.encodeToString(CometConfig()), isAppend = false)
+                cfgFile.writeString(Default.encodeToString(CometConfig()), isAppend = false)
                 userCfg.writeClassToJson(BotVariables.users)
                 shopItemCfg.writeClassToJson(BotVariables.shop)
                 println("[配置] 已自动生成新的配置文件.")
@@ -68,7 +68,7 @@ object DataSetup {
 
     private fun saveCfg() {
         try {
-            cfgFile.writeString(Yaml.default.encodeToString(CometConfig.serializer(), cfg), isAppend = false)
+            cfgFile.writeString(Default.encodeToString(CometConfig.serializer(), cfg), isAppend = false)
             userCfg.writeClassToJson(BotVariables.users)
             shopItemCfg.writeClassToJson(BotVariables.shop)
             savePerGroupSetting()
@@ -78,7 +78,7 @@ object DataSetup {
     }
 
     private fun load() {
-        cfg = Yaml.default.decodeFromString(CometConfig.serializer(), cfgFile.getContext())
+        cfg = Default.decodeFromString(CometConfig.serializer(), cfgFile.getContext())
 
         BotVariables.users.addAll(nullableGson.fromJson<List<BotUser>>(userCfg.getContext()))
 
@@ -103,7 +103,12 @@ object DataSetup {
 
         if (arkNightData.exists()) {
             @Suppress("UNCHECKED_CAST")
-            hiddenOperators = Yaml.default.decodeMapFromString(File(FileUtil.getResourceFolder(), "hidden_operators.yml").getContext())["hiddenOperators"] as MutableList<String>
+            hiddenOperators = Default.decodeMapFromString(
+                File(
+                    FileUtil.getResourceFolder(),
+                    "hidden_operators.yml"
+                ).getContext()
+            )["hiddenOperators"] as MutableList<String>
 
             JsonParser.parseString(arkNightData.getContext()).asJsonObject.forEach { _, e ->
                 arkNight.add(nullableGson.fromJson(e))
@@ -166,7 +171,7 @@ object DataSetup {
 
     fun reload() {
         // 仅重载配置文件
-        cfg = Yaml.default.decodeFromString(CometConfig.serializer(), cfgFile.getContext())
+        cfg = Default.decodeFromString(CometConfig.serializer(), cfgFile.getContext())
     }
 
     fun initPerGroupSetting(bot: Bot) {

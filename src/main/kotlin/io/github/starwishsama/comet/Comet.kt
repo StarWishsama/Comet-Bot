@@ -241,7 +241,7 @@ object Comet {
         try {
             bot.login()
         } catch (e: LoginFailedException) {
-            daemonLogger.info("登录失败, 如果是密码错误, 请重新输入密码")
+            daemonLogger.info("登录失败, 如果是密码错误, 请重新输入密码", e)
             currentStep = 2
             handleLogin()
             return
