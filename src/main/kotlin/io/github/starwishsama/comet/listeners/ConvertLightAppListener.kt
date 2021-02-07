@@ -36,15 +36,12 @@ object ConvertLightAppListener : NListener {
     }
 
     private fun parseJsonMessage(lightApp: LightApp, subject: Contact): MessageChain {
-        val json = JsonParser.parseString(lightApp.content)
-        if (json.isJsonObject) {
-            val jsonObject = json.asJsonObject
-            val prompt = jsonObject["prompt"].asString
-            if (prompt != null && prompt.contentEquals("[QQ小程序]哔哩哔哩")) {
-                return when {
-                    prompt.contains("哔哩哔哩") -> biliBiliCardConvert(jsonObject["meta"].asJsonObject["detail_1"].asJsonObject, subject)
-                    else -> EmptyMessageChain
-                }
+        val cardJson = JsonParser.parseString(lightApp.content)
+        if (cardJson.isJsonObject) {
+            val cardInfo = cardJson.asJsonObject
+            val prompt = cardInfo["prompt"].asString
+            if (prompt != null && prompt.contains("哔哩哔哩")) {
+                return biliBiliCardConvert(cardInfo["meta"].asJsonObject["detail_1"].asJsonObject, subject)
             }
         }
         return EmptyMessageChain
@@ -57,7 +54,8 @@ object ConvertLightAppListener : NListener {
             val url = meta["qqdocurl"].asString
 
             val videoID = StringUtil.parseVideoIDFromBili(NetUtil.getRedirectedURL(url) ?: return EmptyMessageChain)
-            val videoInfo = if (videoID.contains("bv")) {
+
+            val videoInfo = if (videoID.contains("BV")) {
                 VideoApi.videoService.getVideoInfoByBID(videoID)
             } else {
                 VideoApi.videoService.getVideoInfo(videoID)
@@ -72,7 +70,7 @@ object ConvertLightAppListener : NListener {
                     wrapper.toMessageChain(subject, true)
                 }
             }
-        } catch (e: IllegalStateException) {
+        } catch (e: Exception) {
             BotVariables.logger.warning("[监听器] 无法解析卡片消息", e)
             EmptyMessageChain
         }

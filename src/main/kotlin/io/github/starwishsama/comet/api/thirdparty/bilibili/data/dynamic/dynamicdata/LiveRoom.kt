@@ -90,7 +90,7 @@ data class LiveRoom(
         @SerializedName("face")
         val face: String
 ) : DynamicData {
-    val yyMMddPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    private val yyMMddPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     private fun getRoomURL(): String = "https://live.bilibili.com/$roomID"
 
@@ -109,7 +109,7 @@ data class LiveRoom(
 
     override fun getContact(): MessageWrapper {
         val wrapped = MessageWrapper(
-                "${BiliBiliMainApi.getUserNameByMid(uid)}的直播间\n" +
+                "分享了 ${BiliBiliMainApi.getUserNameByMid(uid)} 的直播间\n" +
                         "直播间标题: ${title}\n" +
                         "直播状态: ${getStatus(roundStatus).status}\n" +
                         "直达链接: ${getRoomURL()}\n"

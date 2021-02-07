@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynami
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
@@ -58,7 +59,7 @@ data class TextWithPicture(
     }
 
     override fun getContact(): MessageWrapper {
-        val wrapped = MessageWrapper("发布了动态:\n ${item.text ?: "获取失败"}\n")
+        val wrapped = MessageWrapper("发布了动态:\n ${item.text ?: "获取失败"}\n" + "🕘 ${BotVariables.hmsPattern.format(item.uploadTime.toLocalDateTime())}\n")
 
         if (!item.pictures.isNullOrEmpty()) {
             item.pictures.forEach {
