@@ -8,7 +8,7 @@ import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.context.BiliBiliLiveContext
 import io.github.starwishsama.comet.service.pusher.context.PushContext
 import io.github.starwishsama.comet.service.pusher.context.PushStatus
-import io.github.starwishsama.comet.service.pusher.context.getContextByUID
+import io.github.starwishsama.comet.service.pusher.context.getLiveContext
 import net.mamoe.mirai.Bot
 
 @Suppress("UNCHECKED_CAST")
@@ -29,7 +29,7 @@ class BiliLivePusher(bot: Bot): CometPusher(bot, "bili_live") {
                 }
                 val status = LiveApi.getLiveInfo(user.roomID) ?: return@user
                 val time = System.currentTimeMillis()
-                val cache = (cachePool as MutableList<BiliBiliLiveContext>).getContextByUID(user.id.toLong())
+                val cache = cachePool.getLiveContext(user.id.toLong())
                 val current = BiliBiliLiveContext(
                     mutableListOf(cfg.id),
                     time,

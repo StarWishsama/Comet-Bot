@@ -27,12 +27,14 @@ class BiliBiliDynamicContext(
     override fun compareTo(other: PushContext): Boolean {
         if (other !is BiliBiliDynamicContext) return false
 
-        return (dynamic.data.card?.description?.dynamicId == other.dynamic.data.card?.description?.dynamicId)
-                || (dynamic.data.cards != null && dynamic.data.cards?.get(0)?.description?.dynamicId == other.dynamic.data.cards?.get(0)?.description?.dynamicId)
+        val current = dynamic.data.card?.description?.dynamicId
+        val toCompare = other.dynamic.data.card?.description?.dynamicId
+
+        return current == toCompare
     }
 }
 
-fun Collection<BiliBiliDynamicContext>.getContextByUID(uid: Long): BiliBiliDynamicContext? {
-    val result = this.parallelStream().filter { uid == it.pushUser.id.toLong() }.findFirst()
-    return if (result.isPresent) result.get() else null
+fun Collection<PushContext>.getDynamicContext(uid: Long): BiliBiliDynamicContext? {
+    val result = this.parallelStream().filter { it is BiliBiliDynamicContext && uid == it.pushUser.id.toLong() }.findFirst()
+    return if (result.isPresent) result.get() as BiliBiliDynamicContext else null
 }

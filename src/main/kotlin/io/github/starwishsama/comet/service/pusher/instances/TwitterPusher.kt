@@ -5,10 +5,7 @@ import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.CometPusher
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
-import io.github.starwishsama.comet.service.pusher.context.PushContext
-import io.github.starwishsama.comet.service.pusher.context.PushStatus
-import io.github.starwishsama.comet.service.pusher.context.TwitterContext
-import io.github.starwishsama.comet.service.pusher.context.getContext
+import io.github.starwishsama.comet.service.pusher.context.*
 import net.mamoe.mirai.Bot
 
 @Suppress("UNCHECKED_CAST")
@@ -26,7 +23,7 @@ class TwitterPusher(bot: Bot): CometPusher(bot, "twitter") {
                 cfg.twitterSubscribers.forEach tweet@ { user ->
                     val tweet = TwitterApi.getTweetInTimeline(user) ?: return@tweet
                     val time = System.currentTimeMillis()
-                    val cache = (cachePool as MutableList<TwitterContext>).getContext(user)
+                    val cache = cachePool.getTwitterContext(user)
 
                     if (cache == null) {
                         cachePool.add(TwitterContext(mutableListOf(cfg.id), time, PushStatus.READY, user, tweet))

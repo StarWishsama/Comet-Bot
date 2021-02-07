@@ -54,10 +54,11 @@ abstract class CometPusher(val bot: Bot, val name: String) {
         }
 
         if (pushTime > 0) {
-            latestPushTime = LocalDateTime.now()
             daemonLogger.verboseS("$name 已成功推送消息至 $pushTime 个群")
             resetPushTime()
         }
+
+        latestPushTime = LocalDateTime.now()
     }
 
     fun execute() {

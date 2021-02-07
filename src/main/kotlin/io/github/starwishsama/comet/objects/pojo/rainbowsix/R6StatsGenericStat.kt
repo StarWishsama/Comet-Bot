@@ -141,9 +141,9 @@ data class R6StatsGenericStat(
     }
 
     fun getFancyInfo(): String {
-        return """
-            ♦ $username [${levelInfo.level}]
-            ▶
-        """.trimIndent()
+        return "♦ $username [${levelInfo.level}]\n" +
+                "▶ 总游玩时长 ${stats.generalStat.playTime}\n" +
+                "▶ KD ${stats.generalStat.kd} | 胜率 ${(stats.generalStat.winTime / stats.generalStat.playedGameTime) * 100}%\n" +
+                ""
     }
 }

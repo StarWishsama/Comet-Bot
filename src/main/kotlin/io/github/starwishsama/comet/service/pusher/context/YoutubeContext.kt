@@ -19,7 +19,7 @@ class YoutubeContext(
     }
 }
 
-fun Collection<YoutubeContext>.getContext(id: String): YoutubeContext? {
-    val result = this.parallelStream().filter { id == it.youtubeUser.id }.findFirst()
-    return if (result.isPresent) result.get() else null
+fun Collection<PushContext>.getYoutubeContext(id: String): YoutubeContext? {
+    val result = this.parallelStream().filter { it is YoutubeContext && id == it.youtubeUser.id }.findFirst()
+    return if (result.isPresent) result.get() as YoutubeContext else null
 }

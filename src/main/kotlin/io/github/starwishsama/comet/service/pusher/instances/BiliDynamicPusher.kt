@@ -7,10 +7,7 @@ import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.CometPusher
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
-import io.github.starwishsama.comet.service.pusher.context.BiliBiliDynamicContext
-import io.github.starwishsama.comet.service.pusher.context.PushContext
-import io.github.starwishsama.comet.service.pusher.context.PushStatus
-import io.github.starwishsama.comet.service.pusher.context.getContextByUID
+import io.github.starwishsama.comet.service.pusher.context.*
 import net.mamoe.mirai.Bot
 
 @Suppress("UNCHECKED_CAST")
@@ -35,7 +32,7 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
                         null
                     } ?: return@user
                     val time = System.currentTimeMillis()
-                    val cache = (cachePool as MutableList<BiliBiliDynamicContext>).getContextByUID(user.id.toLong())
+                    val cache = cachePool.getDynamicContext(user.id.toLong())
                     val current = BiliBiliDynamicContext(
                         mutableListOf(cfg.id),
                         time,

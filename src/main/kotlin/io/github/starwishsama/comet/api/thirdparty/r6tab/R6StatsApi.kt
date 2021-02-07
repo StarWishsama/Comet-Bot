@@ -30,7 +30,7 @@ object R6StatsApi: ApiExecutor {
 
     fun getR6StatsAPI(): IR6StatsAPI {
         if (cfg.r6StatsKey == null) {
-            throw ApiKeyIsEmptyException("未填写 R6Stats API")
+            throw ApiKeyIsEmptyException("未填写 R6Stats API, 无法调用 API")
         }
 
         checkRateLimit("R6Stats API 调用已达上限")
@@ -40,8 +40,16 @@ object R6StatsApi: ApiExecutor {
 
 interface IR6StatsAPI {
     @GET("{username}/{platform}/generic")
-    fun getGenericInfo(@Path("username") userName: String, @Path("platform") platform: String = "pc", @HeaderMap headerMap: Map<String, String> = mapOf(Pair("Authorization", "Bearer ${cfg.r6StatsKey}"))): Call<R6StatsGenericStat>
+    fun getGenericInfo(
+        @Path("username") userName: String,
+        @Path("platform") platform: String = "pc",
+        @HeaderMap headerMap: Map<String, String> = mapOf(Pair("Authorization", "Bearer ${cfg.r6StatsKey}"))
+    ): Call<R6StatsGenericStat>
 
     @GET("{username}/{platform}/seasonal")
-    fun getSeasonalInfo(@Path("username") userName: String, @Path("platform") platform: String = "pc", @HeaderMap headerMap: Map<String, String> = mapOf(Pair("Authorization", "Bearer ${cfg.r6StatsKey}"))): Call<R6StatsGenericStat>
+    fun getSeasonalInfo(
+        @Path("username") userName: String,
+        @Path("platform") platform: String = "pc",
+        @HeaderMap headerMap: Map<String, String> = mapOf(Pair("Authorization", "Bearer ${cfg.r6StatsKey}"))
+    ): Call<R6StatsGenericStat>
 }
