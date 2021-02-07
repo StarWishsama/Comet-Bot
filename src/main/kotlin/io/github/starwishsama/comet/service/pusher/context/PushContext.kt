@@ -28,7 +28,7 @@ open class PushContext(
         throw UnsupportedOperationException("Base PushContext can't convert to MessageWrapper")
     }
 
-    override fun compareTo(other: PushContext): Boolean {
+    override fun contentEquals(other: PushContext): Boolean {
         return this == other
     }
 }

@@ -20,10 +20,10 @@ class TwitterContext(
         }
     }
 
-    override fun compareTo(other: PushContext): Boolean {
+    override fun contentEquals(other: PushContext): Boolean {
         if (other !is TwitterContext) return false
 
-        return tweet.id == other.tweet.id
+        return tweet.id == other.tweet.id && tweet.postTime == other.tweet.postTime
     }
 }
 

@@ -41,7 +41,7 @@ class BiliLivePusher(bot: Bot): CometPusher(bot, "bili_live") {
                     cachePool.add(current)
                     addRetrieveTime()
                     return@user
-                } else if (!cache.compareTo(current)){
+                } else if (!cache.contentEquals(current)){
                     cache.apply {
                         retrieveTime = time
                         liveStatus = current.liveStatus

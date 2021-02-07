@@ -14,7 +14,7 @@ class YoutubeContext(
         TODO()
     }
 
-    override fun compareTo(other: PushContext): Boolean {
+    override fun contentEquals(other: PushContext): Boolean {
         TODO()
     }
 }

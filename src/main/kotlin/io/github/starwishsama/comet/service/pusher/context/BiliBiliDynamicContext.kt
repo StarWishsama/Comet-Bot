@@ -24,13 +24,13 @@ class BiliBiliDynamicContext(
         }
     }
 
-    override fun compareTo(other: PushContext): Boolean {
+    override fun contentEquals(other: PushContext): Boolean {
         if (other !is BiliBiliDynamicContext) return false
 
         val current = dynamic.data.card?.description?.dynamicId
         val toCompare = other.dynamic.data.card?.description?.dynamicId
 
-        return current == toCompare
+        return current == toCompare && dynamic.data.card?.description?.timeStamp == other.dynamic.data.card?.description?.timeStamp
     }
 }
 

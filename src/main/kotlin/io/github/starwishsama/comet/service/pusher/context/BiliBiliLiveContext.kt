@@ -30,7 +30,7 @@ class BiliBiliLiveContext(
         ).plusImageUrl(data.keyFrameImageUrl)
     }
 
-    override fun compareTo(other: PushContext): Boolean {
+    override fun contentEquals(other: PushContext): Boolean {
         if (other !is BiliBiliLiveContext) return false
 
         return liveStatus.data.liveTime == other.liveStatus.data.liveTime

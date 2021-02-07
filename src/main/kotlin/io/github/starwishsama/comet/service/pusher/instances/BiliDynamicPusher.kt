@@ -44,7 +44,7 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
                         cachePool.add(current)
                         addRetrieveTime()
                         return@user
-                    } else if (!cache.compareTo(current)) {
+                    } else if (!cache.contentEquals(current)) {
                         cache.apply {
                             this.retrieveTime = time
                             this.dynamic = dynamic
