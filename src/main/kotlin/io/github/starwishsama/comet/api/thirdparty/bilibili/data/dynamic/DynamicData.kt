@@ -54,9 +54,10 @@ data class Dynamic(
             /** /space_history Only */
             @SerializedName("has_more")
             val hasMoreInfo: Int?,
+            /** 获取单个动态时可用 */
             @SerializedName("card")
             val card: Card?,
-            /** /space_history Only */
+            /** 获取动态列表时可用 /space_history Only */
             @SerializedName("cards")
             val cards: List<Card>?,
             @SerializedName("result")
@@ -165,16 +166,30 @@ data class Card(
 }
 
 fun Dynamic.convertToDynamicData(): DynamicData? {
-    if (data.cards != null) {
-        val card = data.cards[0]
-        val singleDynamicObject = JsonParser.parseString(card.card)
-        if (singleDynamicObject.isJsonObject) {
-            val dynamicType = DynamicTypeSelector.getType(card.description.type)
-            if (dynamicType != UnknownType::class) {
-                return BotVariables.nullableGson.fromJson(card.card, dynamicType)
-            }
+    lateinit var card: Card
+    val dynamicJson: String = when {
+        data.cards != null -> {
+            val cardIndex = data.cards[0]
+            card = cardIndex
+            cardIndex.card
+        }
+        data.card != null -> {
+            card = data.card
+            data.card.card
+        }
+        else -> {
+            return null
         }
     }
+
+    val singleDynamicObject = JsonParser.parseString(dynamicJson)
+    if (singleDynamicObject.isJsonObject) {
+        val dynamicType = DynamicTypeSelector.getType(card.description.type)
+        if (dynamicType != UnknownType::class) {
+            return BotVariables.nullableGson.fromJson(card.card, dynamicType)
+        }
+    }
+
     return null
 }
 

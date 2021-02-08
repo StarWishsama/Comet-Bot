@@ -4,6 +4,7 @@ import com.github.salomonbrys.kotson.fromJson
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.nullableGson
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
+import io.github.starwishsama.comet.service.pusher.context.BiliBiliDynamicContext
 import io.github.starwishsama.comet.service.pusher.instances.BiliDynamicPusher
 import io.github.starwishsama.comet.service.pusher.instances.BiliLivePusher
 import io.github.starwishsama.comet.service.pusher.instances.TwitterPusher
@@ -20,23 +21,24 @@ object PusherManager {
     fun initPushers(bot: Bot) {
         usablePusher.addAll(listOf(BiliDynamicPusher(bot), BiliLivePusher(bot), TwitterPusher(bot)))
 
-        try {
-            usablePusher.forEach {
-                val cfgFile = File(pusherFolder, "${it.name}.json")
+        usablePusher.forEach { pusher ->
+            try {
+                val cfgFile = File(pusherFolder, "${pusher.name}.json")
 
                 if (cfgFile.exists()) {
                     val cfg = nullableGson.fromJson<PusherConfig>(cfgFile.getContext())
-                    it.config = cfg
-                    it.cachePool.addAll(cfg.cachePool)
+                    pusher.config = cfg
+                    pusher.cachePool.addAll(cfg.cachePool)
+                    initBiliBiliDynamic(pusher)
                 } else {
                     cfgFile.createNewFile()
-                    cfgFile.writeClassToJson(it.config)
+                    cfgFile.writeClassToJson(pusher.config)
                 }
 
-                it.start()
+                pusher.start()
+            } catch (e: Exception) {
+                daemonLogger.warning("在初始化推送器 ${pusher.name} 时遇到了问题", e)
             }
-        } catch (e: Exception) {
-            daemonLogger.warning("在初始化推送器时遇到了问题", e)
         }
     }
 
@@ -64,5 +66,18 @@ object PusherManager {
         }
 
         return null
+    }
+
+    /**
+     * 初始化缓存中的哔哩哔哩动态历史, 避免缓存大小过大
+     */
+    private fun initBiliBiliDynamic(pusher: CometPusher) {
+        if (pusher is BiliDynamicPusher) {
+            pusher.cachePool.forEach {
+                if (it is BiliBiliDynamicContext) {
+                    it.initDynamic()
+                }
+            }
+        }
     }
 }

@@ -3,7 +3,7 @@ package io.github.starwishsama.comet.commands.chats
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.api.thirdparty.r6tab.R6TabApi.getR6SInfo
+import io.github.starwishsama.comet.api.thirdparty.rainbowsix.R6TabApi.getR6SInfo
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.CometUtil

@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.api.thirdparty.r6tab
+package io.github.starwishsama.comet.api.thirdparty.rainbowsix
 
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor

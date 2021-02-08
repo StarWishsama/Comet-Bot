@@ -10,7 +10,6 @@ import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.context.*
 import net.mamoe.mirai.Bot
 
-@Suppress("UNCHECKED_CAST")
 class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
     override var config: PusherConfig = PusherConfig(
         30_0000L,
@@ -43,7 +42,6 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
                     if (cache == null) {
                         cachePool.add(current)
                         addRetrieveTime()
-                        return@user
                     } else if (!cache.contentEquals(current)) {
                         cache.apply {
                             this.retrieveTime = time

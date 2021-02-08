@@ -11,11 +11,11 @@ class BiliBiliLiveContext(
     @SerializedName("custom_status")
     override var status: PushStatus = PushStatus.READY,
     val pushUser: BiliBiliUser,
-    var liveStatus: LiveRoomInfo,
+    var liveRoomInfo: LiveRoomInfo,
 ): PushContext(pushTarget, retrieveTime, status), Pushable {
 
     override fun toMessageWrapper(): MessageWrapper {
-        val data = liveStatus.data
+        val data = liveRoomInfo.data
 
         if (data.getStatus() != LiveRoomInfo.LiveRoomInfoData.Status.Streaming) {
             return MessageWrapper("未在直播", success = false)
@@ -33,8 +33,8 @@ class BiliBiliLiveContext(
     override fun contentEquals(other: PushContext): Boolean {
         if (other !is BiliBiliLiveContext) return false
 
-        return liveStatus.data.liveTime == other.liveStatus.data.liveTime
-                && liveStatus.data.getStatus() == other.liveStatus.data.getStatus()
+        return liveRoomInfo.data.liveTime == other.liveRoomInfo.data.liveTime
+                && liveRoomInfo.data.getStatus() == other.liveRoomInfo.data.getStatus()
     }
 }
 

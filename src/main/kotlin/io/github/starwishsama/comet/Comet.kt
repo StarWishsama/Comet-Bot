@@ -185,6 +185,7 @@ object Comet {
                 RollCommand(),
                 YoutubeCommand(),
                 MinecraftCommand(),
+                PusherCommand(),
                 // Console Command
                 StopCommand(),
                 DebugCommand(),

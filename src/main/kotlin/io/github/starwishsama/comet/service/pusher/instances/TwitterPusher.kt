@@ -8,7 +8,6 @@ import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.context.*
 import net.mamoe.mirai.Bot
 
-@Suppress("UNCHECKED_CAST")
 class TwitterPusher(bot: Bot): CometPusher(bot, "twitter") {
     override var config: PusherConfig = PusherConfig(
         30_0000L,
@@ -28,7 +27,6 @@ class TwitterPusher(bot: Bot): CometPusher(bot, "twitter") {
                     if (cache == null) {
                         cachePool.add(TwitterContext(mutableListOf(cfg.id), time, PushStatus.READY, user, tweet))
                         addRetrieveTime()
-                        return@forEach
                     } else if (!tweet.contentEquals(cache.tweet)) {
                         cache.apply {
                             this.retrieveTime = time

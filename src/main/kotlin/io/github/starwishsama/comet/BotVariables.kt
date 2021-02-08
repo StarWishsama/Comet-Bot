@@ -1,10 +1,11 @@
 package io.github.starwishsama.comet
 
+import com.google.gson.ExclusionStrategy
+import com.google.gson.FieldAttributes
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.RandomResult
 import io.github.starwishsama.comet.objects.RssItem
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
@@ -48,7 +49,7 @@ object BotVariables {
 
     lateinit var startTime: LocalDateTime
 
-    var service: ScheduledExecutorService = Executors.newScheduledThreadPool(
+    val service: ScheduledExecutorService = Executors.newScheduledThreadPool(
             8,
             BasicThreadFactory.Builder()
                     .namingPattern("comet-service-%d")
@@ -73,8 +74,28 @@ object BotVariables {
         loggerAppender.appendLog(it)
     }
 
-    val nullableGson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
-    val gson: Gson = GsonBuilder().setPrettyPrinting().setLenient().create()
+    val nullableGson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().setExclusionStrategies(
+        object : ExclusionStrategy {
+            override fun shouldSkipField(f: FieldAttributes?): Boolean {
+                return f?.name?.startsWith("_") == true
+            }
+
+            override fun shouldSkipClass(clazz: Class<*>?): Boolean {
+                return false
+            }
+        }
+    ).create()
+    val gson: Gson = GsonBuilder().setPrettyPrinting().setLenient().setExclusionStrategies(
+        object : ExclusionStrategy {
+            override fun shouldSkipField(f: FieldAttributes?): Boolean {
+                return f?.name?.startsWith("U") == true
+            }
+
+            override fun shouldSkipClass(clazz: Class<*>?): Boolean {
+                return false
+            }
+        }
+    ).create()
     var rCon: Rcon? = null
     lateinit var log: File
 
@@ -82,15 +103,14 @@ object BotVariables {
     val users: MutableList<BotUser> = LinkedList()
     var localMessage: MutableList<BotLocalization> = ArrayList()
     var cfg = CometConfig()
-    var underCovers: MutableList<RandomResult> = LinkedList()
     var hitokoto: Hitokoto? = null
-    val rssItems: MutableList<RssItem> = mutableListOf()
+    lateinit var rssItems: MutableList<RssItem>
 
     /** 明日方舟卡池数据 */
-    var arkNight: MutableList<ArkNightOperator> = LinkedList()
+    var arkNight: MutableList<ArkNightOperator> = mutableListOf()
 
     /** 公主链接卡池数据 */
-    var pcr: MutableList<PCRCharacter> = LinkedList()
+    var pcr: MutableList<PCRCharacter> = mutableListOf()
 
     var switch: Boolean = true
 

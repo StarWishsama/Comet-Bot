@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.api.thirdparty.r6tab
+package io.github.starwishsama.comet.api.thirdparty.rainbowsix
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.JsonElement

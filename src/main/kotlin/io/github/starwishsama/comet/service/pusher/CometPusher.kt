@@ -54,7 +54,7 @@ abstract class CometPusher(val bot: Bot, val name: String) {
         }
 
         if (pushTime > 0) {
-            daemonLogger.verboseS("$name 已成功推送消息至 $pushTime 个群")
+            daemonLogger.verboseS("$name 已成功推送 $pushTime 个消息")
             resetPushTime()
         }
 

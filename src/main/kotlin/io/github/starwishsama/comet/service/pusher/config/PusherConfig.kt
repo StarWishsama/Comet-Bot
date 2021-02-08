@@ -6,7 +6,7 @@ open class PusherConfig(
     /**
      * 推送间隔, 单位毫秒
      */
-    val interval: Long,
+    var interval: Long,
     /**
      * 缓存池
      */

@@ -71,6 +71,15 @@ class BiliBiliCommand : ChatCommand {
                             CometUtil.getLocalMessage("msg.no-permission").sendMessage()
                         }
                     }
+                    "refresh" -> {
+                        val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
+                        cfg.biliSubscribers.forEach {
+                            it.userName = BiliBiliMainApi.getUserNameByMid(it.id.toLong())
+                            it.roomID = LiveApi.getRoomIDByUID(it.id.toLong())
+                            delay(1_500)
+                        }
+                        return "刷新缓存成功".sendMessage()
+                    }
                     else -> return getHelp().convertToChain()
                 }
             }
@@ -86,6 +95,7 @@ class BiliBiliCommand : ChatCommand {
         /bili unsub [用户名] 取消订阅用户相关信息
         /bili info [用户名] 查看用户的动态
         /bili push 开启/关闭本群开播推送
+        /bili refresh 刷新订阅UP主缓存
     """.trimIndent()
 
     override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
@@ -196,23 +206,30 @@ class BiliBiliCommand : ChatCommand {
     private suspend fun subscribe(target: String, groupId: Long): MessageChain {
         val cfg = GroupConfigManager.getConfigOrNew(groupId)
         var name = ""
-        val uid: Long = if (target.isNumeric()) {
-            name = BiliBiliMainApi.getUserNameByMid(target.toLong())
-            target.toLong()
-        } else {
-            val item = FakeClientApi.getUser(target)
-            val title = item?.title
-            if (title != null) name = title
-            item?.mid ?: return EmptyMessageChain
+        val uid: Long = when {
+            target.isNumeric() -> {
+                name = BiliBiliMainApi.getUserNameByMid(target.toLong())
+                target.toLong()
+            }
+            FakeClientApi.client.isLogin -> {
+                val item = FakeClientApi.getUser(target)
+                val title = item?.title
+                if (title != null) name = title
+                item?.mid ?: return EmptyMessageChain
+            }
+            else -> {
+                return EmptyMessageChain
+            }
         }
 
         val roomNumber = LiveApi.getRoomIDByUID(uid)
 
-        if (!cfg.biliSubscribers.stream().filter { it.id.toLong() == uid }.findAny().isPresent) {
+        return if (!cfg.biliSubscribers.stream().filter { it.id.toLong() == uid }.findFirst().isPresent) {
             cfg.biliSubscribers.add(BiliBiliUser(uid.toString(), name, roomNumber))
+            sendMessage("订阅 ${name}($uid) 成功")
+        } else {
+            sendMessage("你已经订阅过 ${name}($uid) 了!")
         }
-
-        return sendMessage("订阅 ${name}($uid) 成功")
     }
 
 }
