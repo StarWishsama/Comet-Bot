@@ -41,6 +41,9 @@ import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.Mirai
+import net.mamoe.mirai.event.ConcurrencyKind
+import net.mamoe.mirai.event.EventPriority
+import net.mamoe.mirai.event.globalEventChannel
 import net.mamoe.mirai.network.ForceOfflineException
 import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.*
@@ -50,6 +53,7 @@ import org.jline.terminal.TerminalBuilder
 import java.io.EOFException
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.system.exitProcess
 import kotlin.time.ExperimentalTime
 
@@ -199,9 +203,19 @@ object Comet {
         /** 监听器 */
         val listeners = arrayOf(ConvertLightAppListener, RepeatListener, BotGroupStatusListener, AutoReplyListener)
 
-        listeners.forEach {
-            it.register(bot)
-            logger.info("[监听器] 已注册 ${it.getName()} 监听器")
+        listeners.forEach { listener ->
+            listener.eventToListen.forEach { eventClass ->
+                bot.globalEventChannel().subscribeAlways(
+                    eventClass,
+                    EmptyCoroutineContext,
+                    ConcurrencyKind.CONCURRENT,
+                    EventPriority.NORMAL
+                ) {
+                    listener.listen(this)
+                }
+            }
+
+            logger.info("[监听器] 已注册 ${listener.getName()} 监听器")
         }
 
         startUpTask()

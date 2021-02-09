@@ -1,9 +1,12 @@
 package io.github.starwishsama.comet.listeners
 
-import net.mamoe.mirai.Bot
+import net.mamoe.mirai.event.Event
+import kotlin.reflect.KClass
 
 interface NListener {
-    fun register(bot: Bot)
+    val eventToListen: List<KClass<out Event>>
+
+    fun listen(event: Event)
 
     fun getName(): String
 }

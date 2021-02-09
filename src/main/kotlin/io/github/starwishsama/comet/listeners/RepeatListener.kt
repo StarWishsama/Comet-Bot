@@ -5,24 +5,22 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import net.mamoe.mirai.Bot
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.isBotMuted
+import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
-import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import kotlin.time.ExperimentalTime
 
 object RepeatListener : NListener {
+    override val eventToListen = listOf(GroupMessageEvent::class)
+
     @MiraiExperimentalApi
     @ExperimentalTime
-    override fun register(bot: Bot) {
-        bot.eventChannel.subscribeGroupMessages {
-            always {
-                if (BotVariables.switch && !group.isBotMuted && canRepeat(group.id)) {
-                    handleRepeat(this, RandomUtil.randomDouble())
-                }
-            }
+    override fun listen(event: Event) {
+        if (BotVariables.switch && event is GroupMessageEvent && !event.group.isBotMuted && canRepeat(event.group.id)) {
+            runBlocking { handleRepeat(event, RandomUtil.randomDouble()) }
         }
     }
 

@@ -7,11 +7,10 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.utils.StringUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.isBotMuted
-import net.mamoe.mirai.event.globalEventChannel
-import net.mamoe.mirai.event.subscribeGroupMessages
+import net.mamoe.mirai.event.Event
+import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
@@ -19,18 +18,16 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import kotlin.time.ExperimentalTime
 
 object ConvertLightAppListener : NListener {
+    override val eventToListen = listOf(GroupMessageEvent::class)
+
     @MiraiExperimentalApi
     @ExperimentalTime
-    override fun register(bot: Bot) {
-        bot.globalEventChannel().subscribeGroupMessages {
-            always {
-                if (BotVariables.switch && !this.group.isBotMuted) {
-                    val lightApp = message[LightApp]
-                    if (lightApp != null) {
-                        val result = parseJsonMessage(lightApp, subject)
-                        if (result !is EmptyMessageChain) subject.sendMessage(result)
-                    }
-                }
+    override fun listen(event: Event) {
+        if (BotVariables.switch && event is GroupMessageEvent && !event.group.isBotMuted) {
+            val lightApp = event.message[LightApp]
+            if (lightApp != null) {
+                val result = parseJsonMessage(lightApp, event.subject)
+                if (result !is EmptyMessageChain) runBlocking { event.subject.sendMessage(result) }
             }
         }
     }
