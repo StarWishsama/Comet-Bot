@@ -5,6 +5,7 @@ import com.github.salomonbrys.kotson.forEach
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
+import com.google.gson.stream.JsonReader
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.arkNightPools
@@ -28,6 +29,7 @@ import kotlinx.coroutines.withContext
 import net.mamoe.mirai.Bot
 import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
+import java.io.StringReader
 
 object DataSetup {
     private val userCfg: File = File(BotVariables.filePath, "users.json")
@@ -139,7 +141,7 @@ object DataSetup {
     }
 
     private fun loadLang() {
-        if (!langCfg.exists()) {
+        if (!langCfg.exists() || langCfg.getContext().isEmpty()) {
             val default = arrayOf(BotLocalization("msg.bot-prefix", "Bot > "),
                 BotLocalization("msg.no-permission", "你没有权限"),
                 BotLocalization("msg.bind-success", "绑定账号 %s 成功!"),
@@ -150,8 +152,7 @@ object DataSetup {
             }
             langCfg.writeClassToJson(BotVariables.localMessage)
         } else {
-            val lang: JsonElement =
-                    JsonParser.parseString(langCfg.getContext())
+            val lang: JsonElement = JsonParser.parseReader(JsonReader(StringReader(langCfg.getContext())).also { it.isLenient = true })
             if (lang.isJsonArray) {
                 BotVariables.localMessage = nullableGson.fromJson(FileReader.create(langCfg).readString())
                 daemonLogger.info("[配置] 成功载入多语言文件")
