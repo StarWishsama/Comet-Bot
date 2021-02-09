@@ -42,15 +42,15 @@ class ArkNightCommand : ChatCommand {
                         return getGachaResult(event, user, 300)
                     }
                     "pool", "卡池", "卡池信息" -> {
-                        if (args.size == 1) {
-                            return buildString {
+                        return if (args.size == 1) {
+                            buildString {
                                 append("目前卡池: ${pool.name}\n")
                                 append("详细信息: ${pool.description}")
                             }.sendMessage()
                         } else {
                             val poolName = args[1]
                             val pools = GachaManager.getPoolsByType<ArkNightPool>().parallelStream().filter { it.name == poolName }.findFirst()
-                            return if (pools.isPresent) {
+                            if (pools.isPresent) {
                                 pool = pools.get()
                                 "成功修改卡池为: ${pool.name}".sendMessage()
                             } else {

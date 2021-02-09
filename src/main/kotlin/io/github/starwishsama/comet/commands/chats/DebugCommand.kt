@@ -16,6 +16,7 @@ import io.github.starwishsama.comet.service.task.HitokotoUpdater
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.RssUtil
@@ -60,18 +61,41 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     }
                 }
                 "info" -> {
-                    val ping = try {
-                        NetUtil.checkPingValue()
-                    } catch (t: IOException) {
-                        -1L
+                    if (args.size == 1) {
+                        val ping = try {
+                            NetUtil.checkPingValue()
+                        } catch (t: IOException) {
+                            -1L
+                        }
+                        return ("彗星 Bot ${BuildConfig.version}\n" +
+                                "已注册命令数: ${CommandExecutor.countCommands()}\n" +
+                                "与服务器的延迟为 $ping ms\n" +
+                                "运行时长 ${CometUtil.getRunningTime()}\n" +
+                                "构建时间: ${BuildConfig.buildTime}"
+                                ).sendMessage()
+                    } else {
+                        return when (args[1]) {
+                            "memory", "ram" -> {
+                                RuntimeUtil.getMemoryInfo().sendMessage(false)
+                            }
+                            "thread", "thr" -> {
+                                val executor = BotVariables.service as ThreadPoolExecutor
+
+                                val queueSize: Int = executor.queue.size
+                                val activeCount: Int = executor.activeCount
+                                val completedTaskCount: Long = executor.completedTaskCount
+                                val taskCount: Long = executor.taskCount
+
+                                return """
+当前排队线程数：$queueSize
+当前活动线程数：$activeCount
+执行完成线程数： $completedTaskCount
+总线程数：$taskCount
+                    """.trimIndent().convertToChain()
+                            }
+                            else -> "无效参数".sendMessage()
+                        }
                     }
-                    return ("彗星 Bot ${BuildConfig.version}\n" +
-                            "今日もかわいい~\n" +
-                            "已注册命令数: ${CommandExecutor.countCommands()}\n" +
-                            CometUtil.getMemoryUsage() + "\n" +
-                            "与服务器的延迟为 $ping ms\n" +
-                            "构建时间: ${BuildConfig.buildTime}"
-                            ).sendMessage()
                 }
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().convertToChain()
                 "switch" -> {
@@ -122,29 +146,6 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                 )
                         ).convertToChain()
                     }
-                }
-                "executors" -> {
-                    val executor = BotVariables.service as ThreadPoolExecutor
-
-                    val queueSize: Int = executor.queue.size
-                    val activeCount: Int = executor.activeCount
-                    val completedTaskCount: Long = executor.completedTaskCount
-                    val taskCount: Long = executor.taskCount
-
-                    val tasks = buildString {
-                        append("任务列表:\n")
-                        executor.queue.forEach {
-                            append((it.hashCode())).append(" ")
-                        }
-                    }.trim()
-
-                    return """
-当前排队线程数：$queueSize
-当前活动线程数：$activeCount
-执行完成线程数： $completedTaskCount
-总线程数：$taskCount
-$tasks
-                    """.trimIndent().convertToChain()
                 }
                 "quit" -> {
                     if (event is GroupMessageEvent) {

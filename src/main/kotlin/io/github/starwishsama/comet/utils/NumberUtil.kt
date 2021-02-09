@@ -18,6 +18,13 @@ object NumberUtil {
     @Throws(NumberFormatException::class)
     fun Number.getBetterNumber(): String = getCompactDouble(this.toDouble())
 
+    fun Number.formatDigests(digest: Int = 1): String {
+        if (this is Double) {
+            return String.format("%.${digest}f", this)
+        }
+        return this.toString()
+    }
+
     /**
      * 获取更优雅的数字并转为字符串, 如 13200 -> 1.32w
      */

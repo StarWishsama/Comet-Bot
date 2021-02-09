@@ -2,7 +2,6 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.api.annotations.CometCommand
-import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -20,8 +19,8 @@ class VersionCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (CometUtil.isNoCoolDown(event.sender.id)) {
             return ("彗星 Bot " + BuildConfig.version +
-                    "\n已注册命令数: " + CommandExecutor.countCommands() +
                     "\n运行时长 ${CometUtil.getRunningTime()}" +
+                    "\n构建时间: ${BuildConfig.buildTime}" +
                     "\nMade with ❤ & Mirai ${BuildConfig.miraiVersion}").convertToChain()
         }
         return EmptyMessageChain
