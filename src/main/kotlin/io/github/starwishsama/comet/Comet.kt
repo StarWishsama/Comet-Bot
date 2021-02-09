@@ -91,7 +91,7 @@ object Comet {
 
 
     @ExperimentalTime
-    fun startUpTask() {
+    fun startAllScheduleTask() {
         val apis = arrayOf(BiliBiliMainApi, TwitterApi, YoutubeApi, VideoApi)
 
         /** 定时任务 */
@@ -131,8 +131,6 @@ object Comet {
             daemonLogger.info("定时 GC 清理成功 (-${usedMemoryBefore - getUsedMemory()} MB)")
         }
 
-        GachaManager.loadAllPools()
-
         TaskUtil.runAsync { BackupHelper.checkOldFiles() }
     }
 
@@ -165,6 +163,8 @@ object Comet {
         DataSetup.initPerGroupSetting(bot)
 
         setupRCon()
+
+        GachaManager.loadAllPools()
 
         CommandExecutor.setupCommand(
             arrayOf(
@@ -221,7 +221,7 @@ object Comet {
             logger.info("[监听器] 已注册 ${listener.getName()} 监听器")
         }
 
-        startUpTask()
+        startAllScheduleTask()
 
         PusherManager.initPushers(bot)
 

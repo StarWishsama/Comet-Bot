@@ -8,7 +8,7 @@ import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.context.*
 import net.mamoe.mirai.Bot
 
-class TwitterPusher(bot: Bot): CometPusher(bot, "data") {
+class TwitterPusher(bot: Bot): CometPusher(bot, "twitter") {
     override var config: PusherConfig = PusherConfig(
         30_0000L,
         mutableListOf()
