@@ -2,8 +2,8 @@ package io.github.starwishsama.comet.api.thirdparty.rainbowsix
 
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
+import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatsGenericStat
 import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
-import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6StatsGenericStat
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

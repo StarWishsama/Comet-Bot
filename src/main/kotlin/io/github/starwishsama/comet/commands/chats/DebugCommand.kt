@@ -81,11 +81,11 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                 "push" -> {
                     if (args.size > 1) {
                         return when (args[1].toLowerCase()) {
-                            "twit", "twitter", "推特", "蓝鸟", "twi" -> {
-                                PusherManager.getPusherByName("twitter")?.execute()
+                            "twit", "data", "推特", "蓝鸟", "twi" -> {
+                                PusherManager.getPusherByName("data")?.execute()
                                 sendMessage("Twitter retriever has been triggered and run~")
                             }
-                            "ytb", "y2b", "youtube", "油管" -> {
+                            "ytb", "y2b", "data", "油管" -> {
                                 sendMessage("Youtube retriever is in WIP status.")
                             }
                             "bilibili", "bili", "哔哩哔哩", "b站" -> {
@@ -108,7 +108,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                         }
                     }
                 }
-                "youtube" -> {
+                "data" -> {
                     if (args.size > 1) {
                         return YoutubeApi.getLiveStatusByResult(YoutubeApi.getChannelVideos(args[1], 10)).toMessageChain(event.subject)
                     }

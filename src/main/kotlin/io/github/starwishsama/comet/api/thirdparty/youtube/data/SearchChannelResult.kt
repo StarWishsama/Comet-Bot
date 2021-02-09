@@ -1,9 +1,9 @@
-package io.github.starwishsama.comet.objects.pojo.youtube
+package io.github.starwishsama.comet.api.thirdparty.youtube.data
 
 import com.google.gson.JsonObject
 
 data class SearchChannelResult(
-    val kind: String = "youtube#channelListResponse",
+    val kind: String = "data#channelListResponse",
     val etag: String,
     val pageInfo: SearchVideoResult.PageInfo,
     /**
@@ -37,7 +37,7 @@ data class SearchChannelResult(
 
 /**
  * {
-"kind": "youtube#channelListResponse",
+"kind": "data#channelListResponse",
 "etag": "gSlmHO988MiNC1yWWmFzrAVlnd0",
 "pageInfo": {
 "totalResults": 1,
@@ -45,7 +45,7 @@ data class SearchChannelResult(
 },
 "items": [
 {
-"kind": "youtube#channel",
+"kind": "data#channel",
 "etag": "9J7G7lJBbuw-RPiIEu0Fo75eLRA",
 "id": "UC4YaOt1yT-ZeyB0OmxHgolA",
 "snippet": {

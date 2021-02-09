@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects.pojo.twitter
+package io.github.starwishsama.comet.api.thirdparty.twitter.data
 
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.hmsPattern
 import io.github.starwishsama.comet.BotVariables.nullableGson
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
-import io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity.Media
+import io.github.starwishsama.comet.api.thirdparty.twitter.data.tweetEntity.Media
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly

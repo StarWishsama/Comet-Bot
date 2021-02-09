@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects.pojo.twitter
+package io.github.starwishsama.comet.api.thirdparty.twitter.data
 
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName

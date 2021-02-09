@@ -1,10 +1,10 @@
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
+import io.github.starwishsama.comet.managers.GachaManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
@@ -15,7 +15,6 @@ import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.uploadAsImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -27,55 +26,49 @@ import org.apache.commons.lang3.StringUtils
 @CometCommand
 @Suppress("SpellCheckingInspection")
 class ArkNightCommand : ChatCommand {
+    var pool = GachaManager.getPoolsByType<ArkNightPool>()[0]
+
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        val pool = BotVariables.arkNightPools[0]
         if (CometUtil.isNoCoolDown(event.sender.id, 30)) {
             if (args.isNotEmpty()) {
                 when (args[0]) {
                     "单次寻访", "1", "单抽" -> {
-                        val list = pool.getArkDrawResult(user)
-                        return if (GachaUtil.arkPictureIsUsable()) {
-                            generatePictureGachaResult(pool, event, user, list)
-                        } else {
-                            pool.getArkDrawResultAsString(user, list).sendMessage()
-                        }
+                        return getGachaResult(event, user, 1)
                     }
                     "十连寻访", "10", "十连" -> {
-                        val list: List<ArkNightOperator> = pool.getArkDrawResult(user, 10)
-                        return if (GachaUtil.arkPictureIsUsable()) {
-                            generatePictureGachaResult(pool, event, user, list)
-                        } else {
-                            pool.getArkDrawResultAsString(user, list).sendMessage()
-                        }
+                        return getGachaResult(event, user, 10)
                     }
                     "一井", "300", "来一井" -> {
-                        val list: List<ArkNightOperator> = pool.getArkDrawResult(user, 300)
-                        return if (GachaUtil.arkPictureIsUsable()) {
-                            generatePictureGachaResult(pool, event, user, list)
+                        return getGachaResult(event, user, 300)
+                    }
+                    "pool", "卡池", "卡池信息" -> {
+                        if (args.size == 1) {
+                            return buildString {
+                                append("目前卡池: ${pool.name}\n")
+                                append("详细信息: ${pool.description}")
+                            }.sendMessage()
                         } else {
-                            pool.getArkDrawResultAsString(user, list).sendMessage()
+                            val poolName = args[1]
+                            val pools = GachaManager.getPoolsByType<ArkNightPool>().parallelStream().filter { it.name == poolName }.findFirst()
+                            return if (pools.isPresent) {
+                                pool = pools.get()
+                                "成功修改卡池为: ${pool.name}".sendMessage()
+                            } else {
+                                "找不到名为 $poolName 的卡池".sendMessage()
+                            }
                         }
                     }
                     else -> {
-                        return if (user.isBotAdmin() || (event is GroupMessageEvent && event.sender.isOperator())) {
-                            if (StringUtils.isNumeric(args[0])) {
-                                val gachaTime: Int = try {
-                                    args[0].toInt()
-                                } catch (e: NumberFormatException) {
-                                    return getHelp().convertToChain()
-                                }
-
-                                val list: List<ArkNightOperator> = pool.getArkDrawResult(user, gachaTime)
-                                return if (GachaUtil.arkPictureIsUsable()) {
-                                    generatePictureGachaResult(pool, event, user, list)
-                                } else {
-                                    pool.getArkDrawResultAsString(user, list).sendMessage()
-                                }
-                            } else {
-                                getHelp().convertToChain()
+                        return if (StringUtils.isNumeric(args[0])) {
+                            val gachaTime: Int = try {
+                                args[0].toInt()
+                            } catch (e: NumberFormatException) {
+                                return getHelp().convertToChain()
                             }
+
+                            return getGachaResult(event, user, gachaTime)
                         } else {
-                            "次数抽卡功能已停用, 请使用单抽/十连/一井的方式抽卡!".sendMessage()
+                            getHelp().convertToChain()
                         }
                     }
                 }
@@ -99,6 +92,15 @@ class ArkNightCommand : ChatCommand {
          ============ 命令帮助 ============
          /ark 单次寻访/十连寻访/[次数]
     """.trimIndent()
+
+    suspend fun getGachaResult(event: MessageEvent, user: BotUser, time: Int): MessageChain {
+        val list: List<ArkNightOperator> = pool.getArkDrawResult(user, time)
+        return if (GachaUtil.arkPictureIsUsable()) {
+            generatePictureGachaResult(pool, event, user, list)
+        } else {
+            pool.getArkDrawResultAsString(user, list).sendMessage()
+        }
+    }
 
     private suspend fun generatePictureGachaResult(pool: ArkNightPool, event: MessageEvent, user: BotUser, ops: List<ArkNightOperator>): MessageChain {
         event.subject.sendMessage("请稍等...")

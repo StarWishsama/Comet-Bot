@@ -4,11 +4,11 @@ import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
+import io.github.starwishsama.comet.api.thirdparty.youtube.data.SearchVideoResult
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.pojo.youtube.SearchVideoResult
 import io.github.starwishsama.comet.objects.push.YoutubeUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.CometUtil
@@ -70,18 +70,18 @@ class YoutubeCommand : ChatCommand {
 
     override fun getProps(): CommandProps =
         CommandProps(
-                name = "youtube",
+                name = "data",
                 aliases = listOf("ytb", "y2b", "油管"),
                 description = "查询 Youtube 频道信息",
-                permission = "nbot.commands.youtube",
+                permission = "nbot.commands.data",
                 level = UserLevel.ADMIN
         )
 
     override fun getHelp(): String = """
-        /youtube info [频道ID] 查询某个频道的信息
-        /youtube sub [频道ID] 订阅某个频道的开播消息
-        /youtube unsub [频道ID] 退订某个频道的开播消息
-        /youtube push 开关本群推送功能
+        /data info [频道ID] 查询某个频道的信息
+        /data sub [频道ID] 订阅某个频道的开播消息
+        /data unsub [频道ID] 退订某个频道的开播消息
+        /data push 开关本群推送功能
         
         该命令亦可用 /ytb|y2b|油管 等使用
         频道 ID 即为频道链接 channel 后面的一串字

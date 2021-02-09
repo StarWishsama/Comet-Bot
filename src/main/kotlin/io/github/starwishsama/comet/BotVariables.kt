@@ -10,7 +10,6 @@ import io.github.starwishsama.comet.objects.RssItem
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
-import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.objects.shop.Shop
 import io.github.starwishsama.comet.utils.LoggerAppender
@@ -119,8 +118,6 @@ object BotVariables {
     val hmsPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 
     val yyMMddPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
-
-    val arkNightPools = mutableListOf<ArkNightPool>()
 
     var hiddenOperators = mutableListOf<String>()
 }

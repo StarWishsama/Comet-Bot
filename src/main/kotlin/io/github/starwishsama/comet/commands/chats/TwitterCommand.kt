@@ -6,11 +6,11 @@ import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
+import io.github.starwishsama.comet.api.thirdparty.twitter.data.TwitterUser
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
@@ -72,7 +72,7 @@ class TwitterCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("twitter", arrayListOf("twit", "蓝鸟", "tt"), "查询/订阅蓝鸟账号", "nbot.commands.twitter", UserLevel.ADMIN)
+        CommandProps("data", arrayListOf("twit", "蓝鸟", "tt"), "查询/订阅蓝鸟账号", "nbot.commands.data", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
         /twit info [蓝鸟ID] 查询账号信息
@@ -81,7 +81,7 @@ class TwitterCommand : ChatCommand {
         /twit push 开启/关闭本群推文推送
         /twit id [推文ID] 通过推文ID查询推文
         
-        命令别名: /蓝鸟 /tt /twitter
+        命令别名: /蓝鸟 /tt /data
     """.trimIndent()
 
     override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {

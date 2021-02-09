@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects.pojo.rainbowsix
+package io.github.starwishsama.comet.api.thirdparty.rainbowsix.data
 
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
@@ -81,7 +81,7 @@ data class R6StatsGenericStat(
             /**
              * DBNO (Down But Not Out / 倒了还没死) 次数
              *
-             * 详见: https://rainbowsix.fandom.com/wiki/DBNO
+             * 详见: https://data.fandom.com/wiki/DBNO
              */
             @SerializedName("dbnos")
             val dbno: Long,

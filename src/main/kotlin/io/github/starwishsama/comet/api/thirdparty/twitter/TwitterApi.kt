@@ -10,11 +10,11 @@ import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.BotVariables.nullableGson
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
+import io.github.starwishsama.comet.api.thirdparty.twitter.data.Tweet
+import io.github.starwishsama.comet.api.thirdparty.twitter.data.TwitterUser
 import io.github.starwishsama.comet.exceptions.EmptyTweetException
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.exceptions.TwitterApiException
-import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
-import io.github.starwishsama.comet.objects.pojo.twitter.TwitterUser
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.isType
@@ -124,7 +124,7 @@ object TwitterApi : ApiExecutor {
                 return nullableGson.fromJson(bodyCopy)
             } catch (e: IOException) {
                 if (!NetUtil.isTimeout(e)) {
-                    FileUtil.createErrorReportFile(type = "twitter", t = e, content = bodyCopy, message = "Request URL: $url")
+                    FileUtil.createErrorReportFile(type = "data", t = e, content = bodyCopy, message = "Request URL: $url")
                 } else {
                     daemonLogger.verboseS("[蓝鸟] 在获取用户信息时连接超时")
                 }

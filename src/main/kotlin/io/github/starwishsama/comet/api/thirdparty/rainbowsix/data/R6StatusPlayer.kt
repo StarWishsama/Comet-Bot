@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects.pojo.rainbowsix
+package io.github.starwishsama.comet.api.thirdparty.rainbowsix.data
 
 import com.google.gson.annotations.SerializedName
 

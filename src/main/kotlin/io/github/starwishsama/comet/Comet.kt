@@ -26,6 +26,7 @@ import io.github.starwishsama.comet.listeners.AutoReplyListener
 import io.github.starwishsama.comet.listeners.BotGroupStatusListener
 import io.github.starwishsama.comet.listeners.ConvertLightAppListener
 import io.github.starwishsama.comet.listeners.RepeatListener
+import io.github.starwishsama.comet.managers.GachaManager
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
@@ -129,6 +130,8 @@ object Comet {
             System.gc()
             daemonLogger.info("定时 GC 清理成功 (-${usedMemoryBefore - getUsedMemory()} MB)")
         }
+
+        GachaManager.loadAllPools()
 
         TaskUtil.runAsync { BackupHelper.checkOldFiles() }
     }

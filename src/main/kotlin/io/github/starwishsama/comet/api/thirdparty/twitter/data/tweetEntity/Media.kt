@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.objects.pojo.twitter.tweetEntity
+package io.github.starwishsama.comet.api.thirdparty.twitter.data.tweetEntity
 
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables

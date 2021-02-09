@@ -20,11 +20,22 @@ import kotlin.streams.toList
  *
  * 另见 [io.github.starwishsama.comet.objects.gacha.custom.CustomPool]
  */
-class GachaManager {
+object GachaManager {
     val gachaPools = mutableSetOf<GachaPool>()
-    val poolPath = FileUtil.getChildFolder("gacha")
+    var arkNightUsable = true
+    var pcrUsable = true
+    private val poolPath = FileUtil.getChildFolder("gacha")
 
     fun loadAllPools() {
+        // 载入默认卡池
+        if (arkNightUsable) {
+            gachaPools.add(ArkNightPool())
+        }
+
+        if (pcrUsable) {
+            gachaPools.add(PCRPool())
+        }
+
         if (!poolPath.exists()) {
             poolPath.mkdirs()
             return
@@ -37,6 +48,8 @@ class GachaManager {
         poolPath.listFiles()?.forEach {
             addPoolFromFile(it)
         }
+
+        daemonLogger.info("成功载入了 ${gachaPools.size} 个自定义卡池!")
     }
 
     fun addPool(gachaPool: CustomPool): Boolean {
@@ -104,13 +117,5 @@ class GachaManager {
             }
         }
         return null
-    }
-
-    private fun poolTypeSelector(typeName: String): Class<out GachaPool> {
-        return when (typeName.toLowerCase()) {
-            "arknight" -> ArkNightPool::class.java
-            "pcr" -> PCRPool::class.java
-            else -> throw UnsupportedOperationException("Unsupported gacha pool type: $typeName")
-        }
     }
 }

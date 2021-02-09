@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.service.pusher.context
 
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.comet.objects.pojo.twitter.Tweet
+import io.github.starwishsama.comet.api.thirdparty.twitter.data.Tweet
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 class TwitterContext(

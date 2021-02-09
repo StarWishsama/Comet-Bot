@@ -7,8 +7,8 @@ import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.BotVariables.nullableGson
+import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatusPlayer
 import io.github.starwishsama.comet.enums.R6Rank
-import io.github.starwishsama.comet.objects.pojo.rainbowsix.R6StatusPlayer
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.IDGuidelineType
 import io.github.starwishsama.comet.utils.StringUtil

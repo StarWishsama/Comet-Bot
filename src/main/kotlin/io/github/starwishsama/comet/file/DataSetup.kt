@@ -8,18 +8,17 @@ import com.google.gson.JsonParser
 import com.google.gson.stream.JsonReader
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.arkNight
-import io.github.starwishsama.comet.BotVariables.arkNightPools
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.hiddenOperators
 import io.github.starwishsama.comet.BotVariables.nullableGson
+import io.github.starwishsama.comet.managers.GachaManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
-import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.RuntimeUtil.getOsName
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
@@ -95,6 +94,7 @@ object DataSetup {
             daemonLogger.info("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个")
         } else {
             daemonLogger.info("未检测到公主连结游戏数据, 抽卡模拟器将无法使用")
+            GachaManager.pcrUsable = false
         }
 
         try {
@@ -131,10 +131,9 @@ object DataSetup {
                     }
                 }
             }
-
-            arkNightPools.add(ArkNightPool())
         } else {
             daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
+            GachaManager.arkNightUsable = false
         }
 
         daemonLogger.info("[配置] 成功载入配置文件")
