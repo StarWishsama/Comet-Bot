@@ -35,14 +35,18 @@ abstract class CometPusher(val bot: Bot, val name: String) {
             if (context.status == PushStatus.READY) {
                 context.getPushTarget().forEach group@{
                     try {
-                        val group = bot.getGroup(it) ?: return@group
+                        val wrapper = context.toMessageWrapper()
 
-                        runBlocking {
-                            group.sendMessage(context.toMessageWrapper().toMessageChain(group))
-                            delay(RandomUtil.randomLong(1000, 2000))
+                        if (wrapper.success) {
+                            val group = bot.getGroup(it) ?: return@group
+
+                            runBlocking {
+                                group.sendMessage(wrapper.toMessageChain(group))
+                                delay(RandomUtil.randomLong(1000, 2000))
+                            }
+
+                            addPushTime()
                         }
-
-                        addPushTime()
                     } catch (e: Exception) {
                         daemonLogger.warning("在推送开播消息至群 $it 时出现异常", e)
                     }
