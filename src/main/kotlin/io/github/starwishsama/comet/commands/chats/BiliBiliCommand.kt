@@ -195,7 +195,7 @@ class BiliBiliCommand : ChatCommand {
         return if (dynamic == null) {
             PlainText("\n无最近动态").toMessageChain()
         } else {
-            if (dynamic.text != null) {
+            if (dynamic.getAllText().isNotEmpty()) {
                 dynamic.toMessageChain(event.subject)
             } else {
                 PlainText("\n无最近动态").toMessageChain()

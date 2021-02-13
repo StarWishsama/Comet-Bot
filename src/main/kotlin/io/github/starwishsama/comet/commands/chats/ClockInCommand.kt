@@ -77,7 +77,7 @@ class ClockInCommand : ChatCommand {
             data.checkedUsers.add(sender)
             return result.convertToChain()
         } else {
-            return data.viewData().text.sendMessage()
+            return data.viewData().toMessageChain(msg.subject)
         }
     }
 }

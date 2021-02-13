@@ -132,35 +132,35 @@ object YoutubeApi : ApiExecutor {
             return getLiveStatusByResult(result)
         }
 
-        return MessageWrapper("找不到对应ID的频道")
+        return MessageWrapper().addText("找不到对应ID的频道")
     }
 
     /**
      * 通过 [SearchVideoResult] 获取直播状态, 并将其转换为 [MessageWrapper]
      */
     fun getLiveStatusByResult(result: SearchVideoResult?): MessageWrapper {
-        if (result == null) return MessageWrapper("无直播数据", false)
+        if (result == null) return MessageWrapper().addText("无直播数据").setUsable(false)
 
         val items = result.items
         items.forEach { item ->
             run {
                 if (item.snippet.getType() == VideoType.STREAMING) {
-                    return MessageWrapper("""${item.snippet.channelTitle} 正在直播!
+                    return MessageWrapper().addText("""${item.snippet.channelTitle} 正在直播!
 直播标题: ${item.snippet.videoTitle}
 直播时间: ${item.snippet.publishTime}
 直达链接: ${item.getVideoUrl()}""")
-                            .plusImageUrl(item.snippet.getCoverImgUrl())
+                            .addPictureByURL(item.snippet.getCoverImgUrl())
                 } else if (item.snippet.getType() == VideoType.UPCOMING) {
-                    return MessageWrapper("""
+                    return MessageWrapper().addText("""
 ${item.snippet.channelTitle} 有即将进行的直播!
 直播标题: ${item.snippet.videoTitle}
 开播时间请打开查看 ${item.getVideoUrl()}
-""").plusImageUrl(item.snippet.getCoverImgUrl())
+""").addPictureByURL(item.snippet.getCoverImgUrl())
                 }
             }
         }
 
-        return MessageWrapper("${result.items[0].snippet.channelTitle} 最近没有直播哦", false)
+        return MessageWrapper().addText("${result.items[0].snippet.channelTitle} 最近没有直播哦").setUsable(false)
     }
 
     override var usedTime: Int = 0

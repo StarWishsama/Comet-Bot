@@ -6,6 +6,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.objects.wrapper.Picture
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import java.time.LocalDateTime
 
@@ -64,14 +65,12 @@ data class LiveBroadcast(
     }
 
     override fun getContact(): MessageWrapper {
-        val wrapped = MessageWrapper(
-                "${BiliBiliMainApi.getUserNameByMid(livePlayInfo.uid)} 正在直播!\n" +
-                        "标题: ${livePlayInfo.liveTitle}\n" +
-                        "开播时间: ${BotVariables.yyMMddPattern.format(livePlayInfo.getLiveStartTime())}\n" +
-                        "直达链接: ${livePlayInfo.link}\n"
-        )
+        val wrapped = MessageWrapper().addText("${BiliBiliMainApi.getUserNameByMid(livePlayInfo.uid)} 正在直播!\n" +
+                "标题: ${livePlayInfo.liveTitle}\n" +
+                "开播时间: ${BotVariables.yyMMddPattern.format(livePlayInfo.getLiveStartTime())}\n" +
+                "直达链接: ${livePlayInfo.link}\n")
 
-        wrapped.plusImageUrl(livePlayInfo.coverImage)
+        wrapped.addElement(Picture(livePlayInfo.coverImage))
 
         return wrapped
     }

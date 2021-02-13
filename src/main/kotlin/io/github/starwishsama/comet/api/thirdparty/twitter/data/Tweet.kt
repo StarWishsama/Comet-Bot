@@ -173,7 +173,12 @@ data class Tweet(
     }
 
     fun toMessageWrapper(): MessageWrapper {
-        return MessageWrapper(convertToString()).plusImageUrl(getPictureUrl())
+        return MessageWrapper().addText(convertToString()).apply {
+            val url = getPictureUrl()
+            if (url != null) {
+                addPictureByURL(url)
+            }
+        }
     }
 
     fun toMessageChain(target: Contact): MessageChain {

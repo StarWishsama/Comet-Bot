@@ -30,11 +30,9 @@ data class PlainText(
     )
 
     override fun getContact(): MessageWrapper {
-        return MessageWrapper(
-            "发布了动态: \n" +
-                    "${item.context ?: "获取失败"}\n\n" +
-                    "🕘 ${hmsPattern.format(item.sentTimestamp.toLocalDateTime())}"
-        )
+        return MessageWrapper().addText("发布了动态: \n" +
+                "${item.context ?: "获取失败"}\n\n" +
+                "🕘 ${hmsPattern.format(item.sentTimestamp.toLocalDateTime())}")
     }
 
     override fun getSentTime(): LocalDateTime = item.sentTimestamp.toLocalDateTime()

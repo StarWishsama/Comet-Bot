@@ -65,10 +65,10 @@ data class Video(
     )
 
     override fun getContact(): MessageWrapper {
-        return MessageWrapper("投递了一个视频: $title\n" +
+        return MessageWrapper().addText("投递了一个视频: $title\n" +
                 "发布时间: ${BotVariables.yyMMddPattern.format(publishTime.toLocalDateTime())}\n" +
                 "直达链接: https://www.bilibili.com/video/av$avId\n")
-                .plusImageUrl(cover)
+                .addPictureByURL(cover)
     }
 
     override fun getSentTime(): LocalDateTime = publishTime.toLocalDateTime()

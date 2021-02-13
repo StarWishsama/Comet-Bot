@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables.hmsPattern
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.objects.wrapper.Picture
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import java.time.LocalDateTime
 
@@ -38,13 +39,15 @@ data class Article(
     )
 
     override fun getContact(): MessageWrapper {
-        val wrapped = MessageWrapper(
-                "发布了一篇专栏 $title:\n" +
-                        "$summary\n" +
-                        "查看全文: https://www.bilibili.com/read/cv/$id\n" +
-                        "\uD83D\uDC4D ${stats.like}|\uD83D\uDD01 ${stats.share}|🕘 ${hmsPattern.format(publishTime.toLocalDateTime())}")
+        val wrapped = MessageWrapper().addText(
+            "发布了一篇专栏 $title:\n" +
+                    "$summary\n" +
+                    "查看全文: https://www.bilibili.com/read/cv/$id\n" +
+                    "\uD83D\uDC4D ${stats.like}|\uD83D\uDD01 ${stats.share}|🕘 ${hmsPattern.format(publishTime.toLocalDateTime())}"
+        )
+
         if (!imageURL.isNullOrEmpty()) {
-            wrapped.plusImageUrl(imageURL[0])
+            wrapped.addElement(Picture(imageURL[0]))
         }
         return wrapped
     }

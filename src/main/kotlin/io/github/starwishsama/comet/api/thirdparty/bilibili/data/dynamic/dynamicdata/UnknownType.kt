@@ -6,8 +6,8 @@ import java.time.LocalDateTime
 
 class UnknownType : DynamicData {
     override fun getContact(): MessageWrapper {
-        return MessageWrapper("无法解析此动态消息, 你还是另请高明吧")
+        return MessageWrapper().addText("无法解析此动态消息, 你还是另请高明吧")
     }
 
-    override fun getSentTime(): LocalDateTime = LocalDateTime.MIN
+    override fun getSentTime(): LocalDateTime = LocalDateTime.now()
 }

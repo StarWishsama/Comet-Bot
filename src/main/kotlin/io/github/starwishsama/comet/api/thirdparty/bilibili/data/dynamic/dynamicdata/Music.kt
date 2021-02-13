@@ -30,10 +30,13 @@ data class Music(
         val playCount: Long
 ) : DynamicData {
     override fun getContact(): MessageWrapper {
-        return MessageWrapper("${dynamic ?: "获取失败"}\n" +
-                "发布了音乐: $songName\n" +
-                "🕘 ${BotVariables.yyMMddPattern.format(uploadTime.toLocalDateTime())}")
-                .plusImageUrl(coverURL)
+            return MessageWrapper().addText("${dynamic ?: "获取失败"}\n" +
+                    "发布了音乐: $songName\n" +
+                    "🕘 ${BotVariables.yyMMddPattern.format(uploadTime.toLocalDateTime())}").apply {
+                    if (coverURL != null) {
+                            addPictureByURL(coverURL)
+                    }
+            }
     }
 
     override fun getSentTime(): LocalDateTime = uploadTime.toLocalDateTime()

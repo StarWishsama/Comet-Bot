@@ -75,7 +75,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                             val reply = args.getRestString(2)
 
                             cfg.keyWordReply.forEach {
-                                if (it.reply.text == reply) {
+                                if (it.reply.getAllText() == reply) {
                                     it.keyWords.add(keyWord)
                                     return "已发现现有配置, 成功添加关键词".sendMessage()
                                 }
@@ -84,7 +84,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                             return if (cfg.keyWordReply.add(
                                     PerGroupConfig.ReplyKeyWord(
                                         mutableListOf(keyWord),
-                                        MessageWrapper(reply)
+                                        MessageWrapper().addText(reply)
                                     ))
                             ) {
                                 "添加关键词成功".sendMessage()

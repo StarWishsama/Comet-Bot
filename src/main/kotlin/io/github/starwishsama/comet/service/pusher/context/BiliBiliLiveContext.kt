@@ -18,16 +18,15 @@ class BiliBiliLiveContext(
         val data = liveRoomInfo.data
 
         if (data.getStatus() != LiveRoomInfo.LiveRoomInfoData.Status.Streaming) {
-            return MessageWrapper("未在直播", success = false)
+            return MessageWrapper().addText("未在直播").setUsable(false)
         }
 
-        return MessageWrapper(
+        return MessageWrapper().addText(
             "单推助手 > ${pushUser.userName} 正在直播!" +
                     "\n直播间标题: ${data.title}" +
                     "\n开播时间: ${data.liveTime}" +
                     "\n传送门: ${data.getRoomURL()}",
-            success = true
-        ).plusImageUrl(data.keyFrameImageUrl)
+        ).addPictureByURL(data.keyFrameImageUrl)
     }
 
     override fun contentEquals(other: PushContext): Boolean {

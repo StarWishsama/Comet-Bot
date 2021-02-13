@@ -1,69 +1,87 @@
 package io.github.starwishsama.comet.objects.wrapper
 
-import io.github.starwishsama.comet.utils.StringUtil.convertToChain
-import io.github.starwishsama.comet.utils.network.NetUtil
-import kotlinx.coroutines.delay
 import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.message.data.EmptyMessageChain
-import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
+import net.mamoe.mirai.message.data.MessageChainBuilder
+import kotlin.streams.toList
 
-open class MessageWrapper(var text: String?, val success: Boolean = true): Cloneable {
-    val pictureUrl: MutableList<String> = mutableListOf()
+open class MessageWrapper: Cloneable {
+    private val messageContent = mutableSetOf<WrapperElement>()
+    @Volatile
+    private var usable: Boolean = true
 
-    private suspend fun getPictures(contact: Contact): List<Image> {
-        val images = mutableListOf<Image>()
-
-        pictureUrl.forEach { url ->
-            NetUtil.getInputStream(url)?.use {
-                val uploadedImage = it.uploadAsImage(contact)
-                images.add(uploadedImage)
-                delay(1000)
-            }
-        }
-
-        return images
+    fun addElement(element: WrapperElement): MessageWrapper {
+        messageContent.add(element)
+        return this
     }
 
-    @Throws(UnsupportedOperationException::class)
-    fun plusImageUrl(url: String?): MessageWrapper {
+    fun addElements(vararg element: WrapperElement): MessageWrapper {
+        messageContent.addAll(element)
+        return this
+    }
+
+    fun addElements(elements: Collection<WrapperElement>): MessageWrapper {
+        messageContent.addAll(elements)
+        return this
+    }
+
+    fun addText(text: String): MessageWrapper {
+        messageContent.add(PureText(text))
+        return this
+    }
+
+    fun addPictureByURL(url: String?): MessageWrapper {
         if (url == null) return this
 
-        if (pictureUrl.size <= 9 && !pictureUrl.contains(url)) {
-            pictureUrl.add(url)
-            return this
-        } else {
-            throw UnsupportedOperationException("出于防刷屏考虑, 最多只能添加九张照片")
-        }
+        messageContent.add(Picture(url))
+        return this
     }
 
-    suspend fun toMessageChain(contact: Contact, pictureAtTop: Boolean = false): MessageChain {
-        val textWrapper = text?.trim()
-        if (textWrapper != null) {
-            val images = getPictures(contact)
-            if (images.isNotEmpty()) {
-                var result = textWrapper.convertToChain()
+    fun setUsable(usable: Boolean): MessageWrapper {
+        this.usable = usable
+        return this
+    }
 
-                if (pictureAtTop) {
-                    images.forEach {
-                        result = it + result
-                    }
-                } else {
-                    images.forEach {
-                        result += it
-                    }
+    fun isUsable(): Boolean {
+        return usable
+    }
+
+    fun toMessageChain(subject: Contact): MessageChain {
+        return MessageChainBuilder().apply {
+            messageContent.forEach {
+                if (it !is Picture || !isPictureReachLimit()) {
+                    add(it.toMessageContent(subject))
                 }
-
-                return result
             }
+        }.build()
+    }
 
-            return textWrapper.convertToChain()
-        }
-        return EmptyMessageChain
+    private fun isPictureReachLimit(): Boolean {
+        return messageContent.parallelStream().filter { it is Picture }.count() >= 9
     }
 
     override fun toString(): String {
-        return "MessageWrapper {text=$text, pictureUrls=$pictureUrl}"
+        return "MessageWrapper {content=${messageContent}}"
+    }
+
+    fun getAllText(): String {
+        val texts = messageContent.parallelStream().filter { it is PureText }.toList()
+        return buildString {
+            texts.forEach {
+                append(it.asString())
+            }
+        }
+    }
+
+    fun getMessageContent(): Set<WrapperElement> {
+        return mutableSetOf<WrapperElement>().apply {
+            addAll(messageContent)
+        }
+    }
+
+    fun compare(other: Any?): Boolean {
+        if (other !is MessageWrapper) return false
+
+        return getMessageContent() == other.getMessageContent()
     }
 }

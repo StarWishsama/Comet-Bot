@@ -61,10 +61,10 @@ object ConvertLightAppListener : NListener {
 
             return runBlocking {
                 val wrapper = videoInfo.toMessageWrapper()
-                return@runBlocking if (!wrapper.success) {
+                return@runBlocking if (!wrapper.isUsable()) {
                     EmptyMessageChain
                 } else {
-                    wrapper.toMessageChain(subject, true)
+                    wrapper.toMessageChain(subject)
                 }
             }
         } catch (e: Exception) {

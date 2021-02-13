@@ -31,7 +31,7 @@ class YoutubeCommand : ChatCommand {
             } else {
                 when (args[0]) {
                     "info" ->
-                        return checkInfo(args[1]).toMessageChain(event.subject, true)
+                        return checkInfo(args[1]).toMessageChain(event.subject)
                     "sub" -> return if (event is GroupMessageEvent) {
                         subscribeUser(args[1], event.group.id)
                     } else {
@@ -142,16 +142,16 @@ class YoutubeCommand : ChatCommand {
     }
 
     private fun checkInfo(channelID: String): MessageWrapper {
-        val result = YoutubeApi.getChannelByID(channelID) ?: return MessageWrapper("找不到该频道, 可能是 API 调用已达到上限?")
+        val result = YoutubeApi.getChannelByID(channelID) ?: return MessageWrapper().addText("找不到该频道, 可能是 API 调用已达到上限?")
         val item = result.items[0]
         val text = """
         ${item.snippet.title}
 > ${item.statistics.subscriberCount.getBetterNumber()}位订阅者 | ${item.statistics.viewCount.getBetterNumber()}次观看
 > ${item.snippet.description.limitStringSize(50)}
         """.trimIndent()
-        val wrapper = MessageWrapper(text)
+        val wrapper = MessageWrapper().addText(text)
 
-        wrapper.plusImageUrl(item.snippet.thumbnails.asJsonObject["default"].asJsonObject["url"].asString)
+        wrapper.addPictureByURL(item.snippet.thumbnails.asJsonObject["default"].asJsonObject["url"].asString)
         return wrapper
     }
 

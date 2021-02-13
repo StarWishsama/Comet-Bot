@@ -15,8 +15,8 @@ class TwitterContext(
 
     override fun toMessageWrapper(): MessageWrapper {
         val original = tweet.toMessageWrapper()
-        return MessageWrapper("${tweet.user.name} 发布了一条推文\n" + original.text).also {
-            it.pictureUrl.addAll(original.pictureUrl)
+        return MessageWrapper().addText("${tweet.user.name} 发布了一条推文\n").also {
+            it.addElements(original.getMessageContent())
         }
     }
 

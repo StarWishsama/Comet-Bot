@@ -17,7 +17,7 @@ interface DynamicData {
         if (other == null) return false
         if (other !is DynamicData) return false
 
-        return getContact().text == other.getContact().text && getSentTime() == other.getSentTime()
+        return getContact().compare(other.getContact()) && getSentTime() == other.getSentTime()
     }
 
     fun getSentTime(): LocalDateTime
@@ -196,12 +196,12 @@ fun Dynamic.convertToDynamicData(): DynamicData? {
 fun Dynamic.convertToWrapper(): MessageWrapper {
     return try {
         val data = convertToDynamicData()
-        runBlocking { data?.getContact() ?: MessageWrapper("错误: 不支持的动态类型", false) }
+        runBlocking { data?.getContact() ?: MessageWrapper().addText("错误: 不支持的动态类型").setUsable(false) }
     } catch (e: Exception) {
         if (e is ArrayIndexOutOfBoundsException) {
-            MessageWrapper("没有发过动态", false)
+            MessageWrapper().addText("动态列表为空").setUsable(false)
         } else {
-            MessageWrapper("解析动态失败", false)
+            MessageWrapper().addText("解析动态失败").setUsable(false)
         }
     }
 }

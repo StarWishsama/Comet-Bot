@@ -95,12 +95,12 @@ object BiliBiliMainApi : ApiExecutor {
 
     @Suppress("BlockingMethodInNonBlockingContext")
     @Throws(ApiException::class)
-    suspend fun getWrappedDynamicTimeline(mid: Long): MessageWrapper {
-        val dynamic = getUserDynamicTimeline(mid) ?: return MessageWrapper("获取动态失败", false)
+    fun getWrappedDynamicTimeline(mid: Long): MessageWrapper {
+        val dynamic = getUserDynamicTimeline(mid) ?: return MessageWrapper().addText("无法获取动态").setUsable(false)
 
         try {
             if (dynamic.data.cards != null) {
-                if (dynamic.data.cards.isEmpty()) return MessageWrapper("没有发过动态", false)
+                if (dynamic.data.cards.isEmpty()) return MessageWrapper().addText("没有发过动态").setUsable(false)
 
                 val card = dynamic.data.cards[0]
                 val singleDynamicObject = JsonParser.parseString(card.card)
@@ -109,15 +109,15 @@ object BiliBiliMainApi : ApiExecutor {
                     return if (dynamicType != UnknownType::class) {
                         nullableGson.fromJson(card.card, dynamicType).getContact()
                     } else {
-                        MessageWrapper("错误: 不支持的动态类型", false)
+                        MessageWrapper().addText("错误: 不支持的动态类型").setUsable(false)
                     }
                 }
             }
         } catch (e: Exception) {
-            return MessageWrapper("解析动态失败", false)
+            return MessageWrapper().addText("解析动态失败").setUsable(false)
         }
 
-        return MessageWrapper("获取动态失败", false)
+        return MessageWrapper().addText("获取动态失败").setUsable(false)
     }
 
     /**

@@ -59,11 +59,11 @@ data class TextWithPicture(
     }
 
     override fun getContact(): MessageWrapper {
-        val wrapped = MessageWrapper("发布了动态:\n ${item.text ?: "获取失败"}\n" + "🕘 ${BotVariables.hmsPattern.format(item.uploadTime.toLocalDateTime())}\n")
+        val wrapped = MessageWrapper().addText("发布了动态:\n ${item.text ?: "获取失败"}\n" + "🕘 ${BotVariables.hmsPattern.format(item.uploadTime.toLocalDateTime())}\n")
 
         if (!item.pictures.isNullOrEmpty()) {
             item.pictures.forEach {
-                wrapped.plusImageUrl(it.imgUrl)
+                wrapped.addPictureByURL(it.imgUrl)
             }
         }
 

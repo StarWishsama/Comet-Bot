@@ -7,9 +7,11 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicTypeSelector
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.objects.wrapper.Picture
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import java.time.LocalDateTime
+import kotlin.streams.toList
 
 data class Repost(@SerializedName("origin")
                   var originDynamic: String,
@@ -37,21 +39,17 @@ data class Repost(@SerializedName("origin")
 
     override fun getContact(): MessageWrapper {
         val originalDynamic = item?.originType?.let { getOriginalDynamic(originDynamic, it) }
-                ?: return MessageWrapper("源动态已被删除")
-        val repostPicture = originalDynamic.pictureUrl
-        val msg = MessageWrapper(
-                "转发了 ${if (item.content.isEmpty()) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item.content}"
-                        + "\n\uD83D\uDD58 ${hmsPattern.format(item.getSentTime())}\n" + "原动态信息: \n${originalDynamic.text}"
+                ?: return MessageWrapper().addText("\"源动态已被删除\"")
+        val repostPicture = originalDynamic.getMessageContent().parallelStream().filter { it is Picture }.toList()
+        val msg = MessageWrapper().addText(
+            "转发了 ${if (item.content.isEmpty()) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item.content}"
+                    + "\n\uD83D\uDD58 ${hmsPattern.format(item.getSentTime())}\n" + "原动态信息: \n${originalDynamic.getAllText()}"
         )
 
         if (repostPicture.isNotEmpty()) {
             repostPicture.forEach {
                 if (!repostPicture.isNullOrEmpty()) {
-                    try {
-                        msg.plusImageUrl(it)
-                    } catch (e: UnsupportedOperationException) {
-                        return@forEach
-                    }
+                    msg.addElement(it)
                 }
             }
         }
@@ -71,7 +69,7 @@ data class Repost(@SerializedName("origin")
                     return info.getContact()
                 }
             }
-            return MessageWrapper("无法解析此动态消息, 你还是另请高明吧")
+            return MessageWrapper().addText("无法解析此动态消息, 你还是另请高明吧")
         } catch (e: Exception) {
             FileUtil.createErrorReportFile(
                     "在解析动态时出现了异常",
@@ -80,7 +78,7 @@ data class Repost(@SerializedName("origin")
                     contact,
                     "Excepted type: $dynamicType"
             )
-            return MessageWrapper("在获取时遇到了错误")
+            return MessageWrapper().addText("在获取时遇到了错误")
         }
     }
 }

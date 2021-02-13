@@ -41,6 +41,6 @@ data class ClockInData(val startTime: LocalDateTime, val endTime: LocalDateTime,
             unCheckedText = StringBuilder("无")
         }
 
-        return MessageWrapper("最近一次打卡的数据:\n已打卡人数: $checkedCount\n迟到: $lateText\n未打卡: $unCheckedText")
+        return MessageWrapper().addText("最近一次打卡的数据:\n已打卡人数: $checkedCount\n迟到: $lateText\n未打卡: $unCheckedText")
     }
 }

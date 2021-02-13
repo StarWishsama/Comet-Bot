@@ -32,10 +32,10 @@ class BiliBiliDynamicContext(
 
     override fun toMessageWrapper(): MessageWrapper {
         val before = dynamic.convertToWrapper()
-        return MessageWrapper("${pushUser.userName}\n" + before.text, success = before.success).also {
-            before.pictureUrl.forEach { url ->
-                it.plusImageUrl(url)
-            }
+        return MessageWrapper().addText(
+            "${pushUser.userName}\n" + before.getAllText()
+        ).setUsable(before.isUsable()).also {
+            it.addElements(before.getMessageContent())
         }
     }
 

@@ -14,22 +14,24 @@ data class VideoInfo(
     fun toMessageWrapper(): MessageWrapper {
         try {
 
-            if (data == null) return MessageWrapper(text = null, success = false)
+            if (data == null) return MessageWrapper().setUsable(false)
 
-            return MessageWrapper(
+            return MessageWrapper()
+                .addText(
                 """
                 ${data.title}
                 > ${data.uploader.userName}
                 > ${data.description}
                 👍 ${data.stats.like} 💴 ${data.stats.coin} ⭐ ${data.stats.favorite}
                 ${if (data.stats.historyRank > 0) "本站最高日排行第${data.stats.historyRank}名" else ""}
-            """.trimIndent()
-            ).plusImageUrl(data.coverImg)
+                """.trimIndent()
+                )
+                .addPictureByURL(data.coverImg)
         } catch (e: Exception) {
             FileUtil.createErrorReportFile("解析视频消息失败", "bilibili", e, this.toString(), "")
         }
 
-        return MessageWrapper(text = null, success = false)
+        return MessageWrapper().setUsable(false)
     }
 
     data class Data(

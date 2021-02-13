@@ -37,7 +37,7 @@ abstract class CometPusher(val bot: Bot, val name: String) {
                     try {
                         val wrapper = context.toMessageWrapper()
 
-                        if (wrapper.success) {
+                        if (wrapper.isUsable()) {
                             val group = bot.getGroup(it) ?: return@group
 
                             runBlocking {

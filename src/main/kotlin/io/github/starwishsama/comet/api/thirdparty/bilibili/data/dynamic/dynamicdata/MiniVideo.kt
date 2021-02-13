@@ -34,12 +34,12 @@ data class MiniVideo(
     }
 
     override fun getContact(): MessageWrapper {
-        val wrapped = MessageWrapper("发了一个小视频: ${item?.description ?: "获取失败"}\n")
+        val wrapped = MessageWrapper().addText("发了一个小视频: ${item?.description ?: "获取失败"}\n")
 
         item?.cover?.originImgURL.let {
             if (it != null) {
                 try {
-                    wrapped.plusImageUrl(it)
+                    wrapped.addPictureByURL(it)
                 } catch (e: UnsupportedOperationException) {
                     return@let
                 }

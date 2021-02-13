@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.objects.wrapper.Picture
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -108,14 +109,14 @@ data class LiveRoom(
     }
 
     override fun getContact(): MessageWrapper {
-        val wrapped = MessageWrapper(
-                "分享了 ${BiliBiliMainApi.getUserNameByMid(uid)} 的直播间\n" +
-                        "直播间标题: ${title}\n" +
-                        "直播状态: ${getStatus(roundStatus).status}\n" +
-                        "直达链接: ${getRoomURL()}\n"
+        val wrapped = MessageWrapper().addText(
+            "分享了 ${BiliBiliMainApi.getUserNameByMid(uid)} 的直播间\n" +
+                    "直播间标题: ${title}\n" +
+                    "直播状态: ${getStatus(roundStatus).status}\n" +
+                    "直达链接: ${getRoomURL()}\n"
         )
         if (coverImg.isNotEmpty()) {
-            wrapped.plusImageUrl(coverImg)
+            wrapped.addElement(Picture(coverImg))
         }
         return wrapped
     }
