@@ -40,10 +40,11 @@ object TwitterApi : ApiExecutor {
     private const val twitterTokenGetUrl = "https://api.twitter.com/oauth2/token"
 
     // Bearer Token
-    private var token = BotVariables.cfg.twitterToken
+    //private var token = BotVariables.cfg.twitterToken
+    private var token = ""
 
     // 缓存的推文
-    private var cacheTweet = mutableMapOf<String, Tweet>()
+    private val cacheTweet = mutableMapOf<String, Tweet>()
 
     // Api 调用次数
     override var usedTime: Int = 0
@@ -78,6 +79,7 @@ object TwitterApi : ApiExecutor {
             if (JsonParser.parseString(result).isJsonObject) {
                 // Get Token
                 token = JsonParser.parseString(result).asJsonObject["access_token"].asString
+                BotVariables.cfg.twitterToken = token
                 logger.info("[蓝鸟] 成功获取 Access Token")
             }
         } catch (e: IOException) {
