@@ -139,6 +139,10 @@ data class LiveRoomInfo(
             return LocalDateTime.parse(liveTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
         }
 
+        fun isEmptyTime(): Boolean {
+            return liveTime == "0000-00-00 00:00:00"
+        }
+
         fun getRoomURL(): String {
             return "https://live.bilibili.com/$roomId"
         }
