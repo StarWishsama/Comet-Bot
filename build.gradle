@@ -103,7 +103,7 @@ dependencies {
     implementation 'org.jline:jline:3.19.0'
 
     // Jansi needed by JLine
-    implementation 'org.fusesource.jansi:jansi:2.2.0'
+    implementation 'org.fusesource.jansi:jansi:2.3.1'
 
     // DNSJava used to srv lookup
     implementation 'dnsjava:dnsjava:3.3.1'
