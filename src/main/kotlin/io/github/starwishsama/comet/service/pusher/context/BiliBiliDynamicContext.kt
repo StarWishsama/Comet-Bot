@@ -33,7 +33,7 @@ class BiliBiliDynamicContext(
     override fun toMessageWrapper(): MessageWrapper {
         val before = dynamic.convertToWrapper()
         return MessageWrapper().addText(
-            "${pushUser.userName}\n" + before.getAllText()
+            "${pushUser.userName}\n"
         ).setUsable(before.isUsable()).also {
             it.addElements(before.getMessageContent())
         }
