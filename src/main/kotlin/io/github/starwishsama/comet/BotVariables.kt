@@ -60,17 +60,23 @@ object BotVariables {
 
     val logger: MiraiLogger = PlatformLogger("CometBot") {
         Comet.console.printAbove(it)
-        loggerAppender.appendLog(it)
+        if (::loggerAppender.isInitialized) {
+            loggerAppender.appendLog(it)
+        }
     }
 
     val daemonLogger: MiraiLogger = PlatformLogger("CometService") {
         Comet.console.printAbove(it)
-        loggerAppender.appendLog(it)
+        if (::loggerAppender.isInitialized) {
+            loggerAppender.appendLog(it)
+        }
     }
 
     val consoleCommandLogger: MiraiLogger = PlatformLogger("CometConsole") {
         Comet.console.printAbove(it)
-        loggerAppender.appendLog(it)
+        if (::loggerAppender.isInitialized) {
+            loggerAppender.appendLog(it)
+        }
     }
 
     val nullableGson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().setExclusionStrategies(

@@ -139,7 +139,7 @@ class TwitterCommand : ChatCommand {
 
                     if (twitter != null) {
                         cfg.twitterSubscribers.add(args[1])
-                        return CometUtil.sendMessage("订阅 @${args[1]} 成功")
+                        return CometUtil.sendMessage("订阅 ${twitter.name}(@${twitter.twitterId}) 成功")
                     }
 
                     return CometUtil.sendMessage("订阅 @${args[1]} 失败")

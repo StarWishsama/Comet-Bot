@@ -34,7 +34,7 @@ import java.time.LocalDateTime
  */
 object TwitterApi : ApiExecutor {
     // 蓝鸟 APIv1.1 地址
-    private const val twitterApiUrl = "https://api.twitter.com/1.1/"
+    private const val twitterApiUrl = "https://api.twitter.com/1.1"
 
     // 获取 token 地址
     private const val twitterTokenGetUrl = "https://api.twitter.com/oauth2/token"

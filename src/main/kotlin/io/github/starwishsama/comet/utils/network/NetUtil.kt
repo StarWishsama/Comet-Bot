@@ -128,8 +128,8 @@ object NetUtil {
         return result ?: throw ApiException("执行网络操作失败")
     }
 
-    fun getPageContent(url: String, timeout: Long = 2): String? =
-        executeHttpRequest(url, timeout, cfg.proxyUrl, cfg.proxyPort).body?.string()
+    fun getPageContent(url: String, timeout: Long = 2, proxyUrl: String = cfg.proxyUrl, proxyPort: Int = cfg.proxyPort): String? =
+        executeHttpRequest(url, timeout, proxyUrl, proxyPort).body?.string()
 
     /**
      * 下载文件
@@ -204,7 +204,7 @@ object NetUtil {
         return body?.byteStream()
     }
 
-    fun checkProxyUsable(customUrl: String = "https://www.gstatic.com/generate_204", timeout: Int = 2_000): Boolean {
+    private fun checkProxyUsable(customUrl: String = "https://www.gstatic.com/generate_204", timeout: Int = 2_000): Boolean {
         if (!cfg.proxySwitch || cfg.proxyUrl.isEmpty() || cfg.proxyPort <= 0) return false
 
         Socket(cfg.proxyUrl, cfg.proxyPort).use {
