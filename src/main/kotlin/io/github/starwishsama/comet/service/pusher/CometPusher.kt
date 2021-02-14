@@ -73,7 +73,7 @@ abstract class CometPusher(val bot: Bot, val name: String) {
 
         if (!cfgFile.exists()) cfgFile.createNewFile()
 
-        config.cachePool = cachePool
+        config.cachePool.addAll(cachePool)
 
         cfgFile.writeClassToJson(config)
     }
@@ -84,10 +84,11 @@ abstract class CometPusher(val bot: Bot, val name: String) {
     }
 
     fun start() {
+        cachePool.addAll(config.cachePool)
         TaskUtil.runScheduleTaskAsync(config.interval, config.interval, TimeUnit.MILLISECONDS) {
             execute()
         }
-        daemonLogger.info("$name 推送器已启动")
+        daemonLogger.info("$name 推送器已启动, 载入缓存 ${cachePool.size} 个")
     }
 
     fun addPushTime(){

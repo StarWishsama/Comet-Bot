@@ -22,7 +22,7 @@ object LiveApi : ApiExecutor {
         }
 
         val request = HttpRequest.get(liveUrl + roomId).timeout(500)
-                .header("User-Agent", "Bili live status checker by StarWishsama")
+            .header("User-Agent", "Bili live status checker by StarWishsama")
         val response = request.executeAsync()
 
         return try {
@@ -33,25 +33,21 @@ object LiveApi : ApiExecutor {
         }
     }
 
-    @Throws(RateLimitException::class)
-    fun getLiveStatus(mid: Long): Boolean {
-        val info = getLiveInfo(mid)
-        return info?.data?.liveStatus == 1
-    }
-
     fun getRoomIDByUID(uid: Long): Long {
         val result = NetUtil.executeHttpRequest(
                 url = (liveOldUrl + uid)
         )
 
         result.use {
-            if (result.isSuccessful) {
-                val info = result.body?.string()?.let { nullableGson.fromJson<OldLiveInfo>(it) }
-                return info?.data?.roomId ?: -1
+            return try {
+                val bodyString = result.body?.string()
+                println(bodyString)
+                val info = nullableGson.fromJson<OldRoomInfo>(bodyString ?: return -1)
+                info.data.roomId
+            } catch (e: Exception) {
+                -1
             }
         }
-
-        return -1
     }
 
     override fun isReachLimit(): Boolean {
@@ -65,26 +61,12 @@ object LiveApi : ApiExecutor {
 
     override fun getLimitTime(): Int = 1500
 
-    private data class OldLiveInfo(
-        val code: Int,
-        val message: String,
-        val ttl: Int,
+    private data class OldRoomInfo(
         val data: LiveInfoData
     ) {
         data class LiveInfoData(
-            val roomStatus: Int,
-            val roundStatus: Int,
-            val liveStatus: Int,
-            val url: String,
-            val title: String,
-            val cover: String,
-            val online: Int,
             @SerializedName("roomid")
-            val roomId: Long,
-            @SerializedName("broadcast_type")
-            val broadcastType: Int,
-            @SerializedName("online_hidden")
-            val onlineHidden: Int
+            val roomId: Long
         )
     }
 }

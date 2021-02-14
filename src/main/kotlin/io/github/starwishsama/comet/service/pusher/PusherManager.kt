@@ -27,7 +27,6 @@ object PusherManager {
                 if (cfgFile.exists()) {
                     val cfg = nullableGson.fromJson<PusherConfig>(cfgFile.getContext())
                     pusher.config = cfg
-                    pusher.cachePool.addAll(cfg.cachePool)
                 } else {
                     cfgFile.createNewFile()
                     cfgFile.writeClassToJson(pusher.config)
