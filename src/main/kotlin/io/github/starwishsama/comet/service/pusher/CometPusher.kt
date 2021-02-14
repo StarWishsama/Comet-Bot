@@ -8,9 +8,11 @@ import io.github.starwishsama.comet.service.pusher.context.PushContext
 import io.github.starwishsama.comet.service.pusher.context.PushStatus
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.verboseS
+import io.github.starwishsama.comet.utils.writeClassToJson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
+import java.io.File
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
@@ -63,6 +65,17 @@ abstract class CometPusher(val bot: Bot, val name: String) {
         }
 
         latestPushTime = LocalDateTime.now()
+        save()
+    }
+
+    fun save() {
+        val cfgFile = File(PusherManager.pusherFolder, "${name}.json")
+
+        if (!cfgFile.exists()) cfgFile.createNewFile()
+
+        config.cachePool.addAll(cachePool)
+
+        cfgFile.writeClassToJson(config)
     }
 
     fun execute() {

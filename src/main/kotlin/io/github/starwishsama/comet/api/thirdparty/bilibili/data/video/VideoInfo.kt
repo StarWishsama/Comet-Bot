@@ -19,12 +19,12 @@ data class VideoInfo(
             return MessageWrapper()
                 .addText(
                 """
-                ${data.title}
-                > ${data.uploader.userName}
-                > ${data.description}
-                👍 ${data.stats.like} 💴 ${data.stats.coin} ⭐ ${data.stats.favorite}
-                ${if (data.stats.historyRank > 0) "本站最高日排行第${data.stats.historyRank}名" else ""}
-                """.trimIndent()
+${data.title}
+| ${data.uploader.userName}
+| ${data.description}
+| 👍 ${data.stats.like} 🪙 ${data.stats.coin} ⭐ ${data.stats.favorite}
+${if (data.stats.historyRank > 0) "| 本站最高日排行第${data.stats.historyRank}名" else ""}
+                """.trim().removePrefix(" ")
                 )
                 .addPictureByURL(data.coverImg)
         } catch (e: Exception) {

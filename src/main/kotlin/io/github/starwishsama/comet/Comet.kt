@@ -42,8 +42,6 @@ import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.Mirai
-import net.mamoe.mirai.event.ConcurrencyKind
-import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.globalEventChannel
 import net.mamoe.mirai.network.ForceOfflineException
 import net.mamoe.mirai.network.LoginFailedException
@@ -54,7 +52,6 @@ import org.jline.terminal.TerminalBuilder
 import java.io.EOFException
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.system.exitProcess
 import kotlin.time.ExperimentalTime
 
@@ -208,12 +205,7 @@ object Comet {
 
         listeners.forEach { listener ->
             listener.eventToListen.forEach { eventClass ->
-                bot.globalEventChannel().subscribeAlways(
-                    eventClass,
-                    EmptyCoroutineContext,
-                    ConcurrencyKind.CONCURRENT,
-                    EventPriority.NORMAL
-                ) {
+                bot.globalEventChannel().subscribeAlways(eventClass) {
                     listener.listen(this)
                 }
             }
