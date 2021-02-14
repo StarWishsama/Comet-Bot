@@ -87,7 +87,7 @@ data class CometConfig(
         @Comment("Mirai 心跳周期, 单位分钟, 过长会导致被服务器断开连接")
         var heartBeatPeriod: Long = 1,
 
-        @Comment("Youtube APIKey, 使用 Youtube 推送必填\n申请请见 https://developers.google.com/youtube/v3/getting-started")
+        @Comment("Youtube API Key, 使用 Youtube 推送必填\n申请请见 https://developers.google.com/youtube/v3/getting-started")
         var youtubeApiKey: String = "",
 
         @Comment("推文推送时候是否发送小图而不是原图")
@@ -117,7 +117,7 @@ data class CometConfig(
         val remoteWebDriver: String = "",
 
         @Comment("机器人使用的登录协议, 可选的有 ANDROID_PHONE, ANDROID_PAD 和 ANDROID_WATCH")
-        val botProtocol: BotConfiguration.MiraiProtocol = BotConfiguration.MiraiProtocol.ANDROID_PAD,
+        val botProtocol: BotConfiguration.MiraiProtocol = BotConfiguration.MiraiProtocol.ANDROID_PHONE,
 
         @Comment("自动清理过时文件间隔 (如 Log, 错误报告等), 单位为天. 设为小于 0 的数字以关闭")
         val autoCleanDuration: Int = 15
