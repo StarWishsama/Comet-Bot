@@ -1,8 +1,6 @@
 package io.github.starwishsama.comet.listeners
 
-import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.runBlocking
@@ -11,46 +9,58 @@ import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.time.ExperimentalTime
 
 object RepeatListener : NListener {
     override val eventToListen = listOf(GroupMessageEvent::class)
 
+    private val repeatCachePool = mutableMapOf<Long, RepeatInfo>()
+
     @MiraiExperimentalApi
     @ExperimentalTime
     override fun listen(event: Event) {
         if (BotVariables.switch && event is GroupMessageEvent && !event.group.isBotMuted && canRepeat(event.group.id)) {
-            runBlocking { handleRepeat(event, RandomUtil.randomDouble()) }
+            if (repeatCachePool.isEmpty() || repeatCachePool[event.group.id] == null) {
+                repeatCachePool[event.group.id] = RepeatInfo(
+                    mutableListOf(RepeatInfo.CacheMessage(
+                        event.sender.id,
+                        event.message
+                    ))
+                )
+                return
+            }
+
+            val repeatInfo = repeatCachePool[event.group.id]
+
+            if (repeatInfo?.check(event.sender.id, event.message) == true) {
+                runBlocking { event.subject.sendMessage(doRepeat(repeatInfo.messageCache.last().message)) }
+                repeatInfo.messageCache.clear()
+            }
         }
     }
 
-    @MiraiExperimentalApi
-    private suspend fun handleRepeat(event: GroupMessageEvent, chance: Double) {
-        if (event.message[QuoteReply] == null && chance in 0.50..0.505) {
-            cfg.commandPrefix.forEach {
-                if (event.message.contentToString().startsWith(it)) {
-                    return
+    private fun doRepeat(message: MessageChain): MessageChain {
+        // 避免复读过多图片刷屏
+        val count = message.parallelStream().filter { it is Image }.count()
+
+        if (count <= 1L) {
+            val msgChain = ArrayList<Message>()
+
+            message.forEach {
+                val msg: SingleMessage = if (it is PlainText) {
+                    PlainText(it.content.replace("我".toRegex(), "你"))
+                } else {
+                    it
                 }
+                msgChain.add(msg)
             }
 
-            // 避免复读过多图片刷屏
-            val count = event.message.parallelStream().filter { it is Image }.count()
-
-            if (count <= 1L) {
-                val msgChain = ArrayList<Message>()
-
-                event.message.forEach {
-                    val msg: SingleMessage = if (it is PlainText) {
-                        PlainText(it.content.replace("我".toRegex(), "你"))
-                    } else {
-                        it
-                    }
-                    msgChain.add(msg)
-                }
-
-                event.subject.sendMessage(msgChain.toMessageChain())
-            }
+            return msgChain.toMessageChain()
         }
+
+        return EmptyMessageChain
     }
 
     private fun canRepeat(groupId: Long): Boolean {
@@ -63,4 +73,34 @@ object RepeatListener : NListener {
     }
 
     override fun getName(): String = "复读机"
+}
+
+data class RepeatInfo(
+    val messageCache: MutableList<CacheMessage> = Collections.synchronizedList(mutableListOf())
+) {
+    data class CacheMessage(
+        val senderId: Long,
+        val message: MessageChain
+    )
+
+    fun check(id: Long, message: MessageChain): Boolean {
+        if (messageCache.isEmpty()) {
+            messageCache.add(CacheMessage(id, message))
+            return false
+        }
+
+        if (messageCache.size == 2) {
+            return true
+        }
+
+        val last = messageCache.last()
+
+        if (last.senderId != id && last.message.contentToString() == message.contentToString()) {
+            messageCache.add(CacheMessage(id, message))
+        } else if (last.senderId == id || last.message.contentToString() != message.contentToString()) {
+            messageCache.clear()
+        }
+
+        return false
+    }
 }
