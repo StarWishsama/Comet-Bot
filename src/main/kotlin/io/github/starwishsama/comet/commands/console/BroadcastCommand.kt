@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.commands.console
 
-import io.github.starwishsama.comet.BotVariables.bot
+import io.github.starwishsama.comet.BotVariables.comet
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
@@ -23,7 +23,7 @@ class BroadcastCommand: ConsoleCommand {
 
     private fun sendMessage(groupId: Long, message: String): String {
         if (groupId == -1L) {
-            bot.groups.forEach {
+            comet.getBot().groups.forEach {
                 runBlocking {
                     try {
                         it.sendMessage(message)
@@ -37,7 +37,7 @@ class BroadcastCommand: ConsoleCommand {
             return ""
         }
 
-        val g = bot.getGroup(groupId) ?: return "找不到群号对应的群"
+        val g = comet.getBot().getGroup(groupId) ?: return "找不到群号对应的群"
 
         return runBlocking {
             try {

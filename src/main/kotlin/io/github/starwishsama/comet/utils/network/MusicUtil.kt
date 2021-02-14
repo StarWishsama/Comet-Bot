@@ -3,7 +3,10 @@ package io.github.starwishsama.comet.utils.network
 import cn.hutool.http.HttpRequest
 import com.github.salomonbrys.kotson.fromJson
 import com.github.salomonbrys.kotson.get
-import com.google.gson.*
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonParseException
+import com.google.gson.JsonParser
+import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.logger
@@ -155,7 +158,7 @@ object MusicUtil {
                     ).toMessageChain()
                 }
             } else {
-                logger.warning("无法从 QQ API 获取到歌曲信息")
+                logger.warning("无法从 QQ 音乐 API 获取到歌曲信息")
             }
         } catch (e: IOException) {
             logger.warning("在通过 QQ 音乐搜索歌曲时发生了一个错误", e)
@@ -180,27 +183,10 @@ object MusicUtil {
         data class QQMusicSearchData(
                 @SerializedName("keyword")
                 val searchKeyWord: String,
-                @SerializedName("priority")
-                val priority: Int,
-                @SerializedName("qc")
-                val qc: JsonElement?,
-                /**
-                 * Including:
-                 * curnum: Int,
-                 * curpag: Int,
-                 * list: List?
-                 * totalnum: Int
-                 */
-                @SerializedName("semantic")
-                val semantic: JsonObject,
                 @SerializedName("song")
                 val songs: QQMusicSongs
         ) {
             data class QQMusicSongs(
-                    @SerializedName("curnum")
-                    val currentNumber: Int,
-                    @SerializedName("curpage")
-                    val currentPage: Int,
                     @SerializedName("list")
                     val songList: List<QQMusicSong>
             ) {
@@ -213,48 +199,8 @@ object MusicUtil {
                         /** 专辑名 */
                         @SerializedName("albumname")
                         val albumName: String,
-                        @SerializedName("albumname_hilight")
-                        val albumNameHiLight: String,
-                        @SerializedName("alertid")
-                        val alertId: Int,
-                        @SerializedName("belongCD")
-                        val belongCD: Int,
-                        @SerializedName("cdIdx")
-                        val cdIdx: Int,
                         @SerializedName("chinesesinger")
                         val chineseSinger: Int,
-                        @SerializedName("docid")
-                        val docId: String,
-                        /** 支持的加密格式? 例如: qqhq;common;mp3common;wmacommon */
-                        @SerializedName("format")
-                        val supportFormat: String,
-                        @SerializedName("grp")
-                        val grp: JsonElement?,
-                        @SerializedName("interval")
-                        val interval: Int,
-                        @SerializedName("isonly")
-                        val isOnly: Int,
-                        @SerializedName("lyric")
-                        val lyric: String?,
-                        @SerializedName("lyric_hilight")
-                        val lyricHiLight: String?,
-                        @SerializedName("media_mid")
-                        val mediaMid: String,
-                        @SerializedName("msgid")
-                        val msgId: Int,
-                        @SerializedName("newStatus")
-                        val newStatus: Int,
-                        @SerializedName("nt")
-                        val nt: Long,
-                        @SerializedName("pay")
-                        val pay: JsonObject,
-                        @SerializedName("preview")
-                        val preview: JsonObject,
-                        /** 时间戳 */
-                        @SerializedName("pubtime")
-                        val publishTime: Long,
-                        @SerializedName("pure")
-                        val pure: Int,
                         @SerializedName("singer")
                         val singer: List<QQMusicSinger>,
 
@@ -271,31 +217,15 @@ object MusicUtil {
                         val songMid: String,
                         @SerializedName("songname")
                         val songName: String,
-                        @SerializedName("songname_hilight")
-                        val songNameHilight: String,
                         @SerializedName("songurl")
                         val songUrl: String,
                         @SerializedName("strMediaMid")
                         val mediaMidAsString: String,
-                        @SerializedName("stream")
-                        val stream: String,
-                        @SerializedName("switch")
-                        val switch: Long,
-
-                        /** 未知参数 */
-                        @SerializedName("t")
-                        val t: Long,
-                        val tag: Long,
-                        val type: Int,
-                        val ver: Int,
-                        val vid: String
                 ) {
                     data class QQMusicSinger(
                             val id: Long,
                             val mid: String,
                             val name: String,
-                            @SerializedName("name_hilight")
-                            val nameHilight: String
                     )
 
                     /**

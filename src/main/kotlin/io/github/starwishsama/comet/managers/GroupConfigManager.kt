@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.managers
 
-import io.github.starwishsama.comet.BotVariables.bot
+import io.github.starwishsama.comet.BotVariables.comet
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 
 object GroupConfigManager {
@@ -20,7 +20,7 @@ object GroupConfigManager {
 
     fun getConfigOrNew(groupId: Long): PerGroupConfig {
         if (groupId <= 0) throw RuntimeException("群号不允许小于0")
-        if (bot.getGroup(groupId) == null) throw RuntimeException("所获取的群不存在")
+        if (comet.getBot().getGroup(groupId) == null) throw RuntimeException("所获取的群不存在")
 
         val cfg = getConfig(groupId)
         return cfg ?: createNewConfig(groupId)

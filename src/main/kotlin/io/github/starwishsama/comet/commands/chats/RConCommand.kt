@@ -1,7 +1,6 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
@@ -10,6 +9,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
+import io.github.starwishsama.comet.startup.CometRuntime
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
@@ -97,7 +97,7 @@ class RConCommand : ChatCommand, SuspendCommand {
             2 -> {
                 BotVariables.cfg.rConPassword = event.message.contentToString()
                 runBlocking { event.subject.sendMessage(CometUtil.sendMessage("设置 rCon 完成!")) }
-                Comet.setupRCon()
+                CometRuntime.setupRCon()
                 waitList.remove(user)
                 SessionManager.expireSession(session)
             }

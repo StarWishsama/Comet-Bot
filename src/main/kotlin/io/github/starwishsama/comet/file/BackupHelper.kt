@@ -48,25 +48,18 @@ object BackupHelper {
         var counter = 0
         var totalSize = 0L
 
-        FileUtil.getChildFolder("logs").listFiles()?.forEach { f ->
+        val files = mutableListOf<File>()
+
+        files.addAll(FileUtil.getChildFolder("logs").listFiles() ?: arrayOf())
+        files.addAll(FileUtil.getErrorReportFolder().listFiles() ?: arrayOf())
+        files.addAll(location.listFiles() ?: arrayOf())
+
+        files.forEach { f ->
             val modifiedTime = f.lastModified().toLocalDateTime(true)
             val currentTime = LocalDateTime.now()
             if (Duration.between(modifiedTime, currentTime).toKotlinDuration().inDays > cfg.autoCleanDuration) {
                 try {
                     totalSize += f.length()
-                    f.delete()
-                    counter++
-                } catch (e: Exception) {
-                    daemonLogger.warning("删除旧文件失败", e)
-                }
-            }
-        }
-
-        FileUtil.getErrorReportFolder().listFiles()?.forEach { f ->
-            val modifiedTime = f.lastModified().toLocalDateTime(true)
-            val currentTime = LocalDateTime.now()
-            if (Duration.between(modifiedTime, currentTime).toKotlinDuration().inDays > cfg.autoCleanDuration) {
-                try {
                     f.delete()
                     counter++
                 } catch (e: Exception) {

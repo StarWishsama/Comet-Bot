@@ -182,7 +182,7 @@ class BiliBiliCommand : ChatCommand {
             val subs = buildString {
                 append("监控室列表:\n")
                 list.forEach {
-                    append(it.userName + " (${it.id})\n")
+                    append(it.userName + " (${it.id}, ${it.roomID})\n")
                     trim()
                 }
             }
@@ -193,12 +193,12 @@ class BiliBiliCommand : ChatCommand {
 
     private fun getDynamicText(dynamic: MessageWrapper?, event: MessageEvent): MessageChain {
         return if (dynamic == null) {
-            PlainText("\n无最近动态").toMessageChain()
+            PlainText("\n没有发送过动态").toMessageChain()
         } else {
             if (dynamic.getAllText().isNotEmpty()) {
                 dynamic.toMessageChain(event.subject)
             } else {
-                PlainText("\n无最近动态").toMessageChain()
+                PlainText("\n没有发送过动态").toMessageChain()
             }
         }
     }
@@ -213,7 +213,7 @@ class BiliBiliCommand : ChatCommand {
             }
             else -> {
                 if (!FakeClientApi.client.isLogin) {
-                    return "未登录无法使用查询功能, 请在配置中配置B站账号密码".sendMessage()
+                    return "未登录无法使用昵称搜索订阅, 请在配置中配置B站账号密码".sendMessage()
                 }
 
                 val item = FakeClientApi.getUser(target)

@@ -83,14 +83,14 @@ object DataSetup {
 
         BotVariables.users.addAll(nullableGson.fromJson<List<BotUser>>(userCfg.getContext()))
 
-        BotVariables.shop = nullableGson.fromJson(shopItemCfg.getContext())
+        BotVariables.shop.addAll(nullableGson.fromJson(shopItemCfg.getContext()))
 
         loadLang()
 
         FileUtil.initResourceFile()
 
         if (pcrData.exists()) {
-            BotVariables.pcr = nullableGson.fromJson(pcrData.getContext())
+            BotVariables.pcr.addAll(nullableGson.fromJson(pcrData.getContext()))
             daemonLogger.info("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个")
         } else {
             daemonLogger.info("未检测到公主连结游戏数据, 抽卡模拟器将无法使用")
@@ -105,12 +105,12 @@ object DataSetup {
 
         if (arkNightData.exists()) {
             @Suppress("UNCHECKED_CAST")
-            hiddenOperators = Default.decodeMapFromString(
+            hiddenOperators.addAll(Default.decodeMapFromString(
                 File(
                     FileUtil.getResourceFolder(),
                     "hidden_operators.yml"
                 ).getContext()
-            )["hiddenOperators"] as MutableList<String>
+            )["hiddenOperators"] as MutableList<String>)
 
             JsonParser.parseString(arkNightData.getContext()).asJsonObject.forEach { _, e ->
                 arkNight.add(nullableGson.fromJson(e))

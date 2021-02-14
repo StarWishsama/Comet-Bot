@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
+import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
@@ -232,7 +233,7 @@ object FileUtil {
         try {
             daemonLogger.info("正在加载资源文件...")
             val resourcePath = "resources"
-            val jarFile = File(Comet.javaClass.protectionDomain.codeSource.location.path)
+            val jarFile = File(CometApplication.javaClass.protectionDomain.codeSource.location.path)
 
             if (jarFile.isFile) {
                 copyFromJar(jarFile, resourcePath)
@@ -294,7 +295,7 @@ object FileUtil {
 
                     val actualName = entryName.replace("${resourcePath}/", "").removeSuffix("/")
 
-                    handleResourceFile(entry, actualName)
+                    processFileInJar(entry, actualName)
                 } else if (isInsideResource) {
                     break
                 }
@@ -302,7 +303,7 @@ object FileUtil {
         }
     }
 
-    private fun handleResourceFile(entry: JarEntry, fileName: String, resourcePath: String = "resources") {
+    private fun processFileInJar(entry: JarEntry, fileName: String, resourcePath: String = "resources") {
         if (fileName.isEmpty()) return
 
         val entryName = entry.name
@@ -334,24 +335,6 @@ object FileUtil {
                 }
             }
         }
-    }
-
-
-    inline fun <reified T> convertToEntity(file: File, type: ConfigType, writeTo: T) {
-        TODO()
-        /**require(writeTo != null) { "writeTo cannot be null" }
-        when (type) {
-        is ConfigType.Yaml -> {
-        val serializer = writeTo::class.java.getDeclaredMethod("serializer")
-
-        if (serializer.invoke(Unit) is KSerializer<*>) {
-        writeTo = Yaml.default.decodeFromString(serializer.invoke(Unit) as KSerializer<*>, file.io.github.starwishsama.comet.service.pusher.context.getContext()) as T
-        }
-        }
-        is ConfigType.Json -> {
-        writeTo = gson.fromJson(file.io.github.starwishsama.comet.service.pusher.context.getContext(), T::class.java)
-        }
-        }*/
     }
 
     sealed class ConfigType {

@@ -24,7 +24,6 @@ import net.mamoe.mirai.message.data.*
 import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.time.ExperimentalTime
 
 /**
  * 彗星 Bot 命令处理器
@@ -82,7 +81,6 @@ object CommandExecutor {
     /**
      * FIXME: 考虑多个 Comet 机器人在群内的问题, 优先处理原则
      */
-    @ExperimentalTime
     fun startHandler(bot: Bot) {
         bot.eventChannel.subscribeMessages {
             always {
@@ -116,7 +114,6 @@ object CommandExecutor {
      *
      * @param event Mirai 消息命令 (聊天)
      */
-    @ExperimentalTime
     suspend fun dispatchCommand(event: MessageEvent): ExecutedResult {
         val executedTime = LocalDateTime.now()
         val senderId = event.sender.id
@@ -218,7 +215,6 @@ object CommandExecutor {
      * 处理会话
      * @return 是否为监听会话
      */
-    @ExperimentalTime
     private fun handleSession(sessions: List<Session>, event: MessageEvent, time: LocalDateTime, user: BotUser): Boolean {
         if (hasCommandPrefix(event.message.contentToString()).isEmpty()) {
             val hasDaemonSession = sessions.parallelStream().filter { it is DaemonSession }.findAny()
