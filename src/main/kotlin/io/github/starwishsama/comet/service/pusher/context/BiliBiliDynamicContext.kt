@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.service.pusher.context
 
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
+import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToWrapper
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
@@ -12,11 +12,11 @@ class BiliBiliDynamicContext(
     @SerializedName("custom_status")
     override var status: PushStatus = PushStatus.READY,
     val pushUser: BiliBiliUser,
-    @SerializedName("_dynamic")
-    var dynamic: Dynamic,
+    @SerializedName("dynamic_id")
+    var dynamicId: Long,
 ) : PushContext(pushTarget, retrieveTime, status), Pushable {
     override fun toMessageWrapper(): MessageWrapper {
-        val before = dynamic.convertToWrapper()
+        val before = BiliBiliMainApi.getDynamicById(dynamicId).convertToWrapper()
         return MessageWrapper().addText(
             "${pushUser.userName}\n"
         ).setUsable(before.isUsable()).addElements(before.getMessageContent())
@@ -25,14 +25,7 @@ class BiliBiliDynamicContext(
     override fun contentEquals(other: PushContext): Boolean {
         if (other !is BiliBiliDynamicContext) return false
 
-        val card = dynamic.data.cards?.get(0)
-        val otherCard = other.dynamic.data.cards?.get(0)
-
-        return if (card != null && otherCard != null) {
-            card.description.dynamicId == otherCard.description.dynamicId
-        } else {
-            false
-        }
+        return dynamicId == other.dynamicId
     }
 }
 

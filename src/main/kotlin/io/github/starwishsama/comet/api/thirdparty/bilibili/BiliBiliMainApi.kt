@@ -27,7 +27,7 @@ import java.io.IOException
  */
 object BiliBiliMainApi : ApiExecutor {
     private const val dynamicUrl =
-            "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?visitor_uid=0&host_uid=%uid%&offset_dynamic_id=0&need_top=0"
+            "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=%uid%&offset_dynamic_id=0&need_top=0"
     private const val infoUrl = "http://api.bilibili.com/x/space/acc/info?mid="
     private const val dynamicByIdUrl =
             "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id="

@@ -25,12 +25,12 @@ class TwitterPusher(bot: Bot): CometPusher(bot, "twitter") {
                     val cache = cachePool.getTwitterContext(user)
 
                     if (cache == null) {
-                        cachePool.add(TwitterContext(mutableListOf(cfg.id), time, PushStatus.READY, user, tweet))
+                        cachePool.add(TwitterContext(mutableListOf(cfg.id), time, PushStatus.READY, user, tweet.id))
                         addRetrieveTime()
-                    } else if (!tweet.contentEquals(cache.tweet)) {
+                    } else if (cache.tweetId != tweet.id) {
                         cache.apply {
                             this.retrieveTime = time
-                            this.tweet = tweet
+                            this.tweetId = tweet.id
                             this.status = PushStatus.READY
                         }
                         addRetrieveTime()

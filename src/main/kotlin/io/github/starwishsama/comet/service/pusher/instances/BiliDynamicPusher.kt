@@ -36,7 +36,7 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
                         mutableListOf(cfg.id),
                         time,
                         pushUser = user,
-                        dynamic = dynamic
+                        dynamicId = dynamic.data.cards?.get(0)?.description?.dynamicId ?: -1
                     )
 
                     if (cache == null) {
@@ -45,7 +45,7 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
                     } else if (!cache.contentEquals(current)) {
                         cache.apply {
                             this.retrieveTime = time
-                            this.dynamic = dynamic
+                            this.dynamicId = dynamic.data.cards?.get(0)?.description?.dynamicId ?: -1
                             this.status = PushStatus.READY
                             addPushTarget(cfg.id)
                         }
