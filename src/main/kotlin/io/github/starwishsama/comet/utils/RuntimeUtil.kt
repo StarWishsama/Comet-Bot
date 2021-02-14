@@ -45,11 +45,15 @@ object RuntimeUtil {
         val head = memory.heapMemoryUsage
         val nonHead = memory.nonHeapMemoryUsage
         return buildString {
-            append("| 内存信息 - 初始 - 使用 - 提交 - 最大")
+            append(String.format("> %-4s %-4s %-4s", "内存信息", "堆内", "堆外"))
             append("\n")
-            append("| 堆内    - ${(head.init / byteToMB).formatDigests()} ${(head.used / byteToMB).formatDigests()} ${(head.committed / byteToMB).formatDigests()} ${(head.max / byteToMB).formatDigests()}")
+            append(String.format("| %-4s %-4s %-4s", "初始", (head.init / byteToMB).formatDigests(), (nonHead.init / byteToMB).formatDigests()))
             append("\n")
-            append("| 堆外    - ${(nonHead.init / byteToMB).formatDigests()} ${(nonHead.used / byteToMB).formatDigests()} ${(nonHead.committed / byteToMB).formatDigests()} ${(nonHead.max / byteToMB).formatDigests()}")
+            append(String.format("| %-4s %-4s %-4s", "已使用", (head.used / byteToMB).formatDigests(), (nonHead.used / byteToMB).formatDigests()))
+            append("\n")
+            append(String.format("| %-4s %-4s %-4s", "提交", (head.committed / byteToMB).formatDigests(), (nonHead.committed / byteToMB).formatDigests()))
+            append("\n")
+            append(String.format("| %-4s %-4s %-4s", "最大", (head.max / byteToMB).formatDigests(), (nonHead.max / byteToMB).formatDigests()))
         }.trim()
     }
 }

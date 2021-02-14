@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet
 
+import io.github.starwishsama.comet.startup.CometRuntime
 import io.github.starwishsama.comet.startup.LoginSolver
 import io.github.starwishsama.comet.startup.LoginStatus
 import io.github.starwishsama.comet.utils.FileUtil
@@ -21,7 +22,7 @@ class Comet {
     lateinit var password: String
 
     @OptIn(MiraiInternalApi::class)
-    fun login() {
+    suspend fun login() {
         loginSolver.solve()
 
         BotVariables.daemonLogger.info("正在设置登录配置...")
@@ -47,18 +48,18 @@ class Comet {
         Mirai.FileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
         BotVariables.logger.info("登录中... 使用协议 ${bot.configuration.protocol.name}")
 
-        GlobalScope.launch {
-            try {
-                loginSolver.status = LoginStatus.LOGIN_SUCCESS
-                bot.login()
-            } catch (e: LoginFailedException) {
-                BotVariables.daemonLogger.info("登录失败! 返回的失败信息: ${e.message}")
-                loginSolver.status = LoginStatus.LOGIN_FAILED
-                GlobalScope.launch {
-                    loginSolver.solve()
-                }
-                return@launch
+
+        try {
+            loginSolver.status = LoginStatus.LOGIN_SUCCESS
+            bot.login()
+            CometRuntime.setupBot(bot, bot.logger)
+        } catch (e: LoginFailedException) {
+            BotVariables.daemonLogger.info("登录失败! 返回的失败信息: ${e.message}")
+            loginSolver.status = LoginStatus.LOGIN_FAILED
+            GlobalScope.launch {
+                loginSolver.solve()
             }
+            return
         }
     }
 
@@ -71,6 +72,6 @@ class Comet {
     }
 
     fun isInitialized(): Boolean {
-        return bot.isOnline && ::bot.isInitialized
+        return ::bot.isInitialized && bot.isOnline
     }
 }

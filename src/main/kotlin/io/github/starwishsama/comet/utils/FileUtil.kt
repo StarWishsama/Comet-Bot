@@ -28,7 +28,7 @@ import kotlin.time.ExperimentalTime
 
 @Synchronized
 fun File.writeClassToJson(context: Any, gson: Gson = BotVariables.nullableGson) {
-    FileWriter.create(this).write(gson.toJson(context))
+    FileWriter.create(this).write(gson.toJson(context), false)
 }
 
 @Synchronized

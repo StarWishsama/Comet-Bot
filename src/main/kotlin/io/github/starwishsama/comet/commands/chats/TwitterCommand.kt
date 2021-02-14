@@ -80,8 +80,9 @@ class TwitterCommand : ChatCommand {
         /twit unsub [蓝鸟ID] 取消订阅用户的推文
         /twit push 开启/关闭本群推文推送
         /twit id [推文ID] 通过推文ID查询推文
+        /twit cx 查询订阅列表
         
-        命令别名: /蓝鸟 /tt /data
+        命令别名: /蓝鸟 /tt /twitter
     """.trimIndent()
 
     override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {

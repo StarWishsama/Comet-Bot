@@ -71,8 +71,6 @@ object CometRuntime {
     }
 
     fun setupBot(bot: Bot, logger: MiraiLogger) {
-        DataSetup.initPerGroupSetting(bot)
-
         setupRCon()
 
         GachaManager.loadAllPools()
@@ -132,6 +130,8 @@ object CometRuntime {
         runScheduleTasks()
 
         PusherManager.initPushers(bot)
+
+        DataSetup.initPerGroupSetting(bot)
 
         logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${BotVariables.startTime.getLastingTimeAsString()}")
 

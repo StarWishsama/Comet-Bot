@@ -6,6 +6,7 @@ import io.github.starwishsama.comet.startup.CometRuntime
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
 import org.jline.terminal.TerminalBuilder
@@ -28,12 +29,12 @@ object CometApplication {
         }
 
         try {
-            comet.login()
-            CometRuntime.setupBot(comet.getBot(), comet.getBot().logger)
-
-            GlobalScope.launch {
-                CometRuntime.handleConsoleCommand()
+            runBlocking {
+                comet.login()
             }
+
+            CometRuntime.handleConsoleCommand()
+
             GlobalScope.launch {
                 comet.join()
             }
