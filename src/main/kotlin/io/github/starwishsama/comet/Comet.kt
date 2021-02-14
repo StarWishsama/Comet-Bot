@@ -206,7 +206,9 @@ object Comet {
         listeners.forEach { listener ->
             listener.eventToListen.forEach { eventClass ->
                 bot.globalEventChannel().subscribeAlways(eventClass) {
-                    listener.listen(this)
+                    if (BotVariables.switch) {
+                        listener.listen(this)
+                    }
                 }
             }
 

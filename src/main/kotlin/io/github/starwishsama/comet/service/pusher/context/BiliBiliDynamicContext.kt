@@ -19,9 +19,7 @@ class BiliBiliDynamicContext(
         val before = dynamic.convertToWrapper()
         return MessageWrapper().addText(
             "${pushUser.userName}\n"
-        ).setUsable(before.isUsable()).also {
-            it.addElements(before.getMessageContent())
-        }
+        ).setUsable(before.isUsable()).addElements(before.getMessageContent())
     }
 
     override fun contentEquals(other: PushContext): Boolean {

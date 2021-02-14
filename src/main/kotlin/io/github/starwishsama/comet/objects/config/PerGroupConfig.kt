@@ -60,7 +60,7 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long, @SerializedN
      * 是否关闭对此群消息的复读
      */
     @SerializedName("repeat_function")
-    var doRepeat: Boolean = true
+    var canRepeat: Boolean = true
 
     /**
      * 本群启用的命令

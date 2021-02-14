@@ -1,6 +1,5 @@
 package io.github.starwishsama.comet.listeners
 
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.runBlocking
@@ -8,7 +7,6 @@ import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.utils.MiraiExperimentalApi
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.time.ExperimentalTime
@@ -18,12 +16,14 @@ object RepeatListener : NListener {
 
     private val repeatCachePool = mutableMapOf<Long, RepeatInfo>()
 
-    @MiraiExperimentalApi
     @ExperimentalTime
     override fun listen(event: Event) {
-        if (BotVariables.switch && event is GroupMessageEvent && !event.group.isBotMuted && canRepeat(event.group.id)) {
-            if (repeatCachePool.isEmpty() || repeatCachePool[event.group.id] == null) {
-                repeatCachePool[event.group.id] = RepeatInfo(
+        if (event is GroupMessageEvent && !event.group.isBotMuted && canRepeat(event.group.id)) {
+            val groupId = event.group.id
+            val repeatInfo = repeatCachePool[groupId]
+
+            if (repeatInfo == null) {
+                repeatCachePool[groupId] = RepeatInfo(
                     mutableListOf(RepeatInfo.CacheMessage(
                         event.sender.id,
                         event.message
@@ -32,9 +32,7 @@ object RepeatListener : NListener {
                 return
             }
 
-            val repeatInfo = repeatCachePool[event.group.id]
-
-            if (repeatInfo?.check(event.sender.id, event.message) == true) {
+            if (repeatInfo.check(event.sender.id, event.message)) {
                 runBlocking { event.subject.sendMessage(doRepeat(repeatInfo.messageCache.last().message)) }
                 repeatInfo.messageCache.clear()
             }
@@ -65,7 +63,7 @@ object RepeatListener : NListener {
 
     private fun canRepeat(groupId: Long): Boolean {
         return try {
-            GroupConfigManager.getConfigOrNew(groupId).doRepeat
+            GroupConfigManager.getConfigOrNew(groupId).canRepeat
         } catch (e: NullPointerException) {
             daemonLogger.warning("检测到群 $groupId 的配置文件异常无法获取, 请及时查看!")
             false
@@ -89,16 +87,20 @@ data class RepeatInfo(
             return false
         }
 
-        if (messageCache.size == 2) {
-            return true
-        }
-
         val last = messageCache.last()
+
+
+        if (last.senderId == id || last.message.contentToString() != message.contentToString()) {
+            messageCache.clear()
+            return false
+        }
 
         if (last.senderId != id && last.message.contentToString() == message.contentToString()) {
             messageCache.add(CacheMessage(id, message))
-        } else if (last.senderId == id || last.message.contentToString() != message.contentToString()) {
-            messageCache.clear()
+        }
+
+        if (messageCache.size > 1) {
+            return true
         }
 
         return false

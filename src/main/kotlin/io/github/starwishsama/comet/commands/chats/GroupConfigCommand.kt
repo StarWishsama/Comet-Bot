@@ -46,8 +46,8 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                         }
                     }
                     "repeat" -> {
-                        cfg.doRepeat = !cfg.doRepeat
-                        return sendMessage("已${if (cfg.doRepeat) "开启" else "关闭"}群复读机")
+                        cfg.canRepeat = !cfg.canRepeat
+                        return sendMessage("已${if (cfg.canRepeat) "开启" else "关闭"}群复读机")
                     }
                     "autojoin" -> {
                         return if (event.group.botPermission == MemberPermission.MEMBER) {

@@ -41,7 +41,7 @@ object ConfigConverter {
             this.twitterPushEnabled = cfg.twitterPushEnabled
             this.biliPushEnabled = cfg.biliPushEnabled
             this.youtubeSubscribers.addAll(cfg.youtubeSubscribers)
-            this.doRepeat = cfg.doRepeat
+            this.canRepeat = cfg.doRepeat
             this.groupFilterWords.addAll(cfg.groupFilterWords)
             this.disabledCommands.addAll(cfg.disabledCommands)
         }

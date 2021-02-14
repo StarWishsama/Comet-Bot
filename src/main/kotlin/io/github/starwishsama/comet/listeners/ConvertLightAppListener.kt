@@ -23,7 +23,7 @@ object ConvertLightAppListener : NListener {
     @MiraiExperimentalApi
     @ExperimentalTime
     override fun listen(event: Event) {
-        if (BotVariables.switch && event is GroupMessageEvent && !event.group.isBotMuted) {
+        if (event is GroupMessageEvent && !event.group.isBotMuted) {
             val lightApp = event.message[LightApp]
             if (lightApp != null) {
                 val result = parseJsonMessage(lightApp, event.subject)
