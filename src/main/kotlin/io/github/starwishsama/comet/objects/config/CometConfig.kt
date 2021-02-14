@@ -110,12 +110,6 @@ data class CometConfig(
         @Comment("调试模式, 打开后会有更多 Log 并启用调试功能")
         var debugMode: Boolean = false,
 
-        @Comment("WebDriver 使用的浏览器, 留空为关闭")
-        val webDriverName: String = "",
-
-        @Comment("WebDriver Remote 地址, 留空为关闭")
-        val remoteWebDriver: String = "",
-
         @Comment("机器人使用的登录协议, 可选的有 ANDROID_PHONE, ANDROID_PAD 和 ANDROID_WATCH")
         val botProtocol: BotConfiguration.MiraiProtocol = BotConfiguration.MiraiProtocol.ANDROID_PHONE,
 
