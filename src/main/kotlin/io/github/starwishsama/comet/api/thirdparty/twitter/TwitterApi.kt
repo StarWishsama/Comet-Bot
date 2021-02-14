@@ -40,8 +40,7 @@ object TwitterApi : ApiExecutor {
     private const val twitterTokenGetUrl = "https://api.twitter.com/oauth2/token"
 
     // Bearer Token
-    //private var token = BotVariables.cfg.twitterToken
-    private var token = ""
+    private var token = BotVariables.cfg.twitterToken
 
     // 缓存的推文
     private val cacheTweet = mutableMapOf<String, Tweet>()
@@ -248,7 +247,7 @@ object TwitterApi : ApiExecutor {
                 }
                 list[index]
             } else {
-                throw EmptyTweetException("返回的推文列表为空")
+                return null
             }
         }
 
