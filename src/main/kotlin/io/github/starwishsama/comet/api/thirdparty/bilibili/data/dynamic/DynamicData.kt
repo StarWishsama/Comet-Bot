@@ -60,20 +60,21 @@ data class Dynamic(
             /** 获取动态列表时可用 /space_history Only */
             @SerializedName("cards")
             val cards: List<Card>?,
-            @SerializedName("result")
-            val result: Int,
-            @SerializedName("attentions")
-            val attentions: Attentions,
+            //@SerializedName("result")
+            //val result: Int,
+            //@SerializedName("attentions")
+            //val attentions: Attentions,
             /** /space_history Only */
-            @SerializedName("next_offset")
-            val nextOffset: Long?,
-            @SerializedName("_gt_")
-            val gtNumber: Int,
-            @SerializedName("extension")
-            val extension: JsonObject,
-            @SerializedName("extend_json")
-            val extendJson: String
+            //@SerializedName("next_offset")
+            //val nextOffset: Long?,
+            //@SerializedName("_gt_")
+            //val gtNumber: Int,
+            //@SerializedName("extension")
+            //val extension: JsonObject,
+            //@SerializedName("extend_json")
+            //val extendJson: String
     ) {
+        @Suppress("unused")
         data class Attentions(
                 @SerializedName("uids")
                 val uidList: List<Long>
@@ -86,18 +87,18 @@ data class Card(
         val description: DynamicDesc,
         @SerializedName("card")
         val card: String,
-        @SerializedName("extend_json")
-        val extendJson: String,
-        @SerializedName("extra")
-        val extraJson: JsonObject?,
-        @SerializedName("display")
-        val displayJson: DynamicDisplay
+        //@SerializedName("extend_json")
+        //val extendJson: String,
+        //@SerializedName("extra")
+        //val extraJson: JsonObject?,
+        //@SerializedName("display")
+        //val displayJson: DynamicDisplay
 ) {
     data class DynamicDesc(
             val uid: Int,
             val type: Int,
-            val rid: Long,
-            val acl: Int,
+            //val rid: Long,
+            //val acl: Int,
             @SerializedName("view")
             val viewCount: Int,
             @SerializedName("repost")
@@ -125,11 +126,11 @@ data class Card(
             @SerializedName("user_profile")
             val userProfile: UserProfile,
 
-            @SerializedName("uid_type")
-            val uidType: Int,
+            //@SerializedName("uid_type")
+            //val uidType: Int,
 
-            @SerializedName("status")
-            val dynamicStatus: Int,
+            //@SerializedName("status")
+            //val dynamicStatus: Int,
 
             @SerializedName("dynamic_id_str")
             val dynamicIdAsString: String,
@@ -140,12 +141,13 @@ data class Card(
             @SerializedName("orig_dy_id_str")
             val originalDynamicIdAsString: String,
 
-            @SerializedName("rid_str")
-            val ridAsString: String,
+            //@SerializedName("rid_str")
+            //val ridAsString: String,
 
-            val origin: JsonObject
+            //val origin: JsonObject
     )
 
+    @Suppress("unused")
     data class DynamicDisplay(
             val origin: JsonObject?,
             val relation: JsonObject?,
