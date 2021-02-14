@@ -128,8 +128,10 @@ object NetUtil {
         return result ?: throw ApiException("执行网络操作失败")
     }
 
-    fun getPageContent(url: String, timeout: Long = 2, proxyUrl: String = cfg.proxyUrl, proxyPort: Int = cfg.proxyPort): String? =
-        executeHttpRequest(url, timeout, proxyUrl, proxyPort).body?.string()
+    fun getPageContent(url: String, timeout: Long = 2, proxyUrl: String = cfg.proxyUrl, proxyPort: Int = cfg.proxyPort, call: Request.Builder.() -> Request.Builder = {
+        header("user-agent", defaultUA)
+    },): String? =
+        executeHttpRequest(url, timeout, proxyUrl, proxyPort, call).body?.string()
 
     /**
      * 下载文件

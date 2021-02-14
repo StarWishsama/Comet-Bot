@@ -34,19 +34,12 @@ object LiveApi : ApiExecutor {
     }
 
     fun getRoomIDByUID(uid: Long): Long {
-        val result = NetUtil.executeHttpRequest(
-                url = (liveOldUrl + uid)
-        )
-
-        result.use {
-            return try {
-                val bodyString = result.body?.string()
-                println(bodyString)
-                val info = nullableGson.fromJson<OldRoomInfo>(bodyString ?: return -1)
-                info.data.roomId
-            } catch (e: Exception) {
-                -1
-            }
+        val result = NetUtil.getPageContent(liveOldUrl + uid) { this } ?: return -1
+        return try {
+            val info = nullableGson.fromJson<OldRoomInfo>(result)
+            info.data.roomId
+        } catch (e: Exception) {
+            -1
         }
     }
 
@@ -62,6 +55,8 @@ object LiveApi : ApiExecutor {
     override fun getLimitTime(): Int = 1500
 
     private data class OldRoomInfo(
+        val code: Int,
+        val message: String,
         val data: LiveInfoData
     ) {
         data class LiveInfoData(
