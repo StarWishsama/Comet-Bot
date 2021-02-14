@@ -73,7 +73,7 @@ abstract class CometPusher(val bot: Bot, val name: String) {
 
         if (!cfgFile.exists()) cfgFile.createNewFile()
 
-        config.cachePool.addAll(cachePool)
+        config.cachePool = cachePool
 
         cfgFile.writeClassToJson(config)
     }

@@ -89,13 +89,12 @@ data class RepeatInfo(
 
         val last = messageCache.last()
 
-
-        if (last.senderId == id || last.message.contentToString() != message.contentToString()) {
+        if (last.senderId == id || !last.message.contentEquals(message, ignoreCase = false, strict = true)) {
             messageCache.clear()
             return false
         }
 
-        if (last.senderId != id && last.message.contentToString() == message.contentToString()) {
+        if (last.senderId != id && last.message.contentEquals(message, ignoreCase = false, strict = true)) {
             messageCache.add(CacheMessage(id, message))
         }
 

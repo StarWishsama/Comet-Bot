@@ -228,5 +228,7 @@ object DataSetup {
             if (!loc.exists()) loc.createNewFile()
             loc.writeClassToJson(it, gson)
         }
+
+        daemonLogger.info("已保存所有群配置")
     }
 }

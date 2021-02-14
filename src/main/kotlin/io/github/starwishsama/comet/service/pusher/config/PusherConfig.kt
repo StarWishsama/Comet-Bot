@@ -10,7 +10,7 @@ open class PusherConfig(
     /**
      * 缓存池
      */
-    val cachePool: MutableList<PushContext>
+    var cachePool: MutableList<out PushContext>
 )
 
 class EmptyPusherConfig: PusherConfig(
