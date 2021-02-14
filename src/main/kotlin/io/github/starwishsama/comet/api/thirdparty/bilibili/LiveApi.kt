@@ -41,18 +41,13 @@ object LiveApi : ApiExecutor {
 
     fun getRoomIDByUID(uid: Long): Long {
         val result = NetUtil.executeHttpRequest(
-                url = (liveOldUrl + uid),
-                call = {
-                    header("user-agent", "Bili live status checker by StarWishsama")
-                }
+                url = (liveOldUrl + uid)
         )
 
         result.use {
             if (result.isSuccessful) {
                 val info = result.body?.string()?.let { nullableGson.fromJson<OldLiveInfo>(it) }
-                if (info?.code == 0) {
-                    return info.data.roomId
-                }
+                return info?.data?.roomId ?: -1
             }
         }
 

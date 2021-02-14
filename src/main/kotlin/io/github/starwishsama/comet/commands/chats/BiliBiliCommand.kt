@@ -72,7 +72,7 @@ class BiliBiliCommand : ChatCommand {
                         }
                     }
                     "refresh" -> {
-                        val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
+                        val cfg = GroupConfigManager.getConfig(event.group.id) ?: return "本群尚未注册至 Comet".sendMessage()
                         cfg.biliSubscribers.forEach {
                             it.userName = BiliBiliMainApi.getUserNameByMid(it.id.toLong())
                             it.roomID = LiveApi.getRoomIDByUID(it.id.toLong())
@@ -191,7 +191,7 @@ class BiliBiliCommand : ChatCommand {
         return sendMessage("未订阅任何用户")
     }
 
-    private suspend fun getDynamicText(dynamic: MessageWrapper?, event: MessageEvent): MessageChain {
+    private fun getDynamicText(dynamic: MessageWrapper?, event: MessageEvent): MessageChain {
         return if (dynamic == null) {
             PlainText("\n无最近动态").toMessageChain()
         } else {
@@ -211,14 +211,15 @@ class BiliBiliCommand : ChatCommand {
                 name = BiliBiliMainApi.getUserNameByMid(target.toLong())
                 target.toLong()
             }
-            FakeClientApi.client.isLogin -> {
+            else -> {
+                if (!FakeClientApi.client.isLogin) {
+                    return "未登录无法使用查询功能, 请在配置中配置B站账号密码".sendMessage()
+                }
+
                 val item = FakeClientApi.getUser(target)
                 val title = item?.title
                 if (title != null) name = title
                 item?.mid ?: return EmptyMessageChain
-            }
-            else -> {
-                return EmptyMessageChain
             }
         }
 

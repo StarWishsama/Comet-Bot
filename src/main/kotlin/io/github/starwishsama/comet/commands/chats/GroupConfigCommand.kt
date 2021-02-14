@@ -36,7 +36,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                                     sendMessage("成功将 ${target.id} 移出群助手列表")
                                 } else {
                                     cfg.addHelper(target.id)
-                                    sendMessage("成功将 ${target.id} 移出群助手列表")
+                                    sendMessage("成功将 ${target.id} 加入群助手列表")
                                 }
                             } else {
                                 sendMessage("找不到你想要添加/删除的用户")
