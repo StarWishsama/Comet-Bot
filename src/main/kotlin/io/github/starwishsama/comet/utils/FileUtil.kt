@@ -336,9 +336,4 @@ object FileUtil {
             }
         }
     }
-
-    sealed class ConfigType {
-        object Yaml: ConfigType()
-        object Json: ConfigType()
-    }
 }

@@ -1,28 +1,15 @@
 package io.github.starwishsama.comet.service.pusher
 
-import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.service.pusher.config.EmptyPusherConfig
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
-import io.github.starwishsama.comet.service.pusher.context.PushContext
-import io.github.starwishsama.comet.service.pusher.context.PushStatus
-import io.github.starwishsama.comet.utils.TaskUtil
-import io.github.starwishsama.comet.utils.verboseS
-import io.github.starwishsama.comet.utils.writeClassToJson
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
-import java.io.File
 import java.time.LocalDateTime
-import java.util.concurrent.TimeUnit
 
 /**
  * [CometPusher]
  */
 abstract class CometPusher(val bot: Bot, val name: String) {
     open var config: PusherConfig = EmptyPusherConfig()
-
-    abstract val cachePool: MutableList<PushContext>
 
     var retrieveTime: Int = 0
 
@@ -32,64 +19,16 @@ abstract class CometPusher(val bot: Bot, val name: String) {
 
     abstract fun retrieve()
 
-    open fun push() {
-        cachePool.forEach { context ->
-            if (context.status == PushStatus.READY) {
-                context.getPushTarget().forEach group@{
-                    try {
-                        val wrapper = context.toMessageWrapper()
+    abstract fun push()
 
-                        if (wrapper.isUsable()) {
-                            val group = bot.getGroup(it) ?: return@group
-
-                            runBlocking {
-                                group.sendMessage(wrapper.toMessageChain(group))
-                                delay(RandomUtil.randomLong(1000, 2000))
-                            }
-
-                            addPushTime()
-                        }
-                    } catch (e: Exception) {
-                        daemonLogger.warning("在推送开播消息至群 $it 时出现异常", e)
-                    }
-                }
-
-                context.clearPushTarget()
-                context.status = PushStatus.FINISHED
-            }
-        }
-
-        if (pushTime > 0) {
-            daemonLogger.verboseS("$name 已成功推送 $pushTime 个消息")
-            resetPushTime()
-        }
-
-        latestPushTime = LocalDateTime.now()
-        save()
-    }
-
-    fun save() {
-        val cfgFile = File(PusherManager.pusherFolder, "${name}.json")
-
-        if (!cfgFile.exists()) cfgFile.createNewFile()
-
-        config.cachePool.addAll(cachePool)
-
-        cfgFile.writeClassToJson(config)
-    }
+    abstract fun save()
 
     fun execute() {
         retrieve()
         push()
     }
 
-    fun start() {
-        cachePool.addAll(config.cachePool)
-        TaskUtil.runScheduleTaskAsync(config.interval, config.interval, TimeUnit.MILLISECONDS) {
-            execute()
-        }
-        daemonLogger.info("$name 推送器已启动, 载入缓存 ${cachePool.size} 个")
-    }
+    abstract fun start()
 
     fun addPushTime(){
         pushTime += 1
