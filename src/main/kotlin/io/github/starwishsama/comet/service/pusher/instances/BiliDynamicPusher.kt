@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.service.pusher.instances
 
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.managers.GroupConfigManager
@@ -23,7 +23,7 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
             if (cfg.biliPushEnabled) {
                 cfg.biliSubscribers.forEach user@{ user ->
                     val dynamic: Dynamic = try {
-                        BiliBiliMainApi.getUserDynamicTimeline(user.id.toLong())
+                        DynamicApi.getUserDynamicTimeline(user.id.toLong())
                     } catch (e: RuntimeException) {
                         if (e !is ApiException) {
                             BotVariables.daemonLogger.warning("在获取动态时出现了异常", e)

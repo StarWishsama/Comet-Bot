@@ -32,24 +32,9 @@ object LiveApi : ApiExecutor {
         }
     }
 
-    fun getRoomIDByUID(uid: Long): Long {
-        val result = HttpRequest.get(liveOldUrl + uid)
-            .timeout(2000)
-            .header("user-agent", "PostmanRuntime/7.26.8")
-            .enableDefaultCookie()
-            .executeAsync()
-
-        return try {
-            val info = nullableGson.fromJson<OldRoomInfo>(result.body())
-            info.data.roomId
-        } catch (e: Exception) {
-            -1
-        }
-    }
-
     override fun isReachLimit(): Boolean {
-        val result = BiliBiliMainApi.usedTime > BiliBiliMainApi.getLimitTime()
-        if (!result) BiliBiliMainApi.usedTime++
+        val result = DynamicApi.usedTime > DynamicApi.getLimitTime()
+        if (!result) DynamicApi.usedTime++
         return result
     }
 

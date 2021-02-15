@@ -4,7 +4,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.api.command.CommandExecutor
-import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
@@ -151,7 +151,7 @@ object CometRuntime {
     private fun runScheduleTasks() {
         TaskUtil.runAsync { BackupHelper.checkOldFiles() }
 
-        val apis = arrayOf(BiliBiliMainApi, TwitterApi, YoutubeApi, VideoApi)
+        val apis = arrayOf(DynamicApi, TwitterApi, YoutubeApi, VideoApi)
 
         /** 定时任务 */
         BackupHelper.scheduleBackup()

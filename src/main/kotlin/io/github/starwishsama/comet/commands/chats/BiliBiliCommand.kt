@@ -3,9 +3,10 @@ package io.github.starwishsama.comet.commands.chats
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserInfo
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
@@ -26,6 +27,9 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.toMessageChain
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @CometCommand
 class BiliBiliCommand : ChatCommand {
@@ -52,7 +56,7 @@ class BiliBiliCommand : ChatCommand {
                                     val text = item.title + "\n粉丝数: " + item.fans.getBetterNumber() +
                                             "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
                                             "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") + "\n"
-                                    val dynamic = BiliBiliMainApi.getWrappedDynamicTimeline(item.mid)
+                                    val dynamic = DynamicApi.getWrappedDynamicTimeline(item.mid)
                                     text.convertToChain() + getDynamicText(dynamic, event)
                                 } else {
                                     "找不到对应的B站用户".sendMessage()
@@ -74,8 +78,8 @@ class BiliBiliCommand : ChatCommand {
                     "refresh" -> {
                         val cfg = GroupConfigManager.getConfig(event.group.id) ?: return "本群尚未注册至 Comet".sendMessage()
                         cfg.biliSubscribers.forEach {
-                            it.userName = BiliBiliMainApi.getUserNameByMid(it.id.toLong())
-                            it.roomID = LiveApi.getRoomIDByUID(it.id.toLong())
+                            it.userName = DynamicApi.getUserNameByMid(it.id.toLong())
+                            it.roomID = UserApi.userApiService.getMemberInfoById(it.id.toLong()).execute().body()?.data?.liveRoomInfo?.roomId ?: -1
                             delay(1_500)
                         }
                         return "刷新缓存成功".sendMessage()
@@ -208,7 +212,7 @@ class BiliBiliCommand : ChatCommand {
         var name = ""
         val uid: Long = when {
             target.isNumeric() -> {
-                name = BiliBiliMainApi.getUserNameByMid(target.toLong())
+                name = DynamicApi.getUserNameByMid(target.toLong())
                 target.toLong()
             }
             else -> {
@@ -223,7 +227,20 @@ class BiliBiliCommand : ChatCommand {
             }
         }
 
-        val roomNumber = LiveApi.getRoomIDByUID(uid)
+        var roomNumber: Long = -1
+
+        UserApi.userApiService.getMemberInfoById(uid).enqueue(
+            object : Callback<UserInfo> {
+                override fun onResponse(call: Call<UserInfo>, response: Response<UserInfo>) {
+                    val info = response.body()
+                    if (info != null) {
+                        roomNumber = info.data.liveRoomInfo.roomId
+                    }
+                }
+
+                override fun onFailure(call: Call<UserInfo>, t: Throwable) {}
+            }
+        )
 
         return if (!cfg.biliSubscribers.stream().filter { it.id.toLong() == uid }.findFirst().isPresent) {
             cfg.biliSubscribers.add(BiliBiliUser(uid.toString(), name, roomNumber))

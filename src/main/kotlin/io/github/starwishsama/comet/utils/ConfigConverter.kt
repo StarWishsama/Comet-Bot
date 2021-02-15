@@ -3,8 +3,8 @@ package io.github.starwishsama.comet.utils
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.nullableGson
-import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.config.OldGroupConfig
 import io.github.starwishsama.comet.objects.config.OldVersionTestObject
@@ -28,7 +28,15 @@ object ConfigConverter {
         val biliUsers = mutableListOf<BiliBiliUser>()
 
         cfg.biliSubscribers.forEach {
-            biliUsers.add(BiliBiliUser(it.toString(), BiliBiliMainApi.getUserNameByMid(it), LiveApi.getRoomIDByUID(it)))
+            biliUsers.add(
+                BiliBiliUser(
+                    it.toString(),
+                    DynamicApi.getUserNameByMid(it),
+                    UserApi.userApiService.getMemberInfoById(it)
+                        .execute()
+                        .body()?.data?.liveRoomInfo?.roomId ?: -1
+                )
+            )
         }
 
         new.apply {

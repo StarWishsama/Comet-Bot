@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.live
 
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.CommonResponse
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -9,12 +10,12 @@ import java.time.format.DateTimeFormatter
  * http://api.live.bilibili.com/room/v1/Room/get_info?id=<param>
  */
 data class LiveRoomInfo(
-    val code: Int,
-    val msg: String?,
-    val message: String?,
-    val ttl: Int?,
+    override val code: Int,
+    val msg: String,
+    override val message: String,
+    override val ttl: Int,
     val data: LiveRoomInfoData
-) {
+): CommonResponse(code, message, ttl) {
     data class LiveRoomInfoData(
         val uid: Long,
         @SerializedName("room_id")

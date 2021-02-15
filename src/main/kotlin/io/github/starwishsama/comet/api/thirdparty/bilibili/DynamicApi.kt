@@ -25,7 +25,7 @@ import java.io.IOException
  * 支持多种格式
  * @author Nameless
  */
-object BiliBiliMainApi : ApiExecutor {
+object DynamicApi : ApiExecutor {
     private const val dynamicUrl =
             "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=%uid%&offset_dynamic_id=0&need_top=0"
     private const val infoUrl = "http://api.bilibili.com/x/space/acc/info?mid="

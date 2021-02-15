@@ -1,17 +1,18 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.search
 
 import com.google.gson.annotations.SerializedName
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.CommonResponse
 
 data class SearchUserResult(
         @SerializedName("code")
-        var code: Int, // 0
+        override var code: Int, // 0
         @SerializedName("data")
-        var `data`: Data,
+        var data: Data,
         @SerializedName("message")
-        var message: String, // 0
+        override var message: String, // 0
         @SerializedName("ttl")
-        var ttl: Int // 1
-) {
+        override var ttl: Int // 1
+): CommonResponse(code, message, ttl) {
     data class Data(
             @SerializedName("items")
             var items: List<Item>,

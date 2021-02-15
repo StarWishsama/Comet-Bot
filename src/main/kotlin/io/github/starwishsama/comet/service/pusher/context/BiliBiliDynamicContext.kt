@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.service.pusher.context
 
 import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.comet.api.thirdparty.bilibili.BiliBiliMainApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToWrapper
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
@@ -16,7 +16,7 @@ class BiliBiliDynamicContext(
     var dynamicId: Long,
 ) : PushContext(pushTarget, retrieveTime, status), Pushable {
     override fun toMessageWrapper(): MessageWrapper {
-        val before = BiliBiliMainApi.getDynamicById(dynamicId).convertToWrapper()
+        val before = DynamicApi.getDynamicById(dynamicId).convertToWrapper()
         return MessageWrapper().addText(
             "${pushUser.userName}\n"
         ).setUsable(before.isUsable()).addElements(before.getMessageContent())

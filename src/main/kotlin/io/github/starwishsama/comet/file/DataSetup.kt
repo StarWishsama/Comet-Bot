@@ -72,7 +72,6 @@ object DataSetup {
             cfgFile.writeString(Default.encodeToString(CometConfig.serializer(), cfg), isAppend = false)
             userCfg.writeClassToJson(BotVariables.users)
             shopItemCfg.writeClassToJson(BotVariables.shop)
-            savePerGroupSetting()
         } catch (e: Exception) {
             daemonLogger.warning("[配置] 在保存配置文件时发生了问题", e)
         }
