@@ -19,7 +19,7 @@ data class UserInfo(
         @SerializedName("sex")
         val sex: String,
         @SerializedName("face")
-        val avatar: Long,
+        val avatar: String,
         @SerializedName("sign")
         val sign: String,
         @SerializedName("rank")
