@@ -4,12 +4,15 @@ import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.CommonResponse
 
 data class SearchUserResult(
+        @Transient
         @SerializedName("code")
         override var code: Int, // 0
         @SerializedName("data")
         var data: Data,
+        @Transient
         @SerializedName("message")
         override var message: String, // 0
+        @Transient
         @SerializedName("ttl")
         override var ttl: Int // 1
 ): CommonResponse(code, message, ttl) {
