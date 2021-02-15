@@ -8,7 +8,6 @@ import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.utils.FileUtil
-import io.github.starwishsama.comet.utils.network.NetUtil
 
 object LiveApi : ApiExecutor {
     private const val liveUrl = "http://api.live.bilibili.com/room/v1/Room/get_info?id="
@@ -21,8 +20,8 @@ object LiveApi : ApiExecutor {
             throw RateLimitException(apiRateLimit)
         }
 
-        val request = HttpRequest.get(liveUrl + roomId).timeout(500)
-            .header("User-Agent", "Bili live status checker by StarWishsama")
+        val request = HttpRequest.get(liveUrl + roomId).timeout(2000)
+            .header("User-Agent", "Bili live status checker")
         val response = request.executeAsync()
 
         return try {
@@ -34,9 +33,14 @@ object LiveApi : ApiExecutor {
     }
 
     fun getRoomIDByUID(uid: Long): Long {
-        val result = NetUtil.getPageContent(liveOldUrl + uid) { this } ?: return -1
+        val result = HttpRequest.get(liveOldUrl + uid)
+            .timeout(2000)
+            .header("user-agent", "PostmanRuntime/7.26.8")
+            .enableDefaultCookie()
+            .executeAsync()
+
         return try {
-            val info = nullableGson.fromJson<OldRoomInfo>(result)
+            val info = nullableGson.fromJson<OldRoomInfo>(result.body())
             info.data.roomId
         } catch (e: Exception) {
             -1

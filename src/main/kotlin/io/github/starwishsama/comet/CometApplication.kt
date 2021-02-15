@@ -21,25 +21,27 @@ object CometApplication {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        CometRuntime.postSetup()
+        while (true) {
+            CometRuntime.postSetup()
 
-        comet.apply {
-            id = cfg.botId
-            password = cfg.botPassword
-        }
-
-        try {
-            runBlocking {
-                comet.login()
+            comet.apply {
+                id = cfg.botId
+                password = cfg.botPassword
             }
 
-            CometRuntime.handleConsoleCommand()
+            try {
+                runBlocking {
+                    comet.login()
+                }
 
-            GlobalScope.launch {
-                comet.join()
+                CometRuntime.handleConsoleCommand()
+
+                GlobalScope.launch {
+                    comet.join()
+                }
+            } catch (e: CancellationException) {
+                // 忽略
             }
-        } catch (e: CancellationException) {
-            // 忽略
         }
     }
 }
