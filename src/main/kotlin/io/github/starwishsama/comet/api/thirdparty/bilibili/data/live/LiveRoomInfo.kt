@@ -10,15 +10,8 @@ import java.time.format.DateTimeFormatter
  * http://api.live.bilibili.com/room/v1/Room/get_info?id=<param>
  */
 data class LiveRoomInfo(
-    @Transient
-    override val code: Int,
-    val msg: String,
-    @Transient
-    override val message: String,
-    @Transient
-    override val ttl: Int,
     val data: LiveRoomInfoData
-): CommonResponse(code, message, ttl) {
+): CommonResponse() {
     data class LiveRoomInfoData(
         val uid: Long,
         @SerializedName("room_id")

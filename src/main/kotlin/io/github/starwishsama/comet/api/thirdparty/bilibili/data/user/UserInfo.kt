@@ -9,14 +9,8 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.data.CommonResponse
  * 端点: http://api.bilibili.com/x/space/acc/info
  */
 data class UserInfo(
-    @Transient
-    override val code: Int,
-    @Transient
-    override val message: String,
-    @Transient
-    override val ttl: Int,
     val data: Data
-): CommonResponse(code, message, ttl) {
+): CommonResponse() {
     data class Data(
         @SerializedName("mid")
         val memberId: Long,
