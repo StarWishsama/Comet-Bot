@@ -5,7 +5,7 @@ import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 class TwitterContext(
-    pushTarget: MutableList<Long>,
+    pushTarget: MutableList<Long> = mutableListOf(),
     retrieveTime: Long,
     @SerializedName("custom_status")
     override var status: PushStatus = PushStatus.READY,
@@ -14,7 +14,7 @@ class TwitterContext(
 ) : PushContext(pushTarget, retrieveTime, status), Pushable {
 
     override fun toMessageWrapper(): MessageWrapper {
-        val tweet = TwitterApi.getTweetById(tweetId) ?: return MessageWrapper().setUsable(false)
+        val tweet = TwitterApi.getCacheByID(tweetId) ?: return MessageWrapper().setUsable(false)
         val original = tweet.toMessageWrapper()
         return MessageWrapper().addText("${tweet.user.name} 发布了一条推文\n").also {
             it.addElements(original.getMessageContent())

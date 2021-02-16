@@ -52,6 +52,8 @@ object TwitterApi : ApiExecutor {
         if (token == null) getBearerToken()
     }
 
+    private val cacheTweet = mutableSetOf<Tweet>()
+
     /**
      * 获取用于调用 Twitter API 的 Bearer Token
      *
@@ -199,6 +201,7 @@ object TwitterApi : ApiExecutor {
                     request.body?.string()
                         ?: return null, request.request.url.toString())
                 if (tweet.isNotEmpty()) {
+                    addCacheTweet(tweet[0])
                     tweet[0]
                 } else {
                     throw EmptyTweetException()
@@ -210,7 +213,7 @@ object TwitterApi : ApiExecutor {
     }
 
     /**
-     * 获取单条推文
+     * 获取推特用户时间线
      *
      * 优先获取缓存中的推文, 若缓存中推文过时则获取新推文
      *
@@ -233,6 +236,7 @@ object TwitterApi : ApiExecutor {
 
         val list = getUserTweets(username, max)
         result = if (list.isNotEmpty()) {
+            addCacheTweet(list[index])
             list[index]
         } else {
             null
@@ -241,6 +245,28 @@ object TwitterApi : ApiExecutor {
         logger.verboseS("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
 
         return result
+    }
+
+    private fun addCacheTweet(tweet: Tweet) {
+        if (getCacheByID(tweet.id) == null) {
+            cacheTweet.add(tweet)
+        }
+    }
+
+    /**
+     * 通过推文 ID 获取缓存推文
+     *
+     * @param id 推文 ID
+     * @return 推文, 找不到时返回空
+     */
+    fun getCacheByID(id: Long): Tweet? {
+        for (tweet in cacheTweet) {
+            if (tweet.id == id) {
+                return tweet
+            }
+        }
+
+        return null
     }
 
     /**
