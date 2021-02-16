@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.objects.wrapper
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
+import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.MessageContent
 import net.mamoe.mirai.message.data.PlainText
@@ -41,4 +42,13 @@ data class Picture(val url: String, val filePath: File? = null): WrapperElement 
     override fun asString(): String {
         return filePath?.absolutePath ?: url
     }
+}
+
+data class AtElement(val target: Long): WrapperElement {
+    override fun toMessageContent(subject: Contact): MessageContent {
+        return At(target)
+    }
+
+    override fun asString(): String = "@${target}"
+
 }
