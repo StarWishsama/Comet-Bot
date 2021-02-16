@@ -9,14 +9,18 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.objects.wrapper.toMessageWrapper
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.StringUtil.containsEtc
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.MessageChainBuilder
+import net.mamoe.mirai.message.data.PlainText
 import java.util.*
 
 @CometCommand
@@ -50,11 +54,22 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                         return sendMessage("已${if (cfg.canRepeat) "开启" else "关闭"}群复读机")
                     }
                     "autojoin" -> {
-                        return if (event.group.botPermission == MemberPermission.MEMBER) {
-                            "抱歉, 机器人不是群管, 无法自动接受加群请求.".sendMessage()
+                        if (args.size > 1) {
+                            if (args[1].containsEtc( false, "condition", "条件", "tj", "cd")) {
+                                return if (args.size > 2) {
+                                    cfg.autoAcceptCondition = args.getRestString(2)
+                                    "成功设置自动通过申请条件!".sendMessage()
+                                } else {
+                                    "/gs autojoin condition [关键词]\n满足关键词的入群申请会自动通过".sendMessage()
+                                }
+                            }
                         } else {
-                            cfg.autoAccept = !cfg.autoAccept
-                            "已${if (cfg.autoAccept) "开启" else "关闭"}自动接受加群请求".sendMessage()
+                            return if (event.group.botPermission == MemberPermission.MEMBER) {
+                                "抱歉, 机器人不是群管, 无法自动接受加群请求.".sendMessage()
+                            } else {
+                                cfg.autoAccept = !cfg.autoAccept
+                                "已${if (cfg.autoAccept) "开启" else "关闭"}自动接受加群请求".sendMessage()
+                            }
                         }
                     }
                     "function", "fun", "func" -> {
@@ -93,6 +108,25 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                             }
                         }
                     }
+                    "newcomer", "入群欢迎", "自动欢迎", "zdhy", "rqhy" -> {
+                        if (args.size > 1) {
+                            return if (args.size > 2) {
+                                val welcomeText = MessageChainBuilder().append(args.getRestString(2)).apply {
+                                    event.message.filter { it !is PlainText }.forEach { element ->
+                                        append(element)
+                                    }
+                                }.build().toMessageWrapper()
+
+                                cfg.newComerWelcomeText = welcomeText
+                                "设置欢迎消息成功".sendMessage()
+                            } else {
+                                "/group newcomer [入群欢迎内容]\n内容支持纯文字 + 图片".sendMessage()
+                            }
+                        } else {
+                            cfg.newComerWelcome = !cfg.newComerWelcome
+                            return "已${if (cfg.newComerWelcome) "开启" else "关闭"}加群自动欢迎".sendMessage()
+                        }
+                    }
                 }
             } else {
                 return getHelp().sendMessage()
@@ -109,6 +143,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
         /group repeat 开启/关闭本群机器人复读功能
         /group autojoin 开启/关闭本群机器人自动接受加群请求
         /group func 启用/禁用本群可使用的命令
+        /group newcomer 设置入群欢迎内容
     """.trimIndent()
 
     override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {

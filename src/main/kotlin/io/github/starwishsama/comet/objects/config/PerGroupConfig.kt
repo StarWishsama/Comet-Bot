@@ -74,6 +74,15 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long, @SerializedN
     @SerializedName("keyword_reply")
     val keyWordReply: MutableList<ReplyKeyWord> = mutableListOf()
 
+    @SerializedName("newcomer_welcome")
+    var newComerWelcome: Boolean = false
+
+    @SerializedName("newcomer_welcome_text")
+    var newComerWelcomeText: MessageWrapper = MessageWrapper().setUsable(true)
+
+    @SerializedName("auto_accept_condition")
+    var autoAcceptCondition: String = ""
+
     fun addHelper(id: Long): Boolean {
         if (isHelper(id)) return false
         helpers.add(id)

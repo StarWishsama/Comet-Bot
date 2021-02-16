@@ -109,7 +109,7 @@ class TwitterCommand : ChatCommand {
     @ExperimentalTime
     private fun getTweetWithDesc(name: String, subject: Contact, index: Int = 1, max: Int = 10): MessageChain {
         return try {
-            val tweet = TwitterApi.getTweetInTimeline(name, index, max, false)
+            val tweet = TwitterApi.getTweetInTimeline(name, index, max)
             if (tweet != null) {
                 return CometUtil.sendMessage("\n${tweet.user.name}\n\n") + tweet.toMessageChain(subject)
             } else {

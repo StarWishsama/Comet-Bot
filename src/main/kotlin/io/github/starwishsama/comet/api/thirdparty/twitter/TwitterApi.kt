@@ -42,9 +42,6 @@ object TwitterApi : ApiExecutor {
     // Bearer Token
     private var token = BotVariables.cfg.twitterToken
 
-    // 缓存的推文
-    private val cacheTweet = mutableMapOf<String, Tweet>()
-
     // Api 调用次数
     override var usedTime: Int = 0
     override val duration: Int = 5
@@ -225,46 +222,25 @@ object TwitterApi : ApiExecutor {
      *
      * @return 推文, 若获取失败则返回空值
      */
-    fun getTweetInTimeline(username: String, index: Int = 0, max: Int = 5, needCache: Boolean = true): Tweet? {
+    fun getTweetInTimeline(username: String, index: Int = 0, max: Int = 5): Tweet? {
         val startTime = LocalDateTime.now()
-        val isCache: Boolean
 
         if (index < 0 || max <= index) {
             return null
         }
 
-        val cachedTweet = getCacheTweet(username)
-        val result: Tweet = if (cachedTweet != null && Duration.between(cachedTweet.getSentTime(), LocalDateTime.now()).toMinutes() <= 1) {
-            isCache = true
-            cachedTweet
+        val result: Tweet?
+
+        val list = getUserTweets(username, max)
+        result = if (list.isNotEmpty()) {
+            list[index]
         } else {
-            isCache = false
-            val list = getUserTweets(username, max)
-            if (list.isNotEmpty()) {
-                // 只对获取最新推文时才缓存
-                if (needCache && index == 0) {
-                    addCacheTweet(username, list[index])
-                }
-                list[index]
-            } else {
-                return null
-            }
+            null
         }
 
-        if (!isCache) logger.verboseS("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+        logger.verboseS("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
 
         return result
-    }
-
-    /**
-     * 添加缓存推文
-     * 将推文放入缓存池中
-     *
-     * @param username 推特用户的用户名
-     * @param tweet 推文实体
-     */
-    private fun addCacheTweet(username: String, tweet: Tweet) {
-        cacheTweet[username] = tweet
     }
 
     /**
@@ -288,8 +264,6 @@ object TwitterApi : ApiExecutor {
             }
         }
     }
-
-    fun getCacheTweet(username: String): Tweet? = cacheTweet[username]
 
     override fun isReachLimit(): Boolean {
         return usedTime >= getLimitTime()

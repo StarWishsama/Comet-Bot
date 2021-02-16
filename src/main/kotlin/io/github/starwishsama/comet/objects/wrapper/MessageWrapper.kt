@@ -1,8 +1,12 @@
 package io.github.starwishsama.comet.objects.wrapper
 
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
+import net.mamoe.mirai.message.data.Image
+import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageChainBuilder
+import net.mamoe.mirai.message.data.PlainText
 import kotlin.streams.toList
 
 open class MessageWrapper: Cloneable {
@@ -84,4 +88,23 @@ open class MessageWrapper: Cloneable {
 
         return getMessageContent() == other.getMessageContent()
     }
+}
+
+fun MessageChain.toMessageWrapper(): MessageWrapper {
+    val wrapper = MessageWrapper()
+    for (message in this) {
+        when (message) {
+            is PlainText -> {
+                wrapper.addText(message.content)
+            }
+            is Image -> {
+                runBlocking { wrapper.addPictureByURL(message.queryUrl()) }
+            }
+            else -> {
+                continue
+            }
+        }
+    }
+
+    return wrapper
 }

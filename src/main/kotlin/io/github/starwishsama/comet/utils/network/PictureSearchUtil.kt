@@ -10,8 +10,6 @@ import org.jsoup.Jsoup
 
 /**
  * 图片搜索工具类
- *
- * FIXME: 将搜索结果转换为 Bean, 减少繁琐的解析反解析
  */
 object PictureSearchUtil {
     private const val sauceNaoApi = "https://saucenao.com/search.php?db=5&output_type=2&numres=3&url="

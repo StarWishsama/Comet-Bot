@@ -36,7 +36,12 @@ class BiliBiliLiveContext(
     }
 }
 
-fun Collection<PushContext>.getLiveContext(uid: Long): BiliBiliLiveContext? {
-    val result = this.parallelStream().filter { it is BiliBiliLiveContext && uid == it.pushUser.id.toLong() }.findFirst()
-    return if (result.isPresent) result.get() as BiliBiliLiveContext else null
+fun Collection<BiliBiliLiveContext>.getLiveContext(uid: Long): BiliBiliLiveContext? {
+    for (blc in this) {
+        if (blc.pushUser.id.toLongOrNull() == uid) {
+            return blc
+        }
+    }
+
+    return null
 }

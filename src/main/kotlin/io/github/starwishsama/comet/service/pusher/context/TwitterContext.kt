@@ -28,7 +28,11 @@ class TwitterContext(
     }
 }
 
-fun Collection<PushContext>.getTwitterContext(userName: String): TwitterContext? {
-    val result = this.parallelStream().filter { it is TwitterContext && userName == it.twitterUserName }.findFirst()
-    return if (result.isPresent) result.get() as TwitterContext else null
+fun Collection<TwitterContext>.getTwitterContext(userName: String): TwitterContext? {
+    for (tc in this) {
+        if (tc.twitterUserName == userName) {
+            return tc
+        }
+    }
+    return null
 }
