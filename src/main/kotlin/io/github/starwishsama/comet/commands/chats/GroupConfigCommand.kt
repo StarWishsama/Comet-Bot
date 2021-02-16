@@ -55,13 +55,15 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                     }
                     "autojoin" -> {
                         if (args.size > 1) {
-                            if (args[1].containsEtc( false, "condition", "条件", "tj", "cd")) {
-                                return if (args.size > 2) {
+                            return if (args[1].containsEtc( false, "condition", "条件", "tj", "cd")) {
+                                if (args.size > 2) {
                                     cfg.autoAcceptCondition = args.getRestString(2)
                                     "成功设置自动通过申请条件!".sendMessage()
                                 } else {
                                     "/gs autojoin condition [关键词]\n满足关键词的入群申请会自动通过".sendMessage()
                                 }
+                            } else {
+                                "/gs autojoin condition [关键词]\n满足关键词的入群申请会自动通过".sendMessage()
                             }
                         } else {
                             return if (event.group.botPermission == MemberPermission.MEMBER) {

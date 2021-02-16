@@ -84,15 +84,19 @@ object StringUtil {
     }
 
     fun String.containsEtc(strict: Boolean = true, vararg string: String): Boolean {
+        var counter = 0
+
         string.forEach {
             if (this.contains(it)) {
-                if (!strict) return true
-            } else {
-                return false
+                if (!strict) {
+                    return true
+                } else if (counter < string.size) {
+                    counter++
+                }
             }
         }
 
-        return true
+        return counter >= string.size
     }
 
     fun parseVideoIDFromBili(url: String): String {
