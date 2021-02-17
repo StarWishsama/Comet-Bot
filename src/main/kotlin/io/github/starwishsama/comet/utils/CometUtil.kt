@@ -54,22 +54,22 @@ fun MiraiLogger.warningS(message: String?, throwable: Throwable?) {
     }
 }
 
-@Suppress("unused", "NOTHING_TO_INLINE")
-inline fun MiraiLogger.warningS(throwable: Throwable?) {
+@Suppress("unused")
+fun MiraiLogger.warningS(throwable: Throwable?) {
     if (cfg.debugMode) {
         warning(throwable)
     }
 }
 
-@Suppress("unused", "NOTHING_TO_INLINE")
-inline fun MiraiLogger.debugS(message: String?) {
+@Suppress("unused")
+fun MiraiLogger.debugS(message: String?) {
     if (cfg.debugMode) {
         debug(message)
     }
 }
 
-@Suppress("unused", "NOTHING_TO_INLINE")
-inline fun MiraiLogger.debugS(throwable: Throwable?) {
+@Suppress("unused")
+fun MiraiLogger.debugS(throwable: Throwable?) {
     if (cfg.debugMode) {
         debug(throwable)
     }

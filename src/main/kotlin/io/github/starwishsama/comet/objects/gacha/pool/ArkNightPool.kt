@@ -128,12 +128,12 @@ class ArkNightPool(
             when (drawResult.size) {
                 1 -> {
                     val (name, _, rare) = drawResult[0]
-                    return currentPool + "单次寻访结果\n$name ${GachaUtil.getStar(rare, true)}"
+                    return currentPool + "单次寻访结果\n$name ${GachaUtil.getStar(rare + 1)}"
                 }
                 10 -> {
                     return StringBuilder(currentPool + "十连寻访结果:\n").apply {
                         for ((name, _, rare) in drawResult) {
-                            append(name).append(" ").append(GachaUtil.getStar(rare, true)).append(" ")
+                            append(name).append(" ").append(GachaUtil.getStar(rare + 1)).append(" ")
                         }
                     }.trim().toString()
                 }

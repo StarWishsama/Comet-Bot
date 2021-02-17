@@ -37,6 +37,10 @@ object GachaUtil {
     const val overTimeMessage = "抽卡次数到上限了, 可以少抽一点或者等待条数自动恢复哦~\n" +
             "命令条数现在每小时会恢复100次, 封顶1000次"
     var pictureReady = false
+
+    /**
+     * PRTS 实际保有干员半身立绘量
+     */
     private const val arkNightPictureCount = 185
 
     private const val arkNightDataApi = "https://api.github.com/repos/Kengxxiao/ArknightsGameData"
@@ -53,7 +57,7 @@ object GachaUtil {
     }
 
     fun combinePCRImage(chars: List<PCRCharacter>): CombinedResult {
-        return CombinedResult(BufferedImage(1, 1, 1), listOf())
+        TODO()
     }
 
     /**
@@ -109,12 +113,11 @@ object GachaUtil {
 
     data class CombinedResult(
         val image: BufferedImage,
-        val lostItem: List<out GachaItem>
+        val lostItem: List<GachaItem>
     )
 
-    fun getStar(rare: Int, isArkNight: Boolean = false): String = buildString {
-        val trueRare = if (isArkNight) rare + 1 else rare
-        for (i in 0 until trueRare) {
+    fun getStar(rare: Int): String = buildString {
+        for (i in 0 until rare) {
             append("★")
         }
     }
@@ -143,7 +146,7 @@ object GachaUtil {
                 downloadList.plusAssign(doc2.getElementsByClass("fullImageLink")[0].select("a").attr("href"))
             }
 
-            // [http://prts.wiki]/images/f/ff/半身像_诗怀雅_1.png
+            // http://prts.wiki/images/f/ff/半身像_诗怀雅_1.png
 
             downloadList.parallelStream().forEach { url ->
                 val opName = URLDecoder.decode(url.split("/")[4].split("_")[1], Charsets.UTF_8)

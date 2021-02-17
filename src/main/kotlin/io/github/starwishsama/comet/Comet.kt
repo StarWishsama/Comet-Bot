@@ -25,7 +25,7 @@ class Comet {
     suspend fun login() {
         loginSolver.solve()
 
-        BotVariables.daemonLogger.info("正在设置登录配置...")
+        BotVariables.daemonLogger.info("正在配置登录配置...")
 
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
@@ -47,7 +47,6 @@ class Comet {
         bot = BotFactory.newBot(qq = id, password = password, configuration = config)
         Mirai.FileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
         BotVariables.logger.info("登录中... 使用协议 ${bot.configuration.protocol.name}")
-
 
         try {
             loginSolver.status = LoginStatus.LOGIN_SUCCESS
