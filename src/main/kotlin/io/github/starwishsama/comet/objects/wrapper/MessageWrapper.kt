@@ -85,6 +85,10 @@ open class MessageWrapper: Cloneable {
 
         return getMessageContent() == other.getMessageContent()
     }
+
+    fun isEmpty(): Boolean {
+        return messageContent.isEmpty()
+    }
 }
 
 fun MessageChain.toMessageWrapper(): MessageWrapper {

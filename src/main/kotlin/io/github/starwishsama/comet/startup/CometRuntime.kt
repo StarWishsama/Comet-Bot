@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.startup
 
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.api.command.CommandExecutor
@@ -15,10 +16,7 @@ import io.github.starwishsama.comet.commands.console.DebugCommand
 import io.github.starwishsama.comet.commands.console.StopCommand
 import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
-import io.github.starwishsama.comet.listeners.AutoReplyListener
-import io.github.starwishsama.comet.listeners.BotGroupStatusListener
-import io.github.starwishsama.comet.listeners.ConvertLightAppListener
-import io.github.starwishsama.comet.listeners.RepeatListener
+import io.github.starwishsama.comet.listeners.*
 import io.github.starwishsama.comet.managers.GachaManager
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.utils.FileUtil
@@ -113,13 +111,17 @@ object CometRuntime {
         logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
 
         /** 监听器 */
-        val listeners = arrayOf(ConvertLightAppListener, RepeatListener, BotGroupStatusListener, AutoReplyListener)
+        val listeners = arrayOf(ConvertLightAppListener, RepeatListener, BotGroupStatusListener, AutoReplyListener, GroupMemberChangedListener, GroupRequestListener)
 
         listeners.forEach { listener ->
-            listener.eventToListen.forEach { eventClass ->
-                bot.globalEventChannel().subscribeAlways(eventClass) {
-                    if (BotVariables.switch) {
-                        listener.listen(this)
+            if (listener.eventToListen.isEmpty()) {
+                daemonLogger.warning("监听器 ${listener::class.java.simpleName} 没有监听任何一个事件, 请检查是否正确!")
+            } else {
+                listener.eventToListen.forEach { eventClass ->
+                    bot.globalEventChannel().subscribeAlways(eventClass) {
+                        if (BotVariables.switch) {
+                            listener.listen(this)
+                        }
                     }
                 }
             }

@@ -122,7 +122,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                                 cfg.newComerWelcomeText = welcomeText
                                 "设置欢迎消息成功".sendMessage()
                             } else {
-                                "/group newcomer [入群欢迎内容]\n内容支持纯文字 + 图片".sendMessage()
+                                "/group newcomer [入群欢迎内容]\n内容支持纯文字 + 图片, 想要 @ 入群成员请用 [At] 代替.".sendMessage()
                             }
                         } else {
                             cfg.newComerWelcome = !cfg.newComerWelcome
