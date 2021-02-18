@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.utils.network
 
 import cn.hutool.http.HttpException
 import io.github.starwishsama.comet.BotVariables.cfg
-import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.BotVariables.netLogger
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.utils.StringUtil.containsEtc
@@ -57,7 +57,7 @@ object NetUtil {
                 builder.proxy(Proxy(cfg.proxyType, InetSocketAddress(proxyUrl, proxyPort)))
             }
         } catch (e: Exception) {
-            daemonLogger.warning("无法连接到代理服务器, ${e.message}")
+            netLogger.warning("无法连接到代理服务器, ${e.message}")
         }
 
         val client = builder.build()
@@ -107,7 +107,7 @@ object NetUtil {
         try {
             result = executeRequest(url, timeout, proxyUrl, proxyPort, call).execute()
         } catch (e: IOException) {
-            daemonLogger.warning("执行网络操作失败", e)
+            netLogger.warning("执行网络操作失败", e)
         } finally {
             if (autoClose) {
                 TaskUtil.runAsync(autoCloseDelay) {

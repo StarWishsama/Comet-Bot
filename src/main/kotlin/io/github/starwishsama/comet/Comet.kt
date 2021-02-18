@@ -49,7 +49,7 @@ class Comet {
             bot.login()
             CometRuntime.setupBot(bot, bot.logger)
         } catch (e: LoginFailedException) {
-            BotVariables.daemonLogger.info("登录失败! 返回的失败信息: ${e.message}")
+            BotVariables.daemonLogger.warning("登录失败! 返回的失败信息: ${e.message}")
             loginSolver.status = LoginStatus.LOGIN_FAILED
             GlobalScope.launch {
                 loginSolver.solve()
