@@ -52,7 +52,11 @@ object R6StatsApi: ApiExecutor {
             genericStat = getR6StatsAPI().getGenericInfo(userName, platform).execute().body()
             seasonalStat = getR6StatsAPI().getSeasonalInfo(userName, platform).execute().body()
         } catch (e: Exception) {
-            return MessageWrapper().addText("无法获取玩家 $userName 的信息")
+            if (e is ApiKeyIsEmptyException) {
+                return MessageWrapper().addText("R6Stats API 未正确配置, 请联系机器人管理员")
+            } else {
+                return MessageWrapper().addText("无法获取玩家 $userName 的信息")
+            }
         }
 
         if (genericStat == null || seasonalStat == null) {
