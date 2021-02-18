@@ -103,4 +103,18 @@ object StringUtil {
         val videoID = url.substring(0, url.indexOf("?")).replace("https", "").replace("https", "").split("/")
         return videoID.last()
     }
+
+    fun simplyClassName(name: String): String {
+        return buildString {
+            val classPart = name.split(".")
+            classPart.forEach {
+                if (it != classPart.last()) {
+                    append(it.substring(0, 1))
+                    append(".")
+                } else {
+                    append(it)
+                }
+            }
+        }
+    }
 }

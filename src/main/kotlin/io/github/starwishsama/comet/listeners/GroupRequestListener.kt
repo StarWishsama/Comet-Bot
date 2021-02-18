@@ -15,17 +15,13 @@ object GroupRequestListener: NListener {
 
             if (cfg.autoAccept) {
                 runBlocking {
-                    if (cfg.autoAcceptCondition.isEmpty()) {
+                    if (cfg.autoAcceptCondition.isEmpty() || cfg.autoAcceptCondition == event.message) {
                         event.accept()
                     } else {
-                        if (cfg.autoAcceptCondition == event.message) {
-                            event.accept()
-                        } else {
-                            /**
-                             * @TODO 添加自定义拒绝理由
-                             */
-                            event.reject(false, "")
-                        }
+                        /**
+                         * @TODO 添加自定义拒绝理由
+                         */
+                        event.reject(false, "")
                     }
                 }
             }
