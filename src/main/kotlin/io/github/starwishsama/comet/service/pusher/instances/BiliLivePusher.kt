@@ -13,8 +13,6 @@ import io.github.starwishsama.comet.service.pusher.context.BiliBiliLiveContext
 import io.github.starwishsama.comet.service.pusher.context.PushStatus
 import io.github.starwishsama.comet.service.pusher.context.getLiveContext
 import io.github.starwishsama.comet.utils.TaskUtil
-import io.github.starwishsama.comet.utils.debugS
-import io.github.starwishsama.comet.utils.verboseS
 import io.github.starwishsama.comet.utils.writeClassToJson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -45,9 +43,6 @@ class BiliLivePusher(bot: Bot): CometPusher(bot, "bili_live") {
                         pushUser = user,
                         liveRoomInfo = liveRoomInfo
                     )
-
-                    daemonLogger.debugS(liveRoomInfo.data.toString())
-                    daemonLogger.debugS(cache?.liveRoomInfo?.data.toString())
 
                     if (cache == null) {
                         cachePool.add(current)
@@ -99,7 +94,7 @@ class BiliLivePusher(bot: Bot): CometPusher(bot, "bili_live") {
         }
 
         if (pushTime > 0) {
-            daemonLogger.verboseS("$name 已成功推送 $pushTime 个消息")
+            daemonLogger.verbose("$name 已成功推送 $pushTime 个消息")
             resetPushTime()
         }
 

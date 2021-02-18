@@ -80,7 +80,7 @@ object DataSetup {
         } catch (e: RuntimeException) {
             brokenConfig = true
             e.message?.let { FileUtil.createErrorReportFile("加载配置文件失败, 部分配置文件将会立即创建备份\n", "resource", e, "", it) }
-            daemonLogger.warningS(e)
+            daemonLogger.debug("加载配置文件失败", e)
         } finally {
             if (brokenConfig) {
                 cfgFile.file.createBackupFile()
@@ -210,7 +210,7 @@ object DataSetup {
                             }
                         } catch (e: Exception) {
                             daemonLogger.warning("检测到 ${group.id} 的群配置异常, 正在重新生成...")
-                            daemonLogger.warningS(e)
+                            daemonLogger.debug("加载群配置失败", e)
                             loc.createBackupFile().also { loc.delete() }
                             PerGroupConfig(group.id).also {
                                 it.init()

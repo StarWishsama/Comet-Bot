@@ -246,7 +246,7 @@ object FileUtil {
             }
         } catch (e: Exception) {
             daemonLogger.info("加载资源文件失败, 部分需要资源的功能将无法使用")
-            daemonLogger.warningS("Cannot copy resources files", e)
+            daemonLogger.debug("Cannot copy resources files", e)
         } finally {
             daemonLogger.info("尝试加载资源文件用时 ${startTime.getLastingTime().toFriendly(TimeUnit.SECONDS)}")
         }

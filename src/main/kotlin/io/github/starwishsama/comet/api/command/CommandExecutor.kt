@@ -13,7 +13,6 @@ import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
-import io.github.starwishsama.comet.utils.debugS
 import io.github.starwishsama.comet.utils.network.NetUtil
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
@@ -99,7 +98,7 @@ object CommandExecutor {
                     }
 
                     if (result.status.isOk()) {
-                        BotVariables.logger.debugS(
+                        BotVariables.logger.debug(
                                 "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(msMode = true)}" +
                                         if (result.status.isOk()) ", 执行结果: ${result.status.name}" else ""
                         )

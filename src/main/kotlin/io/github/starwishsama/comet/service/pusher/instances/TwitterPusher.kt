@@ -10,7 +10,6 @@ import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.context.*
 import io.github.starwishsama.comet.utils.TaskUtil
-import io.github.starwishsama.comet.utils.verboseS
 import io.github.starwishsama.comet.utils.writeClassToJson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -84,7 +83,7 @@ class TwitterPusher(bot: Bot): CometPusher(bot, "twitter") {
         }
 
         if (pushTime > 0) {
-            BotVariables.daemonLogger.verboseS("$name 已成功推送 $pushTime 个消息")
+            BotVariables.daemonLogger.verbose("$name 已成功推送 $pushTime 个消息")
             resetPushTime()
         }
 

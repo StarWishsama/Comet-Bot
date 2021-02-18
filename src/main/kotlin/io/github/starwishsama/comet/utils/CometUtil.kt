@@ -20,7 +20,6 @@ import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
-import net.mamoe.mirai.utils.MiraiLogger
 import org.apache.commons.lang3.StringUtils
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -39,69 +38,6 @@ import kotlin.time.toKotlinDuration
  *
  * @author Nameless
  */
-
-@Suppress("unused")
-fun MiraiLogger.warningS(message: String?) {
-    if (cfg.debugMode) {
-        warning(message)
-    }
-}
-
-@Suppress("unused")
-fun MiraiLogger.warningS(message: String?, throwable: Throwable?) {
-    if (cfg.debugMode) {
-        warning(message, throwable)
-    }
-}
-
-@Suppress("unused")
-fun MiraiLogger.warningS(throwable: Throwable?) {
-    if (cfg.debugMode) {
-        warning(throwable)
-    }
-}
-
-@Suppress("unused")
-fun MiraiLogger.debugS(message: String?) {
-    if (cfg.debugMode) {
-        debug(message)
-    }
-}
-
-@Suppress("unused")
-fun MiraiLogger.debugS(throwable: Throwable?) {
-    if (cfg.debugMode) {
-        debug(throwable)
-    }
-}
-
-@Suppress("unused")
-fun MiraiLogger.debugS(message: String?, throwable: Throwable?) {
-    if (cfg.debugMode) {
-        debug(message, throwable)
-    }
-}
-
-@Suppress("unused")
-fun MiraiLogger.verboseS(message: String?) {
-    if (cfg.debugMode) {
-        verbose(message)
-    }
-}
-
-@Suppress("unused")
-fun MiraiLogger.verboseS(throwable: Throwable?) {
-    if (cfg.debugMode) {
-        verbose(throwable)
-    }
-}
-
-@Suppress("unused")
-fun MiraiLogger.verboseS(message: String?, throwable: Throwable?) {
-    if (cfg.debugMode) {
-        verbose(message, throwable)
-    }
-}
 
 fun BufferedImage.toInputStream(formatName: String = "png"): InputStream {
     ByteArrayOutputStream().use { byteOS ->

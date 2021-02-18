@@ -2,7 +2,6 @@ package io.github.starwishsama.comet.listeners
 
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.utils.warningS
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -35,7 +34,7 @@ object AutoReplyListener : NListener {
                         }
                     }
                 } catch (e: Exception) {
-                    daemonLogger.warning("检测到群 ${group.id} 的配置文件异常.").also { daemonLogger.warningS(e) }
+                    daemonLogger.warning("检测到群 ${group.id} 的配置文件异常.").also { daemonLogger.debug("加载配置文件异常", e) }
                     return
                 }
             }

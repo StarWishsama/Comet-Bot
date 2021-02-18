@@ -13,7 +13,6 @@ import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.context.*
 import io.github.starwishsama.comet.utils.TaskUtil
-import io.github.starwishsama.comet.utils.verboseS
 import io.github.starwishsama.comet.utils.writeClassToJson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -99,7 +98,7 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
         }
 
         if (pushTime > 0) {
-            daemonLogger.verboseS("$name 已成功推送 $pushTime 个消息")
+            daemonLogger.verbose("$name 已成功推送 $pushTime 个消息")
             resetPushTime()
         }
 

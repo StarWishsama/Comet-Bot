@@ -18,7 +18,6 @@ import io.github.starwishsama.comet.exceptions.TwitterApiException
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.isType
-import io.github.starwishsama.comet.utils.verboseS
 import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime
@@ -126,12 +125,12 @@ object TwitterApi : ApiExecutor {
                 if (!NetUtil.isTimeout(e)) {
                     FileUtil.createErrorReportFile(type = "data", t = e, content = bodyCopy, message = "Request URL: $url")
                 } else {
-                    daemonLogger.verboseS("[蓝鸟] 在获取用户信息时连接超时")
+                    daemonLogger.verbose("[蓝鸟] 在获取用户信息时连接超时")
                 }
             }
         }
 
-        daemonLogger.verboseS("[蓝鸟] 查询用户信息耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+        daemonLogger.debug("[蓝鸟] 查询用户信息耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
         return null
     }
 
@@ -242,7 +241,7 @@ object TwitterApi : ApiExecutor {
             null
         }
 
-        logger.verboseS("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
+        logger.debug("[蓝鸟] 查询用户最新推文耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
 
         return result
     }

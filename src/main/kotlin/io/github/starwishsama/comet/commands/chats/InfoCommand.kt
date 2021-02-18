@@ -60,9 +60,8 @@ class InfoCommand : ChatCommand {
                 return getHelp().convertToChain()
             }
         } catch (e: Exception) {
-            BotVariables.logger.warning(e)
+            return EmptyMessageChain
         }
-        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps =

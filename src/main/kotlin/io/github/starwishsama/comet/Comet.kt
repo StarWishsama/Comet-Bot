@@ -1,5 +1,7 @@
 package io.github.starwishsama.comet
 
+import io.github.starwishsama.comet.logger.HinaLogLevel
+import io.github.starwishsama.comet.logger.HinaLogger
 import io.github.starwishsama.comet.startup.CometRuntime
 import io.github.starwishsama.comet.startup.LoginSolver
 import io.github.starwishsama.comet.startup.LoginStatus
@@ -13,7 +15,7 @@ import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.MiraiInternalApi
-import net.mamoe.mirai.utils.PlatformLogger
+import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
 
 class Comet {
     private val loginSolver: LoginSolver = LoginSolver(this)
@@ -29,16 +31,10 @@ class Comet {
 
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
-                PlatformLogger("Comet ${it.id}") {
-                    CometApplication.console.printAbove(it)
-                    BotVariables.loggerAppender.appendLog(it)
-                }
+                CustomLogRedirecter("Mirai (${it.id})", BotVariables.logger)
             }
             networkLoggerSupplier = { it ->
-                PlatformLogger("CometNet ${it.id}") {
-                    CometApplication.console.printAbove(it)
-                    BotVariables.loggerAppender.appendLog(it)
-                }
+                CustomLogRedirecter("MiraiNet (${it.id})", BotVariables.netLogger)
             }
             heartbeatPeriodMillis = BotVariables.cfg.heartBeatPeriod * 60 * 1000
             fileBasedDeviceInfo()
@@ -72,5 +68,29 @@ class Comet {
 
     fun isInitialized(): Boolean {
         return ::bot.isInitialized && bot.isOnline
+    }
+}
+
+internal class CustomLogRedirecter(val name: String, private val redirect: HinaLogger): MiraiLoggerPlatformBase() {
+    override val identity: String = name
+
+    override fun debug0(message: String?, e: Throwable?) {
+        redirect.log(HinaLogLevel.Debug, message, e, name)
+    }
+
+    override fun error0(message: String?, e: Throwable?) {
+        redirect.log(HinaLogLevel.Error, message, e, name)
+    }
+
+    override fun info0(message: String?, e: Throwable?) {
+        redirect.log(HinaLogLevel.Info, message, e, name)
+    }
+
+    override fun verbose0(message: String?, e: Throwable?) {
+        redirect.log(HinaLogLevel.Verbose, message, e, name)
+    }
+
+    override fun warning0(message: String?, e: Throwable?) {
+        redirect.log(HinaLogLevel.Warn, message, e, name)
     }
 }

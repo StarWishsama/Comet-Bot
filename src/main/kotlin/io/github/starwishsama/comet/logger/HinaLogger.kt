@@ -18,8 +18,8 @@ open class HinaLogger(
 ) {
     // 时间 日志等级/日志等级缩写 logger名字 -> logger前缀 消息
     // 例: 21/2/18 19:18:32 N/MainLogger(i.g.s.c.t.ClassName) -> [Main] Logger Example
-    fun log(level: HinaLogLevel, message: String?, stacktrace: Throwable? = null, prefix: String = "") {
-        if (!debugMode && level == HinaLogLevel.Debug) return
+    fun log(level: HinaLogLevel, message: String?, stacktrace: Throwable? = null, prefix: String = "", bypass: Boolean = false) {
+        if ((!debugMode || bypass) && level == HinaLogLevel.Debug) return
 
         val executor = Thread.currentThread().stackTrace.toMutableList().also {
             it.subList(2, it.size)
@@ -27,15 +27,15 @@ open class HinaLogger(
 
         val executorInfo = "${StringUtil.simplyClassName(executor.className)}.${executor.methodName}:${executor.lineNumber}"
 
-        var st = ""
+        var trace = ""
 
         if (stacktrace != null) {
-            st = formatStacktrace(stacktrace, null, outputBeautyTrace)
+            trace = formatStacktrace(stacktrace, null, outputBeautyTrace)
         }
 
         logAction(
             "${level.color}${dateTimeFormatter.format(LocalDateTime.now())} ${level.internalName}/${level.simpleName}${if (level == HinaLogLevel.Debug) "($executorInfo)" else ""} $loggerName -> $prefix $message"
-                    + if (st.isNotEmpty()) "\n\n$st\n" else ""
+                    + if (trace.isNotEmpty()) "\n\n$trace\n" else ""
         )
     }
 

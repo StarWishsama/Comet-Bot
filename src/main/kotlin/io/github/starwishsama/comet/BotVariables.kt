@@ -2,6 +2,7 @@ package io.github.starwishsama.comet
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import io.github.starwishsama.comet.logger.HinaLogger
 import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
@@ -14,8 +15,6 @@ import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.network.NetUtil
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.utils.MiraiInternalApi
-import net.mamoe.mirai.utils.MiraiLogger
-import net.mamoe.mirai.utils.PlatformLogger
 import okhttp3.OkHttpClient
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
@@ -57,26 +56,20 @@ object BotVariables {
                     }.build()
     )
 
-    val logger: MiraiLogger = PlatformLogger("CometBot") {
+    internal val logAction: (String) -> Unit = {
         CometApplication.console.printAbove(it)
         if (::loggerAppender.isInitialized) {
             loggerAppender.appendLog(it)
         }
     }
 
-    val daemonLogger: MiraiLogger = PlatformLogger("CometService") {
-        CometApplication.console.printAbove(it)
-        if (::loggerAppender.isInitialized) {
-            loggerAppender.appendLog(it)
-        }
-    }
+    val logger: HinaLogger = HinaLogger("Comet", logAction = { logAction(it) })
 
-    val consoleCommandLogger: MiraiLogger = PlatformLogger("CometConsole") {
-        CometApplication.console.printAbove(it)
-        if (::loggerAppender.isInitialized) {
-            loggerAppender.appendLog(it)
-        }
-    }
+    val netLogger: HinaLogger = HinaLogger("CometNet", logAction = { logAction(it) })
+
+    val daemonLogger: HinaLogger = HinaLogger("CometService", logAction = { logAction(it) })
+
+    val consoleCommandLogger: HinaLogger = HinaLogger("CometConsole", logAction = { logAction(it) })
 
     val nullableGson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().setLenient().create()
     val gson: Gson = GsonBuilder().setPrettyPrinting().setLenient().create()

@@ -6,7 +6,6 @@ import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.utils.network.NetUtil
-import io.github.starwishsama.comet.utils.verboseS
 
 object HitokotoUpdater : Runnable {
     override fun run() {
@@ -14,7 +13,7 @@ object HitokotoUpdater : Runnable {
             val hitokotoJson = NetUtil.getPageContent("https://v1.hitokoto.cn/")
             if (hitokotoJson != null) {
                 hitokoto = getHitokotoJson()
-                logger.verboseS("已获取到今日一言")
+                logger.verbose("已获取到今日一言")
             }
         } catch (e: RuntimeException) {
             logger.warning("在获取一言时发生了问题\n${e.stackTraceToString()}")
