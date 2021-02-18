@@ -22,6 +22,7 @@ class LoginSolver(val comet: Comet) {
                 var command: String
 
                 if (comet.id == 0L || status == LoginStatus.INPUT_ID) {
+                    BotVariables.daemonLogger.info("请输入欲登录的机器人账号. 如需退出, 请输入 stop")
                     command = CometApplication.console.readLine(">")
 
                     if (command == "stop") exitProcess(0)
@@ -34,7 +35,7 @@ class LoginSolver(val comet: Comet) {
                         BotVariables.daemonLogger.info("请输入正确的 QQ 号!")
                     }
                 } else if (comet.password.isEmpty() || status == LoginStatus.INPUT_PASSWORD) {
-                    BotVariables.daemonLogger.info("请输入欲登录的机器人密码. 如需返回上一步, 请输入 back")
+                    BotVariables.daemonLogger.info("请输入欲登录的机器人密码. 如需返回上一步, 请输入 back; 如需退出, 请输入 stop.")
                     command = CometApplication.console.readLine(">", '*')
 
                     if (command == "back") {
