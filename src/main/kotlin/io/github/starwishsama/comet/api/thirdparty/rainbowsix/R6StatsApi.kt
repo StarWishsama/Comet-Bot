@@ -4,7 +4,11 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatsGenericStat
+import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatsSeasonalStat
+import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.Region
+import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.SeasonName
 import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -36,7 +40,33 @@ object R6StatsApi: ApiExecutor {
         }
 
         checkRateLimit("R6Stats API 调用已达上限")
+        usedTime++
         return api
+    }
+
+    fun getPlayerStat(userName: String, platform: String = "pc"): MessageWrapper {
+        val genericStat: R6StatsGenericStat?
+        val seasonalStat: R6StatsSeasonalStat?
+
+        try {
+            genericStat = getR6StatsAPI().getGenericInfo(userName, platform).execute().body()
+            seasonalStat = getR6StatsAPI().getSeasonalInfo(userName, platform).execute().body()
+        } catch (e: Exception) {
+            return MessageWrapper().addText("无法获取玩家 $userName 的信息")
+        }
+
+        if (genericStat == null || seasonalStat == null) {
+            return MessageWrapper().addText("无法获取玩家 $userName 的信息")
+        }
+
+        val latestSeasonalStat = seasonalStat.getSeasonalStat(SeasonName.NEON_DAWN)?.getRegionStat(Region.EMEA) ?: return MessageWrapper().addText("无法获取玩家 $userName 的信息")
+
+        val infoText = "|| ${genericStat.username} [${genericStat.levelInfo.level} 级]\n" +
+                "|| 目前段位 ${latestSeasonalStat.getRank().rankName}\n" +
+                "|| MMR 状态 ${latestSeasonalStat.currentMMR} (${latestSeasonalStat.lastMatchMMRChange})\n" +
+                "|| KD ${genericStat.stats.generalStat.kd} / WL ${genericStat.stats.generalStat.winLoss}"
+
+        return MessageWrapper().addText(infoText)
     }
 }
 
@@ -53,5 +83,5 @@ interface IR6StatsAPI {
         @Path("username") userName: String,
         @Path("platform") platform: String = "pc",
         @HeaderMap headerMap: Map<String, String> = mapOf(Pair("Authorization", "Bearer ${cfg.r6StatsKey}"))
-    ): Call<R6StatsGenericStat>
+    ): Call<R6StatsSeasonalStat>
 }

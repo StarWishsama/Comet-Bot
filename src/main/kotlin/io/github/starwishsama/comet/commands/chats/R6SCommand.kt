@@ -3,7 +3,7 @@ package io.github.starwishsama.comet.commands.chats
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.api.thirdparty.rainbowsix.R6TabApi.getR6SInfo
+import io.github.starwishsama.comet.api.thirdparty.rainbowsix.R6StatsApi
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.CometUtil
@@ -28,13 +28,13 @@ class R6SCommand : ChatCommand {
                         val account = user.r6sAccount
                         return if (args.size <= 1 && account != null) {
                             event.subject.sendMessage(CometUtil.sendMessage("查询中..."))
-                            val result = getR6SInfo(account)
-                            event.sender.at() + ("\n" + result)
+                            val result = R6StatsApi.getPlayerStat(account)
+                            event.sender.at() + "\n" + result.toMessageChain(event.subject)
                         } else {
                             if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
                                 event.subject.sendMessage(CometUtil.sendMessage("查询中..."))
-                                val result = getR6SInfo(args[1])
-                                event.sender.at() + ("\n" + result)
+                                val result = R6StatsApi.getPlayerStat(args[1])
+                                event.sender.at() + "\n" + result.toMessageChain(event.subject)
                             } else {
                                 CometUtil.sendMessage("你输入的 ID 不符合育碧用户名规范!")
                             }
