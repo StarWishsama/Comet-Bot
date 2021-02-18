@@ -47,7 +47,11 @@ object PictureSearchUtil {
     fun ascii2dSearch(url: String): PicSearchResult {
         val request = Jsoup.connect("$ascii2d$url")
         request.header("user-agent", NetUtil.defaultUA).followRedirects(true)
-                .proxy(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
+            .apply {
+                if (BotVariables.cfg.proxySwitch) {
+                    proxy(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
+                }
+            }
         println("$ascii2d$url")
 
         val html = request.get()

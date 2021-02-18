@@ -2,6 +2,7 @@ package io.github.starwishsama.comet
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.CometConfig
@@ -10,17 +11,22 @@ import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.objects.shop.Shop
 import io.github.starwishsama.comet.utils.LoggerAppender
+import io.github.starwishsama.comet.utils.network.NetUtil
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.PlatformLogger
+import okhttp3.OkHttpClient
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
+import java.net.InetSocketAddress
+import java.net.Proxy
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 
 /**
  * 机器人(几乎)所有数据的存放类
@@ -103,4 +109,19 @@ object BotVariables {
     }
 
     val hiddenOperators = mutableListOf<String>()
+
+    val client = OkHttpClient().newBuilder()
+        .connectTimeout(5, TimeUnit.SECONDS)
+        .followRedirects(true)
+        .readTimeout(5, TimeUnit.SECONDS)
+        .hostnameVerifier { _, _ -> true }
+        .also {
+            if (cfg.proxySwitch) {
+                if (NetUtil.checkProxyUsable()) {
+                    it.proxy(Proxy(cfg.proxyType, InetSocketAddress(cfg.proxyUrl, cfg.proxyPort)))
+                }
+            }
+        }
+        .addInterceptor(RetrofitLogger())
+        .build()
 }

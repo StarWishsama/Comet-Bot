@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.api.thirdparty.rainbowsix
 
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatsGenericStat
@@ -18,6 +19,7 @@ object R6StatsApi: ApiExecutor {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api2.r6stats.com/public-api/stats")
             .addConverterFactory(GsonConverterFactory.create())
+            .client(BotVariables.client)
             .build()
 
         api = retrofit.create(IR6StatsAPI::class.java)

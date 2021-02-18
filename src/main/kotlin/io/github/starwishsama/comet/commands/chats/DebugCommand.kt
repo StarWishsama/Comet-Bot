@@ -20,6 +20,8 @@ import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.RssUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -134,7 +136,10 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                 }
                 "data" -> {
                     if (args.size > 1) {
-                        return YoutubeApi.getLiveStatusByResult(YoutubeApi.getChannelVideos(args[1], 10)).toMessageChain(event.subject)
+                        return YoutubeApi.getLiveStatusByResult(
+                            withContext(Dispatchers.IO) {
+                                YoutubeApi.service.getSearchResult(channelId = args[1]).execute().body()
+                            }).toMessageChain(event.subject)
                     }
                 }
                 "rss" -> {

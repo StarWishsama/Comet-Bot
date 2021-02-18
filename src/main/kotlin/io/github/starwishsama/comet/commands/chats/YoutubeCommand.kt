@@ -94,7 +94,7 @@ class YoutubeCommand : ChatCommand {
             val youtubeUserInfo: SearchVideoResult?
 
             try {
-                youtubeUserInfo = YoutubeApi.getChannelVideos(channelID)
+                youtubeUserInfo = YoutubeApi.service.getSearchResult(channelId = channelID).execute().body()
             } catch (e: RateLimitException) {
                 return sendMessage(e.message)
             }
@@ -142,7 +142,7 @@ class YoutubeCommand : ChatCommand {
     }
 
     private fun checkInfo(channelID: String): MessageWrapper {
-        val result = YoutubeApi.getChannelByID(channelID) ?: return MessageWrapper().addText("找不到该频道, 可能是 API 调用已达到上限?")
+        val result = YoutubeApi.service.getChannelResult(channelId = channelID).execute().body() ?: return MessageWrapper().addText("找不到该频道, 可能是 API 调用已达到上限?")
         val item = result.items[0]
         val text = """
         ${item.snippet.title}

@@ -4,15 +4,12 @@ import cn.hutool.http.HttpException
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.exceptions.ApiException
+import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.utils.StringUtil.containsEtc
 import io.github.starwishsama.comet.utils.TaskUtil
-import io.github.starwishsama.comet.utils.verboseS
 import okhttp3.*
 import java.io.*
-import java.net.HttpURLConnection
-import java.net.Proxy
-import java.net.Socket
-import java.net.URL
+import java.net.*
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
@@ -28,7 +25,7 @@ object NetUtil {
      *
      * 注意：响应需要使用 [Response.close] 关闭或使用 [use], 否则会导致泄漏
      *
-     * 获取后的 [Response] 为异步, 响应完全读取 (如使用 [Response.body] 获取响应体字符串)后会失效
+     * 获取后的 [Response] 为异步, 响应完全读取 (如使用 [Response.body] 获取响应体字符串) 后会失效
      *
      * 并且**不可再使用**, 否则抛出 [IllegalStateException]
      *
@@ -52,15 +49,15 @@ object NetUtil {
             .followRedirects(true)
             .readTimeout(timeout, TimeUnit.SECONDS)
             .hostnameVerifier { _, _ -> true }
+            .addInterceptor(RetrofitLogger())
 
 
         try {
             if (checkProxyUsable()) {
-                builder.proxy(Proxy(cfg.proxyType, Socket(proxyUrl, proxyPort).remoteSocketAddress))
-                daemonLogger.verbose("使用代理连接")
+                builder.proxy(Proxy(cfg.proxyType, InetSocketAddress(proxyUrl, proxyPort)))
             }
         } catch (e: Exception) {
-            daemonLogger.info("无法连接到代理服务器, ${e.message}")
+            daemonLogger.warning("无法连接到代理服务器, ${e.message}")
         }
 
         val client = builder.build()
@@ -105,17 +102,13 @@ object NetUtil {
         autoClose: Boolean = false,
         autoCloseDelay: Long = 15
     ): Response {
-        val startTime = System.nanoTime()
-
         var result: Response? = null
 
         try {
             result = executeRequest(url, timeout, proxyUrl, proxyPort, call).execute()
         } catch (e: IOException) {
-            daemonLogger.warning("执行网络操作失败\n" + e.stackTraceToString())
+            daemonLogger.warning("执行网络操作失败", e)
         } finally {
-            daemonLogger.verboseS("执行网络操作用时 ${(System.nanoTime() - startTime).toDouble() / 1_000_000}ms ($url)")
-
             if (autoClose) {
                 TaskUtil.runAsync(autoCloseDelay) {
                     if (result?.body != null) {
@@ -125,7 +118,7 @@ object NetUtil {
             }
         }
 
-        return result ?: throw ApiException("执行网络操作失败")
+        return result ?: throw RuntimeException("执行网络操作失败, 响应为空")
     }
 
     fun getPageContent(url: String, timeout: Long = 2, proxyUrl: String = cfg.proxyUrl, proxyPort: Int = cfg.proxyPort, call: Request.Builder.() -> Request.Builder = {
@@ -184,7 +177,6 @@ object NetUtil {
 
     fun isTimeout(t: Throwable): Boolean {
         val msg = t.message?.toLowerCase() ?: return false
-        // FIXME: 这不是一个很好的识别方法
         return msg.containsEtc(false, "time", "out") || t.javaClass.simpleName.toLowerCase().contains("timeout")
     }
 
@@ -206,13 +198,13 @@ object NetUtil {
         return body?.byteStream()
     }
 
-    private fun checkProxyUsable(customUrl: String = "https://www.gstatic.com/generate_204", timeout: Int = 2_000): Boolean {
+    fun checkProxyUsable(url: String = "https://www.gstatic.com/generate_204", timeout: Int = 2_000): Boolean {
         if (!cfg.proxySwitch || cfg.proxyUrl.isEmpty() || cfg.proxyPort <= 0) return false
 
         Socket(cfg.proxyUrl, cfg.proxyPort).use {
             try {
                 val connection =
-                    (URL(customUrl).openConnection(Proxy(cfg.proxyType, it.remoteSocketAddress))) as HttpURLConnection
+                    (URL(url).openConnection(Proxy(cfg.proxyType, it.remoteSocketAddress))) as HttpURLConnection
                 connection.connectTimeout = 2000
                 connection.connect()
 

@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili
 
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserInfo
 import retrofit2.Call
@@ -15,6 +16,7 @@ object UserApi: ApiExecutor {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.bilibili.com/")
             .addConverterFactory(GsonConverterFactory.create())
+            .client(BotVariables.client)
             .build()
         userApiService = retrofit.create(IUserApi::class.java)
     }

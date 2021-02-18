@@ -1,101 +1,45 @@
 package io.github.starwishsama.comet.api.thirdparty.youtube
 
-import cn.hutool.http.HttpException
-import com.github.salomonbrys.kotson.fromJson
-import com.google.gson.JsonSyntaxException
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.youtube.data.SearchChannelResult
 import io.github.starwishsama.comet.api.thirdparty.youtube.data.SearchVideoResult
 import io.github.starwishsama.comet.api.thirdparty.youtube.data.VideoType
-import io.github.starwishsama.comet.api.thirdparty.youtube.data.YoutubeRequestError
-import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
+import io.github.starwishsama.comet.exceptions.RateLimitException
+import io.github.starwishsama.comet.objects.push.YoutubeUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import io.github.starwishsama.comet.utils.network.NetUtil
+import org.jsoup.Jsoup
+import retrofit2.Call
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import retrofit2.http.Query
 
 /**
  * FIXME: 需要重构
  */
 object YoutubeApi : ApiExecutor {
-    // 100 Unit
-    private var searchApi = "https://www.googleapis.com/youtube/v3/search?order=date&part=snippet,"
-    private const val searchByUserName = "contentDetails,statistics&forUsername="
-    // 1 Unit
-    private const val channelGetApi = "https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id="
-    private const val maxResult = "&maxResults="
-    private var init = false
-
-    /**
-     * 初始化 API 的 APIKey
-     */
-    private fun init() {
-        if (BotVariables.cfg.youtubeApiKey.isNotEmpty()) {
-            searchApi =
-                    "https://www.googleapis.com/youtube/v3/search?key=${BotVariables.cfg.youtubeApiKey}&order=date&part=snippet,"
+    val service: IYoutubeApi
+    get() {
+        if (!isReachLimit()) {
+            usedTime++
+            return field
+        } else {
+            throw RateLimitException("Youtube API 调用已达上限")
         }
-        init = true
     }
 
-    /**
-     * 通过 Youtube 频道 ID 获取频道信息
-     */
-    @Throws(ApiKeyIsEmptyException::class, HttpException::class)
-    fun getChannelByID(channelId: String): SearchChannelResult? {
-        if (!init) init()
+    init {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://youtube.googleapis.com/youtube/v3")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(BotVariables.client)
+            .build()
 
-        if (!searchApi.contains("key")) throw ApiKeyIsEmptyException("Youtube")
-
-        NetUtil.executeHttpRequest(channelGetApi + channelId + "&key=${BotVariables.cfg.youtubeApiKey}").use {
-            if (it.isSuccessful) {
-                val body = it.body?.string() ?: return null
-                try {
-                    return BotVariables.nullableGson.fromJson(body)
-                } catch (e: JsonSyntaxException) {
-                    try {
-                        val error = BotVariables.nullableGson.fromJson(body, YoutubeRequestError::class.java)
-                        BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.error.code}, 信息: ${error.error.message}")
-                    } catch (e: JsonSyntaxException) {
-                        BotVariables.logger.warning("[YTB] 无法解析 API 传入的 json", e)
-                    }
-                }
-            }
-        }
-
-        return null
+        service = retrofit.create(IYoutubeApi::class.java)
     }
 
-    /**
-     * 获取频道下的所有视频
-     */
-    @Throws(ApiKeyIsEmptyException::class, HttpException::class)
-    fun getChannelVideos(channelId: String, count: Int = 5): SearchVideoResult? {
-        if (!init) init()
-
-        if (!searchApi.contains("key")) throw ApiKeyIsEmptyException("Youtube")
-
-        NetUtil.executeHttpRequest(
-                url = "${searchApi}id&channelId=${channelId}$maxResult${count}",
-                timeout = 5
-        ).use { response ->
-
-            if (response.isSuccessful) {
-                val body = response.body?.string() ?: return null
-                /** @TODO 类型自动选择, 类似于 BiliBili 的动态解析 */
-                try {
-                    return BotVariables.nullableGson.fromJson(body, SearchVideoResult::class.java)
-                } catch (e: JsonSyntaxException) {
-                    try {
-                        val error = BotVariables.nullableGson.fromJson(body, YoutubeRequestError::class.java)
-                        BotVariables.logger.warning("[YTB] 无法访问 API \n返回码: ${error.error.code}, 信息: ${error.error.message}")
-                    } catch (e: JsonSyntaxException) {
-                        BotVariables.logger.warning("[YTB] 无法解析 API 传入的 json", e)
-                    }
-                }
-            }
-        }
-
-        return null
-    }
 
     /**
      * 获取直播实体类
@@ -126,13 +70,13 @@ object YoutubeApi : ApiExecutor {
     /**
      * 获取直播状态, 并将其转换为 [MessageWrapper]
      */
-    fun getLiveStatusAsMessage(channelId: String): MessageWrapper? {
-        val result = getChannelVideos(channelId, 5)
+    fun getLiveStatusAsMessage(channelId: String): MessageWrapper {
+        val result = service.getSearchResult(channelId = channelId, maxResult = 5).execute().body()
         if (result != null) {
             return getLiveStatusByResult(result)
         }
 
-        return MessageWrapper().addText("找不到对应ID的频道")
+        return MessageWrapper().addText("找不到对应ID的频道").setUsable(false)
     }
 
     /**
@@ -163,10 +107,52 @@ ${item.snippet.channelTitle} 有即将进行的直播!
         return MessageWrapper().addText("${result.items[0].snippet.channelTitle} 最近没有直播哦").setUsable(false)
     }
 
+    fun getLiveStatusByPage(youtubeUser: YoutubeUser): MessageWrapper {
+        val url = "https://www.youtube.com/channel/${youtubeUser.id}/live"
+
+        try {
+            val page = Jsoup.connect(url).apply {
+                if (cfg.proxySwitch) {
+                    proxy(cfg.proxyUrl, cfg.proxyPort)
+                }
+            }
+
+            return if (page.execute().body().contains("isLive: true")) {
+                val doc = page.get()
+                val streamTitle = doc.title()
+                MessageWrapper().addText("""${youtubeUser.userName} 正在直播!
+直播标题: $streamTitle
+直达链接: https://www.youtube.com/channel/${youtubeUser.id}/live""")
+            } else {
+                MessageWrapper().addText("当前没有在直播").setUsable(false)
+            }
+
+        } catch (e: Exception) {
+            return MessageWrapper().addText("在获取直播信息时发生异常").setUsable(false)
+        }
+    }
+
     override var usedTime: Int = 0
     override val duration: Int = 24
 
     override fun isReachLimit(): Boolean = usedTime > getLimitTime()
 
     override fun getLimitTime(): Int = 10000
+}
+
+interface IYoutubeApi {
+    @GET("/channels")
+    fun getSearchResult(
+        @Query("part") part: String = "snippet%2CcontentDetails%2Cstatistics",
+        @Query("id") channelId: String,
+        @Query("maxResults") maxResult: Int = 5,
+        @Query("key") token: String = cfg.youtubeApiKey
+    ): Call<SearchVideoResult>
+
+    @GET("/channels")
+    fun getChannelResult(
+        @Query("part") part: String = "snippet%2CcontentDetails%2Cstatistics",
+        @Query("id") channelId: String,
+        @Query("key") token: String = cfg.youtubeApiKey
+    ): Call<SearchChannelResult>
 }
