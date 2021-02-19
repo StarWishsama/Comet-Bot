@@ -9,7 +9,6 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import kotlin.time.ExperimentalTime
 
@@ -17,13 +16,10 @@ import kotlin.time.ExperimentalTime
 class VersionCommand : ChatCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(event.sender.id)) {
-            return ("彗星 Bot " + BuildConfig.version +
-                    "\n运行时长 ${CometUtil.getRunningTime()}" +
-                    "\n构建时间: ${BuildConfig.buildTime}" +
-                    "\nMade with ❤ & Mirai ${BuildConfig.miraiVersion}").convertToChain()
-        }
-        return EmptyMessageChain
+        return ("彗星 Bot " + BuildConfig.version +
+                "\n运行时长 ${CometUtil.getRunningTime()}" +
+                "\n构建时间: ${BuildConfig.buildTime}" +
+                "\nMade with ❤ & Mirai ${BuildConfig.miraiVersion}").convertToChain()
     }
 
     override fun getProps(): CommandProps {

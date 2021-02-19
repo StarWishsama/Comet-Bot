@@ -28,36 +28,33 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
     private val hourMinuteFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(event.sender.id)) {
-            if (args.isEmpty()) {
-                return "命令不存在, 使用 /admin help 查看更多".sendMessage()
-            } else {
-                when (args[0]) {
-                    "clockin", "dk", "打卡" -> {
-                        return if (event is GroupMessageEvent) {
-                            clockIn(args, event)
-                        } else {
-                            "该命令只能在群聊使用".sendMessage()
-                        }
+        if (args.isEmpty()) {
+            return "命令不存在, 使用 /admin help 查看更多".sendMessage()
+        } else {
+            when (args[0]) {
+                "clockin", "dk", "打卡" -> {
+                    return if (event is GroupMessageEvent) {
+                        clockIn(args, event)
+                    } else {
+                        "该命令只能在群聊使用".sendMessage()
                     }
-                    "showdata", "打卡数据", "dksj" -> {
-                        return if (event is GroupMessageEvent) {
-                            val data = ClockInManager.getNearestClockIn(event.group.id)
-                            data?.viewData()?.toMessageChain(event.subject)
-                                ?: "本群没有正在进行的打卡".sendMessage()
-                        } else {
-                           "该命令只能在群聊使用".sendMessage()
-                        }
-                    }
-                    "help", "帮助" -> return getHelp().convertToChain()
-                    "permlist", "权限列表", "qxlb" -> return permList(user, args, event)
-                    "permadd", "添加权限", "tjqx" -> return permAdd(user, args, event)
-                    "give", "增加次数" -> return giveCommandUseTime(event, args)
-                    else -> return "命令不存在, 使用 /admin help 查看更多".sendMessage()
                 }
+                "showdata", "打卡数据", "dksj" -> {
+                    return if (event is GroupMessageEvent) {
+                        val data = ClockInManager.getNearestClockIn(event.group.id)
+                        data?.viewData()?.toMessageChain(event.subject)
+                            ?: "本群没有正在进行的打卡".sendMessage()
+                    } else {
+                        "该命令只能在群聊使用".sendMessage()
+                    }
+                }
+                "help", "帮助" -> return getHelp().convertToChain()
+                "permlist", "权限列表", "qxlb" -> return permList(user, args, event)
+                "permadd", "添加权限", "tjqx" -> return permAdd(user, args, event)
+                "give", "增加次数" -> return giveCommandUseTime(event, args)
+                else -> return "命令不存在, 使用 /admin help 查看更多".sendMessage()
             }
         }
-        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps =

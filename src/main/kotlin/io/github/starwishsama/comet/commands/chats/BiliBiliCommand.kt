@@ -34,7 +34,7 @@ import retrofit2.Response
 @CometCommand
 class BiliBiliCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(user.id) && event is GroupMessageEvent) {
+        if (event is GroupMessageEvent) {
             if (args.isEmpty()) {
                 return getHelp().convertToChain()
             } else {
@@ -87,8 +87,9 @@ class BiliBiliCommand : ChatCommand {
                     else -> return getHelp().convertToChain()
                 }
             }
+        } else {
+            return "抱歉, 该命令仅供群聊使用!".sendMessage()
         }
-        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps =

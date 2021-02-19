@@ -19,7 +19,7 @@ import net.mamoe.mirai.message.data.MessageChain
 @CometCommand
 class KickCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (event is GroupMessageEvent && CometUtil.isNoCoolDown(user.id)) {
+        if (event is GroupMessageEvent) {
             if (hasPermission(user, event)) {
                 if (event.group.botPermission.isOperator()) {
                     if (args.isNotEmpty()) {

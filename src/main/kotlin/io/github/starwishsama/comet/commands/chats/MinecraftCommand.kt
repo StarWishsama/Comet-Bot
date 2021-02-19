@@ -5,47 +5,43 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.MinecraftUtil
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
 
 @CometCommand
 class MinecraftCommand: ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(user.id)) {
-            if (args.isEmpty()) return getHelp().convertToChain()
 
-            when (args.size) {
-                1 -> {
-                    if (args[0].contains(":")) {
-                        val split = args[0].split(":")
-                        return query(split[0], split[1].toIntOrNull())
-                    }
+        if (args.isEmpty()) return getHelp().convertToChain()
 
-                    val convert = MinecraftUtil.convert(args[0])
-                    return if (convert.isEmpty()) {
-                        "无法连接至服务器".sendMessage()
-                    } else {
-                        query(convert.host, convert.port)
-                    }
+        when (args.size) {
+            1 -> {
+                if (args[0].contains(":")) {
+                    val split = args[0].split(":")
+                    return query(split[0], split[1].toIntOrNull())
                 }
-                2 -> {
-                    return if (args[1].isNumeric()) {
-                        query(args[0], args[1].toIntOrNull())
-                    } else {
-                        "输入的端口号不合法.".sendMessage()
-                    }
+
+                val convert = MinecraftUtil.convert(args[0])
+                return if (convert.isEmpty()) {
+                    "无法连接至服务器".sendMessage()
+                } else {
+                    query(convert.host, convert.port)
                 }
             }
+            2 -> {
+                return if (args[1].isNumeric()) {
+                    query(args[0], args[1].toIntOrNull())
+                } else {
+                    "输入的端口号不合法.".sendMessage()
+                }
+            }
+            else -> return getHelp().sendMessage()
         }
-
-        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps = CommandProps(

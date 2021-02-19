@@ -8,7 +8,6 @@ import io.github.starwishsama.comet.managers.GachaManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
-import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.GachaUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
@@ -17,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.at
@@ -29,54 +27,51 @@ class ArkNightCommand : ChatCommand {
     var pool = GachaManager.getPoolsByType<ArkNightPool>()[0]
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(event.sender.id, 30)) {
-            if (args.isNotEmpty()) {
-                when (args[0]) {
-                    "单次寻访", "1", "单抽" -> {
-                        return getGachaResult(event, user, 1)
-                    }
-                    "十连寻访", "10", "十连" -> {
-                        return getGachaResult(event, user, 10)
-                    }
-                    "一井", "300", "来一井" -> {
-                        return getGachaResult(event, user, 300)
-                    }
-                    "pool", "卡池", "卡池信息" -> {
-                        return if (args.size == 1) {
-                            buildString {
-                                append("目前卡池: ${pool.name}\n")
-                                append("详细信息: ${pool.description}")
-                            }.sendMessage()
+        if (args.isNotEmpty()) {
+            when (args[0]) {
+                "单次寻访", "1", "单抽" -> {
+                    return getGachaResult(event, user, 1)
+                }
+                "十连寻访", "10", "十连" -> {
+                    return getGachaResult(event, user, 10)
+                }
+                "一井", "300", "来一井" -> {
+                    return getGachaResult(event, user, 300)
+                }
+                "pool", "卡池", "卡池信息" -> {
+                    return if (args.size == 1) {
+                        buildString {
+                            append("目前卡池: ${pool.name}\n")
+                            append("详细信息: ${pool.description}")
+                        }.sendMessage()
+                    } else {
+                        val poolName = args[1]
+                        val pools = GachaManager.getPoolsByType<ArkNightPool>().parallelStream().filter { it.name == poolName }.findFirst()
+                        if (pools.isPresent) {
+                            pool = pools.get()
+                            "成功修改卡池为: ${pool.name}".sendMessage()
                         } else {
-                            val poolName = args[1]
-                            val pools = GachaManager.getPoolsByType<ArkNightPool>().parallelStream().filter { it.name == poolName }.findFirst()
-                            if (pools.isPresent) {
-                                pool = pools.get()
-                                "成功修改卡池为: ${pool.name}".sendMessage()
-                            } else {
-                                "找不到名为 $poolName 的卡池".sendMessage()
-                            }
-                        }
-                    }
-                    else -> {
-                        return if (StringUtils.isNumeric(args[0])) {
-                            val gachaTime: Int = try {
-                                args[0].toInt()
-                            } catch (e: NumberFormatException) {
-                                return getHelp().convertToChain()
-                            }
-
-                            return getGachaResult(event, user, gachaTime)
-                        } else {
-                            getHelp().convertToChain()
+                            "找不到名为 $poolName 的卡池".sendMessage()
                         }
                     }
                 }
-            } else {
-                return getHelp().convertToChain()
+                else -> {
+                    return if (StringUtils.isNumeric(args[0])) {
+                        val gachaTime: Int = try {
+                            args[0].toInt()
+                        } catch (e: NumberFormatException) {
+                            return getHelp().convertToChain()
+                        }
+
+                        return getGachaResult(event, user, gachaTime)
+                    } else {
+                        getHelp().convertToChain()
+                    }
+                }
             }
+        } else {
+            return getHelp().convertToChain()
         }
-        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps =
@@ -85,7 +80,8 @@ class ArkNightCommand : ChatCommand {
                 arrayListOf("ark", "xf", "方舟寻访"),
                 "明日方舟寻访模拟器",
                 "nbot.commands.arknight",
-                UserLevel.USER
+                UserLevel.USER,
+            consumePoint = 15
         )
 
     override fun getHelp(): String = """

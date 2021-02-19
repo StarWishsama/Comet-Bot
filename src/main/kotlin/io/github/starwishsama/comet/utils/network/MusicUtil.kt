@@ -145,8 +145,12 @@ object MusicUtil {
 
                 val playResult = NetUtil.getPageContent("$api4qq${song.songMid}")
                 if (playResult?.isNotBlank() == true) {
-                    val playUrl =
-                        JsonParser.parseString(playResult).asJsonObject["data"].asJsonObject[song.songMid].asString
+                    val musicUrlObject = JsonParser.parseString(playResult).asJsonObject["data"].asJsonObject[song.songMid]
+                    val playUrl = if (!musicUrlObject.isJsonPrimitive) {
+                        ""
+                    } else {
+                        musicUrlObject.asString
+                    }
 
                     return MusicShare(
                         kind = MusicKind.QQMusic,
@@ -203,13 +207,6 @@ object MusicUtil {
                         val chineseSinger: Int,
                         @SerializedName("singer")
                         val singer: List<QQMusicSinger>,
-
-                        /** 不同格式下载大小 */
-                        val size128: Long,
-                        val size320: Long,
-                        val sizeape: Long,
-                        val sizeflac: Long,
-                        val sizeogg: Long,
 
                         @SerializedName("songid")
                         val songId: Long,

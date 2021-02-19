@@ -34,7 +34,7 @@ import kotlin.time.ExperimentalTime
 class DebugCommand : ChatCommand, UnDisableableCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (args.isNotEmpty() && CometUtil.isNoCoolDown(event.sender.id)) {
+        if (args.isNotEmpty()) {
             when (args[0]) {
                 "reload" -> {
                     if (user.isBotOwner()) {

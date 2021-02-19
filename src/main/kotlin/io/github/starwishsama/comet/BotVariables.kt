@@ -91,8 +91,6 @@ object BotVariables {
     @Volatile
     var switch: Boolean = true
 
-    val coolDown: MutableMap<Long, Long> = HashMap()
-
     val hmsPattern: DateTimeFormatter by lazy {
         DateTimeFormatter.ofPattern("HH:mm:ss")
     }

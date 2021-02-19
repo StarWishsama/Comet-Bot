@@ -14,6 +14,7 @@ class BotUser(@SerializedName("userQQ") val id: Long) {
     var level: UserLevel = UserLevel.USER
     var commandTime: Int = 100
     var checkInGroup: Long = 0
+    var lastExecuteTime: Long = -1
     private val permissions = mutableListOf<String>()
 
     fun decreaseTime() {
@@ -54,7 +55,7 @@ class BotUser(@SerializedName("userQQ") val id: Long) {
         return permissions.contains(permission) || isBotOwner()
     }
 
-    fun getPermissions() : String = buildString {
+    fun getPermissions(): String = buildString {
         this@BotUser.permissions.forEach {
             append("$it ")
         }
@@ -109,6 +110,6 @@ class BotUser(@SerializedName("userQQ") val id: Long) {
             return user.orElseGet { null }
         }
 
-        fun getUserSafely(qq: Long): BotUser = getUser(qq) ?: quickRegister(qq)
+        fun getUserOrRegister(qq: Long): BotUser = getUser(qq) ?: quickRegister(qq)
     }
 }

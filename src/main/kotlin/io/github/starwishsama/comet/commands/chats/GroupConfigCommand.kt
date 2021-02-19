@@ -17,7 +17,6 @@ import io.github.starwishsama.comet.utils.StringUtil.containsEtc
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageChainBuilder
 import net.mamoe.mirai.message.data.PlainText
@@ -27,7 +26,7 @@ import java.util.*
 class GroupConfigCommand : ChatCommand, UnDisableableCommand {
     // TODO 适配私聊设置
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(user.id) && event is GroupMessageEvent) {
+        if (event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
                 val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
                 when (args[0].toLowerCase(Locale.ROOT)) {
@@ -129,12 +128,16 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                             return "已${if (cfg.newComerWelcome) "开启" else "关闭"}加群自动欢迎".sendMessage()
                         }
                     }
+                    else -> {
+                        return getHelp().sendMessage()
+                    }
                 }
             } else {
                 return getHelp().sendMessage()
             }
+        } else {
+            return "抱歉, 该命令仅供群聊使用!".sendMessage()
         }
-        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps =

@@ -6,23 +6,24 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.service.pusher.PusherManager
-import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 
 class PusherCommand: ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(event.sender.id)) {
-            if (args.isEmpty()) return getHelp().sendMessage()
+        if (args.isEmpty()) return getHelp().sendMessage()
 
-            when (args[0]) {
-                "status", "状态" -> return displayPusherStatus()
-                "test", "测试" -> return testPusher(args)
+        return when (args[0]) {
+            "status", "状态" -> displayPusherStatus()
+            "test", "测试" -> testPusher(args)
+            else -> {
+                """
+                    /pusher status 展示所有推送器运行状态
+                    /pusher test [推送器名称] 测试一个推送器    
+                    """.trimIndent().sendMessage()
             }
         }
-        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps = CommandProps(

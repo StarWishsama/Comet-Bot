@@ -3,11 +3,8 @@ package io.github.starwishsama.comet.utils
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.cfg
-import io.github.starwishsama.comet.BotVariables.coolDown
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.BotUser.Companion.getUser
-import io.github.starwishsama.comet.objects.BotUser.Companion.isBotOwner
 import io.github.starwishsama.comet.utils.RuntimeUtil.getJVMVersion
 import io.github.starwishsama.comet.utils.RuntimeUtil.getMaxMemory
 import io.github.starwishsama.comet.utils.RuntimeUtil.getOsInfo
@@ -41,7 +38,7 @@ import kotlin.time.toKotlinDuration
 
 fun BufferedImage.toInputStream(formatName: String = "png"): InputStream {
     ByteArrayOutputStream().use { byteOS ->
-        ImageIO.setUseCache(false)
+        if (!ImageIO.getUseCache()) ImageIO.setUseCache(false)
         ImageIO.createImageOutputStream(byteOS).use { imOS ->
             ImageIO.write(this, formatName, imOS)
             return ByteArrayInputStream(byteOS.toByteArray())
@@ -54,39 +51,6 @@ fun BufferedImage.uploadAsImage(contact: Contact): Image {
 }
 
 object CometUtil {
-    /**
-     * 判断指定QQ号是否仍在命令冷却中
-     * (可以自定义命令冷却时间)
-     *
-     * @author Nameless
-     * @param qq 要检测的QQ号
-     * @param seconds 自定义冷却时间
-     * @param checkOnly 是否在检查后立即进入冷却
-     *
-     * @return 目标QQ号是否处于冷却状态
-     */
-    fun isNoCoolDown(qq: Long, seconds: Int = cfg.coolDownTime, checkOnly: Boolean = false): Boolean {
-        if (seconds < 1) return true
-
-        val currentTime = System.currentTimeMillis()
-        if (qq == 80000000L) {
-            return false
-        }
-
-        if (coolDown.containsKey(qq) && !isBotOwner(qq)) {
-            if (currentTime - (coolDown[qq] ?: return false) < seconds * 1000) {
-                return false
-            } else {
-                coolDown.remove(qq)
-            }
-        } else {
-            if (!checkOnly) {
-                coolDown[qq] = currentTime
-            }
-        }
-        return true
-    }
-
     /**
      * 获取本地化文本
      *

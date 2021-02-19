@@ -7,14 +7,12 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.service.task.HitokotoUpdater
-import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.math.RoundingMode
 import java.time.Duration
@@ -23,14 +21,15 @@ import java.time.LocalDateTime
 @CometCommand
 class CheckInCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(event.sender.id) && event is GroupMessageEvent) {
+        if (event is GroupMessageEvent) {
             return if (user.isChecked()) {
                 "你今天已经签到过了! 输入 /cx 可查询签到信息".sendMessage()
             } else {
                 checkIn(event.sender, event, user).convertToChain()
             }
+        } else {
+            return "抱歉, 该命令仅供群聊使用".sendMessage()
         }
-        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps =

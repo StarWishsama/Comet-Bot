@@ -7,32 +7,27 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
-import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 
 class FilterCommand: ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(user.id)) {
-            if (args.isEmpty()) return getHelp().sendMessage()
-            return when (args[0]) {
-                "add", "tj", "添加", "加" -> {
-                    handleAddFilterWord(args.subList(1, args.size), event)
-                }
-                "remove", "del", "delete", "sc", "yc", "删除", "删" -> {
-                    TODO("删除逻辑未完成")
-                }
-                "list", "列表" -> {
-                    TODO("展示列表逻辑未完成")
-                }
-                else -> getHelp().sendMessage()
+        if (args.isEmpty()) return getHelp().sendMessage()
+        return when (args[0]) {
+            "add", "tj", "添加", "加" -> {
+                handleAddFilterWord(args.subList(1, args.size), event)
             }
+            "remove", "del", "delete", "sc", "yc", "删除", "删" -> {
+                TODO("删除逻辑未完成")
+            }
+            "list", "列表" -> {
+                TODO("展示列表逻辑未完成")
+            }
+            else -> getHelp().sendMessage()
         }
-        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps = CommandProps(

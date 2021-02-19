@@ -10,12 +10,10 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
-import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.network.PictureSearchUtil
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.message.data.MessageChain
@@ -27,30 +25,29 @@ class PictureSearchCommand : ChatCommand, SuspendCommand {
 
     @OptIn(MiraiExperimentalApi::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(event.sender.id)) {
-            if (args.isEmpty()) {
-                if (!SessionManager.isValidSessionById(event.sender.id)) {
-                    SessionManager.addSession(Session(this, user.id))
-                }
-
-                val img = event.message[Image] ?: return sendMessage("请发送需要搜索的图片")
-
-                return handlePicSearch(img.queryUrl()).sendMessage()
-            } else if (args[0].contentEquals("source") && args.size > 1) {
-                return try {
-                    val api = PicSearchApiType.valueOf(args[1].toUpperCase(Locale.ROOT))
-                    BotVariables.cfg.pictureSearchApi = api
-                    sendMessage("已切换识图 API 为 ${api.name}", true)
-                } catch (e: Throwable) {
-                    var type = ""
-                    PicSearchApiType.values().forEach {
-                        type = type + it.name + " " + it.desc + "\n"
-                    }
-                    sendMessage("该识图 API 不存在, 可用的 API 类型:\n ${type.trim()}", true)
-                }
+        if (args.isEmpty()) {
+            if (!SessionManager.isValidSessionById(event.sender.id)) {
+                SessionManager.addSession(Session(this, user.id))
             }
+
+            val img = event.message[Image] ?: return sendMessage("请发送需要搜索的图片")
+
+            return handlePicSearch(img.queryUrl()).sendMessage()
+        } else if (args[0].contentEquals("source") && args.size > 1) {
+            return try {
+                val api = PicSearchApiType.valueOf(args[1].toUpperCase(Locale.ROOT))
+                BotVariables.cfg.pictureSearchApi = api
+                sendMessage("已切换识图 API 为 ${api.name}", true)
+            } catch (e: Throwable) {
+                var type = ""
+                PicSearchApiType.values().forEach {
+                    type = type + it.name + " " + it.desc + "\n"
+                }
+                sendMessage("该识图 API 不存在, 可用的 API 类型:\n ${type.trim()}", true)
+            }
+        } else {
+            return getHelp().sendMessage()
         }
-        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps = CommandProps(

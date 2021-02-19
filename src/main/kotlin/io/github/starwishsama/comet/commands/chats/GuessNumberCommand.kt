@@ -28,7 +28,7 @@ import java.time.LocalDateTime
 @CometCommand
 class GuessNumberCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(user.id) && event is GroupMessageEvent) {
+        if (event is GroupMessageEvent) {
             val session = SessionManager.getSessionByGroup(event.group.id, GuessNumberSession::class.java)
             if (session.exists()) {
                 when {

@@ -19,7 +19,6 @@ import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.PlainText
@@ -30,45 +29,42 @@ import kotlin.time.ExperimentalTime
 class TwitterCommand : ChatCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(user.id)) {
-            if (BotVariables.cfg.twitterAccessToken == null) {
-                return CometUtil.sendMessage("蓝鸟推送未被正确设置, 请联系机器人管理员")
+        if (BotVariables.cfg.twitterAccessToken == null) {
+            return CometUtil.sendMessage("蓝鸟推送未被正确设置, 请联系机器人管理员")
+        }
+
+        return if (args.isEmpty()) {
+            getHelp().convertToChain()
+        } else {
+            val id: Long = when {
+                event is GroupMessageEvent -> event.group.id
+                args.size > 1 -> args[2].toLong()
+                else -> -1
             }
 
-            return if (args.isEmpty()) {
-                getHelp().convertToChain()
-            } else {
-                val id: Long = when {
-                    event is GroupMessageEvent -> event.group.id
-                    args.size > 1 -> args[2].toLong()
-                    else -> -1
+            when (args[0]) {
+                "info", "cx", "推文", "tweet", "查推" -> getTweetToMessageChain(args, event)
+                "sub", "订阅" -> subscribeUser(args, id)
+                "unsub", "退订" -> unsubscribeUser(args, id)
+                "list" -> {
+                    val list = GroupConfigManager.getConfigOrNew(id).twitterSubscribers
+                    if (list.isEmpty()) "没有订阅任何蓝鸟用户".convertToChain() else list.toString().convertToChain()
                 }
-
-                when (args[0]) {
-                    "info", "cx", "推文", "tweet", "查推" -> getTweetToMessageChain(args, event)
-                    "sub", "订阅" -> subscribeUser(args, id)
-                    "unsub", "退订" -> unsubscribeUser(args, id)
-                    "list" -> {
-                        val list = GroupConfigManager.getConfigOrNew(id).twitterSubscribers
-                        if (list.isEmpty()) "没有订阅任何蓝鸟用户".convertToChain() else list.toString().convertToChain()
-                    }
-                    "push" -> {
-                        val cfg = GroupConfigManager.getConfigOrNew(id)
-                        cfg.twitterPushEnabled = !cfg.twitterPushEnabled
-                        return CometUtil.sendMessage("蓝鸟动态推送已${if (cfg.twitterPushEnabled) "开启" else "关闭"}")
-                    }
-                    "id" -> {
-                        return if (args[1].isNumeric()) {
-                            getTweetByID(args[1].toLong(), event.subject)
-                        } else {
-                            "请输入有效数字".convertToChain()
-                        }
-                    }
-                    else -> getHelp().convertToChain()
+                "push" -> {
+                    val cfg = GroupConfigManager.getConfigOrNew(id)
+                    cfg.twitterPushEnabled = !cfg.twitterPushEnabled
+                    return CometUtil.sendMessage("蓝鸟动态推送已${if (cfg.twitterPushEnabled) "开启" else "关闭"}")
                 }
+                "id" -> {
+                    return if (args[1].isNumeric()) {
+                        getTweetByID(args[1].toLong(), event.subject)
+                    } else {
+                        "请输入有效数字".convertToChain()
+                    }
+                }
+                else -> getHelp().convertToChain()
             }
         }
-        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps =

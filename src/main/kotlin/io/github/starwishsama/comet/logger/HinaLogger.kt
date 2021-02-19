@@ -25,7 +25,7 @@ open class HinaLogger(
             it.subList(2, it.size)
         }[0]
 
-        val executorInfo = "${StringUtil.simplyClassName(executor.className)}.${executor.methodName}:${executor.lineNumber}"
+        val executorInfo = "${StringUtil.simplyClassName(executor.className)}#${executor.methodName}:${executor.lineNumber}"
 
         var trace = ""
 
@@ -34,7 +34,7 @@ open class HinaLogger(
         }
 
         logAction(
-            "${level.color}${dateTimeFormatter.format(LocalDateTime.now())} ${level.internalName}/${level.simpleName}${if (level == HinaLogLevel.Debug) "($executorInfo)" else ""} $loggerName -> $prefix $message"
+            "${level.color}${dateTimeFormatter.format(LocalDateTime.now())} ${level.internalName}/${level.simpleName}${if (level != HinaLogLevel.Verbose && level != HinaLogLevel.Info) "($executorInfo)" else ""} $loggerName -> $prefix $message"
                     + if (trace.isNotEmpty()) "\n\n$trace\n" else ""
         )
     }

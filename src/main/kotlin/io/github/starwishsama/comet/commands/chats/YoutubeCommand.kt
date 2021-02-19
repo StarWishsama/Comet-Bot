@@ -11,61 +11,56 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.push.YoutubeUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.util.*
 
 @CometCommand
 class YoutubeCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(user.id)) {
-            if (args.isEmpty()) {
-                return getHelp().convertToChain()
-            } else {
-                when (args[0]) {
-                    "info" ->
-                        return checkInfo(args[1]).toMessageChain(event.subject)
-                    "sub" -> return if (event is GroupMessageEvent) {
-                        subscribeUser(args[1], event.group.id)
-                    } else {
-                        "该功能仅限群聊使用".sendMessage()
-                    }
-                    "unsub" -> return if (event is GroupMessageEvent) {
-                        unsubscribeUser(args, event.group.id)
-                    } else {
-                        "该功能仅限群聊使用".sendMessage()
-                    }
-                    "push" -> return if (event is GroupMessageEvent) {
-                        val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
-                        cfg.youtubePushEnabled = !cfg.youtubePushEnabled
-
-                        "Youtube 推送状态: ${cfg.youtubePushEnabled}".sendMessage()
-                    } else {
-                        "该功能仅限群聊使用".sendMessage()
-                    }
-                    "list" -> return if (event is GroupMessageEvent) {
-                        val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
-                        buildString {
-                            append("已订阅账号: ")
-                            cfg.youtubeSubscribers.forEach {
-                                append(it.userName + "(" + it.id + ")").append(",")
-                            }
-                        }.removeSuffix(",").sendMessage()
-                    } else {
-                        "该功能仅限群聊使用".sendMessage()
-                    }
-                    else -> getHelp().convertToChain()
+        if (args.isEmpty()) {
+            return getHelp().convertToChain()
+        } else {
+            when (args[0]) {
+                "info" ->
+                    return checkInfo(args[1]).toMessageChain(event.subject)
+                "sub" -> return if (event is GroupMessageEvent) {
+                    subscribeUser(args[1], event.group.id)
+                } else {
+                    "该功能仅限群聊使用".sendMessage()
                 }
+                "unsub" -> return if (event is GroupMessageEvent) {
+                    unsubscribeUser(args, event.group.id)
+                } else {
+                    "该功能仅限群聊使用".sendMessage()
+                }
+                "push" -> return if (event is GroupMessageEvent) {
+                    val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
+                    cfg.youtubePushEnabled = !cfg.youtubePushEnabled
+
+                    "Youtube 推送状态: ${cfg.youtubePushEnabled}".sendMessage()
+                } else {
+                    "该功能仅限群聊使用".sendMessage()
+                }
+                "list" -> return if (event is GroupMessageEvent) {
+                    val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
+                    buildString {
+                        append("已订阅账号: ")
+                        cfg.youtubeSubscribers.forEach {
+                            append(it.userName + "(" + it.id + ")").append(",")
+                        }
+                    }.removeSuffix(",").sendMessage()
+                } else {
+                    "该功能仅限群聊使用".sendMessage()
+                }
+                else -> return getHelp().convertToChain()
             }
         }
-        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps =

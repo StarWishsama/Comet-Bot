@@ -122,7 +122,7 @@ object CommandExecutor {
 
         val debug = cmd?.getProps()?.name?.contentEquals("debug") == true
 
-        val user = BotUser.getUserSafely(senderId)
+        val user = BotUser.getUserOrRegister(senderId)
 
         if (BotVariables.switch || debug) {
             try {
@@ -141,7 +141,7 @@ object CommandExecutor {
                  */
                 if (cmd != null && event is GroupMessageEvent &&
                         GroupConfigManager.getConfig(event.group.id)?.isDisabledCommand(cmd) == true) {
-                    return if (CometUtil.isNoCoolDown(user.id)) {
+                    return if (validateStatus(user, cmd.getProps())) {
                         ExecutedResult(CometUtil.sendMessage("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
                     } else {
                         ExecutedResult(EmptyMessageChain, cmd, CommandStatus.Disabled())
@@ -353,6 +353,61 @@ object CommandExecutor {
     fun countCommands(): Int = commands.size + consoleCommands.size
 
     fun getCommands() = commands
+
+    /**
+     * 判断指定QQ号是否可以执行命令
+     * (可以自定义命令冷却时间)
+     *
+     * @author Nameless
+     * @param user 检测的用户
+     * @param props 命令配置
+     *
+     * @return 目标QQ号是否处于冷却状态
+     */
+    private fun validateStatus(user: BotUser, props: CommandProps): Boolean {
+        val currentTime = System.currentTimeMillis()
+
+        if (user.id == 80000000L) {
+            return false
+        }
+
+        if (user.isBotOwner()) {
+            return true
+        }
+
+        when (props.consumerType) {
+            CommandExecuteConsumerType.COOLDOWN -> {
+                return when (user.lastExecuteTime) {
+                    -1L -> {
+                        user.lastExecuteTime = currentTime
+                        true
+                    }
+                    else -> {
+                        val result = currentTime - user.lastExecuteTime < props.consumePoint * 1000
+                        user.lastExecuteTime = currentTime
+                        result
+                    }
+                }
+            }
+            CommandExecuteConsumerType.POINT -> {
+                return if (user.checkInPoint >= props.consumePoint) {
+                    user.checkInPoint -= props.consumePoint
+                    true
+                } else {
+                    false
+                }
+            }
+            CommandExecuteConsumerType.COMMAND_TIME -> {
+                return if (user.commandTime >= props.consumePoint) {
+                    user.decreaseTime(props.consumePoint)
+                    true
+                } else {
+                    false
+                }
+            }
+            else -> return false
+        }
+    }
 
     data class ExecutedResult(val msg: MessageChain, val cmd: ChatCommand?, val status: CommandStatus = CommandStatus.NotACommand())
 

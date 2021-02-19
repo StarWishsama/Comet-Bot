@@ -11,7 +11,6 @@ import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.sessions.SessionUser
 import io.github.starwishsama.comet.sessions.commands.roll.RollSession
-import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import kotlinx.coroutines.GlobalScope
@@ -20,7 +19,6 @@ import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.at
 import net.mamoe.mirai.message.data.messageChainOf
@@ -28,7 +26,6 @@ import net.mamoe.mirai.message.data.messageChainOf
 @CometCommand
 class RollCommand : ChatCommand, SuspendCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (!CometUtil.isNoCoolDown(user.id)) return EmptyMessageChain
         if (event !is GroupMessageEvent) return "本命令仅限群聊使用".sendMessage()
 
         val session = SessionManager.getSessionByGroup(event.group.id, RollSession::class.java)

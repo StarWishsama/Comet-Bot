@@ -27,7 +27,7 @@ class RConCommand : ChatCommand, SuspendCommand {
     private val waitList = mutableMapOf<BotUser, Int>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(user.id) && user.hasPermission(getProps().permission)) {
+        if (user.hasPermission(getProps().permission)) {
             if (args.isEmpty()) {
                 return getHelp().convertToChain()
             } else {

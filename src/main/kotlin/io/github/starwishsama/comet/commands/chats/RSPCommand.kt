@@ -10,9 +10,9 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 
@@ -24,11 +24,8 @@ class RSPCommand : ChatCommand, SuspendCommand {
     private val inProgressPlayer = mutableSetOf<Long>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (CometUtil.isNoCoolDown(event.sender.id)) {
-            event.subject.sendMessage("石头剪刀布... 开始! 你要出什么呢?")
-            SessionManager.addAutoCloseSession(Session(this, user.id), 1)
-        }
-        return EmptyMessageChain
+        SessionManager.addAutoCloseSession(Session(this, user.id), 1)
+        return "石头剪刀布... 开始! 你要出什么呢?".sendMessage()
     }
 
     override fun getProps(): CommandProps = CommandProps("janken", arrayListOf("猜拳", "石头剪刀布", "rsp", "cq"), "石头剪刀布", "nbot.commands.rsp", UserLevel.USER)

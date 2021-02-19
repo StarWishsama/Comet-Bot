@@ -7,7 +7,6 @@ import io.github.starwishsama.comet.api.thirdparty.rainbowsix.R6StatsApi
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.CometUtil
-import io.github.starwishsama.comet.utils.CometUtil.isNoCoolDown
 import io.github.starwishsama.comet.utils.IDGuidelineType
 import io.github.starwishsama.comet.utils.StringUtil.isLegitId
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -19,7 +18,7 @@ import net.mamoe.mirai.message.data.at
 @CometCommand
 class R6SCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (isNoCoolDown(event.sender.id) && event is GroupMessageEvent) {
+        if (event is GroupMessageEvent) {
             if (args.isEmpty()) {
                 return CometUtil.sendMessage(getHelp(), true)
             } else {
