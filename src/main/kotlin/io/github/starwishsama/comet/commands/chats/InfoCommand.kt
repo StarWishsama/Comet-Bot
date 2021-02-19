@@ -31,7 +31,7 @@ class InfoCommand : ChatCommand {
                                 "\n权限组: " + user.level.toString() +
                                 "\n命令条数: " + user.commandTime
 
-                    if (user.bindServerAccount != null) {
+                    if (user.bindServerAccount.isNotEmpty()) {
                         reply = reply + "绑定的游戏账号是: " + user.bindServerAccount
                     }
 

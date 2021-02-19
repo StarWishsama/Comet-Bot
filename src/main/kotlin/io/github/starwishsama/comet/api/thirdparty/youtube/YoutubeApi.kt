@@ -32,7 +32,7 @@ object YoutubeApi : ApiExecutor {
 
     init {
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://youtube.googleapis.com/youtube/v3")
+            .baseUrl("https://youtube.googleapis.com/youtube/v3/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(BotVariables.client)
             .build()

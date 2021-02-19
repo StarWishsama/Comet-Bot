@@ -30,12 +30,16 @@ open class HinaLogger(
         var trace = ""
 
         if (stacktrace != null) {
-            trace = formatStacktrace(stacktrace, null, outputBeautyTrace)
+            trace = try {
+                formatStacktrace(stacktrace, null, outputBeautyTrace)
+            } catch (e: Exception) {
+                stacktrace.stackTraceToString()
+            }
         }
 
         logAction(
             "${level.color}${dateTimeFormatter.format(LocalDateTime.now())} ${level.internalName}/${level.simpleName}${if (level != HinaLogLevel.Verbose && level != HinaLogLevel.Info) "($executorInfo)" else ""} $loggerName -> $prefix $message"
-                    + if (trace.isNotEmpty()) "\n\n$trace\n" else ""
+                    + if (trace.isNotEmpty()) "\n\n$trace\n" else "" + "${AnsiUtil.Color.RESET}"
         )
     }
 
@@ -149,7 +153,7 @@ internal fun formatStacktrace(exception: Throwable, packageFilter: String? = nul
 
 sealed class HinaLogLevel(val internalName: String, val simpleName: String, val color: AnsiUtil.Color) {
     object Verbose: HinaLogLevel("VERBOSE", "V", AnsiUtil.Color.GRAY)
-    object Info: HinaLogLevel("INFO", "I", AnsiUtil.Color.WHITE)
+    object Info: HinaLogLevel("INFO", "I", AnsiUtil.Color.RESET)
     object Debug: HinaLogLevel("DEBUG", "D", AnsiUtil.Color.LIGHT_BLUE)
     object Error: HinaLogLevel("ERROR", "E", AnsiUtil.Color.LIGHT_RED)
     object Warn: HinaLogLevel("WARN", "W", AnsiUtil.Color.LIGHT_YELLOW)

@@ -3,19 +3,21 @@ package io.github.starwishsama.comet.objects
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.enums.UserLevel
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import java.time.LocalDateTime
 
 class BotUser(@SerializedName("userQQ") val id: Long) {
     var lastCheckInTime: LocalDateTime = LocalDateTime.now().minusDays(1)
     var checkInPoint: Double = 0.0
     var checkInTime: Int = 0
-    var bindServerAccount: String? = null
-    var r6sAccount: String? = null
+    var bindServerAccount: String = ""
+    var r6sAccount: String = ""
     var level: UserLevel = UserLevel.USER
     var commandTime: Int = 100
     var checkInGroup: Long = 0
     var lastExecuteTime: Long = -1
     private val permissions = mutableListOf<String>()
+    val savedContents: MutableList<MessageWrapper> = mutableListOf()
 
     fun decreaseTime() {
         if (level <= UserLevel.VIP) {

@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.startup
 
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.consoleCommandLogger
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometApplication
@@ -17,6 +18,7 @@ import io.github.starwishsama.comet.commands.console.StopCommand
 import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
+import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.managers.GachaManager
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.utils.FileUtil
@@ -100,6 +102,7 @@ object CometRuntime {
                 YoutubeCommand(),
                 MinecraftCommand(),
                 PusherCommand(),
+                NoteCommand(),
                 // Console Command
                 StopCommand(),
                 DebugCommand(),
@@ -111,7 +114,15 @@ object CometRuntime {
         logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
 
         /** 监听器 */
-        val listeners = arrayOf(ConvertLightAppListener, RepeatListener, BotGroupStatusListener, AutoReplyListener, GroupMemberChangedListener, GroupRequestListener)
+        val listeners = arrayOf(
+            ConvertLightAppListener,
+            RepeatListener,
+            BotGroupStatusListener,
+            AutoReplyListener,
+            GroupMemberChangedListener,
+            GroupRequestListener,
+            NoteListener
+        )
 
         listeners.forEach { listener ->
             if (listener.eventToListen.isEmpty()) {
@@ -192,6 +203,8 @@ object CometRuntime {
 
     fun handleConsoleCommand() {
         TaskUtil.runAsync {
+            consoleCommandLogger.log(HinaLogLevel.Info, "后台已启用", prefix = "后台管理")
+
             while (true) {
                 var line: String
 
@@ -199,7 +212,7 @@ object CometRuntime {
                     line = CometApplication.console.readLine(">")
                     val result = CommandExecutor.dispatchConsoleCommand(line)
                     if (result.isNotEmpty()) {
-                        BotVariables.consoleCommandLogger.info(result)
+                        consoleCommandLogger.info(result)
                     }
                 }
             }

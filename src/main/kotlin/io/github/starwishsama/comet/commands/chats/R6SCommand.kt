@@ -25,7 +25,7 @@ class R6SCommand : ChatCommand {
                 when (args[0].toLowerCase()) {
                     "info", "查询", "cx" -> {
                         val account = user.r6sAccount
-                        return if (args.size <= 1 && account != null) {
+                        return if (args.size <= 1 && account.isNotEmpty()) {
                             event.subject.sendMessage(CometUtil.sendMessage("查询中..."))
                             val result = R6StatsApi.getPlayerStat(account)
                             event.sender.at() + "\n" + result.toMessageChain(event.subject)
