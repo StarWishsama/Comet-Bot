@@ -1,6 +1,5 @@
 package io.github.starwishsama.comet.utils.network
 
-import cn.hutool.http.HttpRequest
 import com.github.salomonbrys.kotson.fromJson
 import com.github.salomonbrys.kotson.get
 import com.google.gson.GsonBuilder
@@ -30,13 +29,13 @@ import java.net.URLEncoder
  * 搜索音乐工具类
  *
  * FIXME: 将搜索结果转换为 Bean, 减少繁琐的解析反解析
+ * TODO: 重构搜索方式, 应给出选项
  */
 object MusicUtil {
     /** 1分钟100次，10分钟500次，1小时2000次 */
     private const val api4qq = "https://api.qq.jsososo.com/song/urls?id="
     private const val api4NetEase = "https://musicapi.leanapp.cn"
     private val gson = GsonBuilder().serializeNulls().setLenient().disableHtmlEscaping().create()
-    private const val versionCode = ".0.0.1"
 
     fun searchNetEaseMusic(songName: String): MessageChain {
         try {
@@ -63,24 +62,15 @@ object MusicUtil {
 
                             artistName = artistName.substring(0, artistName.length - 1)
 
-                            val playResult =
-                                    HttpRequest.get("http://$api4NetEase/song/url?id=$musicId")
-                                    .timeout(3_000).executeAsync()
-                            if (playResult.isOk) {
-                                val playJson = JsonParser.parseString(playResult.body())
-                                if (playJson.isJsonObject) {
-                                    val playUrl = playJson["data"].asJsonArray[0]["url"].asString
 
-                                    return MusicShare(
-                                        MusicKind.NeteaseCloudMusic,
-                                        name,
-                                        artistName,
-                                        jumpUrl = musicUrl,
-                                        pictureUrl = albumUrl,
-                                        playUrl
-                                    ).toMessageChain()
-                                }
-                            }
+                            return MusicShare(
+                                MusicKind.NeteaseCloudMusic,
+                                name,
+                                artistName,
+                                jumpUrl = musicUrl,
+                                pictureUrl = albumUrl,
+                                musicUrl = "http://music.163.com/song/media/outer/url?id=${musicId}&userid=1"
+                            ).toMessageChain()
                         }
                     }
                 }
