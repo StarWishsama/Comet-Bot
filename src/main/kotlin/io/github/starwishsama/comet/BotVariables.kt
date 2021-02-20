@@ -11,6 +11,8 @@ import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.objects.shop.Shop
+import io.github.starwishsama.comet.objects.wrapper.WrapperElement
+import io.github.starwishsama.comet.objects.wrapper.WrapperElementAdapter
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.network.NetUtil
 import net.kronos.rkon.core.Rcon
@@ -71,8 +73,8 @@ object BotVariables {
 
     val consoleCommandLogger: HinaLogger = HinaLogger("CometConsole", logAction = { logAction(it) })
 
-    val nullableGson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().setLenient().create()
-    val gson: Gson = GsonBuilder().setPrettyPrinting().setLenient().create()
+    val nullableGson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().setLenient().registerTypeAdapter(WrapperElement::class.java, WrapperElementAdapter()).create()
+    val gson: Gson = GsonBuilder().setPrettyPrinting().setLenient().registerTypeAdapter(WrapperElement::class.java, WrapperElementAdapter()).create()
     var rCon: Rcon? = null
     lateinit var log: File
 

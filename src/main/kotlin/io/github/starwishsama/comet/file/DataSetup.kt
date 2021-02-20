@@ -103,7 +103,10 @@ object DataSetup {
     private fun load() {
         cfg = Default.decodeFromString(CometConfig.serializer(), cfgFile.file.getContext())
 
-        BotVariables.users.addAll(gson.fromJson<List<BotUser>>(userCfg.file.getContext()))
+        gson.fromJson<List<BotUser>>(userCfg.file.getContext()).forEach {
+            BotUser.addUser(it)
+        }
+
 
         BotVariables.shop.addAll(nullableGson.fromJson(shopItemCfg.file.getContext()))
 

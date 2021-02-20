@@ -113,5 +113,11 @@ class BotUser(@SerializedName("userQQ") val id: Long) {
         }
 
         fun getUserOrRegister(qq: Long): BotUser = getUser(qq) ?: quickRegister(qq)
+
+        fun addUser(botUser: BotUser) {
+            if (getUser(botUser.id) == null) {
+                BotVariables.users.add(botUser)
+            }
+        }
     }
 }

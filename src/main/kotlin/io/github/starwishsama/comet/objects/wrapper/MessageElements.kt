@@ -1,28 +1,27 @@
 package io.github.starwishsama.comet.objects.wrapper
 
+import com.google.gson.*
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import java.io.File
+import java.lang.reflect.Type
 
-@Serializable
-open class WrapperElement {
-    open fun toMessageContent(subject: Contact): MessageContent {
-        throw UnsupportedOperationException("You have to override this method!")
-    }
+interface WrapperElement {
+    val className: String
 
-    open fun asString(): String {
-        throw UnsupportedOperationException("You have to override this method!")
-    }
+    fun toMessageContent(subject: Contact): MessageContent
+
+    fun asString(): String
 }
 
-@Serializable
-data class PureText(val text: String): WrapperElement() {
+data class PureText(val text: String): WrapperElement {
+    override val className: String = this::class.java.name
+
     override fun toMessageContent(subject: Contact): PlainText {
         return PlainText(text)
     }
@@ -33,26 +32,31 @@ data class PureText(val text: String): WrapperElement() {
 }
 
 @Serializable
-data class Picture(val url: String, @Contextual val filePath: File? = null): WrapperElement() {
+data class Picture(val url: String, val filePath: String = ""): WrapperElement {
+    override val className: String = this::class.java.name
+
     override fun toMessageContent(subject: Contact): Image {
         if (url.isNotEmpty()) {
             NetUtil.getInputStream(url)?.use {
                 return runBlocking { it.uploadAsImage(subject) }
             }
-        } else if (filePath != null) {
-            return runBlocking { filePath.uploadAsImage(subject) }
+        } else if (filePath.isNotEmpty() && File(filePath).exists()) {
+            return runBlocking { File(filePath).uploadAsImage(subject) }
         }
+
 
         throw IllegalArgumentException("url or filePath can't be null or empty!")
     }
 
     override fun asString(): String {
-        return filePath?.absolutePath ?: url
+        return if (filePath.isEmpty()) url else filePath
     }
 }
 
 @Serializable
-data class AtElement(val target: Long): WrapperElement() {
+data class AtElement(val target: Long): WrapperElement {
+    override val className: String = this::class.java.name
+
     override fun toMessageContent(subject: Contact): MessageContent {
         return At(target)
     }
@@ -62,7 +66,9 @@ data class AtElement(val target: Long): WrapperElement() {
 }
 
 @Serializable
-data class XmlElement(val content: String): WrapperElement() {
+data class XmlElement(val content: String): WrapperElement {
+    override val className: String = this::class.java.name
+
     @OptIn(MiraiExperimentalApi::class)
     override fun toMessageContent(subject: Contact): MessageContent {
         return SimpleServiceMessage(serviceId = 60, content = content)
@@ -70,4 +76,31 @@ data class XmlElement(val content: String): WrapperElement() {
 
     override fun asString(): String = "XML 消息"
 
+}
+
+class WrapperElementAdapter : JsonDeserializer<Any>, JsonSerializer<Any> {
+    @Throws(JsonParseException::class)
+    override fun deserialize(jsonElement: JsonElement, type: Type,
+                             jsonDeserializationContext: JsonDeserializationContext
+    ): Any {
+        val jsonObject = jsonElement.asJsonObject
+        val className = jsonObject.get("className").asString
+        val objectClass = getObjectClass(className)
+        return jsonDeserializationContext.deserialize(jsonObject, objectClass)
+    }
+
+    override fun serialize(jsonElement: Any, type: Type, jsonSerializationContext: JsonSerializationContext): JsonElement {
+        val element = jsonSerializationContext.serialize(jsonElement).asJsonObject
+        element.addProperty("className", jsonElement.javaClass.name)
+        return element
+    }
+
+
+    private fun getObjectClass(className: String): Class<*> {
+        try {
+            return Class.forName(className)
+        } catch (e: ClassNotFoundException) {
+            throw JsonParseException(e.message)
+        }
+    }
 }

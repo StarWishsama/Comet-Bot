@@ -62,6 +62,7 @@ class NoteCommand: ChatCommand {
                         addElement(it)
                     }
                 }
+                addText("\n")
             }
         }
 
