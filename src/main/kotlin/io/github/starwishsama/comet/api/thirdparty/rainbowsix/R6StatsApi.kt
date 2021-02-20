@@ -21,7 +21,7 @@ object R6StatsApi: ApiExecutor {
 
     init {
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://api2.r6stats.com/public-api/stats")
+            .baseUrl("https://api2.r6stats.com/public-api/stats/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(BotVariables.client)
             .build()

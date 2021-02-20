@@ -49,7 +49,7 @@ object BotVariables {
     lateinit var startTime: LocalDateTime
 
     val service: ScheduledExecutorService = Executors.newScheduledThreadPool(
-            8,
+        Runtime.getRuntime().availableProcessors(),
             BasicThreadFactory.Builder()
                     .namingPattern("comet-service-%d")
                     .daemon(true)

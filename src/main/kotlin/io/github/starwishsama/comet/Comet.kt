@@ -12,10 +12,7 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.network.LoginFailedException
-import net.mamoe.mirai.utils.BotConfiguration
-import net.mamoe.mirai.utils.FileCacheStrategy
-import net.mamoe.mirai.utils.MiraiInternalApi
-import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
+import net.mamoe.mirai.utils.*
 
 class Comet {
     private val loginSolver: LoginSolver = LoginSolver(this)
@@ -36,7 +33,7 @@ class Comet {
             networkLoggerSupplier = { it ->
                 CustomLogRedirecter("MiraiNet (${it.id})", BotVariables.netLogger)
             }
-            heartbeatPeriodMillis = BotVariables.cfg.heartBeatPeriod * 60 * 1000
+            heartbeatPeriodMillis = 30.secondsToMillis
             fileBasedDeviceInfo()
             protocol = BotVariables.cfg.botProtocol
         }

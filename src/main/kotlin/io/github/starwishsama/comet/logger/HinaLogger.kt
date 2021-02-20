@@ -21,9 +21,11 @@ open class HinaLogger(
     fun log(level: HinaLogLevel, message: String?, stacktrace: Throwable? = null, prefix: String = "", bypass: Boolean = false) {
         if ((!debugMode || bypass) && level == HinaLogLevel.Debug) return
 
-        val executor = Thread.currentThread().stackTrace.toMutableList().also {
+        val st = Thread.currentThread().stackTrace.toMutableList().also {
             it.subList(2, it.size)
-        }[0]
+        }
+
+        val executor = st.firstOrNull { !it.className.startsWith("java.") } ?: st.getOrNull(0) ?: st[0]
 
         val executorInfo = "${StringUtil.simplyClassName(executor.className)}#${executor.methodName}:${executor.lineNumber}"
 

@@ -28,6 +28,7 @@ import kotlinx.coroutines.withContext
 import net.mamoe.mirai.Bot
 import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
+import java.io.IOException
 import java.io.StringReader
 
 object DataSetup {
@@ -124,8 +125,8 @@ object DataSetup {
 
         try {
             GachaUtil.arkNightDataCheck(arkNightData.file)
-        } catch (e: Exception) {
-            daemonLogger.warning("下载明日方舟游戏数据失败, ${e.message}\n注意: 数据来源于 Github, 国内用户无法下载请自行下载替换\n链接: ${GachaUtil.arkNightData}")
+        } catch (e: IOException) {
+            daemonLogger.warning("解析明日方舟游戏数据失败, ${e.message}\n注意: 数据来源于 Github, 国内用户无法下载请自行下载替换\n替换位置: ./res/arkNights.json\n链接: ${GachaUtil.arkNightData}")
         }
 
         if (arkNightData.exists()) {
@@ -144,7 +145,7 @@ object DataSetup {
             daemonLogger.info("成功载入明日方舟游戏数据, 共 (${arkNight.size - hiddenOperators.size}/${arkNight.size}) 个")
             if (cfg.arkDrawUseImage) {
                 if (System.getProperty("java.awt.headless") != "true" && getOsName().toLowerCase().contains("linux")) {
-                    daemonLogger.info("检测到类 Unix 系统, 正在启用 Headless 模式")
+                    daemonLogger.info("检测到 Linux 系统, 正在启用无头模式")
                     System.setProperty("java.awt.headless", "true")
                 }
 
