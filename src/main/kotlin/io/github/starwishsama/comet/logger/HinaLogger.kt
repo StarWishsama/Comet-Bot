@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-open class HinaLogger(
+class HinaLogger(
     val loggerName: String,
     val logAction: (String) -> Unit = {
         CometApplication.console.printAbove(it)
@@ -16,6 +16,11 @@ open class HinaLogger(
     var outputBeautyTrace: Boolean = false,
     val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yy/M/dd HH:mm:ss")
 ) {
+
+    init {
+        LoggerInstances.instances.add(this)
+    }
+
     // 时间 日志等级/日志等级缩写 logger名字 -> logger前缀 消息
     // 例: 21/2/18 19:18:32 N/MainLogger(i.g.s.c.t.ClassName) -> [Main] Logger Example
     fun log(level: HinaLogLevel, message: String?, stacktrace: Throwable? = null, prefix: String = "", bypass: Boolean = false) {
@@ -25,7 +30,10 @@ open class HinaLogger(
             it.subList(2, it.size)
         }
 
-        val executor = st.firstOrNull { !it.className.startsWith("java.") } ?: st.getOrNull(0) ?: st[0]
+        val executor = st.firstOrNull {
+            !it.className.startsWith("java.")
+                    && !it.className.startsWith("io.github.starwishsama.comet.logger")
+        } ?: st.getOrNull(0) ?: st[0]
 
         val executorInfo = "${StringUtil.simplyClassName(executor.className)}#${executor.methodName}:${executor.lineNumber}"
 
@@ -40,7 +48,7 @@ open class HinaLogger(
         }
 
         logAction(
-            "${level.color}${dateTimeFormatter.format(LocalDateTime.now())} ${level.internalName}/${level.simpleName}${if (level != HinaLogLevel.Verbose && level != HinaLogLevel.Info) "($executorInfo)" else ""} $loggerName -> $prefix $message"
+            "${level.color}${dateTimeFormatter.format(LocalDateTime.now())} ${level.internalName}/${level.simpleName}${if (level != HinaLogLevel.Verbose && level != HinaLogLevel.Info) "($executorInfo)" else ""} $loggerName -> ${if (prefix.isEmpty()) "" else "$prefix "}$message"
                     + if (trace.isNotEmpty()) "\n\n$trace\n" else "" + "${AnsiUtil.Color.RESET}"
         )
     }

@@ -48,6 +48,8 @@ object BotVariables {
 
     lateinit var startTime: LocalDateTime
 
+    var cfg = CometConfig()
+
     val service: ScheduledExecutorService = Executors.newScheduledThreadPool(
         Runtime.getRuntime().availableProcessors(),
             BasicThreadFactory.Builder()
@@ -65,13 +67,13 @@ object BotVariables {
         }
     }
 
-    val logger: HinaLogger = HinaLogger("Comet", logAction = { logAction(it) })
+    val logger: HinaLogger = HinaLogger("Comet", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
-    val netLogger: HinaLogger = HinaLogger("CometNet", logAction = { logAction(it) })
+    val netLogger: HinaLogger = HinaLogger("CometNet", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
-    val daemonLogger: HinaLogger = HinaLogger("CometService", logAction = { logAction(it) })
+    val daemonLogger: HinaLogger = HinaLogger("CometService", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
-    val consoleCommandLogger: HinaLogger = HinaLogger("CometConsole", logAction = { logAction(it) })
+    val consoleCommandLogger: HinaLogger = HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
     val nullableGson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().setLenient().registerTypeAdapter(WrapperElement::class.java, WrapperElementAdapter()).create()
     val gson: Gson = GsonBuilder().setPrettyPrinting().setLenient().registerTypeAdapter(WrapperElement::class.java, WrapperElementAdapter()).create()
@@ -81,7 +83,6 @@ object BotVariables {
     val shop: MutableList<Shop> = LinkedList()
     val users: MutableList<BotUser> = LinkedList()
     var localMessage: MutableList<BotLocalization> = ArrayList()
-    var cfg = CometConfig()
     var hitokoto: Hitokoto? = null
 
     /** 明日方舟卡池数据 */

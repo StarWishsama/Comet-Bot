@@ -30,6 +30,13 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
         GroupConfigManager.getAllConfigs().forEach { cfg ->
             if (cfg.biliPushEnabled) {
                 cfg.biliSubscribers.forEach user@{ user ->
+                    val cache = cachePool.getDynamicContext(user.id.toLong())
+
+                    if (cache?.status == PushStatus.READY) {
+                        cache.addPushTarget(cfg.id)
+                        return@user
+                    }
+
                     val dynamic: Dynamic = try {
                         DynamicApi.getUserDynamicTimeline(user.id.toLong())
                     } catch (e: RuntimeException) {
@@ -39,7 +46,6 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
                         null
                     } ?: return@user
                     val time = System.currentTimeMillis()
-                    val cache = cachePool.getDynamicContext(user.id.toLong())
                     val current = BiliBiliDynamicContext(
                         mutableListOf(cfg.id),
                         time,

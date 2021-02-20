@@ -5,6 +5,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import java.time.LocalDateTime
+import kotlin.streams.toList
 
 class BotUser(@SerializedName("userQQ") val id: Long) {
     var lastCheckInTime: LocalDateTime = LocalDateTime.now().minusDays(1)
@@ -108,15 +109,24 @@ class BotUser(@SerializedName("userQQ") val id: Long) {
         }
 
         fun getUser(qq: Long): BotUser? {
-            val user = BotVariables.users.parallelStream().filter { it.id == qq }.findFirst()
+            val user = BotVariables.users.stream().filter { it.id == qq }.findFirst()
             return user.orElseGet { null }
         }
 
         fun getUserOrRegister(qq: Long): BotUser = getUser(qq) ?: quickRegister(qq)
 
         fun addUser(botUser: BotUser) {
-            if (getUser(botUser.id) == null) {
+            val duplicatedUser = BotVariables.users.parallelStream().filter { it.id == botUser.id }.toList()
+
+            if (duplicatedUser.isEmpty()) {
                 BotVariables.users.add(botUser)
+            } else {
+                for (du in duplicatedUser) {
+                    if (du.checkInPoint < 1 && botUser.checkInPoint > 0) {
+                        BotVariables.users.remove(du)
+                        BotVariables.users.add(botUser)
+                    }
+                }
             }
         }
     }

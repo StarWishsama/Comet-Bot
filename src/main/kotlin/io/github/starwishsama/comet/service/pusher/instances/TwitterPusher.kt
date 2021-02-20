@@ -27,9 +27,15 @@ class TwitterPusher(bot: Bot): CometPusher(bot, "twitter") {
         GroupConfigManager.getAllConfigs().parallelStream().forEach { cfg ->
             if (cfg.twitterPushEnabled) {
                 cfg.twitterSubscribers.forEach tweet@ { user ->
+                    val cache = cachePool.getTwitterContext(user)
+
+                    if (cache?.status == PushStatus.READY) {
+                        cache.addPushTarget(cfg.id)
+                        return@tweet
+                    }
+
                     val latestTweet = TwitterApi.getTweetInTimeline(user, 0, 2) ?: return@tweet
                     val time = System.currentTimeMillis()
-                    val cache = cachePool.getTwitterContext(user)
 
                     val current = TwitterContext(retrieveTime = time, status = PushStatus.READY, twitterUserName = user, tweetId = latestTweet.id)
 

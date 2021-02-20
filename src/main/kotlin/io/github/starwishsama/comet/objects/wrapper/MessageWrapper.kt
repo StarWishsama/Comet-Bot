@@ -50,7 +50,7 @@ open class MessageWrapper: Cloneable {
     fun toMessageChain(subject: Contact): MessageChain {
         return MessageChainBuilder().apply {
             messageContent.forEach {
-                if (it !is Picture || !isPictureReachLimit()) {
+                if (!isPictureReachLimit() || it !is Picture) {
                     add(it.toMessageContent(subject))
                 }
             }
@@ -58,7 +58,7 @@ open class MessageWrapper: Cloneable {
     }
 
     private fun isPictureReachLimit(): Boolean {
-        return messageContent.parallelStream().filter { it is Picture }.count() >= 9
+        return messageContent.parallelStream().filter { it is Picture }.count() > 9
     }
 
     override fun toString(): String {

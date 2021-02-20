@@ -21,8 +21,8 @@ class NoteCommand: ChatCommand {
         } else {
             when (args[0]) {
                 "list", "列表", "所有", "all" -> listNotes(user, event.subject)
-                "display", "展示" -> displayNote(user, args[0], event.subject)
-                "remove", "sc", "rm", "删除" -> handleRemove(user, args[0])
+                "display", "展示" -> displayNote(user, args[1], event.subject)
+                "remove", "sc", "rm", "删除" -> handleRemove(user, args[1])
                 else -> getHelp().sendMessage()
             }
         }
@@ -83,7 +83,7 @@ class NoteCommand: ChatCommand {
                 return "已清空所有已保存信息!".sendMessage()
             } else {
                 val location = index.toIntOrNull() ?: return "请输入有效数字!".sendMessage()
-                if (location > notes.size) return "找不到你要删除的信息!".sendMessage()
+                if (location >= notes.size) return "找不到你要删除的信息!".sendMessage()
 
                 notes.removeAt(location)
                 return "删除指定消息成功!".sendMessage()

@@ -13,6 +13,7 @@ import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.hiddenOperators
 import io.github.starwishsama.comet.BotVariables.nullableGson
+import io.github.starwishsama.comet.logger.LoggerInstances
 import io.github.starwishsama.comet.managers.GachaManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotLocalization
@@ -42,7 +43,7 @@ object DataSetup {
         it.writeString(Default.encodeToString(CometConfig()), isAppend = false)
     }
     @Suppress("DEPRECATION")
-    private val langCfg: DataFile = DataFile(File(FileUtil.getResourceFolder(), "lang.json"), DataFile.FilePriority.NORMAL) {
+    private val langCfg: DataFile = DataFile(File(FileUtil.getResourceFolder(), "lang.json"), DataFile.FilePriority.HIGH) {
         val default = arrayOf(BotLocalization("msg.bot-prefix", "Bot > "),
             BotLocalization("msg.no-permission", "你没有权限"),
             BotLocalization("msg.bind-success", "绑定账号 %s 成功!"),
@@ -103,6 +104,9 @@ object DataSetup {
 
     private fun load() {
         cfg = Default.decodeFromString(CometConfig.serializer(), cfgFile.file.getContext())
+        LoggerInstances.instances.forEach {
+            it.debugMode = cfg.debugMode
+        }
 
         gson.fromJson<List<BotUser>>(userCfg.file.getContext()).forEach {
             BotUser.addUser(it)

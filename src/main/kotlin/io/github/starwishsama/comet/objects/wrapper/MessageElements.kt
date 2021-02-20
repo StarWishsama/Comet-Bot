@@ -33,6 +33,13 @@ data class PureText(val text: String): WrapperElement {
 
 @Serializable
 data class Picture(val url: String, val filePath: String = ""): WrapperElement {
+
+    init {
+        if (url.isEmpty() && filePath.isEmpty()) {
+            throw IllegalArgumentException("url or filePath can't be null or empty!")
+        }
+    }
+
     override val className: String = this::class.java.name
 
     override fun toMessageContent(subject: Contact): Image {
@@ -40,12 +47,13 @@ data class Picture(val url: String, val filePath: String = ""): WrapperElement {
             NetUtil.getInputStream(url)?.use {
                 return runBlocking { it.uploadAsImage(subject) }
             }
-        } else if (filePath.isNotEmpty() && File(filePath).exists()) {
-            return runBlocking { File(filePath).uploadAsImage(subject) }
+        } else {
+            if (filePath.isNotEmpty() && File(filePath).exists()) {
+                return runBlocking { File(filePath).uploadAsImage(subject) }
+            }
         }
 
-
-        throw IllegalArgumentException("url or filePath can't be null or empty!")
+        throw RuntimeException("Unable to convert Picture to Image, Picture raw content: $this")
     }
 
     override fun asString(): String {

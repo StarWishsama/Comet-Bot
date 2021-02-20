@@ -34,9 +34,15 @@ class BiliLivePusher(bot: Bot): CometPusher(bot, "bili_live") {
                         return@user
                     }
 
+                    val cache = cachePool.getLiveContext(user.id.toLong())
+
+                    if (cache?.status == PushStatus.READY) {
+                        cache.addPushTarget(cfg.id)
+                        return@user
+                    }
+
                     val liveRoomInfo = LiveApi.getLiveInfo(user.roomID) ?: return@user
                     val time = System.currentTimeMillis()
-                    val cache = cachePool.getLiveContext(user.id.toLong())
                     val current = BiliBiliLiveContext(
                         mutableListOf(cfg.id),
                         time,
