@@ -171,6 +171,10 @@ object DataSetup {
 
     private fun loadLang() {
         if (BotVariables.localMessage.isEmpty()) {
+            if (!langCfg.file.exists()) {
+                langCfg.initAction(langCfg.file)
+            }
+
             val lang: JsonElement =
                 JsonParser.parseReader(JsonReader(StringReader(langCfg.file.getContext())).also { it.isLenient = true })
             if (lang.isJsonArray) {
