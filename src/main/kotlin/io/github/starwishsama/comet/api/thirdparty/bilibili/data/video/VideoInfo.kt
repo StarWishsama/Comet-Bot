@@ -22,7 +22,7 @@ data class VideoInfo(
 ${data.title}
 | ${data.uploader.userName}
 | ${data.description}
-| 👍 ${data.stats.like} 🪙 ${data.stats.coin} ⭐ ${data.stats.favorite}
+| 👍 ${data.stats.like} 💰 ${data.stats.coin} ⭐ ${data.stats.favorite}
 ${if (data.stats.historyRank > 0) "| 本站最高日排行第${data.stats.historyRank}名" else ""}
                 """.trim().removePrefix(" ")
                 )
