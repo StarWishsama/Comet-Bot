@@ -9,7 +9,7 @@ import java.util.*
 /**
  * @author Nameless
  */
-open class Session(open var groupId: Long = 0, var command: ChatCommand, val beforeExpiredAction: (Session) -> Unit = {}, val startTime: LocalDateTime = LocalDateTime.now()) {
+open class Session(open var groupId: Long = 0, var command: ChatCommand, val beforeExpiredAction: (Session) -> Unit = {}, open val startTime: LocalDateTime = LocalDateTime.now()) {
     val users: MutableList<SessionUser> = LinkedList()
 
     constructor(command: ChatCommand, id: Long) : this(-1, command) {
