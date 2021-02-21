@@ -14,8 +14,7 @@ class RollSession(
     val keyWord: String,
     val rollStarter: Contact,
     val count: Int,
-    beforeExpired: (Session) -> Unit = {}
-) : Session(groupId, RollCommand(), beforeExpired), DaemonSession {
+) : Session(groupId, RollCommand()), DaemonSession {
     fun getRandomUser(): SessionUser {
         val index = RandomUtil.randomInt(users.size)
         val user = users[index]

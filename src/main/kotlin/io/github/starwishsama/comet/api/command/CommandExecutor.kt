@@ -23,6 +23,7 @@ import net.mamoe.mirai.message.data.*
 import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.streams.toList
 
 /**
  * 彗星 Bot 命令处理器
@@ -216,21 +217,28 @@ object CommandExecutor {
      */
     private fun handleSession(sessions: List<Session>, event: MessageEvent, time: LocalDateTime, user: BotUser): Boolean {
         if (hasCommandPrefix(event.message.contentToString()).isEmpty()) {
-            val hasDaemonSession = sessions.parallelStream().filter { it is DaemonSession }.findAny()
-            hasDaemonSession.ifPresent {
-                sessions.forEach { current ->
-                    if (current !is DaemonSession) {
+            val hasDaemonSession = sessions.parallelStream().filter { it is DaemonSession }.toList()
+
+            if (hasDaemonSession.isEmpty()) {
+                return false
+            } else {
+                hasDaemonSession.forEach {
+                    if (it !is DaemonSession) {
                         return@forEach
                     }
 
-                    val command = current.command
-                    if (command is SuspendCommand) {
-                        command.handleInput(event, user, current)
+
+                    if ((event is GroupMessageEvent && it.groupId == event.group.id) || it.groupId == -1L) {
+                        val command = it.command
+
+                        if (command is SuspendCommand) {
+                            command.handleInput(event, user, it)
+                        }
                     }
                 }
-            }
 
-            return hasDaemonSession.isPresent
+                return true
+            }
         }
 
         BotVariables.logger.debug(

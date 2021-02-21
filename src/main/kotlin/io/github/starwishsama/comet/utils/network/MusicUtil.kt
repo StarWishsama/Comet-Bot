@@ -135,11 +135,12 @@ object MusicUtil {
 
                 val playResult = NetUtil.getPageContent("$api4qq${song.songMid}")
                 if (playResult?.isNotBlank() == true) {
-                    val musicUrlObject = JsonParser.parseString(playResult).asJsonObject["data"].asJsonObject[song.songMid]
-                    val playUrl = if (!musicUrlObject.isJsonPrimitive) {
+                    val musicUrlObject = JsonParser.parseString(playResult).asJsonObject["data"]
+
+                    val playUrl = if (!musicUrlObject.isJsonObject) {
                         ""
                     } else {
-                        musicUrlObject.asString
+                        musicUrlObject.asJsonObject[song.songMid].asString
                     }
 
                     return MusicShare(
