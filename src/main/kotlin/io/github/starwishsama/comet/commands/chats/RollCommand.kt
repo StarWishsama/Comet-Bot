@@ -22,6 +22,7 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.at
 import net.mamoe.mirai.message.data.messageChainOf
+import java.time.LocalDateTime
 
 @CometCommand
 class RollCommand : ChatCommand, SuspendCommand {
@@ -56,31 +57,9 @@ class RollCommand : ChatCommand, SuspendCommand {
                     keyWord = rollKeyWord ?: "",
                     stopAfterMinute = rollDelay ?: 3,
                     count = rollThingCount
-            ) {
-                if (it is RollSession) {
-                    val group = event.bot.getGroup(it.groupId)
+            )
 
-                    if (group == null) {
-                        daemonLogger.warning("推送开奖消息失败: 找不到对应的群[${group}]")
-                    } else {
-                        var winner = messageChainOf()
-                        it.getWinningUsers().forEach { su ->
-                            if (su.member != null) winner = winner.plus(su.member.at())
-                        }
-                        GlobalScope.launch {
-                            group.sendMessage(
-                                    sendMessage(
-                                            "由${(it.rollStarter as Member).nameCardOrNick}发起的抽奖开奖了!\n" +
-                                                    "奖品: ${it.rollItem}\n" +
-                                                    "中奖者: "
-                                    ) + winner
-                            )
-                        }
-                    }
-                }
-            }
-
-            SessionManager.addAutoCloseSession(rollSession, rollSession.stopAfterMinute)
+            SessionManager.addSession(rollSession)
 
             return sendMessage("""
                 ${event.senderName} 发起了一个抽奖!
@@ -109,7 +88,14 @@ class RollCommand : ChatCommand, SuspendCommand {
 
     override fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
         println("handling roll session: $session, ${session is RollSession}")
+
         if (session is RollSession && event is GroupMessageEvent) {
+            if (LocalDateTime.now().minusMinutes(session.stopAfterMinute.toLong()).isBefore(session.startTime)) {
+                generateResult(session, event)
+                SessionManager.expireSession(session)
+                return
+            }
+
             if (session.rollStarter.id == event.sender.id) return
 
             if (session.keyWord.isEmpty()) {
@@ -121,6 +107,28 @@ class RollCommand : ChatCommand, SuspendCommand {
 
             if (session.keyWord == message) {
                 session.addUser(event.sender.id, event.sender.nameCardOrNick, event.sender)
+            }
+        }
+    }
+
+    private fun generateResult(session: RollSession, event: GroupMessageEvent) {
+        val group = event.bot.getGroup(session.groupId)
+
+        if (group == null) {
+            daemonLogger.warning("推送开奖消息失败: 找不到对应的群[${group}]")
+        } else {
+            var winner = messageChainOf()
+            session.getWinningUsers().forEach { su ->
+                if (su.member != null) winner = winner.plus(su.member.at())
+            }
+            GlobalScope.launch {
+                group.sendMessage(
+                    sendMessage(
+                        "由${(session.rollStarter as Member).nameCardOrNick}发起的抽奖开奖了!\n" +
+                                "奖品: ${session.rollItem}\n" +
+                                "中奖者: "
+                    ) + winner
+                )
             }
         }
     }

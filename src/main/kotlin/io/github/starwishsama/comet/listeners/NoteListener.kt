@@ -31,13 +31,13 @@ object NoteListener: NListener {
 
             val quoteReply = msg.firstIsInstanceOrNull<QuoteReply>() ?: return
 
-            val user = BotUser.getUser(quoteReply.source.fromId) ?: return
+            val user = BotUser.getUser(event.sender.id) ?: return
             val content = user.savedContents
 
             content.add(quoteReply.source.originalMessage.toMessageWrapper())
 
             runBlocking {
-                event.subject.sendMessage(QuoteReply(quoteReply.source) + "保存消息成功! 注意: 目前仅支持保存文本, 图片\n你可以在 /note list 中查看已保存的消息".sendMessage())
+                event.subject.sendMessage(QuoteReply(quoteReply.source) + "保存消息成功! 注意: 目前仅支持保存文本\n你可以在 /note list 中查看已保存的消息".sendMessage())
             }
         }
     }
