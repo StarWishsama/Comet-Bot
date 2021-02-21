@@ -37,7 +37,7 @@ class MuteCommand : ChatCommand {
                             )
                             "random", "rand", "随机", "抽奖" -> {
                                 GlobalScope.run {
-                                    delay(1_500)
+                                    delay(500)
                                     doRandomMute(event)
                                 }
                                 CometUtil.sendMessage("下面将抽取一位幸运群友禁言")
@@ -102,11 +102,15 @@ class MuteCommand : ChatCommand {
                     CometUtil.sendMessage("然后时间开始流动")
                 }
             } else {
-                if (group.botAsMember.id == id) CometUtil.sendMessage("不能踢出机器人")
+                if (group.botAsMember.id == id) {
+                    return CometUtil.sendMessage("不能踢出机器人")
+                }
 
                 for (member in group.members) {
                     if (member.id == id) {
-                        if (member.isOperator()) CometUtil.sendMessage("不能踢出管理员")
+                        if (member.isOperator()) {
+                            return CometUtil.sendMessage("不能踢出管理员")
+                        }
                         return when (muteTime) {
                             in 1..2592000 -> {
                                 member.mute(muteTime)
