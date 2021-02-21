@@ -51,7 +51,7 @@ object CometUtil {
         if (otherText.isNullOrEmpty()) return ""
         return buildString {
             if (addPrefix) {
-                append(localizationManager.getLocalizationText("bot-prefix")).append(" ")
+                append(localizationManager.getLocalizationText("prefix")).append(" ")
             }
             append(otherText)
         }.trim()
