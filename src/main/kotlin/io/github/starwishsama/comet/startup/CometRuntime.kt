@@ -172,21 +172,20 @@ object CometRuntime {
             BotVariables.users.forEach { it.addTime(100) }
         }
 
-        TaskUtil.runAsync(5) {
-            val pwd = BotVariables.cfg.biliPassword
-            val username = BotVariables.cfg.biliUserName
 
+        val pwd = BotVariables.cfg.biliPassword
+        val username = BotVariables.cfg.biliUserName
+
+        TaskUtil.runAsync(5) {
             if (pwd != null && username != null) {
-                FakeClientApi.client.runCatching {
-                    runBlocking {
-                        withContext(Dispatchers.IO) {
-                            login(username = username, password = pwd)
-                            BotVariables.daemonLogger.info("成功登录哔哩哔哩账号")
-                        }
+                runBlocking {
+                    withContext(Dispatchers.IO) {
+                        FakeClientApi.client.login(username = username, password = pwd)
+                        daemonLogger.info("成功登录哔哩哔哩账号")
                     }
                 }
             } else {
-                BotVariables.daemonLogger.info("未登录哔哩哔哩账号, 部分哔哩哔哩相关功能可能受限")
+                daemonLogger.info("未登录哔哩哔哩账号, 部分哔哩哔哩相关功能可能受限")
             }
         }
 
