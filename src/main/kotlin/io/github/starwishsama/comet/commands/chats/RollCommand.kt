@@ -87,8 +87,6 @@ class RollCommand : ChatCommand, SuspendCommand {
     """.trimIndent()
 
     override fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
-        println("handling roll session: $session, ${session is RollSession}")
-
         if (session is RollSession && event is GroupMessageEvent) {
             if (LocalDateTime.now().minusMinutes(session.stopAfterMinute.toLong()).isBefore(session.startTime)) {
                 generateResult(session, event)
