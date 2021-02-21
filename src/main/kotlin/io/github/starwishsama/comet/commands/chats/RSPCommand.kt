@@ -9,12 +9,12 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
-import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
+import java.time.LocalDateTime
 
 @CometCommand
 class RSPCommand : ChatCommand, SuspendCommand {
@@ -24,7 +24,7 @@ class RSPCommand : ChatCommand, SuspendCommand {
     private val inProgressPlayer = mutableSetOf<Long>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        SessionManager.addAutoCloseSession(Session(this, user.id), 1)
+        SessionManager.addSession(Session(this, user.id))
         return "石头剪刀布... 开始! 你要出什么呢?".sendMessage()
     }
 
@@ -33,6 +33,11 @@ class RSPCommand : ChatCommand, SuspendCommand {
     override fun getHelp(): String = "/cq 石头剪刀布"
 
     override fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
+        if (LocalDateTime.now().minusMinutes(1L).isBefore(session.startTime)) {
+            SessionManager.expireSession(session)
+            return
+        }
+
         if (!inProgressPlayer.contains(user.id)) {
             try {
                 val player = RockPaperScissors.getType(event.message.contentToString())
@@ -45,10 +50,10 @@ class RSPCommand : ChatCommand, SuspendCommand {
 
                     runBlocking {
                         when (RockPaperScissors.isWin(player, system)) {
-                            -1 -> event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("平局! 我出的是${system.display[0]}"))
-                            0 -> event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("你输了! 我出的是${system.display[0]}"))
-                            1 -> event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("你赢了! 我出的是${system.display[0]}"))
-                            else -> event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("这合理吗?"))
+                            -1 -> event.subject.sendMessage(event.message.quote() + sendMessage("平局! 我出的是${system.display[0]}"))
+                            0 -> event.subject.sendMessage(event.message.quote() + sendMessage("你输了! 我出的是${system.display[0]}"))
+                            1 -> event.subject.sendMessage(event.message.quote() + sendMessage("你赢了! 我出的是${system.display[0]}"))
+                            else -> event.subject.sendMessage(event.message.quote() + sendMessage("这合理吗?"))
                         }
                     }
 
@@ -56,7 +61,7 @@ class RSPCommand : ChatCommand, SuspendCommand {
                         SessionManager.expireSession(session)
                     }
                 } else {
-                    runBlocking { event.subject.sendMessage(event.message.quote() + CometUtil.sendMessage("你的拳法杂乱无章, 这合理吗?")) }
+                    runBlocking { event.subject.sendMessage(event.message.quote() + sendMessage("你的拳法杂乱无章, 这合理吗?")) }
                 }
             } finally {
                 inProgressPlayer.remove(user.id)

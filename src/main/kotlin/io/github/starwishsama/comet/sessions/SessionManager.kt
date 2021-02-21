@@ -1,10 +1,8 @@
 package io.github.starwishsama.comet.sessions
 
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.utils.TaskUtil
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
-import java.util.concurrent.TimeUnit
 
 /**
  * 管理运行中产生的会话
@@ -20,14 +18,6 @@ object SessionManager {
     fun addSession(session: Session): Session {
         daemonLogger.verbose("创建会话 ${session::class.java.simpleName + "#" + session.hashCode()}, 结果: ${sessions.add(session)}")
         return session
-    }
-
-    fun addAutoCloseSession(session: Session, closeAfterMinute: Int) {
-        addSession(session)
-        TaskUtil.runAsync(closeAfterMinute.toLong(), TimeUnit.MINUTES) {
-            session.beforeExpiredAction(session)
-            expireSession(session)
-        }
     }
 
     fun expireSession(session: Session) {
