@@ -2,6 +2,7 @@ package io.github.starwishsama.comet
 
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.comet
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.startup.CometRuntime
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.GlobalScope
@@ -15,14 +16,19 @@ object CometApplication {
     val console: LineReader = LineReaderBuilder
         .builder()
         .terminal(TerminalBuilder.builder().jansi(true).encoding(Charsets.UTF_8).build()).appName("Comet").build()
-        .apply {
-            setOpt(LineReader.Option.DISABLE_EVENT_EXPANSION)
-            unsetOpt(LineReader.Option.INSERT_TAB)
+        .also {
+            it.setOpt(LineReader.Option.DISABLE_EVENT_EXPANSION)
+            it.unsetOpt(LineReader.Option.INSERT_TAB)
         }
 
     @JvmStatic
     fun main(args: Array<String>) {
-        CometRuntime.postSetup()
+        try {
+            CometRuntime.postSetup()
+        } catch (e: Exception) {
+            daemonLogger.serve("无法正常加载 Comet, 程序将自动关闭", e)
+            return
+        }
 
         comet.apply {
             id = cfg.botId
