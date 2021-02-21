@@ -48,7 +48,9 @@ class HinaLogger(
         }
 
         logAction(
-            "${level.color}${dateTimeFormatter.format(LocalDateTime.now())} ${level.internalName}/${level.simpleName}${if (level != HinaLogLevel.Verbose && level != HinaLogLevel.Info) "($executorInfo)" else ""} $loggerName -> ${if (prefix.isEmpty()) "" else "$prefix "}$message"
+            "${level.color}${dateTimeFormatter.format(LocalDateTime.now())} ${level.internalName}/${level.simpleName}" +
+                    "${if (level != HinaLogLevel.Verbose && level != HinaLogLevel.Info && level != HinaLogLevel.Warn) "($executorInfo)" else ""} " +
+                    "$loggerName -> ${if (prefix.isEmpty()) "" else "$prefix "}$message"
                     + if (trace.isNotEmpty()) "\n\n$trace\n" else "" + "${AnsiUtil.Color.RESET}"
         )
     }

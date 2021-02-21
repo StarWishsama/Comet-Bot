@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.commands.chats
 
+import io.github.starwishsama.comet.BotVariables.localizationManager
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
@@ -12,7 +13,6 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
@@ -72,7 +72,7 @@ class BiliBiliCommand : ChatCommand {
                             cfg.biliPushEnabled = !cfg.biliPushEnabled
                             "B站动态推送功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}".sendMessage()
                         } else {
-                            CometUtil.getLocalMessage("msg.no-permission").sendMessage()
+                            localizationManager.getLocalizationText("msg.no-permission").sendMessage()
                         }
                     }
                     "refresh" -> {
@@ -115,7 +115,7 @@ class BiliBiliCommand : ChatCommand {
             if (args.size <= 1) return getHelp().convertToChain()
 
             if (!hasPermission(user, event)) {
-                return CometUtil.getLocalMessage("msg.no-permission").convertToChain()
+                return localizationManager.getLocalizationText("msg.no-permission").convertToChain()
             }
 
             return if (args[1].contains("|")) {

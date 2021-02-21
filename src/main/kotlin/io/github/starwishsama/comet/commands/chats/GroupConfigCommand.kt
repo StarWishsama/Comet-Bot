@@ -13,7 +13,6 @@ import io.github.starwishsama.comet.objects.wrapper.toMessageWrapper
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.CometUtil.sendMessage
-import io.github.starwishsama.comet.utils.StringUtil.containsEtc
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -54,15 +53,18 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                     }
                     "autojoin" -> {
                         if (args.size > 1) {
-                            return if (args[1].containsEtc( false, "condition", "条件", "tj", "cd")) {
-                                if (args.size > 2) {
-                                    cfg.autoAcceptCondition = args.getRestString(2)
-                                    "成功设置自动通过申请条件!".sendMessage()
-                                } else {
+                            return when (args[1]) {
+                                "condition", "条件", "tj", "cd" -> {
+                                    if (args.size > 2) {
+                                        cfg.autoAcceptCondition = args.getRestString(2)
+                                        "成功设置自动通过申请条件!".sendMessage()
+                                    } else {
+                                        "/gs autojoin condition [关键词]\n满足关键词的入群申请会自动通过".sendMessage()
+                                    }
+                                }
+                                else -> {
                                     "/gs autojoin condition [关键词]\n满足关键词的入群申请会自动通过".sendMessage()
                                 }
-                            } else {
-                                "/gs autojoin condition [关键词]\n满足关键词的入群申请会自动通过".sendMessage()
                             }
                         } else {
                             return if (event.group.botPermission == MemberPermission.MEMBER) {

@@ -1,11 +1,8 @@
 package io.github.starwishsama.comet.file
 
-import cn.hutool.core.io.file.FileReader
 import com.github.salomonbrys.kotson.forEach
 import com.github.salomonbrys.kotson.fromJson
-import com.google.gson.JsonElement
 import com.google.gson.JsonParser
-import com.google.gson.stream.JsonReader
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.cfg
@@ -13,10 +10,10 @@ import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.gson
 import io.github.starwishsama.comet.BotVariables.hiddenOperators
 import io.github.starwishsama.comet.BotVariables.nullableGson
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.LoggerInstances
 import io.github.starwishsama.comet.managers.GachaManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.config.DataFile
@@ -30,7 +27,6 @@ import net.mamoe.mirai.Bot
 import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
 import java.io.IOException
-import java.io.StringReader
 
 object DataSetup {
     private val userCfg: DataFile = DataFile(File(BotVariables.filePath, "users.json"), DataFile.FilePriority.HIGH) {
@@ -42,25 +38,13 @@ object DataSetup {
     private val cfgFile: DataFile = DataFile(File(BotVariables.filePath, "config.yml"), DataFile.FilePriority.HIGH) {
         it.writeString(Default.encodeToString(CometConfig()), isAppend = false)
     }
-    @Suppress("DEPRECATION")
-    private val langCfg: DataFile = DataFile(File(FileUtil.getResourceFolder(), "lang.json"), DataFile.FilePriority.HIGH) {
-        val default = arrayOf(BotLocalization("msg.bot-prefix", "Bot > "),
-            BotLocalization("msg.no-permission", "你没有权限"),
-            BotLocalization("msg.bind-success", "绑定账号 %s 成功!"),
-            BotLocalization("checkin.first-time", "你还没有签到过, 先用 /qd 签到一次吧~")
-        )
-        for (text in default) {
-            BotVariables.localMessage.plusAssign(text)
-        }
-        it.writeClassToJson(BotVariables.localMessage)
-    }
     private val pcrData: DataFile = DataFile(File(FileUtil.getResourceFolder(), "pcr.json"), DataFile.FilePriority.NORMAL)
     private val arkNightData: DataFile = DataFile(File(FileUtil.getResourceFolder(), "arkNights.json"), DataFile.FilePriority.NORMAL)
     private val perGroupFolder: DataFile = DataFile(FileUtil.getChildFolder("groups"), DataFile.FilePriority.NORMAL) {
         it.mkdirs()
     }
     private val dataFiles = listOf(
-        userCfg, shopItemCfg, cfgFile, langCfg, pcrData, arkNightData, perGroupFolder
+        userCfg, shopItemCfg, cfgFile, pcrData, arkNightData, perGroupFolder
     )
     private var brokenConfig = false
 
@@ -115,9 +99,9 @@ object DataSetup {
 
         BotVariables.shop.addAll(nullableGson.fromJson(shopItemCfg.file.getContext()))
 
-        loadLang()
-
         FileUtil.initResourceFile()
+
+        loadLang()
 
         if (pcrData.exists()) {
             BotVariables.pcr.addAll(nullableGson.fromJson(pcrData.file.getContext()))
@@ -170,27 +154,13 @@ object DataSetup {
     }
 
     private fun loadLang() {
-        if (BotVariables.localMessage.isEmpty()) {
-            if (!langCfg.file.exists()) {
-                langCfg.initAction(langCfg.file)
-            }
-
-            val lang: JsonElement =
-                JsonParser.parseReader(JsonReader(StringReader(langCfg.file.getContext())).also { it.isLenient = true })
-            if (lang.isJsonArray) {
-                BotVariables.localMessage = nullableGson.fromJson(FileReader.create(langCfg.file).readString())
-                daemonLogger.info("[配置] 成功载入多语言文件")
-            } else {
-                daemonLogger.warning("[配置] 在读取多语言文件时发生异常")
-            }
-        }
+        BotVariables.localizationManager = LocalizationManager()
     }
 
 
     fun saveAllResources() {
         daemonLogger.info("[数据] 自动保存数据完成")
         saveCfg()
-        langCfg.file.writeClassToJson(BotVariables.localMessage)
         savePerGroupSetting()
     }
 

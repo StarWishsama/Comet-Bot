@@ -2,5 +2,4 @@ prefix: 'Comet >'
 message:
   no-permission: '你没有权限!'
   bind-success: '绑定账号成功!'
-  checkin:
-    first-time: '你还没有签到过, 先用 /qd 签到一次吧~'
+  checkin-first-time: '你还没有签到过, 先用 /qd 签到一次吧~'

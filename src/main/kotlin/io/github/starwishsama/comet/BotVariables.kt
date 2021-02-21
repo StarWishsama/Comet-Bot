@@ -2,9 +2,9 @@ package io.github.starwishsama.comet
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
 import io.github.starwishsama.comet.logger.RetrofitLogger
-import io.github.starwishsama.comet.objects.BotLocalization
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
@@ -82,7 +82,7 @@ object BotVariables {
 
     val shop: MutableList<Shop> = LinkedList()
     val users: MutableList<BotUser> = LinkedList()
-    var localMessage: MutableList<BotLocalization> = ArrayList()
+    lateinit var localizationManager: LocalizationManager
     var hitokoto: Hitokoto? = null
 
     /** 明日方舟卡池数据 */
