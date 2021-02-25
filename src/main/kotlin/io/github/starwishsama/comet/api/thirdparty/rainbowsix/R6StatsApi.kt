@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.api.thirdparty.rainbowsix
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatsGenericStat
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatsSeasonalStat
@@ -52,10 +53,11 @@ object R6StatsApi: ApiExecutor {
             genericStat = getR6StatsAPI().getGenericInfo(userName, platform).execute().body()
             seasonalStat = getR6StatsAPI().getSeasonalInfo(userName, platform).execute().body()
         } catch (e: Exception) {
-            if (e is ApiKeyIsEmptyException) {
-                return MessageWrapper().addText("R6Stats API 未正确配置, 请联系机器人管理员")
+            return if (e is ApiKeyIsEmptyException) {
+                MessageWrapper().addText("R6Stats API 未正确配置, 请联系机器人管理员")
             } else {
-                return MessageWrapper().addText("无法获取玩家 $userName 的信息")
+                daemonLogger.warning("R6Stats API 异常", e)
+                MessageWrapper().addText("无法获取玩家 $userName 的信息")
             }
         }
 
@@ -68,7 +70,8 @@ object R6StatsApi: ApiExecutor {
         val infoText = "|| ${genericStat.username} [${genericStat.levelInfo.level} 级]\n" +
                 "|| 目前段位 ${latestSeasonalStat.getRank().rankName}\n" +
                 "|| MMR 状态 ${latestSeasonalStat.currentMMR} (${latestSeasonalStat.lastMatchMMRChange})\n" +
-                "|| KD ${genericStat.stats.generalStat.kd} / WL ${genericStat.stats.generalStat.winLoss}"
+                "|| KD ${genericStat.stats.generalStat.kd} / WL ${genericStat.stats.generalStat.winLoss}\n" +
+                "|| 胜率 ${(genericStat.stats.generalStat.winTime / genericStat.stats.generalStat.playedGameTime) * 100}%"
 
         return MessageWrapper().addText(infoText)
     }

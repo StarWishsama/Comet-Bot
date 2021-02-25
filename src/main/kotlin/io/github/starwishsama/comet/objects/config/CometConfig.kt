@@ -51,10 +51,6 @@ data class CometConfig(
         @Comment("SauceNao 以图搜图 APIKey, 不填亦可, 但可搜索次数会减少")
         val sauceNaoApiKey: String? = null,
 
-        @Deprecated("Replaced with r6StatsKey")
-        @Comment("彩虹六号玩家数据 API, 目前已停止使用")
-        val r6tabKey: String? = null,
-
         @Deprecated("在未来移动到 ApiConfig")
         @Comment("彩虹六号玩家数据 API, 需要自行在 R6Stats Discord 群中申请\n" +
                 "详见: https://discordapp.com/channels/293848587391991836/575341069399752715/741297488543219712")

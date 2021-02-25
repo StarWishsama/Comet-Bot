@@ -126,7 +126,7 @@ data class R6StatsGenericStat(
             @SerializedName("wins")
             val winTime: Long,
             @SerializedName("wl")
-            val winLoss: Long
+            val winLoss: Double
         )
 
         //data class Queue()
