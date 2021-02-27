@@ -62,6 +62,7 @@ object R6StatsApi: ApiExecutor {
         }
 
         if (genericStat == null || seasonalStat == null) {
+            daemonLogger.warning("R6Stats API 异常, genericStat: ${genericStat == null}, seasonalStat: ${seasonalStat == null}")
             return MessageWrapper().addText("无法获取玩家 $userName 的信息")
         }
 

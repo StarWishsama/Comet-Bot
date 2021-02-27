@@ -54,7 +54,7 @@ data class CometConfig(
         @Deprecated("在未来移动到 ApiConfig")
         @Comment("彩虹六号玩家数据 API, 需要自行在 R6Stats Discord 群中申请\n" +
                 "详见: https://discordapp.com/channels/293848587391991836/575341069399752715/741297488543219712")
-        val r6StatsKey: String? = null,
+        var r6StatsKey: String? = null,
 
         @Deprecated("在未来移动到 ApiConfig")
         @Comment("用于获取 Twitter Token 的 Access Token, 使用 Twitter 推送必填")

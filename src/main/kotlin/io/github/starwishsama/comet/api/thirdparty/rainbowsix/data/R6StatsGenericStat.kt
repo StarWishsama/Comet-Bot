@@ -43,7 +43,7 @@ data class R6StatsGenericStat(
     data class Progression(
         val level: Int,
         @SerializedName("lootbox_probability")
-        val alphaBoxProbability: Int,
+        val alphaBoxProbability: Double,
         @SerializedName("total_xp")
         val totalXp: Long
     )
