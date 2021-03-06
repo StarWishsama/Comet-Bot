@@ -120,14 +120,14 @@ object FileUtil {
 
     fun getErrorReportFolder(): File = getChildFolder("error-reports")
 
-    fun createErrorReportFile(reason: String = "发生了一个错误", type: String, t: Throwable, content: String, message: String) {
+    fun createErrorReportFile(reason: String = "发生了一个错误", type: String, t: Throwable?, content: String, message: String) {
         val fileName = "$type-${dateFormatter.format(LocalDateTime.now())}.txt"
         val location = File(getErrorReportFolder(), fileName)
         if (location.exists()) return
 
         location.createNewFile()
 
-        val report = "发生了一个错误:\n${getBeautyStackTrace(t)}\n可能有用的信息: ${message.limitStringSize(150)}\n\n原始获取内容:\n$content"
+        val report = "发生了一个错误:\n${if (t != null) getBeautyStackTrace(t) else "无报错堆栈"}\n可能有用的信息: ${message.limitStringSize(150)}\n\n原始获取内容:\n$content"
         location.writeString(report)
         daemonLogger.warning("$reason, 错误报告已生成! 保存在 ${location.path}")
         daemonLogger.warning("你可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")

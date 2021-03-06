@@ -10,6 +10,7 @@ import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.Region
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.SeasonName
 import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.utils.FileUtil
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -49,9 +50,12 @@ object R6StatsApi: ApiExecutor {
         val genericStat: R6StatsGenericStat?
         val seasonalStat: R6StatsSeasonalStat?
 
+        val genericResult = getR6StatsAPI().getGenericInfo(userName, platform).execute()
+        val seasonalResult = getR6StatsAPI().getSeasonalInfo(userName, platform).execute()
+
         try {
-            genericStat = getR6StatsAPI().getGenericInfo(userName, platform).execute().body()
-            seasonalStat = getR6StatsAPI().getSeasonalInfo(userName, platform).execute().body()
+            genericStat = genericResult.body()
+            seasonalStat = seasonalResult.body()
         } catch (e: Exception) {
             return if (e is ApiKeyIsEmptyException) {
                 MessageWrapper().addText("R6Stats API 未正确配置, 请联系机器人管理员")
@@ -62,7 +66,13 @@ object R6StatsApi: ApiExecutor {
         }
 
         if (genericStat == null || seasonalStat == null) {
-            daemonLogger.warning("R6Stats API 异常, genericStat: ${genericStat == null}, seasonalStat: ${seasonalStat == null}")
+            FileUtil.createErrorReportFile(
+                "R6Stats API 异常",
+                "r6stats",
+                null,
+                genericResult.raw().body?.string() + "\n" + seasonalResult.raw().body?.string(),
+                "genericStat: ${genericStat == null}, seasonalStat: ${seasonalStat == null}"
+            )
             return MessageWrapper().addText("无法获取玩家 $userName 的信息")
         }
 

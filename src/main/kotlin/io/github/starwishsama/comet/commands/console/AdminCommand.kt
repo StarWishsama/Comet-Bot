@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.commands.console
 
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.users
 import io.github.starwishsama.comet.api.annotations.CometCommand
@@ -67,7 +68,7 @@ class AdminCommand : ConsoleCommand {
 
                         return if (time in 1..300) {
                             users.parallelStream().forEach { it.commandTime = time }
-                            "成功重置所有 BotUser 的积分"
+                            "成功重置所有用户的积分为 ${time}"
                         } else {
                             "输入的数字错误! 范围: (0, 300]"
                         }
@@ -99,6 +100,14 @@ class AdminCommand : ConsoleCommand {
 
                         return GroupConfigManager.getConfig(gid)?.disableCommand(args[2])?.msg ?:"输入的群号没有配置文件或不存在!"
                     }
+                }
+                "groups" -> {
+                    return buildString {
+                        append("已加入的群聊:\n")
+                        BotVariables.comet.getBot().groups.forEach {
+                            append("${it.name} (${it.id}),")
+                        }
+                    }.removeSuffix(",").trim()
                 }
                 else -> return getHelp()
             }

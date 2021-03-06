@@ -1,6 +1,5 @@
 package io.github.starwishsama.comet.listeners
 
-import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.Event
@@ -15,27 +14,23 @@ object AutoReplyListener : NListener {
             event.apply {
                 val cfg = GroupConfigManager.getConfig(group.id)
 
-                try {
-                    if (cfg?.keyWordReply == null || cfg.keyWordReply.isEmpty()) return
 
-                    val messageContent = message.contentToString()
+                if (cfg?.keyWordReply == null || cfg.keyWordReply.isEmpty()) return
 
-                    if (cfg.keyWordReply.isEmpty()) return
+                val messageContent = message.contentToString()
 
-                    cfg.keyWordReply.forEach {
+                if (cfg.keyWordReply.isEmpty()) return
 
-                        if (it.keyWords.isEmpty()) return
+                cfg.keyWordReply.forEach {
 
-                        it.keyWords.forEach { keyWord ->
-                            if (messageContent.contains(keyWord)) {
-                                runBlocking { subject.sendMessage(message.quote() + it.reply.toMessageChain(subject)) }
-                                return
-                            }
+                    if (it.keyWords.isEmpty()) return
+
+                    it.keyWords.forEach { keyWord ->
+                        if (messageContent.contains(keyWord)) {
+                            runBlocking { subject.sendMessage(message.quote() + it.reply.toMessageChain(subject)) }
+                            return
                         }
                     }
-                } catch (e: Exception) {
-                    daemonLogger.warning("检测到群 ${group.id} 的配置文件异常.").also { daemonLogger.debug("加载配置文件异常", e) }
-                    return
                 }
             }
         }

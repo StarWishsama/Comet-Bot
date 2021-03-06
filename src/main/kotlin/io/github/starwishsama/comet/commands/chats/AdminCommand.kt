@@ -121,6 +121,9 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
         return EmptyMessageChain
     }
 
+    /**
+     * FIXME: 该命令不该在这里处理
+     */
     private fun clockIn(args: List<String>, message: GroupMessageEvent): MessageChain {
         if (!ClockInManager.isDuplicate(message.group.id, 10)) {
             val startTime: LocalDateTime

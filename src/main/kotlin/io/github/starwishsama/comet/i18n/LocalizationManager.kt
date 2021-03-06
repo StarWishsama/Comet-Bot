@@ -45,7 +45,7 @@ class LocalizationManager {
                 }
             }
         } catch (e: Exception) {
-            daemonLogger.warning("获取本地化文本失败", e)
+            daemonLogger.warning("获取本地化文本失败, 可能是文件损坏?", e)
             return "占位符"
         }
 
