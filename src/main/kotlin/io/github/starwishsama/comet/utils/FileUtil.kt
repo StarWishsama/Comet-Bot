@@ -4,6 +4,8 @@ import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
 import cn.hutool.core.net.URLDecoder
 import cn.hutool.crypto.SecureUtil
+import com.github.salomonbrys.kotson.fromJson
+import com.github.salomonbrys.kotson.typedToJson
 import com.google.gson.Gson
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
@@ -28,7 +30,7 @@ import kotlin.time.ExperimentalTime
 
 @Synchronized
 fun File.writeClassToJson(context: Any, gson: Gson = BotVariables.nullableGson) {
-    FileWriter.create(this).write(gson.toJson(context), false)
+    FileWriter.create(this).write(gson.typedToJson(context), false)
 }
 
 @Synchronized
@@ -60,9 +62,9 @@ fun File.getMD5(): String {
  * @param clazz 指定类
  * @return T
  */
-fun <T> File.parseAsClass(clazz: Class<T>, customParser: Gson = BotVariables.nullableGson): T {
+inline fun <reified T: Any> File.parseAsClass(customParser: Gson = BotVariables.nullableGson): T {
     require(exists()) { "$path 不存在" }
-    return customParser.fromJson(getContext(), clazz)
+    return customParser.fromJson(getContext())
 }
 
 fun File.getChildFolder(folderName: String, createIfNotExists: Boolean = true): File {

@@ -52,7 +52,7 @@ class GithubWebHookHandler: HttpHandler {
             val info = gson.fromJson<PushEvent>(payload)
             GithubPusher.push(info)
         } catch (e: Exception) {
-            daemonLogger.warning("推送 WebHook 消息失败, ${e.message}")
+            daemonLogger.warning("推送 WebHook 消息失败", e)
         }
 
         he.sendResponseHeaders(202, 0)

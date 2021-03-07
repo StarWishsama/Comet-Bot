@@ -92,19 +92,18 @@ object DataSetup {
             it.debugMode = cfg.debugMode
         }
 
-        gson.fromJson<List<BotUser>>(userCfg.file.getContext()).forEach {
+        userCfg.file.parseAsClass<List<BotUser>>().forEach {
             BotUser.addUser(it)
         }
 
-
-        BotVariables.shop.addAll(nullableGson.fromJson(shopItemCfg.file.getContext()))
+        BotVariables.shop.addAll(shopItemCfg.file.parseAsClass())
 
         FileUtil.initResourceFile()
 
         loadLang()
 
         if (pcrData.exists()) {
-            BotVariables.pcr.addAll(nullableGson.fromJson(pcrData.file.getContext()))
+            BotVariables.pcr.addAll(pcrData.file.parseAsClass())
             daemonLogger.info("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个角色")
         } else {
             daemonLogger.info("未检测到公主连结游戏数据, 对应游戏抽卡模拟器将无法使用")
@@ -188,7 +187,7 @@ object DataSetup {
                             if (ConfigConverter.convertOldGroupConfig(loc)) {
                                 return@forEach
                             } else {
-                                loc.parseAsClass(PerGroupConfig::class.java, gson)
+                                loc.parseAsClass(gson)
                             }
                         } catch (e: Exception) {
                             daemonLogger.warning("检测到 ${group.id} 的群配置异常, 正在重新生成...")
@@ -217,7 +216,7 @@ object DataSetup {
         GroupConfigManager.getAllConfigs().forEach {
             val loc = File(perGroupFolder.file, "${it.id}.json")
             if (!loc.exists()) loc.createNewFile()
-            loc.writeClassToJson(it, gson)
+            loc.writeClassToJson(it, nullableGson)
         }
 
         daemonLogger.info("已保存所有群配置")

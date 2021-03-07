@@ -11,7 +11,7 @@ import java.util.stream.Collectors
 object GithubPusher {
     fun push(event: PushEvent) {
         val consumer = GroupConfigManager.getAllConfigs().parallelStream().filter {
-            it.githubRepoSubscribers.contains(event.repoInfo.fullName)
+            it.githubRepoSubscribers.contains(event.repoInfo.fullName) == true
         }.collect(Collectors.toList())
 
         val bot = BotVariables.comet.getBot()
