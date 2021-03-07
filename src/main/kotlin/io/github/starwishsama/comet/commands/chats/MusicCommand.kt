@@ -8,7 +8,7 @@ import io.github.starwishsama.comet.enums.MusicApiType
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.MusicUtil
 import net.mamoe.mirai.event.events.MessageEvent
@@ -29,9 +29,9 @@ class MusicCommand : ChatCommand {
                                 "QQ", "TX", "腾讯" -> BotVariables.cfg.musicApi = MusicApiType.QQ
                                 "NETEASE", "网易", "WY" -> BotVariables.cfg.musicApi = MusicApiType.NETEASE
                             }
-                            sendMessage("音乐API已修改为 ${BotVariables.cfg.musicApi}")
+                            toChain("音乐API已修改为 ${BotVariables.cfg.musicApi}")
                         } else {
-                            "/music api [API名称] (例: QQ)".sendMessage()
+                            "/music api [API名称] (例: QQ)".toChain()
                         }
                     }
                     "QQ", "TX", "腾讯" -> MusicUtil.searchQQMusic(args.getRestString(1), true, event.subject)

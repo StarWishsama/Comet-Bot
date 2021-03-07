@@ -2,8 +2,10 @@ package io.github.starwishsama.comet.startup
 
 import com.hiczp.bilibili.api.retrofit.exception.BilibiliApiException
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.consoleCommandLogger
 import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.BotVariables.webhookServer
 import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.api.command.CommandExecutor
@@ -22,6 +24,7 @@ import io.github.starwishsama.comet.listeners.*
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.managers.GachaManager
 import io.github.starwishsama.comet.service.pusher.PusherManager
+import io.github.starwishsama.comet.service.webhook.WebHookServer
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.RuntimeUtil
@@ -68,6 +71,7 @@ object CometRuntime {
         PusherManager.savePushers()
         BotVariables.service.shutdown()
         BotVariables.rCon?.disconnect()
+        webhookServer?.stop()
         BotVariables.loggerAppender.close()
     }
 
@@ -104,6 +108,7 @@ object CometRuntime {
                 MinecraftCommand(),
                 PusherCommand(),
                 NoteCommand(),
+                GithubCommand(),
                 // Console Command
                 StopCommand(),
                 DebugCommand(),
@@ -145,6 +150,8 @@ object CometRuntime {
 
         PusherManager.initPushers(bot)
 
+        startupServer()
+
         DataSetup.initPerGroupSetting(bot)
 
         logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${BotVariables.startTime.getLastingTimeAsString()}")
@@ -155,10 +162,16 @@ object CometRuntime {
     }
 
     fun setupRCon() {
-        val address = BotVariables.cfg.rConUrl
-        val password = BotVariables.cfg.rConPassword
+        val address = cfg.rConUrl
+        val password = cfg.rConPassword
         if (address != null && password != null && BotVariables.rCon == null) {
-            BotVariables.rCon = Rcon(address, BotVariables.cfg.rConPort, password.toByteArray())
+            BotVariables.rCon = Rcon(address, cfg.rConPort, password.toByteArray())
+        }
+    }
+
+    private fun startupServer() {
+        if (cfg.webHookSwitch) {
+            webhookServer = WebHookServer(cfg.webHookPort)
         }
     }
 

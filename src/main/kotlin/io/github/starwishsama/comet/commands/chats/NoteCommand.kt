@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.XmlElement
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
@@ -17,13 +17,13 @@ import net.mamoe.mirai.message.data.MessageChain
 class NoteCommand: ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         return if (args.isEmpty()) {
-            getHelp().sendMessage()
+            getHelp().toChain()
         } else {
             when (args[0]) {
                 "list", "列表", "所有", "all" -> listNotes(user, event.subject)
                 "display", "展示" -> displayNote(user, args[1], event.subject)
                 "remove", "sc", "rm", "删除" -> handleRemove(user, args[1])
-                else -> getHelp().sendMessage()
+                else -> getHelp().toChain()
             }
         }
     }
@@ -48,7 +48,7 @@ class NoteCommand: ChatCommand {
         val notes = user.savedContents
 
         if (notes.isEmpty()) {
-            return "你还没有保存过信息呢, 试着引用回复你要保存的消息并@我保存吧~".sendMessage()
+            return "你还没有保存过信息呢, 试着引用回复你要保存的消息并@我保存吧~".toChain()
         }
 
         val display = MessageWrapper().apply {
@@ -73,23 +73,23 @@ class NoteCommand: ChatCommand {
         val notes = user.savedContents
 
         if (notes.isEmpty()) {
-            return "你还没有保存过信息呢, 试着引用回复你要保存的消息并@我保存吧~".sendMessage()
+            return "你还没有保存过信息呢, 试着引用回复你要保存的消息并@我保存吧~".toChain()
         }
 
 
         if (index.isNumeric() || index == "all") {
             if (index == "all") {
                 notes.clear()
-                return "已清空所有已保存信息!".sendMessage()
+                return "已清空所有已保存信息!".toChain()
             } else {
-                val location = index.toIntOrNull() ?: return "请输入有效数字!".sendMessage()
-                if (location >= notes.size) return "找不到你要删除的信息!".sendMessage()
+                val location = index.toIntOrNull() ?: return "请输入有效数字!".toChain()
+                if (location >= notes.size) return "找不到你要删除的信息!".toChain()
 
                 notes.removeAt(location)
-                return "删除指定消息成功!".sendMessage()
+                return "删除指定消息成功!".toChain()
             }
         } else {
-            return getHelp().sendMessage()
+            return getHelp().toChain()
         }
     }
 
@@ -97,18 +97,18 @@ class NoteCommand: ChatCommand {
         val notes = user.savedContents
 
         if (notes.isEmpty()) {
-            return "你还没有保存过信息呢, 试着引用回复你要保存的消息并@我保存吧~".sendMessage()
+            return "你还没有保存过信息呢, 试着引用回复你要保存的消息并@我保存吧~".toChain()
         }
 
         if (index.isNumeric() || index == "all") {
-            val location = index.toIntOrNull() ?: return "请输入有效数字!".sendMessage()
-            if (location > notes.size) return "找不到你要删除的信息!".sendMessage()
+            val location = index.toIntOrNull() ?: return "请输入有效数字!".toChain()
+            if (location > notes.size) return "找不到你要删除的信息!".toChain()
             val note = notes[location]
 
             runBlocking { subject.sendMessage(At(user.id) + "以下是你要查看的消息:") }
             return note.toMessageChain(subject)
         } else {
-            return getHelp().sendMessage()
+            return getHelp().toChain()
         }
     }
 }

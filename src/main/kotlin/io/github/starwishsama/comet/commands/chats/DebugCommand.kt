@@ -15,7 +15,7 @@ import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.task.HitokotoUpdater
 import io.github.starwishsama.comet.sessions.SessionManager
 import io.github.starwishsama.comet.utils.CometUtil
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -40,9 +40,9 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                     if (user.isBotOwner()) {
                         return try {
                             DataSetup.reload()
-                            "重载成功.".sendMessage()
+                            "重载成功.".toChain()
                         } catch (e: IOException) {
-                            "在重载时发生了异常.".sendMessage()
+                            "在重载时发生了异常.".toChain()
                         }
                     }
                 }
@@ -59,7 +59,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                 }
                             }
                         }
-                        return sb.toString().trim().sendMessage()
+                        return sb.toString().trim().toChain()
                     }
                 }
                 "info" -> {
@@ -74,11 +74,11 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                 "与服务器的延迟为 $ping ms\n" +
                                 "运行时长 ${CometUtil.getRunningTime()}\n" +
                                 "构建时间: ${BuildConfig.buildTime}"
-                                ).sendMessage()
+                                ).toChain()
                     } else {
                         return when (args[1]) {
                             "memory", "ram" -> {
-                                RuntimeUtil.getMemoryInfo().sendMessage(false)
+                                RuntimeUtil.getMemoryInfo().toChain(false)
                             }
                             "thread", "thr" -> {
                                 val executor = BotVariables.service as ThreadPoolExecutor
@@ -95,29 +95,29 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
 总线程数：$taskCount
                     """.trimIndent().convertToChain()
                             }
-                            else -> "无效参数".sendMessage()
+                            else -> "无效参数".toChain()
                         }
                     }
                 }
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().convertToChain()
                 "switch" -> {
                     BotVariables.switch = !BotVariables.switch
-                    return "维护模式已${if (!BotVariables.switch) "开启" else "关闭"}".sendMessage()
+                    return "维护模式已${if (!BotVariables.switch) "开启" else "关闭"}".toChain()
                 }
                 "push" -> {
                     if (args.size > 1) {
                         return when (args[1].toLowerCase()) {
                             "twit", "twitter", "推特", "蓝鸟", "twi" -> {
                                 PusherManager.getPusherByName("data")?.execute()
-                                sendMessage("Twitter retriever has been triggered and run~")
+                                toChain("Twitter retriever has been triggered and run~")
                             }
                             "ytb", "y2b", "youtube", "油管" -> {
-                                sendMessage("Youtube retriever is in WIP status.")
+                                toChain("Youtube retriever is in WIP status.")
                             }
                             "bilibili", "bili", "哔哩哔哩", "b站" -> {
                                 PusherManager.getPusherByName("bili_dynamic")?.execute()
-                                    ?: return "Can't found pusher".sendMessage()
-                                sendMessage("Bilibili retriever has been triggered and run~")
+                                    ?: return "Can't found pusher".toChain()
+                                toChain("Bilibili retriever has been triggered and run~")
                             }
                             "status" -> {
                                 val ps = PusherManager.getPushers()
@@ -128,9 +128,9 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                         append("上次推送于 ${BotVariables.yyMMddPattern.format(it.latestPushTime)}\n")
                                     }
                                     trim()
-                                }.sendMessage()
+                                }.toChain()
                             }
-                            else -> sendMessage("Unknown retriever type.")
+                            else -> toChain("Unknown retriever type.")
                         }
                     }
                 }

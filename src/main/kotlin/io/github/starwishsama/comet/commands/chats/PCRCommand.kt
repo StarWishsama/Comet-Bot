@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.pool.PCRPool
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.contact.isAdministrator
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -22,9 +22,9 @@ class PCRCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         return if (args.isNotEmpty()) {
             when (args[0]) {
-                "十连" -> pool.getPCRResult(user, 10).sendMessage()
-                "单抽" -> pool.getPCRResult(user, 1).sendMessage()
-                "来一井" -> pool.getPCRResult(user, 300).sendMessage()
+                "十连" -> pool.getPCRResult(user, 10).toChain()
+                "单抽" -> pool.getPCRResult(user, 1).toChain()
+                "来一井" -> pool.getPCRResult(user, 300).toChain()
                 else -> {
                     if (user.isBotAdmin() || (event is GroupMessageEvent && event.sender.isAdministrator())) {
                         if (StringUtils.isNumeric(args[0])) {
@@ -33,12 +33,12 @@ class PCRCommand : ChatCommand {
                             } catch (e: NumberFormatException) {
                                 return getHelp().convertToChain()
                             }
-                            pool.getPCRResult(user, gachaTime).sendMessage()
+                            pool.getPCRResult(user, gachaTime).toChain()
                         } else {
                             getHelp().convertToChain()
                         }
                     } else {
-                        "次数抽卡功能已停用, 请使用单抽/十连/一井的方式抽卡!".sendMessage()
+                        "次数抽卡功能已停用, 请使用单抽/十连/一井的方式抽卡!".toChain()
                     }
                 }
             }

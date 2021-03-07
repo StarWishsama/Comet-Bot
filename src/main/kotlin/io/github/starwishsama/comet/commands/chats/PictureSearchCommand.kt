@@ -10,7 +10,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionManager
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.network.PictureSearchUtil
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.MessageEvent
@@ -30,23 +30,23 @@ class PictureSearchCommand : ChatCommand, SuspendCommand {
                 SessionManager.addSession(Session(this, user.id))
             }
 
-            val img = event.message[Image] ?: return sendMessage("请发送需要搜索的图片")
+            val img = event.message[Image] ?: return toChain("请发送需要搜索的图片")
 
-            return handlePicSearch(img.queryUrl()).sendMessage()
+            return handlePicSearch(img.queryUrl()).toChain()
         } else if (args[0].contentEquals("source") && args.size > 1) {
             return try {
                 val api = PicSearchApiType.valueOf(args[1].toUpperCase(Locale.ROOT))
                 BotVariables.cfg.pictureSearchApi = api
-                sendMessage("已切换识图 API 为 ${api.name}", true)
+                toChain("已切换识图 API 为 ${api.name}", true)
             } catch (e: Throwable) {
                 var type = ""
                 PicSearchApiType.values().forEach {
                     type = type + it.name + " " + it.desc + "\n"
                 }
-                sendMessage("该识图 API 不存在, 可用的 API 类型:\n ${type.trim()}", true)
+                toChain("该识图 API 不存在, 可用的 API 类型:\n ${type.trim()}", true)
             }
         } else {
-            return getHelp().sendMessage()
+            return getHelp().toChain()
         }
     }
 

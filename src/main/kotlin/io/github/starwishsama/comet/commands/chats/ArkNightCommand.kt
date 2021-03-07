@@ -8,7 +8,7 @@ import io.github.starwishsama.comet.managers.GachaManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.GachaUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.uploadAsImage
@@ -43,15 +43,15 @@ class ArkNightCommand : ChatCommand {
                         buildString {
                             append("目前卡池: ${pool.name}\n")
                             append("详细信息: ${pool.description}")
-                        }.sendMessage()
+                        }.toChain()
                     } else {
                         val poolName = args[1]
                         val pools = GachaManager.getPoolsByType<ArkNightPool>().parallelStream().filter { it.name == poolName }.findFirst()
                         if (pools.isPresent) {
                             pool = pools.get()
-                            "成功修改卡池为: ${pool.name}".sendMessage()
+                            "成功修改卡池为: ${pool.name}".toChain()
                         } else {
-                            "找不到名为 $poolName 的卡池".sendMessage()
+                            "找不到名为 $poolName 的卡池".toChain()
                         }
                     }
                 }
@@ -94,7 +94,7 @@ class ArkNightCommand : ChatCommand {
         return if (GachaUtil.arkPictureIsUsable()) {
             generatePictureGachaResult(pool, event, user, list)
         } else {
-            pool.getArkDrawResultAsString(user, list).sendMessage()
+            pool.getArkDrawResultAsString(user, list).toChain()
         }
     }
 
@@ -106,7 +106,7 @@ class ArkNightCommand : ChatCommand {
             val result = GachaUtil.combineGachaImage(if (ops.size <= 10) ops else ops.subList(ops.size - 11, ops.size - 1), pool)
             if (result.lostItem.isNotEmpty())
                 event.subject.sendMessage(
-                    event.message.quote() + sendMessage("由于缺失资源文件, 以下干员无法显示 :(\n" +
+                    event.message.quote() + toChain("由于缺失资源文件, 以下干员无法显示 :(\n" +
                             buildString {
                                 result.lostItem.forEach {
                                     append("${it.name},")

@@ -11,7 +11,7 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.push.YoutubeUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
@@ -32,20 +32,20 @@ class YoutubeCommand : ChatCommand {
                 "sub" -> return if (event is GroupMessageEvent) {
                     subscribeUser(args[1], event.group.id)
                 } else {
-                    "该功能仅限群聊使用".sendMessage()
+                    "该功能仅限群聊使用".toChain()
                 }
                 "unsub" -> return if (event is GroupMessageEvent) {
                     unsubscribeUser(args, event.group.id)
                 } else {
-                    "该功能仅限群聊使用".sendMessage()
+                    "该功能仅限群聊使用".toChain()
                 }
                 "push" -> return if (event is GroupMessageEvent) {
                     val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
                     cfg.youtubePushEnabled = !cfg.youtubePushEnabled
 
-                    "Youtube 推送状态: ${cfg.youtubePushEnabled}".sendMessage()
+                    "Youtube 推送状态: ${cfg.youtubePushEnabled}".toChain()
                 } else {
-                    "该功能仅限群聊使用".sendMessage()
+                    "该功能仅限群聊使用".toChain()
                 }
                 "list" -> return if (event is GroupMessageEvent) {
                     val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
@@ -54,9 +54,9 @@ class YoutubeCommand : ChatCommand {
                         cfg.youtubeSubscribers.forEach {
                             append(it.userName + "(" + it.id + ")").append(",")
                         }
-                    }.removeSuffix(",").sendMessage()
+                    }.removeSuffix(",").toChain()
                 } else {
-                    "该功能仅限群聊使用".sendMessage()
+                    "该功能仅限群聊使用".toChain()
                 }
                 else -> return getHelp().convertToChain()
             }
@@ -91,17 +91,17 @@ class YoutubeCommand : ChatCommand {
             try {
                 youtubeUserInfo = YoutubeApi.service.getSearchResult(channelId = channelID).execute().body()
             } catch (e: RateLimitException) {
-                return sendMessage(e.message)
+                return toChain(e.message)
             }
 
             if (youtubeUserInfo != null) {
                 cfg.youtubeSubscribers.add(YoutubeUser(channelID, youtubeUserInfo.items[0].snippet.channelTitle))
-                return sendMessage("订阅 ${youtubeUserInfo.items[0].snippet.channelTitle} 成功")
+                return toChain("订阅 ${youtubeUserInfo.items[0].snippet.channelTitle} 成功")
             }
 
-            return sendMessage("订阅 $channelID 失败")
+            return toChain("订阅 $channelID 失败")
         } else {
-            return sendMessage("已经订阅过频道ID为 $channelID 的频道了")
+            return toChain("已经订阅过频道ID为 $channelID 的频道了")
         }
     }
 
@@ -113,14 +113,14 @@ class YoutubeCommand : ChatCommand {
                     clearUnsubscribeUsersInPool(groupId, it.id)
                 }
                 cfg.youtubeSubscribers.clear()
-                sendMessage("退订全部用户成功")
+                toChain("退订全部用户成功")
             } else if (hasSubscribed(cfg.youtubeSubscribers, args[1]).isPresent) {
                 val sub = hasSubscribed(cfg.youtubeSubscribers, args[1]).get()
                 cfg.youtubeSubscribers.remove(sub)
                 clearUnsubscribeUsersInPool(groupId, args[1])
-                sendMessage("退订 ${sub.userName} 成功")
+                toChain("退订 ${sub.userName} 成功")
             } else {
-                sendMessage("没有订阅过 @${args[1]}")
+                toChain("没有订阅过 @${args[1]}")
             }
         } else {
             getHelp().convertToChain()

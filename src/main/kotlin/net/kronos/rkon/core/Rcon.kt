@@ -82,7 +82,7 @@ class Rcon(host: String, port: Int, password: ByteArray) {
         require(payload.trim { it <= ' ' }.isNotEmpty()) { "Payload can't be null or empty" }
         val response = send(RconPacket.SERVERDATA_EXECCOMMAND, payload.toByteArray())
         if (response != null) {
-            return CometUtil.sendMessage(String(response.payload, charset)).contentToString()
+            return CometUtil.toChain(String(response.payload, charset)).contentToString()
         }
         return "发生异常"
     }

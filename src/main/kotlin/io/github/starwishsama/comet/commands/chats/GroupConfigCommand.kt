@@ -12,7 +12,7 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.toMessageWrapper
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -35,21 +35,21 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                             if (target != null) {
                                 if (cfg.isHelper(target.id)) {
                                     cfg.removeHelper(target.id)
-                                    sendMessage("成功将 ${target.id} 移出群助手列表")
+                                    toChain("成功将 ${target.id} 移出群助手列表")
                                 } else {
                                     cfg.addHelper(target.id)
-                                    sendMessage("成功将 ${target.id} 加入群助手列表")
+                                    toChain("成功将 ${target.id} 加入群助手列表")
                                 }
                             } else {
-                                sendMessage("找不到你想要添加/删除的用户")
+                                toChain("找不到你想要添加/删除的用户")
                             }
                         } else {
-                            sendMessage(getHelp())
+                            toChain(getHelp())
                         }
                     }
                     "repeat" -> {
                         cfg.canRepeat = !cfg.canRepeat
-                        return sendMessage("已${if (cfg.canRepeat) "开启" else "关闭"}群复读机")
+                        return toChain("已${if (cfg.canRepeat) "开启" else "关闭"}群复读机")
                     }
                     "autojoin" -> {
                         if (args.size > 1) {
@@ -57,37 +57,37 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                                 "condition", "条件", "tj", "cd" -> {
                                     if (args.size > 2) {
                                         cfg.autoAcceptCondition = args.getRestString(2)
-                                        "成功设置自动通过申请条件!".sendMessage()
+                                        "成功设置自动通过申请条件!".toChain()
                                     } else {
-                                        "/gs autojoin condition [关键词]\n满足关键词的入群申请会自动通过".sendMessage()
+                                        "/gs autojoin condition [关键词]\n满足关键词的入群申请会自动通过".toChain()
                                     }
                                 }
                                 else -> {
-                                    "/gs autojoin condition [关键词]\n满足关键词的入群申请会自动通过".sendMessage()
+                                    "/gs autojoin condition [关键词]\n满足关键词的入群申请会自动通过".toChain()
                                 }
                             }
                         } else {
                             return if (event.group.botPermission == MemberPermission.MEMBER) {
-                                "抱歉, 机器人不是群管, 无法自动接受加群请求.".sendMessage()
+                                "抱歉, 机器人不是群管, 无法自动接受加群请求.".toChain()
                             } else {
                                 cfg.autoAccept = !cfg.autoAccept
-                                "已${if (cfg.autoAccept) "开启" else "关闭"}自动接受加群请求".sendMessage()
+                                "已${if (cfg.autoAccept) "开启" else "关闭"}自动接受加群请求".toChain()
                             }
                         }
                     }
                     "function", "fun", "func" -> {
                         if (args.size < 2) {
-                            return sendMessage("""
+                            return toChain("""
                 现在支持禁用彗星 Bot 的命令功能了!
                 /gs function [命令名] 在本群禁用指定命令
             """.trimIndent())
                         }
 
-                        return cfg.disableCommand(args[1]).msg.sendMessage()
+                        return cfg.disableCommand(args[1]).msg.toChain()
                     }
                     "autoreply", "ar", "自动回复", "关键词", "keyword", "kw" -> {
                         if (args.size == 1) {
-                            return "/group ar [关键词] [回复内容]".sendMessage()
+                            return "/group ar [关键词] [回复内容]".toChain()
                         } else {
                             val keyWord = args[1]
                             val reply = args.getRestString(2)
@@ -95,7 +95,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                             cfg.keyWordReply.forEach {
                                 if (it.reply.getAllText() == reply) {
                                     it.keyWords.add(keyWord)
-                                    return "已发现现有配置, 成功添加关键词".sendMessage()
+                                    return "已发现现有配置, 成功添加关键词".toChain()
                                 }
                             }
 
@@ -105,9 +105,9 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                                         MessageWrapper().addText(reply)
                                     ))
                             ) {
-                                "添加关键词成功".sendMessage()
+                                "添加关键词成功".toChain()
                             } else {
-                                "添加关键词失败".sendMessage()
+                                "添加关键词失败".toChain()
                             }
                         }
                     }
@@ -121,24 +121,24 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                                 }.build().toMessageWrapper()
 
                                 cfg.newComerWelcomeText = welcomeText
-                                "设置欢迎消息成功".sendMessage()
+                                "设置欢迎消息成功".toChain()
                             } else {
-                                "/group newcomer [入群欢迎内容]\n内容支持纯文字 + 图片, 想要 @ 入群成员请用 [At] 代替.".sendMessage()
+                                "/group newcomer [入群欢迎内容]\n内容支持纯文字 + 图片, 想要 @ 入群成员请用 [At] 代替.".toChain()
                             }
                         } else {
                             cfg.newComerWelcome = !cfg.newComerWelcome
-                            return "已${if (cfg.newComerWelcome) "开启" else "关闭"}加群自动欢迎".sendMessage()
+                            return "已${if (cfg.newComerWelcome) "开启" else "关闭"}加群自动欢迎".toChain()
                         }
                     }
                     else -> {
-                        return getHelp().sendMessage()
+                        return getHelp().toChain()
                     }
                 }
             } else {
-                return getHelp().sendMessage()
+                return getHelp().toChain()
             }
         } else {
-            return "抱歉, 该命令仅供群聊使用!".sendMessage()
+            return "抱歉, 该命令仅供群聊使用!".toChain()
         }
     }
 

@@ -13,7 +13,7 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
@@ -59,10 +59,10 @@ class BiliBiliCommand : ChatCommand {
                                     val dynamic = DynamicApi.getWrappedDynamicTimeline(item.mid)
                                     text.convertToChain() + getDynamicText(dynamic, event)
                                 } else {
-                                    "找不到对应的B站用户".sendMessage()
+                                    "找不到对应的B站用户".toChain()
                                 }
                             } else {
-                               "未登录无法使用查询功能, 请在配置中配置B站账号密码".sendMessage()
+                               "未登录无法使用查询功能, 请在配置中配置B站账号密码".toChain()
                             }
                         } else getHelp().convertToChain()
                     }
@@ -70,25 +70,25 @@ class BiliBiliCommand : ChatCommand {
                         return if (user.isBotAdmin() || event.sender.isOperator()) {
                             val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
                             cfg.biliPushEnabled = !cfg.biliPushEnabled
-                            "B站动态推送功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}".sendMessage()
+                            "B站动态推送功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}".toChain()
                         } else {
-                            localizationManager.getLocalizationText("msg.no-permission").sendMessage()
+                            localizationManager.getLocalizationText("msg.no-permission").toChain()
                         }
                     }
                     "refresh" -> {
-                        val cfg = GroupConfigManager.getConfig(event.group.id) ?: return "本群尚未注册至 Comet".sendMessage()
+                        val cfg = GroupConfigManager.getConfig(event.group.id) ?: return "本群尚未注册至 Comet".toChain()
                         cfg.biliSubscribers.forEach {
                             it.userName = DynamicApi.getUserNameByMid(it.id.toLong())
                             it.roomID = UserApi.userApiService.getMemberInfoById(it.id.toLong()).execute().body()?.data?.liveRoomInfo?.roomId ?: -1
                             delay(1_500)
                         }
-                        return "刷新缓存成功".sendMessage()
+                        return "刷新缓存成功".toChain()
                     }
                     else -> return getHelp().convertToChain()
                 }
             }
         } else {
-            return "抱歉, 该命令仅供群聊使用!".sendMessage()
+            return "抱歉, 该命令仅供群聊使用!".toChain()
         }
     }
 
@@ -121,18 +121,18 @@ class BiliBiliCommand : ChatCommand {
             return if (args[1].contains("|")) {
                 val users = args[1].split("|")
                 val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
-                subscribeUsers(users, id) ?: sendMessage("订阅多个用户成功", true)
+                subscribeUsers(users, id) ?: toChain("订阅多个用户成功", true)
             } else {
                 val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
                 val result = subscribe(args[1], id)
                 if (result is EmptyMessageChain) {
-                    sendMessage("账号不存在")
+                    toChain("账号不存在")
                 } else {
                     result
                 }
             }
         } catch (e: IllegalArgumentException) {
-            return sendMessage(e.message, true)
+            return toChain(e.message, true)
         }
     }
 
@@ -141,7 +141,7 @@ class BiliBiliCommand : ChatCommand {
             val result = subscribe(it, id)
             delay(500)
             if (result is EmptyMessageChain) {
-                return sendMessage("账号 $it 不存在")
+                return toChain("账号 $it 不存在")
             }
         }
         return null
@@ -153,34 +153,34 @@ class BiliBiliCommand : ChatCommand {
 
             if (args[1] == "all" || args[1] == "全部") {
                 cfg.biliSubscribers.clear()
-                return sendMessage("退订全部成功")
+                return toChain("退订全部成功")
             }
 
             val item = if (args[1].isNumeric()) {
                 val item = cfg.biliSubscribers.parallelStream().filter { it.id == args[1] }.findFirst()
                 if (!item.isPresent) {
-                    return "找不到你要退订的用户".sendMessage()
+                    return "找不到你要退订的用户".toChain()
                 }
 
                 item.get()
             } else {
                 val item = cfg.biliSubscribers.parallelStream().filter { it.userName == args[1] }.findFirst()
                 if (!item.isPresent) {
-                    return "找不到你要退订的用户".sendMessage()
+                    return "找不到你要退订的用户".toChain()
                 }
 
                 item.get()
             }
 
             cfg.biliSubscribers.remove(item)
-            sendMessage("取消订阅用户 ${item.userName} 成功")
+            toChain("取消订阅用户 ${item.userName} 成功")
         } else {
             getHelp().convertToChain()
         }
     }
 
     private fun getSubList(event: MessageEvent): MessageChain {
-        if (event !is GroupMessageEvent) return sendMessage("只能在群里查看订阅列表")
+        if (event !is GroupMessageEvent) return toChain("只能在群里查看订阅列表")
         val list = GroupConfigManager.getConfig(event.group.id)?.biliSubscribers
 
         if (list?.isNotEmpty() == true) {
@@ -191,9 +191,9 @@ class BiliBiliCommand : ChatCommand {
                     trim()
                 }
             }
-            return sendMessage(subs)
+            return toChain(subs)
         }
-        return sendMessage("未订阅任何用户")
+        return toChain("未订阅任何用户")
     }
 
     private fun getDynamicText(dynamic: MessageWrapper?, event: MessageEvent): MessageChain {
@@ -218,7 +218,7 @@ class BiliBiliCommand : ChatCommand {
             }
             else -> {
                 if (!FakeClientApi.client.isLogin) {
-                    return "未登录无法使用昵称搜索订阅, 请在配置中配置B站账号密码".sendMessage()
+                    return "未登录无法使用昵称搜索订阅, 请在配置中配置B站账号密码".toChain()
                 }
 
                 val item = FakeClientApi.getUser(target)
@@ -245,9 +245,9 @@ class BiliBiliCommand : ChatCommand {
 
         return if (!cfg.biliSubscribers.stream().filter { it.id.toLong() == uid }.findFirst().isPresent) {
             cfg.biliSubscribers.add(BiliBiliUser(uid.toString(), name, roomNumber))
-            sendMessage("订阅 ${name}($uid) 成功")
+            toChain("订阅 ${name}($uid) 成功")
         } else {
-            sendMessage("你已经订阅过 ${name}($uid) 了!")
+            toChain("你已经订阅过 ${name}($uid) 了!")
         }
     }
 

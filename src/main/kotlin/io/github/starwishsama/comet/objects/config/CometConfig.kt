@@ -107,5 +107,11 @@ data class CometConfig(
         val botProtocol: BotConfiguration.MiraiProtocol = BotConfiguration.MiraiProtocol.ANDROID_PHONE,
 
         @Comment("自动清理过时文件间隔 (如 Log, 错误报告等), 单位为天. 设为小于 0 的数字以关闭")
-        val autoCleanDuration: Int = 15
+        val autoCleanDuration: Int = 15,
+
+        @Comment("Webhook 功能开关")
+        val webHookSwitch: Boolean = false,
+
+        @Comment("Webhook 推送服务器端口")
+        val webHookPort: Int = 6789
 )

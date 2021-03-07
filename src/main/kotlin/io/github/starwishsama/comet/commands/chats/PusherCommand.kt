@@ -6,13 +6,13 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.service.pusher.PusherManager
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 class PusherCommand: ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (args.isEmpty()) return getHelp().sendMessage()
+        if (args.isEmpty()) return getHelp().toChain()
 
         return when (args[0]) {
             "status", "状态" -> displayPusherStatus()
@@ -21,7 +21,7 @@ class PusherCommand: ChatCommand {
                 """
                     /pusher status 展示所有推送器运行状态
                     /pusher test [推送器名称] 测试一个推送器    
-                    """.trimIndent().sendMessage()
+                    """.trimIndent().toChain()
             }
         }
     }
@@ -48,14 +48,14 @@ class PusherCommand: ChatCommand {
                 append("上次推送于 ${BotVariables.yyMMddPattern.format(it.latestPushTime)}\n")
             }
             trim()
-        }.sendMessage()
+        }.toChain()
     }
 
     private fun testPusher(args: List<String>): MessageChain {
-        if (args.size < 2) return "请填写推送器名!".sendMessage()
+        if (args.size < 2) return "请填写推送器名!".toChain()
 
-        val pusher = PusherManager.getPusherByName(args[1]) ?: return "找不到你要测试的推送器".sendMessage()
+        val pusher = PusherManager.getPusherByName(args[1]) ?: return "找不到你要测试的推送器".toChain()
         pusher.execute()
-        return sendMessage("${pusher.name} 运行完成!")
+        return toChain("${pusher.name} 运行完成!")
     }
 }

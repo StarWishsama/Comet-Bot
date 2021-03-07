@@ -8,7 +8,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.ClockInManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.CometUtil
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
@@ -29,30 +29,30 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (args.isEmpty()) {
-            return "命令不存在, 使用 /admin help 查看更多".sendMessage()
+            return "命令不存在, 使用 /admin help 查看更多".toChain()
         } else {
             when (args[0]) {
                 "clockin", "dk", "打卡" -> {
                     return if (event is GroupMessageEvent) {
                         clockIn(args, event)
                     } else {
-                        "该命令只能在群聊使用".sendMessage()
+                        "该命令只能在群聊使用".toChain()
                     }
                 }
                 "showdata", "打卡数据", "dksj" -> {
                     return if (event is GroupMessageEvent) {
                         val data = ClockInManager.getNearestClockIn(event.group.id)
                         data?.viewData()?.toMessageChain(event.subject)
-                            ?: "本群没有正在进行的打卡".sendMessage()
+                            ?: "本群没有正在进行的打卡".toChain()
                     } else {
-                        "该命令只能在群聊使用".sendMessage()
+                        "该命令只能在群聊使用".toChain()
                     }
                 }
                 "help", "帮助" -> return getHelp().convertToChain()
                 "permlist", "权限列表", "qxlb" -> return permList(user, args, event)
                 "permadd", "添加权限", "tjqx" -> return permAdd(user, args, event)
                 "give", "增加次数" -> return giveCommandUseTime(event, args)
-                else -> return "命令不存在, 使用 /admin help 查看更多".sendMessage()
+                else -> return "命令不存在, 使用 /admin help 查看更多".toChain()
             }
         }
     }
@@ -80,12 +80,12 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
             val target: BotUser? = CometUtil.parseAtAsBotUser(event, args[1])
             val permission = target?.getPermissions()
             if (permission != null) {
-                sendMessage(permission)
+                toChain(permission)
             } else {
-                sendMessage("该用户没有任何权限")
+                toChain("该用户没有任何权限")
             }
         } else {
-            sendMessage(user.getPermissions())
+            toChain(user.getPermissions())
         }
     }
 
@@ -95,10 +95,10 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
                 val target: BotUser? = CometUtil.parseAtAsBotUser(event, args[1])
 
                 target?.addPermission(args[2])
-                return sendMessage("添加权限成功")
+                return toChain("添加权限成功")
             }
         } else {
-            return sendMessage("你没有权限")
+            return toChain("你没有权限")
         }
         return EmptyMessageChain
     }
@@ -110,12 +110,12 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
             return if (target != null) {
                 if (args[2].toInt() <= 1000000) {
                     target.addTime(args[2].toInt())
-                    sendMessage("成功为 $target 添加 ${args[2]} 次命令条数")
+                    toChain("成功为 $target 添加 ${args[2]} 次命令条数")
                 } else {
-                    sendMessage("给予的次数超过系统限制上限")
+                    toChain("给予的次数超过系统限制上限")
                 }
             } else {
-                sendMessage("找不到此用户")
+                toChain("找不到此用户")
             }
         }
         return EmptyMessageChain
@@ -148,24 +148,24 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
                     )
                 }
                 else -> {
-                    return sendMessage("/admin dk (开始时间) [结束时间])")
+                    return toChain("/admin dk (开始时间) [结束时间])")
                 }
             }
 
             val usersList = arrayListOf<Member>()
 
             return if (endTime.isBefore(startTime) || endTime.isEqual(startTime)) {
-                sendMessage("在吗 为什么时间穿越")
+                toChain("在吗 为什么时间穿越")
             } else {
                 for (member in message.group.members) {
                     usersList.add(member)
                 }
 
                 ClockInManager.newClockIn(message.group.id, usersList, startTime, endTime)
-                sendMessage("打卡已开启 请发送 /dk 来打卡")
+                toChain("打卡已开启 请发送 /dk 来打卡")
             }
         } else {
-            return sendMessage("10 分钟内还有一个打卡未结束")
+            return toChain("10 分钟内还有一个打卡未结束")
         }
     }
 }

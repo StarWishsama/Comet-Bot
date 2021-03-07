@@ -9,7 +9,7 @@ import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.logger
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
@@ -86,7 +86,7 @@ object MusicUtil {
             return getQQMusicCard(name)
         }
 
-        val searchResult = getQQMusicSearchResult(name) ?: return "找不到歌曲".sendMessage()
+        val searchResult = getQQMusicSearchResult(name) ?: return "找不到歌曲".toChain()
         val song = searchResult.data.songs.songList[0]
 
         val artistName = buildString {
@@ -112,7 +112,7 @@ object MusicUtil {
         val result = "${song.songName}\nby $artistName\n🔗 > https://y.qq.com/n/yqq/song/${song.songMid}.html"
 
         return if (picIs == null) {
-            result.sendMessage()
+            result.toChain()
         } else {
             runBlocking {
                 picIs!!.uploadAsImage(contact).plus(result)

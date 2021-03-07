@@ -13,6 +13,7 @@ import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.objects.shop.Shop
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
 import io.github.starwishsama.comet.objects.wrapper.WrapperElementAdapter
+import io.github.starwishsama.comet.service.webhook.WebHookServer
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.network.NetUtil
 import net.kronos.rkon.core.Rcon
@@ -50,6 +51,8 @@ object BotVariables {
 
     var cfg = CometConfig()
 
+    var webhookServer: WebHookServer? = null
+
     val service: ScheduledExecutorService = Executors.newScheduledThreadPool(
         Runtime.getRuntime().availableProcessors(),
             BasicThreadFactory.Builder()
@@ -76,7 +79,7 @@ object BotVariables {
     val consoleCommandLogger: HinaLogger = HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
     val nullableGson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().setLenient().registerTypeAdapter(WrapperElement::class.java, WrapperElementAdapter()).create()
-    val gson: Gson = GsonBuilder().setPrettyPrinting().setLenient().registerTypeAdapter(WrapperElement::class.java, WrapperElementAdapter()).create()
+    val gson: Gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter(WrapperElement::class.java, WrapperElementAdapter()).create()
     var rCon: Rcon? = null
     lateinit var log: File
 

@@ -33,10 +33,10 @@ class KickCommand : ChatCommand {
                         return getHelp().convertToChain()
                     }
                 } else {
-                    CometUtil.sendMessage("我不是绿帽 我爬 我爬")
+                    CometUtil.toChain("我不是绿帽 我爬 我爬")
                 }
             } else {
-                CometUtil.sendMessage("你不是绿帽 你爬 你爬")
+                CometUtil.toChain("你不是绿帽 你爬 你爬")
             }
         }
         return EmptyMessageChain

@@ -40,7 +40,7 @@ class MuteCommand : ChatCommand {
                                     delay(500)
                                     doRandomMute(event)
                                 }
-                                CometUtil.sendMessage("下面将抽取一位幸运群友禁言")
+                                CometUtil.toChain("下面将抽取一位幸运群友禁言")
                             }
                             else -> getHelp().convertToChain()
                         }
@@ -49,7 +49,7 @@ class MuteCommand : ChatCommand {
                     getHelp().convertToChain()
                 }
             } else {
-                CometUtil.sendMessage("我不是绿帽 我爬 我爬")
+                CometUtil.toChain("我不是绿帽 我爬 我爬")
             }
         }
         return EmptyMessageChain
@@ -97,38 +97,38 @@ class MuteCommand : ChatCommand {
             if (isAll) {
                 group.settings.isMuteAll = !group.settings.isMuteAll
                 return if (group.settings.isMuteAll) {
-                    CometUtil.sendMessage("The World!")
+                    CometUtil.toChain("The World!")
                 } else {
-                    CometUtil.sendMessage("然后时间开始流动")
+                    CometUtil.toChain("然后时间开始流动")
                 }
             } else {
                 if (group.botAsMember.id == id) {
-                    return CometUtil.sendMessage("不能踢出机器人")
+                    return CometUtil.toChain("不能踢出机器人")
                 }
 
                 for (member in group.members) {
                     if (member.id == id) {
                         if (member.isOperator()) {
-                            return CometUtil.sendMessage("不能踢出管理员")
+                            return CometUtil.toChain("不能踢出管理员")
                         }
                         return when (muteTime) {
                             in 1..2592000 -> {
                                 member.mute(muteTime)
-                                CometUtil.sendMessage("禁言 ${member.nameCardOrNick} 成功")
+                                CometUtil.toChain("禁言 ${member.nameCardOrNick} 成功")
                             }
                             0 -> {
                                 member.unmute()
-                                CometUtil.sendMessage("解禁 ${member.nameCardOrNick} 成功")
+                                CometUtil.toChain("解禁 ${member.nameCardOrNick} 成功")
                             }
-                            else -> CometUtil.sendMessage("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]")
+                            else -> CometUtil.toChain("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]")
                         }
                     }
                 }
             }
 
-            return CometUtil.sendMessage("找不到此用户")
+            return CometUtil.toChain("找不到此用户")
         } else {
-            return CometUtil.sendMessage("我不是绿帽 我爬 我爬")
+            return CometUtil.toChain("我不是绿帽 我爬 我爬")
         }
     }
 

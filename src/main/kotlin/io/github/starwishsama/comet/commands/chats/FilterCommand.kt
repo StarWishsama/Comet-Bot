@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -15,7 +15,7 @@ import net.mamoe.mirai.message.data.MessageChain
 
 class FilterCommand: ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (args.isEmpty()) return getHelp().sendMessage()
+        if (args.isEmpty()) return getHelp().toChain()
         return when (args[0]) {
             "add", "tj", "添加", "加" -> {
                 handleAddFilterWord(args.subList(1, args.size), event)
@@ -26,7 +26,7 @@ class FilterCommand: ChatCommand {
             "list", "列表" -> {
                 TODO("展示列表逻辑未完成")
             }
-            else -> getHelp().sendMessage()
+            else -> getHelp().toChain()
         }
     }
 
@@ -62,7 +62,7 @@ class FilterCommand: ChatCommand {
             doAddWord(words, null)
         }
 
-        return "成功添加该群新的屏蔽词${if (counter > 0) ", 有${counter}个添加失败" else ""}".sendMessage()
+        return "成功添加该群新的屏蔽词${if (counter > 0) ", 有${counter}个添加失败" else ""}".toChain()
     }
 
     private fun doAddWord(words: List<String>, groupCfg: PerGroupConfig?): Int {

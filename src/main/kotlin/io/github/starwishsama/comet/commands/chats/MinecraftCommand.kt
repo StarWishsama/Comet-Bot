@@ -5,7 +5,7 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.MinecraftUtil
@@ -28,7 +28,7 @@ class MinecraftCommand: ChatCommand {
 
                 val convert = MinecraftUtil.convert(args[0])
                 return if (convert.isEmpty()) {
-                    "无法连接至服务器".sendMessage()
+                    "无法连接至服务器".toChain()
                 } else {
                     query(convert.host, convert.port)
                 }
@@ -37,10 +37,10 @@ class MinecraftCommand: ChatCommand {
                 return if (args[1].isNumeric()) {
                     query(args[0], args[1].toIntOrNull())
                 } else {
-                    "输入的端口号不合法.".sendMessage()
+                    "输入的端口号不合法.".toChain()
                 }
             }
-            else -> return getHelp().sendMessage()
+            else -> return getHelp().toChain()
         }
     }
 
@@ -60,12 +60,12 @@ class MinecraftCommand: ChatCommand {
     private fun query(ip: String, port: Int?): MessageChain {
         return try {
             if (port == null) {
-                return "输入的端口号不合法.".sendMessage()
+                return "输入的端口号不合法.".toChain()
             }
             val result = MinecraftUtil.query(ip, port)
-            result.toString().sendMessage()
+            result.toString().toChain()
         } catch (e: IOException) {
-            "查询失败, 服务器可能不在线, 请稍后再试.".sendMessage()
+            "查询失败, 服务器可能不在线, 请稍后再试.".toChain()
         }
     }
 }

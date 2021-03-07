@@ -83,6 +83,9 @@ data class PerGroupConfig(@SerializedName("group_id") val id: Long, @SerializedN
     @SerializedName("auto_accept_condition")
     var autoAcceptCondition: String = ""
 
+    @SerializedName("github_repo_subs")
+    val githubRepoSubscribers: MutableList<String> = mutableListOf()
+
     fun addHelper(id: Long): Boolean {
         if (isHelper(id)) return false
         helpers.add(id)

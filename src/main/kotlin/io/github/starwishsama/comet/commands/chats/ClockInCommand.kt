@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.ClockInManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.checkin.ClockInData
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
@@ -29,10 +29,10 @@ class ClockInCommand : ChatCommand {
                 if (isClockIn(data, event)) {
                     clockIn(event.sender, event, data)
                 } else {
-                    "你已经打卡过了!".sendMessage()
+                    "你已经打卡过了!".toChain()
                 }
             } else {
-                "没有正在进行的打卡".sendMessage()
+                "没有正在进行的打卡".toChain()
             }
         }
         return EmptyMessageChain

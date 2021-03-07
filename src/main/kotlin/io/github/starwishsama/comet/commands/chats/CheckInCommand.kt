@@ -7,7 +7,7 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.service.task.HitokotoUpdater
-import io.github.starwishsama.comet.utils.CometUtil.sendMessage
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.contact.nameCardOrNick
@@ -23,12 +23,12 @@ class CheckInCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (event is GroupMessageEvent) {
             return if (user.isChecked()) {
-                "你今天已经签到过了! 输入 /cx 可查询签到信息".sendMessage()
+                "你今天已经签到过了! 输入 /cx 可查询签到信息".toChain()
             } else {
                 checkIn(event.sender, event, user).convertToChain()
             }
         } else {
-            return "抱歉, 该命令仅供群聊使用".sendMessage()
+            return "抱歉, 该命令仅供群聊使用".toChain()
         }
     }
 

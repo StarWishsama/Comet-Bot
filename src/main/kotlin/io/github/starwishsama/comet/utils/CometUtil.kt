@@ -57,10 +57,10 @@ object CometUtil {
         }.trim()
     }
 
-    fun sendMessage(otherText: String?, addPrefix: Boolean = true): MessageChain = sendMessageAsString(otherText, addPrefix).convertToChain()
+    fun toChain(otherText: String?, addPrefix: Boolean = true): MessageChain = sendMessageAsString(otherText, addPrefix).convertToChain()
 
     @JvmName("stringAsChain")
-    fun String?.sendMessage(addPrefix: Boolean = true): MessageChain = sendMessage(this, addPrefix)
+    fun String?.toChain(addPrefix: Boolean = true): MessageChain = toChain(this, addPrefix)
 
     fun List<String>.getRestString(startAt: Int): String {
         if (isEmpty()) {

@@ -143,7 +143,7 @@ object CommandExecutor {
                 if (cmd != null && event is GroupMessageEvent &&
                         GroupConfigManager.getConfig(event.group.id)?.isDisabledCommand(cmd) == true) {
                     return if (validateStatus(user, cmd.getProps())) {
-                        ExecutedResult(CometUtil.sendMessage("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
+                        ExecutedResult(CometUtil.toChain("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
                     } else {
                         ExecutedResult(EmptyMessageChain, cmd, CommandStatus.Disabled())
                     }
@@ -168,7 +168,7 @@ object CommandExecutor {
                         cmd.execute(event, splitMessage, user)
                     } else {
                         status = CommandStatus.NoPermission()
-                        CometUtil.sendMessage("你没有权限!")
+                        CometUtil.toChain("你没有权限!")
                     }
 
                     return ExecutedResult(result, cmd, status)
@@ -180,9 +180,9 @@ object CommandExecutor {
                 } else {
                     BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message}, 发送者: $senderId", t)
                     if (user.isBotOwner()) {
-                        ExecutedResult(CometUtil.sendMessage("在试图执行命令时发生了一个错误\n简易报错信息 :\n${t.javaClass.name}: ${t.message?.limitStringSize(30)}"), cmd, CommandStatus.Failed())
+                        ExecutedResult(CometUtil.toChain("在试图执行命令时发生了一个错误\n简易报错信息 :\n${t.javaClass.name}: ${t.message?.limitStringSize(30)}"), cmd, CommandStatus.Failed())
                     } else {
-                        ExecutedResult(CometUtil.sendMessage("在试图执行命令时发生了一个错误, 请联系管理员"), cmd, CommandStatus.Failed())
+                        ExecutedResult(CometUtil.toChain("在试图执行命令时发生了一个错误, 请联系管理员"), cmd, CommandStatus.Failed())
                     }
                 }
             }
