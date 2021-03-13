@@ -57,14 +57,14 @@ object GachaUtil {
         }
     }
 
-    fun combinePCRImage(chars: List<PCRCharacter>): CombinedResult {
+    private fun combinePCRImage(chars: List<PCRCharacter>): CombinedResult {
         TODO()
     }
 
     /**
      * 根据抽卡结果合成图片
      */
-    fun combineArkOpImage(ops: List<ArkNightOperator>): CombinedResult {
+    private fun combineArkOpImage(ops: List<ArkNightOperator>): CombinedResult {
         require(ops.isNotEmpty()) { "传入的干员列表不能为空!" }
 
         val lostOperators = mutableListOf<ArkNightOperator>()

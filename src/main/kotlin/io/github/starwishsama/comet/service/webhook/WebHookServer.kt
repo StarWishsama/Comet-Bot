@@ -6,7 +6,6 @@ import com.google.gson.JsonParseException
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
 import com.sun.net.httpserver.HttpServer
-import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.BotVariables.netLogger
 import io.github.starwishsama.comet.api.thirdparty.github.PushEvent
@@ -32,7 +31,7 @@ class GithubWebHookHandler: HttpHandler {
     override fun handle(he: HttpExchange) {
         netLogger.log(HinaLogLevel.Debug, "收到新事件", prefix = "WebHook")
 
-        he.sendResponseHeaders(202, 0)
+        he.sendResponseHeaders(200, 0)
 
         val request = String(he.requestBody.readBytes())
 
@@ -46,7 +45,7 @@ class GithubWebHookHandler: HttpHandler {
         val validate = mapper.readTree(payload).isNull || mapper.readTree(payload).isEmpty
 
         if (validate) {
-            netLogger.log(HinaLogLevel.Debug, "解析请求失败, 不是合法的 JSON.\n${payload}", prefix = "WebHook")
+            netLogger.log(HinaLogLevel.Debug, "解析请求失败, 回调的 JSON 不合法.\n${payload}", prefix = "WebHook")
             return
         }
 
@@ -54,9 +53,9 @@ class GithubWebHookHandler: HttpHandler {
             val info = mapper.readValue<PushEvent>(payload)
             GithubPusher.push(info)
         } catch (e: JsonParseException) {
-            daemonLogger.debug("推送 WebHook 消息失败, 不支持的事件类型")
+            netLogger.log(HinaLogLevel.Debug,"推送 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")
         } catch (e: Exception) {
-            daemonLogger.warning("推送 WebHook 消息失败", e)
+            netLogger.log(HinaLogLevel.Debug,"推送 WebHook 消息失败", e, prefix = "WebHook")
         }
     }
 }
