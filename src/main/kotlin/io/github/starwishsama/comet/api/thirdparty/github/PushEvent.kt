@@ -58,8 +58,7 @@ data class PushEvent(
     )
 
     private fun getLocalTime(time: String): String {
-        val df = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
-        val localTime = LocalDateTime.parse(time, df).atZone(ZoneId.systemDefault())
+        val localTime = LocalDateTime.parse(time, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.systemDefault())
         return BotVariables.yyMMddPattern.format(localTime)
     }
 
