@@ -5,6 +5,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.utils.StringUtil
+import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
@@ -34,7 +35,7 @@ object ConvertLightAppListener : NListener {
 
     private fun parseJsonMessage(lightApp: LightApp, subject: Contact): MessageChain {
         val cardJson = mapper.readTree(lightApp.content)
-        if (!cardJson.isNull && !cardJson.isEmpty) {
+        if (cardJson.isUsable()) {
             val prompt = cardJson["prompt"].asText()
             if (prompt != null && prompt.contains("哔哩哔哩")) {
                 return biliBiliCardConvert(cardJson["meta"]["detail_1"], subject)

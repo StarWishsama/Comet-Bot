@@ -6,7 +6,7 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.R6StatsApi
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.IDGuidelineType
 import io.github.starwishsama.comet.utils.StringUtil.isLegitId
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -20,22 +20,26 @@ class R6SCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (event is GroupMessageEvent) {
             if (args.isEmpty()) {
-                return CometUtil.toChain(getHelp(), true)
+                return toChain(getHelp(), true)
             } else {
                 when (args[0].toLowerCase()) {
                     "info", "查询", "cx" -> {
                         val account = user.r6sAccount
+                        if (account.isEmpty()) {
+                            return "你还没绑定过账号!".toChain()
+                        }
+
                         return if (args.size <= 1 && account.isNotEmpty()) {
-                            event.subject.sendMessage(CometUtil.toChain("查询中..."))
+                            event.subject.sendMessage(toChain("查询中..."))
                             val result = R6StatsApi.getPlayerStat(account)
                             event.sender.at() + "\n" + result.toMessageChain(event.subject)
                         } else {
                             if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
-                                event.subject.sendMessage(CometUtil.toChain("查询中..."))
+                                event.subject.sendMessage(toChain("查询中..."))
                                 val result = R6StatsApi.getPlayerStat(args[1])
                                 event.sender.at() + "\n" + result.toMessageChain(event.subject)
                             } else {
-                                CometUtil.toChain("你输入的 ID 不符合育碧用户名规范!")
+                                toChain("你输入的 ID 不符合育碧用户名规范!")
                             }
                         }
                     }
@@ -45,14 +49,14 @@ class R6SCommand : ChatCommand {
                                 val botUser1 = BotUser.getUser(event.sender.id)
                                 if (botUser1 != null) {
                                     botUser1.r6sAccount = args[1]
-                                    return CometUtil.toChain("绑定成功!")
+                                    return toChain("绑定成功!")
                                 }
                             } else {
-                                return CometUtil.toChain("ID 格式有误!")
+                                return toChain("ID 格式有误!")
                             }
                         }
                     else -> {
-                        return CometUtil.toChain("/r6s info [Uplay账号名]")
+                        return toChain("/r6s info [Uplay账号名]")
                     }
                 }
             }

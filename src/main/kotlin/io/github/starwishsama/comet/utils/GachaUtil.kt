@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
 import io.github.starwishsama.comet.objects.gacha.pool.PCRPool
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
+import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
 import org.jsoup.Jsoup
 import java.awt.Image
@@ -186,7 +187,7 @@ object GachaUtil {
         var isOld = false
 
         daemonLogger.info("明日方舟 > 检查是否为旧版本数据...")
-        if (!location.exists() || !mapper.readTree(location.getContext()).isEmpty) {
+        if (!location.exists() || !mapper.readTree(location.getContext()).isUsable()) {
             daemonLogger.info("明日方舟 > 你还没有卡池数据, 正在自动下载新数据")
             isOld = true
         }

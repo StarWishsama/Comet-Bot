@@ -14,6 +14,7 @@ import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
 import java.io.IOException
 
@@ -103,7 +104,7 @@ object DynamicApi : ApiExecutor {
 
                 val card = dynamic.data.cards[0]
                 val singleDynamicObject = mapper.readTree(card.card)
-                if (!singleDynamicObject.isEmpty && !singleDynamicObject.isNull) {
+                if (singleDynamicObject.isUsable()) {
                     val dynamicType = DynamicTypeSelector.getType(card.description.type)
                     return if (dynamicType != UnknownType::class) {
                         mapper.readValue(card.card, dynamicType).getContact()

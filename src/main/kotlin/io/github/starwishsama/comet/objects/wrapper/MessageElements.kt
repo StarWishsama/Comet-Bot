@@ -3,6 +3,8 @@ package io.github.starwishsama.comet.objects.wrapper
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import io.github.starwishsama.comet.utils.json.WrapperConverter
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
@@ -13,7 +15,8 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import java.io.File
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
+@JsonDeserialize(using = WrapperConverter::class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NONE, include = JsonTypeInfo.As.PROPERTY)
 @JsonSubTypes(
     JsonSubTypes.Type(value = PureText::class, name = "PureText"),
     JsonSubTypes.Type(value = Picture::class, name = "Picture"),
@@ -58,7 +61,7 @@ data class PureText(val text: String): WrapperElement {
  * @param filePath 图片本地路径
  */
 @Serializable
-data class Picture(val url: String, val filePath: String = ""): WrapperElement {
+data class Picture(val url: String = "", val filePath: String = ""): WrapperElement {
 
     init {
         if (url.isEmpty() && filePath.isEmpty()) {

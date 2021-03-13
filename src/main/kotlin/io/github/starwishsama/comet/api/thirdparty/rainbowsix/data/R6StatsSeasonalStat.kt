@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.enums.R6Rank
+import io.github.starwishsama.comet.utils.json.isUsable
 
 data class R6StatsSeasonalStat(
     @JsonProperty("username")
@@ -29,7 +30,7 @@ data class R6StatsSeasonalStat(
 ) {
     fun getSeasonalStat(season: SeasonName): SeasonInfo? {
         val seasonInfo = seasonalStat[season.season]
-        return if (seasonInfo.isNull || seasonInfo.isEmpty) {
+        return if (seasonInfo.isUsable()) {
             null
         } else {
             mapper.readValue(seasonInfo.traverse())

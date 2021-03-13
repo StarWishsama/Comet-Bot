@@ -15,6 +15,7 @@ import io.github.starwishsama.comet.exceptions.EmptyTweetException
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.exceptions.TwitterApiException
 import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.isType
 import java.io.IOException
@@ -72,7 +73,7 @@ object TwitterApi : ApiExecutor {
 
             val result = curl.exec("UTF-8")
 
-            if (!mapper.readTree(result).isEmpty && !mapper.readTree(result).isNull) {
+            if (mapper.readTree(result).isUsable()) {
                 // Get Token
                 token = mapper.readTree(result)["access_token"].asText()
                 BotVariables.cfg.twitterToken = token

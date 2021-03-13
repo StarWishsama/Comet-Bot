@@ -3,7 +3,8 @@ package io.github.starwishsama.comet
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
 import io.github.starwishsama.comet.logger.RetrofitLogger
@@ -13,8 +14,11 @@ import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.objects.shop.Shop
+import io.github.starwishsama.comet.objects.wrapper.WrapperElement
 import io.github.starwishsama.comet.service.webhook.WebHookServer
 import io.github.starwishsama.comet.utils.LoggerAppender
+import io.github.starwishsama.comet.utils.json.LocalDateTimeSupport
+import io.github.starwishsama.comet.utils.json.WrapperConverter
 import io.github.starwishsama.comet.utils.network.NetUtil
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.utils.MiraiInternalApi
@@ -23,6 +27,7 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
 import java.net.InetSocketAddress
 import java.net.Proxy
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -79,11 +84,15 @@ object BotVariables {
     val consoleCommandLogger: HinaLogger = HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
     val mapper: ObjectMapper = ObjectMapper()
-        .findAndRegisterModules()
         .enable(SerializationFeature.INDENT_OUTPUT)
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .registerKotlinModule()
+        .registerModule(KotlinModule(nullIsSameAsDefault = true, nullToEmptyCollection = true, nullToEmptyMap = true))
+        .registerModule(SimpleModule().also {
+            it.addDeserializer(LocalDateTime::class.java, LocalDateTimeSupport)
+            it.addDeserializer(WrapperElement::class.java, WrapperConverter)
+        })
+        .setDateFormat(SimpleDateFormat("yyyy/MM/dd HH:mm:ss"))
 
     var rCon: Rcon? = null
     lateinit var log: File

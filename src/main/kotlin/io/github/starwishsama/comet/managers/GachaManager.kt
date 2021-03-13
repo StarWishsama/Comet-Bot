@@ -9,6 +9,7 @@ import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
 import io.github.starwishsama.comet.objects.gacha.pool.PCRPool
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.getContext
+import io.github.starwishsama.comet.utils.json.isUsable
 import java.io.File
 import kotlin.streams.toList
 
@@ -79,7 +80,7 @@ object GachaManager {
     fun addPoolFromFile(poolFile: File) {
         require(poolFile.exists()) { "${poolFile.name} isn't exists" }
         val context = mapper.readTree(poolFile.getContext())
-        require(!context.isNull && !context.isEmpty) { "${poolFile.name} isn't a valid json file!" }
+        require(!context.isUsable()) { "${poolFile.name} isn't a valid json file!" }
 
         try {
             val pool = mapper.readValue(context.traverse(), CustomPool::class.java)
