@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
 import io.github.starwishsama.comet.logger.RetrofitLogger
@@ -11,8 +11,6 @@ import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.objects.shop.Shop
-import io.github.starwishsama.comet.objects.wrapper.WrapperElement
-import io.github.starwishsama.comet.objects.wrapper.WrapperElementAdapter
 import io.github.starwishsama.comet.service.webhook.WebHookServer
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -78,8 +76,11 @@ object BotVariables {
 
     val consoleCommandLogger: HinaLogger = HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
-    val nullableGson: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().setLenient().registerTypeAdapter(WrapperElement::class.java, WrapperElementAdapter()).create()
-    val gson: Gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter(WrapperElement::class.java, WrapperElementAdapter()).create()
+    val mapper: ObjectMapper = ObjectMapper()
+        .findAndRegisterModules()
+        .enable(SerializationFeature.INDENT_OUTPUT)
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+
     var rCon: Rcon? = null
     lateinit var log: File
 
@@ -104,8 +105,6 @@ object BotVariables {
     val yyMMddPattern: DateTimeFormatter by lazy {
         DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
     }
-
-    val hiddenOperators = mutableListOf<String>()
 
     val client = OkHttpClient().newBuilder()
         .connectTimeout(5, TimeUnit.SECONDS)

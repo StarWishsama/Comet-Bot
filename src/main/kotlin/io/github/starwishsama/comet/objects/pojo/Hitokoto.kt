@@ -1,13 +1,13 @@
 package io.github.starwishsama.comet.objects.pojo
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 
 data class Hitokoto(
-        @SerializedName("hitokoto")
+        @JsonProperty("hitokoto")
         val content: String?,
-        @SerializedName("from")
+        @JsonProperty("from")
         val source: String?,
-        @SerializedName("from_who")
+        @JsonProperty("from_who")
         val author: String?
 ) {
         override fun toString(): String {

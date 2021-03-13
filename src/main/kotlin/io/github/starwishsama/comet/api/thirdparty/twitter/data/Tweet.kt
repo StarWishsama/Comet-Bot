@@ -1,10 +1,10 @@
 package io.github.starwishsama.comet.api.thirdparty.twitter.data
 
-import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.hmsPattern
-import io.github.starwishsama.comet.BotVariables.nullableGson
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.data.tweetEntity.Media
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
@@ -25,30 +25,30 @@ import kotlin.time.toKotlinDuration
 val tcoPattern: Pattern = Pattern.compile("https://t.co/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]")
 
 data class Tweet(
-        @SerializedName("created_at")
+        @JsonProperty("created_at")
         val postTime: String,
         val id: Long,
-        @SerializedName("id_str")
+        @JsonProperty("id_str")
         val idAsString: String,
-        @SerializedName("full_text")
+        @JsonProperty("full_text")
         val text: String,
         val truncated: Boolean,
-        val entities: JsonObject?,
+        val entities: JsonNode?,
         val source: String,
-        @SerializedName("in_reply_to_status_id")
+        @JsonProperty("in_reply_to_status_id")
         val replyTweetId: Long?,
         val user: TwitterUser,
-        @SerializedName("retweeted_status")
+        @JsonProperty("retweeted_status")
         val retweetStatus: Tweet?,
-        @SerializedName("retweet_count")
+        @JsonProperty("retweet_count")
         val retweetCount: Long?,
-        @SerializedName("favorite_count")
+        @JsonProperty("favorite_count")
         val likeCount: Long?,
-        @SerializedName("possibly_sensitive")
+        @JsonProperty("possibly_sensitive")
         val sensitive: Boolean?,
-        @SerializedName("quoted_status")
+        @JsonProperty("quoted_status")
         val quotedStatus: Tweet?,
-        @SerializedName("is_quote_status")
+        @JsonProperty("is_quote_status")
         val isQuoted: Boolean
 ) {
     /**
@@ -127,7 +127,7 @@ data class Tweet(
         if (media != null) {
             try {
                 val image =
-                        nullableGson.fromJson(media.asJsonArray[0].asJsonObject.toString(), Media::class.java)
+                        mapper.readValue(media[0].asText(), Media::class.java)
                 if (image.isSendableMedia()) {
                     return image.getImageUrl()
                 }

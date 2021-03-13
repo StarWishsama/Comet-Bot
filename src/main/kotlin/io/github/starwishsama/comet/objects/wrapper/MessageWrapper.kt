@@ -1,11 +1,13 @@
 package io.github.starwishsama.comet.objects.wrapper
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import kotlin.streams.toList
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 open class MessageWrapper: Cloneable {
     private val messageContent = mutableSetOf<WrapperElement>()
     @Volatile

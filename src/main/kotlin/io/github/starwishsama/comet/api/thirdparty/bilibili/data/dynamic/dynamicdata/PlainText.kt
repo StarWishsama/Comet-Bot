@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.BotVariables.hmsPattern
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
@@ -13,19 +13,19 @@ data class PlainText(
         val item: ItemBean
 ) : DynamicData {
     data class ItemBean(
-        @SerializedName("rp_id")
+        @JsonProperty("rp_id")
         val rpId: Long,
-        @SerializedName("uid")
+        @JsonProperty("uid")
         val senderUid: Long,
-        @SerializedName("content")
+        @JsonProperty("content")
         val context: String?,
-        @SerializedName("orig_dy_id")
+        @JsonProperty("orig_dy_id")
         val originalDynamicId: Long,
-        @SerializedName("pre_dy_id")
+        @JsonProperty("pre_dy_id")
         val previousDynamicId: Long,
-        @SerializedName("timestamp")
+        @JsonProperty("timestamp")
         val sentTimestamp: Long,
-        @SerializedName("reply")
+        @JsonProperty("reply")
         val replyCount: Int
     )
 

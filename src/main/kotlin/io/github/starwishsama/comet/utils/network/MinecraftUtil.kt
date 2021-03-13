@@ -1,10 +1,10 @@
 package io.github.starwishsama.comet.utils.network
 
-import com.github.salomonbrys.kotson.fromJson
-import com.google.gson.JsonElement
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BotVariables.cfg
-import io.github.starwishsama.comet.BotVariables.nullableGson
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
@@ -173,7 +173,7 @@ data class QueryInfo(
     val usedTime: Long
 ) {
     private fun parseJson(): MinecraftServerInfo {
-        return nullableGson.fromJson(json)
+        return mapper.readValue(json)
     }
 
     override fun toString(): String {
@@ -181,9 +181,9 @@ data class QueryInfo(
 
         return """
             > 在线玩家 ${info.players.onlinePlayer}/${info.players.maxPlayer}
-            > MOTD ${if (info.motd.isJsonObject) 
-                info.motd.asJsonObject["extra"].asJsonObject["text"].asString.trim().limitStringSize(20)
-                else info.motd.asString.trim().limitStringSize(20)
+            > MOTD ${if (info.motd.isArray) 
+                info.motd["extra"]["text"].asText().trim().limitStringSize(20)
+                else info.motd.asText().trim().limitStringSize(20)
             }
             > 服务器版本 ${info.version.protocolName}
             > 延迟 ${usedTime.toLocalDateTime().getLastingTimeAsString(TimeUnit.SECONDS, true)}
@@ -194,34 +194,34 @@ data class QueryInfo(
 data class MinecraftServerInfo(
     val version: Version,
     val players: PlayerInfo,
-    @SerializedName("description")
-    val motd: JsonElement,
-    @SerializedName("modinfo")
+    @JsonProperty("description")
+    val motd: JsonNode,
+    @JsonProperty("modinfo")
     val modInfo: ModInfo?
 ) {
     data class Version (
-        @SerializedName("name")
+        @JsonProperty("name")
         val protocolName: String,
-        @SerializedName("protocol")
+        @JsonProperty("protocol")
         val protocolVersion: Int
     )
 
     data class PlayerInfo(
-        @SerializedName("max")
+        @JsonProperty("max")
         val maxPlayer: Int,
-        @SerializedName("online")
+        @JsonProperty("online")
         val onlinePlayer: Int
     )
 
     data class ModInfo(
         val type: String,
-        @SerializedName("modList")
+        @JsonProperty("modList")
         val modList: List<Mod>
     ) {
         data class Mod(
-            @SerializedName("modid")
+            @JsonProperty("modid")
             val modID: String,
-            @SerializedName("version")
+            @JsonProperty("version")
             val version: String
         )
     }

@@ -1,15 +1,11 @@
 package io.github.starwishsama.comet.file
 
-import com.github.salomonbrys.kotson.forEach
-import com.github.salomonbrys.kotson.fromJson
-import com.google.gson.JsonParser
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.gson
-import io.github.starwishsama.comet.BotVariables.hiddenOperators
-import io.github.starwishsama.comet.BotVariables.nullableGson
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.LoggerInstances
 import io.github.starwishsama.comet.managers.GachaManager
@@ -118,18 +114,18 @@ object DataSetup {
 
         if (arkNightData.exists()) {
             @Suppress("UNCHECKED_CAST")
-            hiddenOperators.addAll(Default.decodeMapFromString(
+            GachaUtil.hiddenOperators.addAll(Default.decodeMapFromString(
                 File(
                     FileUtil.getResourceFolder(),
                     "hidden_operators.yml"
                 ).getContext()
             )["hiddenOperators"] as MutableList<String>)
 
-            JsonParser.parseString(arkNightData.file.getContext()).asJsonObject.forEach { _, e ->
-                arkNight.add(nullableGson.fromJson(e))
+            mapper.readTree(arkNightData.file.getContext()).elements().forEach { t ->
+                arkNight.add(mapper.readValue(t.traverse()))
             }
 
-            daemonLogger.info("成功载入明日方舟游戏数据, 共 (${arkNight.size - hiddenOperators.size}/${arkNight.size}) 个")
+            daemonLogger.info("成功载入明日方舟游戏数据, 共 (${arkNight.size - GachaUtil.hiddenOperators.size}/${arkNight.size}) 个")
             if (cfg.arkDrawUseImage) {
                 if (System.getProperty("java.awt.headless") != "true" && getOsName().toLowerCase().contains("linux")) {
                     daemonLogger.info("检测到 Linux 系统, 正在启用无头模式")
@@ -187,7 +183,7 @@ object DataSetup {
                             if (ConfigConverter.convertOldGroupConfig(loc)) {
                                 return@forEach
                             } else {
-                                loc.parseAsClass(gson)
+                                loc.parseAsClass(BotVariables.mapper)
                             }
                         } catch (e: Exception) {
                             daemonLogger.warning("检测到 ${group.id} 的群配置异常, 正在重新生成...")
@@ -216,7 +212,7 @@ object DataSetup {
         GroupConfigManager.getAllConfigs().forEach {
             val loc = File(perGroupFolder.file, "${it.id}.json")
             if (!loc.exists()) loc.createNewFile()
-            loc.writeClassToJson(it, nullableGson)
+            loc.writeClassToJson(it, BotVariables.mapper)
         }
 
         daemonLogger.info("已保存所有群配置")

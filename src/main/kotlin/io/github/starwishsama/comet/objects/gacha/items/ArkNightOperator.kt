@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.objects.gacha.items
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
  * 明日方舟干员
@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName
  */
 data class ArkNightOperator(
         override val name: String,
-        @SerializedName("desc")
+        @JsonProperty("desc")
         val description: String,
         /**
          * 星级
@@ -17,12 +17,12 @@ data class ArkNightOperator(
          * 注意: 明日方舟官方数据中, 星级从0开始计起
          * 即一星干员获取后为零, 但自定义卡池不受影响
          */
-        @SerializedName("rarity")
+        @JsonProperty("rarity")
         override val rare: Int = 0,
         /**
          * 获得途径
          */
-        @SerializedName("itemObtainApproach")
+        @JsonProperty("itemObtainApproach")
         val obtain: String?,
         override val count: Int = 1,
 ) : GachaItem()

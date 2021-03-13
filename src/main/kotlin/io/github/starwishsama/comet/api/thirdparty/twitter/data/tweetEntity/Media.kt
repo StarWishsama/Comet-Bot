@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.api.thirdparty.twitter.data.tweetEntity
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.BotVariables
 
 /**
@@ -10,12 +10,12 @@ data class Media(
     /**
      * 对外展示的链接
      */
-    @SerializedName("display_url")
+    @JsonProperty("display_url")
     val displayUrl: String,
     /**
      * 对外展示链接的扩展版本
      */
-    @SerializedName("expanded_url")
+    @JsonProperty("expanded_url")
     val expandedUrl: String,
     /**
      * Int64 的媒体实体 ID.
@@ -24,7 +24,7 @@ data class Media(
     /**
      * 媒体实体 ID 的字符串版本
      */
-    @SerializedName("id_str")
+    @JsonProperty("id_str")
     val idAsString: String,
     /**
      * An array of integers indicating the offsets within the Tweet text where the URL begins and ends.
@@ -36,12 +36,12 @@ data class Media(
     /**
      * 媒体文件链接 (HTTP)
      */
-    @SerializedName("media_url")
+    @JsonProperty("media_url")
     val mediaUrlHttp: String,
     /**
      * 媒体文件链接 (HTTPS)
      */
-    @SerializedName("media_url_https")
+    @JsonProperty("media_url_https")
     val mediaUrlHttps: String,
     /**
      * 媒体实体类型

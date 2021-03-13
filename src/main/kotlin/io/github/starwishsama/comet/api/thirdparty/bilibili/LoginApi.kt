@@ -1,8 +1,8 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili
 
-import com.github.salomonbrys.kotson.fromJson
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.nullableGson
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.login.GetKeyResponse
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.login.LoginResponse
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -34,7 +34,7 @@ object LoginApi {
         val path = "/api/oauth2/getKey"
         // 取得 hash 和 RSA 公钥
         val passportAPI = NetUtil.getPageContent("$loginApi$path")
-        val keyResponse = passportAPI?.let { nullableGson.fromJson<GetKeyResponse>(it) } ?: return
+        val keyResponse = passportAPI?.let { mapper.readValue<GetKeyResponse>(it) } ?: return
 
         val (hash, key) = keyResponse.data.let { data ->
             data.hash to data.key.split('\n').filterNot { it.startsWith('-') }.joinToString(separator = "")
@@ -55,7 +55,7 @@ object LoginApi {
         }
 
         val doLogin = NetUtil.getPageContent("$loginApi/api/v3/oauth2/login?username=$username&password=$cipheredPassword&challenge=$challenge&seccode=$secCode&validate=$validate")
-        val response = nullableGson.fromJson<LoginResponse>(doLogin ?: return)
+        val response = mapper.readValue<LoginResponse>(doLogin ?: return)
 
         if (response.code != -105) {
             loginResponse = response

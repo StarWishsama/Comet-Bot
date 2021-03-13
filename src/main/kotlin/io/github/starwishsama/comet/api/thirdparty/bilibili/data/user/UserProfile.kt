@@ -1,74 +1,74 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.user
 
-import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 
 data class UserProfile(
         val info: Info,
         val card: Card,
-        @SerializedName("vip")
+        @JsonProperty("vip")
         val vipInfo: VipInfo,
         val pendant: Pendant,
-        @SerializedName("decorate_card")
+        @JsonProperty("decorate_card")
         val decorateCard: DecorateCard?,
         val rank: Int,
         val sign: String,
-        @SerializedName("level_info")
+        @JsonProperty("level_info")
         val levelInfo: LevelInfo
 ) {
     data class DecorateCard(
             val mid: Long,
             val id: Int,
-            @SerializedName("card_url")
+            @JsonProperty("card_url")
             val cardUrl: String,
-            @SerializedName("card_type")
+            @JsonProperty("card_type")
             val cardType: Int,
-            @SerializedName("name")
+            @JsonProperty("name")
             val cardName: String,
             /** 永久挂件为0 */
-            @SerializedName("expire_time")
+            @JsonProperty("expire_time")
             val expireTime: Long,
             /** 卡片分类，如大会员 */
-            @SerializedName("card_type_name")
+            @JsonProperty("card_type_name")
             val cardTypeName: String,
-            @SerializedName("uid")
+            @JsonProperty("uid")
             val uid: Long,
-            @SerializedName("item_id")
+            @JsonProperty("item_id")
             val itemId: Int,
-            @SerializedName("item_type")
+            @JsonProperty("item_type")
             val itemType: Int,
-            @SerializedName("big_card_url")
+            @JsonProperty("big_card_url")
             val bigCardUrl: String,
-            @SerializedName("jump_url")
+            @JsonProperty("jump_url")
             val jumpUrL: String,
             /** 粉丝挂件，如湊-阿库娅 */
-            @SerializedName("fan")
+            @JsonProperty("fan")
             val fan: Fan,
-            @SerializedName("image_enhance")
+            @JsonProperty("image_enhance")
             val enhancedImage: String
     ) {
         data class Fan(
-                @SerializedName("is_fan")
+                @JsonProperty("is_fan")
                 val isFan: Int,
-                @SerializedName("number")
+                @JsonProperty("number")
                 val number: Int,
-                @SerializedName("color")
+                @JsonProperty("color")
                 val color: String,
-                @SerializedName("num_desc")
+                @JsonProperty("num_desc")
                 val numberDescription: String
         )
     }
 
     data class Info(
             var uid: Int = 0,
-            @SerializedName("uname")
+            @JsonProperty("uname")
             var userName: String?,
-            @SerializedName("face")
+            @JsonProperty("face")
             var avatarImgURL: String?
     )
 
     data class Card(
-            @SerializedName("official_verify")
+            @JsonProperty("official_verify")
             val verifyInfo: VerifyInfo
     ) {
         data class VerifyInfo(
@@ -82,18 +82,18 @@ data class UserProfile(
             val name: String,
             val image: String,
             val expire: Int,
-            @SerializedName("image_enhance")
+            @JsonProperty("image_enhance")
             val imageEnhance: String
     )
 
     data class LevelInfo(
-            @SerializedName("current_level")
+            @JsonProperty("current_level")
             val currentLevel: Int,
-            @SerializedName("current_min")
+            @JsonProperty("current_min")
             val currentMinLevel: Int,
-            @SerializedName("current_exp")
+            @JsonProperty("current_exp")
             val currentExp: Int,
-            @SerializedName("next_exp")
+            @JsonProperty("next_exp")
             val nextExp: Int
     )
 
@@ -105,7 +105,7 @@ data class UserProfile(
             val vipStatus: Int,
             val vipStatusWarn: String,
             val themeType: Int,
-            val label: JsonObject?
+            val label: JsonNode?
     )
 }
 

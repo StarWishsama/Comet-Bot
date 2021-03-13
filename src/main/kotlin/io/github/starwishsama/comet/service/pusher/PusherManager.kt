@@ -1,8 +1,8 @@
 package io.github.starwishsama.comet.service.pusher
 
-import com.github.salomonbrys.kotson.fromJson
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.nullableGson
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.instances.BiliDynamicPusher
 import io.github.starwishsama.comet.service.pusher.instances.BiliLivePusher
@@ -25,7 +25,7 @@ object PusherManager {
                 val cfgFile = File(pusherFolder, "${pusher.name}.json")
 
                 if (cfgFile.exists()) {
-                    val cfg = nullableGson.fromJson<PusherConfig>(cfgFile.getContext())
+                    val cfg = mapper.readValue<PusherConfig>(cfgFile.getContext())
                     pusher.config = cfg
                 } else {
                     cfgFile.createNewFile()

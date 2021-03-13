@@ -1,9 +1,9 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili
 
 import cn.hutool.http.HttpRequest
-import com.github.salomonbrys.kotson.fromJson
-import com.google.gson.annotations.SerializedName
-import io.github.starwishsama.comet.BotVariables.nullableGson
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.module.kotlin.readValue
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.exceptions.RateLimitException
@@ -25,7 +25,7 @@ object LiveApi : ApiExecutor {
         val response = request.executeAsync()
 
         return try {
-            nullableGson.fromJson(response.body())
+            mapper.readValue(response.body())
         } catch (t: Throwable) {
             FileUtil.createErrorReportFile("在获取B站直播间信息时出现了意外", "bilibili", t, response.body(), request.url)
             null
@@ -49,7 +49,7 @@ object LiveApi : ApiExecutor {
         val data: LiveInfoData
     ) {
         data class LiveInfoData(
-            @SerializedName("roomid")
+            @JsonProperty("roomid")
             val roomId: Long
         )
     }

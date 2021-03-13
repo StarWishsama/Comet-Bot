@@ -1,8 +1,8 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.BotVariables.hmsPattern
-import io.github.starwishsama.comet.BotVariables.nullableGson
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicTypeSelector
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
@@ -13,25 +13,25 @@ import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import java.time.LocalDateTime
 import kotlin.streams.toList
 
-data class Repost(@SerializedName("origin")
+data class Repost(@JsonProperty("origin")
                   var originDynamic: String,
-                  @SerializedName("origin_extend_json")
+                  @JsonProperty("origin_extend_json")
                   var originExtend: String?,
-                  @SerializedName("origin_user")
+                  @JsonProperty("origin_user")
                   var originUser: UserProfile?,
                   val item: ItemBean?,
-                  @SerializedName("user")
+                  @JsonProperty("user")
                   val profile: UserProfile.Info) : DynamicData {
     data class ItemBean(
-            @SerializedName("content")
+            @JsonProperty("content")
             val content: String,
-            @SerializedName("orig_dy_id")
+            @JsonProperty("orig_dy_id")
             val originDynamicId: Long,
-            @SerializedName("pre_dy_id")
+            @JsonProperty("pre_dy_id")
             val previousDynamicId: Long,
-            @SerializedName("timestamp")
+            @JsonProperty("timestamp")
             val sentTime: Long,
-            @SerializedName("orig_type")
+            @JsonProperty("orig_type")
             val originType: Int
     ) {
         fun getSentTime(): LocalDateTime = sentTime.toLocalDateTime()
@@ -64,7 +64,7 @@ data class Repost(@SerializedName("origin")
 
         try {
             if (dynamicType != UnknownType::class.java) {
-                val info = nullableGson.fromJson(contact, dynamicType)
+                val info = mapper.readValue(contact, dynamicType)
                 if (info != null) {
                     return info.getContact()
                 }

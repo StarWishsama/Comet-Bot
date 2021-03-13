@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.service.pusher.instances
 
 import cn.hutool.core.util.RandomUtil
-import com.github.salomonbrys.kotson.fromJson
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
@@ -113,7 +113,7 @@ class BiliLivePusher(bot: Bot): CometPusher(bot, "bili_live") {
 
         if (!cfgFile.exists()) cfgFile.createNewFile()
 
-        config.cachePool = BotVariables.gson.toJson(cachePool)
+        config.cachePool = BotVariables.mapper.writeValueAsString(cachePool)
 
         cfgFile.writeClassToJson(config)
     }
@@ -121,7 +121,7 @@ class BiliLivePusher(bot: Bot): CometPusher(bot, "bili_live") {
     override fun start() {
         if (config.cachePool.isNotEmpty()) {
             try {
-                cachePool.addAll(BotVariables.gson.fromJson(config.cachePool))
+                cachePool.addAll(BotVariables.mapper.readValue(config.cachePool))
             } catch (e: Exception) {
                 daemonLogger.warning("无法解析 $name 历史推送记录")
             }

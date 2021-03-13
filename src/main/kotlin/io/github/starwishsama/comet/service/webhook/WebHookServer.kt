@@ -1,13 +1,13 @@
 package io.github.starwishsama.comet.service.webhook
 
 import cn.hutool.core.net.URLDecoder
-import com.github.salomonbrys.kotson.fromJson
-import com.google.gson.JsonParser
+import com.fasterxml.jackson.module.kotlin.readValue
+import com.google.gson.JsonParseException
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
 import com.sun.net.httpserver.HttpServer
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.gson
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.BotVariables.netLogger
 import io.github.starwishsama.comet.api.thirdparty.github.PushEvent
 import io.github.starwishsama.comet.logger.HinaLogLevel
@@ -30,7 +30,9 @@ class WebHookServer(port: Int) {
 
 class GithubWebHookHandler: HttpHandler {
     override fun handle(he: HttpExchange) {
-        netLogger.log(HinaLogLevel.Debug, "收到新事件消息", prefix = "WebHook")
+        netLogger.log(HinaLogLevel.Debug, "收到新事件", prefix = "WebHook")
+
+        he.sendResponseHeaders(202, 0)
 
         val request = String(he.requestBody.readBytes())
 
@@ -41,21 +43,21 @@ class GithubWebHookHandler: HttpHandler {
 
         val payload = URLDecoder.decode(request.replace("payload=", ""), Charsets.UTF_8)
 
-        val validate = JsonParser.parseString(payload).isJsonObject
+        val validate = mapper.readTree(payload).isNull || mapper.readTree(payload).isEmpty
 
-        if (!validate) {
-            netLogger.log(HinaLogLevel.Debug, "解析请求失败, \n${payload}", prefix = "WebHook")
+        if (validate) {
+            netLogger.log(HinaLogLevel.Debug, "解析请求失败, 不是合法的 JSON.\n${payload}", prefix = "WebHook")
             return
         }
 
         try {
-            val info = gson.fromJson<PushEvent>(payload)
+            val info = mapper.readValue<PushEvent>(payload)
             GithubPusher.push(info)
+        } catch (e: JsonParseException) {
+            daemonLogger.debug("推送 WebHook 消息失败, 不支持的事件类型")
         } catch (e: Exception) {
             daemonLogger.warning("推送 WebHook 消息失败", e)
         }
-
-        he.sendResponseHeaders(202, 0)
     }
 }
 

@@ -1,8 +1,8 @@
 package io.github.starwishsama.comet.listeners
 
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
+import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.utils.StringUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -33,22 +33,21 @@ object ConvertLightAppListener : NListener {
     }
 
     private fun parseJsonMessage(lightApp: LightApp, subject: Contact): MessageChain {
-        val cardJson = JsonParser.parseString(lightApp.content)
-        if (cardJson.isJsonObject) {
-            val cardInfo = cardJson.asJsonObject
-            val prompt = cardInfo["prompt"].asString
+        val cardJson = mapper.readTree(lightApp.content)
+        if (!cardJson.isNull && !cardJson.isEmpty) {
+            val prompt = cardJson["prompt"].asText()
             if (prompt != null && prompt.contains("哔哩哔哩")) {
-                return biliBiliCardConvert(cardInfo["meta"].asJsonObject["detail_1"].asJsonObject, subject)
+                return biliBiliCardConvert(cardJson["meta"]["detail_1"], subject)
             }
         }
         return EmptyMessageChain
     }
 
-    private fun biliBiliCardConvert(meta: JsonObject?, subject: Contact): MessageChain {
+    private fun biliBiliCardConvert(meta: JsonNode?, subject: Contact): MessageChain {
         if (meta == null) return EmptyMessageChain
 
         return try {
-            val url = meta["qqdocurl"].asString
+            val url = meta["qqdocurl"].asText()
 
             val videoID = StringUtil.parseVideoIDFromBili(NetUtil.getRedirectedURL(url) ?: return EmptyMessageChain)
 

@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
-import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.BotVariables.hmsPattern
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
@@ -10,21 +10,21 @@ import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import java.time.LocalDateTime
 
 data class Article(
-        @SerializedName("id")
+        @JsonProperty("id")
         val id: Long,
-        @SerializedName("title")
+        @JsonProperty("title")
         val title: String,
-        @SerializedName("summary")
+        @JsonProperty("summary")
         val summary: String,
-        @SerializedName("author")
-        val author: JsonObject,
-        @SerializedName("image_urls")
+        @JsonProperty("author")
+        val author: JsonNode,
+        @JsonProperty("image_urls")
         val imageURL: List<String>,
-        @SerializedName("publish_time")
+        @JsonProperty("publish_time")
         val publishTime: Long,
-        @SerializedName("stats")
+        @JsonProperty("stats")
         val stats: Stats,
-        @SerializedName("words")
+        @JsonProperty("words")
         val wordLength: Long
 ) : DynamicData {
     data class Stats(

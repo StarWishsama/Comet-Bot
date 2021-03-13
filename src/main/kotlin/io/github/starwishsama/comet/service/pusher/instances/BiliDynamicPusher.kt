@@ -1,9 +1,9 @@
 package io.github.starwishsama.comet.service.pusher.instances
 
 import cn.hutool.core.util.RandomUtil
-import com.github.salomonbrys.kotson.fromJson
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.gson
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.exceptions.ApiException
@@ -117,7 +117,7 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
 
         if (!cfgFile.exists()) cfgFile.createNewFile()
 
-        config.cachePool = gson.toJson(cachePool)
+        config.cachePool = mapper.writeValueAsString(cachePool)
 
         cfgFile.writeClassToJson(config)
     }
@@ -125,7 +125,7 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
     override fun start() {
         if (config.cachePool.isNotEmpty()) {
             try {
-                cachePool.addAll(gson.fromJson(config.cachePool))
+                cachePool.addAll(mapper.readValue(config.cachePool))
             } catch (e: Exception) {
                 daemonLogger.warning("无法解析 $name 历史推送记录")
             }

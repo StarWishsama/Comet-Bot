@@ -2,8 +2,8 @@ package io.github.starwishsama.comet.utils.network
 
 import cn.hutool.core.util.URLUtil
 import cn.hutool.http.ContentType
-import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.objects.pojo.PicSearchResult
 import io.github.starwishsama.comet.utils.FileUtil
 import org.jsoup.Jsoup
@@ -26,12 +26,12 @@ object PictureSearchUtil {
             if (response.isSuccessful && response.isType(ContentType.JSON.value)) {
                 val body = response.body?.string() ?: return PicSearchResult.emptyResult()
                 try {
-                    val resultBody = JsonParser.parseString(body)
-                    if (resultBody.isJsonObject) {
-                        val resultJson = resultBody.asJsonObject["results"].asJsonArray[0].asJsonObject
-                        val similarity = resultJson["header"].asJsonObject["similarity"].asDouble
-                        val pictureUrl = resultJson["header"].asJsonObject["thumbnail"].asString
-                        val originalUrl = resultJson["data"].asJsonObject["ext_urls"].asJsonArray[0].asString
+                    val resultBody = mapper.readTree(body)
+                    if (!resultBody.isNull) {
+                        val resultJson = resultBody["results"][0]
+                        val similarity = resultJson["header"]["similarity"].asDouble()
+                        val pictureUrl = resultJson["header"]["thumbnail"].asText()
+                        val originalUrl = resultJson["data"]["ext_urls"][0].asText()
                         return PicSearchResult(pictureUrl, originalUrl, similarity, response.request.url.toString())
                     }
                 } catch (e: Exception) {

@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.utils
 
+import io.github.starwishsama.comet.utils.StringUtil.withoutColor
 import java.io.File
 import java.io.FileWriter
 
@@ -20,7 +21,7 @@ class LoggerAppender(file: File) {
     @Synchronized
     fun appendLog(log: String) {
         if (!isClosed) {
-            fileWriter.append(log.replace("\u001B\\[0m".toRegex(), "") + "\n")
+            fileWriter.append(log.withoutColor() + "\n")
             fileWriter.flush()
         }
     }

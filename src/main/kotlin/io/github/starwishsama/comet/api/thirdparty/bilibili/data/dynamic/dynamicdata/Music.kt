@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
@@ -8,25 +8,25 @@ import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import java.time.LocalDateTime
 
 data class Music(
-        @SerializedName("id")
+        @JsonProperty("id")
         val id: Long,
-        @SerializedName("upId")
+        @JsonProperty("upId")
         val upId: Long,
-        @SerializedName("title")
+        @JsonProperty("title")
         val songName: String,
-        @SerializedName("upper")
+        @JsonProperty("upper")
         val uploader: String,
-        @SerializedName("cover")
+        @JsonProperty("cover")
         val coverURL: String?,
-        @SerializedName("author")
+        @JsonProperty("author")
         val author: String,
-        @SerializedName("ctime")
+        @JsonProperty("ctime")
         val uploadTime: Long,
-        @SerializedName("intro")
+        @JsonProperty("intro")
         val dynamic: String?,
-        @SerializedName("replyCnt")
+        @JsonProperty("replyCnt")
         val replyCount: Long,
-        @SerializedName("playCnt")
+        @JsonProperty("playCnt")
         val playCount: Long
 ) : DynamicData {
     override fun getContact(): MessageWrapper {

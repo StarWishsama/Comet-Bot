@@ -1,6 +1,8 @@
 package io.github.starwishsama.comet.objects.wrapper
 
-import com.google.gson.*
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
@@ -9,8 +11,15 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import java.io.File
-import java.lang.reflect.Type
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
+@JsonSubTypes(
+    JsonSubTypes.Type(value = PureText::class, name = "PureText"),
+    JsonSubTypes.Type(value = Picture::class, name = "Picture"),
+    JsonSubTypes.Type(value = AtElement::class, name = "AtElement"),
+    JsonSubTypes.Type(value = XmlElement::class, name = "XmlElement")
+)
 interface WrapperElement {
     val className: String
 
@@ -19,6 +28,13 @@ interface WrapperElement {
     fun asString(): String
 }
 
+/**
+ * [PureText]
+ *
+ * 纯文本消息
+ *
+ * @param text 文本
+ */
 data class PureText(val text: String): WrapperElement {
     override val className: String = this::class.java.name
 
@@ -31,6 +47,16 @@ data class PureText(val text: String): WrapperElement {
     }
 }
 
+/**
+ * [Picture]
+ *
+ * 图片消息
+ *
+ * 必须提供图片下载链接和图片本地路径之中其一.
+ *
+ * @param url 图片下载链接
+ * @param filePath 图片本地路径
+ */
 @Serializable
 data class Picture(val url: String, val filePath: String = ""): WrapperElement {
 
@@ -61,6 +87,13 @@ data class Picture(val url: String, val filePath: String = ""): WrapperElement {
     }
 }
 
+/**
+ * [AtElement]
+ *
+ * At 消息
+ *
+ * @param target At 目标
+ */
 @Serializable
 data class AtElement(val target: Long): WrapperElement {
     override val className: String = this::class.java.name
@@ -73,6 +106,13 @@ data class AtElement(val target: Long): WrapperElement {
 
 }
 
+/**
+ * [XmlElement]
+ *
+ * XML 消息
+ *
+ * @param content XML 消息
+ */
 @Serializable
 data class XmlElement(val content: String): WrapperElement {
     override val className: String = this::class.java.name
@@ -84,31 +124,4 @@ data class XmlElement(val content: String): WrapperElement {
 
     override fun asString(): String = "XML 消息"
 
-}
-
-class WrapperElementAdapter : JsonDeserializer<Any>, JsonSerializer<Any> {
-    @Throws(JsonParseException::class)
-    override fun deserialize(jsonElement: JsonElement, type: Type,
-                             jsonDeserializationContext: JsonDeserializationContext
-    ): Any {
-        val jsonObject = jsonElement.asJsonObject
-        val className = jsonObject.get("className").asString
-        val objectClass = getObjectClass(className)
-        return jsonDeserializationContext.deserialize(jsonObject, objectClass)
-    }
-
-    override fun serialize(jsonElement: Any, type: Type, jsonSerializationContext: JsonSerializationContext): JsonElement {
-        val element = jsonSerializationContext.serialize(jsonElement).asJsonObject
-        element.addProperty("className", jsonElement.javaClass.name)
-        return element
-    }
-
-
-    private fun getObjectClass(className: String): Class<*> {
-        try {
-            return Class.forName(className)
-        } catch (e: ClassNotFoundException) {
-            throw JsonParseException(e.message)
-        }
-    }
 }

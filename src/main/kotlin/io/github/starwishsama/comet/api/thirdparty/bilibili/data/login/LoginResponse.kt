@@ -1,56 +1,56 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.login
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 
 // From https://github.com/czp3009/bilibili-api
 data class LoginResponse(
-    @SerializedName("code")
+    @JsonProperty("code")
     var code: Int, // 0
-    @SerializedName("message")
+    @JsonProperty("message")
     var message: String?,
-    @SerializedName("data")
+    @JsonProperty("data")
     var `data`: Data,
-    @SerializedName("ts")
+    @JsonProperty("ts")
     var ts: Long // 1550219689
 ) {
     data class Data(
-            @SerializedName("cookie_info")
+            @JsonProperty("cookie_info")
             var cookieInfo: CookieInfo,
-            @SerializedName("sso")
+            @JsonProperty("sso")
             var sso: List<String>,
-            @SerializedName("status")
+            @JsonProperty("status")
             var status: Int, // 0
-            @SerializedName("token_info")
+            @JsonProperty("token_info")
             var tokenInfo: TokenInfo,
-            @SerializedName("url")
+            @JsonProperty("url")
             var url: String?
     ) {
         data class CookieInfo(
-            @SerializedName("cookies")
+            @JsonProperty("cookies")
             var cookies: List<Cookie>,
-            @SerializedName("domains")
+            @JsonProperty("domains")
             var domains: List<String>
         ) {
             data class Cookie(
-                @SerializedName("expires")
+                @JsonProperty("expires")
                 var expires: Long, // 1552811689
-                @SerializedName("http_only")
+                @JsonProperty("http_only")
                 var httpOnly: Int, // 1
-                @SerializedName("name")
+                @JsonProperty("name")
                 var name: String, // SESSDATA
-                @SerializedName("value")
+                @JsonProperty("value")
                 var value: String // 5ff9ba24%2C1552811689%2C04ae9421
             )
         }
 
         data class TokenInfo(
-            @SerializedName("access_token")
+            @JsonProperty("access_token")
             var accessToken: String, // fd0303ff75a6ec6b452c28f4d8621021
-            @SerializedName("expires_in")
+            @JsonProperty("expires_in")
             var expiresIn: Long, // 2592000
-            @SerializedName("mid")
+            @JsonProperty("mid")
             var mid: Long, // 20293030
-            @SerializedName("refresh_token")
+            @JsonProperty("refresh_token")
             var refreshToken: String // 6a333ebded3c3dbdde65d136b3190d21
         )
     }

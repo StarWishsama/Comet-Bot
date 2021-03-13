@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.api.thirdparty.youtube.data
 
-import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 
 data class SearchVideoResult(
         val kind: String,
@@ -27,16 +27,16 @@ data class SearchVideoResult(
                 val publishedAt: String,
                 /** 频道ID */
                 val channelId: String,
-                @SerializedName("title")
+                @JsonProperty("title")
                 /** 片段标题 */
                 val videoTitle: String,
-                @SerializedName("description")
+                @JsonProperty("description")
                 /** 片段信息 */
                 val desc: String,
                 /** 片段封面 */
-                val thumbnails: JsonObject,
+                val thumbnails: JsonNode,
                 val channelTitle: String,
-                @SerializedName("liveBroadcastContent")
+                @JsonProperty("liveBroadcastContent")
                 /** 片段类型 */
                 val contentType: String,
                 val publishTime: String
@@ -54,7 +54,7 @@ data class SearchVideoResult(
             /** 获取该片段封面 */
             fun getCoverImgUrl(): String? {
                 return try {
-                    thumbnails.get("medium").asJsonObject.get("url").asString
+                    thumbnails.get("medium").get("url").asText()
                 } catch (e: Exception) {
                     null
                 }

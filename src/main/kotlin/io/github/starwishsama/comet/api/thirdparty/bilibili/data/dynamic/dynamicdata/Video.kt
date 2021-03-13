@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
@@ -8,33 +8,33 @@ import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import java.time.LocalDateTime
 
 data class Video(
-        @SerializedName("aid")
+        @JsonProperty("aid")
         val avId: Long,
-        @SerializedName("attribute")
+        @JsonProperty("attribute")
         val attribute: Int,
-        @SerializedName("cid")
+        @JsonProperty("cid")
         val cid: Long,
         /** 是否为原创视频 */
-        @SerializedName("copyright")
+        @JsonProperty("copyright")
         val isOriginalContent: Int,
-        @SerializedName("ctime")
+        @JsonProperty("ctime")
         val cTime: Long,
         /** 视频简介 */
-        @SerializedName("desc")
+        @JsonProperty("desc")
         val description: String,
-        @SerializedName("dynamic")
+        @JsonProperty("dynamic")
         val dynamicText: String,
-        @SerializedName("jump_url")
+        @JsonProperty("jump_url")
         val appJumpUrl: String,
-        @SerializedName("owner")
+        @JsonProperty("owner")
         val uploader: Uploader,
-        @SerializedName("pic")
+        @JsonProperty("pic")
         val cover: String,
-        @SerializedName("pubdate")
+        @JsonProperty("pubdate")
         val publishTime: Long,
-        @SerializedName("stat")
+        @JsonProperty("stat")
         val stats: Stats,
-        @SerializedName("title")
+        @JsonProperty("title")
         val title: String
 
 ) : DynamicData {
@@ -44,17 +44,17 @@ data class Video(
             val danmaku: Long,
             val dislike: Long,
             val favorite: Long,
-            @SerializedName("his_rank")
+            @JsonProperty("his_rank")
             val hisRank: Int,
-            @SerializedName("like")
+            @JsonProperty("like")
             val like: Long,
-            @SerializedName("now_rank")
+            @JsonProperty("now_rank")
             val currentRank: Int,
-            @SerializedName("reply")
+            @JsonProperty("reply")
             val reply: Long,
-            @SerializedName("share")
+            @JsonProperty("share")
             val share: Long,
-            @SerializedName("view")
+            @JsonProperty("view")
             val view: Long
     )
 

@@ -146,7 +146,7 @@ class YoutubeCommand : ChatCommand {
         """.trimIndent()
         val wrapper = MessageWrapper().addText(text)
 
-        wrapper.addPictureByURL(item.snippet.thumbnails.asJsonObject["default"].asJsonObject["url"].asString)
+        wrapper.addPictureByURL(item.snippet.thumbnails["default"]["url"].asText())
         return wrapper
     }
 

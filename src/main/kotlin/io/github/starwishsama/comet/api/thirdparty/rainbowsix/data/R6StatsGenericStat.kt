@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.api.thirdparty.rainbowsix.data
 
-import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 
 /**
  * R6Tab 综合玩家数据
@@ -13,119 +13,119 @@ import com.google.gson.annotations.SerializedName
  * @author Nameless
  */
 data class R6StatsGenericStat(
-    @SerializedName("username")
+    @JsonProperty("username")
     val username: String,
-    @SerializedName("platform")
+    @JsonProperty("platform")
     val platform: String,
-    @SerializedName("ubisoft_id")
+    @JsonProperty("ubisoft_id")
     val ubisoftID: String,
-    @SerializedName("uplay_id")
+    @JsonProperty("uplay_id")
     val uPlayID: String,
-    @SerializedName("avatar_url_146")
+    @JsonProperty("avatar_url_146")
     val avatarUrlSmall: String,
-    @SerializedName("avatar_url_256")
+    @JsonProperty("avatar_url_256")
     val avatarUrlMedium: String,
-    @SerializedName("last_updated")
+    @JsonProperty("last_updated")
     val lastUpdatedTime: String,
-    @SerializedName("aliases")
+    @JsonProperty("aliases")
     val aliases: List<Aliases>,
-    @SerializedName("progression")
+    @JsonProperty("progression")
     val levelInfo: Progression,
-    @SerializedName("stats")
+    @JsonProperty("stats")
     val stats: GameStats
 ) {
     data class Aliases(
         val username: String,
-        @SerializedName("last_seen_at")
+        @JsonProperty("last_seen_at")
         val lastSeenTime: String
     )
 
     data class Progression(
         val level: Int,
-        @SerializedName("lootbox_probability")
+        @JsonProperty("lootbox_probability")
         val alphaBoxProbability: Double,
-        @SerializedName("total_xp")
+        @JsonProperty("total_xp")
         val totalXp: Long
     )
 
     data class GameStats(
-        @SerializedName("general")
+        @JsonProperty("general")
         val generalStat: GeneralStat,
-        @SerializedName("queue")
-        val queue: JsonObject, //Queue,
-        @SerializedName("gamemode")
-        val gameMode: JsonObject, //GameMode,
-        @SerializedName("timestamps")
+        @JsonProperty("queue")
+        val queue: JsonNode, //Queue,
+        @JsonProperty("gamemode")
+        val gameMode: JsonNode, //GameMode,
+        @JsonProperty("timestamps")
         val timeStamp: TimeStamp
     ) {
         data class GeneralStat(
             /**
              * 助攻数
              */
-            @SerializedName("assists")
+            @JsonProperty("assists")
             val assists: Long,
             /**
              * 部署过的阻挡物数
              */
-            @SerializedName("barricades_deployed")
+            @JsonProperty("barricades_deployed")
             val deployedBarricades: Long,
             /**
              * 盲杀数量
              */
-            @SerializedName("blind_kills")
+            @JsonProperty("blind_kills")
             val blindKills: Long,
-            @SerializedName("bullets_fired")
+            @JsonProperty("bullets_fired")
             val firedBullets: Long,
-            @SerializedName("bullets_hit")
+            @JsonProperty("bullets_hit")
             val hitBullets: Long,
             /**
              * DBNO (Down But Not Out / 倒了还没死) 次数
              *
              * 详见: https://data.fandom.com/wiki/DBNO
              */
-            @SerializedName("dbnos")
+            @JsonProperty("dbnos")
             val dbno: Long,
-            @SerializedName("deaths")
+            @JsonProperty("deaths")
             val deaths: Long,
-            @SerializedName("distance_travelled")
+            @JsonProperty("distance_travelled")
             val travelledDistance: Long,
-            @SerializedName("draws")
+            @JsonProperty("draws")
             val draws: Long,
-            @SerializedName("gadgets_destroyed")
+            @JsonProperty("gadgets_destroyed")
             val destroyedGadgets: Long,
-            @SerializedName("games_played")
+            @JsonProperty("games_played")
             val playedGameTime: Long,
-            @SerializedName("headshots")
+            @JsonProperty("headshots")
             val headshotTime: Long,
-            @SerializedName("kd")
+            @JsonProperty("kd")
             val kd: Double,
-            @SerializedName("kills")
+            @JsonProperty("kills")
             val kills: Long,
-            @SerializedName("losses")
+            @JsonProperty("losses")
             val lossTime: Long,
             /**
              * 近战击杀次数
              */
-            @SerializedName("melee_kills")
+            @JsonProperty("melee_kills")
             val meleeKills: Long,
             /**
              * 穿透击杀次数
              */
-            @SerializedName("penetration_kills")
+            @JsonProperty("penetration_kills")
             val penetrationKills: Long,
-            @SerializedName("playtime")
+            @JsonProperty("playtime")
             val playTime: Long,
-            @SerializedName("rappel_breaches")
+            @JsonProperty("rappel_breaches")
             val rappelBreaches: Long,
-            @SerializedName("reinforcements_deployed")
+            @JsonProperty("reinforcements_deployed")
             val deployedReinforcements: Long,
-            @SerializedName("revives")
+            @JsonProperty("revives")
             val reviveTime: Long,
-            @SerializedName("suicides")
+            @JsonProperty("suicides")
             val suicideTime: Long,
-            @SerializedName("wins")
+            @JsonProperty("wins")
             val winTime: Long,
-            @SerializedName("wl")
+            @JsonProperty("wl")
             val winLoss: Double
         )
 
@@ -135,7 +135,7 @@ data class R6StatsGenericStat(
 
         data class TimeStamp(
             val created: String,
-            @SerializedName("last_updated")
+            @JsonProperty("last_updated")
             val lastUpdatedTime: String
         )
     }

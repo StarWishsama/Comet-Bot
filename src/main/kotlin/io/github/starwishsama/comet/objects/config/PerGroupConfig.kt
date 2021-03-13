@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.objects.config
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
@@ -10,84 +10,84 @@ import io.github.starwishsama.comet.objects.push.YoutubeUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 data class PerGroupConfig(
-    @SerializedName("group_id")
+    @JsonProperty("group_id")
     val id: Long,
-    @SerializedName("version")
+    @JsonProperty("version")
     val version: String = "2",
 
     /**
      * 是否自动接受入群请求
      */
-    @SerializedName("auto_accept")
+    @JsonProperty("auto_accept")
     var autoAccept: Boolean = false,
 
-    @SerializedName("group_helpers")
+    @JsonProperty("group_helpers")
     var helpers: MutableSet<Long> = hashSetOf(),
 
     /**
      * 推文推送服务
      */
-    @SerializedName("twitter_push_function")
+    @JsonProperty("twitter_push_function")
     var twitterPushEnabled: Boolean = false,
 
     /**
      * Twitter 订阅列表
      */
-    @SerializedName("twitter_sub")
+    @JsonProperty("twitter_sub")
     var twitterSubscribers: MutableSet<String> = hashSetOf(),
 
     /**
      * bilibili 开播提醒服务
      */
-    @SerializedName("bili_push_function")
+    @JsonProperty("bili_push_function")
     var biliPushEnabled: Boolean = false,
 
     /**
      * bilibili 订阅列表
      */
-    @SerializedName("bili_sub")
+    @JsonProperty("bili_sub")
     val biliSubscribers: MutableSet<BiliBiliUser> = hashSetOf(),
 
     /**
      * Youtube 开播推送服务
      */
-    @SerializedName("youtube_push_function")
+    @JsonProperty("youtube_push_function")
     var youtubePushEnabled: Boolean = false,
 
     /**
      * Youtube 订阅列表
      */
-    @SerializedName("youtube_sub")
+    @JsonProperty("youtube_sub")
     val youtubeSubscribers: MutableSet<YoutubeUser> = hashSetOf(),
 
     /**
      * 是否关闭对此群消息的复读
      */
-    @SerializedName("repeat_function")
+    @JsonProperty("repeat_function")
     var canRepeat: Boolean = true,
 
     /**
      * 本群启用的命令
      */
-    @SerializedName("disabled_commands")
+    @JsonProperty("disabled_commands")
     val disabledCommands: MutableSet<String> = mutableSetOf(),
 
-    @SerializedName("filter_words")
+    @JsonProperty("filter_words")
     val groupFilterWords: MutableList<String> = mutableListOf(),
 
-    @SerializedName("keyword_reply")
+    @JsonProperty("keyword_reply")
     val keyWordReply: MutableList<ReplyKeyWord> = mutableListOf(),
 
-    @SerializedName("newcomer_welcome")
+    @JsonProperty("newcomer_welcome")
     var newComerWelcome: Boolean = false,
 
-    @SerializedName("newcomer_welcome_text")
+    @JsonProperty("newcomer_welcome_text")
     var newComerWelcomeText: MessageWrapper = MessageWrapper().setUsable(true),
 
-    @SerializedName("auto_accept_condition")
+    @JsonProperty("auto_accept_condition")
     var autoAcceptCondition: String = "",
 
-    @SerializedName("github_repo_subs")
+    @JsonProperty("github_repo_subs")
     val githubRepoSubscribers: MutableList<String> = mutableListOf()
 ) {
 

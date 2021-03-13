@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import java.time.LocalDateTime
@@ -8,11 +8,11 @@ import java.time.LocalDateTime
 data class ShareContext(var vest: VestBean, var sketch: SketchBean) : DynamicData {
     data class VestBean(var uid: Long, var context: String)
     data class SketchBean(var title: String?,
-                          @SerializedName("desc_text")
+                          @JsonProperty("desc_text")
                           var descText: String?,
-                          @SerializedName("cover_url")
+                          @JsonProperty("cover_url")
                           var coverUrl: String?,
-                          @SerializedName("target_url")
+                          @JsonProperty("target_url")
                           var targetUrl: String?)
 
     override fun getContact(): MessageWrapper {

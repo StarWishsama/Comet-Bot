@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.api.thirdparty.youtube.data
 
-import com.google.gson.JsonObject
+import com.fasterxml.jackson.databind.JsonNode
 
 data class SearchChannelResult(
     val kind: String = "data#channelListResponse",
@@ -23,7 +23,7 @@ data class SearchChannelResult(
             val description: String,
             val customUrl: String,
             val publishedAt: String,
-            val thumbnails: JsonObject
+            val thumbnails: JsonNode
         )
 
         data class Statistics(

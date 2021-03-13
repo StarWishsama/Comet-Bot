@@ -1,9 +1,8 @@
 package io.github.starwishsama.comet.managers
 
 import com.google.gson.JsonParseException
-import com.google.gson.JsonParser
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.objects.gacha.custom.CustomPool
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
@@ -79,14 +78,14 @@ object GachaManager {
     @Throws(JsonParseException::class)
     fun addPoolFromFile(poolFile: File) {
         require(poolFile.exists()) { "${poolFile.name} isn't exists" }
-        val context = JsonParser.parseString(poolFile.getContext())
-        require(context.isJsonObject) { "${poolFile.name} isn't a valid json file!" }
+        val context = mapper.readTree(poolFile.getContext())
+        require(!context.isNull && !context.isEmpty) { "${poolFile.name} isn't a valid json file!" }
 
         try {
-            val pool = BotVariables.gson.fromJson(context, CustomPool::class.java)
+            val pool = mapper.readValue(context.traverse(), CustomPool::class.java)
             addPool(pool)
         } catch (e: Exception) {
-            FileUtil.createErrorReportFile("解析卡池信息失败", "gacha", e, context.asString, e.message ?: "")
+            FileUtil.createErrorReportFile("解析卡池信息失败", "gacha", e, context.asText(), e.message ?: "")
         }
     }
 

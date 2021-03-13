@@ -1,14 +1,13 @@
 package io.github.starwishsama.comet.utils.network
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.salomonbrys.kotson.fromJson
-import com.github.salomonbrys.kotson.get
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParseException
-import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
-import com.google.gson.annotations.SerializedName
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.logger
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import kotlinx.coroutines.runBlocking
@@ -42,21 +41,21 @@ object MusicUtil {
             val searchMusicResult = NetUtil.getPageContent("$api4NetEase/search?keywords=${URLEncoder.encode(songName, "UTF-8")}")
 
             if (searchMusicResult?.isNotEmpty() == true) {
-                val searchResult = JsonParser.parseString(searchMusicResult)
-                if (searchResult.isJsonObject) {
-                    val musicId = searchResult.asJsonObject["result"].asJsonArray["songs"][0]["id"].asInt
+                val searchResult = mapper.readTree(searchMusicResult)
+                if (!searchResult.isNull) {
+                    val musicId = searchResult["result"]["songs"][0]["id"].asInt()
                     val musicUrl = "https://music.163.com/#/song?id=$musicId"
                     val songResult = NetUtil.getPageContent("http://$api4NetEase/song/detail?ids=$musicId")
                     if (songResult?.isNotEmpty() == true) {
-                        val songJson = JsonParser.parseString(songResult)
-                        if (songJson.isJsonObject) {
-                            val albumUrl = songJson.asJsonObject["songs"].asJsonArray[0].asJsonObject["al"]["picUrl"].asString
-                            val name = songJson.asJsonObject["songs"].asJsonArray[0].asJsonObject["name"].asString
+                        val songJson = mapper.readTree(songResult)
+                        if (!songJson.isNull) {
+                            val albumUrl = songJson["songs"][0]["al"]["picUrl"].asText()
+                            val name = songJson["songs"][0]["name"].asText()
                             var artistName = ""
 
-                            songJson.asJsonObject["songs"].asJsonArray[0].asJsonObject["ar"].asJsonArray.forEach {
+                            songJson["songs"][0]["ar"].elements().forEach {
                                 run {
-                                    artistName += (it.asJsonObject["name"].asString + "/")
+                                    artistName += (it["name"].asText() + "/")
                                 }
                             }
 
@@ -135,14 +134,13 @@ object MusicUtil {
 
                 val playResult = NetUtil.getPageContent("$api4qq${song.songMid}")
                 if (playResult?.isNotBlank() == true) {
-                    val musicUrlObject = JsonParser.parseString(playResult)
+                    val musicUrlObject = mapper.readTree(playResult)
 
-                    val playUrl = if (!musicUrlObject.isJsonObject) {
+                    val playUrl = if (musicUrlObject.isNull) {
                         ""
                     } else {
-                        val data = musicUrlObject.asJsonObject["data"]
-                        if (data.isJsonObject) {
-                            data.asJsonObject[song.songMid].asString
+                        if (!musicUrlObject["data"].isNull) {
+                            musicUrlObject["data"][song.songMid].asText()
                         } else {
                             ""
                         }
@@ -181,38 +179,38 @@ object MusicUtil {
             val data: QQMusicSearchData
     ) {
         data class QQMusicSearchData(
-                @SerializedName("keyword")
+                @JsonProperty("keyword")
                 val searchKeyWord: String,
-                @SerializedName("song")
+                @JsonProperty("song")
                 val songs: QQMusicSongs
         ) {
             data class QQMusicSongs(
-                    @SerializedName("list")
+                    @JsonProperty("list")
                     val songList: List<QQMusicSong>
             ) {
                 @Suppress("unused")
                 data class QQMusicSong(
-                        @SerializedName("albumid")
+                        @JsonProperty("albumid")
                         val albumId: Int,
-                        @SerializedName("albummid")
+                        @JsonProperty("albummid")
                         val albumMid: String,
                         /** 专辑名 */
-                        @SerializedName("albumname")
+                        @JsonProperty("albumname")
                         val albumName: String,
-                        @SerializedName("chinesesinger")
+                        @JsonProperty("chinesesinger")
                         val chineseSinger: Int,
-                        @SerializedName("singer")
+                        @JsonProperty("singer")
                         val singer: List<QQMusicSinger>,
 
-                        @SerializedName("songid")
+                        @JsonProperty("songid")
                         val songId: Long,
-                        @SerializedName("songmid")
+                        @JsonProperty("songmid")
                         val songMid: String,
-                        @SerializedName("songname")
+                        @JsonProperty("songname")
                         val songName: String,
-                        @SerializedName("songurl")
+                        @JsonProperty("songurl")
                         val songUrl: String,
-                        @SerializedName("strMediaMid")
+                        @JsonProperty("strMediaMid")
                         val mediaMidAsString: String,
                 ) {
                     data class QQMusicSinger(

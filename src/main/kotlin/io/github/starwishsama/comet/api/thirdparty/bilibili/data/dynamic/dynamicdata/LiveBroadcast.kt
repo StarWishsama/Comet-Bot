@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
-import com.google.gson.JsonElement
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
@@ -11,54 +11,54 @@ import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import java.time.LocalDateTime
 
 data class LiveBroadcast(
-        @SerializedName("live_play_info")
+        @JsonProperty("live_play_info")
         val livePlayInfo: LivePlayInfo,
         /** 似乎是B站的直播留档信息, 没见过有这功能的主播 */
-        @SerializedName("live_record_info")
-        val liveRecordInfo: JsonElement?,
+        @JsonProperty("live_record_info")
+        val liveRecordInfo: JsonNode?,
 
         // 以下两项是给 APP 使用的
 
-        @SerializedName("style")
+        @JsonProperty("style")
         val showStyle: Int,
-        @SerializedName("type")
+        @JsonProperty("type")
         val type: Int
 ) : DynamicData {
     data class LivePlayInfo(
-            @SerializedName("area_id")
+            @JsonProperty("area_id")
             val areaId: Int,
-            @SerializedName("area_name")
+            @JsonProperty("area_name")
             val areaName: String,
-            @SerializedName("cover")
+            @JsonProperty("cover")
             val coverImage: String,
-            @SerializedName("link")
+            @JsonProperty("link")
             val link: String,
-            @SerializedName("live_id")
+            @JsonProperty("live_id")
             val liveId: Long,
-            @SerializedName("live_screen_type")
+            @JsonProperty("live_screen_type")
             val liveScreenType: Int,
-            @SerializedName("live_start_time")
+            @JsonProperty("live_start_time")
             val liveStartTime: Long,
             /**
              * 0 未在直播 1 正在直播 2 投稿视频轮播
              */
-            @SerializedName("live_status")
+            @JsonProperty("live_status")
             val liveStatus: Int,
-            @SerializedName("online")
+            @JsonProperty("online")
             val onlineCount: Long,
-            @SerializedName("parent_area_id")
+            @JsonProperty("parent_area_id")
             val parentAreaId: Int,
-            @SerializedName("parent_area_name")
+            @JsonProperty("parent_area_name")
             val parentAreaName: String,
-            @SerializedName("play_type")
+            @JsonProperty("play_type")
             val playType: Int,
-            @SerializedName("room_id")
+            @JsonProperty("room_id")
             val roomId: Long,
-            @SerializedName("room_type")
+            @JsonProperty("room_type")
             val roomType: Int,
-            @SerializedName("title")
+            @JsonProperty("title")
             val liveTitle: String,
-            @SerializedName("uid")
+            @JsonProperty("uid")
             val uid: Long
     ) {
         fun getLiveStartTime(): LocalDateTime = liveStartTime.toLocalDateTime()

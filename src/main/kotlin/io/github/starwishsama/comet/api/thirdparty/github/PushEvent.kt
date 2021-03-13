@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.api.thirdparty.github
 
-import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
@@ -12,31 +12,31 @@ data class PushEvent(
     val ref: String,
     val before: String,
     val after: String,
-    @SerializedName("repository")
+    @JsonProperty("repository")
     val repoInfo: RepoInfo,
-    @SerializedName("pusher")
+    @JsonProperty("pusher")
     val pusher: PusherInfo,
     val compare: String,
-    @SerializedName("commits")
+    @JsonProperty("commits")
     val commitInfo: List<CommitInfo>
 ) {
     data class RepoInfo(
         val id: Long,
-        @SerializedName("node_id")
+        @JsonProperty("node_id")
         val nodeID: String,
-        @SerializedName("name")
+        @JsonProperty("name")
         val name: String,
-        @SerializedName("full_name")
+        @JsonProperty("full_name")
         val fullName: String,
-        @SerializedName("private")
+        @JsonProperty("private")
         val isPrivate: Boolean,
-        @SerializedName("owner")
-        val owner: JsonObject,
-        @SerializedName("html_url")
+        @JsonProperty("owner")
+        val owner: JsonNode,
+        @JsonProperty("html_url")
         val repoUrl: String,
-        @SerializedName("updated_at")
+        @JsonProperty("updated_at")
         val updateTime: String,
-        @SerializedName("pushed_at")
+        @JsonProperty("pushed_at")
         val pushTime: Long,
     )
 

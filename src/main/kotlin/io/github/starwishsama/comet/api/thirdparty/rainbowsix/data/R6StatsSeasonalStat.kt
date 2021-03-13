@@ -1,89 +1,89 @@
 package io.github.starwishsama.comet.api.thirdparty.rainbowsix.data
 
-import com.github.salomonbrys.kotson.fromJson
-import com.google.gson.Gson
-import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.module.kotlin.readValue
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.enums.R6Rank
 
 data class R6StatsSeasonalStat(
-    @SerializedName("username")
+    @JsonProperty("username")
     val userName: String,
-    @SerializedName("platform")
+    @JsonProperty("platform")
     val platform: String,
-    @SerializedName("ubisoft_id")
+    @JsonProperty("ubisoft_id")
     val ubisoftId: String,
-    @SerializedName("uplay_id")
+    @JsonProperty("uplay_id")
     val uplayId: String,
-    @SerializedName("avatar_url_146")
+    @JsonProperty("avatar_url_146")
     val smallAvatar: String,
-    @SerializedName("avatar_url_256")
+    @JsonProperty("avatar_url_256")
     val avatar: String,
     /**
      * 格式 "2021-02-17T12:47:24.000Z"
      */
-    @SerializedName("last_updated")
+    @JsonProperty("last_updated")
     val lastUpdateTime: String,
-    @SerializedName("seasons")
-    val seasonalStat: JsonObject
+    @JsonProperty("seasons")
+    val seasonalStat: JsonNode
 ) {
     fun getSeasonalStat(season: SeasonName): SeasonInfo? {
         val seasonInfo = seasonalStat[season.season]
-        return if (!seasonInfo.isJsonObject) {
+        return if (seasonInfo.isNull || seasonInfo.isEmpty) {
             null
         } else {
-            Gson().fromJson(Gson().toJson(seasonInfo))
+            mapper.readValue(seasonInfo.traverse())
         }
     }
 
     data class SeasonInfo(
         val name: String,
-        @SerializedName("start_date")
+        @JsonProperty("start_date")
         val startDate: String,
-        @SerializedName("end_date")
+        @JsonProperty("end_date")
         val endDate: String?,
-        @SerializedName("regions")
-        val regions: JsonObject
+        @JsonProperty("regions")
+        val regions: JsonNode
     ) {
         fun getRegionStat(region: Region): PerRegionStat? {
             val regionStat = regions[region.region]
-            return if (!regionStat.isJsonObject) {
+            return if (regionStat.isNull) {
                 null
             } else {
-                Gson().fromJson(Gson().toJson(regionStat))
+                mapper.readValue(regionStat.traverse())
             }
         }
 
         data class PerRegionStat(
-            @SerializedName("season_id")
+            @JsonProperty("season_id")
             val seasonId: Int,
-            @SerializedName("region")
+            @JsonProperty("region")
             val regionName: String,
-            @SerializedName("abandons")
+            @JsonProperty("abandons")
             val abandons: Int,
-            @SerializedName("losses")
+            @JsonProperty("losses")
             val losses: Int,
-            @SerializedName("max_mmr")
+            @JsonProperty("max_mmr")
             val maxMMR: Long,
-            @SerializedName("max_rank")
+            @JsonProperty("max_rank")
             val maxRank: Int,
-            @SerializedName("mmr")
+            @JsonProperty("mmr")
             val currentMMR: Long,
-            @SerializedName("rank")
+            @JsonProperty("rank")
             val currentRank: Int,
-            @SerializedName("wins")
+            @JsonProperty("wins")
             val wins: Long,
-            @SerializedName("kills")
+            @JsonProperty("kills")
             val kills: Long,
-            @SerializedName("deaths")
+            @JsonProperty("deaths")
             val deaths: Long,
-            @SerializedName("last_match_mmr_change")
+            @JsonProperty("last_match_mmr_change")
             val lastMatchMMRChange: Long,
-            @SerializedName("champions_rank_position")
+            @JsonProperty("champions_rank_position")
             val championPosition: Int,
-            @SerializedName("rank_image")
+            @JsonProperty("rank_image")
             val rankImage: String,
-            @SerializedName("max_rank_image")
+            @JsonProperty("max_rank_image")
             val maxRankImage: String
         ) {
             fun getRank(): R6Rank = R6Rank.getRank(currentRank)

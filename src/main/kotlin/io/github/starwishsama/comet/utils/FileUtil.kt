@@ -4,9 +4,8 @@ import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
 import cn.hutool.core.net.URLDecoder
 import cn.hutool.crypto.SecureUtil
-import com.github.salomonbrys.kotson.fromJson
-import com.github.salomonbrys.kotson.typedToJson
-import com.google.gson.Gson
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
@@ -29,8 +28,8 @@ import java.util.jar.JarFile
 import kotlin.time.ExperimentalTime
 
 @Synchronized
-fun File.writeClassToJson(context: Any, gson: Gson = BotVariables.nullableGson) {
-    FileWriter.create(this).write(gson.typedToJson(context), false)
+fun File.writeClassToJson(context: Any, mapper: ObjectMapper = BotVariables.mapper) {
+    FileWriter.create(this).write(mapper.writeValueAsString(context), false)
 }
 
 @Synchronized
@@ -62,9 +61,9 @@ fun File.getMD5(): String {
  * @param clazz 指定类
  * @return T
  */
-inline fun <reified T: Any> File.parseAsClass(customParser: Gson = BotVariables.nullableGson): T {
+inline fun <reified T: Any> File.parseAsClass(customParser: ObjectMapper = BotVariables.mapper): T {
     require(exists()) { "$path 不存在" }
-    return customParser.fromJson(getContext())
+    return customParser.readValue(getContext())
 }
 
 fun File.getChildFolder(folderName: String, createIfNotExists: Boolean = true): File {

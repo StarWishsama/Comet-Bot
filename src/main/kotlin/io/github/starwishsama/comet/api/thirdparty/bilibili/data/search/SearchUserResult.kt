@@ -1,79 +1,79 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.search
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.CommonResponse
 
 data class SearchUserResult(
-        @SerializedName("data")
+        @JsonProperty("data")
         var data: Data,
 ): CommonResponse() {
     data class Data(
-            @SerializedName("items")
+            @JsonProperty("items")
             var items: List<Item>,
-            @SerializedName("pages")
+            @JsonProperty("pages")
             var pages: Int, // 2
-            @SerializedName("total")
+            @JsonProperty("total")
             var total: Int, // 0
-            @SerializedName("trackid")
+            @JsonProperty("trackid")
             var trackid: String // 15623048138266462990
     ) {
         data class Item(
-                @SerializedName("archives")
+                @JsonProperty("archives")
                 var archives: Int, // 1
-                @SerializedName("av_items")
+                @JsonProperty("av_items")
                 var avItems: List<AvItem>,
-                @SerializedName("cover")
+                @JsonProperty("cover")
                 var cover: String, // https://i0.hdslb.com/bfs/face/c3200c52ae76004fbbab44010990431d0604aee5.jpg
-                @SerializedName("fans")
+                @JsonProperty("fans")
                 var fans: Int, // 3
-                @SerializedName("goto")
+                @JsonProperty("goto")
                 var goto: String, // author
-                @SerializedName("is_up")
+                @JsonProperty("is_up")
                 var isUp: Boolean, // true
-                @SerializedName("level")
+                @JsonProperty("level")
                 var level: Int, // 3
-                @SerializedName("live_status")
+                @JsonProperty("live_status")
                 var liveStatus: Int, // 1
-                @SerializedName("live_uri")
+                @JsonProperty("live_uri")
                 var liveUri: String, // bilibili://live/3234638?broadcast_type=0
-                @SerializedName("mid")
+                @JsonProperty("mid")
                 var mid: Long, // 32557668
-                @SerializedName("official_verify")
+                @JsonProperty("official_verify")
                 var officialVerify: OfficialVerify,
-                @SerializedName("param")
+                @JsonProperty("param")
                 var `param`: String, // 32557668
-                @SerializedName("roomid")
+                @JsonProperty("roomid")
                 var roomid: Long, // 3234638
-                @SerializedName("sign")
+                @JsonProperty("sign")
                 var sign: String, // 担心额刚好阿西
-                @SerializedName("title")
+                @JsonProperty("title")
                 var title: String, // 刀剑神域小漠
-                @SerializedName("uri")
+                @JsonProperty("uri")
                 var uri: String // bilibili://author/32557668
         ) {
             data class OfficialVerify(
-                    @SerializedName("type")
+                    @JsonProperty("type")
                     var type: Int // 127
             )
 
             data class AvItem(
-                    @SerializedName("cover")
+                    @JsonProperty("cover")
                     var cover: String, // https://i0.hdslb.com/bfs/archive/95be7c1a940dda2bbf4c33213df94eb650e44d10.jpg
-                    @SerializedName("ctime")
+                    @JsonProperty("ctime")
                     var ctime: Int, // 1535755416
-                    @SerializedName("danmaku")
+                    @JsonProperty("danmaku")
                     var danmaku: Int, // 1
-                    @SerializedName("duration")
+                    @JsonProperty("duration")
                     var duration: String, // 3:1
-                    @SerializedName("goto")
+                    @JsonProperty("goto")
                     var goto: String, // av
-                    @SerializedName("param")
+                    @JsonProperty("param")
                     var `param`: String, // 30843572
-                    @SerializedName("play")
+                    @JsonProperty("play")
                     var play: Int, // 15
-                    @SerializedName("title")
+                    @JsonProperty("title")
                     var title: String, // 官方认证：非洲正品大酋长
-                    @SerializedName("uri")
+                    @JsonProperty("uri")
                     var uri: String // bilibili://video/30843572?player_width=1920&player_height=1080&player_rotate=0
             )
         }

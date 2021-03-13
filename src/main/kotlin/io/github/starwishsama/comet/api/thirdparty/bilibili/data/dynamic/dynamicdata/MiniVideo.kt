@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
@@ -12,9 +12,9 @@ data class MiniVideo(
 ) : DynamicData {
     data class AuthorProfile(
             val uid: Int,
-            @SerializedName("name")
+            @JsonProperty("name")
             val userName: String?,
-            @SerializedName("head_url")
+            @JsonProperty("head_url")
             val avatarImgURL: String?
     )
 
@@ -22,13 +22,13 @@ data class MiniVideo(
             var id: Long,
             var description: String?,
             var cover: Cover?,
-            @SerializedName("timestamp")
+            @JsonProperty("timestamp")
             val sentTimestamp: Long
     ) {
         data class Cover(
-                @SerializedName("default")
+                @JsonProperty("default")
                 val defaultImgURL: String?,
-                @SerializedName("unclipped")
+                @JsonProperty("unclipped")
                 val originImgURL: String?
         )
     }

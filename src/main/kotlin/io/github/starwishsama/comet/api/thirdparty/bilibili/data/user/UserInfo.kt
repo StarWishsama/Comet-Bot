@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.user
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.CommonResponse
 
 /**
@@ -12,37 +12,37 @@ data class UserInfo(
     val data: Data
 ): CommonResponse() {
     data class Data(
-        @SerializedName("mid")
+        @JsonProperty("mid")
         val memberId: Long,
-        @SerializedName("name")
+        @JsonProperty("name")
         val userName: String,
-        @SerializedName("sex")
+        @JsonProperty("sex")
         val sex: String,
-        @SerializedName("face")
+        @JsonProperty("face")
         val avatar: String,
-        @SerializedName("sign")
+        @JsonProperty("sign")
         val sign: String,
-        @SerializedName("rank")
+        @JsonProperty("rank")
         val rank: Long,
-        @SerializedName("level")
+        @JsonProperty("level")
         val level: Int,
-        @SerializedName("official")
+        @JsonProperty("official")
         val officialInfo: OfficialInfo?,
-        @SerializedName("vip")
+        @JsonProperty("vip")
         val vipInfo: VipInfo,
-        @SerializedName("pendant")
+        @JsonProperty("pendant")
         val pendant: Pendant,
-        @SerializedName("live_room")
+        @JsonProperty("live_room")
         val liveRoomInfo: LiveRoomInfo
     ) {
         data class OfficialInfo(
-            @SerializedName("role")
+            @JsonProperty("role")
             val role: Int,
-            @SerializedName("title")
+            @JsonProperty("title")
             val title: String,
-            @SerializedName("desc")
+            @JsonProperty("desc")
             val desc: String,
-            @SerializedName("type")
+            @JsonProperty("type")
             val type: Int
         )
 
@@ -56,14 +56,14 @@ data class UserInfo(
             val name: String,
             val image: String,
             val expire: Int,
-            @SerializedName("image_enhance")
+            @JsonProperty("image_enhance")
             val imageEnhance: String
         )
 
         data class LiveRoomInfo(
             val roomStatus: Int,
             val liveStatus: Int,
-            @SerializedName("roomid")
+            @JsonProperty("roomid")
             val roomId: Long
         )
     }

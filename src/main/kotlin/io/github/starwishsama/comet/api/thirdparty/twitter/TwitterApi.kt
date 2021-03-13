@@ -1,14 +1,13 @@
 package io.github.starwishsama.comet.api.thirdparty.twitter
 
 import cn.hutool.http.ContentType
-import com.github.salomonbrys.kotson.fromJson
-import com.google.gson.JsonParser
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.gson.JsonSyntaxException
 import com.roxstudio.utils.CUrl
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.logger
-import io.github.starwishsama.comet.BotVariables.nullableGson
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.twitter.data.Tweet
 import io.github.starwishsama.comet.api.thirdparty.twitter.data.TwitterUser
@@ -73,9 +72,9 @@ object TwitterApi : ApiExecutor {
 
             val result = curl.exec("UTF-8")
 
-            if (JsonParser.parseString(result).isJsonObject) {
+            if (!mapper.readTree(result).isEmpty && !mapper.readTree(result).isNull) {
                 // Get Token
-                token = JsonParser.parseString(result).asJsonObject["access_token"].asString
+                token = mapper.readTree(result)["access_token"].asText()
                 BotVariables.cfg.twitterToken = token
                 logger.info("[蓝鸟] 成功获取 Access Token")
             }
@@ -120,7 +119,7 @@ object TwitterApi : ApiExecutor {
                     bodyCopy = body
                 }
 
-                return nullableGson.fromJson(bodyCopy)
+                return mapper.readValue(bodyCopy)
             } catch (e: IOException) {
                 if (!NetUtil.isTimeout(e)) {
                     FileUtil.createErrorReportFile(type = "data", t = e, content = bodyCopy, message = "Request URL: $url")
@@ -279,10 +278,10 @@ object TwitterApi : ApiExecutor {
      */
     private fun parseJsonToTweet(json: String, url: String): List<Tweet> {
         return try {
-            listOf(nullableGson.fromJson(json, Tweet::class.java))
+            listOf(mapper.readValue(json, Tweet::class.java))
         } catch (e: JsonSyntaxException) {
             try {
-                nullableGson.fromJson(json)
+                mapper.readValue(json)
             } catch (e: RuntimeException) {
                 FileUtil.createErrorReportFile("在解析推文时出现了问题", "tweet", e, json, url)
                 return emptyList()

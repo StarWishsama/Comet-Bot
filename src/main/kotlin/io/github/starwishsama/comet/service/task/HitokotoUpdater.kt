@@ -22,7 +22,7 @@ object HitokotoUpdater : Runnable {
 
     private fun getHitokotoJson(): Hitokoto {
         val hitokotoJson = NetUtil.getPageContent("https://v1.hitokoto.cn/") ?: throw ApiException("在获取一言时发生了问题")
-        return BotVariables.nullableGson.fromJson(hitokotoJson, Hitokoto::class.java)
+        return BotVariables.mapper.readValue(hitokotoJson, Hitokoto::class.java)
     }
 
     fun getHitokoto(useCache: Boolean = true): String {

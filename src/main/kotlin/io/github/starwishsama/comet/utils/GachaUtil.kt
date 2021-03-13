@@ -1,10 +1,10 @@
 package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.net.URLDecoder
-import com.google.gson.JsonParser
 import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.BotVariables.yyMMddPattern
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.ApiException
@@ -37,6 +37,7 @@ object GachaUtil {
     const val overTimeMessage = "抽卡次数到上限了, 可以少抽一点或者等待条数自动恢复哦~\n" +
             "命令条数现在每小时会恢复100次, 封顶1000次"
     var pictureReady = false
+    val hiddenOperators = mutableListOf<String>()
 
     /**
      * PRTS 实际保有干员半身立绘量
@@ -185,13 +186,13 @@ object GachaUtil {
         var isOld = false
 
         daemonLogger.info("明日方舟 > 检查是否为旧版本数据...")
-        if (!location.exists() || !JsonParser.parseString(location.getContext()).isJsonObject) {
+        if (!location.exists() || !mapper.readTree(location.getContext()).isEmpty) {
             daemonLogger.info("明日方舟 > 你还没有卡池数据, 正在自动下载新数据")
             isOld = true
         }
 
-        val result = JsonParser.parseString(NetUtil.executeHttpRequest(arkNightDataApi).body?.string())
-        val updateTime = LocalDateTime.parse(result.asJsonObject["updated_at"].asString, DateTimeFormatter.ISO_DATE_TIME)
+        val result = mapper.readTree(NetUtil.executeHttpRequest(arkNightDataApi).body?.string())
+        val updateTime = LocalDateTime.parse(result["updated_at"].asText(), DateTimeFormatter.ISO_DATE_TIME)
 
         if (isOld || (location.exists() && location.lastModified().toLocalDateTime() < updateTime)) {
             daemonLogger.info("明日方舟干员数据有更新 (${yyMMddPattern.format(updateTime)}), 正在下载")

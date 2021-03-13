@@ -1,12 +1,11 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili
 
 import cn.hutool.http.HttpRequest
-import com.github.salomonbrys.kotson.fromJson
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.gson.JsonParseException
-import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.nullableGson
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicTypeSelector
@@ -43,7 +42,7 @@ object DynamicApi : ApiExecutor {
         val response = HttpRequest.get(infoUrl + mid).timeout(2000)
             .addHeaders(agent)
             .executeAsync()
-        return JsonParser.parseString(response.body()).asJsonObject["data"].asJsonObject["name"].asString
+        return mapper.readTree(response.body())["data"]["name"].asText()
     }
 
     @Throws(ApiException::class)
@@ -57,7 +56,7 @@ object DynamicApi : ApiExecutor {
         ).use { res ->
             if (res.isSuccessful) {
                 val body = res.body?.string() ?: throw ApiException("无法获取动态页面")
-                return nullableGson.fromJson(body)
+                return mapper.readValue(body)
             } else {
                 throw ApiException("无法获取动态页面, 状态码 ${res.code}")
             }
@@ -79,7 +78,7 @@ object DynamicApi : ApiExecutor {
             try {
                 if (response.isSuccessful) {
                     body = response.body?.string() ?: return null
-                    return nullableGson.fromJson(body)
+                    return mapper.readValue(body)
                 }
             } catch (e: Exception) {
                 if (e is JsonSyntaxException || e is JsonParseException || e !is IOException) {
@@ -103,11 +102,11 @@ object DynamicApi : ApiExecutor {
                 if (dynamic.data.cards.isEmpty()) return MessageWrapper().addText("没有发过动态").setUsable(false)
 
                 val card = dynamic.data.cards[0]
-                val singleDynamicObject = JsonParser.parseString(card.card)
-                if (singleDynamicObject.isJsonObject) {
+                val singleDynamicObject = mapper.readTree(card.card)
+                if (!singleDynamicObject.isEmpty && !singleDynamicObject.isNull) {
                     val dynamicType = DynamicTypeSelector.getType(card.description.type)
                     return if (dynamicType != UnknownType::class) {
-                        nullableGson.fromJson(card.card, dynamicType).getContact()
+                        mapper.readValue(card.card, dynamicType).getContact()
                     } else {
                         MessageWrapper().addText("错误: 不支持的动态类型").setUsable(false)
                     }

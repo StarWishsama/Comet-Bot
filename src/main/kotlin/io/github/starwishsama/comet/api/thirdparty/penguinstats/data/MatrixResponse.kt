@@ -1,8 +1,8 @@
 package io.github.starwishsama.comet.api.thirdparty.penguinstats.data
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 
 data class MatrixResponse(
-    @SerializedName("matrix")
+    @JsonProperty("matrix")
     val matrix: List<DropMatrix>
 )

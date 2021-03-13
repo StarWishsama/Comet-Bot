@@ -1,8 +1,7 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
@@ -16,44 +15,44 @@ data class TextWithPicture(
 ) : DynamicData {
     data class User(
             val uid: Long,
-            @SerializedName("head_url")
+            @JsonProperty("head_url")
             val headUrl: String,
-            @SerializedName("name")
+            @JsonProperty("name")
             val name: String,
-            @SerializedName("vip")
+            @JsonProperty("vip")
             val vipInfo: UserProfile.VipInfo
     )
 
     data class Item(
-            @SerializedName("id")
+            @JsonProperty("id")
             val id: Long,
-            @SerializedName("title")
+            @JsonProperty("title")
             val title: String?,
-            @SerializedName("description")
+            @JsonProperty("description")
             val text: String?,
-            @SerializedName("category")
+            @JsonProperty("category")
             val category: String,
-            @SerializedName("role")
-            val role: JsonElement,
-            @SerializedName("sources")
-            val sources: JsonElement,
-            @SerializedName("pictures")
+            @JsonProperty("role")
+            val role: JsonNode,
+            @JsonProperty("sources")
+            val sources: JsonNode,
+            @JsonProperty("pictures")
             val pictures: List<Picture>,
-            @SerializedName("pictures_count")
+            @JsonProperty("pictures_count")
             val pictureCount: Int,
-            @SerializedName("upload_time")
+            @JsonProperty("upload_time")
             val uploadTime: Long,
-            @SerializedName("at_control")
+            @JsonProperty("at_control")
             val atControl: String,
-            @SerializedName("reply")
+            @JsonProperty("reply")
             val replyCount: Long,
-            @SerializedName("settings")
-            val settings: JsonObject,
-            @SerializedName("is_fav")
+            @JsonProperty("settings")
+            val settings: JsonNode,
+            @JsonProperty("is_fav")
             val isFavorite: Int,
     ) {
         data class Picture(
-                @SerializedName("img_src")
+                @JsonProperty("img_src")
                 var imgUrl: String
         )
     }

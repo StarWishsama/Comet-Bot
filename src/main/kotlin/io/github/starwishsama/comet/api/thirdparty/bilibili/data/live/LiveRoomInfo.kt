@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.live
 
-import com.google.gson.JsonElement
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.CommonResponse
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -14,56 +14,56 @@ data class LiveRoomInfo(
 ): CommonResponse() {
     data class LiveRoomInfoData(
         val uid: Long,
-        @SerializedName("room_id")
+        @JsonProperty("room_id")
         val roomId: Long,
-        @SerializedName("short_id")
+        @JsonProperty("short_id")
         val shortRoomId: Int,
-        @SerializedName("attention")
+        @JsonProperty("attention")
         val attentionCount: Long,
-        @SerializedName("online")
+        @JsonProperty("online")
         val onlineCount: Int,
-        @SerializedName("is_portrait")
+        @JsonProperty("is_portrait")
         val portrait: Boolean,
         val description: String?,
         /**
          * 0 未在直播 1 正在直播 2 投稿视频轮播
          */
-        @SerializedName("live_status")
+        @JsonProperty("live_status")
         val liveStatus: Int,
         /**
          * 直播分区 ID
          */
-        @SerializedName("area_id")
+        @JsonProperty("area_id")
         val areaId: Int,
         /**
          * 直播大区 ID
          */
-        @SerializedName("parent_area_id")
+        @JsonProperty("parent_area_id")
         val parentAreaId: Int,
         /**
          * 直播大区名
          */
-        @SerializedName("parent_area_name")
+        @JsonProperty("parent_area_name")
         val parentAreaName: String,
-        @SerializedName("old_area_id")
+        @JsonProperty("old_area_id")
         val oldAreaId: Int,
-        @SerializedName("background")
+        @JsonProperty("background")
         val backgroundImageUrl: String,
-        @SerializedName("title")
+        @JsonProperty("title")
         val title: String?,
-        @SerializedName("user_cover")
+        @JsonProperty("user_cover")
         val liveRoomCoverImageUrl: String,
         /**
          * 直播画面的某一帧图片
          */
-        @SerializedName("keyframe")
+        @JsonProperty("keyframe")
         val keyFrameImageUrl: String,
-        @SerializedName("is_strict_room")
+        @JsonProperty("is_strict_room")
         val strictMode: Boolean,
         /**
          * 开播时间 格式 yyyy-MM-dd HH:mm:ss
          */
-        @SerializedName("live_time")
+        @JsonProperty("live_time")
         val liveTime: String,
         /**
          * 直播间 Tag
@@ -72,44 +72,44 @@ data class LiveRoomInfo(
         /**
          * 未知, 锚 -> 上舰?
          */
-        @SerializedName("is_anchor")
+        @JsonProperty("is_anchor")
         val anchor: Int,
-        @SerializedName("room_silent_type")
+        @JsonProperty("room_silent_type")
         val roomSilentType: String,
-        @SerializedName("room_silent_level")
+        @JsonProperty("room_silent_level")
         val roomSilentLevel: Int,
-        @SerializedName("room_silent_second")
+        @JsonProperty("room_silent_second")
         val roomSilentSecond: Int,
         /**
          * 分区名
          */
-        @SerializedName("area_name")
+        @JsonProperty("area_name")
         val areaName: String,
-        @SerializedName("pendants")
+        @JsonProperty("pendants")
         val pendants: String,
-        @SerializedName("area_pendants")
+        @JsonProperty("area_pendants")
         val areaPendants: String,
-        @SerializedName("hot_words")
+        @JsonProperty("hot_words")
         val hotWords: List<String>,
-        @SerializedName("hot_words_status")
+        @JsonProperty("hot_words_status")
         val hotWordsStatus: Int,
         val verify: String?,
-        @SerializedName("new_pendants")
+        @JsonProperty("new_pendants")
         val newPendants: NewPendants,
-        @SerializedName("up_session")
+        @JsonProperty("up_session")
         val upSession: String?,
-        @SerializedName("pk_status")
+        @JsonProperty("pk_status")
         val pkStatus: Int,
-        @SerializedName("pk_id")
+        @JsonProperty("pk_id")
         val pkId: Int,
-        @SerializedName("battle_id")
+        @JsonProperty("battle_id")
         val battleId: Int,
-        @SerializedName("allow_change_area_time")
+        @JsonProperty("allow_change_area_time")
         val changeAreaTime: Int,
-        @SerializedName("allow_upload_cover_time")
+        @JsonProperty("allow_upload_cover_time")
         val uploadCoverTime: Int,
-        @SerializedName("studio_info")
-        val studioInfo: JsonElement?
+        @JsonProperty("studio_info")
+        val studioInfo: JsonNode?
     ) {
         data class NewPendants(
                 /**
@@ -120,14 +120,14 @@ data class LiveRoomInfo(
                  * "desc": "bilibili直播签约主播"
                  * }
                  */
-                @SerializedName("badge")
-                var badge: JsonElement?,
-                @SerializedName("frame")
-                var frame: JsonElement?,
-                @SerializedName("mobile_badge")
-                var mobileBadge: JsonElement?,
-                @SerializedName("mobile_frame")
-                var mobileFrame: JsonElement?
+                @JsonProperty("badge")
+                var badge: JsonNode?,
+                @JsonProperty("frame")
+                var frame: JsonNode?,
+                @JsonProperty("mobile_badge")
+                var mobileBadge: JsonNode?,
+                @JsonProperty("mobile_frame")
+                var mobileFrame: JsonNode?
         )
 
         fun isLiveNow(): Boolean = getStatus() == Status.Streaming

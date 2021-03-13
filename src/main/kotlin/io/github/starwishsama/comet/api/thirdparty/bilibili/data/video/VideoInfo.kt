@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.video
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.hiczp.bilibili.api.app.model.View
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.FileUtil
@@ -35,84 +35,84 @@ ${if (data.stats.historyRank > 0) "| 本站最高日排行第${data.stats.histor
     }
 
     data class Data(
-        @SerializedName("bvid")
+        @JsonProperty("bvid")
         val bvID: String,
-        @SerializedName("aid")
+        @JsonProperty("aid")
         val avID: Long,
-        @SerializedName("videos")
+        @JsonProperty("videos")
         val videoCount: Int,
         /**
          * 分区 ID
          */
-        @SerializedName("tid")
+        @JsonProperty("tid")
         val partitionID: Long,
         /**
          * 分区名
          */
-        @SerializedName("tname")
+        @JsonProperty("tname")
         val partitionName: String,
         /**
          * 是否为自制视频
          */
-        @SerializedName("copyright")
+        @JsonProperty("copyright")
         val originalVideo: Int,
-        @SerializedName("pic")
+        @JsonProperty("pic")
         val coverImg: String,
-        @SerializedName("title")
+        @JsonProperty("title")
         val title: String?,
-        @SerializedName("pubdate")
+        @JsonProperty("pubdate")
         val publishTime: Long,
-        @SerializedName("desc")
+        @JsonProperty("desc")
         val description: String,
-        @SerializedName("owner")
+        @JsonProperty("owner")
         val uploader: Uploader,
-        @SerializedName("stat")
+        @JsonProperty("stat")
         val stats: Stats,
         /**
          * 视频同步发布时发送动态的文字内容
          */
-        @SerializedName("dynamic")
+        @JsonProperty("dynamic")
         val dynamic: String?,
-        @SerializedName("staff")
+        @JsonProperty("staff")
         val staff: List<View.Data.Staff?>
     ) {
         data class Uploader(
-            @SerializedName("mid")
+            @JsonProperty("mid")
             val memberID: Long,
-            @SerializedName("name")
+            @JsonProperty("name")
             val userName: String,
-            @SerializedName("face")
+            @JsonProperty("face")
             val avatarImageUrl: String
         )
 
         data class Stats(
-            @SerializedName("aid")
+            @JsonProperty("aid")
             val avID: Long,
-            @SerializedName("view")
+            @JsonProperty("view")
             val view: Long,
-            @SerializedName("danmaku")
+            @JsonProperty("danmaku")
             val danmaku: Long,
-            @SerializedName("reply")
+            @JsonProperty("reply")
             val reply: Long,
-            @SerializedName("favorite")
+            @JsonProperty("favorite")
             val favorite: Long,
-            @SerializedName("coin")
+            @JsonProperty("coin")
             val coin: Long,
-            @SerializedName("share")
+            @JsonProperty("share")
             val share: Long,
             /**
              * 现在的全站排行
              */
-            @SerializedName("now_rank")
+            @JsonProperty("now_rank")
             val currentRank: Int,
             /**
              * 历史全站日排行
              */
-            @SerializedName("his_rank")
+            @JsonProperty("his_rank")
             val historyRank: Int,
-            @SerializedName("like")
+            @JsonProperty("like")
             val like: Long,
-            @SerializedName("dislike")
+            @JsonProperty("dislike")
             val dislike: Long
         )
     }

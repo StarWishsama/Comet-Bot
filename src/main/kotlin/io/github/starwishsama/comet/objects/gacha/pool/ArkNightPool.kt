@@ -2,7 +2,6 @@ package io.github.starwishsama.comet.objects.gacha.pool
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.hiddenOperators
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.GachaItem
@@ -23,7 +22,7 @@ class ArkNightPool(
     override val name: String = "标准寻访",
     override val description: String = "适合多种场合的强力干员",
     val condition: ArkNightOperator.() -> Boolean = {
-        !hiddenOperators.contains(name) && obtain?.contains("招募寻访") == true
+        !GachaUtil.hiddenOperators.contains(name) && obtain?.contains("招募寻访") == true
     }
 ) : GachaPool() {
     override val tenjouCount: Int = -1

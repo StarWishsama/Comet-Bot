@@ -1,21 +1,21 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.login
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 
 data class GetKeyResponse(
-    @SerializedName("code")
+    @JsonProperty("code")
     var code: Int, // 0
-    @SerializedName("message")
+    @JsonProperty("message")
     var message: String?,
-    @SerializedName("data")
+    @JsonProperty("data")
     var `data`: Data,
-    @SerializedName("ts")
+    @JsonProperty("ts")
     var ts: Long // 1550219688
 ) {
     data class Data(
-        @SerializedName("hash")
+        @JsonProperty("hash")
         var hash: String, // 93ac6f60b4789952
-        @SerializedName("key")
+        @JsonProperty("key")
         var key: String // -----BEGIN PUBLIC KEY-----MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCdScM09sZJqFPX7bvmB2y6i08JbHsa0v4THafPbJN9NoaZ9Djz1LmeLkVlmWx1DwgHVW+K7LVWT5FV3johacVRuV9837+RNntEK6SE82MPcl7fA++dmW2cLlAjsIIkrX+aIvvSGCuUfcWpWFy3YVDqhuHrNDjdNcaefJIQHMW+sQIDAQAB-----END PUBLIC KEY-----
     )
 }
