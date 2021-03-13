@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
@@ -87,11 +88,14 @@ object BotVariables {
         .enable(SerializationFeature.INDENT_OUTPUT)
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .registerModule(KotlinModule(nullIsSameAsDefault = true, nullToEmptyCollection = true, nullToEmptyMap = true))
-        .registerModule(SimpleModule().also {
-            it.addDeserializer(LocalDateTime::class.java, LocalDateTimeSupport)
-            it.addDeserializer(WrapperElement::class.java, WrapperConverter)
-        })
+        .registerModules(
+            JavaTimeModule(),
+            KotlinModule(nullIsSameAsDefault = true, nullToEmptyCollection = true, nullToEmptyMap = true),
+            SimpleModule().also {
+                it.addDeserializer(LocalDateTime::class.java, LocalDateTimeSupport)
+                it.addDeserializer(WrapperElement::class.java, WrapperConverter)
+            }
+        )
         .setDateFormat(SimpleDateFormat("yyyy/MM/dd HH:mm:ss"))
 
     var rCon: Rcon? = null
