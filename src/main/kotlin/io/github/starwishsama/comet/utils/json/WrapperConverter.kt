@@ -23,8 +23,6 @@ object WrapperConverter: JsonDeserializer<WrapperElement>() {
         .setDateFormat(SimpleDateFormat("yyyy/MM/dd HH:mm:ss"))
 
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): WrapperElement {
-        println("Hi")
-
         val node = p.readValueAsTree<JsonNode>()
 
         return try {
