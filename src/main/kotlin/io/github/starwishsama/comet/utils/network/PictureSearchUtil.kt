@@ -52,7 +52,6 @@ object PictureSearchUtil {
                     proxy(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
                 }
             }
-        println("$ascii2d$url")
 
         val html = request.get()
         val elements = html.body().getElementsByClass("container")

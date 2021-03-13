@@ -91,10 +91,6 @@ data class PerGroupConfig(
     val githubRepoSubscribers: MutableList<String> = mutableListOf()
 ) {
 
-    init {
-        println(githubRepoSubscribers)
-    }
-
     fun addHelper(id: Long): Boolean {
         if (isHelper(id)) return false
         helpers.add(id)

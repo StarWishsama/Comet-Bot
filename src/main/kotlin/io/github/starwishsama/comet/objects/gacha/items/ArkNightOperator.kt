@@ -9,8 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
  */
 data class ArkNightOperator(
         override val name: String,
-        @JsonProperty("desc")
-        val description: String,
+        val desc: String = "",
         /**
          * 星级
          *
