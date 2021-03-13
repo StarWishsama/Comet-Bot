@@ -52,7 +52,6 @@ object BackupHelper {
 
         files.addAll(FileUtil.getChildFolder("logs").listFiles() ?: arrayOf())
         files.addAll(FileUtil.getErrorReportFolder().listFiles() ?: arrayOf())
-        files.addAll(location.listFiles() ?: arrayOf())
 
         files.forEach { f ->
             val modifiedTime = f.lastModified().toLocalDateTime(true)

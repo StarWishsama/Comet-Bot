@@ -199,6 +199,7 @@ object GachaUtil {
             daemonLogger.info("明日方舟干员数据有更新 (${yyMMddPattern.format(updateTime)}), 正在下载")
             val data = NetUtil.downloadFile(FileUtil.getCacheFolder(), arkNightData, location.name)
             Files.copy(data.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            daemonLogger.info("下载完成!")
             data.delete()
         } else {
             daemonLogger.info("明日方舟干员数据为最新版本: ${yyMMddPattern.format(updateTime)}")
