@@ -60,7 +60,7 @@ object BotVariables {
     var webhookServer: WebHookServer? = null
 
     val service: ScheduledExecutorService = Executors.newScheduledThreadPool(
-        Runtime.getRuntime().availableProcessors(),
+        8,
             BasicThreadFactory.Builder()
                     .namingPattern("comet-service-%d")
                     .daemon(true)

@@ -11,6 +11,7 @@ import io.github.starwishsama.comet.BotVariables.netLogger
 import io.github.starwishsama.comet.api.thirdparty.github.PushEvent
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.service.pusher.instances.GithubPusher
+import io.github.starwishsama.comet.utils.json.isUsable
 import java.net.InetSocketAddress
 
 class WebHookServer(port: Int) {
@@ -31,8 +32,6 @@ class GithubWebHookHandler: HttpHandler {
     override fun handle(he: HttpExchange) {
         netLogger.log(HinaLogLevel.Debug, "收到新事件", prefix = "WebHook")
 
-        he.sendResponseHeaders(200, 0)
-
         val request = String(he.requestBody.readBytes())
 
         if (!request.startsWith("payload")) {
@@ -42,7 +41,7 @@ class GithubWebHookHandler: HttpHandler {
 
         val payload = URLDecoder.decode(request.replace("payload=", ""), Charsets.UTF_8)
 
-        val validate = mapper.readTree(payload).isNull || mapper.readTree(payload).isEmpty
+        val validate = mapper.readTree(payload).isUsable()
 
         if (validate) {
             netLogger.log(HinaLogLevel.Debug, "解析请求失败, 回调的 JSON 不合法.\n${payload}", prefix = "WebHook")
@@ -57,6 +56,9 @@ class GithubWebHookHandler: HttpHandler {
         } catch (e: Exception) {
             netLogger.log(HinaLogLevel.Debug,"推送 WebHook 消息失败", e, prefix = "WebHook")
         }
+
+        he.sendResponseHeaders(200, 0)
+        he.responseBody.write("Success".toByteArray())
     }
 }
 

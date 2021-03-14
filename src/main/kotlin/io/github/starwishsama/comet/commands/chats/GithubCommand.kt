@@ -32,7 +32,7 @@ class GithubCommand: ChatCommand {
                     "该命令仅群聊可用".toChain()
                 }
             }
-            "list" -> {
+            "list", "ls" -> {
                 return if (event is GroupMessageEvent) {
                     handleListRepo(event.group.id)
                 } else {
@@ -81,7 +81,7 @@ class GithubCommand: ChatCommand {
             repos.forEach {
                 append("$it, ")
             }
-        }.removeSuffix(",").trim().toChain()
+        }.removeSuffix(", ").trim().toChain()
     }
 
     override fun getProps(): CommandProps =

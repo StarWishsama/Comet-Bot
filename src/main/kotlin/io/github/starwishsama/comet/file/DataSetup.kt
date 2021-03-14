@@ -59,7 +59,7 @@ object DataSetup {
 
         try {
             load()
-        } catch (e: RuntimeException) {
+        } catch (e: Exception) {
             brokenConfig = true
             e.message?.let { FileUtil.createErrorReportFile("加载配置文件失败, 部分配置文件将会立即创建备份\n", "resource", e, "", it) }
             daemonLogger.debug("加载配置文件失败", e)

@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.api.annotations.CometCommand
+import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
@@ -94,8 +95,14 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
             if (args.size > 1) {
                 val target: BotUser? = CometUtil.parseAtAsBotUser(event, args[1])
 
-                target?.addPermission(args[2])
-                return toChain("添加权限成功")
+                val validate = CommandExecutor.getCommands().parallelStream().filter { it.getProps().permission == args[2] }.findAny().isPresent
+
+                return if (validate) {
+                    target?.addPermission(args[2])
+                    toChain("添加权限成功")
+                } else {
+                    "找不到 ${args[2]} 对应的命令".toChain()
+                }
             }
         } else {
             return toChain("你没有权限")
