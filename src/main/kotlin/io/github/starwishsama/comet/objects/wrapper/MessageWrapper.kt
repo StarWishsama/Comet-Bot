@@ -106,6 +106,9 @@ fun MessageChain.toMessageWrapper(): MessageWrapper {
             is At -> {
                 wrapper.addElement(AtElement(message.target))
             }
+            is ServiceMessage -> {
+                wrapper.addElement(XmlElement(message.content))
+            }
             else -> {
                 continue
             }

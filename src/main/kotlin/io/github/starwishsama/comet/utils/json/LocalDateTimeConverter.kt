@@ -7,11 +7,11 @@ import io.github.starwishsama.comet.BotVariables.yyMMddPattern
 import java.time.LocalDateTime
 
 /**
- * [LocalDateTimeSupport]
+ * [LocalDateTimeConverter]
  *
- *
+ * 转换原 Gson 默认序列化 [LocalDateTime] 风格至 Jackson 自定义样式
  */
-object LocalDateTimeSupport: JsonDeserializer<LocalDateTime>() {
+object LocalDateTimeConverter: JsonDeserializer<LocalDateTime>() {
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): LocalDateTime {
         try {
             return LocalDateTime.parse(p.readValueAs(String::class.java), yyMMddPattern)
@@ -33,6 +33,11 @@ object LocalDateTimeSupport: JsonDeserializer<LocalDateTime>() {
     }
 }
 
+/**
+ * [GsonStyleLDT]
+ *
+ * Gson 样式 [LocalDateTime]
+ */
 data class GsonStyleLDT(
     val date: Date,
     val time: Time

@@ -23,7 +23,7 @@ import io.github.starwishsama.comet.objects.shop.Shop
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
 import io.github.starwishsama.comet.service.webhook.WebHookServer
 import io.github.starwishsama.comet.utils.LoggerAppender
-import io.github.starwishsama.comet.utils.json.LocalDateTimeSupport
+import io.github.starwishsama.comet.utils.json.LocalDateTimeConverter
 import io.github.starwishsama.comet.utils.json.WrapperConverter
 import io.github.starwishsama.comet.utils.network.NetUtil
 import net.kronos.rkon.core.Rcon
@@ -110,7 +110,7 @@ object BotVariables {
             },
             KotlinModule(nullIsSameAsDefault = true, nullToEmptyCollection = true, nullToEmptyMap = true),
             SimpleModule().also {
-                it.addDeserializer(LocalDateTime::class.java, LocalDateTimeSupport)
+                it.addDeserializer(LocalDateTime::class.java, LocalDateTimeConverter)
                 it.addDeserializer(WrapperElement::class.java, WrapperConverter)
             }
         )

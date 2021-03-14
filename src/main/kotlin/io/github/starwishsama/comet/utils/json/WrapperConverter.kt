@@ -18,7 +18,7 @@ object WrapperConverter: JsonDeserializer<WrapperElement>() {
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         .registerKotlinModule()
         .registerModule(SimpleModule().also {
-            it.addDeserializer(LocalDateTime::class.java, LocalDateTimeSupport)
+            it.addDeserializer(LocalDateTime::class.java, LocalDateTimeConverter)
         })
         .setDateFormat(SimpleDateFormat("yyyy/MM/dd HH:mm:ss"))
 

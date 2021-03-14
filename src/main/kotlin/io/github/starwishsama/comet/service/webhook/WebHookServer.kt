@@ -1,8 +1,8 @@
 package io.github.starwishsama.comet.service.webhook
 
 import cn.hutool.core.net.URLDecoder
+import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.google.gson.JsonParseException
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
 import com.sun.net.httpserver.HttpServer
@@ -57,8 +57,10 @@ class GithubWebHookHandler: HttpHandler {
             netLogger.log(HinaLogLevel.Debug,"推送 WebHook 消息失败", e, prefix = "WebHook")
         }
 
-        he.sendResponseHeaders(200, 0)
-        he.responseBody.write("Success".toByteArray())
+        val response = "Success".toByteArray()
+
+        he.responseBody.use { it.write(response) }
+        he.sendResponseHeaders(200, response.size.toLong())
     }
 }
 
