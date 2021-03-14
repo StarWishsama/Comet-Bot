@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.api.thirdparty.youtube
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.youtube.data.SearchChannelResult
 import io.github.starwishsama.comet.api.thirdparty.youtube.data.SearchVideoResult
@@ -12,7 +13,7 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import org.jsoup.Jsoup
 import retrofit2.Call
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -33,7 +34,7 @@ object YoutubeApi : ApiExecutor {
     init {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://youtube.googleapis.com/youtube/v3/")
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(JacksonConverterFactory.create(mapper))
             .client(BotVariables.client)
             .build()
 

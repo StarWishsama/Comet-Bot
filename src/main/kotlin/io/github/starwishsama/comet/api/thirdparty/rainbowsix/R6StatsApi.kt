@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.api.thirdparty.rainbowsix
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatsGenericStat
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatsSeasonalStat
@@ -13,7 +14,7 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.FileUtil
 import retrofit2.Call
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.HeaderMap
 import retrofit2.http.Path
@@ -24,7 +25,7 @@ object R6StatsApi: ApiExecutor {
     init {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api2.r6stats.com/public-api/stats/")
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(JacksonConverterFactory.create(mapper))
             .client(BotVariables.client)
             .build()
 

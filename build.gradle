@@ -91,6 +91,7 @@ dependencies {
 
     // Retrofit A type-safe HTTP client for Android and Java @ https://github.com/square/retrofit/
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
 
     // RomeTool for RSS @ https://github.com/rometools/rome
     implementation 'com.rometools:rome:1.15.0'
