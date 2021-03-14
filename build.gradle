@@ -30,9 +30,10 @@ jar {
 }
 
 String branchName = 'git symbolic-ref --short -q HEAD'.execute().text.trim()
-String gitBranchName = "-" + (branchName == null && branchName.isEmpty() ? "Unknown" : branchName)
-String gitCommitId = "-" + 'git rev-parse --short HEAD'.execute().text.trim()
-String versionCode = "0.6.1" + gitBranchName + gitCommitId
+String gitBranchName = "-" + (branchName == null && branchName.isEmpty() ? "Unofficial" : branchName)
+String gitCommitId = 'git rev-parse --short HEAD'.execute().text.trim()
+String gitCommitIdResult = (gitCommitId == null && gitCommitId.isEmpty() ? "" : "-" + gitCommitId)
+String versionCode = "0.6.1" + gitBranchName + gitCommitIdResult
 
 group 'io.github.starwishsama.comet'
 version versionCode
