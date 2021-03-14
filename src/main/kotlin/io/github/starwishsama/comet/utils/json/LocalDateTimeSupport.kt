@@ -14,6 +14,8 @@ import java.time.LocalDateTime
 object LocalDateTimeSupport: JsonDeserializer<LocalDateTime>() {
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): LocalDateTime {
         try {
+            return LocalDateTime.parse(p.readValueAs(String::class.java), yyMMddPattern)
+        } catch (e: Exception) {
             val node = p.readValuesAs(GsonStyleLDT::class.java)
 
             val ldt = node.next()
@@ -27,8 +29,6 @@ object LocalDateTimeSupport: JsonDeserializer<LocalDateTime>() {
                 ldt.time.second,
                 ldt.time.nano
             )
-        } catch (e: Exception) {
-            return LocalDateTime.parse(p.readValueAs(String::class.java), yyMMddPattern)
         }
     }
 }
