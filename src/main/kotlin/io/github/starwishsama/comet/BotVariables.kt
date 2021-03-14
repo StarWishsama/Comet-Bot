@@ -92,9 +92,14 @@ object BotVariables {
     val consoleCommandLogger: HinaLogger = HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
     val mapper: ObjectMapper = ObjectMapper()
+        // 美化输出
         .enable(SerializationFeature.INDENT_OUTPUT)
+        // 将单一值序列化成表
+        .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+        // 禁止将日期类序列化为时间戳
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        // 反序列化时忽略未知参数
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         .registerModules(
             JavaTimeModule().also {
                 it.addSerializer(LocalDateTime::class.java, LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")))
