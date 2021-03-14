@@ -60,7 +60,7 @@ class GithubWebHookHandler: HttpHandler {
         val response = "Success".toByteArray()
 
         he.responseBody.use { it.write(response) }
-        he.sendResponseHeaders(200, response.size.toLong())
+        he.sendResponseHeaders(200, 0)
     }
 }
 

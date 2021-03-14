@@ -86,7 +86,7 @@ object GachaManager {
             val pool = mapper.readValue(context.traverse(), CustomPool::class.java)
             addPool(pool)
         } catch (e: Exception) {
-            FileUtil.createErrorReportFile("解析卡池信息失败", "gacha", e, context.asText(), e.message ?: "")
+            FileUtil.createErrorReportFile("解析卡池信息失败", "gacha", e, "", e.message ?: "")
         }
     }
 
