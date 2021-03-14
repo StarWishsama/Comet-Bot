@@ -25,9 +25,6 @@ class R6SCommand : ChatCommand {
                 when (args[0].toLowerCase()) {
                     "info", "查询", "cx" -> {
                         val account = user.r6sAccount
-                        if (account.isEmpty()) {
-                            return "你还没绑定过账号!".toChain()
-                        }
 
                         return if (args.size <= 1 && account.isNotEmpty()) {
                             event.subject.sendMessage(toChain("查询中..."))
