@@ -79,10 +79,10 @@ object GachaManager {
     @Throws(JsonParseException::class)
     fun addPoolFromFile(poolFile: File) {
         require(poolFile.exists()) { "${poolFile.name} isn't exists" }
-        val context = mapper.readTree(poolFile.getContext())
-        require(!context.isUsable()) { "${poolFile.name} isn't a valid json file!" }
 
         try {
+            val context = mapper.readTree(poolFile.getContext())
+            require(!context.isUsable()) { "${poolFile.name} isn't a valid json file!" }
             val pool = mapper.readValue(context.traverse(), CustomPool::class.java)
             addPool(pool)
         } catch (e: Exception) {
