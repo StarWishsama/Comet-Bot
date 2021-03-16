@@ -80,10 +80,10 @@ object R6StatsApi: ApiExecutor {
         val latestSeasonalStat = seasonalStat.getSeasonalStat(SeasonName.NEON_DAWN)?.getRegionStat(Region.EMEA) ?: return MessageWrapper().addText("无法获取玩家 $userName 的信息")
 
         val infoText = "|| ${genericStat.username} [${genericStat.levelInfo.level} 级]\n" +
-                "|| 目前段位 ${latestSeasonalStat.getRank().rankName}\n" +
+                "|| 目前段位 ${latestSeasonalStat.getRankAsEnum().rankName}\n" +
                 "|| MMR 状态 ${latestSeasonalStat.currentMMR} (${latestSeasonalStat.lastMatchMMRChange})\n" +
                 "|| KD ${genericStat.stats.generalStat.kd} / WL ${genericStat.stats.generalStat.winLoss}\n" +
-                "|| 胜率 ${(genericStat.stats.generalStat.winTime / genericStat.stats.generalStat.playedGameTime) * 100}%"
+                "|| 胜率 ${String.format("%.2f", (genericStat.stats.generalStat.winTime / genericStat.stats.generalStat.playedGameTime.toDouble()) * 100)}%"
 
         return MessageWrapper().addText(infoText)
     }

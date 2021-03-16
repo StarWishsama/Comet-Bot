@@ -48,10 +48,11 @@ data class R6StatsSeasonalStat(
     ) {
         fun getRegionStat(region: Region): PerRegionStat? {
             val regionStat = regions[region.region]
+
             return if (regionStat.isNull) {
                 null
             } else {
-                mapper.readValue(regionStat.traverse())
+                mapper.readValue(regionStat[0].traverse())
             }
         }
 
@@ -87,7 +88,7 @@ data class R6StatsSeasonalStat(
             @JsonProperty("max_rank_image")
             val maxRankImage: String
         ) {
-            fun getRank(): R6Rank = R6Rank.getRank(currentRank)
+            fun getRankAsEnum(): R6Rank = R6Rank.getRank(currentRank)
         }
     }
 }
