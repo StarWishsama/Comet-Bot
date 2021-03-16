@@ -1,4 +1,4 @@
-package io.github.starwishsama.comet.api.thirdparty.github
+package io.github.starwishsama.comet.api.thirdparty.github.data.events
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode

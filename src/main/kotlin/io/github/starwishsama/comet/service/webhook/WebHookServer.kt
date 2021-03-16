@@ -8,7 +8,7 @@ import com.sun.net.httpserver.HttpHandler
 import com.sun.net.httpserver.HttpServer
 import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.BotVariables.netLogger
-import io.github.starwishsama.comet.api.thirdparty.github.PushEvent
+import io.github.starwishsama.comet.api.thirdparty.github.data.events.PushEvent
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.service.pusher.instances.GithubPusher
 import io.github.starwishsama.comet.utils.json.isUsable

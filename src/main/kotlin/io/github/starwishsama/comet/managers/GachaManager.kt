@@ -2,14 +2,14 @@ package io.github.starwishsama.comet.managers
 
 import com.google.gson.JsonParseException
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.objects.gacha.custom.CustomPool
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
 import io.github.starwishsama.comet.objects.gacha.pool.PCRPool
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.getContext
-import io.github.starwishsama.comet.utils.json.isUsable
+import kotlinx.serialization.decodeFromString
+import net.mamoe.yamlkt.Yaml
 import java.io.File
 import kotlin.streams.toList
 
@@ -81,9 +81,7 @@ object GachaManager {
         require(poolFile.exists()) { "${poolFile.name} isn't exists" }
 
         try {
-            val context = mapper.readTree(poolFile.getContext())
-            require(!context.isUsable()) { "${poolFile.name} isn't a valid json file!" }
-            val pool = mapper.readValue(context.traverse(), CustomPool::class.java)
+            val pool = Yaml.decodeFromString<CustomPool>(poolFile.getContext())
             addPool(pool)
         } catch (e: Exception) {
             FileUtil.createErrorReportFile("解析卡池信息失败", "gacha", e, "", e.message ?: "")

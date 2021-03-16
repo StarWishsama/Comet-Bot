@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.service.pusher.instances
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.api.thirdparty.github.PushEvent
+import io.github.starwishsama.comet.api.thirdparty.github.data.events.PushEvent
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
