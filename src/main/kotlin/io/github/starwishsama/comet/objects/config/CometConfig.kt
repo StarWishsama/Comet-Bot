@@ -40,7 +40,7 @@ data class CometConfig(
         val commandPrefix: MutableList<String> = mutableListOf(".", "。", "#", "!", "/", "！"),
 
         @Deprecated("在未来移动到 ApiConfig")
-        @Comment("哔哩哔哩账号用户名, 调用需鉴权API功能 (如 /bili info) 时必填")
+        @Comment("哔哩哔哩账号手机号/邮箱, 调用需鉴权API功能 (如 /bili info) 时必填")
         var biliUserName: String? = null,
 
         @Deprecated("在未来移动到 ApiConfig")
