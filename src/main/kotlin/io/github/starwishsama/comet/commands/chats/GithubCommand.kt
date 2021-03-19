@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.commands.chats
 
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -54,7 +55,7 @@ class GithubCommand: ChatCommand {
             "你已经订阅过 $repoName 了".toChain()
         } else {
             repos.add(repoName)
-            "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址 (设置为仅推送事件)".toChain()
+            "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${BotVariables.cfg.webHookAddress} \n(设置为仅推送事件)".toChain()
         }
     }
 

@@ -25,6 +25,7 @@ import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.managers.GachaManager
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.webhook.WebHookServer
+import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.RuntimeUtil
@@ -171,7 +172,8 @@ object CometRuntime {
 
     private fun startupServer() {
         if (cfg.webHookSwitch) {
-            webhookServer = WebHookServer(cfg.webHookPort)
+            val customSuffix = cfg.webHookAddress.replace("http://", "").replace("https://", "").split("/")
+            webhookServer = WebHookServer(cfg.webHookPort, customSuffix.getRestString(1, "/"))
         }
     }
 

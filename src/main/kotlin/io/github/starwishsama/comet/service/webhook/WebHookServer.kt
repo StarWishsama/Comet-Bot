@@ -14,11 +14,11 @@ import io.github.starwishsama.comet.service.pusher.instances.GithubPusher
 import io.github.starwishsama.comet.utils.json.isUsable
 import java.net.InetSocketAddress
 
-class WebHookServer(port: Int) {
+class WebHookServer(port: Int, customSuffix: String) {
     private val server: HttpServer = HttpServer.create(InetSocketAddress(port), 0)
 
     init {
-        server.createContext("/payload", GithubWebHookHandler())
+        server.createContext("/$customSuffix", GithubWebHookHandler())
         netLogger.log(HinaLogLevel.Info, "服务器启动!", prefix = "WebHook")
         server.start()
     }
@@ -28,11 +28,18 @@ class WebHookServer(port: Int) {
     }
 }
 
+/**
+ * [GithubWebHookHandler]
+ *
+ * 处理 Github Webhook 请求.
+ */
 class GithubWebHookHandler: HttpHandler {
     override fun handle(he: HttpExchange) {
         netLogger.log(HinaLogLevel.Debug, "收到新事件", prefix = "WebHook")
 
         val request = String(he.requestBody.readBytes())
+
+        he.sendResponseHeaders(200, 0)
 
         if (!request.startsWith("payload")) {
             netLogger.log(HinaLogLevel.Debug, "无效请求", prefix = "WebHook")
@@ -56,11 +63,6 @@ class GithubWebHookHandler: HttpHandler {
         } catch (e: Exception) {
             netLogger.log(HinaLogLevel.Debug,"推送 WebHook 消息失败", e, prefix = "WebHook")
         }
-
-        val response = "Success".toByteArray()
-
-        he.responseBody.use { it.write(response) }
-        he.sendResponseHeaders(200, 0)
     }
 }
 

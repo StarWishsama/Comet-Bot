@@ -62,14 +62,14 @@ object CometUtil {
     @JvmName("stringAsChain")
     fun String?.toChain(addPrefix: Boolean = true): MessageChain = toChain(this, addPrefix)
 
-    fun List<String>.getRestString(startAt: Int): String {
+    fun List<String>.getRestString(startAt: Int, joinRune: String = " "): String {
         if (isEmpty()) {
             return "空"
         }
 
         return buildString {
             for (i in startAt until size) {
-                append(this@getRestString[i]).append(" ")
+                append(this@getRestString[i]).append(joinRune)
             }
             trim()
         }
