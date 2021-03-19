@@ -76,12 +76,16 @@ class GithubCommand: ChatCommand {
     private fun handleListRepo(groupId: Long): MessageChain {
         val cfg = GroupConfigManager.getConfig(groupId) ?: return "该群聊尚未注册过 Comet!".toChain()
         val repos = cfg.githubRepoSubscribers
-        return buildString {
-            append("已订阅的项目列表:")
-            repos.forEach {
-                append("$it, ")
-            }
-        }.removeSuffix(", ").trim().toChain()
+        return if (repos.isEmpty()) {
+            "还没订阅过任何项目".toChain()
+        } else {
+            buildString {
+                append("已订阅的项目列表:")
+                repos.forEach {
+                    append("$it, ")
+                }
+            }.removeSuffix(", ").trim().toChain()
+        }
     }
 
     override fun getProps(): CommandProps =
