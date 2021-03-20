@@ -14,12 +14,14 @@ import net.mamoe.mirai.message.data.content
 import java.time.Duration
 import java.time.LocalDateTime
 
-open class GuessNumberSession(override val target: SessionTarget, val answer: Int) : Session(target, GuessNumberCommand::class.java, false, {
-    e: MessageEvent, u: BotUser, session: Session ->
-    handle(e, u, session)
-}) {
+open class GuessNumberSession(override val target: SessionTarget, val answer: Int)
+    : Session(target, GuessNumberCommand::class.java, false) {
     lateinit var usedTime: Duration
     lateinit var lastAnswerTime: LocalDateTime
+
+    override fun handle(event: MessageEvent, user: BotUser, session: Session) {
+        handle(event, user, session)
+    }
 
     fun getGuessNumberUser(id: Long): GuessNumberUser? {
         users.forEach {

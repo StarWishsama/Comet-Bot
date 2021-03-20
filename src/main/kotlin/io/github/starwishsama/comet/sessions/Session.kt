@@ -4,11 +4,10 @@ import io.github.starwishsama.comet.objects.BotUser
 import net.mamoe.mirai.event.events.MessageEvent
 import java.time.LocalDateTime
 
-open class Session(
+abstract class Session(
     open val target: SessionTarget,
     open val creator: Class<*>,
     open val silent: Boolean = false,
-    open val handle: (MessageEvent, BotUser, Session) -> Unit = { me: MessageEvent, bu: BotUser, session: Session -> }
 ) {
     val users: MutableSet<SessionUser> = mutableSetOf()
     val createdTime: LocalDateTime = LocalDateTime.now()
@@ -16,4 +15,6 @@ open class Session(
     override fun toString(): String {
         return "Session#${hashCode()} {target=$target, silent=${silent}, usersCount=${users.size}}"
     }
+
+    abstract fun handle(event: MessageEvent, user: BotUser, session: Session)
 }

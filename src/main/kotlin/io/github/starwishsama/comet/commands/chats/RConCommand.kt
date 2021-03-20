@@ -34,12 +34,15 @@ class RConCommand : ChatCommand {
                 when (args[0]) {
                     "setup" -> {
                         SessionHandler.insertSession(
-                            Session(
+                            object : Session(
                                 SessionTarget(user.id),
                                 this::class.java,
                                 false
-                            ) { e: MessageEvent, u: BotUser, session: Session ->
-                                handleInput(e, u, session)
+                            ) {
+                                override fun handle(event: MessageEvent, user: BotUser, session: Session) {
+                                    this@RConCommand.handleInput(event, user, session)
+                                }
+
                             })
                         return CometUtil.toChain("请在下一条消息发送 rCon 连接地址")
                     }

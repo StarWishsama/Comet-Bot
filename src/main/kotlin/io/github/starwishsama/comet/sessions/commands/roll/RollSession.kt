@@ -11,6 +11,7 @@ import io.github.starwishsama.comet.sessions.SessionUser
 import io.github.starwishsama.comet.utils.CometUtil
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -25,9 +26,11 @@ class RollSession(
     val keyWord: String,
     val rollStarter: Long,
     val count: Int,
-) : Session(target, RollCommand::class.java, silent = true, handle = { e: MessageEvent, _: BotUser, session: Session ->
-    handleInput(e, session)
-}) {
+) : Session(target, RollCommand::class.java, silent = true) {
+    override fun handle(event: MessageEvent, user: BotUser, session: Session) {
+        handle(event, user, session)
+    }
+
     fun getRandomUser(): SessionUser {
         val index = RandomUtil.randomInt(users.size)
         val iter = users.iterator()
@@ -49,7 +52,7 @@ class RollSession(
     companion object {
         fun handleInput(event: MessageEvent, session: Session) {
             if (session is RollSession && event is GroupMessageEvent) {
-                if (LocalDateTime.now().minusMinutes(session.stopAfterMinute.toLong()).isBefore(session.createdTime)) {
+                if (LocalDateTime.now().minusMinutes(session.stopAfterMinute.toLong()).isAfter(session.createdTime)) {
                     generateResult(session, event)
                     SessionHandler.removeSession(session)
                     return
@@ -76,9 +79,18 @@ class RollSession(
             if (group == null) {
                 BotVariables.daemonLogger.warning("推送开奖消息失败: 找不到对应的群[${group}]")
             } else {
-                var winner = messageChainOf()
-                session.getWinningUsers().forEach { su ->
-                    winner = winner.plus(At(su.id))
+                var winnerText = messageChainOf()
+                val winners = session.getWinningUsers()
+
+                if (winners.isEmpty()) {
+                    runBlocking {
+                        group.sendMessage(CometUtil.toChain("没有人参加抽奖, 本次抽奖已结束..."))
+                    }
+                    return
+                }
+
+                winners.forEach { su ->
+                    winnerText = winnerText.plus(At(su.id))
                 }
                 GlobalScope.launch {
                     group.sendMessage(
@@ -86,13 +98,17 @@ class RollSession(
                             "由${group[session.rollStarter]?.nameCardOrNick}发起的抽奖开奖了!\n" +
                                     "奖品: ${session.rollItem}\n" +
                                     "中奖者: "
-                        ) + winner
+                        ) + winnerText
                     )
                 }
             }
         }
 
         private fun RollSession.getWinningUsers(): List<SessionUser> {
+            if (users.isEmpty()) {
+                return emptyList()
+            }
+
             val winners = mutableListOf<SessionUser>()
 
             for (i in 0 until count) {

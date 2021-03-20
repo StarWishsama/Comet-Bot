@@ -26,9 +26,10 @@ class PictureSearchCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (args.isEmpty()) {
             if (!SessionHandler.hasSessionByID(event.sender.id, this::class.java)) {
-                SessionHandler.insertSession(Session(SessionTarget(privateId = event.sender.id), this::class.java, true) {
-                        e: MessageEvent, _: BotUser, session: Session ->
-                    handle(e, session)
+                SessionHandler.insertSession(object : Session(SessionTarget(privateId = event.sender.id), this::class.java, true) {
+                    override fun handle(event: MessageEvent, user: BotUser, session: Session) {
+                        this@PictureSearchCommand.handle(event, session)
+                    }
                 })
             }
 

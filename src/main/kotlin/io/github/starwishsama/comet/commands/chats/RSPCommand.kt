@@ -25,9 +25,11 @@ class RSPCommand : ChatCommand {
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (SessionHandler.hasSessionByID(event.sender.id, this::class.java))
-        SessionHandler.insertSession(Session(SessionTarget(0, event.sender.id), this::class.java, false){
-                e: MessageEvent, u: BotUser, session: Session ->
-            handleInput(e, u, session)
+        SessionHandler.insertSession(object : Session(SessionTarget(0, event.sender.id), this::class.java, false) {
+            override fun handle(event: MessageEvent, user: BotUser, session: Session) {
+                handleInput(event, user, session)
+            }
+
         })
         return "石头剪刀布... 开始! 你要出什么呢?".toChain()
     }
