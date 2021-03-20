@@ -71,8 +71,8 @@ data class PushEvent(
         wrapper.addText("| 提交者 ${headCommitInfo.committer.name}\n")
         wrapper.addText("| 提交信息 \n")
         wrapper.addText("| ${headCommitInfo.message}\n")
-        wrapper.addText("| 详细内容 > \n")
-        wrapper.addText("| ${headCommitInfo.url}")
+        wrapper.addText("| 查看差异: \n")
+        wrapper.addText(compare)
 
         return wrapper
     }
