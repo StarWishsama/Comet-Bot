@@ -4,6 +4,7 @@ import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
@@ -17,7 +18,7 @@ import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import java.time.LocalDateTime
 
 @CometCommand
-class RSPCommand : ChatCommand {
+class RSPCommand : ChatCommand, ConversationCommand {
     /**
      * 储存正在石头剪刀布的用户
      */
@@ -25,12 +26,7 @@ class RSPCommand : ChatCommand {
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (SessionHandler.hasSessionByID(event.sender.id, this::class.java))
-        SessionHandler.insertSession(object : Session(SessionTarget(0, event.sender.id), this::class.java, false) {
-            override fun handle(event: MessageEvent, user: BotUser, session: Session) {
-                handleInput(event, user, session)
-            }
-
-        })
+        SessionHandler.insertSession(Session(SessionTarget(0, event.sender.id), this, false))
         return "石头剪刀布... 开始! 你要出什么呢?".toChain()
     }
 
@@ -38,7 +34,7 @@ class RSPCommand : ChatCommand {
 
     override fun getHelp(): String = "/cq 石头剪刀布"
 
-    private fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
+    override fun handle(event: MessageEvent, user: BotUser, session: Session) {
         if (LocalDateTime.now().minusMinutes(1L).isBefore(session.createdTime)) {
             SessionHandler.removeSession(session)
             return

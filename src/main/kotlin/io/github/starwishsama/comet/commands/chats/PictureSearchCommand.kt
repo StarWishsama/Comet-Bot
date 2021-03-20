@@ -4,6 +4,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.enums.PicSearchApiType
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
@@ -21,16 +22,12 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import java.util.*
 
 @CometCommand
-class PictureSearchCommand : ChatCommand {
+class PictureSearchCommand : ChatCommand, ConversationCommand {
     @OptIn(MiraiExperimentalApi::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (args.isEmpty()) {
             if (!SessionHandler.hasSessionByID(event.sender.id, this::class.java)) {
-                SessionHandler.insertSession(object : Session(SessionTarget(privateId = event.sender.id), this::class.java, true) {
-                    override fun handle(event: MessageEvent, user: BotUser, session: Session) {
-                        this@PictureSearchCommand.handle(event, session)
-                    }
-                })
+                SessionHandler.insertSession(Session(SessionTarget(privateId = event.sender.id), this, true))
             }
 
             val img = event.message[Image] ?: return toChain("请发送需要搜索的图片")
@@ -68,7 +65,7 @@ class PictureSearchCommand : ChatCommand {
     """.trimIndent()
 
     @OptIn(MiraiExperimentalApi::class)
-    fun handle(event: MessageEvent, session: Session) {
+    override fun handle(event: MessageEvent, user: BotUser, session: Session) {
         SessionHandler.removeSession(session)
         val image = event.message[Image]
         runBlocking {

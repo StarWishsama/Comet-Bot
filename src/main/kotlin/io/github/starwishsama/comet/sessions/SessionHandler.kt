@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.sessions
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.command.CommandExecutor
+import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -75,7 +76,11 @@ object SessionHandler {
 
         sessionToHandle.forEach {
             if (it.silent || CommandExecutor.getCommandPrefix(e.message.contentToString()).isEmpty()) {
-                it.handle(e, BotUser.getUserOrRegister(e.sender.id), it)
+                if (it.creator is ConversationCommand) {
+                    it.creator.handle(e, BotUser.getUserOrRegister(e.sender.id), it)
+                } else {
+                    it.handle(e, BotUser.getUserOrRegister(e.sender.id), it)
+                }
             }
         }
 

@@ -26,9 +26,28 @@ class RollSession(
     val keyWord: String,
     val rollStarter: Long,
     val count: Int,
-) : Session(target, RollCommand::class.java, silent = true) {
+) : Session(target, RollCommand(), silent = true) {
     override fun handle(event: MessageEvent, user: BotUser, session: Session) {
-        handle(event, user, session)
+        if (session is RollSession && event is GroupMessageEvent) {
+            if (LocalDateTime.now().minusMinutes(session.stopAfterMinute.toLong()).isAfter(session.createdTime)) {
+                generateResult(session, event)
+                SessionHandler.removeSession(session)
+                return
+            }
+
+            if (session.rollStarter == event.sender.id) return
+
+            if (session.keyWord.isEmpty()) {
+                session.users.add(SessionUser(event.sender.id))
+                return
+            }
+
+            val message = event.message.contentToString()
+
+            if (session.keyWord == message) {
+                session.users.add(SessionUser(event.sender.id))
+            }
+        }
     }
 
     fun getRandomUser(): SessionUser {
@@ -49,73 +68,49 @@ class RollSession(
         throw RuntimeException("Cannot found random user in Roll: ${users.size}")
     }
 
-    companion object {
-        fun handleInput(event: MessageEvent, session: Session) {
-            if (session is RollSession && event is GroupMessageEvent) {
-                if (LocalDateTime.now().minusMinutes(session.stopAfterMinute.toLong()).isAfter(session.createdTime)) {
-                    generateResult(session, event)
-                    SessionHandler.removeSession(session)
-                    return
+
+    private fun generateResult(session: RollSession, event: GroupMessageEvent) {
+        val group = event.bot.getGroup(session.target.groupId)
+
+        if (group == null) {
+            BotVariables.daemonLogger.warning("推送开奖消息失败: 找不到对应的群[${group}]")
+        } else {
+            var winnerText = messageChainOf()
+            val winners = session.getWinningUsers()
+
+            if (winners.isEmpty()) {
+                runBlocking {
+                    group.sendMessage(CometUtil.toChain("没有人参加抽奖, 本次抽奖已结束..."))
                 }
+                return
+            }
 
-                if (session.rollStarter == event.sender.id) return
-
-                if (session.keyWord.isEmpty()) {
-                    session.users.add(SessionUser(event.sender.id))
-                    return
-                }
-
-                val message = event.message.contentToString()
-
-                if (session.keyWord == message) {
-                    session.users.add(SessionUser(event.sender.id))
-                }
+            winners.forEach { su ->
+                winnerText = winnerText.plus(At(su.id))
+            }
+            GlobalScope.launch {
+                group.sendMessage(
+                    CometUtil.toChain(
+                        "由${group[session.rollStarter]?.nameCardOrNick}发起的抽奖开奖了!\n" +
+                                "奖品: ${session.rollItem}\n" +
+                                "中奖者: "
+                    ) + winnerText
+                )
             }
         }
+    }
 
-        private fun generateResult(session: RollSession, event: GroupMessageEvent) {
-            val group = event.bot.getGroup(session.target.groupId)
-
-            if (group == null) {
-                BotVariables.daemonLogger.warning("推送开奖消息失败: 找不到对应的群[${group}]")
-            } else {
-                var winnerText = messageChainOf()
-                val winners = session.getWinningUsers()
-
-                if (winners.isEmpty()) {
-                    runBlocking {
-                        group.sendMessage(CometUtil.toChain("没有人参加抽奖, 本次抽奖已结束..."))
-                    }
-                    return
-                }
-
-                winners.forEach { su ->
-                    winnerText = winnerText.plus(At(su.id))
-                }
-                GlobalScope.launch {
-                    group.sendMessage(
-                        CometUtil.toChain(
-                            "由${group[session.rollStarter]?.nameCardOrNick}发起的抽奖开奖了!\n" +
-                                    "奖品: ${session.rollItem}\n" +
-                                    "中奖者: "
-                        ) + winnerText
-                    )
-                }
-            }
+    private fun RollSession.getWinningUsers(): List<SessionUser> {
+        if (users.isEmpty()) {
+            return emptyList()
         }
 
-        private fun RollSession.getWinningUsers(): List<SessionUser> {
-            if (users.isEmpty()) {
-                return emptyList()
-            }
+        val winners = mutableListOf<SessionUser>()
 
-            val winners = mutableListOf<SessionUser>()
-
-            for (i in 0 until count) {
-                winners.add(getRandomUser())
-            }
-
-            return winners
+        for (i in 0 until count) {
+            winners.add(getRandomUser())
         }
+
+        return winners
     }
 }

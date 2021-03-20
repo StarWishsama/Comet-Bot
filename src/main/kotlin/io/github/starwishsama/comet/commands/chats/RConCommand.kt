@@ -4,6 +4,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
@@ -23,7 +24,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
 
 @CometCommand
-class RConCommand : ChatCommand {
+class RConCommand : ChatCommand, ConversationCommand {
     private val waitList = mutableMapOf<BotUser, Int>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
@@ -34,16 +35,11 @@ class RConCommand : ChatCommand {
                 when (args[0]) {
                     "setup" -> {
                         SessionHandler.insertSession(
-                            object : Session(
+                            Session(
                                 SessionTarget(user.id),
-                                this::class.java,
+                                this,
                                 false
-                            ) {
-                                override fun handle(event: MessageEvent, user: BotUser, session: Session) {
-                                    this@RConCommand.handleInput(event, user, session)
-                                }
-
-                            })
+                            ))
                         return CometUtil.toChain("请在下一条消息发送 rCon 连接地址")
                     }
                     "cmd", "exec", "命令" -> {
@@ -80,7 +76,7 @@ class RConCommand : ChatCommand {
         还可以使用 mc, 执行命令 作为等效命令.
     """.trimIndent()
 
-    private fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
+    override fun handle(event: MessageEvent, user: BotUser, session: Session) {
         if (event.message.contentToString().contains("退出")) {
             waitList.remove(user)
             SessionHandler.removeSession(session)
