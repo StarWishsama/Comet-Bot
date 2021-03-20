@@ -71,8 +71,7 @@ object CometUtil {
             for (i in startAt until size) {
                 append(this@getRestString[i]).append(joinRune)
             }
-            trim()
-        }
+        }.trim().removeSuffix(joinRune)
     }
 
     @ExperimentalTime
