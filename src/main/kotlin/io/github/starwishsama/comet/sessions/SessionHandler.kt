@@ -79,12 +79,12 @@ object SessionHandler {
             }
         }
 
-        if (sessionToHandle.count() > 0) {
+        if (sessionPool.stream().filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }.count() > 0) {
             BotVariables.logger.debug(
                 "[会话] 处理 ${sessionToHandle.count()} 个会话耗时 ${time.getLastingTimeAsString(unit = TimeUnit.SECONDS, msMode = true)}"
             )
         }
 
-        return sessionToHandle.filter { !it.silent }.count() > 0
+        return sessionPool.stream().filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId && !it.silent }.count() > 0
     }
 }
