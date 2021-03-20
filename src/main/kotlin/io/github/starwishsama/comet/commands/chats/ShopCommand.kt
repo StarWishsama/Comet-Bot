@@ -3,16 +3,13 @@ package io.github.starwishsama.comet.commands.chats
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.api.command.interfaces.SuspendCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.sessions.Session
-import io.github.starwishsama.comet.sessions.SessionManager
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 @CometCommand
-class ShopCommand : ChatCommand, SuspendCommand {
+class ShopCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         TODO("Shop command's priority is ultra low, sry :/")
     }
@@ -25,8 +22,4 @@ class ShopCommand : ChatCommand, SuspendCommand {
         /shop buy 购买商品
         /shop put 上架商品
     """.trimIndent()
-
-    override fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
-        SessionManager.expireSession(session)
-    }
 }

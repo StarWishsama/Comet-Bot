@@ -4,12 +4,12 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.api.command.interfaces.SuspendCommand
 import io.github.starwishsama.comet.enums.PicSearchApiType
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
-import io.github.starwishsama.comet.sessions.SessionManager
+import io.github.starwishsama.comet.sessions.SessionHandler
+import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.network.PictureSearchUtil
 import kotlinx.coroutines.runBlocking
@@ -21,13 +21,15 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import java.util.*
 
 @CometCommand
-class PictureSearchCommand : ChatCommand, SuspendCommand {
-
+class PictureSearchCommand : ChatCommand {
     @OptIn(MiraiExperimentalApi::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (args.isEmpty()) {
-            if (!SessionManager.isValidSessionById(event.sender.id)) {
-                SessionManager.addSession(Session(this, user.id))
+            if (!SessionHandler.hasSessionByID(event.sender.id, this::class.java)) {
+                SessionHandler.insertSession(Session(SessionTarget(privateId = event.sender.id), this::class.java, true) {
+                        e: MessageEvent, _: BotUser, session: Session ->
+                    handle(e, session)
+                })
             }
 
             val img = event.message[Image] ?: return toChain("请发送需要搜索的图片")
@@ -65,15 +67,15 @@ class PictureSearchCommand : ChatCommand, SuspendCommand {
     """.trimIndent()
 
     @OptIn(MiraiExperimentalApi::class)
-    override fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
-        SessionManager.expireSession(session)
+    fun handle(event: MessageEvent, session: Session) {
+        SessionHandler.removeSession(session)
         val image = event.message[Image]
         runBlocking {
             if (image != null) {
                 event.subject.sendMessage("请稍等...")
                 event.subject.sendMessage(handlePicSearch(image.queryUrl()))
             } else {
-                event.subject.sendMessage("请发送图片!")
+                event.subject.sendMessage("请发送图片! 输入 /ps 重新搜索.")
             }
         }
     }

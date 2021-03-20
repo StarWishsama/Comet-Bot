@@ -4,11 +4,11 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.api.command.interfaces.SuspendCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
-import io.github.starwishsama.comet.sessions.SessionManager
+import io.github.starwishsama.comet.sessions.SessionHandler
+import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.startup.CometRuntime
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
@@ -23,17 +23,24 @@ import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
 
 @CometCommand
-class RConCommand : ChatCommand, SuspendCommand {
+class RConCommand : ChatCommand {
     private val waitList = mutableMapOf<BotUser, Int>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (user.hasPermission(getProps().permission)) {
             if (args.isEmpty()) {
                 return getHelp().convertToChain()
-            } else {
+            } else if (SessionHandler.hasSessionByID(event.sender.id, this::class.java)) {
                 when (args[0]) {
                     "setup" -> {
-                        SessionManager.addSession(Session(this, user.id))
+                        SessionHandler.insertSession(
+                            Session(
+                                SessionTarget(user.id),
+                                this::class.java,
+                                false
+                            ) { e: MessageEvent, u: BotUser, session: Session ->
+                                handleInput(e, u, session)
+                            })
                         return CometUtil.toChain("请在下一条消息发送 rCon 连接地址")
                     }
                     "cmd", "exec", "命令" -> {
@@ -60,7 +67,8 @@ class RConCommand : ChatCommand, SuspendCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps = CommandProps("rcon", arrayListOf("执行命令"), "远程遥控MC服务器", "nbot.commands.rcon", UserLevel.USER)
+    override fun getProps(): CommandProps =
+        CommandProps("rcon", arrayListOf("执行命令"), "远程遥控MC服务器", "nbot.commands.rcon", UserLevel.USER)
 
     override fun getHelp(): String = """
         /rcon setup(设置) 设置 rCon 参数
@@ -69,10 +77,10 @@ class RConCommand : ChatCommand, SuspendCommand {
         还可以使用 mc, 执行命令 作为等效命令.
     """.trimIndent()
 
-    override fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
+    private fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
         if (event.message.contentToString().contains("退出")) {
             waitList.remove(user)
-            SessionManager.expireSession(session)
+            SessionHandler.removeSession(session)
             return
         }
 
@@ -86,12 +94,24 @@ class RConCommand : ChatCommand, SuspendCommand {
                 val port = event.message.contentToString()
                 if (port.isNumeric()) {
                     BotVariables.cfg.rConPort = event.message.contentToString().toInt()
-                    runBlocking { event.subject.sendMessage(CometUtil.toChain("设置密码成功!\n请在下一条消息发送 rCon 密码\n" +
-                            "如果需要退出设置 请回复退出")) }
+                    runBlocking {
+                        event.subject.sendMessage(
+                            CometUtil.toChain(
+                                "设置密码成功!\n请在下一条消息发送 rCon 密码\n" +
+                                        "如果需要退出设置 请回复退出"
+                            )
+                        )
+                    }
                     waitList[user] = 2
                 } else {
-                    runBlocking { event.subject.sendMessage(CometUtil.toChain("不是有效的端口\n" +
-                            "如果需要退出设置 请回复退出")) }
+                    runBlocking {
+                        event.subject.sendMessage(
+                            CometUtil.toChain(
+                                "不是有效的端口\n" +
+                                        "如果需要退出设置 请回复退出"
+                            )
+                        )
+                    }
                 }
             }
             2 -> {
@@ -99,7 +119,7 @@ class RConCommand : ChatCommand, SuspendCommand {
                 runBlocking { event.subject.sendMessage(CometUtil.toChain("设置 rCon 完成!")) }
                 CometRuntime.setupRCon()
                 waitList.remove(user)
-                SessionManager.expireSession(session)
+                SessionHandler.removeSession(session)
             }
         }
     }

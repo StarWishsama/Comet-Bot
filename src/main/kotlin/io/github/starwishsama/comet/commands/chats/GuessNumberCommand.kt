@@ -5,37 +5,28 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.api.command.interfaces.SuspendCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.sessions.Session
-import io.github.starwishsama.comet.sessions.SessionManager
+import io.github.starwishsama.comet.sessions.SessionHandler
+import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.sessions.commands.guessnumber.GuessNumberSession
-import io.github.starwishsama.comet.sessions.commands.guessnumber.GuessNumberUser
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
-import io.github.starwishsama.comet.utils.StringUtil.isNumeric
-import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.content
-import java.time.Duration
-import java.time.LocalDateTime
 
 @CometCommand
-class GuessNumberCommand : ChatCommand, SuspendCommand {
+class GuessNumberCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (event is GroupMessageEvent) {
-            val session = SessionManager.getSessionByGroup(event.group.id, GuessNumberSession::class.java)
-            if (session.exists()) {
+            if (SessionHandler.hasSessionByGroup(event.group.id, this::class.java)) {
                 when {
                     args.isEmpty() -> {
                         val answer = RandomUtil.randomInt(0, 100)
                         BotVariables.logger.info("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
-                        SessionManager.addSession(GuessNumberSession(event.group.id, RandomUtil.randomInt(0, 101)))
+                        SessionHandler.insertSession(GuessNumberSession(SessionTarget(event.group.id), RandomUtil.randomInt(0, 101)))
                         return CometUtil.toChain("来猜个数字吧! 范围 [0, 100]")
                     }
                     args.size == 2 -> {
@@ -50,7 +41,7 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
                         }
                         val answer = RandomUtil.randomInt(min, max + 1)
                         BotVariables.logger.info("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
-                        SessionManager.addSession(GuessNumberSession(event.group.id, RandomUtil.randomInt(0, 100)))
+                        SessionHandler.insertSession(GuessNumberSession(SessionTarget(event.group.id), answer))
                         return CometUtil.toChain("猜一个数字吧! 范围 [$min, $max]")
                     }
                     else -> {
@@ -71,52 +62,4 @@ class GuessNumberCommand : ChatCommand, SuspendCommand {
         /csz 猜数字
         /csz [最小值] [最大值] 猜指定范围内的数字
     """.trimIndent()
-
-    override fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
-        val trueAnswer = (session as GuessNumberSession).answer
-        session.lastAnswerTime = LocalDateTime.now()
-        val answer = event.message.content
-        var gnUser = session.getGuessNumberUser(user.id)
-
-        if (answer.isNumeric()) {
-            val answerInInt = answer.toInt()
-
-            if (gnUser == null) {
-                gnUser = GuessNumberUser(event.sender.id, event.sender.nameCardOrNick)
-                session.users += gnUser
-            }
-
-            gnUser.guessTime += 1
-
-            runBlocking {
-                when {
-                    answerInInt > trueAnswer -> {
-                        event.subject.sendMessage(CometUtil.toChain("你猜的数字大了"))
-                    }
-                    answerInInt < trueAnswer -> {
-                        event.subject.sendMessage(CometUtil.toChain("你猜的数字小了"))
-                    }
-                    answerInInt == trueAnswer -> {
-                        session.usedTime = Duration.between(session.startTime, LocalDateTime.now())
-                        val sb =
-                            StringBuilder(CometUtil.sendMessageAsString("${event.sender.nameCardOrNick} 猜对了!\n总用时: ${session.usedTime.seconds}s\n\n"))
-                        val list = session.users.sortedBy { (it as GuessNumberUser).guessTime }
-                        list.forEach {
-                            sb.append((it as GuessNumberUser).username).append(" ").append(it.guessTime).append("次\n")
-                        }
-                        event.subject.sendMessage(sb.toString().trim())
-                        SessionManager.expireSession(session)
-                    }
-                    else -> throw RuntimeException("Impossible")
-                }
-            }
-        } else {
-            when (answer) {
-                "不玩了", "结束游戏", "退出游戏" -> {
-                    SessionManager.expireSession(session)
-                    runBlocking { event.subject.sendMessage(CometUtil.sendMessageAsString("游戏已结束")) }
-                }
-            }
-        }
-    }
 }

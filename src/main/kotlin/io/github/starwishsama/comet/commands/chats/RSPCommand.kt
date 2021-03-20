@@ -4,11 +4,11 @@ import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.api.command.interfaces.SuspendCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.Session
-import io.github.starwishsama.comet.sessions.SessionManager
+import io.github.starwishsama.comet.sessions.SessionHandler
+import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.MessageEvent
@@ -17,14 +17,18 @@ import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import java.time.LocalDateTime
 
 @CometCommand
-class RSPCommand : ChatCommand, SuspendCommand {
+class RSPCommand : ChatCommand {
     /**
      * 储存正在石头剪刀布的用户
      */
     private val inProgressPlayer = mutableSetOf<Long>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        SessionManager.addSession(Session(this, user.id))
+        if (SessionHandler.hasSessionByID(event.sender.id, this::class.java))
+        SessionHandler.insertSession(Session(SessionTarget(0, event.sender.id), this::class.java, false){
+                e: MessageEvent, u: BotUser, session: Session ->
+            handleInput(e, u, session)
+        })
         return "石头剪刀布... 开始! 你要出什么呢?".toChain()
     }
 
@@ -32,9 +36,9 @@ class RSPCommand : ChatCommand, SuspendCommand {
 
     override fun getHelp(): String = "/cq 石头剪刀布"
 
-    override fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
-        if (LocalDateTime.now().minusMinutes(1L).isBefore(session.startTime)) {
-            SessionManager.expireSession(session)
+    private fun handleInput(event: MessageEvent, user: BotUser, session: Session) {
+        if (LocalDateTime.now().minusMinutes(1L).isBefore(session.createdTime)) {
+            SessionHandler.removeSession(session)
             return
         }
 
@@ -58,7 +62,7 @@ class RSPCommand : ChatCommand, SuspendCommand {
                     }
 
                     if (gameStatus in -1..1) {
-                        SessionManager.expireSession(session)
+                        SessionHandler.removeSession(session)
                     }
                 } else {
                     runBlocking { event.subject.sendMessage(event.message.quote() + toChain("你的拳法杂乱无章, 这合理吗?")) }

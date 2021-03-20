@@ -3,12 +3,9 @@ package io.github.starwishsama.comet.api.command
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
-import io.github.starwishsama.comet.api.command.interfaces.SuspendCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.sessions.DaemonSession
-import io.github.starwishsama.comet.sessions.Session
-import io.github.starwishsama.comet.sessions.SessionManager
+import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
@@ -22,8 +19,6 @@ import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.message.data.*
 import java.time.LocalDateTime
 import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.streams.toList
 
 /**
  * 彗星 Bot 命令处理器
@@ -77,10 +72,6 @@ object CommandExecutor {
         }
     }
 
-
-    /**
-     * FIXME: 考虑多个 Comet 机器人在群内的问题, 优先处理原则
-     */
     fun startHandler(bot: Bot) {
         bot.eventChannel.subscribeMessages {
             always {
@@ -115,25 +106,23 @@ object CommandExecutor {
      * @param event Mirai 消息命令 (聊天)
      */
     suspend fun dispatchCommand(event: MessageEvent): ExecutedResult {
-        val executedTime = LocalDateTime.now()
         val senderId = event.sender.id
         val message = event.message.contentToString()
 
         val cmd = getCommand(getCommandName(message))
 
-        val debug = cmd?.getProps()?.name?.contentEquals("debug") == true
+        val useDebug = cmd?.getProps()?.name?.contentEquals("debug") == true
 
         val user = BotUser.getUserOrRegister(senderId)
 
-        if (BotVariables.switch || debug) {
+        if (BotVariables.switch || useDebug) {
             try {
-                val session = SessionManager.getSessionByEvent(event)
 
                 /**
                  * 如果不是监听会话, 则停止尝试解析并执行可能的命令
                  * 反之在监听时仍然可以执行命令
                  */
-                if (session.exists() && !handleSession(session.sessionList, event, executedTime, user)) {
+                if (SessionHandler.handleSessions(event)) {
                     return ExecutedResult(EmptyMessageChain, cmd, CommandStatus.MoveToSession())
                 }
 
@@ -149,7 +138,7 @@ object CommandExecutor {
                     }
                 }
 
-                val prefix = hasCommandPrefix(message)
+                val prefix = getCommandPrefix(message)
 
                 if (prefix.isNotEmpty() && cmd != null) {
                     // 前缀末尾下标
@@ -211,42 +200,6 @@ object CommandExecutor {
         return ""
     }
 
-    /**
-     * 处理会话
-     * @return 是否为监听会话
-     */
-    private fun handleSession(sessions: List<Session>, event: MessageEvent, time: LocalDateTime, user: BotUser): Boolean {
-        if (hasCommandPrefix(event.message.contentToString()).isEmpty()) {
-            val hasDaemonSession = sessions.parallelStream().filter { it is DaemonSession }.toList()
-
-            if (hasDaemonSession.isEmpty()) {
-                return false
-            } else {
-                hasDaemonSession.forEach {
-                    if (it !is DaemonSession) {
-                        return@forEach
-                    }
-
-
-                    if ((event is GroupMessageEvent && it.groupId == event.group.id) || it.groupId == -1L) {
-                        val command = it.command
-
-                        if (command is SuspendCommand) {
-                            command.handleInput(event, user, it)
-                        }
-                    }
-                }
-
-                return true
-            }
-        }
-
-        BotVariables.logger.debug(
-                "[会话] 处理会话耗时 ${time.getLastingTimeAsString(unit = TimeUnit.SECONDS, msMode = true)}"
-        )
-        return true
-    }
-
     fun getCommand(cmdPrefix: String): ChatCommand? {
         val command = commands.parallelStream().filter {
             isCommandNameEquals(it, cmdPrefix)
@@ -265,7 +218,7 @@ object CommandExecutor {
     }
 
     private fun getCommandName(message: String): String {
-        val cmdPrefix = hasCommandPrefix(message)
+        val cmdPrefix = getCommandPrefix(message)
 
         val index = message.indexOf(cmdPrefix) + cmdPrefix.length
 
@@ -277,7 +230,7 @@ object CommandExecutor {
      *
      * @return 消息前缀, 不匹配返回空
      */
-    private fun hasCommandPrefix(message: String): String {
+    fun getCommandPrefix(message: String): String {
         if (message.isNotEmpty()) {
             BotVariables.cfg.commandPrefix.forEach {
                 if (message.startsWith(it)) {

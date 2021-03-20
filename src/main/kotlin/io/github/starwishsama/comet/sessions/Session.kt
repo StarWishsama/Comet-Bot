@@ -1,36 +1,19 @@
 package io.github.starwishsama.comet.sessions
 
-import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import net.mamoe.mirai.contact.Member
+import io.github.starwishsama.comet.objects.BotUser
+import net.mamoe.mirai.event.events.MessageEvent
 import java.time.LocalDateTime
-import java.util.*
 
-
-/**
- * @author Nameless
- */
-open class Session(open var groupId: Long = 0, var command: ChatCommand, val startTime: LocalDateTime = LocalDateTime.now()) {
-    val users: MutableList<SessionUser> = LinkedList()
-
-    constructor(command: ChatCommand, id: Long) : this(-1, command) {
-        addUser(id)
-    }
+open class Session(
+    open val target: SessionTarget,
+    open val creator: Class<*>,
+    open val silent: Boolean = false,
+    open val handle: (MessageEvent, BotUser, Session) -> Unit = { me: MessageEvent, bu: BotUser, session: Session -> }
+) {
+    val users: MutableSet<SessionUser> = mutableSetOf()
+    val createdTime: LocalDateTime = LocalDateTime.now()
 
     override fun toString(): String {
-        return "Session#${hashCode()} {groupId=$groupId, command=${command.getProps().name}, usersCount=${users.size}}"
-    }
-
-    fun addUser(id: Long, name: String = "未知", member: Member? = null) {
-        users.add(SessionUser(id, name, member))
-    }
-
-    fun getUserByID(id: Long): SessionUser? {
-        val result = users.stream().filter { it.userId == id }.findAny()
-
-        return if (result.isPresent) {
-            result.get()
-        } else {
-            null
-        }
+        return "Session#${hashCode()} {target=$target, silent=${silent}, usersCount=${users.size}}"
     }
 }

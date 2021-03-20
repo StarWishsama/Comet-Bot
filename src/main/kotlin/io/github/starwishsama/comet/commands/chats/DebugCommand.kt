@@ -13,7 +13,7 @@ import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.task.HitokotoUpdater
-import io.github.starwishsama.comet.sessions.SessionManager
+import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.RuntimeUtil
@@ -49,7 +49,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                 "session" -> {
                     if (user.isBotOwner()) {
                         val sb = StringBuilder("目前活跃的会话列表: \n").apply {
-                            val sessions = SessionManager.getSessions()
+                            val sessions = SessionHandler.getSessions()
 
                             if (sessions.isEmpty()) {
                                 append("无")

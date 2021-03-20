@@ -8,7 +8,7 @@ import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.sessions.SessionManager
+import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.RuntimeUtil
 import kotlin.time.ExperimentalTime
@@ -20,7 +20,7 @@ class DebugCommand : ConsoleCommand {
         if (args.isNotEmpty()) {
             when (args[0]) {
                 "sessions" -> {
-                    val sessions = SessionManager.getSessions()
+                    val sessions = SessionHandler.getSessions()
                     return buildString {
                         append("目前活跃的会话列表: \n")
                         if (sessions.isEmpty()) {
@@ -44,20 +44,6 @@ class DebugCommand : ConsoleCommand {
                 "switch" -> {
                     BotVariables.switch = !BotVariables.switch
                     return "Bot > 维护模式已${if (!BotVariables.switch) "开启" else "关闭"}"
-                }
-                "session" -> {
-                    val sb = StringBuilder("目前活跃的会话列表: \n").apply {
-                        val sessions = SessionManager.getSessions()
-
-                        if (sessions.isEmpty()) {
-                            append("无")
-                        } else {
-                            for ((i, session) in sessions.withIndex()) {
-                                append(i + 1).append(" ").append(session.toString()).append("\n")
-                            }
-                        }
-                    }
-                    return sb.toString().trim()
                 }
                 else -> return getHelp()
             }
