@@ -4,6 +4,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
+import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import java.time.LocalDateTime
 import java.util.*
@@ -61,6 +62,14 @@ object SessionHandler {
     fun handleSessions(e: MessageEvent): Boolean {
         val time = LocalDateTime.now()
         val target = SessionTarget()
+
+        target.apply {
+            if (e is GroupMessageEvent) {
+                groupId = e.group.id
+            }
+
+            privateId = e.sender.id
+        }
 
         val sessionToHandle = sessionPool.stream().filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }
 
