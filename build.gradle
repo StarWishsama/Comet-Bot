@@ -117,6 +117,7 @@ shadowJar {
 compileKotlin {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
-        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses"]
+        // -Xuse-ir -> https://youtrack.jetbrains.com/issue/KT-44567
+        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses", "-Xuse-ir"]
     }
 }
