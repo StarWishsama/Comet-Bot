@@ -25,13 +25,17 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
     @OptIn(MiraiExperimentalApi::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (args.isEmpty()) {
-            if (!SessionHandler.hasSessionByID(event.sender.id, this::class.java)) {
-                SessionHandler.insertSession(Session(SessionTarget(privateId = event.sender.id), this, true))
+            val imageToSearch = event.message[Image]
+
+            if (imageToSearch == null) {
+                if (!SessionHandler.hasSessionByID(event.sender.id, this::class.java)) {
+                    SessionHandler.insertSession(Session(SessionTarget(privateId = event.sender.id), this, true))
+                }
+
+                return toChain("请发送需要搜索的图片")
             }
 
-            val img = event.message[Image] ?: return toChain("请发送需要搜索的图片")
-
-            return handlePicSearch(img.queryUrl()).toChain()
+            return handlePicSearch(imageToSearch.queryUrl()).toChain()
         } else if (args[0].contentEquals("source") && args.size > 1) {
             return try {
                 val api = PicSearchApiType.valueOf(args[1].toUpperCase(Locale.ROOT))

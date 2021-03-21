@@ -60,7 +60,7 @@ object SessionHandler {
      *
      * @param e 消息事件
      */
-    suspend fun handleSessions(e: MessageEvent): Boolean {
+    suspend fun handleSessions(e: MessageEvent, u: BotUser): Boolean {
         val time = LocalDateTime.now()
         val target = SessionTarget()
 
@@ -77,9 +77,9 @@ object SessionHandler {
         for (session in sessionToHandle.toList()) {
             if (session.silent || CommandExecutor.getCommandPrefix(e.message.contentToString()).isEmpty()) {
                 if (session.creator is ConversationCommand) {
-                    session.creator.handle(e, BotUser.getUserOrRegister(e.sender.id), session)
+                    session.creator.handle(e, u, session)
                 } else {
-                    session.handle(e, BotUser.getUserOrRegister(e.sender.id), session)
+                    session.handle(e, u, session)
                 }
             }
         }

@@ -122,7 +122,7 @@ object CommandExecutor {
                  * 如果不是监听会话, 则停止尝试解析并执行可能的命令
                  * 反之在监听时仍然可以执行命令
                  */
-                if (SessionHandler.handleSessions(event)) {
+                if (SessionHandler.handleSessions(event, user)) {
                     return ExecutedResult(EmptyMessageChain, cmd, CommandStatus.MoveToSession())
                 }
 
