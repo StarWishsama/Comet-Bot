@@ -19,7 +19,7 @@ plugins {
 }
 
 def mainClass = 'io.github.starwishsama.comet.CometApplication'
-def miraiVersion = '2.5-M2'
+def miraiVersion = '2.5-RC'
 
 jar {
     manifest {
@@ -96,9 +96,6 @@ dependencies {
     implementation 'com.rometools:rome-utils:1.15.0'
     implementation 'com.rometools:rome-fetcher:1.15.0'
 
-    // Selenium WebDriver @ https://www.selenium.dev/
-    //implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
-
     // Jline a Java library for handling console input @ https://github.com/jline/jline3
     implementation 'org.jline:jline:3.19.0'
 
@@ -112,13 +109,16 @@ dependencies {
 shadowJar {
     dependsOn(generateBuildConfig)
     zip64 true
+    exclude("META-INF/*.txt")
+    exclude("META-INF/*.md")
+    exclude("META-INF/CHANGES")
+    exclude("META-INF/LICENSE")
+    exclude("META-INF/NOTICE")
 }
 
 compileKotlin {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
         freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses"]
-        // https://youtrack.jetbrains.com/issue/KT-44567
-        useIR = false
     }
 }

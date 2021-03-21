@@ -100,7 +100,7 @@ class RollSession(
         }
     }
 
-    private fun RollSession.getWinningUsers(): List<SessionUser> {
+    private fun getWinningUsers(): List<SessionUser> {
         if (users.isEmpty()) {
             return emptyList()
         }
