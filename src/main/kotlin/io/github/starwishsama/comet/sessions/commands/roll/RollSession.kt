@@ -9,9 +9,6 @@ import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.sessions.SessionUser
 import io.github.starwishsama.comet.utils.CometUtil
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -27,7 +24,7 @@ class RollSession(
     val rollStarter: Long,
     val count: Int,
 ) : Session(target, RollCommand(), silent = true) {
-    override fun handle(event: MessageEvent, user: BotUser, session: Session) {
+    override suspend fun handle(event: MessageEvent, user: BotUser, session: Session) {
         if (session is RollSession && event is GroupMessageEvent) {
             if (LocalDateTime.now().minusMinutes(session.stopAfterMinute.toLong()).isAfter(session.createdTime)) {
                 generateResult(session, event)
@@ -69,7 +66,7 @@ class RollSession(
     }
 
 
-    private fun generateResult(session: RollSession, event: GroupMessageEvent) {
+    private suspend fun generateResult(session: RollSession, event: GroupMessageEvent) {
         val group = event.bot.getGroup(session.target.groupId)
 
         if (group == null) {
@@ -79,24 +76,21 @@ class RollSession(
             val winners = session.getWinningUsers()
 
             if (winners.isEmpty()) {
-                runBlocking {
-                    group.sendMessage(CometUtil.toChain("没有人参加抽奖, 本次抽奖已结束..."))
-                }
+                group.sendMessage(CometUtil.toChain("没有人参加抽奖, 本次抽奖已结束..."))
                 return
             }
 
             winners.forEach { su ->
                 winnerText = winnerText.plus(At(su.id))
             }
-            GlobalScope.launch {
-                group.sendMessage(
-                    CometUtil.toChain(
-                        "由${group[session.rollStarter]?.nameCardOrNick}发起的抽奖开奖了!\n" +
-                                "奖品: ${session.rollItem}\n" +
-                                "中奖者: "
-                    ) + winnerText
-                )
-            }
+
+            group.sendMessage(
+                CometUtil.toChain(
+                    "由${group[session.rollStarter]?.nameCardOrNick}发起的抽奖开奖了!\n" +
+                            "奖品: ${session.rollItem}\n" +
+                            "中奖者: "
+                ) + winnerText
+            )
         }
     }
 

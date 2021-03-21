@@ -13,7 +13,6 @@ import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.network.PictureSearchUtil
-import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
@@ -65,16 +64,15 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
     """.trimIndent()
 
     @OptIn(MiraiExperimentalApi::class)
-    override fun handle(event: MessageEvent, user: BotUser, session: Session) {
+    override suspend fun handle(event: MessageEvent, user: BotUser, session: Session) {
         SessionHandler.removeSession(session)
         val image = event.message[Image]
-        runBlocking {
-            if (image != null) {
-                event.subject.sendMessage("请稍等...")
-                event.subject.sendMessage(handlePicSearch(image.queryUrl()))
-            } else {
-                event.subject.sendMessage("请发送图片! 输入 /ps 重新搜索.")
-            }
+
+        if (image != null) {
+            event.subject.sendMessage("请稍等...")
+            event.subject.sendMessage(handlePicSearch(image.queryUrl()))
+        } else {
+            event.subject.sendMessage("请发送图片! 输入 /ps 重新搜索.")
         }
     }
 

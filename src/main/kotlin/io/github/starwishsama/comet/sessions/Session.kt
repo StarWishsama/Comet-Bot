@@ -17,6 +17,6 @@ open class Session(
         return "Session#${hashCode()} {target=$target, silent=${silent}, usersCount=${users.size}}"
     }
 
-    open fun handle(event: MessageEvent, user: BotUser, session: Session) {
+    open suspend fun handle(event: MessageEvent, user: BotUser, session: Session) {
     }
 }

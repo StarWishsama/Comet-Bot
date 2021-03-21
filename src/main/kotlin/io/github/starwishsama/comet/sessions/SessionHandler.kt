@@ -60,7 +60,7 @@ object SessionHandler {
      *
      * @param e 消息事件
      */
-    fun handleSessions(e: MessageEvent): Boolean {
+    suspend fun handleSessions(e: MessageEvent): Boolean {
         val time = LocalDateTime.now()
         val target = SessionTarget()
 
@@ -74,12 +74,12 @@ object SessionHandler {
 
         val sessionToHandle = sessionPool.stream().filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }
 
-        sessionToHandle.forEach {
-            if (it.silent || CommandExecutor.getCommandPrefix(e.message.contentToString()).isEmpty()) {
-                if (it.creator is ConversationCommand) {
-                    it.creator.handle(e, BotUser.getUserOrRegister(e.sender.id), it)
+        for (session in sessionToHandle.toList()) {
+            if (session.silent || CommandExecutor.getCommandPrefix(e.message.contentToString()).isEmpty()) {
+                if (session.creator is ConversationCommand) {
+                    session.creator.handle(e, BotUser.getUserOrRegister(e.sender.id), session)
                 } else {
-                    it.handle(e, BotUser.getUserOrRegister(e.sender.id), it)
+                    session.handle(e, BotUser.getUserOrRegister(e.sender.id), session)
                 }
             }
         }

@@ -11,7 +11,6 @@ import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.utils.CometUtil.toChain
-import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
@@ -34,7 +33,7 @@ class RSPCommand : ChatCommand, ConversationCommand {
 
     override fun getHelp(): String = "/cq 石头剪刀布"
 
-    override fun handle(event: MessageEvent, user: BotUser, session: Session) {
+    override suspend fun handle(event: MessageEvent, user: BotUser, session: Session) {
         if (LocalDateTime.now().minusMinutes(1L).isBefore(session.createdTime)) {
             SessionHandler.removeSession(session)
             return
@@ -50,20 +49,18 @@ class RSPCommand : ChatCommand, ConversationCommand {
 
                     val gameStatus = RockPaperScissors.isWin(player, system)
 
-                    runBlocking {
-                        when (RockPaperScissors.isWin(player, system)) {
-                            -1 -> event.subject.sendMessage(event.message.quote() + toChain("平局! 我出的是${system.display[0]}"))
-                            0 -> event.subject.sendMessage(event.message.quote() + toChain("你输了! 我出的是${system.display[0]}"))
-                            1 -> event.subject.sendMessage(event.message.quote() + toChain("你赢了! 我出的是${system.display[0]}"))
-                            else -> event.subject.sendMessage(event.message.quote() + toChain("这合理吗?"))
-                        }
+                    when (RockPaperScissors.isWin(player, system)) {
+                        -1 -> event.subject.sendMessage(event.message.quote() + toChain("平局! 我出的是${system.display[0]}"))
+                        0 -> event.subject.sendMessage(event.message.quote() + toChain("你输了! 我出的是${system.display[0]}"))
+                        1 -> event.subject.sendMessage(event.message.quote() + toChain("你赢了! 我出的是${system.display[0]}"))
+                        else -> event.subject.sendMessage(event.message.quote() + toChain("这合理吗?"))
                     }
 
                     if (gameStatus in -1..1) {
                         SessionHandler.removeSession(session)
                     }
                 } else {
-                    runBlocking { event.subject.sendMessage(event.message.quote() + toChain("你的拳法杂乱无章, 这合理吗?")) }
+                    event.subject.sendMessage(event.message.quote() + toChain("你的拳法杂乱无章, 这合理吗?"))
                 }
             } finally {
                 inProgressPlayer.remove(user.id)

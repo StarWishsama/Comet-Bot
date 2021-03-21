@@ -16,7 +16,6 @@ import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -76,7 +75,7 @@ class RConCommand : ChatCommand, ConversationCommand {
         还可以使用 mc, 执行命令 作为等效命令.
     """.trimIndent()
 
-    override fun handle(event: MessageEvent, user: BotUser, session: Session) {
+    override suspend fun handle(event: MessageEvent, user: BotUser, session: Session) {
         if (event.message.contentToString().contains("退出")) {
             waitList.remove(user)
             SessionHandler.removeSession(session)
@@ -86,36 +85,33 @@ class RConCommand : ChatCommand, ConversationCommand {
         when (waitList[user] ?: 0) {
             0 -> {
                 BotVariables.cfg.rConUrl = event.message.contentToString()
-                runBlocking { event.subject.sendMessage(CometUtil.sendMessageAsString("已设置 rCon 连接地址为 ${BotVariables.cfg.rConUrl}\n请在下一条消息发送 rCon 密码\n如果需要退出设置 请回复退出")) }
+                event.subject.sendMessage(CometUtil.sendMessageAsString("已设置 rCon 连接地址为 ${BotVariables.cfg.rConUrl}\n请在下一条消息发送 rCon 密码\n如果需要退出设置 请回复退出"))
                 waitList[user] = 1
             }
             1 -> {
                 val port = event.message.contentToString()
                 if (port.isNumeric()) {
                     BotVariables.cfg.rConPort = event.message.contentToString().toInt()
-                    runBlocking {
-                        event.subject.sendMessage(
-                            CometUtil.toChain(
-                                "设置密码成功!\n请在下一条消息发送 rCon 密码\n" +
-                                        "如果需要退出设置 请回复退出"
-                            )
+
+                    event.subject.sendMessage(
+                        CometUtil.toChain(
+                            "设置密码成功!\n请在下一条消息发送 rCon 密码\n" +
+                                    "如果需要退出设置 请回复退出"
                         )
-                    }
+                    )
                     waitList[user] = 2
                 } else {
-                    runBlocking {
-                        event.subject.sendMessage(
-                            CometUtil.toChain(
-                                "不是有效的端口\n" +
-                                        "如果需要退出设置 请回复退出"
-                            )
+                    event.subject.sendMessage(
+                        CometUtil.toChain(
+                            "不是有效的端口\n" +
+                                    "如果需要退出设置 请回复退出"
                         )
-                    }
+                    )
                 }
             }
             2 -> {
                 BotVariables.cfg.rConPassword = event.message.contentToString()
-                runBlocking { event.subject.sendMessage(CometUtil.toChain("设置 rCon 完成!")) }
+                event.subject.sendMessage(CometUtil.toChain("设置 rCon 完成!"))
                 CometRuntime.setupRCon()
                 waitList.remove(user)
                 SessionHandler.removeSession(session)

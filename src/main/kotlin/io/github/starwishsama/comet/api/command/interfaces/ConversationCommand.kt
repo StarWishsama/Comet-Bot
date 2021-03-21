@@ -10,5 +10,5 @@ import net.mamoe.mirai.event.events.MessageEvent
  * 支持接受输入内容并处理.
  */
 interface ConversationCommand {
-    fun handle(event: MessageEvent, user: BotUser, session: Session)
+    suspend fun handle(event: MessageEvent, user: BotUser, session: Session)
 }
