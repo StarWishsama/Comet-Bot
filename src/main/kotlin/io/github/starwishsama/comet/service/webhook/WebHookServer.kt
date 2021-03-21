@@ -19,8 +19,13 @@ class WebHookServer(port: Int, customSuffix: String) {
 
     init {
         server.createContext("/$customSuffix", GithubWebHookHandler())
-        server.setExecutor { }
-        netLogger.log(HinaLogLevel.Info, "服务器启动!", prefix = "WebHook")
+        netLogger.log(HinaLogLevel.Info, "已注册 Github WebHook 后缀: $customSuffix", prefix = "WebHook")
+        server.createContext("/test") { he ->
+            he.responseBody.write("Hello Comet!".toByteArray())
+            he.sendResponseHeaders(200, 0)
+            he.responseBody.close()
+        }
+        netLogger.log(HinaLogLevel.Info, "服务器启动! 运行在端口 $port", prefix = "WebHook")
         server.start()
     }
 
@@ -39,11 +44,6 @@ class GithubWebHookHandler: HttpHandler {
         netLogger.log(HinaLogLevel.Debug, "收到新事件", prefix = "WebHook")
 
         val request = String(he.requestBody.readBytes())
-
-        val response = "Success"
-        he.responseHeaders.add("content-type", "text/plain; charset=UTF-8")
-        he.responseBody.use { it.write(response.toByteArray()) }
-        he.sendResponseHeaders(200, response.length.toLong())
 
         if (!request.startsWith("payload")) {
             netLogger.log(HinaLogLevel.Debug, "无效请求", prefix = "WebHook")
@@ -67,6 +67,13 @@ class GithubWebHookHandler: HttpHandler {
             netLogger.log(HinaLogLevel.Debug,"推送 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")
         } catch (e: Exception) {
             netLogger.log(HinaLogLevel.Warn,"推送 WebHook 消息失败", e, prefix = "WebHook")
+        }
+
+        he.responseBody.use {
+            val response = "Success"
+            he.responseHeaders.add("content-type", "text/plain; charset=UTF-8")
+            it.write(response.toByteArray())
+            he.sendResponseHeaders(200, response.length.toLong())
         }
     }
 }

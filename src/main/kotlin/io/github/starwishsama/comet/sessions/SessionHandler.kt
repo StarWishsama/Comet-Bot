@@ -72,9 +72,15 @@ object SessionHandler {
             privateId = e.sender.id
         }
 
-        val sessionToHandle = sessionPool.stream().filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }
+        val sessionStream = sessionPool.stream().filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }
 
-        for (session in sessionToHandle.toList()) {
+        val sessionToHandle = sessionStream.toList()
+
+        if (sessionToHandle.isEmpty()) {
+            return false
+        }
+
+        for (session in sessionToHandle) {
             if (session.silent || CommandExecutor.getCommandPrefix(e.message.contentToString()).isEmpty()) {
                 if (session.creator is ConversationCommand) {
                     session.creator.handle(e, u, session)
@@ -86,7 +92,7 @@ object SessionHandler {
 
         if (sessionPool.stream().filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }.count() > 0) {
             BotVariables.logger.debug(
-                "[会话] 处理 ${sessionToHandle.count()} 个会话耗时 ${time.getLastingTimeAsString(unit = TimeUnit.SECONDS, msMode = true)}"
+                "[会话] 处理 ${sessionStream.count()} 个会话耗时 ${time.getLastingTimeAsString(unit = TimeUnit.SECONDS, msMode = true)}"
             )
         }
 

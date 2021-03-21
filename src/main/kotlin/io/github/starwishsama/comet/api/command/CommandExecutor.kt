@@ -105,7 +105,7 @@ object CommandExecutor {
      *
      * @param event Mirai 消息命令 (聊天)
      */
-    suspend fun dispatchCommand(event: MessageEvent): ExecutedResult {
+    private suspend fun dispatchCommand(event: MessageEvent): ExecutedResult {
         val senderId = event.sender.id
         val message = event.message.contentToString()
 

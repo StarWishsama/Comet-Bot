@@ -21,7 +21,7 @@ import net.mamoe.mirai.message.data.MessageChain
 class GuessNumberCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (event is GroupMessageEvent) {
-            if (SessionHandler.hasSessionByGroup(event.group.id, this::class.java)) {
+            if (!SessionHandler.hasSessionByGroup(event.group.id, this::class.java)) {
                 when {
                     args.isEmpty() -> {
                         val answer = RandomUtil.randomInt(0, 100)
