@@ -19,6 +19,7 @@ class WebHookServer(port: Int, customSuffix: String) {
 
     init {
         server.createContext("/$customSuffix", GithubWebHookHandler())
+        server.setExecutor { }
         netLogger.log(HinaLogLevel.Info, "服务器启动!", prefix = "WebHook")
         server.start()
     }
@@ -39,7 +40,10 @@ class GithubWebHookHandler: HttpHandler {
 
         val request = String(he.requestBody.readBytes())
 
-        he.sendResponseHeaders(200, 0)
+        val response = "Success"
+        he.responseHeaders.add("content-type", "text/plain; charset=UTF-8")
+        he.responseBody.use { it.write(response.toByteArray()) }
+        he.sendResponseHeaders(200, response.length.toLong())
 
         if (!request.startsWith("payload")) {
             netLogger.log(HinaLogLevel.Debug, "无效请求", prefix = "WebHook")
@@ -51,17 +55,18 @@ class GithubWebHookHandler: HttpHandler {
         val validate = mapper.readTree(payload).isUsable()
 
         if (validate) {
-            netLogger.log(HinaLogLevel.Debug, "解析请求失败, 回调的 JSON 不合法.\n${payload}", prefix = "WebHook")
+            netLogger.log(HinaLogLevel.Warn, "解析请求失败, 回调的 JSON 不合法.\n${payload}", prefix = "WebHook")
             return
         }
 
         try {
             val info = mapper.readValue<PushEvent>(payload)
             GithubPusher.push(info)
+            netLogger.log(HinaLogLevel.Debug,"推送 WebHook 消息成功", prefix = "WebHook")
         } catch (e: JsonParseException) {
             netLogger.log(HinaLogLevel.Debug,"推送 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")
         } catch (e: Exception) {
-            netLogger.log(HinaLogLevel.Debug,"推送 WebHook 消息失败", e, prefix = "WebHook")
+            netLogger.log(HinaLogLevel.Warn,"推送 WebHook 消息失败", e, prefix = "WebHook")
         }
     }
 }
