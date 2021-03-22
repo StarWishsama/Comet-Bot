@@ -13,7 +13,7 @@ buildscript {
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.4.31'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.31'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.32'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
     id("com.github.gmazzo.buildconfig") version("2.0.2")
 }
