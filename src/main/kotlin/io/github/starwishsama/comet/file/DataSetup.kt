@@ -1,28 +1,21 @@
 package io.github.starwishsama.comet.file
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.arkNight
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.LoggerInstances
-import io.github.starwishsama.comet.managers.GachaManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.config.DataFile
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.service.compatibility.CompatibilityService
+import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.utils.*
-import io.github.starwishsama.comet.utils.RuntimeUtil.getOsName
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import net.mamoe.mirai.Bot
 import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
-import java.io.IOException
 
 object DataSetup {
     private val userCfg: DataFile = DataFile(File(BotVariables.filePath, "users.json"), DataFile.FilePriority.HIGH) {
@@ -34,8 +27,9 @@ object DataSetup {
     private val cfgFile: DataFile = DataFile(File(BotVariables.filePath, "config.yml"), DataFile.FilePriority.HIGH) {
         it.writeString(Default.encodeToString(CometConfig()), isAppend = false)
     }
-    private val pcrData: DataFile = DataFile(File(FileUtil.getResourceFolder(), "pcr.json"), DataFile.FilePriority.NORMAL)
-    private val arkNightData: DataFile = DataFile(File(FileUtil.getResourceFolder(), "arkNights.json"), DataFile.FilePriority.NORMAL)
+    val pcrData: DataFile = DataFile(File(FileUtil.getResourceFolder(), "pcr.json"), DataFile.FilePriority.NORMAL)
+    private val arkNightData: DataFile =
+        DataFile(File(FileUtil.getResourceFolder(), "arkNights.json"), DataFile.FilePriority.NORMAL)
     private val perGroupFolder: DataFile = DataFile(FileUtil.getChildFolder("groups"), DataFile.FilePriority.NORMAL) {
         it.mkdirs()
     }
@@ -100,54 +94,7 @@ object DataSetup {
 
         loadLang()
 
-        if (pcrData.exists()) {
-            BotVariables.pcr.addAll(pcrData.file.parseAsClass())
-            daemonLogger.info("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个角色")
-        } else {
-            daemonLogger.info("未检测到公主连结游戏数据, 对应游戏抽卡模拟器将无法使用")
-            GachaManager.pcrUsable = false
-        }
-
-        try {
-            GachaUtil.arkNightDataCheck(arkNightData.file)
-        } catch (e: IOException) {
-            daemonLogger.warning("解析明日方舟游戏数据失败, ${e.message}\n注意: 数据来源于 Github, 国内用户无法下载请自行下载替换\n替换位置: ./res/arkNights.json\n链接: ${GachaUtil.arkNightData}")
-        }
-
-        if (arkNightData.exists()) {
-            @Suppress("UNCHECKED_CAST")
-            GachaUtil.hiddenOperators.addAll(Default.decodeMapFromString(
-                File(
-                    FileUtil.getResourceFolder(),
-                    "hidden_operators.yml"
-                ).getContext()
-            )["hiddenOperators"] as MutableList<String>)
-
-            mapper.readTree(arkNightData.file.getContext()).elements().forEach { t ->
-                arkNight.add(mapper.readValue(t.traverse()))
-            }
-
-            daemonLogger.info("成功载入明日方舟游戏数据, 共 (${arkNight.size - GachaUtil.hiddenOperators.size}/${arkNight.size}) 个")
-            if (cfg.arkDrawUseImage) {
-                if (System.getProperty("java.awt.headless") != "true" && getOsName().toLowerCase().contains("linux")) {
-                    daemonLogger.info("检测到 Linux 系统, 正在启用无头模式")
-                    System.setProperty("java.awt.headless", "true")
-                }
-
-                TaskUtil.runAsync {
-                    runBlocking {
-                        withContext(Dispatchers.IO) {
-                            GachaUtil.downloadArkNightsFile()
-                        }
-                    }
-                }
-            }
-        } else {
-            daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
-            GachaManager.arkNightUsable = false
-        }
-
-        daemonLogger.info("[配置] 成功载入配置文件")
+        GachaService.loadGachaData(arkNightData.file, pcrData.file)
     }
 
     private fun loadLang() {

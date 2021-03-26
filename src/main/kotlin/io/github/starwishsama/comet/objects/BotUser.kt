@@ -37,8 +37,8 @@ data class BotUser(
         checkInPoint += point
     }
 
-    fun addTime(time: Int) {
-        if (level == UserLevel.USER && commandTime <= 1000) {
+    fun addTime(time: Int, bypass: Boolean = false) {
+        if (level == UserLevel.USER && (commandTime <= 1000 || bypass)) {
             commandTime += time
         }
     }
@@ -47,7 +47,7 @@ data class BotUser(
         checkInPoint -= point
     }
 
-    fun plusDay(){
+    fun plusDay() {
         checkInTime++
     }
 

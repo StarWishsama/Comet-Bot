@@ -67,8 +67,8 @@ class AdminCommand : ConsoleCommand {
                         }
 
                         return if (time in 1..300) {
-                            users.parallelStream().forEach { it.commandTime = time }
-                            "成功重置所有用户的积分为 ${time}"
+                            users.forEach { it.value.commandTime = time }
+                            "成功重置所有用户的积分为 $time"
                         } else {
                             "输入的数字错误! 范围: (0, 300]"
                         }
@@ -83,7 +83,7 @@ class AdminCommand : ConsoleCommand {
                         }
 
                         return if (time in 1..10000) {
-                            users.parallelStream().forEach { it.commandTime += time }
+                            users.forEach { it.value.addTime(time, true) }
                             "成功给予所有 BotUser 积分 $time 点"
                         } else {
                             "输入的数字错误! 范围: (0, 10000]"

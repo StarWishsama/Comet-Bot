@@ -22,7 +22,7 @@ import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
 import io.github.starwishsama.comet.logger.HinaLogLevel
-import io.github.starwishsama.comet.managers.GachaManager
+import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.webhook.WebHookServer
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
@@ -79,7 +79,7 @@ object CometRuntime {
     fun setupBot(bot: Bot, logger: MiraiLogger) {
         setupRCon()
 
-        GachaManager.loadAllPools()
+        GachaService.loadAllPools()
 
         CommandExecutor.setupCommand(
             arrayOf(
@@ -185,11 +185,11 @@ object CometRuntime {
         /** 定时任务 */
         BackupHelper.scheduleBackup()
         TaskUtil.runScheduleTaskAsync(5, 5, TimeUnit.HOURS) {
-            BotVariables.users.forEach { it.addTime(100) }
+            BotVariables.users.forEach { it.value.addTime(100) }
         }
 
 
-        val pwd = BotVariables.cfg.biliPassword
+        val pwd = cfg.biliPassword
         val username = BotVariables.cfg.biliUserName
 
         TaskUtil.runAsync(5) {
@@ -197,7 +197,7 @@ object CometRuntime {
                 runBlocking {
                     withContext(Dispatchers.IO) {
                         try {
-                            val response = FakeClientApi.client.login(username = username, password = pwd)
+                            FakeClientApi.client.login(username = username, password = pwd)
                             daemonLogger.info("成功登录哔哩哔哩账号")
                         } catch (e: BilibiliApiException) {
                             when (e.commonResponse.code) {

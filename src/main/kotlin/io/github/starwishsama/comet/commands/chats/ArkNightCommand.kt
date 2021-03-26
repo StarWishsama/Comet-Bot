@@ -4,10 +4,10 @@ import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.managers.GachaManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
+import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.GachaUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
@@ -24,9 +24,13 @@ import org.apache.commons.lang3.StringUtils
 @CometCommand
 @Suppress("SpellCheckingInspection")
 class ArkNightCommand : ChatCommand {
-    var pool = GachaManager.getPoolsByType<ArkNightPool>()[0]
+    var pool = GachaService.getPoolsByType<ArkNightPool>()[0]
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+        if (!GachaService.isArkNightUsable()) {
+            return "还未下载明日方舟卡池数据, 无法使用".toChain()
+        }
+
         if (args.isNotEmpty()) {
             when (args[0]) {
                 "单次寻访", "1", "单抽" -> {
@@ -46,7 +50,9 @@ class ArkNightCommand : ChatCommand {
                         }.toChain()
                     } else {
                         val poolName = args[1]
-                        val pools = GachaManager.getPoolsByType<ArkNightPool>().parallelStream().filter { it.name == poolName }.findFirst()
+                        val pools =
+                            GachaService.getPoolsByType<ArkNightPool>().parallelStream().filter { it.name == poolName }
+                                .findFirst()
                         if (pools.isPresent) {
                             pool = pools.get()
                             "成功修改卡池为: ${pool.name}".toChain()
