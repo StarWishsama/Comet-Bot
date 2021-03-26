@@ -10,10 +10,10 @@ import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.LoggerInstances
 import io.github.starwishsama.comet.managers.GachaManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.config.DataFile
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
+import io.github.starwishsama.comet.service.compatibility.CompatibilityService
 import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.RuntimeUtil.getOsName
 import kotlinx.coroutines.Dispatchers
@@ -88,9 +88,11 @@ object DataSetup {
             it.debugMode = cfg.debugMode
         }
 
-        userCfg.file.parseAsClass<List<BotUser>>().forEach {
-            BotUser.addUser(it)
+        if (CompatibilityService.checkUserData(userCfg.file)) {
+            BotVariables.users.putAll(userCfg.file.parseAsClass())
         }
+
+        daemonLogger.info("已加载了 ${BotVariables.users.size} 个用户数据.")
 
         BotVariables.shop.addAll(shopItemCfg.file.parseAsClass())
 
@@ -180,10 +182,10 @@ object DataSetup {
                         }
                     } else {
                         try {
-                            if (ConfigConverter.convertOldGroupConfig(loc)) {
+                            if (CompatibilityService.checkConfigFile(loc)) {
                                 return@forEach
                             } else {
-                                loc.parseAsClass(BotVariables.mapper)
+                                loc.parseAsClass(mapper)
                             }
                         } catch (e: Exception) {
                             daemonLogger.warning("检测到 ${group.id} 的群配置异常, 正在重新生成...")
@@ -212,7 +214,7 @@ object DataSetup {
         GroupConfigManager.getAllConfigs().forEach {
             val loc = File(perGroupFolder.file, "${it.id}.json")
             if (!loc.exists()) loc.createNewFile()
-            loc.writeClassToJson(it, BotVariables.mapper)
+            loc.writeClassToJson(it, mapper)
         }
 
         daemonLogger.info("已保存所有群配置")

@@ -120,7 +120,7 @@ object BotVariables {
     lateinit var log: File
 
     val shop: MutableList<Shop> = LinkedList()
-    val users: MutableList<BotUser> = LinkedList()
+    val users: MutableMap<Long, BotUser> = hashMapOf()
     lateinit var localizationManager: LocalizationManager
     var hitokoto: Hitokoto? = null
 

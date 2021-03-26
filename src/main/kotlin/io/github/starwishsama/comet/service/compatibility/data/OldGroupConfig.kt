@@ -1,11 +1,12 @@
-package io.github.starwishsama.comet.objects.config
+package io.github.starwishsama.comet.service.compatibility.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.push.YoutubeUser
 
-data class OldVersionTestObject(
+data class VersionTestObject(
     /**
-     * bilibili 订阅列表
+     * 配置文件版本号
      */
     @JsonProperty("version")
     val version: String

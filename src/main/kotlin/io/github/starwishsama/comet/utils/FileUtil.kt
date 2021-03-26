@@ -100,14 +100,22 @@ fun File.filesCount(): Int {
     return files.size
 }
 
+fun File.copyAndRename(name: String) {
+    require(exists()) { "$name 不存在" }
+
+    if (isDirectory) return
+
+    val backup = File(parent, name)
+    backup.createNewFile()
+    Files.copy(toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING)
+}
+
 fun File.createBackupFile() {
     require(exists()) { "$name 不存在" }
 
     if (isDirectory) return
 
-    val backup = File(parent, "$name.backup")
-    backup.createNewFile()
-    Files.copy(toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING)
+    copyAndRename("$name.backup")
 }
 
 object FileUtil {
