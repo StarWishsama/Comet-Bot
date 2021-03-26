@@ -84,8 +84,6 @@ object SessionHandler {
             if (session.silent || CommandExecutor.getCommandPrefix(e.message.contentToString()).isEmpty()) {
                 if (session.creator is ConversationCommand) {
                     session.creator.handle(e, u, session)
-                } else {
-                    session.handle(e, u, session)
                 }
             }
         }
