@@ -56,7 +56,7 @@ object DataSetup {
         } catch (e: Exception) {
             brokenConfig = true
             e.message?.let { FileUtil.createErrorReportFile("加载配置文件失败, 部分配置文件将会立即创建备份\n", "resource", e, "", it) }
-            daemonLogger.debug("加载配置文件失败", e)
+            throw e
         } finally {
             if (brokenConfig) {
                 cfgFile.file.createBackupFile()
@@ -92,15 +92,10 @@ object DataSetup {
 
         FileUtil.initResourceFile()
 
-        loadLang()
+        BotVariables.localizationManager = LocalizationManager()
 
         GachaService.loadGachaData(arkNightData.file, pcrData.file)
     }
-
-    private fun loadLang() {
-        BotVariables.localizationManager = LocalizationManager()
-    }
-
 
     fun saveAllResources() {
         daemonLogger.info("[数据] 自动保存数据完成")
@@ -146,8 +141,7 @@ object DataSetup {
                     }
                     GroupConfigManager.addConfig(cfg)
                 }
-            }
-            catch (e: RuntimeException) {
+            } catch (e: RuntimeException) {
                 BotVariables.logger.warning("[配置] 在加载 ${group.id} 的分群配置时出现了问题", e)
             }
         }
