@@ -47,7 +47,7 @@ object DataSetup {
                     it.initAction(it.file)
                 }
             } catch (e: RuntimeException) {
-                daemonLogger.warning("在初始化文件时出现了意外", e)
+                daemonLogger.warning("在初始化文件 ${it.file.name} 时出现了意外", e)
             }
         }
 
