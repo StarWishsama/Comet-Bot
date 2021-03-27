@@ -128,7 +128,7 @@ object GachaUtil {
     fun checkHasGachaTime(user: BotUser, time: Int): Boolean =
         (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
 
-    fun downloadArkNightsFile() {
+    fun downloadArkNightImage() {
         val arkLoc = FileUtil.getResourceFolder().getChildFolder("ark")
 
         if (arkLoc.filesCount() < arkNightPictureCount) {
@@ -151,7 +151,7 @@ object GachaUtil {
 
             // http://prts.wiki/images/f/ff/半身像_诗怀雅_1.png
 
-            downloadList.parallelStream().forEach { url ->
+            downloadList.forEach { url ->
                 val opName = URLDecoder.decode(url.split("/")[4].split("_")[1], Charsets.UTF_8)
 
                 if (arkNight.stream().filter { it.name == opName }.findFirst().isPresent) {

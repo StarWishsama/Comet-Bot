@@ -3,6 +3,7 @@ package io.github.starwishsama.comet.commands.chats
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.api.thirdparty.github.GithubApi
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
@@ -51,11 +52,18 @@ class GithubCommand: ChatCommand {
 
         val cfg = GroupConfigManager.getConfig(groupId) ?: return "该群聊尚未注册过 Comet!".toChain()
         val repos = cfg.githubRepoSubscribers
+
+        val authorAndRepo = repoName.split("/")
+
         return if (repos.contains(repoName)) {
             "你已经订阅过 $repoName 了".toChain()
         } else {
-            repos.add(repoName)
-            "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${BotVariables.cfg.webHookAddress} \n(设置为仅推送事件)".toChain()
+            if (GithubApi.isRepoExists(authorAndRepo[0], authorAndRepo[1])) {
+                repos.add(repoName)
+                "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${BotVariables.cfg.webHookAddress} \n(设置为仅推送事件)".toChain()
+            } else {
+                "仓库 $repoName 找不到或者没有权限访问!".toChain()
+            }
         }
     }
 

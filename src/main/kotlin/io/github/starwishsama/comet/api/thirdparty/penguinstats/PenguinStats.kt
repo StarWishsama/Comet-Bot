@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.api.thirdparty.penguinstats
 
+import io.github.starwishsama.comet.api.thirdparty.penguinstats.data.MatrixResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -23,5 +24,5 @@ interface PenguinStatsAPI {
         showClosedZone: Boolean = false,
         @Query("is_personal")
         isPersonal: Boolean = false
-    ): Call<okhttp3.Response>
+    ): MatrixResponse
 }

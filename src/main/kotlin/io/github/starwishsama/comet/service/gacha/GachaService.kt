@@ -166,7 +166,7 @@ object GachaService {
                 TaskUtil.runAsync {
                     runBlocking {
                         withContext(Dispatchers.IO) {
-                            GachaUtil.downloadArkNightsFile()
+                            GachaUtil.downloadArkNightImage()
                         }
                     }
                 }
