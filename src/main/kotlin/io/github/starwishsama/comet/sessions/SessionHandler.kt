@@ -90,7 +90,12 @@ object SessionHandler {
 
         if (sessionPool.stream().filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }.count() > 0) {
             BotVariables.logger.debug(
-                "[会话] 处理 ${sessionStream.count()} 个会话耗时 ${time.getLastingTimeAsString(unit = TimeUnit.SECONDS, msMode = true)}"
+                "[会话] 处理 ${sessionToHandle.count()} 个会话耗时 ${
+                    time.getLastingTimeAsString(
+                        unit = TimeUnit.SECONDS,
+                        msMode = true
+                    )
+                }"
             )
         }
 
