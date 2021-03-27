@@ -27,6 +27,10 @@ object GachaService {
     fun loadGachaData(arkNight: File, pcr: File) {
         loadArkNightData(arkNight)
         loadPCRData(pcr)
+
+        if (arkNightUsable) {
+            loadDefaultArkNightData()
+        }
     }
 
     fun loadAllPools() {
@@ -146,21 +150,11 @@ object GachaService {
         }
 
         if (data.exists()) {
-            @Suppress("UNCHECKED_CAST")
-            GachaUtil.hiddenOperators.addAll(
-                Yaml.decodeMapFromString(
-                    File(
-                        FileUtil.getResourceFolder(),
-                        "hidden_operators.yml"
-                    ).getContext()
-                )["hiddenOperators"] as MutableList<String>
-            )
-
             BotVariables.mapper.readTree(data).elements().forEach { t ->
                 BotVariables.arkNight.add(BotVariables.mapper.readValue(t.traverse()))
             }
 
-            BotVariables.daemonLogger.info("成功载入明日方舟游戏数据, 共 (${BotVariables.arkNight.size - GachaUtil.hiddenOperators.size}/${BotVariables.arkNight.size}) 个")
+            BotVariables.daemonLogger.info("成功载入明日方舟游戏数据, 共 ${BotVariables.arkNight.size} 个干员")
             if (BotVariables.cfg.arkDrawUseImage) {
                 if (System.getProperty("java.awt.headless") != "true" && RuntimeUtil.getOsName().toLowerCase()
                         .contains("linux")
@@ -183,5 +177,21 @@ object GachaService {
         }
 
         BotVariables.daemonLogger.info("[配置] 成功载入配置文件")
+    }
+
+    private fun loadDefaultArkNightData() {
+        val default = File(FileUtil.getResourceFolder(), "default_arknight.json")
+
+        if (!default.exists()) {
+            BotVariables.daemonLogger.warning("无法加载默认明日方舟数据: ${default.name} 不存在")
+        }
+
+        val node = BotVariables.mapper.readTree(default)
+
+        node.forEach {
+            it.forEach { inside ->
+                GachaConstants.arkNightDefault.add(inside.asText())
+            }
+        }
     }
 }

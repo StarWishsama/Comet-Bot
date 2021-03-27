@@ -15,6 +15,7 @@ import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
 import io.github.starwishsama.comet.objects.gacha.pool.PCRPool
+import io.github.starwishsama.comet.service.gacha.GachaConstants
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.json.isUsable
@@ -38,7 +39,6 @@ object GachaUtil {
     const val overTimeMessage = "抽卡次数到上限了, 可以少抽一点或者等待条数自动恢复哦~\n" +
             "命令条数现在每小时会恢复100次, 封顶1000次"
     var pictureReady = false
-    val hiddenOperators = mutableListOf<String>()
 
     /**
      * PRTS 实际保有干员半身立绘量
@@ -46,7 +46,8 @@ object GachaUtil {
     private const val arkNightPictureCount = 185
 
     private const val arkNightDataApi = "https://api.github.com/repos/Kengxxiao/ArknightsGameData"
-    const val arkNightData = "https://raw.fastgit.org/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json"
+    const val arkNightData =
+        "https://raw.fastgit.org/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json"
 
     fun combineGachaImage(gachaResult: List<GachaItem>, poolType: GachaPool): CombinedResult {
         require(gachaResult.isNotEmpty()) { "传入的抽卡结果列表不能为空!" }
@@ -95,11 +96,11 @@ object GachaUtil {
                 val imageHeight = bufferedImage.height
 
                 createGraphics.drawImage(
-                        bufferedImage.getScaledInstance(
-                                imageWidth,
-                                imageHeight,
-                                Image.SCALE_SMOOTH
-                        ), newBufferedImageWidth, 0, imageWidth, imageHeight, null
+                    bufferedImage.getScaledInstance(
+                        imageWidth,
+                        imageHeight,
+                        Image.SCALE_SMOOTH
+                    ), newBufferedImageWidth, 0, imageWidth, imageHeight, null
                 )
 
                 newBufferedImageWidth += imageWidth
@@ -125,7 +126,7 @@ object GachaUtil {
     }
 
     fun checkHasGachaTime(user: BotUser, time: Int): Boolean =
-            (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
+        (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
 
     fun downloadArkNightsFile() {
         val arkLoc = FileUtil.getResourceFolder().getChildFolder("ark")
@@ -139,7 +140,7 @@ object GachaUtil {
             val downloadList = mutableSetOf<String>()
 
             val ele = Jsoup.connect(
-                    "http://prts.wiki/w/PRTS:%E6%96%87%E4%BB%B6%E4%B8%80%E8%A7%88/%E5%B9%B2%E5%91%98%E7%B2%BE%E8%8B%B10%E5%8D%8A%E8%BA%AB%E5%83%8F"
+                "http://prts.wiki/w/PRTS:%E6%96%87%E4%BB%B6%E4%B8%80%E8%A7%88/%E5%B9%B2%E5%91%98%E7%B2%BE%E8%8B%B10%E5%8D%8A%E8%BA%AB%E5%83%8F"
             ).get().getElementsByClass("mw-parser-output")[0].select("a")
 
 
@@ -207,4 +208,6 @@ object GachaUtil {
     }
 
     fun arkPictureIsUsable(): Boolean = cfg.arkDrawUseImage && pictureReady
+
+    fun hasOperator(name: String): Boolean = GachaConstants.arkNightDefault.contains(name)
 }
