@@ -197,11 +197,11 @@ object GachaUtil {
         val updateTime = LocalDateTime.parse(result["updated_at"].asText(), DateTimeFormatter.ISO_DATE_TIME)
 
         if (isOld || (location.exists() && location.lastModified().toLocalDateTime() < updateTime)) {
-            daemonLogger.info("明日方舟干员数据有更新 (${yyMMddPattern.format(updateTime)}), 正在下载")
-            val data = NetUtil.downloadFile(FileUtil.getCacheFolder(), arkNightData, location.name)
-            Files.copy(data.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            daemonLogger.info("下载完成!")
-            data.delete()
+            TaskUtil.runAsync {
+                daemonLogger.info("明日方舟干员数据有更新 (${yyMMddPattern.format(updateTime)}), 正在下载")
+                NetUtil.downloadFile(FileUtil.getCacheFolder(), arkNightData, location.name)
+                daemonLogger.info("下载完成!")
+            }
         } else {
             daemonLogger.info("明日方舟干员数据为最新版本: ${yyMMddPattern.format(updateTime)}")
         }

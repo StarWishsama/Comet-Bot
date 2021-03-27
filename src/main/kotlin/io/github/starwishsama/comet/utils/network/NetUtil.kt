@@ -132,7 +132,7 @@ object NetUtil {
      * @param address  下载地址
      * @param downloadPath 下载文件储存的文件夹
      */
-    fun downloadFile(downloadPath: File, address: String): File {
+    private fun downloadFile(downloadPath: File, address: String): File {
         val url = URL(address)
         val conn = url.openConnection() as HttpURLConnection
 
