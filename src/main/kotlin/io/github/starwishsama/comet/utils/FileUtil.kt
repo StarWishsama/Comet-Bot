@@ -143,22 +143,14 @@ object FileUtil {
     }
 
     /**
-     * 初始化 Log 文件
+     * 获取当前 Log 文件
      *
      * @return log 文件位置
      */
-    fun initLog(): File? {
-        try {
-            val initTime = LocalDateTime.now()
-            val parent = getChildFolder("logs")
-            BotVariables.log = File(parent, "log-${dateFormatter.format(initTime)}.log")
-            BotVariables.log.createNewFile()
-            return BotVariables.log
-        } catch (e: IOException) {
-            daemonLogger.error("初始化 Log 文件失败")
-        }
-
-        return null
+    fun getLogLocation(): File {
+        val initTime = LocalDateTime.now()
+        val parent = getChildFolder("logs")
+        return File(parent, "log-${dateFormatter.format(initTime)}.log").also { it.createNewFile() }
     }
 
     /**

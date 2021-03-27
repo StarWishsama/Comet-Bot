@@ -117,7 +117,6 @@ object BotVariables {
         .setDateFormat(SimpleDateFormat("yyyy/MM/dd HH:mm:ss"))
 
     var rCon: Rcon? = null
-    lateinit var log: File
 
     val shop: MutableList<Shop> = LinkedList()
     val users: MutableMap<Long, BotUser> = hashMapOf()
@@ -141,18 +140,5 @@ object BotVariables {
         DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
     }
 
-    val client = OkHttpClient().newBuilder()
-        .connectTimeout(5, TimeUnit.SECONDS)
-        .followRedirects(true)
-        .readTimeout(5, TimeUnit.SECONDS)
-        .hostnameVerifier { _, _ -> true }
-        .also {
-            if (cfg.proxySwitch) {
-                if (NetUtil.checkProxyUsable()) {
-                    it.proxy(Proxy(cfg.proxyType, InetSocketAddress(cfg.proxyUrl, cfg.proxyPort)))
-                }
-            }
-        }
-        .addInterceptor(RetrofitLogger())
-        .build()
+    lateinit var client: OkHttpClient
 }

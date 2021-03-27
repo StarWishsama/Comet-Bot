@@ -22,6 +22,7 @@ import io.github.starwishsama.comet.file.BackupHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
 import io.github.starwishsama.comet.logger.HinaLogLevel
+import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.webhook.WebHookServer
@@ -31,6 +32,7 @@ import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.TaskUtil
+import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -38,6 +40,9 @@ import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.globalEventChannel
 import net.mamoe.mirai.utils.MiraiLogger
+import okhttp3.OkHttpClient
+import java.net.InetSocketAddress
+import java.net.Proxy
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
@@ -45,8 +50,7 @@ object CometRuntime {
     fun postSetup() {
         BotVariables.filePath = FileUtil.getJarLocation()
         BotVariables.startTime = LocalDateTime.now()
-        FileUtil.initLog()
-        BotVariables.loggerAppender = LoggerAppender(BotVariables.log)
+        BotVariables.loggerAppender = LoggerAppender(FileUtil.getLogLocation())
 
         Runtime.getRuntime().addShutdownHook(Thread { shutdownTask() })
 
@@ -64,6 +68,21 @@ object CometRuntime {
         )
 
         DataSetup.init()
+
+        BotVariables.client = OkHttpClient().newBuilder()
+            .connectTimeout(5, TimeUnit.SECONDS)
+            .followRedirects(true)
+            .readTimeout(5, TimeUnit.SECONDS)
+            .hostnameVerifier { _, _ -> true }
+            .also {
+                if (cfg.proxySwitch) {
+                    if (NetUtil.checkProxyUsable()) {
+                        it.proxy(Proxy(cfg.proxyType, InetSocketAddress(cfg.proxyUrl, cfg.proxyPort)))
+                    }
+                }
+            }
+            .addInterceptor(RetrofitLogger())
+            .build()
     }
 
     private fun shutdownTask(){
