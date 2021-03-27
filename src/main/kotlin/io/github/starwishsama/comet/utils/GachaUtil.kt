@@ -43,7 +43,7 @@ object GachaUtil {
     /**
      * PRTS 实际保有干员半身立绘量
      */
-    private const val arkNightPictureCount = 185
+    private const val arkNightPictureCount = 194
 
     private const val arkNightDataApi = "https://api.github.com/repos/Kengxxiao/ArknightsGameData"
     const val arkNightData =
