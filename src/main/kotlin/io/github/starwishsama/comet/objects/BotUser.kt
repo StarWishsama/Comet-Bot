@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.objects
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.enums.UserLevel
@@ -9,7 +10,7 @@ import java.time.LocalDateTime
 data class BotUser(
     @JsonProperty("userQQ")
     val id: Long,
-    var lastCheckInTime: LocalDateTime = LocalDateTime.MIN,
+    var lastCheckInTime: LocalDateTime = LocalDateTime.now(),
     var checkInPoint: Double = 0.0,
     var checkInTime: Int = 0,
     var bindServerAccount: String = "",
@@ -104,8 +105,10 @@ data class BotUser(
         }
 
         fun quickRegister(id: Long): BotUser {
-            val user = BotUser(id)
-            return BotVariables.users.putIfAbsent(id, user) ?: user
+            BotVariables.users[id].apply {
+                val register = BotUser(id)
+                return this ?: register.also { BotVariables.users.putIfAbsent(id, register) }
+            }
         }
 
         fun getUser(id: Long): BotUser? {

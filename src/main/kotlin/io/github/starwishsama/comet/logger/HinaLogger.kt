@@ -87,6 +87,10 @@ class HinaLogger(
         log(HinaLogLevel.Warn, content, stacktrace)
     }
 
+    fun warning(stacktrace: Throwable?) {
+        log(HinaLogLevel.Warn, stacktrace = stacktrace, message = null)
+    }
+
     fun debug(content: String?) {
         log(HinaLogLevel.Debug, content)
     }
