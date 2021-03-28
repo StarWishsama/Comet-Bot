@@ -2,6 +2,7 @@ package io.github.starwishsama.comet.objects.gacha.pool
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.GachaItem
@@ -28,7 +29,19 @@ class ArkNightPool(
 ) : GachaPool() {
     override val tenjouCount: Int = -1
     override val tenjouRare: Int = -1
-    override val poolItems: MutableList<ArkNightOperator> = BotVariables.arkNight.stream().filter { condition(it) }.collect(Collectors.toList())
+    override val poolItems: MutableList<ArkNightOperator> = mutableListOf()
+
+    init {
+        BotVariables.arkNight.stream().filter { condition(it) }.forEach {
+            poolItems.add(it)
+        }
+
+        BotVariables.daemonLogger.log(
+            HinaLogLevel.Info,
+            message = "已加载了 ${poolItems.size} 个干员至卡池 $name",
+            prefix = "明日方舟"
+        )
+    }
 
     private val r6Range = 0.50..0.52
     private val r5Range = 0.0..0.08

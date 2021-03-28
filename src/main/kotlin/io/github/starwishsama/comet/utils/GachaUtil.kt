@@ -185,23 +185,24 @@ object GachaUtil {
     }
 
     fun arkNightDataCheck(location: File) {
-        var isOld = false
+        var exists = true
 
         daemonLogger.info("明日方舟 > 检查是否为旧版本数据...")
         if (!location.exists() || !mapper.readTree(location.getContext()).isUsable()) {
             daemonLogger.info("明日方舟 > 你还没有卡池数据, 正在自动下载新数据")
-            isOld = true
+            exists = false
         }
 
         val result = mapper.readTree(NetUtil.executeHttpRequest(arkNightDataApi).body?.string())
         val updateTime = LocalDateTime.parse(result["updated_at"].asText(), DateTimeFormatter.ISO_DATE_TIME)
 
-        if (isOld || (location.exists() && location.lastModified().toLocalDateTime() < updateTime)) {
-            TaskUtil.runAsync {
-                daemonLogger.info("明日方舟干员数据有更新 (${yyMMddPattern.format(updateTime)}), 正在下载")
-                NetUtil.downloadFile(FileUtil.getCacheFolder(), arkNightData, location.name)
-                daemonLogger.info("下载完成!")
-            }
+        if (!exists) {
+            val cache = NetUtil.downloadFile(FileUtil.getCacheFolder(), arkNightData, location.name)
+            cache.deleteOnExit()
+            Files.copy(cache.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            daemonLogger.info("成功下载明日方舟卡池数据!")
+        } else if (location.exists() && location.lastModified().toLocalDateTime() < updateTime) {
+            daemonLogger.info("明日方舟干员数据更新了 (在 ${yyMMddPattern.format(updateTime)}), 请自行更新")
         } else {
             daemonLogger.info("明日方舟干员数据为最新版本: ${yyMMddPattern.format(updateTime)}")
         }
