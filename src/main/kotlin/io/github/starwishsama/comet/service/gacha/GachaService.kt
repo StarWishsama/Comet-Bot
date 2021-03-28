@@ -193,5 +193,7 @@ object GachaService {
                 GachaConstants.arkNightDefault.add(inside.asText())
             }
         }
+
+        BotVariables.daemonLogger.info("加载默认明日方舟数据成功, 共 ${GachaConstants.arkNightDefault.size} 个干员")
     }
 }
