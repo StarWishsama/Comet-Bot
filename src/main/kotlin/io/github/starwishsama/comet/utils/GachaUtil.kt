@@ -43,7 +43,7 @@ object GachaUtil {
     /**
      * PRTS 实际保有干员半身立绘量
      */
-    private const val arkNightPictureCount = 194
+    private const val arkNightPictureCount = 193
 
     private const val arkNightDataApi = "https://api.github.com/repos/Kengxxiao/ArknightsGameData"
     const val arkNightData =
@@ -202,6 +202,7 @@ object GachaUtil {
             Files.copy(cache.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)
             daemonLogger.info("成功下载明日方舟卡池数据!")
         } else if (location.exists() && location.lastModified().toLocalDateTime() < updateTime) {
+            // 这个检测并不准确, 因为其他服务器数据更新的时候也算, 而 Github API 似乎看不到最新 commit (?)
             daemonLogger.info("明日方舟干员数据更新了 (在 ${yyMMddPattern.format(updateTime)}), 请自行更新")
         } else {
             daemonLogger.info("明日方舟干员数据为最新版本: ${yyMMddPattern.format(updateTime)}")
