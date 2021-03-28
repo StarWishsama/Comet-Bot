@@ -24,7 +24,7 @@ class ArkNightPool(
     override val name: String = "标准寻访",
     override val description: String = "适合多种场合的强力干员",
     val condition: ArkNightOperator.() -> Boolean = {
-        GachaUtil.hasOperator(name) && obtain?.contains("招募寻访") == true
+        GachaUtil.hasOperator(this.name) && obtain?.contains("招募寻访") == true
     }
 ) : GachaPool() {
     override val tenjouCount: Int = -1
