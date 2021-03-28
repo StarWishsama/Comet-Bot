@@ -188,7 +188,7 @@ object GachaUtil {
         var exists = true
 
         daemonLogger.info("明日方舟 > 检查是否为旧版本数据...")
-        if (!location.exists() || !mapper.readTree(location.getContext()).isUsable()) {
+        if (!location.exists()) {
             daemonLogger.info("明日方舟 > 你还没有卡池数据, 正在自动下载新数据")
             exists = false
         }
