@@ -5,6 +5,7 @@ import com.hiczp.bilibili.api.BilibiliClient
 import com.hiczp.bilibili.api.app.model.SearchUserResult
 import com.hiczp.bilibili.api.retrofit.exception.BilibiliApiException
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.logger.HinaLogLevel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -28,6 +29,7 @@ object FakeClientApi {
                 client.login(userName, password, challenge, secCode, validate)
                 BotVariables.daemonLogger.info("成功登录哔哩哔哩账号")
             } catch (e: BilibiliApiException) {
+                BotVariables.daemonLogger.log(HinaLogLevel.Debug, "", e, bypass = true)
                 when (e.commonResponse.code) {
                     -629 -> {
                         BotVariables.daemonLogger.warning("哔哩哔哩账号密码错误, 请稍后在后台用 /bili login [账号] [密码] 重试!")

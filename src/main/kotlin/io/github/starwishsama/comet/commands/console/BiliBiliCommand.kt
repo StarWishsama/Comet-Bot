@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.commands.console
 
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
@@ -23,6 +24,8 @@ class BiliBiliCommand : ConsoleCommand {
                 }
 
                 if (args.size > 1) {
+                    BotVariables.daemonLogger.info("challenge = ${args[1]}, validate = ${args[2]}")
+
                     FakeClientApi.login(
                         cacheLoginData.userName,
                         cacheLoginData.passWord,
