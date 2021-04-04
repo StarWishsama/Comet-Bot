@@ -214,27 +214,10 @@ object CometRuntime {
         TaskUtil.runAsync(5) {
             if (pwd != null && username != null) {
                 runBlocking {
-                    withContext(Dispatchers.IO) {
-                        try {
-                            FakeClientApi.client.login(username = username, password = pwd)
-                            daemonLogger.info("成功登录哔哩哔哩账号")
-                        } catch (e: BilibiliApiException) {
-                            when (e.commonResponse.code) {
-                                -629 -> {
-                                    daemonLogger.warning("哔哩哔哩账号密码错误, 请稍后在后台用 /bili login [账号] [密码] 进行进一步操作!")
-                                }
-                                -105 -> {
-                                    daemonLogger.warning("需要滑块验证码登录, 请稍后在后台用 /bili login [账号] [密码] 进行进一步操作!")
-                                }
-                                else -> {
-                                    daemonLogger.warning("登录失败!", e)
-                                }
-                            }
-                        }
-                    }
+                    FakeClientApi.login(username, pwd)
                 }
             } else {
-                daemonLogger.info("未登录哔哩哔哩账号, 部分哔哩哔哩相关功能可能受限")
+                daemonLogger.info("未设置哔哩哔哩账号, 部分哔哩哔哩相关功能可能受限")
             }
         }
 
