@@ -25,8 +25,6 @@ data class QQMusicSearchResult(
                 /** 专辑名 */
                 @JsonProperty("albumname")
                 val albumName: String,
-                @JsonProperty("chinesesinger")
-                val chineseSinger: Int,
                 @JsonProperty("singer")
                 val singer: List<QQMusicSinger>,
 
@@ -36,21 +34,12 @@ data class QQMusicSearchResult(
                 val songMid: String,
                 @JsonProperty("songname")
                 val songName: String,
-                @JsonProperty("songurl")
-                val songUrl: String,
-                @JsonProperty("strMediaMid")
-                val mediaMidAsString: String,
             ) {
                 data class QQMusicSinger(
                     val id: Long,
                     val mid: String,
                     val name: String,
                 )
-
-                /**
-                 * 是否为中文歌手
-                 */
-                fun isChineseSinger(): Boolean = chineseSinger == 1
             }
         }
     }

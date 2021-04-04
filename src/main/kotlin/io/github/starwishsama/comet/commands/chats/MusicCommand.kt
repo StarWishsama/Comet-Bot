@@ -4,23 +4,17 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.enums.MusicApiType
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.api.thirdparty.music.ThirdPartyMusicApi
-import io.github.starwishsama.comet.api.thirdparty.music.entity.MusicSearchResult
-import io.github.starwishsama.comet.sessions.Session
-import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.*
-import java.util.*
 
 @CometCommand
 class MusicCommand : ChatCommand {
-    val api = BotVariables.cfg.musicApi
     //val usingUsers = mutableMapOf<Long, List<MusicSearchResult>>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
@@ -38,12 +32,15 @@ class MusicCommand : ChatCommand {
                     }
                 }
                 MusicApiType.QQ.name -> {
+                    event.subject.sendMessage("请稍等...")
                     return handleQQMusic(args.getRestString(1))
                 }
                 MusicApiType.NETEASE.name -> {
+                    event.subject.sendMessage("请稍等...")
                     return handleNetEaseMusic(args.getRestString(1))
                 }
                 else -> {
+                    event.subject.sendMessage("请稍等...")
                     return handleMusicSearch(args.getRestString(0))
                 }
             }
@@ -68,7 +65,7 @@ class MusicCommand : ChatCommand {
     """.trimIndent()
 
     private fun handleMusicSearch(name: String): MessageChain {
-        when (api) {
+        when (BotVariables.cfg.musicApi) {
             MusicApiType.NETEASE -> handleNetEaseMusic(name)
             MusicApiType.QQ -> handleQQMusic(name)
         }
