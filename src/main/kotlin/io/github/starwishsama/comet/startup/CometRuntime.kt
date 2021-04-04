@@ -41,6 +41,8 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.globalEventChannel
 import net.mamoe.mirai.utils.MiraiLogger
 import okhttp3.OkHttpClient
+import org.jline.reader.EndOfFileException
+import org.jline.reader.UserInterruptException
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.time.LocalDateTime
@@ -241,10 +243,14 @@ object CometRuntime {
                 var line: String
 
                 runBlocking {
-                    line = CometApplication.console.readLine(">")
-                    val result = CommandExecutor.dispatchConsoleCommand(line)
-                    if (result.isNotEmpty()) {
-                        consoleCommandLogger.info(result)
+                    try {
+                        line = CometApplication.console.readLine(">")
+                        val result = CommandExecutor.dispatchConsoleCommand(line)
+                        if (result.isNotEmpty()) {
+                            consoleCommandLogger.info(result)
+                        }
+                    } catch (ignored: EndOfFileException) {
+                    } catch (ignored: UserInterruptException) {
                     }
                 }
             }
