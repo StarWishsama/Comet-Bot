@@ -133,6 +133,7 @@ object CometRuntime {
                 StopCommand(),
                 DebugCommand(),
                 io.github.starwishsama.comet.commands.console.AdminCommand(),
+                io.github.starwishsama.comet.commands.console.BiliBiliCommand(),
                 BroadcastCommand()
             )
         )
