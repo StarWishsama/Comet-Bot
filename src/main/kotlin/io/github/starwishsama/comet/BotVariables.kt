@@ -39,9 +39,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 
 /**
  * 机器人(几乎)所有数据的存放类
@@ -66,15 +64,15 @@ object BotVariables {
 
     var webhookServer: WebHookServer? = null
 
-    val service: ScheduledExecutorService = Executors.newScheduledThreadPool(
-        8,
-            BasicThreadFactory.Builder()
-                    .namingPattern("comet-service-%d")
-                    .daemon(true)
-                    .uncaughtExceptionHandler { thread, t ->
-                        daemonLogger.warning("线程 ${thread.name} 在执行任务时发生了错误", t)
-                    }.build()
-    )
+    val service = ScheduledThreadPoolExecutor(
+        10,
+        BasicThreadFactory.Builder()
+            .namingPattern("comet-service-%d")
+            .daemon(true)
+            .uncaughtExceptionHandler { thread, t ->
+                daemonLogger.warning("线程 ${thread.name} 在执行任务时发生了错误", t)
+            }.build()
+    ).also { it.maximumPoolSize = 30 }
 
     internal val logAction: (String) -> Unit = {
         CometApplication.console.printAbove(it)
