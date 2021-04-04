@@ -21,7 +21,7 @@ import java.util.*
 @CometCommand
 class MusicCommand : ChatCommand {
     val api = BotVariables.cfg.musicApi
-    val usingUsers = mutableMapOf<Long, List<MusicSearchResult>>()
+    //val usingUsers = mutableMapOf<Long, List<MusicSearchResult>>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (args.size > 1) {
