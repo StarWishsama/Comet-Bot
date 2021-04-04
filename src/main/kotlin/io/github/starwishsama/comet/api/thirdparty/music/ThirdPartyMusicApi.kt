@@ -15,16 +15,17 @@ import net.mamoe.mirai.message.data.toMessageChain
 import java.net.URLEncoder
 
 /**
- * 搜索音乐工具类
- *
+ * 腾讯音乐, 网易云音乐搜索 API
  */
 object ThirdPartyMusicApi {
-    /** 1分钟100次，10分钟500次，1小时2000次 */
-    private const val api4qq = "https://api.qq.jsososo.com/song/urls?id="
-    private const val api4NetEase = "https://musicapi.leanapp.cn"
+    /** 腾讯, 调用限额1分钟100次，10分钟500次，1小时2000次 */
+    private const val jsososo = "https://api.qq.jsososo.com/song/urls?id="
+
+    // 网易
+    private const val leanapp = "https://musicapi.leanapp.cn"
 
     fun searchNetEaseMusic(name: String, length: Int = 3): List<MusicSearchResult> {
-        val page = NetUtil.getPageContent("$api4NetEase/search?keywords=${URLEncoder.encode(name, "UTF-8")}")
+        val page = NetUtil.getPageContent("$leanapp/search?keywords=${URLEncoder.encode(name, "UTF-8")}")
 
         val searchResult: LeanAppSearchResponse = mapper.readValue(page ?: return emptyList())
 
@@ -42,7 +43,7 @@ object ThirdPartyMusicApi {
 
         songs.subList(0, songs.size.coerceAtMost(length - 1)).forEach {
             val songResult =
-                NetUtil.getPageContent("http://$api4NetEase/song/detail?ids=${it.id}")
+                NetUtil.getPageContent("http://$leanapp/song/detail?ids=${it.id}")
             songDetails.add(mapper.readValue(songResult ?: return@forEach))
         }
 
@@ -79,7 +80,7 @@ object ThirdPartyMusicApi {
                 }
             }
 
-            val playResult = NetUtil.getPageContent("$api4qq${song.songMid}")
+            val playResult = NetUtil.getPageContent("$jsososo${song.songMid}")
 
             val playURL: String
 

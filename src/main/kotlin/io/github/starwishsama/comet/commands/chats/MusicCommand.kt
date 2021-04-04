@@ -97,7 +97,7 @@ class MusicCommand : ChatCommand {
 
         } catch (e: Exception) {
             BotVariables.daemonLogger.warning("点歌时出现了意外", e)
-            return "❌ 点歌系统发生异常".toChain()
+            return "❌ 点歌系统开小差了, 稍后再试试吧".toChain()
         }
     }
 
@@ -122,7 +122,7 @@ class MusicCommand : ChatCommand {
 
         } catch (e: Exception) {
             BotVariables.daemonLogger.warning("点歌时出现了意外", e)
-            return "❌ 点歌系统发生异常".toChain()
+            return "❌ 点歌系统开小差了, 稍后再试试吧".toChain()
         }
     }
 }
