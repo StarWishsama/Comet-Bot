@@ -12,6 +12,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MusicKind
 import net.mamoe.mirai.message.data.MusicShare
 import net.mamoe.mirai.message.data.toMessageChain
+import java.lang.NullPointerException
 import java.net.URLEncoder
 
 /**
@@ -71,9 +72,7 @@ object ThirdPartyMusicApi {
 
         val songs = searchResult.data.songs.songList
 
-        songs.subList(0, songs.size.coerceAtMost(length))
-
-        songs.forEach { song ->
+        songs.subList(0, songs.size.coerceAtMost(length)).forEach { song ->
             val artists = mutableListOf<String>().also { l ->
                 song.singer.forEach {
                     l.add(it.name)
@@ -90,10 +89,15 @@ object ThirdPartyMusicApi {
                 playURL = if (musicUrlObject.isNull) {
                     ""
                 } else {
-                    if (!musicUrlObject["data"].isNull) {
-                        musicUrlObject["data"][song.songMid].asText()
-                    } else {
-                        ""
+                    try {
+                        val urlObject = musicUrlObject["data"]
+                        if (!urlObject.isNull) {
+                            urlObject[song.songMid].asText()
+                        } else {
+                            ""
+                        }
+                    } catch (e: NullPointerException) {
+                        return@forEach
                     }
                 }
             } else {
