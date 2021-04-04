@@ -24,10 +24,10 @@ class MusicCommand : ChatCommand {
     //val usingUsers = mutableMapOf<Long, List<MusicSearchResult>>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (args.size > 1) {
+        if (args.isNotEmpty()) {
             return when (args[0].toLowerCase()) {
                 "api" -> {
-                    if (args.size > 2) {
+                    if (args.size > 1) {
                         when (args[1].toUpperCase()) {
                             "QQ", "TX", "腾讯" -> BotVariables.cfg.musicApi = MusicApiType.QQ
                             "NETEASE", "网易", "WY" -> BotVariables.cfg.musicApi = MusicApiType.NETEASE
