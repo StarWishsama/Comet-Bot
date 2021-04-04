@@ -8,6 +8,8 @@ import net.mamoe.mirai.event.events.MessageEvent
  * 交互式命令
  *
  * 支持接受输入内容并处理.
+ *
+ * 需要创建一个 [Session] 以触发监听
  */
 interface ConversationCommand {
     suspend fun handle(event: MessageEvent, user: BotUser, session: Session)
