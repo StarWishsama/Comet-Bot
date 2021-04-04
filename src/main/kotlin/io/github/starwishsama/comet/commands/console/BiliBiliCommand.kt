@@ -26,9 +26,9 @@ class BiliBiliCommand : ConsoleCommand {
                     FakeClientApi.login(
                         cacheLoginData.userName,
                         cacheLoginData.passWord,
-                        args[1],
-                        "${args[2]}|jordan",
-                        args[2]
+                        challenge = args[1],
+                        secCode = "${args[2]}|jordan",
+                        validate = args[2]
                     )
                 } else {
                     return getHelp()
