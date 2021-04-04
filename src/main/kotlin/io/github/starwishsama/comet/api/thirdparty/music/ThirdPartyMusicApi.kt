@@ -43,7 +43,7 @@ object ThirdPartyMusicApi {
 
         songs.subList(0, songs.size.coerceAtMost(length - 1)).forEach {
             val songResult =
-                NetUtil.getPageContent("http://$leanapp/song/detail?ids=${it.id}")
+                NetUtil.getPageContent("$leanapp/song/detail?ids=${it.id}")
             songDetails.add(mapper.readValue(songResult ?: return@forEach))
         }
 
