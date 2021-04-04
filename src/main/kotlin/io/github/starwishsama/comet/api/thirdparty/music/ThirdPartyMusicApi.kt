@@ -24,7 +24,7 @@ object ThirdPartyMusicApi {
     // 网易
     private const val leanapp = "https://musicapi.leanapp.cn"
 
-    fun searchNetEaseMusic(name: String, length: Int = 3): List<MusicSearchResult> {
+    fun searchNetEaseMusic(name: String, length: Int = 1): List<MusicSearchResult> {
         val page = NetUtil.getPageContent("$leanapp/search?keywords=${URLEncoder.encode(name, "UTF-8")}")
 
         val searchResult: LeanAppSearchResponse = mapper.readValue(page ?: return emptyList())
@@ -41,7 +41,7 @@ object ThirdPartyMusicApi {
             return emptyList()
         }
 
-        songs.subList(0, songs.size.coerceAtMost(length - 1)).forEach {
+        songs.subList(0, songs.size.coerceAtMost(length)).forEach {
             val songResult =
                 NetUtil.getPageContent("$leanapp/song/detail?ids=${it.id}")
             songDetails.add(mapper.readValue(songResult ?: return@forEach))
@@ -64,7 +64,7 @@ object ThirdPartyMusicApi {
         return songResults
     }
 
-    fun searchQQMusic(name: String, length: Int = 5): List<MusicSearchResult> {
+    fun searchQQMusic(name: String, length: Int = 1): List<MusicSearchResult> {
         val searchResult = getQQMusicSearchResult(name) ?: return emptyList()
 
         val result = mutableListOf<MusicSearchResult>()
