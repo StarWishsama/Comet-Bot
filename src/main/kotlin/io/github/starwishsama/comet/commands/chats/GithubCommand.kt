@@ -74,11 +74,11 @@ class GithubCommand: ChatCommand {
 
         val cfg = GroupConfigManager.getConfig(groupId) ?: return "该群聊尚未注册过 Comet!".toChain()
         val repos = cfg.githubRepoSubscribers
-        return if (!repos.contains(repoName)) {
-            "你还没订阅过 $repoName".toChain()
-        } else {
-            repos.remove(repoName)
+
+        return if (repos.remove(repoName)) {
             "取消订阅 $repoName 成功!\n退订后, 请在对应项目下删除 WebHook 地址".toChain()
+        } else {
+            "你还没订阅过 $repoName".toChain()
         }
     }
 
