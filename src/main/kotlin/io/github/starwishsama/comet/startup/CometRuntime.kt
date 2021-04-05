@@ -24,7 +24,6 @@ import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
-import io.github.starwishsama.comet.service.server.CometServer
 import io.github.starwishsama.comet.service.webhook.WebHookServer
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.FileUtil
@@ -191,10 +190,13 @@ object CometRuntime {
     }
 
     private fun startupServer() {
-        if (cfg.webHookSwitch) {
-            val customSuffix = cfg.webHookAddress.replace("http://", "").replace("https://", "").split("/")
-            cometServer =
-                CometServer(cfg.webHookPort).also { it.githubPrefix = customSuffix.getRestString(1, "/"); it.start() }
+        try {
+            if (cfg.webHookSwitch) {
+                val customSuffix = cfg.webHookAddress.replace("http://", "").replace("https://", "").split("/")
+                cometServer = WebHookServer(cfg.webHookPort, customSuffix.getRestString(1, "/"))
+            }
+        } catch (e: Throwable) {
+            daemonLogger.warning("Comet 服务端启动失败", e)
         }
     }
 
@@ -211,7 +213,7 @@ object CometRuntime {
 
 
         val pwd = cfg.biliPassword
-        val username = BotVariables.cfg.biliUserName
+        val username = cfg.biliUserName
 
         TaskUtil.runAsync(5) {
             if (pwd != null && username != null) {

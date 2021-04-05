@@ -13,7 +13,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
-import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
@@ -21,19 +20,15 @@ import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.objects.shop.Shop
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
-import io.github.starwishsama.comet.service.server.CometServer
 import io.github.starwishsama.comet.service.webhook.WebHookServer
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.json.LocalDateTimeConverter
 import io.github.starwishsama.comet.utils.json.WrapperConverter
-import io.github.starwishsama.comet.utils.network.NetUtil
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.utils.MiraiInternalApi
 import okhttp3.OkHttpClient
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
-import java.net.InetSocketAddress
-import java.net.Proxy
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -63,7 +58,7 @@ object BotVariables {
 
     var cfg = CometConfig()
 
-    lateinit var cometServer: CometServer
+    lateinit var cometServer: WebHookServer
 
     val service = ScheduledThreadPoolExecutor(
         10,
