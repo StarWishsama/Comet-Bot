@@ -62,18 +62,21 @@ class GithubWebHookHandler: HttpHandler {
         try {
             val info = mapper.readValue<PushEvent>(payload)
             GithubPusher.push(info)
-            netLogger.log(HinaLogLevel.Debug,"推送 WebHook 消息成功", prefix = "WebHook")
+            netLogger.log(HinaLogLevel.Debug, "推送 WebHook 消息成功", prefix = "WebHook")
         } catch (e: JsonParseException) {
-            netLogger.log(HinaLogLevel.Debug,"推送 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")
+            netLogger.log(HinaLogLevel.Debug, "推送 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")
         } catch (e: Exception) {
-            netLogger.log(HinaLogLevel.Warn,"推送 WebHook 消息失败", e, prefix = "WebHook")
+            netLogger.log(HinaLogLevel.Warn, "推送 WebHook 消息失败", e, prefix = "WebHook")
         }
 
+        val response = "Success".toByteArray()
+
+        he.responseHeaders.add("content-type", "text/plain; charset=UTF-8")
+        he.sendResponseHeaders(200, response.size.toLong())
+
         he.responseBody.use {
-            val response = "Success"
-            he.responseHeaders.add("content-type", "text/plain; charset=UTF-8")
-            it.write(response.toByteArray())
-            he.sendResponseHeaders(200, response.length.toLong())
+            it.write(response)
+            it.flush()
         }
     }
 }
