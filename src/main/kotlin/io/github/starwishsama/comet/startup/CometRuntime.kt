@@ -126,7 +126,6 @@ object CometRuntime {
                 YoutubeCommand(),
                 MinecraftCommand(),
                 PusherCommand(),
-                NoteCommand(),
                 GithubCommand(),
                 // Console Command
                 StopCommand(),
