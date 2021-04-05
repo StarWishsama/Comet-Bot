@@ -81,16 +81,7 @@ class MusicCommand : ChatCommand {
                 return "❌ 找不到你想搜索的音乐".toChain()
             }
 
-            val song = result[0]
-
-            return MusicShare(
-                MusicKind.NeteaseCloudMusic,
-                song.name,
-                song.getAuthorName(),
-                song.jumpURL,
-                song.albumPicture,
-                song.songURL
-            ).toMessageChain()
+            return result[0].toMessageChain(MusicKind.NeteaseCloudMusic)
 
         } catch (e: Exception) {
             BotVariables.daemonLogger.warning("点歌时出现了意外", e)
@@ -106,17 +97,7 @@ class MusicCommand : ChatCommand {
                 return "❌ 找不到你想搜索的音乐".toChain()
             }
 
-            val song = result[0]
-
-            return MusicShare(
-                MusicKind.QQMusic,
-                song.name,
-                song.getAuthorName(),
-                song.jumpURL,
-                song.albumPicture,
-                song.songURL
-            ).toMessageChain()
-
+            return result[0].toMessageChain(MusicKind.QQMusic)
         } catch (e: Exception) {
             BotVariables.daemonLogger.warning("点歌时出现了意外", e)
             return "❌ 点歌系统开小差了, 稍后再试试吧".toChain()

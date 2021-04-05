@@ -118,25 +118,6 @@ object ThirdPartyMusicApi {
         return result
     }
 
-    fun generateQQMusicCard(result: List<MusicSearchResult>, index: Int = 0): MessageChain {
-        if (result.isEmpty() || !result[0].usable) {
-            return "找不到歌曲".toChain()
-        }
-
-        if (index > result.size - 1 || index < 0) {
-            return "找不到对应的歌曲".toChain()
-        }
-
-        return MusicShare(
-            kind = MusicKind.QQMusic,
-            title = result[index].name,
-            summary = result[index].getAuthorName(),
-            jumpUrl = result[index].jumpURL,
-            pictureUrl = result[index].albumPicture,
-            musicUrl = result[index].songURL
-        ).toMessageChain()
-    }
-
     private fun getQQMusicSearchResult(name: String): QQMusicSearchResult? {
         val songResult =
             NetUtil.getPageContent(
