@@ -1,11 +1,10 @@
 package io.github.starwishsama.comet.startup
 
-import com.hiczp.bilibili.api.retrofit.exception.BilibiliApiException
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
+import io.github.starwishsama.comet.BotVariables.cometServer
 import io.github.starwishsama.comet.BotVariables.consoleCommandLogger
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.webhookServer
 import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.api.command.CommandExecutor
@@ -25,6 +24,7 @@ import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
+import io.github.starwishsama.comet.service.server.CometServer
 import io.github.starwishsama.comet.service.webhook.WebHookServer
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.FileUtil
@@ -33,9 +33,7 @@ import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.globalEventChannel
@@ -91,9 +89,9 @@ object CometRuntime {
         BotVariables.logger.info("[Bot] 正在关闭 Bot...")
         DataSetup.saveAllResources()
         PusherManager.savePushers()
+        cometServer.stop()
         BotVariables.service.shutdown()
         BotVariables.rCon?.disconnect()
-        webhookServer?.stop()
         BotVariables.loggerAppender.close()
     }
 
@@ -195,7 +193,8 @@ object CometRuntime {
     private fun startupServer() {
         if (cfg.webHookSwitch) {
             val customSuffix = cfg.webHookAddress.replace("http://", "").replace("https://", "").split("/")
-            webhookServer = WebHookServer(cfg.webHookPort, customSuffix.getRestString(1, "/"))
+            cometServer =
+                CometServer(cfg.webHookPort).also { it.githubPrefix = customSuffix.getRestString(1, "/"); it.start() }
         }
     }
 

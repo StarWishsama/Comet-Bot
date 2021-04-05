@@ -21,6 +21,7 @@ import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.objects.shop.Shop
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
+import io.github.starwishsama.comet.service.server.CometServer
 import io.github.starwishsama.comet.service.webhook.WebHookServer
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.json.LocalDateTimeConverter
@@ -62,7 +63,7 @@ object BotVariables {
 
     var cfg = CometConfig()
 
-    var webhookServer: WebHookServer? = null
+    lateinit var cometServer: CometServer
 
     val service = ScheduledThreadPoolExecutor(
         10,
