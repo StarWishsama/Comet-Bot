@@ -58,7 +58,7 @@ object BotVariables {
 
     var cfg = CometConfig()
 
-    lateinit var cometServer: WebHookServer
+    var cometServer: WebHookServer? = null
 
     val service = ScheduledThreadPoolExecutor(
         10,

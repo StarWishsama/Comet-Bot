@@ -88,7 +88,7 @@ object CometRuntime {
         BotVariables.logger.info("[Bot] 正在关闭 Bot...")
         DataSetup.saveAllResources()
         PusherManager.savePushers()
-        cometServer.stop()
+        cometServer?.stop()
         BotVariables.service.shutdown()
         BotVariables.rCon?.disconnect()
         BotVariables.loggerAppender.close()
