@@ -146,8 +146,7 @@ object CometRuntime {
             BotGroupStatusListener,
             AutoReplyListener,
             GroupMemberChangedListener,
-            GroupRequestListener,
-            NoteListener
+            GroupRequestListener
         )
 
         listeners.forEach { listener ->
