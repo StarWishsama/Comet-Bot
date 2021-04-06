@@ -2,6 +2,6 @@ package io.github.starwishsama.comet.utils
 
 import cn.hutool.crypto.SecureUtil
 
-fun String.toSHA256(): String {
-    return SecureUtil.sha256(this)
+fun String.toHMAC(key: String): String {
+    return SecureUtil.hmacSha256(key).digestHex(this)
 }

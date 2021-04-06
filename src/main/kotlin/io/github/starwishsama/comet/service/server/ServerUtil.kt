@@ -1,14 +1,14 @@
 package io.github.starwishsama.comet.service.server
 
 import io.github.starwishsama.comet.BotVariables.cfg
-import io.github.starwishsama.comet.utils.toSHA256
+import io.github.starwishsama.comet.utils.toHMAC
 import java.net.InetSocketAddress
 
 object ServerUtil {
     private val coolDownCache = mutableMapOf<String, Long>()
 
     fun checkSignature(remote: String, requestBody: String): Boolean {
-        val local = (cfg.webHookSecret + requestBody).toSHA256()
+        val local = requestBody.toHMAC(cfg.webHookSecret)
         return local == remote
     }
 
