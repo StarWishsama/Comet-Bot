@@ -8,7 +8,7 @@ object ServerUtil {
     private val coolDownCache = mutableMapOf<String, Long>()
 
     fun checkSignature(remote: String, requestBody: String): Boolean {
-        val local = "sha256=" + (cfg.webHookSecret + requestBody).toSHA256()
+        val local = (cfg.webHookSecret + requestBody).toSHA256()
         return local == remote
     }
 
