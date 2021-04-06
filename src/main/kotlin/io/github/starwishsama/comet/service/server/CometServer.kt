@@ -19,9 +19,10 @@ class WebHookServer(port: Int, customSuffix: String) {
             }
 
             he.sendResponseHeaders(200, 0)
-            he.responseBody.write("Hello Comet!".toByteArray())
-            he.responseBody.flush()
-            he.responseBody.close()
+            he.responseBody.use {
+                it.write("Hello Comet!".toByteArray())
+                it.flush()
+            }
         }
         netLogger.log(HinaLogLevel.Info, "服务器启动! 运行在端口 $port", prefix = "WebHook")
         server.start()
