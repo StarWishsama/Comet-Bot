@@ -15,11 +15,16 @@ object ServerUtil {
     fun checkCoolDown(remote: InetSocketAddress): Boolean {
         val target = coolDownCache[remote.hostString]
 
-        return if (target == null) {
-            coolDownCache[remote.hostString] = System.currentTimeMillis()
-            false
-        } else {
-            System.currentTimeMillis() - target > 10 * 1000
+        return when {
+            target == null -> {
+                coolDownCache[remote.hostString] = System.currentTimeMillis()
+                false
+            }
+            System.currentTimeMillis() - target > 10 * 1000 -> {
+                coolDownCache.remove(remote.hostString)
+                true
+            }
+            else -> false
         }
     }
 }
