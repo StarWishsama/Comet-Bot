@@ -33,7 +33,12 @@ fun File.writeClassToJson(context: Any, mapper: ObjectMapper = BotVariables.mapp
 }
 
 @Synchronized
-fun File.writeString(context: String, autoWrap: Boolean = true, isAppend: Boolean = false, newIfNotExists: Boolean = true) {
+fun File.writeString(
+    context: String,
+    autoWrap: Boolean = true,
+    isAppend: Boolean = false,
+    newIfNotExists: Boolean = true
+) {
     if (newIfNotExists) {
         createNewFile()
     }
@@ -61,7 +66,7 @@ fun File.getMD5(): String {
  * @param clazz 指定类
  * @return T
  */
-inline fun <reified T: Any> File.parseAsClass(customParser: ObjectMapper = BotVariables.mapper): T {
+inline fun <reified T : Any> File.parseAsClass(customParser: ObjectMapper = BotVariables.mapper): T {
     require(exists()) { "$path 不存在" }
     return customParser.readValue(getContext())
 }
@@ -129,14 +134,21 @@ object FileUtil {
 
     fun getErrorReportFolder(): File = getChildFolder("error-reports")
 
-    fun createErrorReportFile(reason: String = "发生了一个错误", type: String, t: Throwable?, content: String, message: String) {
+    fun createErrorReportFile(
+        reason: String = "发生了一个错误",
+        type: String,
+        t: Throwable?,
+        content: String,
+        message: String
+    ) {
         val fileName = "$type-${dateFormatter.format(LocalDateTime.now())}.txt"
         val location = File(getErrorReportFolder(), fileName)
         if (location.exists()) return
 
         location.createNewFile()
 
-        val report = "发生了一个错误:\n${if (t != null) getBeautyStackTrace(t) else "无报错堆栈"}\n可能有用的信息: ${message.limitStringSize(150)}\n\n原始获取内容:\n$content"
+        val report =
+            "发生了一个错误:\n${if (t != null) getBeautyStackTrace(t) else "无报错堆栈"}\n可能有用的信息: ${message.limitStringSize(150)}\n\n原始获取内容:\n$content"
         location.writeString(report)
         daemonLogger.warning("$reason, 错误报告已生成! 保存在 ${location.path}")
         daemonLogger.warning("你可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")
@@ -225,8 +237,11 @@ object FileUtil {
         return location
     }
 
-    fun createTempFile(content: Any) {
+    fun createTempFile(content: Any, deleteOnExit: Boolean) {
         val f = File(getCacheFolder(), "temp${System.currentTimeMillis()}.tmp")
+        if (deleteOnExit) {
+            f.deleteOnExit()
+        }
         f.createNewFile()
         f.writeText(content.toString())
     }
@@ -322,7 +337,8 @@ object FileUtil {
 
 
             if (!f.exists() || f.lastModified().toLocalDateTime() >
-                entry.lastModifiedTime.toMillis().toLocalDateTime(true)) {
+                entry.lastModifiedTime.toMillis().toLocalDateTime(true)
+            ) {
 
                 if (!f.exists()) {
                     f.createNewFile()

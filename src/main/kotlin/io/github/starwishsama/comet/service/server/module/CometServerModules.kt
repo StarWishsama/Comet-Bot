@@ -41,7 +41,9 @@ class GithubWebHookHandler : HttpHandler {
 
         BotVariables.netLogger.log(HinaLogLevel.Debug, "收到新事件", prefix = "WebHook")
 
-        FileUtil.createTempFile(request)
+        if (cfg.debugMode) {
+            FileUtil.createTempFile(request, true)
+        }
 
         if (!request.startsWith("payload")) {
             BotVariables.netLogger.log(HinaLogLevel.Debug, "无效请求", prefix = "WebHook")
