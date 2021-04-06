@@ -17,7 +17,7 @@ data class RepoInfo(
     @JsonProperty("html_url")
     val url: String,
     @JsonProperty("description")
-    val description: String
+    val description: String?
 ) {
     data class OwnerInfo(
         val login: String,

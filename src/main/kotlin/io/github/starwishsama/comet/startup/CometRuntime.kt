@@ -24,7 +24,7 @@ import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
-import io.github.starwishsama.comet.service.webhook.WebHookServer
+import io.github.starwishsama.comet.service.server.WebHookServer
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
@@ -150,7 +150,7 @@ object CometRuntime {
 
         listeners.forEach { listener ->
             if (listener.eventToListen.isEmpty()) {
-                daemonLogger.warning("监听器 ${listener::class.java.simpleName} 没有监听任何一个事件, 请检查是否正确!")
+                daemonLogger.warning("监听器 ${listener::class.java.simpleName} 没有监听任何一个事件!")
             } else {
                 listener.eventToListen.forEach { eventClass ->
                     bot.globalEventChannel().subscribeAlways(eventClass) {

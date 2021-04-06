@@ -225,6 +225,12 @@ object FileUtil {
         return location
     }
 
+    fun createTempFile(content: Any) {
+        val f = File(getCacheFolder(), "temp${System.currentTimeMillis()}.tmp")
+        f.createNewFile()
+        f.writeText(content.toString())
+    }
+
     /**
      * 初始化资源文件
      */
