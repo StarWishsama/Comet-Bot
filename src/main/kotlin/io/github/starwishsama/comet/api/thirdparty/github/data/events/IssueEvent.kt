@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.api.thirdparty.github.data.events
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
@@ -14,7 +15,7 @@ data class IssueEvent(
      */
     val action: String,
     val issue: IssueObject,
-    val repository: PushEvent.RepoInfo,
+    val repository: RepoInfo,
     val sender: SenderInfo
 ) : GithubEvent {
 
@@ -39,6 +40,26 @@ data class IssueEvent(
     data class SenderInfo(
         val login: String,
         val id: Long
+    )
+
+    data class RepoInfo(
+        val id: Long,
+        @JsonProperty("node_id")
+        val nodeID: String,
+        @JsonProperty("name")
+        val name: String,
+        @JsonProperty("full_name")
+        val fullName: String,
+        @JsonProperty("private")
+        val isPrivate: Boolean,
+        @JsonProperty("owner")
+        val owner: JsonNode,
+        @JsonProperty("html_url")
+        val repoUrl: String,
+        @JsonProperty("updated_at")
+        val updateTime: String,
+        @JsonProperty("pushed_at")
+        val pushTime: String,
     )
 
     override fun toMessageWrapper(): MessageWrapper {
