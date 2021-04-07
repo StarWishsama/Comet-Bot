@@ -9,6 +9,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.api.thirdparty.github.GithubEventHandler
 import io.github.starwishsama.comet.api.thirdparty.github.data.events.PushEvent
+import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.service.pusher.instances.GithubPusher
 import io.github.starwishsama.comet.service.server.ServerUtil
@@ -22,6 +23,7 @@ import io.github.starwishsama.comet.utils.json.isUsable
  */
 class GithubWebHookHandler : HttpHandler {
     private val signature256 = "X-Hub-Signature-256"
+    private val eventTypeHeader = "X-GitHub-Event"
 
     override fun handle(he: HttpExchange) {
         val signature = he.requestHeaders[signature256]
@@ -81,11 +83,15 @@ class GithubWebHookHandler : HttpHandler {
             return
         }
 
+        val eventType = he.requestHeaders[eventTypeHeader]?.get(0) ?: ""
+
         try {
-            val info = GithubEventHandler.process(payload)
+            val info = GithubEventHandler.process(payload, eventType)
             GithubPusher.push(info)
             BotVariables.netLogger.log(HinaLogLevel.Debug, "推送 WebHook 消息成功", prefix = "WebHook")
         } catch (e: JsonParseException) {
+            BotVariables.netLogger.log(HinaLogLevel.Debug, "推送 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")
+        } catch (e: ApiException) {
             BotVariables.netLogger.log(HinaLogLevel.Debug, "推送 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")
         } catch (e: Exception) {
             BotVariables.netLogger.log(HinaLogLevel.Warn, "推送 WebHook 消息失败", e, prefix = "WebHook")
