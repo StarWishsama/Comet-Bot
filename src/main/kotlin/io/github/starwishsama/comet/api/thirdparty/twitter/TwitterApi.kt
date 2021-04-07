@@ -1,8 +1,8 @@
 package io.github.starwishsama.comet.api.thirdparty.twitter
 
 import cn.hutool.http.ContentType
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.google.gson.JsonSyntaxException
 import com.roxstudio.utils.CUrl
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
@@ -61,10 +61,10 @@ object TwitterApi : ApiExecutor {
     private fun getBearerToken() {
         try {
             val curl = CUrl(twitterTokenGetUrl).opt(
-                    "-u",
-                    "${BotVariables.cfg.twitterAccessToken}:${BotVariables.cfg.twitterAccessSecret}",
-                    "--data",
-                    "grant_type=client_credentials"
+                "-u",
+                "${BotVariables.cfg.twitterAccessToken}:${BotVariables.cfg.twitterAccessSecret}",
+                "--data",
+                "grant_type=client_credentials"
             )
 
             if (BotVariables.cfg.proxyUrl.isNotEmpty() && BotVariables.cfg.proxyPort != -1) {
@@ -102,12 +102,13 @@ object TwitterApi : ApiExecutor {
 
         val startTime = LocalDateTime.now()
         val url = "$twitterApiUrl/users/show.json?screen_name=$username&tweet_mode=extended"
-       NetUtil.executeHttpRequest(
-                url = url,
-                timeout = 5,
-                call = {
-                    header("authorization", "Bearer $token")
-                }
+
+        NetUtil.executeHttpRequest(
+            url = url,
+            timeout = 5,
+            call = {
+                header("authorization", "Bearer $token")
+            }
         ).use { conn ->
 
             var bodyCopy = ""
@@ -123,7 +124,12 @@ object TwitterApi : ApiExecutor {
                 return mapper.readValue(bodyCopy)
             } catch (e: IOException) {
                 if (!NetUtil.isTimeout(e)) {
-                    FileUtil.createErrorReportFile(type = "data", t = e, content = bodyCopy, message = "Request URL: $url")
+                    FileUtil.createErrorReportFile(
+                        type = "data",
+                        t = e,
+                        content = bodyCopy,
+                        message = "Request URL: $url"
+                    )
                 } else {
                     daemonLogger.verbose("[蓝鸟] 在获取用户信息时连接超时")
                 }
@@ -152,17 +158,18 @@ object TwitterApi : ApiExecutor {
         usedTime++
 
         NetUtil.executeHttpRequest(
-                url = "$twitterApiUrl/statuses/user_timeline.json?screen_name=$username&count=${count}&tweet_mode=extended",
-                timeout = 5,
-                call = {
-                    header("authorization", "Bearer $token")
-                    header("content-type", "application/json;charset=utf-8")
-                }
+            url = "$twitterApiUrl/statuses/user_timeline.json?screen_name=$username&count=${count}&tweet_mode=extended",
+            timeout = 5,
+            call = {
+                header("authorization", "Bearer $token")
+                header("content-type", "application/json;charset=utf-8")
+            }
         ).use { request ->
             if (request.isSuccessful) {
                 val tweetList = parseJsonToTweet(
                     request.body?.string()
-                        ?: return emptyList(), request.request.url.toString())
+                        ?: return emptyList(), request.request.url.toString()
+                )
                 return if (tweetList.isNotEmpty()) {
                     tweetList.sortedByDescending { it.getSentTime() }
                 } else {
@@ -189,16 +196,17 @@ object TwitterApi : ApiExecutor {
         checkRateLimit(apiReachLimit)
 
         NetUtil.executeHttpRequest(
-                url = "$twitterApiUrl/statuses/show.json?id=$id&tweet_mode=extended",
-                timeout = 5,
-                call = {
-                    header("authorization", "Bearer $token")
-                }
+            url = "$twitterApiUrl/statuses/show.json?id=$id&tweet_mode=extended",
+            timeout = 5,
+            call = {
+                header("authorization", "Bearer $token")
+            }
         ).use { request ->
             return if (request.isSuccessful && request.isType(ContentType.JSON.value)) {
                 val tweet = parseJsonToTweet(
                     request.body?.string()
-                        ?: return null, request.request.url.toString())
+                        ?: return null, request.request.url.toString()
+                )
                 if (tweet.isNotEmpty()) {
                     addCacheTweet(tweet[0])
                     tweet[0]
@@ -280,7 +288,7 @@ object TwitterApi : ApiExecutor {
     private fun parseJsonToTweet(json: String, url: String): List<Tweet> {
         return try {
             listOf(mapper.readValue(json, Tweet::class.java))
-        } catch (e: JsonSyntaxException) {
+        } catch (e: MismatchedInputException) {
             try {
                 mapper.readValue(json)
             } catch (e: RuntimeException) {
