@@ -9,7 +9,6 @@ import java.time.ZoneId
 
 import java.time.format.DateTimeFormatter
 
-
 data class PushEvent(
     val ref: String,
     val before: String,
@@ -23,7 +22,7 @@ data class PushEvent(
     val commitInfo: List<CommitInfo>,
     @JsonProperty("head_commit")
     val headCommitInfo: CommitInfo
-) {
+) : GithubEvent {
     data class RepoInfo(
         val id: Long,
         @JsonProperty("node_id")
@@ -58,11 +57,11 @@ data class PushEvent(
     )
 
     private fun getLocalTime(time: String): String {
-        val localTime = LocalDateTime.parse(time, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.systemDefault())
+        val localTime = LocalDateTime.parse(time, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.of("CTT"))
         return BotVariables.yyMMddPattern.format(localTime)
     }
 
-    fun toMessageWrapper(): MessageWrapper {
+    override fun toMessageWrapper(): MessageWrapper {
         val wrapper = MessageWrapper()
 
         wrapper.addText("| 仓库 ${repoInfo.fullName} 有新动态啦\n")
@@ -75,5 +74,9 @@ data class PushEvent(
         wrapper.addText(compare)
 
         return wrapper
+    }
+
+    override fun repoName(): String {
+        return repoInfo.fullName
     }
 }

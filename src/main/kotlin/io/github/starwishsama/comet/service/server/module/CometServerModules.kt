@@ -7,6 +7,7 @@ import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
+import io.github.starwishsama.comet.api.thirdparty.github.GithubEventHandler
 import io.github.starwishsama.comet.api.thirdparty.github.data.events.PushEvent
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.service.pusher.instances.GithubPusher
@@ -27,15 +28,29 @@ class GithubWebHookHandler : HttpHandler {
 
         if (cfg.webHookSecret.isNotEmpty() && signature == null) {
             BotVariables.netLogger.log(HinaLogLevel.Debug, "收到新事件, 未通过安全验证. 请求的签名为: 无", prefix = "WebHook")
-            he.sendResponseHeaders(500, 0)
+            val resp = "Unauthorized".toByteArray()
+            he.sendResponseHeaders(500, resp.size.toLong())
+            he.responseBody.use {
+                it.write(resp)
+                it.flush()
+            }
             return
         }
 
         val request = String(he.requestBody.readBytes())
 
         if (cfg.webHookSecret.isNotEmpty() && signature != null && !ServerUtil.checkSignature(signature[0], request)) {
-            BotVariables.netLogger.log(HinaLogLevel.Debug, "收到新事件, 未通过安全验证. 请求的签名为: $signature", prefix = "WebHook")
-            he.sendResponseHeaders(500, 0)
+            BotVariables.netLogger.log(
+                HinaLogLevel.Debug,
+                "收到新事件, 未通过安全验证. 请求的签名为: ${signature[0]}",
+                prefix = "WebHook"
+            )
+            val resp = "Unauthorized".toByteArray()
+            he.sendResponseHeaders(500, resp.size.toLong())
+            he.responseBody.use {
+                it.write(resp)
+                it.flush()
+            }
             return
         }
 
@@ -47,7 +62,12 @@ class GithubWebHookHandler : HttpHandler {
 
         if (!request.startsWith("payload")) {
             BotVariables.netLogger.log(HinaLogLevel.Debug, "无效请求", prefix = "WebHook")
-            he.sendResponseHeaders(403, 0)
+            val resp = "Unsupported Request".toByteArray()
+            he.sendResponseHeaders(403, resp.size.toLong())
+            he.responseBody.use {
+                it.write(resp)
+                it.flush()
+            }
             return
         }
 
@@ -62,7 +82,7 @@ class GithubWebHookHandler : HttpHandler {
         }
 
         try {
-            val info = BotVariables.mapper.readValue<PushEvent>(payload)
+            val info = GithubEventHandler.process(payload)
             GithubPusher.push(info)
             BotVariables.netLogger.log(HinaLogLevel.Debug, "推送 WebHook 消息成功", prefix = "WebHook")
         } catch (e: JsonParseException) {
