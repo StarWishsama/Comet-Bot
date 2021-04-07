@@ -32,7 +32,7 @@ data class IssueEvent(
     ) {
         fun convertCreatedTime(): String {
             val localTime =
-                LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.of("CTT"))
+                LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.systemDefault())
             return BotVariables.yyMMddPattern.format(localTime)
         }
     }
