@@ -20,6 +20,7 @@ data class IssueEvent(
 ) : GithubEvent {
 
     data class IssueObject(
+        @JsonProperty("html_url")
         val url: String,
         val id: Long,
         val title: String,
@@ -66,13 +67,13 @@ data class IssueEvent(
         val wrapper = MessageWrapper()
 
         wrapper.addText("| 仓库 ${repository.fullName} 有新议题啦\n")
-        wrapper.addText("| 议题 #${issue.number}")
+        wrapper.addText("| 议题 #${issue.number}\n")
         wrapper.addText("| 创建时间 ${issue.convertCreatedTime()}\n")
         wrapper.addText("| 创建人 ${sender.login}\n")
-        wrapper.addText("| 查看详细信息: ${issue.url}")
+        wrapper.addText("| 查看详细信息: ${issue.url}\n")
         wrapper.addText("| 简略信息: \n")
         wrapper.addText("| ${issue.title}\n")
-        wrapper.addText("| ${issue.body.limitStringSize(20)}\n")
+        wrapper.addText("| ${issue.body.limitStringSize(30)}\n")
 
         return wrapper
     }
