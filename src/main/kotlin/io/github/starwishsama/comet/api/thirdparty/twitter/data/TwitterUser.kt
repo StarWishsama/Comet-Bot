@@ -24,7 +24,6 @@ data class TwitterUser(
     val desc: String?,
     // 个人主页链接
     val url: String?,
-    val entities: JsonNode?,
     // 账号是否带锁
     val protected: Boolean,
     // 关注人数

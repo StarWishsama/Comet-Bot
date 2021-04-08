@@ -30,7 +30,7 @@ class TwitterCommand : ChatCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (BotVariables.cfg.twitterAccessToken == null) {
-            return CometUtil.toChain("蓝鸟推送未被正确设置, 请联系机器人管理员")
+            return CometUtil.toChain("推特推送未被正确设置, 请联系机器人管理员")
         }
 
         return if (args.isEmpty()) {
@@ -48,12 +48,12 @@ class TwitterCommand : ChatCommand {
                 "unsub", "退订" -> unsubscribeUser(args, id)
                 "list" -> {
                     val list = GroupConfigManager.getConfigOrNew(id).twitterSubscribers
-                    if (list.isEmpty()) "没有订阅任何蓝鸟用户".convertToChain() else list.toString().convertToChain()
+                    if (list.isEmpty()) "没有订阅任何推特用户".convertToChain() else list.toString().convertToChain()
                 }
                 "push" -> {
                     val cfg = GroupConfigManager.getConfigOrNew(id)
                     cfg.twitterPushEnabled = !cfg.twitterPushEnabled
-                    return CometUtil.toChain("蓝鸟动态推送已${if (cfg.twitterPushEnabled) "开启" else "关闭"}")
+                    return CometUtil.toChain("推特动态推送已${if (cfg.twitterPushEnabled) "开启" else "关闭"}")
                 }
                 "id" -> {
                     return if (args[1].isNumeric()) {
@@ -62,23 +62,28 @@ class TwitterCommand : ChatCommand {
                         "请输入有效数字".convertToChain()
                     }
                 }
+                "nopic" -> {
+                    val cfg = GroupConfigManager.getConfigOrNew(id)
+                    cfg.twitterPictureMode = !cfg.twitterPictureMode
+                    return CometUtil.toChain("推特动态推送图片已${if (cfg.twitterPushEnabled) "开启" else "关闭"}")
+                }
                 else -> getHelp().convertToChain()
             }
         }
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("data", arrayListOf("twit", "蓝鸟", "tt"), "查询/订阅蓝鸟账号", "nbot.commands.data", UserLevel.ADMIN)
+        CommandProps("data", arrayListOf("twit", "推特", "tt"), "查询/订阅推特账号", "nbot.commands.data", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
-        /twit info [蓝鸟ID] 查询账号信息
-        /twit sub [蓝鸟ID] 订阅用户的推文
-        /twit unsub [蓝鸟ID] 取消订阅用户的推文
+        /twit info [推特ID] 查询账号信息
+        /twit sub [推特ID] 订阅用户的推文
+        /twit unsub [推特ID] 取消订阅用户的推文
         /twit push 开启/关闭本群推文推送
         /twit id [推文ID] 通过推文ID查询推文
         /twit cx 查询订阅列表
         
-        命令别名: /蓝鸟 /tt /twitter
+        命令别名: /推特 /tt /twitter
     """.trimIndent()
 
     override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
@@ -126,20 +131,16 @@ class TwitterCommand : ChatCommand {
             val cfg = GroupConfigManager.getConfigOrNew(groupId)
             if (args.size > 1) {
                 if (!cfg.twitterSubscribers.contains(args[1])) {
-                    val twitter: TwitterUser?
+                    val twitterUser: TwitterUser
 
                     try {
-                        twitter = TwitterApi.getUserProfile(args[1])
+                        twitterUser = TwitterApi.getUserProfile(-1, args[1])[0]
                     } catch (e: RateLimitException) {
-                        return CometUtil.toChain(e.message)
+                        return CometUtil.toChain("订阅 @${args[1]} 失败")
                     }
 
-                    if (twitter != null) {
-                        cfg.twitterSubscribers.add(args[1])
-                        return CometUtil.toChain("订阅 ${twitter.name}(@${twitter.twitterId}) 成功")
-                    }
-
-                    return CometUtil.toChain("订阅 @${args[1]} 失败")
+                    cfg.twitterSubscribers.add(args[1])
+                    return CometUtil.toChain("订阅 ${twitterUser.name}(@${twitterUser.twitterId}) 成功")
                 } else {
                     return CometUtil.toChain("已经订阅过 @${args[1]} 了")
                 }

@@ -5,11 +5,13 @@ import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
+import java.util.stream.Collectors
 import kotlin.streams.toList
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-open class MessageWrapper: Cloneable {
+open class MessageWrapper {
     private val messageContent = mutableSetOf<WrapperElement>()
+
     @Volatile
     private var usable: Boolean = true
 
@@ -58,6 +60,12 @@ open class MessageWrapper: Cloneable {
             }
         }.build()
     }
+
+    fun removeElements(type: Class<*>): MessageWrapper =
+        MessageWrapper().setUsable(usable).also {
+            it.addElements((getMessageContent()).parallelStream().filter { mw -> mw.className == type.name }
+                .collect(Collectors.toSet()))
+        }
 
     private fun isPictureReachLimit(): Boolean {
         return messageContent.parallelStream().filter { it is Picture }.count() > 9

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.objects.wrapper.Picture
 import io.github.starwishsama.comet.service.pusher.CometPusher
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
@@ -18,7 +19,7 @@ import java.io.File
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
-class TwitterPusher(bot: Bot): CometPusher(bot, "twitter") {
+class TwitterPusher(bot: Bot) : CometPusher(bot, "twitter") {
     override var config: PusherConfig = PusherConfig(30_0000L)
 
     private val cachePool: MutableList<TwitterContext> = mutableListOf()
@@ -26,7 +27,7 @@ class TwitterPusher(bot: Bot): CometPusher(bot, "twitter") {
     override fun retrieve() {
         GroupConfigManager.getAllConfigs().parallelStream().forEach { cfg ->
             if (cfg.twitterPushEnabled) {
-                cfg.twitterSubscribers.forEach tweet@ { user ->
+                cfg.twitterSubscribers.forEach tweet@{ user ->
                     val cache = cachePool.getTwitterContext(user)
 
                     if (cache?.status == PushStatus.READY) {
@@ -37,7 +38,12 @@ class TwitterPusher(bot: Bot): CometPusher(bot, "twitter") {
                     val latestTweet = TwitterApi.getTweetInTimeline(user, 0, 2) ?: return@tweet
                     val time = System.currentTimeMillis()
 
-                    val current = TwitterContext(retrieveTime = time, status = PushStatus.READY, twitterUserName = user, tweetId = latestTweet.id)
+                    val current = TwitterContext(
+                        retrieveTime = time,
+                        status = PushStatus.READY,
+                        twitterUserName = user,
+                        tweetId = latestTweet.id
+                    )
 
                     if (cache == null) {
                         cachePool.add(current.also { it.addPushTarget(cfg.id) })
@@ -66,7 +72,11 @@ class TwitterPusher(bot: Bot): CometPusher(bot, "twitter") {
             if (context.status == PushStatus.READY) {
                 context.getPushTarget().forEach group@{
                     try {
-                        val wrapper = context.toMessageWrapper()
+                        var wrapper = context.toMessageWrapper()
+
+                        if (GroupConfigManager.getConfig(it)?.twitterPictureMode == false) {
+                            wrapper = wrapper.removeElements(Picture::class.java)
+                        }
 
                         if (wrapper.isUsable()) {
                             val group = bot.getGroup(it) ?: return@group

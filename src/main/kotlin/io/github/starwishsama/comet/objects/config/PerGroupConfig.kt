@@ -36,6 +36,9 @@ data class PerGroupConfig(
     @JsonProperty("twitter_sub")
     var twitterSubscribers: MutableSet<String> = hashSetOf(),
 
+    @JsonProperty("twitter_picture_mode")
+    var twitterPictureMode: Boolean = true,
+
     /**
      * bilibili 开播提醒服务
      */
@@ -145,10 +148,10 @@ data class PerGroupConfig(
     }
 
     sealed class ConfigureCommandStatus(val msg: String) {
-        object UnDisabled: ConfigureCommandStatus("该命令无法被禁用!")
-        object Enabled: ConfigureCommandStatus("成功启用该命令")
-        object Disabled: ConfigureCommandStatus("成功禁用该命令")
-        object NotExist: ConfigureCommandStatus("该命令不存在!")
+        object UnDisabled : ConfigureCommandStatus("该命令无法被禁用!")
+        object Enabled : ConfigureCommandStatus("成功启用该命令")
+        object Disabled : ConfigureCommandStatus("成功禁用该命令")
+        object NotExist : ConfigureCommandStatus("该命令不存在!")
     }
 
     data class ReplyKeyWord(

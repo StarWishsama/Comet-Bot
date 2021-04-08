@@ -94,14 +94,18 @@ object TwitterApi : ApiExecutor {
      * @return 账号信息
      */
     @Throws(RateLimitException::class, TwitterApiException::class)
-    fun getUserProfile(username: String): TwitterUser? {
+    fun getUserProfile(id: Long, username: String = ""): List<TwitterUser> {
         checkToken()
         checkRateLimit(apiReachLimit)
 
         usedTime++
 
         val startTime = LocalDateTime.now()
-        val url = "$twitterApiUrl/users/show.json?screen_name=$username&tweet_mode=extended"
+        val url = if (username.isEmpty()) {
+            "$twitterApiUrl/users/lookup.json?user_id=$id"
+        } else {
+            "$twitterApiUrl/users/lookup.json?screen_name=$username"
+        }
 
         NetUtil.executeHttpRequest(
             url = url,
@@ -122,7 +126,7 @@ object TwitterApi : ApiExecutor {
                 }
 
                 return mapper.readValue(bodyCopy)
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 if (!NetUtil.isTimeout(e)) {
                     FileUtil.createErrorReportFile(
                         type = "data",
@@ -137,7 +141,7 @@ object TwitterApi : ApiExecutor {
         }
 
         daemonLogger.debug("[蓝鸟] 查询用户信息耗时 ${Duration.between(startTime, LocalDateTime.now()).toMillis()}ms")
-        return null
+        return emptyList()
     }
 
     /**
