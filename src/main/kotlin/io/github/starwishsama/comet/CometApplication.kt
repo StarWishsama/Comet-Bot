@@ -42,15 +42,11 @@ object CometApplication {
 
             CometRuntime.handleConsoleCommand()
 
-            GlobalScope.launch {
+            runBlocking {
                 comet.join()
             }
         } catch (e: CancellationException) {
             // 忽略
-        }
-
-        while (true) {
-            // Keep running
         }
     }
 }

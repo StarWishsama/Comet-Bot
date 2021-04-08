@@ -18,6 +18,7 @@ import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.RssUtil
 import kotlinx.coroutines.Dispatchers
@@ -81,7 +82,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                 RuntimeUtil.getMemoryInfo().toChain(false)
                             }
                             "thread", "thr" -> {
-                                val executor = BotVariables.service as ThreadPoolExecutor
+                                val executor = TaskUtil.service as ThreadPoolExecutor
 
                                 val queueSize: Int = executor.queue.size
                                 val activeCount: Int = executor.activeCount
@@ -145,10 +146,10 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                 "rss" -> {
                     if (args.size > 1) {
                         return RssUtil.simplifyHTML(
-                                RssUtil.getFromEntry(
-                                        RssUtil.getEntryFromURL(args[1])
-                                                ?: return "Can't retrieve page content".convertToChain()
-                                )
+                            RssUtil.getFromEntry(
+                                RssUtil.getEntryFromURL(args[1])
+                                    ?: return "Can't retrieve page content".convertToChain()
+                            )
                         ).convertToChain()
                     }
                 }

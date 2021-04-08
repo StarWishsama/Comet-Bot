@@ -271,13 +271,7 @@ object TwitterApi : ApiExecutor {
      * @return 推文, 找不到时返回空
      */
     fun getCacheByID(id: Long): Tweet? {
-        for (tweet in cacheTweet) {
-            if (tweet.id == id) {
-                return tweet
-            }
-        }
-
-        return null
+        return cacheTweet.firstOrNull { it.id == id }
     }
 
     /**

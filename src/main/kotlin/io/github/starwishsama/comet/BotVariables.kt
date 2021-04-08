@@ -60,16 +60,6 @@ object BotVariables {
 
     var cometServer: WebHookServer? = null
 
-    val service = ScheduledThreadPoolExecutor(
-        10,
-        BasicThreadFactory.Builder()
-            .namingPattern("comet-service-%d")
-            .daemon(true)
-            .uncaughtExceptionHandler { thread, t ->
-                daemonLogger.warning("线程 ${thread.name} 在执行任务时发生了错误", t)
-            }.build()
-    ).also { it.maximumPoolSize = 30 }
-
     internal val logAction: (String) -> Unit = {
         CometApplication.console.printAbove(it)
         if (::loggerAppender.isInitialized) {
@@ -83,7 +73,8 @@ object BotVariables {
 
     val daemonLogger: HinaLogger = HinaLogger("CometService", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
-    val consoleCommandLogger: HinaLogger = HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+    val consoleCommandLogger: HinaLogger =
+        HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
     val mapper: ObjectMapper = ObjectMapper()
         // 美化输出
@@ -96,11 +87,20 @@ object BotVariables {
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         .registerModules(
             JavaTimeModule().also {
-                it.addSerializer(LocalDateTime::class.java, LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")))
+                it.addSerializer(
+                    LocalDateTime::class.java,
+                    LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
+                )
                 it.addSerializer(LocalDate::class.java, LocalDateSerializer(DateTimeFormatter.ofPattern("yyyy/MM/dd")))
                 it.addSerializer(LocalTime::class.java, LocalTimeSerializer(DateTimeFormatter.ofPattern("HH:mm:ss")))
-                it.addDeserializer(LocalDate::class.java, LocalDateDeserializer(DateTimeFormatter.ofPattern("yyyy/MM/dd")))
-                it.addDeserializer(LocalTime::class.java, LocalTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss")))
+                it.addDeserializer(
+                    LocalDate::class.java,
+                    LocalDateDeserializer(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+                )
+                it.addDeserializer(
+                    LocalTime::class.java,
+                    LocalTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss"))
+                )
             },
             KotlinModule(nullIsSameAsDefault = true, nullToEmptyCollection = true, nullToEmptyMap = true),
             SimpleModule().also {
