@@ -16,8 +16,8 @@ object GithubPusher {
             return
         }
 
-        val consumer = GroupConfigManager.getAllConfigs().parallelStream().filter {
-            it.githubRepoSubscribers.contains(event.repoName())
+        val consumer = GroupConfigManager.getAllConfigs().parallelStream().filter { cfg ->
+            cfg.githubRepoSubscribers.any { it.split("/")[1] == "*" || it == event.repoName() }
         }.collect(Collectors.toList())
 
         val bot = BotVariables.comet.getBot()

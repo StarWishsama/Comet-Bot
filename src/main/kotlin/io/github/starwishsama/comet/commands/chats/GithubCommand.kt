@@ -13,7 +13,7 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-class GithubCommand: ChatCommand {
+class GithubCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (args.isEmpty()) {
             return getHelp().convertToChain()
@@ -58,7 +58,11 @@ class GithubCommand: ChatCommand {
         return if (repos.contains(repoName)) {
             "你已经订阅过 $repoName 了".toChain()
         } else {
-            if (GithubApi.isRepoExists(authorAndRepo[0], authorAndRepo[1])) {
+            if (GithubApi.isRepoExists(
+                    authorAndRepo[0],
+                    authorAndRepo[1]
+                ) || (GithubApi.isUserExists(authorAndRepo[0]) && authorAndRepo[1] == "*")
+            ) {
                 repos.add(repoName)
                 "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${BotVariables.cfg.webHookAddress} \n(设置为仅推送事件)".toChain()
             } else {
