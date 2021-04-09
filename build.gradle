@@ -28,25 +28,10 @@ jar {
     }
 }
 
-def branchName = 'git symbolic-ref --short -q HEAD'.execute().text.trim()
-def gitBranchName = (branchName == null && branchName.isEmpty() ? "-UNOFFICIAL" :  "-" + branchName)
-def gitCommitId = 'git rev-parse --short HEAD'.execute().text.trim()
-def gitCommitIdResult = (gitCommitId == null && gitCommitId.isEmpty() ? "" : "-" + gitCommitId)
-String versionCode = "0.6.1" + gitBranchName + gitCommitIdResult
+String versionCode
 
 group 'io.github.starwishsama.comet'
 version versionCode
-
-tasks {
-    buildConfig {
-        println "Processing version code and other stuffs....."
-
-        packageName("io.github.starwishsama.comet")
-        buildConfigField("String", "version", "\"${versionCode}\"")
-        buildConfigField("String", "buildTime", "\"${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))}\"")
-        buildConfigField("String", "miraiVersion", "\"$miraiVersion\"")
-    }
-}
 
 repositories {
     mavenCentral()
@@ -106,7 +91,51 @@ dependencies {
     implementation 'dnsjava:dnsjava:3.3.1'
 }
 
+tasks {
+    task generateBuildVersion() {
+        versionCode = "0.6.1" + getGitBranchName() + getGitCommitID()
+    }
+
+    buildConfig {
+        println "Processing version code and other stuffs....."
+
+        packageName("io.github.starwishsama.comet")
+        buildConfigField("String", "version", "\"${versionCode}\"")
+        buildConfigField("String", "buildTime", "\"${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))}\"")
+        buildConfigField("String", "miraiVersion", "\"$miraiVersion\"")
+    }
+}
+
+def getGitCommitID() {
+    def gitCommit = "-UnknownCommit"
+    try {
+        def workingDir = new File("${project.projectDir}")
+        def result = 'git rev-parse --short HEAD'.execute(null, workingDir)
+        result.waitFor()
+        if (result.exitValue() == 0) {
+            gitCommit = "-" + result.text.trim()
+        }
+    } catch (ignored) {}
+
+    return gitCommit
+}
+
+def getGitBranchName() {
+    def gitBranch = "-UnknownBranch"
+    try {
+        def workingDir = new File("${project.projectDir}")
+        def result = 'git rev-parse --abbrev-ref HEAD'.execute(null, workingDir)
+        result.waitFor()
+        if (result.exitValue() == 0) {
+            gitBranch = "-" + result.text.trim()
+        }
+    } catch (ignored) {}
+
+    return gitBranch
+}
+
 shadowJar {
+    dependsOn(generateBuildVersion)
     dependsOn(generateBuildConfig)
     zip64 true
     exclude("META-INF/*.txt")
