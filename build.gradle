@@ -28,10 +28,8 @@ jar {
     }
 }
 
-String versionCode
-
 group 'io.github.starwishsama.comet'
-version versionCode
+version "0.6.1" + getGitBranchName() + getGitCommitID()
 
 repositories {
     mavenCentral()
@@ -92,15 +90,11 @@ dependencies {
 }
 
 tasks {
-    task generateBuildVersion() {
-        versionCode = "0.6.1" + getGitBranchName() + getGitCommitID()
-    }
-
     buildConfig {
         println "Processing version code and other stuffs....."
 
         packageName("io.github.starwishsama.comet")
-        buildConfigField("String", "version", "\"${versionCode}\"")
+        buildConfigField("String", "version", "\"${version}\"")
         buildConfigField("String", "buildTime", "\"${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))}\"")
         buildConfigField("String", "miraiVersion", "\"$miraiVersion\"")
     }
@@ -135,7 +129,6 @@ def getGitBranchName() {
 }
 
 shadowJar {
-    dependsOn(generateBuildVersion)
     dependsOn(generateBuildConfig)
     zip64 true
     exclude("META-INF/*.txt")
@@ -146,7 +139,7 @@ shadowJar {
 }
 
 compileKotlin {
-    println "Building Comet $versionCode..."
+    println "Building Comet $version..."
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
