@@ -81,4 +81,8 @@ data class IssueEvent(
     override fun repoName(): String {
         return repository.fullName
     }
+
+    override fun sendable(): Boolean {
+        return action == "opened"
+    }
 }

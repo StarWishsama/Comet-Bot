@@ -29,4 +29,6 @@ data class PingEvent(
     override fun repoName(): String {
         return repositoryInfo.repoFullName
     }
+
+    override fun sendable(): Boolean = false
 }

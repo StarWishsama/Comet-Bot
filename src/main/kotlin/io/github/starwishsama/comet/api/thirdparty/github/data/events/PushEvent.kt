@@ -79,4 +79,6 @@ data class PushEvent(
     override fun repoName(): String {
         return repoInfo.fullName
     }
+
+    override fun sendable(): Boolean = true
 }

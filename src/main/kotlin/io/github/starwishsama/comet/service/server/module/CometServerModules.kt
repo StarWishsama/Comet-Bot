@@ -86,19 +86,14 @@ class GithubWebHookHandler : HttpHandler {
         val eventType = he.requestHeaders[eventTypeHeader]?.get(0) ?: ""
 
         try {
-            val info = GithubEventHandler.process(payload, eventType)
+            val info = GithubEventHandler.process(payload, eventType) ?: return BotVariables.netLogger.log(HinaLogLevel.Debug, "推送 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")
             GithubPusher.push(info)
-            BotVariables.netLogger.log(HinaLogLevel.Debug, "推送 WebHook 消息成功", prefix = "WebHook")
-        } catch (e: JsonParseException) {
-            BotVariables.netLogger.log(HinaLogLevel.Debug, "推送 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")
-        } catch (e: ApiException) {
-            BotVariables.netLogger.log(HinaLogLevel.Debug, "推送 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")
         } catch (e: Exception) {
             BotVariables.netLogger.log(HinaLogLevel.Warn, "推送 WebHook 消息失败", e, prefix = "WebHook")
         }
 
         val response = if (cfg.webHookSecret.isEmpty()) {
-            "Comet 已收到事件, 推荐使用密钥以保证安全".toByteArray()
+            "Comet 已收到事件, 推荐使用密钥加密以保证服务器安全".toByteArray()
         } else {
             "Comet 已收到事件".toByteArray()
         }

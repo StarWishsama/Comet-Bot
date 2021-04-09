@@ -6,4 +6,6 @@ interface GithubEvent {
     fun toMessageWrapper(): MessageWrapper
 
     fun repoName(): String
+
+    fun sendable(): Boolean
 }
