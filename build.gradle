@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
         google()
         maven { url "https://plugins.gradle.org/m2/" }
-        maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/central/' }
     }
 }
 
@@ -15,7 +15,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.4.32'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.32'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
-    id("com.github.gmazzo.buildconfig") version("2.0.2")
+    id 'com.github.gmazzo.buildconfig' version '3.0.0'
 }
 
 def mainClass = 'io.github.starwishsama.comet.CometApplication'
@@ -28,10 +28,10 @@ jar {
     }
 }
 
-String branchName = 'git symbolic-ref --short -q HEAD'.execute().text.trim()
-String gitBranchName = "-" + (branchName == null && branchName.isEmpty() ? "Unofficial" : branchName)
-String gitCommitId = 'git rev-parse --short HEAD'.execute().text.trim()
-String gitCommitIdResult = (gitCommitId == null && gitCommitId.isEmpty() ? "" : "-" + gitCommitId)
+def branchName = 'git symbolic-ref --short -q HEAD'.execute().text.trim()
+def gitBranchName = (branchName == null && branchName.isEmpty() ? "-UNOFFICIAL" :  "-" + branchName)
+def gitCommitId = 'git rev-parse --short HEAD'.execute().text.trim()
+def gitCommitIdResult = (gitCommitId == null && gitCommitId.isEmpty() ? "" : "-" + gitCommitId)
 String versionCode = "0.6.1" + gitBranchName + gitCommitIdResult
 
 group 'io.github.starwishsama.comet'
@@ -117,6 +117,8 @@ shadowJar {
 }
 
 compileKotlin {
+    println "Building Comet $versionCode..."
+
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
         freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses"]
