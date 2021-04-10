@@ -41,8 +41,6 @@ import java.util.concurrent.*
  * 机器人(几乎)所有数据的存放类
  * 可以直接访问数据
  *
- * FIXME: 不应该在初始化时 init 这么多变量, 应当分担到各自所需类中 (即懒处理它们)
- *
  * @author Nameless
  */
 
@@ -112,8 +110,8 @@ object BotVariables {
 
     var rCon: Rcon? = null
 
-    val shop: MutableList<Shop> = LinkedList()
-    val users: MutableMap<Long, BotUser> = hashMapOf()
+    val shop: MutableSet<Shop> = mutableSetOf()
+    val users: MutableMap<Long, BotUser> = ConcurrentHashMap()
     lateinit var localizationManager: LocalizationManager
     var hitokoto: Hitokoto? = null
 
