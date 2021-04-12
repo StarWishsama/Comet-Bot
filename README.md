@@ -79,7 +79,7 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
 
 ------
 
-    Copyright (C) 2018-2020 StarWishsama
+    Copyright (C) 2018-2021 StarWishsama
     
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
