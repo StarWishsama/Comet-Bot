@@ -56,7 +56,7 @@ dependencies {
     implementation("net.mamoe.yamlkt:yamlkt:0.9.0")
     // jackson https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
     implementation 'com.fasterxml.jackson.core:jackson-core:2.12.2'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.12.2'
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.12.2"
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.2'
