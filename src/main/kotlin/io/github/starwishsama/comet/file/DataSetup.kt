@@ -21,9 +21,10 @@ object DataSetup {
     private val userCfg: DataFile = DataFile(File(BotVariables.filePath, "users.json"), DataFile.FilePriority.HIGH) {
         it.writeClassToJson(BotVariables.users)
     }
-    private val shopItemCfg: DataFile = DataFile(File(BotVariables.filePath, "items.json"), DataFile.FilePriority.NORMAL) {
-        it.writeClassToJson(BotVariables.shop)
-    }
+    private val shopItemCfg: DataFile =
+        DataFile(File(BotVariables.filePath, "items.json"), DataFile.FilePriority.NORMAL) {
+            it.writeClassToJson(BotVariables.shop)
+        }
     private val cfgFile: DataFile = DataFile(File(BotVariables.filePath, "config.yml"), DataFile.FilePriority.HIGH) {
         it.writeString(Default.encodeToString(CometConfig()), isAppend = false)
     }
@@ -78,6 +79,7 @@ object DataSetup {
 
     private fun load() {
         cfg = Default.decodeFromString(CometConfig.serializer(), cfgFile.file.getContext())
+
         LoggerInstances.instances.forEach {
             it.debugMode = cfg.debugMode
         }

@@ -25,31 +25,31 @@ import kotlin.time.toKotlinDuration
 val tcoPattern: Pattern = Pattern.compile("https://t.co/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]")
 
 data class Tweet(
-        @JsonProperty("created_at")
-        val postTime: String,
-        val id: Long,
-        @JsonProperty("id_str")
-        val idAsString: String,
-        @JsonProperty("full_text")
-        val text: String,
-        val truncated: Boolean,
-        val entities: JsonNode?,
-        val source: String,
-        @JsonProperty("in_reply_to_status_id")
-        val replyTweetId: Long?,
-        val user: TwitterUser,
-        @JsonProperty("retweeted_status")
-        val retweetStatus: Tweet?,
-        @JsonProperty("retweet_count")
-        val retweetCount: Long?,
-        @JsonProperty("favorite_count")
-        val likeCount: Long?,
-        @JsonProperty("possibly_sensitive")
-        val sensitive: Boolean?,
-        @JsonProperty("quoted_status")
-        val quotedStatus: Tweet?,
-        @JsonProperty("is_quote_status")
-        val isQuoted: Boolean
+    @JsonProperty("created_at")
+    val postTime: String,
+    val id: Long,
+    @JsonProperty("id_str")
+    val idAsString: String,
+    @JsonProperty("full_text")
+    val text: String,
+    val truncated: Boolean,
+    val entities: JsonNode?,
+    val source: String,
+    @JsonProperty("in_reply_to_status_id")
+    val replyTweetId: Long?,
+    val user: TwitterUser,
+    @JsonProperty("retweeted_status")
+    val retweetStatus: Tweet?,
+    @JsonProperty("retweet_count")
+    val retweetCount: Long?,
+    @JsonProperty("favorite_count")
+    val likeCount: Long?,
+    @JsonProperty("possibly_sensitive")
+    val sensitive: Boolean?,
+    @JsonProperty("quoted_status")
+    val quotedStatus: Tweet?,
+    @JsonProperty("is_quote_status")
+    val isQuoted: Boolean
 ) {
     /**
      * 格式化输出推文
@@ -57,7 +57,7 @@ data class Tweet(
     @OptIn(ExperimentalTime::class)
     fun convertToString(): String {
         val duration =
-                Duration.between(getSentTime(), LocalDateTime.now())
+            Duration.between(getSentTime(), LocalDateTime.now())
         val extraText =
             "❤${likeCount?.getBetterNumber()} | \uD83D\uDD01${retweetCount} | 🕘${hmsPattern.format(getSentTime())}"
 
@@ -127,7 +127,7 @@ data class Tweet(
         if (media != null) {
             try {
                 val image =
-                        mapper.readValue(media[0].asText(), Media::class.java)
+                    mapper.readValue(media[0].asText(), Media::class.java)
                 if (image.isSendableMedia()) {
                     return image.getImageUrl()
                 }
@@ -185,7 +185,7 @@ data class Tweet(
         return runBlocking { toMessageWrapper().toMessageChain(target) }
     }
 
-    fun getTweetURL(): String {
+    private fun getTweetURL(): String {
         return "https://twitter.com/${user.twitterId}/status/$idAsString"
     }
 }

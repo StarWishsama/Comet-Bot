@@ -16,7 +16,6 @@ import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -304,8 +303,6 @@ object FileUtil {
      */
     @Suppress("SameParameterValue")
     private fun copyFromJar(jarFile: File, resourcePath: String) {
-        var isInsideResource = false
-
         JarFile(jarFile).use { jar ->
             val entries = jar.entries()
             while (entries.hasMoreElements()) {
@@ -313,18 +310,23 @@ object FileUtil {
                 val entryName = entry.name
 
                 if (entryName.startsWith("$resourcePath/")) {
-                    if (!isInsideResource) isInsideResource = true
-
                     val actualName = entryName.replace("${resourcePath}/", "").removeSuffix("/")
 
                     processFileInJar(entry, actualName)
-                } else if (isInsideResource) {
-                    break
+                } else {
+                    continue
                 }
             }
         }
     }
 
+    /**
+     * 处理 jar 中的文件
+     *
+     * @param entry jar
+     * @param fileName 文件名
+     * @param resourcePath 资源文件储存文件夹
+     */
     private fun processFileInJar(entry: JarEntry, fileName: String, resourcePath: String = "resources") {
         if (fileName.isEmpty()) return
 
@@ -333,25 +335,23 @@ object FileUtil {
         if (entry.isDirectory && entryName != "$resourcePath/") {
             File(getResourceFolder(), "$fileName/").mkdirs()
         } else {
-            val f = File(getResourceFolder(), fileName)
+            val current = File(getResourceFolder(), fileName)
 
-
-            if (!f.exists() || f.lastModified().toLocalDateTime() >
+            if (!current.exists() || current.lastModified().toLocalDateTime() >
                 entry.lastModifiedTime.toMillis().toLocalDateTime(true)
             ) {
-
-                if (!f.exists()) {
-                    f.createNewFile()
+                if (!current.exists()) {
+                    current.createNewFile()
                 }
 
-                FileOutputStream(f).use { fos ->
+                FileOutputStream(current).use { fos ->
                     val byteArray = ByteArray(1024)
-                    var i: Int
+                    var len: Int
                     javaClass.classLoader.getResourceAsStream(entryName).use { fis ->
                         if (fis != null) {
                             // While the input stream has bytes
-                            while (fis.read(byteArray).also { i = it } > 0) {
-                                fos.write(byteArray, 0, i)
+                            while (fis.read(byteArray).also { len = it } > 0) {
+                                fos.write(byteArray, 0, len)
                             }
                         }
                     }
