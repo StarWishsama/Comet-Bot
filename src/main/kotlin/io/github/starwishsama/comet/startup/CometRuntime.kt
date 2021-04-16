@@ -12,7 +12,6 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
-import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.commands.chats.*
 import io.github.starwishsama.comet.commands.console.BroadcastCommand
 import io.github.starwishsama.comet.commands.console.DebugCommand
@@ -203,7 +202,7 @@ object CometRuntime {
     private fun runScheduleTasks() {
         TaskUtil.runAsync { BackupHelper.checkOldFiles() }
 
-        val apis = arrayOf(DynamicApi, TwitterApi, YoutubeApi, VideoApi)
+        val apis = arrayOf(DynamicApi, TwitterApi, VideoApi)
 
         /** 定时任务 */
         BackupHelper.scheduleBackup()
@@ -213,11 +212,11 @@ object CometRuntime {
 
         val biliConfig = ApiManager.getConfig<BiliBiliConfig>()
 
-        val pwd = biliConfig?.password
-        val username = biliConfig?.login
+        val pwd = biliConfig.password
+        val username = biliConfig.login
 
         TaskUtil.runAsync(5) {
-            if (pwd != null && username != null) {
+            if (pwd.isNotEmpty() && username.isNotEmpty()) {
                 runBlocking {
                     FakeClientApi.login(username, pwd)
                 }

@@ -105,7 +105,7 @@ object DataSetup {
     fun saveAllResources() {
         daemonLogger.info("[数据] 自动保存数据完成")
         saveCfg()
-        savePerGroupSetting()
+        GroupConfigManager.saveAll()
     }
 
     fun reload() {
@@ -152,17 +152,5 @@ object DataSetup {
         }
 
         BotVariables.logger.info("[配置] 成功加载了 ${GroupConfigManager.getAllConfigs().size} 个群配置")
-    }
-
-    private fun savePerGroupSetting() {
-        if (!perGroupFolder.exists()) return
-
-        GroupConfigManager.getAllConfigs().forEach {
-            val loc = File(perGroupFolder.file, "${it.id}.json")
-            if (!loc.exists()) loc.createNewFile()
-            loc.writeClassToJson(it, mapper)
-        }
-
-        daemonLogger.info("已保存所有群配置")
     }
 }

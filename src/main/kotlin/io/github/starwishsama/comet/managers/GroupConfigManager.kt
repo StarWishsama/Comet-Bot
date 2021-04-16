@@ -1,7 +1,12 @@
 package io.github.starwishsama.comet.managers
 
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.comet
+import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
+import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.writeClassToJson
+import java.io.File
 
 object GroupConfigManager {
     private val groupConfigs: MutableSet<PerGroupConfig> = HashSet()
@@ -43,4 +48,20 @@ object GroupConfigManager {
     }
 
     fun getAllConfigs(): Set<PerGroupConfig> = groupConfigs
+
+    fun saveAll() {
+        if (!FileUtil.getChildFolder("groups").exists()) {
+            FileUtil.getChildFolder("groups").mkdirs()
+        }
+
+        GroupConfigManager.getAllConfigs().forEach {
+            val loc = File(FileUtil.getChildFolder("groups"), "${it.id}.json")
+            if (!loc.exists()) {
+                loc.createNewFile()
+            }
+            loc.writeClassToJson(it)
+        }
+
+        BotVariables.daemonLogger.info("已保存所有群配置")
+    }
 }
