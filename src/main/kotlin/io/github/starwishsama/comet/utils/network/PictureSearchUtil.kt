@@ -4,6 +4,8 @@ import cn.hutool.core.util.URLUtil
 import cn.hutool.http.ContentType
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.managers.ApiManager
+import io.github.starwishsama.comet.objects.config.api.SauceNaoConfig
 import io.github.starwishsama.comet.objects.pojo.PicSearchResult
 import io.github.starwishsama.comet.utils.FileUtil
 import org.jsoup.Jsoup
@@ -17,12 +19,12 @@ object PictureSearchUtil {
 
     fun sauceNaoSearch(url: String): PicSearchResult {
         val encodedUrl = URLUtil.encode(url)
-        val key = BotVariables.cfg.sauceNaoApiKey
+        val key = ApiManager.getConfig<SauceNaoConfig>()?.token
 
         NetUtil.executeHttpRequest(
-                url = "$sauceNaoApi$encodedUrl${if (key != null && key.isNotEmpty()) "&api_key=$key" else ""}",
-                timeout = 5
-        ).use {response ->
+            url = "$sauceNaoApi$encodedUrl${if (key != null && key.isNotEmpty()) "&api_key=$key" else ""}",
+            timeout = 5
+        ).use { response ->
             if (response.isSuccessful && response.isType(ContentType.JSON.value)) {
                 val body = response.body?.string() ?: return PicSearchResult.emptyResult()
                 try {
@@ -36,8 +38,10 @@ object PictureSearchUtil {
                     }
                 } catch (e: Exception) {
                     BotVariables.logger.error("[以图搜图] 在解析 API 传回的 json 时出现了问题", e)
-                    FileUtil.createErrorReportFile(type = "picsearch", t = e, content = body,
-                        message = "Request URL: ${response.request.url}")
+                    FileUtil.createErrorReportFile(
+                        type = "picsearch", t = e, content = body,
+                        message = "Request URL: ${response.request.url}"
+                    )
                 }
             }
         }
@@ -60,7 +64,7 @@ object PictureSearchUtil {
         val original: String
         try {
             imgUrl =
-                    "https://ascii2d.net/" + elements.select(".image-box")[1].select("img")[0].attributes()["src"]
+                "https://ascii2d.net/" + elements.select(".image-box")[1].select("img")[0].attributes()["src"]
             original = sources[0].attributes()["href"]
         } catch (ignored: IndexOutOfBoundsException) {
             return PicSearchResult.emptyResult()

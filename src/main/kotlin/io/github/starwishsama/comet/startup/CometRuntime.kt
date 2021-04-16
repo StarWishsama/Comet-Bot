@@ -22,6 +22,8 @@ import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.RetrofitLogger
+import io.github.starwishsama.comet.managers.ApiManager
+import io.github.starwishsama.comet.objects.config.api.BiliBiliConfig
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.server.WebHookServer
@@ -209,9 +211,10 @@ object CometRuntime {
             BotVariables.users.forEach { it.value.addTime(100) }
         }
 
+        val biliConfig = ApiManager.getConfig<BiliBiliConfig>()
 
-        val pwd = cfg.biliPassword
-        val username = cfg.biliUserName
+        val pwd = biliConfig?.password
+        val username = biliConfig?.login
 
         TaskUtil.runAsync(5) {
             if (pwd != null && username != null) {

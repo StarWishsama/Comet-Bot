@@ -15,6 +15,7 @@ import io.github.starwishsama.comet.service.compatibility.data.OldGroupConfig
 import io.github.starwishsama.comet.service.compatibility.data.VersionTestObject
 import io.github.starwishsama.comet.utils.copyAndRename
 import io.github.starwishsama.comet.utils.getContext
+import io.github.starwishsama.comet.utils.json.isUsable
 import java.io.File
 import kotlin.streams.toList
 
@@ -28,18 +29,22 @@ import kotlin.streams.toList
  */
 object CompatibilityService {
     fun checkConfigFile(cfgFile: File): Boolean {
-        val context = cfgFile.getContext()
+        val tree = mapper.readTree(cfgFile)
         try {
-            mapper.readValue(context, VersionTestObject::class.java)
-            return false
-        } catch (ignored: Exception) {}
+            if (tree["bili_sub"].isUsable()) {
+                val test = tree["bili_sub"] as List<*>
+
+                return test.first() !is Long
+            }
+        } catch (ignored: Exception) {
+        }
 
         val cfg: OldGroupConfig
 
         try {
             daemonLogger.log(HinaLogLevel.Info, "已检测到旧版本配置文件, 正在迁移...", prefix = "兼容性")
 
-            cfg = mapper.readValue(context, OldGroupConfig::class.java)
+            cfg = mapper.readValue(cfgFile, OldGroupConfig::class.java)
         } catch (e: Exception) {
             daemonLogger.log(HinaLogLevel.Warn, "转换旧版本配置文件数据失败!", e, prefix = "兼容性")
             return false
@@ -80,11 +85,18 @@ object CompatibilityService {
         return true
     }
 
+    /**
+     * 转换旧版本用户数据
+     *
+     * @param userData 用户数据文件
+     * @return 转换是否成功
+     */
     fun checkUserData(userData: File): Boolean {
         try {
             mapper.readValue<Map<Long, BotUser>>(userData)
             return true
-        } catch (ignored: Exception) {}
+        } catch (ignored: Exception) {
+        }
 
         try {
             userData.copyAndRename("users.json.old")
@@ -93,6 +105,8 @@ object CompatibilityService {
                 val actual = handleDuplication(old, it)
                 BotVariables.users[actual.id] = actual
             }
+
+            return true
         } catch (e: Exception) {
             daemonLogger.log(HinaLogLevel.Warn, "转换旧版本用户数据失败!", e, prefix = "兼容性")
         }

@@ -6,6 +6,7 @@ import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.LoggerInstances
+import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.config.DataFile
@@ -90,13 +91,15 @@ object DataSetup {
 
         daemonLogger.info("已加载了 ${BotVariables.users.size} 个用户数据.")
 
-        BotVariables.shop.addAll(shopItemCfg.file.parseAsClass())
+        //BotVariables.shop.addAll(shopItemCfg.file.parseAsClass())
 
         FileUtil.initResourceFile()
 
         BotVariables.localizationManager = LocalizationManager()
 
         GachaService.loadGachaData(arkNightData.file, pcrData.file)
+
+        ApiManager.loadAllApiConfig()
     }
 
     fun saveAllResources() {
@@ -106,8 +109,8 @@ object DataSetup {
     }
 
     fun reload() {
-        // 仅重载配置文件
         cfg = Default.decodeFromString(CometConfig.serializer(), cfgFile.file.getContext())
+        ApiManager.reloadConfig()
     }
 
     fun initPerGroupSetting(bot: Bot) {

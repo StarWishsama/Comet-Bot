@@ -14,6 +14,8 @@ import io.github.starwishsama.comet.api.thirdparty.twitter.data.TwitterUser
 import io.github.starwishsama.comet.exceptions.EmptyTweetException
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.exceptions.TwitterApiException
+import io.github.starwishsama.comet.managers.ApiManager
+import io.github.starwishsama.comet.objects.config.api.TwitterConfig
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -38,8 +40,10 @@ object TwitterApi : ApiExecutor {
     // 获取 token 地址
     private const val twitterTokenGetUrl = "https://api.twitter.com/oauth2/token"
 
+    private val apiConfig = ApiManager.getConfig<TwitterConfig>()
+
     // Bearer Token
-    private var token = BotVariables.cfg.twitterToken
+    private var token = apiConfig.token
 
     // Api 调用次数
     override var usedTime: Int = 0
@@ -48,7 +52,7 @@ object TwitterApi : ApiExecutor {
     private const val apiReachLimit = "已达到 Twitter API 调用上限"
 
     private fun checkToken() {
-        if (token == null) getBearerToken()
+        if (token.isEmpty()) getBearerToken()
     }
 
     private val cacheTweet = mutableSetOf<Tweet>()
@@ -62,7 +66,7 @@ object TwitterApi : ApiExecutor {
         try {
             val curl = CUrl(twitterTokenGetUrl).opt(
                 "-u",
-                "${BotVariables.cfg.twitterAccessToken}:${BotVariables.cfg.twitterAccessSecret}",
+                "${apiConfig.accessToken}:${apiConfig.accessSecret}",
                 "--data",
                 "grant_type=client_credentials"
             )
@@ -76,7 +80,8 @@ object TwitterApi : ApiExecutor {
             if (mapper.readTree(result).isUsable()) {
                 // Get Token
                 token = mapper.readTree(result)["access_token"].asText()
-                BotVariables.cfg.twitterToken = token
+                apiConfig.token = token
+
                 logger.info("[蓝鸟] 成功获取 Access Token")
             }
         } catch (e: IOException) {

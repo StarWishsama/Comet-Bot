@@ -20,16 +20,17 @@ import retrofit2.http.Query
 /**
  * FIXME: 需要重构
  */
+@Deprecated("No longer to use")
 object YoutubeApi : ApiExecutor {
     val service: IYoutubeApi
-    get() {
-        if (!isReachLimit()) {
-            usedTime++
-            return field
-        } else {
-            throw RateLimitException("Youtube API 调用已达上限")
+        get() {
+            if (!isReachLimit()) {
+                usedTime++
+                return field
+            } else {
+                throw RateLimitException("Youtube API 调用已达上限")
+            }
         }
-    }
 
     init {
         val retrofit = Retrofit.Builder()
@@ -90,17 +91,21 @@ object YoutubeApi : ApiExecutor {
         items.forEach { item ->
             run {
                 if (item.snippet.getType() == VideoType.STREAMING) {
-                    return MessageWrapper().addText("""${item.snippet.channelTitle} 正在直播!
+                    return MessageWrapper().addText(
+                        """${item.snippet.channelTitle} 正在直播!
 直播标题: ${item.snippet.videoTitle}
 直播时间: ${item.snippet.publishTime}
-直达链接: ${item.getVideoUrl()}""")
-                            .addPictureByURL(item.snippet.getCoverImgUrl())
+直达链接: ${item.getVideoUrl()}"""
+                    )
+                        .addPictureByURL(item.snippet.getCoverImgUrl())
                 } else if (item.snippet.getType() == VideoType.UPCOMING) {
-                    return MessageWrapper().addText("""
+                    return MessageWrapper().addText(
+                        """
 ${item.snippet.channelTitle} 有即将进行的直播!
 直播标题: ${item.snippet.videoTitle}
 开播时间请打开查看 ${item.getVideoUrl()}
-""").addPictureByURL(item.snippet.getCoverImgUrl())
+"""
+                    ).addPictureByURL(item.snippet.getCoverImgUrl())
                 }
             }
         }
@@ -121,9 +126,11 @@ ${item.snippet.channelTitle} 有即将进行的直播!
             return if (page.execute().body().contains("isLive: true")) {
                 val doc = page.get()
                 val streamTitle = doc.title()
-                MessageWrapper().addText("""${youtubeUser.userName} 正在直播!
+                MessageWrapper().addText(
+                    """${youtubeUser.userName} 正在直播!
 直播标题: $streamTitle
-直达链接: https://www.youtube.com/channel/${youtubeUser.id}/live""")
+直达链接: https://www.youtube.com/channel/${youtubeUser.id}/live"""
+                )
             } else {
                 MessageWrapper().addText("当前没有在直播").setUsable(false)
             }
@@ -147,13 +154,13 @@ interface IYoutubeApi {
         @Query("part") part: String = "snippet%2CcontentDetails%2Cstatistics",
         @Query("id") channelId: String,
         @Query("maxResults") maxResult: Int = 5,
-        @Query("key") token: String = cfg.youtubeApiKey
+        @Query("key") token: String = ""
     ): Call<SearchVideoResult>
 
     @GET("/channels")
     fun getChannelResult(
         @Query("part") part: String = "snippet%2CcontentDetails%2Cstatistics",
         @Query("id") channelId: String,
-        @Query("key") token: String = cfg.youtubeApiKey
+        @Query("key") token: String = ""
     ): Call<SearchChannelResult>
 }

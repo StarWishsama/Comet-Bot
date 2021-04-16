@@ -1,7 +1,8 @@
 package io.github.starwishsama.comet.api.thirdparty.twitter.data.tweetEntity
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.managers.ApiManager
+import io.github.starwishsama.comet.objects.config.api.TwitterConfig
 
 /**
  * 推文中的媒体实体类
@@ -55,7 +56,7 @@ data class Media(
 
     fun getImageUrl(): String {
         val imgType = arrayOf("jpg", "png", "jpeg", "webp", "heif", "gif")
-        if (BotVariables.cfg.smallImageMode) {
+        if (ApiManager.getConfig<TwitterConfig>().smallImageMode) {
             var type = ""
             imgType.forEach {
                 if (mediaUrlHttps.contains(it)) {
