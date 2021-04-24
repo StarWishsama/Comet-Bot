@@ -12,6 +12,7 @@ import org.xbill.DNS.Lookup
 import org.xbill.DNS.SRVRecord
 import org.xbill.DNS.Type
 import java.io.*
+import java.lang.StringBuilder
 import java.net.Proxy
 import java.net.Socket
 import java.time.Duration
@@ -155,7 +156,8 @@ object MinecraftUtil {
                 val result = records[0] as SRVRecord
                 SRVConvertResult(result.target.toString().replaceFirst(Regex("\\.$"), ""), result.port)
             } else {
-                SRVConvertResult("", -1)
+                // 可能这个链接就是普通的 A 解析, fallback 一下
+                SRVConvertResult(host, 25565)
             }
         } catch (e: Exception) {
             SRVConvertResult("", -1)
@@ -185,13 +187,11 @@ data class QueryInfo(
 
         return """
             > 在线玩家 ${info.players.onlinePlayer}/${info.players.maxPlayer}
-            > MOTD ${
-            if (info.motd.isArray)
-                info.motd["extra"]["text"].asText().trim().limitStringSize(20)
-            else info.motd.asText().trim().limitStringSize(20)
+            > MOTD ${info.parseMOTD()}
         }
             > 服务器版本 ${info.version.protocolName}
             > 延迟 $usedTime
+            ${if (info.modInfo?.modList != null) "> MOD 列表 " + info.modInfo.modList else ""}
         """.trimIndent()
     }
 }
@@ -204,6 +204,20 @@ data class MinecraftServerInfo(
     @JsonProperty("modinfo")
     val modInfo: ModInfo?
 ) {
+    fun parseMOTD(): String {
+        val builder = StringBuilder()
+
+        if (motd["extra"] == null) {
+            builder.append(motd["text"])
+        } else {
+            motd["extra"].forEach {
+                builder.append(it["text"].asText())
+            }
+        }
+
+        return builder.toString().trim()
+    }
+
     data class Version(
         @JsonProperty("name")
         val protocolName: String,
