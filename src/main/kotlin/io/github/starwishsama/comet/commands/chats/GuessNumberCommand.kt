@@ -2,7 +2,6 @@ package io.github.starwishsama.comet.commands.chats
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.api.annotations.CometCommand
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
@@ -25,7 +24,7 @@ import net.mamoe.mirai.message.data.content
 import java.time.Duration
 import java.time.LocalDateTime
 
-@CometCommand
+
 class GuessNumberCommand : ChatCommand, ConversationCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (event is GroupMessageEvent) {
@@ -34,7 +33,12 @@ class GuessNumberCommand : ChatCommand, ConversationCommand {
                     args.isEmpty() -> {
                         val answer = RandomUtil.randomInt(0, 100)
                         BotVariables.logger.info("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
-                        SessionHandler.insertSession(GuessNumberSession(SessionTarget(event.group.id), RandomUtil.randomInt(0, 101)))
+                        SessionHandler.insertSession(
+                            GuessNumberSession(
+                                SessionTarget(event.group.id),
+                                RandomUtil.randomInt(0, 101)
+                            )
+                        )
                         return CometUtil.toChain("来猜个数字吧! 范围 [0, 100]")
                     }
                     args.size == 2 -> {

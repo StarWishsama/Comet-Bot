@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-@CometCommand
+
 @Suppress("SpellCheckingInspection")
 class AdminCommand : ChatCommand, UnDisableableCommand {
     private val hourMinuteFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -95,7 +95,9 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
             if (args.size > 1) {
                 val target: BotUser? = CometUtil.parseAtAsBotUser(event, args[1])
 
-                val validate = CommandExecutor.getCommands().parallelStream().filter { it.getProps().permission == args[2] }.findAny().isPresent
+                val validate =
+                    CommandExecutor.getCommands().parallelStream().filter { it.getProps().permission == args[2] }
+                        .findAny().isPresent
 
                 return if (validate) {
                     target?.addPermission(args[2])

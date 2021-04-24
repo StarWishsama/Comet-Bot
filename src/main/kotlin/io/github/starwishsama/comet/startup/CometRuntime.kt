@@ -100,42 +100,7 @@ object CometRuntime {
 
         GachaService.loadAllPools()
 
-        CommandExecutor.setupCommand(
-            arrayOf(
-                AdminCommand(),
-                ArkNightCommand(),
-                BiliBiliCommand(),
-                CheckInCommand(),
-                ClockInCommand(),
-                io.github.starwishsama.comet.commands.chats.DebugCommand(),
-                DivineCommand(),
-                PCRCommand(),
-                GuessNumberCommand(),
-                HelpCommand(),
-                InfoCommand(),
-                MusicCommand(),
-                MuteCommand(),
-                PictureSearchCommand(),
-                R6SCommand(),
-                RConCommand(),
-                KickCommand(),
-                TwitterCommand(),
-                VersionCommand(),
-                GroupConfigCommand(),
-                RSPCommand(),
-                RollCommand(),
-                YoutubeCommand(),
-                MinecraftCommand(),
-                PusherCommand(),
-                GithubCommand(),
-                // Console Command
-                StopCommand(),
-                DebugCommand(),
-                io.github.starwishsama.comet.commands.console.AdminCommand(),
-                io.github.starwishsama.comet.commands.console.BiliBiliCommand(),
-                BroadcastCommand()
-            )
-        )
+        CommandExecutor.registerAllCommands()
 
         logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
 

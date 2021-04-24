@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.chats
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -13,7 +13,7 @@ import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-@CometCommand
+
 class DivineCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         return if (args.isNotEmpty()) {

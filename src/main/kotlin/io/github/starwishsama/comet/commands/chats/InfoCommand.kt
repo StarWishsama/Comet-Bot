@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -17,7 +17,7 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import java.time.format.DateTimeFormatter
 
 @OptIn(MiraiExperimentalApi::class)
-@CometCommand
+
 class InfoCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (args.isEmpty()) {

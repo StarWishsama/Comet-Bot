@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.chats
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -9,7 +9,6 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.service.task.HitokotoUpdater
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
-import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -18,7 +17,6 @@ import java.math.RoundingMode
 import java.time.Duration
 import java.time.LocalDateTime
 
-@CometCommand
 /**
  * CheckInCommand
  *
@@ -27,6 +25,7 @@ import java.time.LocalDateTime
  * @author StarWishsama
  * @author StivenDing
  */
+
 class CheckInCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         return if (event is GroupMessageEvent) {

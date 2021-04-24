@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.api.command
 
 import io.github.starwishsama.comet.BotVariables
+
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
@@ -20,6 +21,9 @@ import net.mamoe.mirai.message.data.*
 import java.time.LocalDateTime
 import java.util.*
 
+import org.reflections.Reflections;
+import java.lang.reflect.Modifier
+
 /**
  * 彗星 Bot 命令处理器
  *
@@ -30,6 +34,26 @@ object CommandExecutor {
     private val commands: MutableSet<ChatCommand> = mutableSetOf()
     private val consoleCommands = mutableListOf<ConsoleCommand>()
 
+    fun registerAllCommands() {
+        val reflections = Reflections()
+
+        val chatCommands: Set<Class<out ChatCommand>> = reflections.getSubTypesOf(ChatCommand::class.java)
+
+        for (command in chatCommands) {
+            if (!command.isInterface && !Modifier.isAbstract(command.modifiers)) {
+                setupCommand(command.newInstance())
+            }
+        }
+
+        val consoleCommands = reflections.getSubTypesOf(ConsoleCommand::class.java)
+
+        consoleCommands.forEach {
+            if (!it.isInterface && !Modifier.isAbstract(it.modifiers)) {
+                setupConsoleCommand(it.newInstance())
+            }
+        }
+    }
+
     /**
      * 注册命令
      *
@@ -38,6 +62,14 @@ object CommandExecutor {
     private fun setupCommand(command: ChatCommand) {
         if (command.canRegister() && !commands.add(command)) {
             BotVariables.logger.warning("[命令] 正在尝试注册已有命令 ${command.getProps().name}")
+        }
+    }
+
+    private fun setupConsoleCommand(command: ConsoleCommand) {
+        if (!consoleCommands.contains(command)) {
+            consoleCommands.plusAssign(command)
+        } else {
+            BotVariables.logger.warning("[命令] 正在尝试注册已有后台命令 ${command.getProps().name}")
         }
     }
 
@@ -59,12 +91,7 @@ object CommandExecutor {
         commands.forEach {
             when (it) {
                 is ChatCommand -> setupCommand(it)
-                is ConsoleCommand ->
-                    if (!consoleCommands.contains(it)) {
-                        consoleCommands.plusAssign(it)
-                    } else {
-                        BotVariables.logger.warning("[命令] 正在尝试注册已有后台命令 ${it.getProps().name}")
-                    }
+                is ConsoleCommand -> setupConsoleCommand(it)
                 else -> {
                     BotVariables.logger.warning("[命令] 正在尝试注册非命令类 ${it.javaClass.simpleName}")
                 }
@@ -91,8 +118,8 @@ object CommandExecutor {
 
                     if (result.status.isOk()) {
                         BotVariables.logger.debug(
-                                "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(msMode = true)}" +
-                                        if (result.status.isOk()) ", 执行结果: ${result.status.name}" else ""
+                            "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(msMode = true)}" +
+                                    if (result.status.isOk()) ", 执行结果: ${result.status.name}" else ""
                         )
                     }
                 }
@@ -130,7 +157,8 @@ object CommandExecutor {
                  * 检查是否在尝试执行被禁用命令
                  */
                 if (cmd != null && event is GroupMessageEvent &&
-                        GroupConfigManager.getConfig(event.group.id)?.isDisabledCommand(cmd) == true) {
+                    GroupConfigManager.getConfig(event.group.id)?.isDisabledCommand(cmd) == true
+                ) {
                     return if (validateStatus(user, cmd.getProps())) {
                         ExecutedResult(CometUtil.toChain("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
                     } else {
@@ -169,7 +197,15 @@ object CommandExecutor {
                 } else {
                     BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message}, 发送者: $senderId", t)
                     if (user.isBotOwner()) {
-                        ExecutedResult(CometUtil.toChain("在试图执行命令时发生了一个错误\n简易报错信息 :\n${t.javaClass.name}: ${t.message?.limitStringSize(30)}"), cmd, CommandStatus.Failed())
+                        ExecutedResult(
+                            CometUtil.toChain(
+                                "在试图执行命令时发生了一个错误\n简易报错信息 :\n${t.javaClass.name}: ${
+                                    t.message?.limitStringSize(
+                                        30
+                                    )
+                                }"
+                            ), cmd, CommandStatus.Failed()
+                        )
                     } else {
                         ExecutedResult(CometUtil.toChain("在试图执行命令时发生了一个错误, 请联系管理员"), cmd, CommandStatus.Failed())
                     }
@@ -370,15 +406,19 @@ object CommandExecutor {
         }
     }
 
-    data class ExecutedResult(val msg: MessageChain, val cmd: ChatCommand?, val status: CommandStatus = CommandStatus.NotACommand())
+    data class ExecutedResult(
+        val msg: MessageChain,
+        val cmd: ChatCommand?,
+        val status: CommandStatus = CommandStatus.NotACommand()
+    )
 
     sealed class CommandStatus(val name: String) {
-        class Success: CommandStatus("成功")
-        class NoPermission: CommandStatus("无权限")
-        class Failed: CommandStatus("失败")
-        class Disabled: CommandStatus("命令被禁用")
-        class MoveToSession: CommandStatus("移交会话处理")
-        class NotACommand: CommandStatus("非命令")
+        class Success : CommandStatus("成功")
+        class NoPermission : CommandStatus("无权限")
+        class Failed : CommandStatus("失败")
+        class Disabled : CommandStatus("命令被禁用")
+        class MoveToSession : CommandStatus("移交会话处理")
+        class NotACommand : CommandStatus("非命令")
 
         fun isOk(): Boolean = this is Success || this is NoPermission || this is Failed
     }

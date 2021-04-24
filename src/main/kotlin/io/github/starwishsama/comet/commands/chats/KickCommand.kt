@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -16,7 +16,7 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 
-@CometCommand
+
 class KickCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (event is GroupMessageEvent) {
@@ -43,7 +43,7 @@ class KickCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-            CommandProps("kick", arrayListOf("tr", "踢人"), "踢人", "nbot.commands.kick", UserLevel.USER)
+        CommandProps("kick", arrayListOf("tr", "踢人"), "踢人", "nbot.commands.kick", UserLevel.USER)
 
     override fun getHelp(): String = """
         ======= 命令帮助 =======

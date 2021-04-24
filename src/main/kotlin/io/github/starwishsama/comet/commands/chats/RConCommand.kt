@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
@@ -22,7 +22,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
 
-@CometCommand
+
 class RConCommand : ChatCommand, ConversationCommand {
     private val waitList = mutableMapOf<BotUser, Int>()
 
@@ -38,7 +38,8 @@ class RConCommand : ChatCommand, ConversationCommand {
                                 SessionTarget(user.id),
                                 this,
                                 false
-                            ))
+                            )
+                        )
                         return CometUtil.toChain("请在下一条消息发送 rCon 连接地址")
                     }
                     "cmd", "exec", "命令" -> {

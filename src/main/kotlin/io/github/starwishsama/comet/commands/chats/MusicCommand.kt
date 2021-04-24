@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.MusicApiType
@@ -13,7 +13,7 @@ import io.github.starwishsama.comet.api.thirdparty.music.ThirdPartyMusicApi
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.*
 
-@CometCommand
+
 class MusicCommand : ChatCommand {
     //val usingUsers = mutableMapOf<Long, List<MusicSearchResult>>()
 

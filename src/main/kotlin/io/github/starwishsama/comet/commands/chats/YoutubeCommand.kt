@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
@@ -20,7 +20,7 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import java.util.*
 
-@CometCommand
+
 class YoutubeCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (args.isEmpty()) {
@@ -65,11 +65,11 @@ class YoutubeCommand : ChatCommand {
 
     override fun getProps(): CommandProps =
         CommandProps(
-                name = "data",
-                aliases = listOf("ytb", "y2b", "油管"),
-                description = "查询 Youtube 频道信息",
-                permission = "nbot.commands.data",
-                level = UserLevel.ADMIN
+            name = "data",
+            aliases = listOf("ytb", "y2b", "油管"),
+            description = "查询 Youtube 频道信息",
+            permission = "nbot.commands.data",
+            level = UserLevel.ADMIN
         )
 
     override fun getHelp(): String = """
@@ -130,14 +130,15 @@ class YoutubeCommand : ChatCommand {
     private fun clearUnsubscribeUsersInPool(groupId: Long, userName: String) {
         return
         /**YoutubeStreamingChecker.pushPool.forEach { (username, cache) ->
-            if (username == userName && cache.groups.contains(groupId)) {
-                cache.groups.remove(groupId)
-            }
+        if (username == userName && cache.groups.contains(groupId)) {
+        cache.groups.remove(groupId)
+        }
         }*/
     }
 
     private fun checkInfo(channelID: String): MessageWrapper {
-        val result = YoutubeApi.service.getChannelResult(channelId = channelID).execute().body() ?: return MessageWrapper().addText("找不到该频道, 可能是 API 调用已达到上限?")
+        val result = YoutubeApi.service.getChannelResult(channelId = channelID).execute().body()
+            ?: return MessageWrapper().addText("找不到该频道, 可能是 API 调用已达到上限?")
         val item = result.items[0]
         val text = """
         ${item.snippet.title}

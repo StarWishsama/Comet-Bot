@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -21,7 +21,7 @@ import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.at
 import org.apache.commons.lang3.StringUtils
 
-@CometCommand
+
 @Suppress("SpellCheckingInspection")
 class ArkNightCommand : ChatCommand {
     var pool = GachaService.getPoolsByType<ArkNightPool>()[0]
@@ -82,11 +82,11 @@ class ArkNightCommand : ChatCommand {
 
     override fun getProps(): CommandProps =
         CommandProps(
-                "arknight",
-                arrayListOf("ark", "xf", "方舟寻访"),
-                "明日方舟寻访模拟器",
-                "nbot.commands.arknight",
-                UserLevel.USER,
+            "arknight",
+            arrayListOf("ark", "xf", "方舟寻访"),
+            "明日方舟寻访模拟器",
+            "nbot.commands.arknight",
+            UserLevel.USER,
             consumePoint = 15
         )
 
@@ -104,12 +104,18 @@ class ArkNightCommand : ChatCommand {
         }
     }
 
-    private suspend fun generatePictureGachaResult(pool: ArkNightPool, event: MessageEvent, user: BotUser, ops: List<ArkNightOperator>): MessageChain {
+    private suspend fun generatePictureGachaResult(
+        pool: ArkNightPool,
+        event: MessageEvent,
+        user: BotUser,
+        ops: List<ArkNightOperator>
+    ): MessageChain {
         event.subject.sendMessage("请稍等...")
 
         return if (ops.isNotEmpty()) {
             // 只获取最后十个
-            val result = GachaUtil.combineGachaImage(if (ops.size <= 10) ops else ops.subList(ops.size - 11, ops.size - 1), pool)
+            val result =
+                GachaUtil.combineGachaImage(if (ops.size <= 10) ops else ops.subList(ops.size - 11, ops.size - 1), pool)
             if (result.lostItem.isNotEmpty())
                 event.subject.sendMessage(
                     event.message.quote() + toChain("由于缺失资源文件, 以下干员无法显示 :(\n" +
@@ -117,7 +123,8 @@ class ArkNightCommand : ChatCommand {
                                 result.lostItem.forEach {
                                     append("${it.name},")
                                 }
-                            }.removeSuffix(","))
+                            }.removeSuffix(",")
+                    )
                 )
             val gachaImage = withContext(Dispatchers.IO) { result.image.uploadAsImage(event.subject) }
 

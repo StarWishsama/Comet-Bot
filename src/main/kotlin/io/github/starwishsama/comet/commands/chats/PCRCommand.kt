@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -14,7 +14,7 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import org.apache.commons.lang3.StringUtils
 
-@CometCommand
+
 class PCRCommand : ChatCommand {
     // 这只是一个临时测试, 未来将放入卡池链表中
     private val pool = PCRPool()
@@ -48,7 +48,14 @@ class PCRCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("pcr", arrayListOf("gzlj", "公主连结"), "公主链接抽卡模拟器", "nbot.commands.pcr", UserLevel.USER, consumePoint = 15)
+        CommandProps(
+            "pcr",
+            arrayListOf("gzlj", "公主连结"),
+            "公主链接抽卡模拟器",
+            "nbot.commands.pcr",
+            UserLevel.USER,
+            consumePoint = 15
+        )
 
     override fun getHelp(): String = """
          ============ 命令帮助 ============

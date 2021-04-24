@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.chats
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -18,7 +18,7 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 
-@CometCommand
+
 class MuteCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (event is GroupMessageEvent && hasPermission(user, event)) {
@@ -30,10 +30,10 @@ class MuteCommand : ChatCommand {
                     } else {
                         when (args[0]) {
                             "all", "全体", "全禁", "全体禁言" -> doMute(
-                                    event.group,
-                                    -1,
-                                    -1,
-                                    true
+                                event.group,
+                                -1,
+                                -1,
+                                true
                             )
                             "random", "rand", "随机", "抽奖" -> {
                                 GlobalScope.run {
@@ -56,7 +56,7 @@ class MuteCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-            CommandProps("mute", arrayListOf("jy", "禁言"), "禁言", "nbot.commands.mute", UserLevel.USER)
+        CommandProps("mute", arrayListOf("jy", "禁言"), "禁言", "nbot.commands.mute", UserLevel.USER)
 
     override fun getHelp(): String = """
         ======= 命令帮助 =======

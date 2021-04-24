@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BotVariables.localizationManager
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
@@ -31,7 +31,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-@CometCommand
+
 class BiliBiliCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (event is GroupMessageEvent) {
@@ -62,7 +62,7 @@ class BiliBiliCommand : ChatCommand {
                                     "找不到对应的B站用户".toChain()
                                 }
                             } else {
-                               "未登录无法使用查询功能, 请在配置中配置B站账号密码".toChain()
+                                "未登录无法使用查询功能, 请在配置中配置B站账号密码".toChain()
                             }
                         } else getHelp().convertToChain()
                     }
@@ -79,7 +79,8 @@ class BiliBiliCommand : ChatCommand {
                         val cfg = GroupConfigManager.getConfig(event.group.id) ?: return "本群尚未注册至 Comet".toChain()
                         cfg.biliSubscribers.forEach {
                             it.userName = DynamicApi.getUserNameByMid(it.id.toLong())
-                            it.roomID = UserApi.userApiService.getMemberInfoById(it.id.toLong()).execute().body()?.data?.liveRoomInfo?.roomId ?: -1
+                            it.roomID = UserApi.userApiService.getMemberInfoById(it.id.toLong()).execute()
+                                .body()?.data?.liveRoomInfo?.roomId ?: -1
                             delay(1_500)
                         }
                         return "刷新缓存成功".toChain()

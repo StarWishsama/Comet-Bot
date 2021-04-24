@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BuildConfig
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
@@ -31,7 +31,7 @@ import java.io.IOException
 import java.util.concurrent.ThreadPoolExecutor
 import kotlin.time.ExperimentalTime
 
-@CometCommand
+
 class DebugCommand : ChatCommand, UnDisableableCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {

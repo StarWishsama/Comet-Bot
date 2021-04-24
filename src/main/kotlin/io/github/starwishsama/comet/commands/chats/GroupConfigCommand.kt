@@ -1,6 +1,6 @@
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
@@ -21,7 +21,7 @@ import net.mamoe.mirai.message.data.MessageChainBuilder
 import net.mamoe.mirai.message.data.PlainText
 import java.util.*
 
-@CometCommand
+
 class GroupConfigCommand : ChatCommand, UnDisableableCommand {
     // TODO 适配私聊设置
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
@@ -77,10 +77,12 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                     }
                     "function", "fun", "func" -> {
                         if (args.size < 2) {
-                            return toChain("""
+                            return toChain(
+                                """
                 现在支持禁用彗星 Bot 的命令功能了!
                 /gs function [命令名] 在本群禁用指定命令
-            """.trimIndent())
+            """.trimIndent()
+                            )
                         }
 
                         return cfg.disableCommand(args[1]).msg.toChain()
@@ -103,7 +105,8 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                                     PerGroupConfig.ReplyKeyWord(
                                         mutableListOf(keyWord),
                                         MessageWrapper().addText(reply)
-                                    ))
+                                    )
+                                )
                             ) {
                                 "添加关键词成功".toChain()
                             } else {

@@ -2,7 +2,7 @@ package io.github.starwishsama.comet.commands.chats
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
@@ -23,7 +23,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.messageChainOf
 import java.time.LocalDateTime
 
-@CometCommand
+
 class RollCommand : ChatCommand, ConversationCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (event !is GroupMessageEvent) return "本命令仅限群聊使用".toChain()
@@ -49,23 +49,25 @@ class RollCommand : ChatCommand, ConversationCommand {
             }
 
             val rollSession = RollSession(
-                    target = SessionTarget(event.group.id),
-                    rollStarter = event.sender.id,
-                    rollItem = rollThing,
-                    keyWord = rollKeyWord ?: "",
-                    stopAfterMinute = rollDelay ?: 3,
-                    count = rollThingCount
+                target = SessionTarget(event.group.id),
+                rollStarter = event.sender.id,
+                rollItem = rollThing,
+                keyWord = rollKeyWord ?: "",
+                stopAfterMinute = rollDelay ?: 3,
+                count = rollThingCount
             )
 
             SessionHandler.insertSession(rollSession)
 
-            return toChain("""
+            return toChain(
+                """
                 ${event.senderName} 发起了一个抽奖!
                 抽奖物品: ${rollSession.rollItem}
                 抽奖人数: ${rollSession.count}
                 参与方式: ${if (rollSession.keyWord.isEmpty()) "在群内发送任意消息" else "发送 ${rollSession.keyWord}"}
                 将会在 ${rollSession.stopAfterMinute} 分钟后开奖
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
     }
 

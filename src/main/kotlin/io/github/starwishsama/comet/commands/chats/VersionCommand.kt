@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BuildConfig
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -12,7 +12,7 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import kotlin.time.ExperimentalTime
 
-@CometCommand
+
 class VersionCommand : ChatCommand {
     @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
@@ -23,7 +23,13 @@ class VersionCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps {
-        return CommandProps("version", arrayListOf("v", "版本", "comet"), "查看版本号", "nbot.commands.version", UserLevel.USER)
+        return CommandProps(
+            "version",
+            arrayListOf("v", "版本", "comet"),
+            "查看版本号",
+            "nbot.commands.version",
+            UserLevel.USER
+        )
     }
 
     override fun getHelp(): String = ""

@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.commands.chats
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.api.annotations.CometCommand
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
@@ -16,7 +16,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import java.time.LocalDateTime
 
-@CometCommand
+
 class RSPCommand : ChatCommand, ConversationCommand {
     /**
      * 储存正在石头剪刀布的用户
@@ -25,11 +25,12 @@ class RSPCommand : ChatCommand, ConversationCommand {
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (SessionHandler.hasSessionByID(event.sender.id, this::class.java))
-        SessionHandler.insertSession(Session(SessionTarget(0, event.sender.id), this, false))
+            SessionHandler.insertSession(Session(SessionTarget(0, event.sender.id), this, false))
         return "石头剪刀布... 开始! 你要出什么呢?".toChain()
     }
 
-    override fun getProps(): CommandProps = CommandProps("janken", arrayListOf("猜拳", "石头剪刀布", "rsp", "cq"), "石头剪刀布", "nbot.commands.rsp", UserLevel.USER)
+    override fun getProps(): CommandProps =
+        CommandProps("janken", arrayListOf("猜拳", "石头剪刀布", "rsp", "cq"), "石头剪刀布", "nbot.commands.rsp", UserLevel.USER)
 
     override fun getHelp(): String = "/cq 石头剪刀布"
 
