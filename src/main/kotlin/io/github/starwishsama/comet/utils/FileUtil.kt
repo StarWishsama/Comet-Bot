@@ -91,7 +91,7 @@ fun File.getChildFolder(folderName: String, createIfNotExists: Boolean = true): 
 @Suppress("unused")
 fun File.folderIsEmpty(): Boolean {
     require(exists()) { "$name 不存在" }
-    return isDirectory && this.filesCount() > 0
+    return filesCount() < 0
 }
 
 fun File.filesCount(): Int {
