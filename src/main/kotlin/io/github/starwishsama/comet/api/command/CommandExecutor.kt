@@ -21,9 +21,6 @@ import net.mamoe.mirai.message.data.*
 import java.time.LocalDateTime
 import java.util.*
 
-import org.reflections.Reflections;
-import java.lang.reflect.Modifier
-
 /**
  * 彗星 Bot 命令处理器
  *
