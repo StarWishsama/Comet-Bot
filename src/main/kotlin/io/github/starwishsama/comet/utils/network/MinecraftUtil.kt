@@ -191,7 +191,7 @@ data class QueryInfo(
             else info.motd.asText().trim().limitStringSize(20)
         }
             > 服务器版本 ${info.version.protocolName}
-            > 延迟 ${usedTime}
+            > 延迟 $usedTime
         """.trimIndent()
     }
 }
