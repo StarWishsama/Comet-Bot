@@ -34,26 +34,6 @@ object CommandExecutor {
     private val commands: MutableSet<ChatCommand> = mutableSetOf()
     private val consoleCommands = mutableListOf<ConsoleCommand>()
 
-    fun registerAllCommands() {
-        val reflections = Reflections()
-
-        val chatCommands: Set<Class<out ChatCommand>> = reflections.getSubTypesOf(ChatCommand::class.java)
-
-        for (command in chatCommands) {
-            if (!command.isInterface && !Modifier.isAbstract(command.modifiers)) {
-                setupCommand(command.newInstance())
-            }
-        }
-
-        val consoleCommands = reflections.getSubTypesOf(ConsoleCommand::class.java)
-
-        consoleCommands.forEach {
-            if (!it.isInterface && !Modifier.isAbstract(it.modifiers)) {
-                setupConsoleCommand(it.newInstance())
-            }
-        }
-    }
-
     /**
      * 注册命令
      *
