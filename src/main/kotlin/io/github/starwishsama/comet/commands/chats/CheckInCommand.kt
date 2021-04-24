@@ -19,27 +19,36 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 @CometCommand
+/**
+ * CheckInCommand
+ *
+ * 签到命令, 可以获得积分
+ *
+ * @author StarWishsama
+ * @author StivenDing
+ */
 class CheckInCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (event is GroupMessageEvent) {
-            return if (user.isChecked()) {
+        return if (event is GroupMessageEvent) {
+            if (user.isChecked()) {
                 "你今天已经签到过了! 输入 /cx 可查询签到信息".toChain()
             } else {
-                checkIn(event.sender, event, user).convertToChain()
+                checkIn(event, user).convertToChain()
             }
         } else {
-            return "抱歉, 该命令仅供群聊使用".toChain()
+            "抱歉, 该命令仅供群聊使用".toChain()
         }
     }
 
     override fun getProps(): CommandProps =
         CommandProps("checkin", arrayListOf("签到", "qd"), "签到命令", "nbot.commands.checkin", UserLevel.USER)
 
-    override fun getHelp(): String = ""
+    override fun getHelp(): String = "/qd 签到"
 
-    private fun checkIn(sender: User, msg: MessageEvent, user: BotUser): String {
+    private fun checkIn(msg: MessageEvent, user: BotUser): String {
         return run {
             val point = calculatePoint(user)
+            val sender = msg.sender
 
             var extra = "\n连续签到 ${user.checkInTime} 天, 额外获得了 ${point[1]} 点积分~"
             if (user.checkInTime < 2 || point[1] == 0.0) {
@@ -63,10 +72,14 @@ class CheckInCommand : ChatCommand {
         }
     }
 
+    /**
+     * 计算签到所得积分
+     *
+     * @return 获取积分情况, [0] 为签到所得, [1] 为额外获得
+     */
     private fun calculatePoint(user: BotUser): DoubleArray {
+        // 计算签到时间
         val now = LocalDateTime.now()
-        // 计算连续签到次数，此处用了 Date 这个废弃的类，应换为 Calendar，too lazy to do so.
-        // 已经更换为 Java 8 的全新日期 API :)
         val duration = Duration.between(user.lastCheckInTime, now)
         if (duration.toDays() <= 1) {
             user.plusDay()
@@ -81,11 +94,13 @@ class CheckInCommand : ChatCommand {
         val basePoint = RandomUtil.randomDouble(0.0, 10.0, 1, RoundingMode.HALF_DOWN)
         // 连续签到的奖励积分
         val awardPoint = (if (awardProp < 3) {
-            String.format("%.1f", awardProp * basePoint).toDouble()
+            String.format("%.1f", awardProp * basePoint)
         } else {
-            1.5 * basePoint
+            String.format("%.1f", 1.5 * basePoint)
         }).toDouble()
+
         user.addPoint(basePoint + awardPoint)
+
         return doubleArrayOf(basePoint, awardPoint)
     }
 

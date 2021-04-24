@@ -90,7 +90,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                 val taskCount: Long = executor.taskCount
 
                                 return """
-当前排队线程数：$queueSize
+当前队列中线程数：$queueSize
 当前活动线程数：$activeCount
 执行完成线程数： $completedTaskCount
 总线程数：$taskCount
