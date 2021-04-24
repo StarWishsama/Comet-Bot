@@ -9,7 +9,7 @@ import org.jline.reader.UserInterruptException
 import java.io.EOFException
 import kotlin.system.exitProcess
 
-class LoginSolver(val comet: Comet) {
+class CometLoginHelper(val comet: Comet) {
     var status: LoginStatus = LoginStatus.WAITING
 
     fun solve() {

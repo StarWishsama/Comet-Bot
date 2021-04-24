@@ -38,7 +38,7 @@ import java.util.*
 import java.util.concurrent.*
 
 /**
- * 机器人(几乎)所有数据的存放类
+ * Comet (几乎) 所有数据的存放类
  * 可以直接访问数据
  *
  * @author Nameless

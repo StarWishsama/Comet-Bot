@@ -14,6 +14,8 @@ import org.xbill.DNS.Type
 import java.io.*
 import java.net.Proxy
 import java.net.Socket
+import java.time.Duration
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 /**
@@ -26,6 +28,7 @@ import java.util.concurrent.TimeUnit
 object MinecraftUtil {
     @Throws(IOException::class)
     fun query(host: String, port: Int): QueryInfo {
+        val start = LocalDateTime.now()
         val socket: Socket
         if (cfg.proxySwitch) {
             socket = Socket(Proxy(cfg.proxyType, Socket(cfg.proxyUrl, cfg.proxyPort).remoteSocketAddress))
@@ -111,7 +114,8 @@ object MinecraftUtil {
         inputStreamReader.close()
         inputStream.close()
         socket.close()
-        return QueryInfo(json, pingTime)
+
+        return QueryInfo(json, start.getLastingTimeAsString())
     }
 
     @Throws(IOException::class)
@@ -170,7 +174,7 @@ data class SRVConvertResult(
 
 data class QueryInfo(
     val json: String,
-    val usedTime: Long
+    val usedTime: String
 ) {
     private fun parseJson(): MinecraftServerInfo {
         return mapper.readValue(json)
@@ -181,12 +185,13 @@ data class QueryInfo(
 
         return """
             > 在线玩家 ${info.players.onlinePlayer}/${info.players.maxPlayer}
-            > MOTD ${if (info.motd.isArray) 
+            > MOTD ${
+            if (info.motd.isArray)
                 info.motd["extra"]["text"].asText().trim().limitStringSize(20)
-                else info.motd.asText().trim().limitStringSize(20)
-            }
+            else info.motd.asText().trim().limitStringSize(20)
+        }
             > 服务器版本 ${info.version.protocolName}
-            > 延迟 ${usedTime.toLocalDateTime().getLastingTimeAsString(TimeUnit.SECONDS, true)}
+            > 延迟 ${usedTime}
         """.trimIndent()
     }
 }
@@ -199,7 +204,7 @@ data class MinecraftServerInfo(
     @JsonProperty("modinfo")
     val modInfo: ModInfo?
 ) {
-    data class Version (
+    data class Version(
         @JsonProperty("name")
         val protocolName: String,
         @JsonProperty("protocol")
