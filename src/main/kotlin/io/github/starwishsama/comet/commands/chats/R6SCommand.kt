@@ -18,43 +18,43 @@ import net.mamoe.mirai.message.data.at
 
 class R6SCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (event is GroupMessageEvent) {
-            if (args.isEmpty()) {
-                return toChain(getHelp(), true)
-            } else {
-                when (args[0].toLowerCase()) {
-                    "info", "查询", "cx" -> {
-                        val account = user.r6sAccount
+        if (args.isEmpty()) {
+            return toChain(getHelp(), true)
+        } else {
+            when (args[0].toLowerCase()) {
+                "info", "查询", "cx" -> {
+                    val account = user.r6sAccount
 
-                        return if (args.size <= 1 && account.isNotEmpty()) {
+                    return if (args.size <= 1 && account.isNotEmpty()) {
+                        event.subject.sendMessage(toChain("查询中..."))
+                        val result = R6StatsApi.getPlayerStat(account)
+                        val resultText = "\n" + result.toMessageChain(event.subject)
+                        if (event is GroupMessageEvent) event.sender.at() + resultText else resultText.toChain(false)
+                    } else {
+                        if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
                             event.subject.sendMessage(toChain("查询中..."))
-                            val result = R6StatsApi.getPlayerStat(account)
-                            event.sender.at() + "\n" + result.toMessageChain(event.subject)
+                            val result = R6StatsApi.getPlayerStat(args[1])
+                            val resultText = "\n" + result.toMessageChain(event.subject)
+                            if (event is GroupMessageEvent) event.sender.at() + resultText else resultText.toChain(false)
                         } else {
-                            if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
-                                event.subject.sendMessage(toChain("查询中..."))
-                                val result = R6StatsApi.getPlayerStat(args[1])
-                                event.sender.at() + "\n" + result.toMessageChain(event.subject)
-                            } else {
-                                toChain("你输入的 ID 不符合育碧用户名规范!")
-                            }
+                            toChain("你输入的 ID 不符合育碧用户名规范!")
                         }
                     }
-                    "bind", "绑定" ->
-                        if (args[1].isNotEmpty() && args.size > 1) {
-                            if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
-                                val botUser1 = BotUser.getUser(event.sender.id)
-                                if (botUser1 != null) {
-                                    botUser1.r6sAccount = args[1]
-                                    return toChain("绑定成功!")
-                                }
-                            } else {
-                                return toChain("ID 格式有误!")
+                }
+                "bind", "绑定" ->
+                    if (args[1].isNotEmpty() && args.size > 1) {
+                        if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
+                            val botUser1 = BotUser.getUser(event.sender.id)
+                            if (botUser1 != null) {
+                                botUser1.r6sAccount = args[1]
+                                return toChain("绑定成功!")
                             }
+                        } else {
+                            return toChain("ID 格式有误!")
                         }
-                    else -> {
-                        return toChain("/r6s info [Uplay账号名]")
                     }
+                else -> {
+                    return toChain("/r6s info [Uplay账号名]")
                 }
             }
         }

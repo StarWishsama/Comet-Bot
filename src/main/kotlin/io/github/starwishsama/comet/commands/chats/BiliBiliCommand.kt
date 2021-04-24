@@ -34,63 +34,73 @@ import retrofit2.Response
 
 class BiliBiliCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (event is GroupMessageEvent) {
-            if (args.isEmpty()) {
-                return getHelp().convertToChain()
-            } else {
-                when (args[0]) {
-                    "sub", "订阅" -> return advancedSubscribe(user, args, event)
-                    "unsub", "取消订阅" -> {
-                        return unsubscribe(args, event.group.id)
-                    }
-                    "list" -> {
-                        event.subject.sendMessage("请稍等...")
-                        return getSubList(event)
-                    }
-                    "info", "查询", "cx" -> {
-                        return if (args.size > 1) {
-                            if (!FakeClientApi.client.isLogin) {
-                                event.subject.sendMessage(event.message.quote() + "请稍等...")
-                                val item = FakeClientApi.getUser(args[1])
-                                if (item != null) {
-                                    val text = item.title + "\n粉丝数: " + item.fans.getBetterNumber() +
-                                            "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
-                                            "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") + "\n"
-                                    val dynamic = DynamicApi.getWrappedDynamicTimeline(item.mid)
-                                    text.convertToChain() + getDynamicText(dynamic, event)
-                                } else {
-                                    "找不到对应的B站用户".toChain()
-                                }
-                            } else {
-                                "未登录无法使用查询功能, 请在配置中配置B站账号密码".toChain()
-                            }
-                        } else getHelp().convertToChain()
-                    }
-                    "push" -> {
-                        return if (user.isBotAdmin() || event.sender.isOperator()) {
-                            val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
-                            cfg.biliPushEnabled = !cfg.biliPushEnabled
-                            "B站动态推送功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}".toChain()
-                        } else {
-                            localizationManager.getLocalizationText("msg.no-permission").toChain()
-                        }
-                    }
-                    "refresh" -> {
-                        val cfg = GroupConfigManager.getConfig(event.group.id) ?: return "本群尚未注册至 Comet".toChain()
-                        cfg.biliSubscribers.forEach {
-                            it.userName = DynamicApi.getUserNameByMid(it.id.toLong())
-                            it.roomID = UserApi.userApiService.getMemberInfoById(it.id.toLong()).execute()
-                                .body()?.data?.liveRoomInfo?.roomId ?: -1
-                            delay(1_500)
-                        }
-                        return "刷新缓存成功".toChain()
-                    }
-                    else -> return getHelp().convertToChain()
+        if (args.isEmpty()) {
+            return getHelp().convertToChain()
+        }
+
+        when (args[0]) {
+            "sub", "订阅" -> return advancedSubscribe(user, args, event)
+            "unsub", "取消订阅" -> {
+                return if (event is GroupMessageEvent) {
+                    unsubscribe(args, event.group.id)
+                } else {
+                    toChain("抱歉, 该命令仅限群聊使用!")
                 }
             }
-        } else {
-            return "抱歉, 该命令仅供群聊使用!".toChain()
+            "list" -> {
+                event.subject.sendMessage("请稍等...")
+                return getSubList(event)
+            }
+            "info", "查询", "cx" -> {
+                return if (args.size > 1) {
+                    if (!FakeClientApi.client.isLogin) {
+                        event.subject.sendMessage(event.message.quote() + "请稍等...")
+                        val item = FakeClientApi.getUser(args[1])
+                        if (item != null) {
+                            val text = item.title + "\n粉丝数: " + item.fans.getBetterNumber() +
+                                    "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
+                                    "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") + "\n"
+                            val dynamic = DynamicApi.getWrappedDynamicTimeline(item.mid)
+                            text.convertToChain() + getDynamicText(dynamic, event)
+                        } else {
+                            "找不到对应的B站用户".toChain()
+                        }
+                    } else {
+                        "未登录无法使用查询功能, 请在配置中配置B站账号密码".toChain()
+                    }
+                } else getHelp().convertToChain()
+            }
+            "push" -> {
+                return if (event is GroupMessageEvent) {
+                    if (user.isBotAdmin() || event.sender.isOperator()) {
+                        val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
+                        cfg.biliPushEnabled = !cfg.biliPushEnabled
+                        "B站动态推送功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}".toChain()
+                    } else {
+                        localizationManager.getLocalizationText("msg.no-permission").toChain()
+                    }
+                } else {
+                    toChain("抱歉, 该命令仅限群聊使用!")
+                }
+            }
+            "refresh" -> {
+                if (event is GroupMessageEvent) {
+                    val cfg = GroupConfigManager.getConfig(event.group.id) ?: return "本群尚未注册至 Comet".toChain()
+                    cfg.biliSubscribers.forEach {
+                        it.userName = DynamicApi.getUserNameByMid(it.id.toLong())
+                        it.roomID = UserApi.userApiService.getMemberInfoById(it.id.toLong()).execute()
+                            .body()?.data?.liveRoomInfo?.roomId ?: -1
+                        delay(1_500)
+                    }
+                    return "刷新缓存成功".toChain()
+                } else {
+                    toChain("抱歉, 该命令仅限群聊使用!")
+                }
+            }
+            else -> return getHelp().convertToChain()
         }
+
+        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps =
