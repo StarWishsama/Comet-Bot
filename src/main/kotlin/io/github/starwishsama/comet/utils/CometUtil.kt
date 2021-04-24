@@ -34,7 +34,9 @@ import kotlin.time.toKotlinDuration
 
 fun BufferedImage.toInputStream(formatName: String = "png"): InputStream {
     ByteArrayOutputStream().use { byteOS ->
-        if (!ImageIO.getUseCache()) ImageIO.setUseCache(false)
+        if (ImageIO.getUseCache()) {
+            ImageIO.setUseCache(false)
+        }
         ImageIO.createImageOutputStream(byteOS).use { imOS ->
             ImageIO.write(this, formatName, imOS)
             return ByteArrayInputStream(byteOS.toByteArray())
@@ -57,7 +59,8 @@ object CometUtil {
         }.trim()
     }
 
-    fun toChain(otherText: String?, addPrefix: Boolean = true): MessageChain = sendMessageAsString(otherText, addPrefix).convertToChain()
+    fun toChain(otherText: String?, addPrefix: Boolean = true): MessageChain =
+        sendMessageAsString(otherText, addPrefix).convertToChain()
 
     @JvmName("stringAsChain")
     fun String?.toChain(addPrefix: Boolean = true): MessageChain = toChain(this, addPrefix)
@@ -88,7 +91,7 @@ object CometUtil {
         }
 
         return if (StringUtils.isNumeric(possibleID)) {
-           possibleID.toLong()
+            possibleID.toLong()
         } else {
             -1
         }

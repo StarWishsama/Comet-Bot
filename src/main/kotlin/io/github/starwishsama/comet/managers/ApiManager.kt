@@ -24,7 +24,7 @@ object ApiManager {
 
         if (apiConfigFile.folderIsEmpty()) {
             createBlankConfigs()
-            daemonLogger.log(HinaLogLevel.Info, "在处理 API 配置时出现了意外", prefix = "API设置")
+            daemonLogger.log(HinaLogLevel.Info, "API 配置生成成功! 注意: 自新版本开始 API 请在 /api 文件夹下配置", prefix = "API设置")
             return
         }
 
