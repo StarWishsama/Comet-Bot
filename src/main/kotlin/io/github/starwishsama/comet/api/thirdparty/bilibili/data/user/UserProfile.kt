@@ -1,111 +1,104 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.user
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
 
 data class UserProfile(
-        val info: Info,
-        val card: Card,
-        @JsonProperty("vip")
-        val vipInfo: VipInfo,
-        val pendant: Pendant,
-        @JsonProperty("decorate_card")
-        val decorateCard: DecorateCard?,
-        val rank: Int,
-        val sign: String,
-        @JsonProperty("level_info")
-        val levelInfo: LevelInfo
+    val info: Info,
+    val card: Card,
+    @JsonProperty("vip")
+    val vipInfo: VipInfo,
+    val pendant: Pendant,
+    @JsonProperty("decorate_card")
+    val decorateCard: DecorateCard?,
+    val rank: Int,
+    val sign: String,
+    @JsonProperty("level_info")
+    val levelInfo: LevelInfo
 ) {
     data class DecorateCard(
-            val mid: Long,
-            val id: Int,
-            @JsonProperty("card_url")
-            val cardUrl: String,
-            @JsonProperty("card_type")
-            val cardType: Int,
-            @JsonProperty("name")
-            val cardName: String,
-            /** 永久挂件为0 */
-            @JsonProperty("expire_time")
-            val expireTime: Long,
-            /** 卡片分类，如大会员 */
-            @JsonProperty("card_type_name")
-            val cardTypeName: String,
-            @JsonProperty("uid")
-            val uid: Long,
-            @JsonProperty("item_id")
-            val itemId: Int,
-            @JsonProperty("item_type")
-            val itemType: Int,
-            @JsonProperty("big_card_url")
-            val bigCardUrl: String,
-            @JsonProperty("jump_url")
-            val jumpUrL: String,
-            /** 粉丝挂件，如湊-阿库娅 */
-            @JsonProperty("fan")
-            val fan: Fan,
-            @JsonProperty("image_enhance")
-            val enhancedImage: String
+        val mid: Long,
+        val id: Int,
+        @JsonProperty("card_url")
+        val cardUrl: String,
+        @JsonProperty("card_type")
+        val cardType: Int,
+        @JsonProperty("name")
+        val cardName: String,
+        /** 永久挂件为0 */
+        @JsonProperty("expire_time")
+        val expireTime: Long,
+        /** 卡片分类，如大会员 */
+        @JsonProperty("card_type_name")
+        val cardTypeName: String,
+        @JsonProperty("uid")
+        val uid: Long,
+        @JsonProperty("item_id")
+        val itemId: Int,
+        @JsonProperty("item_type")
+        val itemType: Int,
+        @JsonProperty("big_card_url")
+        val bigCardUrl: String,
+        @JsonProperty("jump_url")
+        val jumpUrL: String,
+        /** 粉丝挂件，如湊-阿库娅 */
+        @JsonProperty("fan")
+        val fan: Fan,
+        @JsonProperty("image_enhance")
+        val enhancedImage: String
     ) {
         data class Fan(
-                @JsonProperty("is_fan")
-                val isFan: Int,
-                @JsonProperty("number")
-                val number: Int,
-                @JsonProperty("color")
-                val color: String,
-                @JsonProperty("num_desc")
-                val numberDescription: String
+            @JsonProperty("is_fan")
+            val isFan: Int,
+            @JsonProperty("number")
+            val number: Int,
+            @JsonProperty("color")
+            val color: String,
+            @JsonProperty("num_desc")
+            val numberDescription: String
         )
     }
 
     data class Info(
-            var uid: Int = 0,
-            @JsonProperty("uname")
-            var userName: String?,
-            @JsonProperty("face")
-            var avatarImgURL: String?
+        var uid: Int = 0,
+        @JsonProperty("uname")
+        var userName: String?,
+        @JsonProperty("face")
+        var avatarImgURL: String?
     )
 
     data class Card(
-            @JsonProperty("official_verify")
-            val verifyInfo: VerifyInfo
+        @JsonProperty("official_verify")
+        val verifyInfo: VerifyInfo
     ) {
         data class VerifyInfo(
-                val type: Int,
-                val desc: String
+            val type: Int,
+            val desc: String
         )
     }
 
     data class Pendant(
-            val pid: Int,
-            val name: String,
-            val image: String,
-            val expire: Int,
-            @JsonProperty("image_enhance")
-            val imageEnhance: String
+        val pid: Int,
+        val name: String,
+        val image: String,
+        val expire: Int,
+        @JsonProperty("image_enhance")
+        val imageEnhance: String
     )
 
     data class LevelInfo(
-            @JsonProperty("current_level")
-            val currentLevel: Int,
-            @JsonProperty("current_min")
-            val currentMinLevel: Int,
-            @JsonProperty("current_exp")
-            val currentExp: Int,
-            @JsonProperty("next_exp")
-            val nextExp: Int
+        @JsonProperty("current_level")
+        val currentLevel: Int,
+        @JsonProperty("current_min")
+        val currentMinLevel: Int,
+        @JsonProperty("current_exp")
+        val currentExp: Int,
+        @JsonProperty("next_exp")
+        val nextExp: Int
     )
 
     data class VipInfo(
-            val vipType: Int,
-            val vipDueDate: Long,
-            val dueRemark: String,
-            val accessStatus: Int,
-            val vipStatus: Int,
-            val vipStatusWarn: String,
-            val themeType: Int,
-            val label: JsonNode?
+        val vipType: Int,
+        val vipDueDate: Long
     )
 }
 

@@ -12,9 +12,7 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.service.compatibility.data.OldGroupConfig
-import io.github.starwishsama.comet.service.compatibility.data.VersionTestObject
 import io.github.starwishsama.comet.utils.copyAndRename
-import io.github.starwishsama.comet.utils.getContext
 import io.github.starwishsama.comet.utils.json.isUsable
 import java.io.File
 import kotlin.streams.toList
@@ -42,11 +40,11 @@ object CompatibilityService {
         val cfg: OldGroupConfig
 
         try {
-            daemonLogger.log(HinaLogLevel.Info, "已检测到旧版本配置文件, 正在迁移...", prefix = "兼容性")
+            daemonLogger.log(HinaLogLevel.Info, "已检测到旧版本配置 ${cfgFile.name}, 正在迁移...", prefix = "兼容性")
 
             cfg = mapper.readValue(cfgFile, OldGroupConfig::class.java)
         } catch (e: Exception) {
-            daemonLogger.log(HinaLogLevel.Warn, "转换旧版本配置文件数据失败!", e, prefix = "兼容性")
+            daemonLogger.log(HinaLogLevel.Warn, "转换旧版本配置 ${cfgFile.name} 数据失败!", e, prefix = "兼容性")
             return false
         }
         val new = PerGroupConfig(cfg.id)

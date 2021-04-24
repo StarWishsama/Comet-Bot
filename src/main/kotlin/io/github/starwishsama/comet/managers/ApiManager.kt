@@ -35,7 +35,7 @@ object ApiManager {
             }
         }
 
-        daemonLogger.log(HinaLogLevel.Warn, "已加载 ${apiConfigs.size} 个配置", prefix = "API设置")
+        daemonLogger.log(HinaLogLevel.Info, "已加载 ${apiConfigs.size} 个配置", prefix = "API设置")
     }
 
     private fun createBlankConfigs() {

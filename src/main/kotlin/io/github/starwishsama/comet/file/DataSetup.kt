@@ -129,11 +129,7 @@ object DataSetup {
                         }
                     } else {
                         try {
-                            if (CompatibilityService.checkConfigFile(loc)) {
-                                return@forEach
-                            } else {
-                                loc.parseAsClass(mapper)
-                            }
+                            loc.parseAsClass(mapper)
                         } catch (e: Exception) {
                             daemonLogger.warning("检测到 ${group.id} 的群配置异常, 正在重新生成...")
                             daemonLogger.debug("加载群配置失败", e)
