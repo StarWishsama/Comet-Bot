@@ -9,6 +9,7 @@ import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.MinecraftUtil
+import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
@@ -23,19 +24,19 @@ class MinecraftCommand : ChatCommand {
             1 -> {
                 if (args[0].contains(":")) {
                     val split = args[0].split(":")
-                    return query(split[0], split[1].toIntOrNull())
+                    return query(split[0], split[1].toIntOrNull(), event.subject)
                 }
 
                 val convert = MinecraftUtil.convert(args[0])
                 return if (convert.isEmpty()) {
                     "无法连接至服务器".toChain()
                 } else {
-                    query(convert.host, convert.port)
+                    query(convert.host, convert.port, event.subject)
                 }
             }
             2 -> {
                 return if (args[1].isNumeric()) {
-                    query(args[0], args[1].toIntOrNull())
+                    query(args[0], args[1].toIntOrNull(), event.subject)
                 } else {
                     "输入的端口号不合法.".toChain()
                 }
@@ -57,13 +58,13 @@ class MinecraftCommand : ChatCommand {
         /mc [服务器地址] 查询服务器信息 (使用 SRV)
     """.trimIndent()
 
-    private fun query(ip: String, port: Int?): MessageChain {
+    private fun query(ip: String, port: Int?, subject: Contact): MessageChain {
         return try {
             if (port == null) {
                 return "输入的端口号不合法.".toChain()
             }
             val result = MinecraftUtil.query(ip, port)
-            result.toString().toChain()
+            result.convertToWrapper().toMessageChain(subject)
         } catch (e: IOException) {
             "查询失败, 服务器可能不在线, 请稍后再试.".toChain()
         }

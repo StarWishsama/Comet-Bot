@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import io.github.starwishsama.comet.utils.StringUtil.base64ToImage
 import io.github.starwishsama.comet.utils.json.WrapperConverter
 import io.github.starwishsama.comet.utils.network.NetUtil
+import io.github.starwishsama.comet.utils.uploadAsImage
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.contact.Contact
@@ -38,7 +40,7 @@ interface WrapperElement {
  *
  * @param text 文本
  */
-data class PureText(val text: String): WrapperElement {
+data class PureText(val text: String) : WrapperElement {
     override val className: String = this::class.java.name
 
     override fun toMessageContent(subject: Contact): PlainText {
@@ -55,13 +57,13 @@ data class PureText(val text: String): WrapperElement {
  *
  * 图片消息
  *
- * 必须提供图片下载链接和图片本地路径之中其一.
+ * 必须提供图片下载链接, 图片本地路径及 Base64 之中其一.
  *
  * @param url 图片下载链接
  * @param filePath 图片本地路径
  */
 @Serializable
-data class Picture(val url: String = "", val filePath: String = ""): WrapperElement {
+data class Picture(val url: String = "", val filePath: String = "", val base64: String = "") : WrapperElement {
 
     init {
         if (url.isEmpty() && filePath.isEmpty()) {
@@ -76,17 +78,19 @@ data class Picture(val url: String = "", val filePath: String = ""): WrapperElem
             NetUtil.getInputStream(url)?.use {
                 return runBlocking { it.uploadAsImage(subject) }
             }
-        } else {
+        } else if (filePath.isNotEmpty()) {
             if (filePath.isNotEmpty() && File(filePath).exists()) {
                 return runBlocking { File(filePath).uploadAsImage(subject) }
             }
+        } else if (base64.isNotEmpty()) {
+            return base64.toByteArray().base64ToImage()?.uploadAsImage(subject)
         }
 
         throw RuntimeException("Unable to convert Picture to Image, Picture raw content: $this")
     }
 
     override fun asString(): String {
-        return if (filePath.isEmpty()) url else filePath
+        return filePath.ifEmpty { url }
     }
 }
 
@@ -98,7 +102,7 @@ data class Picture(val url: String = "", val filePath: String = ""): WrapperElem
  * @param target At 目标
  */
 @Serializable
-data class AtElement(val target: Long): WrapperElement {
+data class AtElement(val target: Long) : WrapperElement {
     override val className: String = this::class.java.name
 
     override fun toMessageContent(subject: Contact): MessageContent {
@@ -117,7 +121,7 @@ data class AtElement(val target: Long): WrapperElement {
  * @param content XML 消息
  */
 @Serializable
-data class XmlElement(val content: String): WrapperElement {
+data class XmlElement(val content: String) : WrapperElement {
     override val className: String = this::class.java.name
 
     @OptIn(MiraiExperimentalApi::class)

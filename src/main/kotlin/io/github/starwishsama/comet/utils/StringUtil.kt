@@ -1,10 +1,14 @@
 package io.github.starwishsama.comet.utils
 
+import cn.hutool.core.codec.Base64Decoder
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.toMessageChain
+import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
+import javax.imageio.ImageIO
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
@@ -119,4 +123,17 @@ object StringUtil {
     }
 
     fun String.withoutColor() = this.replace("\u001B\\[[;\\d]*m".toRegex(), "")
+
+    fun ByteArray.base64ToImage(): BufferedImage {
+        if (this.isEmpty()) {
+            throw IllegalArgumentException("Image byte array cannot be empty!")
+        }
+
+        val imageByte = Base64Decoder.decode(this)
+
+        val bis = ByteArrayInputStream(imageByte)
+        bis.use {
+            return ImageIO.read(bis)
+        }
+    }
 }

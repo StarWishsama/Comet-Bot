@@ -1,23 +1,24 @@
 package io.github.starwishsama.comet.utils.network
 
+import cn.hutool.core.codec.Base64Decoder
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.mapper
-import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.objects.wrapper.Picture
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
-import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import org.xbill.DNS.Lookup
 import org.xbill.DNS.SRVRecord
 import org.xbill.DNS.Type
+import java.awt.image.BufferedImage
 import java.io.*
-import java.lang.StringBuilder
 import java.net.Proxy
 import java.net.Socket
-import java.time.Duration
 import java.time.LocalDateTime
-import java.util.concurrent.TimeUnit
+import javax.imageio.ImageIO
+
 
 /**
  * 查询 Minecraft 服务器信息
@@ -182,17 +183,26 @@ data class QueryInfo(
         return mapper.readValue(json)
     }
 
-    override fun toString(): String {
+    fun convertToWrapper(): MessageWrapper {
         val info = parseJson()
 
-        return """
+        val wrapper = MessageWrapper()
+
+        wrapper.addText(
+            """
             > 在线玩家 ${info.players.onlinePlayer}/${info.players.maxPlayer}
             > MOTD ${info.parseMOTD()}
-        }
             > 服务器版本 ${info.version.protocolName}
             > 延迟 $usedTime
             ${if (info.modInfo?.modList != null) "> MOD 列表 " + info.modInfo.modList else ""}
         """.trimIndent()
+        )
+
+        if (info.favicon != null) {
+            wrapper.addElement(Picture(base64 = info.favicon.split(",")[1]))
+        }
+
+        return wrapper
     }
 }
 
@@ -202,7 +212,9 @@ data class MinecraftServerInfo(
     @JsonProperty("description")
     val motd: JsonNode,
     @JsonProperty("modinfo")
-    val modInfo: ModInfo?
+    val modInfo: ModInfo?,
+    @JsonProperty("favicon")
+    val favicon: String?
 ) {
     fun parseMOTD(): String {
         val builder = StringBuilder()
