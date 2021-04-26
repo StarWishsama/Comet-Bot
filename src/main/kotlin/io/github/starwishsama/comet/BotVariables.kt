@@ -11,6 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
 import io.github.starwishsama.comet.objects.BotUser
@@ -18,23 +19,21 @@ import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
-import io.github.starwishsama.comet.objects.shop.Shop
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
 import io.github.starwishsama.comet.service.server.WebHookServer
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.json.LocalDateTimeConverter
 import io.github.starwishsama.comet.utils.json.WrapperConverter
+
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.utils.MiraiInternalApi
 import okhttp3.OkHttpClient
-import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import java.io.File
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.util.*
 import java.util.concurrent.*
 
 /**
@@ -50,13 +49,13 @@ object BotVariables {
 
     val comet: Comet = Comet()
 
-    lateinit var loggerAppender: LoggerAppender
+    internal lateinit var loggerAppender: LoggerAppender
 
-    lateinit var startTime: LocalDateTime
+    internal lateinit var startTime: LocalDateTime
 
-    var cfg = CometConfig()
+    internal var cfg = CometConfig()
 
-    var cometServer: WebHookServer? = null
+    internal var cometServer: WebHookServer? = null
 
     internal val logAction: (String) -> Unit = {
         CometApplication.console.printAbove(it)
@@ -67,14 +66,16 @@ object BotVariables {
 
     val logger: HinaLogger = HinaLogger("Comet", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
-    val netLogger: HinaLogger = HinaLogger("CometNet", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+    internal val netLogger: HinaLogger =
+        HinaLogger("CometNet", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
-    val daemonLogger: HinaLogger = HinaLogger("CometService", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+    internal val daemonLogger: HinaLogger =
+        HinaLogger("CometService", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
-    val consoleCommandLogger: HinaLogger =
+    internal val consoleCommandLogger: HinaLogger =
         HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
-    val mapper: ObjectMapper = ObjectMapper()
+    internal val mapper: ObjectMapper = ObjectMapper()
         // 美化输出
         .enable(SerializationFeature.INDENT_OUTPUT)
         // 将单一值序列化成表
@@ -110,7 +111,6 @@ object BotVariables {
 
     var rCon: Rcon? = null
 
-    val shop: MutableSet<Shop> = mutableSetOf()
     val users: MutableMap<Long, BotUser> = ConcurrentHashMap()
     lateinit var localizationManager: LocalizationManager
     var hitokoto: Hitokoto? = null

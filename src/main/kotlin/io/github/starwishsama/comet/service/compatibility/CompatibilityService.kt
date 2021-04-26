@@ -29,11 +29,7 @@ object CompatibilityService {
     fun checkConfigFile(cfgFile: File): Boolean {
         val tree = mapper.readTree(cfgFile)
         try {
-            if (tree["bili_sub"].isUsable()) {
-                val test = tree["bili_sub"] as List<*>
-
-                return test.first() !is Long
-            }
+            return tree["version"].isUsable()
         } catch (ignored: Exception) {
         }
 

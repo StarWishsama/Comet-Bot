@@ -1,13 +1,12 @@
 package io.github.starwishsama.comet.api.command
 
 import io.github.starwishsama.comet.BotVariables
-
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.sessions.SessionHandler
-import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
@@ -86,8 +85,10 @@ object CommandExecutor {
                     val result = dispatchCommand(this)
 
                     try {
-                        if (result.status.isOk() && result.msg !is EmptyMessageChain) {
-                            this.subject.sendMessage(result.msg)
+                        val filtered = result.msg.doFilter()
+
+                        if (result.status.isOk() && filtered !is EmptyMessageChain) {
+                            this.subject.sendMessage(filtered)
                         }
                     } catch (e: IllegalArgumentException) {
                         BotVariables.logger.warning("正在尝试发送空消息, 执行的命令为 $result")
@@ -137,7 +138,7 @@ object CommandExecutor {
                     GroupConfigManager.getConfig(event.group.id)?.isDisabledCommand(cmd) == true
                 ) {
                     return if (validateStatus(user, cmd.getProps())) {
-                        ExecutedResult(CometUtil.toChain("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
+                        ExecutedResult(toChain("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
                     } else {
                         ExecutedResult(EmptyMessageChain, cmd, CommandStatus.Disabled())
                     }
@@ -162,7 +163,7 @@ object CommandExecutor {
                         cmd.execute(event, splitMessage, user)
                     } else {
                         status = CommandStatus.NoPermission()
-                        CometUtil.toChain("你没有权限!")
+                        BotVariables.localizationManager.getLocalizationText("msg.no-permission").toChain()
                     }
 
                     return ExecutedResult(result, cmd, status)
@@ -175,7 +176,7 @@ object CommandExecutor {
                     BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message}, 发送者: $senderId", t)
                     if (user.isBotOwner()) {
                         ExecutedResult(
-                            CometUtil.toChain(
+                            toChain(
                                 "在试图执行命令时发生了一个错误\n简易报错信息 :\n${t.javaClass.name}: ${
                                     t.message?.limitStringSize(
                                         30
@@ -184,7 +185,7 @@ object CommandExecutor {
                             ), cmd, CommandStatus.Failed()
                         )
                     } else {
-                        ExecutedResult(CometUtil.toChain("在试图执行命令时发生了一个错误, 请联系管理员"), cmd, CommandStatus.Failed())
+                        ExecutedResult(toChain("在试图执行命令时发生了一个错误, 请联系管理员"), cmd, CommandStatus.Failed())
                     }
                 }
             }

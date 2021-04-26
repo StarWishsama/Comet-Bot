@@ -1,9 +1,8 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili
 
 import cn.hutool.http.HttpRequest
+import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.google.gson.JsonParseException
-import com.google.gson.JsonSyntaxException
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
@@ -16,7 +15,6 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
-import java.io.IOException
 
 /**
  * BiliBili 动态 API
@@ -27,10 +25,10 @@ import java.io.IOException
  */
 object DynamicApi : ApiExecutor {
     private const val dynamicUrl =
-            "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=%uid%&offset_dynamic_id=0&need_top=0"
-    private const val infoUrl = "http://api.bilibili.com/x/space/acc/info?mid="
+        "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=%uid%&offset_dynamic_id=0&need_top=0"
+    private const val infoUrl = "https://api.bilibili.com/x/space/acc/info?mid="
     private const val dynamicByIdUrl =
-            "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id="
+        "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id="
     private val agent = mutableMapOf("User-Agent" to "Nameless live status checker by StarWishsama")
     private const val apiRateLimit = "BiliBili API调用已达上限"
 
@@ -53,7 +51,7 @@ object DynamicApi : ApiExecutor {
         }
 
         NetUtil.executeHttpRequest(
-                url = dynamicByIdUrl + id.toString()
+            url = dynamicByIdUrl + id.toString()
         ).use { res ->
             if (res.isSuccessful) {
                 val body = res.body?.string() ?: throw ApiException("无法获取动态页面")
@@ -71,26 +69,30 @@ object DynamicApi : ApiExecutor {
             throw RateLimitException(apiRateLimit)
         }
 
-        NetUtil.executeHttpRequest(
-                url = dynamicUrl.replace("%uid%", mid.toString())
-        ).use { response ->
-            val url = response.request.url.toString()
-            var body = ""
-            try {
-                if (response.isSuccessful) {
-                    body = response.body?.string() ?: return null
-                    return mapper.readValue(body)
-                }
-            } catch (e: Exception) {
-                if (e is JsonSyntaxException || e is JsonParseException || e !is IOException) {
-                    FileUtil.createErrorReportFile("解析动态失败", "bilibili", e, body, "请求 URL 为: $url")
-                    throw ApiException("解析动态失败")
-                } else {
-                    daemonLogger.warning("解析动态时出现异常", e)
-                }
+        val response = NetUtil.executeHttpRequest(
+            url = dynamicUrl.replace("%uid%", mid.toString())
+        )
+
+        val url = response.request.url.toString()
+        var body = ""
+        try {
+            if (response.isSuccessful) {
+                body = response.body?.string() ?: return null
+                return mapper.readValue(body)
+            } else {
+                daemonLogger.warning("解析动态时出现异常")
+                return null
             }
+        } catch (e: Exception) {
+            if (e is JsonProcessingException) {
+                FileUtil.createErrorReportFile("解析动态失败", "bilibili", e, body, "请求 URL 为: $url")
+                throw ApiException("解析动态失败, 无法解析传入 Json")
+            } else {
+                daemonLogger.warning("解析动态时出现异常", e)
+            }
+
+            return null
         }
-        throw ApiException("无法获取动态")
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
