@@ -12,11 +12,12 @@ object GithubApi {
     private val userCache = mutableSetOf<String>()
 
     fun getRepoInfo(owner: String, repoName: String): RepoInfo? {
-        val response = NetUtil.getPageContent("${apiUrl}/${owner}/${repoName}") ?: return null
+        val response = NetUtil.getPageContent("${apiUrl}/repos/${owner}/${repoName}") ?: return null
 
         return try {
             mapper.readValue<RepoInfo>(response)
         } catch (e: Exception) {
+            e.printStackTrace()
             null
         }
     }

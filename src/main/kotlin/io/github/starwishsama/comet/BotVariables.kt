@@ -11,7 +11,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
 import io.github.starwishsama.comet.objects.BotUser
@@ -24,7 +23,6 @@ import io.github.starwishsama.comet.service.server.WebHookServer
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.json.LocalDateTimeConverter
 import io.github.starwishsama.comet.utils.json.WrapperConverter
-
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.utils.MiraiInternalApi
 import okhttp3.OkHttpClient
@@ -34,7 +32,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.util.concurrent.*
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Comet (几乎) 所有数据的存放类
@@ -75,7 +73,7 @@ object BotVariables {
     internal val consoleCommandLogger: HinaLogger =
         HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
-    internal val mapper: ObjectMapper = ObjectMapper()
+    val mapper: ObjectMapper = ObjectMapper()
         // 美化输出
         .enable(SerializationFeature.INDENT_OUTPUT)
         // 将单一值序列化成表
