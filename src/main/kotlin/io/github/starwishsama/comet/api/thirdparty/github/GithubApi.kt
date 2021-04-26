@@ -17,7 +17,6 @@ object GithubApi {
         return try {
             mapper.readValue<RepoInfo>(response)
         } catch (e: Exception) {
-            e.printStackTrace()
             null
         }
     }
