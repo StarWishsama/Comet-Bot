@@ -5,8 +5,6 @@ import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.github.data.api.RepoInfo
 import io.github.starwishsama.comet.api.thirdparty.github.data.api.UserInfo
 import io.github.starwishsama.comet.utils.network.NetUtil
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.selects.select
 
 object GithubApi {
     private const val apiUrl = "https://api.github.com"
@@ -37,11 +35,11 @@ object GithubApi {
         return if (caches[author] == repo) {
             true
         } else {
-            return if (getRepoInfo(author, repo) == null) {
+            return if (getRepoInfo(author, repo) != null) {
                 caches.putIfAbsent(author, repo)
-                false
-            } else {
                 true
+            } else {
+                false
             }
         }
     }

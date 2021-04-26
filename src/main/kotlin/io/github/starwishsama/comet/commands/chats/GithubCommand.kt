@@ -15,32 +15,18 @@ import net.mamoe.mirai.message.data.MessageChain
 
 class GithubCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+        if (event !is GroupMessageEvent) {
+            return "该命令仅群聊可用".toChain()
+        }
+
         if (args.isEmpty()) {
             return getHelp().convertToChain()
         }
 
         return when (args[0]) {
-            "add" -> {
-                return if (event is GroupMessageEvent) {
-                    handleAddRepo(args[1], event.group.id)
-                } else {
-                    "该命令仅群聊可用".toChain()
-                }
-            }
-            "rm" -> {
-                return if (event is GroupMessageEvent) {
-                    handleRemoveRepo(args[1], event.group.id)
-                } else {
-                    "该命令仅群聊可用".toChain()
-                }
-            }
-            "list", "ls" -> {
-                return if (event is GroupMessageEvent) {
-                    handleListRepo(event.group.id)
-                } else {
-                    "该命令仅群聊可用".toChain()
-                }
-            }
+            "add", "sub" -> handleAddRepo(args[1], event.group.id)
+            "rm", "unsub" -> handleRemoveRepo(args[1], event.group.id)
+            "list", "ls" -> handleListRepo(event.group.id)
             else -> getHelp().convertToChain()
         }
     }
