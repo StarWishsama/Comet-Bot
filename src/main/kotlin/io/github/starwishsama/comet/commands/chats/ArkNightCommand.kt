@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils
 
 @Suppress("SpellCheckingInspection")
 class ArkNightCommand : ChatCommand {
-    var pool = GachaService.getPoolsByType<ArkNightPool>()[0]
+    private var pool = GachaService.getPoolsByType<ArkNightPool>()[0]
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (!GachaService.isArkNightUsable()) {
@@ -118,12 +118,13 @@ class ArkNightCommand : ChatCommand {
                 GachaUtil.combineGachaImage(if (ops.size <= 10) ops else ops.subList(ops.size - 11, ops.size - 1), pool)
             if (result.lostItem.isNotEmpty())
                 event.subject.sendMessage(
-                    event.message.quote() + toChain("由于缺失资源文件, 以下干员无法显示 :(\n" +
-                            buildString {
-                                result.lostItem.forEach {
-                                    append("${it.name},")
-                                }
-                            }.removeSuffix(",")
+                    event.message.quote() + toChain(
+                        "由于缺失资源文件, 以下干员无法显示 :(\n" +
+                                buildString {
+                                    result.lostItem.forEach {
+                                        append("${it.name},")
+                                    }
+                                }.removeSuffix(",")
                     )
                 )
             val gachaImage = withContext(Dispatchers.IO) { result.image.uploadAsImage(event.subject) }

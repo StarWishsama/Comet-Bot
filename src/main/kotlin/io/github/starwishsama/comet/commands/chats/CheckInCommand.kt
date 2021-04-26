@@ -18,7 +18,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 /**
- * CheckInCommand
+ * [CheckInCommand]
  *
  * 签到命令, 可以获得积分
  *

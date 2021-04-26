@@ -61,7 +61,7 @@ class ArkNightPool(
 
             // 按默认抽卡规则抽出对应星级干员, 超过五十连后保底机制启用
 
-            val rare: Int =  when (probability) {
+            val rare: Int = when (probability) {
                 in r6Range.start..r6Range.endInclusive + r6UpRate -> 6 // 2%
                 in r5Range -> 5 // 8%
                 in r4Range -> 4 // 40%
@@ -158,7 +158,7 @@ class ArkNightPool(
 
                     return currentPool + "寻访结果:\n" +
                             "寻访次数: ${drawResult.size}\n" +
-                            "结果: ${r6Count}|${r5Count}|${r4Count}|${r3Count}\n" +
+                            "结果: ${r6Count}[6]|${r5Count}[5]|${r4Count}[4]|${r3Count}[3]\n" +
                             "使用合成玉 ${drawResult.size * 600}"
                 }
             }
@@ -170,5 +170,6 @@ class ArkNightPool(
     /**
      * 明日方舟抽卡，返回文字
      */
-    fun getArkDrawResultAsString(user: BotUser, time: Int): String = getArkDrawResultAsString(user, getArkDrawResult(user, time))
+    fun getArkDrawResultAsString(user: BotUser, time: Int): String =
+        getArkDrawResultAsString(user, getArkDrawResult(user, time))
 }

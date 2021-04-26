@@ -6,54 +6,29 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.managers.ClockInManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
-import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-
 
 @Suppress("SpellCheckingInspection")
 class AdminCommand : ChatCommand, UnDisableableCommand {
-    private val hourMinuteFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (args.isEmpty()) {
-            return "命令不存在, 使用 /admin help 查看更多".toChain()
+        return if (args.isEmpty()) {
+            "命令不存在, 使用 /admin help 查看更多".toChain()
         } else {
             when (args[0]) {
-                "clockin", "dk", "打卡" -> {
-                    return if (event is GroupMessageEvent) {
-                        clockIn(args, event)
-                    } else {
-                        "该命令只能在群聊使用".toChain()
-                    }
-                }
-                "showdata", "打卡数据", "dksj" -> {
-                    return if (event is GroupMessageEvent) {
-                        val data = ClockInManager.getNearestClockIn(event.group.id)
-                        data?.viewData()?.toMessageChain(event.subject)
-                            ?: "本群没有正在进行的打卡".toChain()
-                    } else {
-                        "该命令只能在群聊使用".toChain()
-                    }
-                }
-                "help", "帮助" -> return getHelp().convertToChain()
-                "permlist", "权限列表", "qxlb" -> return permList(user, args, event)
-                "permadd", "添加权限", "tjqx" -> return permAdd(user, args, event)
-                "give", "增加次数" -> return giveCommandUseTime(event, args)
-                else -> return "命令不存在, 使用 /admin help 查看更多".toChain()
+                "help", "帮助" -> getHelp().convertToChain()
+                "permlist", "权限列表", "qxlb" -> permList(user, args, event)
+                "permadd", "添加权限", "tjqx" -> permAdd(user, args, event)
+                "give", "增加次数" -> giveCommandUseTime(event, args)
+                else -> "命令不存在, 使用 /admin help 查看更多".toChain()
             }
         }
     }
@@ -128,53 +103,5 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
             }
         }
         return EmptyMessageChain
-    }
-
-    /**
-     * FIXME: 该命令不该在这里处理
-     */
-    private fun clockIn(args: List<String>, message: GroupMessageEvent): MessageChain {
-        if (!ClockInManager.isDuplicate(message.group.id, 10)) {
-            val startTime: LocalDateTime
-            val endTime: LocalDateTime
-
-            when (args.size) {
-                3 -> {
-                    startTime = LocalDateTime.of(
-                        LocalDate.now(),
-                        LocalTime.parse(args[1], hourMinuteFormatter)
-                    )
-                    endTime = LocalDateTime.of(
-                        LocalDate.now(),
-                        LocalTime.parse(args[2], hourMinuteFormatter)
-                    )
-                }
-                2 -> {
-                    startTime = LocalDateTime.now()
-                    endTime = LocalDateTime.of(
-                        LocalDate.now(),
-                        LocalTime.parse(args[1], hourMinuteFormatter)
-                    )
-                }
-                else -> {
-                    return toChain("/admin dk (开始时间) [结束时间])")
-                }
-            }
-
-            val usersList = arrayListOf<Member>()
-
-            return if (endTime.isBefore(startTime) || endTime.isEqual(startTime)) {
-                toChain("在吗 为什么时间穿越")
-            } else {
-                for (member in message.group.members) {
-                    usersList.add(member)
-                }
-
-                ClockInManager.newClockIn(message.group.id, usersList, startTime, endTime)
-                toChain("打卡已开启 请发送 /dk 来打卡")
-            }
-        } else {
-            return toChain("10 分钟内还有一个打卡未结束")
-        }
     }
 }
