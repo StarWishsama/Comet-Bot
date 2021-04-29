@@ -11,13 +11,17 @@ import java.math.RoundingMode
 import java.util.stream.Collectors
 
 /**
- * Operator info from https://github.com/Kengxxiao/ArknightsGameData/
+ * [ArkNightPool]
  *
- * Operator Picture from http://prts.wiki/
+ * 明日方舟抽卡实现方法
  *
- * You can download here: https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json
+ * 干员信息来源: https://github.com/Kengxxiao/ArknightsGameData/
  *
- * @author Nameless
+ * 干员图片来源: http://prts.wiki/
+ *
+ * 感谢以上大佬提供的资源!
+ *
+ * @author StarWishsama
  */
 
 class ArkNightPool(
@@ -43,9 +47,9 @@ class ArkNightPool(
         )
     }
 
-    private val r6Range = 0.50..0.52
-    private val r5Range = 0.0..0.08
-    private val r4Range = 0.09..0.49
+    private val r6Range = 0.0..0.02
+    private val r5Range = 0.03..0.11
+    private val r4Range = 0.12..0.52
 
     override fun doDraw(time: Int): List<ArkNightOperator> {
         val result = mutableListOf<ArkNightOperator>()
@@ -57,11 +61,8 @@ class ArkNightPool(
                 r6UpRate += 0.02
             }
 
-            val probability = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
-
             // 按默认抽卡规则抽出对应星级干员, 超过五十连后保底机制启用
-
-            val rare: Int = when (probability) {
+            val rare: Int = when (RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)) {
                 in r6Range.start..r6Range.endInclusive + r6UpRate -> 6 // 2%
                 in r5Range -> 5 // 8%
                 in r4Range -> 4 // 40%
@@ -71,53 +72,64 @@ class ArkNightPool(
             when {
                 // 如果在保底的基础上抽到了六星, 则重置加倍概率
                 r6UpRate > 0 -> {
-                    if (rare == 6) r6UpRate = 0.0 else r6UpRate += 0.02
+                    if (rare == 6) {
+                        r6UpRate = 0.0
+                    } else {
+                        r6UpRate += 0.02
+                    }
                 }
                 // 究极非酋之后必爆一个六星
-                rare != 6 && r6UpRate > 0.5 -> {
-                    result.add(getGachaItem(6, r6UpRate))
+                rare != 6 && r6UpRate >= 1 -> {
+                    result.add(getArkNightOperator(6))
                     r6UpRate = 0.0
                     return@repeat
                 }
             }
 
-            result.add(getGachaItem(rare, probability))
+            result.add(getArkNightOperator(rare))
         }
         return result
     }
 
     override fun getGachaItem(rare: Int): GachaItem {
-        return getGachaItem(rare, -1.0)
+        return getArkNightOperator(rare)
     }
 
     // 使用自定义抽卡方式
-    private fun getGachaItem(rare: Int, probability: Double): ArkNightOperator {
+    private fun getArkNightOperator(rare: Int): ArkNightOperator {
+        // 首先获取所有对应星级干员
+        val rareItems = poolItems.parallelStream().filter { it.rare == (rare - 1) }.collect(Collectors.toList())
+
+        require(rareItems.isNotEmpty()) { "获取干员列表失败: 空列表. 等级为 ${rare - 1}, 池内干员数 ${poolItems.size}" }
+
+        val weight: Int
+
         // 然后检查是否到了出 UP 角色的时候
         if (highProbabilityItems.isNotEmpty()) {
-            val targetUps = highProbabilityItems.keys.parallelStream().collect(Collectors.toList())
-            val targetUp = targetUps[RandomUtil.randomInt(0, targetUps.size - 1)]
+            val highItems =
+                highProbabilityItems.keys.parallelStream().collect(Collectors.toList()) as MutableList<ArkNightOperator>
+            rareItems.addAll(highItems)
 
-            val targetProbability = when (targetUp.rare) {
-                6 -> {
-                    r6Range.start..r6Range.endInclusive.plus(highProbabilityItems[targetUp] ?: 0.0)
+            rareItems.shuffle()
+
+            weight = RandomUtil.randomInt(0, rareItems.size - 1)
+
+            val target = rareItems[weight]
+
+            for ((gi, prop) in highProbabilityItems) {
+                val recalculatedProp = (weight * prop).toInt()
+                val redrawResult = rareItems[recalculatedProp]
+                if (redrawResult.name == gi.name) {
+                    return redrawResult
                 }
-                5 -> {
-                    r5Range.start..r5Range.endInclusive.plus(highProbabilityItems[targetUp] ?: 0.0)
-                }
-                4 -> {
-                    r4Range.start..r4Range.endInclusive.plus(highProbabilityItems[targetUp] ?: 0.0)
-                }
-                else -> r4Range
             }
 
-            if (probability in targetProbability) {
-                return targetUp as ArkNightOperator
-            }
+            return target
+        } else {
+            weight = RandomUtil.randomInt(0, rareItems.size - 1)
+            rareItems.shuffle()
+            return rareItems[weight]
         }
-
-        val rareItems = poolItems.parallelStream().filter { it.rare == (rare - 1) }.collect(Collectors.toList())
-        require(rareItems.isNotEmpty()) { "获取干员列表失败: 空列表. 等级为 ${rare - 1}, 池内干员数 ${poolItems.size}" }
-        return rareItems[RandomUtil.randomInt(0, rareItems.size - 1)]
     }
 
     /**

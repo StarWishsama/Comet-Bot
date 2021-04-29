@@ -12,7 +12,7 @@ data class MusicSearchResult(
     val albumPicture: String,
     val songURL: String
 ) {
-    fun getAuthorName(): String =
+    private fun getAuthorName(): String =
         buildString {
             author.forEach {
                 append("$it/")
