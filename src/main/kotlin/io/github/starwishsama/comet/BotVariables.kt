@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap
  * Comet (几乎) 所有数据的存放类
  * 可以直接访问数据
  *
- * @author Nameless
+ * @author StarWishsama
  */
 
 @OptIn(MiraiInternalApi::class)

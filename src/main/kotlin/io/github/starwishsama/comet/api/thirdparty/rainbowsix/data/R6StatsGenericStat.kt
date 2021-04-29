@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode
  *
  * 时间格式: 2020-12-09T04:19:47.000Z
  *
- * @author Nameless
+ * @author StarWishsama
  */
 data class R6StatsGenericStat(
     @JsonProperty("username")

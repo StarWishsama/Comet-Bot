@@ -51,7 +51,7 @@ data class BotUser(
         checkInTime++
     }
 
-    fun resetDay(){
+    fun resetDay() {
         checkInTime = 1
     }
 
@@ -88,7 +88,7 @@ data class BotUser(
     /**
      * 判断是否签到过了
      *
-     * @author NamelessSAMA
+     * @author StarWishsama
      * @return 是否签到
      */
     fun isChecked(): Boolean {

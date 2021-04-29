@@ -24,7 +24,7 @@ import java.util.*
  * 彗星 Bot 命令处理器
  *
  * 处理群聊/私聊聊天信息中存在的命令
- * @author Nameless
+ * @author StarWishsama
  */
 object CommandExecutor {
     private val commands: MutableSet<ChatCommand> = mutableSetOf()
@@ -333,7 +333,7 @@ object CommandExecutor {
      * 判断指定QQ号是否可以执行命令
      * (可以自定义命令冷却时间)
      *
-     * @author Nameless
+     * @author StarWishsama
      * @param user 检测的用户
      * @param props 命令配置
      *

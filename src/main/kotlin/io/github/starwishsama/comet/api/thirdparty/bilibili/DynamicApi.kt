@@ -21,7 +21,7 @@ import io.github.starwishsama.comet.utils.network.NetUtil
  *
  * 获取用户的最新动态
  * 支持多种格式
- * @author Nameless
+ * @author StarWishsama
  */
 object DynamicApi : ApiExecutor {
     private const val dynamicUrl =
