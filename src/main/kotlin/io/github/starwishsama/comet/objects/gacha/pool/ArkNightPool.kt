@@ -121,6 +121,8 @@ class ArkNightPool(
                 val redrawResult = rareItems[recalculatedProp]
                 if (redrawResult.name == gi.name) {
                     return redrawResult
+                } else {
+                    rareItems.shuffle()
                 }
             }
 
