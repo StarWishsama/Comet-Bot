@@ -69,7 +69,7 @@ object GachaService {
 
         return when (gachaPool.gameType) {
             CustomPool.GameType.ARKNIGHT -> {
-                parseArkNightPool(gachaPool)?.let { gachaPools.add(it) } == true
+                parseArkNightPool(gachaPool).let { gachaPools.add(it) }
             }
             // 暂不支持 PCR 卡池自定义
             CustomPool.GameType.PCR -> {
