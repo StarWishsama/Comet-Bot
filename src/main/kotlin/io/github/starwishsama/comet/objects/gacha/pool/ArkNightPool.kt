@@ -47,9 +47,9 @@ class ArkNightPool(
         )
     }
 
-    private val r6Range = 0.0..0.02
-    private val r5Range = 0.03..0.11
-    private val r4Range = 0.12..0.52
+    private val r3Range = 0.0..0.5
+    private val r4Range = 0.51..0.91
+    private val r5Range = 0.92..0.97
 
     override fun doDraw(time: Int): List<ArkNightOperator> {
         val result = mutableListOf<ArkNightOperator>()
@@ -63,10 +63,10 @@ class ArkNightPool(
 
             // 按默认抽卡规则抽出对应星级干员, 超过五十连后保底机制启用
             val rare: Int = when (RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)) {
-                in r6Range.start..r6Range.endInclusive + r6UpRate -> 6 // 2%
-                in r5Range -> 5 // 8%
+                in r3Range -> 6 // 50%
                 in r4Range -> 4 // 40%
-                else -> 3 // 50%
+                in r5Range -> 5 // 8%
+                else -> 3 // 2%
             }
 
             when {
@@ -75,9 +75,17 @@ class ArkNightPool(
                     if (rare == 6) {
                         r6UpRate = 0.0
                     } else {
-                        r6UpRate += 0.02
+                        val r6Rate = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
+
+                        if (r6Rate >= r6UpRate) {
+                            result.add(getArkNightOperator(6))
+                            return@repeat
+                        } else {
+                            r6UpRate += 0.02
+                        }
                     }
                 }
+
                 // 究极非酋之后必爆一个六星
                 rare != 6 && r6UpRate >= 1 -> {
                     result.add(getArkNightOperator(6))
