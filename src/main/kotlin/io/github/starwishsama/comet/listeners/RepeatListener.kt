@@ -8,7 +8,6 @@ import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.time.ExperimentalTime
 
 object RepeatListener : NListener {
@@ -24,17 +23,18 @@ object RepeatListener : NListener {
 
             if (repeatInfo == null) {
                 repeatCachePool[groupId] = RepeatInfo(
-                    mutableListOf(RepeatInfo.CacheMessage(
-                        event.sender.id,
-                        event.message
-                    ))
+                    mutableListOf(
+                        RepeatInfo.CacheMessage(
+                            event.sender.id,
+                            event.message
+                        )
+                    )
                 )
                 return
             }
 
             if (repeatInfo.check(event.sender.id, event.message)) {
                 runBlocking { event.subject.sendMessage(doRepeat(repeatInfo.messageCache.last().message)) }
-                repeatInfo.messageCache.clear()
             }
         }
     }
