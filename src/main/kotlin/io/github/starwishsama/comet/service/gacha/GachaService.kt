@@ -103,7 +103,7 @@ object GachaService {
         return pcrUsable
     }
 
-    private fun parseArkNightPool(customPool: CustomPool): ArkNightPool? {
+    private fun parseArkNightPool(customPool: CustomPool): ArkNightPool {
         val pool = ArkNightPool(
             customPool.poolName,
             customPool.poolDescription
@@ -129,7 +129,8 @@ object GachaService {
                 }
             }
         }
-        return null
+
+        return pool
     }
 
     private fun loadPCRData(data: File) {
