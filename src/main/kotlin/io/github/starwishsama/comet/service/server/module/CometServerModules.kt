@@ -1,15 +1,11 @@
 package io.github.starwishsama.comet.service.server.module
 
 import cn.hutool.core.net.URLDecoder
-import com.fasterxml.jackson.core.JsonParseException
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.api.thirdparty.github.GithubEventHandler
-import io.github.starwishsama.comet.api.thirdparty.github.data.events.PushEvent
-import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.service.pusher.instances.GithubPusher
 import io.github.starwishsama.comet.service.server.ServerUtil
@@ -62,7 +58,7 @@ class GithubWebHookHandler : HttpHandler {
             FileUtil.createTempFile(request, true)
         }
 
-        if (!request.startsWith("payload")) {
+        if (he.requestHeaders["X-GitHub-Delivery"] != null) {
             BotVariables.netLogger.log(HinaLogLevel.Debug, "无效请求", prefix = "WebHook")
             val resp = "Unsupported Request".toByteArray()
             he.sendResponseHeaders(403, resp.size.toLong())
@@ -86,7 +82,11 @@ class GithubWebHookHandler : HttpHandler {
         val eventType = he.requestHeaders[eventTypeHeader]?.get(0) ?: ""
 
         try {
-            val info = GithubEventHandler.process(payload, eventType) ?: return BotVariables.netLogger.log(HinaLogLevel.Debug, "推送 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")
+            val info = GithubEventHandler.process(payload, eventType) ?: return BotVariables.netLogger.log(
+                HinaLogLevel.Debug,
+                "推送 WebHook 消息失败, 不支持的事件类型",
+                prefix = "WebHook"
+            )
             GithubPusher.push(info)
         } catch (e: Exception) {
             BotVariables.netLogger.log(HinaLogLevel.Warn, "推送 WebHook 消息失败", e, prefix = "WebHook")

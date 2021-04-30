@@ -63,10 +63,10 @@ class ArkNightPool(
 
             // 按默认抽卡规则抽出对应星级干员, 超过五十连后保底机制启用
             val rare: Int = when (RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)) {
-                in r3Range -> 6 // 50%
+                in r3Range -> 3 // 50%
                 in r4Range -> 4 // 40%
                 in r5Range -> 5 // 8%
-                else -> 3 // 2%
+                else -> 6 // 2%
             }
 
             when {
