@@ -47,7 +47,15 @@ class ArkNightCommand : ChatCommand {
                         buildString {
                             append("目前卡池: ${pool.name}\n")
                             append("详细信息: ${pool.description}")
-                        }.toChain()
+
+                            val pools = GachaService.getPoolsByType<ArkNightPool>()
+
+                            append("\n\n")
+
+                            pools.forEach {
+                                append(it.name + " ->\n" + it.description + "\n")
+                            }
+                        }.trim().toChain()
                     } else {
                         val poolName = args[1]
                         val pools =
