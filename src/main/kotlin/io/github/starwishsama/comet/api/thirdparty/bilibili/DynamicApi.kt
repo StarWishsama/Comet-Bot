@@ -106,6 +106,7 @@ object DynamicApi : ApiExecutor {
 
                 val card = dynamic.data.cards[0]
                 val singleDynamicObject = mapper.readTree(card.card)
+
                 if (singleDynamicObject.isUsable()) {
                     val dynamicType = DynamicTypeSelector.getType(card.description.type)
                     return if (dynamicType != UnknownType::class) {
@@ -115,11 +116,11 @@ object DynamicApi : ApiExecutor {
                     }
                 }
             }
+
+            return MessageWrapper().addText("获取动态失败").setUsable(false)
         } catch (e: Exception) {
             return MessageWrapper().addText("解析动态失败").setUsable(false)
         }
-
-        return MessageWrapper().addText("获取动态失败").setUsable(false)
     }
 
     /**
