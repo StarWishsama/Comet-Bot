@@ -74,7 +74,8 @@ object RepeatListener : NListener {
 }
 
 data class RepeatInfo(
-    val messageCache: MutableList<CacheMessage> = Collections.synchronizedList(mutableListOf())
+    val messageCache: MutableList<CacheMessage> = Collections.synchronizedList(mutableListOf()),
+    var hasRepeated: Boolean = false
 ) {
     data class CacheMessage(
         val senderId: Long,
@@ -98,7 +99,8 @@ data class RepeatInfo(
             messageCache.add(CacheMessage(id, message))
         }
 
-        if (messageCache.size > 1) {
+        if (messageCache.size > 1 && !hasRepeated) {
+            hasRepeated = true
             return true
         }
 
