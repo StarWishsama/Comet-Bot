@@ -6,13 +6,8 @@ import io.github.starwishsama.comet.api.thirdparty.music.data.LeanAppDetailRespo
 import io.github.starwishsama.comet.api.thirdparty.music.data.LeanAppSearchResponse
 import io.github.starwishsama.comet.api.thirdparty.music.data.QQMusicSearchResult
 import io.github.starwishsama.comet.api.thirdparty.music.entity.MusicSearchResult
-import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.network.NetUtil
-import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.MusicKind
-import net.mamoe.mirai.message.data.MusicShare
-import net.mamoe.mirai.message.data.toMessageChain
-import java.lang.NullPointerException
+import org.jsoup.Jsoup
 import java.net.URLEncoder
 
 /**
@@ -104,12 +99,14 @@ object ThirdPartyMusicApi {
                 return@forEach
             }
 
+            val jumpUrl = "https://y.qq.com/n/yqq/song/${song.songMid}.html?no_redirect=1"
+
             result.add(
                 MusicSearchResult(
                     song.songName,
                     artists,
-                    "https://y.qq.com/n/yqq/song/${song.songMid}.html?ADTAG=h5_playsong&no_redirect=1",
-                    "http://imgcache.qq.com/music/photo/album_300/17/300_albumpic_${song.albumId}_0.jpg",
+                    jumpUrl,
+                    getQQMusicCover(jumpUrl),
                     playURL
                 )
             )
@@ -121,13 +118,20 @@ object ThirdPartyMusicApi {
     private fun getQQMusicSearchResult(name: String): QQMusicSearchResult? {
         val songResult =
             NetUtil.getPageContent(
-                "https://c.y.qq.com/soso/fcgi-bin/client_search_cp?g_tk=5381&p=1&n=20&w=${
+                "https://c.y.qq.com/soso/fcgi-bin/client_search_cp?w=${
                     URLEncoder.encode(
                         name,
                         "UTF-8"
                     )
-                }&format=json&loginUin=0&hostUin=0&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0&remoteplace=txt.yqq.song&t=0&aggr=1&cr=1&catZhida=0&flag_qc=0"
+                }&format=json&inCharset=utf8&outCharset=utf-8"
             )
         return mapper.readValue(songResult ?: return null)
+    }
+
+    private fun getQQMusicCover(songURL: String): String {
+        val req = Jsoup.connect(songURL)
+        val resp = req.execute()
+
+        return "http:" + resp.parse().getElementsByClass("data__cover").select("img")[0].attributes()["src"]
     }
 }

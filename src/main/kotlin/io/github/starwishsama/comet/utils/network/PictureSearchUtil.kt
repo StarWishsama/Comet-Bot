@@ -19,10 +19,10 @@ object PictureSearchUtil {
 
     fun sauceNaoSearch(url: String): PicSearchResult {
         val encodedUrl = URLUtil.encode(url)
-        val key = ApiManager.getConfig<SauceNaoConfig>()?.token
+        val key = ApiManager.getConfig<SauceNaoConfig>().token
 
         NetUtil.executeHttpRequest(
-            url = "$sauceNaoApi$encodedUrl${if (key != null && key.isNotEmpty()) "&api_key=$key" else ""}",
+            url = "$sauceNaoApi$encodedUrl${if (key.isNotEmpty()) "&api_key=$key" else ""}",
             timeout = 5
         ).use { response ->
             if (response.isSuccessful && response.isType(ContentType.JSON.value)) {
