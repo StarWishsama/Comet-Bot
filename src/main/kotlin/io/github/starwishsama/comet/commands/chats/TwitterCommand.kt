@@ -121,7 +121,7 @@ class TwitterCommand : ChatCommand {
             if (NetUtil.isTimeout(t)) {
                 CometUtil.toChain("获取推文时连接超时")
             } else {
-                daemonLogger.warning(t.stackTraceToString())
+                daemonLogger.warning(t)
                 CometUtil.toChain("获取推文时出现了异常")
             }
         }
