@@ -24,7 +24,6 @@ data class CustomPool(
     val modifiedGachaItems: List<ModifiedGachaItem>
 ) {
     @Serializable
-    @Suppress("unused")
     enum class GameType {
         ARKNIGHT, PCR
     }
@@ -35,6 +34,8 @@ data class CustomPool(
         val name: String,
         @Comment("该物品的概率提升或降低值, 设为 0 不调整")
         val probability: Double,
+        @Comment("加成权值, 如 W 是 30% 中加成五倍权值. 如果这个干员没有权值填 1.")
+        val weight: Int,
         @Comment("是否从卡池中移除该物品, 若不则填 false")
         val isHidden: Boolean
     )

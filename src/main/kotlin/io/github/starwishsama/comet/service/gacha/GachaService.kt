@@ -9,6 +9,7 @@ import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
 import io.github.starwishsama.comet.objects.gacha.pool.PCRPool
 import io.github.starwishsama.comet.utils.*
+import io.github.starwishsama.comet.utils.math.MathUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -108,7 +109,8 @@ object GachaService {
             customPool.poolName,
             customPool.poolDescription
         ) {
-            customPool.condition.contains(obtain)
+            GachaUtil.hasOperator(this.name) &&
+                    (if (customPool.condition.isNotEmpty()) !customPool.condition.contains(obtain) else true)
         }
 
         customPool.modifiedGachaItems.forEach { item ->
@@ -121,7 +123,15 @@ object GachaService {
                 }
 
                 if (item.probability > 0) {
-                    pool.highProbabilityItems[it] = item.probability
+                    if (item.weight <= 1) {
+                        pool.highProbabilityItems[it] = item.probability
+                    } else {
+                        pool.highProbabilityItems[it] = MathUtil.calculateWeight(
+                            pool.poolItems.size,
+                            pool.poolItems.filter { poolItem -> poolItem.rare == result.get().rare }.size,
+                            item.weight
+                        )
+                    }
                 }
             }.also {
                 if (!result.isPresent) {

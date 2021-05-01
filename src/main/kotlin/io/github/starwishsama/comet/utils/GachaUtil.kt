@@ -39,11 +39,6 @@ object GachaUtil {
             "命令条数现在每小时会恢复100次, 封顶1000次"
     var pictureReady = false
 
-    /**
-     * PRTS 实际保有干员半身立绘量
-     */
-    private const val arkNightPictureCount = 193
-
     private const val arkNightDataApi = "https://api.github.com/repos/Kengxxiao/ArknightsGameData"
     const val arkNightData =
         "https://raw.fastgit.org/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json"
@@ -131,17 +126,22 @@ object GachaUtil {
     fun downloadArkNightImage() {
         val arkLoc = FileUtil.getResourceFolder().getChildFolder("ark")
 
-        if (arkLoc.filesCount() < arkNightPictureCount) {
+        val ele = Jsoup.connect(
+            "http://prts.wiki/w/PRTS:%E6%96%87%E4%BB%B6%E4%B8%80%E8%A7%88/%E5%B9%B2%E5%91%98%E7%B2%BE%E8%8B%B10%E5%8D%8A%E8%BA%AB%E5%83%8F"
+        ).get().getElementsByClass("mw-parser-output")[0].select("a")
+
+        /**
+         * PRTS 实际保有干员半身立绘量
+         */
+        val actualCount = ele.size
+
+        if (arkLoc.filesCount() < actualCount) {
             val startTime = LocalDateTime.now()
             daemonLogger.info("正在下载 明日方舟图片资源文件")
 
             var successCount = 0
 
             val downloadList = mutableSetOf<String>()
-
-            val ele = Jsoup.connect(
-                "http://prts.wiki/w/PRTS:%E6%96%87%E4%BB%B6%E4%B8%80%E8%A7%88/%E5%B9%B2%E5%91%98%E7%B2%BE%E8%8B%B10%E5%8D%8A%E8%BA%AB%E5%83%8F"
-            ).get().getElementsByClass("mw-parser-output")[0].select("a")
 
 
             ele.forEach {
