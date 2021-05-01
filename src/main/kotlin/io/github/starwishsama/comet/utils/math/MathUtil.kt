@@ -21,6 +21,10 @@ object MathUtil {
 
         val afterWeight = sub * weightValue
 
-        return afterWeight.toDouble() / sub + afterWeight.toDouble()
+        println(afterWeight)
+
+        println(sub)
+
+        return afterWeight.toDouble() / (sub + afterWeight.toDouble())
     }
 }

@@ -133,7 +133,7 @@ class ArkNightPool(
 
             for ((gi, prop) in highProbabilityItems) {
                 val recalculatedProp = (weight * prop).toInt()
-                val redrawResult = rareItems[recalculatedProp]
+                val redrawResult = rareItems[recalculatedProp.coerceAtMost(rareItems.size - 1)]
                 if (redrawResult.name == gi.name) {
                     return ArkNightOperatorInfo(redrawResult, true)
                 } else {

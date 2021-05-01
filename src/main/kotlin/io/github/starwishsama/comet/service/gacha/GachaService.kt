@@ -109,7 +109,8 @@ object GachaService {
             customPool.poolName,
             customPool.poolDescription
         ) {
-            GachaUtil.hasOperator(this.name) &&
+            (GachaUtil.hasOperator(this.name) || customPool.modifiedGachaItems.stream().filter { it.name == this.name }
+                .findAny().isPresent) &&
                     (if (customPool.condition.isNotEmpty()) !customPool.condition.contains(obtain) else true)
         }
 
