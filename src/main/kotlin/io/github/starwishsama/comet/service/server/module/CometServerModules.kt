@@ -58,7 +58,7 @@ class GithubWebHookHandler : HttpHandler {
             FileUtil.createTempFile(request, true)
         }
 
-        if (he.requestHeaders["X-GitHub-Delivery"] == null) {
+        if (he.requestHeaders[eventTypeHeader] == null) {
             BotVariables.netLogger.log(HinaLogLevel.Debug, "无效请求", prefix = "WebHook")
             val resp = "Unsupported Request".toByteArray()
             he.sendResponseHeaders(403, resp.size.toLong())
@@ -73,7 +73,7 @@ class GithubWebHookHandler : HttpHandler {
 
         val validate = BotVariables.mapper.readTree(payload).isUsable()
 
-        if (validate) {
+        if (!validate) {
             BotVariables.netLogger.log(HinaLogLevel.Warn, "解析请求失败, 回调的 JSON 不合法.\n${payload}", prefix = "WebHook")
             he.sendResponseHeaders(403, 0)
             return

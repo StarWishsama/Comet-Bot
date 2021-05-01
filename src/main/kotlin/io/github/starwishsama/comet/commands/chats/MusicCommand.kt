@@ -29,6 +29,7 @@ class MusicCommand : ChatCommand {
                             "QQ", "TX", "腾讯" -> BotVariables.cfg.musicApi = MusicApiType.QQ
                             "NETEASE", "网易", "WY" -> BotVariables.cfg.musicApi = MusicApiType.NETEASE
                         }
+
                         toChain("音乐API已修改为 ${BotVariables.cfg.musicApi}")
                     } else {
                         "/music api [API名称] (QQ/WY)".toChain()
@@ -40,15 +41,15 @@ class MusicCommand : ChatCommand {
                 }
                 MusicApiType.QQ.name -> {
                     event.subject.sendMessage("请稍等...")
-                    return handleQQMusic(args.getRestString(1), event.subject)
+                    handleQQMusic(args.getRestString(1), event.subject)
                 }
                 MusicApiType.NETEASE.name -> {
                     event.subject.sendMessage("请稍等...")
-                    return handleNetEaseMusic(args.getRestString(1), event.subject)
+                    handleNetEaseMusic(args.getRestString(1), event.subject)
                 }
                 else -> {
                     event.subject.sendMessage("请稍等...")
-                    return handleMusicSearch(args.getRestString(0), event.subject)
+                    handleMusicSearch(args.getRestString(0), event.subject)
                 }
             }
         } else {

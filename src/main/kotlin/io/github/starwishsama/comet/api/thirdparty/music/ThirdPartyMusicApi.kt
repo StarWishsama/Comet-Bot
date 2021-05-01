@@ -81,6 +81,8 @@ object ThirdPartyMusicApi {
 
             val playResult = NetUtil.getPageContent("$jsososo${song.songMid}")
 
+            println(playResult)
+
             val playURL: String
 
             if (playResult?.isNotBlank() == true) {
@@ -89,15 +91,11 @@ object ThirdPartyMusicApi {
                 playURL = if (musicUrlObject.isNull) {
                     ""
                 } else {
-                    try {
-                        val urlObject = musicUrlObject["data"]
-                        if (!urlObject.isNull) {
-                            urlObject[song.songMid].asText()
-                        } else {
-                            ""
-                        }
-                    } catch (e: NullPointerException) {
-                        return@forEach
+                    val urlObject = musicUrlObject["data"]
+                    if (!urlObject.isNull) {
+                        urlObject[song.songMid].asText()
+                    } else {
+                        ""
                     }
                 }
             } else {
@@ -117,10 +115,12 @@ object ThirdPartyMusicApi {
             )
         }
 
+        println(result)
+
         return result
     }
 
-    private fun getQQMusicSearchResult(name: String): QQMusicSearchResult? {
+    fun getQQMusicSearchResult(name: String): QQMusicSearchResult? {
         val songResult =
             NetUtil.getPageContent(
                 "https://c.y.qq.com/soso/fcgi-bin/client_search_cp?w=${
