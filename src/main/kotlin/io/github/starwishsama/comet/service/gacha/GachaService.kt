@@ -85,7 +85,7 @@ object GachaService {
 
     @Throws(JsonParseException::class)
     fun addPoolFromFile(poolFile: File) {
-        require(poolFile.exists()) { "${poolFile.name} isn't exists" }
+        require(poolFile.exists()) { "${poolFile.absolutePath} isn't exists" }
 
         try {
             val pool = Yaml.decodeFromString<CustomPool>(poolFile.getContext())

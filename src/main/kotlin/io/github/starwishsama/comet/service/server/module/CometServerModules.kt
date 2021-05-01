@@ -58,7 +58,7 @@ class GithubWebHookHandler : HttpHandler {
             FileUtil.createTempFile(request, true)
         }
 
-        if (he.requestHeaders["X-GitHub-Delivery"] != null) {
+        if (he.requestHeaders["X-GitHub-Delivery"] == null) {
             BotVariables.netLogger.log(HinaLogLevel.Debug, "无效请求", prefix = "WebHook")
             val resp = "Unsupported Request".toByteArray()
             he.sendResponseHeaders(403, resp.size.toLong())
