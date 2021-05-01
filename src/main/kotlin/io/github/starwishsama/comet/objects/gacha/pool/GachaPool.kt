@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.objects.gacha.pool
 
+import io.github.starwishsama.comet.objects.gacha.GachaResult
 import io.github.starwishsama.comet.objects.gacha.items.GachaItem
 
 /**
@@ -53,7 +54,7 @@ abstract class GachaPool {
     /**
      * 抽卡实现方法
      */
-    abstract fun doDraw(time: Int = 1): List<GachaItem>
+    abstract fun doDraw(time: Int = 1): GachaResult
 
     /**
      * 获取指定稀有度的物品

@@ -4,6 +4,7 @@ import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.gacha.GachaResult
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.GachaItem
 import io.github.starwishsama.comet.utils.GachaUtil
@@ -51,8 +52,8 @@ class ArkNightPool(
     private val r4Range = 0.51..0.91
     private val r5Range = 0.92..0.97
 
-    override fun doDraw(time: Int): List<ArkNightOperator> {
-        val result = mutableListOf<ArkNightOperator>()
+    override fun doDraw(time: Int): GachaResult {
+        val gachaResult = GachaResult()
         var r6UpRate = 0.00
 
         repeat(time) {
@@ -81,23 +82,36 @@ class ArkNightPool(
 
                 // 究极非酋之后必爆一个六星
                 rare != 6 && r6UpRate >= 1 -> {
-                    result.add(getArkNightOperator(6))
+                    getArkNightOperator(rare).apply {
+                        gachaResult.items.add(operator)
+                    }
                     r6UpRate = 0.0
                     return@repeat
                 }
             }
 
-            result.add(getArkNightOperator(rare))
+            getArkNightOperator(rare).apply {
+                if (isSpecial) {
+                    gachaResult.specialItems.add(operator)
+                }
+
+                gachaResult.items.add(operator)
+            }
         }
-        return result
+        return gachaResult
     }
 
     override fun getGachaItem(rare: Int): GachaItem {
-        return getArkNightOperator(rare)
+        return getArkNightOperator(rare).operator
     }
 
+    private data class ArkNightOperatorInfo(
+        val operator: ArkNightOperator,
+        val isSpecial: Boolean
+    )
+
     // 使用自定义抽卡方式
-    private fun getArkNightOperator(rare: Int): ArkNightOperator {
+    private fun getArkNightOperator(rare: Int): ArkNightOperatorInfo {
         // 首先获取所有对应星级干员
         val rareItems = poolItems.parallelStream().filter { it.rare == (rare - 1) }.collect(Collectors.toList())
 
@@ -121,60 +135,70 @@ class ArkNightPool(
                 val recalculatedProp = (weight * prop).toInt()
                 val redrawResult = rareItems[recalculatedProp]
                 if (redrawResult.name == gi.name) {
-                    return redrawResult
+                    return ArkNightOperatorInfo(redrawResult, true)
                 } else {
                     rareItems.shuffle()
                 }
             }
 
-            return target
+            return ArkNightOperatorInfo(target, false)
         } else {
             weight = RandomUtil.randomInt(0, rareItems.size - 1)
             rareItems.shuffle()
-            return rareItems[weight]
+            val operator = rareItems[weight]
+            return ArkNightOperatorInfo(operator, false)
         }
     }
 
     /**
      * 明日方舟抽卡结果
      */
-    fun getArkDrawResult(user: BotUser, time: Int = 1): List<ArkNightOperator> {
+    fun getArkDrawResult(user: BotUser, time: Int = 1): GachaResult {
         return if (GachaUtil.checkHasGachaTime(user, time)) {
             user.decreaseTime(time)
             doDraw(time)
         } else {
-            emptyList()
+            GachaResult()
         }
     }
 
     /**
      * 明日方舟抽卡，返回文字
      */
-    fun getArkDrawResultAsString(user: BotUser, drawResult: List<ArkNightOperator>): String {
+    fun getArkDrawResultAsString(user: BotUser, drawResult: GachaResult): String {
         val currentPool = "目前卡池为: $name\n"
-        if (drawResult.isNotEmpty()) {
-            when (drawResult.size) {
+        if (!drawResult.isEmpty()) {
+            when (drawResult.items.size) {
                 1 -> {
-                    val (name, _, rare) = drawResult[0]
+                    val (name, _, rare) = drawResult.items[0] as ArkNightOperator
                     return currentPool + "单次寻访结果\n$name ${GachaUtil.getStarText(rare + 1)}"
                 }
                 10 -> {
                     return StringBuilder(currentPool + "十连寻访结果:\n").apply {
-                        for ((name, _, rare) in drawResult) {
+                        for ((name, _, rare) in drawResult.items as List<ArkNightOperator>) {
                             append(name).append(" ").append(GachaUtil.getStarText(rare + 1)).append(" ")
                         }
                     }.trim().toString()
                 }
                 else -> {
-                    val r6Count = drawResult.parallelStream().filter { it.rare + 1 == 6 }.count()
-                    val r5Count = drawResult.parallelStream().filter { it.rare + 1 == 4 }.count()
-                    val r4Count = drawResult.parallelStream().filter { it.rare + 1 == 3 }.count()
-                    val r3Count = drawResult.size - r6Count - r5Count - r4Count
+                    val r6Count = drawResult.items.parallelStream().filter { it.rare + 1 == 6 }.count()
+                    val r5Count = drawResult.items.parallelStream().filter { it.rare + 1 == 4 }.count()
+                    val r4Count = drawResult.items.parallelStream().filter { it.rare + 1 == 3 }.count()
+                    val r3Count = drawResult.items.size - r6Count - r5Count - r4Count
 
-                    return currentPool + "寻访结果:\n" +
-                            "寻访次数: ${drawResult.size}\n" +
+                    var returnText = currentPool + "寻访结果:\n" +
+                            "寻访次数: ${drawResult.items.size}\n" +
                             "结果: ${r6Count}[6]|${r5Count}[5]|${r4Count}[4]|${r3Count}[3]\n" +
-                            "使用合成玉 ${drawResult.size * 600}"
+                            "使用合成玉 ${drawResult.items.size * 600}"
+
+                    if (drawResult.specialItems.isNotEmpty()) {
+                        returnText += "\n\n出现特殊物品!\n"
+                        drawResult.specialItems.forEach {
+                            returnText += "${it.name} > ${GachaUtil.getStarText(it.rare + 1)}"
+                        }
+                    }
+
+                    return returnText
                 }
             }
         } else {

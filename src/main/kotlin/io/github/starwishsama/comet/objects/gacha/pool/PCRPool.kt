@@ -4,6 +4,7 @@ import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.pcr
 import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.gacha.GachaResult
 import io.github.starwishsama.comet.objects.gacha.items.GachaItem
 import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.utils.GachaUtil
@@ -21,7 +22,7 @@ class PCRPool(
     private val R2 = 200
     private val R1 = 775
 
-    override fun doDraw(time: Int): MutableList<PCRCharacter> {
+    override fun doDraw(time: Int): GachaResult {
         val drawResult = mutableListOf<PCRCharacter>()
 
         repeat(time) {
@@ -44,7 +45,7 @@ class PCRPool(
             }
         }
 
-        return drawResult
+        return GachaResult().apply { items.addAll(drawResult) }
     }
 
     override fun getGachaItem(rare: Int): PCRCharacter {
@@ -68,21 +69,21 @@ class PCRPool(
         }
     }
 
-    private fun getGachaResultAsString(gachaResult: MutableList<PCRCharacter>, startTime: Long): String {
-        val time = gachaResult.size
+    private fun getGachaResultAsString(gachaResult: GachaResult, startTime: Long): String {
+        val time = gachaResult.items.size
 
         return when {
             time <= 10 -> {
                 buildString {
                     append("素敵な仲間が増えますよ!\n")
-                    for ((name, star) in gachaResult) {
+                    for ((name, star) in gachaResult.items as List<PCRCharacter>) {
                         append(name).append(" ").append(GachaUtil.getStarText(star)).append(" ")
                     }
                 }.trim()
             }
             else -> {
                 val r3s =
-                    gachaResult.parallelStream().filter { it.rare == 3 }.collect(Collectors.toList())
+                    gachaResult.items.parallelStream().filter { it.rare == 3 }.collect(Collectors.toList())
 
                 val r3Character = buildString {
                     for (c in r3s) {
@@ -92,20 +93,20 @@ class PCRPool(
 
                 var firstTimeGetR3 = 0
 
-                for (i in gachaResult.indices) {
-                    if (gachaResult[i].rare == 3) {
+                for (i in gachaResult.items.indices) {
+                    if (gachaResult.items[i].rare == 3) {
                         firstTimeGetR3 = i
                         break
                     }
                 }
 
-                val r3Size = gachaResult.parallelStream().filter { it.rare == 3 }.count()
-                val r2Size = gachaResult.parallelStream().filter { it.rare == 2 }.count()
-                val r1Size = gachaResult.parallelStream().filter { it.rare == 1 }.count()
+                val r3Size = gachaResult.items.parallelStream().filter { it.rare == 3 }.count()
+                val r2Size = gachaResult.items.parallelStream().filter { it.rare == 2 }.count()
+                val r1Size = gachaResult.items.parallelStream().filter { it.rare == 1 }.count()
 
                 """
                         素敵な仲間が増えますよ！ 
-                        本次抽卡次数为 ${gachaResult.size}
+                        本次抽卡次数为 ${gachaResult.items.size}
                         ${if (firstTimeGetR3 != 0) "第${firstTimeGetR3}抽获得三星角色" else "酋长, 我们回家吧"}
                         $r3Character
                         ★★★×${r3Size} ★★×${r2Size} ★×${r1Size}

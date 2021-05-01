@@ -5,7 +5,7 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
+import io.github.starwishsama.comet.objects.gacha.GachaResult
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.utils.CometUtil.toChain
@@ -104,11 +104,11 @@ class ArkNightCommand : ChatCommand {
     """.trimIndent()
 
     suspend fun getGachaResult(event: MessageEvent, user: BotUser, time: Int): MessageChain {
-        val list: List<ArkNightOperator> = pool.getArkDrawResult(user, time)
+        val gachaResult: GachaResult = pool.getArkDrawResult(user, time)
         return if (GachaUtil.arkPictureIsUsable()) {
-            generatePictureGachaResult(pool, event, user, list)
+            generatePictureGachaResult(pool, event, user, gachaResult)
         } else {
-            pool.getArkDrawResultAsString(user, list).toChain()
+            pool.getArkDrawResultAsString(user, gachaResult).toChain()
         }
     }
 
@@ -116,9 +116,11 @@ class ArkNightCommand : ChatCommand {
         pool: ArkNightPool,
         event: MessageEvent,
         user: BotUser,
-        ops: List<ArkNightOperator>
+        gachaResult: GachaResult
     ): MessageChain {
         event.subject.sendMessage("请稍等...")
+
+        val ops = gachaResult.items
 
         return if (ops.isNotEmpty()) {
             // 只获取最后十个
@@ -137,7 +139,7 @@ class ArkNightCommand : ChatCommand {
                 )
             val gachaImage = withContext(Dispatchers.IO) { result.image.uploadAsImage(event.subject) }
 
-            val reply = gachaImage.plus("\n").plus(pool.getArkDrawResultAsString(user, ops))
+            val reply = gachaImage.plus("\n").plus(pool.getArkDrawResultAsString(user, gachaResult))
 
             if (event is GroupMessageEvent) event.sender.at().plus("\n").plus(reply) else reply
         } else {
