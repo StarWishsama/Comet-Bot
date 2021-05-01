@@ -81,21 +81,23 @@ object ThirdPartyMusicApi {
 
             val playResult = NetUtil.getPageContent("$jsososo${song.songMid}")
 
-            println(playResult)
-
             val playURL: String
 
             if (playResult?.isNotBlank() == true) {
                 val musicUrlObject = mapper.readTree(playResult)
 
                 playURL = if (musicUrlObject.isNull) {
-                    ""
+                    return@forEach
                 } else {
                     val urlObject = musicUrlObject["data"]
                     if (!urlObject.isNull) {
-                        urlObject[song.songMid].asText()
+                        if (urlObject[song.songMid] != null && !urlObject[song.songMid].isNull) {
+                            urlObject[song.songMid].asText()
+                        } else {
+                            return@forEach
+                        }
                     } else {
-                        ""
+                        return@forEach
                     }
                 }
             } else {
@@ -114,8 +116,6 @@ object ThirdPartyMusicApi {
                 )
             )
         }
-
-        println(result)
 
         return result
     }

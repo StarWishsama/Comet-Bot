@@ -21,39 +21,43 @@ class MusicCommand : ChatCommand {
     var plainText: Boolean = false
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (args.isNotEmpty()) {
-            return when (args[0].toLowerCase()) {
-                "api" -> {
-                    if (args.size > 1) {
-                        when (args[1].toUpperCase()) {
-                            "QQ", "TX", "腾讯" -> BotVariables.cfg.musicApi = MusicApiType.QQ
-                            "NETEASE", "网易", "WY" -> BotVariables.cfg.musicApi = MusicApiType.NETEASE
-                        }
+        if (args.isEmpty()) {
+            return getHelp().toChain()
+        }
 
-                        toChain("音乐API已修改为 ${BotVariables.cfg.musicApi}")
-                    } else {
-                        "/music api [API名称] (QQ/WY)".toChain()
+        return when (args[0]) {
+            "api" -> {
+                if (args.size > 1) {
+                    when (args[1].toUpperCase()) {
+                        "QQ", "TX", "腾讯" -> BotVariables.cfg.musicApi = MusicApiType.QQ
+                        "NETEASE", "网易", "WY" -> BotVariables.cfg.musicApi = MusicApiType.NETEASE
                     }
-                }
-                "mode" -> {
-                    plainText = !plainText
-                    "纯文字模式: $plainText".toChain()
-                }
-                MusicApiType.QQ.name -> {
-                    event.subject.sendMessage("请稍等...")
-                    handleQQMusic(args.getRestString(1), event.subject)
-                }
-                MusicApiType.NETEASE.name -> {
-                    event.subject.sendMessage("请稍等...")
-                    handleNetEaseMusic(args.getRestString(1), event.subject)
-                }
-                else -> {
-                    event.subject.sendMessage("请稍等...")
-                    handleMusicSearch(args.getRestString(0), event.subject)
+
+                    toChain("音乐API已修改为 ${BotVariables.cfg.musicApi}")
+                } else {
+                    "/music api [API名称] (QQ/WY)".toChain()
                 }
             }
-        } else {
-            return getHelp().toChain()
+
+            "mode" -> {
+                plainText = !plainText
+                "纯文字模式: $plainText".toChain()
+            }
+
+            MusicApiType.QQ.name -> {
+                event.subject.sendMessage("请稍等...")
+                handleQQMusic(args.getRestString(1), event.subject)
+            }
+
+            MusicApiType.NETEASE.name -> {
+                event.subject.sendMessage("请稍等...")
+                handleNetEaseMusic(args.getRestString(1), event.subject)
+            }
+
+            else -> {
+                event.subject.sendMessage("请稍等...")
+                handleMusicSearch(args.getRestString(0), event.subject)
+            }
         }
     }
 
