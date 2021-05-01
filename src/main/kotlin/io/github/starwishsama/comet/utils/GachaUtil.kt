@@ -18,7 +18,6 @@ import io.github.starwishsama.comet.objects.gacha.pool.PCRPool
 import io.github.starwishsama.comet.service.gacha.GachaConstants
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
-import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
 import org.jsoup.Jsoup
 import java.awt.Image
@@ -43,7 +42,7 @@ object GachaUtil {
     /**
      * PRTS 实际保有干员半身立绘量
      */
-    private const val arkNightPictureCount = 193
+    private const val arkNightPictureCount = 196
 
     private const val arkNightDataApi = "https://api.github.com/repos/Kengxxiao/ArknightsGameData"
     const val arkNightData =
@@ -75,9 +74,9 @@ object GachaUtil {
 
         val picHeight = 380
 
-        val newBufferedImage = BufferedImage(picSize * ops.size, picHeight, BufferedImage.TYPE_INT_RGB)
+        val gachaResultImage = BufferedImage(picSize * ops.size, picHeight, BufferedImage.TYPE_INT_RGB)
 
-        val createGraphics = newBufferedImage.createGraphics()
+        val graphics = gachaResultImage.createGraphics()
 
         var newBufferedImageWidth = 0
 
@@ -85,7 +84,7 @@ object GachaUtil {
             val file = File(FileUtil.getResourceFolder().getChildFolder("ark"), i.name + ".png")
 
             if (!file.exists()) {
-                lostOperators.plusAssign(i)
+                lostOperators.add(i)
                 daemonLogger.warning("明日方舟: 干员 ${i.name} 的图片不存在")
             } else {
                 val inStream: InputStream = file.inputStream()
@@ -95,7 +94,7 @@ object GachaUtil {
                 val imageWidth = bufferedImage.width
                 val imageHeight = bufferedImage.height
 
-                createGraphics.drawImage(
+                graphics.drawImage(
                     bufferedImage.getScaledInstance(
                         imageWidth,
                         imageHeight,
@@ -108,9 +107,9 @@ object GachaUtil {
             }
         }
 
-        createGraphics.dispose()
+        graphics.dispose()
 
-        return CombinedResult(newBufferedImage, lostOperators)
+        return CombinedResult(gachaResultImage, lostOperators)
 
     }
 
@@ -119,7 +118,7 @@ object GachaUtil {
         val lostItem: List<GachaItem>
     )
 
-    fun getStar(rare: Int): String = buildString {
+    fun getStarText(rare: Int): String = buildString {
         for (i in 0 until rare) {
             append("★")
         }
@@ -128,6 +127,7 @@ object GachaUtil {
     fun checkHasGachaTime(user: BotUser, time: Int): Boolean =
         (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
 
+    @Suppress("HttpUrlsUsage")
     fun downloadArkNightImage() {
         val arkLoc = FileUtil.getResourceFolder().getChildFolder("ark")
 

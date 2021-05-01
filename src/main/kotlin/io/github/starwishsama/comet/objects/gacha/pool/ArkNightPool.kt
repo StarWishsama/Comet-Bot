@@ -75,14 +75,7 @@ class ArkNightPool(
                     if (rare == 6) {
                         r6UpRate = 0.0
                     } else {
-                        val r6Rate = RandomUtil.randomDouble(2, RoundingMode.HALF_DOWN)
-
-                        if (r6Rate >= r6UpRate) {
-                            result.add(getArkNightOperator(6))
-                            return@repeat
-                        } else {
-                            r6UpRate += 0.02
-                        }
+                        r6UpRate += 0.02
                     }
                 }
 
@@ -163,12 +156,12 @@ class ArkNightPool(
             when (drawResult.size) {
                 1 -> {
                     val (name, _, rare) = drawResult[0]
-                    return currentPool + "单次寻访结果\n$name ${GachaUtil.getStar(rare + 1)}"
+                    return currentPool + "单次寻访结果\n$name ${GachaUtil.getStarText(rare + 1)}"
                 }
                 10 -> {
                     return StringBuilder(currentPool + "十连寻访结果:\n").apply {
                         for ((name, _, rare) in drawResult) {
-                            append(name).append(" ").append(GachaUtil.getStar(rare + 1)).append(" ")
+                            append(name).append(" ").append(GachaUtil.getStarText(rare + 1)).append(" ")
                         }
                     }.trim().toString()
                 }
