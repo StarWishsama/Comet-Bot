@@ -19,6 +19,8 @@ import io.github.starwishsama.comet.service.gacha.GachaConstants
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.network.NetUtil
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
 import java.awt.Image
 import java.awt.image.BufferedImage
@@ -145,8 +147,12 @@ object GachaUtil {
 
 
             ele.forEach {
-                val doc2 = Jsoup.connect("http://prts.wiki/" + it.attr("href")).get()
-                downloadList.plusAssign(doc2.getElementsByClass("fullImageLink")[0].select("a").attr("href"))
+                try {
+                    val image = Jsoup.connect("http://prts.wiki/" + it.attr("href")).timeout(30_000).get()
+                    downloadList.plusAssign(image.getElementsByClass("fullImageLink")[0].select("a").attr("href"))
+                } catch (e: Exception) {
+                    daemonLogger.warning("下载图片 http://prts.wiki/${it.attr("href")} 失败, 请手动下载.")
+                }
             }
 
             // http://prts.wiki/images/f/ff/半身像_诗怀雅_1.png
@@ -163,6 +169,11 @@ object GachaUtil {
                             }
                             if (result != null) throw result
                             successCount++
+
+                            // 休息三秒钟, 避免给 PRTS 服务器带来太大压力
+                            runBlocking {
+                                delay(3_000)
+                            }
                         }
                     } catch (e: Exception) {
                         if (e !is ApiException)

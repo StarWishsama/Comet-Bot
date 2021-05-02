@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter
  */
 data class LiveRoomInfo(
     val data: LiveRoomInfoData
-): CommonResponse() {
+) : CommonResponse() {
     data class LiveRoomInfoData(
         val uid: Long,
         @JsonProperty("room_id")
@@ -112,28 +112,32 @@ data class LiveRoomInfo(
         val studioInfo: JsonNode?
     ) {
         data class NewPendants(
-                /**
-                 * "badge": {
-                 * "name": "v_person",
-                 * "position": 3,
-                 * "value": "",
-                 * "desc": "bilibili直播签约主播"
-                 * }
-                 */
-                @JsonProperty("badge")
-                var badge: JsonNode?,
-                @JsonProperty("frame")
-                var frame: JsonNode?,
-                @JsonProperty("mobile_badge")
-                var mobileBadge: JsonNode?,
-                @JsonProperty("mobile_frame")
-                var mobileFrame: JsonNode?
+            /**
+             * "badge": {
+             * "name": "v_person",
+             * "position": 3,
+             * "value": "",
+             * "desc": "bilibili直播签约主播"
+             * }
+             */
+            @JsonProperty("badge")
+            var badge: JsonNode?,
+            @JsonProperty("frame")
+            var frame: JsonNode?,
+            @JsonProperty("mobile_badge")
+            var mobileBadge: JsonNode?,
+            @JsonProperty("mobile_frame")
+            var mobileFrame: JsonNode?
         )
 
         fun isLiveNow(): Boolean = getStatus() == Status.Streaming
 
-        fun getLiveTime(): LocalDateTime {
-            return LocalDateTime.parse(liveTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        fun parseLiveTime(): LocalDateTime {
+            return if (isEmptyTime()) {
+                LocalDateTime.MIN
+            } else {
+                LocalDateTime.parse(liveTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+            }
         }
 
         fun isEmptyTime(): Boolean {
