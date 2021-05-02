@@ -27,6 +27,7 @@ import java.util.stream.Collectors
 
 class ArkNightPool(
     override val name: String = "标准寻访",
+    override val displayName: String = "标准寻访",
     override val description: String = "适合多种场合的强力干员",
     val condition: ArkNightOperator.() -> Boolean = {
         GachaUtil.hasOperator(this.name) && obtain?.contains("招募寻访") == true
@@ -166,7 +167,7 @@ class ArkNightPool(
      * 明日方舟抽卡，返回文字
      */
     fun getArkDrawResultAsString(user: BotUser, drawResult: GachaResult): String {
-        val currentPool = "目前卡池为: $name\n"
+        val currentPool = "目前卡池为: $displayName\n"
         if (!drawResult.isEmpty()) {
             when (drawResult.items.size) {
                 1 -> {

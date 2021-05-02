@@ -107,6 +107,7 @@ object GachaService {
     private fun parseArkNightPool(customPool: CustomPool): ArkNightPool {
         val pool = ArkNightPool(
             customPool.poolName,
+            customPool.displayPoolName,
             customPool.poolDescription
         ) {
             (GachaUtil.hasOperator(this.name) || customPool.modifiedGachaItems.stream().filter { it.name == this.name }

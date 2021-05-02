@@ -12,6 +12,7 @@ import java.util.stream.Collectors
 
 class PCRPool(
     override val name: String = "白金寻访",
+    override val displayName: String = "白金寻访",
     override val tenjouCount: Int = 300,
     override val tenjouRare: Int = -1,
     override val poolItems: MutableList<out GachaItem> = pcr,

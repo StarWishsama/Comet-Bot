@@ -12,9 +12,14 @@ import io.github.starwishsama.comet.objects.gacha.items.GachaItem
  */
 abstract class GachaPool {
     /**
-     * 游戏卡池名称
+     * 游戏卡池内部名称
      */
     abstract val name: String
+
+    /**
+     * 游戏卡池对外展示名称
+     */
+    abstract val displayName: String
 
     /**
      * 游戏卡池描述
