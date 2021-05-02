@@ -64,7 +64,7 @@ data class LiveRoomInfo(
          * 开播时间 格式 yyyy-MM-dd HH:mm:ss
          */
         @JsonProperty("live_time")
-        val liveTime: String,
+        var liveTime: String,
         /**
          * 直播间 Tag
          */
@@ -89,28 +89,22 @@ data class LiveRoomInfo(
         val pendants: String,
         @JsonProperty("area_pendants")
         val areaPendants: String,
-        @JsonProperty("hot_words")
-        val hotWords: List<String>,
-        @JsonProperty("hot_words_status")
-        val hotWordsStatus: Int,
         val verify: String?,
         @JsonProperty("new_pendants")
         val newPendants: NewPendants,
         @JsonProperty("up_session")
         val upSession: String?,
-        @JsonProperty("pk_status")
-        val pkStatus: Int,
-        @JsonProperty("pk_id")
-        val pkId: Int,
-        @JsonProperty("battle_id")
-        val battleId: Int,
         @JsonProperty("allow_change_area_time")
         val changeAreaTime: Int,
         @JsonProperty("allow_upload_cover_time")
         val uploadCoverTime: Int,
-        @JsonProperty("studio_info")
-        val studioInfo: JsonNode?
     ) {
+        init {
+            if (isEmptyTime()) {
+                liveTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.MIN)
+            }
+        }
+
         data class NewPendants(
             /**
              * "badge": {

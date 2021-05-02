@@ -4,14 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.push.YoutubeUser
 
-data class VersionTestObject(
-    /**
-     * 配置文件版本号
-     */
-    @JsonProperty("version")
-    val version: String
-)
-
 data class OldGroupConfig(@JsonProperty("group_id") val id: Long) {
     /**
      * 是否自动接受入群请求

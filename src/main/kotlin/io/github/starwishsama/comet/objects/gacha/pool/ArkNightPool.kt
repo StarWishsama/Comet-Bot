@@ -118,13 +118,13 @@ class ArkNightPool(
 
         require(rareItems.isNotEmpty()) { "获取干员列表失败: 空列表. 等级为 ${rare - 1}, 池内干员数 ${poolItems.size}" }
 
-        val weight: Int
+        var weight: Int
 
         // 然后检查是否到了出 UP 角色的时候
         if (highProbabilityItems.isNotEmpty()) {
             val highItems =
                 highProbabilityItems.keys.parallelStream().collect(Collectors.toList()) as MutableList<ArkNightOperator>
-            rareItems.addAll(highItems)
+            rareItems.addAll(highItems.filter { it.rare == rare - 1 })
 
             rareItems.shuffle()
 
@@ -134,10 +134,12 @@ class ArkNightPool(
 
             for ((gi, prop) in highProbabilityItems) {
                 val recalculatedProp = (weight * prop).toInt()
-                val redrawResult = rareItems[recalculatedProp.coerceAtLeast(rareItems.size - 1)]
+                val redrawResult = rareItems[recalculatedProp]
+
                 if (redrawResult.name == gi.name) {
                     return ArkNightOperatorInfo(redrawResult, true)
                 } else {
+                    weight = RandomUtil.randomInt(0, rareItems.size - 1)
                     rareItems.shuffle()
                 }
             }
