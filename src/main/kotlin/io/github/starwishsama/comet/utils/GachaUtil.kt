@@ -150,6 +150,11 @@ object GachaUtil {
                 try {
                     val image = Jsoup.connect("http://prts.wiki/" + it.attr("href")).timeout(30_000).get()
                     downloadList.plusAssign(image.getElementsByClass("fullImageLink")[0].select("a").attr("href"))
+
+                    // 休息 1.5 秒, 避免给 PRTS 服务器带来太大压力
+                    runBlocking {
+                        delay(1_500)
+                    }
                 } catch (e: Exception) {
                     daemonLogger.warning("下载图片 http://prts.wiki/${it.attr("href")} 失败, 请手动下载.")
                 }
