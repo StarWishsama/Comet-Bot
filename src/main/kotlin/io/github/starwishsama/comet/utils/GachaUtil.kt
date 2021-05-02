@@ -130,7 +130,7 @@ object GachaUtil {
 
         val ele = Jsoup.connect(
             "http://prts.wiki/w/PRTS:%E6%96%87%E4%BB%B6%E4%B8%80%E8%A7%88/%E5%B9%B2%E5%91%98%E7%B2%BE%E8%8B%B10%E5%8D%8A%E8%BA%AB%E5%83%8F"
-        ).get().getElementsByClass("mw-parser-output")[0].select("a")
+        ).timeout(5_000).get().getElementsByClass("mw-parser-output")[0].select("a")
 
         /**
          * PRTS 实际保有干员半身立绘量
@@ -148,7 +148,7 @@ object GachaUtil {
 
             ele.forEach {
                 try {
-                    val image = Jsoup.connect("http://prts.wiki/" + it.attr("href")).timeout(30_000).get()
+                    val image = Jsoup.connect("http://prts.wiki/" + it.attr("href")).timeout(10_000).get()
                     downloadList.plusAssign(image.getElementsByClass("fullImageLink")[0].select("a").attr("href"))
 
                     // 休息 1.5 秒, 避免给 PRTS 服务器带来太大压力
