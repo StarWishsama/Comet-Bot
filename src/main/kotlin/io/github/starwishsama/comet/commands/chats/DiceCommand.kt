@@ -72,7 +72,12 @@ class DiceCommand : ChatCommand {
             }
 
             if (diceSize.isNumeric()) {
-                result.add(diceSize.toIntOrNull() ?: return emptyList())
+                val parseDiceSize = diceSize.toIntOrNull() ?: return emptyList()
+                if (parseDiceSize <= 1000) {
+                    result.add(parseDiceSize)
+                } else {
+                    return emptyList()
+                }
             }
         }
 
