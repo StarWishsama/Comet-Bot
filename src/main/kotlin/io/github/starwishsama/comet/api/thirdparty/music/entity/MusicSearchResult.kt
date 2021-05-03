@@ -40,7 +40,7 @@ data class MusicSearchResult(
 
         wrapper.addText(
             "$name - ${getAuthorName()}\n" +
-                    "跳转链接: $jumpURL"
+                    "跳转链接: $songURL"
         )
 
         return wrapper
