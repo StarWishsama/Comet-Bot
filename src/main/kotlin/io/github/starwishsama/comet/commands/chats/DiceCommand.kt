@@ -45,6 +45,7 @@ class DiceCommand : ChatCommand {
         /dice [指定方法] 投骰子
         
         如: /dice 1d100
+        注意: 骰子最大只能投 10 个, 1000 面.
     """.trimIndent()
 
     private fun parseInput(input: String): List<Int> {
