@@ -380,7 +380,7 @@ object CommandExecutor {
                     false
                 }
             }
-            else -> return false
+            CommandExecuteConsumerType.NONE -> return true
         }
     }
 
