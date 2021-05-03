@@ -104,10 +104,16 @@ class DiceCommand : ChatCommand {
 
     private fun List<DiceResult>.convertToString(): String {
         return buildString {
+            var count = 0
+
             this@convertToString.forEach {
-                append("d${it.base}(${it.result})")
+                append("d${it.base}(${it.result.also { result -> count += result }})")
                 append("+")
             }
-        }.removeSuffix("+")
+
+            delete(length - 1, length)
+
+            append("=$count")
+        }
     }
 }
