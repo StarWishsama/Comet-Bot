@@ -87,7 +87,7 @@ object CommandExecutor {
                     try {
                         val filtered = result.msg.doFilter()
 
-                        if (result.status.isOk() && filtered !is EmptyMessageChain) {
+                        if (result.status.isOk() && !filtered.isContentEmpty()) {
                             this.subject.sendMessage(filtered)
                         }
                     } catch (e: IllegalArgumentException) {

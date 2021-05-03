@@ -13,7 +13,7 @@ import java.util.regex.Pattern
 
 class DiceCommand : ChatCommand {
     // 骰子正则表达式
-    private val pattern = Pattern.compile("\\d[dD]\\d{1,3}")
+    private val pattern = Pattern.compile("(\\d)([dD])(\\d{1,3})")
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (args.isEmpty()) {

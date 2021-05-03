@@ -6,8 +6,6 @@ import io.github.starwishsama.comet.startup.CometLoginHelper
 import io.github.starwishsama.comet.startup.CometRuntime
 import io.github.starwishsama.comet.startup.LoginStatus
 import io.github.starwishsama.comet.utils.FileUtil
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.Mirai
@@ -50,10 +48,7 @@ class Comet {
         } catch (e: LoginFailedException) {
             BotVariables.daemonLogger.warning("登录失败! 返回的失败信息: ${e.message}")
             cometLoginHelper.status = LoginStatus.LOGIN_FAILED
-            GlobalScope.launch {
-                cometLoginHelper.solve()
-            }
-            return
+            cometLoginHelper.solve()
         }
     }
 
