@@ -61,7 +61,12 @@ class DiceCommand : ChatCommand {
             val diceSize = matcher.group(3)
 
             if (time.isNumeric()) {
-                result.add(matcher.group(1).toIntOrNull() ?: return emptyList())
+                val parseTime = matcher.group(1).toIntOrNull() ?: return emptyList()
+                if (parseTime <= 10) {
+                    result.add(parseTime)
+                } else {
+                    return emptyList()
+                }
             } else if (time.isEmpty() && d.toLowerCase() == "d") {
                 result.add(1)
             }
