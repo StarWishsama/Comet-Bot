@@ -107,7 +107,7 @@ object NetUtil {
         try {
             result = executeRequest(url, timeout, proxyUrl, proxyPort, call).execute()
         } catch (e: IOException) {
-            netLogger.warning("执行网络操作失败", e)
+            netLogger.warning("执行网络操作失败: $url", e)
         } finally {
             if (autoClose) {
                 TaskUtil.runAsync(autoCloseDelay) {
@@ -118,12 +118,15 @@ object NetUtil {
             }
         }
 
-        return result ?: throw RuntimeException("执行网络操作失败, 响应为空")
+        return result ?: throw RuntimeException("执行网络操作失败, 响应为空: $url")
     }
 
-    fun getPageContent(url: String, timeout: Long = 2, proxyUrl: String = cfg.proxyUrl, proxyPort: Int = cfg.proxyPort, call: Request.Builder.() -> Request.Builder = {
-        header("user-agent", defaultUA)
-    },): String? =
+    fun getPageContent(
+        url: String, timeout: Long = 2, proxyUrl: String = cfg.proxyUrl, proxyPort: Int = cfg.proxyPort,
+        call: Request.Builder.() -> Request.Builder = {
+            header("user-agent", defaultUA)
+        },
+    ): String? =
         executeHttpRequest(url, timeout, proxyUrl, proxyPort, call).body?.string()
 
     /**

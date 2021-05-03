@@ -128,6 +128,7 @@ object CometRuntime {
                 MinecraftCommand(),
                 PusherCommand(),
                 GithubCommand(),
+                DiceCommand(),
                 // Console Command
                 StopCommand(),
                 DebugCommand(),

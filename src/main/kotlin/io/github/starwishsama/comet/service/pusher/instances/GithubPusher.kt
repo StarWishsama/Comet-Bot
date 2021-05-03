@@ -3,7 +3,6 @@ package io.github.starwishsama.comet.service.pusher.instances
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.github.data.events.GithubEvent
-import io.github.starwishsama.comet.api.thirdparty.github.data.events.PushEvent
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.delay
@@ -20,11 +19,9 @@ object GithubPusher {
             cfg.githubRepoSubscribers.any { it.split("/")[1] == "*" || it == event.repoName() }
         }.collect(Collectors.toList())
 
-        val bot = BotVariables.comet.getBot()
-
         runBlocking {
             consumer.forEach {
-                bot.getGroup(it.id)?.also { g ->
+                BotVariables.comet.getBot().getGroup(it.id)?.also { g ->
                     g.sendMessage(
                         event.toMessageWrapper().toMessageChain(g)
                     )

@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.isOperator
@@ -49,7 +50,7 @@ class BiliBiliCommand : ChatCommand {
             }
             "list" -> {
                 event.subject.sendMessage("请稍等...")
-                return getSubList(event)
+                return getSubscribers(event)
             }
             "info", "查询", "cx" -> {
                 return if (args.size > 1) {
@@ -86,11 +87,13 @@ class BiliBiliCommand : ChatCommand {
             "refresh" -> {
                 if (event is GroupMessageEvent) {
                     val cfg = GroupConfigManager.getConfig(event.group.id) ?: return "本群尚未注册至 Comet".toChain()
-                    cfg.biliSubscribers.forEach {
-                        it.userName = DynamicApi.getUserNameByMid(it.id.toLong())
-                        it.roomID = UserApi.userApiService.getMemberInfoById(it.id.toLong()).execute()
-                            .body()?.data?.liveRoomInfo?.roomId ?: -1
-                        delay(1_500)
+                    GlobalScope.run {
+                        cfg.biliSubscribers.forEach {
+                            it.userName = DynamicApi.getUserNameByMid(it.id.toLong())
+                            it.roomID = UserApi.userApiService.getMemberInfoById(it.id.toLong()).execute()
+                                .body()?.data?.liveRoomInfo?.roomId ?: -1
+                            delay(1_500)
+                        }
                     }
                     return "刷新缓存成功".toChain()
                 } else {
@@ -190,7 +193,7 @@ class BiliBiliCommand : ChatCommand {
         }
     }
 
-    private fun getSubList(event: MessageEvent): MessageChain {
+    private fun getSubscribers(event: MessageEvent): MessageChain {
         if (event !is GroupMessageEvent) return toChain("只能在群里查看订阅列表")
         val list = GroupConfigManager.getConfig(event.group.id)?.biliSubscribers
 

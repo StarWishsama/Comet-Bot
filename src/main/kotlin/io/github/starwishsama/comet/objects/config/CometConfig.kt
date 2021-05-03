@@ -42,13 +42,13 @@ data class CometConfig(
     @Comment("是否启用代理, 启用后以下两项才可使用")
     var proxySwitch: Boolean = false,
 
-    @Comment("本地代理服务器地址, 目前仅支持 HTTP 代理")
+    @Comment("本地代理服务器地址")
     var proxyUrl: String = "",
 
-    @Comment("本地代理服务器端口, 目前仅支持 HTTP 代理")
+    @Comment("本地代理服务器端口")
     var proxyPort: Int = 0,
 
-    @Comment("本地代理类型, 支持 HTTP 和 SOCKS")
+    @Comment("本地代理类型, 选填项为 HTTP 和 SOCKS\nSOCKS 选项支持 v4/v5")
     var proxyType: Proxy.Type = Proxy.Type.HTTP,
 
     @Comment("以图搜图 API 类型, 请使用 /ps source 命令修改")

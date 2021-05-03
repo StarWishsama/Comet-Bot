@@ -1,5 +1,6 @@
 package io.github.starwishsama.comet.api.thirdparty.music.entity
 
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MusicKind
 import net.mamoe.mirai.message.data.MusicShare
@@ -12,7 +13,7 @@ data class MusicSearchResult(
     val albumPicture: String,
     val songURL: String
 ) {
-    fun getAuthorName(): String =
+    private fun getAuthorName(): String =
         buildString {
             author.forEach {
                 append("$it/")
@@ -30,5 +31,18 @@ data class MusicSearchResult(
             albumPicture,
             songURL
         ).toMessageChain()
+    }
+
+    fun toMessageWrapper(): MessageWrapper {
+        val wrapper = MessageWrapper()
+
+        wrapper.addPictureByURL(albumPicture)
+
+        wrapper.addText(
+            "$name - ${getAuthorName()}\n" +
+                    "跳转链接: $songURL"
+        )
+
+        return wrapper
     }
 }

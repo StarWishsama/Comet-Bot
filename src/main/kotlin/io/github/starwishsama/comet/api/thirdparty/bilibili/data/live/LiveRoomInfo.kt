@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter
  */
 data class LiveRoomInfo(
     val data: LiveRoomInfoData
-): CommonResponse() {
+) : CommonResponse() {
     data class LiveRoomInfoData(
         val uid: Long,
         @JsonProperty("room_id")
@@ -64,7 +64,7 @@ data class LiveRoomInfo(
          * 开播时间 格式 yyyy-MM-dd HH:mm:ss
          */
         @JsonProperty("live_time")
-        val liveTime: String,
+        var liveTime: String,
         /**
          * 直播间 Tag
          */
@@ -89,51 +89,49 @@ data class LiveRoomInfo(
         val pendants: String,
         @JsonProperty("area_pendants")
         val areaPendants: String,
-        @JsonProperty("hot_words")
-        val hotWords: List<String>,
-        @JsonProperty("hot_words_status")
-        val hotWordsStatus: Int,
         val verify: String?,
         @JsonProperty("new_pendants")
         val newPendants: NewPendants,
         @JsonProperty("up_session")
         val upSession: String?,
-        @JsonProperty("pk_status")
-        val pkStatus: Int,
-        @JsonProperty("pk_id")
-        val pkId: Int,
-        @JsonProperty("battle_id")
-        val battleId: Int,
         @JsonProperty("allow_change_area_time")
         val changeAreaTime: Int,
         @JsonProperty("allow_upload_cover_time")
         val uploadCoverTime: Int,
-        @JsonProperty("studio_info")
-        val studioInfo: JsonNode?
     ) {
+        init {
+            if (isEmptyTime()) {
+                liveTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.MIN)
+            }
+        }
+
         data class NewPendants(
-                /**
-                 * "badge": {
-                 * "name": "v_person",
-                 * "position": 3,
-                 * "value": "",
-                 * "desc": "bilibili直播签约主播"
-                 * }
-                 */
-                @JsonProperty("badge")
-                var badge: JsonNode?,
-                @JsonProperty("frame")
-                var frame: JsonNode?,
-                @JsonProperty("mobile_badge")
-                var mobileBadge: JsonNode?,
-                @JsonProperty("mobile_frame")
-                var mobileFrame: JsonNode?
+            /**
+             * "badge": {
+             * "name": "v_person",
+             * "position": 3,
+             * "value": "",
+             * "desc": "bilibili直播签约主播"
+             * }
+             */
+            @JsonProperty("badge")
+            var badge: JsonNode?,
+            @JsonProperty("frame")
+            var frame: JsonNode?,
+            @JsonProperty("mobile_badge")
+            var mobileBadge: JsonNode?,
+            @JsonProperty("mobile_frame")
+            var mobileFrame: JsonNode?
         )
 
         fun isLiveNow(): Boolean = getStatus() == Status.Streaming
 
-        fun getLiveTime(): LocalDateTime {
-            return LocalDateTime.parse(liveTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        fun parseLiveTime(): LocalDateTime {
+            return if (isEmptyTime()) {
+                LocalDateTime.MIN
+            } else {
+                LocalDateTime.parse(liveTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+            }
         }
 
         fun isEmptyTime(): Boolean {

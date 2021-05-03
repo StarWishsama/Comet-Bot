@@ -31,7 +31,7 @@ import java.time.LocalDateTime
  *
  * FIXME: 整理一下代码结构
  *
- * @author Nameless
+ * @author StarWishsama
  */
 object TwitterApi : ApiExecutor {
     // 蓝鸟 APIv1.1 地址

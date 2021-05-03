@@ -23,17 +23,13 @@ import kotlin.streams.toList
  * 负责转换破坏性更新时的数据类.
  *
  * @see [BotUser]
- * @see [io.github.starwishsama.comet.objects.config.CometConfig]
+ * @see [PerGroupConfig]
  */
 object CompatibilityService {
     fun checkConfigFile(cfgFile: File): Boolean {
         val tree = mapper.readTree(cfgFile)
         try {
-            if (tree["bili_sub"].isUsable()) {
-                val test = tree["bili_sub"] as List<*>
-
-                return test.first() !is Long
-            }
+            return tree["version"].isUsable()
         } catch (ignored: Exception) {
         }
 

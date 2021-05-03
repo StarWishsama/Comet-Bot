@@ -22,7 +22,7 @@ object StringUtil {
     /**
      * 判断ID是否符合育碧账号昵称格式规范
      *
-     * @author NamelessSAMA
+     * @author StarWishsama
      * @param username 用户名
      * @return 是否符合规范
      */

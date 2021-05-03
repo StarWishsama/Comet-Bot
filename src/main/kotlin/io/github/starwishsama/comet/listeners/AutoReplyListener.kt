@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.listeners
 
 import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.objects.BotUser
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -14,12 +15,27 @@ object AutoReplyListener : NListener {
             event.apply {
                 val cfg = GroupConfigManager.getConfig(group.id)
 
-
                 if (cfg?.keyWordReply == null || cfg.keyWordReply.isEmpty()) return
 
-                val messageContent = message.contentToString()
+                val user = BotUser.getUserOrRegister(sender.id)
 
-                if (cfg.keyWordReply.isEmpty()) return
+                val currentTime = System.currentTimeMillis()
+
+                val hasCoolDown = when (user.lastExecuteTime) {
+                    -1L -> {
+                        user.lastExecuteTime = currentTime
+                        true
+                    }
+                    else -> {
+                        val result = currentTime - user.lastExecuteTime < 5000
+                        user.lastExecuteTime = currentTime
+                        result
+                    }
+                }
+
+                if (!hasCoolDown) return
+
+                val messageContent = message.contentToString()
 
                 cfg.keyWordReply.forEach {
 

@@ -117,17 +117,15 @@ data class Tweet(
      * 获取推文中的第一张图片
      */
     private fun getPictureUrl(nestedMode: Boolean = false): String? {
-        val jsonEntities = entities
 
         /**
          * 从此推文中获取图片链接
          */
 
-        val media = jsonEntities?.get("media")
+        val media = entities?.get("media")
         if (media != null) {
             try {
-                val image =
-                    mapper.readValue(media[0].asText(), Media::class.java)
+                val image = mapper.readValue(media[0].traverse(), Media::class.java)
                 if (image.isSendableMedia()) {
                     return image.getImageUrl()
                 }
@@ -137,7 +135,6 @@ data class Tweet(
         }
 
         // 避免套娃
-        // FIXME: 逻辑错误?
         if (!nestedMode) {
             /**
              * 如果推文中没有图片, 则尝试获取转推中的图片

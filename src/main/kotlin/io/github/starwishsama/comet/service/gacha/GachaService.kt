@@ -9,6 +9,7 @@ import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
 import io.github.starwishsama.comet.objects.gacha.pool.PCRPool
 import io.github.starwishsama.comet.utils.*
+import io.github.starwishsama.comet.utils.math.MathUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -69,7 +70,7 @@ object GachaService {
 
         return when (gachaPool.gameType) {
             CustomPool.GameType.ARKNIGHT -> {
-                parseArkNightPool(gachaPool)?.let { gachaPools.add(it) } == true
+                parseArkNightPool(gachaPool).let { gachaPools.add(it) }
             }
             // 暂不支持 PCR 卡池自定义
             CustomPool.GameType.PCR -> {
@@ -85,7 +86,7 @@ object GachaService {
 
     @Throws(JsonParseException::class)
     fun addPoolFromFile(poolFile: File) {
-        require(poolFile.exists()) { "${poolFile.name} isn't exists" }
+        require(poolFile.exists()) { "${poolFile.absolutePath} isn't exists" }
 
         try {
             val pool = Yaml.decodeFromString<CustomPool>(poolFile.getContext())
@@ -103,12 +104,15 @@ object GachaService {
         return pcrUsable
     }
 
-    private fun parseArkNightPool(customPool: CustomPool): ArkNightPool? {
+    private fun parseArkNightPool(customPool: CustomPool): ArkNightPool {
         val pool = ArkNightPool(
             customPool.poolName,
+            customPool.displayPoolName,
             customPool.poolDescription
         ) {
-            customPool.condition.contains(obtain)
+            (GachaUtil.hasOperator(this.name) || customPool.modifiedGachaItems.stream().filter { it.name == this.name }
+                .findAny().isPresent) &&
+                    (if (customPool.condition.isNotEmpty()) !customPool.condition.contains(obtain) else true)
         }
 
         customPool.modifiedGachaItems.forEach { item ->
@@ -121,7 +125,15 @@ object GachaService {
                 }
 
                 if (item.probability > 0) {
-                    pool.highProbabilityItems[it] = item.probability
+                    if (item.weight <= 1) {
+                        pool.highProbabilityItems[it] = item.probability
+                    } else {
+                        pool.highProbabilityItems[it] = MathUtil.calculateWeight(
+                            pool.poolItems.size,
+                            pool.poolItems.filter { poolItem -> poolItem.rare == result.get().rare }.size,
+                            item.weight
+                        )
+                    }
                 }
             }.also {
                 if (!result.isPresent) {
@@ -129,7 +141,8 @@ object GachaService {
                 }
             }
         }
-        return null
+
+        return pool
     }
 
     private fun loadPCRData(data: File) {

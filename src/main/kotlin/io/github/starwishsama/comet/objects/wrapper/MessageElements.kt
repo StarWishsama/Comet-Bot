@@ -66,7 +66,7 @@ data class PureText(val text: String) : WrapperElement {
 data class Picture(val url: String = "", val filePath: String = "", val base64: String = "") : WrapperElement {
 
     init {
-        if (url.isEmpty() && filePath.isEmpty()) {
+        if (url.isEmpty() && filePath.isEmpty() && base64.isEmpty()) {
             throw IllegalArgumentException("url or filePath can't be null or empty!")
         }
     }
@@ -83,7 +83,7 @@ data class Picture(val url: String = "", val filePath: String = "", val base64: 
                 return runBlocking { File(filePath).uploadAsImage(subject) }
             }
         } else if (base64.isNotEmpty()) {
-            return base64.toByteArray().base64ToImage()?.uploadAsImage(subject)
+            return base64.toByteArray().base64ToImage().uploadAsImage(subject)
         }
 
         throw RuntimeException("Unable to convert Picture to Image, Picture raw content: $this")

@@ -2,17 +2,18 @@ package io.github.starwishsama.comet
 
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.HinaLogger
-import io.github.starwishsama.comet.startup.CometRuntime
 import io.github.starwishsama.comet.startup.CometLoginHelper
+import io.github.starwishsama.comet.startup.CometRuntime
 import io.github.starwishsama.comet.startup.LoginStatus
 import io.github.starwishsama.comet.utils.FileUtil
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.network.LoginFailedException
-import net.mamoe.mirai.utils.*
+import net.mamoe.mirai.utils.BotConfiguration
+import net.mamoe.mirai.utils.FileCacheStrategy
+import net.mamoe.mirai.utils.MiraiInternalApi
+import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
 
 class Comet {
     private val cometLoginHelper: CometLoginHelper = CometLoginHelper(this)
@@ -33,7 +34,6 @@ class Comet {
             networkLoggerSupplier = { it ->
                 CustomLogRedirecter("MiraiNet (${it.id})", BotVariables.netLogger)
             }
-            heartbeatPeriodMillis = 30.secondsToMillis
             fileBasedDeviceInfo()
             protocol = BotVariables.cfg.botProtocol
         }
@@ -48,10 +48,7 @@ class Comet {
         } catch (e: LoginFailedException) {
             BotVariables.daemonLogger.warning("登录失败! 返回的失败信息: ${e.message}")
             cometLoginHelper.status = LoginStatus.LOGIN_FAILED
-            GlobalScope.launch {
-                cometLoginHelper.solve()
-            }
-            return
+            cometLoginHelper.solve()
         }
     }
 

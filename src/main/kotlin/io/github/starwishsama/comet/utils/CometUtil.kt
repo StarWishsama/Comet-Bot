@@ -13,7 +13,9 @@ import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.At
+import net.mamoe.mirai.message.data.Image
+import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import org.apache.commons.lang3.StringUtils
 import java.awt.image.BufferedImage
@@ -29,7 +31,7 @@ import kotlin.time.toKotlinDuration
 /**
  * 用于辅助机器人运行的各种工具方法
  *
- * @author Nameless
+ * @author StarWishsama
  */
 
 fun BufferedImage.toInputStream(formatName: String = "png"): InputStream {

@@ -1,51 +1,63 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BotVariables
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.api.thirdparty.music.ThirdPartyMusicApi
 import io.github.starwishsama.comet.enums.MusicApiType
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.CometUtil.toChain
-import io.github.starwishsama.comet.api.thirdparty.music.ThirdPartyMusicApi
+import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.MusicKind
 
 
 class MusicCommand : ChatCommand {
     //val usingUsers = mutableMapOf<Long, List<MusicSearchResult>>()
+    var plainText: Boolean = false
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (args.isNotEmpty()) {
-            return when (args[0].toLowerCase()) {
-                "api" -> {
-                    if (args.size > 1) {
-                        when (args[1].toUpperCase()) {
-                            "QQ", "TX", "腾讯" -> BotVariables.cfg.musicApi = MusicApiType.QQ
-                            "NETEASE", "网易", "WY" -> BotVariables.cfg.musicApi = MusicApiType.NETEASE
-                        }
-                        toChain("音乐API已修改为 ${BotVariables.cfg.musicApi}")
-                    } else {
-                        "/music api [API名称] (QQ/WY)".toChain()
+        if (args.isEmpty()) {
+            return getHelp().toChain()
+        }
+
+        return when (args[0]) {
+            "api" -> {
+                if (args.size > 1) {
+                    when (args[1].toUpperCase()) {
+                        "QQ", "TX", "腾讯" -> BotVariables.cfg.musicApi = MusicApiType.QQ
+                        "NETEASE", "网易", "WY" -> BotVariables.cfg.musicApi = MusicApiType.NETEASE
                     }
-                }
-                MusicApiType.QQ.name -> {
-                    event.subject.sendMessage("请稍等...")
-                    return handleQQMusic(args.getRestString(1))
-                }
-                MusicApiType.NETEASE.name -> {
-                    event.subject.sendMessage("请稍等...")
-                    return handleNetEaseMusic(args.getRestString(1))
-                }
-                else -> {
-                    event.subject.sendMessage("请稍等...")
-                    return handleMusicSearch(args.getRestString(0))
+
+                    toChain("音乐API已修改为 ${BotVariables.cfg.musicApi}")
+                } else {
+                    "/music api [API名称] (QQ/WY)".toChain()
                 }
             }
-        } else {
-            return getHelp().toChain()
+
+            "mode" -> {
+                plainText = !plainText
+                "纯文字模式: $plainText".toChain()
+            }
+
+            MusicApiType.QQ.name -> {
+                event.subject.sendMessage("请稍等...")
+                handleQQMusic(args.getRestString(1), event.subject)
+            }
+
+            MusicApiType.NETEASE.name -> {
+                event.subject.sendMessage("请稍等...")
+                handleNetEaseMusic(args.getRestString(1), event.subject)
+            }
+
+            else -> {
+                event.subject.sendMessage("请稍等...")
+                handleMusicSearch(args.getRestString(0), event.subject)
+            }
         }
     }
 
@@ -64,16 +76,16 @@ class MusicCommand : ChatCommand {
         /music [歌名] 点歌
     """.trimIndent()
 
-    private fun handleMusicSearch(name: String): MessageChain {
+    private fun handleMusicSearch(name: String, subject: Contact): MessageChain {
         when (BotVariables.cfg.musicApi) {
-            MusicApiType.NETEASE -> handleNetEaseMusic(name)
-            MusicApiType.QQ -> handleQQMusic(name)
+            MusicApiType.NETEASE -> handleNetEaseMusic(name, subject)
+            MusicApiType.QQ -> handleQQMusic(name, subject)
         }
 
         return EmptyMessageChain
     }
 
-    private fun handleNetEaseMusic(name: String): MessageChain {
+    private fun handleNetEaseMusic(name: String, subject: Contact): MessageChain {
         try {
             val result = ThirdPartyMusicApi.searchNetEaseMusic(name)
 
@@ -81,15 +93,18 @@ class MusicCommand : ChatCommand {
                 return "❌ 找不到你想搜索的音乐".toChain()
             }
 
-            return result[0].toMessageChain(MusicKind.NeteaseCloudMusic)
-
+            return if (plainText) {
+                result[0].toMessageWrapper().toMessageChain(subject)
+            } else {
+                result[0].toMessageChain(MusicKind.NeteaseCloudMusic)
+            }
         } catch (e: Exception) {
             BotVariables.daemonLogger.warning("点歌时出现了意外", e)
             return "❌ 点歌系统开小差了, 稍后再试试吧".toChain()
         }
     }
 
-    private fun handleQQMusic(name: String): MessageChain {
+    private fun handleQQMusic(name: String, subject: Contact): MessageChain {
         try {
             val result = ThirdPartyMusicApi.searchQQMusic(name)
 
@@ -97,7 +112,11 @@ class MusicCommand : ChatCommand {
                 return "❌ 找不到你想搜索的音乐".toChain()
             }
 
-            return result[0].toMessageChain(MusicKind.QQMusic)
+            return if (plainText) {
+                result[0].toMessageWrapper().toMessageChain(subject)
+            } else {
+                result[0].toMessageChain(MusicKind.QQMusic)
+            }
         } catch (e: Exception) {
             BotVariables.daemonLogger.warning("点歌时出现了意外", e)
             return "❌ 点歌系统开小差了, 稍后再试试吧".toChain()

@@ -10,7 +10,7 @@ import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-class PusherCommand: ChatCommand {
+class PusherCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (args.isEmpty()) return getHelp().toChain()
 
@@ -36,8 +36,8 @@ class PusherCommand: ChatCommand {
 
     override fun getHelp(): String =
         "/pusher status 查看所有监听器运行状态\n" +
-        "/pusher test [监听器名称] 测试一个监听器是否可用\n" +
-        ""
+                "/pusher test [监听器名称] 测试一个监听器是否可用\n" +
+                ""
 
     private fun displayPusherStatus(): MessageChain {
         val ps = PusherManager.getPushers()
@@ -45,7 +45,7 @@ class PusherCommand: ChatCommand {
             ps.forEach {
                 append(it::class.java.simpleName + "\n")
                 append("上次推送了 ${it.pushTime} 次\n")
-                append("上次推送于 ${BotVariables.yyMMddPattern.format(it.latestPushTime)}\n")
+                append("上次运行于 ${BotVariables.yyMMddPattern.format(it.latestPushTime)}\n")
             }
             trim()
         }.toChain()

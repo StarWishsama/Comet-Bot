@@ -2,15 +2,13 @@ package io.github.starwishsama.comet.api.thirdparty.penguinstats
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.penguinstats.data.MatrixResponse
-import io.github.starwishsama.comet.api.thirdparty.rainbowsix.IR6StatsAPI
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
 object PenguinStats {
-    private val api: PenguinStatsAPI
+    val api: PenguinStatsAPI
 
     init {
         val retrofit = Retrofit.Builder()
@@ -31,9 +29,9 @@ interface PenguinStatsAPI {
     @GET("result/matrix")
     fun getMatrix(
         @Query("stageFilter")
-        stageFilter: List<Long>,
+        stageFilter: List<Long> = listOf(),
         @Query("itemFilter")
-        itemFilter: List<Long>,
+        itemFilter: List<String> = listOf(),
         @Query("server")
         serverName: String = ArkNightServer.CN.toString(),
         @Query("show_closed_zones")

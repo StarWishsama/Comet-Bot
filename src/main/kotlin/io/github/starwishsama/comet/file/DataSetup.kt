@@ -22,10 +22,6 @@ object DataSetup {
     private val userCfg: DataFile = DataFile(File(BotVariables.filePath, "users.json"), DataFile.FilePriority.HIGH) {
         it.writeClassToJson(BotVariables.users)
     }
-    private val shopItemCfg: DataFile =
-        DataFile(File(BotVariables.filePath, "items.json"), DataFile.FilePriority.NORMAL) {
-            it.writeClassToJson(BotVariables.shop)
-        }
     private val cfgFile: DataFile = DataFile(File(BotVariables.filePath, "config.yml"), DataFile.FilePriority.HIGH) {
         it.writeString(Default.encodeToString(CometConfig()), isAppend = false)
     }
@@ -36,7 +32,7 @@ object DataSetup {
         it.mkdirs()
     }
     private val dataFiles = listOf(
-        userCfg, shopItemCfg, cfgFile, pcrData, arkNightData, perGroupFolder
+        userCfg, cfgFile, pcrData, arkNightData, perGroupFolder
     )
     private var brokenConfig = false
 
@@ -63,7 +59,6 @@ object DataSetup {
             if (brokenConfig) {
                 cfgFile.file.createBackupFile()
                 userCfg.file.createBackupFile()
-                shopItemCfg.file.createBackupFile()
             }
         }
     }
@@ -72,7 +67,6 @@ object DataSetup {
         try {
             cfgFile.file.writeString(Default.encodeToString(CometConfig.serializer(), cfg), isAppend = false)
             userCfg.file.writeClassToJson(BotVariables.users)
-            shopItemCfg.file.writeClassToJson(BotVariables.shop)
         } catch (e: Exception) {
             daemonLogger.warning("[配置] 在保存配置文件时发生了问题", e)
         }
@@ -90,8 +84,6 @@ object DataSetup {
         }
 
         daemonLogger.info("已加载了 ${BotVariables.users.size} 个用户数据.")
-
-        //BotVariables.shop.addAll(shopItemCfg.file.parseAsClass())
 
         FileUtil.initResourceFile()
 

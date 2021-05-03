@@ -2,17 +2,15 @@ package io.github.starwishsama.comet.api.thirdparty.music
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BotVariables.mapper
-import io.github.starwishsama.comet.api.thirdparty.music.data.LeanAppDetailResponse
-import io.github.starwishsama.comet.api.thirdparty.music.data.LeanAppSearchResponse
+import io.github.starwishsama.comet.api.thirdparty.music.data.NetEaseSearchResult
 import io.github.starwishsama.comet.api.thirdparty.music.data.QQMusicSearchResult
 import io.github.starwishsama.comet.api.thirdparty.music.entity.MusicSearchResult
-import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.network.NetUtil
-import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.MusicKind
-import net.mamoe.mirai.message.data.MusicShare
-import net.mamoe.mirai.message.data.toMessageChain
-import java.lang.NullPointerException
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
+import okio.BufferedSink
+import org.jsoup.Jsoup
 import java.net.URLEncoder
 
 /**
@@ -22,42 +20,44 @@ object ThirdPartyMusicApi {
     /** 腾讯, 调用限额1分钟100次，10分钟500次，1小时2000次 */
     private const val jsososo = "https://api.qq.jsososo.com/song/urls?id="
 
-    // 网易
-    private const val leanapp = "https://musicapi.leanapp.cn"
-
     fun searchNetEaseMusic(name: String, length: Int = 1): List<MusicSearchResult> {
-        val page = NetUtil.getPageContent("$leanapp/search?keywords=${URLEncoder.encode(name, "UTF-8")}")
+        val resp = NetUtil.executeHttpRequest("https://music.163.com/api/search/pc?offset=0&total=true&limit=${
+            1.coerceAtMost(
+                length
+            )
+        }&type=1&s=${name}", call = {
+            header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0")
+            post(object : RequestBody() {
+                override fun contentType(): MediaType? {
+                    return "application/x-www-form-urlencoded".toMediaTypeOrNull()
+                }
 
-        val searchResult: LeanAppSearchResponse = mapper.readValue(page ?: return emptyList())
+                override fun writeTo(sink: BufferedSink) {
+                    return
+                }
+
+            })
+        })
+
+        val page = resp.body?.string()
+
+        val searchResult: NetEaseSearchResult = mapper.readValue(page ?: return emptyList())
 
         if (searchResult.code != 200) {
             return emptyList()
         }
 
-        val songDetails = mutableListOf<LeanAppDetailResponse>()
-
-        val songs = searchResult.result.songs
-
-        if (songs.isEmpty()) {
-            return emptyList()
-        }
-
-        songs.subList(0, songs.size.coerceAtMost(length)).forEach {
-            val songResult =
-                NetUtil.getPageContent("$leanapp/song/detail?ids=${it.id}")
-            songDetails.add(mapper.readValue(songResult ?: return@forEach))
-        }
-
         val songResults = mutableListOf<MusicSearchResult>()
 
-        songDetails.forEach {
+        searchResult.result.songs.forEach { song: NetEaseSearchResult.Song ->
+
             songResults.add(
                 MusicSearchResult(
-                    it.songs[0].name,
-                    it.songs[0].buildArtistsName(),
-                    "https://music.163.com/#/song?id=${it.songs[0].id}",
-                    it.songs[0].album.albumPictureURL,
-                    "http://music.163.com/song/media/outer/url?id=${it.songs[0].id}&userid=1"
+                    song.name,
+                    song.buildArtistsName(),
+                    "https://music.163.com/#/song?id=${song.id}",
+                    song.album.picUrl,
+                    "http://music.163.com/song/media/outer/url?id=${song.id}&userid=1"
                 )
             )
         }
@@ -87,16 +87,16 @@ object ThirdPartyMusicApi {
                 val musicUrlObject = mapper.readTree(playResult)
 
                 playURL = if (musicUrlObject.isNull) {
-                    ""
+                    return@forEach
                 } else {
-                    try {
-                        val urlObject = musicUrlObject["data"]
-                        if (!urlObject.isNull) {
+                    val urlObject = musicUrlObject["data"]
+                    if (!urlObject.isNull) {
+                        if (urlObject[song.songMid] != null && !urlObject[song.songMid].isNull) {
                             urlObject[song.songMid].asText()
                         } else {
-                            ""
+                            return@forEach
                         }
-                    } catch (e: NullPointerException) {
+                    } else {
                         return@forEach
                     }
                 }
@@ -104,12 +104,14 @@ object ThirdPartyMusicApi {
                 return@forEach
             }
 
+            val jumpUrl = "https://y.qq.com/n/yqq/song/${song.songMid}.html?no_redirect=1"
+
             result.add(
                 MusicSearchResult(
                     song.songName,
                     artists,
-                    "https://y.qq.com/n/yqq/song/${song.songMid}.html?ADTAG=h5_playsong&no_redirect=1",
-                    "http://imgcache.qq.com/music/photo/album_300/17/300_albumpic_${song.albumId}_0.jpg",
+                    jumpUrl,
+                    getQQMusicCover(jumpUrl),
                     playURL
                 )
             )
@@ -118,16 +120,23 @@ object ThirdPartyMusicApi {
         return result
     }
 
-    private fun getQQMusicSearchResult(name: String): QQMusicSearchResult? {
+    fun getQQMusicSearchResult(name: String): QQMusicSearchResult? {
         val songResult =
             NetUtil.getPageContent(
-                "https://c.y.qq.com/soso/fcgi-bin/client_search_cp?g_tk=5381&p=1&n=20&w=${
+                "https://c.y.qq.com/soso/fcgi-bin/client_search_cp?w=${
                     URLEncoder.encode(
                         name,
                         "UTF-8"
                     )
-                }&format=json&loginUin=0&hostUin=0&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0&remoteplace=txt.yqq.song&t=0&aggr=1&cr=1&catZhida=0&flag_qc=0"
+                }&format=json&inCharset=utf8&outCharset=utf-8"
             )
         return mapper.readValue(songResult ?: return null)
+    }
+
+    private fun getQQMusicCover(songURL: String): String {
+        val req = Jsoup.connect(songURL)
+        val resp = req.execute()
+
+        return "http:" + resp.parse().getElementsByClass("data__cover").select("img")[0].attributes()["src"]
     }
 }

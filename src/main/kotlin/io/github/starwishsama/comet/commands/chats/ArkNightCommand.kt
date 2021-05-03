@@ -5,7 +5,7 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
+import io.github.starwishsama.comet.objects.gacha.GachaResult
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.utils.CometUtil.toChain
@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils
 
 @Suppress("SpellCheckingInspection")
 class ArkNightCommand : ChatCommand {
-    var pool = GachaService.getPoolsByType<ArkNightPool>()[0]
+    private var pool = GachaService.getPoolsByType<ArkNightPool>()[0]
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (!GachaService.isArkNightUsable()) {
@@ -47,7 +47,15 @@ class ArkNightCommand : ChatCommand {
                         buildString {
                             append("目前卡池: ${pool.name}\n")
                             append("详细信息: ${pool.description}")
-                        }.toChain()
+
+                            val pools = GachaService.getPoolsByType<ArkNightPool>()
+
+                            append("\n\n卡池列表: ")
+
+                            pools.forEach {
+                                append(it.name).append(",")
+                            }
+                        }.removeSuffix(",").toChain()
                     } else {
                         val poolName = args[1]
                         val pools =
@@ -96,11 +104,11 @@ class ArkNightCommand : ChatCommand {
     """.trimIndent()
 
     suspend fun getGachaResult(event: MessageEvent, user: BotUser, time: Int): MessageChain {
-        val list: List<ArkNightOperator> = pool.getArkDrawResult(user, time)
+        val gachaResult: GachaResult = pool.getArkDrawResult(user, time)
         return if (GachaUtil.arkPictureIsUsable()) {
-            generatePictureGachaResult(pool, event, user, list)
+            generatePictureGachaResult(pool, event, user, gachaResult)
         } else {
-            pool.getArkDrawResultAsString(user, list).toChain()
+            pool.getArkDrawResultAsString(user, gachaResult).toChain()
         }
     }
 
@@ -108,9 +116,11 @@ class ArkNightCommand : ChatCommand {
         pool: ArkNightPool,
         event: MessageEvent,
         user: BotUser,
-        ops: List<ArkNightOperator>
+        gachaResult: GachaResult
     ): MessageChain {
         event.subject.sendMessage("请稍等...")
+
+        val ops = gachaResult.items
 
         return if (ops.isNotEmpty()) {
             // 只获取最后十个
@@ -118,17 +128,18 @@ class ArkNightCommand : ChatCommand {
                 GachaUtil.combineGachaImage(if (ops.size <= 10) ops else ops.subList(ops.size - 11, ops.size - 1), pool)
             if (result.lostItem.isNotEmpty())
                 event.subject.sendMessage(
-                    event.message.quote() + toChain("由于缺失资源文件, 以下干员无法显示 :(\n" +
-                            buildString {
-                                result.lostItem.forEach {
-                                    append("${it.name},")
-                                }
-                            }.removeSuffix(",")
+                    event.message.quote() + toChain(
+                        "由于缺失资源文件, 以下干员无法显示 :(\n" +
+                                buildString {
+                                    result.lostItem.forEach {
+                                        append("${it.name},")
+                                    }
+                                }.removeSuffix(",")
                     )
                 )
             val gachaImage = withContext(Dispatchers.IO) { result.image.uploadAsImage(event.subject) }
 
-            val reply = gachaImage.plus("\n").plus(pool.getArkDrawResultAsString(user, ops))
+            val reply = gachaImage.plus("\n").plus(pool.getArkDrawResultAsString(user, gachaResult))
 
             if (event is GroupMessageEvent) event.sender.at().plus("\n").plus(reply) else reply
         } else {

@@ -8,7 +8,6 @@ import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.time.ExperimentalTime
 
 object RepeatListener : NListener {
@@ -24,17 +23,18 @@ object RepeatListener : NListener {
 
             if (repeatInfo == null) {
                 repeatCachePool[groupId] = RepeatInfo(
-                    mutableListOf(RepeatInfo.CacheMessage(
-                        event.sender.id,
-                        event.message
-                    ))
+                    mutableListOf(
+                        RepeatInfo.CacheMessage(
+                            event.sender.id,
+                            event.message
+                        )
+                    )
                 )
                 return
             }
 
             if (repeatInfo.check(event.sender.id, event.message)) {
                 runBlocking { event.subject.sendMessage(doRepeat(repeatInfo.messageCache.last().message)) }
-                repeatInfo.messageCache.clear()
             }
         }
     }
@@ -74,7 +74,8 @@ object RepeatListener : NListener {
 }
 
 data class RepeatInfo(
-    val messageCache: MutableList<CacheMessage> = Collections.synchronizedList(mutableListOf())
+    val messageCache: MutableList<CacheMessage> = Collections.synchronizedList(mutableListOf()),
+    var hasRepeated: Boolean = false
 ) {
     data class CacheMessage(
         val senderId: Long,
@@ -98,7 +99,8 @@ data class RepeatInfo(
             messageCache.add(CacheMessage(id, message))
         }
 
-        if (messageCache.size > 1) {
+        if (messageCache.size > 1 && !hasRepeated) {
+            hasRepeated = true
             return true
         }
 
