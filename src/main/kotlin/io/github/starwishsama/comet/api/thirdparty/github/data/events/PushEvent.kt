@@ -2,12 +2,11 @@ package io.github.starwishsama.comet.api.thirdparty.github.data.events
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import java.time.LocalDateTime
-import java.time.ZoneId
 
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 data class PushEvent(
     val ref: String,
@@ -37,8 +36,6 @@ data class PushEvent(
         val owner: JsonNode,
         @JsonProperty("html_url")
         val repoUrl: String,
-        @JsonProperty("updated_at")
-        val updateTime: String,
         @JsonProperty("pushed_at")
         val pushTime: Long,
     )
@@ -56,16 +53,15 @@ data class PushEvent(
         val committer: PusherInfo
     )
 
-    private fun getLocalTime(time: String): String {
-        val localTime = LocalDateTime.parse(time, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.systemDefault())
-        return BotVariables.yyMMddPattern.format(localTime)
+    private fun getLocalTime(time: Long): String {
+        return SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault()).format(Date(time*1000L))
     }
 
     override fun toMessageWrapper(): MessageWrapper {
         val wrapper = MessageWrapper()
 
         wrapper.addText("| 仓库 ${repoInfo.fullName} 有新动态啦\n")
-        wrapper.addText("| 推送时间 ${getLocalTime(repoInfo.updateTime)}\n")
+        wrapper.addText("| 推送时间 ${getLocalTime(repoInfo.pushTime)}\n")
         wrapper.addText("| 推送分支 ${ref.replace("refs/heads/", "")}\n")
         wrapper.addText("| 提交者 ${headCommitInfo.committer.name}\n")
         wrapper.addText("| 提交信息 \n")
