@@ -100,7 +100,7 @@ data class LiveRoomInfo(
         val uploadCoverTime: Int,
     ) {
         init {
-            if (isEmptyTime()) {
+            if (isLiveTimeInvalid()) {
                 liveTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.MIN)
             }
         }
@@ -127,15 +127,16 @@ data class LiveRoomInfo(
         fun isLiveNow(): Boolean = getStatus() == Status.Streaming
 
         fun parseLiveTime(): LocalDateTime {
-            return if (isEmptyTime()) {
+            return if (isLiveTimeInvalid()) {
                 LocalDateTime.MIN
             } else {
                 LocalDateTime.parse(liveTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
             }
         }
 
-        fun isEmptyTime(): Boolean {
-            return liveTime == "0000-00-00 00:00:00"
+        fun isLiveTimeInvalid(): Boolean {
+            val timepart = liveTime.split("-")
+            return liveTime == "0000-00-00 00:00:00" || timepart[0].toLong() in -999999999..999999999
         }
 
         fun getRoomURL(): String {

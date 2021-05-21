@@ -32,7 +32,7 @@ class BiliBiliLiveContext(
     override fun contentEquals(other: PushContext): Boolean {
         if (other !is BiliBiliLiveContext) return false
 
-        return liveRoomInfo.data.getStatus() == other.liveRoomInfo.data.getStatus() && (!liveRoomInfo.data.isEmptyTime() && liveRoomInfo.data.parseLiveTime() == other.liveRoomInfo.data.parseLiveTime())
+        return liveRoomInfo.data.getStatus() == other.liveRoomInfo.data.getStatus() && (!liveRoomInfo.data.isLiveTimeInvalid() && liveRoomInfo.data.parseLiveTime() == other.liveRoomInfo.data.parseLiveTime())
     }
 }
 
