@@ -55,7 +55,7 @@ data class PushEvent(
 
     private fun getLocalTime(time: Long): String {
         return BotVariables.yyMMddPattern.format(
-            Instant.ofEpochMilli(time).atZone(ZoneId.systemDefault()).toLocalDateTime()
+            Instant.ofEpochMilli(time * 1000L).atZone(ZoneId.systemDefault()).toLocalDateTime()
         )
     }
 
