@@ -2,11 +2,11 @@ package io.github.starwishsama.comet.api.thirdparty.github.data.events
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.time.Instant
+import java.time.ZoneId
 
 data class PushEvent(
     val ref: String,
@@ -54,7 +54,9 @@ data class PushEvent(
     )
 
     private fun getLocalTime(time: Long): String {
-        return SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault()).format(Date(time*1000L))
+        return BotVariables.yyMMddPattern.format(
+            Instant.ofEpochMilli(time).atZone(ZoneId.systemDefault()).toLocalDateTime()
+        )
     }
 
     override fun toMessageWrapper(): MessageWrapper {
