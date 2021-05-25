@@ -22,7 +22,6 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
 
-
 class RConCommand : ChatCommand, ConversationCommand {
     private val waitList = mutableMapOf<BotUser, Int>()
 
