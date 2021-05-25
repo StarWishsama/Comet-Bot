@@ -49,7 +49,7 @@ object R6StatsApi : ApiExecutor {
     override fun getLimitTime(): Int = 60
 
     fun getR6StatsAPI(): IR6StatsAPI {
-        if (ApiManager.getConfig<R6StatsConfig>()?.token == null) {
+        if (ApiManager.getConfig<R6StatsConfig>().token.isEmpty()) {
             throw ApiKeyIsEmptyException("未填写 R6Stats API, 无法调用 API")
         }
 
@@ -73,7 +73,7 @@ object R6StatsApi : ApiExecutor {
                 MessageWrapper().addText("R6Stats API 未正确配置, 请联系机器人管理员")
             } else {
                 daemonLogger.warning("R6Stats API 异常", e)
-                MessageWrapper().addText("无法获取玩家 $userName 的信息")
+                MessageWrapper().addText("API 异常, 无法获取玩家 $userName 的信息")
             }
         }
 
@@ -85,11 +85,11 @@ object R6StatsApi : ApiExecutor {
                 genericResult.raw().body?.string() + "\n" + seasonalResult.raw().body?.string(),
                 "genericStat: ${genericStat == null}, seasonalStat: ${seasonalStat == null}"
             )
-            return MessageWrapper().addText("无法获取玩家 $userName 的信息")
+            return MessageWrapper().addText("无法获取玩家 $userName 的信息, 数据为空")
         }
 
         val latestSeasonalStat = seasonalStat.getSeasonalStat(SeasonName.NEON_DAWN)?.getRegionStat(Region.EMEA)
-            ?: return MessageWrapper().addText("无法获取玩家 $userName 的信息")
+            ?: return MessageWrapper().addText("无法获取玩家 $userName 的信息, 赛季数据为空")
 
         val infoText = "|| ${genericStat.username} [${genericStat.levelInfo.level} 级]\n" +
                 "|| 目前段位 ${latestSeasonalStat.getRankAsEnum().rankName}\n" +
@@ -114,7 +114,7 @@ interface IR6StatsAPI {
         @HeaderMap headerMap: Map<String, String> = mapOf(
             Pair(
                 "Authorization",
-                "Bearer ${ApiManager.getConfig<R6StatsConfig>()?.token}"
+                "Bearer ${ApiManager.getConfig<R6StatsConfig>().token}"
             )
         )
     ): Call<R6StatsGenericStat>
@@ -126,7 +126,7 @@ interface IR6StatsAPI {
         @HeaderMap headerMap: Map<String, String> = mapOf(
             Pair(
                 "Authorization",
-                "Bearer ${ApiManager.getConfig<R6StatsConfig>()?.token}"
+                "Bearer ${ApiManager.getConfig<R6StatsConfig>().token}"
             )
         )
     ): Call<R6StatsSeasonalStat>
