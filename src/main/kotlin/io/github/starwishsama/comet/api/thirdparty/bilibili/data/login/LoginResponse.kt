@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.login
 
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -14,16 +24,16 @@ data class LoginResponse(
     var ts: Long // 1550219689
 ) {
     data class Data(
-            @JsonProperty("cookie_info")
-            var cookieInfo: CookieInfo,
-            @JsonProperty("sso")
-            var sso: List<String>,
-            @JsonProperty("status")
-            var status: Int, // 0
-            @JsonProperty("token_info")
-            var tokenInfo: TokenInfo,
-            @JsonProperty("url")
-            var url: String?
+        @JsonProperty("cookie_info")
+        var cookieInfo: CookieInfo,
+        @JsonProperty("sso")
+        var sso: List<String>,
+        @JsonProperty("status")
+        var status: Int, // 0
+        @JsonProperty("token_info")
+        var tokenInfo: TokenInfo,
+        @JsonProperty("url")
+        var url: String?
     ) {
         data class CookieInfo(
             @JsonProperty("cookies")
