@@ -98,6 +98,11 @@ object GachaService {
     fun addPoolFromFile(poolFile: File) {
         require(poolFile.exists()) { "${poolFile.absolutePath} isn't exists" }
 
+        // 不处理非 YAML 类型文件
+        if (!poolFile.name.endsWith("yml") || !poolFile.name.endsWith("yaml")) {
+            return
+        }
+
         try {
             val pool = Yaml.decodeFromString<CustomPool>(poolFile.getContext())
             addPool(pool)

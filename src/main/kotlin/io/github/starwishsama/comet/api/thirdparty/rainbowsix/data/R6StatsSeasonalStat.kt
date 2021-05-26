@@ -104,6 +104,11 @@ data class R6StatsSeasonalStat(
 }
 
 enum class SeasonName(val season: String) {
+
+    NORTH_STAR("north_star"),
+
+    CRIMSON_HEIST("crimson_heist"),
+
     NEON_DAWN("neon_dawn"),
 
     SHADOW_LEGACY("shadow_legacy"),

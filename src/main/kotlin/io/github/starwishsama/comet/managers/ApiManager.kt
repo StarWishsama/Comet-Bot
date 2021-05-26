@@ -22,7 +22,7 @@ import io.github.starwishsama.comet.utils.folderIsEmpty
 import java.io.File
 
 object ApiManager {
-    val apiConfigs = mutableListOf<ApiConfig>()
+    val apiConfigs = mutableSetOf<ApiConfig>()
 
     inline fun <reified T> getConfig(): T {
         val result = apiConfigs.find { it is T } ?: throw ApiException("找不到指定 API 的配置")
@@ -37,8 +37,8 @@ object ApiManager {
         }
 
         if (apiConfigFile.folderIsEmpty()) {
-            createBlankConfigs()
-            daemonLogger.log(HinaLogLevel.Info, "API 配置生成成功! 注意: 自新版本开始 API 请在 /api 文件夹下配置", prefix = "API设置")
+            createDefaultConfigs()
+            daemonLogger.log(HinaLogLevel.Info, "API 配置生成成功! 注意: 自新版本开始 API 配置请在 /api 文件夹下配置", prefix = "API设置")
         }
 
         apiConfigFile.listFiles()?.forEach {
@@ -52,7 +52,7 @@ object ApiManager {
         daemonLogger.log(HinaLogLevel.Info, "已加载 ${apiConfigs.size} 个配置", prefix = "API设置")
     }
 
-    private fun createBlankConfigs() {
+    private fun createDefaultConfigs() {
         val apiConfigFile = FileUtil.getChildFolder("api")
         val defaultConfigType = mutableListOf(BiliBiliConfig(), R6StatsConfig(), SauceNaoConfig(), TwitterConfig())
 
@@ -63,7 +63,6 @@ object ApiManager {
 
     fun reloadConfig() {
         apiConfigs.clear()
-
         loadAllApiConfig()
     }
 }

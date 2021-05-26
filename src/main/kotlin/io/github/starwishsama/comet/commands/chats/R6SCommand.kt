@@ -10,7 +10,6 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.R6StatsApi
@@ -24,7 +23,6 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.at
-
 
 class R6SCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
@@ -53,14 +51,11 @@ class R6SCommand : ChatCommand {
                 }
                 "bind", "绑定" ->
                     if (args[1].isNotEmpty() && args.size > 1) {
-                        if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
-                            val botUser1 = BotUser.getUser(event.sender.id)
-                            if (botUser1 != null) {
-                                botUser1.r6sAccount = args[1]
-                                return toChain("绑定成功!")
-                            }
+                        return if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
+                            user.r6sAccount = args[1]
+                            toChain("绑定成功!")
                         } else {
-                            return toChain("ID 格式有误!")
+                            toChain("ID 格式有误!")
                         }
                     }
                 else -> {

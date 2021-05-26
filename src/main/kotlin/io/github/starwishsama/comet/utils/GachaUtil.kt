@@ -147,14 +147,13 @@ object GachaUtil {
          */
         val actualCount = ele.size
 
-        if (arkLoc.filesCount() < actualCount) {
+        if (arkLoc.filesCount() == 0) {
             val startTime = LocalDateTime.now()
             daemonLogger.info("正在下载 明日方舟图片资源文件")
 
             var successCount = 0
 
             val downloadList = mutableSetOf<String>()
-
 
             ele.forEach {
                 try {
@@ -166,7 +165,7 @@ object GachaUtil {
                         delay(1_500)
                     }
                 } catch (e: Exception) {
-                    daemonLogger.warning("下载图片 http://prts.wiki/${it.attr("href")} 失败, 请手动下载.")
+                    daemonLogger.warning("获取图片 http://prts.wiki/${it.attr("href")} 失败, 请手动下载.")
                 }
             }
 

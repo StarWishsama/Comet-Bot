@@ -146,7 +146,7 @@ data class LiveRoomInfo(
 
         fun isLiveTimeInvalid(): Boolean {
             val timepart = liveTime.split("-")
-            return liveTime == "0000-00-00 00:00:00" || timepart[0].toLong() in -999999999..999999999
+            return liveTime == "0000-00-00 00:00:00" || timepart[0].toLong() !in -999999999..999999999
         }
 
         fun getRoomURL(): String {
