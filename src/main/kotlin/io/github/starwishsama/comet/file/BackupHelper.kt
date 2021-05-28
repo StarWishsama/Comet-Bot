@@ -66,7 +66,7 @@ object BackupHelper {
         files.forEach { f ->
             val modifiedTime = f.lastModified().toLocalDateTime(true)
             val currentTime = LocalDateTime.now()
-            if (Duration.between(modifiedTime, currentTime).toKotlinDuration().inDays > cfg.autoCleanDuration) {
+            if (Duration.between(modifiedTime, currentTime).toKotlinDuration().inWholeDays > cfg.autoCleanDuration) {
                 try {
                     totalSize += f.length()
                     f.delete()

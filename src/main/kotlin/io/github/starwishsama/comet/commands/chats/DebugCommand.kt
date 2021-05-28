@@ -117,7 +117,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                 }
                 "push" -> {
                     if (args.size > 1) {
-                        return when (args[1].toLowerCase()) {
+                        return when (args[1].lowercase()) {
                             "twit", "twitter", "推特", "蓝鸟", "twi" -> {
                                 PusherManager.getPusherByName("data")?.execute()
                                 toChain("Twitter retriever has been triggered and run~")

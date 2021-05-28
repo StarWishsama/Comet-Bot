@@ -29,7 +29,7 @@ class R6SCommand : ChatCommand {
         if (args.isEmpty()) {
             return toChain(getHelp(), true)
         } else {
-            when (args[0].toLowerCase()) {
+            when (args[0].lowercase()) {
                 "info", "查询", "cx" -> {
                     val account = user.r6sAccount
 

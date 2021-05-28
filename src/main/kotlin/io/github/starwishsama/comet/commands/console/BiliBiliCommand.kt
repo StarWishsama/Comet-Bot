@@ -23,7 +23,7 @@ class BiliBiliCommand : ConsoleCommand {
             return getHelp()
         }
 
-        when (args[0].toLowerCase()) {
+        when (args[0].lowercase()) {
             "login" -> {
                 FakeClientApi.login(cacheLoginData.userName, cacheLoginData.passWord)
             }

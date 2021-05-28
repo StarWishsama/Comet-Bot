@@ -78,7 +78,7 @@ class DiceCommand : ChatCommand {
                 } else {
                     return emptyList()
                 }
-            } else if (time.isEmpty() && d.toLowerCase() == "d") {
+            } else if (time.isEmpty() && d.lowercase() == "d") {
                 result.add(1)
             }
 

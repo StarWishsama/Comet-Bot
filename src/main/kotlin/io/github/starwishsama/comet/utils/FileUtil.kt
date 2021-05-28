@@ -180,7 +180,7 @@ object FileUtil {
     @Suppress("SpellCheckingInspection")
     fun getJarLocation(): File {
         var path: String = Comet::class.java.protectionDomain.codeSource.location.path
-        if (System.getProperty("os.name").toLowerCase().contains("dows")) {
+        if (System.getProperty("os.name").lowercase().contains("dows")) {
             path = path.substring(1)
         }
         if (path.contains("jar")) {

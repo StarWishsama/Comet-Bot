@@ -184,7 +184,7 @@ object GachaService {
 
             BotVariables.daemonLogger.info("成功载入明日方舟游戏数据, 共 ${BotVariables.arkNight.size} 个干员")
             if (BotVariables.cfg.arkDrawUseImage) {
-                if (System.getProperty("java.awt.headless") != "true" && RuntimeUtil.getOsName().toLowerCase()
+                if (System.getProperty("java.awt.headless") != "true" && RuntimeUtil.getOsName().lowercase()
                         .contains("linux")
                 ) {
                     BotVariables.daemonLogger.info("检测到 Linux 系统, 正在启用无头模式")

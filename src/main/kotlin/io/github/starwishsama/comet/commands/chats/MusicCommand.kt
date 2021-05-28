@@ -38,7 +38,7 @@ class MusicCommand : ChatCommand {
         return when (args[0]) {
             "api" -> {
                 if (args.size > 1) {
-                    when (args[1].toUpperCase()) {
+                    when (args[1].uppercase()) {
                         "QQ", "TX", "腾讯" -> BotVariables.cfg.musicApi = MusicApiType.QQ
                         "NETEASE", "网易", "WY" -> BotVariables.cfg.musicApi = MusicApiType.NETEASE
                     }
