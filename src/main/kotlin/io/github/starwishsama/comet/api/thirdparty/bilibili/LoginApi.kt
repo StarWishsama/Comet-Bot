@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.api.thirdparty.bilibili
 
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -25,11 +35,11 @@ object LoginApi {
      * 登录结果请查看 [LoginApi.loginResponse]
      */
     fun login(
-            username: String, password: String,
-            // 如果登陆请求返回了 "验证码错误!"(-105) 的结果, 那么下一次发送登陆请求就需要带上验证码
-            challenge: String? = null,
-            secCode: String? = null,
-            validate: String? = null
+        username: String, password: String,
+        // 如果登陆请求返回了 "验证码错误!"(-105) 的结果, 那么下一次发送登陆请求就需要带上验证码
+        challenge: String? = null,
+        secCode: String? = null,
+        validate: String? = null
     ) {
         val path = "/api/oauth2/getKey"
         // 取得 hash 和 RSA 公钥
@@ -54,7 +64,8 @@ object LoginApi {
             String(it)
         }
 
-        val doLogin = NetUtil.getPageContent("$loginApi/api/v3/oauth2/login?username=$username&password=$cipheredPassword&challenge=$challenge&seccode=$secCode&validate=$validate")
+        val doLogin =
+            NetUtil.getPageContent("$loginApi/api/v3/oauth2/login?username=$username&password=$cipheredPassword&challenge=$challenge&seccode=$secCode&validate=$validate")
         val response = mapper.readValue<LoginResponse>(doLogin ?: return)
 
         if (response.code != -105) {

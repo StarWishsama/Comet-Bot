@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BotVariables.localizationManager
@@ -54,20 +64,16 @@ class BiliBiliCommand : ChatCommand {
             }
             "info", "查询", "cx" -> {
                 return if (args.size > 1) {
-                    if (!FakeClientApi.client.isLogin) {
-                        event.subject.sendMessage(event.message.quote() + "请稍等...")
-                        val item = FakeClientApi.getUser(args[1])
-                        if (item != null) {
-                            val text = item.title + "\n粉丝数: " + item.fans.getBetterNumber() +
-                                    "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
-                                    "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") + "\n"
-                            val dynamic = DynamicApi.getWrappedDynamicTimeline(item.mid)
-                            text.convertToChain() + getDynamicText(dynamic, event)
-                        } else {
-                            "找不到对应的B站用户".toChain()
-                        }
+                    event.subject.sendMessage(event.message.quote() + "请稍等...")
+                    val item = FakeClientApi.getUser(args[1])
+                    if (item != null) {
+                        val text = item.title + "\n粉丝数: " + item.fans.getBetterNumber() +
+                                "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
+                                "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") + "\n"
+                        val dynamic = DynamicApi.getWrappedDynamicTimeline(item.mid)
+                        text.convertToChain() + getDynamicText(dynamic, event)
                     } else {
-                        "未登录无法使用查询功能, 请在配置中配置B站账号密码".toChain()
+                        "找不到对应的B站用户".toChain()
                     }
                 } else getHelp().convertToChain()
             }

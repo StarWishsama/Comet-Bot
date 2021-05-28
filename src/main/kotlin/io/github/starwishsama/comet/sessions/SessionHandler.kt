@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.sessions
 
 import io.github.starwishsama.comet.BotVariables
@@ -37,7 +47,8 @@ object SessionHandler {
         return getSessionsByGroup(groupID).stream().filter { it.creator::class.java == cmd }.count() > 0
     }
 
-    fun getSessionsByGroup(groupID: Long): List<Session> = sessionPool.stream().filter { it.target.groupId == groupID }.toList()
+    fun getSessionsByGroup(groupID: Long): List<Session> =
+        sessionPool.stream().filter { it.target.groupId == groupID }.toList()
 
     fun hasSessionByID(id: Long): Boolean = getSessionsByID(id).isNotEmpty()
 
@@ -72,7 +83,8 @@ object SessionHandler {
             privateId = e.sender.id
         }
 
-        val sessionStream = sessionPool.stream().filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }
+        val sessionStream = sessionPool.stream()
+            .filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }
 
         val sessionToHandle = sessionStream.toList()
 
@@ -88,7 +100,9 @@ object SessionHandler {
             }
         }
 
-        if (sessionPool.stream().filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }.count() > 0) {
+        if (sessionPool.stream()
+                .filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }.count() > 0
+        ) {
             BotVariables.logger.debug(
                 "[会话] 处理 ${sessionToHandle.count()} 个会话耗时 ${
                     time.getLastingTimeAsString(
@@ -99,6 +113,8 @@ object SessionHandler {
             )
         }
 
-        return sessionPool.stream().filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId && !it.silent }.count() > 0
+        return sessionPool.stream()
+            .filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId && !it.silent }
+            .count() > 0
     }
 }

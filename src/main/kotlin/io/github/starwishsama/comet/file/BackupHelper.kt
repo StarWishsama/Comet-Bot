@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.file
 
 import cn.hutool.core.io.file.FileWriter
@@ -19,7 +29,7 @@ object BackupHelper {
     private val location: File = FileUtil.getChildFolder("backups")
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
 
-    private fun createBackup(){
+    private fun createBackup() {
         try {
             if (!location.exists()) {
                 location.mkdirs()
@@ -31,7 +41,7 @@ object BackupHelper {
             val backupFile = File(location, backupFileName)
             backupFile.createNewFile()
             FileWriter.create(backupFile, Charsets.UTF_8)
-                    .write(BotVariables.mapper.writeValueAsString(BotVariables.users))
+                .write(BotVariables.mapper.writeValueAsString(BotVariables.users))
             BotVariables.logger.info("[备份] 备份成功! 文件名是 $backupFileName")
         } catch (e: Exception) {
             BotVariables.logger.error("[备份] 尝试备份时发生了异常", e)

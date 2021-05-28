@@ -1,6 +1,15 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.utils.network
 
-import cn.hutool.core.codec.Base64Decoder
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -12,12 +21,10 @@ import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import org.xbill.DNS.Lookup
 import org.xbill.DNS.SRVRecord
 import org.xbill.DNS.Type
-import java.awt.image.BufferedImage
 import java.io.*
 import java.net.Proxy
 import java.net.Socket
 import java.time.LocalDateTime
-import javax.imageio.ImageIO
 
 
 /**

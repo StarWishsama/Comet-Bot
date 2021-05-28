@@ -1,5 +1,14 @@
-package io.github.starwishsama.comet.commands.chats
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
 
+package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
@@ -14,7 +23,6 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.at
-
 
 class R6SCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
@@ -43,14 +51,11 @@ class R6SCommand : ChatCommand {
                 }
                 "bind", "绑定" ->
                     if (args[1].isNotEmpty() && args.size > 1) {
-                        if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
-                            val botUser1 = BotUser.getUser(event.sender.id)
-                            if (botUser1 != null) {
-                                botUser1.r6sAccount = args[1]
-                                return toChain("绑定成功!")
-                            }
+                        return if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
+                            user.r6sAccount = args[1]
+                            toChain("绑定成功!")
                         } else {
-                            return toChain("ID 格式有误!")
+                            toChain("ID 格式有误!")
                         }
                     }
                 else -> {

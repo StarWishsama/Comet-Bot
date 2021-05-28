@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.utils
 
 import io.github.starwishsama.comet.BotVariables
@@ -47,13 +57,41 @@ object RuntimeUtil {
         return buildString {
             append(String.format("> %-4s %-4s %-4s", "内存信息", "堆内", "堆外"))
             append("\n")
-            append(String.format("| %-4s %-4s %-4s", "初始", (head.init / byteToMB).formatDigests(), (nonHead.init / byteToMB).formatDigests()))
+            append(
+                String.format(
+                    "| %-4s %-4s %-4s",
+                    "初始",
+                    (head.init / byteToMB).formatDigests(),
+                    (nonHead.init / byteToMB).formatDigests()
+                )
+            )
             append("\n")
-            append(String.format("| %-4s %-4s %-4s", "已使用", (head.used / byteToMB).formatDigests(), (nonHead.used / byteToMB).formatDigests()))
+            append(
+                String.format(
+                    "| %-4s %-4s %-4s",
+                    "已使用",
+                    (head.used / byteToMB).formatDigests(),
+                    (nonHead.used / byteToMB).formatDigests()
+                )
+            )
             append("\n")
-            append(String.format("| %-4s %-4s %-4s", "提交", (head.committed / byteToMB).formatDigests(), (nonHead.committed / byteToMB).formatDigests()))
+            append(
+                String.format(
+                    "| %-4s %-4s %-4s",
+                    "提交",
+                    (head.committed / byteToMB).formatDigests(),
+                    (nonHead.committed / byteToMB).formatDigests()
+                )
+            )
             append("\n")
-            append(String.format("| %-4s %-4s %-4s", "最大", (head.max / byteToMB).formatDigests(), (nonHead.max / byteToMB).formatDigests()))
+            append(
+                String.format(
+                    "| %-4s %-4s %-4s",
+                    "最大",
+                    (head.max / byteToMB).formatDigests(),
+                    (nonHead.max / byteToMB).formatDigests()
+                )
+            )
         }.trim()
     }
 }

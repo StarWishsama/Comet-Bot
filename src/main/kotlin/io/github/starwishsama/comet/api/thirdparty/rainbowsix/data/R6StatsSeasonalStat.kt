@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.api.thirdparty.rainbowsix.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -94,6 +104,11 @@ data class R6StatsSeasonalStat(
 }
 
 enum class SeasonName(val season: String) {
+
+    NORTH_STAR("north_star"),
+
+    CRIMSON_HEIST("crimson_heist"),
+
     NEON_DAWN("neon_dawn"),
 
     SHADOW_LEGACY("shadow_legacy"),

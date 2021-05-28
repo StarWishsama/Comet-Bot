@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.net.URLDecoder
@@ -137,14 +147,13 @@ object GachaUtil {
          */
         val actualCount = ele.size
 
-        if (arkLoc.filesCount() < actualCount) {
+        if (arkLoc.filesCount() == 0) {
             val startTime = LocalDateTime.now()
             daemonLogger.info("正在下载 明日方舟图片资源文件")
 
             var successCount = 0
 
             val downloadList = mutableSetOf<String>()
-
 
             ele.forEach {
                 try {
@@ -156,7 +165,7 @@ object GachaUtil {
                         delay(1_500)
                     }
                 } catch (e: Exception) {
-                    daemonLogger.warning("下载图片 http://prts.wiki/${it.attr("href")} 失败, 请手动下载.")
+                    daemonLogger.warning("获取图片 http://prts.wiki/${it.attr("href")} 失败, 请手动下载.")
                 }
             }
 
