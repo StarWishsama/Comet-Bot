@@ -37,23 +37,27 @@ object FakeClientApi {
         withContext(Dispatchers.IO) {
             try {
                 client.login(userName, password, challenge, secCode, validate)
-                BotVariables.daemonLogger.info("成功登录哔哩哔哩账号")
-            } catch (e: BilibiliApiException) {
-                BotVariables.daemonLogger.log(HinaLogLevel.Debug, "", e, bypass = true)
-                when (e.commonResponse.code) {
-                    -629 -> {
-                        BotVariables.daemonLogger.warning("哔哩哔哩账号密码错误, 请稍后在后台用 /bili login [账号] [密码] 重试!")
+                BotVariables.daemonLogger.info("哔哩哔哩账号登录状态: ${client.isLogin}")
+            } catch (e: Exception) {
+                if (e is BilibiliApiException) {
+                    BotVariables.daemonLogger.log(HinaLogLevel.Debug, "", e, bypass = true)
+                    when (e.commonResponse.code) {
+                        -629 -> {
+                            BotVariables.daemonLogger.warning("哔哩哔哩账号密码错误, 请稍后在后台用 /bili login [账号] [密码] 重试!")
+                        }
+                        -105 -> {
+                            BotVariables.daemonLogger.warning(
+                                "极验滑块链接: ${e.commonResponse.data?.get("url")?.asString}" +
+                                        "\n需要滑块验证码登录, 请稍后在后台用 /bili retry 进行进一步操作!\n" +
+                                        "需要将获得的 challenge 和 validate 填入, 如果不懂如何获取请查看 Wiki"
+                            )
+                        }
+                        else -> {
+                            BotVariables.daemonLogger.warning("登录失败!", e)
+                        }
                     }
-                    -105 -> {
-                        BotVariables.daemonLogger.warning(
-                            "极验滑块链接: ${e.commonResponse.data?.get("url")?.asString}" +
-                                    "\n需要滑块验证码登录, 请稍后在后台用 /bili retry 进行进一步操作!\n" +
-                                    "需要将获得的 challenge 和 validate 填入, 如果不懂如何获取请查看 Wiki"
-                        )
-                    }
-                    else -> {
-                        BotVariables.daemonLogger.warning("登录失败!", e)
-                    }
+                } else {
+                    BotVariables.daemonLogger.warning("登录失败!", e)
                 }
             }
         }
