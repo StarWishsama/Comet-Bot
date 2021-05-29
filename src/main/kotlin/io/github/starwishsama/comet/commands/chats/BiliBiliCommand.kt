@@ -65,7 +65,12 @@ class BiliBiliCommand : ChatCommand {
             "info", "查询", "cx" -> {
                 return if (args.size > 1) {
                     event.subject.sendMessage(event.message.quote() + "请稍等...")
+
                     val item = FakeClientApi.getUser(args[1])
+                    if (FakeClientApi.client.loginResponse == null) {
+                        "B站账号登录异常, 请联系管理员".toChain()
+                    }
+
                     if (item != null) {
                         val text = item.title + "\n粉丝数: " + item.fans.getBetterNumber() +
                                 "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +

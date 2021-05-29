@@ -28,7 +28,6 @@ import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.utils.MiraiExperimentalApi
-import java.util.*
 
 
 class PictureSearchCommand : ChatCommand, ConversationCommand {
@@ -48,15 +47,19 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
             return handlePicSearch(imageToSearch.queryUrl()).toChain()
         } else if (args[0].contentEquals("source") && args.size > 1) {
             return try {
-                val api = PicSearchApiType.valueOf(args[1].toUpperCase(Locale.ROOT))
+                val api = PicSearchApiType.valueOf(args[1].uppercase())
                 BotVariables.cfg.pictureSearchApi = api
                 toChain("已切换识图 API 为 ${api.name}", true)
-            } catch (e: Throwable) {
-                var type = ""
-                PicSearchApiType.values().forEach {
-                    type = type + it.name + " " + it.desc + "\n"
-                }
-                toChain("该识图 API 不存在, 可用的 API 类型:\n ${type.trim()}", true)
+            } catch (ignored: IllegalArgumentException) {
+                toChain(
+                    "该识图 API 不存在, 可用的 API 类型:\n ${
+                        buildString {
+                            PicSearchApiType.values().forEach {
+                                append("${it.name} ${it.desc},")
+                            }
+                        }.removeSuffix(",")
+                    }", true
+                )
             }
         } else {
             return getHelp().toChain()
@@ -91,11 +94,12 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
     }
 
     private fun handlePicSearch(url: String): String {
+        val defaultSimilarity = 52.5
         when (BotVariables.cfg.pictureSearchApi) {
             PicSearchApiType.SAUCENAO -> {
                 val result = PictureSearchUtil.sauceNaoSearch(url)
                 return when {
-                    result.similarity >= 52.5 -> {
+                    result.similarity >= defaultSimilarity -> {
                         "相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n"
                     }
                     result.similarity == -1.0 -> {

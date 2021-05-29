@@ -72,7 +72,6 @@ fun File.getMD5(): String {
 /**
  * 直接将文件内容 (json) 序列化为指定的类
  *
- * @param clazz 指定类
  * @return T
  */
 inline fun <reified T : Any> File.parseAsClass(customParser: ObjectMapper = BotVariables.mapper): T {

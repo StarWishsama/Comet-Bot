@@ -71,12 +71,16 @@ object FakeClientApi {
             if (!searchResult.items.isNullOrEmpty()) {
                 return searchResult.items[0]
             }
-        } catch (e: BilibiliApiException) {
-            BotVariables.logger.warning(
-                "在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
-                        "${e.commonResponse.msg}\n" +
-                        "${e.commonResponse.message}", e
-            )
+        } catch (e: Exception) {
+            if (e is BilibiliApiException) {
+                BotVariables.logger.warning(
+                    "在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +
+                            "${e.commonResponse.msg}\n" +
+                            "${e.commonResponse.message}", e
+                )
+            } else {
+                BotVariables.logger.warning("在搜索B站用户时出现了意外", e)
+            }
         }
         return null
     }

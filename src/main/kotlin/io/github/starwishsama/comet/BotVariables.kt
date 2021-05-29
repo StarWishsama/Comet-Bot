@@ -27,7 +27,6 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
-import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
 import io.github.starwishsama.comet.service.server.WebHookServer
 import io.github.starwishsama.comet.utils.LoggerAppender
@@ -74,14 +73,17 @@ object BotVariables {
 
     val logger: HinaLogger = HinaLogger("Comet", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
-    internal val netLogger: HinaLogger =
+    internal val netLogger: HinaLogger by lazy {
         HinaLogger("CometNet", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+    }
 
-    internal val daemonLogger: HinaLogger =
+    internal val daemonLogger: HinaLogger by lazy {
         HinaLogger("CometService", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+    }
 
-    internal val consoleCommandLogger: HinaLogger =
+    internal val consoleCommandLogger: HinaLogger by lazy {
         HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+    }
 
     val mapper: ObjectMapper = ObjectMapper()
         // 美化输出
@@ -121,7 +123,6 @@ object BotVariables {
 
     val users: MutableMap<Long, BotUser> = ConcurrentHashMap()
     lateinit var localizationManager: LocalizationManager
-    var hitokoto: Hitokoto? = null
 
     /** 明日方舟卡池数据 */
     val arkNight: MutableList<ArkNightOperator> = mutableListOf()
