@@ -29,7 +29,6 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageChainBuilder
 import net.mamoe.mirai.message.data.PlainText
-import java.util.*
 
 
 class GroupConfigCommand : ChatCommand, UnDisableableCommand {
@@ -38,7 +37,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
         if (event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
                 val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
-                when (args[0].toLowerCase(Locale.ROOT)) {
+                when (args[0].lowercase()) {
                     "helper", "群管" -> {
                         return if (args.size == 2) {
                             val target = CometUtil.parseAtAsBotUser(event, args[1])

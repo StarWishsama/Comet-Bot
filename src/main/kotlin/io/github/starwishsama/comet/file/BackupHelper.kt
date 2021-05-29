@@ -18,6 +18,7 @@ import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.TaskUtil
 import java.io.File
+import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -43,7 +44,7 @@ object BackupHelper {
             FileWriter.create(backupFile, Charsets.UTF_8)
                 .write(BotVariables.mapper.writeValueAsString(BotVariables.users))
             BotVariables.logger.info("[备份] 备份成功! 文件名是 $backupFileName")
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             BotVariables.logger.error("[备份] 尝试备份时发生了异常", e)
         }
     }
@@ -66,12 +67,12 @@ object BackupHelper {
         files.forEach { f ->
             val modifiedTime = f.lastModified().toLocalDateTime(true)
             val currentTime = LocalDateTime.now()
-            if (Duration.between(modifiedTime, currentTime).toKotlinDuration().inDays > cfg.autoCleanDuration) {
+            if (Duration.between(modifiedTime, currentTime).toKotlinDuration().inWholeDays > cfg.autoCleanDuration) {
                 try {
                     totalSize += f.length()
                     f.delete()
                     counter++
-                } catch (e: Exception) {
+                } catch (e: IOException) {
                     daemonLogger.warning("删除旧文件失败", e)
                 }
             }

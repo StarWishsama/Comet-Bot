@@ -72,7 +72,6 @@ fun File.getMD5(): String {
 /**
  * 直接将文件内容 (json) 序列化为指定的类
  *
- * @param clazz 指定类
  * @return T
  */
 inline fun <reified T : Any> File.parseAsClass(customParser: ObjectMapper = BotVariables.mapper): T {
@@ -180,7 +179,7 @@ object FileUtil {
     @Suppress("SpellCheckingInspection")
     fun getJarLocation(): File {
         var path: String = Comet::class.java.protectionDomain.codeSource.location.path
-        if (System.getProperty("os.name").toLowerCase().contains("dows")) {
+        if (System.getProperty("os.name").lowercase().contains("dows")) {
             path = path.substring(1)
         }
         if (path.contains("jar")) {

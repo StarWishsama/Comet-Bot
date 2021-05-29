@@ -121,7 +121,9 @@ class GuessNumberCommand : ChatCommand, ConversationCommand {
                     event.subject.sendMessage(sb.toString().trim())
                     SessionHandler.removeSession(session)
                 }
-                else -> throw RuntimeException("GuessNumber: Impossible answer input: ${answerInInt}, answer: ${trueAnswer}")
+                else -> {
+                    throw RuntimeException("GuessNumber: Impossible answer input: ${answerInInt}, answer: ${trueAnswer}")
+                }
             }
         } else {
             when (answer) {

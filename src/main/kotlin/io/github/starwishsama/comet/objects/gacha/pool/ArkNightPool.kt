@@ -198,11 +198,12 @@ class ArkNightPool(
                     val r5Count = drawResult.items.parallelStream().filter { it.rare + 1 == 4 }.count()
                     val r4Count = drawResult.items.parallelStream().filter { it.rare + 1 == 3 }.count()
                     val r3Count = drawResult.items.size - r6Count - r5Count - r4Count
+                    val perTimeUsed = 600
 
                     var returnText = currentPool + "寻访结果:\n" +
                             "寻访次数: ${drawResult.items.size}\n" +
                             "结果: ${r6Count}[6]|${r5Count}[5]|${r4Count}[4]|${r3Count}[3]\n" +
-                            "使用合成玉 ${drawResult.items.size * 600}"
+                            "使用合成玉 ${drawResult.items.size * perTimeUsed}"
 
                     if (drawResult.specialItems.isNotEmpty()) {
                         returnText += "\n\n出现特殊物品!\n"

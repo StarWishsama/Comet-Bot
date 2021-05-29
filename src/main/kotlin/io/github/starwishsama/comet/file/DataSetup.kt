@@ -27,6 +27,7 @@ import io.github.starwishsama.comet.utils.*
 import net.mamoe.mirai.Bot
 import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
+import java.io.IOException
 
 object DataSetup {
     private val userCfg: DataFile = DataFile(File(BotVariables.filePath, "users.json"), DataFile.FilePriority.HIGH) {
@@ -54,7 +55,7 @@ object DataSetup {
                 if (it.priority >= DataFile.FilePriority.NORMAL) {
                     it.initAction(it.file)
                 }
-            } catch (e: RuntimeException) {
+            } catch (e: IOException) {
                 daemonLogger.warning("在初始化文件 ${it.file.name} 时出现了意外", e)
             }
         }

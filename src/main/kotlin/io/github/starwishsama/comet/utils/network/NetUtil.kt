@@ -189,8 +189,8 @@ object NetUtil {
     }
 
     fun isTimeout(t: Throwable): Boolean {
-        val msg = t.message?.toLowerCase() ?: return false
-        return msg.containsEtc(false, "time", "out") || t.javaClass.simpleName.toLowerCase().contains("timeout")
+        val msg = t.message?.lowercase() ?: return false
+        return msg.containsEtc(false, "time", "out") || t.javaClass.simpleName.lowercase().contains("timeout")
     }
 
     @Throws(HttpException::class)

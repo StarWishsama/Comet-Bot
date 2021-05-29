@@ -11,13 +11,15 @@
 package io.github.starwishsama.comet.service.task
 
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.hitokoto
 import io.github.starwishsama.comet.BotVariables.logger
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.utils.network.NetUtil
+import java.io.IOException
 
 object HitokotoUpdater : Runnable {
+    private var hitokoto: Hitokoto? = null
+
     override fun run() {
         try {
             val hitokotoJson = NetUtil.getPageContent("https://v1.hitokoto.cn/")
@@ -42,7 +44,7 @@ object HitokotoUpdater : Runnable {
             } else {
                 getHitokotoJson().toString()
             }
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             logger.warning("在从缓存中获取一言时发生错误", e)
         }
         return "无法获取今日一言"
