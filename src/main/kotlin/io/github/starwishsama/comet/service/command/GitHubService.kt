@@ -74,7 +74,11 @@ object GitHubService {
                 ) || (GithubApi.isUserExists(authorAndRepo[0]) && authorAndRepo[1] == "*")
             ) {
                 repos.add(id, authorAndRepo[0], authorAndRepo[1], repoSecret)
-                "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${BotVariables.cfg.webHookAddress} \n(设置为仅推送事件)".toChain()
+                if (repoSecret.isEmpty() || isGroup) {
+                    "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${BotVariables.cfg.webHookAddress}".toChain()
+                } else {
+                    "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${BotVariables.cfg.webHookAddress}\nSecret 为 $repoSecret".toChain()
+                }
             } else {
                 "仓库 $repoName 找不到或者没有权限访问!".toChain()
             }
