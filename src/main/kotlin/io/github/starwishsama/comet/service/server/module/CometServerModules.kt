@@ -49,11 +49,11 @@ class GithubWebHookHandler : HttpHandler {
         if (signature == null && GitHubService.repos.checkSecret(signature, "", eventType) == SecretStatus.NO_SECRET) {
             BotVariables.netLogger.log(HinaLogLevel.Debug, "收到新事件, 未通过安全验证. 请求的签名为: 无", prefix = "WebHook")
             val resp = "A Serve error has happened".toByteArray()
-            he.sendResponseHeaders(HttpStatus.HTTP_INTERNAL_ERROR, resp.size.toLong())
             he.responseBody.use {
                 it.write(resp)
                 it.flush()
             }
+            he.sendResponseHeaders(HttpStatus.HTTP_INTERNAL_ERROR, resp.size.toLong())
             return
         }
 
@@ -68,11 +68,11 @@ class GithubWebHookHandler : HttpHandler {
                 prefix = "WebHook"
             )
             val resp = "A Serve error has happened".toByteArray()
-            he.sendResponseHeaders(HttpStatus.HTTP_INTERNAL_ERROR, resp.size.toLong())
             he.responseBody.use {
                 it.write(resp)
                 it.flush()
             }
+            he.sendResponseHeaders(HttpStatus.HTTP_INTERNAL_ERROR, resp.size.toLong())
             return
         }
 
