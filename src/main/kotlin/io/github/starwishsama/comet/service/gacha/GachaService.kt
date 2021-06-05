@@ -13,7 +13,6 @@ package io.github.starwishsama.comet.service.gacha
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.gson.JsonParseException
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.file.DataFiles
 import io.github.starwishsama.comet.objects.gacha.custom.CustomPool
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
@@ -35,9 +34,9 @@ object GachaService {
     private var pcrUsable = true
     private val poolPath = FileUtil.getChildFolder("gacha")
 
-    fun loadGachaData(arkNight: File, pcr: File) {
+    fun loadGachaData(arkNight: File) {
         loadArkNightData(arkNight)
-        loadPCRData(pcr)
+        loadPCRData()
 
         if (arkNightUsable) {
             loadDefaultArkNightData()
@@ -106,7 +105,7 @@ object GachaService {
         try {
             val pool = Yaml.decodeFromString<CustomPool>(poolFile.getContext())
             addPool(pool)
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             FileUtil.createErrorReportFile("解析卡池信息失败", "gacha", e, "", e.message ?: "")
         }
     }
@@ -160,14 +159,16 @@ object GachaService {
         return pool
     }
 
-    private fun loadPCRData(data: File) {
-        if (data.exists()) {
-            BotVariables.pcr.addAll(DataFiles.pcrData.file.parseAsClass())
-            BotVariables.daemonLogger.info("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个角色")
+    @Deprecated("PCR have no enough data to maintain")
+    private fun loadPCRData() {
+        BotVariables.daemonLogger.info("公主连结抽卡模拟器已停止维护.")
+        /**if (data.exists()) {
+        BotVariables.pcr.addAll(DataFiles.pcrData.file.parseAsClass())
+        BotVariables.daemonLogger.info("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个角色")
         } else {
-            BotVariables.daemonLogger.info("未检测到公主连结游戏数据, 对应游戏抽卡模拟器将无法使用")
-            pcrUsable = false
-        }
+        BotVariables.daemonLogger.info("未检测到公主连结游戏数据, 对应游戏抽卡模拟器将无法使用")
+        pcrUsable = false
+        }*/
     }
 
     private fun loadArkNightData(data: File) {

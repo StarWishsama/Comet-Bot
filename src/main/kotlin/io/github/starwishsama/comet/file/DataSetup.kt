@@ -17,7 +17,6 @@ import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.file.DataFiles.allDataFile
 import io.github.starwishsama.comet.file.DataFiles.arkNightData
 import io.github.starwishsama.comet.file.DataFiles.cfgFile
-import io.github.starwishsama.comet.file.DataFiles.pcrData
 import io.github.starwishsama.comet.file.DataFiles.perGroupFolder
 import io.github.starwishsama.comet.file.DataFiles.userCfg
 import io.github.starwishsama.comet.i18n.LocalizationManager
@@ -92,7 +91,7 @@ object DataSetup {
 
         BotVariables.localizationManager = LocalizationManager()
 
-        GachaService.loadGachaData(arkNightData.file, pcrData.file)
+        GachaService.loadGachaData(arkNightData.file)
 
         ApiManager.loadAllApiConfig()
     }

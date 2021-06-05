@@ -82,9 +82,10 @@ object R6StatsApi : ApiExecutor {
                 "R6Stats API 异常",
                 "r6stats",
                 null,
-                genericResult.raw().body?.string() + "\n" + seasonalResult.raw().body?.string(),
-                "genericStat: ${genericStat == null}, seasonalStat: ${seasonalStat == null}"
+                genericResult.toString() + "\n" + seasonalResult.toString(),
+                "genericStat isNull = ${genericStat == null}, seasonalStat isNull = ${seasonalStat == null}"
             )
+
             return MessageWrapper().addText("无法获取玩家 $userName 的信息, 数据为空")
         }
 

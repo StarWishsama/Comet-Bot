@@ -43,13 +43,17 @@ object ApiManager {
 
         apiConfigFile.listFiles()?.forEach {
             try {
-                apiConfigs.add(mapper.readValue(it))
+                addConfig(mapper.readValue(it))
             } catch (e: Exception) {
                 daemonLogger.log(HinaLogLevel.Warn, "在处理 API 配置时出现了意外", e, prefix = "API设置")
             }
         }
 
         daemonLogger.log(HinaLogLevel.Info, "已加载 ${apiConfigs.size} 个配置", prefix = "API设置")
+    }
+
+    fun addConfig(config: ApiConfig) {
+        apiConfigs.add(config)
     }
 
     private fun createDefaultConfigs() {
