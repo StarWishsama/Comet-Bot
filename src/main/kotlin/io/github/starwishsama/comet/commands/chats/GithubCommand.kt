@@ -17,26 +17,20 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.service.command.GitHubService.getRepoList
 import io.github.starwishsama.comet.service.command.GitHubService.subscribeRepo
 import io.github.starwishsama.comet.service.command.GitHubService.unsubscribeRepo
-import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
-import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 class GithubCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (event !is GroupMessageEvent) {
-            return "该命令仅群聊可用".toChain()
-        }
-
         if (args.isEmpty()) {
             return getHelp().convertToChain()
         }
 
         return when (args[0]) {
-            "add", "sub" -> subscribeRepo(args, event.group.id)
-            "rm", "unsub" -> unsubscribeRepo(args[1], event.group.id)
-            "list", "ls" -> getRepoList(event.group.id)
+            "add", "sub" -> subscribeRepo(args, event)
+            "rm", "unsub" -> unsubscribeRepo(args, event)
+            "list", "ls" -> getRepoList(args, event)
             else -> getHelp().convertToChain()
         }
     }
