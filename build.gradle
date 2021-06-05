@@ -100,7 +100,7 @@ dependencies {
 
 tasks {
     buildConfig {
-        println "Processing version code and other stuffs....."
+        println "Comet >> Generating comet information....."
 
         packageName("io.github.starwishsama.comet")
         buildConfigField("String", "version", "\"${version}\"")
@@ -148,7 +148,8 @@ shadowJar {
 }
 
 compileKotlin {
-    println "Building Comet $version..."
+    println "Comet >> Welcome to Comet!"
+    println "Comet >> Now building Comet $version..."
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
