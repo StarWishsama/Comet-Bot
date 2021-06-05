@@ -11,7 +11,6 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BotVariables.localizationManager
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
@@ -27,7 +26,7 @@ import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
-import kotlinx.coroutines.GlobalScope
+import io.github.starwishsama.comet.utils.TaskUtil
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.isOperator
@@ -41,6 +40,7 @@ import net.mamoe.mirai.message.data.toMessageChain
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Thread.sleep
 
 
 class BiliBiliCommand : ChatCommand {
@@ -98,14 +98,16 @@ class BiliBiliCommand : ChatCommand {
             "refresh" -> {
                 if (event is GroupMessageEvent) {
                     val cfg = GroupConfigManager.getConfig(event.group.id) ?: return "本群尚未注册至 Comet".toChain()
-                    GlobalScope.run {
+
+                    TaskUtil.runAsync {
                         cfg.biliSubscribers.forEach {
                             it.userName = DynamicApi.getUserNameByMid(it.id.toLong())
                             it.roomID = UserApi.userApiService.getMemberInfoById(it.id.toLong()).execute()
                                 .body()?.data?.liveRoomInfo?.roomId ?: -1
-                            delay(1_500)
+                            sleep(1_500)
                         }
                     }
+
                     return "刷新缓存成功".toChain()
                 } else {
                     toChain("抱歉, 该命令仅限群聊使用!")

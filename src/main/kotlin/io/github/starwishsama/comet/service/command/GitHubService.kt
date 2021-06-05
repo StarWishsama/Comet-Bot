@@ -11,9 +11,13 @@
 package io.github.starwishsama.comet.service.command
 
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.github.GithubApi
 import io.github.starwishsama.comet.file.DataFiles
 import io.github.starwishsama.comet.objects.config.GithubRepos
+import io.github.starwishsama.comet.sessions.Session
+import io.github.starwishsama.comet.sessions.SessionHandler
+import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.getContext
 import io.github.starwishsama.comet.utils.writeString
@@ -127,7 +131,7 @@ object GitHubService {
                 return "请填写正确的群号!".toChain()
             }
 
-            args[2].toLongOrNull() ?: return "请填写正确的群号!".toChain()
+            args[1].toLongOrNull() ?: return "请填写正确的群号!".toChain()
         }
 
 
@@ -141,6 +145,46 @@ object GitHubService {
                 }
             }.removeSuffix(", ").trim().toChain()
         }
+    }
+
+    fun modifyRepo(
+        args: List<String>,
+        event: MessageEvent,
+        command: ChatCommand,
+        session: Session? = null
+    ): MessageChain {
+        if (session == null) {
+            if (args.size < 2) {
+                return "正确的命令: /github modify [仓库名称]".toChain()
+            } else if (args.isEmpty()) {
+                return "正确的命令: /github add [仓库名称] (仓库 Secret [可选])".toChain()
+            }
+
+            val repoName = args[1]
+
+            val repo = repos.repos.filter { it.getFullName() == repoName }.toMutableList().also { repo ->
+                if (repo.isEmpty()) {
+                    repo.addAll(repos.repos.filter { it.repoAuthor == repoName.split("/")[0] && it.repoName == "*" })
+                }
+            }
+
+            return if (repo.isEmpty()) {
+                "找不到你想修改的 Github 仓库哟".toChain()
+            } else {
+                SessionHandler.insertSession(Session(SessionTarget(privateId = event.sender.id), command))
+
+                """
+                已进入仓库编辑模式
+                输入 '' 
+                """.trimIndent().toChain()
+            }
+        } else {
+            return handleModifyMode(args, event, session)
+        }
+    }
+
+    private fun handleModifyMode(args: List<String>, event: MessageEvent, session: Session): MessageChain {
+        TODO()
     }
 
     fun saveData() {

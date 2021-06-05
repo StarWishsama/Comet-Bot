@@ -12,16 +12,19 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.service.command.GitHubService.getRepoList
+import io.github.starwishsama.comet.service.command.GitHubService.modifyRepo
 import io.github.starwishsama.comet.service.command.GitHubService.subscribeRepo
 import io.github.starwishsama.comet.service.command.GitHubService.unsubscribeRepo
+import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-class GithubCommand : ChatCommand {
+class GithubCommand : ChatCommand, ConversationCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         if (args.isEmpty()) {
             return getHelp().convertToChain()
@@ -31,6 +34,7 @@ class GithubCommand : ChatCommand {
             "add", "sub" -> subscribeRepo(args, event)
             "rm", "unsub" -> unsubscribeRepo(args, event)
             "list", "ls" -> getRepoList(args, event)
+            "md", "modify" -> modifyRepo(args, event, this)
             else -> getHelp().convertToChain()
         }
     }
@@ -49,4 +53,8 @@ class GithubCommand : ChatCommand {
         /gh rm [仓库名称] 取消订阅 Github 项目推送动态
         /gh list 列出所有已订阅 Github 项目动态
     """.trimIndent()
+
+    override suspend fun handle(event: MessageEvent, user: BotUser, session: Session) {
+        event.subject.sendMessage(modifyRepo(event.message.contentToString().split(" "), event, this, session))
+    }
 }

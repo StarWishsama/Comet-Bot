@@ -11,7 +11,6 @@
 package io.github.starwishsama.comet.commands.chats
 
 import cn.hutool.core.util.RandomUtil
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -20,8 +19,8 @@ import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
+import io.github.starwishsama.comet.utils.TaskUtil
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -46,9 +45,10 @@ class MuteCommand : ChatCommand {
                                 true
                             )
                             "random", "rand", "随机", "抽奖" -> {
-                                GlobalScope.run {
-                                    delay(500)
-                                    doRandomMute(event)
+                                TaskUtil.runAsync(500) {
+                                    runBlocking {
+                                        doRandomMute(event)
+                                    }
                                 }
                                 CometUtil.toChain("下面将抽取一位幸运群友禁言")
                             }
