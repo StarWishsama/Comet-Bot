@@ -33,7 +33,14 @@ object GitHubService {
         }
     }
 
-    fun subscribeRepo(repoName: String, groupId: Long, repoSecret: String): MessageChain {
+    fun subscribeRepo(args: List<String>, groupId: Long): MessageChain {
+        if (args.size < 2) {
+            return "正确的命令: /github add [仓库名称] (仓库 Secret [可选])".toChain()
+        }
+
+        val repoName = args[1]
+        val repoSecret = if (args.size == 3) args[2] else ""
+
         if (!repoName.contains("/")) {
             return "请填写正确的仓库名称! 格式: 用户名/仓库名".toChain()
         }

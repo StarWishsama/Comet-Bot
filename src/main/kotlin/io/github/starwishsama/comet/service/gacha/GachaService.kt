@@ -13,7 +13,7 @@ package io.github.starwishsama.comet.service.gacha
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.gson.JsonParseException
 import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.file.DataSetup
+import io.github.starwishsama.comet.file.DataFiles
 import io.github.starwishsama.comet.objects.gacha.custom.CustomPool
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
@@ -162,7 +162,7 @@ object GachaService {
 
     private fun loadPCRData(data: File) {
         if (data.exists()) {
-            BotVariables.pcr.addAll(DataSetup.pcrData.file.parseAsClass())
+            BotVariables.pcr.addAll(DataFiles.pcrData.file.parseAsClass())
             BotVariables.daemonLogger.info("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个角色")
         } else {
             BotVariables.daemonLogger.info("未检测到公主连结游戏数据, 对应游戏抽卡模拟器将无法使用")

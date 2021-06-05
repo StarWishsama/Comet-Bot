@@ -76,7 +76,7 @@ data class GithubRepos(
         val targetRepo = this.repos.find { it.repoAuthor == repoAuthor && it.repoName == repoName }
         if (targetRepo == null) {
             this.repos.add(
-                GithubRepos.GithubRepo(
+                GithubRepo(
                     repoAuthor,
                     repoName,
                     repoSecret,

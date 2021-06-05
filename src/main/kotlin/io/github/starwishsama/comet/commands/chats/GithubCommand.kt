@@ -34,7 +34,7 @@ class GithubCommand : ChatCommand {
         }
 
         return when (args[0]) {
-            "add", "sub" -> subscribeRepo(args[1], event.group.id)
+            "add", "sub" -> subscribeRepo(args, event.group.id)
             "rm", "unsub" -> unsubscribeRepo(args[1], event.group.id)
             "list", "ls" -> getRepoList(event.group.id)
             else -> getHelp().convertToChain()
