@@ -113,7 +113,7 @@ class GithubWebHookHandler : HttpHandler {
      */
     private fun checkOrigin(he: HttpExchange): Boolean {
         if (he.requestHeaders[eventTypeHeader] == null || he.requestHeaders["User-Agent"]?.get(0)
-                ?.startsWith("GitHub-Hookshot") == true
+                ?.startsWith("GitHub-Hookshot") == false
         ) {
             BotVariables.netLogger.log(HinaLogLevel.Debug, "无效请求", prefix = "WebHook")
             val resp = "Unsupported Request".toByteArray()
