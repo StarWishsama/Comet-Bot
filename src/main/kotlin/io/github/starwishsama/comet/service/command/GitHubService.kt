@@ -45,12 +45,12 @@ object GitHubService {
         }
 
         val repoName = args[1]
-        val repoSecret = if (isGroup && args.size == 4) {
+        val repoSecret = if (!isGroup && args.size == 4) {
             args[3]
         } else if (args.size == 3) {
             args[2]
         } else {
-            return "正确的命令: /github add [仓库名称] (仓库 Secret [可选])".toChain()
+            ""
         }
 
         val id = if (isGroup) {
