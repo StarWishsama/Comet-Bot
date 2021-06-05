@@ -21,7 +21,6 @@ import io.github.starwishsama.comet.objects.config.SecretStatus
 import io.github.starwishsama.comet.service.command.GitHubService
 import io.github.starwishsama.comet.service.pusher.instances.GithubPusher
 import io.github.starwishsama.comet.utils.json.isUsable
-import io.github.starwishsama.comet.utils.network.writeString
 import java.io.IOException
 
 // For bypass detekt
@@ -37,14 +36,17 @@ class GithubWebHookHandler : HttpHandler {
     private val eventTypeHeader = "X-GitHub-Event"
 
     override fun handle(he: HttpExchange) {
+        he.responseHeaders.add("content-type", "text/plain; charset=UTF-8")
+
         // Get information from header to identity whether the request is from GitHub.
         if (!checkOrigin(he)) {
             return
         }
 
         val signature = he.requestHeaders[signature256]
+        val eventType = he.requestHeaders[eventTypeHeader]?.get(0) ?: ""
 
-        if (GitHubService.repos.checkSecret(signature, "", "") == SecretStatus.NO_SECRET && signature == null) {
+        if (signature == null && GitHubService.repos.checkSecret(signature, "", eventType) == SecretStatus.NO_SECRET) {
             BotVariables.netLogger.log(HinaLogLevel.Debug, "收到新事件, 未通过安全验证. 请求的签名为: 无", prefix = "WebHook")
             val resp = "A Serve error has happened".toByteArray()
             he.sendResponseHeaders(HttpStatus.HTTP_INTERNAL_ERROR, resp.size.toLong())
@@ -56,7 +58,6 @@ class GithubWebHookHandler : HttpHandler {
         }
 
         val request = String(he.requestBody.readBytes())
-        val eventType = he.requestHeaders[eventTypeHeader]?.get(0) ?: ""
 
         val hasSecret = GitHubService.repos.checkSecret(signature, request, eventType)
 
@@ -102,10 +103,14 @@ class GithubWebHookHandler : HttpHandler {
             "Comet 已收到事件, 推荐使用密钥加密以保证服务器安全"
         } else {
             "Comet 已收到事件"
+        }.toByteArray()
+
+        he.responseBody.use {
+            it.write(response)
+            it.flush()
         }
 
-        he.responseHeaders.add("content-type", "text/plain; charset=UTF-8")
-        he.writeString(response, statusCode = HttpStatus.HTTP_OK)
+        he.sendResponseHeaders(HttpStatus.HTTP_OK, response.size.toLong())
     }
 
     /**

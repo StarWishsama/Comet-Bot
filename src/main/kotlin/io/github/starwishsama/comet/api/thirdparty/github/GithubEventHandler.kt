@@ -32,7 +32,7 @@ object GithubEventHandler {
                 mapper.readValue<PushEvent>(raw)
             }
             else -> {
-                BotVariables.netLogger.log(HinaLogLevel.Debug, "推送 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")
+                BotVariables.netLogger.log(HinaLogLevel.Debug, "解析 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")
                 null
             }
         }

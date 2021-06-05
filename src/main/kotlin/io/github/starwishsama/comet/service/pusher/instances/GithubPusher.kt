@@ -24,10 +24,10 @@ object GithubPusher {
             return
         }
 
-        val authorAndRepo = event.repoName()
+        val authorAndRepo = event.repoName().split("/")
 
         val consumer = GitHubService.repos.repos.filter {
-            it.repoAuthor == authorAndRepo[0].toString() && (it.repoName == "*" || it.repoName == authorAndRepo[1].toString())
+            it.repoAuthor == authorAndRepo[0] && (it.repoName == "*" || it.repoName == authorAndRepo[1])
         }
 
         runBlocking {

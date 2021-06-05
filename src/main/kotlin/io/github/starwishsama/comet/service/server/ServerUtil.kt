@@ -19,7 +19,7 @@ object ServerUtil {
 
     fun checkSignature(secret: String, remote: String, requestBody: String): Boolean {
         val local = "sha256=" + requestBody.toHMAC(secret)
-        daemonLogger.debug("本地解析签名为: $local")
+        daemonLogger.debug("本地解析签名为: $local, 远程签名为: $remote")
         return local == remote
     }
 

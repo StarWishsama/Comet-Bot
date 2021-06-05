@@ -65,8 +65,10 @@ object GitHubService {
 
         val authorAndRepo = repoName.split("/")
 
-        return if (repos.contains(authorAndRepo[0], authorAndRepo[1])) {
-            "你已经订阅过 $repoName 了".toChain()
+        val repo = repos.contains(authorAndRepo[0], authorAndRepo[1])
+
+        return if (repo != null) {
+            "你已经订阅过 ${repo.getFullName()} 了".toChain()
         } else {
             if (GithubApi.isRepoExists(
                     authorAndRepo[0],
@@ -86,13 +88,19 @@ object GitHubService {
     }
 
     fun unsubscribeRepo(args: List<String>, event: MessageEvent): MessageChain {
+        val isGroup = event is GroupMessageEvent
+
+        if (!isGroup && args.size < 3) {
+            return "正确的命令: /github rm [仓库名称] [群号]".toChain()
+        } else if (args.size < 2) {
+            return "正确的命令: /github rm [仓库名称]".toChain()
+        }
+
         val repoName = args[1]
 
         if (!repoName.contains("/")) {
             return "请填写正确的仓库名称! 格式: 用户名/仓库名".toChain()
         }
-
-        val isGroup = event is GroupMessageEvent
 
         val id = if (isGroup) {
             (event as GroupMessageEvent).group.id
@@ -115,6 +123,10 @@ object GitHubService {
         val id = if (isGroup) {
             (event as GroupMessageEvent).group.id
         } else {
+            if (args.size == 1) {
+                return "请填写正确的群号!".toChain()
+            }
+
             args[2].toLongOrNull() ?: return "请填写正确的群号!".toChain()
         }
 
