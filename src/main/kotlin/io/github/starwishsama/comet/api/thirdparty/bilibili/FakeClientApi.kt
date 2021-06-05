@@ -18,6 +18,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.IOException
 
 /**
  * 调用 [BilibiliClient] 的辅助 API 类
@@ -37,8 +38,8 @@ object FakeClientApi {
         withContext(Dispatchers.IO) {
             try {
                 client.login(userName, password, challenge, secCode, validate)
-                BotVariables.daemonLogger.info("哔哩哔哩账号登录状态: ${client.isLogin}")
-            } catch (e: Exception) {
+                BotVariables.daemonLogger.info("哔哩哔哩账号登录详情: ${client.loginResponse}")
+            } catch (e: IOException) {
                 if (e is BilibiliApiException) {
                     BotVariables.daemonLogger.log(HinaLogLevel.Debug, "", e, bypass = true)
                     when (e.commonResponse.code) {
@@ -53,7 +54,7 @@ object FakeClientApi {
                             )
                         }
                         else -> {
-                            BotVariables.daemonLogger.warning("登录失败!", e)
+                            BotVariables.daemonLogger.warning("登录失败! 响应码为 ${e.commonResponse.code}", e)
                         }
                     }
                 } else {
@@ -75,7 +76,7 @@ object FakeClientApi {
             if (!searchResult.items.isNullOrEmpty()) {
                 return searchResult.items[0]
             }
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             if (e is BilibiliApiException) {
                 BotVariables.logger.warning(
                     "在调用B站API时出现了问题, 响应码 ${e.commonResponse.code}\n" +

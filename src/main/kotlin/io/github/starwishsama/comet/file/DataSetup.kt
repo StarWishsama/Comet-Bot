@@ -14,6 +14,12 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.file.DataFiles.allDataFile
+import io.github.starwishsama.comet.file.DataFiles.arkNightData
+import io.github.starwishsama.comet.file.DataFiles.cfgFile
+import io.github.starwishsama.comet.file.DataFiles.pcrData
+import io.github.starwishsama.comet.file.DataFiles.perGroupFolder
+import io.github.starwishsama.comet.file.DataFiles.userCfg
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.LoggerInstances
 import io.github.starwishsama.comet.managers.ApiManager
@@ -21,6 +27,7 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.config.DataFile
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
+import io.github.starwishsama.comet.service.command.GitHubService
 import io.github.starwishsama.comet.service.compatibility.CompatibilityService
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.utils.*
@@ -30,30 +37,15 @@ import java.io.File
 import java.io.IOException
 
 object DataSetup {
-    private val userCfg: DataFile = DataFile(File(BotVariables.filePath, "users.json"), DataFile.FilePriority.HIGH) {
-        it.writeClassToJson(BotVariables.users)
-    }
-    private val cfgFile: DataFile = DataFile(File(BotVariables.filePath, "config.yml"), DataFile.FilePriority.HIGH) {
-        it.writeString(Default.encodeToString(CometConfig()), isAppend = false)
-    }
-    val pcrData: DataFile = DataFile(File(FileUtil.getResourceFolder(), "pcr.json"), DataFile.FilePriority.NORMAL)
-    private val arkNightData: DataFile =
-        DataFile(File(FileUtil.getResourceFolder(), "arkNights.json"), DataFile.FilePriority.NORMAL)
-    private val perGroupFolder: DataFile = DataFile(FileUtil.getChildFolder("groups"), DataFile.FilePriority.NORMAL) {
-        it.mkdirs()
-    }
-    private val dataFiles = listOf(
-        userCfg, cfgFile, pcrData, arkNightData, perGroupFolder
-    )
     private var brokenConfig = false
 
     fun init() {
-        dataFiles.forEach {
+        allDataFile.forEach {
             try {
                 if (it.file.exists()) return@forEach
 
                 if (it.priority >= DataFile.FilePriority.NORMAL) {
-                    it.initAction(it.file)
+                    it.init()
                 }
             } catch (e: IOException) {
                 daemonLogger.warning("在初始化文件 ${it.file.name} 时出现了意外", e)
@@ -109,6 +101,7 @@ object DataSetup {
         daemonLogger.info("[数据] 自动保存数据完成")
         saveCfg()
         GroupConfigManager.saveAll()
+        GitHubService.saveData()
     }
 
     fun reload() {

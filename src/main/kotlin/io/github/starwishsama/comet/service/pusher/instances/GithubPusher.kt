@@ -14,10 +14,9 @@ import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.github.data.events.GithubEvent
 import io.github.starwishsama.comet.logger.HinaLogLevel
-import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.service.command.GitHubService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import java.util.stream.Collectors
 
 object GithubPusher {
     fun push(event: GithubEvent) {
@@ -25,18 +24,22 @@ object GithubPusher {
             return
         }
 
-        val consumer = GroupConfigManager.getAllConfigs().parallelStream().filter { cfg ->
-            cfg.githubRepoSubscribers.any { it.split("/")[1] == "*" || it == event.repoName() }
-        }.collect(Collectors.toList())
+        val authorAndRepo = event.repoName()
+
+        val consumer = GitHubService.repos.repos.filter {
+            it.repoAuthor == authorAndRepo[0].toString() && (it.repoName == "*" || it.repoName == authorAndRepo[1].toString())
+        }
 
         runBlocking {
             consumer.forEach {
-                BotVariables.comet.getBot().getGroup(it.id)?.also { g ->
-                    g.sendMessage(
-                        event.toMessageWrapper().toMessageChain(g)
-                    )
+                it.repoTarget.forEach { id ->
+                    BotVariables.comet.getBot().getGroup(id)?.also { g ->
+                        g.sendMessage(
+                            event.toMessageWrapper().toMessageChain(g)
+                        )
+                    }
+                    delay(RandomUtil.randomLong(10, 400))
                 }
-                delay(RandomUtil.randomLong(10, 400))
             }
         }
 

@@ -10,13 +10,13 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.api.thirdparty.github.GithubApi
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.service.command.GitHubService.getRepoList
+import io.github.starwishsama.comet.service.command.GitHubService.subscribeRepo
+import io.github.starwishsama.comet.service.command.GitHubService.unsubscribeRepo
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -34,73 +34,17 @@ class GithubCommand : ChatCommand {
         }
 
         return when (args[0]) {
-            "add", "sub" -> handleAddRepo(args[1], event.group.id)
-            "rm", "unsub" -> handleRemoveRepo(args[1], event.group.id)
-            "list", "ls" -> handleListRepo(event.group.id)
+            "add", "sub" -> subscribeRepo(args[1], event.group.id)
+            "rm", "unsub" -> unsubscribeRepo(args[1], event.group.id)
+            "list", "ls" -> getRepoList(event.group.id)
             else -> getHelp().convertToChain()
-        }
-    }
-
-    private fun handleAddRepo(repoName: String, groupId: Long): MessageChain {
-        if (!repoName.contains("/")) {
-            return "请填写正确的仓库名称! 格式: 用户名/仓库名".toChain()
-        }
-
-        val cfg = GroupConfigManager.getConfig(groupId) ?: return "该群聊尚未注册过 Comet!".toChain()
-        val repos = cfg.githubRepoSubscribers
-
-        val authorAndRepo = repoName.split("/")
-
-        return if (repos.contains(repoName)) {
-            "你已经订阅过 $repoName 了".toChain()
-        } else {
-            if (GithubApi.isRepoExists(
-                    authorAndRepo[0],
-                    authorAndRepo[1]
-                ) || (GithubApi.isUserExists(authorAndRepo[0]) && authorAndRepo[1] == "*")
-            ) {
-                repos.add(repoName)
-                "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${BotVariables.cfg.webHookAddress} \n(设置为仅推送事件)".toChain()
-            } else {
-                "仓库 $repoName 找不到或者没有权限访问!".toChain()
-            }
-        }
-    }
-
-    private fun handleRemoveRepo(repoName: String, groupId: Long): MessageChain {
-        if (!repoName.contains("/")) {
-            return "请填写正确的仓库名称! 格式: 用户名/仓库名".toChain()
-        }
-
-        val cfg = GroupConfigManager.getConfig(groupId) ?: return "该群聊尚未注册过 Comet!".toChain()
-        val repos = cfg.githubRepoSubscribers
-
-        return if (repos.remove(repoName)) {
-            "取消订阅 $repoName 成功!\n退订后, 请在对应项目下删除 WebHook 地址".toChain()
-        } else {
-            "你还没订阅过 $repoName".toChain()
-        }
-    }
-
-    private fun handleListRepo(groupId: Long): MessageChain {
-        val cfg = GroupConfigManager.getConfig(groupId) ?: return "该群聊尚未注册过 Comet!".toChain()
-        val repos = cfg.githubRepoSubscribers
-        return if (repos.isEmpty()) {
-            "还没订阅过任何项目".toChain()
-        } else {
-            buildString {
-                append("已订阅的项目列表:")
-                repos.forEach {
-                    append("$it, ")
-                }
-            }.removeSuffix(", ").trim().toChain()
         }
     }
 
     override fun getProps(): CommandProps =
         CommandProps(
             "github",
-            listOf("gh"),
+            listOf("gh", "git"),
             "订阅 Github 项目推送动态",
             "nbot.commands.github",
             UserLevel.ADMIN

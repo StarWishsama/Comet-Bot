@@ -15,11 +15,15 @@ import java.io.File
 class DataFile(
     val file: File,
     val priority: FilePriority,
-    val initAction: (File) -> Unit = {}
+    val initAction: (File) -> Unit = {},
 ) {
     fun exists(): Boolean = file.exists()
 
     fun createNewFile(): Boolean = file.createNewFile()
+
+    fun init() {
+        initAction(file)
+    }
 
     enum class FilePriority {
         /**
