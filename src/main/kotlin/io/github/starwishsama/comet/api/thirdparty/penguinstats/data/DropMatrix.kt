@@ -16,8 +16,7 @@ data class DropMatrix(
     /**
      * 关卡内部 ID
      */
-    @JsonProperty("stageId")
-    val stageID: String,
+    val stageId: String,
     /**
      * 物品内部 ID
      */

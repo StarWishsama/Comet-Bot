@@ -10,24 +10,100 @@
 
 package io.github.starwishsama.comet.api.thirdparty.penguinstats
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.api.thirdparty.penguinstats.data.ArkNightItemInfo
+import io.github.starwishsama.comet.api.thirdparty.penguinstats.data.ArkNightStageInfo
 import io.github.starwishsama.comet.api.thirdparty.penguinstats.data.MatrixResponse
+import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.writeClassToJson
+import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import java.io.File
+import java.io.IOException
 
 object PenguinStats {
     val api: PenguinStatsAPI
+    val itemInfo: MutableSet<ArkNightItemInfo> = mutableSetOf()
+    val stageInfo: MutableSet<ArkNightStageInfo> = mutableSetOf()
+    private val itemInfoFile = File(FileUtil.getResourceFolder(), "arknight_item.json")
+    private val stageInfoFile = File(FileUtil.getResourceFolder(), "arknight_stage.json")
 
     init {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://penguin-stats.io/PenguinStats/api/v2/")
-            .addConverterFactory(JacksonConverterFactory.create(BotVariables.mapper))
+            .addConverterFactory(JacksonConverterFactory.create(mapper))
             .client(BotVariables.client)
             .build()
 
         api = retrofit.create(PenguinStatsAPI::class.java)
+
+        checkCache()
+    }
+
+    fun getItemDropInfo(item: String): String {
+        itemInfo.find { it.exists(item) } ?: return "你要搜索的物品不存在: $item"
+
+        return try {
+            val matrix = api.getMatrix(itemFilter = listOf(item))
+
+            matrix.toString()
+        } catch (e: IOException) {
+            daemonLogger.warning("连接至企鹅物流时发生了异常", e)
+            "连接至企鹅物流时发生了异常"
+        }
+    }
+
+    private fun checkCache() {
+        try {
+            if (itemInfoFile.exists()) {
+                itemInfo.addAll(mapper.readValue(itemInfoFile))
+            } else {
+                itemInfo.addAll(api.getItemInfo())
+                itemInfoFile.createNewFile()
+                itemInfoFile.writeClassToJson(itemInfo)
+            }
+        } catch (e: IOException) {
+            daemonLogger.warning("在尝试获取明日方舟物品信息时出现异常", e)
+        }
+
+        try {
+            if (stageInfoFile.exists()) {
+                stageInfo.addAll(mapper.readValue(stageInfoFile))
+            } else {
+                stageInfo.addAll(api.getStageInfo())
+                stageInfoFile.createNewFile()
+                stageInfoFile.writeClassToJson(stageInfo)
+            }
+        } catch (e: IOException) {
+            daemonLogger.warning("在尝试获取明日方舟关卡信息时出现异常", e)
+        }
+    }
+
+    fun forceUpdate() {
+        itemInfo.apply {
+            try {
+                clear()
+                addAll(api.getItemInfo())
+                itemInfoFile.writeClassToJson(itemInfo)
+            } catch (e: IOException) {
+                daemonLogger.warning("在尝试获取明日方舟物品信息时出现异常", e)
+            }
+        }
+        stageInfo.apply {
+            try {
+                clear()
+                addAll(api.getStageInfo())
+                stageInfoFile.writeClassToJson(stageInfo)
+            } catch (e: IOException) {
+                daemonLogger.warning("在尝试获取明日方舟关卡信息时出现异常", e)
+            }
+        }
     }
 }
 
@@ -48,5 +124,11 @@ interface PenguinStatsAPI {
         showClosedZone: Boolean = false,
         @Query("is_personal")
         isPersonal: Boolean = false
-    ): MatrixResponse
+    ): Call<MatrixResponse>
+
+    @GET("items")
+    fun getItemInfo(): MutableSet<ArkNightItemInfo>
+
+    @GET("stages")
+    fun getStageInfo(): MutableSet<ArkNightStageInfo>
 }

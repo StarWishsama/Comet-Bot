@@ -30,7 +30,7 @@ enum class IDGuidelineType(val rule: Regex) {
 
 object StringUtil {
     /**
-     * 判断ID是否符合育碧账号昵称格式规范
+     * 判断ID是否符合账号昵称格式规范
      *
      * @author StarWishsama
      * @param username 用户名

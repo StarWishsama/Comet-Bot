@@ -139,6 +139,7 @@ object CometRuntime {
                 PusherCommand(),
                 GithubCommand(),
                 DiceCommand(),
+                PenguinStatCommand(),
                 // Console Command
                 StopCommand(),
                 DebugCommand(),
