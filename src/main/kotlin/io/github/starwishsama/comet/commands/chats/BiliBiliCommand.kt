@@ -241,10 +241,6 @@ class BiliBiliCommand : ChatCommand {
                 target.toLong()
             }
             else -> {
-                if (!FakeClientApi.client.isLogin) {
-                    return "未登录无法使用昵称搜索订阅, 请在配置中配置B站账号密码".toChain()
-                }
-
                 val item = FakeClientApi.getUser(target)
                 val title = item?.title
                 if (title != null) name = title
