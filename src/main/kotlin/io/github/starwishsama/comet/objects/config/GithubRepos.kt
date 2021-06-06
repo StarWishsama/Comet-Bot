@@ -94,25 +94,19 @@ data class GithubRepos(
 
     fun remove(from: Long, repoAuthor: String, repoName: String): Boolean {
         if (repoName == "*") {
-            val targetRepos = this.repos.filter { it.repoAuthor == repoAuthor }
+            val targetRepos = this.repos.filter { it.repoAuthor == repoAuthor && it.repoTarget.contains(from) }
 
-            if (targetRepos.isNotEmpty()) {
-                targetRepos.forEach {
-                    it.repoTarget.remove(from)
-                }
+            targetRepos.forEach {
+                repos.remove(it)
             }
 
-            return targetRepos.none { it.repoTarget.contains(from) }
+            return true
         } else {
-            val targetRepo = this.repos.find { it.repoAuthor == repoAuthor && it.repoName == repoName } ?: return false
+            val targetRepo =
+                this.repos.find { it.repoAuthor == repoAuthor && it.repoName == repoName && it.repoTarget.contains(from) }
+                    ?: return false
 
-            val success = targetRepo.repoTarget.remove(from)
-
-            return if (targetRepo.repoTarget.isEmpty()) {
-                this.repos.remove(targetRepo)
-            } else {
-                success
-            }
+            return repos.remove(targetRepo)
         }
     }
 }
