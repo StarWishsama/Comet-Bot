@@ -111,3 +111,7 @@
 特别感谢 [Kengxxiao](https://github.com/Kengxxiao/) 的项目 [ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData)
 提供明日方舟游戏数据资源
 
+特别感谢 [企鹅物流](https://penguin-stats.io/) 提供的明日方舟物品掉落数据
+
+![](https://penguin.upyun.galvincdn.com/logos/penguin_stats_logo.png)
+
