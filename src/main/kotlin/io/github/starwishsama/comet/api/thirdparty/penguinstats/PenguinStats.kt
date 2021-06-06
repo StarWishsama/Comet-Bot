@@ -47,10 +47,10 @@ object PenguinStats {
     }
 
     fun getItemDropInfo(item: String): String {
-        itemInfo.find { it.exists(item) } ?: return "你要搜索的物品不存在: $item"
+        val itemInstance = itemInfo.find { it.exists(item) } ?: return "你要搜索的物品不存在: $item"
 
         return try {
-            val matrix = api.getMatrix(itemFilter = listOf(item))
+            val matrix = api.getMatrix(itemFilter = listOf(itemInstance.itemId))
 
             matrix.execute().body()?.toString() ?: "连接至企鹅物流时发生了异常"
         } catch (e: IOException) {

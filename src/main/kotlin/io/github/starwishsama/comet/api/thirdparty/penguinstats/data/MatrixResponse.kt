@@ -18,11 +18,11 @@ data class MatrixResponse(
     val matrix: List<DropMatrix>
 ) {
     override fun toString(): String {
-        return buildString {
-            if (matrix.isEmpty()) {
-                return ""
-            }
+        if (matrix.isEmpty()) {
+            return "找不到对应的物品!"
+        }
 
+        return buildString {
             append("${PenguinStats.itemInfo.find { item -> item.itemId == matrix[0].itemID }?.displayName ?: matrix[0].itemID}可在以下关卡获取:\n")
 
             matrix.forEach {
