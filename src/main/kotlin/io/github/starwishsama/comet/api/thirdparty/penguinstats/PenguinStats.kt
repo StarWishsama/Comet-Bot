@@ -52,7 +52,7 @@ object PenguinStats {
         return try {
             val matrix = api.getMatrix(itemFilter = listOf(item))
 
-            matrix.toString()
+            matrix.execute().body()?.toString() ?: "连接至企鹅物流时发生了异常"
         } catch (e: IOException) {
             daemonLogger.warning("连接至企鹅物流时发生了异常", e)
             "连接至企鹅物流时发生了异常"
