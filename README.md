@@ -10,8 +10,6 @@
 
 **一切开发旨在学习，请勿用于非法用途**
 
-English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/README_en.md)
-
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/b26348aabf51452195dbc14846accd86)](https://www.codacy.com/manual/StarWishsama/Comet-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Comet-Bot&amp;utm_campaign=Badge_Grade)
 [![Kotlin Gradle](https://github.com/StarWishsama/Comet-Bot/workflows/Kotlin%20Gradle/badge.svg)](https://github.com/StarWishsama/Comet-Bot/actions/)
 [![LICENSE](https://img.shields.io/github/license/StarWishsama/Comet-Bot.svg?style=popout)](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE)
@@ -33,7 +31,6 @@ English Version: [README](https://github.com/StarWishsama/Comet-Bot/blob/mirai/R
 * 单推小助手
     - 支持订阅 bilibili 用户动态/开播提醒
     - 支持订阅推特用户最新消息
-    - 支持订阅 Youtube 用户开播提醒 (实验性)
 * rCon 功能, 支持连接到有 rCon 功能的游戏
 * 查询推特用户信息/推文
 * 自动推送最新推文到指定群聊

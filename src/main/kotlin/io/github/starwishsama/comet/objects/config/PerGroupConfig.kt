@@ -16,7 +16,6 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
-import io.github.starwishsama.comet.objects.push.YoutubeUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 data class PerGroupConfig(
@@ -60,19 +59,6 @@ data class PerGroupConfig(
      */
     @JsonProperty("bili_sub")
     val biliSubscribers: MutableSet<BiliBiliUser> = hashSetOf(),
-
-    /**
-     * Youtube 开播推送服务
-     */
-    @JsonProperty("youtube_push_function")
-    var youtubePushEnabled: Boolean = false,
-
-    /**
-     * Youtube 订阅列表
-     */
-    @JsonProperty("youtube_sub")
-    val youtubeSubscribers: MutableSet<YoutubeUser> = hashSetOf(),
-
     /**
      * 是否关闭对此群消息的复读
      */

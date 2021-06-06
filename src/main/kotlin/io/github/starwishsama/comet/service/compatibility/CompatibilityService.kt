@@ -71,14 +71,12 @@ object CompatibilityService {
 
         new.apply {
             this.keyWordReply.addAll(cfg.keyWordReply)
-            this.youtubePushEnabled = cfg.youtubePushEnabled
             this.twitterSubscribers.addAll(cfg.twitterSubscribers)
             this.biliSubscribers.addAll(biliUsers)
             this.autoAccept = cfg.autoAccept
             this.helpers = cfg.helpers
             this.twitterPushEnabled = cfg.twitterPushEnabled
             this.biliPushEnabled = cfg.biliPushEnabled
-            this.youtubeSubscribers.addAll(cfg.youtubeSubscribers)
             this.canRepeat = cfg.doRepeat
             this.groupFilterWords.addAll(cfg.groupFilterWords)
             this.disabledCommands.addAll(cfg.disabledCommands)

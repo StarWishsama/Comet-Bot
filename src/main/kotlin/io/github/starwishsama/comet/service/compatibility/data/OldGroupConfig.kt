@@ -12,7 +12,6 @@ package io.github.starwishsama.comet.service.compatibility.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
-import io.github.starwishsama.comet.objects.push.YoutubeUser
 
 data class OldGroupConfig(@JsonProperty("group_id") val id: Long) {
     /**
@@ -47,18 +46,6 @@ data class OldGroupConfig(@JsonProperty("group_id") val id: Long) {
      */
     @JsonProperty("bili_sub")
     val biliSubscribers: MutableSet<Long> = hashSetOf()
-
-    /**
-     * Youtube 开播推送服务
-     */
-    @JsonProperty("youtube_push_function")
-    var youtubePushEnabled: Boolean = false
-
-    /**
-     * Youtube 订阅列表
-     */
-    @JsonProperty("youtube_sub")
-    val youtubeSubscribers: MutableSet<YoutubeUser> = hashSetOf()
 
     /**
      * 是否关闭对此群消息的复读

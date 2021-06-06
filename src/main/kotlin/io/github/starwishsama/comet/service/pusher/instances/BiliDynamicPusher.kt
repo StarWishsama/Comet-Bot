@@ -58,6 +58,7 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
                         null
                     } ?: return@user
                     val time = System.currentTimeMillis()
+
                     val current = BiliBiliDynamicContext(
                         mutableListOf(cfg.id),
                         time,
@@ -110,7 +111,6 @@ class BiliDynamicPusher(bot: Bot) : CometPusher(bot, "bili_dynamic") {
                     }
                 }
 
-                context.clearPushTarget()
                 context.status = PushStatus.FINISHED
             }
         }

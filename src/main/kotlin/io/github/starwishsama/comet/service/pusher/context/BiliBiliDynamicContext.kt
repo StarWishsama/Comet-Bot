@@ -27,6 +27,7 @@ class BiliBiliDynamicContext(
 ) : PushContext(pushTarget, retrieveTime, status), Pushable {
     override fun toMessageWrapper(): MessageWrapper {
         val before = DynamicApi.getDynamicById(dynamicId).convertToWrapper()
+
         return MessageWrapper().addText(
             "${pushUser.userName}\n"
         ).setUsable(before.isUsable()).addElements(before.getMessageContent())

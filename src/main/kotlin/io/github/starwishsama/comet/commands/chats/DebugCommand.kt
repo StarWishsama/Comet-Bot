@@ -12,12 +12,10 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BuildConfig
-
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
-import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.BotUser
@@ -31,8 +29,6 @@ import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.RssUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -122,9 +118,6 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                 PusherManager.getPusherByName("data")?.execute()
                                 toChain("Twitter retriever has been triggered and run~")
                             }
-                            "ytb", "y2b", "youtube", "油管" -> {
-                                toChain("Youtube retriever is in WIP status.")
-                            }
                             "bilibili", "bili", "哔哩哔哩", "b站" -> {
                                 PusherManager.getPusherByName("bili_dynamic")?.execute()
                                     ?: return "Can't found pusher".toChain()
@@ -143,14 +136,6 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                             }
                             else -> toChain("Unknown retriever type.")
                         }
-                    }
-                }
-                "data" -> {
-                    if (args.size > 1) {
-                        return YoutubeApi.getLiveStatusByResult(
-                            withContext(Dispatchers.IO) {
-                                YoutubeApi.service.getSearchResult(channelId = args[1]).execute().body()
-                            }).toMessageChain(event.subject)
                     }
                 }
                 "rss" -> {

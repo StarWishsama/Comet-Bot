@@ -134,7 +134,6 @@ object CometRuntime {
                 GroupConfigCommand(),
                 RSPCommand(),
                 RollCommand(),
-                YoutubeCommand(),
                 MinecraftCommand(),
                 PusherCommand(),
                 GithubCommand(),
