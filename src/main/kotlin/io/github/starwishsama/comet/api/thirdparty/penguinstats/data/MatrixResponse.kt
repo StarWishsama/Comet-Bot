@@ -27,8 +27,8 @@ data class MatrixResponse(
 
             matrix.forEach {
                 append(
-                    PenguinStats.stageInfo.find { info -> info.stageId == it.stageId }?.localizedCode?.zh
-                        ?: it.stageId + ", "
+                    (PenguinStats.stageInfo.find { info -> info.stageId == it.stageId }?.localizedCode?.zh
+                        ?: it.stageId) + ", "
                 )
             }
         }.removeSuffix(", ")
