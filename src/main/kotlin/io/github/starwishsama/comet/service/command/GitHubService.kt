@@ -28,6 +28,7 @@ import net.mamoe.yamlkt.Yaml
 
 object GitHubService {
     val repos: GithubRepos
+    private val editorCache = mutableMapOf<Session, GithubRepos.GithubRepo>()
 
     init {
         DataFiles.githubRepoData.init()
@@ -171,20 +172,80 @@ object GitHubService {
             return if (repo.isEmpty()) {
                 "找不到你想修改的 Github 仓库哟".toChain()
             } else {
-                SessionHandler.insertSession(Session(SessionTarget(privateId = event.sender.id), command))
+                val createdSession = Session(SessionTarget(privateId = event.sender.id), command)
+                SessionHandler.insertSession(createdSession)
+
+                editorCache[createdSession] = repo[0]
 
                 """
                 已进入仓库编辑模式
-                输入 '' 
+                输入 加群 [群号] / add [群号] 以添加订阅
+                输入 删群 [群号] / rm [群号] 以取消订阅
+                输入 退订 / unsub 以删除此仓库
+                输入 退出 / exit 退出编辑模式
                 """.trimIndent().toChain()
             }
         } else {
-            return handleModifyMode(args, event, session)
+            return handleModifyMode(args, session)
         }
     }
 
-    private fun handleModifyMode(args: List<String>, event: MessageEvent, session: Session): MessageChain {
-        TODO()
+    private fun handleModifyMode(args: List<String>, session: Session): MessageChain {
+        val currentRepo = editorCache[session]
+
+        if (currentRepo == null) {
+            SessionHandler.removeSession(session)
+            return "已退出编辑模式".toChain()
+        }
+
+        when (args[0]) {
+            "加群", "add" -> {
+                return if (args.size == 1) {
+                    "输入 加群 [群号] / add [群号] 以添加订阅".toChain()
+                } else {
+                    val id = args[1].toLongOrNull() ?: return "请输入正确的群号!".toChain()
+
+                    if (BotVariables.comet.getBot().getGroup(id) != null) {
+                        currentRepo.repoTarget.add(id)
+
+                        "添加订阅群聊 ($id) 成功!".toChain()
+                    } else {
+                        "你要添加的群聊 ($id) 不存在!".toChain()
+                    }
+                }
+            }
+            "删群", "rm" -> {
+                return if (args.size == 1) {
+                    "输入 删群 [群号] / rm [群号] 以添加订阅".toChain()
+                } else {
+                    val id = args[1].toLongOrNull() ?: return "请输入正确的群号!".toChain()
+
+                    if (BotVariables.comet.getBot().getGroup(id) != null) {
+                        currentRepo.repoTarget.remove(id)
+
+                        "取消订阅群聊 ($id) 成功!".toChain()
+                    } else {
+                        "你要删除的群聊 ($id) 不存在!".toChain()
+                    }
+                }
+            }
+            "退订", "unsub" -> {
+                return "退订状态: ${repos.repos.remove(currentRepo)}".toChain()
+            }
+            "退出", "exit" -> {
+                SessionHandler.removeSession(session)
+                editorCache.remove(session)
+                return "已退出编辑模式".toChain()
+            }
+            else -> {
+                return """
+                输入 加群 [群号] / add [群号] 以添加订阅
+                输入 删群 [群号] / rm [群号] 以取消订阅
+                输入 退订 / unsub 以删除此仓库
+                输入 退出 / exit 退出编辑模式
+                """.trimIndent().toChain()
+            }
+        }
     }
 
     fun saveData() {
