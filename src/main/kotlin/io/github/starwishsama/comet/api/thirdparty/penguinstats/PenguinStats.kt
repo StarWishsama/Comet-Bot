@@ -64,7 +64,7 @@ object PenguinStats {
             if (itemInfoFile.exists()) {
                 itemInfo.addAll(mapper.readValue(itemInfoFile))
             } else {
-                itemInfo.addAll(api.getItemInfo())
+                api.getItemInfo().execute().body()?.let { itemInfo.addAll(it) }
                 itemInfoFile.createNewFile()
                 itemInfoFile.writeClassToJson(itemInfo)
             }
@@ -76,7 +76,7 @@ object PenguinStats {
             if (stageInfoFile.exists()) {
                 stageInfo.addAll(mapper.readValue(stageInfoFile))
             } else {
-                stageInfo.addAll(api.getStageInfo())
+                api.getStageInfo().execute().body()?.let { stageInfo.addAll(it) }
                 stageInfoFile.createNewFile()
                 stageInfoFile.writeClassToJson(stageInfo)
             }
@@ -89,7 +89,7 @@ object PenguinStats {
         itemInfo.apply {
             try {
                 clear()
-                addAll(api.getItemInfo())
+                api.getItemInfo().execute().body()?.let { addAll(it) }
                 itemInfoFile.writeClassToJson(itemInfo)
             } catch (e: IOException) {
                 daemonLogger.warning("在尝试获取明日方舟物品信息时出现异常", e)
@@ -98,7 +98,7 @@ object PenguinStats {
         stageInfo.apply {
             try {
                 clear()
-                addAll(api.getStageInfo())
+                api.getStageInfo().execute().body()?.let { addAll(it) }
                 stageInfoFile.writeClassToJson(stageInfo)
             } catch (e: IOException) {
                 daemonLogger.warning("在尝试获取明日方舟关卡信息时出现异常", e)
@@ -127,8 +127,8 @@ interface PenguinStatsAPI {
     ): Call<MatrixResponse>
 
     @GET("items")
-    fun getItemInfo(): MutableSet<ArkNightItemInfo>
+    fun getItemInfo(): Call<MutableSet<ArkNightItemInfo>>
 
     @GET("stages")
-    fun getStageInfo(): MutableSet<ArkNightStageInfo>
+    fun getStageInfo(): Call<MutableSet<ArkNightStageInfo>>
 }

@@ -23,7 +23,7 @@ data class ArkNightStageInfo(
     val localizedCode: ArkNightItemInfo.LocalizedObject
 ) {
     data class DropInfo(
-        val itemId: Long,
+        val itemId: String?,
         val dropType: String,
         val bounds: DropBound
     ) {
@@ -35,5 +35,5 @@ data class ArkNightStageInfo(
 }
 
 enum class StageType {
-    MAIN, ACTIVITY
+    MAIN, ACTIVITY, SUB, DAILY
 }

@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class ArkNightItemInfo(
     val itemId: String,
+    @JsonProperty("name")
     val displayName: String,
     val sortId: Long,
     val rarity: Int,
