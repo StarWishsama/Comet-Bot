@@ -10,15 +10,13 @@
 
 package io.github.starwishsama.comet.service.pusher.context
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 class TwitterContext(
-    pushTarget: MutableList<Long> = mutableListOf(),
+    pushTarget: MutableSet<Long> = mutableSetOf(),
     retrieveTime: Long,
-    @JsonProperty("custom_status")
-    override var status: PushStatus = PushStatus.READY,
+    status: PushStatus = PushStatus.CREATED,
     val twitterUserName: String,
     var tweetId: Long
 ) : PushContext(pushTarget, retrieveTime, status), Pushable {
@@ -34,15 +32,6 @@ class TwitterContext(
     override fun contentEquals(other: PushContext): Boolean {
         if (other !is TwitterContext) return false
 
-        return tweetId == other.tweetId
+        return twitterUserName == other.twitterUserName && tweetId == other.tweetId
     }
-}
-
-fun Collection<TwitterContext>.getTwitterContext(userName: String): TwitterContext? {
-    for (tc in this) {
-        if (tc.twitterUserName == userName) {
-            return tc
-        }
-    }
-    return null
 }

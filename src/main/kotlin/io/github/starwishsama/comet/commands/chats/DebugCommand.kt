@@ -129,7 +129,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                     ps.forEach {
                                         append(it::class.java.simpleName + "\n")
                                         append("上次推送了 ${it.pushTime} 次\n")
-                                        append("上次推送于 ${BotVariables.yyMMddPattern.format(it.latestPushTime)}\n")
+                                        append("上次推送于 ${BotVariables.yyMMddPattern.format(it.latestTriggerTime)}\n")
                                     }
                                     trim()
                                 }.toChain()

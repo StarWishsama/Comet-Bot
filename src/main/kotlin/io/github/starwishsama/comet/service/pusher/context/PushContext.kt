@@ -10,29 +10,57 @@
 
 package io.github.starwishsama.comet.service.pusher.context
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import java.util.*
 
 /**
  * [PushContext]
  *
  * 推送内容
  */
-open class PushContext(
-    private val pushTarget: MutableList<Long>,
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NONE, include = JsonTypeInfo.As.PROPERTY)
+@JsonSubTypes(
+    JsonSubTypes.Type(value = BiliBiliDynamicContext::class, name = "bili_dynamic"),
+    JsonSubTypes.Type(value = BiliBiliLiveContext::class, name = "bili_live"),
+    JsonSubTypes.Type(value = TwitterContext::class, name = "tweet")
+)
+abstract class PushContext(
+    /**
+     * 需要被推送的对象
+     */
+    private val pushTarget: MutableSet<Long>,
+    /**
+     * 获取该内容的时间, 为 [currentTimeMillis]
+     */
     var retrieveTime: Long,
+    /**
+     * 该内容的状态, 详见 [PushStatus]
+     */
     open var status: PushStatus
 ) : Pushable {
+    /**
+     * 添加一个推送对象
+     */
     fun addPushTarget(id: Long) {
-        if (!pushTarget.contains(id)) {
-            pushTarget.add(id)
-        }
+        pushTarget.add(id)
     }
 
+    /**
+     * 清空所有推送对象
+     */
     fun clearPushTarget() {
         pushTarget.clear()
     }
 
-    fun getPushTarget(): MutableList<Long> = pushTarget
+    /**
+     * 获取推送对象的不可变副本 [UnmodifiableSet]
+     */
+    fun getPushTarget(): Set<Long> = Collections.unmodifiableSet(pushTarget)
 
     override fun toMessageWrapper(): MessageWrapper {
         throw UnsupportedOperationException("Base PushContext can't convert to MessageWrapper")
@@ -44,5 +72,5 @@ open class PushContext(
 }
 
 enum class PushStatus {
-    READY, FINISHED
+    CREATED, PROGRESSING, PUSHING, PUSHED
 }

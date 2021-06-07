@@ -17,10 +17,10 @@ import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 class BiliBiliDynamicContext(
-    pushTarget: MutableList<Long>,
+    pushTarget: MutableSet<Long>,
     retrieveTime: Long,
-    @JsonProperty("custom_status")
-    override var status: PushStatus = PushStatus.READY,
+    status: PushStatus = PushStatus.CREATED,
+    @JsonProperty("push_user")
     val pushUser: BiliBiliUser,
     @JsonProperty("dynamic_id")
     var dynamicId: Long,
@@ -38,13 +38,4 @@ class BiliBiliDynamicContext(
 
         return dynamicId == other.dynamicId
     }
-}
-
-fun Collection<PushContext>.getDynamicContext(uid: Long): BiliBiliDynamicContext? {
-    for (pushContext in this) {
-        if (pushContext is BiliBiliDynamicContext && pushContext.pushUser.id.toLongOrNull() == uid) {
-            return pushContext
-        }
-    }
-    return null
 }

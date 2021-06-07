@@ -18,6 +18,7 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import kotlinx.coroutines.runBlocking
+import okhttp3.internal.toLongOrDefault
 import java.time.LocalDateTime
 
 interface DynamicData {
@@ -60,6 +61,24 @@ data class Dynamic(
     @JsonProperty("data")
     val data: Data
 ) {
+    /**
+     * 获取该动态响应体的 ID
+     * 如果获取的为时间线动态, 则会尝试获取第一条的 ID
+     */
+    fun getDynamicID(): Long {
+        return when {
+            data.card != null -> {
+                data.card.description.dynamicIdAsString.toLongOrDefault(-1)
+            }
+            data.cards != null -> {
+                data.cards[0].description.dynamicIdAsString.toLongOrDefault(-1)
+            }
+            else -> {
+                -1
+            }
+        }
+    }
+
     data class Data(
         /** /space_history Only */
         @JsonProperty("has_more")
@@ -70,19 +89,6 @@ data class Dynamic(
         /** 获取动态列表时可用 /space_history Only */
         @JsonProperty("cards")
         val cards: List<Card>?,
-        //@JsonProperty("result")
-        //val result: Int,
-        //@JsonProperty("attentions")
-        //val attentions: Attentions,
-        /** /space_history Only */
-        //@JsonProperty("next_offset")
-        //val nextOffset: Long?,
-        //@JsonProperty("_gt_")
-        //val gtNumber: Int,
-        //@JsonProperty("extension")
-        //val extension: JsonNode,
-        //@JsonProperty("extend_json")
-        //val extendJson: String
     ) {
         @Suppress("unused")
         data class Attentions(

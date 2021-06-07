@@ -42,6 +42,8 @@ object DynamicApi : ApiExecutor {
     private val agent = mutableMapOf("User-Agent" to "Nameless live status checker by StarWishsama")
     private const val apiRateLimit = "BiliBili API调用已达上限"
 
+    private val cacheDynamic = mutableMapOf<Long, Dynamic>()
+
     @Throws(RateLimitException::class)
     fun getUserNameByMid(mid: Long): String {
         if (isReachLimit()) {
@@ -65,7 +67,9 @@ object DynamicApi : ApiExecutor {
         ).use { res ->
             if (res.isSuccessful) {
                 val body = res.body?.string() ?: throw ApiException("无法获取动态页面")
-                return mapper.readValue(body)
+                val result: Dynamic = mapper.readValue(body)
+                cacheDynamic[result.getDynamicID()] = result
+                return result
             } else {
                 throw ApiException("无法获取动态页面, 状态码 ${res.code}")
             }
@@ -88,7 +92,9 @@ object DynamicApi : ApiExecutor {
         try {
             if (response.isSuccessful) {
                 body = response.body?.string() ?: return null
-                return mapper.readValue(body)
+                val result: Dynamic = mapper.readValue(body)
+                cacheDynamic[result.getDynamicID()] = result
+                return result
             } else {
                 daemonLogger.warning("解析动态时出现异常")
                 return null

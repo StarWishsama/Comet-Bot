@@ -10,18 +10,22 @@
 
 package io.github.starwishsama.comet.service.pusher.config
 
+import io.github.starwishsama.comet.service.pusher.context.PushContext
+import java.util.concurrent.TimeUnit
+
 open class PusherConfig(
     /**
-     * 推送间隔, 单位毫秒
+     * 推送间隔, 单位由 [timeUnit] 决定
      */
-    var interval: Long,
+    val interval: Long,
+
+    /**
+     * 时间单位
+     */
+    val timeUnit: TimeUnit = TimeUnit.MINUTES,
+
     /**
      * 缓存池
      */
-    var cachePool: String = ""
-)
-
-class EmptyPusherConfig : PusherConfig(
-    -1,
-    ""
+    val cachePool: MutableList<PushContext> = mutableListOf()
 )

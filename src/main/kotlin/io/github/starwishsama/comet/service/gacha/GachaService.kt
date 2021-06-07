@@ -213,6 +213,7 @@ object GachaService {
 
         if (!default.exists()) {
             BotVariables.daemonLogger.warning("无法加载默认明日方舟数据: ${default.name} 不存在")
+            return
         }
 
         val node = BotVariables.mapper.readTree(default)

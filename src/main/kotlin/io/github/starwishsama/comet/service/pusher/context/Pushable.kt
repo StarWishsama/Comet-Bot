@@ -12,8 +12,19 @@ package io.github.starwishsama.comet.service.pusher.context
 
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
+/**
+ * [Pushable]
+ *
+ * 声明其为一个可推送的类, 用于 [CometPusher] 推送
+ */
 interface Pushable {
+    /**
+     * 转换为通用的 [MessageWrapper]
+     */
     fun toMessageWrapper(): MessageWrapper
 
+    /**
+     * 检查一个 [PushContext] 是否和自身内容相同
+     */
     fun contentEquals(other: PushContext): Boolean
 }

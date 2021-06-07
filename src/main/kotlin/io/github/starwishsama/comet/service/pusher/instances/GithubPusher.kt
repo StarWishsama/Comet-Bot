@@ -38,7 +38,7 @@ object GithubPusher {
                             event.toMessageWrapper().toMessageChain(g)
                         )
                     }
-                    delay(RandomUtil.randomLong(10, 400))
+                    delay(RandomUtil.randomLong(10, 500))
                 }
             }
         }

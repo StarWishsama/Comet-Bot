@@ -10,20 +10,17 @@
 
 package io.github.starwishsama.comet.service.pusher.context
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 class BiliBiliLiveContext(
-    pushTarget: MutableList<Long>,
+    pushTarget: MutableSet<Long>,
     retrieveTime: Long,
-    @JsonProperty("custom_status")
-    override var status: PushStatus = PushStatus.READY,
+    status: PushStatus = PushStatus.CREATED,
     val pushUser: BiliBiliUser,
     var liveRoomInfo: LiveRoomInfo,
 ) : PushContext(pushTarget, retrieveTime, status), Pushable {
-
     override fun toMessageWrapper(): MessageWrapper {
         val data = liveRoomInfo.data
 
@@ -42,16 +39,8 @@ class BiliBiliLiveContext(
     override fun contentEquals(other: PushContext): Boolean {
         if (other !is BiliBiliLiveContext) return false
 
-        return liveRoomInfo.data.getStatus() == other.liveRoomInfo.data.getStatus() && (!liveRoomInfo.data.isLiveTimeInvalid() && liveRoomInfo.data.parseLiveTime() == other.liveRoomInfo.data.parseLiveTime())
+        return liveRoomInfo.data.getStatus() == other.liveRoomInfo.data.getStatus()
+                && (!liveRoomInfo.data.isLiveTimeInvalid()
+                && liveRoomInfo.data.parseLiveTime() == other.liveRoomInfo.data.parseLiveTime())
     }
-}
-
-fun Collection<BiliBiliLiveContext>.getLiveContext(uid: Long): BiliBiliLiveContext? {
-    for (blc in this) {
-        if (blc.pushUser.id.toLongOrNull() == uid) {
-            return blc
-        }
-    }
-
-    return null
 }

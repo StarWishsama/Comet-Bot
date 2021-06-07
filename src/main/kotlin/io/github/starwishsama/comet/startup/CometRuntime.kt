@@ -205,7 +205,7 @@ object CometRuntime {
                 val customSuffix = cfg.webHookAddress.replace("http://", "").replace("https://", "").split("/")
                 cometServer = WebHookServer(cfg.webHookPort, customSuffix.getRestString(1, "/"))
             }
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             daemonLogger.warning("Comet 服务端启动失败", e)
         }
     }
@@ -231,8 +231,6 @@ object CometRuntime {
                 runBlocking {
                     FakeClientApi.login(username, pwd)
                 }
-            } else {
-                daemonLogger.info("未设置哔哩哔哩账号, 部分哔哩哔哩相关功能可能受限")
             }
         }
 
