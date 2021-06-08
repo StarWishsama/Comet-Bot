@@ -24,7 +24,6 @@ import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import java.io.File
 import java.time.LocalDateTime
-import java.util.concurrent.TimeUnit
 
 /**
  * [CometPusher]
@@ -45,23 +44,30 @@ abstract class CometPusher(
 
     var latestTriggerTime: LocalDateTime = LocalDateTime.now()
 
+    /**
+     * 获取推送数据方法
+     */
     abstract fun retrieve()
 
+    /**
+     * 推送方法
+     */
     fun push() {
         cachePool.forEach { context ->
             if (context.status == PushStatus.CREATED || context.status == PushStatus.PROGRESSING) {
 
                 context.status = PushStatus.PUSHING
 
+                val wrapper = context.toMessageWrapper()
+
+                daemonLogger.debug("正在尝试推送消息 #${wrapper.hashCode()}, 可用状态: ${wrapper.isUsable()}")
+
                 context.getPushTarget().forEach group@{
                     try {
-                        val wrapper = context.toMessageWrapper()
-
                         if (wrapper.isUsable()) {
                             val group = bot.getGroup(it) ?: return@group
 
                             runBlocking {
-                                BotVariables.daemonLogger.debug("正在推送动态消息至 ${group.id}")
                                 group.sendMessage(wrapper.toMessageChain(group))
                                 delay(RandomUtil.randomLong(1000, 2000))
                             }
@@ -69,7 +75,7 @@ abstract class CometPusher(
                             pushTime++
                         }
                     } catch (e: Exception) {
-                        BotVariables.daemonLogger.warning("在推送消息至群 $it 时出现异常", e)
+                        daemonLogger.warning("在推送消息至群 $it 时出现异常", e)
                     }
                 }
 
@@ -106,7 +112,7 @@ abstract class CometPusher(
             }
         }
 
-        TaskUtil.runScheduleTaskAsync(config.interval, config.interval, TimeUnit.MILLISECONDS) {
+        TaskUtil.runScheduleTaskAsync(config.interval, config.interval, config.timeUnit) {
             execute()
         }
 

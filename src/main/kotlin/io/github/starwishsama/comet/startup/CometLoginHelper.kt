@@ -26,6 +26,7 @@ class CometLoginHelper(val comet: Comet) {
         while (status != LoginStatus.LOGGING) {
             try {
                 if (comet.isInitialized()) {
+                    BotVariables.daemonLogger.info("机器人已完成登录.")
                     break
                 }
 
@@ -37,14 +38,14 @@ class CometLoginHelper(val comet: Comet) {
 
                     if (command == "stop") exitProcess(0)
 
-                    if (command.isNumeric()) {
+                    if (command.isNumeric() && command.toLongOrNull() != null) {
                         comet.id = command.toLong()
                         BotVariables.daemonLogger.info("成功设置账号为 ${comet.id}")
                         status = LoginStatus.INPUT_PASSWORD
                     } else {
                         BotVariables.daemonLogger.info("请输入正确的 QQ 号!")
                     }
-                } else if (comet.password.isEmpty() || status == LoginStatus.INPUT_PASSWORD) {
+                } else if (comet.password.isEmpty() || status == LoginStatus.INPUT_PASSWORD || status == LoginStatus.LOGIN_FAILED) {
                     BotVariables.daemonLogger.info("请输入欲登录的机器人密码. 如需返回上一步, 请输入 back; 如需退出, 请输入 stop.")
                     command = CometApplication.console.readLine(">", '*')
 

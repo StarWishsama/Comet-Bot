@@ -12,7 +12,7 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata.*
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
@@ -184,27 +184,30 @@ data class Card(
 }
 
 fun Dynamic.convertToDynamicData(): DynamicData? {
-    lateinit var card: Card
-    val dynamicJson: String = when {
-        data.cards != null -> {
-            val cardIndex = data.cards[0]
-            card = cardIndex
-            cardIndex.card
+    val card: Card? = when {
+        data.cards != null && data.cards.isNotEmpty() -> {
+            data.cards[0]
         }
+
         data.card != null -> {
-            card = data.card
-            data.card.card
+            data.card
         }
-        else -> {
-            return null
-        }
+
+        else -> return null
+    }
+
+
+    val dynamicJson = card?.card
+
+    if (card == null) {
+        return null
     }
 
     val singleDynamicObject = mapper.readTree(dynamicJson)
     if (!singleDynamicObject.isNull) {
         val dynamicType = DynamicTypeSelector.getType(card.description.type)
         if (dynamicType != UnknownType::class) {
-            return BotVariables.mapper.readValue(card.card, dynamicType)
+            return mapper.readValue(card.card, dynamicType)
         }
     }
 
@@ -216,6 +219,8 @@ fun Dynamic.convertToWrapper(): MessageWrapper {
         val data = convertToDynamicData()
         runBlocking { data?.getContact() ?: MessageWrapper().addText("错误: 不支持的动态类型").setUsable(false) }
     } catch (e: Exception) {
+        daemonLogger.warning("解析动态时出现了问题", e)
+
         if (e is ArrayIndexOutOfBoundsException) {
             MessageWrapper().addText("动态列表为空").setUsable(false)
         } else {

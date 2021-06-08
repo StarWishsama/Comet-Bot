@@ -14,7 +14,6 @@ import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.comet
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.startup.CometRuntime
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
@@ -61,7 +60,8 @@ object CometApplication {
             runBlocking {
                 comet.join()
             }
-        } catch (e: CancellationException) {
+
+        } catch (e: Exception) {
             // 忽略
         }
     }

@@ -23,7 +23,7 @@ import java.util.*
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NONE, include = JsonTypeInfo.As.PROPERTY)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
 @JsonSubTypes(
     JsonSubTypes.Type(value = BiliBiliDynamicContext::class, name = "bili_dynamic"),
     JsonSubTypes.Type(value = BiliBiliLiveContext::class, name = "bili_live"),
