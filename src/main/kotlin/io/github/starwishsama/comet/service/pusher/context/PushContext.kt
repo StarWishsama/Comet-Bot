@@ -72,5 +72,5 @@ abstract class PushContext(
 }
 
 enum class PushStatus {
-    CREATED, PROGRESSING, PUSHING, PUSHED
+    CREATED, PROGRESSING, PUSHING, PUSHED, INVAILD
 }

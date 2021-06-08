@@ -11,7 +11,6 @@
 package io.github.starwishsama.comet.service.pusher.instances
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
@@ -73,6 +72,8 @@ abstract class CometPusher(
                             }
 
                             pushTime++
+                        } else {
+                            context.status = PushStatus.INVAILD
                         }
                     } catch (e: Exception) {
                         daemonLogger.warning("在推送消息至群 $it 时出现异常", e)
@@ -84,7 +85,7 @@ abstract class CometPusher(
         }
 
         if (pushTime > 0) {
-            BotVariables.daemonLogger.verbose("$name 已成功推送 $pushTime 个消息")
+            daemonLogger.verbose("$name 已成功推送 $pushTime 个消息")
             pushTime = 0
         }
 
