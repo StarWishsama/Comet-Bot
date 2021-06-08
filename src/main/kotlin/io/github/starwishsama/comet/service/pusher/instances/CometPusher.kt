@@ -59,7 +59,7 @@ abstract class CometPusher(
 
                 val wrapper = context.toMessageWrapper()
 
-                daemonLogger.debug("正在尝试推送消息 #${wrapper.hashCode()}, 可用状态: ${wrapper.isUsable()}")
+                daemonLogger.debug("正在尝试推送消息 ${wrapper::class.simpleName}#${wrapper.hashCode()}, 可用状态: ${wrapper.isUsable()}")
 
                 context.getPushTarget().forEach group@{
                     try {
