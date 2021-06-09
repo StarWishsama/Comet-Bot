@@ -21,10 +21,8 @@ import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.GachaItem
-import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
-import io.github.starwishsama.comet.objects.gacha.pool.PCRPool
 import io.github.starwishsama.comet.service.gacha.GachaConstants
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
@@ -60,13 +58,8 @@ object GachaUtil {
 
         return when (poolType) {
             is ArkNightPool -> combineArkOpImage(gachaResult as List<ArkNightOperator>)
-            is PCRPool -> combinePCRImage(gachaResult as List<PCRCharacter>)
             else -> throw UnsupportedOperationException("暂不支持合成该卡池图片")
         }
-    }
-
-    private fun combinePCRImage(chars: List<PCRCharacter>): CombinedResult {
-        TODO()
     }
 
     /**
