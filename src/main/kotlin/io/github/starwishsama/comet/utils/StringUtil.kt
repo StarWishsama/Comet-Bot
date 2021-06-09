@@ -29,14 +29,20 @@ enum class IDGuidelineType(val rule: Regex) {
 }
 
 object StringUtil {
-    /**
-     * 判断ID是否符合账号昵称格式规范
-     *
-     * @author StarWishsama
-     * @param username 用户名
-     * @return 是否符合规范
-     */
-    fun isLegitId(username: String, type: IDGuidelineType): Boolean = type.rule.matches(username)
+    fun String.withoutColor() = this.replace("\u001B\\[[;\\d]*m".toRegex(), "")
+
+    fun ByteArray.base64ToImage(): BufferedImage {
+        if (this.isEmpty()) {
+            throw IllegalArgumentException("Image byte array cannot be empty!")
+        }
+
+        val imageByte = Base64Decoder.decode(this)
+
+        val bis = ByteArrayInputStream(imageByte)
+        bis.use {
+            return ImageIO.read(bis)
+        }
+    }
 
     /**
      * 来自 Mirai 的 asHumanReadable
@@ -113,6 +119,15 @@ object StringUtil {
         return counter >= string.size
     }
 
+    /**
+     * 判断ID是否符合账号昵称格式规范
+     *
+     * @author StarWishsama
+     * @param username 用户名
+     * @return 是否符合规范
+     */
+    fun isLegitId(username: String, type: IDGuidelineType): Boolean = type.rule.matches(username)
+
     fun parseVideoIDFromBili(url: String): String {
         val videoID = url.substring(0, url.indexOf("?")).replace("https", "").replace("https", "").split("/")
         return videoID.last()
@@ -129,21 +144,6 @@ object StringUtil {
                     append(it)
                 }
             }
-        }
-    }
-
-    fun String.withoutColor() = this.replace("\u001B\\[[;\\d]*m".toRegex(), "")
-
-    fun ByteArray.base64ToImage(): BufferedImage {
-        if (this.isEmpty()) {
-            throw IllegalArgumentException("Image byte array cannot be empty!")
-        }
-
-        val imageByte = Base64Decoder.decode(this)
-
-        val bis = ByteArrayInputStream(imageByte)
-        bis.use {
-            return ImageIO.read(bis)
         }
     }
 }
