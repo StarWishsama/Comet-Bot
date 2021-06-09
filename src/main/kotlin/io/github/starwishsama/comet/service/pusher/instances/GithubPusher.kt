@@ -10,12 +10,10 @@
 
 package io.github.starwishsama.comet.service.pusher.instances
 
-import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.thirdparty.github.data.events.GithubEvent
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.service.command.GitHubService
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
 object GithubPusher {
@@ -38,7 +36,6 @@ object GithubPusher {
                             event.toMessageWrapper().toMessageChain(g)
                         )
                     }
-                    delay(RandomUtil.randomLong(10, 500))
                 }
             }
         }

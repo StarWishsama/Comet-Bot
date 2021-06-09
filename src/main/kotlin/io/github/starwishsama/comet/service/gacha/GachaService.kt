@@ -16,7 +16,6 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.gacha.custom.CustomPool
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
-import io.github.starwishsama.comet.objects.gacha.pool.PCRPool
 import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.math.MathUtil
 import kotlinx.coroutines.Dispatchers
@@ -31,12 +30,10 @@ import kotlin.streams.toList
 object GachaService {
     val gachaPools = mutableSetOf<GachaPool>()
     private var arkNightUsable = true
-    private var pcrUsable = true
     private val poolPath = FileUtil.getChildFolder("gacha")
 
     fun loadGachaData(arkNight: File) {
         loadArkNightData(arkNight)
-        loadPCRData()
 
         if (arkNightUsable) {
             loadDefaultArkNightData()
@@ -47,10 +44,6 @@ object GachaService {
         // 载入默认卡池
         if (arkNightUsable) {
             gachaPools.add(ArkNightPool())
-        }
-
-        if (pcrUsable) {
-            gachaPools.add(PCRPool())
         }
 
         if (!poolPath.exists()) {
@@ -81,10 +74,6 @@ object GachaService {
             CustomPool.GameType.ARKNIGHT -> {
                 parseArkNightPool(gachaPool).let { gachaPools.add(it) }
             }
-            // 暂不支持 PCR 卡池自定义
-            CustomPool.GameType.PCR -> {
-                false
-            }
         }
     }
 
@@ -112,10 +101,6 @@ object GachaService {
 
     fun isArkNightUsable(): Boolean {
         return arkNightUsable
-    }
-
-    fun isPCRUsable(): Boolean {
-        return pcrUsable
     }
 
     private fun parseArkNightPool(customPool: CustomPool): ArkNightPool {

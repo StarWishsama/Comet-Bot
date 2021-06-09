@@ -35,7 +35,7 @@ data class CustomPool(
 ) {
     @Serializable
     enum class GameType {
-        ARKNIGHT, PCR
+        ARKNIGHT
     }
 
     @Serializable

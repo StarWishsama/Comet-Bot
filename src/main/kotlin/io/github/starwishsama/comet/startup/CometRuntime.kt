@@ -119,7 +119,6 @@ object CometRuntime {
                 ClockInCommand(),
                 io.github.starwishsama.comet.commands.chats.DebugCommand(),
                 DivineCommand(),
-                PCRCommand(),
                 GuessNumberCommand(),
                 HelpCommand(),
                 InfoCommand(),

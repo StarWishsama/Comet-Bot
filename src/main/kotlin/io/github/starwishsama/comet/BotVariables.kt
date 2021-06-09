@@ -23,30 +23,24 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
-import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
-import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
 import io.github.starwishsama.comet.service.server.WebHookServer
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.json.LocalDateTimeConverter
 import io.github.starwishsama.comet.utils.json.WrapperConverter
-import io.github.starwishsama.comet.utils.network.NetUtil
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.utils.MiraiInternalApi
 import okhttp3.OkHttpClient
 import java.io.File
-import java.net.InetSocketAddress
-import java.net.Proxy
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 
 /**
  * Comet (几乎) 所有数据的存放类
@@ -132,10 +126,6 @@ object BotVariables {
     /** 明日方舟卡池数据 */
     val arkNight: MutableList<ArkNightOperator> = mutableListOf()
 
-    /** 公主链接卡池数据 */
-    @Deprecated("PCR have no enough data to maintain")
-    val pcr: MutableList<PCRCharacter> = mutableListOf()
-
     @Volatile
     var switch: Boolean = true
 
@@ -147,18 +137,5 @@ object BotVariables {
         DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
     }
 
-    var client: OkHttpClient = OkHttpClient().newBuilder()
-        .connectTimeout(5, TimeUnit.SECONDS)
-        .followRedirects(true)
-        .readTimeout(5, TimeUnit.SECONDS)
-        .hostnameVerifier { _, _ -> true }
-        .also {
-            if (cfg.proxySwitch) {
-                if (NetUtil.checkProxyUsable()) {
-                    it.proxy(Proxy(cfg.proxyType, InetSocketAddress(cfg.proxyUrl, cfg.proxyPort)))
-                }
-            }
-        }
-        .addInterceptor(RetrofitLogger())
-        .build()
+    lateinit var client: OkHttpClient
 }
