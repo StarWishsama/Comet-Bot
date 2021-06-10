@@ -99,7 +99,10 @@ abstract class CometPusher(
 
         if (!cfgFile.exists()) cfgFile.createNewFile()
 
-        config.cachePool.addAll(cachePool)
+        config.cachePool.apply {
+            clear()
+            addAll(cachePool)
+        }
 
         cfgFile.writeClassToJson(config)
     }
