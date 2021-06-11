@@ -14,7 +14,6 @@ import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
-import io.github.starwishsama.comet.service.pusher.context.PushContext
 import io.github.starwishsama.comet.service.pusher.context.PushStatus
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.writeClassToJson
@@ -39,7 +38,7 @@ abstract class CometPusher(
 
     var pushTime: Int = 0
 
-    val cachePool = mutableSetOf<PushContext>()
+    val cachePool = config.cachePool
 
     var latestTriggerTime: LocalDateTime = LocalDateTime.now()
 
@@ -98,11 +97,6 @@ abstract class CometPusher(
         val cfgFile = File(PusherManager.pusherFolder, "${name}.json")
 
         if (!cfgFile.exists()) cfgFile.createNewFile()
-
-        config.cachePool.apply {
-            clear()
-            addAll(cachePool)
-        }
 
         cfgFile.writeClassToJson(config)
     }
