@@ -102,14 +102,6 @@ abstract class CometPusher(
     }
 
     fun start() {
-        if (config.cachePool.isNotEmpty()) {
-            try {
-                cachePool.addAll(config.cachePool)
-            } catch (e: Exception) {
-                daemonLogger.warning("无法解析 $name 历史推送记录")
-            }
-        }
-
         TaskUtil.runScheduleTaskAsync(config.interval, config.interval, config.timeUnit) {
             execute()
         }
