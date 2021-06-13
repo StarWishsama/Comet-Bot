@@ -21,6 +21,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import java.math.RoundingMode
 import java.time.Duration
 import java.time.LocalDateTime
+import kotlin.math.min
 
 /**
  * [CheckInService]
@@ -56,7 +57,7 @@ object CheckInService {
             if (checkInPoint.getAllPoint() == 0.0) {
                 append("今天运气不佳, 没有积分")
             } else {
-                "获得了 ${String.format("%.1f", checkInPoint.basePoint)} 点积分"
+                append("获得了 ${String.format("%.1f", checkInPoint.basePoint)} 点积分")
             }
 
             append("\n")
@@ -76,7 +77,7 @@ object CheckInService {
     /**
      * 计算签到所得积分
      *
-     * @return 获取积分情况, [0] 为签到所得, [1] 为额外获得
+     * @return 获取积分情况, 详见 [CheckInResult]
      */
     private fun calculatePoint(user: BotUser): CheckInResult {
         // 计算签到时间
@@ -92,11 +93,11 @@ object CheckInService {
         user.lastCheckInTime = currentTime
 
         // 使用随机数工具生成基础积分
-        val basePoint = RandomUtil.randomDouble(0.0, 15.0, 1, RoundingMode.HALF_DOWN)
+        val basePoint = RandomUtil.randomDouble(0.0, 10.0, 1, RoundingMode.HALF_DOWN)
 
         // 只取小数点后一位，将最大奖励点数限制到 3 倍
         val awardProp =
-            (RandomUtil.randomDouble(0.0, 0.2, 1, RoundingMode.HALF_DOWN) * (user.checkInTime - 1)).coerceAtLeast(3.0)
+            min(1.5, (RandomUtil.randomDouble(0.0, 0.2, 1, RoundingMode.HALF_DOWN) * (user.checkInTime - 1)))
 
         // 连续签到的奖励积分
         val awardPoint = String.format("%.1f", awardProp * basePoint).toDouble()
