@@ -10,16 +10,20 @@
 
 package io.github.starwishsama.comet.utils.network
 
+import cn.hutool.http.HttpStatus
 import com.sun.net.httpserver.HttpExchange
 import java.nio.charset.Charset
 
-fun HttpExchange.writeString(string: String, charset: Charset = Charsets.UTF_8, statusCode: Int) {
-    val bytes = string.toByteArray(charset)
+fun HttpExchange.writeTextResponse(
+    text: String,
+    charset: Charset = Charsets.UTF_8,
+    statusCode: Int = HttpStatus.HTTP_OK
+) {
+    val bytes = text.toByteArray(charset)
+    sendResponseHeaders(statusCode, bytes.size.toLong())
 
     responseBody.use {
         it.write(bytes)
         it.flush()
     }
-
-    sendResponseHeaders(statusCode, bytes.size.toLong())
 }

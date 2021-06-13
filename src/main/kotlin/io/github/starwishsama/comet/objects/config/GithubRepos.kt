@@ -112,6 +112,15 @@ data class GithubRepos(
 }
 
 enum class SecretStatus {
-    NO_SECRET, HAS_SECRET, UNAUTHORIZED, NOT_FOUND, FAILED
+
+    NO_SECRET,
+
+    HAS_SECRET,
+
+    UNAUTHORIZED,
+
+    NOT_FOUND,
+
+    FAILED
 }
 

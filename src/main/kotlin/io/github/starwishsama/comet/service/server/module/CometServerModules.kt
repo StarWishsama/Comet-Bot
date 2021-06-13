@@ -21,6 +21,7 @@ import io.github.starwishsama.comet.objects.config.SecretStatus
 import io.github.starwishsama.comet.service.command.GitHubService
 import io.github.starwishsama.comet.service.pusher.instances.GithubPusher
 import io.github.starwishsama.comet.utils.json.isUsable
+import io.github.starwishsama.comet.utils.network.writeTextResponse
 import java.io.IOException
 
 // For bypass detekt
@@ -45,46 +46,21 @@ class GithubWebHookHandler : HttpHandler {
 
         val signature = he.requestHeaders[signature256]
         val eventType = he.requestHeaders[eventTypeHeader]?.get(0) ?: ""
-
-        if (signature == null && GitHubService.repos.checkSecret(signature, "", eventType) == SecretStatus.NO_SECRET) {
-            BotVariables.netLogger.log(HinaLogLevel.Debug, "收到新事件, 未通过安全验证. 请求的签名为: 无", prefix = "WebHook")
-            val resp = "A Serve error has happened".toByteArray()
-            he.responseBody.use {
-                it.write(resp)
-                it.flush()
-            }
-            he.sendResponseHeaders(HttpStatus.HTTP_INTERNAL_ERROR, resp.size.toLong())
-            return
-        }
-
         val request = String(he.requestBody.readBytes())
+        val secretStatus = GitHubService.repos.checkSecret(signature, request, eventType)
 
-        val hasSecret = GitHubService.repos.checkSecret(signature, request, eventType)
-
-        if (signature != null && hasSecret == SecretStatus.UNAUTHORIZED) {
-            BotVariables.netLogger.log(
-                HinaLogLevel.Debug,
-                "收到新事件, 未通过安全验证. 请求的签名为: ${signature[0]}",
-                prefix = "WebHook"
-            )
-            val resp = "A Serve error has happened".toByteArray()
-            he.responseBody.use {
-                it.write(resp)
-                it.flush()
-            }
-            he.sendResponseHeaders(HttpStatus.HTTP_INTERNAL_ERROR, resp.size.toLong())
+        if (!checkSecretStatus(he, secretStatus, signature)) {
             return
         }
 
         BotVariables.netLogger.log(HinaLogLevel.Debug, "收到新事件", prefix = "WebHook")
 
         val payload = URLDecoder.decode(request.replace("payload=", ""), Charsets.UTF_8)
-
         val validate = BotVariables.mapper.readTree(payload).isUsable()
 
         if (!validate) {
             BotVariables.netLogger.log(HinaLogLevel.Warn, "解析请求失败, 回调的 JSON 不合法.\n${payload}", prefix = "WebHook")
-            he.sendResponseHeaders(HttpStatus.HTTP_INTERNAL_ERROR, 0)
+            he.writeTextResponse("Unknown request", statusCode = HttpStatus.HTTP_INTERNAL_ERROR)
             return
         }
 
@@ -99,22 +75,45 @@ class GithubWebHookHandler : HttpHandler {
             BotVariables.netLogger.log(HinaLogLevel.Warn, "推送 WebHook 消息失败", e, prefix = "WebHook")
         }
 
-        val response = if (hasSecret == SecretStatus.NO_SECRET) {
+        val response = if (secretStatus == SecretStatus.NO_SECRET) {
             "Comet 已收到事件, 推荐使用密钥加密以保证服务器安全"
         } else {
             "Comet 已收到事件"
-        }.toByteArray()
-
-        he.responseBody.use {
-            it.write(response)
-            it.flush()
         }
 
-        he.sendResponseHeaders(HttpStatus.HTTP_OK, response.size.toLong())
+        he.writeTextResponse(response)
+    }
+
+    private fun checkSecretStatus(
+        he: HttpExchange,
+        secretStatus: SecretStatus,
+        signature: MutableList<String>?
+    ): Boolean {
+        if (signature == null && secretStatus == SecretStatus.NO_SECRET) {
+            BotVariables.netLogger.log(HinaLogLevel.Debug, "收到新事件, 未通过安全验证. 请求的签名为: 无", prefix = "WebHook")
+            he.writeTextResponse("A Serve error has happened", statusCode = HttpStatus.HTTP_INTERNAL_ERROR)
+            return false
+        }
+
+        if (signature != null && secretStatus == SecretStatus.UNAUTHORIZED) {
+            BotVariables.netLogger.log(
+                HinaLogLevel.Debug,
+                "收到新事件, 未通过安全验证. 请求的签名为: ${signature[0]}",
+                prefix = "WebHook"
+            )
+            he.writeTextResponse("A Serve error has happened", statusCode = HttpStatus.HTTP_INTERNAL_ERROR)
+            return false
+        }
+
+        return true
     }
 
     /**
      * [checkOrigin]
+     *
+     * 通过多种方式检测来源是否来自于 GitHub
+     *
+     * @return 是否为 GitHub 的请求
      */
     private fun checkOrigin(he: HttpExchange): Boolean {
         if (he.requestHeaders[eventTypeHeader] == null || he.requestHeaders["User-Agent"]?.get(0)
