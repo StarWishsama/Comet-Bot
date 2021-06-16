@@ -25,7 +25,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.5.10'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.10'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
-    id 'com.github.gmazzo.buildconfig' version '3.0.0'
+    id 'com.github.gmazzo.buildconfig' version '3.0.1'
 }
 
 def mainClass = 'io.github.starwishsama.comet.CometApplication'
