@@ -53,6 +53,7 @@ object GachaUtil {
     const val arkNightData =
         "https://raw.fastgit.org/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json"
 
+    @Suppress("UNCHECKED_CAST")
     fun combineGachaImage(gachaResult: List<GachaItem>, poolType: GachaPool): CombinedResult {
         require(gachaResult.isNotEmpty()) { "传入的抽卡结果列表不能为空!" }
 

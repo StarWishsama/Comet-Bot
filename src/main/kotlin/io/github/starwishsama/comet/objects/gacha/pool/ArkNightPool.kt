@@ -122,6 +122,7 @@ class ArkNightPool(
     )
 
     // 使用自定义抽卡方式
+    @Suppress("UNCHECKED_CAST")
     private fun getArkNightOperator(rare: Int): ArkNightOperatorInfo {
         // 首先获取所有对应星级干员
         val rareItems = poolItems.parallelStream().filter { it.rare == (rare - 1) }.collect(Collectors.toList())
@@ -178,6 +179,7 @@ class ArkNightPool(
     /**
      * 明日方舟抽卡，返回文字
      */
+    @Suppress("UNCHECKED_CAST")
     fun getArkDrawResultAsString(user: BotUser, drawResult: GachaResult): String {
         val currentPool = "目前卡池为: $displayName\n"
         if (!drawResult.isEmpty()) {
