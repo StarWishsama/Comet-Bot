@@ -84,7 +84,7 @@ object BotVariables {
         HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
     }
 
-    internal val mapper: ObjectMapper = ObjectMapper()
+    val mapper: ObjectMapper = ObjectMapper()
         // 美化输出
         .enable(SerializationFeature.INDENT_OUTPUT)
         // 将单一值序列化成表
