@@ -57,6 +57,8 @@ object BotVariables {
 
     internal lateinit var loggerAppender: LoggerAppender
 
+    internal lateinit var miraiLoggerAppender: LoggerAppender
+
     internal lateinit var startTime: LocalDateTime
 
     internal var cfg = CometConfig()
@@ -82,6 +84,15 @@ object BotVariables {
 
     internal val consoleCommandLogger: HinaLogger by lazy {
         HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+    }
+
+    internal val miraiLogger: HinaLogger by lazy {
+        HinaLogger("mirai", logAction = {
+            CometApplication.console.printAbove(it)
+            if (::miraiLoggerAppender.isInitialized) {
+                miraiLoggerAppender.appendLog(it)
+            }
+        }, debugMode = cfg.debugMode)
     }
 
     val mapper: ObjectMapper = ObjectMapper()

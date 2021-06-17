@@ -39,10 +39,10 @@ class Comet {
 
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
-                CustomLogRedirecter("Mirai (${it.id})", BotVariables.logger)
+                CustomLogRedirecter("Mirai (${it.id})", BotVariables.miraiLogger)
             }
             networkLoggerSupplier = { it ->
-                CustomLogRedirecter("MiraiNet (${it.id})", BotVariables.netLogger)
+                CustomLogRedirecter("MiraiNet (${it.id})", BotVariables.miraiLogger)
             }
 
             fileBasedDeviceInfo()

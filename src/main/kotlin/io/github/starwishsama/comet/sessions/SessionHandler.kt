@@ -48,7 +48,7 @@ object SessionHandler {
     }
 
     fun getSessionsByGroup(groupID: Long): List<Session> =
-        sessionPool.stream().filter { it.target.groupId == groupID }.toList()
+        sessionPool.stream().filter { it.target.groupId == groupID }.collect(Collectors.toList())
 
     fun hasSessionByID(id: Long): Boolean = getSessionsByID(id).isNotEmpty()
 
@@ -56,7 +56,8 @@ object SessionHandler {
         return getSessionsByID(id).stream().filter { it.creator::class.java == cmd }.count() > 0
     }
 
-    fun getSessionsByID(id: Long): List<Session> = sessionPool.stream().filter { it.target.privateId == id }.toList()
+    fun getSessionsByID(id: Long): List<Session> =
+        sessionPool.stream().filter { it.target.privateId == id }.collect(Collectors.toList())
 
     /**
      * 获取所有活跃中的会话列表副本.

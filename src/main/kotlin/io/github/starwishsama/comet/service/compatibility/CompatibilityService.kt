@@ -25,7 +25,6 @@ import io.github.starwishsama.comet.service.compatibility.data.OldGroupConfig
 import io.github.starwishsama.comet.utils.copyAndRename
 import io.github.starwishsama.comet.utils.json.isUsable
 import java.io.File
-import kotlin.streams.toList
 
 /**
  * [CompatibilityService]
@@ -117,7 +116,7 @@ object CompatibilityService {
     }
 
     private fun handleDuplication(users: List<BotUser>, current: BotUser): BotUser {
-        val duplicatedUser = users.parallelStream().filter { it.id == current.id }.toList()
+        val duplicatedUser = users.parallelStream().filter { it.id == current.id }.collect(Collectors.toList())
 
         if (duplicatedUser.isEmpty()) {
             return current

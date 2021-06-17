@@ -167,10 +167,10 @@ object FileUtil {
      *
      * @return log 文件位置
      */
-    fun getLogLocation(): File {
+    fun getLogLocation(customPrefix: String = "log"): File {
         val initTime = LocalDateTime.now()
         val parent = getChildFolder("logs")
-        return File(parent, "log-${dateFormatter.format(initTime)}.log").also { it.createNewFile() }
+        return File(parent, "$customPrefix-${dateFormatter.format(initTime)}.log").also { it.createNewFile() }
     }
 
     /**

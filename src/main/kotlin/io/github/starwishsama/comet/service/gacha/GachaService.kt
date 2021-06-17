@@ -25,7 +25,6 @@ import kotlinx.serialization.decodeFromString
 import net.mamoe.yamlkt.Yaml
 import java.io.File
 import java.io.IOException
-import kotlin.streams.toList
 
 object GachaService {
     val gachaPools = mutableSetOf<GachaPool>()
@@ -79,7 +78,7 @@ object GachaService {
 
     @Suppress("unchecked_cast")
     inline fun <reified T> getPoolsByType(): List<T> {
-        return gachaPools.stream().filter { it is T }.toList() as List<T>
+        return gachaPools.stream().filter { it is T }.collect(Collectors.toList()) as List<T>
     }
 
     @Throws(JsonParseException::class)

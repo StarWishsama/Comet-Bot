@@ -21,7 +21,6 @@ import io.github.starwishsama.comet.objects.wrapper.Picture
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import java.time.LocalDateTime
-import kotlin.streams.toList
 
 data class Repost(
     @JsonProperty("origin")
@@ -52,7 +51,8 @@ data class Repost(
     override fun getContact(): MessageWrapper {
         val originalDynamic = item?.originType?.let { getOriginalDynamic(originDynamic, it) }
             ?: return MessageWrapper().addText("\"源动态已被删除\"")
-        val repostPicture = originalDynamic.getMessageContent().parallelStream().filter { it is Picture }.toList()
+        val repostPicture =
+            originalDynamic.getMessageContent().parallelStream().filter { it is Picture }.collect(Collectors.toList())
         val msg = MessageWrapper().addText(
             "转发了 ${if (item.content.isEmpty()) "源动态已被删除" else "${originUser?.info?.userName} 的动态:"} \n${item.content}"
                     + "\n\uD83D\uDD58 ${hmsPattern.format(item.getSentTime())}\n" + "原动态信息: \n${originalDynamic.getAllText()}"

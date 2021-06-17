@@ -61,6 +61,7 @@ object CometRuntime {
         BotVariables.filePath = FileUtil.getJarLocation()
         BotVariables.startTime = LocalDateTime.now()
         BotVariables.loggerAppender = LoggerAppender(FileUtil.getLogLocation())
+        BotVariables.loggerAppender = LoggerAppender(FileUtil.getLogLocation("mirai"))
 
         Runtime.getRuntime().addShutdownHook(Thread { shutdownTask() })
 
