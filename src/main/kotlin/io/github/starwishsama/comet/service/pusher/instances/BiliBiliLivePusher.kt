@@ -57,9 +57,9 @@ class BiliBiliLivePusher(
                 }
             }
 
-
-            BotVariables.daemonLogger.verbose("已获取了 $retrieveTime 个开播消息")
             retrieveTime = 0
         }
+
+        BotVariables.daemonLogger.verbose("已获取了 $retrieveTime 个开播消息")
     }
 }
