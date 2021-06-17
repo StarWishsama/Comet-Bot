@@ -19,7 +19,7 @@ import java.lang.management.OperatingSystemMXBean
 object RuntimeUtil {
     private const val byteToMB = 1048576.0
 
-    fun doGC() {
+    fun forceGC() {
         val usedMemoryBefore: Long = getUsedMemory()
         System.runFinalization()
         System.gc()

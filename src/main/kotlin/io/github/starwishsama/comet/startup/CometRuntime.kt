@@ -185,7 +185,7 @@ object CometRuntime {
 
         logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${BotVariables.startTime.getLastingTimeAsString()}")
 
-        RuntimeUtil.doGC()
+        RuntimeUtil.forceGC()
 
         CommandExecutor.startHandler(bot)
     }
@@ -240,7 +240,7 @@ object CometRuntime {
         }
 
         TaskUtil.runScheduleTaskAsync(1, 1, TimeUnit.HOURS) {
-            RuntimeUtil.doGC()
+            RuntimeUtil.forceGC()
         }
     }
 

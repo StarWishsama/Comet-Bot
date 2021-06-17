@@ -86,5 +86,8 @@ data class CometConfig(
     val webHookAddress: String = "http://example.address.com/payload",
 
     @Comment("Webhook Secret, 为确保服务器安全, 推荐填写")
-    val webHookSecret: String = ""
+    val webHookSecret: String = "",
+
+    @Comment("调度池最大容量, 默认为 30")
+    val maxPoolSize: Int = 30
 )

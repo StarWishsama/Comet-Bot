@@ -54,13 +54,15 @@ class HinaLogger(
         val executorInfo =
             "${StringUtil.simplyClassName(executor.className)}#${executor.methodName}:${executor.lineNumber}"
 
-        var trace = ""
-
-        if (stacktrace != null) {
-            trace = try {
-                formatStacktrace(stacktrace, null, outputBeautyTrace)
-            } catch (e: Exception) {
-                stacktrace.stackTraceToString()
+        val trace = buildString {
+            if (stacktrace != null) {
+                append(
+                    try {
+                        formatStacktrace(stacktrace, null, outputBeautyTrace)
+                    } catch (e: Exception) {
+                        stacktrace.stackTraceToString()
+                    }
+                )
             }
         }
 

@@ -51,7 +51,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 @OptIn(MiraiInternalApi::class)
 object BotVariables {
-    lateinit var filePath: File
+    internal lateinit var filePath: File
 
     val comet: Comet = Comet()
 
@@ -84,7 +84,7 @@ object BotVariables {
         HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
     }
 
-    val mapper: ObjectMapper = ObjectMapper()
+    internal val mapper: ObjectMapper = ObjectMapper()
         // 美化输出
         .enable(SerializationFeature.INDENT_OUTPUT)
         // 将单一值序列化成表
@@ -118,24 +118,24 @@ object BotVariables {
         )
         .setDateFormat(SimpleDateFormat("yyyy/MM/dd HH:mm:ss"))
 
-    var rCon: Rcon? = null
+    internal var rCon: Rcon? = null
 
-    val users: MutableMap<Long, BotUser> = ConcurrentHashMap()
-    lateinit var localizationManager: LocalizationManager
+    internal val users: MutableMap<Long, BotUser> = ConcurrentHashMap()
+    internal lateinit var localizationManager: LocalizationManager
 
     /** 明日方舟卡池数据 */
-    val arkNight: MutableList<ArkNightOperator> = mutableListOf()
+    internal val arkNight: MutableList<ArkNightOperator> = mutableListOf()
 
     @Volatile
-    var switch: Boolean = true
+    internal var switch: Boolean = true
 
-    val hmsPattern: DateTimeFormatter by lazy {
+    internal val hmsPattern: DateTimeFormatter by lazy {
         DateTimeFormatter.ofPattern("HH:mm:ss")
     }
 
-    val yyMMddPattern: DateTimeFormatter by lazy {
+    internal val yyMMddPattern: DateTimeFormatter by lazy {
         DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
     }
 
-    lateinit var client: OkHttpClient
+    internal lateinit var client: OkHttpClient
 }

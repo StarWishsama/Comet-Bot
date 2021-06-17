@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.utils
 
+import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.exceptions.ReachRetryLimitException
@@ -27,7 +28,7 @@ object TaskUtil {
             .uncaughtExceptionHandler { thread, t ->
                 daemonLogger.warning("线程 ${thread.name} 在执行任务时发生了错误", t)
             }.build()
-    ).also { it.maximumPoolSize = 30 }
+    ).also { it.maximumPoolSize = BotVariables.cfg.maxPoolSize }
 
     fun runAsync(delay: Long = 0, unit: TimeUnit = TimeUnit.SECONDS, task: () -> Unit): ScheduledFuture<*> {
         return service.schedule({
