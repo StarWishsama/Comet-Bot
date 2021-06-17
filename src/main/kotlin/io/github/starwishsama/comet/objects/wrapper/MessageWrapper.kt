@@ -16,7 +16,6 @@ import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import java.util.stream.Collectors
-import kotlin.streams.toList
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class MessageWrapper {
@@ -90,7 +89,7 @@ open class MessageWrapper {
     }
 
     fun getAllText(): String {
-        val texts = messageContent.parallelStream().filter { it is PureText }.toList()
+        val texts = messageContent.parallelStream().filter { it is PureText }.collect(Collectors.toList())
         return buildString {
             texts.forEach {
                 append(it.asString())
