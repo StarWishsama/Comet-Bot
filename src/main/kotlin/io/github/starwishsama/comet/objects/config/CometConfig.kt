@@ -19,14 +19,41 @@ import java.net.Proxy
 
 @Serializable
 data class CometConfig(
-    @Comment("机器人的账号")
+    /**
+     * Mirai 核心相关
+     */
+    @Comment("机器人的 QQ 账号")
     var botId: Long = 0,
 
-    @Comment("机器人的密码")
+    @Comment("机器人的 QQ 密码")
     var botPassword: String = "",
+
+    @Comment("Mirai 使用的登录协议, 可选的有 ANDROID_PHONE (推荐), ANDROID_PAD (可同时在线) 和 ANDROID_WATCH (支持功能少)")
+    val botProtocol: BotConfiguration.MiraiProtocol = BotConfiguration.MiraiProtocol.ANDROID_PHONE,
+
+    @Comment("Mirai 的心跳策略, 可选的有 STAT_HB(推荐), REGISTER, NONE\n仅当无法正常工作时才修改此项!")
+    val heartbeatStrategy: BotConfiguration.HeartbeatStrategy = BotConfiguration.HeartbeatStrategy.STAT_HB,
 
     @Comment("自动保存数据周期, 单位分钟")
     val autoSaveTime: Long = 60,
+
+    @Comment("执行所有机器人命令的全局冷却时间, 单位秒")
+    val coolDownTime: Int = 5,
+
+    @Comment("自动清理过时文件间隔 (如 Log, 错误报告等), 单位为天. 设为小于 0 的数字以关闭")
+    val autoCleanDuration: Int = 15,
+
+    @Comment("调度池最大容量, 默认为 30")
+    val maxPoolSize: Int = 30,
+
+    @Comment("明日方舟抽卡模拟器是否使用图片")
+    var arkDrawUseImage: Boolean = false,
+
+    @Comment("调试模式, 打开后会有更多 Log 并启用调试功能")
+    var debugMode: Boolean = false,
+
+    @Comment("Webhook 功能开关")
+    val webHookSwitch: Boolean = false,
 
     @Comment("RCON 服务器地址, 不使用 RCON 功能可不填")
     var rConUrl: String? = null,
@@ -36,9 +63,6 @@ data class CometConfig(
 
     @Comment("RCON 服务器连接密码, 不使用 RCON 功能可不填")
     var rConPassword: String? = null,
-
-    @Comment("执行所有机器人命令的全局冷却时间, 单位秒")
-    val coolDownTime: Int = 5,
 
     @Comment("机器人发送消息需要屏蔽的词汇")
     val filterWords: MutableList<String> = mutableListOf(),
@@ -64,21 +88,6 @@ data class CometConfig(
     @Comment("以图搜图 API 类型, 请使用 /ps source 命令修改")
     var pictureSearchApi: PicSearchApiType = PicSearchApiType.SAUCENAO,
 
-    @Comment("明日方舟抽卡模拟器是否使用图片")
-    var arkDrawUseImage: Boolean = false,
-
-    @Comment("调试模式, 打开后会有更多 Log 并启用调试功能")
-    var debugMode: Boolean = false,
-
-    @Comment("机器人使用的登录协议, 可选的有 ANDROID_PHONE, ANDROID_PAD 和 ANDROID_WATCH")
-    val botProtocol: BotConfiguration.MiraiProtocol = BotConfiguration.MiraiProtocol.ANDROID_PHONE,
-
-    @Comment("自动清理过时文件间隔 (如 Log, 错误报告等), 单位为天. 设为小于 0 的数字以关闭")
-    val autoCleanDuration: Int = 15,
-
-    @Comment("Webhook 功能开关")
-    val webHookSwitch: Boolean = false,
-
     @Comment("Webhook 推送服务器端口")
     val webHookPort: Int = 6789,
 
@@ -87,7 +96,4 @@ data class CometConfig(
 
     @Comment("Webhook Secret, 为确保服务器安全, 推荐填写")
     val webHookSecret: String = "",
-
-    @Comment("调度池最大容量, 默认为 30")
-    val maxPoolSize: Int = 30
 )

@@ -44,8 +44,12 @@ class Comet {
             networkLoggerSupplier = { it ->
                 CustomLogRedirecter("MiraiNet (${it.id})", BotVariables.netLogger)
             }
+
             fileBasedDeviceInfo()
+
             protocol = BotVariables.cfg.botProtocol
+
+            heartbeatStrategy = BotVariables.cfg.heartbeatStrategy
         }
         bot = BotFactory.newBot(qq = id, password = password, configuration = config)
         Mirai.FileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
