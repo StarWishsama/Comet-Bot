@@ -80,7 +80,7 @@ dependencies {
     implementation 'com.github.rockswang:java-curl:1.2.2.190107'
 
     // BiliBili-Api @ https://github.com/czp3009/bilibili-api
-    api 'com.hiczp:bilibili-api:0.1.3'
+    api 'com.github.StarWishsama:bilibili-api:1434672ec6'
 
     // jsoup HTML parser library @ https://jsoup.org/
     implementation 'org.jsoup:jsoup:1.13.1'

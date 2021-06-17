@@ -11,7 +11,6 @@
 package io.github.starwishsama.comet.service.gacha
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.google.gson.JsonParseException
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.gacha.custom.CustomPool
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
@@ -82,7 +81,6 @@ object GachaService {
         return gachaPools.stream().filter { it is T }.collect(Collectors.toList()) as List<T>
     }
 
-    @Throws(JsonParseException::class)
     fun addPoolFromFile(poolFile: File) {
         require(poolFile.exists()) { "${poolFile.absolutePath} isn't exists" }
 

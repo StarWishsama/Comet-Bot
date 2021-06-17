@@ -10,7 +10,6 @@
 
 package io.github.starwishsama.comet.api.thirdparty.bilibili
 
-import com.github.salomonbrys.kotson.get
 import com.hiczp.bilibili.api.BilibiliClient
 import com.hiczp.bilibili.api.app.model.SearchUserResult
 import com.hiczp.bilibili.api.retrofit.exception.BilibiliApiException
@@ -48,7 +47,7 @@ object FakeClientApi {
                         }
                         -105 -> {
                             BotVariables.daemonLogger.warning(
-                                "极验滑块链接: ${e.commonResponse.data?.get("url")?.asString}" +
+                                "极验滑块链接: ${e.commonResponse.data?.asJsonObject?.get("url")?.asString}" +
                                         "\n需要滑块验证码登录, 请稍后在后台用 /bili retry 进行进一步操作!\n" +
                                         "需要将获得的 challenge 和 validate 填入, 如果不懂如何获取请查看 Wiki"
                             )
