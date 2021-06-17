@@ -158,7 +158,7 @@ compileKotlin {
     println "Comet >> Now building Comet $version..."
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_11
         freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses"]
         useIR = true
     }
