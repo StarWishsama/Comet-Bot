@@ -21,6 +21,7 @@ import io.github.starwishsama.comet.objects.wrapper.Picture
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import java.time.LocalDateTime
+import java.util.stream.Collectors
 
 data class Repost(
     @JsonProperty("origin")

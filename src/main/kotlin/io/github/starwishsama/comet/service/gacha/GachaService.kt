@@ -25,6 +25,7 @@ import kotlinx.serialization.decodeFromString
 import net.mamoe.yamlkt.Yaml
 import java.io.File
 import java.io.IOException
+import java.util.stream.Collectors
 
 object GachaService {
     val gachaPools = mutableSetOf<GachaPool>()

@@ -25,6 +25,7 @@ import io.github.starwishsama.comet.service.compatibility.data.OldGroupConfig
 import io.github.starwishsama.comet.utils.copyAndRename
 import io.github.starwishsama.comet.utils.json.isUsable
 import java.io.File
+import java.util.stream.Collectors
 
 /**
  * [CompatibilityService]
