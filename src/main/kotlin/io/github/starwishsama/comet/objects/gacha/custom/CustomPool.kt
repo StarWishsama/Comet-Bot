@@ -12,18 +12,18 @@ package io.github.starwishsama.comet.objects.gacha.custom
 
 import kotlinx.serialization.Serializable
 
-// import net.mamoe.yamlkt.Comment
+import net.mamoe.yamlkt.Comment
 
 @Serializable
 @Suppress("SpellCheckingInspection")
 data class CustomPool(
-    // @Comment("卡池游戏类型, 目前仅支持 ARKNIGHT, PCR")
+    @Comment("卡池游戏类型, 目前仅支持 ARKNIGHT, PCR")
     val gameType: GameType,
-    // @Comment("自定义卡池内部名称, 用于卡池选择")
+    @Comment("自定义卡池内部名称, 用于卡池选择")
     val poolName: String,
-    // @Comment("自定义卡池展示名称")
+    @Comment("自定义卡池展示名称")
     val displayPoolName: String,
-    // @Comment("自定义卡池简介")
+    @Comment("自定义卡池简介")
     val poolDescription: String,
     /** @Comment(
     """卡池内不需要干员的条件, 如 "公开招募" 则会屏蔽掉公招可获得的干员
@@ -31,7 +31,7 @@ data class CustomPool(
     """
     )*/
     val condition: List<String>,
-    // @Comment("修改卡池物品的获得概率")
+    @Comment("修改卡池物品的获得概率")
     val modifiedGachaItems: List<ModifiedGachaItem>
 ) {
     @Serializable
@@ -41,13 +41,13 @@ data class CustomPool(
 
     @Serializable
     data class ModifiedGachaItem(
-        // @Comment("修改数据的卡池物品名称")
+        @Comment("修改数据的卡池物品名称")
         val name: String,
-        // @Comment("该物品的概率提升或降低值, 设为 0 不调整")
+        @Comment("该物品的概率提升或降低值, 设为 0 不调整")
         val probability: Double,
-        // @Comment("加成权值, 如 W 是 30% 中加成五倍权值. 如果这个干员没有权值填 1.")
+        @Comment("加成权值, 如 W 是 30% 中加成五倍权值. 如果这个干员没有权值填 1.")
         val weight: Int,
-        // @Comment("是否从卡池中移除该物品, 若不则填 false")
+        @Comment("是否从卡池中移除该物品, 若不则填 false")
         val isHidden: Boolean
     )
 }
