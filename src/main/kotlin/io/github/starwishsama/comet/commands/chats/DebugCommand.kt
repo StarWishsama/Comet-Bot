@@ -28,7 +28,6 @@ import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
-import io.github.starwishsama.comet.utils.network.RssUtil
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -136,16 +135,6 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                             }
                             else -> toChain("Unknown retriever type.")
                         }
-                    }
-                }
-                "rss" -> {
-                    if (args.size > 1) {
-                        return RssUtil.simplifyHTML(
-                            RssUtil.getFromEntry(
-                                RssUtil.getEntryFromURL(args[1])
-                                    ?: return "Can't retrieve page content".convertToChain()
-                            )
-                        ).convertToChain()
                     }
                 }
                 "quit" -> {

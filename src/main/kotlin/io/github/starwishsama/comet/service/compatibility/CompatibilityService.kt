@@ -15,7 +15,7 @@ import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BotVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
@@ -62,9 +62,7 @@ object CompatibilityService {
                 BiliBiliUser(
                     it.toString(),
                     DynamicApi.getUserNameByMid(it),
-                    UserApi.userApiService.getMemberInfoById(it)
-                        .execute()
-                        .body()?.data?.liveRoomInfo?.roomId ?: -1
+                    LiveApi.getLiveInfo(it)?.data?.roomId ?: -1
                 )
             )
         }

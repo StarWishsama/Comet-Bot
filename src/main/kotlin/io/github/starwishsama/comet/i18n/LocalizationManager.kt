@@ -10,11 +10,12 @@
 
 package io.github.starwishsama.comet.i18n
 
+import com.charleskorn.kaml.Yaml
 import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.getChildFolder
 import io.github.starwishsama.comet.utils.getContext
-import net.mamoe.yamlkt.Yaml
+import kotlinx.serialization.decodeFromString
 import java.io.File
 
 class LocalizationManager {
@@ -26,7 +27,7 @@ class LocalizationManager {
 
         val localizationFile = File(localizedFolder, currentLanguage.fileName)
         if (localizationFile.exists()) {
-            localizationYaml = Yaml.Default.decodeMapFromString(localizationFile.getContext())
+            localizationYaml = Yaml.default.decodeFromString(localizationFile.getContext())
             daemonLogger.info("多语言服务已启动! 使用语言: $currentLanguage")
         } else {
             daemonLogger.warning("多语言文件未被正确生成! 部分文本可能会受到影响")

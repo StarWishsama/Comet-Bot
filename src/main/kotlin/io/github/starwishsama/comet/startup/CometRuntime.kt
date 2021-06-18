@@ -19,7 +19,6 @@ import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.chats.*
@@ -144,7 +143,6 @@ object CometRuntime {
                 StopCommand(),
                 DebugCommand(),
                 io.github.starwishsama.comet.commands.console.AdminCommand(),
-                io.github.starwishsama.comet.commands.console.BiliBiliCommand(),
                 BroadcastCommand()
             )
         )
@@ -230,7 +228,6 @@ object CometRuntime {
         TaskUtil.runAsync(5) {
             if (pwd.isNotEmpty() && username.isNotEmpty()) {
                 runBlocking {
-                    FakeClientApi.login(username, pwd)
                 }
             }
         }

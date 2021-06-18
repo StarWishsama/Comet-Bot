@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.file
 
+import com.charleskorn.kaml.Yaml
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.cfg
 import io.github.starwishsama.comet.BotVariables.daemonLogger
@@ -31,7 +32,6 @@ import io.github.starwishsama.comet.service.compatibility.CompatibilityService
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.utils.*
 import net.mamoe.mirai.Bot
-import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
 import java.io.IOException
 
@@ -67,7 +67,7 @@ object DataSetup {
 
     private fun saveCfg() {
         try {
-            cfgFile.file.writeString(Default.encodeToString(CometConfig.serializer(), cfg), isAppend = false)
+            cfgFile.file.writeString(Yaml.default.encodeToString(CometConfig.serializer(), cfg), isAppend = false)
             userCfg.file.writeClassToJson(BotVariables.users)
         } catch (e: Exception) {
             daemonLogger.warning("[配置] 在保存配置文件时发生了问题", e)
@@ -75,7 +75,7 @@ object DataSetup {
     }
 
     private fun load() {
-        cfg = Default.decodeFromString(CometConfig.serializer(), cfgFile.file.getContext())
+        cfg = Yaml.default.decodeFromString(CometConfig.serializer(), cfgFile.file.getContext())
 
         LoggerInstances.instances.forEach {
             it.debugMode = cfg.debugMode
@@ -104,7 +104,7 @@ object DataSetup {
     }
 
     fun reload() {
-        cfg = Default.decodeFromString(CometConfig.serializer(), cfgFile.file.getContext())
+        cfg = Yaml.default.decodeFromString(CometConfig.serializer(), cfgFile.file.getContext())
         ApiManager.reloadConfig()
     }
 

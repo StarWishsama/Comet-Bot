@@ -14,7 +14,8 @@ import io.github.starwishsama.comet.BotVariables.localizationManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.SearchApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserInfo
 import io.github.starwishsama.comet.enums.UserLevel
@@ -37,9 +38,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.toMessageChain
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import okhttp3.internal.toLongOrDefault
 import java.lang.Thread.sleep
 
 
@@ -66,13 +65,27 @@ class BiliBiliCommand : ChatCommand {
                 return if (args.size > 1) {
                     event.subject.sendMessage(event.message.quote() + "请稍等...")
 
-                    val item = FakeClientApi.getUser(args[1])
+                    val item: UserInfo? =
+                        if (args[1].isNumeric()) {
+                            UserApi.userApiService.getMemberInfoById(args[1].toLongOrDefault(0)).execute().body()
+                        } else {
+                            val searchResult = SearchApi.searchApiService.searchUser(keyword = args[1]).execute().body()
+
+                            if (searchResult == null) {
+                                return "找不到对应的B站用户".toChain()
+                            } else {
+                                UserApi.userApiService.getMemberInfoById(searchResult.data.result[0].mid).execute()
+                                    .body()
+                            }
+                        }
 
                     if (item != null) {
-                        val text = item.title + "\n粉丝数: " + item.fans.getBetterNumber() +
-                                "\n最近视频: " + (if (!item.avItems.isNullOrEmpty()) item.avItems[0].title else "没有投稿过视频") +
-                                "\n直播状态: " + (if (item.liveStatus == 1) "✔" else "✘") + "\n"
-                        val dynamic = DynamicApi.getWrappedDynamicTimeline(item.mid)
+                        val recentVideos =
+                            UserApi.userApiService.getMemberVideoById(item.data.card.mid).execute().body()
+
+                        val text = item.data.card.name + "\n粉丝数: " + item.data.follower.getBetterNumber() +
+                                "\n最近视频: " + (if (recentVideos != null) recentVideos.data.list.videoList[0].toString() else "没有投稿过视频")
+                        val dynamic = DynamicApi.getWrappedDynamicTimeline(item.data.card.mid)
                         text.convertToChain() + getDynamicText(dynamic, event)
                     } else {
                         "找不到对应的B站用户".toChain()
@@ -99,8 +112,7 @@ class BiliBiliCommand : ChatCommand {
                     TaskUtil.runAsync {
                         cfg.biliSubscribers.forEach {
                             it.userName = DynamicApi.getUserNameByMid(it.id.toLong())
-                            it.roomID = UserApi.userApiService.getMemberInfoById(it.id.toLong()).execute()
-                                .body()?.data?.liveRoomInfo?.roomId ?: -1
+                            it.roomID = LiveApi.getLiveInfo(it.id.toLong())?.data?.roomId ?: -1
                             sleep(1_500)
                         }
                     }
@@ -232,7 +244,7 @@ class BiliBiliCommand : ChatCommand {
         }
     }
 
-    private suspend fun subscribe(target: String, groupId: Long): MessageChain {
+    private fun subscribe(target: String, groupId: Long): MessageChain {
         val cfg = GroupConfigManager.getConfigOrNew(groupId)
         var name = ""
         val uid: Long = when {
@@ -241,27 +253,14 @@ class BiliBiliCommand : ChatCommand {
                 target.toLong()
             }
             else -> {
-                val item = FakeClientApi.getUser(target)
-                val title = item?.title
+                val item = SearchApi.searchApiService.searchUser(keyword = target).execute().body()
+                val title = item?.data?.result?.get(0)?.userName
                 if (title != null) name = title
-                item?.mid ?: return EmptyMessageChain
+                item?.data?.result?.get(0)?.mid ?: return EmptyMessageChain
             }
         }
 
-        var roomNumber: Long = -1
-
-        UserApi.userApiService.getMemberInfoById(uid).enqueue(
-            object : Callback<UserInfo> {
-                override fun onResponse(call: Call<UserInfo>, response: Response<UserInfo>) {
-                    val info = response.body()
-                    if (info != null) {
-                        roomNumber = info.data.liveRoomInfo.roomId
-                    }
-                }
-
-                override fun onFailure(call: Call<UserInfo>, t: Throwable) {}
-            }
-        )
+        val roomNumber: Long = LiveApi.getLiveInfo(uid)?.data?.roomId ?: -1
 
         return if (!cfg.biliSubscribers.stream().filter { it.id.toLong() == uid }.findFirst().isPresent) {
             cfg.biliSubscribers.add(BiliBiliUser(uid.toString(), name, roomNumber))

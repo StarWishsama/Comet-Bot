@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.service.command
 
+import com.charleskorn.kaml.Yaml
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.github.GithubApi
@@ -21,10 +22,10 @@ import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.getContext
 import io.github.starwishsama.comet.utils.writeString
+import kotlinx.serialization.encodeToString
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.yamlkt.Yaml
 
 object GitHubService {
     val repos: GithubRepos
@@ -36,7 +37,7 @@ object GitHubService {
         repos = if (context.isEmpty()) {
             GithubRepos()
         } else {
-            Yaml.Default.decodeFromString(GithubRepos.serializer(), context)
+            Yaml.default.decodeFromString(GithubRepos.serializer(), context)
         }
     }
 
@@ -249,6 +250,6 @@ object GitHubService {
     }
 
     fun saveData() {
-        DataFiles.githubRepoData.file.writeString(Yaml.encodeToString(repos))
+        DataFiles.githubRepoData.file.writeString(Yaml.default.encodeToString(repos))
     }
 }

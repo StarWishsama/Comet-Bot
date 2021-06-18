@@ -10,13 +10,14 @@
 
 package io.github.starwishsama.comet.file
 
+import com.charleskorn.kaml.Yaml
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.config.DataFile
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.writeClassToJson
 import io.github.starwishsama.comet.utils.writeString
-import net.mamoe.yamlkt.Yaml
+import kotlinx.serialization.encodeToString
 import java.io.File
 
 object DataFiles {
@@ -25,7 +26,7 @@ object DataFiles {
     }
 
     val cfgFile: DataFile = DataFile(File(BotVariables.filePath, "config.yml"), DataFile.FilePriority.HIGH) {
-        it.writeString(Yaml.encodeToString(CometConfig()), isAppend = false)
+        it.writeString(Yaml.default.encodeToString(CometConfig()), isAppend = false)
     }
 
     val pcrData: DataFile = DataFile(File(FileUtil.getResourceFolder(), "pcr.json"), DataFile.FilePriority.NORMAL)

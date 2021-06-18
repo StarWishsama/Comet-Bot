@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.service.gacha
 
+import com.charleskorn.kaml.Yaml
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.objects.gacha.custom.CustomPool
@@ -21,7 +22,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
-import net.mamoe.yamlkt.Yaml
 import java.io.File
 import java.io.IOException
 import java.util.stream.Collectors
@@ -90,7 +90,7 @@ object GachaService {
         }
 
         try {
-            val pool = Yaml.decodeFromString<CustomPool>(poolFile.getContext())
+            val pool = Yaml.default.decodeFromString<CustomPool>(poolFile.getContext())
             addPool(pool)
         } catch (e: IOException) {
             FileUtil.createErrorReportFile("解析卡池信息失败", "gacha", e, "", e.message ?: "")
