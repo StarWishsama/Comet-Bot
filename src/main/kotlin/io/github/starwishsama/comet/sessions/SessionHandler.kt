@@ -21,7 +21,6 @@ import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
-import kotlin.streams.toList
 
 object SessionHandler {
     private val sessionPool: MutableSet<Session> = Collections.synchronizedSet(mutableSetOf())
@@ -88,7 +87,7 @@ object SessionHandler {
         val sessionStream = sessionPool.stream()
             .filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }
 
-        val sessionToHandle = sessionStream.toList()
+        val sessionToHandle = sessionStream.collect(Collectors.toList())
 
         if (sessionToHandle.isEmpty()) {
             return false

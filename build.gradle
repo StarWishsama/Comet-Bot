@@ -140,8 +140,14 @@ shadowJar {
     exclude("META-INF/NOTICE")
 }
 
+compileJava {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 compileKotlin {
     println "Comet >> Welcome to Comet!"
+    println "Comet >> Using Java " + System.getProperty("java.version") + " to build."
     println "Comet >> Now building Comet $version..."
 
     kotlinOptions {
