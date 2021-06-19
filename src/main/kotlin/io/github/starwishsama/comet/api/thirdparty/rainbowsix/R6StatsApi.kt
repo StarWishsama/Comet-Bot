@@ -90,7 +90,7 @@ object R6StatsApi : ApiExecutor {
         }
 
         // TODO: 支持分赛季数据获取
-        val latestSeasonalStat = seasonalStat.getSeasonalStat(SeasonName.CRIMSON_HEIST)?.getRegionStat(Region.EMEA)
+        val latestSeasonalStat = seasonalStat.getSeasonalStat(SeasonName.NORTH_STAR)?.getRegionStat(Region.EMEA)
             ?: return MessageWrapper().addText("无法获取玩家 $userName 的信息, 赛季数据为空")
 
         val infoText = "|| ${genericStat.username} [${genericStat.levelInfo.level} 级]\n" +
