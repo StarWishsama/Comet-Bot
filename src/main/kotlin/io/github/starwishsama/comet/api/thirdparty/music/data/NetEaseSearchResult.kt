@@ -50,7 +50,7 @@ data class NetEaseSearchResult(
                 names.add(it.name)
             }
 
-            return names.collect(Collectors.toList())
+            return names.toList()
         }
     }
 }
