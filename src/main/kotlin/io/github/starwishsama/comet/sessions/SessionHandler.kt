@@ -49,7 +49,7 @@ object SessionHandler {
     }
 
     fun getSessionsByGroup(groupID: Long): List<Session> =
-        sessionPool.stream().filter { it.target.groupId == groupID }.toList()
+        sessionPool.stream().filter { it.target.groupId == groupID }.collect(Collectors.toList())
 
     fun hasSessionByID(id: Long): Boolean = getSessionsByID(id).isNotEmpty()
 
