@@ -170,7 +170,11 @@ object FileUtil {
     fun getLogLocation(customPrefix: String = "log"): File {
         val initTime = LocalDateTime.now()
         val parent = getChildFolder("logs")
-        return File(parent, "$customPrefix-${dateFormatter.format(initTime)}.log").also { it.createNewFile() }
+        return File(parent, "$customPrefix-${dateFormatter.format(initTime)}.log").also {
+            if (!it.exists()) {
+                it.createNewFile()
+            }
+        }
     }
 
     /**
