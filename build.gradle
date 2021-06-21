@@ -55,7 +55,7 @@ dependencies {
 
     implementation("net.mamoe:mirai-core-all:$miraiVersion")
 
-    implementation 'cn.hutool:hutool-http:5.6.7'
+    implementation 'cn.hutool:hutool-http:5.7.2'
     implementation 'cn.hutool:hutool-crypto:5.6.7'
 
     implementation 'org.apache.commons:commons-lang3:3.12.0'
