@@ -60,8 +60,8 @@ class ArkNightPool(
     }
 
     private val r3Range = 0.0..0.5
-    private val r4Range = 0.51..0.91
-    private val r5Range = 0.92..0.97
+    private val r4Range = 0.5..0.9
+    private val r5Range = 0.9..0.98
 
     override fun doDraw(time: Int): GachaResult {
         val gachaResult = GachaResult()
