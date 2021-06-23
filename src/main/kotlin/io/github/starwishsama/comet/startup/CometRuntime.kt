@@ -25,13 +25,11 @@ import io.github.starwishsama.comet.commands.chats.*
 import io.github.starwishsama.comet.commands.console.BroadcastCommand
 import io.github.starwishsama.comet.commands.console.DebugCommand
 import io.github.starwishsama.comet.commands.console.StopCommand
-import io.github.starwishsama.comet.file.BackupHelper
+import io.github.starwishsama.comet.file.DataSaveHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.RetrofitLogger
-import io.github.starwishsama.comet.managers.ApiManager
-import io.github.starwishsama.comet.objects.config.api.BiliBiliConfig
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.server.WebHookServer
@@ -210,26 +208,16 @@ object CometRuntime {
     }
 
     private fun runScheduleTasks() {
-        TaskUtil.runAsync { BackupHelper.checkOldFiles() }
+        TaskUtil.runAsync { DataSaveHelper.checkOldFiles() }
 
         val apis = arrayOf(DynamicApi, TwitterApi, VideoApi)
 
         /** 定时任务 */
-        BackupHelper.scheduleBackup()
+        DataSaveHelper.scheduleBackup()
+        DataSaveHelper.scheduleSave()
+
         TaskUtil.runScheduleTaskAsync(5, 5, TimeUnit.HOURS) {
             BotVariables.users.forEach { it.value.addTime(100) }
-        }
-
-        val biliConfig = ApiManager.getConfig<BiliBiliConfig>()
-
-        val pwd = biliConfig.password
-        val username = biliConfig.login
-
-        TaskUtil.runAsync(5) {
-            if (pwd.isNotEmpty() && username.isNotEmpty()) {
-                runBlocking {
-                }
-            }
         }
 
         apis.forEach {

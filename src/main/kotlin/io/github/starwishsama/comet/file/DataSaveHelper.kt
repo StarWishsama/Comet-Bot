@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
-object BackupHelper {
+object DataSaveHelper {
     private val location: File = FileUtil.getChildFolder("backups")
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
 
@@ -50,7 +50,15 @@ object BackupHelper {
     }
 
     fun scheduleBackup() =
-        TaskUtil.runScheduleTaskAsync(cfg.autoSaveTime, cfg.autoSaveTime, TimeUnit.MINUTES, BackupHelper::createBackup)
+        TaskUtil.runScheduleTaskAsync(
+            cfg.autoSaveTime,
+            cfg.autoSaveTime,
+            TimeUnit.MINUTES,
+            DataSaveHelper::createBackup
+        )
+
+    fun scheduleSave() =
+        TaskUtil.runScheduleTaskAsync(cfg.autoSaveTime, cfg.autoSaveTime, TimeUnit.MINUTES, DataSetup::saveAllResources)
 
     @OptIn(ExperimentalTime::class)
     fun checkOldFiles() {
