@@ -27,13 +27,13 @@ import net.mamoe.mirai.message.data.MessageChain
 class DivineCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
         return if (args.isNotEmpty()) {
-            if (user.commandTime > 0 || user.level != UserLevel.USER) {
+            if (user.checkInPoint > 0 || user.level != UserLevel.USER) {
                 if (args.isEmpty()) return CometUtil.toChain("请检查需要占卜的字符是否超过上限或为空!")
 
                 val randomEventName = args.getRestString(0)
                 if (randomEventName.isNotBlank() && randomEventName.length < 30) {
                     val result = RandomResult(-1000, RandomUtil.randomDouble(0.0, 1.0), randomEventName)
-                    user.decreaseTime()
+                    user.consumePoint(1)
                     RandomResult.getChance(result).convertToChain()
                 } else {
                     CometUtil.toChain("请检查需要占卜的字符是否超过上限或为空!")

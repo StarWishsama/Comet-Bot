@@ -216,10 +216,6 @@ object CometRuntime {
         DataSaveHelper.scheduleBackup()
         DataSaveHelper.scheduleSave()
 
-        TaskUtil.runScheduleTaskAsync(5, 5, TimeUnit.HOURS) {
-            BotVariables.users.forEach { it.value.addTime(100) }
-        }
-
         apis.forEach {
             TaskUtil.runScheduleTaskAsync(it.duration.toLong(), it.duration.toLong(), TimeUnit.HOURS) {
                 it.resetTime()

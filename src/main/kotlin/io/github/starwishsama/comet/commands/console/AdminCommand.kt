@@ -12,8 +12,6 @@ package io.github.starwishsama.comet.commands.console
 
 import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.users
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -22,7 +20,6 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.BotUser
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import java.io.IOException
-
 
 class AdminCommand : ConsoleCommand {
     override suspend fun execute(args: List<String>): String {
@@ -66,38 +63,6 @@ class AdminCommand : ConsoleCommand {
                         return "重载成功."
                     } catch (e: IOException) {
                         daemonLogger.warning("在重载时发生了异常", e)
-                    }
-                }
-                "resetpoint", "rpoint", "rp" -> {
-                    if (args.size > 1 && args[1].isNumeric()) {
-                        val time = try {
-                            args[1].toInt()
-                        } catch (e: NumberFormatException) {
-                            return "输入的数字不合法! 范围: (0, 300]"
-                        }
-
-                        return if (time in 1..300) {
-                            users.forEach { it.value.commandTime = time }
-                            "成功重置所有用户的积分为 $time"
-                        } else {
-                            "输入的数字错误! 范围: (0, 300]"
-                        }
-                    }
-                }
-                "give" -> {
-                    if (args.size > 1 && args[1].isNumeric()) {
-                        val time = try {
-                            args[1].toInt()
-                        } catch (e: NumberFormatException) {
-                            return "输入的数字不合法! 范围: (0, 10000]"
-                        }
-
-                        return if (time in 1..10000) {
-                            users.forEach { it.value.addTime(time, true) }
-                            "成功给予所有 BotUser 积分 $time 点"
-                        } else {
-                            "输入的数字错误! 范围: (0, 10000]"
-                        }
                     }
                 }
                 "cmd" -> {

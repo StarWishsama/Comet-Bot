@@ -72,7 +72,7 @@ object ArkNightService {
 
             if (event is GroupMessageEvent) event.sender.at().plus("\n").plus(reply) else reply
         } else {
-            (GachaUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}").convertToChain()
+            (GachaUtil.overTimeMessage + "\n剩余积分: ${user.checkInPoint}").convertToChain()
         }
     }
 

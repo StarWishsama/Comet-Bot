@@ -25,36 +25,17 @@ data class BotUser(
     var bindServerAccount: String = "",
     var r6sAccount: String = "",
     var level: UserLevel = UserLevel.USER,
-    var commandTime: Int = 100,
     var checkInGroup: Long = 0,
     var lastExecuteTime: Long = -1,
     private val permissions: MutableList<String> = mutableListOf(),
     val savedContents: MutableList<MessageWrapper> = mutableListOf()
 ) {
-    fun decreaseTime() {
-        if (level <= UserLevel.VIP) {
-            commandTime--
-        }
+    fun addPoint(point: Number) {
+        checkInPoint += point.toDouble()
     }
 
-    fun decreaseTime(time: Int) {
-        if (level <= UserLevel.VIP) {
-            commandTime -= time
-        }
-    }
-
-    fun addPoint(point: Double) {
-        checkInPoint += point
-    }
-
-    fun addTime(time: Int, bypass: Boolean = false) {
-        if (level == UserLevel.USER && (commandTime <= 1000 || bypass)) {
-            commandTime += time
-        }
-    }
-
-    fun costPoint(point: Double) {
-        checkInPoint -= point
+    fun consumePoint(point: Number) {
+        checkInPoint -= point.toDouble()
     }
 
     fun plusDay() {

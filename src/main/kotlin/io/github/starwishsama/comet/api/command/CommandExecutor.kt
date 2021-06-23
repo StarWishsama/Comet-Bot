@@ -382,14 +382,6 @@ object CommandExecutor {
                     false
                 }
             }
-            CommandExecuteConsumerType.COMMAND_TIME -> {
-                return if (user.commandTime >= props.consumePoint) {
-                    user.decreaseTime(props.consumePoint)
-                    true
-                } else {
-                    false
-                }
-            }
             CommandExecuteConsumerType.NONE -> return true
         }
     }

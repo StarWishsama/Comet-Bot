@@ -169,7 +169,7 @@ class ArkNightPool(
      */
     fun getArkDrawResult(user: BotUser, time: Int = 1): GachaResult {
         return if (GachaUtil.checkHasGachaTime(user, time)) {
-            user.decreaseTime(time)
+            user.consumePoint(time)
             doDraw(time)
         } else {
             GachaResult()
@@ -218,7 +218,7 @@ class ArkNightPool(
                 }
             }
         } else {
-            return GachaUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}"
+            return GachaUtil.overTimeMessage + "\n剩余积分: ${user.checkInPoint}"
         }
     }
 

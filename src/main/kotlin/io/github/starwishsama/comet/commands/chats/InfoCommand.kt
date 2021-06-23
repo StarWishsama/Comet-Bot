@@ -35,8 +35,7 @@ class InfoCommand : ChatCommand {
                 "\n积分: " + String.format("%.1f", user.checkInPoint) +
                         "\n累计连续签到了 " + user.checkInTime.toString() + " 天" + "\n上次签到于: " +
                         user.lastCheckInTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString() +
-                        "\n权限组: " + user.level.toString() +
-                        "\n命令条数: " + user.commandTime
+                        "\n权限组: " + user.level.toString()
 
             if (user.bindServerAccount.isNotEmpty()) {
                 reply = reply + "绑定的游戏账号是: " + user.bindServerAccount

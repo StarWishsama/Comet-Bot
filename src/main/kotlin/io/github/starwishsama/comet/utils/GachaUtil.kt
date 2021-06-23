@@ -126,7 +126,7 @@ object GachaUtil {
     }
 
     fun checkHasGachaTime(user: BotUser, time: Int): Boolean =
-        (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
+        (user.checkInPoint >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
 
     @Suppress("HttpUrlsUsage")
     fun downloadArkNightImage() {
