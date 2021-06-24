@@ -10,10 +10,10 @@
 
 package io.github.starwishsama.comet.file
 
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.cfg
-import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.cfg
+import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.file.DataFiles.allDataFile
 import io.github.starwishsama.comet.file.DataFiles.arkNightData
 import io.github.starwishsama.comet.file.DataFiles.cfgFile
@@ -68,7 +68,7 @@ object DataSetup {
     private fun saveCfg() {
         try {
             cfgFile.file.writeString(Default.encodeToString(CometConfig.serializer(), cfg), isAppend = false)
-            userCfg.file.writeClassToJson(BotVariables.users)
+            userCfg.file.writeClassToJson(CometVariables.USERS)
         } catch (e: Exception) {
             daemonLogger.warning("[配置] 在保存配置文件时发生了问题", e)
         }
@@ -82,14 +82,14 @@ object DataSetup {
         }
 
         if (CompatibilityService.checkUserData(userCfg.file)) {
-            BotVariables.users.putAll(userCfg.file.parseAsClass())
+            CometVariables.USERS.putAll(userCfg.file.parseAsClass())
         }
 
-        daemonLogger.info("已加载了 ${BotVariables.users.size} 个用户数据.")
+        daemonLogger.info("已加载了 ${CometVariables.USERS.size} 个用户数据.")
 
         FileUtil.initResourceFile()
 
-        BotVariables.localizationManager = LocalizationManager()
+        CometVariables.localizationManager = LocalizationManager()
 
         GachaService.loadGachaData(arkNightData.file)
 
@@ -138,10 +138,10 @@ object DataSetup {
                     GroupConfigManager.addConfig(cfg)
                 }
             } catch (e: RuntimeException) {
-                BotVariables.logger.warning("[配置] 在加载 ${group.id} 的分群配置时出现了问题", e)
+                CometVariables.logger.warning("[配置] 在加载 ${group.id} 的分群配置时出现了问题", e)
             }
         }
 
-        BotVariables.logger.info("[配置] 成功加载了 ${GroupConfigManager.getAllConfigs().size} 个群配置")
+        CometVariables.logger.info("[配置] 成功加载了 ${GroupConfigManager.getAllConfigs().size} 个群配置")
     }
 }

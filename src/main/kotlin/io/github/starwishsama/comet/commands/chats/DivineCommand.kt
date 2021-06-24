@@ -15,7 +15,7 @@ import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.RandomResult
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
@@ -25,7 +25,7 @@ import net.mamoe.mirai.message.data.MessageChain
 
 
 class DivineCommand : ChatCommand {
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return if (args.isNotEmpty()) {
             if (user.checkInPoint > 0 || user.level != UserLevel.USER) {
                 if (args.isEmpty()) return CometUtil.toChain("请检查需要占卜的字符是否超过上限或为空!")

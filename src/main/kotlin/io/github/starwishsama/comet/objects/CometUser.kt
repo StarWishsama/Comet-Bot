@@ -11,12 +11,12 @@
 package io.github.starwishsama.comet.objects
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import java.time.LocalDateTime
 
-data class BotUser(
+data class CometUser(
     @JsonProperty("userQQ")
     val id: Long,
     var lastCheckInTime: LocalDateTime = LocalDateTime.now(),
@@ -51,7 +51,7 @@ data class BotUser(
     }
 
     fun getPermissions(): String = buildString {
-        this@BotUser.permissions.forEach {
+        this@CometUser.permissions.forEach {
             append("$it ")
         }
     }.trim()
@@ -94,17 +94,17 @@ data class BotUser(
             return getUser(id)?.level == UserLevel.OWNER
         }
 
-        fun quickRegister(id: Long): BotUser {
-            BotVariables.users[id].apply {
-                val register = BotUser(id)
-                return this ?: register.also { BotVariables.users.putIfAbsent(id, register) }
+        fun quickRegister(id: Long): CometUser {
+            CometVariables.USERS[id].apply {
+                val register = CometUser(id)
+                return this ?: register.also { CometVariables.USERS.putIfAbsent(id, register) }
             }
         }
 
-        fun getUser(id: Long): BotUser? {
-            return BotVariables.users[id]
+        fun getUser(id: Long): CometUser? {
+            return CometVariables.USERS[id]
         }
 
-        fun getUserOrRegister(qq: Long): BotUser = getUser(qq) ?: quickRegister(qq)
+        fun getUserOrRegister(qq: Long): CometUser = getUser(qq) ?: quickRegister(qq)
     }
 }

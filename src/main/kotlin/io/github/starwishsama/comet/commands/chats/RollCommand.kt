@@ -11,13 +11,13 @@
 package io.github.starwishsama.comet.commands.chats
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
@@ -35,7 +35,7 @@ import java.time.LocalDateTime
 
 
 class RollCommand : ChatCommand, ConversationCommand {
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (event !is GroupMessageEvent) return "本命令仅限群聊使用".toChain()
 
         if (SessionHandler.hasSessionByGroup(event.group.id, RollSession::class.java)) {
@@ -96,7 +96,7 @@ class RollCommand : ChatCommand, ConversationCommand {
         抽奖延迟时间不填则自动设为 3 分钟.
     """.trimIndent()
 
-    override suspend fun handle(event: MessageEvent, user: BotUser, session: Session) {
+    override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
         if (session is RollSession && event is GroupMessageEvent) {
             if (LocalDateTime.now().minusMinutes(session.stopAfterMinute.toLong()).isAfter(session.createdTime)) {
                 generateResult(session, event)
@@ -142,7 +142,7 @@ class RollCommand : ChatCommand, ConversationCommand {
         val group = event.bot.getGroup(session.target.groupId)
 
         if (group == null) {
-            BotVariables.daemonLogger.warning("推送开奖消息失败: 找不到对应的群[${group}]")
+            CometVariables.daemonLogger.warning("推送开奖消息失败: 找不到对应的群[${group}]")
         } else {
             var winnerText = messageChainOf()
             val winners = session.getWinningUsers()

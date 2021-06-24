@@ -14,7 +14,7 @@ import cn.hutool.core.net.URLDecoder
 import cn.hutool.http.HttpStatus
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.github.GithubEventHandler
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.config.SecretStatus
@@ -53,26 +53,26 @@ class GithubWebHookHandler : HttpHandler {
             return
         }
 
-        BotVariables.netLogger.log(HinaLogLevel.Debug, "收到新事件", prefix = "WebHook")
+        CometVariables.netLogger.log(HinaLogLevel.Debug, "收到新事件", prefix = "WebHook")
 
         val payload = URLDecoder.decode(request.replace("payload=", ""), Charsets.UTF_8)
-        val validate = BotVariables.mapper.readTree(payload).isUsable()
+        val validate = CometVariables.mapper.readTree(payload).isUsable()
 
         if (!validate) {
-            BotVariables.netLogger.log(HinaLogLevel.Warn, "解析请求失败, 回调的 JSON 不合法.\n${payload}", prefix = "WebHook")
+            CometVariables.netLogger.log(HinaLogLevel.Warn, "解析请求失败, 回调的 JSON 不合法.\n${payload}", prefix = "WebHook")
             he.writeTextResponse("Unknown request", statusCode = HttpStatus.HTTP_INTERNAL_ERROR)
             return
         }
 
         try {
-            val info = GithubEventHandler.process(payload, eventType) ?: return BotVariables.netLogger.log(
+            val info = GithubEventHandler.process(payload, eventType) ?: return CometVariables.netLogger.log(
                 HinaLogLevel.Debug,
                 "推送 WebHook 消息失败, 不支持的事件类型",
                 prefix = "WebHook"
             )
             GithubPusher.push(info)
         } catch (e: IOException) {
-            BotVariables.netLogger.log(HinaLogLevel.Warn, "推送 WebHook 消息失败", e, prefix = "WebHook")
+            CometVariables.netLogger.log(HinaLogLevel.Warn, "推送 WebHook 消息失败", e, prefix = "WebHook")
         }
 
         val response = if (secretStatus == SecretStatus.NO_SECRET) {
@@ -90,13 +90,13 @@ class GithubWebHookHandler : HttpHandler {
         signature: MutableList<String>?
     ): Boolean {
         if (signature == null && secretStatus == SecretStatus.NO_SECRET) {
-            BotVariables.netLogger.log(HinaLogLevel.Debug, "收到新事件, 未通过安全验证. 请求的签名为: 无", prefix = "WebHook")
+            CometVariables.netLogger.log(HinaLogLevel.Debug, "收到新事件, 未通过安全验证. 请求的签名为: 无", prefix = "WebHook")
             he.writeTextResponse("A Serve error has happened", statusCode = HttpStatus.HTTP_INTERNAL_ERROR)
             return false
         }
 
         if (signature != null && secretStatus == SecretStatus.UNAUTHORIZED) {
-            BotVariables.netLogger.log(
+            CometVariables.netLogger.log(
                 HinaLogLevel.Debug,
                 "收到新事件, 未通过安全验证. 请求的签名为: ${signature[0]}",
                 prefix = "WebHook"
@@ -119,7 +119,7 @@ class GithubWebHookHandler : HttpHandler {
         if (he.requestHeaders[eventTypeHeader] == null || he.requestHeaders["User-Agent"]?.get(0)
                 ?.startsWith("GitHub-Hookshot") == false
         ) {
-            BotVariables.netLogger.log(HinaLogLevel.Debug, "无效请求", prefix = "WebHook")
+            CometVariables.netLogger.log(HinaLogLevel.Debug, "无效请求", prefix = "WebHook")
             val resp = "Unsupported Request".toByteArray()
             he.sendResponseHeaders(HttpStatus.HTTP_FORBIDDEN, resp.size.toLong())
             he.responseBody.use {

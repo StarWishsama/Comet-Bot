@@ -23,7 +23,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
@@ -50,7 +50,7 @@ import java.util.concurrent.ConcurrentHashMap
  */
 
 @OptIn(MiraiInternalApi::class)
-object BotVariables {
+object CometVariables {
     internal lateinit var filePath: File
 
     val comet: Comet = Comet()
@@ -58,6 +58,8 @@ object BotVariables {
     internal lateinit var loggerAppender: LoggerAppender
 
     internal lateinit var miraiLoggerAppender: LoggerAppender
+
+    internal lateinit var miraiNetLoggerAppender: LoggerAppender
 
     internal lateinit var startTime: LocalDateTime
 
@@ -91,6 +93,15 @@ object BotVariables {
             CometApplication.console.printAbove(it)
             if (::miraiLoggerAppender.isInitialized) {
                 miraiLoggerAppender.appendLog(it)
+            }
+        }, debugMode = cfg.debugMode)
+    }
+
+    internal val miraiNetLogger: HinaLogger by lazy {
+        HinaLogger("miraiNet", logAction = {
+            CometApplication.console.printAbove(it)
+            if (::miraiNetLoggerAppender.isInitialized) {
+                miraiNetLoggerAppender.appendLog(it)
             }
         }, debugMode = cfg.debugMode)
     }
@@ -131,7 +142,7 @@ object BotVariables {
 
     internal var rCon: Rcon? = null
 
-    internal val users: MutableMap<Long, BotUser> = ConcurrentHashMap()
+    internal val USERS: MutableMap<Long, CometUser> = ConcurrentHashMap()
     internal lateinit var localizationManager: LocalizationManager
 
     /** 明日方舟卡池数据 */

@@ -10,8 +10,8 @@
 
 package io.github.starwishsama.comet.managers
 
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.comet
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.writeClassToJson
@@ -71,6 +71,6 @@ object GroupConfigManager {
             loc.writeClassToJson(it)
         }
 
-        BotVariables.daemonLogger.info("已保存所有群配置")
+        CometVariables.daemonLogger.info("已保存所有群配置")
     }
 }

@@ -14,10 +14,10 @@ import cn.hutool.http.ContentType
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.roxstudio.utils.CUrl
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.logger
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.logger
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.twitter.data.Tweet
 import io.github.starwishsama.comet.api.thirdparty.twitter.data.TwitterUser
@@ -81,8 +81,8 @@ object TwitterApi : ApiExecutor {
                 "grant_type=client_credentials"
             )
 
-            if (BotVariables.cfg.proxyUrl.isNotEmpty() && BotVariables.cfg.proxyPort != -1) {
-                curl.proxy(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
+            if (CometVariables.cfg.proxyUrl.isNotEmpty() && CometVariables.cfg.proxyPort != -1) {
+                curl.proxy(CometVariables.cfg.proxyUrl, CometVariables.cfg.proxyPort)
             }
 
             val result = curl.exec("UTF-8")

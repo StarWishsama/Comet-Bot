@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.service.server
 
 import com.sun.net.httpserver.HttpServer
-import io.github.starwishsama.comet.BotVariables.netLogger
+import io.github.starwishsama.comet.CometVariables.netLogger
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.service.server.module.GithubWebHookHandler
 import java.net.InetSocketAddress

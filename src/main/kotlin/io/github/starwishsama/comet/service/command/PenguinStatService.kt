@@ -12,7 +12,7 @@ package io.github.starwishsama.comet.service.command
 
 import io.github.starwishsama.comet.api.thirdparty.penguinstats.PenguinStats
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.message.data.MessageChain
 
@@ -25,7 +25,7 @@ object PenguinStatService {
         return PenguinStats.getItemDropInfo(args[1]).toChain()
     }
 
-    fun forceUpdate(user: BotUser): MessageChain {
+    fun forceUpdate(user: CometUser): MessageChain {
         return if (user.compareLevel(UserLevel.ADMIN)) {
             PenguinStats.forceUpdate()
             "正在更新企鹅物流数据...".toChain()

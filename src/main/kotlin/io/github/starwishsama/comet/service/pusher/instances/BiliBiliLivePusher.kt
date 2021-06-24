@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.service.pusher.instances
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
@@ -60,6 +60,6 @@ class BiliBiliLivePusher(
             retrieveTime = 0
         }
 
-        BotVariables.daemonLogger.verbose("已获取了 $retrieveTime 个开播消息")
+        CometVariables.daemonLogger.verbose("已获取了 $retrieveTime 个开播消息")
     }
 }

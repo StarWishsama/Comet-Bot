@@ -11,14 +11,14 @@
 package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.net.URLDecoder
-import io.github.starwishsama.comet.BotVariables.arkNight
-import io.github.starwishsama.comet.BotVariables.cfg
-import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.mapper
-import io.github.starwishsama.comet.BotVariables.yyMMddPattern
+import io.github.starwishsama.comet.CometVariables.arkNight
+import io.github.starwishsama.comet.CometVariables.cfg
+import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.mapper
+import io.github.starwishsama.comet.CometVariables.yyMMddPattern
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.ApiException
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.GachaItem
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
@@ -125,7 +125,7 @@ object GachaUtil {
         }
     }
 
-    fun checkHasGachaTime(user: BotUser, time: Int): Boolean =
+    fun checkHasGachaTime(user: CometUser, time: Int): Boolean =
         (user.checkInPoint >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
 
     @Suppress("HttpUrlsUsage")

@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.api.thirdparty.bilibili
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.search.SearchUserResult
 import retrofit2.Call
@@ -25,8 +25,8 @@ object SearchApi : ApiExecutor {
     init {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.bilibili.com/")
-            .addConverterFactory(JacksonConverterFactory.create(BotVariables.mapper))
-            .client(BotVariables.client)
+            .addConverterFactory(JacksonConverterFactory.create(CometVariables.mapper))
+            .client(CometVariables.client)
             .build()
         searchApiService = retrofit.create(ISearchApi::class.java)
     }

@@ -11,8 +11,8 @@
 package io.github.starwishsama.comet.utils.network
 
 import cn.hutool.http.HttpException
-import io.github.starwishsama.comet.BotVariables.cfg
-import io.github.starwishsama.comet.BotVariables.netLogger
+import io.github.starwishsama.comet.CometVariables.cfg
+import io.github.starwishsama.comet.CometVariables.netLogger
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.utils.StringUtil.containsEtc

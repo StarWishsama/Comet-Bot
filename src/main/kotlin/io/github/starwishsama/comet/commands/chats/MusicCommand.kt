@@ -10,13 +10,13 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.music.ThirdPartyMusicApi
 import io.github.starwishsama.comet.enums.MusicApiType
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.contact.Contact
@@ -30,7 +30,7 @@ class MusicCommand : ChatCommand {
     //val usingUsers = mutableMapOf<Long, List<MusicSearchResult>>()
     var plainText: Boolean = false
 
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             return getHelp().toChain()
         }
@@ -39,11 +39,11 @@ class MusicCommand : ChatCommand {
             "api" -> {
                 if (args.size > 1) {
                     when (args[1].uppercase()) {
-                        "QQ", "TX", "腾讯" -> BotVariables.cfg.musicApi = MusicApiType.QQ
-                        "NETEASE", "网易", "WY" -> BotVariables.cfg.musicApi = MusicApiType.NETEASE
+                        "QQ", "TX", "腾讯" -> CometVariables.cfg.musicApi = MusicApiType.QQ
+                        "NETEASE", "网易", "WY" -> CometVariables.cfg.musicApi = MusicApiType.NETEASE
                     }
 
-                    toChain("音乐API已修改为 ${BotVariables.cfg.musicApi}")
+                    toChain("音乐API已修改为 ${CometVariables.cfg.musicApi}")
                 } else {
                     "/music api [API名称] (QQ/WY)".toChain()
                 }
@@ -87,7 +87,7 @@ class MusicCommand : ChatCommand {
     """.trimIndent()
 
     private fun handleMusicSearch(name: String, subject: Contact): MessageChain {
-        when (BotVariables.cfg.musicApi) {
+        when (CometVariables.cfg.musicApi) {
             MusicApiType.NETEASE -> handleNetEaseMusic(name, subject)
             MusicApiType.QQ -> handleQQMusic(name, subject)
         }
@@ -109,7 +109,7 @@ class MusicCommand : ChatCommand {
                 result[0].toMessageChain(MusicKind.NeteaseCloudMusic)
             }
         } catch (e: Exception) {
-            BotVariables.daemonLogger.warning("点歌时出现了意外", e)
+            CometVariables.daemonLogger.warning("点歌时出现了意外", e)
             return "❌ 点歌系统开小差了, 稍后再试试吧".toChain()
         }
     }
@@ -128,7 +128,7 @@ class MusicCommand : ChatCommand {
                 result[0].toMessageChain(MusicKind.QQMusic)
             }
         } catch (e: Exception) {
-            BotVariables.daemonLogger.warning("点歌时出现了意外", e)
+            CometVariables.daemonLogger.warning("点歌时出现了意外", e)
             return "❌ 点歌系统开小差了, 稍后再试试吧".toChain()
         }
     }

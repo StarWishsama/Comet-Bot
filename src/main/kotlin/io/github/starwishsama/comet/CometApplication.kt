@@ -10,9 +10,9 @@
 
 package io.github.starwishsama.comet
 
-import io.github.starwishsama.comet.BotVariables.cfg
-import io.github.starwishsama.comet.BotVariables.comet
-import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.cfg
+import io.github.starwishsama.comet.CometVariables.comet
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.startup.CometRuntime
 import kotlinx.coroutines.runBlocking
 import org.jline.reader.LineReader

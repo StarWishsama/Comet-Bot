@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.file
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.config.DataFile
 import io.github.starwishsama.comet.utils.FileUtil
@@ -20,11 +20,11 @@ import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
 
 object DataFiles {
-    val userCfg: DataFile = DataFile(File(BotVariables.filePath, "users.json"), DataFile.FilePriority.HIGH) {
-        it.writeClassToJson(BotVariables.users)
+    val userCfg: DataFile = DataFile(File(CometVariables.filePath, "users.json"), DataFile.FilePriority.HIGH) {
+        it.writeClassToJson(CometVariables.USERS)
     }
 
-    val cfgFile: DataFile = DataFile(File(BotVariables.filePath, "config.yml"), DataFile.FilePriority.HIGH) {
+    val cfgFile: DataFile = DataFile(File(CometVariables.filePath, "config.yml"), DataFile.FilePriority.HIGH) {
         it.writeString(Default.encodeToString(CometConfig()), isAppend = false)
     }
 

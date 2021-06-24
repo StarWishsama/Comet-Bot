@@ -14,13 +14,13 @@ package io.github.starwishsama.comet.commands.chats
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 
 class ShopCommand : ChatCommand {
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         TODO("Shop command's priority is ultra low, sry :/")
     }
 

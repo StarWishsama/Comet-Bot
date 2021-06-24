@@ -10,15 +10,15 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BuildConfig
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.task.HitokotoUpdater
 import io.github.starwishsama.comet.sessions.SessionHandler
@@ -39,7 +39,7 @@ import kotlin.time.ExperimentalTime
 
 class DebugCommand : ChatCommand, UnDisableableCommand {
     @ExperimentalTime
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isNotEmpty()) {
             when (args[0]) {
                 "reload" -> {
@@ -107,8 +107,8 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                 }
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().convertToChain()
                 "switch" -> {
-                    BotVariables.switch = !BotVariables.switch
-                    return "维护模式已${if (!BotVariables.switch) "开启" else "关闭"}".toChain()
+                    CometVariables.switch = !CometVariables.switch
+                    return "维护模式已${if (!CometVariables.switch) "开启" else "关闭"}".toChain()
                 }
                 "push" -> {
                     if (args.size > 1) {
@@ -128,7 +128,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                     ps.forEach {
                                         append(it::class.java.simpleName + "\n")
                                         append("上次推送了 ${it.pushTime} 次\n")
-                                        append("上次推送于 ${BotVariables.yyMMddPattern.format(it.latestTriggerTime)}\n")
+                                        append("上次推送于 ${CometVariables.yyMMddPattern.format(it.latestTriggerTime)}\n")
                                     }
                                     trim()
                                 }.toChain()
@@ -158,5 +158,5 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
         get() = true
 
     override val canRegister: () -> Boolean
-        get() = { BotVariables.cfg.debugMode }
+        get() = { CometVariables.cfg.debugMode }
 }

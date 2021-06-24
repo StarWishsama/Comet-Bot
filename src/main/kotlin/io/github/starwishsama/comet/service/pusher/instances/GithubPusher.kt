@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.service.pusher.instances
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.github.data.events.GithubEvent
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.service.command.GitHubService
@@ -31,7 +31,7 @@ object GithubPusher {
         runBlocking {
             consumer.forEach {
                 it.repoTarget.forEach { id ->
-                    BotVariables.comet.getBot().getGroup(id)?.also { g ->
+                    CometVariables.comet.getBot().getGroup(id)?.also { g ->
                         g.sendMessage(
                             event.toMessageWrapper().toMessageChain(g)
                         )
@@ -40,6 +40,6 @@ object GithubPusher {
             }
         }
 
-        BotVariables.netLogger.log(HinaLogLevel.Debug, "推送 WebHook 消息成功", prefix = "WebHook")
+        CometVariables.netLogger.log(HinaLogLevel.Debug, "推送 WebHook 消息成功", prefix = "WebHook")
     }
 }

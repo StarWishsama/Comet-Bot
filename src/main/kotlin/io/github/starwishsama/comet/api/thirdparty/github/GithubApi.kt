@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.api.thirdparty.github
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.github.data.api.RepoInfo
 import io.github.starwishsama.comet.api.thirdparty.github.data.api.UserInfo
 import io.github.starwishsama.comet.utils.network.NetUtil

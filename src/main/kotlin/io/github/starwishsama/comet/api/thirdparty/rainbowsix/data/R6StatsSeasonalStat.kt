@@ -13,7 +13,7 @@ package io.github.starwishsama.comet.api.thirdparty.rainbowsix.data
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.enums.R6Rank
 
 data class R6StatsSeasonalStat(

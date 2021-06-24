@@ -10,8 +10,8 @@
 
 package io.github.starwishsama.comet.service.task
 
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.logger
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.logger
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -34,7 +34,7 @@ object HitokotoUpdater : Runnable {
 
     private fun getHitokotoJson(): Hitokoto {
         val hitokotoJson = NetUtil.getPageContent("https://v1.hitokoto.cn/") ?: throw ApiException("在获取一言时发生了问题")
-        return BotVariables.mapper.readValue(hitokotoJson, Hitokoto::class.java)
+        return CometVariables.mapper.readValue(hitokotoJson, Hitokoto::class.java)
     }
 
     fun getHitokoto(useCache: Boolean = true): String {

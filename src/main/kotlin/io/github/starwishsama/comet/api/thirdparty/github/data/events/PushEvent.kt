@@ -12,7 +12,7 @@ package io.github.starwishsama.comet.api.thirdparty.github.data.events
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 import java.time.Instant
@@ -64,7 +64,7 @@ data class PushEvent(
     )
 
     private fun getLocalTime(time: Long): String {
-        return BotVariables.yyMMddPattern.format(
+        return CometVariables.yyMMddPattern.format(
             Instant.ofEpochMilli(time * 1000L).atZone(ZoneId.systemDefault()).toLocalDateTime()
         )
     }

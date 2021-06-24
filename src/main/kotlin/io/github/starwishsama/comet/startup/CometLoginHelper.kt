@@ -10,9 +10,9 @@
 
 package io.github.starwishsama.comet.startup
 
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.CometApplication
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import org.jline.reader.EndOfFileException
 import org.jline.reader.UserInterruptException
@@ -26,27 +26,27 @@ class CometLoginHelper(val comet: Comet) {
         while (status != LoginStatus.LOGGING) {
             try {
                 if (comet.isInitialized()) {
-                    BotVariables.daemonLogger.info("机器人已完成登录.")
+                    CometVariables.daemonLogger.info("机器人已完成登录.")
                     break
                 }
 
                 var command: String
 
                 if (comet.id == 0L || status == LoginStatus.INPUT_ID) {
-                    BotVariables.daemonLogger.info("请输入欲登录的机器人账号. 如需退出, 请输入 stop")
+                    CometVariables.daemonLogger.info("请输入欲登录的机器人账号. 如需退出, 请输入 stop")
                     command = CometApplication.console.readLine(">")
 
                     if (command == "stop") exitProcess(0)
 
                     if (command.isNumeric() && command.toLongOrNull() != null) {
                         comet.id = command.toLong()
-                        BotVariables.daemonLogger.info("成功设置账号为 ${comet.id}")
+                        CometVariables.daemonLogger.info("成功设置账号为 ${comet.id}")
                         status = LoginStatus.INPUT_PASSWORD
                     } else {
-                        BotVariables.daemonLogger.info("请输入正确的 QQ 号!")
+                        CometVariables.daemonLogger.info("请输入正确的 QQ 号!")
                     }
                 } else if (comet.password.isEmpty() || status == LoginStatus.INPUT_PASSWORD || status == LoginStatus.LOGIN_FAILED) {
-                    BotVariables.daemonLogger.info("请输入欲登录的机器人密码. 如需返回上一步, 请输入 back; 如需退出, 请输入 stop.")
+                    CometVariables.daemonLogger.info("请输入欲登录的机器人密码. 如需返回上一步, 请输入 back; 如需退出, 请输入 stop.")
                     command = CometApplication.console.readLine(">", '*')
 
                     if (command == "back") {
@@ -55,7 +55,7 @@ class CometLoginHelper(val comet: Comet) {
                     }
 
                     comet.password = command
-                    BotVariables.daemonLogger.info("设置成功! 正在启动 Comet...")
+                    CometVariables.daemonLogger.info("设置成功! 正在启动 Comet...")
                     status = LoginStatus.LOGGING
                     break
                 } else if (comet.id > 0 && comet.password.isNotEmpty()) {

@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.github.starwishsama.comet.BotVariables.hmsPattern
+import io.github.starwishsama.comet.CometVariables.hmsPattern
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper

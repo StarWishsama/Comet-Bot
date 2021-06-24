@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.api.command
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.enums.UserLevel
 
 data class CommandProps(
@@ -20,5 +20,5 @@ data class CommandProps(
     val permission: String,
     val level: UserLevel,
     val consumerType: CommandExecuteConsumerType = CommandExecuteConsumerType.COOLDOWN,
-    val consumePoint: Int = BotVariables.cfg.coolDownTime
+    val consumePoint: Int = CometVariables.cfg.coolDownTime
 )

@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
@@ -20,7 +20,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.api.TwitterConfig
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
@@ -38,7 +38,7 @@ import kotlin.time.ExperimentalTime
 
 class TwitterCommand : ChatCommand {
     @ExperimentalTime
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (ApiManager.getConfig<TwitterConfig>().token.isEmpty()) {
             return toChain("推特推送未被正确设置, 请联系机器人管理员")
         }
@@ -97,7 +97,7 @@ class TwitterCommand : ChatCommand {
         命令别名: /推特 /tt /twitter
     """.trimIndent()
 
-    override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
+    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
         if (super.hasPermission(user, e)) return true
         if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true
         return false

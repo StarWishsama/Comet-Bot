@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.utils
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.utils.NumberUtil.formatDigests
 import java.lang.management.ManagementFactory
 import java.lang.management.OperatingSystemMXBean
@@ -23,7 +23,7 @@ object RuntimeUtil {
         val usedMemoryBefore: Long = getUsedMemory()
         System.runFinalization()
         System.gc()
-        BotVariables.daemonLogger.info("GC 清理完成 (已清理 ${usedMemoryBefore - getUsedMemory()} MB)")
+        CometVariables.daemonLogger.info("GC 清理完成 (已清理 ${usedMemoryBefore - getUsedMemory()} MB)")
     }
 
     fun getOperatingSystemBean(): OperatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean()

@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.service.command
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.github.GithubApi
 import io.github.starwishsama.comet.file.DataFiles
@@ -82,9 +82,9 @@ object GitHubService {
             ) {
                 repos.add(id, authorAndRepo[0], authorAndRepo[1], repoSecret)
                 if (repoSecret.isEmpty() || isGroup) {
-                    "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${BotVariables.cfg.webHookAddress}".toChain()
+                    "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${CometVariables.cfg.webHookAddress}".toChain()
                 } else {
-                    "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${BotVariables.cfg.webHookAddress}\nSecret 为 $repoSecret".toChain()
+                    "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${CometVariables.cfg.webHookAddress}\nSecret 为 $repoSecret".toChain()
                 }
             } else {
                 "仓库 $repoName 找不到或者没有权限访问!".toChain()
@@ -205,7 +205,7 @@ object GitHubService {
                 } else {
                     val id = args[1].toLongOrNull() ?: return "请输入正确的群号!".toChain()
 
-                    if (BotVariables.comet.getBot().getGroup(id) != null) {
+                    if (CometVariables.comet.getBot().getGroup(id) != null) {
                         currentRepo.repoTarget.add(id)
 
                         "添加订阅群聊 ($id) 成功!".toChain()
@@ -220,7 +220,7 @@ object GitHubService {
                 } else {
                     val id = args[1].toLongOrNull() ?: return "请输入正确的群号!".toChain()
 
-                    if (BotVariables.comet.getBot().getGroup(id) != null) {
+                    if (CometVariables.comet.getBot().getGroup(id) != null) {
                         currentRepo.repoTarget.remove(id)
 
                         "取消订阅群聊 ($id) 成功!".toChain()

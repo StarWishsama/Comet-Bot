@@ -13,7 +13,7 @@ package io.github.starwishsama.comet.service.pusher
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.instances.BiliBiliDynamicPusher
 import io.github.starwishsama.comet.service.pusher.instances.BiliBiliLivePusher
@@ -38,7 +38,7 @@ object PusherManager {
             try {
 
                 if (cfgFile.exists()) {
-                    val cfg = BotVariables.mapper.readValue<PusherConfig>(cfgFile.getContext())
+                    val cfg = CometVariables.mapper.readValue<PusherConfig>(cfgFile.getContext())
                     pusher.config = cfg
                 } else {
                     cfgFile.createNewFile()
@@ -48,11 +48,11 @@ object PusherManager {
                 pusher.start()
             } catch (e: Exception) {
                 if (e is JsonProcessingException || e is JsonMappingException) {
-                    BotVariables.daemonLogger.warning("在解析推送器配置 ${pusher.name} 时遇到了问题, 已自动重新生成", e)
+                    CometVariables.daemonLogger.warning("在解析推送器配置 ${pusher.name} 时遇到了问题, 已自动重新生成", e)
                     cfgFile.delete()
                     cfgFile.createNewFile().also { cfgFile.writeClassToJson(pusher.config) }
                 } else {
-                    BotVariables.daemonLogger.warning("在初始化推送器 ${pusher.name} 时遇到了问题", e)
+                    CometVariables.daemonLogger.warning("在初始化推送器 ${pusher.name} 时遇到了问题", e)
                 }
             }
         }

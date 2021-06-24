@@ -14,7 +14,7 @@ package io.github.starwishsama.comet.commands.chats
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.service.command.ArkNightService.configGachaPool
 import io.github.starwishsama.comet.service.command.ArkNightService.getGachaResult
 import io.github.starwishsama.comet.service.command.ArkNightService.handleFreedomDraw
@@ -27,7 +27,7 @@ import net.mamoe.mirai.message.data.MessageChain
 
 @Suppress("SpellCheckingInspection")
 class ArkNightCommand : ChatCommand {
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!GachaService.isArkNightUsable()) {
             return "还未下载明日方舟卡池数据, 无法使用".toChain()
         }

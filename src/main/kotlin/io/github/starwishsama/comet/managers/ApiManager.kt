@@ -11,8 +11,8 @@
 package io.github.starwishsama.comet.managers
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.config.api.*

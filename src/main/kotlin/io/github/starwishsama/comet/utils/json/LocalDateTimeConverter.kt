@@ -13,7 +13,7 @@ package io.github.starwishsama.comet.utils.json
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
-import io.github.starwishsama.comet.BotVariables.yyMMddPattern
+import io.github.starwishsama.comet.CometVariables.yyMMddPattern
 import java.time.LocalDateTime
 
 /**

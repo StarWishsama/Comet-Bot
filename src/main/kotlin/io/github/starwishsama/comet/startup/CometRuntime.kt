@@ -10,13 +10,13 @@
 
 package io.github.starwishsama.comet.startup
 
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.cfg
-import io.github.starwishsama.comet.BotVariables.cometServer
-import io.github.starwishsama.comet.BotVariables.consoleCommandLogger
-import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometApplication
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.cfg
+import io.github.starwishsama.comet.CometVariables.cometServer
+import io.github.starwishsama.comet.CometVariables.consoleCommandLogger
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
@@ -55,14 +55,15 @@ import java.util.concurrent.TimeUnit
 
 object CometRuntime {
     fun postSetup() {
-        BotVariables.filePath = FileUtil.getJarLocation()
-        BotVariables.startTime = LocalDateTime.now()
-        BotVariables.loggerAppender = LoggerAppender(FileUtil.getLogLocation())
-        BotVariables.miraiLoggerAppender = LoggerAppender(FileUtil.getLogLocation("mirai"))
+        CometVariables.filePath = FileUtil.getJarLocation()
+        CometVariables.startTime = LocalDateTime.now()
+        CometVariables.loggerAppender = LoggerAppender(FileUtil.getLogLocation())
+        CometVariables.miraiLoggerAppender = LoggerAppender(FileUtil.getLogLocation("mirai"))
+        CometVariables.miraiNetLoggerAppender = LoggerAppender(FileUtil.getLogLocation("mirai-net"))
 
         Runtime.getRuntime().addShutdownHook(Thread { shutdownTask() })
 
-        BotVariables.logger.info(
+        CometVariables.logger.info(
             """
         
            ______                     __ 
@@ -77,7 +78,7 @@ object CometRuntime {
 
         DataSetup.init()
 
-        BotVariables.client = OkHttpClient().newBuilder()
+        CometVariables.client = OkHttpClient().newBuilder()
             .connectTimeout(5, TimeUnit.SECONDS)
             .followRedirects(true)
             .readTimeout(5, TimeUnit.SECONDS)
@@ -94,14 +95,14 @@ object CometRuntime {
     }
 
     private fun shutdownTask() {
-        BotVariables.logger.info("[Bot] 正在关闭 Bot...")
+        CometVariables.logger.info("[Bot] 正在关闭 Bot...")
         DataSetup.saveAllResources()
         PusherManager.savePushers()
         cometServer?.stop()
         TaskUtil.service.shutdown()
-        BotVariables.rCon?.disconnect()
-        BotVariables.loggerAppender.close()
-        BotVariables.miraiLoggerAppender.close()
+        CometVariables.rCon?.disconnect()
+        CometVariables.loggerAppender.close()
+        CometVariables.miraiLoggerAppender.close()
     }
 
     fun setupBot(bot: Bot, logger: MiraiLogger) {
@@ -163,7 +164,7 @@ object CometRuntime {
             } else {
                 listener.eventToListen.forEach { eventClass ->
                     bot.globalEventChannel().subscribeAlways(eventClass) {
-                        if (BotVariables.switch) {
+                        if (CometVariables.switch) {
                             listener.listen(this)
                         }
                     }
@@ -181,7 +182,7 @@ object CometRuntime {
 
         DataSetup.initPerGroupSetting(bot)
 
-        logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${BotVariables.startTime.getLastingTimeAsString()}")
+        logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${CometVariables.startTime.getLastingTimeAsString()}")
 
         RuntimeUtil.forceGC()
 
@@ -191,8 +192,8 @@ object CometRuntime {
     fun setupRCon() {
         val address = cfg.rConUrl
         val password = cfg.rConPassword
-        if (address != null && password != null && BotVariables.rCon == null) {
-            BotVariables.rCon = Rcon(address, cfg.rConPort, password.toByteArray())
+        if (address != null && password != null && CometVariables.rCon == null) {
+            CometVariables.rCon = Rcon(address, cfg.rConPort, password.toByteArray())
         }
     }
 

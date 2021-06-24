@@ -10,10 +10,10 @@
 
 package io.github.starwishsama.comet.sessions
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -32,12 +32,12 @@ object SessionHandler {
      * @return 添加状态
      */
     fun insertSession(session: Session): Boolean {
-        BotVariables.daemonLogger.verbose("创建会话 ${session::class.java.simpleName + "#" + session.hashCode()}")
+        CometVariables.daemonLogger.verbose("创建会话 ${session::class.java.simpleName + "#" + session.hashCode()}")
         return sessionPool.add(session)
     }
 
     fun removeSession(session: Session): Boolean {
-        BotVariables.daemonLogger.verbose("移除会话 ${session::class.java.simpleName + "#" + session.hashCode()}")
+        CometVariables.daemonLogger.verbose("移除会话 ${session::class.java.simpleName + "#" + session.hashCode()}")
         return sessionPool.remove(session)
     }
 
@@ -72,7 +72,7 @@ object SessionHandler {
      *
      * @param e 消息事件
      */
-    suspend fun handleSessions(e: MessageEvent, u: BotUser): Boolean {
+    suspend fun handleSessions(e: MessageEvent, u: CometUser): Boolean {
         val time = LocalDateTime.now()
         val target = SessionTarget()
 
@@ -104,7 +104,7 @@ object SessionHandler {
         if (sessionPool.stream()
                 .filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }.count() > 0
         ) {
-            BotVariables.logger.debug(
+            CometVariables.logger.debug(
                 "[会话] 处理 ${sessionToHandle.count()} 个会话耗时 ${
                     time.getLastingTimeAsString(
                         unit = TimeUnit.SECONDS,

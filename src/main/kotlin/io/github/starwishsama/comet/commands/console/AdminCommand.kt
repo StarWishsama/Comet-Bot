@@ -10,14 +10,14 @@
 
 package io.github.starwishsama.comet.commands.console
 
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import java.io.IOException
 
@@ -29,7 +29,7 @@ class AdminCommand : ConsoleCommand {
                     when (args.size) {
                         2 -> {
                             if (args[1].isNumeric()) {
-                                val target = BotUser.getUser(args[1].toLong()) ?: return "目标没有使用过 Comet"
+                                val target = CometUser.getUser(args[1].toLong()) ?: return "目标没有使用过 Comet"
 
                                 val targetLevel = target.level.ordinal + 1
 
@@ -45,7 +45,7 @@ class AdminCommand : ConsoleCommand {
                         3 -> {
                             if (args[1].isNumeric()) {
                                 try {
-                                    val target = BotUser.getUser(args[1].toLong()) ?: return "目标没有使用过 Comet"
+                                    val target = CometUser.getUser(args[1].toLong()) ?: return "目标没有使用过 Comet"
                                     val level = UserLevel.valueOf(args[2])
                                     target.level = level
 
@@ -79,7 +79,7 @@ class AdminCommand : ConsoleCommand {
                 "groups" -> {
                     return buildString {
                         append("已加入的群聊:\n")
-                        BotVariables.comet.getBot().groups.forEach {
+                        CometVariables.comet.getBot().groups.forEach {
                             append("${it.name} (${it.id}),")
                         }
                     }.removeSuffix(",").trim()

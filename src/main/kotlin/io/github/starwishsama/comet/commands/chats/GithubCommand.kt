@@ -14,7 +14,7 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.service.command.GitHubService.getRepoList
 import io.github.starwishsama.comet.service.command.GitHubService.modifyRepo
 import io.github.starwishsama.comet.service.command.GitHubService.subscribeRepo
@@ -25,7 +25,7 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 class GithubCommand : ChatCommand, ConversationCommand {
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             return getHelp().convertToChain()
         }
@@ -54,7 +54,7 @@ class GithubCommand : ChatCommand, ConversationCommand {
         /gh list 列出所有已订阅 Github 项目动态
     """.trimIndent()
 
-    override suspend fun handle(event: MessageEvent, user: BotUser, session: Session) {
+    override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
         event.subject.sendMessage(modifyRepo(event.message.contentToString().split(" "), event, this, session))
     }
 }

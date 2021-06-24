@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.listeners
 
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -27,7 +27,7 @@ object AutoReplyListener : NListener {
 
                 if (cfg?.keyWordReply == null || cfg.keyWordReply.isEmpty()) return
 
-                val user = BotUser.getUserOrRegister(sender.id)
+                val user = CometUser.getUserOrRegister(sender.id)
 
                 val currentTime = System.currentTimeMillis()
 

@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
@@ -77,7 +77,7 @@ data class Video(
     override fun getContact(): MessageWrapper {
         return MessageWrapper().addText(
             "投递了一个视频: $title\n" +
-                    "发布时间: ${BotVariables.yyMMddPattern.format(publishTime.toLocalDateTime())}\n" +
+                    "发布时间: ${CometVariables.yyMMddPattern.format(publishTime.toLocalDateTime())}\n" +
                     "直达链接: https://www.bilibili.com/video/av$avId\n"
         )
             .addPictureByURL(cover)

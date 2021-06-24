@@ -15,7 +15,7 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.service.command.AdminService.addPermission
 import io.github.starwishsama.comet.service.command.AdminService.giveCommandTime
 import io.github.starwishsama.comet.service.command.AdminService.listPermissions
@@ -28,7 +28,7 @@ import net.mamoe.mirai.message.data.MessageChain
 
 @Suppress("SpellCheckingInspection")
 class AdminCommand : ChatCommand, UnDisableableCommand {
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return if (args.isEmpty()) {
             getHelp().toChain()
         } else {
@@ -53,7 +53,7 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
         /admin give [用户] [命令条数] 给一个用户添加命令条数
     """.trimIndent()
 
-    override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
+    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
         val bLevel = getProps().level
         if (user.compareLevel(bLevel)) return true
         if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true

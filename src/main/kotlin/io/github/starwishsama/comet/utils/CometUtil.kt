@@ -10,10 +10,10 @@
 
 package io.github.starwishsama.comet.utils
 
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.localizationManager
-import io.github.starwishsama.comet.objects.BotUser
-import io.github.starwishsama.comet.objects.BotUser.Companion.getUser
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.localizationManager
+import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.CometUser.Companion.getUser
 import io.github.starwishsama.comet.utils.RuntimeUtil.getJVMVersion
 import io.github.starwishsama.comet.utils.RuntimeUtil.getMaxMemory
 import io.github.starwishsama.comet.utils.RuntimeUtil.getOsInfo
@@ -91,7 +91,7 @@ object CometUtil {
 
     @ExperimentalTime
     fun getRunningTime(): String {
-        val remain = Duration.between(BotVariables.startTime, LocalDateTime.now())
+        val remain = Duration.between(CometVariables.startTime, LocalDateTime.now())
         return remain.toKotlinDuration().toFriendly()
     }
 
@@ -109,7 +109,7 @@ object CometUtil {
         }
     }
 
-    fun parseAtAsBotUser(event: MessageEvent, id: String): BotUser? = getUser(parseAtToId(event, id))
+    fun parseAtAsBotUser(event: MessageEvent, id: String): CometUser? = getUser(parseAtToId(event, id))
 
     @OptIn(ExperimentalTime::class)
     fun getMemoryUsage(): String =

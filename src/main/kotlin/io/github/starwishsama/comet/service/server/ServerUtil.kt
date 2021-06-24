@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.service.server
 
-import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.utils.toHMAC
 import java.net.InetSocketAddress
 

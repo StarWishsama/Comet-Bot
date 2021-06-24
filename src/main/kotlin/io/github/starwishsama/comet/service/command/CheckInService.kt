@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.service.command
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.service.task.HitokotoUpdater
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.contact.nameCardOrNick
@@ -29,7 +29,7 @@ import kotlin.math.min
  * 负责处理签到命令 [CheckInCommand]
  */
 object CheckInService {
-    fun handleCheckIn(event: MessageEvent, user: BotUser): MessageChain {
+    fun handleCheckIn(event: MessageEvent, user: CometUser): MessageChain {
         return if (event is GroupMessageEvent) {
             if (user.isChecked()) {
                 "你今天已经签到过了! 输入 /cx 可查询签到信息".toChain()
@@ -41,7 +41,7 @@ object CheckInService {
         }
     }
 
-    private fun doCheckIn(event: MessageEvent, user: BotUser): MessageChain {
+    private fun doCheckIn(event: MessageEvent, user: CometUser): MessageChain {
         val checkInPoint = calculatePoint(user)
         val sender = event.sender
 
@@ -79,7 +79,7 @@ object CheckInService {
      *
      * @return 获取积分情况, 详见 [CheckInResult]
      */
-    private fun calculatePoint(user: BotUser): CheckInResult {
+    private fun calculatePoint(user: CometUser): CheckInResult {
         // 计算签到时间
         val currentTime = LocalDateTime.now()
         val checkDuration = Duration.between(user.lastCheckInTime, currentTime)

@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.service.pusher.instances
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.exceptions.ApiException
@@ -38,7 +38,7 @@ class BiliBiliDynamicPusher(
                     DynamicApi.getUserDynamicTimeline(user.id.toLong())
                 } catch (e: RuntimeException) {
                     if (e !is ApiException) {
-                        BotVariables.daemonLogger.warning("在获取动态时出现了异常", e)
+                        CometVariables.daemonLogger.warning("在获取动态时出现了异常", e)
                     }
                     null
                 } ?: return@user
@@ -74,7 +74,7 @@ class BiliBiliDynamicPusher(
         }
 
 
-        BotVariables.daemonLogger.verbose("已获取了 $retrieveTime 个动态")
+        CometVariables.daemonLogger.verbose("已获取了 $retrieveTime 个动态")
         retrieveTime = 0
 
     }

@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.api.command.interfaces
 
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.sessions.Session
 import net.mamoe.mirai.event.events.MessageEvent
 
@@ -22,5 +22,5 @@ import net.mamoe.mirai.event.events.MessageEvent
  * 需要创建一个 [Session] 以触发监听
  */
 interface ConversationCommand {
-    suspend fun handle(event: MessageEvent, user: BotUser, session: Session)
+    suspend fun handle(event: MessageEvent, user: CometUser, session: Session)
 }

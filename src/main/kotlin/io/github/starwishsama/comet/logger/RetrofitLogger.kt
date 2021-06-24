@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.logger
 
-import io.github.starwishsama.comet.BotVariables.netLogger
+import io.github.starwishsama.comet.CometVariables.netLogger
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.util.concurrent.TimeUnit

@@ -16,10 +16,10 @@ import cn.hutool.core.net.URLDecoder
 import cn.hutool.crypto.SecureUtil
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.CometApplication
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
@@ -37,7 +37,7 @@ import java.util.jar.JarFile
 import kotlin.time.ExperimentalTime
 
 @Synchronized
-fun File.writeClassToJson(context: Any, mapper: ObjectMapper = BotVariables.mapper) {
+fun File.writeClassToJson(context: Any, mapper: ObjectMapper = CometVariables.mapper) {
     FileWriter.create(this).write(mapper.writeValueAsString(context), false)
 }
 
@@ -74,7 +74,7 @@ fun File.getMD5(): String {
  *
  * @return T
  */
-inline fun <reified T : Any> File.parseAsClass(customParser: ObjectMapper = BotVariables.mapper): T {
+inline fun <reified T : Any> File.parseAsClass(customParser: ObjectMapper = CometVariables.mapper): T {
     require(exists()) { "$path 不存在" }
     return customParser.readValue(getContext())
 }
@@ -134,7 +134,7 @@ fun File.createBackupFile() {
 object FileUtil {
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
 
-    fun getChildFolder(childName: String): File = BotVariables.filePath.getChildFolder(childName)
+    fun getChildFolder(childName: String): File = CometVariables.filePath.getChildFolder(childName)
 
     fun getCacheFolder(): File = getChildFolder("cache")
 

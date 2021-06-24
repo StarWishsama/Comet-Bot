@@ -12,7 +12,7 @@ package io.github.starwishsama.comet.api.thirdparty.github.data.events
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import java.time.LocalDateTime
@@ -44,7 +44,7 @@ data class IssueEvent(
         fun convertCreatedTime(): String {
             val localTime =
                 LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.systemDefault())
-            return BotVariables.yyMMddPattern.format(localTime)
+            return CometVariables.yyMMddPattern.format(localTime)
         }
     }
 

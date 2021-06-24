@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.api.command.interfaces
 
 import io.github.starwishsama.comet.api.command.CommandProps
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
@@ -23,7 +23,7 @@ import net.mamoe.mirai.message.data.MessageChain
  */
 interface ChatCommand {
     /** 执行命令后的逻辑 */
-    suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain
+    suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain
 
     /** 命令属性 */
     fun getProps(): CommandProps
@@ -32,7 +32,7 @@ interface ChatCommand {
     fun getHelp(): String
 
     /** 判断用户是否有权限使用该命令, 有必要时可以重载 */
-    fun hasPermission(user: BotUser, e: MessageEvent): Boolean =
+    fun hasPermission(user: CometUser, e: MessageEvent): Boolean =
         user.compareLevel(getProps().level) || user.hasPermission(getProps().permission)
 
     val name: String

@@ -10,8 +10,8 @@
 
 package io.github.starwishsama.comet.commands.console
 
-import io.github.starwishsama.comet.BotVariables.comet
-import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.comet
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.enums.UserLevel

@@ -15,7 +15,7 @@ import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
@@ -25,7 +25,7 @@ import kotlin.time.ExperimentalTime
 
 class VersionCommand : ChatCommand {
     @ExperimentalTime
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return ("彗星 Bot " + BuildConfig.version +
                 "\n运行时长 ${CometUtil.getRunningTime()}" +
                 "\n构建时间: ${BuildConfig.buildTime}" +

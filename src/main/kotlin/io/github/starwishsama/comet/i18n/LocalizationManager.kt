@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.i18n
 
-import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.getChildFolder
 import io.github.starwishsama.comet.utils.getContext

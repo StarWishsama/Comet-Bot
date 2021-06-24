@@ -11,14 +11,14 @@
 package io.github.starwishsama.comet.service.compatibility
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.service.compatibility.data.OldGroupConfig
@@ -32,7 +32,7 @@ import java.util.stream.Collectors
  *
  * 负责转换破坏性更新时的数据类.
  *
- * @see [BotUser]
+ * @see [CometUser]
  * @see [PerGroupConfig]
  */
 object CompatibilityService {
@@ -93,17 +93,17 @@ object CompatibilityService {
      */
     fun checkUserData(userData: File): Boolean {
         try {
-            mapper.readValue<Map<Long, BotUser>>(userData)
+            mapper.readValue<Map<Long, CometUser>>(userData)
             return true
         } catch (ignored: Exception) {
         }
 
         try {
             userData.copyAndRename("users.json.old")
-            val old = mapper.readValue<List<BotUser>>(userData)
+            val old = mapper.readValue<List<CometUser>>(userData)
             old.forEach {
                 val actual = handleDuplication(old, it)
-                BotVariables.users[actual.id] = actual
+                CometVariables.USERS[actual.id] = actual
             }
 
             return true
@@ -114,7 +114,7 @@ object CompatibilityService {
         return false
     }
 
-    private fun handleDuplication(users: List<BotUser>, current: BotUser): BotUser {
+    private fun handleDuplication(users: List<CometUser>, current: CometUser): CometUser {
         val duplicatedUser = users.parallelStream().filter { it.id == current.id }.collect(Collectors.toList())
 
         if (duplicatedUser.isEmpty()) {

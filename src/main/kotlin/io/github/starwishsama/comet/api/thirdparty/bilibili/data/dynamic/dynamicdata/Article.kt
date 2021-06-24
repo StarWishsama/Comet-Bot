@@ -12,7 +12,7 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynami
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
-import io.github.starwishsama.comet.BotVariables.hmsPattern
+import io.github.starwishsama.comet.CometVariables.hmsPattern
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.Picture

@@ -12,8 +12,8 @@ package io.github.starwishsama.comet.utils.network
 
 import cn.hutool.core.util.URLUtil
 import cn.hutool.http.ContentType
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.objects.config.api.SauceNaoConfig
 import io.github.starwishsama.comet.objects.pojo.PicSearchResult
@@ -47,7 +47,7 @@ object PictureSearchUtil {
                         return PicSearchResult(pictureUrl, originalUrl, similarity, response.request.url.toString())
                     }
                 } catch (e: Exception) {
-                    BotVariables.logger.error("[以图搜图] 在解析 API 传回的 json 时出现了问题", e)
+                    CometVariables.logger.error("[以图搜图] 在解析 API 传回的 json 时出现了问题", e)
                     FileUtil.createErrorReportFile(
                         type = "picsearch", t = e, content = body,
                         message = "Request URL: ${response.request.url}"
@@ -62,8 +62,8 @@ object PictureSearchUtil {
         val request = Jsoup.connect("$ascii2d$url")
         request.header("user-agent", NetUtil.defaultUA).followRedirects(true)
             .apply {
-                if (BotVariables.cfg.proxySwitch) {
-                    proxy(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
+                if (CometVariables.cfg.proxySwitch) {
+                    proxy(CometVariables.cfg.proxyUrl, CometVariables.cfg.proxyPort)
                 }
             }
 

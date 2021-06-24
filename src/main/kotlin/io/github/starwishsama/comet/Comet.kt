@@ -35,17 +35,18 @@ class Comet {
     suspend fun login() {
         cometLoginHelper.solve()
 
-        BotVariables.daemonLogger.info("正在配置登录配置...")
+        CometVariables.daemonLogger.info("正在配置登录配置...")
 
         initBot()
-        BotVariables.logger.info("登录中... 使用协议 ${bot.configuration.protocol.name}")
+
+        CometVariables.logger.info("登录中... 使用协议 ${bot.configuration.protocol.name}")
 
         try {
             cometLoginHelper.status = LoginStatus.LOGIN_SUCCESS
             bot.login()
             CometRuntime.setupBot(bot, bot.logger)
         } catch (e: LoginFailedException) {
-            BotVariables.daemonLogger.warning("登录失败! 返回的失败信息: ${e.message}")
+            CometVariables.daemonLogger.warning("登录失败! 返回的失败信息: ${e.message}")
             cometLoginHelper.status = LoginStatus.LOGIN_FAILED
             cometLoginHelper.solve()
         }
@@ -58,17 +59,17 @@ class Comet {
     fun initBot() {
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
-                CustomLogRedirecter("Mirai (${it.id})", BotVariables.miraiLogger)
+                CustomLogRedirecter("Mirai (${it.id})", CometVariables.miraiLogger)
             }
             networkLoggerSupplier = { it ->
-                CustomLogRedirecter("MiraiNet (${it.id})", BotVariables.miraiLogger)
+                CustomLogRedirecter("MiraiNet (${it.id})", CometVariables.miraiNetLogger)
             }
 
             fileBasedDeviceInfo()
 
-            protocol = BotVariables.cfg.botProtocol
+            protocol = CometVariables.cfg.botProtocol
 
-            heartbeatStrategy = BotVariables.cfg.heartbeatStrategy
+            heartbeatStrategy = CometVariables.cfg.heartbeatStrategy
         }
         bot = BotFactory.newBot(qq = id, password = password, configuration = config)
         Mirai.FileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())

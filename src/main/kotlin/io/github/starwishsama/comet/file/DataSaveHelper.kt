@@ -11,9 +11,9 @@
 package io.github.starwishsama.comet.file
 
 import cn.hutool.core.io.file.FileWriter
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.cfg
-import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.cfg
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.TaskUtil
@@ -42,10 +42,10 @@ object DataSaveHelper {
             val backupFile = File(location, backupFileName)
             backupFile.createNewFile()
             FileWriter.create(backupFile, Charsets.UTF_8)
-                .write(BotVariables.mapper.writeValueAsString(BotVariables.users))
-            BotVariables.logger.info("[备份] 备份成功! 文件名是 $backupFileName")
+                .write(CometVariables.mapper.writeValueAsString(CometVariables.USERS))
+            CometVariables.logger.info("[备份] 备份成功! 文件名是 $backupFileName")
         } catch (e: IOException) {
-            BotVariables.logger.error("[备份] 尝试备份时发生了异常", e)
+            CometVariables.logger.error("[备份] 尝试备份时发生了异常", e)
         }
     }
 

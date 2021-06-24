@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.service.command
 
 import io.github.starwishsama.comet.api.command.CommandExecutor
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.event.events.MessageEvent
@@ -21,9 +21,9 @@ import net.mamoe.mirai.message.data.MessageChain
 object AdminService {
     private const val maxCommandTime = 1000000
 
-    fun listPermissions(user: BotUser, args: List<String>, event: MessageEvent): MessageChain {
+    fun listPermissions(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
         return if (args.size > 1) {
-            val target: BotUser? = CometUtil.parseAtAsBotUser(event, args[1])
+            val target: CometUser? = CometUtil.parseAtAsBotUser(event, args[1])
             val permissions = target?.getPermissions()
             if (permissions != null) {
                 "该用户拥有的权限: $permissions".toChain()
@@ -35,10 +35,10 @@ object AdminService {
         }
     }
 
-    fun addPermission(user: BotUser, args: List<String>, event: MessageEvent): MessageChain {
+    fun addPermission(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
         if (user.isBotOwner()) {
             if (args.size > 1) {
-                val target: BotUser? = CometUtil.parseAtAsBotUser(event, args[1])
+                val target: CometUser? = CometUtil.parseAtAsBotUser(event, args[1])
 
                 val validate =
                     CommandExecutor.getCommands().parallelStream().filter { it.getProps().permission == args[2] }
@@ -59,7 +59,7 @@ object AdminService {
 
     fun giveCommandTime(event: MessageEvent, args: List<String>): MessageChain {
         if (args.size > 1) {
-            val target: BotUser = CometUtil.parseAtAsBotUser(event, args[1]) ?: return "找不到此用户".toChain()
+            val target: CometUser = CometUtil.parseAtAsBotUser(event, args[1]) ?: return "找不到此用户".toChain()
 
             val commandTime = args[2].toIntOrNull() ?: return "请输入正确的数字!".toChain()
 

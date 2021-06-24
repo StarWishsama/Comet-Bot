@@ -16,7 +16,7 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.toMessageWrapper
@@ -33,7 +33,7 @@ import net.mamoe.mirai.message.data.PlainText
 
 class GroupConfigCommand : ChatCommand, UnDisableableCommand {
     // TODO 适配私聊设置
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
                 val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
@@ -165,7 +165,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
         /group newcomer 设置入群欢迎内容
     """.trimIndent()
 
-    override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
+    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
         val level = getProps().level
         if (user.compareLevel(level)) return true
         if (e is GroupMessageEvent && e.sender.permission > MemberPermission.MEMBER) return true

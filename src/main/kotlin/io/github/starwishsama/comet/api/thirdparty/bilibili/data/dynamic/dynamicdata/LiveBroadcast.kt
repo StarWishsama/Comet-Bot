@@ -12,7 +12,7 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynami
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
@@ -78,7 +78,7 @@ data class LiveBroadcast(
         val wrapped = MessageWrapper().addText(
             "${DynamicApi.getUserNameByMid(livePlayInfo.uid)} 正在直播!\n" +
                     "标题: ${livePlayInfo.liveTitle}\n" +
-                    "开播时间: ${BotVariables.yyMMddPattern.format(livePlayInfo.getLiveStartTime())}\n" +
+                    "开播时间: ${CometVariables.yyMMddPattern.format(livePlayInfo.getLiveStartTime())}\n" +
                     "直达链接: ${livePlayInfo.link}\n"
         )
 

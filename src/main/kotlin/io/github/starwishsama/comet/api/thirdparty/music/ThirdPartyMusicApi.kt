@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.api.thirdparty.music
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.music.data.NetEaseSearchResult
 import io.github.starwishsama.comet.api.thirdparty.music.data.QQMusicSearchResult
 import io.github.starwishsama.comet.api.thirdparty.music.entity.MusicSearchResult

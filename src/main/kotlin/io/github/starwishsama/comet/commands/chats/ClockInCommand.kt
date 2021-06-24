@@ -14,7 +14,7 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.ClockInManager
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.checkin.ClockInData
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
@@ -33,7 +33,7 @@ import java.time.format.DateTimeFormatter
 class ClockInCommand : ChatCommand {
     private val hourMinuteFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
                 when (args[0]) {
@@ -70,7 +70,7 @@ class ClockInCommand : ChatCommand {
 
     override fun getHelp(): String = ""
 
-    override fun hasPermission(user: BotUser, e: MessageEvent): Boolean = user.compareLevel(getProps().level)
+    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean = user.compareLevel(getProps().level)
 
     private fun isClockIn(data: ClockInData, event: GroupMessageEvent): Boolean {
         if (data.checkedUsers.isNotEmpty()) {

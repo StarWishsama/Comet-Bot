@@ -10,14 +10,14 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.enums.PicSearchApiType
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
@@ -32,7 +32,7 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 
 class PictureSearchCommand : ChatCommand, ConversationCommand {
     @OptIn(MiraiExperimentalApi::class)
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             val imageToSearch = event.message[Image]
 
@@ -48,7 +48,7 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
         } else if (args[0].contentEquals("source") && args.size > 1) {
             return try {
                 val api = PicSearchApiType.valueOf(args[1].uppercase())
-                BotVariables.cfg.pictureSearchApi = api
+                CometVariables.cfg.pictureSearchApi = api
                 toChain("已切换识图 API 为 ${api.name}", true)
             } catch (ignored: IllegalArgumentException) {
                 toChain(
@@ -81,7 +81,7 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
     """.trimIndent()
 
     @OptIn(MiraiExperimentalApi::class)
-    override suspend fun handle(event: MessageEvent, user: BotUser, session: Session) {
+    override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
         SessionHandler.removeSession(session)
         val image = event.message[Image]
 
@@ -95,7 +95,7 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
 
     private fun handlePicSearch(url: String): String {
         val defaultSimilarity = 52.5
-        when (BotVariables.cfg.pictureSearchApi) {
+        when (CometVariables.cfg.pictureSearchApi) {
             PicSearchApiType.SAUCENAO -> {
                 val result = PictureSearchUtil.sauceNaoSearch(url)
                 return when {

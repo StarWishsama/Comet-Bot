@@ -10,12 +10,12 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.Mirai
@@ -29,7 +29,7 @@ import java.time.format.DateTimeFormatter
 @OptIn(MiraiExperimentalApi::class)
 
 class InfoCommand : ChatCommand {
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             var reply =
                 "\n积分: " + String.format("%.1f", user.checkInPoint) +
@@ -47,7 +47,7 @@ class InfoCommand : ChatCommand {
                 reply.convertToChain()
             }
         } else if (args.size == 1 && args[0].contentEquals("排行") || args[0].contentEquals("ph")) {
-            val users = BotVariables.users.values.sortedByDescending { it.checkInPoint }
+            val users = CometVariables.USERS.values.sortedByDescending { it.checkInPoint }
             val sb = StringBuilder()
             sb.append("积分排行榜").append("\n")
             return if (users.size > 9) {

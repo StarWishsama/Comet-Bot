@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.listeners
 
-import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.isBotMuted

@@ -15,7 +15,7 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
@@ -29,7 +29,7 @@ import net.mamoe.mirai.message.data.MessageChain
 
 
 class MuteCommand : ChatCommand {
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (event is GroupMessageEvent && hasPermission(user, event)) {
             return if (event.group.botPermission.isOperator()) {
                 if (args.isNotEmpty()) {
@@ -74,7 +74,7 @@ class MuteCommand : ChatCommand {
         时长为 0 时解禁
     """.trimIndent()
 
-    override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
+    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
         if (e is GroupMessageEvent) {
             if (e.sender.permission >= MemberPermission.ADMINISTRATOR) return true
             val cfg = GroupConfigManager.getConfigOrNew(e.group.id)

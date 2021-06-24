@@ -11,9 +11,9 @@
 package io.github.starwishsama.comet.objects.gacha.pool
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.logger.HinaLogLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.gacha.GachaResult
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.GachaItem
@@ -48,11 +48,11 @@ class ArkNightPool(
     override val poolItems: MutableList<ArkNightOperator> = mutableListOf()
 
     init {
-        BotVariables.arkNight.stream().filter { condition(it) }.forEach {
+        CometVariables.arkNight.stream().filter { condition(it) }.forEach {
             poolItems.add(it)
         }
 
-        BotVariables.daemonLogger.log(
+        CometVariables.daemonLogger.log(
             HinaLogLevel.Info,
             message = "已加载了 ${poolItems.size} 个干员至卡池 $name",
             prefix = "明日方舟"
@@ -167,7 +167,7 @@ class ArkNightPool(
     /**
      * 明日方舟抽卡结果
      */
-    fun getArkDrawResult(user: BotUser, time: Int = 1): GachaResult {
+    fun getArkDrawResult(user: CometUser, time: Int = 1): GachaResult {
         return if (GachaUtil.checkHasGachaTime(user, time)) {
             user.consumePoint(time)
             doDraw(time)
@@ -180,7 +180,7 @@ class ArkNightPool(
      * 明日方舟抽卡，返回文字
      */
     @Suppress("UNCHECKED_CAST")
-    fun getArkDrawResultAsString(user: BotUser, drawResult: GachaResult): String {
+    fun getArkDrawResultAsString(user: CometUser, drawResult: GachaResult): String {
         val currentPool = "目前卡池为: $displayName\n"
         if (!drawResult.isEmpty()) {
             when (drawResult.items.size) {
@@ -225,6 +225,6 @@ class ArkNightPool(
     /**
      * 明日方舟抽卡，返回文字
      */
-    fun getArkDrawResultAsString(user: BotUser, time: Int): String =
+    fun getArkDrawResultAsString(user: CometUser, time: Int): String =
         getArkDrawResultAsString(user, getArkDrawResult(user, time))
 }

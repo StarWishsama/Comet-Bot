@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.service.command
 
 import io.github.starwishsama.comet.commands.chats.ArkNightCommand
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.gacha.GachaResult
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.service.gacha.GachaService
@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils
 object ArkNightService {
     private var pool = GachaService.getPoolsByType<ArkNightPool>()[0]
 
-    suspend fun getGachaResult(event: MessageEvent, user: BotUser, time: Int): MessageChain {
+    suspend fun getGachaResult(event: MessageEvent, user: CometUser, time: Int): MessageChain {
         val gachaResult: GachaResult = pool.getArkDrawResult(user, time)
         return if (GachaUtil.arkPictureIsUsable()) {
             generatePictureGachaResult(pool, event, user, gachaResult)
@@ -44,7 +44,7 @@ object ArkNightService {
     private suspend fun generatePictureGachaResult(
         pool: ArkNightPool,
         event: MessageEvent,
-        user: BotUser,
+        user: CometUser,
         gachaResult: GachaResult
     ): MessageChain {
         event.subject.sendMessage("请稍等...")
@@ -76,7 +76,7 @@ object ArkNightService {
         }
     }
 
-    fun handleFreedomDraw(event: MessageEvent, user: BotUser, args: List<String>): MessageChain {
+    fun handleFreedomDraw(event: MessageEvent, user: CometUser, args: List<String>): MessageChain {
         return if (StringUtils.isNumeric(args[0])) {
             val gachaTime: Int = try {
                 args[0].toInt()

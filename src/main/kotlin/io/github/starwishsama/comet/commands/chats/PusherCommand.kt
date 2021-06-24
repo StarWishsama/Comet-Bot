@@ -10,18 +10,18 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 class PusherCommand : ChatCommand {
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) return getHelp().toChain()
 
         return when (args[0]) {
@@ -55,7 +55,7 @@ class PusherCommand : ChatCommand {
             ps.forEach {
                 append(it::class.java.simpleName + "\n")
                 append("上次推送了 ${it.pushTime} 次\n")
-                append("上次运行于 ${BotVariables.yyMMddPattern.format(it.latestTriggerTime)}\n")
+                append("上次运行于 ${CometVariables.yyMMddPattern.format(it.latestTriggerTime)}\n")
             }
             trim()
         }.toChain()

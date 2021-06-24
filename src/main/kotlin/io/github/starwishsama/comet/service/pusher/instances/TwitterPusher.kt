@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.service.pusher.instances
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
@@ -52,7 +52,7 @@ class TwitterPusher(bot: Bot) : CometPusher(bot, "twitter", PusherConfig(5, Time
             }
         }
 
-        BotVariables.daemonLogger.verbose("已获取了 $retrieveTime 条推文")
+        CometVariables.daemonLogger.verbose("已获取了 $retrieveTime 条推文")
         retrieveTime = 0
     }
 }

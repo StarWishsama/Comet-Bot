@@ -12,9 +12,9 @@ package io.github.starwishsama.comet.api.thirdparty.twitter.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.hmsPattern
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.hmsPattern
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.data.tweetEntity.Media
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
@@ -140,7 +140,7 @@ data class Tweet(
                     return image.getImageUrl()
                 }
             } catch (e: RuntimeException) {
-                BotVariables.logger.warning("在获取推文下的图片链接时发生了问题", e)
+                CometVariables.logger.warning("在获取推文下的图片链接时发生了问题", e)
             }
         }
 

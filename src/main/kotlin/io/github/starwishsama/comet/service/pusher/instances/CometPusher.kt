@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.service.pusher.instances
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.context.PushStatus

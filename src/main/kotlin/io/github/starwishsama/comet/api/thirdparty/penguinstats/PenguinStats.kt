@@ -11,9 +11,9 @@
 package io.github.starwishsama.comet.api.thirdparty.penguinstats
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.penguinstats.data.ArkNightItemInfo
 import io.github.starwishsama.comet.api.thirdparty.penguinstats.data.ArkNightStageInfo
 import io.github.starwishsama.comet.api.thirdparty.penguinstats.data.MatrixResponse
@@ -38,7 +38,7 @@ object PenguinStats {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://penguin-stats.io/PenguinStats/api/v2/")
             .addConverterFactory(JacksonConverterFactory.create(mapper))
-            .client(BotVariables.client)
+            .client(CometVariables.client)
             .build()
 
         api = retrofit.create(PenguinStatsAPI::class.java)

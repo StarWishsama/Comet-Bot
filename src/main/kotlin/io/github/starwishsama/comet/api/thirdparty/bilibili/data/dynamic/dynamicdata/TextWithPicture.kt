@@ -12,7 +12,7 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynami
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
@@ -69,7 +69,7 @@ data class TextWithPicture(
 
     override fun getContact(): MessageWrapper {
         val wrapped =
-            MessageWrapper().addText("发布了动态:\n ${item.text ?: "获取失败"}\n" + "🕘 ${BotVariables.hmsPattern.format(item.uploadTime.toLocalDateTime())}\n")
+            MessageWrapper().addText("发布了动态:\n ${item.text ?: "获取失败"}\n" + "🕘 ${CometVariables.hmsPattern.format(item.uploadTime.toLocalDateTime())}\n")
 
         if (!item.pictures.isNullOrEmpty()) {
             item.pictures.forEach {

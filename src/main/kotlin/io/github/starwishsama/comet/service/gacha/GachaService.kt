@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.service.gacha
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.gacha.custom.CustomPool
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
@@ -58,14 +58,14 @@ object GachaService {
             addPoolFromFile(it)
         }
 
-        BotVariables.daemonLogger.info("成功载入了 ${gachaPools.size} 个自定义卡池!")
+        CometVariables.daemonLogger.info("成功载入了 ${gachaPools.size} 个自定义卡池!")
     }
 
     fun addPool(gachaPool: CustomPool): Boolean {
         val exists = gachaPools.parallelStream().filter { it.name == gachaPool.poolName }.findAny().isPresent
 
         if (exists) {
-            BotVariables.daemonLogger.warning("已有相同名称的卡池存在! 请检查是否忘记删除了旧文件: ${gachaPool.poolName}")
+            CometVariables.daemonLogger.warning("已有相同名称的卡池存在! 请检查是否忘记删除了旧文件: ${gachaPool.poolName}")
             return false
         }
 
@@ -134,7 +134,7 @@ object GachaService {
                 }
             }.also {
                 if (!result.isPresent) {
-                    BotVariables.daemonLogger.warning("名为 ${item.name} 的抽卡物品不存在于游戏数据中")
+                    CometVariables.daemonLogger.warning("名为 ${item.name} 的抽卡物品不存在于游戏数据中")
                 }
             }
         }
@@ -144,7 +144,7 @@ object GachaService {
 
     @Deprecated("PCR have no enough data to maintain")
     private fun loadPCRData() {
-        BotVariables.daemonLogger.info("公主连结抽卡模拟器已停止维护.")
+        CometVariables.daemonLogger.info("公主连结抽卡模拟器已停止维护.")
         /**if (data.exists()) {
         BotVariables.pcr.addAll(DataFiles.pcrData.file.parseAsClass())
         BotVariables.daemonLogger.info("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个角色")
@@ -158,20 +158,20 @@ object GachaService {
         try {
             GachaUtil.arkNightDataCheck(data)
         } catch (e: IOException) {
-            BotVariables.daemonLogger.warning("解析明日方舟游戏数据失败, ${e.message}\n注意: 数据来源于 Github, 国内用户无法下载请自行下载替换\n替换位置: ./res/arkNights.json\n链接: ${GachaUtil.arkNightData}")
+            CometVariables.daemonLogger.warning("解析明日方舟游戏数据失败, ${e.message}\n注意: 数据来源于 Github, 国内用户无法下载请自行下载替换\n替换位置: ./res/arkNights.json\n链接: ${GachaUtil.arkNightData}")
         }
 
         if (data.exists()) {
-            BotVariables.mapper.readTree(data).elements().forEach { t ->
-                BotVariables.arkNight.add(BotVariables.mapper.readValue(t.traverse()))
+            CometVariables.mapper.readTree(data).elements().forEach { t ->
+                CometVariables.arkNight.add(CometVariables.mapper.readValue(t.traverse()))
             }
 
-            BotVariables.daemonLogger.info("成功载入明日方舟游戏数据, 共 ${BotVariables.arkNight.size} 个干员")
-            if (BotVariables.cfg.arkDrawUseImage) {
+            CometVariables.daemonLogger.info("成功载入明日方舟游戏数据, 共 ${CometVariables.arkNight.size} 个干员")
+            if (CometVariables.cfg.arkDrawUseImage) {
                 if (System.getProperty("java.awt.headless") != "true" && RuntimeUtil.getOsName().lowercase()
                         .contains("linux")
                 ) {
-                    BotVariables.daemonLogger.info("检测到 Linux 系统, 正在启用无头模式")
+                    CometVariables.daemonLogger.info("检测到 Linux 系统, 正在启用无头模式")
                     System.setProperty("java.awt.headless", "true")
                 }
 
@@ -184,22 +184,22 @@ object GachaService {
                 }
             }
         } else {
-            BotVariables.daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
+            CometVariables.daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
             arkNightUsable = false
         }
 
-        BotVariables.daemonLogger.info("[配置] 成功载入配置文件")
+        CometVariables.daemonLogger.info("[配置] 成功载入配置文件")
     }
 
     private fun loadDefaultArkNightData() {
         val default = File(FileUtil.getResourceFolder(), "default_arknight.json")
 
         if (!default.exists()) {
-            BotVariables.daemonLogger.warning("无法加载默认明日方舟数据: ${default.name} 不存在")
+            CometVariables.daemonLogger.warning("无法加载默认明日方舟数据: ${default.name} 不存在")
             return
         }
 
-        val node = BotVariables.mapper.readTree(default)
+        val node = CometVariables.mapper.readTree(default)
 
         node.forEach {
             it.forEach { inside ->
@@ -207,6 +207,6 @@ object GachaService {
             }
         }
 
-        BotVariables.daemonLogger.info("加载默认明日方舟数据成功, 共 ${GachaConstants.arkNightDefault.size} 个干员")
+        CometVariables.daemonLogger.info("加载默认明日方舟数据成功, 共 ${GachaConstants.arkNightDefault.size} 个干员")
     }
 }

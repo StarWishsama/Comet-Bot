@@ -11,9 +11,9 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.login.GetKeyResponse
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.login.LoginResponse
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -38,7 +38,7 @@ object LoginApi {
         val retrofit = Retrofit.Builder()
             .baseUrl(loginApiEndpoint)
             .addConverterFactory(JacksonConverterFactory.create(mapper))
-            .client(BotVariables.client)
+            .client(CometVariables.client)
             .build()
         loginApiService = retrofit.create(ILoginApi::class.java)
     }
