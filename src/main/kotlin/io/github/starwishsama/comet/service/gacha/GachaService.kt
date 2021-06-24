@@ -50,15 +50,15 @@ object GachaService {
             return
         }
 
-        if (poolPath.listFiles()?.isEmpty() == true) {
-            return
+        val poolFiles = poolPath.listFiles()
+
+        if (poolFiles != null) {
+            poolPath.listFiles().forEach {
+                addPoolFromFile(it)
+            }
         }
 
-        poolPath.listFiles()?.forEach {
-            addPoolFromFile(it)
-        }
-
-        CometVariables.daemonLogger.info("成功载入了 ${gachaPools.size} 个自定义卡池!")
+        CometVariables.daemonLogger.info("成功载入了 ${gachaPools.size - 1} 个自定义卡池!")
     }
 
     fun addPool(gachaPool: CustomPool): Boolean {
@@ -92,6 +92,9 @@ object GachaService {
         try {
             val pool = Default.decodeFromString<CustomPool>(poolFile.getContext())
             addPool(pool)
+
+            CometVariables.daemonLogger.info("已载入卡池 ${pool.poolName}")
+
         } catch (e: IOException) {
             FileUtil.createErrorReportFile("解析卡池信息失败", "gacha", e, "", e.message ?: "")
         }

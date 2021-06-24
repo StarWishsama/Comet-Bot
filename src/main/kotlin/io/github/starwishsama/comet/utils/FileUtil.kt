@@ -341,7 +341,11 @@ object FileUtil {
      * @param resourcePath 资源文件储存文件夹
      */
     private fun processFileInJar(entry: JarEntry, fileName: String, resourcePath: String = "resources") {
-        if (fileName.isEmpty()) return
+        var counter = 0
+
+        if (fileName.isEmpty()) {
+            return
+        }
 
         val entryName = entry.name
 
@@ -365,9 +369,13 @@ object FileUtil {
                         while (fis.read(byteArray).also { len = it } > 0) {
                             fos.write(byteArray, 0, len)
                         }
+
+                        counter++
                     }
                 }
             }
         }
+
+        daemonLogger.info("已处理 $counter 个数据文件.")
     }
 }
