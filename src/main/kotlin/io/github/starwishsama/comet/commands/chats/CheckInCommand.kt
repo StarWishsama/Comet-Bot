@@ -33,7 +33,7 @@ class CheckInCommand : ChatCommand {
     }
 
     override fun getProps(): CommandProps =
-        CommandProps("checkin", arrayListOf("签到", "qd"), "签到命令", "nbot.commands.checkin", UserLevel.USER)
+        CommandProps("clock", arrayListOf("签到", "qd"), "签到命令", "nbot.commands.clock", UserLevel.USER)
 
     override fun getHelp(): String = "/qd 签到"
 }

@@ -190,7 +190,7 @@ object NetUtil {
 
     fun isTimeout(t: Throwable): Boolean {
         val msg = t.message?.lowercase() ?: return false
-        return msg.containsEtc(false, "time", "out") || t.javaClass.simpleName.lowercase().contains("timeout")
+        return msg.containsEtc(true, "time", "out") || t.javaClass.simpleName.lowercase().contains("timeout")
     }
 
     @Throws(HttpException::class)
@@ -218,10 +218,10 @@ object NetUtil {
             try {
                 val connection =
                     (URL(url).openConnection(Proxy(cfg.proxyType, it.remoteSocketAddress))) as HttpURLConnection
-                connection.connectTimeout = 2000
+                connection.connectTimeout = timeout
                 connection.connect()
 
-            } catch (t: IOException) {
+            } catch (ignored: IOException) {
                 return false
             }
             return it.inetAddress.isReachable(timeout)

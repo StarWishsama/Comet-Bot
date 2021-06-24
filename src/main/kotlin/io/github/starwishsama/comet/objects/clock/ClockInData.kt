@@ -8,7 +8,7 @@
  *
  */
 
-package io.github.starwishsama.comet.objects.checkin
+package io.github.starwishsama.comet.objects.clock
 
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import net.mamoe.mirai.contact.Member

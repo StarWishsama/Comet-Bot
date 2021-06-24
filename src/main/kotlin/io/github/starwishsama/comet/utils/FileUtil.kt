@@ -360,12 +360,10 @@ object FileUtil {
                 FileOutputStream(current).use { fos ->
                     val byteArray = ByteArray(1024)
                     var len: Int
-                    javaClass.classLoader.getResourceAsStream(entryName).use { fis ->
-                        if (fis != null) {
-                            // While the input stream has bytes
-                            while (fis.read(byteArray).also { len = it } > 0) {
-                                fos.write(byteArray, 0, len)
-                            }
+                    javaClass.classLoader.getResourceAsStream(entryName)?.use { fis ->
+                        // While the input stream has bytes
+                        while (fis.read(byteArray).also { len = it } > 0) {
+                            fos.write(byteArray, 0, len)
                         }
                     }
                 }

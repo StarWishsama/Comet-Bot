@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.managers
 
-import io.github.starwishsama.comet.objects.checkin.ClockInData
+import io.github.starwishsama.comet.objects.clock.ClockInData
 import net.mamoe.mirai.contact.Member
 import java.time.Duration
 import java.time.LocalDateTime
