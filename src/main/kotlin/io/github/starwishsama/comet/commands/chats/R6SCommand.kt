@@ -33,11 +33,15 @@ class R6SCommand : ChatCommand {
                 "info", "查询", "cx" -> {
                     val account = user.r6sAccount
 
-                    return if (args.size <= 1 && account.isNotEmpty()) {
-                        event.subject.sendMessage(toChain("查询中..."))
-                        val result = R6StatsApi.getPlayerStat(account)
-                        val resultText = "\n" + result.toMessageChain(event.subject)
-                        if (event is GroupMessageEvent) event.sender.at() + resultText else resultText.toChain(false)
+                    return if (args.size <= 1) {
+                        if (account.isNotEmpty()) {
+                            event.subject.sendMessage(toChain("查询中..."))
+                            val result = R6StatsApi.getPlayerStat(account)
+                            val resultText = "\n" + result.toMessageChain(event.subject)
+                            if (event is GroupMessageEvent) event.sender.at() + resultText else resultText.toChain(false)
+                        } else {
+                            "你还未绑定育碧账号, 输入 /r6s bind [账号] 绑定快速查询战绩".toChain()
+                        }
                     } else {
                         if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
                             event.subject.sendMessage(toChain("查询中..."))
