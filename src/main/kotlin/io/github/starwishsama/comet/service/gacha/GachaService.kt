@@ -50,12 +50,8 @@ object GachaService {
             return
         }
 
-        val poolFiles = poolPath.listFiles()
-
-        if (poolFiles != null) {
-            poolPath.listFiles().forEach {
-                addPoolFromFile(it)
-            }
+        poolPath.listFiles()?.forEach {
+            addPoolFromFile(it)
         }
 
         CometVariables.daemonLogger.info("成功载入了 ${gachaPools.size - 1} 个自定义卡池!")
@@ -85,7 +81,8 @@ object GachaService {
         require(poolFile.exists()) { "${poolFile.absolutePath} isn't exists" }
 
         // 不处理非 YAML 类型文件
-        if (!poolFile.name.endsWith("yml") || !poolFile.name.endsWith("yaml")) {
+        if (!poolFile.name.endsWith("yml") && !poolFile.name.endsWith("yaml")) {
+            CometVariables.daemonLogger.warning("检测到不受支持的卡池文件 ${poolFile.name}")
             return
         }
 
