@@ -27,7 +27,7 @@ abstract class DataFileEntity(
     fun createNewFile(): Boolean = file.createNewFile()
 
     fun check() {
-        if (exists() && file.getContext().isNotEmpty()) {
+        if (exists() && (file.isDirectory || file.getContext().isNotEmpty())) {
             return
         }
 
