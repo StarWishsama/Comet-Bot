@@ -11,8 +11,10 @@
 package io.github.starwishsama.comet.file
 
 import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.config.CometConfig
-import io.github.starwishsama.comet.objects.config.DataFile
+import io.github.starwishsama.comet.objects.config.DataFileEntity
+import io.github.starwishsama.comet.service.command.GitHubService
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.writeClassToJson
 import io.github.starwishsama.comet.utils.writeString
@@ -20,29 +22,74 @@ import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
 
 object DataFiles {
-    val userCfg: DataFile = DataFile(File(CometVariables.filePath, "users.json"), DataFile.FilePriority.HIGH) {
-        it.writeClassToJson(CometVariables.USERS)
-    }
+    val userCfg: DataFileEntity =
+        object : DataFileEntity(File(CometVariables.filePath, "users.json"), FilePriority.HIGH) {
+            override fun init() {
+                file.writeClassToJson(CometVariables.USERS)
+            }
 
-    val cfgFile: DataFile = DataFile(File(CometVariables.filePath, "config.yml"), DataFile.FilePriority.HIGH) {
-        it.writeString(Default.encodeToString(CometConfig()), isAppend = false)
-    }
+            override fun save() {
+                file.writeClassToJson(CometVariables.USERS)
+            }
+        }
 
-    val pcrData: DataFile = DataFile(File(FileUtil.getResourceFolder(), "pcr.json"), DataFile.FilePriority.NORMAL)
+    val cfgFile: DataFileEntity =
+        object : DataFileEntity(File(CometVariables.filePath, "config.yml"), DataFileEntity.FilePriority.HIGH) {
+            override fun init() {
+                file.writeString(Default.encodeToString(CometConfig()), isAppend = false)
+            }
 
-    val arkNightData: DataFile =
-        DataFile(File(FileUtil.getResourceFolder(), "arkNights.json"), DataFile.FilePriority.NORMAL)
+            override fun save() {
+                file.writeString(Default.encodeToString(CometConfig.serializer(), CometVariables.cfg), isAppend = false)
+            }
+        }
 
-    val perGroupFolder: DataFile = DataFile(FileUtil.getChildFolder("groups"), DataFile.FilePriority.NORMAL) {
-        it.mkdirs()
-    }
+    val arkNightData: DataFileEntity =
+        object : DataFileEntity(File(FileUtil.getResourceFolder(), "arkNights.json"), FilePriority.NORMAL) {
+            override fun init() {
+                // No need to init
+            }
 
-    val githubRepoData: DataFile =
-        DataFile(File(FileUtil.getResourceFolder(), "repos.yml"), DataFile.FilePriority.LOW) {
-            it.createNewFile()
+            override fun save() {
+                // No need to save
+            }
+        }
+
+    val perGroupFolder: DataFileEntity =
+        object : DataFileEntity(FileUtil.getChildFolder("groups"), FilePriority.NORMAL) {
+            override fun init() {
+                file.mkdirs()
+            }
+
+            override fun save() {
+                if (!file.exists()) {
+                    file.mkdirs()
+                }
+
+                GroupConfigManager.getAllConfigs().forEach {
+                    val loc = File(file, "${it.id}.json")
+                    if (!loc.exists()) {
+                        loc.createNewFile()
+                    }
+                    loc.writeClassToJson(it)
+                }
+
+                CometVariables.daemonLogger.info("已保存所有群配置")
+            }
+        }
+
+    val githubRepoData: DataFileEntity =
+        object : DataFileEntity(File(FileUtil.getResourceFolder(), "repos.yml"), FilePriority.LOW) {
+            override fun init() {
+                file.createNewFile()
+            }
+
+            override fun save() {
+                file.writeString(Default.encodeToString(GitHubService.repos))
+            }
         }
 
     val allDataFile = listOf(
-        userCfg, cfgFile, pcrData, arkNightData, perGroupFolder
+        userCfg, cfgFile, arkNightData, perGroupFolder
     )
 }

@@ -10,19 +10,36 @@
 
 package io.github.starwishsama.comet.objects.config
 
+import io.github.starwishsama.comet.utils.createBackupFile
+import io.github.starwishsama.comet.utils.getContext
 import java.io.File
 
-class DataFile(
+abstract class DataFileEntity(
     val file: File,
     val priority: FilePriority,
-    val initAction: (File) -> Unit = {},
 ) {
+    abstract fun init()
+
+    abstract fun save()
+
     fun exists(): Boolean = file.exists()
 
     fun createNewFile(): Boolean = file.createNewFile()
 
-    fun init() {
-        initAction(file)
+    fun check() {
+        if (exists() && file.getContext().isNotEmpty()) {
+            return
+        }
+
+        if (priority >= FilePriority.NORMAL) {
+            init()
+        }
+    }
+
+    fun createBackup() {
+        if (!file.isDirectory) {
+            file.createBackupFile()
+        }
     }
 
     enum class FilePriority {

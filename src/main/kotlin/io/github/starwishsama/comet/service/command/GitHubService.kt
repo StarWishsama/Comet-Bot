@@ -31,7 +31,7 @@ object GitHubService {
     private val editorCache = mutableMapOf<Session, GithubRepos.GithubRepo>()
 
     init {
-        DataFiles.githubRepoData.init()
+        DataFiles.githubRepoData.check()
         val context = DataFiles.githubRepoData.file.getContext()
         repos = if (context.isEmpty()) {
             GithubRepos()

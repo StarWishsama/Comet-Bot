@@ -24,7 +24,6 @@ import io.github.starwishsama.comet.logger.LoggerInstances
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.config.CometConfig
-import io.github.starwishsama.comet.objects.config.DataFile
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.service.command.GitHubService
 import io.github.starwishsama.comet.service.compatibility.CompatibilityService
@@ -41,11 +40,7 @@ object DataSetup {
     fun init() {
         allDataFile.forEach {
             try {
-                if (it.file.exists()) return@forEach
-
-                if (it.priority >= DataFile.FilePriority.NORMAL) {
-                    it.init()
-                }
+                it.check()
             } catch (e: IOException) {
                 daemonLogger.warning("在初始化文件 ${it.file.name} 时出现了意外", e)
             }
@@ -55,12 +50,13 @@ object DataSetup {
             load()
         } catch (e: Exception) {
             brokenConfig = true
-            e.message?.let { FileUtil.createErrorReportFile("加载配置文件失败, 部分配置文件将会立即创建备份\n", "resource", e, "", it) }
+            e.message?.let { FileUtil.createErrorReportFile("加载数据文件失败, 正在创建备份...\n", "resource", e, "", it) }
             throw e
         } finally {
             if (brokenConfig) {
-                cfgFile.file.createBackupFile()
-                userCfg.file.createBackupFile()
+                allDataFile.forEach {
+                    it.createBackup()
+                }
             }
         }
     }
@@ -99,7 +95,7 @@ object DataSetup {
     fun saveAllResources() {
         daemonLogger.info("[数据] 自动保存数据完成")
         saveCfg()
-        GroupConfigManager.saveAll()
+        perGroupFolder.save()
         GitHubService.saveData()
     }
 
