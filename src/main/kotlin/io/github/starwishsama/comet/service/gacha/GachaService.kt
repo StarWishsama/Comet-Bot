@@ -24,12 +24,15 @@ import kotlinx.serialization.decodeFromString
 import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
 import java.io.IOException
+import java.util.regex.Pattern
 import java.util.stream.Collectors
 
 object GachaService {
     val gachaPools = mutableSetOf<GachaPool>()
     private var arkNightUsable = true
     private val poolPath = FileUtil.getChildFolder("gacha")
+
+    private val yamlFilePattern = Pattern.compile(".y[a]?ml")
 
     fun loadGachaData(arkNight: File) {
         loadArkNightData(arkNight)
@@ -81,7 +84,7 @@ object GachaService {
         require(poolFile.exists()) { "${poolFile.absolutePath} isn't exists" }
 
         // 不处理非 YAML 类型文件
-        if (!poolFile.name.endsWith("yml") && !poolFile.name.endsWith("yaml")) {
+        if (!yamlFilePattern.matcher(poolFile.name).find()) {
             CometVariables.daemonLogger.warning("检测到不受支持的卡池文件 ${poolFile.name}")
             return
         }
@@ -140,18 +143,6 @@ object GachaService {
         }
 
         return pool
-    }
-
-    @Deprecated("PCR have no enough data to maintain")
-    private fun loadPCRData() {
-        CometVariables.daemonLogger.info("公主连结抽卡模拟器已停止维护.")
-        /**if (data.exists()) {
-        BotVariables.pcr.addAll(DataFiles.pcrData.file.parseAsClass())
-        BotVariables.daemonLogger.info("成功载入公主连结游戏数据, 共 ${BotVariables.pcr.size} 个角色")
-        } else {
-        BotVariables.daemonLogger.info("未检测到公主连结游戏数据, 对应游戏抽卡模拟器将无法使用")
-        pcrUsable = false
-        }*/
     }
 
     private fun loadArkNightData(data: File) {
