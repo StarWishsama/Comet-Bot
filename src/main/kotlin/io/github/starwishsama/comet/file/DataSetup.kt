@@ -90,6 +90,8 @@ object DataSetup {
         GachaService.loadGachaData(arkNightData.file)
 
         ApiManager.loadAllApiConfig()
+
+        daemonLogger.info("数据文件加载完成.")
     }
 
     fun saveAllResources() {

@@ -17,9 +17,6 @@ import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
 import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.math.MathUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
@@ -167,19 +164,13 @@ object GachaService {
                 }
 
                 TaskUtil.runAsync {
-                    runBlocking {
-                        withContext(Dispatchers.IO) {
-                            GachaUtil.downloadArkNightImage()
-                        }
-                    }
+                    GachaUtil.checkArkNightImage()
                 }
             }
         } else {
             CometVariables.daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
             arkNightUsable = false
         }
-
-        CometVariables.daemonLogger.info("[配置] 成功载入配置文件")
     }
 
     private fun loadDefaultArkNightData() {

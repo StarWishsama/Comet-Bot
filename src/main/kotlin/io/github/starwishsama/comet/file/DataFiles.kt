@@ -86,7 +86,7 @@ object DataFiles {
         }
 
     val githubRepoData: DataFileEntity =
-        object : DataFileEntity(File(FileUtil.getResourceFolder(), "repos.yml"), FilePriority.LOW) {
+        object : DataFileEntity(File(FileUtil.getResourceFolder(), "repos.yml"), FilePriority.NORMAL) {
             override fun init() {
                 file.createNewFile()
             }

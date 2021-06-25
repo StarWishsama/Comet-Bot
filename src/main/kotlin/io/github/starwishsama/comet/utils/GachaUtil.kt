@@ -129,21 +129,16 @@ object GachaUtil {
         (user.checkInPoint >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
 
     @Suppress("HttpUrlsUsage")
-    fun downloadArkNightImage() {
+    fun checkArkNightImage() {
         val arkLoc = FileUtil.getResourceFolder().getChildFolder("ark")
-
-        val ele = Jsoup.connect(
-            "http://prts.wiki/w/PRTS:%E6%96%87%E4%BB%B6%E4%B8%80%E8%A7%88/%E5%B9%B2%E5%91%98%E7%B2%BE%E8%8B%B10%E5%8D%8A%E8%BA%AB%E5%83%8F"
-        ).timeout(5_000).get().getElementsByClass("mw-parser-output")[0].select("a")
-
-        /**
-         * PRTS 实际保有干员半身立绘量
-         */
-        val actualCount = ele.size
 
         if (arkLoc.filesCount() == 0) {
             val startTime = LocalDateTime.now()
             daemonLogger.info("正在下载 明日方舟图片资源文件")
+
+            val ele = Jsoup.connect(
+                "http://prts.wiki/w/PRTS:%E6%96%87%E4%BB%B6%E4%B8%80%E8%A7%88/%E5%B9%B2%E5%91%98%E7%B2%BE%E8%8B%B10%E5%8D%8A%E8%BA%AB%E5%83%8F"
+            ).timeout(5_000).get().getElementsByClass("mw-parser-output")[0].select("a")
 
             var successCount = 0
 
