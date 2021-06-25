@@ -13,7 +13,7 @@ package io.github.starwishsama.comet.service.command
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.github.GithubApi
-import io.github.starwishsama.comet.file.DataFiles
+import io.github.starwishsama.comet.file.GithubRepoData
 import io.github.starwishsama.comet.objects.config.GithubRepos
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
@@ -30,8 +30,8 @@ object GitHubService {
     private val editorCache = mutableMapOf<Session, GithubRepos.GithubRepo>()
 
     init {
-        DataFiles.githubRepoData.check()
-        val context = DataFiles.githubRepoData.file.getContext()
+        GithubRepoData.check()
+        val context = GithubRepoData.file.getContext()
         repos = if (context.isEmpty()) {
             GithubRepos()
         } else {
@@ -245,9 +245,5 @@ object GitHubService {
                 """.trimIndent().toChain()
             }
         }
-    }
-
-    fun saveData() {
-        DataFiles.githubRepoData.save()
     }
 }

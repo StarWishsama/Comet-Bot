@@ -40,6 +40,7 @@ class WebHookServer(port: Int, customSuffix: String) {
 
     fun stop() {
         server.stop(0)
+        netLogger.log(HinaLogLevel.Info, "服务器已关闭", prefix = "WebHook")
     }
 }
 

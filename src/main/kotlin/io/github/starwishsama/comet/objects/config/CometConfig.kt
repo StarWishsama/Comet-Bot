@@ -97,5 +97,5 @@ data class CometConfig(
     @Comment("Webhook Secret, 为确保服务器安全, 推荐填写")
     val webHookSecret: String = "",
 ) {
-    fun isEmpty() = botId == 0L || botPassword.isEmpty()
+    fun isNotEmpty() = botId != 0L && botPassword.isNotEmpty()
 }

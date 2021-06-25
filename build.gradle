@@ -153,6 +153,6 @@ compileKotlin {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
         freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses"]
-        useOldBackend = true
+        useIR = true
     }
 }

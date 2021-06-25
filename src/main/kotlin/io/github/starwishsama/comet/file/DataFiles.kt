@@ -22,81 +22,73 @@ import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
 
 object DataFiles {
-    val userCfg: DataFileEntity =
-        object : DataFileEntity(File(CometVariables.filePath, "users.json"), FilePriority.HIGH) {
-            override fun init() {
-                file.writeClassToJson(CometVariables.cometUsers)
-            }
-
-            override fun save() {
-                if (CometVariables.cometUsers.isNotEmpty()) {
-                    file.writeClassToJson(CometVariables.cometUsers)
-                }
-            }
-        }
-
-    val cfgFile: DataFileEntity =
-        object : DataFileEntity(File(CometVariables.filePath, "config.yml"), FilePriority.HIGH) {
-            override fun init() {
-                file.writeString(Default.encodeToString(CometConfig()), isAppend = false)
-            }
-
-            override fun save() {
-                if (!CometVariables.cfg.isEmpty()) {
-                    file.writeString(
-                        Default.encodeToString(CometConfig.serializer(), CometVariables.cfg),
-                        isAppend = false
-                    )
-                }
-            }
-        }
-
-    val arkNightData: DataFileEntity =
-        object : DataFileEntity(File(FileUtil.getResourceFolder(), "arkNights.json"), FilePriority.NORMAL) {
-            override fun init() {
-                // No need to init
-            }
-
-            override fun save() {
-                // No need to save
-            }
-        }
-
-    val perGroupFolder: DataFileEntity =
-        object : DataFileEntity(FileUtil.getChildFolder("groups"), FilePriority.NORMAL) {
-            override fun init() {
-                file.mkdirs()
-            }
-
-            override fun save() {
-                if (!file.exists()) {
-                    file.mkdirs()
-                }
-
-                GroupConfigManager.getAllConfigs().forEach {
-                    val loc = File(file, "${it.id}.json")
-                    if (!loc.exists()) {
-                        loc.createNewFile()
-                    }
-                    loc.writeClassToJson(it)
-                }
-
-                CometVariables.daemonLogger.info("已保存所有群配置")
-            }
-        }
-
-    val githubRepoData: DataFileEntity =
-        object : DataFileEntity(File(FileUtil.getResourceFolder(), "repos.yml"), FilePriority.NORMAL) {
-            override fun init() {
-                file.createNewFile()
-            }
-
-            override fun save() {
-                file.writeString(Default.encodeToString(GitHubService.repos))
-            }
-        }
-
     val allDataFile = listOf(
-        userCfg, cfgFile, arkNightData, perGroupFolder
+        UserConfig, Config, ArkNightData, GroupConfig, GithubRepoData
     )
+}
+
+object UserConfig : DataFileEntity(File(CometVariables.filePath, "users.json")) {
+    override fun init() {
+        file.writeClassToJson(CometVariables.cometUsers)
+    }
+
+    override fun save() {
+        if (CometVariables.cometUsers.isNotEmpty()) {
+            file.writeClassToJson(CometVariables.cometUsers)
+        }
+    }
+}
+
+object Config : DataFileEntity(File(CometVariables.filePath, "config.yml")) {
+    override fun init() {
+        file.writeString(Default.encodeToString(CometConfig()))
+    }
+
+    override fun save() {
+        if (CometVariables.cfg.isNotEmpty()) {
+            file.writeString(Default.encodeToString(CometVariables.cfg))
+        }
+    }
+}
+
+object ArkNightData : DataFileEntity(File(FileUtil.getResourceFolder(), "arkNights.json")) {
+    override fun init() {
+        // No need to init
+    }
+
+    override fun save() {
+        // No need to save
+    }
+}
+
+object GroupConfig : DataFileEntity(FileUtil.getChildFolder("groups")) {
+    override fun init() {
+        file.mkdirs()
+    }
+
+    override fun save() {
+        if (!file.exists()) {
+            file.mkdirs()
+        }
+
+        GroupConfigManager.getAllConfigs().forEach {
+            val loc = File(file, "${it.id}.json")
+            if (!loc.exists()) {
+                loc.createNewFile()
+            }
+            loc.writeClassToJson(it)
+        }
+
+        CometVariables.daemonLogger.info("已保存所有群配置")
+    }
+}
+
+object GithubRepoData : DataFileEntity(File(FileUtil.getResourceFolder(), "repos.yml")) {
+    override fun init() {
+        file.createNewFile()
+    }
+
+    override fun save() {
+        file.writeString(Default.encodeToString(GitHubService.repos))
+    }
 }

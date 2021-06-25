@@ -49,6 +49,7 @@ class Comet {
             CometVariables.daemonLogger.warning("登录失败! 返回的失败信息: ${e.message}")
             cometLoginHelper.status = LoginStatus.LOGIN_FAILED
             cometLoginHelper.solve()
+            login()
         }
     }
 

@@ -15,17 +15,12 @@ import io.github.starwishsama.comet.CometVariables.cfg
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.file.DataFiles.allDataFile
-import io.github.starwishsama.comet.file.DataFiles.arkNightData
-import io.github.starwishsama.comet.file.DataFiles.cfgFile
-import io.github.starwishsama.comet.file.DataFiles.perGroupFolder
-import io.github.starwishsama.comet.file.DataFiles.userCfg
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.LoggerInstances
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
-import io.github.starwishsama.comet.service.command.GitHubService
 import io.github.starwishsama.comet.service.compatibility.CompatibilityService
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.utils.*
@@ -61,17 +56,8 @@ object DataSetup {
         }
     }
 
-    private fun saveCfg() {
-        try {
-            cfgFile.save()
-            userCfg.save()
-        } catch (e: Exception) {
-            daemonLogger.warning("[配置] 在保存配置文件时发生了问题", e)
-        }
-    }
-
     private fun load() {
-        cfg = Default.decodeFromString(CometConfig.serializer(), cfgFile.file.getContext())
+        cfg = Default.decodeFromString(CometConfig.serializer(), Config.file.getContext())
 
         CometVariables.localizationManager = LocalizationManager()
 
@@ -79,15 +65,15 @@ object DataSetup {
             it.debugMode = cfg.debugMode
         }
 
-        if (CompatibilityService.checkUserData(userCfg.file)) {
-            CometVariables.cometUsers.putAll(userCfg.file.parseAsClass())
+        if (CompatibilityService.checkUserData(UserConfig.file)) {
+            CometVariables.cometUsers.putAll(UserConfig.file.parseAsClass())
         }
 
         daemonLogger.info("已加载了 ${CometVariables.cometUsers.size} 个用户数据.")
 
         FileUtil.initResourceFile()
 
-        GachaService.loadGachaData(arkNightData.file)
+        GachaService.loadGachaData(ArkNightData.file)
 
         ApiManager.loadAllApiConfig()
 
@@ -95,20 +81,21 @@ object DataSetup {
     }
 
     fun saveAllResources() {
+        Config.save()
+        UserConfig.save()
+        GroupConfig.save()
+        GithubRepoData.save()
         daemonLogger.info("[数据] 自动保存数据完成")
-        saveCfg()
-        perGroupFolder.save()
-        GitHubService.saveData()
     }
 
     fun reload() {
-        cfg = Default.decodeFromString(CometConfig.serializer(), cfgFile.file.getContext())
+        cfg = Default.decodeFromString(CometConfig.serializer(), Config.file.getContext())
         ApiManager.reloadConfig()
     }
 
     fun initPerGroupSetting(bot: Bot) {
         bot.groups.forEach { group ->
-            val loc = File(perGroupFolder.file, "${group.id}.json")
+            val loc = File(GroupConfig.file, "${group.id}.json")
             try {
                 if (!loc.exists()) {
                     FileUtil.createBlankFile(loc)

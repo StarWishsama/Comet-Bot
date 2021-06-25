@@ -101,8 +101,8 @@ object CometRuntime {
         cometServer?.stop()
         TaskUtil.service.shutdown()
         CometVariables.rCon?.disconnect()
-        CometVariables.loggerAppender.close()
         CometVariables.miraiLoggerAppender.close()
+        CometVariables.loggerAppender.close()
     }
 
     fun setupBot(bot: Bot, logger: MiraiLogger) {
