@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.objects.config
 
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.utils.createBackupFile
 import io.github.starwishsama.comet.utils.getContext
 import java.io.File
@@ -26,11 +27,11 @@ abstract class DataFileEntity(
     fun createNewFile(): Boolean = file.createNewFile()
 
     fun check() {
-        if (exists() && (file.isDirectory || file.getContext().isNotEmpty())) {
-            return
+        if (!exists() || (file.isFile && file.getContext().isEmpty())) {
+            init()
         }
 
-        init()
+        daemonLogger.debug("加载资源 ${this.javaClass.simpleName}(${file.name})")
     }
 
     fun createBackup() {

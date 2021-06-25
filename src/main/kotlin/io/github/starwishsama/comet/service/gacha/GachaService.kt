@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
 import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.math.MathUtil
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
@@ -50,24 +51,25 @@ object GachaService {
             return
         }
 
-        poolPath.listFiles()?.forEach {
+        poolPath.listFiles().forEach {
             addPoolFromFile(it)
         }
 
+        // Unreachable
         CometVariables.daemonLogger.info("成功载入了 ${gachaPools.size - 1} 个自定义卡池!")
     }
 
-    fun addPool(gachaPool: CustomPool): Boolean {
+    fun addPool(gachaPool: CustomPool): GachaPool? {
         val exists = gachaPools.parallelStream().filter { it.name == gachaPool.poolName }.findAny().isPresent
 
         if (exists) {
             CometVariables.daemonLogger.warning("已有相同名称的卡池存在! 请检查是否忘记删除了旧文件: ${gachaPool.poolName}")
-            return false
+            return null
         }
 
         return when (gachaPool.gameType) {
             CustomPool.GameType.ARKNIGHT -> {
-                parseArkNightPool(gachaPool).let { gachaPools.add(it) }
+                parseArkNightPool(gachaPool).apply { gachaPools.add(this) }
             }
         }
     }
@@ -87,13 +89,14 @@ object GachaService {
         }
 
         try {
-            val pool = Default.decodeFromString<CustomPool>(poolFile.getContext())
-            addPool(pool)
+            val pool = addPool(Default.decodeFromString(poolFile.getContext()))
 
-            CometVariables.daemonLogger.info("已载入卡池 ${pool.poolName}")
+            CometVariables.daemonLogger.info("已载入卡池 ${pool?.name}")
 
         } catch (e: IOException) {
-            FileUtil.createErrorReportFile("解析卡池信息失败", "gacha", e, "", e.message ?: "")
+            FileUtil.createErrorReportFile("解析卡池信息失败", "gacha", e, poolFile.name, e.message ?: "")
+        } catch (e: SerializationException) {
+            FileUtil.createErrorReportFile("解析卡池信息失败", "gacha", e, poolFile.name, e.message ?: "")
         }
     }
 

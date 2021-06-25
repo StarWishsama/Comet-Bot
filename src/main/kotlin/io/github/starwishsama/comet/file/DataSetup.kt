@@ -33,6 +33,8 @@ object DataSetup {
     private var brokenConfig = false
 
     fun init() {
+        daemonLogger.info("正在加载资源文件...")
+
         allDataFile.forEach {
             try {
                 it.check()

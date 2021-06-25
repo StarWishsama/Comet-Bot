@@ -33,9 +33,7 @@ object UserConfig : DataFileEntity(File(CometVariables.filePath, "users.json")) 
     }
 
     override fun save() {
-        if (CometVariables.cometUsers.isNotEmpty()) {
-            file.writeClassToJson(CometVariables.cometUsers)
-        }
+        file.writeClassToJson(CometVariables.cometUsers)
     }
 }
 
@@ -45,9 +43,7 @@ object Config : DataFileEntity(File(CometVariables.filePath, "config.yml")) {
     }
 
     override fun save() {
-        if (CometVariables.cfg.isNotEmpty()) {
-            file.writeString(Default.encodeToString(CometVariables.cfg))
-        }
+        file.writeString(Default.encodeToString(CometVariables.cfg))
     }
 }
 

@@ -29,7 +29,15 @@ class Comet {
     private val cometLoginHelper: CometLoginHelper = CometLoginHelper(this)
     private lateinit var bot: Bot
     var id: Long = 0
-    lateinit var password: String
+        set(value) {
+            CometVariables.cfg.botId = value
+            field = value
+        }
+    var password: String = ""
+        set(value) {
+            CometVariables.cfg.botPassword = value
+            field = value
+        }
 
     @OptIn(MiraiInternalApi::class)
     suspend fun login() {
@@ -48,7 +56,6 @@ class Comet {
         } catch (e: LoginFailedException) {
             CometVariables.daemonLogger.warning("登录失败! 返回的失败信息: ${e.message}")
             cometLoginHelper.status = LoginStatus.LOGIN_FAILED
-            cometLoginHelper.solve()
             login()
         }
     }

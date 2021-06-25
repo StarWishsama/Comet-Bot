@@ -54,6 +54,8 @@ class CometLoginHelper(val comet: Comet) {
                         continue
                     }
 
+                    if (command == "stop") exitProcess(0)
+
                     comet.password = command
                     CometVariables.daemonLogger.info("设置成功! 正在启动 Comet...")
                     status = LoginStatus.LOGGING
