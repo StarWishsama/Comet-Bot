@@ -47,7 +47,7 @@ class InfoCommand : ChatCommand {
                 reply.convertToChain()
             }
         } else if (args.size == 1 && args[0].contentEquals("排行") || args[0].contentEquals("ph")) {
-            val users = CometVariables.USERS.values.sortedByDescending { it.checkInPoint }
+            val users = CometVariables.cometUsers.values.sortedByDescending { it.checkInPoint }
             val sb = StringBuilder()
             sb.append("积分排行榜").append("\n")
             return if (users.size > 9) {

@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 data class CometUser(
     @JsonProperty("userQQ")
     val id: Long,
-    var lastCheckInTime: LocalDateTime = LocalDateTime.now(),
+    var lastCheckInTime: LocalDateTime = LocalDateTime.now().minusDays(1),
     var checkInPoint: Double = 0.0,
     var checkInTime: Int = 0,
     var bindServerAccount: String = "",
@@ -90,19 +90,15 @@ data class CometUser(
     }
 
     companion object {
-        fun isBotOwner(id: Long): Boolean {
-            return getUser(id)?.level == UserLevel.OWNER
-        }
-
         fun quickRegister(id: Long): CometUser {
-            CometVariables.USERS[id].apply {
+            CometVariables.cometUsers[id].apply {
                 val register = CometUser(id)
-                return this ?: register.also { CometVariables.USERS.putIfAbsent(id, register) }
+                return this ?: register.also { CometVariables.cometUsers.putIfAbsent(id, register) }
             }
         }
 
         fun getUser(id: Long): CometUser? {
-            return CometVariables.USERS[id]
+            return CometVariables.cometUsers[id]
         }
 
         fun getUserOrRegister(qq: Long): CometUser = getUser(qq) ?: quickRegister(qq)

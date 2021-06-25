@@ -20,7 +20,6 @@ import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.getContext
-import io.github.starwishsama.comet.utils.writeString
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
@@ -249,6 +248,6 @@ object GitHubService {
     }
 
     fun saveData() {
-        DataFiles.githubRepoData.file.writeString(Default.encodeToString(repos))
+        DataFiles.githubRepoData.save()
     }
 }

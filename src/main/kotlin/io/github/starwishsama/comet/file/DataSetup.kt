@@ -63,8 +63,8 @@ object DataSetup {
 
     private fun saveCfg() {
         try {
-            cfgFile.file.writeString(Default.encodeToString(CometConfig.serializer(), cfg), isAppend = false)
-            userCfg.file.writeClassToJson(CometVariables.USERS)
+            cfgFile.save()
+            userCfg.save()
         } catch (e: Exception) {
             daemonLogger.warning("[配置] 在保存配置文件时发生了问题", e)
         }
@@ -73,19 +73,19 @@ object DataSetup {
     private fun load() {
         cfg = Default.decodeFromString(CometConfig.serializer(), cfgFile.file.getContext())
 
+        CometVariables.localizationManager = LocalizationManager()
+
         LoggerInstances.instances.forEach {
             it.debugMode = cfg.debugMode
         }
 
         if (CompatibilityService.checkUserData(userCfg.file)) {
-            CometVariables.USERS.putAll(userCfg.file.parseAsClass())
+            CometVariables.cometUsers.putAll(userCfg.file.parseAsClass())
         }
 
-        daemonLogger.info("已加载了 ${CometVariables.USERS.size} 个用户数据.")
+        daemonLogger.info("已加载了 ${CometVariables.cometUsers.size} 个用户数据.")
 
         FileUtil.initResourceFile()
-
-        CometVariables.localizationManager = LocalizationManager()
 
         GachaService.loadGachaData(arkNightData.file)
 

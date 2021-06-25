@@ -142,7 +142,7 @@ object CometVariables {
 
     internal var rCon: Rcon? = null
 
-    internal val USERS: MutableMap<Long, CometUser> = ConcurrentHashMap()
+    internal val cometUsers: MutableMap<Long, CometUser> = ConcurrentHashMap()
     internal lateinit var localizationManager: LocalizationManager
 
     /** 明日方舟卡池数据 */

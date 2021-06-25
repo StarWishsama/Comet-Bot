@@ -103,7 +103,7 @@ object CompatibilityService {
             val old = mapper.readValue<List<CometUser>>(userData)
             old.forEach {
                 val actual = handleDuplication(old, it)
-                CometVariables.USERS[actual.id] = actual
+                CometVariables.cometUsers[actual.id] = actual
             }
 
             return true

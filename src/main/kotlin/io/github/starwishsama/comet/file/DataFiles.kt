@@ -25,22 +25,29 @@ object DataFiles {
     val userCfg: DataFileEntity =
         object : DataFileEntity(File(CometVariables.filePath, "users.json"), FilePriority.HIGH) {
             override fun init() {
-                file.writeClassToJson(CometVariables.USERS)
+                file.writeClassToJson(CometVariables.cometUsers)
             }
 
             override fun save() {
-                file.writeClassToJson(CometVariables.USERS)
+                if (CometVariables.cometUsers.isNotEmpty()) {
+                    file.writeClassToJson(CometVariables.cometUsers)
+                }
             }
         }
 
     val cfgFile: DataFileEntity =
-        object : DataFileEntity(File(CometVariables.filePath, "config.yml"), DataFileEntity.FilePriority.HIGH) {
+        object : DataFileEntity(File(CometVariables.filePath, "config.yml"), FilePriority.HIGH) {
             override fun init() {
                 file.writeString(Default.encodeToString(CometConfig()), isAppend = false)
             }
 
             override fun save() {
-                file.writeString(Default.encodeToString(CometConfig.serializer(), CometVariables.cfg), isAppend = false)
+                if (!CometVariables.cfg.isEmpty()) {
+                    file.writeString(
+                        Default.encodeToString(CometConfig.serializer(), CometVariables.cfg),
+                        isAppend = false
+                    )
+                }
             }
         }
 

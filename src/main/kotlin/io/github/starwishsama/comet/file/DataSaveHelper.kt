@@ -42,7 +42,7 @@ object DataSaveHelper {
             val backupFile = File(location, backupFileName)
             backupFile.createNewFile()
             FileWriter.create(backupFile, Charsets.UTF_8)
-                .write(CometVariables.mapper.writeValueAsString(CometVariables.USERS))
+                .write(CometVariables.mapper.writeValueAsString(CometVariables.cometUsers))
             CometVariables.logger.info("[备份] 备份成功! 文件名是 $backupFileName")
         } catch (e: IOException) {
             CometVariables.logger.error("[备份] 尝试备份时发生了异常", e)
