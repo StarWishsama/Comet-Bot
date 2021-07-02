@@ -32,7 +32,7 @@ data class MusicSearchResult(
 
     fun isEmpty(): Boolean = name.isEmpty() || jumpURL.isEmpty() || albumPicture.isEmpty() || songURL.isEmpty()
 
-    fun toMessageChain(kind: MusicKind): MessageChain {
+    fun parseToChain(kind: MusicKind): MessageChain {
         return MusicShare(
             kind,
             name,
@@ -50,7 +50,7 @@ data class MusicSearchResult(
 
         wrapper.addText(
             "$name - ${getAuthorName()}\n" +
-                    "跳转链接: $songURL"
+                    "跳转链接: $jumpURL"
         )
 
         return wrapper

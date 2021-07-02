@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.api.thirdparty.music
 
+import cn.hutool.http.HttpStatus
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.music.data.NetEaseSearchResult
@@ -36,7 +37,6 @@ object ThirdPartyMusicApi {
                 length
             )
         }&type=1&s=${name}", call = {
-            header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0")
             post(object : RequestBody() {
                 override fun contentType(): MediaType? {
                     return "application/x-www-form-urlencoded".toMediaTypeOrNull()
@@ -53,7 +53,7 @@ object ThirdPartyMusicApi {
 
         val searchResult: NetEaseSearchResult = mapper.readValue(page ?: return emptyList())
 
-        if (searchResult.code != 200) {
+        if (searchResult.code != HttpStatus.HTTP_OK) {
             return emptyList()
         }
 

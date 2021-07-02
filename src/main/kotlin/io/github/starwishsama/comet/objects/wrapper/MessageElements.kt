@@ -38,7 +38,7 @@ import java.io.File
 interface WrapperElement {
     val className: String
 
-    fun toMessageContent(subject: Contact): MessageContent
+    fun toMessageContent(subject: Contact?): MessageContent
 
     fun asString(): String
 }
@@ -53,7 +53,7 @@ interface WrapperElement {
 data class PureText(val text: String) : WrapperElement {
     override val className: String = this::class.java.name
 
-    override fun toMessageContent(subject: Contact): PlainText {
+    override fun toMessageContent(subject: Contact?): PlainText {
         return PlainText(text)
     }
 
@@ -83,7 +83,9 @@ data class Picture(val url: String = "", val filePath: String = "", val base64: 
 
     override val className: String = this::class.java.name
 
-    override fun toMessageContent(subject: Contact): Image {
+    override fun toMessageContent(subject: Contact?): Image {
+        requireNotNull(subject) { "subject cannot be null!" }
+
         if (url.isNotEmpty()) {
             NetUtil.getInputStream(url)?.use {
                 return runBlocking { it.uploadAsImage(subject) }
@@ -115,7 +117,7 @@ data class Picture(val url: String = "", val filePath: String = "", val base64: 
 data class AtElement(val target: Long) : WrapperElement {
     override val className: String = this::class.java.name
 
-    override fun toMessageContent(subject: Contact): MessageContent {
+    override fun toMessageContent(subject: Contact?): MessageContent {
         return At(target)
     }
 
@@ -135,7 +137,7 @@ data class XmlElement(val content: String) : WrapperElement {
     override val className: String = this::class.java.name
 
     @OptIn(MiraiExperimentalApi::class)
-    override fun toMessageContent(subject: Contact): MessageContent {
+    override fun toMessageContent(subject: Contact?): MessageContent {
         return SimpleServiceMessage(serviceId = 60, content = content)
     }
 

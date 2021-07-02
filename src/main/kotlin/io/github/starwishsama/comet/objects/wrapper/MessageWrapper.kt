@@ -63,13 +63,19 @@ open class MessageWrapper {
     fun toMessageChain(subject: Contact?): MessageChain {
         return MessageChainBuilder().apply {
             messageContent.forEach {
-                if (!isPictureReachLimit() || it !is Picture) {
-                    if (subject != null) {
-                        add(it.toMessageContent(subject))
-                    } else {
+                if (it is Picture) {
+                    if (isPictureReachLimit()) return@forEach
+
+                    if (subject == null) {
                         add("[图片]")
+                    } else {
+                        add(it.toMessageContent(subject))
                     }
+
+                    return@forEach
                 }
+
+                add(it.toMessageContent(subject))
             }
         }.build()
     }

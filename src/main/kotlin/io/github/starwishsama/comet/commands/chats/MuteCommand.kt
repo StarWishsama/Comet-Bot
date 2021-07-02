@@ -10,18 +10,19 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.service.command.MuteService
 import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
-import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.TaskUtil
 import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.contact.*
+import net.mamoe.mirai.contact.MemberPermission
+import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -35,10 +36,10 @@ class MuteCommand : ChatCommand {
                 if (args.isNotEmpty()) {
                     val at = CometUtil.parseAtAsBotUser(event, args[0])
                     if (at != null) {
-                        doMute(event.group, at.id, getMuteTime(args[1]), false)
+                        MuteService.doMute(event.group, at.id, MuteService.getMuteTime(args[1]), false)
                     } else {
                         when (args[0]) {
-                            "all", "全体", "全禁", "全体禁言" -> doMute(
+                            "all", "全体", "全禁", "全体禁言" -> MuteService.doMute(
                                 event.group,
                                 -1,
                                 -1,
@@ -47,10 +48,11 @@ class MuteCommand : ChatCommand {
                             "random", "rand", "随机", "抽奖" -> {
                                 TaskUtil.runAsync(500) {
                                     runBlocking {
-                                        doRandomMute(event)
+                                        MuteService.doRandomMute(event)
                                     }
                                 }
-                                CometUtil.toChain("下面将抽取一位幸运群友禁言")
+
+                                "下面将抽取一位幸运群友禁言".toChain()
                             }
                             else -> getHelp().convertToChain()
                         }
@@ -59,7 +61,7 @@ class MuteCommand : ChatCommand {
                     getHelp().convertToChain()
                 }
             } else {
-                CometUtil.toChain("我不是绿帽 我爬 我爬")
+                "机器人需要管理员权限才能进行禁言!".toChain()
             }
         }
         return EmptyMessageChain
@@ -70,7 +72,8 @@ class MuteCommand : ChatCommand {
 
     override fun getHelp(): String = """
         ======= 命令帮助 =======
-        /mute [@/QQ/all] [禁言时长]
+        /mute [@/QQ/all] [禁言时长] 禁言
+        /mute [rand/random/抽奖/随机] 随机抽取一位群友禁言
         时长为 0 时解禁
     """.trimIndent()
 
@@ -81,100 +84,5 @@ class MuteCommand : ChatCommand {
             if (cfg.isHelper(e.sender.id)) return true
         }
         return user.hasPermission(getProps().permission)
-    }
-
-    private suspend fun doRandomMute(event: GroupMessageEvent) {
-        val iterator = event.group.members.iterator()
-        var index = 0
-        var randomIndex = RandomUtil.randomInt(0, event.group.members.size)
-        var target: Long = -1
-        while (iterator.hasNext()) {
-            val member = iterator.next()
-            if (index == randomIndex) {
-                if (member.isAdministrator()) {
-                    randomIndex++
-                    continue
-                }
-                target = member.id
-            }
-            index++
-        }
-        doMute(event.group, target, RandomUtil.randomLong(1, 2592000).toInt(), false)
-    }
-
-    private suspend fun doMute(group: Group, id: Long, muteTime: Int, isAll: Boolean): MessageChain {
-        if (group.botAsMember.isOperator()) {
-            if (isAll) {
-                group.settings.isMuteAll = !group.settings.isMuteAll
-                return if (group.settings.isMuteAll) {
-                    CometUtil.toChain("The World!")
-                } else {
-                    CometUtil.toChain("然后时间开始流动")
-                }
-            } else {
-                if (group.botAsMember.id == id) {
-                    return CometUtil.toChain("不能踢出机器人")
-                }
-
-                for (member in group.members) {
-                    if (member.id == id) {
-                        if (member.isOperator()) {
-                            return CometUtil.toChain("不能踢出管理员")
-                        }
-                        return when (muteTime) {
-                            in 1..2592000 -> {
-                                member.mute(muteTime)
-                                CometUtil.toChain("禁言 ${member.nameCardOrNick} 成功")
-                            }
-                            0 -> {
-                                member.unmute()
-                                CometUtil.toChain("解禁 ${member.nameCardOrNick} 成功")
-                            }
-                            else -> CometUtil.toChain("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]")
-                        }
-                    }
-                }
-            }
-
-            return CometUtil.toChain("找不到此用户")
-        } else {
-            return CometUtil.toChain("我不是绿帽 我爬 我爬")
-        }
-    }
-
-    /**
-     * 这段代码看起来很神必
-     * 但是 It just works.
-     * FIXME: 更换为正则表达式更优雅的处理
-     */
-    private fun getMuteTime(message: String): Int {
-        if (message.isNumeric()) return message.toInt()
-
-        var banTime = 0L
-        var tempTime: String = message
-        if (tempTime.indexOf('d') != -1) {
-            banTime += (tempTime.substring(0, tempTime.indexOf('d')).toInt() * 24
-                    * 60 * 60)
-            tempTime = tempTime.substring(tempTime.indexOf('d') + 1)
-        } else if (tempTime.contains("天")) {
-            banTime += (tempTime.substring(0, tempTime.indexOf('天')).toInt() * 24
-                    * 60 * 60)
-            tempTime = tempTime.substring(tempTime.indexOf('天') + 1)
-        }
-        if (tempTime.indexOf('h') != -1) {
-            banTime += (tempTime.substring(0, tempTime.indexOf('h')).toInt() * 60
-                    * 60)
-            tempTime = tempTime.substring(tempTime.indexOf('h') + 1)
-        } else if (tempTime.contains("小时")) {
-            banTime += (tempTime.substring(0, tempTime.indexOf("时")).toInt() * 60
-                    * 60)
-            tempTime = tempTime.substring(tempTime.indexOf("时") + 1)
-        }
-        if (tempTime.indexOf('m') != -1) {
-            banTime += tempTime.substring(0, tempTime.indexOf('m')).toInt() * 60
-        } else if (tempTime.contains("分钟")) {
-            banTime += tempTime.substring(0, tempTime.indexOf("分钟")).toInt() * 60
-        }
-        return banTime.toInt()
     }
 }

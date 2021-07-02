@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.objects.config.api
 
+import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.SeasonName
 import kotlinx.serialization.Serializable
 import net.mamoe.yamlkt.Comment
 import java.util.concurrent.TimeUnit
@@ -20,7 +21,8 @@ data class R6StatsConfig(
     @Comment("R6Stats API 此项无需修改")
     override val interval: Int = -1,
     @Comment("R6Stats API 此项无需修改")
-    override val timeUnit: TimeUnit = TimeUnit.MINUTES
+    override val timeUnit: TimeUnit = TimeUnit.MINUTES,
+    val seasonName: SeasonName = SeasonName.NORTH_STAR
 ) : ApiConfig {
     override val apiName: String = "r6stats"
 }

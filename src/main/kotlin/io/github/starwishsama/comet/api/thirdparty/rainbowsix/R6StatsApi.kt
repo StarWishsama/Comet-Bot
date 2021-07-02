@@ -17,7 +17,6 @@ import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatsGenericStat
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatsSeasonalStat
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.Region
-import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.SeasonName
 import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.objects.config.api.R6StatsConfig
@@ -89,8 +88,9 @@ object R6StatsApi : ApiExecutor {
             return MessageWrapper().addText("无法获取玩家 $userName 的信息, 数据为空")
         }
 
-        // TODO: 支持分赛季数据获取
-        val latestSeasonalStat = seasonalStat.getSeasonalStat(SeasonName.CRIMSON_HEIST)?.getRegionStat(Region.EMEA)
+        val cfg = ApiManager.getConfig<R6StatsConfig>()
+
+        val latestSeasonalStat = seasonalStat.getSeasonalStat(cfg.seasonName)?.getRegionStat(Region.EMEA)
             ?: return MessageWrapper().addText("无法获取玩家 $userName 的信息, 赛季数据为空")
 
         val infoText = "|| ${genericStat.username} [${genericStat.levelInfo.level} 级]\n" +
