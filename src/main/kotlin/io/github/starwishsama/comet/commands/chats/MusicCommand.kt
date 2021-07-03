@@ -28,24 +28,24 @@ class MusicCommand : ChatCommand {
             return getHelp().toChain()
         }
 
-        when (args[0]) {
-            "api" -> return MusicService.setMusicApi(args)
+        return when (args[0]) {
+            "api" -> MusicService.setMusicApi(args)
 
-            "mode" -> return MusicService.setTextMode()
+            "mode" -> MusicService.setTextMode()
 
             MusicApiType.QQ.name -> {
                 event.subject.sendMessage("请稍等...")
-                return MusicService.handleQQMusic(args.getRestString(1), event.subject)
+                MusicService.handleQQMusic(args.getRestString(1), event.subject)
             }
 
             MusicApiType.NETEASE.name -> {
                 event.subject.sendMessage("请稍等...")
-                return MusicService.handleNetEaseMusic(args.getRestString(1), event.subject)
+                MusicService.handleNetEaseMusic(args.getRestString(1), event.subject)
             }
 
             else -> {
                 event.subject.sendMessage("请稍等...")
-                return MusicService.handleMusicSearch(args.getRestString(0), event.subject)
+                MusicService.handleMusicSearch(args.getRestString(0), event.subject)
             }
         }
     }

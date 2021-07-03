@@ -64,7 +64,9 @@ open class MessageWrapper {
         return MessageChainBuilder().apply {
             messageContent.forEach {
                 if (it is Picture) {
-                    if (isPictureReachLimit()) return@forEach
+                    if (isPictureReachLimit()) {
+                        return@forEach
+                    }
 
                     if (subject == null) {
                         add("[图片]")

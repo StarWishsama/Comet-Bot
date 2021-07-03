@@ -15,7 +15,6 @@ import io.github.starwishsama.comet.api.thirdparty.music.ThirdPartyMusicApi
 import io.github.starwishsama.comet.enums.MusicApiType
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MusicKind
 
@@ -40,16 +39,14 @@ object MusicService {
         }
     }
 
-    fun handleMusicSearch(name: String, subject: Contact): MessageChain {
-        when (CometVariables.cfg.musicApi) {
+    fun handleMusicSearch(name: String, subject: Contact?): MessageChain {
+        return when (CometVariables.cfg.musicApi) {
             MusicApiType.NETEASE -> handleNetEaseMusic(name, subject)
             MusicApiType.QQ -> handleQQMusic(name, subject)
         }
-
-        return EmptyMessageChain
     }
 
-    fun handleNetEaseMusic(name: String, subject: Contact): MessageChain {
+    fun handleNetEaseMusic(name: String, subject: Contact?): MessageChain {
         try {
             val result = ThirdPartyMusicApi.searchNetEaseMusic(name)
 
@@ -60,7 +57,7 @@ object MusicService {
             return if (plainText) {
                 result[0].toMessageWrapper().toMessageChain(subject)
             } else {
-                result[0].parseToChain(MusicKind.NeteaseCloudMusic)
+                result[0].toMusicShare(MusicKind.NeteaseCloudMusic)
             }
         } catch (e: Exception) {
             CometVariables.daemonLogger.warning("点歌时出现了意外", e)
@@ -68,7 +65,7 @@ object MusicService {
         }
     }
 
-    fun handleQQMusic(name: String, subject: Contact): MessageChain {
+    fun handleQQMusic(name: String, subject: Contact?): MessageChain {
         try {
             val result = ThirdPartyMusicApi.searchQQMusic(name)
 
@@ -79,7 +76,7 @@ object MusicService {
             return if (plainText) {
                 result[0].toMessageWrapper().toMessageChain(subject)
             } else {
-                result[0].parseToChain(MusicKind.QQMusic)
+                result[0].toMusicShare(MusicKind.QQMusic)
             }
         } catch (e: Exception) {
             CometVariables.daemonLogger.warning("点歌时出现了意外", e)

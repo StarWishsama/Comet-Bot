@@ -32,7 +32,7 @@ data class MusicSearchResult(
 
     fun isEmpty(): Boolean = name.isEmpty() || jumpURL.isEmpty() || albumPicture.isEmpty() || songURL.isEmpty()
 
-    fun parseToChain(kind: MusicKind): MessageChain {
+    fun toMusicShare(kind: MusicKind): MessageChain {
         return MusicShare(
             kind,
             name,
