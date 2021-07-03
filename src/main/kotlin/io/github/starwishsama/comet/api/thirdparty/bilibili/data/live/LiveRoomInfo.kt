@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.live
 
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -100,7 +110,7 @@ data class LiveRoomInfo(
         val uploadCoverTime: Int,
     ) {
         init {
-            if (isEmptyTime()) {
+            if (isLiveTimeInvalid()) {
                 liveTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.MIN)
             }
         }
@@ -127,15 +137,16 @@ data class LiveRoomInfo(
         fun isLiveNow(): Boolean = getStatus() == Status.Streaming
 
         fun parseLiveTime(): LocalDateTime {
-            return if (isEmptyTime()) {
+            return if (isLiveTimeInvalid()) {
                 LocalDateTime.MIN
             } else {
                 LocalDateTime.parse(liveTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
             }
         }
 
-        fun isEmptyTime(): Boolean {
-            return liveTime == "0000-00-00 00:00:00"
+        fun isLiveTimeInvalid(): Boolean {
+            val timepart = liveTime.split("-")
+            return liveTime == "0000-00-00 00:00:00" || timepart[0].toLong() !in -999999999..999999999
         }
 
         fun getRoomURL(): String {

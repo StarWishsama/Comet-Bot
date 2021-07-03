@@ -1,7 +1,18 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.api.thirdparty.music
 
+import cn.hutool.http.HttpStatus
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.music.data.NetEaseSearchResult
 import io.github.starwishsama.comet.api.thirdparty.music.data.QQMusicSearchResult
 import io.github.starwishsama.comet.api.thirdparty.music.entity.MusicSearchResult
@@ -26,7 +37,6 @@ object ThirdPartyMusicApi {
                 length
             )
         }&type=1&s=${name}", call = {
-            header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0")
             post(object : RequestBody() {
                 override fun contentType(): MediaType? {
                     return "application/x-www-form-urlencoded".toMediaTypeOrNull()
@@ -43,7 +53,7 @@ object ThirdPartyMusicApi {
 
         val searchResult: NetEaseSearchResult = mapper.readValue(page ?: return emptyList())
 
-        if (searchResult.code != 200) {
+        if (searchResult.code != HttpStatus.HTTP_OK) {
             return emptyList()
         }
 

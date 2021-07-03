@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.commands.chats
 
 import cn.hutool.core.util.RandomUtil
@@ -5,7 +15,7 @@ import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.RandomResult
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
@@ -15,15 +25,15 @@ import net.mamoe.mirai.message.data.MessageChain
 
 
 class DivineCommand : ChatCommand {
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return if (args.isNotEmpty()) {
-            if (user.commandTime > 0 || user.level != UserLevel.USER) {
+            if (user.checkInPoint > 0 || user.level != UserLevel.USER) {
                 if (args.isEmpty()) return CometUtil.toChain("请检查需要占卜的字符是否超过上限或为空!")
 
                 val randomEventName = args.getRestString(0)
                 if (randomEventName.isNotBlank() && randomEventName.length < 30) {
                     val result = RandomResult(-1000, RandomUtil.randomDouble(0.0, 1.0), randomEventName)
-                    user.decreaseTime()
+                    user.consumePoint(1)
                     RandomResult.getChance(result).convertToChain()
                 } else {
                     CometUtil.toChain("请检查需要占卜的字符是否超过上限或为空!")

@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.codec.Base64Decoder
@@ -19,14 +29,20 @@ enum class IDGuidelineType(val rule: Regex) {
 }
 
 object StringUtil {
-    /**
-     * 判断ID是否符合育碧账号昵称格式规范
-     *
-     * @author StarWishsama
-     * @param username 用户名
-     * @return 是否符合规范
-     */
-    fun isLegitId(username: String, type: IDGuidelineType): Boolean = type.rule.matches(username)
+    fun String.withoutColor() = this.replace("\u001B\\[[;\\d]*m".toRegex(), "")
+
+    fun ByteArray.base64ToImage(): BufferedImage {
+        if (this.isEmpty()) {
+            throw IllegalArgumentException("Image byte array cannot be empty!")
+        }
+
+        val imageByte = Base64Decoder.decode(this)
+
+        val bis = ByteArrayInputStream(imageByte)
+        bis.use {
+            return ImageIO.read(bis)
+        }
+    }
 
     /**
      * 来自 Mirai 的 asHumanReadable
@@ -103,6 +119,15 @@ object StringUtil {
         return counter >= string.size
     }
 
+    /**
+     * 判断ID是否符合账号昵称格式规范
+     *
+     * @author StarWishsama
+     * @param username 用户名
+     * @return 是否符合规范
+     */
+    fun isLegitId(username: String, type: IDGuidelineType): Boolean = type.rule.matches(username)
+
     fun parseVideoIDFromBili(url: String): String {
         val videoID = url.substring(0, url.indexOf("?")).replace("https", "").replace("https", "").split("/")
         return videoID.last()
@@ -119,21 +144,6 @@ object StringUtil {
                     append(it)
                 }
             }
-        }
-    }
-
-    fun String.withoutColor() = this.replace("\u001B\\[[;\\d]*m".toRegex(), "")
-
-    fun ByteArray.base64ToImage(): BufferedImage {
-        if (this.isEmpty()) {
-            throw IllegalArgumentException("Image byte array cannot be empty!")
-        }
-
-        val imageByte = Base64Decoder.decode(this)
-
-        val bis = ByteArrayInputStream(imageByte)
-        bis.use {
-            return ImageIO.read(bis)
         }
     }
 }

@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.io.file.FileReader
@@ -6,10 +16,10 @@ import cn.hutool.core.net.URLDecoder
 import cn.hutool.crypto.SecureUtil
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.CometApplication
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
@@ -27,7 +37,7 @@ import java.util.jar.JarFile
 import kotlin.time.ExperimentalTime
 
 @Synchronized
-fun File.writeClassToJson(context: Any, mapper: ObjectMapper = BotVariables.mapper) {
+fun File.writeClassToJson(context: Any, mapper: ObjectMapper = CometVariables.mapper) {
     FileWriter.create(this).write(mapper.writeValueAsString(context), false)
 }
 
@@ -62,10 +72,9 @@ fun File.getMD5(): String {
 /**
  * 直接将文件内容 (json) 序列化为指定的类
  *
- * @param clazz 指定类
  * @return T
  */
-inline fun <reified T : Any> File.parseAsClass(customParser: ObjectMapper = BotVariables.mapper): T {
+inline fun <reified T : Any> File.parseAsClass(customParser: ObjectMapper = CometVariables.mapper): T {
     require(exists()) { "$path 不存在" }
     return customParser.readValue(getContext())
 }
@@ -125,7 +134,7 @@ fun File.createBackupFile() {
 object FileUtil {
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
 
-    fun getChildFolder(childName: String): File = BotVariables.filePath.getChildFolder(childName)
+    fun getChildFolder(childName: String): File = CometVariables.filePath.getChildFolder(childName)
 
     fun getCacheFolder(): File = getChildFolder("cache")
 
@@ -158,10 +167,14 @@ object FileUtil {
      *
      * @return log 文件位置
      */
-    fun getLogLocation(): File {
+    fun getLogLocation(customPrefix: String = "log"): File {
         val initTime = LocalDateTime.now()
         val parent = getChildFolder("logs")
-        return File(parent, "log-${dateFormatter.format(initTime)}.log").also { it.createNewFile() }
+        return File(parent, "$customPrefix-${dateFormatter.format(initTime)}.log").also {
+            if (!it.exists()) {
+                it.createNewFile()
+            }
+        }
     }
 
     /**
@@ -170,7 +183,7 @@ object FileUtil {
     @Suppress("SpellCheckingInspection")
     fun getJarLocation(): File {
         var path: String = Comet::class.java.protectionDomain.codeSource.location.path
-        if (System.getProperty("os.name").toLowerCase().contains("dows")) {
+        if (System.getProperty("os.name").lowercase().contains("dows")) {
             path = path.substring(1)
         }
         if (path.contains("jar")) {
@@ -328,7 +341,11 @@ object FileUtil {
      * @param resourcePath 资源文件储存文件夹
      */
     private fun processFileInJar(entry: JarEntry, fileName: String, resourcePath: String = "resources") {
-        if (fileName.isEmpty()) return
+        var counter = 0
+
+        if (fileName.isEmpty()) {
+            return
+        }
 
         val entryName = entry.name
 
@@ -347,16 +364,18 @@ object FileUtil {
                 FileOutputStream(current).use { fos ->
                     val byteArray = ByteArray(1024)
                     var len: Int
-                    javaClass.classLoader.getResourceAsStream(entryName).use { fis ->
-                        if (fis != null) {
-                            // While the input stream has bytes
-                            while (fis.read(byteArray).also { len = it } > 0) {
-                                fos.write(byteArray, 0, len)
-                            }
+                    javaClass.classLoader.getResourceAsStream(entryName)?.use { fis ->
+                        // While the input stream has bytes
+                        while (fis.read(byteArray).also { len = it } > 0) {
+                            fos.write(byteArray, 0, len)
                         }
+
+                        counter++
                     }
                 }
             }
         }
+
+        daemonLogger.info("已处理 $counter 个数据文件.")
     }
 }

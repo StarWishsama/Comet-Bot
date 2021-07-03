@@ -1,10 +1,20 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.i18n
 
-import io.github.starwishsama.comet.BotVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.getChildFolder
 import io.github.starwishsama.comet.utils.getContext
-import net.mamoe.yamlkt.Yaml
+import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
 
 class LocalizationManager {
@@ -16,7 +26,7 @@ class LocalizationManager {
 
         val localizationFile = File(localizedFolder, currentLanguage.fileName)
         if (localizationFile.exists()) {
-            localizationYaml = Yaml.Default.decodeMapFromString(localizationFile.getContext())
+            localizationYaml = Default.decodeMapFromString(localizationFile.getContext())
             daemonLogger.info("多语言服务已启动! 使用语言: $currentLanguage")
         } else {
             daemonLogger.warning("多语言文件未被正确生成! 部分文本可能会受到影响")

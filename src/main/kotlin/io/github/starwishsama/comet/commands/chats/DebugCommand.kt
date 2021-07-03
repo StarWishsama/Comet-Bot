@@ -1,16 +1,24 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.BotVariables
 import io.github.starwishsama.comet.BuildConfig
-
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
-import io.github.starwishsama.comet.api.thirdparty.youtube.YoutubeApi
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.task.HitokotoUpdater
 import io.github.starwishsama.comet.sessions.SessionHandler
@@ -20,9 +28,6 @@ import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
-import io.github.starwishsama.comet.utils.network.RssUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -34,7 +39,7 @@ import kotlin.time.ExperimentalTime
 
 class DebugCommand : ChatCommand, UnDisableableCommand {
     @ExperimentalTime
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isNotEmpty()) {
             when (args[0]) {
                 "reload" -> {
@@ -102,18 +107,15 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                 }
                 "hitokoto" -> return HitokotoUpdater.getHitokoto().convertToChain()
                 "switch" -> {
-                    BotVariables.switch = !BotVariables.switch
-                    return "维护模式已${if (!BotVariables.switch) "开启" else "关闭"}".toChain()
+                    CometVariables.switch = !CometVariables.switch
+                    return "维护模式已${if (!CometVariables.switch) "开启" else "关闭"}".toChain()
                 }
                 "push" -> {
                     if (args.size > 1) {
-                        return when (args[1].toLowerCase()) {
+                        return when (args[1].lowercase()) {
                             "twit", "twitter", "推特", "蓝鸟", "twi" -> {
                                 PusherManager.getPusherByName("data")?.execute()
                                 toChain("Twitter retriever has been triggered and run~")
-                            }
-                            "ytb", "y2b", "youtube", "油管" -> {
-                                toChain("Youtube retriever is in WIP status.")
                             }
                             "bilibili", "bili", "哔哩哔哩", "b站" -> {
                                 PusherManager.getPusherByName("bili_dynamic")?.execute()
@@ -126,31 +128,13 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                                     ps.forEach {
                                         append(it::class.java.simpleName + "\n")
                                         append("上次推送了 ${it.pushTime} 次\n")
-                                        append("上次推送于 ${BotVariables.yyMMddPattern.format(it.latestPushTime)}\n")
+                                        append("上次推送于 ${CometVariables.yyMMddPattern.format(it.latestTriggerTime)}\n")
                                     }
                                     trim()
                                 }.toChain()
                             }
                             else -> toChain("Unknown retriever type.")
                         }
-                    }
-                }
-                "data" -> {
-                    if (args.size > 1) {
-                        return YoutubeApi.getLiveStatusByResult(
-                            withContext(Dispatchers.IO) {
-                                YoutubeApi.service.getSearchResult(channelId = args[1]).execute().body()
-                            }).toMessageChain(event.subject)
-                    }
-                }
-                "rss" -> {
-                    if (args.size > 1) {
-                        return RssUtil.simplifyHTML(
-                            RssUtil.getFromEntry(
-                                RssUtil.getEntryFromURL(args[1])
-                                    ?: return "Can't retrieve page content".convertToChain()
-                            )
-                        ).convertToChain()
                     }
                 }
                 "quit" -> {
@@ -174,5 +158,5 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
         get() = true
 
     override val canRegister: () -> Boolean
-        get() = { BotVariables.cfg.debugMode }
+        get() = { CometVariables.cfg.debugMode }
 }

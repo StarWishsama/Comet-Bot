@@ -1,8 +1,18 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.managers
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.config.api.*
@@ -12,7 +22,7 @@ import io.github.starwishsama.comet.utils.folderIsEmpty
 import java.io.File
 
 object ApiManager {
-    val apiConfigs = mutableListOf<ApiConfig>()
+    val apiConfigs = mutableSetOf<ApiConfig>()
 
     inline fun <reified T> getConfig(): T {
         val result = apiConfigs.find { it is T } ?: throw ApiException("找不到指定 API 的配置")
@@ -27,13 +37,13 @@ object ApiManager {
         }
 
         if (apiConfigFile.folderIsEmpty()) {
-            createBlankConfigs()
-            daemonLogger.log(HinaLogLevel.Info, "API 配置生成成功! 注意: 自新版本开始 API 请在 /api 文件夹下配置", prefix = "API设置")
+            createDefaultConfigs()
+            daemonLogger.log(HinaLogLevel.Info, "API 配置生成成功! 注意: 自新版本开始 API 配置请在 /api 文件夹下配置", prefix = "API设置")
         }
 
         apiConfigFile.listFiles()?.forEach {
             try {
-                apiConfigs.add(mapper.readValue(it))
+                addConfig(mapper.readValue(it))
             } catch (e: Exception) {
                 daemonLogger.log(HinaLogLevel.Warn, "在处理 API 配置时出现了意外", e, prefix = "API设置")
             }
@@ -42,7 +52,11 @@ object ApiManager {
         daemonLogger.log(HinaLogLevel.Info, "已加载 ${apiConfigs.size} 个配置", prefix = "API设置")
     }
 
-    private fun createBlankConfigs() {
+    fun addConfig(config: ApiConfig) {
+        apiConfigs.add(config)
+    }
+
+    private fun createDefaultConfigs() {
         val apiConfigFile = FileUtil.getChildFolder("api")
         val defaultConfigType = mutableListOf(BiliBiliConfig(), R6StatsConfig(), SauceNaoConfig(), TwitterConfig())
 
@@ -53,7 +67,6 @@ object ApiManager {
 
     fun reloadConfig() {
         apiConfigs.clear()
-
         loadAllApiConfig()
     }
 }

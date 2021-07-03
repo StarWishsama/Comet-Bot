@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.objects.wrapper
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
@@ -6,7 +16,6 @@ import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import java.util.stream.Collectors
-import kotlin.streams.toList
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class MessageWrapper {
@@ -54,13 +63,21 @@ open class MessageWrapper {
     fun toMessageChain(subject: Contact?): MessageChain {
         return MessageChainBuilder().apply {
             messageContent.forEach {
-                if (!isPictureReachLimit() || it !is Picture) {
-                    if (subject != null) {
-                        add(it.toMessageContent(subject))
-                    } else {
-                        add("[图片]")
+                if (it is Picture) {
+                    if (isPictureReachLimit()) {
+                        return@forEach
                     }
+
+                    if (subject == null) {
+                        add("[图片]")
+                    } else {
+                        add(it.toMessageContent(subject))
+                    }
+
+                    return@forEach
                 }
+
+                add(it.toMessageContent(subject))
             }
         }.build()
     }
@@ -80,7 +97,7 @@ open class MessageWrapper {
     }
 
     fun getAllText(): String {
-        val texts = messageContent.parallelStream().filter { it is PureText }.toList()
+        val texts = messageContent.parallelStream().filter { it is PureText }.collect(Collectors.toList())
         return buildString {
             texts.forEach {
                 append(it.asString())

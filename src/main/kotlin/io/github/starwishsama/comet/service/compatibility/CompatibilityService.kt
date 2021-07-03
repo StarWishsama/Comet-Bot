@@ -1,28 +1,38 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.service.compatibility
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.service.compatibility.data.OldGroupConfig
 import io.github.starwishsama.comet.utils.copyAndRename
 import io.github.starwishsama.comet.utils.json.isUsable
 import java.io.File
-import kotlin.streams.toList
+import java.util.stream.Collectors
 
 /**
  * [CompatibilityService]
  *
  * 负责转换破坏性更新时的数据类.
  *
- * @see [BotUser]
+ * @see [CometUser]
  * @see [PerGroupConfig]
  */
 object CompatibilityService {
@@ -52,23 +62,19 @@ object CompatibilityService {
                 BiliBiliUser(
                     it.toString(),
                     DynamicApi.getUserNameByMid(it),
-                    UserApi.userApiService.getMemberInfoById(it)
-                        .execute()
-                        .body()?.data?.liveRoomInfo?.roomId ?: -1
+                    LiveApi.getLiveInfo(it)?.data?.roomId ?: -1
                 )
             )
         }
 
         new.apply {
             this.keyWordReply.addAll(cfg.keyWordReply)
-            this.youtubePushEnabled = cfg.youtubePushEnabled
             this.twitterSubscribers.addAll(cfg.twitterSubscribers)
             this.biliSubscribers.addAll(biliUsers)
             this.autoAccept = cfg.autoAccept
             this.helpers = cfg.helpers
             this.twitterPushEnabled = cfg.twitterPushEnabled
             this.biliPushEnabled = cfg.biliPushEnabled
-            this.youtubeSubscribers.addAll(cfg.youtubeSubscribers)
             this.canRepeat = cfg.doRepeat
             this.groupFilterWords.addAll(cfg.groupFilterWords)
             this.disabledCommands.addAll(cfg.disabledCommands)
@@ -87,17 +93,17 @@ object CompatibilityService {
      */
     fun checkUserData(userData: File): Boolean {
         try {
-            mapper.readValue<Map<Long, BotUser>>(userData)
+            mapper.readValue<Map<Long, CometUser>>(userData)
             return true
         } catch (ignored: Exception) {
         }
 
         try {
             userData.copyAndRename("users.json.old")
-            val old = mapper.readValue<List<BotUser>>(userData)
+            val old = mapper.readValue<List<CometUser>>(userData)
             old.forEach {
                 val actual = handleDuplication(old, it)
-                BotVariables.users[actual.id] = actual
+                CometVariables.cometUsers[actual.id] = actual
             }
 
             return true
@@ -108,8 +114,8 @@ object CompatibilityService {
         return false
     }
 
-    private fun handleDuplication(users: List<BotUser>, current: BotUser): BotUser {
-        val duplicatedUser = users.parallelStream().filter { it.id == current.id }.toList()
+    private fun handleDuplication(users: List<CometUser>, current: CometUser): CometUser {
+        val duplicatedUser = users.parallelStream().filter { it.id == current.id }.collect(Collectors.toList())
 
         if (duplicatedUser.isEmpty()) {
             return current

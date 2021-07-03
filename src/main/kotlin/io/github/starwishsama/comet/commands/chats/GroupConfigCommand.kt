@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.commands.chats
 
 
@@ -6,7 +16,7 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.toMessageWrapper
@@ -19,16 +29,15 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageChainBuilder
 import net.mamoe.mirai.message.data.PlainText
-import java.util.*
 
 
 class GroupConfigCommand : ChatCommand, UnDisableableCommand {
     // TODO 适配私聊设置
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
                 val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
-                when (args[0].toLowerCase(Locale.ROOT)) {
+                when (args[0].lowercase()) {
                     "helper", "群管" -> {
                         return if (args.size == 2) {
                             val target = CometUtil.parseAtAsBotUser(event, args[1])
@@ -156,7 +165,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
         /group newcomer 设置入群欢迎内容
     """.trimIndent()
 
-    override fun hasPermission(user: BotUser, e: MessageEvent): Boolean {
+    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
         val level = getProps().level
         if (user.compareLevel(level)) return true
         if (e is GroupMessageEvent && e.sender.permission > MemberPermission.MEMBER) return true

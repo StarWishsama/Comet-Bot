@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.logger
 
 import io.github.starwishsama.comet.CometApplication
@@ -23,7 +33,13 @@ class HinaLogger(
 
     // 时间 日志等级/日志等级缩写 logger名字 -> logger前缀 消息
     // 例: 21/2/18 19:18:32 N/MainLogger(i.g.s.c.t.ClassName) -> [Main] Logger Example
-    fun log(level: HinaLogLevel, message: String?, stacktrace: Throwable? = null, prefix: String = "", bypass: Boolean = false) {
+    fun log(
+        level: HinaLogLevel,
+        message: String?,
+        stacktrace: Throwable? = null,
+        prefix: String = "",
+        bypass: Boolean = false
+    ) {
         if (!debugMode && (level == HinaLogLevel.Debug && !bypass)) return
 
         val st = Thread.currentThread().stackTrace.toMutableList().also {
@@ -35,15 +51,18 @@ class HinaLogger(
                     && !it.className.startsWith("io.github.starwishsama.comet.logger")
         } ?: st.getOrNull(0) ?: st[0]
 
-        val executorInfo = "${StringUtil.simplyClassName(executor.className)}#${executor.methodName}:${executor.lineNumber}"
+        val executorInfo =
+            "${StringUtil.simplyClassName(executor.className)}#${executor.methodName}:${executor.lineNumber}"
 
-        var trace = ""
-
-        if (stacktrace != null) {
-            trace = try {
-                formatStacktrace(stacktrace, null, outputBeautyTrace)
-            } catch (e: Exception) {
-                stacktrace.stackTraceToString()
+        val trace = buildString {
+            if (stacktrace != null) {
+                append(
+                    try {
+                        formatStacktrace(stacktrace, null, outputBeautyTrace)
+                    } catch (e: Exception) {
+                        stacktrace.stackTraceToString()
+                    }
+                )
             }
         }
 
@@ -168,11 +187,11 @@ internal fun formatStacktrace(exception: Throwable, packageFilter: String? = nul
 }
 
 sealed class HinaLogLevel(val internalName: String, val simpleName: String, val color: AnsiUtil.Color) {
-    object Verbose: HinaLogLevel("VERBOSE", "V", AnsiUtil.Color.GRAY)
-    object Info: HinaLogLevel("INFO", "I", AnsiUtil.Color.RESET)
-    object Debug: HinaLogLevel("DEBUG", "D", AnsiUtil.Color.LIGHT_BLUE)
-    object Error: HinaLogLevel("ERROR", "E", AnsiUtil.Color.LIGHT_RED)
-    object Warn: HinaLogLevel("WARN", "W", AnsiUtil.Color.LIGHT_YELLOW)
-    object Serve: HinaLogLevel("SERVE", "S", AnsiUtil.Color.RED)
-    object Fatal: HinaLogLevel("FATAL", "F", AnsiUtil.Color.RED)
+    object Verbose : HinaLogLevel("VERBOSE", "V", AnsiUtil.Color.GRAY)
+    object Info : HinaLogLevel("INFO", "I", AnsiUtil.Color.RESET)
+    object Debug : HinaLogLevel("DEBUG", "D", AnsiUtil.Color.LIGHT_BLUE)
+    object Error : HinaLogLevel("ERROR", "E", AnsiUtil.Color.LIGHT_RED)
+    object Warn : HinaLogLevel("WARN", "W", AnsiUtil.Color.LIGHT_YELLOW)
+    object Serve : HinaLogLevel("SERVE", "S", AnsiUtil.Color.RED)
+    object Fatal : HinaLogLevel("FATAL", "F", AnsiUtil.Color.RED)
 }

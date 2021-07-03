@@ -1,13 +1,22 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.api.thirdparty.github.data.events
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import java.time.LocalDateTime
-import java.time.ZoneId
 
-import java.time.format.DateTimeFormatter
+import java.time.Instant
+import java.time.ZoneId
 
 data class PushEvent(
     val ref: String,
@@ -37,8 +46,6 @@ data class PushEvent(
         val owner: JsonNode,
         @JsonProperty("html_url")
         val repoUrl: String,
-        @JsonProperty("updated_at")
-        val updateTime: String,
         @JsonProperty("pushed_at")
         val pushTime: Long,
     )
@@ -56,16 +63,17 @@ data class PushEvent(
         val committer: PusherInfo
     )
 
-    private fun getLocalTime(time: String): String {
-        val localTime = LocalDateTime.parse(time, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.systemDefault())
-        return BotVariables.yyMMddPattern.format(localTime)
+    private fun getLocalTime(time: Long): String {
+        return CometVariables.yyMMddPattern.format(
+            Instant.ofEpochMilli(time * 1000L).atZone(ZoneId.systemDefault()).toLocalDateTime()
+        )
     }
 
     override fun toMessageWrapper(): MessageWrapper {
         val wrapper = MessageWrapper()
 
         wrapper.addText("| 仓库 ${repoInfo.fullName} 有新动态啦\n")
-        wrapper.addText("| 推送时间 ${getLocalTime(repoInfo.updateTime)}\n")
+        wrapper.addText("| 推送时间 ${getLocalTime(repoInfo.pushTime)}\n")
         wrapper.addText("| 推送分支 ${ref.replace("refs/heads/", "")}\n")
         wrapper.addText("| 提交者 ${headCommitInfo.committer.name}\n")
         wrapper.addText("| 提交信息 \n")

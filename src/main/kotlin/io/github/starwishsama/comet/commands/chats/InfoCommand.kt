@@ -1,11 +1,21 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.Mirai
@@ -19,14 +29,13 @@ import java.time.format.DateTimeFormatter
 @OptIn(MiraiExperimentalApi::class)
 
 class InfoCommand : ChatCommand {
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             var reply =
                 "\n积分: " + String.format("%.1f", user.checkInPoint) +
                         "\n累计连续签到了 " + user.checkInTime.toString() + " 天" + "\n上次签到于: " +
                         user.lastCheckInTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString() +
-                        "\n权限组: " + user.level.toString() +
-                        "\n命令条数: " + user.commandTime
+                        "\n权限组: " + user.level.toString()
 
             if (user.bindServerAccount.isNotEmpty()) {
                 reply = reply + "绑定的游戏账号是: " + user.bindServerAccount
@@ -38,7 +47,7 @@ class InfoCommand : ChatCommand {
                 reply.convertToChain()
             }
         } else if (args.size == 1 && args[0].contentEquals("排行") || args[0].contentEquals("ph")) {
-            val users = BotVariables.users.values.sortedByDescending { it.checkInPoint }
+            val users = CometVariables.cometUsers.values.sortedByDescending { it.checkInPoint }
             val sb = StringBuilder()
             sb.append("积分排行榜").append("\n")
             return if (users.size > 9) {

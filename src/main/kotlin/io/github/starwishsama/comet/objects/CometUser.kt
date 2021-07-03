@@ -1,50 +1,41 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.objects
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import java.time.LocalDateTime
 
-data class BotUser(
+data class CometUser(
     @JsonProperty("userQQ")
     val id: Long,
-    var lastCheckInTime: LocalDateTime = LocalDateTime.now(),
+    var lastCheckInTime: LocalDateTime = LocalDateTime.now().minusDays(1),
     var checkInPoint: Double = 0.0,
     var checkInTime: Int = 0,
     var bindServerAccount: String = "",
     var r6sAccount: String = "",
     var level: UserLevel = UserLevel.USER,
-    var commandTime: Int = 100,
     var checkInGroup: Long = 0,
     var lastExecuteTime: Long = -1,
     private val permissions: MutableList<String> = mutableListOf(),
     val savedContents: MutableList<MessageWrapper> = mutableListOf()
 ) {
-    fun decreaseTime() {
-        if (level <= UserLevel.VIP) {
-            commandTime--
-        }
+    fun addPoint(point: Number) {
+        checkInPoint += point.toDouble()
     }
 
-    fun decreaseTime(time: Int) {
-        if (level <= UserLevel.VIP) {
-            commandTime -= time
-        }
-    }
-
-    fun addPoint(point: Double) {
-        checkInPoint += point
-    }
-
-    fun addTime(time: Int, bypass: Boolean = false) {
-        if (level == UserLevel.USER && (commandTime <= 1000 || bypass)) {
-            commandTime += time
-        }
-    }
-
-    fun costPoint(point: Double) {
-        checkInPoint -= point
+    fun consumePoint(point: Number) {
+        checkInPoint -= point.toDouble()
     }
 
     fun plusDay() {
@@ -60,7 +51,7 @@ data class BotUser(
     }
 
     fun getPermissions(): String = buildString {
-        this@BotUser.permissions.forEach {
+        this@CometUser.permissions.forEach {
             append("$it ")
         }
     }.trim()
@@ -99,21 +90,17 @@ data class BotUser(
     }
 
     companion object {
-        fun isBotOwner(id: Long): Boolean {
-            return getUser(id)?.level == UserLevel.OWNER
-        }
-
-        fun quickRegister(id: Long): BotUser {
-            BotVariables.users[id].apply {
-                val register = BotUser(id)
-                return this ?: register.also { BotVariables.users.putIfAbsent(id, register) }
+        fun quickRegister(id: Long): CometUser {
+            CometVariables.cometUsers[id].apply {
+                val register = CometUser(id)
+                return this ?: register.also { CometVariables.cometUsers.putIfAbsent(id, register) }
             }
         }
 
-        fun getUser(id: Long): BotUser? {
-            return BotVariables.users[id]
+        fun getUser(id: Long): CometUser? {
+            return CometVariables.cometUsers[id]
         }
 
-        fun getUserOrRegister(qq: Long): BotUser = getUser(qq) ?: quickRegister(qq)
+        fun getUserOrRegister(qq: Long): CometUser = getUser(qq) ?: quickRegister(qq)
     }
 }

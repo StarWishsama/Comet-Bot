@@ -1,9 +1,18 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.commands.console
 
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.comet
 import io.github.starwishsama.comet.BuildConfig
-
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
@@ -35,15 +44,15 @@ class DebugCommand : ConsoleCommand {
                 }
                 "info" ->
                     return ("彗星 Bot ${BuildConfig.version}\n" +
-                            "Comet 状态: ${comet.getBot().isOnline} | ${BotVariables.switch}\n" +
+                            "Comet 状态: ${comet.getBot().isOnline} | ${CometVariables.switch}\n" +
                             "已注册命令数: ${CommandExecutor.countCommands()}\n" +
                             CometUtil.getMemoryUsage() + "\n" +
                             "CPU 负载: ${RuntimeUtil.getOperatingSystemBean().systemLoadAverage}\n" +
                             "构建时间: ${BuildConfig.buildTime}"
                             )
                 "switch" -> {
-                    BotVariables.switch = !BotVariables.switch
-                    return "Bot > 维护模式已${if (!BotVariables.switch) "开启" else "关闭"}"
+                    CometVariables.switch = !CometVariables.switch
+                    return "Bot > 维护模式已${if (!CometVariables.switch) "开启" else "关闭"}"
                 }
                 else -> return getHelp()
             }

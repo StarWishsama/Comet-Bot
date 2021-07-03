@@ -1,9 +1,19 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.objects.gacha.pool
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.logger.HinaLogLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.gacha.GachaResult
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.GachaItem
@@ -38,11 +48,11 @@ class ArkNightPool(
     override val poolItems: MutableList<ArkNightOperator> = mutableListOf()
 
     init {
-        BotVariables.arkNight.stream().filter { condition(it) }.forEach {
+        CometVariables.arkNight.stream().filter { condition(it) }.forEach {
             poolItems.add(it)
         }
 
-        BotVariables.daemonLogger.log(
+        CometVariables.daemonLogger.log(
             HinaLogLevel.Info,
             message = "已加载了 ${poolItems.size} 个干员至卡池 $name",
             prefix = "明日方舟"
@@ -50,8 +60,8 @@ class ArkNightPool(
     }
 
     private val r3Range = 0.0..0.5
-    private val r4Range = 0.51..0.91
-    private val r5Range = 0.92..0.97
+    private val r4Range = 0.5..0.9
+    private val r5Range = 0.9..0.98
 
     override fun doDraw(time: Int): GachaResult {
         val gachaResult = GachaResult()
@@ -112,6 +122,7 @@ class ArkNightPool(
     )
 
     // 使用自定义抽卡方式
+    @Suppress("UNCHECKED_CAST")
     private fun getArkNightOperator(rare: Int): ArkNightOperatorInfo {
         // 首先获取所有对应星级干员
         val rareItems = poolItems.parallelStream().filter { it.rare == (rare - 1) }.collect(Collectors.toList())
@@ -156,9 +167,9 @@ class ArkNightPool(
     /**
      * 明日方舟抽卡结果
      */
-    fun getArkDrawResult(user: BotUser, time: Int = 1): GachaResult {
+    fun getArkDrawResult(user: CometUser, time: Int = 1): GachaResult {
         return if (GachaUtil.checkHasGachaTime(user, time)) {
-            user.decreaseTime(time)
+            user.consumePoint(time * 0.1)
             doDraw(time)
         } else {
             GachaResult()
@@ -168,7 +179,8 @@ class ArkNightPool(
     /**
      * 明日方舟抽卡，返回文字
      */
-    fun getArkDrawResultAsString(user: BotUser, drawResult: GachaResult): String {
+    @Suppress("UNCHECKED_CAST")
+    fun getArkDrawResultAsString(user: CometUser, drawResult: GachaResult): String {
         val currentPool = "目前卡池为: $displayName\n"
         if (!drawResult.isEmpty()) {
             when (drawResult.items.size) {
@@ -188,11 +200,12 @@ class ArkNightPool(
                     val r5Count = drawResult.items.parallelStream().filter { it.rare + 1 == 4 }.count()
                     val r4Count = drawResult.items.parallelStream().filter { it.rare + 1 == 3 }.count()
                     val r3Count = drawResult.items.size - r6Count - r5Count - r4Count
+                    val perTimeUsed = 600
 
                     var returnText = currentPool + "寻访结果:\n" +
                             "寻访次数: ${drawResult.items.size}\n" +
                             "结果: ${r6Count}[6]|${r5Count}[5]|${r4Count}[4]|${r3Count}[3]\n" +
-                            "使用合成玉 ${drawResult.items.size * 600}"
+                            "使用合成玉 ${drawResult.items.size * perTimeUsed}"
 
                     if (drawResult.specialItems.isNotEmpty()) {
                         returnText += "\n\n出现特殊物品!\n"
@@ -205,13 +218,13 @@ class ArkNightPool(
                 }
             }
         } else {
-            return GachaUtil.overTimeMessage + "\n剩余次数: ${user.commandTime}"
+            return GachaUtil.overTimeMessage + "\n剩余积分: ${user.checkInPoint}"
         }
     }
 
     /**
      * 明日方舟抽卡，返回文字
      */
-    fun getArkDrawResultAsString(user: BotUser, time: Int): String =
+    fun getArkDrawResultAsString(user: CometUser, time: Int): String =
         getArkDrawResultAsString(user, getArkDrawResult(user, time))
 }

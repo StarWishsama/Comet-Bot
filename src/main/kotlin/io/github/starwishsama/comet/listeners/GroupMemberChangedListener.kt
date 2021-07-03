@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.listeners
 
 import io.github.starwishsama.comet.managers.GroupConfigManager
@@ -9,7 +19,7 @@ import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.MemberJoinEvent
 import kotlin.reflect.KClass
 
-object GroupMemberChangedListener: NListener {
+object GroupMemberChangedListener : NListener {
     override val eventToListen: List<KClass<out Event>> = listOf(MemberJoinEvent::class)
 
     override fun listen(event: Event) {
@@ -17,7 +27,14 @@ object GroupMemberChangedListener: NListener {
             val cfg = GroupConfigManager.getConfig(event.groupId) ?: return
 
             if (cfg.newComerWelcome && !cfg.newComerWelcomeText.isEmpty()) {
-                runBlocking { event.group.sendMessage(reWrapMessage(cfg.newComerWelcomeText, event).toMessageChain(event.group)) }
+                runBlocking {
+                    event.group.sendMessage(
+                        reWrapMessage(
+                            cfg.newComerWelcomeText,
+                            event
+                        ).toMessageChain(event.group)
+                    )
+                }
             }
         }
     }

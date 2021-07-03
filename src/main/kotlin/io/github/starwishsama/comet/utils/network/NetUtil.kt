@@ -1,8 +1,18 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.utils.network
 
 import cn.hutool.http.HttpException
-import io.github.starwishsama.comet.BotVariables.cfg
-import io.github.starwishsama.comet.BotVariables.netLogger
+import io.github.starwishsama.comet.CometVariables.cfg
+import io.github.starwishsama.comet.CometVariables.netLogger
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.utils.StringUtil.containsEtc
@@ -179,8 +189,8 @@ object NetUtil {
     }
 
     fun isTimeout(t: Throwable): Boolean {
-        val msg = t.message?.toLowerCase() ?: return false
-        return msg.containsEtc(false, "time", "out") || t.javaClass.simpleName.toLowerCase().contains("timeout")
+        val msg = t.message?.lowercase() ?: return false
+        return msg.containsEtc(true, "time", "out") || t.javaClass.simpleName.lowercase().contains("timeout")
     }
 
     @Throws(HttpException::class)
@@ -208,10 +218,10 @@ object NetUtil {
             try {
                 val connection =
                     (URL(url).openConnection(Proxy(cfg.proxyType, it.remoteSocketAddress))) as HttpURLConnection
-                connection.connectTimeout = 2000
+                connection.connectTimeout = timeout
                 connection.connect()
 
-            } catch (t: IOException) {
+            } catch (ignored: IOException) {
                 return false
             }
             return it.inetAddress.isReachable(timeout)

@@ -1,11 +1,17 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.managers
 
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.comet
+import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
-import io.github.starwishsama.comet.utils.FileUtil
-import io.github.starwishsama.comet.utils.writeClassToJson
-import java.io.File
 
 object GroupConfigManager {
     private val groupConfigs: MutableSet<PerGroupConfig> = HashSet()
@@ -47,20 +53,4 @@ object GroupConfigManager {
     }
 
     fun getAllConfigs(): Set<PerGroupConfig> = groupConfigs
-
-    fun saveAll() {
-        if (!FileUtil.getChildFolder("groups").exists()) {
-            FileUtil.getChildFolder("groups").mkdirs()
-        }
-
-        getAllConfigs().forEach {
-            val loc = File(FileUtil.getChildFolder("groups"), "${it.id}.json")
-            if (!loc.exists()) {
-                loc.createNewFile()
-            }
-            loc.writeClassToJson(it)
-        }
-
-        BotVariables.daemonLogger.info("已保存所有群配置")
-    }
 }

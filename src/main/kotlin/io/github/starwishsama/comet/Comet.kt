@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet
 
 import io.github.starwishsama.comet.logger.HinaLogLevel
@@ -19,41 +29,58 @@ class Comet {
     private val cometLoginHelper: CometLoginHelper = CometLoginHelper(this)
     private lateinit var bot: Bot
     var id: Long = 0
-    lateinit var password: String
+        set(value) {
+            CometVariables.cfg.botId = value
+            field = value
+        }
+    var password: String = ""
+        set(value) {
+            CometVariables.cfg.botPassword = value
+            field = value
+        }
 
     @OptIn(MiraiInternalApi::class)
     suspend fun login() {
         cometLoginHelper.solve()
 
-        BotVariables.daemonLogger.info("正在配置登录配置...")
+        CometVariables.daemonLogger.info("正在配置登录配置...")
 
-        val config = BotConfiguration.Default.apply {
-            botLoggerSupplier = { it ->
-                CustomLogRedirecter("Mirai (${it.id})", BotVariables.logger)
-            }
-            networkLoggerSupplier = { it ->
-                CustomLogRedirecter("MiraiNet (${it.id})", BotVariables.netLogger)
-            }
-            fileBasedDeviceInfo()
-            protocol = BotVariables.cfg.botProtocol
-        }
-        bot = BotFactory.newBot(qq = id, password = password, configuration = config)
-        Mirai.FileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
-        BotVariables.logger.info("登录中... 使用协议 ${bot.configuration.protocol.name}")
+        initBot()
+
+        CometVariables.logger.info("登录中... 使用协议 ${bot.configuration.protocol.name}")
 
         try {
             cometLoginHelper.status = LoginStatus.LOGIN_SUCCESS
             bot.login()
             CometRuntime.setupBot(bot, bot.logger)
         } catch (e: LoginFailedException) {
-            BotVariables.daemonLogger.warning("登录失败! 返回的失败信息: ${e.message}")
+            CometVariables.daemonLogger.warning("登录失败! 返回的失败信息: ${e.message}")
             cometLoginHelper.status = LoginStatus.LOGIN_FAILED
-            cometLoginHelper.solve()
+            login()
         }
     }
 
     suspend fun join() {
         bot.join()
+    }
+
+    fun initBot() {
+        val config = BotConfiguration.Default.apply {
+            botLoggerSupplier = { it ->
+                CustomLogRedirecter("Mirai (${it.id})", CometVariables.miraiLogger)
+            }
+            networkLoggerSupplier = { it ->
+                CustomLogRedirecter("MiraiNet (${it.id})", CometVariables.miraiNetLogger)
+            }
+
+            fileBasedDeviceInfo()
+
+            protocol = CometVariables.cfg.botProtocol
+
+            heartbeatStrategy = CometVariables.cfg.heartbeatStrategy
+        }
+        bot = BotFactory.newBot(qq = id, password = password, configuration = config)
+        Mirai.FileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
     }
 
     fun getBot(): Bot {

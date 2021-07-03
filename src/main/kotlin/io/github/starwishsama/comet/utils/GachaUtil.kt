@@ -1,20 +1,28 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.net.URLDecoder
-import io.github.starwishsama.comet.BotVariables.arkNight
-import io.github.starwishsama.comet.BotVariables.cfg
-import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.mapper
-import io.github.starwishsama.comet.BotVariables.yyMMddPattern
+import io.github.starwishsama.comet.CometVariables.arkNight
+import io.github.starwishsama.comet.CometVariables.cfg
+import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.mapper
+import io.github.starwishsama.comet.CometVariables.yyMMddPattern
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.ApiException
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.gacha.items.GachaItem
-import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
-import io.github.starwishsama.comet.objects.gacha.pool.PCRPool
 import io.github.starwishsama.comet.service.gacha.GachaConstants
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
@@ -45,18 +53,14 @@ object GachaUtil {
     const val arkNightData =
         "https://raw.fastgit.org/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json"
 
+    @Suppress("UNCHECKED_CAST")
     fun combineGachaImage(gachaResult: List<GachaItem>, poolType: GachaPool): CombinedResult {
         require(gachaResult.isNotEmpty()) { "传入的抽卡结果列表不能为空!" }
 
         return when (poolType) {
             is ArkNightPool -> combineArkOpImage(gachaResult as List<ArkNightOperator>)
-            is PCRPool -> combinePCRImage(gachaResult as List<PCRCharacter>)
             else -> throw UnsupportedOperationException("暂不支持合成该卡池图片")
         }
-    }
-
-    private fun combinePCRImage(chars: List<PCRCharacter>): CombinedResult {
-        TODO()
     }
 
     /**
@@ -121,30 +125,24 @@ object GachaUtil {
         }
     }
 
-    fun checkHasGachaTime(user: BotUser, time: Int): Boolean =
-        (user.commandTime >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
+    fun checkHasGachaTime(user: CometUser, time: Int): Boolean =
+        (user.checkInPoint >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
 
     @Suppress("HttpUrlsUsage")
-    fun downloadArkNightImage() {
+    fun checkArkNightImage() {
         val arkLoc = FileUtil.getResourceFolder().getChildFolder("ark")
 
-        val ele = Jsoup.connect(
-            "http://prts.wiki/w/PRTS:%E6%96%87%E4%BB%B6%E4%B8%80%E8%A7%88/%E5%B9%B2%E5%91%98%E7%B2%BE%E8%8B%B10%E5%8D%8A%E8%BA%AB%E5%83%8F"
-        ).timeout(5_000).get().getElementsByClass("mw-parser-output")[0].select("a")
-
-        /**
-         * PRTS 实际保有干员半身立绘量
-         */
-        val actualCount = ele.size
-
-        if (arkLoc.filesCount() < actualCount) {
+        if (arkLoc.filesCount() == 0) {
             val startTime = LocalDateTime.now()
             daemonLogger.info("正在下载 明日方舟图片资源文件")
+
+            val ele = Jsoup.connect(
+                "http://prts.wiki/w/PRTS:%E6%96%87%E4%BB%B6%E4%B8%80%E8%A7%88/%E5%B9%B2%E5%91%98%E7%B2%BE%E8%8B%B10%E5%8D%8A%E8%BA%AB%E5%83%8F"
+            ).timeout(5_000).get().getElementsByClass("mw-parser-output")[0].select("a")
 
             var successCount = 0
 
             val downloadList = mutableSetOf<String>()
-
 
             ele.forEach {
                 try {
@@ -156,7 +154,7 @@ object GachaUtil {
                         delay(1_500)
                     }
                 } catch (e: Exception) {
-                    daemonLogger.warning("下载图片 http://prts.wiki/${it.attr("href")} 失败, 请手动下载.")
+                    daemonLogger.warning("获取图片 http://prts.wiki/${it.attr("href")} 失败, 请手动下载.")
                 }
             }
 

@@ -1,9 +1,19 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.utils.network
 
 import cn.hutool.core.util.URLUtil
 import cn.hutool.http.ContentType
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.objects.config.api.SauceNaoConfig
 import io.github.starwishsama.comet.objects.pojo.PicSearchResult
@@ -37,7 +47,7 @@ object PictureSearchUtil {
                         return PicSearchResult(pictureUrl, originalUrl, similarity, response.request.url.toString())
                     }
                 } catch (e: Exception) {
-                    BotVariables.logger.error("[以图搜图] 在解析 API 传回的 json 时出现了问题", e)
+                    CometVariables.logger.error("[以图搜图] 在解析 API 传回的 json 时出现了问题", e)
                     FileUtil.createErrorReportFile(
                         type = "picsearch", t = e, content = body,
                         message = "Request URL: ${response.request.url}"
@@ -52,8 +62,8 @@ object PictureSearchUtil {
         val request = Jsoup.connect("$ascii2d$url")
         request.header("user-agent", NetUtil.defaultUA).followRedirects(true)
             .apply {
-                if (BotVariables.cfg.proxySwitch) {
-                    proxy(BotVariables.cfg.proxyUrl, BotVariables.cfg.proxyPort)
+                if (CometVariables.cfg.proxySwitch) {
+                    proxy(CometVariables.cfg.proxyUrl, CometVariables.cfg.proxyPort)
                 }
             }
 

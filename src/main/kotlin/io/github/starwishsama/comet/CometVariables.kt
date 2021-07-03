@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet
 
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -13,11 +23,9 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
-import io.github.starwishsama.comet.objects.gacha.items.PCRCharacter
-import io.github.starwishsama.comet.objects.pojo.Hitokoto
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
 import io.github.starwishsama.comet.service.server.WebHookServer
 import io.github.starwishsama.comet.utils.LoggerAppender
@@ -42,12 +50,16 @@ import java.util.concurrent.ConcurrentHashMap
  */
 
 @OptIn(MiraiInternalApi::class)
-object BotVariables {
-    lateinit var filePath: File
+object CometVariables {
+    internal lateinit var filePath: File
 
     val comet: Comet = Comet()
 
     internal lateinit var loggerAppender: LoggerAppender
+
+    internal lateinit var miraiLoggerAppender: LoggerAppender
+
+    internal lateinit var miraiNetLoggerAppender: LoggerAppender
 
     internal lateinit var startTime: LocalDateTime
 
@@ -64,14 +76,35 @@ object BotVariables {
 
     val logger: HinaLogger = HinaLogger("Comet", logAction = { logAction(it) }, debugMode = cfg.debugMode)
 
-    internal val netLogger: HinaLogger =
+    internal val netLogger: HinaLogger by lazy {
         HinaLogger("CometNet", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+    }
 
-    internal val daemonLogger: HinaLogger =
+    internal val daemonLogger: HinaLogger by lazy {
         HinaLogger("CometService", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+    }
 
-    internal val consoleCommandLogger: HinaLogger =
+    internal val consoleCommandLogger: HinaLogger by lazy {
         HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+    }
+
+    internal val miraiLogger: HinaLogger by lazy {
+        HinaLogger("mirai", logAction = {
+            CometApplication.console.printAbove(it)
+            if (::miraiLoggerAppender.isInitialized) {
+                miraiLoggerAppender.appendLog(it)
+            }
+        }, debugMode = cfg.debugMode)
+    }
+
+    internal val miraiNetLogger: HinaLogger by lazy {
+        HinaLogger("miraiNet", logAction = {
+            CometApplication.console.printAbove(it)
+            if (::miraiNetLoggerAppender.isInitialized) {
+                miraiNetLoggerAppender.appendLog(it)
+            }
+        }, debugMode = cfg.debugMode)
+    }
 
     val mapper: ObjectMapper = ObjectMapper()
         // 美化输出
@@ -107,28 +140,24 @@ object BotVariables {
         )
         .setDateFormat(SimpleDateFormat("yyyy/MM/dd HH:mm:ss"))
 
-    var rCon: Rcon? = null
+    internal var rCon: Rcon? = null
 
-    val users: MutableMap<Long, BotUser> = ConcurrentHashMap()
-    lateinit var localizationManager: LocalizationManager
-    var hitokoto: Hitokoto? = null
+    internal val cometUsers: MutableMap<Long, CometUser> = ConcurrentHashMap()
+    internal lateinit var localizationManager: LocalizationManager
 
     /** 明日方舟卡池数据 */
-    val arkNight: MutableList<ArkNightOperator> = mutableListOf()
-
-    /** 公主链接卡池数据 */
-    val pcr: MutableList<PCRCharacter> = mutableListOf()
+    internal val arkNight: MutableList<ArkNightOperator> = mutableListOf()
 
     @Volatile
-    var switch: Boolean = true
+    internal var switch: Boolean = true
 
-    val hmsPattern: DateTimeFormatter by lazy {
+    internal val hmsPattern: DateTimeFormatter by lazy {
         DateTimeFormatter.ofPattern("HH:mm:ss")
     }
 
-    val yyMMddPattern: DateTimeFormatter by lazy {
+    internal val yyMMddPattern: DateTimeFormatter by lazy {
         DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
     }
 
-    lateinit var client: OkHttpClient
+    internal lateinit var client: OkHttpClient
 }

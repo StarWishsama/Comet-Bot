@@ -1,13 +1,22 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.api.thirdparty.rainbowsix
 
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatsGenericStat
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatsSeasonalStat
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.Region
-import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.SeasonName
 import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.objects.config.api.R6StatsConfig
@@ -27,7 +36,7 @@ object R6StatsApi : ApiExecutor {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api2.r6stats.com/public-api/stats/")
             .addConverterFactory(JacksonConverterFactory.create(mapper))
-            .client(BotVariables.client)
+            .client(CometVariables.client)
             .build()
 
         api = retrofit.create(IR6StatsAPI::class.java)
@@ -39,7 +48,7 @@ object R6StatsApi : ApiExecutor {
     override fun getLimitTime(): Int = 60
 
     fun getR6StatsAPI(): IR6StatsAPI {
-        if (ApiManager.getConfig<R6StatsConfig>()?.token == null) {
+        if (ApiManager.getConfig<R6StatsConfig>().token.isEmpty()) {
             throw ApiKeyIsEmptyException("未填写 R6Stats API, 无法调用 API")
         }
 
@@ -63,7 +72,7 @@ object R6StatsApi : ApiExecutor {
                 MessageWrapper().addText("R6Stats API 未正确配置, 请联系机器人管理员")
             } else {
                 daemonLogger.warning("R6Stats API 异常", e)
-                MessageWrapper().addText("无法获取玩家 $userName 的信息")
+                MessageWrapper().addText("API 异常, 无法获取玩家 $userName 的信息")
             }
         }
 
@@ -72,14 +81,17 @@ object R6StatsApi : ApiExecutor {
                 "R6Stats API 异常",
                 "r6stats",
                 null,
-                genericResult.raw().body?.string() + "\n" + seasonalResult.raw().body?.string(),
-                "genericStat: ${genericStat == null}, seasonalStat: ${seasonalStat == null}"
+                genericResult.toString() + "\n" + seasonalResult.toString(),
+                "genericStat isNull = ${genericStat == null}, seasonalStat isNull = ${seasonalStat == null}"
             )
-            return MessageWrapper().addText("无法获取玩家 $userName 的信息")
+
+            return MessageWrapper().addText("无法获取玩家 $userName 的信息, 数据为空")
         }
 
-        val latestSeasonalStat = seasonalStat.getSeasonalStat(SeasonName.NEON_DAWN)?.getRegionStat(Region.EMEA)
-            ?: return MessageWrapper().addText("无法获取玩家 $userName 的信息")
+        val cfg = ApiManager.getConfig<R6StatsConfig>()
+
+        val latestSeasonalStat = seasonalStat.getSeasonalStat(cfg.seasonName)?.getRegionStat(Region.EMEA)
+            ?: return MessageWrapper().addText("无法获取玩家 $userName 的信息, 赛季数据为空")
 
         val infoText = "|| ${genericStat.username} [${genericStat.levelInfo.level} 级]\n" +
                 "|| 目前段位 ${latestSeasonalStat.getRankAsEnum().rankName}\n" +
@@ -104,7 +116,7 @@ interface IR6StatsAPI {
         @HeaderMap headerMap: Map<String, String> = mapOf(
             Pair(
                 "Authorization",
-                "Bearer ${ApiManager.getConfig<R6StatsConfig>()?.token}"
+                "Bearer ${ApiManager.getConfig<R6StatsConfig>().token}"
             )
         )
     ): Call<R6StatsGenericStat>
@@ -116,7 +128,7 @@ interface IR6StatsAPI {
         @HeaderMap headerMap: Map<String, String> = mapOf(
             Pair(
                 "Authorization",
-                "Bearer ${ApiManager.getConfig<R6StatsConfig>()?.token}"
+                "Bearer ${ApiManager.getConfig<R6StatsConfig>().token}"
             )
         )
     ): Call<R6StatsSeasonalStat>

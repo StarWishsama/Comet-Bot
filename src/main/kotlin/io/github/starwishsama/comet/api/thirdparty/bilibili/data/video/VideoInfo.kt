@@ -1,7 +1,16 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.video
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.hiczp.bilibili.api.app.model.View
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.FileUtil
 
@@ -18,7 +27,7 @@ data class VideoInfo(
 
             return MessageWrapper()
                 .addText(
-                """
+                    """
 ${data.title}
 | ${data.uploader.userName}
 | ${data.description}
@@ -73,8 +82,6 @@ ${if (data.stats.historyRank > 0) "| 本站最高日排行第${data.stats.histor
          */
         @JsonProperty("dynamic")
         val dynamic: String?,
-        @JsonProperty("staff")
-        val staff: List<View.Data.Staff?>
     ) {
         data class Uploader(
             @JsonProperty("mid")

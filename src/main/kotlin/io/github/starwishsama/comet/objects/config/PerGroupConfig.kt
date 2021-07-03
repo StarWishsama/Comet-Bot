@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.objects.config
 
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -6,7 +16,6 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
-import io.github.starwishsama.comet.objects.push.YoutubeUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 data class PerGroupConfig(
@@ -50,19 +59,6 @@ data class PerGroupConfig(
      */
     @JsonProperty("bili_sub")
     val biliSubscribers: MutableSet<BiliBiliUser> = hashSetOf(),
-
-    /**
-     * Youtube 开播推送服务
-     */
-    @JsonProperty("youtube_push_function")
-    var youtubePushEnabled: Boolean = false,
-
-    /**
-     * Youtube 订阅列表
-     */
-    @JsonProperty("youtube_sub")
-    val youtubeSubscribers: MutableSet<YoutubeUser> = hashSetOf(),
-
     /**
      * 是否关闭对此群消息的复读
      */

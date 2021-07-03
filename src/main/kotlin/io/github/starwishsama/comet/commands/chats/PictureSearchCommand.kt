@@ -1,13 +1,23 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.enums.PicSearchApiType
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
@@ -18,12 +28,11 @@ import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.utils.MiraiExperimentalApi
-import java.util.*
 
 
 class PictureSearchCommand : ChatCommand, ConversationCommand {
     @OptIn(MiraiExperimentalApi::class)
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             val imageToSearch = event.message[Image]
 
@@ -38,15 +47,19 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
             return handlePicSearch(imageToSearch.queryUrl()).toChain()
         } else if (args[0].contentEquals("source") && args.size > 1) {
             return try {
-                val api = PicSearchApiType.valueOf(args[1].toUpperCase(Locale.ROOT))
-                BotVariables.cfg.pictureSearchApi = api
+                val api = PicSearchApiType.valueOf(args[1].uppercase())
+                CometVariables.cfg.pictureSearchApi = api
                 toChain("已切换识图 API 为 ${api.name}", true)
-            } catch (e: Throwable) {
-                var type = ""
-                PicSearchApiType.values().forEach {
-                    type = type + it.name + " " + it.desc + "\n"
-                }
-                toChain("该识图 API 不存在, 可用的 API 类型:\n ${type.trim()}", true)
+            } catch (ignored: IllegalArgumentException) {
+                toChain(
+                    "该识图 API 不存在, 可用的 API 类型:\n ${
+                        buildString {
+                            PicSearchApiType.values().forEach {
+                                append("${it.name} ${it.desc},")
+                            }
+                        }.removeSuffix(",")
+                    }", true
+                )
             }
         } else {
             return getHelp().toChain()
@@ -68,7 +81,7 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
     """.trimIndent()
 
     @OptIn(MiraiExperimentalApi::class)
-    override suspend fun handle(event: MessageEvent, user: BotUser, session: Session) {
+    override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
         SessionHandler.removeSession(session)
         val image = event.message[Image]
 
@@ -81,11 +94,12 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
     }
 
     private fun handlePicSearch(url: String): String {
-        when (BotVariables.cfg.pictureSearchApi) {
+        val defaultSimilarity = 52.5
+        when (CometVariables.cfg.pictureSearchApi) {
             PicSearchApiType.SAUCENAO -> {
                 val result = PictureSearchUtil.sauceNaoSearch(url)
                 return when {
-                    result.similarity >= 52.5 -> {
+                    result.similarity >= defaultSimilarity -> {
                         "相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n"
                     }
                     result.similarity == -1.0 -> {

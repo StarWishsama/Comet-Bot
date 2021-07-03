@@ -1,28 +1,35 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.startup
 
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.cfg
-import io.github.starwishsama.comet.BotVariables.cometServer
-import io.github.starwishsama.comet.BotVariables.consoleCommandLogger
-import io.github.starwishsama.comet.BotVariables.daemonLogger
 import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometApplication
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.cfg
+import io.github.starwishsama.comet.CometVariables.cometServer
+import io.github.starwishsama.comet.CometVariables.consoleCommandLogger
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.api.command.CommandExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.FakeClientApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.chats.*
 import io.github.starwishsama.comet.commands.console.BroadcastCommand
 import io.github.starwishsama.comet.commands.console.DebugCommand
 import io.github.starwishsama.comet.commands.console.StopCommand
-import io.github.starwishsama.comet.file.BackupHelper
+import io.github.starwishsama.comet.file.DataSaveHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.RetrofitLogger
-import io.github.starwishsama.comet.managers.ApiManager
-import io.github.starwishsama.comet.objects.config.api.BiliBiliConfig
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.server.WebHookServer
@@ -48,13 +55,15 @@ import java.util.concurrent.TimeUnit
 
 object CometRuntime {
     fun postSetup() {
-        BotVariables.filePath = FileUtil.getJarLocation()
-        BotVariables.startTime = LocalDateTime.now()
-        BotVariables.loggerAppender = LoggerAppender(FileUtil.getLogLocation())
+        CometVariables.filePath = FileUtil.getJarLocation()
+        CometVariables.startTime = LocalDateTime.now()
+        CometVariables.loggerAppender = LoggerAppender(FileUtil.getLogLocation())
+        CometVariables.miraiLoggerAppender = LoggerAppender(FileUtil.getLogLocation("mirai"))
+        CometVariables.miraiNetLoggerAppender = LoggerAppender(FileUtil.getLogLocation("mirai-net"))
 
         Runtime.getRuntime().addShutdownHook(Thread { shutdownTask() })
 
-        BotVariables.logger.info(
+        CometVariables.logger.info(
             """
         
            ______                     __ 
@@ -69,7 +78,7 @@ object CometRuntime {
 
         DataSetup.init()
 
-        BotVariables.client = OkHttpClient().newBuilder()
+        CometVariables.client = OkHttpClient().newBuilder()
             .connectTimeout(5, TimeUnit.SECONDS)
             .followRedirects(true)
             .readTimeout(5, TimeUnit.SECONDS)
@@ -86,13 +95,14 @@ object CometRuntime {
     }
 
     private fun shutdownTask() {
-        BotVariables.logger.info("[Bot] 正在关闭 Bot...")
+        CometVariables.logger.info("[Bot] 正在关闭 Bot...")
         DataSetup.saveAllResources()
         PusherManager.savePushers()
         cometServer?.stop()
         TaskUtil.service.shutdown()
-        BotVariables.rCon?.disconnect()
-        BotVariables.loggerAppender.close()
+        CometVariables.rCon?.disconnect()
+        CometVariables.miraiLoggerAppender.close()
+        CometVariables.loggerAppender.close()
     }
 
     fun setupBot(bot: Bot, logger: MiraiLogger) {
@@ -109,7 +119,6 @@ object CometRuntime {
                 ClockInCommand(),
                 io.github.starwishsama.comet.commands.chats.DebugCommand(),
                 DivineCommand(),
-                PCRCommand(),
                 GuessNumberCommand(),
                 HelpCommand(),
                 InfoCommand(),
@@ -124,16 +133,15 @@ object CometRuntime {
                 GroupConfigCommand(),
                 RSPCommand(),
                 RollCommand(),
-                YoutubeCommand(),
                 MinecraftCommand(),
                 PusherCommand(),
                 GithubCommand(),
                 DiceCommand(),
+                PenguinStatCommand(),
                 // Console Command
                 StopCommand(),
                 DebugCommand(),
                 io.github.starwishsama.comet.commands.console.AdminCommand(),
-                io.github.starwishsama.comet.commands.console.BiliBiliCommand(),
                 BroadcastCommand()
             )
         )
@@ -156,7 +164,7 @@ object CometRuntime {
             } else {
                 listener.eventToListen.forEach { eventClass ->
                     bot.globalEventChannel().subscribeAlways(eventClass) {
-                        if (BotVariables.switch) {
+                        if (CometVariables.switch) {
                             listener.listen(this)
                         }
                     }
@@ -174,9 +182,9 @@ object CometRuntime {
 
         DataSetup.initPerGroupSetting(bot)
 
-        logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${BotVariables.startTime.getLastingTimeAsString()}")
+        logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${CometVariables.startTime.getLastingTimeAsString()}")
 
-        RuntimeUtil.doGC()
+        RuntimeUtil.forceGC()
 
         CommandExecutor.startHandler(bot)
     }
@@ -184,8 +192,8 @@ object CometRuntime {
     fun setupRCon() {
         val address = cfg.rConUrl
         val password = cfg.rConPassword
-        if (address != null && password != null && BotVariables.rCon == null) {
-            BotVariables.rCon = Rcon(address, cfg.rConPort, password.toByteArray())
+        if (address != null && password != null && CometVariables.rCon == null) {
+            CometVariables.rCon = Rcon(address, cfg.rConPort, password.toByteArray())
         }
     }
 
@@ -195,36 +203,19 @@ object CometRuntime {
                 val customSuffix = cfg.webHookAddress.replace("http://", "").replace("https://", "").split("/")
                 cometServer = WebHookServer(cfg.webHookPort, customSuffix.getRestString(1, "/"))
             }
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             daemonLogger.warning("Comet 服务端启动失败", e)
         }
     }
 
     private fun runScheduleTasks() {
-        TaskUtil.runAsync { BackupHelper.checkOldFiles() }
+        TaskUtil.runAsync { DataSaveHelper.checkOldFiles() }
 
         val apis = arrayOf(DynamicApi, TwitterApi, VideoApi)
 
         /** 定时任务 */
-        BackupHelper.scheduleBackup()
-        TaskUtil.runScheduleTaskAsync(5, 5, TimeUnit.HOURS) {
-            BotVariables.users.forEach { it.value.addTime(100) }
-        }
-
-        val biliConfig = ApiManager.getConfig<BiliBiliConfig>()
-
-        val pwd = biliConfig.password
-        val username = biliConfig.login
-
-        TaskUtil.runAsync(5) {
-            if (pwd.isNotEmpty() && username.isNotEmpty()) {
-                runBlocking {
-                    FakeClientApi.login(username, pwd)
-                }
-            } else {
-                daemonLogger.info("未设置哔哩哔哩账号, 部分哔哩哔哩相关功能可能受限")
-            }
-        }
+        DataSaveHelper.scheduleBackup()
+        DataSaveHelper.scheduleSave()
 
         apis.forEach {
             TaskUtil.runScheduleTaskAsync(it.duration.toLong(), it.duration.toLong(), TimeUnit.HOURS) {
@@ -233,7 +224,7 @@ object CometRuntime {
         }
 
         TaskUtil.runScheduleTaskAsync(1, 1, TimeUnit.HOURS) {
-            RuntimeUtil.doGC()
+            RuntimeUtil.forceGC()
         }
     }
 

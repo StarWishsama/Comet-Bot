@@ -1,10 +1,20 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.api.command
 
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
@@ -37,7 +47,7 @@ object CommandExecutor {
      */
     private fun setupCommand(command: ChatCommand) {
         if (command.canRegister() && !commands.add(command)) {
-            BotVariables.logger.warning("[命令] 正在尝试注册已有命令 ${command.getProps().name}")
+            CometVariables.logger.warning("[命令] 正在尝试注册已有命令 ${command.getProps().name}")
         }
     }
 
@@ -45,7 +55,7 @@ object CommandExecutor {
         if (!consoleCommands.contains(command)) {
             consoleCommands.plusAssign(command)
         } else {
-            BotVariables.logger.warning("[命令] 正在尝试注册已有后台命令 ${command.getProps().name}")
+            CometVariables.logger.warning("[命令] 正在尝试注册已有后台命令 ${command.getProps().name}")
         }
     }
 
@@ -69,7 +79,7 @@ object CommandExecutor {
                 is ChatCommand -> setupCommand(it)
                 is ConsoleCommand -> setupConsoleCommand(it)
                 else -> {
-                    BotVariables.logger.warning("[命令] 正在尝试注册非命令类 ${it.javaClass.simpleName}")
+                    CometVariables.logger.warning("[命令] 正在尝试注册非命令类 ${it.javaClass.simpleName}")
                 }
             }
         }
@@ -91,11 +101,11 @@ object CommandExecutor {
                             this.subject.sendMessage(filtered)
                         }
                     } catch (e: IllegalArgumentException) {
-                        BotVariables.logger.warning("正在尝试发送空消息, 执行的命令为 $result")
+                        CometVariables.logger.warning("正在尝试发送空消息, 执行的命令为 $result")
                     }
 
                     if (result.status.isOk()) {
-                        BotVariables.logger.debug(
+                        CometVariables.logger.debug(
                             "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(msMode = true)}" +
                                     if (result.status.isOk()) ", 执行结果: ${result.status.name}" else ""
                         )
@@ -118,9 +128,9 @@ object CommandExecutor {
 
         val useDebug = cmd?.getProps()?.name?.contentEquals("debug") == true
 
-        val user = BotUser.getUserOrRegister(senderId)
+        val user = CometUser.getUserOrRegister(senderId)
 
-        if (BotVariables.switch || useDebug) {
+        if (CometVariables.switch || useDebug) {
             try {
 
                 /**
@@ -153,7 +163,7 @@ object CommandExecutor {
                     var splitMessage = message.substring(index, message.length).split(" ")
                     splitMessage = splitMessage.subList(1, splitMessage.size)
 
-                    BotVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.name} (原始消息: ${message})")
+                    CometVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.name} (原始消息: ${message})")
 
                     val status: CommandStatus
 
@@ -163,17 +173,17 @@ object CommandExecutor {
                         cmd.execute(event, splitMessage, user)
                     } else {
                         status = CommandStatus.NoPermission()
-                        BotVariables.localizationManager.getLocalizationText("msg.no-permission").toChain()
+                        CometVariables.localizationManager.getLocalizationText("msg.no-permission").toChain()
                     }
 
                     return ExecutedResult(result, cmd, status)
                 }
             } catch (t: Throwable) {
                 return if (NetUtil.isTimeout(t)) {
-                    BotVariables.logger.warning("执行网络操作失败: ", t)
+                    CometVariables.logger.warning("执行网络操作失败: ", t)
                     ExecutedResult("Bot > 在执行网络操作时连接超时: ${t.message ?: ""}".convertToChain(), cmd)
                 } else {
-                    BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message}, 发送者: $senderId", t)
+                    CometVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message}, 发送者: $senderId", t)
                     if (user.isBotOwner()) {
                         ExecutedResult(
                             toChain(
@@ -204,11 +214,11 @@ object CommandExecutor {
             if (cmd != null) {
                 val splitMessage = content.split(" ")
                 val splitCommand = splitMessage.subList(1, splitMessage.size)
-                BotVariables.logger.debug("[命令] 后台尝试执行命令: " + cmd.getProps().name)
+                CometVariables.logger.debug("[命令] 后台尝试执行命令: " + cmd.getProps().name)
                 return cmd.execute(splitCommand)
             }
         } catch (t: Throwable) {
-            BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $content", t)
+            CometVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $content", t)
             return ""
         }
         return ""
@@ -246,7 +256,7 @@ object CommandExecutor {
      */
     fun getCommandPrefix(message: String): String {
         if (message.isNotEmpty()) {
-            BotVariables.cfg.commandPrefix.forEach {
+            CometVariables.cfg.commandPrefix.forEach {
                 if (message.startsWith(it)) {
                     return it
                 }
@@ -296,7 +306,7 @@ object CommandExecutor {
     }
 
     fun MessageChain.doFilter(): MessageChain {
-        if (BotVariables.cfg.filterWords.isNullOrEmpty()) {
+        if (CometVariables.cfg.filterWords.isNullOrEmpty()) {
             return this
         }
 
@@ -308,7 +318,7 @@ object CommandExecutor {
         for (i in revampChain.indices) {
             if (revampChain[i] is PlainText) {
                 var context = revampChain[i].content
-                BotVariables.cfg.filterWords.forEach {
+                CometVariables.cfg.filterWords.forEach {
                     if (context.contains(it)) {
                         count++
                         context = context.replace(it.toRegex(), " ")
@@ -339,7 +349,7 @@ object CommandExecutor {
      *
      * @return 目标QQ号是否处于冷却状态
      */
-    private fun validateStatus(user: BotUser, props: CommandProps): Boolean {
+    private fun validateStatus(user: CometUser, props: CommandProps): Boolean {
         val currentTime = System.currentTimeMillis()
 
         if (user.id == 80000000L) {
@@ -367,14 +377,6 @@ object CommandExecutor {
             CommandExecuteConsumerType.POINT -> {
                 return if (user.checkInPoint >= props.consumePoint) {
                     user.checkInPoint -= props.consumePoint
-                    true
-                } else {
-                    false
-                }
-            }
-            CommandExecuteConsumerType.COMMAND_TIME -> {
-                return if (user.commandTime >= props.consumePoint) {
-                    user.decreaseTime(props.consumePoint)
                     true
                 } else {
                     false

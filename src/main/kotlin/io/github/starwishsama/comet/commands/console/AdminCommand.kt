@@ -1,18 +1,25 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.commands.console
 
-import io.github.starwishsama.comet.BotVariables
-import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.users
-
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import java.io.IOException
-
 
 class AdminCommand : ConsoleCommand {
     override suspend fun execute(args: List<String>): String {
@@ -22,7 +29,7 @@ class AdminCommand : ConsoleCommand {
                     when (args.size) {
                         2 -> {
                             if (args[1].isNumeric()) {
-                                val target = BotUser.getUser(args[1].toLong()) ?: return "目标没有使用过 Comet"
+                                val target = CometUser.getUser(args[1].toLong()) ?: return "目标没有使用过 Comet"
 
                                 val targetLevel = target.level.ordinal + 1
 
@@ -38,7 +45,7 @@ class AdminCommand : ConsoleCommand {
                         3 -> {
                             if (args[1].isNumeric()) {
                                 try {
-                                    val target = BotUser.getUser(args[1].toLong()) ?: return "目标没有使用过 Comet"
+                                    val target = CometUser.getUser(args[1].toLong()) ?: return "目标没有使用过 Comet"
                                     val level = UserLevel.valueOf(args[2])
                                     target.level = level
 
@@ -58,38 +65,6 @@ class AdminCommand : ConsoleCommand {
                         daemonLogger.warning("在重载时发生了异常", e)
                     }
                 }
-                "resetpoint", "rpoint", "rp" -> {
-                    if (args.size > 1 && args[1].isNumeric()) {
-                        val time = try {
-                            args[1].toInt()
-                        } catch (e: NumberFormatException) {
-                            return "输入的数字不合法! 范围: (0, 300]"
-                        }
-
-                        return if (time in 1..300) {
-                            users.forEach { it.value.commandTime = time }
-                            "成功重置所有用户的积分为 $time"
-                        } else {
-                            "输入的数字错误! 范围: (0, 300]"
-                        }
-                    }
-                }
-                "give" -> {
-                    if (args.size > 1 && args[1].isNumeric()) {
-                        val time = try {
-                            args[1].toInt()
-                        } catch (e: NumberFormatException) {
-                            return "输入的数字不合法! 范围: (0, 10000]"
-                        }
-
-                        return if (time in 1..10000) {
-                            users.forEach { it.value.addTime(time, true) }
-                            "成功给予所有 BotUser 积分 $time 点"
-                        } else {
-                            "输入的数字错误! 范围: (0, 10000]"
-                        }
-                    }
-                }
                 "cmd" -> {
                     if (args.size > 2 && args[1].isNumeric()) {
                         val gid = try {
@@ -104,7 +79,7 @@ class AdminCommand : ConsoleCommand {
                 "groups" -> {
                     return buildString {
                         append("已加入的群聊:\n")
-                        BotVariables.comet.getBot().groups.forEach {
+                        CometVariables.comet.getBot().groups.forEach {
                             append("${it.name} (${it.id}),")
                         }
                     }.removeSuffix(",").trim()

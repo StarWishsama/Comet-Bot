@@ -1,7 +1,17 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.service.server
 
 import com.sun.net.httpserver.HttpServer
-import io.github.starwishsama.comet.BotVariables.netLogger
+import io.github.starwishsama.comet.CometVariables.netLogger
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.service.server.module.GithubWebHookHandler
 import java.net.InetSocketAddress
@@ -30,6 +40,7 @@ class WebHookServer(port: Int, customSuffix: String) {
 
     fun stop() {
         server.stop(0)
+        netLogger.log(HinaLogLevel.Info, "服务器已关闭", prefix = "WebHook")
     }
 }
 

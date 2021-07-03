@@ -1,12 +1,22 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.commands.chats
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.BotVariables
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.BotUser
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
@@ -26,13 +36,13 @@ import java.time.LocalDateTime
 
 
 class GuessNumberCommand : ChatCommand, ConversationCommand {
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (event is GroupMessageEvent) {
             if (!SessionHandler.hasSessionByGroup(event.group.id, this::class.java)) {
                 when {
                     args.isEmpty() -> {
                         val answer = RandomUtil.randomInt(0, 100)
-                        BotVariables.logger.info("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
+                        CometVariables.logger.info("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
                         SessionHandler.insertSession(
                             GuessNumberSession(
                                 SessionTarget(event.group.id),
@@ -52,7 +62,7 @@ class GuessNumberCommand : ChatCommand, ConversationCommand {
                             return CometUtil.toChain("最小值不能大于等于最大值")
                         }
                         val answer = RandomUtil.randomInt(min, max + 1)
-                        BotVariables.logger.info("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
+                        CometVariables.logger.info("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
                         SessionHandler.insertSession(GuessNumberSession(SessionTarget(event.group.id), answer))
                         return CometUtil.toChain("猜一个数字吧! 范围 [$min, $max]")
                     }
@@ -75,7 +85,7 @@ class GuessNumberCommand : ChatCommand, ConversationCommand {
         /csz [最小值] [最大值] 猜指定范围内的数字
     """.trimIndent()
 
-    override suspend fun handle(event: MessageEvent, user: BotUser, session: Session) {
+    override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
         val trueAnswer = (session as GuessNumberSession).answer
         session.lastAnswerTime = LocalDateTime.now()
         val answer = event.message.content
@@ -111,7 +121,9 @@ class GuessNumberCommand : ChatCommand, ConversationCommand {
                     event.subject.sendMessage(sb.toString().trim())
                     SessionHandler.removeSession(session)
                 }
-                else -> throw RuntimeException("GuessNumber: Impossible answer input: ${answerInInt}, answer: ${trueAnswer}")
+                else -> {
+                    throw RuntimeException("GuessNumber: Impossible answer input: ${answerInInt}, answer: ${trueAnswer}")
+                }
             }
         } else {
             when (answer) {

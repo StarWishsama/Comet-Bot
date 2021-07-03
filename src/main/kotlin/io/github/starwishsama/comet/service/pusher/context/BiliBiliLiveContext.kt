@@ -1,19 +1,26 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.service.pusher.context
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 class BiliBiliLiveContext(
-    pushTarget: MutableList<Long>,
+    pushTarget: MutableSet<Long>,
     retrieveTime: Long,
-    @JsonProperty("custom_status")
-    override var status: PushStatus = PushStatus.READY,
+    status: PushStatus = PushStatus.CREATED,
     val pushUser: BiliBiliUser,
     var liveRoomInfo: LiveRoomInfo,
 ) : PushContext(pushTarget, retrieveTime, status), Pushable {
-
     override fun toMessageWrapper(): MessageWrapper {
         val data = liveRoomInfo.data
 
@@ -32,16 +39,8 @@ class BiliBiliLiveContext(
     override fun contentEquals(other: PushContext): Boolean {
         if (other !is BiliBiliLiveContext) return false
 
-        return liveRoomInfo.data.getStatus() == other.liveRoomInfo.data.getStatus() && (!liveRoomInfo.data.isEmptyTime() && liveRoomInfo.data.parseLiveTime() == other.liveRoomInfo.data.parseLiveTime())
+        return liveRoomInfo.data.getStatus() == other.liveRoomInfo.data.getStatus()
+                && (!liveRoomInfo.data.isLiveTimeInvalid()
+                && liveRoomInfo.data.parseLiveTime() == other.liveRoomInfo.data.parseLiveTime())
     }
-}
-
-fun Collection<BiliBiliLiveContext>.getLiveContext(uid: Long): BiliBiliLiveContext? {
-    for (blc in this) {
-        if (blc.pushUser.id.toLongOrNull() == uid) {
-            return blc
-        }
-    }
-
-    return null
 }

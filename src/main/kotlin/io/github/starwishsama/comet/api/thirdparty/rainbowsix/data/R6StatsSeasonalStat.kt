@@ -1,11 +1,20 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.api.thirdparty.rainbowsix.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.enums.R6Rank
-import io.github.starwishsama.comet.utils.json.isUsable
 
 data class R6StatsSeasonalStat(
     @JsonProperty("username")
@@ -30,11 +39,7 @@ data class R6StatsSeasonalStat(
 ) {
     fun getSeasonalStat(season: SeasonName): SeasonInfo? {
         val seasonInfo = seasonalStat[season.season]
-        return if (seasonInfo.isUsable()) {
-            null
-        } else {
-            mapper.readValue(seasonInfo.traverse())
-        }
+        return mapper.readValue(seasonInfo.traverse())
     }
 
     data class SeasonInfo(
@@ -49,11 +54,7 @@ data class R6StatsSeasonalStat(
         fun getRegionStat(region: Region): PerRegionStat? {
             val regionStat = regions[region.region]
 
-            return if (regionStat.isNull) {
-                null
-            } else {
-                mapper.readValue(regionStat[0].traverse())
-            }
+            return mapper.readValue(regionStat[0].traverse())
         }
 
         data class PerRegionStat(
@@ -94,6 +95,11 @@ data class R6StatsSeasonalStat(
 }
 
 enum class SeasonName(val season: String) {
+
+    NORTH_STAR("north_star"),
+
+    CRIMSON_HEIST("crimson_heist"),
+
     NEON_DAWN("neon_dawn"),
 
     SHADOW_LEGACY("shadow_legacy"),

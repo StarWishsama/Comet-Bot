@@ -1,10 +1,20 @@
+/*
+ * Copyright (c) 2019-2021 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
 package io.github.starwishsama.comet.api.thirdparty.bilibili
 
 import cn.hutool.http.HttpRequest
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.BotVariables.daemonLogger
-import io.github.starwishsama.comet.BotVariables.mapper
+import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicTypeSelector
@@ -32,6 +42,8 @@ object DynamicApi : ApiExecutor {
     private val agent = mutableMapOf("User-Agent" to "Nameless live status checker by StarWishsama")
     private const val apiRateLimit = "BiliBili API调用已达上限"
 
+    private val cacheDynamic = mutableMapOf<Long, Dynamic>()
+
     @Throws(RateLimitException::class)
     fun getUserNameByMid(mid: Long): String {
         if (isReachLimit()) {
@@ -55,7 +67,9 @@ object DynamicApi : ApiExecutor {
         ).use { res ->
             if (res.isSuccessful) {
                 val body = res.body?.string() ?: throw ApiException("无法获取动态页面")
-                return mapper.readValue(body)
+                val result: Dynamic = mapper.readValue(body)
+                cacheDynamic[result.getDynamicID()] = result
+                return result
             } else {
                 throw ApiException("无法获取动态页面, 状态码 ${res.code}")
             }
@@ -78,7 +92,9 @@ object DynamicApi : ApiExecutor {
         try {
             if (response.isSuccessful) {
                 body = response.body?.string() ?: return null
-                return mapper.readValue(body)
+                val result: Dynamic = mapper.readValue(body)
+                cacheDynamic[result.getDynamicID()] = result
+                return result
             } else {
                 daemonLogger.warning("解析动态时出现异常")
                 return null
