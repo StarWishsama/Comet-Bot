@@ -77,7 +77,7 @@ data class IssueEvent(
         val wrapper = MessageWrapper()
 
         when (action) {
-            "open" -> {
+            "opened" -> {
                 wrapper.addText("| 仓库 ${repository.fullName} 有新议题啦\n")
                 wrapper.addText("| 议题 #${issue.number}\n")
                 wrapper.addText("| 创建时间 ${issue.convertCreatedTime()}\n")
@@ -104,6 +104,6 @@ data class IssueEvent(
     }
 
     override fun sendable(): Boolean {
-        return action == "opened"
+        return action == "opened" || action == "closed"
     }
 }

@@ -16,7 +16,9 @@ import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 data class PushEvent(
     val ref: String,
@@ -61,7 +63,13 @@ data class PushEvent(
         val timestamp: String,
         val url: String,
         val committer: PusherInfo
-    )
+    ) {
+        fun convertTimestamp(): String {
+            val localTime =
+                LocalDateTime.parse(timestamp, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.systemDefault())
+            return CometVariables.yyMMddPattern.format(localTime)
+        }
+    }
 
     private fun getLocalTime(time: Long): String {
         return CometVariables.yyMMddPattern.format(

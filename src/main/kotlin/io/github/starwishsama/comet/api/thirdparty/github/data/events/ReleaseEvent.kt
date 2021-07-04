@@ -18,22 +18,27 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-data class IssueCommentEvent(
+data class ReleaseEvent(
+    // created, prereleased
     val action: String,
-    val issue: IssueEvent.IssueObject,
-    val comment: CommentObject,
+    val release: ReleaseInfo,
     val repository: IssueEvent.RepoInfo,
+    val sender: IssueEvent.SenderInfo,
 ) : GithubEvent {
-    data class CommentObject(
+
+    data class ReleaseInfo(
         @JsonProperty("html_url")
         val url: String,
-        val id: Long,
-        val user: IssueEvent.SenderInfo,
+        @JsonProperty("tag_name")
+        val tagName: String,
+        @JsonProperty("name")
+        val title: String,
+        val body: String,
         @JsonProperty("created_at")
         val createdTime: String,
-        @JsonProperty("updated_at")
-        val updatedTime: String,
-        val body: String,
+        @JsonProperty("published_at")
+        val publishTime: String,
+        val author: IssueEvent.SenderInfo
     ) {
         fun convertCreatedTime(): String {
             val localTime =
@@ -43,18 +48,21 @@ data class IssueCommentEvent(
     }
 
     override fun toMessageWrapper(): MessageWrapper {
-        return MessageWrapper().apply {
-            addText("| 仓库 ${repository.fullName} 议题 #${issue.number} 下有新回复\n")
-            addText("| 创建时间 ${comment.convertCreatedTime()}\n")
-            addText("| 创建人 ${comment.user.login}\n")
-            addText("| 查看详细信息: ${comment.url}\n")
-            addText("| 简略信息: \n")
-            addText("| ${comment.body.limitStringSize(80).trim()}\n")
+        val wrapper = MessageWrapper()
 
-        }
+        wrapper.addText("| 仓库 ${repository.fullName} 有新版本发布\n")
+        wrapper.addText("| 版本 #${release.tagName}\n")
+        wrapper.addText("| 发布时间 ${release.convertCreatedTime()}\n")
+        wrapper.addText("| 发布人 ${release.author.login}\n")
+        wrapper.addText("| 发布版信息: \n")
+        wrapper.addText("| ${release.title}\n")
+        wrapper.addText("| ${release.body.limitStringSize(50).trim()}")
+        wrapper.addText("| 查看完整信息: ${release.url}")
+
+        return wrapper
     }
 
     override fun repoName(): String = repository.fullName
 
-    override fun sendable(): Boolean = true
+    override fun sendable(): Boolean = action == "released" || action == "prereleased"
 }
