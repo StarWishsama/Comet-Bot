@@ -21,6 +21,7 @@ import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import io.github.starwishsama.comet.utils.network.NetUtil
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -208,14 +209,14 @@ object CommandExecutor {
      *
      * @param content 纯文本命令 (后台)
      */
-    suspend fun dispatchConsoleCommand(content: String): String {
+    fun dispatchConsoleCommand(content: String): String {
         try {
             val cmd = getConsoleCommand(getCommandName(content))
             if (cmd != null) {
                 val splitMessage = content.split(" ")
                 val splitCommand = splitMessage.subList(1, splitMessage.size)
                 CometVariables.logger.debug("[命令] 后台尝试执行命令: " + cmd.getProps().name)
-                return cmd.execute(splitCommand)
+                return runBlocking { cmd.execute(splitCommand) }
             }
         } catch (t: Throwable) {
             CometVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $content", t)

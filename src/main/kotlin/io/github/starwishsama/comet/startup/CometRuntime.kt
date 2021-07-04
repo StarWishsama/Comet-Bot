@@ -14,6 +14,7 @@ import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.cfg
+import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.CometVariables.cometServer
 import io.github.starwishsama.comet.CometVariables.consoleCommandLogger
 import io.github.starwishsama.comet.CometVariables.daemonLogger
@@ -40,7 +41,7 @@ import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.isActive
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.globalEventChannel
@@ -232,20 +233,19 @@ object CometRuntime {
         TaskUtil.runAsync {
             consoleCommandLogger.log(HinaLogLevel.Info, "后台已启用", prefix = "后台管理")
 
-            while (true) {
+            while (comet.getBot().isActive) {
                 var line: String
 
-                runBlocking {
-                    try {
-                        line = CometApplication.console.readLine(">")
-                        val result = CommandExecutor.dispatchConsoleCommand(line)
-                        if (result.isNotEmpty()) {
-                            consoleCommandLogger.info(result)
-                        }
-                    } catch (ignored: EndOfFileException) {
-                    } catch (ignored: UserInterruptException) {
+                try {
+                    line = CometApplication.console.readLine(">")
+                    val result = CommandExecutor.dispatchConsoleCommand(line)
+                    if (result.isNotEmpty()) {
+                        consoleCommandLogger.info(result)
                     }
+                } catch (ignored: EndOfFileException) {
+                } catch (ignored: UserInterruptException) {
                 }
+
             }
         }
     }
