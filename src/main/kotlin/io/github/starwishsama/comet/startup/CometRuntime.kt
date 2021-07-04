@@ -106,10 +106,6 @@ object CometRuntime {
     }
 
     fun setupBot(bot: Bot, logger: MiraiLogger) {
-        setupRCon()
-
-        GachaService.loadAllPools()
-
         CommandExecutor.setupCommand(
             arrayOf(
                 AdminCommand(),
@@ -148,6 +144,8 @@ object CometRuntime {
 
         logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
 
+        CommandExecutor.startHandler(bot)
+
         /** 监听器 */
         val listeners = arrayOf(
             ConvertLightAppListener,
@@ -174,19 +172,19 @@ object CometRuntime {
             logger.info("[监听器] 已注册 ${listener.getName()} 监听器")
         }
 
+        DataSetup.initPerGroupSetting(bot)
+
+        setupRCon()
+
         runScheduleTasks()
 
         PusherManager.initPushers(bot)
 
         startupServer()
 
-        DataSetup.initPerGroupSetting(bot)
-
         logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${CometVariables.startTime.getLastingTimeAsString()}")
 
-        RuntimeUtil.forceGC()
-
-        CommandExecutor.startHandler(bot)
+        TaskUtil.runAsync { GachaService.loadAllPools() }
     }
 
     fun setupRCon() {
@@ -198,11 +196,13 @@ object CometRuntime {
     }
 
     private fun startupServer() {
+        if (!cfg.webHookSwitch) {
+            return
+        }
+
         try {
-            if (cfg.webHookSwitch) {
-                val customSuffix = cfg.webHookAddress.replace("http://", "").replace("https://", "").split("/")
-                cometServer = WebHookServer(cfg.webHookPort, customSuffix.getRestString(1, "/"))
-            }
+            val customSuffix = cfg.webHookAddress.replace("http://", "").replace("https://", "").split("/")
+            cometServer = WebHookServer(cfg.webHookPort, customSuffix.getRestString(1, "/"))
         } catch (e: Exception) {
             daemonLogger.warning("Comet 服务端启动失败", e)
         }
