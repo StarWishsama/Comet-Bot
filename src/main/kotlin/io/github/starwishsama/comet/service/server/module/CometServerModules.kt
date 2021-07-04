@@ -65,12 +65,23 @@ class GithubWebHookHandler : HttpHandler {
         }
 
         try {
-            val info = GithubEventHandler.process(payload, eventType) ?: return CometVariables.netLogger.log(
-                HinaLogLevel.Debug,
-                "推送 WebHook 消息失败, 不支持的事件类型",
-                prefix = "WebHook"
-            )
-            GithubPusher.push(info)
+            val info = GithubEventHandler.process(payload, eventType)
+            if (info != null) {
+                GithubPusher.push(info)
+            } else {
+                CometVariables.netLogger.log(
+                    HinaLogLevel.Debug,
+                    "推送 WebHook 消息失败, 不支持的事件类型",
+                    prefix = "WebHook"
+                )
+
+                he.writeTextResponse(
+                    "Comet 已收到事件, 但所请求的事件类型不支持 (${eventType})",
+                    statusCode = HttpStatus.HTTP_INTERNAL_ERROR
+                )
+
+                return
+            }
         } catch (e: IOException) {
             CometVariables.netLogger.log(HinaLogLevel.Warn, "推送 WebHook 消息失败", e, prefix = "WebHook")
         }
