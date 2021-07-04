@@ -22,7 +22,7 @@ data class R6StatsConfig(
     override val interval: Int = -1,
     @Comment("R6Stats API 此项无需修改")
     override val timeUnit: TimeUnit = TimeUnit.MINUTES,
-    val seasonName: SeasonName = SeasonName.NORTH_STAR
+    val seasonName: SeasonName = SeasonName.CRIMSON_HEIST
 ) : ApiConfig {
     override val apiName: String = "r6stats"
 }
