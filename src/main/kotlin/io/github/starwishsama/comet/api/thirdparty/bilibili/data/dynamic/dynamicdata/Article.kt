@@ -48,7 +48,7 @@ data class Article(
         val dynamic: Int
     )
 
-    override fun getContact(): MessageWrapper {
+    override fun asMessageWrapper(): MessageWrapper {
         val wrapped = MessageWrapper().addText(
             "发布了一篇专栏 $title:\n" +
                     "$summary\n" +

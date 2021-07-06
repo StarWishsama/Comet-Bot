@@ -12,6 +12,7 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynami
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.CometVariables.hmsPattern
+import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
@@ -39,12 +40,41 @@ data class PlainText(
         val replyCount: Int
     )
 
-    override fun getContact(): MessageWrapper {
-        return MessageWrapper().addText(
-            "发布了动态: \n" +
-                    "${item.context ?: "获取失败"}\n\n" +
-                    "🕘 ${hmsPattern.format(item.sentTimestamp.toLocalDateTime())}"
-        )
+    override fun asMessageWrapper(): MessageWrapper {
+        val cache = DynamicApi.getDynamicByData(this)
+        val context = item.context
+        val card = cache?.data?.findFirstCard()
+
+        if (cache != null && context != null && card != null) {
+            var cacheString = context
+            val wrapper = MessageWrapper().addText("发布了动态: \n")
+
+            card.display["emoji_info"]["emoji_details"]?.forEach {
+                val displayName = it["emoji_name"].asText()
+                val emojiImage = it["url"].asText()
+
+                cacheString!!.split(displayName).also { list ->
+                    list.forEach { s ->
+                        wrapper.addText(s)
+                        if (list.last() != s) {
+                            wrapper.addPictureByURL(emojiImage)
+                        }
+                    }
+                }
+
+                cacheString = cacheString!!.replace(displayName.toRegex(), "")
+            }
+
+            wrapper.addText("\n🕘 ${hmsPattern.format(item.sentTimestamp.toLocalDateTime())}")
+
+            return wrapper
+        } else {
+            return MessageWrapper().addText(
+                "发布了动态: \n" +
+                        "${context ?: "获取失败"}\n\n" +
+                        "🕘 ${hmsPattern.format(item.sentTimestamp.toLocalDateTime())}"
+            )
+        }
     }
 
     override fun getSentTime(): LocalDateTime = item.sentTimestamp.toLocalDateTime()

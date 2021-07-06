@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.mapper
+import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata.*
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
@@ -22,13 +23,13 @@ import okhttp3.internal.toLongOrDefault
 import java.time.LocalDateTime
 
 interface DynamicData {
-    fun getContact(): MessageWrapper
+    fun asMessageWrapper(): MessageWrapper
 
     fun compare(other: Any?): Boolean {
         if (other == null) return false
         if (other !is DynamicData) return false
 
-        return getContact().compare(other.getContact()) && getSentTime() == other.getSentTime()
+        return asMessageWrapper().compare(other.asMessageWrapper()) && getSentTime() == other.getSentTime()
     }
 
     fun getSentTime(): LocalDateTime
@@ -52,6 +53,49 @@ object DynamicTypeSelector {
     }
 }
 
+fun Dynamic.convertToDynamicData(): DynamicData? {
+    val card: Card = when {
+        data.cards != null && data.cards.isNotEmpty() -> {
+            data.cards[0]
+        }
+
+        data.card != null -> {
+            data.card
+        }
+
+        else -> return null
+    }
+
+    val dynamicJson = card.card
+
+    val singleDynamicObject = mapper.readTree(dynamicJson)
+    if (!singleDynamicObject.isNull) {
+        val dynamicType = DynamicTypeSelector.getType(card.description.type)
+        if (dynamicType != UnknownType::class) {
+            val dynamicData = mapper.readValue(card.card, dynamicType)
+            DynamicApi.insertDynamicData(this, dynamicData)
+            return dynamicData
+        }
+    }
+
+    return null
+}
+
+fun Dynamic.convertToWrapper(): MessageWrapper {
+    return try {
+        val data = convertToDynamicData()
+        runBlocking { data?.asMessageWrapper() ?: MessageWrapper().addText("错误: 不支持的动态类型").setUsable(false) }
+    } catch (e: Exception) {
+        daemonLogger.warning("解析动态时出现了问题", e)
+
+        if (e is ArrayIndexOutOfBoundsException) {
+            MessageWrapper().addText("动态列表为空").setUsable(false)
+        } else {
+            MessageWrapper().addText("解析动态失败").setUsable(false)
+        }
+    }
+}
+
 data class Dynamic(
     val code: Int,
     @JsonProperty("msg")
@@ -59,19 +103,19 @@ data class Dynamic(
     @JsonProperty("message")
     val message: String,
     @JsonProperty("data")
-    val data: Data
+    val data: Data,
 ) {
     /**
      * 获取该动态响应体的 ID
-     * 如果获取的为时间线动态, 则会尝试获取第一条的 ID
+     * 如果获取的为时间线动态, 可以选择获取第几个动态
      */
-    fun getDynamicID(): Long {
+    fun getDynamicID(index: Int = 0): Long {
         return when {
             data.card != null -> {
                 data.card.description.dynamicIdAsString.toLongOrDefault(-1)
             }
             data.cards != null -> {
-                data.cards[0].description.dynamicIdAsString.toLongOrDefault(-1)
+                data.cards[index].description.dynamicIdAsString.toLongOrDefault(-1)
             }
             else -> {
                 -1
@@ -90,6 +134,14 @@ data class Dynamic(
         @JsonProperty("cards")
         val cards: List<Card>?,
     ) {
+        fun findFirstCard(): Card? {
+            return if (cards == null || cards.isEmpty()) {
+                card
+            } else {
+                cards[0]
+            }
+        }
+
         @Suppress("unused")
         data class Attentions(
             @JsonProperty("uids")
@@ -107,8 +159,9 @@ data class Card(
     //val extendJson: String,
     //@JsonProperty("extra")
     //val extraJson: JsonNode?,
-    //@JsonProperty("display")
-    //val displayJson: DynamicDisplay
+    /** 类似于推特的 Media, 可能有 emoji_info */
+    @JsonProperty("display")
+    val display: JsonNode
 ) {
     data class DynamicDesc(
         val uid: Int,
@@ -162,69 +215,4 @@ data class Card(
 
         //val origin: JsonNode
     )
-
-    @Suppress("unused")
-    data class DynamicDisplay(
-        val origin: JsonNode?,
-        val relation: JsonNode?,
-        @JsonProperty("comment_info")
-        val hotComment: HotComments?
-    ) {
-        data class HotComments(
-            val comments: HotComment
-        ) {
-            data class HotComment(
-                val uid: Int,
-                @JsonProperty("name")
-                val name: String,
-                val content: String
-            )
-        }
-    }
-}
-
-fun Dynamic.convertToDynamicData(): DynamicData? {
-    val card: Card? = when {
-        data.cards != null && data.cards.isNotEmpty() -> {
-            data.cards[0]
-        }
-
-        data.card != null -> {
-            data.card
-        }
-
-        else -> return null
-    }
-
-
-    val dynamicJson = card?.card
-
-    if (card == null) {
-        return null
-    }
-
-    val singleDynamicObject = mapper.readTree(dynamicJson)
-    if (!singleDynamicObject.isNull) {
-        val dynamicType = DynamicTypeSelector.getType(card.description.type)
-        if (dynamicType != UnknownType::class) {
-            return mapper.readValue(card.card, dynamicType)
-        }
-    }
-
-    return null
-}
-
-fun Dynamic.convertToWrapper(): MessageWrapper {
-    return try {
-        val data = convertToDynamicData()
-        runBlocking { data?.getContact() ?: MessageWrapper().addText("错误: 不支持的动态类型").setUsable(false) }
-    } catch (e: Exception) {
-        daemonLogger.warning("解析动态时出现了问题", e)
-
-        if (e is ArrayIndexOutOfBoundsException) {
-            MessageWrapper().addText("动态列表为空").setUsable(false)
-        } else {
-            MessageWrapper().addText("解析动态失败").setUsable(false)
-        }
-    }
 }

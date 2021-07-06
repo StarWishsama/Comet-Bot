@@ -43,7 +43,7 @@ data class MiniVideo(
         )
     }
 
-    override fun getContact(): MessageWrapper {
+    override fun asMessageWrapper(): MessageWrapper {
         val wrapped = MessageWrapper().addText("发了一个小视频: ${item?.description ?: "获取失败"}\n")
 
         item?.cover?.originImgURL.let {

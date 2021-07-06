@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 data class LiveBroadcast(
     @JsonProperty("live_play_info")
     val livePlayInfo: LivePlayInfo,
-    /** 似乎是B站的直播留档信息, 没见过有这功能的主播 */
+    /** B站直播录像信息 */
     @JsonProperty("live_record_info")
     val liveRecordInfo: JsonNode?,
 
@@ -74,7 +74,7 @@ data class LiveBroadcast(
         fun getLiveStartTime(): LocalDateTime = liveStartTime.toLocalDateTime()
     }
 
-    override fun getContact(): MessageWrapper {
+    override fun asMessageWrapper(): MessageWrapper {
         val wrapped = MessageWrapper().addText(
             "${DynamicApi.getUserNameByMid(livePlayInfo.uid)} 正在直播!\n" +
                     "标题: ${livePlayInfo.liveTitle}\n" +
