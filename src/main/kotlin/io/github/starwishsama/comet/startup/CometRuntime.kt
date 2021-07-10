@@ -56,7 +56,6 @@ import java.util.concurrent.TimeUnit
 
 object CometRuntime {
     fun postSetup() {
-        CometVariables.filePath = FileUtil.getJarLocation()
         CometVariables.startTime = LocalDateTime.now()
         CometVariables.loggerAppender = LoggerAppender(FileUtil.getLogLocation())
         CometVariables.miraiLoggerAppender = LoggerAppender(FileUtil.getLogLocation("mirai"))

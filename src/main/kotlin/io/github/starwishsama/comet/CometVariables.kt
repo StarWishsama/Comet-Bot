@@ -28,6 +28,7 @@ import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
 import io.github.starwishsama.comet.service.server.WebHookServer
+import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.json.LocalDateTimeConverter
 import io.github.starwishsama.comet.utils.json.WrapperConverter
@@ -51,7 +52,9 @@ import java.util.concurrent.ConcurrentHashMap
 
 @OptIn(MiraiInternalApi::class)
 object CometVariables {
-    internal lateinit var filePath: File
+    internal val filePath: File by lazy {
+        FileUtil.getJarLocation()
+    }
 
     val comet: Comet = Comet()
 
