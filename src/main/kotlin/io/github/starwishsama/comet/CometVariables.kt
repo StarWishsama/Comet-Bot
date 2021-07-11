@@ -27,7 +27,7 @@ import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
-import io.github.starwishsama.comet.service.server.WebHookServer
+import io.github.starwishsama.comet.service.server.CometServiceServer
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.json.LocalDateTimeConverter
@@ -68,7 +68,7 @@ object CometVariables {
 
     internal var cfg = CometConfig()
 
-    internal var cometServer: WebHookServer? = null
+    internal var cometServiceServer: CometServiceServer? = null
 
     internal val logAction: (String) -> Unit = {
         CometApplication.console.printAbove(it)

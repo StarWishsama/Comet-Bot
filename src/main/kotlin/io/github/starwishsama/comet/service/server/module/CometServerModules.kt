@@ -25,6 +25,7 @@ import io.github.starwishsama.comet.utils.network.writeTextResponse
 import java.io.IOException
 
 // For bypass detekt
+@Suppress("unused")
 object CometServerModules
 
 /**
@@ -37,6 +38,9 @@ class GithubWebHookHandler : HttpHandler {
     private val eventTypeHeader = "X-GitHub-Event"
 
     override fun handle(he: HttpExchange) {
+        CometVariables.netLogger.debug("有新连接 ${he.requestMethod} - ${he.requestURI}")
+        CometVariables.netLogger.debug("请求 Headers ${he.requestHeaders.entries}")
+
         he.responseHeaders.add("content-type", "text/plain; charset=UTF-8")
 
         // Get information from header to identity whether the request is from GitHub.
@@ -64,6 +68,8 @@ class GithubWebHookHandler : HttpHandler {
             return
         }
 
+        var hasError = false
+
         try {
             val info = GithubEventHandler.process(payload, eventType)
             if (info != null) {
@@ -84,15 +90,21 @@ class GithubWebHookHandler : HttpHandler {
             }
         } catch (e: IOException) {
             CometVariables.netLogger.log(HinaLogLevel.Warn, "推送 WebHook 消息失败", e, prefix = "WebHook")
-        }
+            hasError = true
+        } finally {
+            when {
+                secretStatus == SecretStatus.NO_SECRET -> {
+                    he.writeTextResponse("Comet 已收到事件, 推荐使用密钥加密以保证服务器安全")
+                }
+                hasError -> {
+                    he.writeTextResponse("Comet 发生内部错误", statusCode = HttpStatus.HTTP_INTERNAL_ERROR)
+                }
+                else -> {
+                    he.writeTextResponse("Comet 已收到事件")
+                }
+            }
 
-        val response = if (secretStatus == SecretStatus.NO_SECRET) {
-            "Comet 已收到事件, 推荐使用密钥加密以保证服务器安全"
-        } else {
-            "Comet 已收到事件"
         }
-
-        he.writeTextResponse(response)
     }
 
     private fun checkSecretStatus(
@@ -131,12 +143,7 @@ class GithubWebHookHandler : HttpHandler {
                 ?.startsWith("GitHub-Hookshot") == false
         ) {
             CometVariables.netLogger.log(HinaLogLevel.Debug, "无效请求", prefix = "WebHook")
-            val resp = "Unsupported Request".toByteArray()
-            he.sendResponseHeaders(HttpStatus.HTTP_FORBIDDEN, resp.size.toLong())
-            he.responseBody.use {
-                it.write(resp)
-                it.flush()
-            }
+            he.writeTextResponse("Unsupported Request", statusCode = HttpStatus.HTTP_FORBIDDEN)
             return false
         }
 

@@ -14,12 +14,16 @@ import com.sun.net.httpserver.HttpServer
 import io.github.starwishsama.comet.CometVariables.netLogger
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.service.server.module.GithubWebHookHandler
+import io.github.starwishsama.comet.utils.network.writeTextResponse
 import java.net.InetSocketAddress
 
-class WebHookServer(port: Int, customSuffix: String) {
+class CometServiceServer(port: Int, customSuffix: String) {
     private val server: HttpServer = HttpServer.create(InetSocketAddress(port), 0)
 
     init {
+        server.createContext("/") {
+            it.writeTextResponse("Request URL is ${it.requestURI}")
+        }
         server.createContext("/$customSuffix", GithubWebHookHandler())
         netLogger.log(HinaLogLevel.Info, "已注册 Github WebHook 后缀: $customSuffix", prefix = "WebHook")
         server.createContext("/test") { he ->
@@ -28,11 +32,7 @@ class WebHookServer(port: Int, customSuffix: String) {
                 return@createContext
             }
 
-            he.sendResponseHeaders(200, 0)
-            he.responseBody.use {
-                it.write("Hello Comet!".toByteArray())
-                it.flush()
-            }
+            he.writeTextResponse("Hello Comet")
         }
         netLogger.log(HinaLogLevel.Info, "服务器启动! 运行在端口 $port", prefix = "WebHook")
         server.start()

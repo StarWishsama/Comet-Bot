@@ -15,7 +15,7 @@ import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.cfg
 import io.github.starwishsama.comet.CometVariables.comet
-import io.github.starwishsama.comet.CometVariables.cometServer
+import io.github.starwishsama.comet.CometVariables.cometServiceServer
 import io.github.starwishsama.comet.CometVariables.consoleCommandLogger
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.api.command.CommandExecutor
@@ -33,7 +33,7 @@ import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
-import io.github.starwishsama.comet.service.server.WebHookServer
+import io.github.starwishsama.comet.service.server.CometServiceServer
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
@@ -98,7 +98,7 @@ object CometRuntime {
         CometVariables.logger.info("[Bot] 正在关闭 Bot...")
         DataSetup.saveAllResources()
         PusherManager.savePushers()
-        cometServer?.stop()
+        cometServiceServer?.stop()
         TaskUtil.service.shutdown()
         CometVariables.rCon?.disconnect()
         CometVariables.miraiLoggerAppender.close()
@@ -202,7 +202,7 @@ object CometRuntime {
 
         try {
             val customSuffix = cfg.webHookAddress.replace("http://", "").replace("https://", "").split("/")
-            cometServer = WebHookServer(cfg.webHookPort, customSuffix.getRestString(1, "/"))
+            cometServiceServer = CometServiceServer(cfg.webHookPort, customSuffix.getRestString(1, "/"))
         } catch (e: Exception) {
             daemonLogger.warning("Comet 服务端启动失败", e)
         }
