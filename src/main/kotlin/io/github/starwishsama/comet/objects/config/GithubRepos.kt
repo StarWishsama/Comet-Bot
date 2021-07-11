@@ -63,10 +63,10 @@ data class GithubRepos(
         }
     }
 
-    fun contains(repoAuthor: String, repoName: String): GithubRepo? {
+    fun contains(repoAuthor: String, repoName: String, groupId: Long): GithubRepo? {
         val targetRepos = this.repos.filter { it.repoAuthor == repoAuthor }
         val targetRepo = targetRepos.find { it.repoName == repoName }
-        return targetRepos.find { it.repoName == "*" } ?: targetRepo
+        return targetRepos.find { it.repoName == "*" && it.repoTarget.contains(groupId) } ?: targetRepo
     }
 
     fun add(target: Long, repoAuthor: String, repoName: String, repoSecret: String = ""): Boolean {

@@ -69,7 +69,7 @@ object GitHubService {
 
         val authorAndRepo = repoName.split("/")
 
-        val repo = repos.contains(authorAndRepo[0], authorAndRepo[1])
+        val repo = repos.contains(authorAndRepo[0], authorAndRepo[1], id)
 
         return if (repo != null) {
             "你已经订阅过 ${repo.getFullName()} 了".toChain()
@@ -80,10 +80,14 @@ object GitHubService {
                 ) || (GithubApi.isUserExists(authorAndRepo[0]) && authorAndRepo[1] == "*")
             ) {
                 repos.add(id, authorAndRepo[0], authorAndRepo[1], repoSecret)
+
+                val subscribeSuccessText =
+                    "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${CometVariables.cfg.webHookAddress}"
+
                 if (repoSecret.isEmpty() || isGroup) {
-                    "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${CometVariables.cfg.webHookAddress}".toChain()
+                    subscribeSuccessText.toChain()
                 } else {
-                    "订阅 $repoName 成功!\n添加后, 请在对应项目下添加 WebHook 地址: ${CometVariables.cfg.webHookAddress}\nSecret 为 $repoSecret".toChain()
+                    "${subscribeSuccessText}\nSecret 为 $repoSecret".toChain()
                 }
             } else {
                 "仓库 $repoName 找不到或者没有权限访问!".toChain()

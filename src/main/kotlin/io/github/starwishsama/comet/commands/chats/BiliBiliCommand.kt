@@ -99,7 +99,7 @@ class BiliBiliCommand : ChatCommand {
                         cfg.biliPushEnabled = !cfg.biliPushEnabled
                         "B站动态推送功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}".toChain()
                     } else {
-                        localizationManager.getLocalizationText("msg.no-permission").toChain()
+                        localizationManager.getLocalizationText("message.no-permission").toChain()
                     }
                 } else {
                     toChain("抱歉, 该命令仅限群聊使用!")
@@ -151,7 +151,7 @@ class BiliBiliCommand : ChatCommand {
             if (args.size <= 1) return getHelp().convertToChain()
 
             if (!hasPermission(user, event)) {
-                return localizationManager.getLocalizationText("msg.no-permission").convertToChain()
+                return localizationManager.getLocalizationText("message.no-permission").convertToChain()
             }
 
             return if (args[1].contains("|")) {

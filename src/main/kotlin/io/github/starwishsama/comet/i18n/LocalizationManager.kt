@@ -35,7 +35,7 @@ class LocalizationManager {
 
     fun getLocalizationText(target: String): String {
         if (localizationYaml.isEmpty()) {
-            return "占位符"
+            return "$target - 占位符"
         }
 
         try {
@@ -48,18 +48,18 @@ class LocalizationManager {
                     val current = localizationYaml[it]
 
                     if (nodes.last() != it) {
-                        currentNode = getDeepNode(current) ?: return "占位符"
+                        currentNode = getDeepNode(current) ?: return "$target - 占位符"
                     } else {
-                        return currentNode[it] ?: "占位符"
+                        return currentNode[it] ?: "$target - 占位符"
                     }
                 }
             }
         } catch (e: Exception) {
             daemonLogger.warning("获取本地化文本失败, 可能是文件损坏?", e)
-            return "占位符"
+            return "$target - 占位符"
         }
 
-        return "占位符"
+        return "$target - 占位符"
     }
 
     @Suppress("UNCHECKED_CAST")

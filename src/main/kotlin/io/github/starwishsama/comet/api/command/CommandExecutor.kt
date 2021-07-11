@@ -174,7 +174,7 @@ object CommandExecutor {
                         cmd.execute(event, splitMessage, user)
                     } else {
                         status = CommandStatus.NoPermission()
-                        CometVariables.localizationManager.getLocalizationText("msg.no-permission").toChain()
+                        CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
                     }
 
                     return ExecutedResult(result, cmd, status)
