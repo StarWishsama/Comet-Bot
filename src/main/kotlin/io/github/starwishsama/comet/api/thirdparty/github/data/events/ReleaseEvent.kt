@@ -50,7 +50,7 @@ data class ReleaseEvent(
     override fun toMessageWrapper(): MessageWrapper {
         val wrapper = MessageWrapper()
 
-        wrapper.addText("| 仓库 ${repository.fullName} 有新版本发布\n")
+        wrapper.addText("\uD83D\uDCE6 仓库 ${repository.fullName} 有新版本发布\n")
         wrapper.addText("| 版本 #${release.tagName}\n")
         wrapper.addText("| 发布时间 ${release.convertCreatedTime()}\n")
         wrapper.addText("| 发布人 ${release.author.login}\n")

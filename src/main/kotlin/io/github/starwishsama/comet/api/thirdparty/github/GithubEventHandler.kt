@@ -34,6 +34,9 @@ object GithubEventHandler {
             "release" -> {
                 mapper.readValue<ReleaseEvent>(raw)
             }
+            "pull_request" -> {
+                mapper.readValue<PullRequestEvent>(raw)
+            }
             else -> {
                 CometVariables.netLogger.log(HinaLogLevel.Debug, "解析 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")
                 null

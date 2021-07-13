@@ -80,7 +80,7 @@ data class PushEvent(
     override fun toMessageWrapper(): MessageWrapper {
         val wrapper = MessageWrapper()
 
-        wrapper.addText("| 仓库 ${repoInfo.fullName} 有新动态啦\n")
+        wrapper.addText("⬆️ 仓库 ${repoInfo.fullName} 有新提交啦\n")
         wrapper.addText("| 推送时间 ${getLocalTime(repoInfo.pushTime)}\n")
         wrapper.addText("| 推送分支 ${ref.replace("refs/heads/", "")}\n")
         wrapper.addText("| 提交者 ${headCommitInfo.committer.name}\n")

@@ -78,7 +78,7 @@ data class IssueEvent(
 
         when (action) {
             "opened" -> {
-                wrapper.addText("| 仓库 ${repository.fullName} 有新议题啦\n")
+                wrapper.addText("\uD83D\uDC1B 仓库 ${repository.fullName} 有新议题啦\n")
                 wrapper.addText("| 议题 #${issue.number}\n")
                 wrapper.addText("| 创建时间 ${issue.convertCreatedTime()}\n")
                 wrapper.addText("| 创建人 ${sender.login}\n")
@@ -89,7 +89,7 @@ data class IssueEvent(
             }
 
             "closed" -> {
-                wrapper.addText("| 仓库 ${repository.fullName}\n")
+                wrapper.addText("\uD83D\uDC1B 仓库 ${repository.fullName}\n")
                 wrapper.addText("| 议题 #${issue.number} 已关闭\n")
                 wrapper.addText("| 创建人 ${sender.login}\n")
                 wrapper.addText("| 查看详细信息: ${issue.url}\n")

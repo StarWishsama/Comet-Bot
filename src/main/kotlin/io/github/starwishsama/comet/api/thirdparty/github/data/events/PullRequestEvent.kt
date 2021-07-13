@@ -18,22 +18,22 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-data class IssueCommentEvent(
+data class PullRequestEvent(
     val action: String,
-    val issue: IssueEvent.IssueObject,
-    val comment: CommentObject,
-    val repository: IssueEvent.RepoInfo,
+    @JsonProperty("pull_request")
+    val pullRequestInfo: PullRequestInfo,
+    @JsonProperty("repository")
+    val repository: PushEvent.RepoInfo,
+    val sender: IssueEvent.SenderInfo
 ) : GithubEvent {
-    data class CommentObject(
+
+    data class PullRequestInfo(
         @JsonProperty("html_url")
         val url: String,
-        val id: Long,
-        val user: IssueEvent.SenderInfo,
+        val title: String,
+        val body: String,
         @JsonProperty("created_at")
         val createdTime: String,
-        @JsonProperty("updated_at")
-        val updatedTime: String,
-        val body: String,
     ) {
         fun convertCreatedTime(): String {
             val localTime =
@@ -43,18 +43,21 @@ data class IssueCommentEvent(
     }
 
     override fun toMessageWrapper(): MessageWrapper {
-        return MessageWrapper().apply {
-            addText("\uD83D\uDCAC 仓库 ${repository.fullName} 议题 #${issue.number} 下有新回复\n")
-            addText("| 创建时间 ${comment.convertCreatedTime()}\n")
-            addText("| 创建人 ${comment.user.login}\n")
-            addText("| 查看详细信息: ${comment.url}\n")
-            addText("| 简略信息: \n")
-            addText("| ${comment.body.limitStringSize(80).trim()}\n")
+        val wrapper = MessageWrapper()
 
-        }
+        wrapper.addText("\uD83D\uDD27 仓库 ${repository.fullName} 有新的提交更改\n")
+        wrapper.addText("| ${pullRequestInfo.body}\n")
+        wrapper.addText("| 发布时间 ${pullRequestInfo.convertCreatedTime()}\n")
+        wrapper.addText("| 发布人 ${sender.login}\n")
+        wrapper.addText("| 提交更改信息: \n")
+        wrapper.addText("| ${pullRequestInfo.title}\n")
+        wrapper.addText("| ${pullRequestInfo.body.limitStringSize(100).trim()}")
+        wrapper.addText("| 查看完整信息: ${pullRequestInfo.url}")
+
+        return wrapper
     }
 
     override fun repoName(): String = repository.fullName
 
-    override fun sendable(): Boolean = true
+    override fun sendable(): Boolean = action == "opened"
 }
