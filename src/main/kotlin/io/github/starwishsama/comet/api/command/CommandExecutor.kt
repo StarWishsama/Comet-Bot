@@ -179,20 +179,16 @@ object CommandExecutor {
 
                     return ExecutedResult(result, cmd, status)
                 }
-            } catch (t: Throwable) {
-                return if (NetUtil.isTimeout(t)) {
-                    CometVariables.logger.warning("执行网络操作失败: ", t)
-                    ExecutedResult("Bot > 在执行网络操作时连接超时: ${t.message ?: ""}".convertToChain(), cmd)
+            } catch (e: Exception) {
+                return if (NetUtil.isTimeout(e)) {
+                    CometVariables.logger.warning("执行网络操作失败: ", e)
+                    ExecutedResult("Bot > 在执行网络操作时连接超时: ${e.message ?: ""}".convertToChain(), cmd)
                 } else {
-                    CometVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message}, 发送者: $senderId", t)
+                    CometVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message}, 发送者: $senderId", e)
                     if (user.isBotOwner()) {
                         ExecutedResult(
                             toChain(
-                                "在试图执行命令时发生了一个错误\n简易报错信息 :\n${t.javaClass.name}: ${
-                                    t.message?.limitStringSize(
-                                        30
-                                    )
-                                }"
+                                "在试图执行命令时发生了一个错误\n简易报错信息 :\n${e.javaClass.name}: ${e.message?.limitStringSize(30)}"
                             ), cmd, CommandStatus.Failed()
                         )
                     } else {

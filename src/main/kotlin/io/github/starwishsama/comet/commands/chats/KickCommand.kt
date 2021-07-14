@@ -27,26 +27,21 @@ import net.mamoe.mirai.message.data.MessageChain
 
 class KickCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
-        if (event is GroupMessageEvent) {
-            if (hasPermission(user, event)) {
-                if (event.group.botPermission.isOperator()) {
-                    if (args.isNotEmpty()) {
-                        val at = CometUtil.parseAtToId(event, args[0])
-                        if (at > -1) {
-                            doKick(event, at, "")
-                        } else {
-                            getHelp().convertToChain()
-                        }
-                    } else {
-                        return getHelp().convertToChain()
-                    }
+        if (event is GroupMessageEvent && event.group.botPermission.isOperator()) {
+            if (args.isNotEmpty()) {
+                val at = CometUtil.parseAtToId(event, args[0])
+                if (at > -1) {
+                    doKick(event, at, "")
                 } else {
-                    CometUtil.toChain("我不是绿帽 我爬 我爬")
+                    getHelp().convertToChain()
                 }
             } else {
-                CometUtil.toChain("你不是绿帽 你爬 你爬")
+                return getHelp().convertToChain()
             }
+        } else {
+            CometUtil.toChain("我不是绿帽 我爬 我爬")
         }
+
         return EmptyMessageChain
     }
 

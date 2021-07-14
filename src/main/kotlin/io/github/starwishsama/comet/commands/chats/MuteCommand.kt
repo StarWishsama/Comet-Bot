@@ -22,49 +22,39 @@ import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.TaskUtil
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.MemberPermission
-import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 
 
 class MuteCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
-        if (event is GroupMessageEvent && hasPermission(user, event)) {
-            return if (event.group.botPermission.isOperator()) {
-                if (args.isNotEmpty()) {
-                    val at = CometUtil.parseAtAsBotUser(event, args[0])
-                    if (at != null) {
-                        MuteService.doMute(event.group, at.id, MuteService.getMuteTime(args[1]), false)
-                    } else {
-                        when (args[0]) {
-                            "all", "全体", "全禁", "全体禁言" -> MuteService.doMute(
-                                event.group,
-                                -1,
-                                -1,
-                                true
-                            )
-                            "random", "rand", "随机", "抽奖" -> {
-                                TaskUtil.runAsync(500) {
-                                    runBlocking {
-                                        MuteService.doRandomMute(event)
-                                    }
-                                }
-
-                                "下面将抽取一位幸运群友禁言".toChain()
-                            }
-                            else -> getHelp().convertToChain()
-                        }
-                    }
+        return if (event is GroupMessageEvent) {
+            if (args.isNotEmpty()) {
+                val at = CometUtil.parseAtAsBotUser(event, args[0])
+                if (at != null) {
+                    MuteService.doMute(event.group, at.id, MuteService.getMuteTime(args[1]), false)
                 } else {
-                    getHelp().convertToChain()
+                    when (args[0]) {
+                        "all", "全体", "全禁", "全体禁言" -> MuteService.doMute(event.group, -1, -1, true)
+                        "random", "rand", "随机", "抽奖" -> {
+                            TaskUtil.runAsync(500) {
+                                runBlocking {
+                                    MuteService.doRandomMute(event)
+                                }
+                            }
+
+                            "下面将抽取一位幸运群友禁言".toChain()
+                        }
+                        else -> getHelp().convertToChain()
+                    }
                 }
             } else {
-                "机器人需要管理员权限才能进行禁言!".toChain()
+                getHelp().convertToChain()
             }
+        } else {
+            "仅限群聊使用".toChain()
         }
-        return EmptyMessageChain
     }
 
     override fun getProps(): CommandProps =
