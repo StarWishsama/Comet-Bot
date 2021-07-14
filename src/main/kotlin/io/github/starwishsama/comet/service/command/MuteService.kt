@@ -82,41 +82,21 @@ object MuteService {
         }
     }
 
-    /**
-     * 这段代码看起来很神必
-     * 但是 It just works.
-     * FIXME: 更换为正则表达式更优雅的处理
-     */
     fun getMuteTime(message: String): Int {
         if (message.isNumeric()) {
             return message.toInt()
         }
 
         var banTime = 0L
-        var tempTime: String = message
-        if (tempTime.indexOf('d') != -1) {
-            banTime += (tempTime.substring(0, tempTime.indexOf('d')).toInt() * 24
-                    * 60 * 60)
-            tempTime = tempTime.substring(tempTime.indexOf('d') + 1)
-        } else if (tempTime.contains("天")) {
-            banTime += (tempTime.substring(0, tempTime.indexOf('天')).toInt() * 24
-                    * 60 * 60)
-            tempTime = tempTime.substring(tempTime.indexOf('天') + 1)
-        }
-        if (tempTime.indexOf('h') != -1) {
-            banTime += (tempTime.substring(0, tempTime.indexOf('h')).toInt() * 60
-                    * 60)
-            tempTime = tempTime.substring(tempTime.indexOf('h') + 1)
-        } else if (tempTime.contains("小时")) {
-            banTime += (tempTime.substring(0, tempTime.indexOf("时")).toInt() * 60
-                    * 60)
-            tempTime = tempTime.substring(tempTime.indexOf("时") + 1)
-        }
-        if (tempTime.indexOf('m') != -1) {
-            banTime += tempTime.substring(0, tempTime.indexOf('m')).toInt() * 60
-        } else if (tempTime.contains("分钟")) {
-            banTime += tempTime.substring(0, tempTime.indexOf("分钟")).toInt() * 60
-        }
+
+        val dayRegex = Regex("""(\d{1,2})[dD天]""")
+        val hourRegex = Regex("""(\d{1,2})(h|H|小时|时)""")
+        val minRegex = Regex("""(\d{1,2})(分钟|分|m|M)""")
+
+        banTime = dayRegex.find(message)?.groups?.get(1)?.value?.toLong()?.times(24 * 60 * 60) ?: 0L
+        banTime += hourRegex.find(message)?.groups?.get(1)?.value?.toLong()?.times(24 * 60) ?: 0L
+        banTime += minRegex.find(message)?.groups?.get(1)?.value?.toLong()?.times(60) ?: 0L
+
         return banTime.toInt()
     }
 }
