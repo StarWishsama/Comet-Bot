@@ -17,14 +17,13 @@ import io.github.starwishsama.comet.CometVariables.cfg
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.Picture
-import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import org.xbill.DNS.Lookup
 import org.xbill.DNS.SRVRecord
 import org.xbill.DNS.Type
 import java.io.*
 import java.net.Proxy
 import java.net.Socket
-import java.time.LocalDateTime
+import java.time.Instant
 
 
 /**
@@ -37,7 +36,8 @@ import java.time.LocalDateTime
 object MinecraftUtil {
     @Throws(IOException::class)
     fun query(host: String, port: Int): QueryInfo {
-        val start = LocalDateTime.now()
+        val start = Instant.now()
+
         val socket: Socket
         if (cfg.proxySwitch) {
             socket = Socket(Proxy(cfg.proxyType, Socket(cfg.proxyUrl, cfg.proxyPort).remoteSocketAddress))
@@ -124,7 +124,7 @@ object MinecraftUtil {
         inputStream.close()
         socket.close()
 
-        return QueryInfo(json, start.getLastingTimeAsString())
+        return QueryInfo(json, Instant.now().minusMillis(start.toEpochMilli()).toEpochMilli())
     }
 
     @Throws(IOException::class)
@@ -184,7 +184,7 @@ data class SRVConvertResult(
 
 data class QueryInfo(
     val json: String,
-    val usedTime: String
+    val usedTime: Long
 ) {
     private fun parseJson(): MinecraftServerInfo {
         return mapper.readValue(json)
@@ -200,7 +200,7 @@ data class QueryInfo(
             > 在线玩家 ${info.players.onlinePlayer}/${info.players.maxPlayer}
             > MOTD ${info.parseMOTD()}
             > 服务器版本 ${info.version.protocolName}
-            > 延迟 $usedTime
+            > 延迟 ${usedTime}ms
             ${if (info.modInfo?.modList != null) "> MOD 列表 " + info.modInfo.modList else ""}
         """.trimIndent()
         )

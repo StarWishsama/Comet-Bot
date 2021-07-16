@@ -32,6 +32,8 @@ class MinecraftCommand : ChatCommand {
             1 -> {
                 if (args[0].contains(":")) {
                     val split = args[0].split(":")
+                    event.subject.sendMessage(toChain("查询中..."))
+
                     return query(split[0], split[1].toIntOrNull(), event.subject)
                 }
 
@@ -39,11 +41,14 @@ class MinecraftCommand : ChatCommand {
                 return if (convert.isEmpty()) {
                     "无法连接至服务器".toChain()
                 } else {
+                    event.subject.sendMessage(toChain("查询中..."))
                     query(convert.host, convert.port, event.subject)
                 }
             }
             2 -> {
                 return if (args[1].isNumeric()) {
+                    event.subject.sendMessage(toChain("查询中..."))
+
                     query(args[0], args[1].toIntOrNull(), event.subject)
                 } else {
                     "输入的端口号不合法.".toChain()

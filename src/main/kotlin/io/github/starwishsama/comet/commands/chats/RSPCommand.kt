@@ -47,7 +47,7 @@ class RSPCommand : ChatCommand, ConversationCommand {
     override fun getHelp(): String = "/cq 石头剪刀布"
 
     override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
-        if (LocalDateTime.now().minusMinutes(1L).isBefore(session.createdTime)) {
+        if (LocalDateTime.now().minusMinutes(1L).isAfter(session.createdTime)) {
             SessionHandler.removeSession(session)
             return
         }
