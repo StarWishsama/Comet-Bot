@@ -34,8 +34,10 @@ class RSPCommand : ChatCommand, ConversationCommand {
     private val inProgressPlayer = mutableSetOf<Long>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
-        if (SessionHandler.hasSessionByID(event.sender.id, this::class.java))
+        if (!SessionHandler.hasSessionByID(event.sender.id, this::class.java)) {
             SessionHandler.insertSession(Session(SessionTarget(0, event.sender.id), this, false))
+        }
+
         return "石头剪刀布... 开始! 你要出什么呢?".toChain()
     }
 
