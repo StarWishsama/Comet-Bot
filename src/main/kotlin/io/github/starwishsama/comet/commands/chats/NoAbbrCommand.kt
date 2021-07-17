@@ -10,48 +10,39 @@
 
 package io.github.starwishsama.comet.commands.chats
 
+import io.github.starwishsama.comet.api.command.CommandExecuteConsumerType
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
-import io.github.starwishsama.comet.service.command.PenguinStatService
 import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-class PenguinStatCommand : ChatCommand {
+class NoAbbrCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             return getHelp().toChain()
         }
 
-        return when (args[0]) {
-            "item", "物品" -> {
-                PenguinStatService.queryItem(args)
-            }
-            "update", "更新" -> {
-                PenguinStatService.forceUpdate(user)
-            }
-            else -> {
-                getHelp().toChain()
-            }
-        }
+        return getHelp().convertToChain()
     }
 
     override fun getProps(): CommandProps =
         CommandProps(
-            "penguinstats",
-            listOf("企鹅物流", "pgs"),
-            "查询明日方舟物品掉落信息",
-            "nbot.commands.penguinstats",
-            UserLevel.USER
+            "noabbr",
+            listOf("nbnhhsh", "hhsh", "解析缩写", "能不能好好说话"),
+            "能不能好好说话?",
+            "nbot.commands.noabbr",
+            UserLevel.USER,
+            consumerType = CommandExecuteConsumerType.POINT,
+            consumePoint = 0.1
         )
 
-    override fun getHelp(): String =
-        """
-        老板~ 欢迎来到企鹅物流数据统计! [Beta]
+    override fun getHelp(): String = """
+/noabbr [缩写] 解析缩写的意思
         
-        /pgs item [物品名] 查询该物品在哪里掉落
-        /pgs update 强制更新企鹅物流数据
-        """.trimIndent()
+能不能好好说话?        
+    """.trimIndent()
 }

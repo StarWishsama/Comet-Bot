@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.objects.config
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.github.starwishsama.comet.api.command.CommandExecutor
+import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
@@ -125,7 +125,7 @@ data class PerGroupConfig(
     }
 
     fun disableCommand(commandName: String): ConfigureCommandStatus {
-        val command = CommandExecutor.getCommand(commandName)
+        val command = CommandManager.getCommand(commandName)
         if (command != null) {
             if (command is UnDisableableCommand) {
                 return ConfigureCommandStatus.UnDisabled

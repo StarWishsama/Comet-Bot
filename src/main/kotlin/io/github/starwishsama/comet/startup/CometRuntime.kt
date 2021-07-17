@@ -18,7 +18,8 @@ import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.CometVariables.cometServiceServer
 import io.github.starwishsama.comet.CometVariables.consoleCommandLogger
 import io.github.starwishsama.comet.CometVariables.daemonLogger
-import io.github.starwishsama.comet.api.command.CommandExecutor
+import io.github.starwishsama.comet.api.command.CommandManager
+import io.github.starwishsama.comet.api.command.MessageHandler
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
@@ -106,7 +107,7 @@ object CometRuntime {
     }
 
     fun setupBot(bot: Bot, logger: MiraiLogger) {
-        CommandExecutor.setupCommand(
+        CommandManager.setupCommand(
             arrayOf(
                 AdminCommand(),
                 ArkNightCommand(),
@@ -142,9 +143,9 @@ object CometRuntime {
             )
         )
 
-        logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
+        logger.info("[命令] 已注册 " + CommandManager.countCommands() + " 个命令")
 
-        CommandExecutor.startHandler(bot)
+        MessageHandler.startHandler(bot)
 
         /** 监听器 */
         val listeners = arrayOf(
@@ -237,7 +238,7 @@ object CometRuntime {
 
                 try {
                     line = CometApplication.console.readLine(">")
-                    val result = CommandExecutor.dispatchConsoleCommand(line)
+                    val result = MessageHandler.dispatchConsoleCommand(line)
                     if (result.isNotEmpty()) {
                         consoleCommandLogger.info(result)
                     }

@@ -13,7 +13,7 @@ package io.github.starwishsama.comet.commands.console
 import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.comet
-import io.github.starwishsama.comet.api.command.CommandExecutor
+import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -45,7 +45,7 @@ class DebugCommand : ConsoleCommand {
                 "info" ->
                     return ("彗星 Bot ${BuildConfig.version}\n" +
                             "Comet 状态: ${comet.getBot().isOnline} | ${CometVariables.switch}\n" +
-                            "已注册命令数: ${CommandExecutor.countCommands()}\n" +
+                            "已注册命令数: ${CommandManager.countCommands()}\n" +
                             CometUtil.getMemoryUsage() + "\n" +
                             "CPU 负载: ${RuntimeUtil.getOperatingSystemBean().systemLoadAverage}\n" +
                             "构建时间: ${BuildConfig.buildTime}"

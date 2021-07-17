@@ -12,7 +12,7 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.api.command.CommandExecutor
+import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
@@ -76,7 +76,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                             -1L
                         }
                         return ("彗星 Bot ${BuildConfig.version}\n" +
-                                "已注册命令数: ${CommandExecutor.countCommands()}\n" +
+                                "已注册命令数: ${CommandManager.countCommands()}\n" +
                                 "与服务器的延迟为 $ping ms\n" +
                                 "运行时长 ${CometUtil.getRunningTime()}\n" +
                                 "构建时间: ${BuildConfig.buildTime}"

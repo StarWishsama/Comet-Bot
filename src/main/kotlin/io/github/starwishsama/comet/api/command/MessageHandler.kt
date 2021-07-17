@@ -12,7 +12,6 @@ package io.github.starwishsama.comet.api.command
 
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.sessions.SessionHandler
@@ -20,6 +19,7 @@ import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
+import io.github.starwishsama.comet.utils.doFilter
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
@@ -27,65 +27,19 @@ import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.event.subscribeMessages
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.isContentEmpty
 import java.time.LocalDateTime
-import java.util.*
 
 /**
- * 彗星 Bot 命令处理器
+ * 彗星 Bot 消息处理器
  *
- * 处理群聊/私聊聊天信息中存在的命令
+ * 处理聊天信息和后台中存在的命令
+ *
  * @author StarWishsama
  */
-object CommandExecutor {
-    private val commands: MutableSet<ChatCommand> = mutableSetOf()
-    private val consoleCommands = mutableListOf<ConsoleCommand>()
-
-    /**
-     * 注册命令
-     *
-     * @param command 要注册的命令
-     */
-    private fun setupCommand(command: ChatCommand) {
-        if (command.canRegister() && !commands.add(command)) {
-            CometVariables.logger.warning("[命令] 正在尝试注册已有命令 ${command.getProps().name}")
-        }
-    }
-
-    private fun setupConsoleCommand(command: ConsoleCommand) {
-        if (!consoleCommands.contains(command)) {
-            consoleCommands.plusAssign(command)
-        } else {
-            CometVariables.logger.warning("[命令] 正在尝试注册已有后台命令 ${command.getProps().name}")
-        }
-    }
-
-    /**
-     * 注册命令
-     *
-     * @param commands 要注册的命令集合
-     */
-    @Suppress("unused")
-    fun setupCommand(commands: Array<ChatCommand>) {
-        commands.forEach {
-            if (!CommandExecutor.commands.contains(it) && it.canRegister()) {
-                CommandExecutor.commands.add(it)
-            }
-        }
-    }
-
-    fun setupCommand(commands: Array<Any>) {
-        commands.forEach {
-            when (it) {
-                is ChatCommand -> setupCommand(it)
-                is ConsoleCommand -> setupConsoleCommand(it)
-                else -> {
-                    CometVariables.logger.warning("[命令] 正在尝试注册非命令类 ${it.javaClass.simpleName}")
-                }
-            }
-        }
-    }
-
+object MessageHandler {
     fun startHandler(bot: Bot) {
         bot.eventChannel.subscribeMessages {
             always {
@@ -125,7 +79,7 @@ object CommandExecutor {
         val senderId = event.sender.id
         val message = event.message.contentToString()
 
-        val cmd = getCommand(getCommandName(message))
+        val cmd = CommandManager.getCommand(CommandManager.getCommandName(message))
 
         val useDebug = cmd?.getProps()?.name?.contentEquals("debug") == true
 
@@ -133,31 +87,62 @@ object CommandExecutor {
 
         if (CometVariables.switch || useDebug) {
             try {
-
                 /**
                  * 如果不是监听会话, 则停止尝试解析并执行可能的命令
                  * 反之在监听时仍然可以执行命令
                  */
                 if (SessionHandler.handleSessions(event, user)) {
-                    return ExecutedResult(EmptyMessageChain, cmd, CommandStatus.MoveToSession())
+                    return ExecutedResult(
+                        EmptyMessageChain,
+                        cmd,
+                        CommandStatus.MoveToSession()
+                    )
                 }
+
+                /**
+                 * 命令不存在
+                 */
+                if (cmd == null) {
+                    return ExecutedResult(
+                        EmptyMessageChain,
+                        cmd,
+                        CommandStatus.NotACommand()
+                    )
+                }
+
+                val useStatus = validateUseStatus(user, cmd.getProps())
 
                 /**
                  * 检查是否在尝试执行被禁用命令
                  */
-                if (cmd != null && event is GroupMessageEvent &&
-                    GroupConfigManager.getConfig(event.group.id)?.isDisabledCommand(cmd) == true
+                if (event is GroupMessageEvent && GroupConfigManager.getConfig(event.group.id)
+                        ?.isDisabledCommand(cmd) == true
                 ) {
-                    return if (validateStatus(user, cmd.getProps())) {
-                        ExecutedResult(toChain("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
+                    return if (useStatus) {
+                        ExecutedResult(
+                            toChain("该命令已被管理员禁用"),
+                            cmd,
+                            CommandStatus.Disabled()
+                        )
                     } else {
                         ExecutedResult(EmptyMessageChain, cmd, CommandStatus.Disabled())
                     }
                 }
 
-                val prefix = getCommandPrefix(message)
+                if (!useStatus) {
+                    return if (cmd.getProps().consumerType == CommandExecuteConsumerType.POINT) {
+                        val response = CometVariables.localizationManager.getLocalizationText("message.no-enough-point")
+                            .replace("%point%", user.checkInPoint.toString())
+                            .replace("%cost%", cmd.getProps().consumePoint.toString())
+                        ExecutedResult(response.toChain(), cmd, CommandStatus.Success())
+                    } else {
+                        ExecutedResult(EmptyMessageChain, cmd, CommandStatus.Success())
+                    }
+                }
 
-                if (prefix.isNotEmpty() && cmd != null) {
+                val prefix = CommandManager.getCommandPrefix(message)
+
+                if (prefix.isNotEmpty()) {
                     // 前缀末尾下标
                     val index = message.indexOf(prefix) + prefix.length
 
@@ -178,6 +163,12 @@ object CommandExecutor {
                     }
 
                     return ExecutedResult(result, cmd, status)
+                } else {
+                    return ExecutedResult(
+                        EmptyMessageChain,
+                        cmd,
+                        CommandStatus.NotACommand()
+                    )
                 }
             } catch (e: Exception) {
                 return if (NetUtil.isTimeout(e)) {
@@ -188,16 +179,21 @@ object CommandExecutor {
                     if (user.isBotOwner()) {
                         ExecutedResult(
                             toChain(
-                                "在试图执行命令时发生了一个错误\n简易报错信息 :\n${e.javaClass.name}: ${e.message?.limitStringSize(30)}"
-                            ), cmd, CommandStatus.Failed()
+                                "在试图执行命令时发生了一个错误\n简易报错信息 :\n${e.javaClass.name}: ${
+                                    e.message?.limitStringSize(
+                                        30
+                                    )
+                                }"
+                            ), cmd
                         )
                     } else {
-                        ExecutedResult(toChain("在试图执行命令时发生了一个错误, 请联系管理员"), cmd, CommandStatus.Failed())
+                        ExecutedResult(toChain("在试图执行命令时发生了一个错误, 请联系管理员"), cmd)
                     }
                 }
             }
+        } else {
+            return ExecutedResult(EmptyMessageChain, cmd, CommandStatus.CometIsClose())
         }
-        return ExecutedResult(EmptyMessageChain, cmd)
     }
 
     /**
@@ -207,7 +203,7 @@ object CommandExecutor {
      */
     fun dispatchConsoleCommand(content: String): String {
         try {
-            val cmd = getConsoleCommand(getCommandName(content))
+            val cmd = CommandManager.getConsoleCommand(CommandManager.getCommandName(content))
             if (cmd != null) {
                 val splitMessage = content.split(" ")
                 val splitCommand = splitMessage.subList(1, splitMessage.size)
@@ -221,137 +217,18 @@ object CommandExecutor {
         return ""
     }
 
-    fun getCommand(cmdPrefix: String): ChatCommand? {
-        val command = commands.parallelStream().filter {
-            isCommandNameEquals(it, cmdPrefix)
-        }.findFirst()
-
-        return if (command.isPresent) command.get() else null
-    }
-
-    private fun getConsoleCommand(cmdPrefix: String): ConsoleCommand? {
-        for (command in consoleCommands) {
-            if (isCommandNameEquals(command, cmdPrefix)) {
-                return command
-            }
-        }
-        return null
-    }
-
-    private fun getCommandName(message: String): String {
-        val cmdPrefix = getCommandPrefix(message)
-
-        val index = message.indexOf(cmdPrefix) + cmdPrefix.length
-
-        return message.substring(index, message.length).split(" ")[0]
-    }
-
     /**
-     * 消息开头是否为命令前缀
-     *
-     * @return 消息前缀, 不匹配返回空
-     */
-    fun getCommandPrefix(message: String): String {
-        if (message.isNotEmpty()) {
-            CometVariables.cfg.commandPrefix.forEach {
-                if (message.startsWith(it)) {
-                    return it
-                }
-            }
-        }
-
-        return ""
-    }
-
-    private fun isCommandNameEquals(cmd: ChatCommand, cmdName: String): Boolean {
-        val props = cmd.getProps()
-        when {
-            props.name.contentEquals(cmdName) -> {
-                return true
-            }
-            props.aliases.isNotEmpty() -> {
-                val aliases = props.aliases.parallelStream().filter { it!!.contentEquals(cmdName) }.findFirst()
-                if (aliases.isPresent) {
-                    return true
-                }
-            }
-            else -> {
-                return false
-            }
-        }
-        return false
-    }
-
-    private fun isCommandNameEquals(cmd: ConsoleCommand, cmdName: String): Boolean {
-        val props = cmd.getProps()
-
-        when {
-            props.name.contentEquals(cmdName) -> {
-                return true
-            }
-            props.aliases.isNotEmpty() -> {
-                val name = props.aliases.parallelStream().filter { alias -> alias!!.contentEquals(cmdName) }.findFirst()
-                if (name.isPresent) {
-                    return true
-                }
-            }
-            else -> {
-                return false
-            }
-        }
-        return false
-    }
-
-    fun MessageChain.doFilter(): MessageChain {
-        if (CometVariables.cfg.filterWords.isNullOrEmpty()) {
-            return this
-        }
-
-        val revampChain = LinkedList<SingleMessage>()
-        this.forEach { revampChain.add(it) }
-
-        var count = 0
-
-        for (i in revampChain.indices) {
-            if (revampChain[i] is PlainText) {
-                var context = revampChain[i].content
-                CometVariables.cfg.filterWords.forEach {
-                    if (context.contains(it)) {
-                        count++
-                        context = context.replace(it.toRegex(), " ")
-                    }
-
-                    if (count > 5) {
-                        return EmptyMessageChain
-                    }
-                }
-                revampChain[i] = PlainText(context)
-            }
-        }
-
-        return revampChain.toMessageChain()
-    }
-
-    fun countCommands(): Int = commands.size + consoleCommands.size
-
-    fun getCommands() = commands
-
-    /**
-     * 判断指定QQ号是否可以执行命令
+     * 判断指定用户是否可以执行命令
      * (可以自定义命令冷却时间)
      *
      * @author StarWishsama
-     * @param user 检测的用户
+     * @param user 检测用户
      * @param props 命令配置
      *
-     * @return 目标QQ号是否处于冷却状态
+     * @return 目标用户是否可以执行命令
      */
-    private fun validateStatus(user: CometUser, props: CommandProps): Boolean {
+    private fun validateUseStatus(user: CometUser, props: CommandProps): Boolean {
         val currentTime = System.currentTimeMillis()
-
-        if (user.id == 80000000L) {
-            return false
-        }
 
         if (user.isBotOwner()) {
             return true
@@ -386,7 +263,7 @@ object CommandExecutor {
     data class ExecutedResult(
         val msg: MessageChain,
         val cmd: ChatCommand?,
-        val status: CommandStatus = CommandStatus.NotACommand()
+        val status: CommandStatus = CommandStatus.Failed()
     )
 
     sealed class CommandStatus(val name: String) {
@@ -396,6 +273,7 @@ object CommandExecutor {
         class Disabled : CommandStatus("命令被禁用")
         class MoveToSession : CommandStatus("移交会话处理")
         class NotACommand : CommandStatus("非命令")
+        class CometIsClose : CommandStatus("Comet 已关闭")
 
         fun isOk(): Boolean = this is Success || this is NoPermission || this is Failed
     }

@@ -20,5 +20,5 @@ data class CommandProps(
     val permission: String,
     val level: UserLevel,
     val consumerType: CommandExecuteConsumerType = CommandExecuteConsumerType.COOLDOWN,
-    val consumePoint: Int = CometVariables.cfg.coolDownTime
+    val consumePoint: Double = CometVariables.cfg.coolDownTime.toDouble(),
 )

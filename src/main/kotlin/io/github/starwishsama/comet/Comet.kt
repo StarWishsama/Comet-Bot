@@ -64,7 +64,7 @@ class Comet {
         bot.join()
     }
 
-    fun initBot() {
+    private fun initBot() {
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
                 CustomLogRedirecter("Mirai (${it.id})", CometVariables.miraiLogger)

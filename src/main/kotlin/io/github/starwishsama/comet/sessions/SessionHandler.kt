@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.sessions
 
 import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.api.command.CommandExecutor
+import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
@@ -94,7 +94,7 @@ object SessionHandler {
         }
 
         for (session in sessionToHandle) {
-            if (session.silent || CommandExecutor.getCommandPrefix(e.message.contentToString()).isEmpty()) {
+            if (session.silent || CommandManager.getCommandPrefix(e.message.contentToString()).isEmpty()) {
                 if (session.creator is ConversationCommand) {
                     session.creator.handle(e, u, session)
                 }

@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.service.command
 
-import io.github.starwishsama.comet.api.command.CommandExecutor
+import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.toChain
@@ -41,7 +41,7 @@ object AdminService {
                 val target: CometUser? = CometUtil.parseAtAsBotUser(event, args[1])
 
                 val validate =
-                    CommandExecutor.getCommands().parallelStream().filter { it.getProps().permission == args[2] }
+                    CommandManager.getCommands().parallelStream().filter { it.getProps().permission == args[2] }
                         .findAny().isPresent
 
                 return if (validate) {

@@ -60,7 +60,7 @@ class ArkNightCommand : ChatCommand {
             "明日方舟寻访模拟器",
             "nbot.commands.arknight",
             UserLevel.USER,
-            consumePoint = 15
+            consumePoint = 15.0
         )
 
     override fun getHelp(): String = """

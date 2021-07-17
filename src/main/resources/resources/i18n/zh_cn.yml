@@ -3,4 +3,4 @@ message:
   no-permission: '你没有权限!'
   bind-success: '绑定账号成功!'
   checkin-first-time: '你还没有签到过, 先用 /qd 签到一次吧~'
-  no-enough-point: '积分不足 (%point%), 可以通过签到获取积分哦'
+  no-enough-point: '积分不足 (%point%), 本次使用需要 %cost% 点积分, 可以通过签到 (/qd) 获取积分哦'

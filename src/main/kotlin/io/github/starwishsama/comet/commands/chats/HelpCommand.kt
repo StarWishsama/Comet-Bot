@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.commands.chats
 
 
-import io.github.starwishsama.comet.api.command.CommandExecutor
+import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
@@ -28,7 +28,7 @@ class HelpCommand : ChatCommand {
             val sb = buildString {
                 append(CometUtil.sendMessageAsString("可用的命令:"))
                 append("\n[")
-                for (cmd in CommandExecutor.getCommands()) {
+                for (cmd in CommandManager.getCommands()) {
                     if (!cmd.isHidden) {
                         append(cmd.getProps().name).append(", ")
                     }
@@ -37,7 +37,7 @@ class HelpCommand : ChatCommand {
 
             return sb.trim().convertToChain()
         } else {
-            val cmd = CommandExecutor.getCommand(args[0])
+            val cmd = CommandManager.getCommand(args[0])
             return if (cmd != null) {
                 CometUtil.toChain("关于 /${cmd.name} 的帮助信息\n${cmd.getHelp()}")
             } else {

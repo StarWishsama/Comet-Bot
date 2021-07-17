@@ -57,7 +57,7 @@ class MusicCommand : ChatCommand {
             "点歌命令",
             "nbot.commands.music",
             UserLevel.USER,
-            consumePoint = 5
+            consumePoint = 5.0
         )
 
     override fun getHelp(): String = """
