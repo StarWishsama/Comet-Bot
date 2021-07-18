@@ -30,19 +30,12 @@ object RepeatListener : NListener {
             val repeatInfo = repeatCachePool[groupId]
 
             if (repeatInfo == null) {
-                repeatCachePool[groupId] = RepeatInfo(
-                    mutableListOf(
-                        RepeatInfo.CacheMessage(
-                            event.sender.id,
-                            event.message
-                        )
-                    )
-                )
+                repeatCachePool[groupId] = RepeatInfo(mutableListOf(event.message))
                 return
             }
 
-            if (repeatInfo.check(event.sender.id, event.message)) {
-                runBlocking { event.subject.sendMessage(doRepeat(repeatInfo.messageCache.last().message)) }
+            if (repeatInfo.handleRepeat(event.message)) {
+                runBlocking { event.subject.sendMessage(doRepeat(repeatInfo.messageCache.last())) }
             }
         }
     }
@@ -77,29 +70,25 @@ object RepeatListener : NListener {
 }
 
 data class RepeatInfo(
-    val messageCache: MutableList<CacheMessage> = mutableListOf(),
+    val messageCache: MutableList<MessageChain> = mutableListOf(),
     var hasRepeated: Boolean = false
 ) {
-    data class CacheMessage(
-        val senderId: Long,
-        val message: MessageChain
-    )
-
-    fun check(id: Long, message: MessageChain): Boolean {
+    fun handleRepeat(message: MessageChain): Boolean {
         if (messageCache.isEmpty()) {
-            messageCache.add(CacheMessage(id, message))
+            messageCache.add(message)
             return false
         }
 
         val last = messageCache.last()
+        val lastSender = last.source.fromId
 
-        if (last.senderId == id || !last.message.contentEquals(message, ignoreCase = false, strict = true)) {
+        if (lastSender == message.source.fromId || !last.contentEquals(message, ignoreCase = false, strict = true)) {
             messageCache.clear()
             return false
         }
 
-        if (last.senderId != id && last.message.contentEquals(message, ignoreCase = false, strict = true)) {
-            messageCache.add(CacheMessage(id, message))
+        if (lastSender != message.source.fromId && last.contentEquals(message, ignoreCase = false, strict = true)) {
+            messageCache.add(message)
         }
 
         if (messageCache.size > 1 && !hasRepeated) {
