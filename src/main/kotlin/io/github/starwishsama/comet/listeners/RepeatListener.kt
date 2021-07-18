@@ -10,14 +10,12 @@
 
 package io.github.starwishsama.comet.listeners
 
-import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
-import java.util.*
 import kotlin.time.ExperimentalTime
 
 object RepeatListener : NListener {
@@ -72,19 +70,14 @@ object RepeatListener : NListener {
     }
 
     private fun canRepeat(groupId: Long): Boolean {
-        return try {
-            GroupConfigManager.getConfigOrNew(groupId).canRepeat
-        } catch (e: NullPointerException) {
-            daemonLogger.warning("检测到群 $groupId 的配置文件异常无法获取, 请及时查看!")
-            false
-        }
+        return GroupConfigManager.getConfigOrNew(groupId).canRepeat
     }
 
     override fun getName(): String = "复读机"
 }
 
 data class RepeatInfo(
-    val messageCache: MutableList<CacheMessage> = Collections.synchronizedList(mutableListOf()),
+    val messageCache: MutableList<CacheMessage> = mutableListOf(),
     var hasRepeated: Boolean = false
 ) {
     data class CacheMessage(
