@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet
 
+import io.github.starwishsama.comet.CometVariables.logger
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.HinaLogger
 import io.github.starwishsama.comet.startup.CometLoginHelper
@@ -47,12 +48,12 @@ class Comet {
 
         initBot()
 
-        CometVariables.logger.info("登录中... 使用协议 ${bot.configuration.protocol.name}")
+        logger.info("登录中... 使用协议 ${bot.configuration.protocol.name}")
 
         try {
             cometLoginHelper.status = LoginStatus.LOGIN_SUCCESS
             bot.login()
-            CometRuntime.setupBot(bot, bot.logger)
+            CometRuntime.setupBot(bot)
         } catch (e: LoginFailedException) {
             CometVariables.daemonLogger.warning("登录失败! 返回的失败信息: ${e.message}")
             cometLoginHelper.status = LoginStatus.LOGIN_FAILED

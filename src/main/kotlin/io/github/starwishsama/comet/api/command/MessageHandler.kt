@@ -61,8 +61,7 @@ object MessageHandler {
 
                     if (result.status.isOk()) {
                         CometVariables.logger.debug(
-                            "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(msMode = true)}" +
-                                    if (result.status.isOk()) ", 执行结果: ${result.status.name}" else ""
+                            "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(msMode = true)}, 执行结果: ${result.status.name}"
                         )
                     }
                 }
@@ -85,29 +84,23 @@ object MessageHandler {
 
         val user = CometUser.getUserOrRegister(senderId)
 
-        if (CometVariables.switch || useDebug) {
+        if (!CometVariables.switch && !useDebug) {
+            return ExecutedResult(EmptyMessageChain, cmd, CommandStatus.CometIsClose())
+        } else {
             try {
                 /**
                  * 如果不是监听会话, 则停止尝试解析并执行可能的命令
                  * 反之在监听时仍然可以执行命令
                  */
                 if (SessionHandler.handleSessions(event, user)) {
-                    return ExecutedResult(
-                        EmptyMessageChain,
-                        cmd,
-                        CommandStatus.MoveToSession()
-                    )
+                    return ExecutedResult(EmptyMessageChain, cmd, CommandStatus.PassToSession())
                 }
 
                 /**
                  * 命令不存在
                  */
                 if (cmd == null) {
-                    return ExecutedResult(
-                        EmptyMessageChain,
-                        cmd,
-                        CommandStatus.NotACommand()
-                    )
+                    return ExecutedResult(EmptyMessageChain, null, CommandStatus.NotACommand())
                 }
 
                 val useStatus = validateUseStatus(user, cmd.getProps())
@@ -115,15 +108,11 @@ object MessageHandler {
                 /**
                  * 检查是否在尝试执行被禁用命令
                  */
-                if (event is GroupMessageEvent && GroupConfigManager.getConfig(event.group.id)
-                        ?.isDisabledCommand(cmd) == true
+                if (event is GroupMessageEvent && GroupConfigManager.getConfigOrNew(event.group.id)
+                        .isDisabledCommand(cmd)
                 ) {
                     return if (useStatus) {
-                        ExecutedResult(
-                            toChain("该命令已被管理员禁用"),
-                            cmd,
-                            CommandStatus.Disabled()
-                        )
+                        ExecutedResult(toChain("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
                     } else {
                         ExecutedResult(EmptyMessageChain, cmd, CommandStatus.Disabled())
                     }
@@ -146,8 +135,8 @@ object MessageHandler {
                     // 前缀末尾下标
                     val index = message.indexOf(prefix) + prefix.length
 
-                    var splitMessage = message.substring(index, message.length).split(" ")
-                    splitMessage = splitMessage.subList(1, splitMessage.size)
+                    val splitMessage = message.substring(index, message.length).split(" ")
+                        .also { it.subList(1, it.size) }
 
                     CometVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.name} (原始消息: ${message})")
 
@@ -164,11 +153,7 @@ object MessageHandler {
 
                     return ExecutedResult(result, cmd, status)
                 } else {
-                    return ExecutedResult(
-                        EmptyMessageChain,
-                        cmd,
-                        CommandStatus.NotACommand()
-                    )
+                    return ExecutedResult(EmptyMessageChain, cmd, CommandStatus.NotACommand())
                 }
             } catch (e: Exception) {
                 return if (NetUtil.isTimeout(e)) {
@@ -191,8 +176,6 @@ object MessageHandler {
                     }
                 }
             }
-        } else {
-            return ExecutedResult(EmptyMessageChain, cmd, CommandStatus.CometIsClose())
         }
     }
 
@@ -228,21 +211,21 @@ object MessageHandler {
      * @return 目标用户是否可以执行命令
      */
     private fun validateUseStatus(user: CometUser, props: CommandProps): Boolean {
-        val currentTime = System.currentTimeMillis()
-
         if (user.isBotOwner()) {
             return true
         }
 
         when (props.consumerType) {
             CommandExecuteConsumerType.COOLDOWN -> {
+                val currentTime = System.currentTimeMillis()
+
                 return when (user.lastExecuteTime) {
                     -1L -> {
                         user.lastExecuteTime = currentTime
                         true
                     }
                     else -> {
-                        val result = currentTime - user.lastExecuteTime < props.consumePoint * 1000
+                        val result = currentTime - user.lastExecuteTime > props.consumePoint * 1000
                         user.lastExecuteTime = currentTime
                         result
                     }
@@ -266,15 +249,15 @@ object MessageHandler {
         val status: CommandStatus = CommandStatus.Failed()
     )
 
-    sealed class CommandStatus(val name: String) {
-        class Success : CommandStatus("成功")
-        class NoPermission : CommandStatus("无权限")
-        class Failed : CommandStatus("失败")
-        class Disabled : CommandStatus("命令被禁用")
-        class MoveToSession : CommandStatus("移交会话处理")
-        class NotACommand : CommandStatus("非命令")
-        class CometIsClose : CommandStatus("Comet 已关闭")
+    sealed class CommandStatus(val name: String, private val isSuccessful: Boolean) {
+        class Success : CommandStatus("成功", true)
+        class NoPermission : CommandStatus("无权限", true)
+        class Failed : CommandStatus("失败", true)
+        class Disabled : CommandStatus("命令被禁用", true)
+        class PassToSession : CommandStatus("移交会话处理", false)
+        class NotACommand : CommandStatus("非命令", false)
+        class CometIsClose : CommandStatus("Comet 已关闭", false)
 
-        fun isOk(): Boolean = this is Success || this is NoPermission || this is Failed
+        fun isOk(): Boolean = this.isSuccessful
     }
 }

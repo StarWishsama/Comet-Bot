@@ -115,7 +115,7 @@ object SessionHandler {
         }
 
         return sessionPool.stream()
-            .filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId && !it.silent }
+            .filter { (it.target.groupId == target.groupId || it.target.privateId == target.privateId) && !it.silent }
             .count() > 0
     }
 }

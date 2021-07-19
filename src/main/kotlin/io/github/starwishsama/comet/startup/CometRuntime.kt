@@ -18,6 +18,7 @@ import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.CometVariables.cometServiceServer
 import io.github.starwishsama.comet.CometVariables.consoleCommandLogger
 import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.logger
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.MessageHandler
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
@@ -46,7 +47,6 @@ import kotlinx.coroutines.isActive
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.globalEventChannel
-import net.mamoe.mirai.utils.MiraiLogger
 import okhttp3.OkHttpClient
 import org.jline.reader.EndOfFileException
 import org.jline.reader.UserInterruptException
@@ -106,7 +106,7 @@ object CometRuntime {
         CometVariables.loggerAppender.close()
     }
 
-    fun setupBot(bot: Bot, logger: MiraiLogger) {
+    fun setupBot(bot: Bot) {
         CommandManager.setupCommand(
             arrayOf(
                 AdminCommand(),

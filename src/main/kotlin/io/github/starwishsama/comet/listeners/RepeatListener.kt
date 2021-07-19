@@ -12,20 +12,23 @@ package io.github.starwishsama.comet.listeners
 
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
-import kotlin.time.ExperimentalTime
 
 object RepeatListener : NListener {
     override val eventToListen = listOf(GroupMessageEvent::class)
 
     private val repeatCachePool = mutableMapOf<Long, RepeatInfo>()
 
-    @ExperimentalTime
     override fun listen(event: Event) {
-        if (event is GroupMessageEvent && !event.group.isBotMuted && canRepeat(event.group.id)) {
+        if (event !is GroupMessageEvent) {
+            return
+        }
+
+        if (!event.group.isBotMuted && groupSupportRepeat(event.group.id)) {
             val groupId = event.group.id
             val repeatInfo = repeatCachePool[groupId]
 
@@ -34,35 +37,11 @@ object RepeatListener : NListener {
                 return
             }
 
-            if (repeatInfo.handleRepeat(event.message)) {
-                runBlocking { event.subject.sendMessage(doRepeat(repeatInfo.messageCache.last())) }
-            }
+            repeatInfo.handleRepeat(event.group, event.message)
         }
     }
 
-    private fun doRepeat(message: MessageChain): MessageChain {
-        // 避免复读过多图片刷屏
-        val count = message.parallelStream().filter { it is Image }.count()
-
-        if (count <= 1L) {
-            val msgChain = ArrayList<Message>()
-
-            message.forEach {
-                val msg: SingleMessage = if (it is PlainText) {
-                    PlainText(it.content.replace("我".toRegex(), "你"))
-                } else {
-                    it
-                }
-                msgChain.add(msg)
-            }
-
-            return msgChain.toMessageChain()
-        }
-
-        return EmptyMessageChain
-    }
-
-    private fun canRepeat(groupId: Long): Boolean {
+    private fun groupSupportRepeat(groupId: Long): Boolean {
         return GroupConfigManager.getConfigOrNew(groupId).canRepeat
     }
 
@@ -70,32 +49,50 @@ object RepeatListener : NListener {
 }
 
 data class RepeatInfo(
-    val messageCache: MutableList<MessageChain> = mutableListOf(),
-    var hasRepeated: Boolean = false
+    val messageCache: MutableList<MessageChain> = mutableListOf()
 ) {
-    fun handleRepeat(message: MessageChain): Boolean {
+    fun handleRepeat(group: Group, message: MessageChain) {
         if (messageCache.isEmpty()) {
             messageCache.add(message)
-            return false
         }
 
-        val last = messageCache.last()
-        val lastSender = last.source.fromId
+        val lastMessage = messageCache.last()
+        val lastSender = lastMessage.source.fromId
 
-        if (lastSender == message.source.fromId || !last.contentEquals(message, ignoreCase = false, strict = true)) {
-            messageCache.clear()
-            return false
-        }
-
-        if (lastSender != message.source.fromId && last.contentEquals(message, ignoreCase = false, strict = true)) {
+        if (lastSender != message.source.fromId
+            && lastMessage.contentEquals(message, ignoreCase = false, strict = true)
+        ) {
             messageCache.add(message)
+        } else {
+            messageCache.clear()
+            return
         }
 
-        if (messageCache.size > 1 && !hasRepeated) {
-            hasRepeated = true
-            return true
+        if (messageCache.size > 1) {
+            runBlocking { group.sendMessage(processRepeatMessage(lastMessage)) }
+            messageCache.clear()
         }
+    }
 
-        return false
+    private fun processRepeatMessage(message: MessageChain): MessageChain {
+        // 避免复读过多图片刷屏
+        val count = message.parallelStream().filter { it is Image }.count()
+
+        if (count <= 2L) {
+            val revampChain = ArrayList<Message>()
+
+            message.forEach {
+                val msg: SingleMessage = if (it is PlainText) {
+                    PlainText(it.content.replace("我".toRegex(), "你"))
+                } else {
+                    it
+                }
+                revampChain.add(msg)
+            }
+
+            return revampChain.toMessageChain()
+        } else {
+            return EmptyMessageChain
+        }
     }
 }
