@@ -135,10 +135,9 @@ object MessageHandler {
                     // 前缀末尾下标
                     val index = message.indexOf(prefix) + prefix.length
 
-                    val splitMessage = message.substring(index, message.length).split(" ")
-                        .also { it.subList(1, it.size) }
+                    val splitMessage = message.substring(index, message.length).trim().split(" ")
 
-                    CometVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.name} (原始消息: ${message})")
+                    CometVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.name} (原始消息: ${splitMessage})")
 
                     val status: CommandStatus
 
@@ -164,11 +163,7 @@ object MessageHandler {
                     if (user.isBotOwner()) {
                         ExecutedResult(
                             toChain(
-                                "在试图执行命令时发生了一个错误\n简易报错信息 :\n${e.javaClass.name}: ${
-                                    e.message?.limitStringSize(
-                                        30
-                                    )
-                                }"
+                                "在试图执行命令时发生了一个错误\n简易报错信息 :\n${e.javaClass.name}: ${e.message?.limitStringSize(30)}"
                             ), cmd
                         )
                     } else {
