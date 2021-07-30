@@ -213,7 +213,9 @@ object GitHubService {
     }
 
     fun lookupRepo(args: List<String>, event: MessageEvent): MessageChain {
-        return GithubApi.getRepoInfoPicture(args[0], args[1]).toMessageChain(event.subject)
+        val repoName = args[1].split("/")
+
+        return GithubApi.getRepoInfoPicture(repoName[0], repoName[1]).toMessageChain(event.subject)
     }
 
     private fun handleModifyMode(args: List<String>, session: Session): MessageChain {

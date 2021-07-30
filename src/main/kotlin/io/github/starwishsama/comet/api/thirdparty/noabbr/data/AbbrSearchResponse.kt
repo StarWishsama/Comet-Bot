@@ -36,7 +36,7 @@ data class AbbrSearchResponse(
 
         if (trans.isNotEmpty()) {
             return MessageWrapper().addText(
-                "缩写对应的可能结果: $inputting"
+                "缩写对应的可能结果: $trans"
             )
         }
 
