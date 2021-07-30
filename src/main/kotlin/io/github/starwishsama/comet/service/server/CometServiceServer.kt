@@ -25,7 +25,7 @@ class CometServiceServer(port: Int, customSuffix: String) {
             it.writeTextResponse("Request URL is ${it.requestURI}")
         }
         server.createContext("/$customSuffix", GithubWebHookHandler())
-        netLogger.log(HinaLogLevel.Info, "已注册 Github WebHook 后缀: $customSuffix", prefix = "WebHook")
+        netLogger.log(HinaLogLevel.Info, "已注册 Github WebHook 路由后缀: $customSuffix", prefix = "WebHook")
         server.createContext("/test") { he ->
             if (ServerUtil.checkCoolDown(he.remoteAddress)) {
                 he.sendResponseHeaders(500, 0)

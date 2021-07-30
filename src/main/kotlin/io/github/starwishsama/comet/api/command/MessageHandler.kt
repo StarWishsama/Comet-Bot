@@ -135,9 +135,10 @@ object MessageHandler {
                     // 前缀末尾下标
                     val index = message.indexOf(prefix) + prefix.length
 
-                    val splitMessage = message.substring(index, message.length).trim().split(" ")
+                    val tempMessage = message.substring(index, message.length).trim().split(" ")
+                    val splitMessage = tempMessage.subList(1, tempMessage.size)
 
-                    CometVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.name} (原始消息: ${splitMessage})")
+                    CometVariables.logger.debug("[命令] $senderId 尝试执行命令: ${cmd.name} (原始消息: ${tempMessage}, 解析消息: ${splitMessage})")
 
                     val status: CommandStatus
 

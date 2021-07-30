@@ -13,7 +13,9 @@ package io.github.starwishsama.comet.service.command
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.github.GithubApi
+import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.GithubRepoData
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.GithubRepos
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
@@ -39,7 +41,11 @@ object GitHubService {
         }
     }
 
-    fun subscribeRepo(args: List<String>, event: MessageEvent): MessageChain {
+    fun subscribeRepo(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
+        if (!user.hasPermission("nbot.commands.github") || !user.compareLevel(UserLevel.ADMIN)) {
+            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         val isGroup = event is GroupMessageEvent
 
         if (!isGroup && args.size < 3) {
@@ -95,7 +101,11 @@ object GitHubService {
         }
     }
 
-    fun unsubscribeRepo(args: List<String>, event: MessageEvent): MessageChain {
+    fun unsubscribeRepo(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
+        if (!user.hasPermission("nbot.commands.github") || !user.compareLevel(UserLevel.ADMIN)) {
+            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         val isGroup = event is GroupMessageEvent
 
         if (!isGroup && args.size < 3) {
@@ -125,7 +135,11 @@ object GitHubService {
         }
     }
 
-    fun getRepoList(args: List<String>, event: MessageEvent): MessageChain {
+    fun getRepoList(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
+        if (!user.hasPermission("nbot.commands.github") || !user.compareLevel(UserLevel.ADMIN)) {
+            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         val isGroup = event is GroupMessageEvent
 
         val id = if (isGroup) {
@@ -152,11 +166,16 @@ object GitHubService {
     }
 
     fun modifyRepo(
+        user: CometUser,
         args: List<String>,
         event: MessageEvent,
         command: ChatCommand,
         session: Session? = null
     ): MessageChain {
+        if (!user.hasPermission("nbot.commands.github") || !user.compareLevel(UserLevel.ADMIN)) {
+            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         if (session == null) {
             if (args.size < 2) {
                 return "正确的命令: /github modify [仓库名称]".toChain()
@@ -191,6 +210,10 @@ object GitHubService {
         } else {
             return handleModifyMode(args, session)
         }
+    }
+
+    fun lookupRepo(args: List<String>, event: MessageEvent): MessageChain {
+        return GithubApi.getRepoInfoPicture(args[0], args[1]).toMessageChain(event.subject)
     }
 
     private fun handleModifyMode(args: List<String>, session: Session): MessageChain {

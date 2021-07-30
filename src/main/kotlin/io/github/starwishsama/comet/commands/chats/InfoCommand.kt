@@ -31,15 +31,11 @@ import java.time.format.DateTimeFormatter
 class InfoCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
-            var reply =
+            val reply =
                 "\n积分: " + String.format("%.1f", user.checkInPoint) +
                         "\n累计连续签到了 " + user.checkInTime.toString() + " 天" + "\n上次签到于: " +
                         user.lastCheckInTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString() +
                         "\n权限组: " + user.level.toString()
-
-            if (user.bindServerAccount.isNotEmpty()) {
-                reply = reply + "绑定的游戏账号是: " + user.bindServerAccount
-            }
 
             return if (event is GroupMessageEvent) {
                 event.sender.at() + reply.convertToChain()

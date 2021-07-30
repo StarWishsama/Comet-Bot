@@ -35,7 +35,7 @@ class VersionCommand : ChatCommand {
     override fun getProps(): CommandProps {
         return CommandProps(
             "version",
-            arrayListOf("v", "版本", "comet"),
+            arrayListOf("v", "版本", "comet", "status"),
             "查看版本号",
             "nbot.commands.version",
             UserLevel.USER

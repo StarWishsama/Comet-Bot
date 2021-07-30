@@ -13,7 +13,6 @@ package io.github.starwishsama.comet.objects
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import java.time.LocalDateTime
 
 data class CometUser(
@@ -22,13 +21,11 @@ data class CometUser(
     var lastCheckInTime: LocalDateTime = LocalDateTime.now().minusDays(1),
     var checkInPoint: Double = 0.0,
     var checkInTime: Int = 0,
-    var bindServerAccount: String = "",
     var r6sAccount: String = "",
     var level: UserLevel = UserLevel.USER,
     var checkInGroup: Long = 0,
     var lastExecuteTime: Long = -1,
     private val permissions: MutableList<String> = mutableListOf(),
-    val savedContents: MutableList<MessageWrapper> = mutableListOf()
 ) {
     fun addPoint(point: Number) {
         checkInPoint += point.toDouble()

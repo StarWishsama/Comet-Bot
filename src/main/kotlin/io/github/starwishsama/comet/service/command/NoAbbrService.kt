@@ -10,5 +10,17 @@
 
 package io.github.starwishsama.comet.service.command
 
+import io.github.starwishsama.comet.api.thirdparty.noabbr.NoAbbrApi
+import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.event.events.MessageEvent
+import net.mamoe.mirai.message.data.MessageChain
+
 object NoAbbrService {
+    fun parseAbbr(event: MessageEvent, input: String): MessageChain {
+        runBlocking { event.subject.sendMessage("请稍后...") }
+
+        val result = NoAbbrApi.guessMeaning(input)
+
+        return result.toMessageWrapper().toMessageChain(event.subject)
+    }
 }

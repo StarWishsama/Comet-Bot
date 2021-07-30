@@ -15,8 +15,9 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.service.command.NoAbbrService
+import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.CometUtil.toChain
-import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
@@ -26,7 +27,7 @@ class NoAbbrCommand : ChatCommand {
             return getHelp().toChain()
         }
 
-        return getHelp().convertToChain()
+        return NoAbbrService.parseAbbr(event, args.getRestString(0))
     }
 
     override fun getProps(): CommandProps =

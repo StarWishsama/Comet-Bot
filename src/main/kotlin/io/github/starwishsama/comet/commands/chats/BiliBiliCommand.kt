@@ -84,7 +84,7 @@ class BiliBiliCommand : ChatCommand {
                             UserApi.userApiService.getMemberVideoById(item.data.card.mid).execute().body()
 
                         val text = item.data.card.name + "\n粉丝数: " + item.data.follower.getBetterNumber() +
-                                "\n最近视频: " + (if (recentVideos != null) recentVideos.data.list.videoList[0].toString() else "没有投稿过视频")
+                                "\n最近视频: " + (if (recentVideos != null) recentVideos.data.list.videoList[0].toString() else "没有投稿过视频") + "\n"
                         val dynamic = DynamicApi.getWrappedDynamicTimeline(item.data.card.mid)
                         text.convertToChain() + getDynamicText(dynamic, event)
                     } else {

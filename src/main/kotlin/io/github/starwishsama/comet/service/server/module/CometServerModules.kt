@@ -54,6 +54,7 @@ class GithubWebHookHandler : HttpHandler {
         val secretStatus = GitHubService.repos.checkSecret(signature, request, eventType)
 
         if (!checkSecretStatus(he, secretStatus, signature)) {
+            CometVariables.netLogger.log(HinaLogLevel.Debug, "Secret 校验失败", prefix = "WebHook")
             return
         }
 

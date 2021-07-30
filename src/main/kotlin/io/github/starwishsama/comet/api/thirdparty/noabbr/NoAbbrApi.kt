@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.noabbr.data.AbbrSearchRequest
 import io.github.starwishsama.comet.api.thirdparty.noabbr.data.AbbrSearchResponse
 import io.github.starwishsama.comet.utils.network.NetUtil
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 
 object NoAbbrApi : ApiExecutor {
@@ -26,7 +27,8 @@ object NoAbbrApi : ApiExecutor {
         val call = NetUtil.executeRequest(
             apiRouteURL,
             method = "POST",
-            body = mapper.writeValueAsString(AbbrSearchRequest(abbr)).trim().toRequestBody()
+            body = mapper.writeValueAsString(AbbrSearchRequest(abbr)).trim()
+                .toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
         )
 
         val responseBody = call.execute().body ?: return AbbrSearchResponse.empty()
@@ -36,7 +38,7 @@ object NoAbbrApi : ApiExecutor {
         val tree = mapper.readTree(responseString)
 
         if (tree.isNull || tree.isObject) {
-            daemonLogger.debug("解析能不能好好说话回调失败: 不是 JsonArray (${tree.nodeType})")
+            daemonLogger.warning("解析能不能好好说话回调失败: 回调结果异常 (${tree.nodeType})")
             return AbbrSearchResponse.empty()
         }
 
@@ -46,10 +48,10 @@ object NoAbbrApi : ApiExecutor {
 
         val firstNode = tree[0]
 
-        return if (firstNode.isTextual) {
-            mapper.readValue(firstNode.asText())
+        return if (firstNode.isObject) {
+            mapper.readValue(firstNode.traverse())
         } else {
-            daemonLogger.debug("解析能不能好好说话回调失败: 回调结果为空")
+            daemonLogger.warning("解析能不能好好说话回调失败: 回调结果异常 ${firstNode.nodeType}")
             AbbrSearchResponse.empty()
         }
     }

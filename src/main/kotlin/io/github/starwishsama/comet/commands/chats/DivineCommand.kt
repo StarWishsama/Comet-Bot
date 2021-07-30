@@ -26,8 +26,6 @@ import net.mamoe.mirai.message.data.MessageChain
 class DivineCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return if (args.isNotEmpty()) {
-            if (args.isEmpty()) return toChain("请检查需要占卜的字符是否超过上限或为空!")
-
             val randomEventName = args.getRestString(0)
             if (randomEventName.isNotBlank() && randomEventName.length < 30) {
                 val result = RandomResult(-1000, RandomUtil.randomDouble(0.0, 1.0), randomEventName)

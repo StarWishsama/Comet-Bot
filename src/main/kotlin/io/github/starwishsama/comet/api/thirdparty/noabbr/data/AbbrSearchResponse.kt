@@ -25,7 +25,7 @@ data class AbbrSearchResponse(
 
     fun toMessageWrapper(): MessageWrapper {
         if (name.isEmpty()) {
-            return MessageWrapper().setUsable(false)
+            return MessageWrapper().addText("找不到对应结果")
         }
 
         if (trans.isEmpty() && inputting.isNotEmpty()) {

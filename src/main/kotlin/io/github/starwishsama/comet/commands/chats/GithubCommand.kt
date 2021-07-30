@@ -16,6 +16,7 @@ import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.service.command.GitHubService.getRepoList
+import io.github.starwishsama.comet.service.command.GitHubService.lookupRepo
 import io.github.starwishsama.comet.service.command.GitHubService.modifyRepo
 import io.github.starwishsama.comet.service.command.GitHubService.subscribeRepo
 import io.github.starwishsama.comet.service.command.GitHubService.unsubscribeRepo
@@ -31,10 +32,11 @@ class GithubCommand : ChatCommand, ConversationCommand {
         }
 
         return when (args[0]) {
-            "add", "sub" -> subscribeRepo(args, event)
-            "rm", "unsub" -> unsubscribeRepo(args, event)
-            "list", "ls" -> getRepoList(args, event)
-            "md", "modify" -> modifyRepo(args, event, this)
+            "add", "sub" -> subscribeRepo(user, args, event)
+            "rm", "unsub" -> unsubscribeRepo(user, args, event)
+            "list", "ls" -> getRepoList(user, args, event)
+            "md", "modify" -> modifyRepo(user, args, event, this)
+            "lookup", "cx" -> lookupRepo(args, event)
             else -> getHelp().convertToChain()
         }
     }
@@ -45,7 +47,7 @@ class GithubCommand : ChatCommand, ConversationCommand {
             listOf("gh", "git"),
             "订阅 Github 项目推送动态",
             "nbot.commands.github",
-            UserLevel.ADMIN
+            UserLevel.USER,
         )
 
     override fun getHelp(): String = """
@@ -55,6 +57,6 @@ class GithubCommand : ChatCommand, ConversationCommand {
     """.trimIndent()
 
     override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
-        event.subject.sendMessage(modifyRepo(event.message.contentToString().split(" "), event, this, session))
+        event.subject.sendMessage(modifyRepo(user, event.message.contentToString().split(" "), event, this, session))
     }
 }

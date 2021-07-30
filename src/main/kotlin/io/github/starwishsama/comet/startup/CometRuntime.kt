@@ -36,7 +36,6 @@ import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.server.CometServiceServer
-import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.RuntimeUtil
@@ -135,6 +134,7 @@ object CometRuntime {
                 GithubCommand(),
                 DiceCommand(),
                 PenguinStatCommand(),
+                NoAbbrCommand(),
                 // Console Command
                 StopCommand(),
                 DebugCommand(),
@@ -203,7 +203,7 @@ object CometRuntime {
 
         try {
             val customSuffix = cfg.webHookAddress.replace("http://", "").replace("https://", "").split("/")
-            cometServiceServer = CometServiceServer(cfg.webHookPort, customSuffix.getRestString(1, "/"))
+            cometServiceServer = CometServiceServer(cfg.webHookPort, customSuffix.last())
         } catch (e: Exception) {
             daemonLogger.warning("Comet 服务端启动失败", e)
         }
