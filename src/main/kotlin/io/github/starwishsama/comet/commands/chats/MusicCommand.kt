@@ -61,7 +61,6 @@ class MusicCommand : ChatCommand {
         )
 
     override fun getHelp(): String = """
-        ======= 命令帮助 =======
         /music [歌名] 点歌
         /music api 修改点歌来源
         /music mode 切换显示模式

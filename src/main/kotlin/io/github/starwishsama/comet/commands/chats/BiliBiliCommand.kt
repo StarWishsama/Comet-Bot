@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.SearchApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToWrapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserInfo
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
@@ -86,7 +87,7 @@ class BiliBiliCommand : ChatCommand {
                         val text = item.data.card.name + "\n粉丝数: " + item.data.follower.getBetterNumber() +
                                 "\n最近视频: " + (if (recentVideos != null) recentVideos.data.list.videoList[0].toString() else "没有投稿过视频") + "\n"
                         val dynamic = DynamicApi.getWrappedDynamicTimeline(item.data.card.mid)
-                        text.convertToChain() + getDynamicText(dynamic, event)
+                        text.convertToChain() + "\n" + getDynamicText(dynamic, event)
                     } else {
                         "找不到对应的B站用户".toChain()
                     }
@@ -122,6 +123,14 @@ class BiliBiliCommand : ChatCommand {
                     toChain("抱歉, 该命令仅限群聊使用!")
                 }
             }
+            "id" -> {
+                if (args[1].isNumeric()) {
+                    val dynamic = DynamicApi.getDynamicById(args[1].toLong())
+                    return dynamic.convertToWrapper().toMessageChain(event.subject)
+                } else {
+                    "请输入有效的动态 ID".toChain()
+                }
+            }
             else -> return getHelp().convertToChain()
         }
 
@@ -137,6 +146,7 @@ class BiliBiliCommand : ChatCommand {
         /bili info [用户名] 查看用户的动态
         /bili push 开启/关闭本群开播推送
         /bili refresh 刷新订阅UP主缓存
+        /bili id [动态 ID] 通过动态 ID 查询动态
     """.trimIndent()
 
     override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {

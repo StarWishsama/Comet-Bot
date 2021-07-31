@@ -21,7 +21,6 @@ import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-
 class HelpCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
@@ -39,7 +38,7 @@ class HelpCommand : ChatCommand {
         } else {
             val cmd = CommandManager.getCommand(args[0])
             return if (cmd != null) {
-                CometUtil.toChain("关于 /${cmd.name} 的帮助信息\n${cmd.getHelp()}")
+                CometUtil.toChain("关于 /${cmd.name} 的帮助信息\n${cmd.getHelp()}\n\n该命令还有其他别名可以使用: ${cmd.getProps().aliases}")
             } else {
                 CometUtil.toChain("该命令不存在哦")
             }

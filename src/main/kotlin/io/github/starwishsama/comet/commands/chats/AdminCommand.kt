@@ -46,7 +46,6 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
         CommandProps("admin", arrayListOf("管理", "管", "gl"), "机器人管理员命令", "nbot.commands.admin", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
-        ======= 命令帮助 =======
         /admin help 展示此帮助列表
         /admin permlist [用户] 查看用户拥有的权限
         /admin permadd [用户] [权限名] 给一个用户添加权限

@@ -54,6 +54,8 @@ class GithubCommand : ChatCommand, ConversationCommand {
         /gh add [仓库名称] 订阅 Github 项目推送动态
         /gh rm [仓库名称] 取消订阅 Github 项目推送动态
         /gh list 列出所有已订阅 Github 项目动态
+        /gh md [仓库名称] 编辑 Github 仓库推送状态
+        /gh cx [仓库名称] 查看 Github 仓库简略详情
     """.trimIndent()
 
     override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {

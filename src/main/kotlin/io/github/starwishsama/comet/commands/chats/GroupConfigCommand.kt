@@ -162,6 +162,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
         /group repeat 开启/关闭本群机器人复读功能
         /group autojoin 开启/关闭本群机器人自动接受加群请求
         /group func 启用/禁用本群可使用的命令
+        /group autoreply 设置自动回复
         /group newcomer 设置入群欢迎内容
     """.trimIndent()
 

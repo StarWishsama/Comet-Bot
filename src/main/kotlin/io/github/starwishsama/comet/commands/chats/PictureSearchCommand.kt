@@ -75,7 +75,6 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
     )
 
     override fun getHelp(): String = """
-        ======= 命令帮助 =======
         /ytst 以图搜图
         /ytst source [API名称] 修改搜图源
     """.trimIndent()

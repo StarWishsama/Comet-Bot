@@ -43,7 +43,6 @@ class DivineCommand : ChatCommand {
         CommandProps("divine", arrayListOf("zb", "占卜"), "占卜命令", "nbot.commands.divine", UserLevel.USER)
 
     override fun getHelp(): String = """
-         ======= 命令帮助 =======
          /zb [占卜内容] 占卜
     """.trimIndent()
 }

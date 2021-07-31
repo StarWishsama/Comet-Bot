@@ -64,7 +64,7 @@ class ArkNightCommand : ChatCommand {
         )
 
     override fun getHelp(): String = """
-         ============ 命令帮助 ============
-         /ark 单次寻访/十连寻访/[次数]
+         /ark 单次寻访/十连寻访/一井/[次数]
+         /ark pool 修改抽卡卡池
     """.trimIndent()
 }

@@ -68,7 +68,7 @@ class ClockInCommand : ChatCommand {
     override fun getProps(): CommandProps =
         CommandProps("clockin", arrayListOf("打卡", "dk"), "打卡命令", "nbot.commands.clockin", UserLevel.USER)
 
-    override fun getHelp(): String = ""
+    override fun getHelp(): String = "/dk 打卡"
 
     override fun hasPermission(user: CometUser, e: MessageEvent): Boolean = user.compareLevel(getProps().level)
 

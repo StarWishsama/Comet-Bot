@@ -61,8 +61,8 @@ class MuteCommand : ChatCommand {
         CommandProps("mute", arrayListOf("jy", "禁言"), "禁言", "nbot.commands.mute", UserLevel.USER)
 
     override fun getHelp(): String = """
-        ======= 命令帮助 =======
-        /mute [@/QQ/all] [禁言时长] 禁言
+        /mute [@/QQ] [禁言时长] 禁言
+        /mute all 全体禁言
         /mute [rand/random/抽奖/随机] 随机抽取一位群友禁言
         时长为 0 时解禁
     """.trimIndent()

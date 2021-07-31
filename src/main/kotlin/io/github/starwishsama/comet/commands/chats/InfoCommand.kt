@@ -55,7 +55,7 @@ class InfoCommand : ChatCommand {
                 delay(500)
                 (sb.toString().trim { it <= ' ' }).convertToChain()
             } else {
-                "数据不足".convertToChain()
+                "数据不足, 请等待系统更新".convertToChain()
             }
         } else {
             return getHelp().convertToChain()
@@ -66,7 +66,6 @@ class InfoCommand : ChatCommand {
         CommandProps("info", arrayListOf("cx", "查询"), "查询积分等", "nbot.commands.info", UserLevel.USER)
 
     override fun getHelp(): String = """
-        ======= 命令帮助 =======
         /cx 查询自己的积分信息
         /cx ph 查询积分排行榜
     """.trimIndent()
