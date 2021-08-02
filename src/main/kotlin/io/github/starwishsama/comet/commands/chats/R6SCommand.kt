@@ -36,18 +36,16 @@ class R6SCommand : ChatCommand {
                     return if (args.size <= 1) {
                         if (account.isNotEmpty()) {
                             event.subject.sendMessage(toChain("查询中..."))
-                            val result = R6StatsApi.getPlayerStat(account)
-                            val resultText = "\n" + result.toMessageChain(event.subject)
-                            if (event is GroupMessageEvent) event.sender.at() + resultText else resultText.toChain(false)
+                            val result = R6StatsApi.getPlayerStat(account).toMessageChain(event.subject)
+                            if (event is GroupMessageEvent) event.sender.at() + result else result
                         } else {
                             "你还未绑定育碧账号, 输入 /r6s bind [账号] 绑定快速查询战绩".toChain()
                         }
                     } else {
                         if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
                             event.subject.sendMessage(toChain("查询中..."))
-                            val result = R6StatsApi.getPlayerStat(args[1])
-                            val resultText = "\n" + result.toMessageChain(event.subject)
-                            if (event is GroupMessageEvent) event.sender.at() + resultText else resultText.toChain(false)
+                            val result = R6StatsApi.getPlayerStat(args[1]).toMessageChain(event.subject)
+                            if (event is GroupMessageEvent) event.sender.at() + result else result
                         } else {
                             toChain("你输入的 ID 不符合育碧用户名规范!")
                         }

@@ -38,7 +38,8 @@ class NoAbbrCommand : ChatCommand {
             "nbot.commands.noabbr",
             UserLevel.USER,
             consumerType = CommandExecuteConsumerType.POINT,
-            consumePoint = 0.1
+            consumePoint = 0.1,
+            needRecall = true
         )
 
     override fun getHelp(): String = """

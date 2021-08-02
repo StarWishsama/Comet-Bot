@@ -30,11 +30,11 @@ fun MessageChain.doFilter(): MessageChain {
             CometVariables.cfg.filterWords.forEach {
                 if (context.contains(it)) {
                     count++
-                    context = context.replace(it.toRegex(), " ")
-                }
-
-                if (count > 5) {
-                    return EmptyMessageChain
+                    var replaceText = ""
+                    repeat(it.length) {
+                        replaceText += "*"
+                    }
+                    context = context.replace(it.toRegex(), replaceText)
                 }
             }
             revampChain[i] = PlainText(context)

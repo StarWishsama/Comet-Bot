@@ -30,15 +30,15 @@ data class AbbrSearchResponse(
 
         if (trans.isEmpty() && inputting.isNotEmpty()) {
             return MessageWrapper().addText(
-                "你输入的可能是: ${inputting.subList(0, inputting.size.coerceAtMost(10))}\n" +
-                        "仅显示前十条可能结果"
+                "你输入的可能是: ${inputting.subList(0, inputting.size.coerceAtMost(3))}\n" +
+                        "仅显示前三条可能结果"
             )
         }
 
         if (trans.isNotEmpty()) {
             return MessageWrapper().addText(
-                "缩写对应的可能结果: ${trans.subList(0, trans.size.coerceAtMost(10))}\n" +
-                        "仅显示前十条可能结果"
+                "缩写对应的可能结果: ${trans.subList(0, trans.size.coerceAtMost(3))}\n" +
+                        "仅显示前三条可能结果"
             )
         }
 

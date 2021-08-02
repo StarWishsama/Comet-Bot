@@ -31,6 +31,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.isContentEmpty
 import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 
 /**
  * 彗星 Bot 消息处理器
@@ -53,7 +54,11 @@ object MessageHandler {
                         val filtered = result.msg.doFilter()
 
                         if (result.status.isOk() && !filtered.isContentEmpty()) {
-                            this.subject.sendMessage(filtered)
+                            val recipient = this.subject.sendMessage(filtered)
+
+                            if (result.cmd?.getProps()?.needRecall == true) {
+                                recipient.recallIn(TimeUnit.SECONDS.convert(10, TimeUnit.MILLISECONDS))
+                            }
                         }
                     } catch (e: IllegalArgumentException) {
                         CometVariables.logger.warning("正在尝试发送空消息, 执行的命令为 $result")
