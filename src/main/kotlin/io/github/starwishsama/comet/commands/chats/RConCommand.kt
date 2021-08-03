@@ -36,7 +36,7 @@ class RConCommand : ChatCommand, ConversationCommand {
     private val waitList = mutableMapOf<CometUser, Int>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
-        if (user.hasPermission(getProps().permission)) {
+        if (user.hasPermission(props.permission)) {
             if (args.isEmpty()) {
                 return getHelp().convertToChain()
             } else if (SessionHandler.hasSessionByID(event.sender.id, this::class.java)) {
@@ -75,7 +75,7 @@ class RConCommand : ChatCommand, ConversationCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps("rcon", arrayListOf("执行命令"), "远程遥控MC服务器", "nbot.commands.rcon", UserLevel.USER)
 
     override fun getHelp(): String = """

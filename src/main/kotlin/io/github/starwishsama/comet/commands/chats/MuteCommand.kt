@@ -57,7 +57,7 @@ class MuteCommand : ChatCommand {
         }
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps("mute", arrayListOf("jy", "禁言"), "禁言", "nbot.commands.mute", UserLevel.USER)
 
     override fun getHelp(): String = """
@@ -73,6 +73,6 @@ class MuteCommand : ChatCommand {
             val cfg = GroupConfigManager.getConfigOrNew(e.group.id)
             if (cfg.isHelper(e.sender.id)) return true
         }
-        return user.hasPermission(getProps().permission)
+        return user.hasPermission(props.permission)
     }
 }

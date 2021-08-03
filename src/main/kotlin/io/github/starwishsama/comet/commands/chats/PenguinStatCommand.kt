@@ -38,7 +38,7 @@ class PenguinStatCommand : ChatCommand {
         }
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps(
             "penguinstats",
             listOf("企鹅物流", "pgs"),

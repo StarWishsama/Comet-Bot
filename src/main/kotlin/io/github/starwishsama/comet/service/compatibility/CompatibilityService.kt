@@ -77,7 +77,6 @@ object CompatibilityService {
             this.biliPushEnabled = cfg.biliPushEnabled
             this.canRepeat = cfg.doRepeat
             this.groupFilterWords.addAll(cfg.groupFilterWords)
-            this.disabledCommands.addAll(cfg.disabledCommands)
         }
 
         GroupConfigManager.addConfig(new)

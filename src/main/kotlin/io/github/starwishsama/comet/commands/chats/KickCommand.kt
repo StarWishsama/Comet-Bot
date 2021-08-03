@@ -45,7 +45,7 @@ class KickCommand : ChatCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps("kick", arrayListOf("tr", "踢人"), "踢人", "nbot.commands.kick", UserLevel.USER)
 
     override fun getHelp(): String = """
@@ -60,7 +60,7 @@ class KickCommand : ChatCommand {
             if (cfg.isHelper(user.id)) return true
         }
 
-        return user.hasPermission(getProps().permission)
+        return user.hasPermission(props.permission)
     }
 
     private fun doKick(event: GroupMessageEvent, target: Long, reason: String) {

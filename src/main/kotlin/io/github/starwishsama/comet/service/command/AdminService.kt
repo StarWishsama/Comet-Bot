@@ -41,7 +41,7 @@ object AdminService {
                 val target: CometUser? = CometUtil.parseAtAsBotUser(event, args[1])
 
                 val validate =
-                    CommandManager.getCommands().parallelStream().filter { it.getProps().permission == args[2] }
+                    CommandManager.getCommands().parallelStream().filter { it.props.permission == args[2] }
                         .findAny().isPresent
 
                 return if (validate) {

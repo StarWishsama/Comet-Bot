@@ -42,7 +42,7 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
         }
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps("admin", arrayListOf("管理", "管", "gl"), "机器人管理员命令", "nbot.commands.admin", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
@@ -53,7 +53,7 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
     """.trimIndent()
 
     override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        val bLevel = getProps().level
+        val bLevel = props.level
         if (user.compareLevel(bLevel)) return true
         if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true
         return false

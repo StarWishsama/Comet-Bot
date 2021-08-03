@@ -68,7 +68,7 @@ class R6SCommand : ChatCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps("r6", arrayListOf("r6s", "彩六"), "彩虹六号数据查询", "nbot.commands.r6s", UserLevel.USER)
 
     override fun getHelp(): String = """

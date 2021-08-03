@@ -65,12 +65,12 @@ class ClockInCommand : ChatCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps("clockin", arrayListOf("打卡", "dk"), "打卡命令", "nbot.commands.clockin", UserLevel.USER)
 
     override fun getHelp(): String = "/dk 打卡"
 
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean = user.compareLevel(getProps().level)
+    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean = user.compareLevel(props.level)
 
     private fun isClockIn(data: ClockInData, event: GroupMessageEvent): Boolean {
         if (data.checkedUsers.isNotEmpty()) {

@@ -41,7 +41,7 @@ class GithubCommand : ChatCommand, ConversationCommand {
         }
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps(
             "github",
             listOf("gh", "git"),

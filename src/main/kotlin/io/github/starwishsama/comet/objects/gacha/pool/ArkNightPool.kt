@@ -168,12 +168,13 @@ class ArkNightPool(
      * 明日方舟抽卡结果
      */
     fun getArkDrawResult(user: CometUser, time: Int = 1): GachaResult {
-        return if (GachaUtil.checkHasGachaTime(user, time)) {
-            user.consumePoint(time * 0.1)
-            doDraw(time)
+        return doDraw(time)
+        /**return if (GachaUtil.checkHasGachaTime(user, time)) {
+        user.consumePoint(time * 0.1)
+        doDraw(time)
         } else {
-            GachaResult()
-        }
+        GachaResult()
+        }*/
     }
 
     /**

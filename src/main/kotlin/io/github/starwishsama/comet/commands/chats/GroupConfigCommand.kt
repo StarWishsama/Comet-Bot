@@ -11,6 +11,7 @@
 package io.github.starwishsama.comet.commands.chats
 
 
+import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
@@ -94,7 +95,9 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                             )
                         }
 
-                        return cfg.disableCommand(args[1]).msg.toChain()
+                        val cmd = CommandManager.getCommand(args[1])
+
+                        return cmd?.props?.disableCommand(event.group.id)?.msg?.toChain() ?: "找不到对应命令".toChain()
                     }
                     "autoreply", "ar", "自动回复", "关键词", "keyword", "kw" -> {
                         if (args.size == 1) {
@@ -154,7 +157,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
         }
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps("group", arrayListOf("群设置", "gs"), "设置群内设置", "nbot.commands.groupconfig", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
@@ -167,7 +170,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
     """.trimIndent()
 
     override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        val level = getProps().level
+        val level = props.level
         if (user.compareLevel(level)) return true
         if (e is GroupMessageEvent && e.sender.permission > MemberPermission.MEMBER) return true
         return false

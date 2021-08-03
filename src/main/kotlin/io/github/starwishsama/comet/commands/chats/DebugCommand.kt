@@ -148,9 +148,9 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps {
-        return CommandProps("debug", mutableListOf(), "Debug", "nbot.commands.debug", UserLevel.ADMIN)
-    }
+    override var props: CommandProps =
+        CommandProps("debug", mutableListOf(), "Debug", "nbot.commands.debug", UserLevel.ADMIN)
+
 
     override fun getHelp(): String = "调试命令会随时变动, 请自行查阅代码"
 

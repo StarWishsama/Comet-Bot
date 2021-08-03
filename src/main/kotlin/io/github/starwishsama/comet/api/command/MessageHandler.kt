@@ -12,7 +12,6 @@ package io.github.starwishsama.comet.api.command
 
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.utils.CometUtil.toChain
@@ -56,7 +55,7 @@ object MessageHandler {
                         if (result.status.isOk() && !filtered.isContentEmpty()) {
                             val recipient = this.subject.sendMessage(filtered)
 
-                            if (result.cmd?.getProps()?.needRecall == true) {
+                            if (result.cmd?.props?.needRecall == true) {
                                 recipient.recallIn(TimeUnit.SECONDS.convert(10, TimeUnit.MILLISECONDS))
                             }
                         }
@@ -85,7 +84,7 @@ object MessageHandler {
 
         val cmd = CommandManager.getCommand(CommandManager.getCommandName(message))
 
-        val useDebug = cmd?.getProps()?.name?.contentEquals("debug") == true
+        val useDebug = cmd?.props?.name?.contentEquals("debug") == true
 
         val user = CometUser.getUserOrRegister(senderId)
 
@@ -108,13 +107,12 @@ object MessageHandler {
                     return ExecutedResult(EmptyMessageChain, null, CommandStatus.NotACommand())
                 }
 
-                val useStatus = validateUseStatus(user, cmd.getProps())
+                val useStatus = validateUseStatus(user, cmd.props)
 
                 /**
                  * 检查是否在尝试执行被禁用命令
                  */
-                if (event is GroupMessageEvent && GroupConfigManager.getConfigOrNew(event.group.id)
-                        .isDisabledCommand(cmd)
+                if (event is GroupMessageEvent && cmd.props.isDisabledCommand(event.group.id)
                 ) {
                     return if (useStatus) {
                         ExecutedResult(toChain("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
@@ -124,10 +122,10 @@ object MessageHandler {
                 }
 
                 if (!useStatus) {
-                    return if (cmd.getProps().consumerType == CommandExecuteConsumerType.POINT) {
+                    return if (cmd.props.consumerType == CommandExecuteConsumerType.POINT) {
                         val response = CometVariables.localizationManager.getLocalizationText("message.no-enough-point")
                             .replace("%point%", user.checkInPoint.toString())
-                            .replace("%cost%", cmd.getProps().consumePoint.toString())
+                            .replace("%cost%", cmd.props.consumePoint.toString())
                         ExecutedResult(response.toChain(), cmd, CommandStatus.Success())
                     } else {
                         ExecutedResult(EmptyMessageChain, cmd, CommandStatus.Success())

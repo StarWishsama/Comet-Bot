@@ -11,6 +11,7 @@
 package io.github.starwishsama.comet.api.command
 
 import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.enums.UserLevel
 
 data class CommandProps(
@@ -22,4 +23,36 @@ data class CommandProps(
     val consumerType: CommandExecuteConsumerType = CommandExecuteConsumerType.COOLDOWN,
     val consumePoint: Double = CometVariables.cfg.coolDownTime.toDouble(),
     val needRecall: Boolean = false,
-)
+    val enabled: Boolean = true,
+    val disableGroup: MutableSet<Long> = mutableSetOf()
+) {
+    fun isDisabledCommand(id: Long): Boolean {
+        return disableGroup.contains(id)
+    }
+
+    fun disableCommand(id: Long): ConfigureCommandStatus {
+        val command = CommandManager.getCommand(name)
+        if (command != null) {
+            if (command is UnDisableableCommand) {
+                return ConfigureCommandStatus.UnDisabled
+            }
+
+            return if (!command.props.disableGroup.contains(id)) {
+                command.props.disableGroup.add(id)
+                ConfigureCommandStatus.Disabled
+            } else {
+                command.props.disableGroup.remove(id)
+                ConfigureCommandStatus.Enabled
+            }
+        } else {
+            return ConfigureCommandStatus.NotExist
+        }
+    }
+
+    sealed class ConfigureCommandStatus(val msg: String) {
+        object UnDisabled : ConfigureCommandStatus("该命令无法被禁用!")
+        object Enabled : ConfigureCommandStatus("成功启用该命令")
+        object Disabled : ConfigureCommandStatus("成功禁用该命令")
+        object NotExist : ConfigureCommandStatus("该命令不存在!")
+    }
+}

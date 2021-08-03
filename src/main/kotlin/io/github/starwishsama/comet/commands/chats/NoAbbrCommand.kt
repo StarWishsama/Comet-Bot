@@ -30,7 +30,7 @@ class NoAbbrCommand : ChatCommand {
         return NoAbbrService.parseAbbr(event, args.getRestString(0))
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps(
             "noabbr",
             listOf("nbnhhsh", "hhsh", "解析缩写", "能不能好好说话"),

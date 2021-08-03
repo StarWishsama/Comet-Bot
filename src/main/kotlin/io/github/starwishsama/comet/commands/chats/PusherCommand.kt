@@ -36,7 +36,7 @@ class PusherCommand : ChatCommand {
         }
     }
 
-    override fun getProps(): CommandProps = CommandProps(
+    override var props: CommandProps = CommandProps(
         "pusher",
         arrayListOf("推送器", "tsq"),
         "管理 Comet 的所有推送器",

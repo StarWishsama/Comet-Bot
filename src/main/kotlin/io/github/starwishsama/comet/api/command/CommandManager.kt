@@ -30,7 +30,7 @@ object CommandManager {
      */
     private fun setupCommand(command: ChatCommand) {
         if (command.canRegister() && !commands.add(command)) {
-            CometVariables.logger.warning("[命令] 正在尝试注册已有命令 ${command.getProps().name}")
+            CometVariables.logger.warning("[命令] 正在尝试注册已有命令 ${command.props.name}")
         }
     }
 
@@ -48,7 +48,7 @@ object CommandManager {
      * @param commands 要注册的命令集合
      */
     @Suppress("unused")
-    fun setupCommand(commands: Array<ChatCommand>) {
+    fun setupCommands(commands: Array<ChatCommand>) {
         commands.forEach {
             if (!CommandManager.commands.contains(it) && it.canRegister()) {
                 CommandManager.commands.add(it)
@@ -56,7 +56,7 @@ object CommandManager {
         }
     }
 
-    fun setupCommand(commands: Array<Any>) {
+    fun setupCommands(commands: Array<Any>) {
         commands.forEach {
             when (it) {
                 is ChatCommand -> setupCommand(it)
@@ -111,7 +111,7 @@ object CommandManager {
     }
 
     private fun isCommandNameEquals(cmd: ChatCommand, cmdName: String): Boolean {
-        val props = cmd.getProps()
+        val props = cmd.props
         when {
             props.name.contentEquals(cmdName) -> {
                 return true

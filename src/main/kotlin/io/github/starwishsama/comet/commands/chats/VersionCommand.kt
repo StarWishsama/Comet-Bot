@@ -32,15 +32,14 @@ class VersionCommand : ChatCommand {
                 "\nMade with ❤ & Mirai ${BuildConfig.miraiVersion}").convertToChain()
     }
 
-    override fun getProps(): CommandProps {
-        return CommandProps(
+    override var props: CommandProps =
+        CommandProps(
             "version",
             arrayListOf("v", "版本", "comet", "status"),
             "查看版本号",
             "nbot.commands.version",
             UserLevel.USER
         )
-    }
 
     override fun getHelp(): String = ""
 }

@@ -50,7 +50,7 @@ class MusicCommand : ChatCommand {
         }
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps(
             "music",
             arrayListOf("dg", "点歌", "歌"),

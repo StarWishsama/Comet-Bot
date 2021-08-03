@@ -32,7 +32,7 @@ class CheckInCommand : ChatCommand {
         return handleCheckIn(event, user)
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps("clock", arrayListOf("签到", "qd"), "签到命令", "nbot.commands.clock", UserLevel.USER)
 
     override fun getHelp(): String = "/qd 签到"

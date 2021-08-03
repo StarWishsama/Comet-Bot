@@ -29,7 +29,7 @@ class HelpCommand : ChatCommand {
                 append("\n[")
                 for (cmd in CommandManager.getCommands()) {
                     if (!cmd.isHidden) {
-                        append(cmd.getProps().name).append(", ")
+                        append(cmd.props.name).append(", ")
                     }
                 }
             }.removeSuffix(", ").plus("]")
@@ -38,14 +38,14 @@ class HelpCommand : ChatCommand {
         } else {
             val cmd = CommandManager.getCommand(args[0])
             return if (cmd != null) {
-                CometUtil.toChain("关于 /${cmd.name} 的帮助信息\n${cmd.getHelp()}\n\n该命令还有其他别名可以使用: ${cmd.getProps().aliases}")
+                CometUtil.toChain("关于 /${cmd.name} 的帮助信息\n${cmd.getHelp()}\n\n该命令还有其他别名可以使用: ${cmd.props.aliases}")
             } else {
                 CometUtil.toChain("该命令不存在哦")
             }
         }
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps("help", arrayListOf("?", "帮助", "菜单"), "帮助命令", "nbot.commands.help", UserLevel.USER)
 
     // 它自己就是帮助命令 不需要再帮了

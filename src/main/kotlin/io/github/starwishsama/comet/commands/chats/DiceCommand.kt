@@ -41,15 +41,14 @@ class DiceCommand : ChatCommand {
         return "结果: ${args[0]}=${result.convertToString()}".toChain()
     }
 
-    override fun getProps(): CommandProps {
-        return CommandProps(
+    override var props: CommandProps =
+        CommandProps(
             "dice",
             listOf("tz", "骰子"),
             "投骰子",
             "nbot.commands.dice",
             UserLevel.USER
         )
-    }
 
     override fun getHelp(): String = """
         /dice [指定方法] 投骰子

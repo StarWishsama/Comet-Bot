@@ -26,17 +26,17 @@ interface ChatCommand {
     suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain
 
     /** 命令属性 */
-    fun getProps(): CommandProps
+    var props: CommandProps
 
     /** 命令帮助文本 必填 */
     fun getHelp(): String
 
     /** 判断用户是否有权限使用该命令, 有必要时可以重载 */
     fun hasPermission(user: CometUser, e: MessageEvent): Boolean =
-        user.compareLevel(getProps().level) || user.hasPermission(getProps().permission)
+        user.compareLevel(props.level) || user.hasPermission(props.permission)
 
     val name: String
-        get() = getProps().name
+        get() = props.name
 
     val isHidden: Boolean
         get() = false

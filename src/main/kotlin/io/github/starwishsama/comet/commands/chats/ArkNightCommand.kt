@@ -53,14 +53,14 @@ class ArkNightCommand : ChatCommand {
         }
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps(
             "arknight",
             arrayListOf("ark", "xf", "方舟寻访"),
             "明日方舟寻访模拟器",
             "nbot.commands.arknight",
             UserLevel.USER,
-            consumePoint = 15.0
+            consumePoint = 5.0
         )
 
     override fun getHelp(): String = """

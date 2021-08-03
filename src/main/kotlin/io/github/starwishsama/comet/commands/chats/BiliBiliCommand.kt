@@ -137,7 +137,7 @@ class BiliBiliCommand : ChatCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps =
+    override var props: CommandProps =
         CommandProps("bili", arrayListOf(), "订阅查询B站主播/用户动态", "nbot.commands.bili", UserLevel.USER)
 
     override fun getHelp(): String = """
@@ -150,7 +150,7 @@ class BiliBiliCommand : ChatCommand {
     """.trimIndent()
 
     override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        val level = getProps().level
+        val level = props.level
         if (user.compareLevel(level)) return true
         if (e is GroupMessageEvent && e.sender.permission >= MemberPermission.MEMBER) return true
         return false
