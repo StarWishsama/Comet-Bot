@@ -22,7 +22,6 @@ data class CommandProps(
     val level: UserLevel,
     val consumerType: CommandExecuteConsumerType = CommandExecuteConsumerType.COOLDOWN,
     val consumePoint: Double = CometVariables.cfg.coolDownTime.toDouble(),
-    val needRecall: Boolean = false,
     val enabled: Boolean = true,
     val disableGroup: MutableSet<Long> = mutableSetOf()
 ) {

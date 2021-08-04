@@ -11,6 +11,7 @@
 package io.github.starwishsama.comet.api.command
 
 import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.api.command.interfaces.CallbackCommand
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.sessions.SessionHandler
@@ -30,7 +31,6 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.isContentEmpty
 import java.time.LocalDateTime
-import java.util.concurrent.TimeUnit
 
 /**
  * 彗星 Bot 消息处理器
@@ -53,10 +53,10 @@ object MessageHandler {
                         val filtered = result.msg.doFilter()
 
                         if (result.status.isOk() && !filtered.isContentEmpty()) {
-                            val recipient = this.subject.sendMessage(filtered)
+                            val receipt = this.subject.sendMessage(filtered)
 
-                            if (result.cmd?.props?.needRecall == true) {
-                                recipient.recallIn(TimeUnit.SECONDS.convert(10, TimeUnit.MILLISECONDS))
+                            if (result.cmd is CallbackCommand) {
+                                result.cmd.handleReceipt(receipt)
                             }
                         }
                     } catch (e: IllegalArgumentException) {
