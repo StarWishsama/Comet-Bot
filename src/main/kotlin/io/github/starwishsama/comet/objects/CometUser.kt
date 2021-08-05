@@ -25,7 +25,7 @@ data class CometUser(
     var level: UserLevel = UserLevel.USER,
     var checkInGroup: Long = 0,
     var lastExecuteTime: Long = -1,
-    private val permissions: MutableSet<String> = mutableSetOf(),
+    private val permissions: MutableList<String> = mutableListOf(),
 ) {
     fun addPoint(point: Number) {
         checkInPoint += point.toDouble()

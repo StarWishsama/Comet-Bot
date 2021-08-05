@@ -12,22 +12,16 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.api.command.CommandExecuteConsumerType
 import io.github.starwishsama.comet.api.command.CommandProps
-import io.github.starwishsama.comet.api.command.interfaces.CallbackCommand
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.service.command.NoAbbrService
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.CometUtil.toChain
-import io.github.starwishsama.comet.utils.TaskUtil
-import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.data.MessageChain
-import java.util.concurrent.TimeUnit
 
-class NoAbbrCommand : ChatCommand, CallbackCommand {
+class NoAbbrCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             return getHelp().toChain()
@@ -45,6 +39,7 @@ class NoAbbrCommand : ChatCommand, CallbackCommand {
             UserLevel.USER,
             consumerType = CommandExecuteConsumerType.POINT,
             consumePoint = 0.1,
+            needRecall = true
         )
 
     override fun getHelp(): String = """
@@ -52,10 +47,4 @@ class NoAbbrCommand : ChatCommand, CallbackCommand {
         
 能不能好好说话?        
     """.trimIndent()
-
-    override fun handleReceipt(receipt: MessageReceipt<Contact>) {
-        TaskUtil.runAsync(20, TimeUnit.SECONDS) {
-            runBlocking { receipt.recall() }
-        }
-    }
 }

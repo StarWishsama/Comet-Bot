@@ -10,20 +10,17 @@
 
 package io.github.starwishsama.comet.api.command.interfaces
 
-import io.github.starwishsama.comet.api.command.CommandProps
+import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.sessions.Session
+import net.mamoe.mirai.event.events.MessageEvent
 
 /**
- * 控制台命令接口
- * 支持控制台环境下处理命令
+ * 交互式命令
  *
- * @author StarWishsama
+ * 支持接受输入内容并处理.
+ *
+ * 需要创建一个 [Session] 以触发监听
  */
-interface ConsoleCommand {
-    /** 执行命令后的逻辑 */
-    suspend fun execute(args: List<String>): String
-
-    /** 命令属性 */
-    fun getProps(): CommandProps
-
-    fun getHelp(): String
+interface ConversationCommand {
+    suspend fun handle(event: MessageEvent, user: CometUser, session: Session)
 }

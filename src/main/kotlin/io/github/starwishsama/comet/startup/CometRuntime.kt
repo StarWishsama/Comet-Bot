@@ -11,12 +11,9 @@
 package io.github.starwishsama.comet.startup
 
 import io.github.starwishsama.comet.BuildConfig
-import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.cfg
-import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.CometVariables.cometServiceServer
-import io.github.starwishsama.comet.CometVariables.consoleCommandLogger
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.logger
 import io.github.starwishsama.comet.api.command.CommandManager
@@ -26,30 +23,21 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.chats.*
-import io.github.starwishsama.comet.commands.console.BroadcastCommand
-import io.github.starwishsama.comet.commands.console.DebugCommand
-import io.github.starwishsama.comet.commands.console.StopCommand
 import io.github.starwishsama.comet.file.DataSaveHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
-import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.server.CometServiceServer
-import io.github.starwishsama.comet.utils.FileUtil
-import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
-import kotlinx.coroutines.isActive
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.globalEventChannel
 import okhttp3.OkHttpClient
-import org.jline.reader.EndOfFileException
-import org.jline.reader.UserInterruptException
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.time.LocalDateTime
@@ -58,11 +46,6 @@ import java.util.concurrent.TimeUnit
 object CometRuntime {
     fun postSetup() {
         CometVariables.startTime = LocalDateTime.now()
-        CometVariables.loggerAppender = LoggerAppender(FileUtil.getLogLocation())
-        CometVariables.miraiLoggerAppender = LoggerAppender(FileUtil.getLogLocation("mirai"))
-        CometVariables.miraiNetLoggerAppender = LoggerAppender(FileUtil.getLogLocation("mirai-net"))
-
-        Runtime.getRuntime().addShutdownHook(Thread { shutdownTask() })
 
         logger.info(
             """
@@ -95,7 +78,7 @@ object CometRuntime {
             .build()
     }
 
-    private fun shutdownTask() {
+    fun shutdownTask() {
         logger.info("[Bot] 正在关闭 Bot...")
         DataSetup.saveAllResources()
         CommandPropsManager.save()
@@ -115,7 +98,7 @@ object CometRuntime {
                 BiliBiliCommand(),
                 CheckInCommand(),
                 ClockInCommand(),
-                io.github.starwishsama.comet.commands.chats.DebugCommand(),
+                DebugCommand(),
                 DivineCommand(),
                 GuessNumberCommand(),
                 HelpCommand(),
@@ -137,11 +120,6 @@ object CometRuntime {
                 DiceCommand(),
                 PenguinStatCommand(),
                 NoAbbrCommand(),
-                // Console Command
-                StopCommand(),
-                DebugCommand(),
-                io.github.starwishsama.comet.commands.console.AdminCommand(),
-                BroadcastCommand()
             )
         )
 
@@ -230,27 +208,6 @@ object CometRuntime {
 
         TaskUtil.runScheduleTaskAsync(1, 1, TimeUnit.HOURS) {
             RuntimeUtil.forceGC()
-        }
-    }
-
-    fun handleConsoleCommand() {
-        TaskUtil.runAsync {
-            consoleCommandLogger.log(HinaLogLevel.Info, "后台已启用", prefix = "后台管理")
-
-            while (comet.getBot().isActive) {
-                var line: String
-
-                try {
-                    line = CometApplication.console.readLine(">")
-                    val result = MessageHandler.dispatchConsoleCommand(line)
-                    if (result.isNotEmpty()) {
-                        consoleCommandLogger.info(result)
-                    }
-                } catch (ignored: EndOfFileException) {
-                } catch (ignored: UserInterruptException) {
-                }
-
-            }
         }
     }
 }

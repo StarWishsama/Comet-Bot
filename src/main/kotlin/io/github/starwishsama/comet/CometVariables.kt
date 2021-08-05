@@ -28,7 +28,6 @@ import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
 import io.github.starwishsama.comet.service.server.CometServiceServer
-import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.json.LocalDateTimeConverter
 import io.github.starwishsama.comet.utils.json.WrapperConverter
@@ -53,7 +52,7 @@ import java.util.concurrent.ConcurrentHashMap
 @OptIn(MiraiInternalApi::class)
 object CometVariables {
     internal val filePath: File by lazy {
-        FileUtil.getJarLocation()
+        CometPlugin.dataFolder
     }
 
     val comet: Comet = Comet()
@@ -70,43 +69,18 @@ object CometVariables {
 
     internal var cometServiceServer: CometServiceServer? = null
 
-    internal val logAction: (String) -> Unit = {
-        CometApplication.console.printAbove(it)
-        if (::loggerAppender.isInitialized) {
-            loggerAppender.appendLog(it)
-        }
-    }
-
-    val logger: HinaLogger = HinaLogger("Comet", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+    val logger: HinaLogger = HinaLogger("Comet", debugMode = cfg.debugMode)
 
     internal val netLogger: HinaLogger by lazy {
-        HinaLogger("CometNet", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+        HinaLogger("CometNet", debugMode = cfg.debugMode)
     }
 
     internal val daemonLogger: HinaLogger by lazy {
-        HinaLogger("CometService", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+        HinaLogger("CometService", debugMode = cfg.debugMode)
     }
 
     internal val consoleCommandLogger: HinaLogger by lazy {
-        HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
-    }
-
-    internal val miraiLogger: HinaLogger by lazy {
-        HinaLogger("mirai", logAction = {
-            CometApplication.console.printAbove(it)
-            if (::miraiLoggerAppender.isInitialized) {
-                miraiLoggerAppender.appendLog(it)
-            }
-        }, debugMode = cfg.debugMode)
-    }
-
-    internal val miraiNetLogger: HinaLogger by lazy {
-        HinaLogger("miraiNet", logAction = {
-            CometApplication.console.printAbove(it)
-            if (::miraiNetLoggerAppender.isInitialized) {
-                miraiNetLoggerAppender.appendLog(it)
-            }
-        }, debugMode = cfg.debugMode)
+        HinaLogger("CometConsole", debugMode = cfg.debugMode)
     }
 
     val mapper: ObjectMapper = ObjectMapper()

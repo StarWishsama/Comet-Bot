@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.logger
 
-import io.github.starwishsama.comet.CometApplication
+import io.github.starwishsama.comet.CometPlugin
 import io.github.starwishsama.comet.utils.AnsiUtil
 import io.github.starwishsama.comet.utils.StringUtil
 import java.time.LocalDateTime
@@ -19,8 +19,8 @@ import java.time.format.DateTimeFormatter
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 class HinaLogger(
     val loggerName: String,
-    val logAction: (String) -> Unit = {
-        CometApplication.console.printAbove(it)
+    val logAction: (HinaLogLevel, String) -> Unit = { level, log ->
+        default(level, log)
     },
     var debugMode: Boolean = false,
     var outputBeautyTrace: Boolean = false,
@@ -67,6 +67,7 @@ class HinaLogger(
         }
 
         logAction(
+            level,
             "${level.color}${dateTimeFormatter.format(LocalDateTime.now())} ${level.internalName}/${level.simpleName}" +
                     "${if (level != HinaLogLevel.Verbose && level != HinaLogLevel.Info && level != HinaLogLevel.Warn) "($executorInfo)" else ""} " +
                     "$loggerName -> ${if (prefix.isEmpty()) "" else "$prefix "}$message"
@@ -132,6 +133,18 @@ class HinaLogger(
 
     fun fatal(content: String?) {
         log(HinaLogLevel.Fatal, content)
+    }
+
+    companion object {
+        fun default(level: HinaLogLevel, log: String) {
+            when (level) {
+                HinaLogLevel.Info -> CometPlugin.logger.info(log)
+                HinaLogLevel.Error -> CometPlugin.logger.error(log)
+                HinaLogLevel.Warn, HinaLogLevel.Fatal, HinaLogLevel.Serve -> CometPlugin.logger.warning(log)
+                HinaLogLevel.Verbose -> CometPlugin.logger.verbose(log)
+                HinaLogLevel.Debug -> CometPlugin.logger.debug(log)
+            }
+        }
     }
 }
 

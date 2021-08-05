@@ -17,7 +17,7 @@ import cn.hutool.crypto.SecureUtil
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.Comet
-import io.github.starwishsama.comet.CometApplication
+import io.github.starwishsama.comet.CometPlugin
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
@@ -267,7 +267,7 @@ object FileUtil {
         try {
             daemonLogger.info("正在加载资源文件...")
             val resourcePath = "resources"
-            val jarFile = File(CometApplication.javaClass.protectionDomain.codeSource.location.path)
+            val jarFile = File(CometPlugin.javaClass.protectionDomain.codeSource.location.path)
 
             if (jarFile.isFile) {
                 copyFromJar(jarFile, resourcePath)

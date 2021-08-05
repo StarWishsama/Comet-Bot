@@ -25,11 +25,11 @@ data class CustomPool(
     val displayPoolName: String,
     @Comment("自定义卡池简介")
     val poolDescription: String,
-    @Comment(
-        """卡池内不需要干员的条件, 如 "公开招募" 则会屏蔽掉公招可获得的干员
+    /** @Comment(
+    """卡池内不需要干员的条件, 如 "公开招募" 则会屏蔽掉公招可获得的干员
     你也可以在 modifiedGachaItems 处手动添加不需要的卡池物品
     """
-    )
+    )*/
     val condition: List<String>,
     @Comment("修改卡池物品的获得概率")
     val modifiedGachaItems: List<ModifiedGachaItem>

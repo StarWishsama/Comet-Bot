@@ -11,7 +11,6 @@
 package io.github.starwishsama.comet.api.command
 
 import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.api.command.interfaces.CallbackCommand
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.sessions.SessionHandler
@@ -21,7 +20,6 @@ import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import io.github.starwishsama.comet.utils.doFilter
 import io.github.starwishsama.comet.utils.network.NetUtil
-import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -31,6 +29,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.isContentEmpty
 import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 
 /**
  * 彗星 Bot 消息处理器
@@ -53,10 +52,10 @@ object MessageHandler {
                         val filtered = result.msg.doFilter()
 
                         if (result.status.isOk() && !filtered.isContentEmpty()) {
-                            val receipt = this.subject.sendMessage(filtered)
+                            val recipient = this.subject.sendMessage(filtered)
 
-                            if (result.cmd is CallbackCommand) {
-                                result.cmd.handleReceipt(receipt)
+                            if (result.cmd?.props?.needRecall == true) {
+                                recipient.recallIn(TimeUnit.SECONDS.convert(10, TimeUnit.MILLISECONDS))
                             }
                         }
                     } catch (e: IllegalArgumentException) {
@@ -176,27 +175,6 @@ object MessageHandler {
                 }
             }
         }
-    }
-
-    /**
-     * 执行后台命令
-     *
-     * @param content 纯文本命令 (后台)
-     */
-    fun dispatchConsoleCommand(content: String): String {
-        try {
-            val cmd = CommandManager.getConsoleCommand(CommandManager.getCommandName(content))
-            if (cmd != null) {
-                val splitMessage = content.split(" ")
-                val splitCommand = splitMessage.subList(1, splitMessage.size)
-                CometVariables.logger.debug("[命令] 后台尝试执行命令: " + cmd.getProps().name)
-                return runBlocking { cmd.execute(splitCommand) }
-            }
-        } catch (t: Throwable) {
-            CometVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $content", t)
-            return ""
-        }
-        return ""
     }
 
     /**

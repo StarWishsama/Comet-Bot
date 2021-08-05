@@ -26,6 +26,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.21'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
     id 'com.github.gmazzo.buildconfig' version '3.0.2'
+    id("net.mamoe.mirai-console") version "2.7-RC-dev-3"
 }
 
 def mainClass = 'io.github.starwishsama.comet.CometApplication'
@@ -52,8 +53,6 @@ repositories {
 dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-core:1.2.2'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-
-    implementation("net.mamoe:mirai-core-all:$miraiVersion")
 
     implementation 'cn.hutool:hutool-http:5.7.6'
     implementation 'cn.hutool:hutool-crypto:5.7.6'
@@ -82,14 +81,10 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
 
-    // Jline a Java library for handling console input @ https://github.com/jline/jline3
-    implementation 'org.jline:jline:3.20.0'
-
-    // Jansi needed by JLine
-    implementation 'org.fusesource.jansi:jansi:2.3.4'
-
     // DNSJava used to srv lookup
     implementation 'dnsjava:dnsjava:3.4.0'
+
+    api 'org.fusesource.jansi:jansi:2.3.4'
 }
 
 tasks {

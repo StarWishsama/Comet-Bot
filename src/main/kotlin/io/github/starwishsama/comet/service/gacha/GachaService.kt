@@ -41,8 +41,6 @@ object GachaService {
     }
 
     fun loadAllPools() {
-        gachaPools.clear()
-
         // 载入默认卡池
         if (arkNightUsable) {
             gachaPools.add(ArkNightPool())

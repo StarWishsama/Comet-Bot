@@ -12,7 +12,6 @@ package io.github.starwishsama.comet.api.command
 
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 
 /**
  * 彗星 Bot 命令管理器
@@ -21,7 +20,6 @@ import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
  */
 object CommandManager {
     private val commands: MutableSet<ChatCommand> = mutableSetOf()
-    private val consoleCommands = mutableListOf<ConsoleCommand>()
 
     /**
      * 注册命令
@@ -34,36 +32,15 @@ object CommandManager {
         }
     }
 
-    private fun setupConsoleCommand(command: ConsoleCommand) {
-        if (!consoleCommands.contains(command)) {
-            consoleCommands.plusAssign(command)
-        } else {
-            CometVariables.logger.warning("[命令] 正在尝试注册已有后台命令 ${command.getProps().name}")
-        }
-    }
-
     /**
      * 注册命令
      *
      * @param commands 要注册的命令集合
      */
-    @Suppress("unused")
     fun setupCommands(commands: Array<ChatCommand>) {
         commands.forEach {
             if (!CommandManager.commands.contains(it) && it.canRegister()) {
                 CommandManager.commands.add(it)
-            }
-        }
-    }
-
-    fun setupCommands(commands: Array<Any>) {
-        commands.forEach {
-            when (it) {
-                is ChatCommand -> setupCommand(it)
-                is ConsoleCommand -> setupConsoleCommand(it)
-                else -> {
-                    CometVariables.logger.warning("[命令] 正在尝试注册非命令类 ${it.javaClass.simpleName}")
-                }
             }
         }
     }
@@ -74,15 +51,6 @@ object CommandManager {
         }.findFirst()
 
         return if (command.isPresent) command.get() else null
-    }
-
-    fun getConsoleCommand(cmdPrefix: String): ConsoleCommand? {
-        for (command in consoleCommands) {
-            if (isCommandNameEquals(command, cmdPrefix)) {
-                return command
-            }
-        }
-        return null
     }
 
     fun getCommandName(message: String): String {
@@ -129,27 +97,7 @@ object CommandManager {
         return false
     }
 
-    private fun isCommandNameEquals(cmd: ConsoleCommand, cmdName: String): Boolean {
-        val props = cmd.getProps()
-
-        when {
-            props.name.contentEquals(cmdName) -> {
-                return true
-            }
-            props.aliases.isNotEmpty() -> {
-                val name = props.aliases.parallelStream().filter { alias -> alias!!.contentEquals(cmdName) }.findFirst()
-                if (name.isPresent) {
-                    return true
-                }
-            }
-            else -> {
-                return false
-            }
-        }
-        return false
-    }
-
-    fun countCommands(): Int = commands.size + consoleCommands.size
+    fun countCommands(): Int = commands.size
 
     fun getCommands() = commands
 }
