@@ -27,6 +27,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.0.0'
     id 'com.github.gmazzo.buildconfig' version '3.0.2'
     id("net.mamoe.mirai-console") version "2.7-RC-dev-3"
+    id "org.jetbrains.kotlin.kapt" version "1.5.21"
 }
 
 def mainClass = 'io.github.starwishsama.comet.CometApplication'
@@ -85,6 +86,10 @@ dependencies {
     implementation 'dnsjava:dnsjava:3.4.0'
 
     api 'org.fusesource.jansi:jansi:2.3.4'
+
+    def autoService = "1.0-rc7"
+    kapt("com.google.auto.service:auto-service:$autoService")
+    compileOnly("com.google.auto.service:auto-service-annotations:$autoService")
 }
 
 tasks {

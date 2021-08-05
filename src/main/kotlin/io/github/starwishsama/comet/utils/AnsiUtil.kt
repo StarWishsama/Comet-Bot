@@ -10,8 +10,6 @@
 
 package io.github.starwishsama.comet.utils
 
-import org.fusesource.jansi.Ansi
-
 object AnsiUtil {
     enum class Color(private val format: String) {
         RESET("\u001b[0m"),
@@ -30,9 +28,7 @@ object AnsiUtil {
         LIGHT_YELLOW("\u001b[93m"),
         LIGHT_BLUE("\u001b[94m"),
         LIGHT_PURPLE("\u001b[95m"),
-        LIGHT_CYAN("\u001b[96m"),
-
-        DARK_RED(Ansi.ansi().fgRgb(170, 0, 0).toString());
+        LIGHT_CYAN("\u001b[96m");
 
         override fun toString(): String = format
     }
