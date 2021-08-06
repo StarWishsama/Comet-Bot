@@ -11,6 +11,7 @@
 package io.github.starwishsama.comet.service.task
 
 import io.github.starwishsama.comet.CometVariables.comet
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.utils.CometUtil.toChain
@@ -22,6 +23,7 @@ object GroupFileAutoRemover {
     private val cachePool = mutableSetOf<PerGroupConfig>()
 
     fun execute() {
+        daemonLogger.debug("正在自动删除群文件")
         val configs = GroupConfigManager.getAllConfigs()
 
         configs.forEach {
@@ -51,6 +53,8 @@ object GroupFileAutoRemover {
 
             val files = group.filesRoot.listFilesCollection()
 
+            var counter = 0
+
             for (file in files) {
                 if (file.isDirectory()) {
                     continue
@@ -61,15 +65,19 @@ object GroupFileAutoRemover {
                 if (handleTime - cfg.oldFileCleanDelay >= modifyTime) {
                     if (cfg.oldFileMatchPattern.isEmpty()) {
                         file.delete()
+                        counter++
                     } else if (Pattern.matches(cfg.oldFileMatchPattern, file.name)) {
                         file.delete()
+                        counter++
                     } else {
                         continue
                     }
                 }
             }
 
-            group.sendMessage("已自动删除本群过期文件.".toChain())
+            if (counter > 0) {
+                group.sendMessage("已自动删除本群过期文件, 共 $counter 个文件.".toChain())
+            }
         }
     }
 }
