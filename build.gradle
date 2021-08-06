@@ -91,7 +91,7 @@ dependencies {
     // DNSJava used to srv lookup
     implementation 'dnsjava:dnsjava:3.4.1'
 
-    implementation 'io.ktor:ktor-server-core:1.5.4'
+    implementation 'io.ktor:ktor-server-core:1.6.2'
     implementation 'io.ktor:ktor-server-netty:1.5.4'
 }
 
