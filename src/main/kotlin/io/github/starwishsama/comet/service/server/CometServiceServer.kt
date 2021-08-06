@@ -10,37 +10,59 @@
 
 package io.github.starwishsama.comet.service.server
 
-import com.sun.net.httpserver.HttpServer
 import io.github.starwishsama.comet.CometVariables.netLogger
 import io.github.starwishsama.comet.logger.HinaLogLevel
-import io.github.starwishsama.comet.service.server.module.GithubWebHookHandler
-import io.github.starwishsama.comet.utils.network.writeTextResponse
-import java.net.InetSocketAddress
+import io.github.starwishsama.comet.service.server.module.defaultModule
+import io.github.starwishsama.comet.service.server.module.githubWebHookModule
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 
 class CometServiceServer(port: Int, customSuffix: String) {
-    private val server: HttpServer = HttpServer.create(InetSocketAddress(port), 0)
+    val server: ApplicationEngine
 
     init {
-        server.createContext("/") {
-            it.writeTextResponse("Request URL is ${it.requestURI}")
-        }
-        server.createContext("/$customSuffix", GithubWebHookHandler())
-        netLogger.log(HinaLogLevel.Info, "已注册 Github WebHook 路由后缀: $customSuffix", prefix = "WebHook")
-        server.createContext("/test") { he ->
-            if (ServerUtil.checkCoolDown(he.remoteAddress)) {
-                he.sendResponseHeaders(500, 0)
-                return@createContext
+        server = embeddedServer(Netty, environment = applicationEngineEnvironment {
+            module {
+                defaultModule()
+                githubWebHookModule(customSuffix)
             }
 
-            he.writeTextResponse("Hello Comet")
-        }
+            connector {
+                this.port = port
+            }
+        })
+
+        server.start(false)
         netLogger.log(HinaLogLevel.Info, "服务器启动! 运行在端口 $port", prefix = "WebHook")
-        server.start()
     }
 
     fun stop() {
-        server.stop(0)
-        netLogger.log(HinaLogLevel.Info, "服务器已关闭", prefix = "WebHook")
+        server.stop(1000, 1000)
     }
+
+    /**private val server: HttpServer = HttpServer.create(InetSocketAddress(port), 0)
+
+    init {
+    server.createContext("/") {
+    it.writeTextResponse("Request URL is ${it.requestURI}")
+    }
+    server.createContext("/$customSuffix", GithubWebHookHandler())
+    netLogger.log(HinaLogLevel.Info, "已注册 Github WebHook 路由后缀: $customSuffix", prefix = "WebHook")
+    server.createContext("/test") { he ->
+    if (ServerUtil.checkCoolDown(he.remoteAddress)) {
+    he.sendResponseHeaders(500, 0)
+    return@createContext
+    }
+
+    he.writeTextResponse("Hello Comet")
+    }
+    netLogger.log(HinaLogLevel.Info, "服务器启动! 运行在端口 $port", prefix = "WebHook")
+    server.start()
+    }
+
+    fun stop() {
+    server.stop(0)
+    netLogger.log(HinaLogLevel.Info, "服务器已关闭", prefix = "WebHook")
+    }*/
 }
 
