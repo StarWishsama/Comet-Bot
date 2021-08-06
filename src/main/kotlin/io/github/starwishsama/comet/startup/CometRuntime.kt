@@ -37,6 +37,7 @@ import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.server.CometServiceServer
+import io.github.starwishsama.comet.service.task.GroupFileAutoRemover
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.RuntimeUtil
@@ -226,6 +227,10 @@ object CometRuntime {
             TaskUtil.runScheduleTaskAsync(it.duration.toLong(), it.duration.toLong(), TimeUnit.HOURS) {
                 it.resetTime()
             }
+        }
+
+        TaskUtil.runScheduleTaskAsync(1, 1, TimeUnit.HOURS) {
+            GroupFileAutoRemover.execute()
         }
 
         TaskUtil.runScheduleTaskAsync(1, 1, TimeUnit.HOURS) {
