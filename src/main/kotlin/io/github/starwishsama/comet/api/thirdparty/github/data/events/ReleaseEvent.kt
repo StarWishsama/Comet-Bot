@@ -56,7 +56,7 @@ data class ReleaseEvent(
         wrapper.addText("| 发布人 ${release.author.login}\n")
         wrapper.addText("| 发布版信息: \n")
         wrapper.addText("| ${release.title}\n")
-        wrapper.addText("| ${release.body.limitStringSize(50).trim()}")
+        wrapper.addText("| ${release.body.limitStringSize(50).trim()}\n")
         wrapper.addText("| 查看完整信息: ${release.url}")
 
         return wrapper
