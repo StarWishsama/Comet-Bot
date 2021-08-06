@@ -14,6 +14,8 @@ import io.github.starwishsama.comet.CometVariables.netLogger
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.service.server.module.defaultModule
 import io.github.starwishsama.comet.service.server.module.githubWebHookModule
+import io.ktor.application.*
+import io.ktor.features.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
@@ -23,6 +25,8 @@ class CometServiceServer(port: Int, customSuffix: String) {
     init {
         server = embeddedServer(Netty, environment = applicationEngineEnvironment {
             module {
+                install(CallLogging)
+
                 defaultModule()
                 githubWebHookModule(customSuffix)
             }

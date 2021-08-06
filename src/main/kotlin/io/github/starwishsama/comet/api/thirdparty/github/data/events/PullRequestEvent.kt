@@ -11,6 +11,7 @@
 package io.github.starwishsama.comet.api.thirdparty.github.data.events
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
@@ -23,9 +24,25 @@ data class PullRequestEvent(
     @JsonProperty("pull_request")
     val pullRequestInfo: PullRequestInfo,
     @JsonProperty("repository")
-    val repository: PushEvent.RepoInfo,
+    val repository: RepoInfo,
     val sender: IssueEvent.SenderInfo
 ) : GithubEvent {
+
+    data class RepoInfo(
+        val id: Long,
+        @JsonProperty("node_id")
+        val nodeID: String,
+        @JsonProperty("name")
+        val name: String,
+        @JsonProperty("full_name")
+        val fullName: String,
+        @JsonProperty("private")
+        val isPrivate: Boolean,
+        @JsonProperty("owner")
+        val owner: JsonNode,
+        @JsonProperty("html_url")
+        val repoUrl: String,
+    )
 
     data class PullRequestInfo(
         @JsonProperty("html_url")
