@@ -79,7 +79,16 @@ data class PerGroupConfig(
     var autoAcceptCondition: String = "",
 
     @JsonProperty("github_repo_subs")
-    val githubRepoSubscribers: MutableList<String> = mutableListOf()
+    val githubRepoSubscribers: MutableList<String> = mutableListOf(),
+
+    @JsonProperty("old_file_clean_feature")
+    var oldFileCleanFeature: Boolean = false,
+
+    @JsonProperty("old_file_clean_delay")
+    var oldFileCleanDelay: Long = 1000 * 60 * 60 * 24,
+
+    @JsonProperty("old_file_match_pattern")
+    var oldFileMatchPattern: String = ""
 ) {
 
     fun addHelper(id: Long): Boolean {

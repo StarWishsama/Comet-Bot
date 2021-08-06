@@ -45,6 +45,7 @@ class CometServiceServer(port: Int, customSuffix: String) {
     }
 
     /**private val server: HttpServer = HttpServer.create(InetSocketAddress(port), 0)
+
     init {
     server.createContext("/") {
     it.writeTextResponse("Request URL is ${it.requestURI}")
@@ -56,13 +57,16 @@ class CometServiceServer(port: Int, customSuffix: String) {
     he.sendResponseHeaders(500, 0)
     return@createContext
     }
+
     he.writeTextResponse("Hello Comet")
     }
     netLogger.log(HinaLogLevel.Info, "服务器启动! 运行在端口 $port", prefix = "WebHook")
     server.start()
     }
+
     fun stop() {
     server.stop(0)
     netLogger.log(HinaLogLevel.Info, "服务器已关闭", prefix = "WebHook")
     }*/
 }
+

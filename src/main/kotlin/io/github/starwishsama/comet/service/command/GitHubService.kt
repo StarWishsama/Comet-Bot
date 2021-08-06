@@ -29,6 +29,7 @@ import net.mamoe.yamlkt.Yaml.Default
 
 object GitHubService {
     val repos: GithubRepos
+
     private val editorCache = mutableMapOf<Session, GithubRepos.GithubRepo>()
 
     init {
