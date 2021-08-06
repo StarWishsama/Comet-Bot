@@ -13,7 +13,9 @@ package io.github.starwishsama.comet.service.task
 import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.contact.isAdministrator
 import java.util.regex.Pattern
 
 object GroupFileAutoRemover {
@@ -39,9 +41,14 @@ object GroupFileAutoRemover {
 
     private fun handlePerGroupFile(cfg: PerGroupConfig) {
         val group = comet.getBot().getGroup(cfg.id) ?: return
-        val handleTime = System.currentTimeMillis()
 
         runBlocking {
+            if (!group.botAsMember.isAdministrator()) {
+                group.sendMessage("机器人没有权限删除群文件, 任务已取消".toChain())
+            }
+
+            val handleTime = System.currentTimeMillis()
+
             val files = group.filesRoot.listFilesCollection()
 
             for (file in files) {
@@ -61,6 +68,8 @@ object GroupFileAutoRemover {
                     }
                 }
             }
+
+            group.sendMessage("已自动删除本群过期文件.".toChain())
         }
     }
 }
