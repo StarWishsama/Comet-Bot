@@ -17,5 +17,5 @@ interface GithubEvent {
 
     fun repoName(): String
 
-    fun sendable(): Boolean
+    fun isSendableEvent(): Boolean
 }

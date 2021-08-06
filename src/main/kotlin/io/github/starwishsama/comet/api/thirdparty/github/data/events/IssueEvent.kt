@@ -103,7 +103,7 @@ data class IssueEvent(
         return repository.fullName
     }
 
-    override fun sendable(): Boolean {
+    override fun isSendableEvent(): Boolean {
         return action == "opened" || action == "closed"
     }
 }

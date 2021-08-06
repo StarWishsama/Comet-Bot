@@ -90,6 +90,9 @@ dependencies {
     def autoService = "1.0-rc7"
     kapt("com.google.auto.service:auto-service:$autoService")
     compileOnly("com.google.auto.service:auto-service-annotations:$autoService")
+
+    implementation 'io.ktor:ktor-server-core:1.5.4'
+    implementation 'io.ktor:ktor-server-netty:1.5.4'
 }
 
 tasks {

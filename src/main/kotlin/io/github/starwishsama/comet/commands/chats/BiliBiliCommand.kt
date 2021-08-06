@@ -14,7 +14,6 @@ import io.github.starwishsama.comet.CometVariables.localizationManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.SearchApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToWrapper
@@ -113,7 +112,8 @@ class BiliBiliCommand : ChatCommand {
                     TaskUtil.runAsync {
                         cfg.biliSubscribers.forEach {
                             it.userName = DynamicApi.getUserNameByMid(it.id.toLong())
-                            it.roomID = LiveApi.getLiveInfo(it.id.toLong())?.data?.roomId ?: -1
+                            it.roomID = UserApi.userApiService.getUserInfo(it.id.toLong()).execute()
+                                .body()?.data?.liveRoomInfo?.roomID ?: -1
                             sleep(1_500)
                         }
                     }
@@ -270,7 +270,8 @@ class BiliBiliCommand : ChatCommand {
             }
         }
 
-        val roomNumber: Long = LiveApi.getLiveInfo(uid)?.data?.roomId ?: -1
+        val roomNumber: Long =
+            UserApi.userApiService.getUserInfo(uid).execute().body()?.data?.liveRoomInfo?.roomID ?: -1
 
         return if (!cfg.biliSubscribers.stream().filter { it.id.toLong() == uid }.findFirst().isPresent) {
             cfg.biliSubscribers.add(BiliBiliUser(uid.toString(), name, roomNumber))

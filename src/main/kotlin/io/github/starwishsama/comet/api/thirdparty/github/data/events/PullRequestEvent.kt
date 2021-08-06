@@ -11,6 +11,7 @@
 package io.github.starwishsama.comet.api.thirdparty.github.data.events
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
@@ -23,9 +24,25 @@ data class PullRequestEvent(
     @JsonProperty("pull_request")
     val pullRequestInfo: PullRequestInfo,
     @JsonProperty("repository")
-    val repository: PushEvent.RepoInfo,
+    val repository: RepoInfo,
     val sender: IssueEvent.SenderInfo
 ) : GithubEvent {
+
+    data class RepoInfo(
+        val id: Long,
+        @JsonProperty("node_id")
+        val nodeID: String,
+        @JsonProperty("name")
+        val name: String,
+        @JsonProperty("full_name")
+        val fullName: String,
+        @JsonProperty("private")
+        val isPrivate: Boolean,
+        @JsonProperty("owner")
+        val owner: JsonNode,
+        @JsonProperty("html_url")
+        val repoUrl: String,
+    )
 
     data class PullRequestInfo(
         @JsonProperty("html_url")
@@ -51,7 +68,7 @@ data class PullRequestEvent(
         wrapper.addText("| 发布人 ${sender.login}\n")
         wrapper.addText("| 提交更改信息: \n")
         wrapper.addText("| ${pullRequestInfo.title}\n")
-        wrapper.addText("| ${pullRequestInfo.body.limitStringSize(100).trim()}")
+        wrapper.addText("| ${pullRequestInfo.body.limitStringSize(100).trim()}\n")
         wrapper.addText("| 查看完整信息: ${pullRequestInfo.url}")
 
         return wrapper
@@ -59,5 +76,5 @@ data class PullRequestEvent(
 
     override fun repoName(): String = repository.fullName
 
-    override fun sendable(): Boolean = action == "opened"
+    override fun isSendableEvent(): Boolean = action == "opened"
 }
