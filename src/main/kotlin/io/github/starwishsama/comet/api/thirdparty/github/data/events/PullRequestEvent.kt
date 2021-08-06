@@ -76,5 +76,5 @@ data class PullRequestEvent(
 
     override fun repoName(): String = repository.fullName
 
-    override fun sendable(): Boolean = action == "opened"
+    override fun isSendableEvent(): Boolean = action == "opened"
 }

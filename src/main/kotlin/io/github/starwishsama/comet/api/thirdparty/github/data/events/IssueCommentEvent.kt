@@ -56,5 +56,5 @@ data class IssueCommentEvent(
 
     override fun repoName(): String = repository.fullName
 
-    override fun sendable(): Boolean = true
+    override fun isSendableEvent(): Boolean = true
 }

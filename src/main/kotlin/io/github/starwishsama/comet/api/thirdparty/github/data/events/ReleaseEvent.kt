@@ -64,5 +64,5 @@ data class ReleaseEvent(
 
     override fun repoName(): String = repository.fullName
 
-    override fun sendable(): Boolean = action == "released" || action == "prereleased"
+    override fun isSendableEvent(): Boolean = action == "released" || action == "prereleased"
 }

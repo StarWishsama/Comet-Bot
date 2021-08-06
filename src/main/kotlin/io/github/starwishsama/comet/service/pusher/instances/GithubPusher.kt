@@ -18,7 +18,7 @@ import kotlinx.coroutines.runBlocking
 
 object GithubPusher {
     fun push(event: GithubEvent) {
-        if (!event.sendable()) {
+        if (!event.isSendableEvent()) {
             return
         }
 

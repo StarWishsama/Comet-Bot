@@ -40,5 +40,5 @@ data class PingEvent(
         return repositoryInfo.repoFullName
     }
 
-    override fun sendable(): Boolean = false
+    override fun isSendableEvent(): Boolean = false
 }
