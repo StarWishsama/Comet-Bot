@@ -35,7 +35,7 @@ abstract class PushContext(
      */
     private val pushTarget: MutableSet<Long>,
     /**
-     * 获取该内容的时间, 为 [currentTimeMillis]
+     * 获取该内容的时间, 为 [System.currentTimeMillis]
      */
     var retrieveTime: Long,
     /**
@@ -58,7 +58,7 @@ abstract class PushContext(
     }
 
     /**
-     * 获取推送对象的不可变副本 [UnmodifiableSet]
+     * 获取推送对象的不可变副本 [Collections.unmodifiableSet]
      */
     fun getPushTarget(): Set<Long> = Collections.unmodifiableSet(pushTarget)
 
