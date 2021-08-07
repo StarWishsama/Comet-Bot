@@ -193,11 +193,11 @@ data class QueryInfo(
 
         wrapper.addText(
             """
-            > 在线玩家 ${info.players.onlinePlayer}/${info.players.maxPlayer}
-            > MOTD ${info.parseMOTD()}
-            > 服务器版本 ${info.version.protocolName}
-            > 延迟 ${usedTime}ms
-            ${if (info.modInfo?.modList != null) "> MOD 列表 " + info.modInfo.modList else ""}
+> 在线玩家 ${info.players.onlinePlayer}/${info.players.maxPlayer}
+> MOTD ${info.parseMOTD()}
+> 服务器版本 ${info.version.protocolName}
+> 延迟 ${usedTime}ms
+${if (info.modInfo?.modList != null) "> MOD 列表 " + info.modInfo.modList else ""}
         """.trimIndent()
         )
 
