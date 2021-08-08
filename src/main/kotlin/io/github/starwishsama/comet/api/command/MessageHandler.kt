@@ -127,9 +127,9 @@ object MessageHandler {
                         val response = CometVariables.localizationManager.getLocalizationText("message.no-enough-point")
                             .replace("%point%", user.checkInPoint.fixDisplay())
                             .replace("%cost%", cmd.props.consumePoint.fixDisplay())
-                        ExecutedResult(response.toChain(), cmd, CommandStatus.Success())
+                        ExecutedResult(response.toChain(), cmd, CommandStatus.ValidateFailed())
                     } else {
-                        ExecutedResult(EmptyMessageChain, cmd, CommandStatus.Failed())
+                        ExecutedResult(EmptyMessageChain, cmd, CommandStatus.ValidateFailed())
                     }
                 }
 
@@ -219,7 +219,7 @@ object MessageHandler {
 
         when (props.consumerType) {
             CommandExecuteConsumerType.COOLDOWN -> {
-                return if (user.lastExecuteTime == -1L) {
+                return if (user.lastExecuteTime < 0) {
                     user.lastExecuteTime = currentTime
                     true
                 } else {
@@ -254,6 +254,7 @@ object MessageHandler {
         class PassToSession : CommandStatus("移交会话处理", false)
         class NotACommand : CommandStatus("非命令", false)
         class CometIsClose : CommandStatus("Comet 已关闭", false)
+        class ValidateFailed : CommandStatus("冷却/无积分", true)
 
         fun isOk(): Boolean = this.isSuccessful
     }
