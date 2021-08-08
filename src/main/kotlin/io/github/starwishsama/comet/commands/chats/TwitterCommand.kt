@@ -82,7 +82,7 @@ class TwitterCommand : ChatCommand {
         }
     }
 
-    override var props: CommandProps =
+    override val props: CommandProps =
         CommandProps("data", arrayListOf("twit", "推特", "tt"), "查询/订阅推特账号", "nbot.commands.data", UserLevel.ADMIN)
 
     override fun getHelp(): String = """

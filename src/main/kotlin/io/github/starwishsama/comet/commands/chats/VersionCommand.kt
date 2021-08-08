@@ -32,7 +32,7 @@ class VersionCommand : ChatCommand {
                 "\nMade with ❤ & Mirai ${BuildConfig.miraiVersion}").convertToChain()
     }
 
-    override var props: CommandProps =
+    override val props: CommandProps =
         CommandProps(
             "version",
             arrayListOf("v", "版本", "comet", "status"),

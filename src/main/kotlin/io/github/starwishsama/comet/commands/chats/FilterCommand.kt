@@ -40,7 +40,7 @@ class FilterCommand : ChatCommand {
         }
     }
 
-    override var props: CommandProps = CommandProps(
+    override val props: CommandProps = CommandProps(
         "filter",
         listOf("屏蔽", "glq", "pb"),
         "加/删机器人禁止发送的词汇",

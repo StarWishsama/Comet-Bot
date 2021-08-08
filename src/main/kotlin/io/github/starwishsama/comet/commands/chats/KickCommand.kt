@@ -45,7 +45,7 @@ class KickCommand : ChatCommand {
         return EmptyMessageChain
     }
 
-    override var props: CommandProps =
+    override val props: CommandProps =
         CommandProps("kick", arrayListOf("tr", "踢人"), "踢人", "nbot.commands.kick", UserLevel.USER)
 
     override fun getHelp(): String = """

@@ -24,7 +24,7 @@ class ShopCommand : ChatCommand {
         TODO("Shop command's priority is ultra low, sry :/")
     }
 
-    override var props: CommandProps =
+    override val props: CommandProps =
         CommandProps("shop", arrayListOf("sd", "商店"), "积分商店", "nbot.commands.shop", UserLevel.USER)
 
     override fun getHelp(): String = """

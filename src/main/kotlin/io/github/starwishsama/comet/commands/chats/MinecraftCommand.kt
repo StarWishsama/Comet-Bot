@@ -58,7 +58,7 @@ class MinecraftCommand : ChatCommand {
         }
     }
 
-    override var props: CommandProps = CommandProps(
+    override val props: CommandProps = CommandProps(
         "mc",
         listOf("我的世界", "mcquery", "mq", "服务器", "服务器查询", "mccx"),
         "查询我的世界服务器信息",

@@ -193,7 +193,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
         }
     }
 
-    override var props: CommandProps =
+    override val props: CommandProps =
         CommandProps("group", arrayListOf("群设置", "gs"), "设置群内设置", "nbot.commands.groupconfig", UserLevel.ADMIN)
 
     override fun getHelp(): String = """

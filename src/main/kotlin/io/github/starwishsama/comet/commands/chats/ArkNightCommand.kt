@@ -53,7 +53,7 @@ class ArkNightCommand : ChatCommand {
         }
     }
 
-    override var props: CommandProps =
+    override val props: CommandProps =
         CommandProps(
             "arknight",
             arrayListOf("ark", "xf", "方舟寻访"),

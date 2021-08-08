@@ -65,7 +65,7 @@ class ClockInCommand : ChatCommand {
         return EmptyMessageChain
     }
 
-    override var props: CommandProps =
+    override val props: CommandProps =
         CommandProps("clockin", arrayListOf("打卡", "dk"), "打卡命令", "nbot.commands.clockin", UserLevel.USER)
 
     override fun getHelp(): String = "/dk 打卡"

@@ -137,7 +137,7 @@ class BiliBiliCommand : ChatCommand {
         return EmptyMessageChain
     }
 
-    override var props: CommandProps =
+    override val props: CommandProps =
         CommandProps("bili", arrayListOf(), "订阅查询B站主播/用户动态", "nbot.commands.bili", UserLevel.USER)
 
     override fun getHelp(): String = """
