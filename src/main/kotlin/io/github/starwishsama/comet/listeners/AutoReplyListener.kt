@@ -29,21 +29,9 @@ object AutoReplyListener : NListener {
 
                 val user = CometUser.getUserOrRegister(sender.id)
 
-                val currentTime = System.currentTimeMillis()
-
-                val hasCoolDown = when (user.lastExecuteTime) {
-                    -1L -> {
-                        user.lastExecuteTime = currentTime
-                        true
-                    }
-                    else -> {
-                        val result = currentTime - user.lastExecuteTime < 5000
-                        user.lastExecuteTime = currentTime
-                        result
-                    }
+                if (!user.checkCoolDown(true)) {
+                    return
                 }
-
-                if (!hasCoolDown) return
 
                 val messageContent = message.contentToString()
 

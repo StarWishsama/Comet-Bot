@@ -86,6 +86,27 @@ data class CometUser(
         return period.days == 0
     }
 
+    /**
+     * 判断是否处于冷却状态
+     *
+     * @param silent 检查时不更新调用时间
+     * @param coolDown 冷却时长, 单位秒
+     *
+     * @return 是否处于冷却状态
+     */
+    fun checkCoolDown(silent: Boolean = false, coolDown: Int = CometVariables.cfg.coolDownTime): Boolean {
+        val currentTime = System.currentTimeMillis()
+
+        return if (lastExecuteTime < 0) {
+            if (!silent) lastExecuteTime = currentTime
+            true
+        } else {
+            val hasCoolDown = currentTime - lastExecuteTime >= coolDown * 1000
+            if (!silent) lastExecuteTime = currentTime
+            hasCoolDown
+        }
+    }
+
     companion object {
         fun quickRegister(id: Long): CometUser {
             CometVariables.cometUsers[id].apply {

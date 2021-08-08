@@ -211,32 +211,23 @@ object MessageHandler {
      * @return 目标用户是否可以执行命令
      */
     private fun validateUseStatus(user: CometUser, props: CommandProps): Boolean {
-        val currentTime = System.currentTimeMillis()
-
         if (user.isBotOwner()) {
             return true
         }
 
-        when (props.consumerType) {
+        return when (props.consumerType) {
             CommandExecuteConsumerType.COOLDOWN -> {
-                return if (user.lastExecuteTime < 0) {
-                    user.lastExecuteTime = currentTime
-                    true
-                } else {
-                    val hasCoolDown = currentTime - user.lastExecuteTime >= props.consumePoint * 1000
-                    user.lastExecuteTime = currentTime
-                    hasCoolDown
-                }
+                user.checkCoolDown(coolDown = props.consumePoint.toInt())
             }
             CommandExecuteConsumerType.POINT -> {
-                return if (user.checkInPoint >= props.consumePoint) {
+                if (user.checkInPoint >= props.consumePoint) {
                     user.checkInPoint -= props.consumePoint
                     true
                 } else {
                     false
                 }
             }
-            CommandExecuteConsumerType.NONE -> return true
+            CommandExecuteConsumerType.NONE -> true
         }
     }
 
