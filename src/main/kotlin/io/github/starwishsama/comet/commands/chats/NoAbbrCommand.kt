@@ -43,8 +43,8 @@ class NoAbbrCommand : ChatCommand, CallbackCommand {
             "能不能好好说话?",
             "nbot.commands.noabbr",
             UserLevel.USER,
-            consumerType = CommandExecuteConsumerType.POINT,
-            consumePoint = 0.1,
+            consumerType = CommandExecuteConsumerType.COOLDOWN,
+            consumePoint = 15.0,
         )
 
     override fun getHelp(): String = """
