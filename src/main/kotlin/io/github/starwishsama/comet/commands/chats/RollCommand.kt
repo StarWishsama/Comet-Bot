@@ -89,7 +89,7 @@ class RollCommand : ChatCommand, ConversationCommand {
     }
 
     @Suppress("SpellCheckingInspection")
-    override var props: CommandProps = CommandProps(
+    override val props: CommandProps = CommandProps(
         "roll",
         arrayListOf("rl", "抽奖"),
         "roll东西",

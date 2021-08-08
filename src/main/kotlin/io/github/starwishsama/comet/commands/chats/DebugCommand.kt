@@ -148,7 +148,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
         return EmptyMessageChain
     }
 
-    override var props: CommandProps =
+    override val props: CommandProps =
         CommandProps("debug", mutableListOf(), "Debug", "nbot.commands.debug", UserLevel.ADMIN)
 
 

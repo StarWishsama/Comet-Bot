@@ -17,7 +17,6 @@ import io.github.starwishsama.comet.CometVariables.cometServiceServer
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.logger
 import io.github.starwishsama.comet.api.command.CommandManager
-import io.github.starwishsama.comet.api.command.CommandPropsManager
 import io.github.starwishsama.comet.api.command.MessageHandler
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
@@ -82,7 +81,6 @@ object CometRuntime {
     fun shutdownTask() {
         logger.info("[Bot] 正在关闭 Bot...")
         DataSetup.saveAllResources()
-        CommandPropsManager.save()
         PusherManager.savePushers()
         cometServiceServer?.stop()
         TaskUtil.service.shutdown()
@@ -123,8 +121,6 @@ object CometRuntime {
                 NoAbbrCommand(),
             )
         )
-
-        CommandPropsManager.load()
 
         logger.info("[命令] 已注册 " + CommandManager.countCommands() + " 个命令")
 

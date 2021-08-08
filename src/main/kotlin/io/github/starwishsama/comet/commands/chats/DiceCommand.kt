@@ -41,7 +41,7 @@ class DiceCommand : ChatCommand {
         return "结果: ${args[0]}=${result.convertToString()}".toChain()
     }
 
-    override var props: CommandProps =
+    override val props: CommandProps =
         CommandProps(
             "dice",
             listOf("tz", "骰子"),

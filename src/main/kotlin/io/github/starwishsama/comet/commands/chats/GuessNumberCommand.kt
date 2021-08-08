@@ -77,7 +77,7 @@ class GuessNumberCommand : ChatCommand, ConversationCommand {
         return EmptyMessageChain
     }
 
-    override var props: CommandProps =
+    override val props: CommandProps =
         CommandProps("guessnumber", arrayListOf("csz"), "猜数字", "nbot.commands.guessnumber", UserLevel.USER)
 
     override fun getHelp(): String = """

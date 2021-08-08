@@ -13,6 +13,7 @@ package io.github.starwishsama.comet.api.command
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.enums.UserLevel
+import io.github.starwishsama.comet.managers.GroupConfigManager
 
 data class CommandProps(
     val name: String,
@@ -22,12 +23,9 @@ data class CommandProps(
     val level: UserLevel,
     val consumerType: CommandExecuteConsumerType = CommandExecuteConsumerType.COOLDOWN,
     val consumePoint: Double = CometVariables.cfg.coolDownTime.toDouble(),
-    val needRecall: Boolean = false,
-    val enabled: Boolean = true,
-    val disableGroup: MutableSet<Long> = mutableSetOf()
 ) {
     fun isDisabledCommand(id: Long): Boolean {
-        return disableGroup.contains(id)
+        return GroupConfigManager.getConfig(id)?.disabledCommands?.contains(name) ?: false
     }
 
     fun disableCommand(id: Long): ConfigureCommandStatus {
@@ -37,11 +35,14 @@ data class CommandProps(
                 return ConfigureCommandStatus.UnDisabled
             }
 
-            return if (!command.props.disableGroup.contains(id)) {
-                command.props.disableGroup.add(id)
+            val disabledCommands =
+                GroupConfigManager.getConfig(id)?.disabledCommands ?: return ConfigureCommandStatus.Error
+
+            return if (!disabledCommands.contains(name)) {
+                disabledCommands.add(name)
                 ConfigureCommandStatus.Disabled
             } else {
-                command.props.disableGroup.remove(id)
+                disabledCommands.remove(name)
                 ConfigureCommandStatus.Enabled
             }
         } else {
@@ -54,5 +55,6 @@ data class CommandProps(
         object Enabled : ConfigureCommandStatus("成功启用该命令")
         object Disabled : ConfigureCommandStatus("成功禁用该命令")
         object NotExist : ConfigureCommandStatus("该命令不存在!")
+        object Error : ConfigureCommandStatus("禁用失败, 发生了意外错误.")
     }
 }

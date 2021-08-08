@@ -75,7 +75,7 @@ class RConCommand : ChatCommand, ConversationCommand {
         return EmptyMessageChain
     }
 
-    override var props: CommandProps =
+    override val props: CommandProps =
         CommandProps("rcon", arrayListOf("执行命令"), "远程遥控MC服务器", "nbot.commands.rcon", UserLevel.USER)
 
     override fun getHelp(): String = """

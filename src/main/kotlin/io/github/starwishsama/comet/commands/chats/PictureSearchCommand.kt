@@ -66,7 +66,7 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
         }
     }
 
-    override var props: CommandProps = CommandProps(
+    override val props: CommandProps = CommandProps(
         "ps",
         arrayListOf("ytst", "st", "搜图", "以图搜图"),
         "以图搜图",

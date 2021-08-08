@@ -26,7 +26,7 @@ interface ChatCommand {
     suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain
 
     /** 命令属性 */
-    var props: CommandProps
+    val props: CommandProps
 
     /** 命令帮助文本 必填 */
     fun getHelp(): String

@@ -45,7 +45,7 @@ class HelpCommand : ChatCommand {
         }
     }
 
-    override var props: CommandProps =
+    override val props: CommandProps =
         CommandProps("help", arrayListOf("?", "帮助", "菜单"), "帮助命令", "nbot.commands.help", UserLevel.USER)
 
     // 它自己就是帮助命令 不需要再帮了

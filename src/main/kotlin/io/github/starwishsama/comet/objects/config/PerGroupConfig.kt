@@ -88,7 +88,10 @@ data class PerGroupConfig(
     var oldFileCleanDelay: Long = 1000 * 60 * 60 * 24,
 
     @JsonProperty("old_file_match_pattern")
-    var oldFileMatchPattern: String = ""
+    var oldFileMatchPattern: String = "",
+
+    @JsonProperty("disabled_commands")
+    val disabledCommands: MutableSet<String> = mutableSetOf()
 ) {
 
     fun addHelper(id: Long): Boolean {
