@@ -46,9 +46,9 @@ object MuteService {
             if (isAll) {
                 group.settings.isMuteAll = !group.settings.isMuteAll
                 return if (group.settings.isMuteAll) {
-                    CometUtil.toChain("The World!")
+                    CometUtil.toChain("全体禁言已开启")
                 } else {
-                    CometUtil.toChain("然后时间开始流动")
+                    CometUtil.toChain("全体禁言已关闭")
                 }
             }
 
