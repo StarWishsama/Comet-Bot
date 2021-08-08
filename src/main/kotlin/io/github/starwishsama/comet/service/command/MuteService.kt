@@ -53,13 +53,13 @@ object MuteService {
             }
 
             if (group.botAsMember.id == id) {
-                return CometUtil.toChain("不能踢出机器人")
+                return CometUtil.toChain("不能禁言机器人")
             }
 
             for (member in group.members) {
                 if (member.id == id) {
                     if (member.isOperator()) {
-                        return CometUtil.toChain("不能踢出管理员")
+                        return CometUtil.toChain("不能禁言管理员")
                     }
 
                     return when (muteTime) {
