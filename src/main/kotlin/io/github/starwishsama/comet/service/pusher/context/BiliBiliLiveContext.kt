@@ -40,7 +40,6 @@ class BiliBiliLiveContext(
         if (other !is BiliBiliLiveContext) return false
 
         return liveRoomInfo.data.getStatus() == other.liveRoomInfo.data.getStatus()
-                && (!liveRoomInfo.data.isLiveTimeInvalid()
-                && liveRoomInfo.data.parseLiveTime() == other.liveRoomInfo.data.parseLiveTime())
+                && (!liveRoomInfo.data.isLiveTimeInvalid() && liveRoomInfo.data.parseLiveTime() == other.liveRoomInfo.data.parseLiveTime())
     }
 }

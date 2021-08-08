@@ -22,14 +22,11 @@ fun MessageChain.doFilter(): MessageChain {
     val revampChain = LinkedList<SingleMessage>()
     this.forEach { revampChain.add(it) }
 
-    var count = 0
-
     for (i in revampChain.indices) {
         if (revampChain[i] is PlainText) {
             var context = revampChain[i].content
             CometVariables.cfg.filterWords.forEach {
                 if (context.contains(it)) {
-                    count++
                     var replaceText = ""
                     repeat(it.length) {
                         replaceText += "*"

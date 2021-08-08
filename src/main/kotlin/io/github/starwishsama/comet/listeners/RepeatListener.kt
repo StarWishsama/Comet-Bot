@@ -28,7 +28,11 @@ object RepeatListener : NListener {
             return
         }
 
-        if (!event.group.isBotMuted && groupSupportRepeat(event.group.id)) {
+        if (event.group.isBotMuted) {
+            return
+        }
+
+        if (GroupConfigManager.getConfigOrNew(event.group.id).canRepeat) {
             val groupId = event.group.id
             val repeatInfo = repeatCachePool[groupId]
 
@@ -41,10 +45,6 @@ object RepeatListener : NListener {
         }
     }
 
-    private fun groupSupportRepeat(groupId: Long): Boolean {
-        return GroupConfigManager.getConfigOrNew(groupId).canRepeat
-    }
-
     override fun getName(): String = "复读机"
 }
 
@@ -54,13 +54,17 @@ data class RepeatInfo(
     fun handleRepeat(group: Group, message: MessageChain) {
         if (messageCache.isEmpty()) {
             messageCache.add(message)
+            return
         }
 
         val lastMessage = messageCache.last()
         val lastSender = lastMessage.source.fromId
 
-        if (lastSender != message.source.fromId
-            && lastMessage.contentEquals(message, ignoreCase = false, strict = true)
+        if (lastSender != message.sourceOrNull?.fromId && lastMessage.contentEquals(
+                message,
+                ignoreCase = false,
+                strict = true
+            )
         ) {
             messageCache.add(message)
         } else {

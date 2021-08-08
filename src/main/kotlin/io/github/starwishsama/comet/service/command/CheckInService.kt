@@ -30,14 +30,10 @@ import kotlin.math.min
  */
 object CheckInService {
     fun handleCheckIn(event: MessageEvent, user: CometUser): MessageChain {
-        return if (event is GroupMessageEvent) {
-            if (user.isChecked()) {
-                "你今天已经签到过了! 输入 /cx 可查询签到信息".toChain()
-            } else {
-                doCheckIn(event, user)
-            }
+        return if (user.isChecked()) {
+            "你今天已经签到过了! 输入 /cx 可查询签到信息".toChain()
         } else {
-            "抱歉, 该命令仅供群聊使用".toChain()
+            doCheckIn(event, user)
         }
     }
 

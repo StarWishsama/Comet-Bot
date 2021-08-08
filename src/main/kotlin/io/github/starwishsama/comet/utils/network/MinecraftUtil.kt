@@ -23,7 +23,6 @@ import org.xbill.DNS.Type
 import java.io.*
 import java.net.Proxy
 import java.net.Socket
-import java.time.Instant
 
 
 /**
@@ -36,8 +35,6 @@ import java.time.Instant
 object MinecraftUtil {
     @Throws(IOException::class)
     fun query(host: String, port: Int): QueryInfo {
-        val start = Instant.now()
-
         val socket: Socket
         if (cfg.proxySwitch) {
             socket = Socket(Proxy(cfg.proxyType, Socket(cfg.proxyUrl, cfg.proxyPort).remoteSocketAddress))
@@ -116,15 +113,14 @@ object MinecraftUtil {
         if (id != 0x01) {
             throw IOException("无效的数据包 ID")
         }
-        /* 读取回应 (pingtime) */
-        val pingTime = dataInputStream.readLong()
+
         dataOutputStream.close()
         outputStream.close()
         inputStreamReader.close()
         inputStream.close()
         socket.close()
 
-        return QueryInfo(json, Instant.now().minusMillis(start.toEpochMilli()).toEpochMilli())
+        return QueryInfo(json, System.currentTimeMillis() - now)
     }
 
     @Throws(IOException::class)
@@ -197,11 +193,11 @@ data class QueryInfo(
 
         wrapper.addText(
             """
-            > 在线玩家 ${info.players.onlinePlayer}/${info.players.maxPlayer}
-            > MOTD ${info.parseMOTD()}
-            > 服务器版本 ${info.version.protocolName}
-            > 延迟 ${usedTime}ms
-            ${if (info.modInfo?.modList != null) "> MOD 列表 " + info.modInfo.modList else ""}
+> 在线玩家 ${info.players.onlinePlayer}/${info.players.maxPlayer}
+> MOTD ${info.parseMOTD()}
+> 服务器版本 ${info.version.protocolName}
+> 延迟 ${usedTime}ms
+${if (info.modInfo?.modList != null) "> MOD 列表 " + info.modInfo.modList else ""}
         """.trimIndent()
         )
 
@@ -224,6 +220,10 @@ data class MinecraftServerInfo(
     val favicon: String?
 ) {
     fun parseMOTD(): String {
+        if (motd.isTextual) {
+            return motd.asText()
+        }
+
         val builder = StringBuilder()
 
         if (motd["extra"] == null) {
