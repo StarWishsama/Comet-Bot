@@ -128,7 +128,7 @@ object MessageHandler {
                             .replace("%cost%", cmd.props.consumePoint.toString())
                         ExecutedResult(response.toChain(), cmd, CommandStatus.Success())
                     } else {
-                        ExecutedResult(EmptyMessageChain, cmd, CommandStatus.Success())
+                        ExecutedResult(EmptyMessageChain, cmd, CommandStatus.Failed())
                     }
                 }
 
@@ -210,24 +210,21 @@ object MessageHandler {
      * @return 目标用户是否可以执行命令
      */
     private fun validateUseStatus(user: CometUser, props: CommandProps): Boolean {
+        val currentTime = System.currentTimeMillis()
+
         if (user.isBotOwner()) {
             return true
         }
 
         when (props.consumerType) {
             CommandExecuteConsumerType.COOLDOWN -> {
-                val currentTime = System.currentTimeMillis()
-
-                return when (user.lastExecuteTime) {
-                    -1L -> {
-                        user.lastExecuteTime = currentTime
-                        true
-                    }
-                    else -> {
-                        val result = currentTime - user.lastExecuteTime > props.consumePoint * 1000
-                        user.lastExecuteTime = currentTime
-                        result
-                    }
+                return if (user.lastExecuteTime == -1L) {
+                    user.lastExecuteTime = currentTime
+                    true
+                } else {
+                    val hasCoolDown = currentTime - user.lastExecuteTime >= props.consumePoint * 1000
+                    user.lastExecuteTime = currentTime
+                    hasCoolDown
                 }
             }
             CommandExecuteConsumerType.POINT -> {
