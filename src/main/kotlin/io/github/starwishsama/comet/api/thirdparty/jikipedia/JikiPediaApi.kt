@@ -17,7 +17,7 @@ import java.io.IOException
 import java.nio.charset.StandardCharsets
 
 object JikiPediaApi {
-    const val searchRoute = "https://jikipedia.com/search?phrase="
+    private const val searchRoute = "https://jikipedia.com/search?phrase="
 
     fun search(keyword: String): JikiPediaSearchResult {
         return try {
