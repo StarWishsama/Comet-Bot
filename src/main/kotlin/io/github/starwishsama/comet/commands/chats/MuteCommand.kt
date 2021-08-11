@@ -32,8 +32,13 @@ class MuteCommand : ChatCommand {
         return if (event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
                 val at = CometUtil.parseAtAsBotUser(event, args[0])
+
                 if (at != null) {
-                    MuteService.doMute(event.group, at.id, MuteService.getMuteTime(args[1]), false)
+                    if (args.size > 1) {
+                        MuteService.doMute(event.group, at.id, MuteService.getMuteTime(args[1]), false)
+                    } else {
+                        MuteService.doMute(event.group, at.id, 60, false)
+                    }
                 } else {
                     when (args[0]) {
                         "all", "全体", "全禁", "全体禁言" -> MuteService.doMute(event.group, -1, -1, true)
