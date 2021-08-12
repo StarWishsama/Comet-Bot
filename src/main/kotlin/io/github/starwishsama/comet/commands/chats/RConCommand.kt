@@ -121,8 +121,8 @@ class RConCommand : ChatCommand, ConversationCommand {
             }
             2 -> {
                 CometVariables.cfg.rConPassword = event.message.contentToString()
-                event.subject.sendMessage(CometUtil.toChain("设置 rcon 完成!"))
                 CometRuntime.setupRCon()
+                event.subject.sendMessage(CometUtil.toChain("设置 rcon 完成!"))
                 waitList.remove(user)
                 SessionHandler.removeSession(session)
             }
