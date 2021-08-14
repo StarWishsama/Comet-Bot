@@ -23,9 +23,11 @@ class NoAbbrRequestTask(override val content: Contact, override val param: Strin
         return NoAbbrApi.guessMeaning(param)
     }
 
-    override fun callback(result: AbbrSearchResponse) {
+    override fun callback(result: Any?) {
         runBlocking {
-            content.sendMessage(result.toMessageWrapper().toMessageChain(content))
+            if (result is AbbrSearchResponse) {
+                content.sendMessage(result.toMessageWrapper().toMessageChain(content))
+            }
         }
     }
 }

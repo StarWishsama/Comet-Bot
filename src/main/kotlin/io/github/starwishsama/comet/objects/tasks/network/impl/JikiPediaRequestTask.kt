@@ -24,19 +24,21 @@ class JikiPediaRequestTask(override val content: Contact, override val param: St
         return JikiPediaApi.search(param)
     }
 
-    override fun callback(result: JikiPediaSearchResult) {
+    override fun callback(result: Any?) {
         runBlocking {
-            val wrapper = result.toMessageWrapper()
+            if (result is JikiPediaSearchResult) {
+                val wrapper = result.toMessageWrapper()
 
-            val chain = if (!wrapper.isUsable()) {
-                "使用次数已达上限, 一会儿再试吧".toChain()
-            } else if (wrapper.isEmpty()) {
-                "找不到对应结果".toChain()
-            } else {
-                result.toMessageWrapper().toMessageChain(content)
+                val chain = if (!wrapper.isUsable()) {
+                    "使用次数已达上限, 一会儿再试吧".toChain()
+                } else if (wrapper.isEmpty()) {
+                    "找不到对应结果".toChain()
+                } else {
+                    result.toMessageWrapper().toMessageChain(content)
+                }
+
+                content.sendMessage(chain)
             }
-
-            content.sendMessage(chain)
         }
     }
 }
