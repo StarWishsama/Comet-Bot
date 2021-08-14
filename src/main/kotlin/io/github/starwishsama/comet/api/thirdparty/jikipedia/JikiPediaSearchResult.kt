@@ -10,13 +10,24 @@
 
 package io.github.starwishsama.comet.api.thirdparty.jikipedia
 
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+
 data class JikiPediaSearchResult(
     val title: String,
     val content: String,
+    val rateLimit: Boolean = false
 ) {
     companion object {
-        fun empty(): JikiPediaSearchResult {
-            return JikiPediaSearchResult("", "")
+        fun empty(rateLimit: Boolean = false): JikiPediaSearchResult {
+            return JikiPediaSearchResult("", "", rateLimit)
+        }
+    }
+
+    fun toMessageWrapper(): MessageWrapper {
+        return if (rateLimit) {
+            MessageWrapper().setUsable(false)
+        } else {
+            MessageWrapper().addText("搜索 $title 为你找到以下可能解释：\n$content")
         }
     }
 }

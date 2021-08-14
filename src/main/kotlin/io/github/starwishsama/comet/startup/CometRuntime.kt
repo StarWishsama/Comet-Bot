@@ -136,6 +136,7 @@ object CometRuntime {
                 DiceCommand(),
                 PenguinStatCommand(),
                 NoAbbrCommand(),
+                JikiPediaCommand(),
                 // Console Command
                 StopCommand(),
                 DebugCommand(),

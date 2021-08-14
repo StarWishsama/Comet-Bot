@@ -11,30 +11,46 @@
 package io.github.starwishsama.comet.api.thirdparty.jikipedia
 
 import cn.hutool.core.net.URLEncoder
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 
-object JikiPediaApi {
+object JikiPediaApi : ApiExecutor {
     private const val searchRoute = "https://jikipedia.com/search?phrase="
 
     fun search(keyword: String): JikiPediaSearchResult {
         return try {
-            println(searchRoute + URLEncoder.DEFAULT.encode(keyword, StandardCharsets.UTF_8))
-            val document = Jsoup.connect(searchRoute + URLEncoder.DEFAULT.encode(keyword, StandardCharsets.UTF_8)).get()
+            if (isReachLimit()) {
+                return JikiPediaSearchResult.empty(true)
+            }
 
-            val firstResult = document.selectFirst("#search > div > div.masonry")
-                ?.getElementsByAttributeValue("data-index", "0")
+            usedTime++
 
-            val render = firstResult?.first()?.getElementsByClass("brax-render")
+            val connection = Jsoup.connect(searchRoute + URLEncoder.DEFAULT.encode(keyword, StandardCharsets.UTF_8))
 
-            //println(render)
+            connection.userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 Edg/92.0.902.67")
 
-            println(render?.let { concatContent(it) })
+            if (CometVariables.cfg.proxySwitch) {
+                connection.proxy(CometVariables.cfg.proxyUrl, CometVariables.cfg.proxyPort)
+            }
 
-            JikiPediaSearchResult.empty()
+            val document = connection.get()
 
+            val tile = document.selectFirst("#search > div > div.masonry")
+                ?.getElementsByClass("tile")?.get(0)
+
+            val render = tile?.getElementsByClass("brax-render")
+
+            val content = render?.first()?.allElements?.let { concatContent(it) }
+
+            if (content == null) {
+                JikiPediaSearchResult.empty()
+            } else {
+                return JikiPediaSearchResult(keyword, content)
+            }
         } catch (e: IOException) {
             JikiPediaSearchResult.empty()
         }
@@ -44,14 +60,19 @@ object JikiPediaApi {
         return if (elements.isNotEmpty()) {
             buildString {
                 elements.forEach { ele ->
-                    println(ele.allElements)
-                    val result = ele.allElements.first()?.data()
-                    //println(result)
-                    append(result)
+                    if (ele.className() == "text") {
+                        append(ele.text())
+                    }
                 }
             }
         } else {
             ""
         }
     }
+
+    override var usedTime: Int = 0
+
+    override val duration: Int = 3
+
+    override fun getLimitTime(): Int = 20
 }
