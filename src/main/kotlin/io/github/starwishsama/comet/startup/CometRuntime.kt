@@ -119,6 +119,7 @@ object CometRuntime {
                 DiceCommand(),
                 PenguinStatCommand(),
                 NoAbbrCommand(),
+                JikiPediaCommand()
             )
         )
 
