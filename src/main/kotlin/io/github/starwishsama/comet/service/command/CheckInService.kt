@@ -12,7 +12,7 @@ package io.github.starwishsama.comet.service.command
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.objects.CometUser
-import io.github.starwishsama.comet.service.task.HitokotoUpdater
+import io.github.starwishsama.comet.objects.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.NumberUtil.fixDisplay
 import net.mamoe.mirai.contact.nameCardOrNick

@@ -33,10 +33,11 @@ import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.RetrofitLogger
+import io.github.starwishsama.comet.managers.NetworkRequestManager
+import io.github.starwishsama.comet.objects.tasks.GroupFileAutoRemover
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.server.CometServiceServer
-import io.github.starwishsama.comet.service.task.GroupFileAutoRemover
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.RuntimeUtil
@@ -184,6 +185,10 @@ object CometRuntime {
         PusherManager.initPushers(bot)
 
         startupServer()
+
+        TaskUtil.runScheduleTaskAsync(5, 5, TimeUnit.SECONDS) {
+            NetworkRequestManager.schedule()
+        }
 
         logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${CometVariables.startTime.getLastingTimeAsString()}")
 

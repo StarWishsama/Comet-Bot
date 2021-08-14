@@ -10,26 +10,16 @@
 
 package io.github.starwishsama.comet.service.command
 
-import io.github.starwishsama.comet.api.thirdparty.jikipedia.JikiPediaApi
+import io.github.starwishsama.comet.managers.NetworkRequestManager
+import io.github.starwishsama.comet.objects.tasks.network.impl.JikiPediaRequestTask
 import io.github.starwishsama.comet.utils.CometUtil.toChain
-import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 object JikiPediaService {
     fun searchJiki(event: MessageEvent, input: String): MessageChain {
-        runBlocking { event.subject.sendMessage("请稍后...") }
+        NetworkRequestManager.addTask(JikiPediaRequestTask(event.subject, input))
 
-        val result = JikiPediaApi.search(input)
-
-        val wrapper = result.toMessageWrapper()
-
-        return if (!wrapper.isUsable()) {
-            "使用次数已达上限, 一会儿再试吧".toChain()
-        } else if (wrapper.isEmpty()) {
-            "找不到对应结果".toChain()
-        } else {
-            result.toMessageWrapper().toMessageChain(event.subject)
-        }
+        return "请稍后...".toChain()
     }
 }

@@ -10,17 +10,16 @@
 
 package io.github.starwishsama.comet.service.command
 
-import io.github.starwishsama.comet.api.thirdparty.noabbr.NoAbbrApi
-import kotlinx.coroutines.runBlocking
+import io.github.starwishsama.comet.managers.NetworkRequestManager
+import io.github.starwishsama.comet.objects.tasks.network.impl.NoAbbrRequestTask
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 object NoAbbrService {
     fun parseAbbr(event: MessageEvent, input: String): MessageChain {
-        runBlocking { event.subject.sendMessage("请稍后...") }
+        NetworkRequestManager.addTask(NoAbbrRequestTask(event.subject, input))
 
-        val result = NoAbbrApi.guessMeaning(input)
-
-        return result.toMessageWrapper().toMessageChain(event.subject)
+        return "请稍后...".toChain()
     }
 }
