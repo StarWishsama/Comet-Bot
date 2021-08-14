@@ -13,6 +13,4 @@ package io.github.starwishsama.comet.objects.tasks.network
 abstract class NetworkRequestTask {
     abstract val content: Any
     abstract val param: String
-
-    abstract fun callback(result: Any?)
 }

@@ -12,4 +12,6 @@ package io.github.starwishsama.comet.objects.tasks.network
 
 interface INetworkRequestTask<T> {
     fun request(param: String): T
+
+    fun callback(result: T)
 }
