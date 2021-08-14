@@ -26,6 +26,8 @@ data class JikiPediaSearchResult(
     fun toMessageWrapper(): MessageWrapper {
         return if (rateLimit) {
             MessageWrapper().setUsable(false)
+        } else if (content.isEmpty()) {
+            MessageWrapper()
         } else {
             MessageWrapper().addText("搜索 $title 为你找到以下可能解释：\n$content")
         }
