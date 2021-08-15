@@ -49,7 +49,8 @@ object RepeatListener : NListener {
 }
 
 data class RepeatInfo(
-    val messageCache: MutableList<MessageChain> = mutableListOf()
+    val messageCache: MutableList<MessageChain> = mutableListOf(),
+    var lastRepeat: MessageChain = EmptyMessageChain
 ) {
     fun handleRepeat(group: Group, message: MessageChain) {
         if (messageCache.isEmpty()) {
@@ -72,8 +73,11 @@ data class RepeatInfo(
             return
         }
 
-        if (messageCache.size > 1) {
-            runBlocking { group.sendMessage(processRepeatMessage(lastMessage)) }
+        if (messageCache.size > 1 && !lastMessage.contentEquals(lastMessage, false, true)) {
+            runBlocking {
+                lastRepeat = lastMessage
+                group.sendMessage(processRepeatMessage(lastMessage))
+            }
             messageCache.clear()
         }
     }
