@@ -51,7 +51,7 @@ object CheckInService {
                 user.checkInGroup = 0
             }
 
-            if (checkInPoint.getAllPoint() == 0.0) {
+            if (checkInPoint.getAllPoint() <= 0) {
                 append("今天运气不佳, 没有积分")
             } else {
                 append("获得了 ${checkInPoint.basePoint.fixDisplay()} 点积分")
