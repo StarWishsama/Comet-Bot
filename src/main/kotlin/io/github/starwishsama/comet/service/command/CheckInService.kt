@@ -59,8 +59,8 @@ object CheckInService {
 
             append("\n")
 
-            if (checkInPoint.extraPoint > 0 || user.checkInTime >= 2) {
-                append("连续签到 ${user.checkInTime} 天, 幸运获得了 ${checkInPoint.extraPoint} 点积分~\n")
+            if (user.checkInTime >= 2) {
+                append("连续签到 ${user.checkInTime} 天 ${if (checkInPoint.extraPoint > 0) ", 幸运获得了 ${checkInPoint.extraPoint} 点积分~\n" else ""}")
             }
 
             append("目前积分 > ${user.checkInPoint.fixDisplay()}\n")
@@ -97,7 +97,11 @@ object CheckInService {
             min(1.5, (RandomUtil.randomDouble(0.0, 0.2, 1, RoundingMode.HALF_DOWN) * (user.checkInTime - 1)))
 
         // 连续签到的奖励积分
-        val awardPoint = String.format("%.1f", awardProp * basePoint).toDouble()
+        val awardPoint = if (basePoint < 0) {
+            0.0
+        } else {
+            String.format("%.1f", awardProp * basePoint).toDouble()
+        }
 
         user.addPoint(basePoint + awardPoint)
 
