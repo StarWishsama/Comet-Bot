@@ -131,40 +131,37 @@ class TwitterCommand : ChatCommand {
     @ExperimentalTime
     private suspend fun getTweetToMessageChain(args: List<String>, event: MessageEvent): MessageChain {
         return if (args.size > 1) {
-            event.subject.sendMessage(event.message.quote() + toChain("正在查询, 请稍等"))
+            val task = object : NetworkRequestTask(), INetworkRequestTask<MessageChain> {
+                override fun request(param: String): MessageChain {
+                    return if (args.size > 2) {
+                        val index = args[2].toIntOrNull()
 
-            try {
-                val index = args[2].toInt()
-                val max = 1 + args[2].toInt()
-
-                val task = object : NetworkRequestTask(), INetworkRequestTask<MessageChain> {
-                    override fun request(param: String): MessageChain {
-                        return if (args.size > 2) {
-                            getTweetWithDesc(args[1], event.subject, index, max)
+                        if (index != null) {
+                            getTweetWithDesc(args[1], event.subject, index, 1 + index)
                         } else {
-                            getTweetWithDesc(args[1], event.subject, 0, 1)
+                            "请输入有效的数字".toChain()
                         }
+                    } else {
+                        getTweetWithDesc(args[1], event.subject, 0, 1)
                     }
-
-                    override val content: Contact = event.subject
-                    override val param: String = ""
-
-                    override fun callback(result: Any?) {
-                        if (result is MessageChain) {
-                            runBlocking {
-                                content.sendMessage(result)
-                            }
-                        }
-                    }
-
                 }
 
-                NetworkRequestManager.addTask(task)
+                override val content: Contact = event.subject
+                override val param: String = ""
 
-                return EmptyMessageChain
-            } catch (e: NumberFormatException) {
-                toChain("请输入有效数字")
+                override fun callback(result: Any?) {
+                    if (result is MessageChain) {
+                        runBlocking {
+                            content.sendMessage(result)
+                        }
+                    }
+                }
+
             }
+
+            NetworkRequestManager.addTask(task)
+
+            event.message.quote() + toChain("正在查询, 请稍等")
         } else {
             getHelp().convertToChain()
         }
