@@ -20,16 +20,21 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.api.TwitterConfig
+import io.github.starwishsama.comet.objects.tasks.network.INetworkRequestTask
+import io.github.starwishsama.comet.objects.tasks.network.NetworkRequestTask
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.NetUtil
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
+import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.PlainText
@@ -67,7 +72,27 @@ class TwitterCommand : ChatCommand {
                 }
                 "id" -> {
                     return if (args[1].isNumeric()) {
-                        getTweetByID(args[1].toLong(), event.subject)
+                        val task = object : NetworkRequestTask(), INetworkRequestTask<MessageChain> {
+                            override fun request(param: String): MessageChain {
+                                return getTweetByID(args[1].toLong(), event.subject)
+                            }
+
+                            override val content: Contact = event.subject
+                            override val param: String = ""
+
+                            override fun callback(result: Any?) {
+                                if (result is MessageChain) {
+                                    runBlocking {
+                                        content.sendMessage(result)
+                                    }
+                                }
+                            }
+
+                        }
+
+                        NetworkRequestManager.addTask(task)
+
+                        EmptyMessageChain
                     } else {
                         "请输入有效数字".convertToChain()
                     }
@@ -107,9 +132,36 @@ class TwitterCommand : ChatCommand {
     private suspend fun getTweetToMessageChain(args: List<String>, event: MessageEvent): MessageChain {
         return if (args.size > 1) {
             event.subject.sendMessage(event.message.quote() + toChain("正在查询, 请稍等"))
+
             try {
-                if (args.size > 2) getTweetWithDesc(args[1], event.subject, args[2].toInt(), 1 + args[2].toInt())
-                else getTweetWithDesc(args[1], event.subject, 0, 1)
+                val index = args[2].toInt()
+                val max = 1 + args[2].toInt()
+
+                val task = object : NetworkRequestTask(), INetworkRequestTask<MessageChain> {
+                    override fun request(param: String): MessageChain {
+                        return if (args.size > 2) {
+                            getTweetWithDesc(args[1], event.subject, index, max)
+                        } else {
+                            getTweetWithDesc(args[1], event.subject, 0, 1)
+                        }
+                    }
+
+                    override val content: Contact = event.subject
+                    override val param: String = ""
+
+                    override fun callback(result: Any?) {
+                        if (result is MessageChain) {
+                            runBlocking {
+                                content.sendMessage(result)
+                            }
+                        }
+                    }
+
+                }
+
+                NetworkRequestManager.addTask(task)
+
+                return EmptyMessageChain
             } catch (e: NumberFormatException) {
                 toChain("请输入有效数字")
             }
