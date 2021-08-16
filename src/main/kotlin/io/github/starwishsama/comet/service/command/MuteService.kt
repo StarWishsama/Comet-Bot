@@ -80,16 +80,24 @@ object MuteService {
         }
 
         var banTime: Long
+        // 30*24*60*60, a month
+        val maxBanTime: Long = 2592000
 
+        val yearRegex = Regex("""(\d{1,2})[yY年]""")
+        val monRegex = Regex("""(\d{1,2})(月|mon|Mon)""")
         val dayRegex = Regex("""(\d{1,2})[dD天]""")
-        val hourRegex = Regex("""(\d{1,2})(h|H|小时|时)""")
-        val minRegex = Regex("""(\d{1,2})(分钟|分|m|M)""")
-        val secRegex = Regex("""(\d{1,7})(分钟|分|m|M)""")
+        val hourRegex = Regex("""(\d{1,2})(小时|时|h|H)""")
+        val minRegex = Regex("""(\d{1,2})(分钟|分|m|M)(?!on)""")
+        val secRegex = Regex("""(\d{1,7})(秒钟|秒|s|S)""")
 
-        banTime = dayRegex.find(message)?.groups?.get(1)?.value?.toLong()?.times(24 * 60 * 60) ?: 0L
+        banTime = yearRegex.find(message)?.groups?.get(1)?.value?.toLong()?.times(365 * 24 * 60 * 60) ?: 0L
+        banTime += monRegex.find(message)?.groups?.get(1)?.value?.toLong()?.times(30 * 24 * 60 * 60) ?: 0L
+        banTime += dayRegex.find(message)?.groups?.get(1)?.value?.toLong()?.times(24 * 60 * 60) ?: 0L
         banTime += hourRegex.find(message)?.groups?.get(1)?.value?.toLong()?.times(60 * 60) ?: 0L
         banTime += minRegex.find(message)?.groups?.get(1)?.value?.toLong()?.times(60) ?: 0L
         banTime += secRegex.find(message)?.groups?.get(1)?.value?.toLong() ?: 0L
+
+        if (banTime > maxBanTime) banTime = maxBanTime
 
         return banTime.toInt()
     }
