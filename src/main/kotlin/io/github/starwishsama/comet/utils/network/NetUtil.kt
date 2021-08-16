@@ -126,7 +126,7 @@ object NetUtil {
             netLogger.warning("执行网络操作失败: $url", e)
         } finally {
             if (autoClose) {
-                TaskUtil.runAsync(autoCloseDelay) {
+                TaskUtil.schedule(autoCloseDelay) {
                     if (result?.body != null) {
                         result.close()
                     }

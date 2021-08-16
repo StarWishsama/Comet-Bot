@@ -69,7 +69,7 @@ class RollCommand : ChatCommand, ConversationCommand {
             )
 
             SessionHandler.insertSession(rollSession)
-            TaskUtil.runAsync(rollSession.stopAfterMinute.toLong(), TimeUnit.MINUTES) {
+            TaskUtil.schedule(rollSession.stopAfterMinute.toLong(), TimeUnit.MINUTES) {
                 runBlocking {
                     generateResult(rollSession, event)
                 }

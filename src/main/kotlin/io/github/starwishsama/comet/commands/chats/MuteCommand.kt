@@ -43,7 +43,7 @@ class MuteCommand : ChatCommand {
                     when (args[0]) {
                         "all", "全体", "全禁", "全体禁言" -> MuteService.doMute(event.group, -1, -1, true)
                         "random", "rand", "随机", "抽奖" -> {
-                            TaskUtil.runAsync(500) {
+                            TaskUtil.schedule(5) {
                                 runBlocking {
                                     MuteService.doRandomMute(event)
                                 }

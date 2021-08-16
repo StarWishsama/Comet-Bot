@@ -186,13 +186,13 @@ object CometRuntime {
 
         startupServer()
 
-        TaskUtil.runScheduleTaskAsync(5, 5, TimeUnit.SECONDS) {
+        TaskUtil.scheduleAtFixedRate(5, 5, TimeUnit.SECONDS) {
             NetworkRequestManager.schedule()
         }
 
         logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${CometVariables.startTime.getLastingTimeAsString()}")
 
-        TaskUtil.runAsync { GachaService.loadAllPools() }
+        TaskUtil.schedule { GachaService.loadAllPools() }
     }
 
     fun setupRCon() {
@@ -217,7 +217,7 @@ object CometRuntime {
     }
 
     private fun runScheduleTasks() {
-        TaskUtil.runAsync { DataSaveHelper.checkOldFiles() }
+        TaskUtil.schedule { DataSaveHelper.checkOldFiles() }
 
         val apis = arrayOf(DynamicApi, TwitterApi, VideoApi)
 
@@ -226,22 +226,22 @@ object CometRuntime {
         DataSaveHelper.scheduleSave()
 
         apis.forEach {
-            TaskUtil.runScheduleTaskAsync(it.duration.toLong(), it.duration.toLong(), TimeUnit.HOURS) {
+            TaskUtil.scheduleAtFixedRate(it.duration.toLong(), it.duration.toLong(), TimeUnit.HOURS) {
                 it.resetTime()
             }
         }
 
-        TaskUtil.runScheduleTaskAsync(1, 1, TimeUnit.HOURS) {
+        TaskUtil.scheduleAtFixedRate(1, 1, TimeUnit.HOURS) {
             GroupFileAutoRemover.execute()
         }
 
-        TaskUtil.runScheduleTaskAsync(1, 1, TimeUnit.HOURS) {
+        TaskUtil.scheduleAtFixedRate(1, 1, TimeUnit.HOURS) {
             RuntimeUtil.forceGC()
         }
     }
 
     fun handleConsoleCommand() {
-        TaskUtil.runAsync {
+        TaskUtil.schedule {
             consoleCommandLogger.log(HinaLogLevel.Info, "后台已启用", prefix = "后台管理")
 
             while (comet.getBot().isActive) {

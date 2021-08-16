@@ -13,16 +13,17 @@ package io.github.starwishsama.comet.service.command
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
-import net.mamoe.mirai.contact.*
+import net.mamoe.mirai.contact.Group
+import net.mamoe.mirai.contact.isAdministrator
+import net.mamoe.mirai.contact.isOperator
+import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 object MuteService {
-
     suspend fun doRandomMute(event: GroupMessageEvent) {
-        val target: Long =
-            event.group.members.filter { !it.isAdministrator() }.randomOrNull()?.id ?: -1
-        doMute(event.group, target, RandomUtil.randomLong(1, 2592000).toInt(), false)
+        val target: Long = event.group.members.filter { !it.isAdministrator() }.randomOrNull()?.id ?: -1
+        event.subject.sendMessage(doMute(event.group, target, RandomUtil.randomLong(1, 2592000).toInt(), false))
     }
 
     suspend fun doMute(group: Group, id: Long, muteTime: Int, isAll: Boolean): MessageChain {

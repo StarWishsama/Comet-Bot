@@ -54,7 +54,7 @@ class NoAbbrCommand : ChatCommand, CallbackCommand {
     """.trimIndent()
 
     override fun handleReceipt(receipt: MessageReceipt<Contact>) {
-        TaskUtil.runAsync(20, TimeUnit.SECONDS) {
+        TaskUtil.schedule(20, TimeUnit.SECONDS) {
             runBlocking { receipt.recall() }
         }
     }

@@ -168,7 +168,7 @@ object GachaService {
                     System.setProperty("java.awt.headless", "true")
                 }
 
-                TaskUtil.runAsync {
+                TaskUtil.schedule {
                     GachaUtil.checkArkNightImage()
                 }
             }

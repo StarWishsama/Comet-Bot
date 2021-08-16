@@ -146,7 +146,7 @@ class BiliBiliCommand : ChatCommand {
                 if (event is GroupMessageEvent) {
                     val cfg = GroupConfigManager.getConfig(event.group.id) ?: return "本群尚未注册至 Comet".toChain()
 
-                    TaskUtil.runAsync {
+                    TaskUtil.schedule {
                         cfg.biliSubscribers.forEach {
                             it.userName = DynamicApi.getUserNameByMid(it.id.toLong())
                             it.roomID = UserApi.userApiService.getUserInfo(it.id.toLong()).execute()
