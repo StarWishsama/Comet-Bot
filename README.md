@@ -10,7 +10,7 @@
 
 **一切开发旨在学习，请勿用于非法用途**
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/b26348aabf51452195dbc14846accd86)](https://www.codacy.com/manual/StarWishsama/Comet-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Comet-Bot&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/6d5507c8dc364b9a9cb2a04bd8d04e64)](https://www.codacy.com/gh/StarWishsama/Comet-Bot/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Comet-Bot&amp;utm_campaign=Badge_Grade)
 [![Kotlin Gradle](https://github.com/StarWishsama/Comet-Bot/workflows/Kotlin%20Gradle/badge.svg)](https://github.com/StarWishsama/Comet-Bot/actions/)
 [![LICENSE](https://img.shields.io/github/license/StarWishsama/Comet-Bot.svg?style=popout)](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE)
 [![Issues](https://img.shields.io/github/issues/StarWishsama/Comet-Bot.svg?style=popout)](https://github.com/StarWishsama/Comet-Bot/issues)
