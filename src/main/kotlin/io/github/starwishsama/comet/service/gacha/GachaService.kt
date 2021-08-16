@@ -53,7 +53,7 @@ object GachaService {
             return
         }
 
-        poolPath.listFiles().forEach {
+        poolPath.listFiles()?.forEach {
             addPoolFromFile(it)
         }
 

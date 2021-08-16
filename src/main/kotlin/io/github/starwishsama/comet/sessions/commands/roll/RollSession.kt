@@ -15,7 +15,7 @@ import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionTarget
 
 class RollSession(
-    override var target: SessionTarget,
+    override val target: SessionTarget,
     val rollItem: String,
     val stopAfterMinute: Int,
     val keyWord: String,

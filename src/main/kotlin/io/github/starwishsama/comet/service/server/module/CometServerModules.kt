@@ -39,7 +39,7 @@ fun Application.githubWebHookModule(customSuffix: String) {
 
 internal fun Routing.defaultCallback() {
     get("/") {
-        call.respondText("The request path is ${this.call.request.queryParameters}")
+        call.respondText("The request path is ${this.call.request.queryParameters.entries()}")
     }
 }
 
@@ -129,6 +129,7 @@ object GithubWebHookHandler {
             }
         } catch (e: Exception) {
             CometVariables.netLogger.log(HinaLogLevel.Warn, "推送 WebHook 消息失败", e, prefix = "WebHook")
+            call.respondText("Comet 发生内部错误", status = HttpStatusCode.InternalServerError)
         }
     }
 
