@@ -41,22 +41,29 @@ object MuteService {
                 return CometUtil.toChain("不能禁言机器人")
             }
 
-            for (member in group.members) {
-                if (member.id == id) {
-                    if (member.isOperator()) {
-                        return CometUtil.toChain("不能禁言管理员")
-                    }
+            val member = group.members.find { it.id == id }
 
-                    return when (muteTime) {
-                        in 1..2592000 -> {
-                            member.mute(muteTime)
-                            CometUtil.toChain("禁言 ${member.nameCardOrNick} 成功")
-                        }
-                        0 -> {
+            if (member != null) {
+                if (member.isOperator()) {
+                    return CometUtil.toChain("不能禁言管理员")
+                }
+
+                return when (muteTime) {
+                    in 1..2592000 -> {
+                        member.mute(muteTime)
+                        CometUtil.toChain("禁言 ${member.nameCardOrNick} 成功")
+                    }
+                    0 -> {
+                        member.unmute()
+                        CometUtil.toChain("解禁 ${member.nameCardOrNick} 成功")
+                    }
+                    else -> {
+                        if (member.isMuted) {
                             member.unmute()
                             CometUtil.toChain("解禁 ${member.nameCardOrNick} 成功")
+                        } else {
+                            CometUtil.toChain("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]")
                         }
-                        else -> CometUtil.toChain("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]")
                     }
                 }
             }
