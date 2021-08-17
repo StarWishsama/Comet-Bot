@@ -51,7 +51,7 @@ object GachaService {
             return
         }
 
-        poolPath.listFiles().forEach {
+        poolPath.listFiles()?.forEach {
             addPoolFromFile(it)
         }
 
@@ -166,7 +166,7 @@ object GachaService {
                     System.setProperty("java.awt.headless", "true")
                 }
 
-                TaskUtil.runAsync {
+                TaskUtil.schedule {
                     GachaUtil.checkArkNightImage()
                 }
             }

@@ -43,7 +43,7 @@ object GitHubService {
     }
 
     fun subscribeRepo(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
-        if (!user.hasPermission("nbot.commands.github") || !user.compareLevel(UserLevel.ADMIN)) {
+        if (!user.hasPermission("nbot.commands.github") && !user.compareLevel(UserLevel.ADMIN) && (event is GroupMessageEvent && event.sender.isAdministrator())) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
@@ -103,7 +103,7 @@ object GitHubService {
     }
 
     fun unsubscribeRepo(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
-        if (!user.hasPermission("nbot.commands.github") || !user.compareLevel(UserLevel.ADMIN)) {
+        if (!user.hasPermission("nbot.commands.github") && !user.compareLevel(UserLevel.ADMIN) && (event is GroupMessageEvent && event.sender.isAdministrator())) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
@@ -137,7 +137,7 @@ object GitHubService {
     }
 
     fun getRepoList(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
-        if (!user.hasPermission("nbot.commands.github") || !user.compareLevel(UserLevel.ADMIN)) {
+        if (!user.hasPermission("nbot.commands.github") && !user.compareLevel(UserLevel.ADMIN) && (event is GroupMessageEvent && event.sender.isAdministrator())) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
@@ -173,7 +173,7 @@ object GitHubService {
         command: ChatCommand,
         session: Session? = null
     ): MessageChain {
-        if (!user.hasPermission("nbot.commands.github") || !user.compareLevel(UserLevel.ADMIN)) {
+        if (!user.hasPermission("nbot.commands.github") && !user.compareLevel(UserLevel.ADMIN) && (event is GroupMessageEvent && event.sender.isAdministrator())) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 

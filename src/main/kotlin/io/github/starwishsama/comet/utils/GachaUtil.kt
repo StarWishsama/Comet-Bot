@@ -167,7 +167,7 @@ object GachaUtil {
                     try {
                         val file = File(arkLoc, url)
                         if (!file.exists()) {
-                            val result = TaskUtil.executeRetry(3) {
+                            val result = TaskUtil.executeWithRetry(3) {
                                 NetUtil.downloadFile(arkLoc, "http://prts.wiki$url", "$opName.png")
                             }
                             if (result != null) throw result

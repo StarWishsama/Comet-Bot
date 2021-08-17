@@ -8,9 +8,8 @@
  *
  */
 
-package io.github.starwishsama.comet.sessions
+package io.github.starwishsama.comet.objects.tasks.network
 
-data class SessionTarget(
-    val groupId: Long = 0,
-    val privateId: Long = 0
-)
+interface INetworkRequestTask<T> {
+    fun request(param: String): T
+}

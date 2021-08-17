@@ -74,14 +74,11 @@ object SessionHandler {
      */
     suspend fun handleSessions(e: MessageEvent, u: CometUser): Boolean {
         val time = LocalDateTime.now()
-        val target = SessionTarget()
 
-        target.apply {
-            if (e is GroupMessageEvent) {
-                groupId = e.group.id
-            }
-
-            privateId = e.sender.id
+        val target = if (e is GroupMessageEvent) {
+            SessionTarget(e.group.id, e.sender.id)
+        } else {
+            SessionTarget(privateId = e.sender.id)
         }
 
         val sessionStream = sessionPool.stream()

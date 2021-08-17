@@ -102,7 +102,7 @@ abstract class CometPusher(
     }
 
     fun start() {
-        TaskUtil.runScheduleTaskAsync(config.interval, config.interval, config.timeUnit) {
+        TaskUtil.scheduleAtFixedRate(config.interval, config.interval, config.timeUnit) {
             execute()
         }
 

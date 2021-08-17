@@ -8,7 +8,7 @@
  *
  */
 
-package io.github.starwishsama.comet.service.task
+package io.github.starwishsama.comet.objects.tasks
 
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.logger

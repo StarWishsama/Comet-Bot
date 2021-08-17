@@ -18,10 +18,14 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.SearchApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToWrapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserInfo
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserVideoInfo
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
+import io.github.starwishsama.comet.objects.tasks.network.INetworkRequestTask
+import io.github.starwishsama.comet.objects.tasks.network.NetworkRequestTask
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
@@ -29,6 +33,8 @@ import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.TaskUtil
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -63,33 +69,64 @@ class BiliBiliCommand : ChatCommand {
             }
             "info", "查询", "cx" -> {
                 return if (args.size > 1) {
-                    event.subject.sendMessage(event.message.quote() + "请稍等...")
-
-                    val item: UserInfo? =
-                        if (args[1].isNumeric()) {
-                            UserApi.userApiService.getMemberInfoById(args[1].toLongOrDefault(0)).execute().body()
-                        } else {
-                            val searchResult = SearchApi.searchApiService.searchUser(keyword = args[1]).execute().body()
-
-                            if (searchResult == null) {
-                                return "找不到对应的B站用户".toChain()
+                    val task = object : NetworkRequestTask(),
+                        INetworkRequestTask<Triple<UserInfo?, UserVideoInfo?, MessageWrapper?>> {
+                        override fun request(param: String): Triple<UserInfo?, UserVideoInfo?, MessageWrapper?> {
+                            val userInfo: UserInfo? = if (param.isNumeric()) {
+                                UserApi.userApiService.getMemberInfoById(args[1].toLongOrDefault(0)).execute().body()
                             } else {
-                                UserApi.userApiService.getMemberInfoById(searchResult.data.result[0].mid).execute()
-                                    .body()
+                                val searchResult =
+                                    SearchApi.searchApiService.searchUser(keyword = args[1]).execute().body()
+
+                                if (searchResult == null) {
+                                    null
+                                } else {
+                                    UserApi.userApiService.getMemberInfoById(searchResult.data.result[0].mid).execute()
+                                        .body()
+                                }
                             }
+
+                            if (userInfo == null) {
+                                return Triple(null, null, null)
+                            }
+
+                            val recentVideos =
+                                UserApi.userApiService.getMemberVideoById(userInfo.data.card.mid).execute().body()
+
+                            val dynamic = DynamicApi.getWrappedDynamicTimeline(userInfo.data.card.mid)
+
+                            return Triple(userInfo, recentVideos, dynamic)
                         }
 
-                    if (item != null) {
-                        val recentVideos =
-                            UserApi.userApiService.getMemberVideoById(item.data.card.mid).execute().body()
+                        override val content: Contact = event.subject
 
-                        val text = item.data.card.name + "\n粉丝数: " + item.data.follower.getBetterNumber() +
-                                "\n最近视频: " + (if (recentVideos != null) recentVideos.data.list.videoList[0].toString() else "没有投稿过视频") + "\n"
-                        val dynamic = DynamicApi.getWrappedDynamicTimeline(item.data.card.mid)
-                        text.convertToChain() + "\n" + getDynamicText(dynamic, event)
-                    } else {
-                        "找不到对应的B站用户".toChain()
+                        override val param: String = args[1]
+
+                        override fun callback(result: Any?) {
+                            if (result is Triple<*, *, *> && result.first is UserInfo? && result.second is UserVideoInfo? && result.third is MessageWrapper?) {
+                                val item = result.first as UserInfo?
+
+                                val chain = if (item != null) {
+                                    val recentVideos = result.second as UserVideoInfo?
+
+                                    val text = item.data.card.name + "\n粉丝数: " + item.data.follower.getBetterNumber() +
+                                            "\n最近视频: " + (if (recentVideos != null) recentVideos.data.list.videoList[0].toString() else "没有投稿过视频") + "\n"
+                                    val dynamic = DynamicApi.getWrappedDynamicTimeline(item.data.card.mid)
+                                    text.convertToChain() + "\n" + getDynamicText(dynamic, event)
+                                } else {
+                                    "找不到对应的B站用户".toChain()
+                                }
+
+                                runBlocking {
+                                    content.sendMessage(chain)
+                                }
+                            }
+                        }
                     }
+
+                    NetworkRequestManager.addTask(task)
+
+                    return event.message.quote() + "请稍等..."
                 } else getHelp().convertToChain()
             }
             "push" -> {
@@ -109,7 +146,7 @@ class BiliBiliCommand : ChatCommand {
                 if (event is GroupMessageEvent) {
                     val cfg = GroupConfigManager.getConfig(event.group.id) ?: return "本群尚未注册至 Comet".toChain()
 
-                    TaskUtil.runAsync {
+                    TaskUtil.schedule {
                         cfg.biliSubscribers.forEach {
                             it.userName = DynamicApi.getUserNameByMid(it.id.toLong())
                             it.roomID = UserApi.userApiService.getUserInfo(it.id.toLong()).execute()

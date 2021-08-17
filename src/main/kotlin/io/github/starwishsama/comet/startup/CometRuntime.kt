@@ -26,10 +26,11 @@ import io.github.starwishsama.comet.file.DataSaveHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
 import io.github.starwishsama.comet.logger.RetrofitLogger
+import io.github.starwishsama.comet.managers.NetworkRequestManager
+import io.github.starwishsama.comet.objects.tasks.GroupFileAutoRemover
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.server.CometServiceServer
-import io.github.starwishsama.comet.service.task.GroupFileAutoRemover
 import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.TaskUtil
@@ -163,9 +164,13 @@ object CometRuntime {
 
         startupServer()
 
+        TaskUtil.scheduleAtFixedRate(5, 5, TimeUnit.SECONDS) {
+            NetworkRequestManager.schedule()
+        }
+
         logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${CometVariables.startTime.getLastingTimeAsString()}")
 
-        TaskUtil.runAsync { GachaService.loadAllPools() }
+        TaskUtil.schedule { GachaService.loadAllPools() }
     }
 
     fun setupRCon() {
@@ -190,7 +195,7 @@ object CometRuntime {
     }
 
     private fun runScheduleTasks() {
-        TaskUtil.runAsync { DataSaveHelper.checkOldFiles() }
+        TaskUtil.schedule { DataSaveHelper.checkOldFiles() }
 
         val apis = arrayOf(DynamicApi, TwitterApi, VideoApi)
 
@@ -199,16 +204,16 @@ object CometRuntime {
         DataSaveHelper.scheduleSave()
 
         apis.forEach {
-            TaskUtil.runScheduleTaskAsync(it.duration.toLong(), it.duration.toLong(), TimeUnit.HOURS) {
+            TaskUtil.scheduleAtFixedRate(it.duration.toLong(), it.duration.toLong(), TimeUnit.HOURS) {
                 it.resetTime()
             }
         }
 
-        TaskUtil.runScheduleTaskAsync(1, 1, TimeUnit.HOURS) {
+        TaskUtil.scheduleAtFixedRate(1, 1, TimeUnit.HOURS) {
             GroupFileAutoRemover.execute()
         }
 
-        TaskUtil.runScheduleTaskAsync(1, 1, TimeUnit.HOURS) {
+        TaskUtil.scheduleAtFixedRate(1, 1, TimeUnit.HOURS) {
             RuntimeUtil.forceGC()
         }
     }

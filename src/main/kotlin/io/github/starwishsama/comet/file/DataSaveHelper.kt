@@ -50,7 +50,7 @@ object DataSaveHelper {
     }
 
     fun scheduleBackup() =
-        TaskUtil.runScheduleTaskAsync(
+        TaskUtil.scheduleAtFixedRate(
             cfg.autoSaveTime,
             cfg.autoSaveTime,
             TimeUnit.MINUTES,
@@ -58,7 +58,7 @@ object DataSaveHelper {
         )
 
     fun scheduleSave() =
-        TaskUtil.runScheduleTaskAsync(cfg.autoSaveTime, cfg.autoSaveTime, TimeUnit.MINUTES, DataSetup::saveAllResources)
+        TaskUtil.scheduleAtFixedRate(cfg.autoSaveTime, cfg.autoSaveTime, TimeUnit.MINUTES, DataSetup::saveAllResources)
 
     @OptIn(ExperimentalTime::class)
     fun checkOldFiles() {

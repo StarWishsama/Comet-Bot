@@ -16,12 +16,17 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.service.command.JikiPediaService
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 class JikiPediaCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
-        return JikiPediaService.searchJiki(event, args.getRestString(0))
+        return if (args.isNotEmpty()) {
+            JikiPediaService.searchJiki(event, args.getRestString(0))
+        } else {
+            getHelp().toChain()
+        }
     }
 
     override val props: CommandProps = CommandProps(

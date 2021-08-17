@@ -8,7 +8,7 @@
  *
  */
 
-package io.github.starwishsama.comet.service.task
+package io.github.starwishsama.comet.objects.tasks
 
 import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.CometVariables.daemonLogger
@@ -18,6 +18,7 @@ import io.github.starwishsama.comet.utils.CometUtil.toChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.isAdministrator
 import java.util.regex.Pattern
+import kotlin.streams.toList
 
 object GroupFileAutoRemover {
     private val cachePool = mutableSetOf<PerGroupConfig>()
@@ -26,13 +27,13 @@ object GroupFileAutoRemover {
         daemonLogger.debug("正在自动删除群文件")
         val configs = GroupConfigManager.getAllConfigs()
 
-        configs.forEach {
-            if (!it.oldFileCleanFeature) {
-                return@forEach
-            } else {
-                cachePool.add(it)
-            }
+        val groups = configs.parallelStream().filter { it.oldFileCleanFeature }.toList()
+
+        if (groups.isEmpty()) {
+            return
         }
+
+        cachePool.addAll(groups)
 
         cachePool.forEach {
             handlePerGroupFile(it)
