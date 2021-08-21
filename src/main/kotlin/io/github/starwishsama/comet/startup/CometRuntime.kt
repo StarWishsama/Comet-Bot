@@ -21,8 +21,10 @@ import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.logger
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.MessageHandler
-import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.*
+import io.github.starwishsama.comet.api.thirdparty.jikipedia.JikiPediaApi
+import io.github.starwishsama.comet.api.thirdparty.noabbr.NoAbbrApi
+import io.github.starwishsama.comet.api.thirdparty.rainbowsix.R6StatsApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.chats.*
 import io.github.starwishsama.comet.commands.console.BroadcastCommand
@@ -219,15 +221,18 @@ object CometRuntime {
     private fun runScheduleTasks() {
         TaskUtil.schedule { DataSaveHelper.checkOldFiles() }
 
-        val apis = arrayOf(DynamicApi, TwitterApi, VideoApi)
+        val apis =
+            arrayOf(DynamicApi, JikiPediaApi, LiveApi, NoAbbrApi, R6StatsApi, SearchApi, TwitterApi, UserApi, VideoApi)
 
         /** 定时任务 */
         DataSaveHelper.scheduleBackup()
         DataSaveHelper.scheduleSave()
 
         apis.forEach {
-            TaskUtil.scheduleAtFixedRate(it.duration.toLong(), it.duration.toLong(), TimeUnit.HOURS) {
-                it.resetTime()
+            if (it.duration > 0) {
+                TaskUtil.scheduleAtFixedRate(it.duration.toLong(), it.duration.toLong(), TimeUnit.HOURS) {
+                    it.resetTime()
+                }
             }
         }
 

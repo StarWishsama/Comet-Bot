@@ -12,7 +12,7 @@ package io.github.starwishsama.comet.service.command
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.utils.CometUtil
-import io.github.starwishsama.comet.utils.StringUtil.isNumeric
+import io.github.starwishsama.comet.utils.math.TimeUtil
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.isAdministrator
 import net.mamoe.mirai.contact.isOperator
@@ -75,30 +75,14 @@ object MuteService {
     }
 
     fun getMuteTime(message: String): Int {
-        if (message.isNumeric()) {
-            return message.toInt()
+        // 30*24*60*60, a month
+        val maxBanTime = 2592000
+        var banTime = TimeUtil.parseTextTime(message)
+
+        if (banTime > maxBanTime) {
+            banTime = maxBanTime
         }
 
-        var banTime: Long
-        // 30*24*60*60, a month
-        val maxBanTime: Long = 2592000
-
-        val yearRegex = Regex("""(\d{1,2})[yY年]""")
-        val monRegex = Regex("""(\d{1,2})(月|mon|Mon)""")
-        val dayRegex = Regex("""(\d{1,2})[dD天]""")
-        val hourRegex = Regex("""(\d{1,2})(小时|时|h|H)""")
-        val minRegex = Regex("""(\d{1,2})(分钟|分|m|M)(?!on)""")
-        val secRegex = Regex("""(\d{1,7})(秒钟|秒|s|S)""")
-
-        banTime = yearRegex.find(message)?.groups?.get(1)?.value?.toLong()?.times(365 * 24 * 60 * 60) ?: 0L
-        banTime += monRegex.find(message)?.groups?.get(1)?.value?.toLong()?.times(30 * 24 * 60 * 60) ?: 0L
-        banTime += dayRegex.find(message)?.groups?.get(1)?.value?.toLong()?.times(24 * 60 * 60) ?: 0L
-        banTime += hourRegex.find(message)?.groups?.get(1)?.value?.toLong()?.times(60 * 60) ?: 0L
-        banTime += minRegex.find(message)?.groups?.get(1)?.value?.toLong()?.times(60) ?: 0L
-        banTime += secRegex.find(message)?.groups?.get(1)?.value?.toLong() ?: 0L
-
-        if (banTime > maxBanTime) banTime = maxBanTime
-
-        return banTime.toInt()
+        return banTime
     }
 }
