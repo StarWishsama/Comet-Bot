@@ -154,7 +154,7 @@ object CometRuntime {
 
         /** 监听器 */
         val listeners = arrayOf(
-            ConvertLightAppListener,
+            BiliBiliShareListener,
             RepeatListener,
             BotGroupStatusListener,
             AutoReplyListener,

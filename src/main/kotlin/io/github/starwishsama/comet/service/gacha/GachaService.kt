@@ -22,7 +22,6 @@ import kotlinx.serialization.decodeFromString
 import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
 import java.io.IOException
-import java.util.regex.Pattern
 import java.util.stream.Collectors
 
 object GachaService {
@@ -30,7 +29,7 @@ object GachaService {
     private var arkNightUsable = true
     private val poolPath = FileUtil.getChildFolder("gacha")
 
-    private val yamlFilePattern = Pattern.compile(".y[a]?ml")
+    private val yamlFilePattern = Regex(".y[a]?ml")
 
     fun loadGachaData(arkNight: File) {
         loadArkNightData(arkNight)
@@ -85,7 +84,7 @@ object GachaService {
         require(poolFile.exists()) { "${poolFile.absolutePath} isn't exists" }
 
         // 不处理非 YAML 类型文件
-        if (!yamlFilePattern.matcher(poolFile.name).find()) {
+        if (yamlFilePattern.find(poolFile.name) != null) {
             CometVariables.daemonLogger.warning("检测到不受支持的卡池文件 ${poolFile.name}")
             return
         }
