@@ -42,9 +42,9 @@ object BiliBiliShareListener : NListener {
 
             if (checkResult.isNotEmpty()) {
                 runBlocking { 
-                    event.subject.sendMessage(checkResult) 
-                    return
+                    event.subject.sendMessage(checkResult)
                 }
+                return
             }
 
             val lightApp = event.message[LightApp] ?: return
