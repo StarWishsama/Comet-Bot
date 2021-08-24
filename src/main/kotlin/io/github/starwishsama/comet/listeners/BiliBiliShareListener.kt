@@ -41,7 +41,10 @@ object BiliBiliShareListener : NListener {
             val checkResult = biliBiliLinkConvert(targetURL, event.subject)
 
             if (checkResult.isNotEmpty()) {
-                runBlocking { event.subject.sendMessage(checkResult) }
+                runBlocking { 
+                    event.subject.sendMessage(checkResult)
+                }
+                return
             }
 
             val lightApp = event.message[LightApp] ?: return
@@ -69,24 +72,7 @@ object BiliBiliShareListener : NListener {
 
         return try {
             val url = meta["qqdocurl"].asText()
-
-            val videoID = parseVideoIDFromBili(NetUtil.getRedirectedURL(url) ?: return EmptyMessageChain)
-
-            val videoInfo = if (videoID.contains("BV")) {
-                VideoApi.videoService.getVideoInfoByBID(videoID)
-            } else {
-                VideoApi.videoService.getVideoInfo(videoID)
-            }.execute().body() ?: return EmptyMessageChain
-
-
-            return runBlocking {
-                val wrapper = videoInfo.toMessageWrapper()
-                return@runBlocking if (!wrapper.isUsable()) {
-                    EmptyMessageChain
-                } else {
-                    wrapper.toMessageChain(subject)
-                }
-            }
+            biliBiliLinkConvert(url, subject)
         } catch (e: Exception) {
             CometVariables.logger.warning("[监听器] 无法解析卡片消息", e)
             EmptyMessageChain
@@ -112,7 +98,7 @@ object BiliBiliShareListener : NListener {
         }
     }
 
-    fun parseVideoIDFromBili(url: String): String {
+    private fun parseVideoIDFromBili(url: String): String {
         val videoID = url.substring(0, url.indexOf("?")).replace("https", "").replace("https", "").split("/")
         return videoID.last()
     }
