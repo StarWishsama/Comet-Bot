@@ -164,7 +164,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                                 "pattern" -> {
                                     return if (args.size > 2) {
                                         cfg.oldFileMatchPattern = args[2]
-                                        "已设置文件匹配正则表达式为 ${cfg.oldFileMatchPattern}.".toChain()
+                                        "已设置文件匹配正则表达式为 [${cfg.oldFileMatchPattern}].".toChain()
                                     } else {
                                         "/group frm pattern [文件匹配正则表达式]".toChain()
                                     }

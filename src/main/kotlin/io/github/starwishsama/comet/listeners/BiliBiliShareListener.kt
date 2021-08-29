@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
-import io.github.starwishsama.comet.utils.StringUtil
 import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
@@ -28,17 +27,31 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import kotlin.time.ExperimentalTime
 
-object ConvertLightAppListener : NListener {
+object BiliBiliShareListener : NListener {
     override val eventToListen = listOf(GroupMessageEvent::class)
+
+    private val bvPattern = Regex("""https://b23.tv/\w{1,6}""")
 
     @MiraiExperimentalApi
     @ExperimentalTime
     override fun listen(event: Event) {
         if (event is GroupMessageEvent && !event.group.isBotMuted) {
-            val lightApp = event.message[LightApp]
-            if (lightApp != null) {
-                val result = parseJsonMessage(lightApp, event.subject)
-                if (result !is EmptyMessageChain) runBlocking { event.subject.sendMessage(result) }
+            val targetURL = bvPattern.find(event.message.contentToString())?.groups?.get(0)?.value ?: return
+
+            val checkResult = biliBiliLinkConvert(targetURL, event.subject)
+
+            if (checkResult.isNotEmpty()) {
+                runBlocking { 
+                    event.subject.sendMessage(checkResult)
+                }
+                return
+            }
+
+            val lightApp = event.message[LightApp] ?: return
+
+            val result = parseJsonMessage(lightApp, event.subject)
+            if (result.isNotEmpty()) {
+                runBlocking { event.subject.sendMessage(result) }
             }
         }
     }
@@ -59,28 +72,35 @@ object ConvertLightAppListener : NListener {
 
         return try {
             val url = meta["qqdocurl"].asText()
-
-            val videoID = StringUtil.parseVideoIDFromBili(NetUtil.getRedirectedURL(url) ?: return EmptyMessageChain)
-
-            val videoInfo = if (videoID.contains("BV")) {
-                VideoApi.videoService.getVideoInfoByBID(videoID)
-            } else {
-                VideoApi.videoService.getVideoInfo(videoID)
-            }.execute().body() ?: return EmptyMessageChain
-
-
-            return runBlocking {
-                val wrapper = videoInfo.toMessageWrapper()
-                return@runBlocking if (!wrapper.isUsable()) {
-                    EmptyMessageChain
-                } else {
-                    wrapper.toMessageChain(subject)
-                }
-            }
+            biliBiliLinkConvert(url, subject)
         } catch (e: Exception) {
             CometVariables.logger.warning("[监听器] 无法解析卡片消息", e)
             EmptyMessageChain
         }
+    }
+
+    private fun biliBiliLinkConvert(url: String, subject: Contact): MessageChain {
+        val videoID = parseVideoIDFromBili(NetUtil.getRedirectedURL(url) ?: return EmptyMessageChain)
+
+        val videoInfo = if (videoID.contains("BV")) {
+            VideoApi.videoService.getVideoInfoByBID(videoID)
+        } else {
+            VideoApi.videoService.getVideoInfo(videoID)
+        }.execute().body() ?: return EmptyMessageChain
+
+        return runBlocking {
+            val wrapper = videoInfo.toMessageWrapper()
+            return@runBlocking if (!wrapper.isUsable()) {
+                EmptyMessageChain
+            } else {
+                wrapper.toMessageChain(subject)
+            }
+        }
+    }
+
+    private fun parseVideoIDFromBili(url: String): String {
+        val videoID = url.substring(0, url.indexOf("?")).replace("https", "").replace("https", "").split("/")
+        return videoID.last()
     }
 
     override fun getName(): String = "去你大爷的小程序"

@@ -10,23 +10,32 @@
 
 package io.github.starwishsama.comet.objects.tasks.network.impl
 
+import io.github.starwishsama.comet.CometVariables.localizationManager
 import io.github.starwishsama.comet.api.thirdparty.noabbr.NoAbbrApi
 import io.github.starwishsama.comet.api.thirdparty.noabbr.data.AbbrSearchResponse
 import io.github.starwishsama.comet.objects.tasks.network.INetworkRequestTask
 import io.github.starwishsama.comet.objects.tasks.network.NetworkRequestTask
+import io.github.starwishsama.comet.utils.CometUtil.toChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
+import java.io.IOException
 
 class NoAbbrRequestTask(override val content: Contact, override val param: String) : NetworkRequestTask(),
     INetworkRequestTask<AbbrSearchResponse> {
     override fun request(param: String): AbbrSearchResponse {
-        return NoAbbrApi.guessMeaning(param)
+        return try {
+            NoAbbrApi.guessMeaning(param)
+        } catch (e: IOException) {
+            AbbrSearchResponse.empty()
+        }
     }
 
     override fun callback(result: Any?) {
         runBlocking {
-            if (result is AbbrSearchResponse) {
+            if (result is AbbrSearchResponse && !result.isEmpty()) {
                 content.sendMessage(result.toMessageWrapper().toMessageChain(content))
+            } else {
+                content.sendMessage(localizationManager.getLocalizationText("network-error").toChain())
             }
         }
     }

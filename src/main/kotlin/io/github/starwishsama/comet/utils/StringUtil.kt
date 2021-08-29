@@ -128,11 +128,6 @@ object StringUtil {
      */
     fun isLegitId(username: String, type: IDGuidelineType): Boolean = type.rule.matches(username)
 
-    fun parseVideoIDFromBili(url: String): String {
-        val videoID = url.substring(0, url.indexOf("?")).replace("https", "").replace("https", "").split("/")
-        return videoID.last()
-    }
-
     fun simplyClassName(name: String): String {
         return buildString {
             val classPart = name.split(".")

@@ -26,12 +26,12 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.21'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
     id 'com.github.gmazzo.buildconfig' version '3.0.2'
-    id("net.mamoe.mirai-console") version "2.7-RC-dev-3"
+    id("net.mamoe.mirai-console") version "2.7.0"
     id "org.jetbrains.kotlin.kapt" version "1.5.21"
 }
 
 def mainClass = 'io.github.starwishsama.comet.CometApplication'
-def miraiVersion = '2.7-RC'
+def miraiVersion = '2.7.0'
 
 jar {
     manifest {
@@ -55,8 +55,8 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-core:1.2.2'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
-    implementation 'cn.hutool:hutool-http:5.7.8'
-    implementation 'cn.hutool:hutool-crypto:5.7.8'
+    implementation 'cn.hutool:hutool-http:5.7.9'
+    implementation 'cn.hutool:hutool-crypto:5.7.9'
 
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'org.apache.commons:commons-io:1.3.2'
@@ -76,14 +76,14 @@ dependencies {
     implementation 'com.github.rockswang:java-curl:1.2.2.190107'
 
     // jsoup HTML parser library @ https://jsoup.org/
-    implementation 'org.jsoup:jsoup:1.14.1'
+    implementation 'org.jsoup:jsoup:1.14.2'
 
     // Retrofit A type-safe HTTP client for Android and Java @ https://github.com/square/retrofit/
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
 
     // DNSJava used to srv lookup
-    implementation 'dnsjava:dnsjava:3.4.0'
+    implementation 'dnsjava:dnsjava:3.4.1'
 
     api 'org.fusesource.jansi:jansi:2.3.4'
 
