@@ -17,11 +17,16 @@ import io.github.starwishsama.comet.objects.tasks.network.NetworkRequestTask
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
+import java.io.IOException
 
 class JikiPediaRequestTask(override val content: Contact, override val param: String) : NetworkRequestTask(),
     INetworkRequestTask<JikiPediaSearchResult> {
     override fun request(param: String): JikiPediaSearchResult {
-        return JikiPediaApi.search(param)
+        return try {
+            JikiPediaApi.search(param)
+        } catch (e: IOException) {
+            JikiPediaSearchResult.empty()
+        }
     }
 
     override fun callback(result: Any?) {
