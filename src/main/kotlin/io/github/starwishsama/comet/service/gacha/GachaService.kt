@@ -84,7 +84,7 @@ object GachaService {
         require(poolFile.exists()) { "${poolFile.absolutePath} isn't exists" }
 
         // 不处理非 YAML 类型文件
-        if (yamlFilePattern.find(poolFile.name) != null) {
+        if (yamlFilePattern.find(poolFile.name) == null) {
             CometVariables.daemonLogger.warning("检测到不受支持的卡池文件 ${poolFile.name}")
             return
         }
