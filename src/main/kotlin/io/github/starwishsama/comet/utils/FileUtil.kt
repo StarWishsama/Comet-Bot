@@ -325,7 +325,7 @@ object FileUtil {
                 if (entryName.startsWith("$resourcePath/")) {
                     val actualName = entryName.replace("${resourcePath}/", "").removeSuffix("/")
 
-                    processFileInJar(entry, actualName)
+                    processFileInJar(jar, entry, actualName)
                 } else {
                     continue
                 }
@@ -340,7 +340,7 @@ object FileUtil {
      * @param fileName 文件名
      * @param resourcePath 资源文件储存文件夹
      */
-    private fun processFileInJar(entry: JarEntry, fileName: String, resourcePath: String = "resources") {
+    private fun processFileInJar(jar: JarFile, entry: JarEntry, fileName: String, resourcePath: String = "resources") {
         var counter = 0
 
         if (fileName.isEmpty()) {
@@ -364,7 +364,7 @@ object FileUtil {
                 FileOutputStream(current).use { fos ->
                     val byteArray = ByteArray(1024)
                     var len: Int
-                    javaClass.classLoader.getResourceAsStream(entryName)?.use { fis ->
+                    jar.getInputStream(entry)?.use { fis ->
                         // While the input stream has bytes
                         while (fis.read(byteArray).also { len = it } > 0) {
                             fos.write(byteArray, 0, len)
