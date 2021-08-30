@@ -17,7 +17,9 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.enums.PicSearchApiType
 import io.github.starwishsama.comet.enums.UserLevel
+import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.config.api.SauceNaoConfig
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
@@ -96,6 +98,10 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
         val defaultSimilarity = 52.5
         when (CometVariables.cfg.pictureSearchApi) {
             PicSearchApiType.SAUCENAO -> {
+                if (ApiManager.getConfig<SauceNaoConfig>().token.isEmpty()) {
+                    return "SauceNao 搜索未被正确配置, 请联系管理员."
+                }
+
                 val result = PictureSearchUtil.sauceNaoSearch(url)
                 return when {
                     result.similarity >= defaultSimilarity -> {
