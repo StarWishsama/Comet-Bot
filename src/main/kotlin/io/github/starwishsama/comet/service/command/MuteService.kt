@@ -48,11 +48,6 @@ object MuteService {
                     return CometUtil.toChain("不能禁言管理员")
                 }
 
-                if (member.isMuted) {
-                    member.unmute()
-                    CometUtil.toChain("解禁 ${member.nameCardOrNick} 成功")
-                }
-
                 return when (muteTime) {
                     in 1..2592000 -> {
                         member.mute(muteTime)
