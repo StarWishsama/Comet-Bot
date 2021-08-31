@@ -67,7 +67,7 @@ data class PullRequestEvent(
         wrapper.addText("| 发布时间 ${pullRequestInfo.convertCreatedTime()}\n")
         wrapper.addText("| 发布人 ${sender.login}\n")
         wrapper.addText("| 提交更改信息: \n")
-        wrapper.addText("| ${pullRequestInfo.title}\n")
+        wrapper.addText("| ${pullRequestInfo.title.limitStringSize(50)}\n")
         wrapper.addText("| ${pullRequestInfo.body.limitStringSize(100).trim()}\n")
         wrapper.addText("| 查看完整信息: ${pullRequestInfo.url}")
 

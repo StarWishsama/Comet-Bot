@@ -107,6 +107,7 @@ object CometRuntime {
                 InfoCommand(),
                 MusicCommand(),
                 MuteCommand(),
+                UnMuteCommand(),
                 PictureSearchCommand(),
                 R6SCommand(),
                 RConCommand(),

@@ -13,6 +13,7 @@ package io.github.starwishsama.comet.api.thirdparty.jikipedia
 import cn.hutool.core.net.URLEncoder
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
+import io.github.starwishsama.comet.utils.network.NetUtil
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import java.io.IOException
@@ -31,7 +32,7 @@ object JikiPediaApi : ApiExecutor {
 
             val connection = Jsoup.connect(searchRoute + URLEncoder.DEFAULT.encode(keyword, StandardCharsets.UTF_8))
 
-            connection.userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 Edg/92.0.902.67")
+            connection.userAgent(NetUtil.defaultUA)
 
             if (CometVariables.cfg.proxySwitch) {
                 connection.proxy(CometVariables.cfg.proxyUrl, CometVariables.cfg.proxyPort)
