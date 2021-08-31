@@ -69,16 +69,20 @@ data class RepeatInfo(
         ) {
             messageCache.add(message)
         } else {
+            // No one repeat now, clear it
             lastRepeat = EmptyMessageChain
             messageCache.clear()
             return
         }
 
-        if (messageCache.size > 1 && !lastMessage.contentEquals(lastMessage, ignoreCase = false, strict = true)) {
+        if (messageCache.size > 1 && !lastMessage.contentEquals(lastRepeat, ignoreCase = false, strict = true)) {
             runBlocking {
-                lastRepeat = lastMessage
                 group.sendMessage(processRepeatMessage(lastMessage))
             }
+
+            // Set last repeat message
+            lastRepeat = lastMessage
+
             messageCache.clear()
         }
     }
