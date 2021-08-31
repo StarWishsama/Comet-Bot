@@ -31,17 +31,20 @@ object BiliBiliShareListener : NListener {
     override val eventToListen = listOf(GroupMessageEvent::class)
 
     private val bvPattern = Regex("""https://b23.tv/\w{1,6}""")
+    private val longUrlPattern = Regex("""https://www.bilibili.com/video/(av|BV)\w{1,10}""")
 
     @MiraiExperimentalApi
     @ExperimentalTime
     override fun listen(event: Event) {
         if (event is GroupMessageEvent && !event.group.isBotMuted) {
-            val targetURL = bvPattern.find(event.message.contentToString())?.groups?.get(0)?.value ?: return
+            val targetURL = bvPattern.find(event.message.contentToString())?.groups?.get(0)?.value
+                ?: longUrlPattern.find(event.message.contentToString())?.groups?.get(0)?.value
+                ?: return
 
             val checkResult = biliBiliLinkConvert(targetURL, event.subject)
 
             if (checkResult.isNotEmpty()) {
-                runBlocking { 
+                runBlocking {
                     event.subject.sendMessage(checkResult)
                 }
                 return

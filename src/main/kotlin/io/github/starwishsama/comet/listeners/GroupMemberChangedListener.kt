@@ -31,7 +31,7 @@ object GroupMemberChangedListener : NListener {
                     event.group.sendMessage(
                         reWrapMessage(
                             cfg.newComerWelcomeText,
-                            event
+                            event.user.id
                         ).toMessageChain(event.group)
                     )
                 }
@@ -41,7 +41,7 @@ object GroupMemberChangedListener : NListener {
 
     override fun getName(): String = "群聊欢迎"
 
-    private fun reWrapMessage(original: MessageWrapper, event: MemberJoinEvent): MessageWrapper {
+    private fun reWrapMessage(original: MessageWrapper, memberID: Long): MessageWrapper {
         val newWrapper = MessageWrapper()
 
         for (wrapperElement in original.getMessageContent()) {
@@ -52,7 +52,7 @@ object GroupMemberChangedListener : NListener {
                     val after = wrapperElement.text.substring(index)
 
                     newWrapper.addText("$before ")
-                    newWrapper.addElement(AtElement(event.member.id))
+                    newWrapper.addElement(AtElement(memberID))
                     newWrapper.addText(" $after")
                 } else {
                     newWrapper.addElement(wrapperElement)
