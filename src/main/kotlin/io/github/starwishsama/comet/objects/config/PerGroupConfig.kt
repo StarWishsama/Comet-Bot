@@ -57,6 +57,13 @@ data class PerGroupConfig(
      */
     @JsonProperty("bili_sub")
     val biliSubscribers: MutableSet<BiliBiliUser> = hashSetOf(),
+
+    /**
+     * 是否关闭对此群消息中的B站视频解析
+     */
+    @JsonProperty("can_parse_bili_video")
+    var canParseBiliVideo: Boolean = true,
+
     /**
      * 是否关闭对此群消息的复读
      */

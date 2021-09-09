@@ -19,8 +19,6 @@ import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.CometUser
-import io.github.starwishsama.comet.objects.tasks.HitokotoUpdater
-import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.toChain
@@ -34,11 +32,8 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
 import java.util.concurrent.ThreadPoolExecutor
-import kotlin.time.ExperimentalTime
-
 
 class DebugCommand : ChatCommand, UnDisableableCommand {
-    @ExperimentalTime
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isNotEmpty()) {
             when (args[0]) {
@@ -105,37 +100,9 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
                         }
                     }
                 }
-                "hitokoto" -> return HitokotoUpdater.getHitokoto().convertToChain()
                 "switch" -> {
                     CometVariables.switch = !CometVariables.switch
                     return "维护模式已${if (!CometVariables.switch) "开启" else "关闭"}".toChain()
-                }
-                "push" -> {
-                    if (args.size > 1) {
-                        return when (args[1].lowercase()) {
-                            "twit", "twitter", "推特", "蓝鸟", "twi" -> {
-                                PusherManager.getPusherByName("data")?.execute()
-                                toChain("Twitter retriever has been triggered and run~")
-                            }
-                            "bilibili", "bili", "哔哩哔哩", "b站" -> {
-                                PusherManager.getPusherByName("bili_dynamic")?.execute()
-                                    ?: return "Can't found pusher".toChain()
-                                toChain("Bilibili retriever has been triggered and run~")
-                            }
-                            "status" -> {
-                                val ps = PusherManager.getPushers()
-                                buildString {
-                                    ps.forEach {
-                                        append(it::class.java.simpleName + "\n")
-                                        append("上次推送了 ${it.pushTime} 次\n")
-                                        append("上次推送于 ${CometVariables.yyMMddPattern.format(it.latestTriggerTime)}\n")
-                                    }
-                                    trim()
-                                }.toChain()
-                            }
-                            else -> toChain("Unknown retriever type.")
-                        }
-                    }
                 }
                 "quit" -> {
                     if (event is GroupMessageEvent) {

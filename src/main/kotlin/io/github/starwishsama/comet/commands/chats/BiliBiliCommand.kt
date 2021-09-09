@@ -168,6 +168,13 @@ class BiliBiliCommand : ChatCommand {
                     "请输入有效的动态 ID".toChain()
                 }
             }
+            "parse" -> {
+                return if (event is GroupMessageEvent) {
+                    setParseVideo(event.group.id)
+                } else {
+                    toChain("抱歉, 该命令仅限群聊使用!")
+                }
+            }
             else -> return getHelp().convertToChain()
         }
 
@@ -184,6 +191,7 @@ class BiliBiliCommand : ChatCommand {
         /bili push 开启/关闭本群开播推送
         /bili refresh 刷新订阅UP主缓存
         /bili id [动态 ID] 通过动态 ID 查询动态
+        /bili parse 开启/关闭群聊消息视频解析
     """.trimIndent()
 
     override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
@@ -316,6 +324,14 @@ class BiliBiliCommand : ChatCommand {
         } else {
             toChain("你已经订阅过 ${name}($uid) 了!")
         }
+    }
+
+    private fun setParseVideo(groupId: Long): MessageChain {
+        val cfg = GroupConfigManager.getConfig(groupId) ?: return "请求的群聊不存在!".toChain()
+
+        cfg.canParseBiliVideo = !cfg.canParseBiliVideo
+
+        return "群聊视频解析已${if (cfg.canParseBiliVideo) "开启" else "关闭"}".toChain()
     }
 
 }

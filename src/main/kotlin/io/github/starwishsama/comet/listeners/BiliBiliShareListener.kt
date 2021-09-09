@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
+import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
@@ -37,6 +38,10 @@ object BiliBiliShareListener : NListener {
     @ExperimentalTime
     override fun listen(event: Event) {
         if (event is GroupMessageEvent && !event.group.isBotMuted) {
+            if (GroupConfigManager.getConfig(event.group.id)?.canParseBiliVideo != true) {
+                return
+            }
+
             val targetURL = bvPattern.find(event.message.contentToString())?.groups?.get(0)?.value
                 ?: longUrlPattern.find(event.message.contentToString())?.groups?.get(0)?.value
                 ?: return

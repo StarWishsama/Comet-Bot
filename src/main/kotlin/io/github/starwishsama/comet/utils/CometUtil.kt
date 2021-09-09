@@ -89,7 +89,7 @@ object CometUtil {
         }.trim().removeSuffix(joinRune)
     }
 
-    @ExperimentalTime
+    @OptIn(ExperimentalTime::class)
     fun getRunningTime(): String {
         val remain = Duration.between(CometVariables.startTime, LocalDateTime.now())
         return remain.toKotlinDuration().toFriendly()
