@@ -16,6 +16,7 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.MemberPermission
@@ -31,7 +32,11 @@ class KickCommand : ChatCommand {
             if (args.isNotEmpty()) {
                 val at = CometUtil.parseAtToId(event, args[0])
                 if (at > -1) {
-                    doKick(event, at, "")
+                    if (args.size > 1) {
+                        doKick(event, at, args.getRestString(1))
+                    } else {
+                        doKick(event, at, "")
+                    }
                 } else {
                     getHelp().convertToChain()
                 }

@@ -16,8 +16,8 @@ import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.ClockInManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.clock.ClockInData
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.CometUtil.toChain
-import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -86,23 +86,27 @@ class ClockInCommand : ChatCommand {
     private fun doClockIn(sender: Member, msg: GroupMessageEvent, data: ClockInData): MessageChain {
         val checkInTime = LocalDateTime.now()
         if (Duration.between(data.endTime, checkInTime).toMinutes() <= 5) {
-            var result =
-                "Bot > ${msg.sender.nameCardOrNick} 打卡成功!\n打卡时间: ${
-                    checkInTime.format(
-                        DateTimeFormatter.ofPattern(
-                            "yyyy-MM-dd HH:mm:ss"
+            val result =
+                MessageWrapper().addText(
+                    "Bot > ${msg.sender.nameCardOrNick} 打卡成功!\n打卡时间: ${
+                        checkInTime.format(
+                            DateTimeFormatter.ofPattern(
+                                "yyyy-MM-dd HH:mm:ss"
+                            )
                         )
-                    )
-                }"
-            result += if (checkInTime.isAfter(data.endTime)) {
-                data.lateUsers.add(sender)
-                "\n签到状态: 迟到"
-            } else {
-                "\n签到状态: 成功"
-            }
+                    }"
+                )
+            result.addText(
+                if (checkInTime.isAfter(data.endTime)) {
+                    data.lateUsers.add(sender)
+                    "\n签到状态: 迟到"
+                } else {
+                    "\n签到状态: 成功"
+                }
+            )
 
             data.checkedUsers.add(sender)
-            return result.convertToChain()
+            return result.toMessageChain(null)
         } else {
             return data.viewData().toMessageChain(msg.subject)
         }
