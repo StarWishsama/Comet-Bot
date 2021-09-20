@@ -39,7 +39,7 @@ object MinecraftUtil {
             socket = Socket(host, port)
         }
 
-        socket.soTimeout = 10 * 1000
+        socket.soTimeout = 1500
 
         val outputStream = socket.getOutputStream()
         val dataOutputStream = DataOutputStream(outputStream)

@@ -48,7 +48,6 @@ class MinecraftCommand : ChatCommand {
             2 -> {
                 return if (args[1].isNumeric()) {
                     event.subject.sendMessage(toChain("查询中..."))
-
                     query(args[0], args[1].toIntOrNull(), event.subject)
                 } else {
                     "输入的端口号不合法.".toChain()
@@ -76,8 +75,21 @@ class MinecraftCommand : ChatCommand {
             if (port == null) {
                 return "输入的端口号不合法.".toChain()
             }
-            val result = MinecraftUtil.javaQuery(ip, port)
-            result.convertToWrapper().toMessageChain(subject)
+
+            val javaResult = MinecraftUtil.javaQuery(ip, port)
+            val javaWrapper = javaResult.convertToWrapper()
+
+            return if (!javaWrapper.isEmpty()) {
+                javaWrapper.toMessageChain(subject)
+            } else {
+                val bedrockResult = MinecraftUtil.bedrockQuery(ip, port)
+                val bedrockWrapper = bedrockResult.convertToWrapper()
+                if (!bedrockWrapper.isEmpty()) {
+                    bedrockResult.convertToWrapper().toMessageChain(subject)
+                } else {
+                    "查询失败, 服务器可能不在线, 请稍后再试.".toChain()
+                }
+            }
         } catch (e: IOException) {
             "查询失败, 服务器可能不在线, 请稍后再试.".toChain()
         }
