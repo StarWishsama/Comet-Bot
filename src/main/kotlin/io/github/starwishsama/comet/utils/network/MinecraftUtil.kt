@@ -29,94 +29,97 @@ import java.net.*
  * https://github.com/LovesAsuna/Mirai-Bot/blob/master/src/main/kotlin/me/lovesasuna/bot/util/protocol/QueryUtil.kt
  */
 object MinecraftUtil {
-    @Throws(IOException::class)
     fun javaQuery(host: String, port: Int): QueryInfo {
-        val socket: Socket
-        if (cfg.proxySwitch) {
-            socket = Socket(Proxy(cfg.proxyType, Socket(cfg.proxyUrl, cfg.proxyPort).remoteSocketAddress))
-            socket.connect(Socket(host, port).remoteSocketAddress)
-        } else {
-            socket = Socket(host, port)
-        }
+        try {
+            val socket: Socket
+            if (cfg.proxySwitch) {
+                socket = Socket(Proxy(cfg.proxyType, Socket(cfg.proxyUrl, cfg.proxyPort).remoteSocketAddress))
+                socket.connect(Socket(host, port).remoteSocketAddress)
+            } else {
+                socket = Socket(host, port)
+            }
 
-        socket.soTimeout = 1500
+            socket.soTimeout = 1500
 
-        val outputStream = socket.getOutputStream()
-        val dataOutputStream = DataOutputStream(outputStream)
-        val inputStream = socket.getInputStream()
-        val inputStreamReader = InputStreamReader(inputStream)
-        val b = ByteArrayOutputStream()
-        val handshake = DataOutputStream(b)
-        /*握手数据包id*/
-        handshake.writeByte(0x00)
-        /*协议版本*/
-        writeVarInt(handshake, 578)
-        /*主机地址长度*/
-        writeVarInt(handshake, host.length)
-        /*主机地址*/
-        handshake.writeBytes(host)
-        /*端口*/
-        handshake.writeShort(25565)
-        /*状态(握手是1)*/
-        writeVarInt(handshake, 1)
+            val outputStream = socket.getOutputStream()
+            val dataOutputStream = DataOutputStream(outputStream)
+            val inputStream = socket.getInputStream()
+            val inputStreamReader = InputStreamReader(inputStream)
+            val b = ByteArrayOutputStream()
+            val handshake = DataOutputStream(b)
+            /*握手数据包id*/
+            handshake.writeByte(0x00)
+            /*协议版本*/
+            writeVarInt(handshake, 578)
+            /*主机地址长度*/
+            writeVarInt(handshake, host.length)
+            /*主机地址*/
+            handshake.writeBytes(host)
+            /*端口*/
+            handshake.writeShort(25565)
+            /*状态(握手是1)*/
+            writeVarInt(handshake, 1)
 
-        /*发送的握手数据包大小*/
-        writeVarInt(dataOutputStream, b.size())
-        /*发送握手数据包*/
-        dataOutputStream.write(b.toByteArray())
+            /*发送的握手数据包大小*/
+            writeVarInt(dataOutputStream, b.size())
+            /*发送握手数据包*/
+            dataOutputStream.write(b.toByteArray())
 
-        /*大小为1*/
-        dataOutputStream.writeByte(0x01)
-        /*ping的数据包id*/
-        dataOutputStream.writeByte(0x00)
-        val dataInputStream = DataInputStream(inputStream)
-        /*返回的数据包大小*/
-        readVarInt(dataInputStream)
-        /*返回的数据包id*/
-        var id = readVarInt(dataInputStream)
-        if (id == -1) {
-            throw IOException("数据流过早结束")
-        }
+            /*大小为1*/
+            dataOutputStream.writeByte(0x01)
+            /*ping的数据包id*/
+            dataOutputStream.writeByte(0x00)
+            val dataInputStream = DataInputStream(inputStream)
+            /*返回的数据包大小*/
+            readVarInt(dataInputStream)
+            /*返回的数据包id*/
+            var id = readVarInt(dataInputStream)
+            if (id == -1) {
+                throw IOException("数据流过早结束")
+            }
 
-        /*需要返回的状态*/
-        if (id != 0x00) {
-            throw IOException("无效的数据包 ID")
-        }
-        /*json字符串长度*/
-        val length = readVarInt(dataInputStream)
-        if (length == -1) {
-            throw IOException("数据流过早结束")
-        }
-        if (length == 0) {
-            throw IOException("无效的 json 字符串长度")
-        }
-        val jsonString = ByteArray(length)
-        /* 读取json字符串 */
-        dataInputStream.readFully(jsonString)
-        val json = String(jsonString, Charsets.UTF_8)
-        val now = System.currentTimeMillis()
-        /* 数据包大小 */
-        dataOutputStream.writeByte(0x09)
-        /* ping 0x01 */
-        dataOutputStream.writeByte(0x01)
-        /*时间*/
-        dataOutputStream.writeLong(now)
-        readVarInt(dataInputStream)
-        id = readVarInt(dataInputStream)
-        if (id == -1) {
-            throw IOException("数据流过早结束")
-        }
-        if (id != 0x01) {
-            throw IOException("无效的数据包 ID")
-        }
+            /*需要返回的状态*/
+            if (id != 0x00) {
+                throw IOException("无效的数据包 ID")
+            }
+            /*json字符串长度*/
+            val length = readVarInt(dataInputStream)
+            if (length == -1) {
+                throw IOException("数据流过早结束")
+            }
+            if (length == 0) {
+                throw IOException("无效的 json 字符串长度")
+            }
+            val jsonString = ByteArray(length)
+            /* 读取json字符串 */
+            dataInputStream.readFully(jsonString)
+            val json = String(jsonString, Charsets.UTF_8)
+            val now = System.currentTimeMillis()
+            /* 数据包大小 */
+            dataOutputStream.writeByte(0x09)
+            /* ping 0x01 */
+            dataOutputStream.writeByte(0x01)
+            /*时间*/
+            dataOutputStream.writeLong(now)
+            readVarInt(dataInputStream)
+            id = readVarInt(dataInputStream)
+            if (id == -1) {
+                throw IOException("数据流过早结束")
+            }
+            if (id != 0x01) {
+                throw IOException("无效的数据包 ID")
+            }
 
-        dataOutputStream.close()
-        outputStream.close()
-        inputStreamReader.close()
-        inputStream.close()
-        socket.close()
+            dataOutputStream.close()
+            outputStream.close()
+            inputStreamReader.close()
+            inputStream.close()
+            socket.close()
 
-        return QueryInfo(json, QueryType.JAVA, System.currentTimeMillis() - now)
+            return QueryInfo(json, QueryType.JAVA, System.currentTimeMillis() - now)
+        } catch (e: IOException) {
+            return QueryInfo("", QueryType.JAVA, -1)
+        }
     }
 
     @Throws(IOException::class)

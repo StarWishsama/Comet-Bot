@@ -27,6 +27,10 @@ data class QueryInfo(
     }
 
     fun convertToWrapper(): MessageWrapper {
+        if (rawResponse.isEmpty()) {
+            return MessageWrapper()
+        }
+
         return parseServerInfo().getStatus(usedTime)
     }
 }
