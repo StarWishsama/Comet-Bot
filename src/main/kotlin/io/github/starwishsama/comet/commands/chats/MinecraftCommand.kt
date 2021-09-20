@@ -76,7 +76,7 @@ class MinecraftCommand : ChatCommand {
             if (port == null) {
                 return "输入的端口号不合法.".toChain()
             }
-            val result = MinecraftUtil.query(ip, port)
+            val result = MinecraftUtil.javaQuery(ip, port)
             result.convertToWrapper().toMessageChain(subject)
         } catch (e: IOException) {
             "查询失败, 服务器可能不在线, 请稍后再试.".toChain()
