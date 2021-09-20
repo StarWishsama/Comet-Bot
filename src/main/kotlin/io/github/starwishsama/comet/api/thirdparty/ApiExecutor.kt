@@ -27,6 +27,7 @@ interface ApiExecutor {
     }
 
     fun getLimitTime(): Int
+
     fun resetTime() {
         usedTime = 0
     }

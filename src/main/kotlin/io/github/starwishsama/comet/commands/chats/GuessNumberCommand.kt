@@ -115,7 +115,7 @@ class GuessNumberCommand : ChatCommand, ConversationCommand {
                         StringBuilder(CometUtil.sendMessageAsString("${event.sender.nameCardOrNick} 猜对了!\n总用时: ${session.usedTime.seconds}s\n\n"))
                     val list = session.users.sortedBy { (it as GuessNumberUser).guessTime }
                     list.forEach {
-                        sb.append((it as GuessNumberUser).username).append(" ").append(it.guessTime)
+                        sb.append("\n" + (it as GuessNumberUser).username).append(" ").append(it.guessTime)
                             .append("次\n")
                     }
                     event.subject.sendMessage(sb.toString().trim())
