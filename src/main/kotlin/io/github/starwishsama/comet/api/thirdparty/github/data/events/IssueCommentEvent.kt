@@ -38,13 +38,13 @@ data class IssueCommentEvent(
         fun convertCreatedTime(): String {
             val localTime =
                 LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.systemDefault())
-            return CometVariables.yyMMddPattern.format(localTime)
+            return CometVariables.hmsPattern.format(localTime)
         }
     }
 
     override fun toMessageWrapper(): MessageWrapper {
         return MessageWrapper().apply {
-            addText("\uD83D\uDCAC 仓库 ${repository.fullName} 议题 #${issue.number} 下有新回复\n")
+            addText("\uD83D\uDCAC ${repository.fullName} 议题 #${issue.number} 下有新回复\n")
             addText("| 创建时间 ${comment.convertCreatedTime()}\n")
             addText("| 创建人 ${comment.user.login}\n")
             addText("| 查看详细信息: ${comment.url}\n")
