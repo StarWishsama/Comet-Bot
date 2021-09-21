@@ -138,23 +138,35 @@ object GithubWebHookHandler {
         secretStatus: SecretStatus,
         signature: String?
     ): Boolean {
-        if (signature == null && secretStatus == SecretStatus.NO_SECRET) {
-            CometVariables.netLogger.log(HinaLogLevel.Debug, "收到新事件, 未通过安全验证. 请求的签名为: 无", prefix = "WebHook")
-            call.respondText(status = HttpStatusCode.InternalServerError, text = "A Serve error has happened")
-            return false
+        if (secretStatus == SecretStatus.HAS_SECRET && signature != null) {
+            return true
         }
 
-        if (signature != null && secretStatus == SecretStatus.UNAUTHORIZED) {
+        if (signature == null && secretStatus == SecretStatus.NO_SECRET) {
+            return true
+        }
+
+        if (secretStatus == SecretStatus.FAILED) {
             CometVariables.netLogger.log(
                 HinaLogLevel.Debug,
-                "收到新事件, 未通过安全验证. 请求的签名为: ${signature[0]}",
+                "获取 Secret 失败",
                 prefix = "WebHook"
             )
-            call.respondText(status = HttpStatusCode.InternalServerError, text = "A Serve error has happened")
+            call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
             return false
         }
 
-        return true
+        if (secretStatus == SecretStatus.UNAUTHORIZED) {
+            CometVariables.netLogger.log(
+                HinaLogLevel.Debug,
+                "收到新事件, 未通过安全验证. 请求的签名为: ${signature?.get(0) ?: "无"}",
+                prefix = "WebHook"
+            )
+            call.respondText(status = HttpStatusCode.Forbidden, text = "The request isn't verified")
+            return false
+        }
+
+        return false
     }
 
     /**
