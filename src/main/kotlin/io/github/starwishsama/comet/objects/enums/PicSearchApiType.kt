@@ -8,7 +8,7 @@
  *
  */
 
-package io.github.starwishsama.comet.enums
+package io.github.starwishsama.comet.objects.enums
 
 enum class PicSearchApiType(val desc: String) {
     SAUCENAO("老牌以图搜图，有超三十个图片来源"),

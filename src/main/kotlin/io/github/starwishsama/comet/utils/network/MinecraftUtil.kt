@@ -10,19 +10,15 @@
 
 package io.github.starwishsama.comet.utils.network
 
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.CometVariables.cfg
-import io.github.starwishsama.comet.CometVariables.mapper
-import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import io.github.starwishsama.comet.objects.wrapper.Picture
+import io.github.starwishsama.comet.objects.minecraft.QueryInfo
+import io.github.starwishsama.comet.objects.minecraft.QueryType
+import io.github.starwishsama.comet.objects.minecraft.SRVConvertResult
 import org.xbill.DNS.Lookup
 import org.xbill.DNS.SRVRecord
 import org.xbill.DNS.Type
 import java.io.*
-import java.net.Proxy
-import java.net.Socket
+import java.net.*
 
 
 /**
@@ -33,94 +29,97 @@ import java.net.Socket
  * https://github.com/LovesAsuna/Mirai-Bot/blob/master/src/main/kotlin/me/lovesasuna/bot/util/protocol/QueryUtil.kt
  */
 object MinecraftUtil {
-    @Throws(IOException::class)
-    fun query(host: String, port: Int): QueryInfo {
-        val socket: Socket
-        if (cfg.proxySwitch) {
-            socket = Socket(Proxy(cfg.proxyType, Socket(cfg.proxyUrl, cfg.proxyPort).remoteSocketAddress))
-            socket.connect(Socket(host, port).remoteSocketAddress)
-        } else {
-            socket = Socket(host, port)
-        }
+    fun javaQuery(host: String, port: Int): QueryInfo {
+        try {
+            val socket: Socket
+            if (cfg.proxySwitch) {
+                socket = Socket(Proxy(cfg.proxyType, Socket(cfg.proxyUrl, cfg.proxyPort).remoteSocketAddress))
+                socket.connect(Socket(host, port).remoteSocketAddress)
+            } else {
+                socket = Socket(host, port)
+            }
 
-        socket.soTimeout = 10 * 1000
+            socket.soTimeout = 1500
 
-        val outputStream = socket.getOutputStream()
-        val dataOutputStream = DataOutputStream(outputStream)
-        val inputStream = socket.getInputStream()
-        val inputStreamReader = InputStreamReader(inputStream)
-        val b = ByteArrayOutputStream()
-        val handshake = DataOutputStream(b)
-        /*握手数据包id*/
-        handshake.writeByte(0x00)
-        /*协议版本*/
-        writeVarInt(handshake, 578)
-        /*主机地址长度*/
-        writeVarInt(handshake, host.length)
-        /*主机地址*/
-        handshake.writeBytes(host)
-        /*端口*/
-        handshake.writeShort(25565)
-        /*状态(握手是1)*/
-        writeVarInt(handshake, 1)
+            val outputStream = socket.getOutputStream()
+            val dataOutputStream = DataOutputStream(outputStream)
+            val inputStream = socket.getInputStream()
+            val inputStreamReader = InputStreamReader(inputStream)
+            val b = ByteArrayOutputStream()
+            val handshake = DataOutputStream(b)
+            /*握手数据包id*/
+            handshake.writeByte(0x00)
+            /*协议版本*/
+            writeVarInt(handshake, 578)
+            /*主机地址长度*/
+            writeVarInt(handshake, host.length)
+            /*主机地址*/
+            handshake.writeBytes(host)
+            /*端口*/
+            handshake.writeShort(25565)
+            /*状态(握手是1)*/
+            writeVarInt(handshake, 1)
 
-        /*发送的握手数据包大小*/
-        writeVarInt(dataOutputStream, b.size())
-        /*发送握手数据包*/
-        dataOutputStream.write(b.toByteArray())
+            /*发送的握手数据包大小*/
+            writeVarInt(dataOutputStream, b.size())
+            /*发送握手数据包*/
+            dataOutputStream.write(b.toByteArray())
 
-        /*大小为1*/
-        dataOutputStream.writeByte(0x01)
-        /*ping的数据包id*/
-        dataOutputStream.writeByte(0x00)
-        val dataInputStream = DataInputStream(inputStream)
-        /*返回的数据包大小*/
-        readVarInt(dataInputStream)
-        /*返回的数据包id*/
-        var id = readVarInt(dataInputStream)
-        if (id == -1) {
-            throw IOException("数据流过早结束")
-        }
+            /*大小为1*/
+            dataOutputStream.writeByte(0x01)
+            /*ping的数据包id*/
+            dataOutputStream.writeByte(0x00)
+            val dataInputStream = DataInputStream(inputStream)
+            /*返回的数据包大小*/
+            readVarInt(dataInputStream)
+            /*返回的数据包id*/
+            var id = readVarInt(dataInputStream)
+            if (id == -1) {
+                throw IOException("数据流过早结束")
+            }
 
-        /*需要返回的状态*/
-        if (id != 0x00) {
-            throw IOException("无效的数据包 ID")
-        }
-        /*json字符串长度*/
-        val length = readVarInt(dataInputStream)
-        if (length == -1) {
-            throw IOException("数据流过早结束")
-        }
-        if (length == 0) {
-            throw IOException("无效的 json 字符串长度")
-        }
-        val jsonString = ByteArray(length)
-        /* 读取json字符串 */
-        dataInputStream.readFully(jsonString)
-        val json = String(jsonString, Charsets.UTF_8)
-        val now = System.currentTimeMillis()
-        /* 数据包大小 */
-        dataOutputStream.writeByte(0x09)
-        /* ping 0x01 */
-        dataOutputStream.writeByte(0x01)
-        /*时间*/
-        dataOutputStream.writeLong(now)
-        readVarInt(dataInputStream)
-        id = readVarInt(dataInputStream)
-        if (id == -1) {
-            throw IOException("数据流过早结束")
-        }
-        if (id != 0x01) {
-            throw IOException("无效的数据包 ID")
-        }
+            /*需要返回的状态*/
+            if (id != 0x00) {
+                throw IOException("无效的数据包 ID")
+            }
+            /*json字符串长度*/
+            val length = readVarInt(dataInputStream)
+            if (length == -1) {
+                throw IOException("数据流过早结束")
+            }
+            if (length == 0) {
+                throw IOException("无效的 json 字符串长度")
+            }
+            val jsonString = ByteArray(length)
+            /* 读取json字符串 */
+            dataInputStream.readFully(jsonString)
+            val json = String(jsonString, Charsets.UTF_8)
+            val now = System.currentTimeMillis()
+            /* 数据包大小 */
+            dataOutputStream.writeByte(0x09)
+            /* ping 0x01 */
+            dataOutputStream.writeByte(0x01)
+            /*时间*/
+            dataOutputStream.writeLong(now)
+            readVarInt(dataInputStream)
+            id = readVarInt(dataInputStream)
+            if (id == -1) {
+                throw IOException("数据流过早结束")
+            }
+            if (id != 0x01) {
+                throw IOException("无效的数据包 ID")
+            }
 
-        dataOutputStream.close()
-        outputStream.close()
-        inputStreamReader.close()
-        inputStream.close()
-        socket.close()
+            dataOutputStream.close()
+            outputStream.close()
+            inputStreamReader.close()
+            inputStream.close()
+            socket.close()
 
-        return QueryInfo(json, System.currentTimeMillis() - now)
+            return QueryInfo(json, QueryType.JAVA, System.currentTimeMillis() - now)
+        } catch (e: IOException) {
+            return QueryInfo("", QueryType.JAVA, -1)
+        }
     }
 
     @Throws(IOException::class)
@@ -153,6 +152,56 @@ object MinecraftUtil {
         return i
     }
 
+    /**
+     * 基岩版部分
+     * 代码来自: https://github.com/zixuan2020/mirai-bedrock-motd
+     */
+
+    @Throws(IOException::class)
+    fun bedrockQuery(address: String, port: Int = 19132): QueryInfo {
+        val socket = DatagramSocket()
+
+        socket.use {
+            socket.soTimeout = 1500
+            val start = System.currentTimeMillis()
+            socket.connect(InetAddress.getByName(address), port)
+            val receivePacket = DatagramPacket(ByteArray(1024), 1024)
+
+            // 数据包
+            val bytes: ByteArray = convertToBedrockByte("0100000000240D12D300FFFF00FEFEFEFEFDFDFDFD12345678")
+                ?: return QueryInfo("", QueryType.BEDROCK, System.currentTimeMillis() - start)
+            socket.send(DatagramPacket(bytes, 0, bytes.size))
+
+            socket.receive(receivePacket)
+
+            val result = String(receivePacket.data, Charsets.UTF_8)
+
+            return QueryInfo(result, QueryType.BEDROCK, System.currentTimeMillis() - start)
+        }
+    }
+
+    private fun convertToBedrockByte(hexString: String): ByteArray? {
+        if (hexString.isEmpty()) {
+            return null
+        }
+
+        val lowerHex = hexString.lowercase()
+
+        val byteArray = ByteArray(lowerHex.length shr 1)
+
+        var index = 0
+
+        for (i in lowerHex.indices) {
+            if (index > lowerHex.length - 1) return byteArray
+            val highDit = lowerHex[index].digitToInt(16) and 0xFF
+            val lowDit = lowerHex[index + 1].digitToInt(16) and 0xFF
+            byteArray[i] = (highDit shl 4 or lowDit).toByte()
+            index += 2
+        }
+
+        return byteArray
+    }
+
     fun convert(host: String): SRVConvertResult {
         return try {
             val records = Lookup("_minecraft._tcp.$host", Type.SRV).run()
@@ -166,101 +215,5 @@ object MinecraftUtil {
         } catch (e: Exception) {
             SRVConvertResult("", -1)
         }
-    }
-}
-
-data class SRVConvertResult(
-    val host: String,
-    val port: Int,
-) {
-    fun isEmpty(): Boolean {
-        return host.isEmpty() || port < 0
-    }
-}
-
-data class QueryInfo(
-    val json: String,
-    val usedTime: Long
-) {
-    private fun parseJson(): MinecraftServerInfo {
-        return mapper.readValue(json)
-    }
-
-    fun convertToWrapper(): MessageWrapper {
-        val info = parseJson()
-
-        val wrapper = MessageWrapper()
-
-        wrapper.addText(
-            """
-> 在线玩家 ${info.players.onlinePlayer}/${info.players.maxPlayer}
-> MOTD ${info.parseMOTD()}
-> 服务器版本 ${info.version.protocolName}
-> 延迟 ${usedTime}ms
-${if (info.modInfo?.modList != null) "> MOD 列表 " + info.modInfo.modList else ""}
-        """.trimIndent()
-        )
-
-        if (info.favicon != null) {
-            wrapper.addElement(Picture(base64 = info.favicon.split(",")[1]))
-        }
-
-        return wrapper
-    }
-}
-
-data class MinecraftServerInfo(
-    val version: Version,
-    val players: PlayerInfo,
-    @JsonProperty("description")
-    val motd: JsonNode,
-    @JsonProperty("modinfo")
-    val modInfo: ModInfo?,
-    @JsonProperty("favicon")
-    val favicon: String?
-) {
-    fun parseMOTD(): String {
-        if (motd.isTextual) {
-            return motd.asText()
-        }
-
-        val builder = StringBuilder()
-
-        if (motd["extra"] == null) {
-            builder.append(motd["text"])
-        } else {
-            motd["extra"].forEach {
-                builder.append(it["text"].asText())
-            }
-        }
-
-        return builder.toString().trim()
-    }
-
-    data class Version(
-        @JsonProperty("name")
-        val protocolName: String,
-        @JsonProperty("protocol")
-        val protocolVersion: Int
-    )
-
-    data class PlayerInfo(
-        @JsonProperty("max")
-        val maxPlayer: Int,
-        @JsonProperty("online")
-        val onlinePlayer: Int
-    )
-
-    data class ModInfo(
-        val type: String,
-        @JsonProperty("modList")
-        val modList: List<Mod>
-    ) {
-        data class Mod(
-            @JsonProperty("modid")
-            val modID: String,
-            @JsonProperty("version")
-            val version: String
-        )
     }
 }

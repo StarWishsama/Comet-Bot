@@ -8,16 +8,8 @@
  *
  */
 
-package io.github.starwishsama.comet.managers
+package io.github.starwishsama.comet.objects.enums
 
-import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-
-object UsageManager {
-    fun logCommand(cmd: ChatCommand, caller: Long, callGroup: Long, content: String) {
-        TODO()
-    }
-
-    fun purgeLog() {
-        TODO()
-    }
+enum class MusicApiType {
+    QQ, NETEASE
 }

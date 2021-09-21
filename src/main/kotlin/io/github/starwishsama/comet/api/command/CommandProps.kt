@@ -12,8 +12,8 @@ package io.github.starwishsama.comet.api.command
 
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.objects.enums.UserLevel
 
 data class CommandProps(
     val name: String,

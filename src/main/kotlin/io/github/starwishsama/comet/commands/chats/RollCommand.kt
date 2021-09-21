@@ -10,13 +10,12 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
@@ -122,25 +121,6 @@ class RollCommand : ChatCommand, ConversationCommand {
         }
     }
 
-    private fun getRandomUser(users: MutableSet<SessionUser>): SessionUser {
-        val index = RandomUtil.randomInt(users.size)
-        val iter = users.iterator()
-        var current = 0
-
-        while (iter.hasNext()) {
-            val user = iter.next()
-            if (current == index) {
-                users.remove(user)
-                return user
-            } else {
-                current++
-            }
-        }
-
-        throw RuntimeException("Cannot found random user in Roll: ${users.size}")
-    }
-
-
     private suspend fun generateResult(session: RollSession, event: GroupMessageEvent) {
         val group = event.bot.getGroup(session.target.groupId)
 
@@ -156,7 +136,7 @@ class RollCommand : ChatCommand, ConversationCommand {
             }
 
             winners.forEach { su ->
-                winnerText = winnerText.plus(At(su.id))
+                winnerText = winnerText.plus(At(su.id)).plus(" ")
             }
 
             group.sendMessage(
@@ -177,7 +157,7 @@ class RollCommand : ChatCommand, ConversationCommand {
         val winners = mutableListOf<SessionUser>()
 
         for (i in 0 until count) {
-            winners.add(getRandomUser(users))
+            winners.add(users.random().also { users.remove(it) })
         }
 
         return winners

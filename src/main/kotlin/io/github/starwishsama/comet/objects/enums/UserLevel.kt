@@ -8,8 +8,8 @@
  *
  */
 
-package io.github.starwishsama.comet.enums
+package io.github.starwishsama.comet.objects.enums
 
-enum class MusicApiType {
-    QQ, NETEASE
+enum class UserLevel {
+    USER, VIP, ADMIN, OWNER, CONSOLE;
 }

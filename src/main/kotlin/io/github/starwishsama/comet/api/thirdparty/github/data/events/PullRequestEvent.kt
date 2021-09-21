@@ -55,18 +55,18 @@ data class PullRequestEvent(
         fun convertCreatedTime(): String {
             val localTime =
                 LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.systemDefault())
-            return CometVariables.yyMMddPattern.format(localTime)
+            return CometVariables.hmsPattern.format(localTime)
         }
     }
 
     override fun toMessageWrapper(): MessageWrapper {
         val wrapper = MessageWrapper()
 
-        wrapper.addText("\uD83D\uDD27 仓库 ${repository.fullName} 有新的提交更改\n")
+        wrapper.addText("\uD83D\uDD27 ${repository.fullName} 有新的提交更改\n")
         wrapper.addText("| ${pullRequestInfo.body}\n")
         wrapper.addText("| 发布时间 ${pullRequestInfo.convertCreatedTime()}\n")
         wrapper.addText("| 发布人 ${sender.login}\n")
-        wrapper.addText("| 提交更改信息: \n")
+        wrapper.addText("| 提交更改信息 \n")
         wrapper.addText("| ${pullRequestInfo.title.limitStringSize(50)}\n")
         wrapper.addText("| ${pullRequestInfo.body.limitStringSize(100).trim()}\n")
         wrapper.addText("| 查看完整信息: ${pullRequestInfo.url}")

@@ -8,8 +8,13 @@
  *
  */
 
-package io.github.starwishsama.comet.enums
+package io.github.starwishsama.comet.objects.minecraft
 
-enum class UserLevel {
-    USER, VIP, ADMIN, OWNER, CONSOLE;
+data class SRVConvertResult(
+    val host: String,
+    val port: Int,
+) {
+    fun isEmpty(): Boolean {
+        return host.isEmpty() || port < 0
+    }
 }
