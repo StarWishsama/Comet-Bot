@@ -88,7 +88,11 @@ object BiliBiliShareListener : NListener {
     }
 
     private fun biliBiliLinkConvert(url: String, subject: Contact): MessageChain {
-        val videoID = parseVideoIDFromBili(NetUtil.getRedirectedURL(url) ?: return EmptyMessageChain)
+        val videoID = if (bvPattern.matches(url)) {
+            parseVideoIDFromBili(NetUtil.getRedirectedURL(url) ?: return EmptyMessageChain)
+        } else {
+            parseVideoIDFromBili(url)
+        }
 
         val videoInfo = if (videoID.contains("BV")) {
             VideoApi.videoService.getVideoInfoByBID(videoID)
