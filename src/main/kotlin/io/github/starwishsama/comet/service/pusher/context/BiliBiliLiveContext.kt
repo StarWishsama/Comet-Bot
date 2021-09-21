@@ -29,7 +29,7 @@ class BiliBiliLiveContext(
         }
 
         return MessageWrapper().addText(
-            "单推助手 > ${pushUser.userName} 正在直播!" +
+            "直播间助手 > ${pushUser.userName} 正在直播!" +
                     "\n直播间标题: ${data.title}" +
                     "\n开播时间: ${data.liveTime}" +
                     "\n传送门: ${data.getRoomURL()}",
