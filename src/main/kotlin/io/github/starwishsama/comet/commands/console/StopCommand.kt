@@ -13,7 +13,7 @@ package io.github.starwishsama.comet.commands.console
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
-import io.github.starwishsama.comet.enums.UserLevel
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import kotlin.system.exitProcess
 
 

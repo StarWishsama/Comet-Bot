@@ -10,8 +10,8 @@
 
 package io.github.starwishsama.comet.objects.config
 
-import io.github.starwishsama.comet.enums.MusicApiType
-import io.github.starwishsama.comet.enums.PicSearchApiType
+import io.github.starwishsama.comet.objects.enums.MusicApiType
+import io.github.starwishsama.comet.objects.enums.PicSearchApiType
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.yamlkt.Comment

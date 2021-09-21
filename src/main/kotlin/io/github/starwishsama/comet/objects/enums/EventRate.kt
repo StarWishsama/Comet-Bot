@@ -8,8 +8,8 @@
  *
  */
 
-package io.github.starwishsama.comet.enums
+package io.github.starwishsama.comet.objects.enums
 
-enum class MusicApiType {
-    QQ, NETEASE
+enum class EventRate(val type: String) {
+    HIGHEST("大吉"), HIGH("中吉"), NORMAL("小吉"), LOW("末吉"), LOWEST("凶"), NEVER("大凶");
 }

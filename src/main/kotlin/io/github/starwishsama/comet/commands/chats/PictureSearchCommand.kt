@@ -11,15 +11,14 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.CometVariables
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
-import io.github.starwishsama.comet.enums.PicSearchApiType
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.api.SauceNaoConfig
+import io.github.starwishsama.comet.objects.enums.PicSearchApiType
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget

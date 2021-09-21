@@ -13,10 +13,10 @@ package io.github.starwishsama.comet.service.command
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.github.GithubApi
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.GithubRepoData
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.GithubRepos
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget

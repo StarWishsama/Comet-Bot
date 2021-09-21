@@ -15,9 +15,9 @@ import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import java.io.IOException
 

@@ -19,10 +19,10 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToWrapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserInfo
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserVideoInfo
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.tasks.network.INetworkRequestTask
 import io.github.starwishsama.comet.objects.tasks.network.NetworkRequestTask

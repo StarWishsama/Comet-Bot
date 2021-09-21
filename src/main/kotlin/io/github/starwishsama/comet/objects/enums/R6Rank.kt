@@ -8,7 +8,7 @@
  *
  */
 
-package io.github.starwishsama.comet.enums
+package io.github.starwishsama.comet.objects.enums
 
 enum class R6Rank(val rankName: String, private val rankId: Int) {
     UNRANKED("未定级", 0), COPPER_4("紫铜 4", 1), COPPER_3("紫铜 3", 2), COPPER_2("紫铜 2", 3), COPPER_1(

@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.objects
 
-import io.github.starwishsama.comet.enums.EventRate
+import io.github.starwishsama.comet.objects.enums.EventRate
 import java.text.NumberFormat
 
 data class RandomResult(var id: Long, var chance: Double, var eventName: String) {

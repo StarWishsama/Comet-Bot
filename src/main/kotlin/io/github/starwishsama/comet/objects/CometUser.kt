@@ -12,7 +12,7 @@ package io.github.starwishsama.comet.objects
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.enums.UserLevel
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import java.time.LocalDateTime
 
 data class CometUser(

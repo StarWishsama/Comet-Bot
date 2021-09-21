@@ -14,8 +14,8 @@ package io.github.starwishsama.comet.commands.chats
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.AdminService.addPermission
 import io.github.starwishsama.comet.service.command.AdminService.giveCommandTime
 import io.github.starwishsama.comet.service.command.AdminService.listPermissions
