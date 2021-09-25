@@ -32,7 +32,7 @@ data class PushEvent(
     @JsonProperty("commits")
     val commitInfo: List<CommitInfo>,
     @JsonProperty("head_commit")
-    val headCommitInfo: CommitInfo
+    val headCommitInfo: CommitInfo?
 ) : GithubEvent {
     data class RepoInfo(
         val id: Long,
@@ -78,6 +78,10 @@ data class PushEvent(
     }
 
     override fun toMessageWrapper(): MessageWrapper {
+        if (headCommitInfo == null) {
+            return MessageWrapper().setUsable(false)
+        }
+
         val wrapper = MessageWrapper()
 
         wrapper.addText("⬆️${repoInfo.fullName} 有新提交啦\n")
