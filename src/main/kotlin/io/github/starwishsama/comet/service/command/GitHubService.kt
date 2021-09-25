@@ -155,7 +155,7 @@ object GitHubService {
         }
 
 
-        return if (repos.isEmpty()) {
+        return if (repos.repos.count { it.repoTarget.contains(id) } < 1) {
             "还没订阅过任何项目".toChain()
         } else {
             buildString {
