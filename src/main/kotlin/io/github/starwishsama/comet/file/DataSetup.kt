@@ -97,7 +97,7 @@ object DataSetup {
 
     fun initPerGroupSetting(bot: Bot) {
         bot.groups.forEach { group ->
-            val loc = File(GroupConfig.file, "${group.id}.json")
+            val loc = File(GroupConfig.file, "${group.id}.serialize")
             try {
                 if (!loc.exists()) {
                     FileUtil.createBlankFile(loc)

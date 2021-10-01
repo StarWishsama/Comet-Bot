@@ -27,7 +27,7 @@ object DataFiles {
     )
 }
 
-object UserConfig : DataFileEntity(File(CometVariables.filePath, "users.json")) {
+object UserConfig : DataFileEntity(File(CometVariables.filePath, "users.serialize")) {
     override fun init() {
         file.writeClassToJson(CometVariables.cometUsers)
     }
@@ -47,7 +47,7 @@ object Config : DataFileEntity(File(CometVariables.filePath, "config.yml")) {
     }
 }
 
-object ArkNightData : DataFileEntity(File(FileUtil.getResourceFolder(), "arkNights.json")) {
+object ArkNightData : DataFileEntity(File(FileUtil.getResourceFolder(), "arkNights.serialize")) {
     override fun init() {
         // No need to init
     }
@@ -68,7 +68,7 @@ object GroupConfig : DataFileEntity(FileUtil.getChildFolder("groups")) {
         }
 
         GroupConfigManager.getAllConfigs().forEach {
-            val loc = File(file, "${it.id}.json")
+            val loc = File(file, "${it.id}.serialize")
             if (!loc.exists()) {
                 loc.createNewFile()
             }

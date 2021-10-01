@@ -23,7 +23,7 @@ import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.service.compatibility.data.OldGroupConfig
 import io.github.starwishsama.comet.utils.copyAndRename
-import io.github.starwishsama.comet.utils.json.isUsable
+import io.github.starwishsama.comet.utils.serialize.isUsable
 import java.io.File
 import java.util.stream.Collectors
 
@@ -98,7 +98,7 @@ object CompatibilityService {
         }
 
         try {
-            userData.copyAndRename("users.json.old")
+            userData.copyAndRename("users.serialize.old")
             val old = mapper.readValue<List<CometUser>>(userData)
             old.forEach {
                 val actual = handleDuplication(old, it)

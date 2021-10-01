@@ -37,7 +37,7 @@ object DataSaveHelper {
             }
 
             val backupTime = LocalDateTime.now()
-            val backupFileName = "backup-${dateFormatter.format(backupTime)}.json"
+            val backupFileName = "backup-${dateFormatter.format(backupTime)}.serialize"
 
             val backupFile = File(location, backupFileName)
             backupFile.createNewFile()

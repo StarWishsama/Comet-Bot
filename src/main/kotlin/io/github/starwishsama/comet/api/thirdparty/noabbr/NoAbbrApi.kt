@@ -28,7 +28,7 @@ object NoAbbrApi : ApiExecutor {
             apiRouteURL,
             method = "POST",
             body = mapper.writeValueAsString(AbbrSearchRequest(abbr)).trim()
-                .toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+                .toRequestBody("application/serialize; charset=utf-8".toMediaTypeOrNull())
         )
 
         val responseBody = call.execute().body ?: return AbbrSearchResponse.empty()

@@ -150,7 +150,7 @@ object GachaService {
         try {
             GachaUtil.arkNightDataCheck(data)
         } catch (e: IOException) {
-            CometVariables.daemonLogger.warning("解析明日方舟游戏数据失败, ${e.message}\n注意: 数据来源于 Github, 国内用户无法下载请自行下载替换\n替换位置: ./res/arkNights.json\n链接: ${GachaUtil.arkNightData}")
+            CometVariables.daemonLogger.warning("解析明日方舟游戏数据失败, ${e.message}\n注意: 数据来源于 Github, 国内用户无法下载请自行下载替换\n替换位置: ./res/arkNights.serialize\n链接: ${GachaUtil.arkNightData}")
         }
 
         if (data.exists()) {
@@ -178,7 +178,7 @@ object GachaService {
     }
 
     private fun loadDefaultArkNightData() {
-        val default = File(FileUtil.getResourceFolder(), "default_arknight.json")
+        val default = File(FileUtil.getResourceFolder(), "default_arknight.serialize")
 
         if (!default.exists()) {
             CometVariables.daemonLogger.warning("无法加载默认明日方舟数据: ${default.name} 不存在")

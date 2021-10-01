@@ -33,7 +33,7 @@ object PusherManager {
         usablePusher.addAll(listOf(BiliBiliDynamicPusher(bot), BiliBiliLivePusher(bot), TwitterPusher(bot)))
 
         usablePusher.forEach { pusher ->
-            val cfgFile = File(pusherFolder, "${pusher.name}.json")
+            val cfgFile = File(pusherFolder, "${pusher.name}.serialize")
 
             try {
 

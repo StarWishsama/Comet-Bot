@@ -94,7 +94,7 @@ abstract class CometPusher(
 
 
     fun save() {
-        val cfgFile = File(PusherManager.pusherFolder, "${name}.json")
+        val cfgFile = File(PusherManager.pusherFolder, "${name}.serialize")
 
         if (!cfgFile.exists()) cfgFile.createNewFile()
 
