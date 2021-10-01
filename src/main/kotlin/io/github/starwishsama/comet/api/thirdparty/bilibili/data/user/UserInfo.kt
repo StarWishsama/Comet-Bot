@@ -60,7 +60,7 @@ data class UserInfo(
                             "机构认证"
                         }
                         else -> {
-                            ""
+                            "官方认证"
                         }
                     }
                 }

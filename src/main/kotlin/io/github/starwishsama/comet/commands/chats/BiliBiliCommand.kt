@@ -113,15 +113,14 @@ class BiliBiliCommand : ChatCommand {
                                     val card = item.data.card
 
                                     """
-                                    ${card.name}${if (card.vipInfo.toString().isEmpty()) "" else " | ${card.vipInfo}"}
-                                    ${card.officialVerifyInfo.toString().ifEmpty { "" }}
-                                    ${card.sign}
+${card.name}${if (card.vipInfo.toString().isEmpty()) "" else " | ${card.vipInfo}"}
+${card.officialVerifyInfo.toString().ifEmpty { "" }}
+${card.sign}
+                                                                        
+粉丝 ${item.data.follower.getBetterNumber()} | 获赞 ${item.data.likeCount.getBetterNumber()}
                                     
-                                    粉丝 ${item.data.follower.getBetterNumber()} | 获赞 ${item.data.likeCount.getBetterNumber()}
-                                    
-                                    最近投递视频: ${if (recentVideos == null) "没有投稿过视频" else recentVideos.data.list.videoList[0].toString()}
-                                       
-                                    """.trimIndent().toChain()
+最近投递视频: ${if (recentVideos == null) "没有投稿过视频" else recentVideos.data.list.videoList[0].toString()}                             
+""".trimIndent().toChain()
                                 } else {
                                     "找不到对应的B站用户".toChain()
                                 }
