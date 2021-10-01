@@ -19,6 +19,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer
+import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
@@ -53,7 +54,9 @@ object WrapperConverter : JsonDeserializer<WrapperElement>() {
                     LocalTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss"))
                 )
             },
-            KotlinModule(nullIsSameAsDefault = true, nullToEmptyCollection = true, nullToEmptyMap = true),
+            KotlinModule.Builder().enable(KotlinFeature.NullIsSameAsDefault)
+                .enable(KotlinFeature.NullToEmptyCollection)
+                .enable(KotlinFeature.NullToEmptyMap).build(),
             SimpleModule().also {
                 it.addDeserializer(LocalDateTime::class.java, LocalDateTimeConverter)
             })
