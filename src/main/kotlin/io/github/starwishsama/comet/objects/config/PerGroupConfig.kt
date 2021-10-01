@@ -92,7 +92,7 @@ data class PerGroupConfig(
     var oldFileCleanFeature: Boolean = false,
 
     @JsonProperty("old_file_clean_delay")
-    var oldFileCleanDelay: Long = 1000 * 60 * 60 * 24,
+    var oldFileCleanDelay: Long = 1000L * 60 * 60 * 24,
 
     @JsonProperty("old_file_match_pattern")
     var oldFileMatchPattern: String = "",

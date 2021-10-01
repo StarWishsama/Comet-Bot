@@ -24,7 +24,7 @@ import kotlin.time.ExperimentalTime
 
 
 class DebugCommand : ConsoleCommand {
-    @ExperimentalTime
+    @OptIn(ExperimentalTime::class)
     override suspend fun execute(args: List<String>): String {
         if (args.isNotEmpty()) {
             when (args[0]) {

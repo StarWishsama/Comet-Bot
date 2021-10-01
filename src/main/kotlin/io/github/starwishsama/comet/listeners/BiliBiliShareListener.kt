@@ -34,8 +34,7 @@ object BiliBiliShareListener : NListener {
     private val bvPattern = Regex("""https://b23.tv/\w{1,6}""")
     private val longUrlPattern = Regex("""https://www.bilibili.com/video/(av|BV)\w{1,10}""")
 
-    @MiraiExperimentalApi
-    @ExperimentalTime
+    @OptIn(MiraiExperimentalApi::class, ExperimentalTime::class)
     override fun listen(event: Event) {
         if (event is GroupMessageEvent && !event.group.isBotMuted) {
             if (GroupConfigManager.getConfig(event.group.id)?.canParseBiliVideo != true) {
