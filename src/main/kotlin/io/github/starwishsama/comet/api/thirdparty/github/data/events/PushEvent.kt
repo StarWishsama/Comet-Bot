@@ -54,7 +54,8 @@ data class PushEvent(
 
     data class PusherInfo(
         val name: String,
-        val email: String
+        // 推送者为 bot 时会为空
+        val email: String?
     )
 
     data class CommitInfo(
