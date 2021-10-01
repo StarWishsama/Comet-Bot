@@ -89,7 +89,7 @@ dependencies {
     implementation 'org.fusesource.jansi:jansi:2.3.4'
 
     // DNSJava used to srv lookup
-    implementation 'dnsjava:dnsjava:3.4.1'
+    implementation 'dnsjava:dnsjava:3.4.2'
 
     implementation 'io.ktor:ktor-server-core:1.5.4'
     implementation 'io.ktor:ktor-server-netty:1.5.4'
