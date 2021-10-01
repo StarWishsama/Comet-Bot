@@ -30,6 +30,7 @@ plugins {
 
 def mainClass = 'io.github.starwishsama.comet.CometApplication'
 def miraiVersion = '2.7.1'
+def jacksonVersion = '2.13.0'
 
 jar {
     manifest {
@@ -65,12 +66,12 @@ dependencies {
     implementation("net.mamoe.yamlkt:yamlkt:0.10.2")
 
     // jackson @ https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.0'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.0'
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0"
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0"
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0'
+    implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
 
     // CUrl
     implementation 'com.github.rockswang:java-curl:1.2.2.190107'
