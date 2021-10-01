@@ -88,7 +88,7 @@ object MinecraftUtil {
                 throw IOException("数据流过早结束")
             }
             if (length == 0) {
-                throw IOException("无效的 serialize 字符串长度")
+                throw IOException("无效的 json 字符串长度")
             }
             val jsonString = ByteArray(length)
             /* 读取json字符串 */

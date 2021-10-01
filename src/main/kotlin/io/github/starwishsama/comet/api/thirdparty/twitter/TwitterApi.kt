@@ -27,9 +27,9 @@ import io.github.starwishsama.comet.exceptions.TwitterApiException
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.objects.config.api.TwitterConfig
 import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.isType
-import io.github.starwishsama.comet.utils.serialize.isUsable
 import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime
@@ -117,9 +117,9 @@ object TwitterApi : ApiExecutor {
 
         val startTime = LocalDateTime.now()
         val url = if (username.isEmpty()) {
-            "$twitterApiUrl/users/lookup.serialize?user_id=$id"
+            "$twitterApiUrl/users/lookup.json?user_id=$id"
         } else {
-            "$twitterApiUrl/users/lookup.serialize?screen_name=$username"
+            "$twitterApiUrl/users/lookup.json?screen_name=$username"
         }
 
         NetUtil.executeHttpRequest(
@@ -177,11 +177,11 @@ object TwitterApi : ApiExecutor {
         usedTime++
 
         NetUtil.executeHttpRequest(
-            url = "$twitterApiUrl/statuses/user_timeline.serialize?screen_name=$username&count=${count}&tweet_mode=extended",
+            url = "$twitterApiUrl/statuses/user_timeline.json?screen_name=$username&count=${count}&tweet_mode=extended",
             timeout = 5,
             call = {
                 header("authorization", "Bearer $token")
-                header("content-type", "application/serialize;charset=utf-8")
+                header("content-type", "application/json;charset=utf-8")
             }
         ).use { request ->
             if (request.isSuccessful) {
@@ -215,7 +215,7 @@ object TwitterApi : ApiExecutor {
         checkRateLimit(apiReachLimit)
 
         NetUtil.executeHttpRequest(
-            url = "$twitterApiUrl/statuses/show.serialize?id=$id&tweet_mode=extended",
+            url = "$twitterApiUrl/statuses/show.json?id=$id&tweet_mode=extended",
             timeout = 5,
             call = {
                 header("authorization", "Bearer $token")
@@ -290,11 +290,11 @@ object TwitterApi : ApiExecutor {
     }
 
     /**
-     * 将 serialize 解析为推文实体
+     * 将 json 解析为推文实体
      * 支持多个推文和单个推文 (以链表形式返回)
      *
-     * @param json 从 Twitter API 中获取到的推文 serialize
-     * @param url 请求解析 serialize 的推文, 用于创建错误报告
+     * @param json 从 Twitter API 中获取到的推文 json
+     * @param url 请求解析 json 的推文, 用于创建错误报告
      *
      * @return 推文列表
      */

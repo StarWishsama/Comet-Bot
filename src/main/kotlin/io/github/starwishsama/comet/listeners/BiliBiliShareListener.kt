@@ -15,8 +15,8 @@ import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
-import io.github.starwishsama.comet.utils.serialize.isUsable
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.isBotMuted

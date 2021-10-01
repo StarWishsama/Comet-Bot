@@ -8,7 +8,7 @@
  *
  */
 
-package io.github.starwishsama.comet.utils.serialize
+package io.github.starwishsama.comet.utils.json
 
 import com.fasterxml.jackson.databind.JsonNode
 

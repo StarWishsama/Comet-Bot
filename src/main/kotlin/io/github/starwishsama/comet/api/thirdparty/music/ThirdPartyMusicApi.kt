@@ -138,7 +138,7 @@ object ThirdPartyMusicApi {
                         name,
                         "UTF-8"
                     )
-                }&format=serialize&inCharset=utf8&outCharset=utf-8"
+                }&format=json&inCharset=utf8&outCharset=utf-8"
             )
         return mapper.readValue(songResult ?: return null)
     }

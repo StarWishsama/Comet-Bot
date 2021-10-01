@@ -11,7 +11,6 @@
 package io.github.starwishsama.comet.service.command
 
 import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.github.GithubApi
 import io.github.starwishsama.comet.file.GithubRepoData
@@ -23,7 +22,6 @@ import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.getContext
-import net.mamoe.mirai.contact.getMember
 import net.mamoe.mirai.contact.isAdministrator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -71,14 +69,6 @@ object GitHubService {
             (event as GroupMessageEvent).group.id
         } else {
             args[2].toLongOrNull() ?: return "请填写正确的群号!".toChain()
-        }
-
-        if (!isGroup && comet.getBot().getGroup(id) == null) {
-            return "机器人不在你指定的群内.".toChain()
-        }
-
-        if (comet.getBot().getGroup(id)?.getMember(user.id)?.isAdministrator() != true) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
         if (!repoName.contains("/")) {
@@ -138,14 +128,6 @@ object GitHubService {
             args[2].toLongOrNull() ?: return "请填写正确的群号!".toChain()
         }
 
-        if (!isGroup && comet.getBot().getGroup(id) == null) {
-            return "机器人不在你指定的群内.".toChain()
-        }
-
-        if (comet.getBot().getGroup(id)?.getMember(user.id)?.isAdministrator() != true) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
-        }
-
         val authorAndRepo = repoName.split("/")
 
         return if (repos.remove(id, authorAndRepo[0], authorAndRepo[1])) {
@@ -172,13 +154,6 @@ object GitHubService {
             args[1].toLongOrNull() ?: return "请填写正确的群号!".toChain()
         }
 
-        if (!isGroup && comet.getBot().getGroup(id) == null) {
-            return "机器人不在你指定的群内.".toChain()
-        }
-
-        if (comet.getBot().getGroup(id)?.getMember(user.id)?.isAdministrator() != true) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
-        }
 
         return if (repos.repos.count { it.repoTarget.contains(id) } < 1) {
             "还没订阅过任何项目".toChain()
@@ -199,7 +174,7 @@ object GitHubService {
         command: ChatCommand,
         session: Session? = null
     ): MessageChain {
-        if (!user.hasPermission("nbot.commands.github") && !user.compareLevel(UserLevel.ADMIN)) {
+        if (!user.hasPermission("nbot.commands.github") && !user.compareLevel(UserLevel.ADMIN) && (event is GroupMessageEvent && event.sender.isAdministrator())) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
@@ -260,7 +235,7 @@ object GitHubService {
                 } else {
                     val id = args[1].toLongOrNull() ?: return "请输入正确的群号!".toChain()
 
-                    if (comet.getBot().getGroup(id) != null) {
+                    if (CometVariables.comet.getBot().getGroup(id) != null) {
                         currentRepo.repoTarget.add(id)
 
                         "添加订阅群聊 ($id) 成功!".toChain()
@@ -275,7 +250,7 @@ object GitHubService {
                 } else {
                     val id = args[1].toLongOrNull() ?: return "请输入正确的群号!".toChain()
 
-                    if (comet.getBot().getGroup(id) != null) {
+                    if (CometVariables.comet.getBot().getGroup(id) != null) {
                         currentRepo.repoTarget.remove(id)
 
                         "取消订阅群聊 ($id) 成功!".toChain()

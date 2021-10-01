@@ -70,7 +70,7 @@ fun File.getMD5(): String {
 }
 
 /**
- * 直接将文件内容 (serialize) 序列化为指定的类
+ * 直接将文件内容 (json) 序列化为指定的类
  *
  * @return T
  */

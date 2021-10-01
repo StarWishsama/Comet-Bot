@@ -31,8 +31,8 @@ object PenguinStats {
     val api: PenguinStatsAPI
     val itemInfo: MutableSet<ArkNightItemInfo> = mutableSetOf()
     val stageInfo: MutableSet<ArkNightStageInfo> = mutableSetOf()
-    private val itemInfoFile = File(FileUtil.getResourceFolder(), "arknight_item.serialize")
-    private val stageInfoFile = File(FileUtil.getResourceFolder(), "arknight_stage.serialize")
+    private val itemInfoFile = File(FileUtil.getResourceFolder(), "arknight_item.json")
+    private val stageInfoFile = File(FileUtil.getResourceFolder(), "arknight_stage.json")
 
     init {
         val retrofit = Retrofit.Builder()

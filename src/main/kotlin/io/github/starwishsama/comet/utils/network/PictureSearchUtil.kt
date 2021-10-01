@@ -53,7 +53,7 @@ object PictureSearchUtil {
                             return PicSearchResult(pictureUrl, originalUrl, similarity, response.request.url.toString())
                         }
                     } catch (e: Exception) {
-                        CometVariables.logger.error("[以图搜图] 在解析 API 传回的 serialize 时出现了问题", e)
+                        CometVariables.logger.error("[以图搜图] 在解析 API 传回的 json 时出现了问题", e)
                         FileUtil.createErrorReportFile(
                             type = "picsearch", t = e, content = body,
                             message = "Request URL: ${response.request.url}"

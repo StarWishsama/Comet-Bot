@@ -17,7 +17,7 @@ import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.config.SecretStatus
 import io.github.starwishsama.comet.service.command.GitHubService
 import io.github.starwishsama.comet.service.pusher.instances.GithubPusher
-import io.github.starwishsama.comet.utils.serialize.isUsable
+import io.github.starwishsama.comet.utils.json.isUsable
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
