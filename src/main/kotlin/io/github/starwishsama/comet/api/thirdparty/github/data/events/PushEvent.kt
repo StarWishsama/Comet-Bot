@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 
 import java.time.Instant
 import java.time.LocalDateTime
@@ -90,7 +91,7 @@ data class PushEvent(
         wrapper.addText("| 推送分支 ${ref.replace("refs/heads/", "")}\n")
         wrapper.addText("| 提交者 ${headCommitInfo.committer.name}\n")
         wrapper.addText("| 提交信息 \n")
-        wrapper.addText("| ${headCommitInfo.message}\n")
+        wrapper.addText("| ${headCommitInfo.message.limitStringSize(100)}\n")
         wrapper.addText("| 查看差异 \n")
         wrapper.addText(compare)
 
