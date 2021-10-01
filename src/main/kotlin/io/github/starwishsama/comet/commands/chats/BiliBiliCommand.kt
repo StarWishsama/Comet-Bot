@@ -44,7 +44,6 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.toMessageChain
-import okhttp3.internal.toLongOrDefault
 import java.lang.Thread.sleep
 
 
@@ -70,10 +69,15 @@ class BiliBiliCommand : ChatCommand {
             "info", "查询", "cx" -> {
                 return if (args.size > 1) {
                     val task = object : NetworkRequestTask(),
-                        INetworkRequestTask<Triple<UserInfo?, UserVideoInfo?, MessageWrapper?>> {
-                        override fun request(param: String): Triple<UserInfo?, UserVideoInfo?, MessageWrapper?> {
+                        INetworkRequestTask<Pair<UserInfo?, UserVideoInfo?>> {
+                        override fun request(param: String): Pair<UserInfo?, UserVideoInfo?> {
                             val userInfo: UserInfo? = if (param.isNumeric()) {
-                                UserApi.userApiService.getMemberInfoById(args[1].toLongOrDefault(0)).execute().body()
+                                UserApi.userApiService.getMemberInfoById(
+                                    args[1].toLongOrNull() ?: return Pair(
+                                        null,
+                                        null
+                                    )
+                                ).execute().body()
                             } else {
                                 val searchResult =
                                     SearchApi.searchApiService.searchUser(keyword = args[1]).execute().body()
@@ -87,15 +91,13 @@ class BiliBiliCommand : ChatCommand {
                             }
 
                             if (userInfo == null) {
-                                return Triple(null, null, null)
+                                return Pair(null, null)
                             }
 
                             val recentVideos =
                                 UserApi.userApiService.getMemberVideoById(userInfo.data.card.mid).execute().body()
 
-                            val dynamic = DynamicApi.getWrappedDynamicTimeline(userInfo.data.card.mid)
-
-                            return Triple(userInfo, recentVideos, dynamic)
+                            return Pair(userInfo, recentVideos)
                         }
 
                         override val content: Contact = event.subject
@@ -103,22 +105,33 @@ class BiliBiliCommand : ChatCommand {
                         override val param: String = args[1]
 
                         override fun callback(result: Any?) {
-                            if (result is Triple<*, *, *> && result.first is UserInfo? && result.second is UserVideoInfo? && result.third is MessageWrapper?) {
+                            if (result is Pair<*, *> && result.first is UserInfo? && result.second is UserVideoInfo?) {
                                 val item = result.first as UserInfo?
 
                                 val chain = if (item != null) {
                                     val recentVideos = result.second as UserVideoInfo?
+                                    val card = item.data.card
 
-                                    val text = item.data.card.name + "\n粉丝数: " + item.data.follower.getBetterNumber() +
-                                            "\n最近视频: " + (if (recentVideos != null) recentVideos.data.list.videoList[0].toString() else "没有投稿过视频") + "\n"
-                                    val dynamic = DynamicApi.getWrappedDynamicTimeline(item.data.card.mid)
-                                    text.convertToChain() + "\n" + getDynamicText(dynamic, event)
+                                    """
+                                    ${card.name}${if (card.vipInfo.toString().isEmpty()) "" else " | ${card.vipInfo}"}
+                                    ${card.officialVerifyInfo.toString().ifEmpty { "" }}
+                                    ${card.sign}
+                                    
+                                    粉丝 ${item.data.follower.getBetterNumber()} | 获赞 ${item.data.likeCount.getBetterNumber()}
+                                    
+                                    最近投递视频: ${if (recentVideos == null) "没有投稿过视频" else recentVideos.data.list.videoList[0].toString()}
+                                       
+                                    """.trimIndent().toChain()
                                 } else {
                                     "找不到对应的B站用户".toChain()
                                 }
 
                                 runBlocking {
                                     content.sendMessage(chain)
+                                }
+                            } else {
+                                runBlocking {
+                                    content.sendMessage("无法查询到对应B站用户信息".toChain())
                                 }
                             }
                         }
