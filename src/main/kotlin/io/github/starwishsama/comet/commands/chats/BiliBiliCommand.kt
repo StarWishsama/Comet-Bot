@@ -14,36 +14,23 @@ import io.github.starwishsama.comet.CometVariables.localizationManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.SearchApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToWrapper
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserInfo
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserVideoInfo
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
-import io.github.starwishsama.comet.objects.push.BiliBiliUser
-import io.github.starwishsama.comet.objects.tasks.network.INetworkRequestTask
-import io.github.starwishsama.comet.objects.tasks.network.NetworkRequestTask
-import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.service.command.BiliBiliService
+import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.CometUtil.toChain
-import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.TaskUtil
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.MessageSource.Key.quote
-import net.mamoe.mirai.message.data.PlainText
-import net.mamoe.mirai.message.data.toMessageChain
 import java.lang.Thread.sleep
 
 
@@ -54,91 +41,30 @@ class BiliBiliCommand : ChatCommand {
         }
 
         when (args[0]) {
-            "sub", "订阅" -> return advancedSubscribe(user, args, event)
+            "sub", "订阅" -> return BiliBiliService.callSubscribeUser(this, user, args, event)
             "unsub", "取消订阅" -> {
                 return if (event is GroupMessageEvent) {
-                    unsubscribe(args, event.group.id)
+                    BiliBiliService.callUnsubscribeUser(this, args, event.group.id)
                 } else {
                     toChain("抱歉, 该命令仅限群聊使用!")
                 }
             }
             "list" -> {
                 event.subject.sendMessage("请稍等...")
-                return getSubscribers(event)
+                return BiliBiliService.getSubscribers(event)
+            }
+            "dynamic", "动态", "dt" -> {
+                return if (args.size > 1) {
+                    BiliBiliService.searchUserDynamic(args.getRestString(1), event)
+                    EmptyMessageChain
+                } else {
+                    getHelp().convertToChain()
+                }
             }
             "info", "查询", "cx" -> {
                 return if (args.size > 1) {
-                    val task = object : NetworkRequestTask(),
-                        INetworkRequestTask<Pair<UserInfo?, UserVideoInfo?>> {
-                        override fun request(param: String): Pair<UserInfo?, UserVideoInfo?> {
-                            val userInfo: UserInfo? = if (param.isNumeric()) {
-                                UserApi.userApiService.getMemberInfoById(
-                                    args[1].toLongOrNull() ?: return Pair(
-                                        null,
-                                        null
-                                    )
-                                ).execute().body()
-                            } else {
-                                val searchResult =
-                                    SearchApi.searchApiService.searchUser(keyword = args[1]).execute().body()
-
-                                if (searchResult == null) {
-                                    null
-                                } else {
-                                    UserApi.userApiService.getMemberInfoById(searchResult.data.result[0].mid).execute()
-                                        .body()
-                                }
-                            }
-
-                            if (userInfo == null) {
-                                return Pair(null, null)
-                            }
-
-                            val recentVideos =
-                                UserApi.userApiService.getMemberVideoById(userInfo.data.card.mid).execute().body()
-
-                            return Pair(userInfo, recentVideos)
-                        }
-
-                        override val content: Contact = event.subject
-
-                        override val param: String = args[1]
-
-                        override fun callback(result: Any?) {
-                            if (result is Pair<*, *> && result.first is UserInfo? && result.second is UserVideoInfo?) {
-                                val item = result.first as UserInfo?
-
-                                val chain = if (item != null) {
-                                    val recentVideos = result.second as UserVideoInfo?
-                                    val card = item.data.card
-
-                                    """
-${card.name}${if (card.vipInfo.toString().isEmpty()) "" else " | ${card.vipInfo}"}
-${card.officialVerifyInfo.toString().ifEmpty { "" }}
-${card.sign}
-                                                                        
-粉丝 ${item.data.follower.getBetterNumber()} | 获赞 ${item.data.likeCount.getBetterNumber()}
-                                    
-最近投递视频: ${if (recentVideos == null) "没有投稿过视频" else recentVideos.data.list.videoList[0].toString()}                             
-""".trimIndent().toChain()
-                                } else {
-                                    "找不到对应的B站用户".toChain()
-                                }
-
-                                runBlocking {
-                                    content.sendMessage(chain)
-                                }
-                            } else {
-                                runBlocking {
-                                    content.sendMessage("无法查询到对应B站用户信息".toChain())
-                                }
-                            }
-                        }
-                    }
-
-                    NetworkRequestManager.addTask(task)
-
-                    return event.message.quote() + "请稍等..."
+                    BiliBiliService.searchUserInfo(args.getRestString(1), event)
+                    EmptyMessageChain
                 } else getHelp().convertToChain()
             }
             "push" -> {
@@ -167,7 +93,7 @@ ${card.sign}
                         }
                     }
 
-                    return "刷新缓存成功".toChain()
+                    return "正在刷新动态, 请稍后".toChain()
                 } else {
                     toChain("抱歉, 该命令仅限群聊使用!")
                 }
@@ -182,7 +108,7 @@ ${card.sign}
             }
             "parse" -> {
                 return if (event is GroupMessageEvent) {
-                    setParseVideo(event.group.id)
+                    BiliBiliService.setParseVideo(event.group.id)
                 } else {
                     toChain("抱歉, 该命令仅限群聊使用!")
                 }
@@ -197,9 +123,10 @@ ${card.sign}
         CommandProps("bili", arrayListOf(), "订阅查询B站主播/用户动态", "nbot.commands.bili", UserLevel.USER)
 
     override fun getHelp(): String = """
-        /bili sub [用户名] 订阅用户相关信息
-        /bili unsub [用户名] 取消订阅用户相关信息
-        /bili info [用户名] 查看用户的动态
+        /bili sub [用户名/UID] 订阅用户相关信息
+        /bili unsub [用户名/UID] 取消订阅用户相关信息
+        /bili info [用户名/UID] 查看指定用户信息
+        /bili dynamic [用户名/UID] 查看指定用户动态
         /bili push 开启/关闭本群开播推送
         /bili refresh 刷新订阅UP主缓存
         /bili id [动态 ID] 通过动态 ID 查询动态
@@ -211,139 +138,6 @@ ${card.sign}
         if (user.compareLevel(level)) return true
         if (e is GroupMessageEvent && e.sender.permission >= MemberPermission.MEMBER) return true
         return false
-    }
-
-    private suspend fun advancedSubscribe(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
-        try {
-            if (args.size <= 1) return getHelp().convertToChain()
-
-            if (!hasPermission(user, event)) {
-                return localizationManager.getLocalizationText("message.no-permission").convertToChain()
-            }
-
-            return if (args[1].contains("|")) {
-                val users = args[1].split("|")
-                val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
-                subscribeUsers(users, id) ?: toChain("订阅多个用户成功", true)
-            } else {
-                val id = if (event is GroupMessageEvent) event.group.id else args[2].toLong()
-                val result = subscribe(args[1], id)
-                if (result is EmptyMessageChain) {
-                    toChain("账号不存在")
-                } else {
-                    result
-                }
-            }
-        } catch (e: IllegalArgumentException) {
-            return toChain(e.message, true)
-        }
-    }
-
-    private suspend fun subscribeUsers(users: List<String>, id: Long): MessageChain? {
-        users.forEach {
-            val result = subscribe(it, id)
-            delay(500)
-            if (result is EmptyMessageChain) {
-                return toChain("账号 $it 不存在")
-            }
-        }
-        return null
-    }
-
-    private fun unsubscribe(args: List<String>, groupId: Long): MessageChain {
-        return if (args.size > 1) {
-            val cfg = GroupConfigManager.getConfigOrNew(groupId)
-
-            if (args[1] == "all" || args[1] == "全部") {
-                cfg.biliSubscribers.clear()
-                return toChain("退订全部成功")
-            }
-
-            val item = if (args[1].isNumeric()) {
-                val item = cfg.biliSubscribers.parallelStream().filter { it.id == args[1] }.findFirst()
-                if (!item.isPresent) {
-                    return "找不到你要退订的用户".toChain()
-                }
-
-                item.get()
-            } else {
-                val item = cfg.biliSubscribers.parallelStream().filter { it.userName == args[1] }.findFirst()
-                if (!item.isPresent) {
-                    return "找不到你要退订的用户".toChain()
-                }
-
-                item.get()
-            }
-
-            cfg.biliSubscribers.remove(item)
-            toChain("取消订阅用户 ${item.userName} 成功")
-        } else {
-            getHelp().convertToChain()
-        }
-    }
-
-    private fun getSubscribers(event: MessageEvent): MessageChain {
-        if (event !is GroupMessageEvent) return toChain("只能在群里查看订阅列表")
-        val list = GroupConfigManager.getConfig(event.group.id)?.biliSubscribers
-
-        if (list?.isNotEmpty() == true) {
-            val subs = buildString {
-                append("监控室列表:\n")
-                list.forEach {
-                    append(it.userName + " (${it.id}, ${it.roomID})\n")
-                    trim()
-                }
-            }
-            return toChain(subs)
-        }
-        return toChain("未订阅任何用户")
-    }
-
-    private fun getDynamicText(dynamic: MessageWrapper?, event: MessageEvent): MessageChain {
-        return if (dynamic == null) {
-            PlainText("\n没有发送过动态").toMessageChain()
-        } else {
-            if (dynamic.getAllText().isNotEmpty()) {
-                dynamic.toMessageChain(event.subject)
-            } else {
-                PlainText("\n没有发送过动态").toMessageChain()
-            }
-        }
-    }
-
-    private fun subscribe(target: String, groupId: Long): MessageChain {
-        val cfg = GroupConfigManager.getConfigOrNew(groupId)
-        var name = ""
-        val uid: Long = when {
-            target.isNumeric() -> {
-                name = DynamicApi.getUserNameByMid(target.toLong())
-                target.toLong()
-            }
-            else -> {
-                val item = SearchApi.searchApiService.searchUser(keyword = target).execute().body()
-                val title = item?.data?.result?.get(0)?.userName
-                if (title != null) name = title
-                item?.data?.result?.get(0)?.mid ?: return EmptyMessageChain
-            }
-        }
-
-        val roomNumber: Long =
-            UserApi.userApiService.getUserInfo(uid).execute().body()?.data?.liveRoomInfo?.roomID ?: -1
-
-        return if (!cfg.biliSubscribers.stream().filter { it.id.toLong() == uid }.findFirst().isPresent) {
-            cfg.biliSubscribers.add(BiliBiliUser(uid.toString(), name, roomNumber))
-            toChain("订阅 ${name}($uid) 成功")
-        } else {
-            toChain("你已经订阅过 ${name}($uid) 了!")
-        }
-    }
-
-    private fun setParseVideo(groupId: Long): MessageChain {
-        val cfg = GroupConfigManager.getConfig(groupId) ?: return "请求的群聊不存在!".toChain()
-
-        cfg.canParseBiliVideo = !cfg.canParseBiliVideo
-
-        return "群聊视频解析已${if (cfg.canParseBiliVideo) "开启" else "关闭"}".toChain()
     }
 
 }
