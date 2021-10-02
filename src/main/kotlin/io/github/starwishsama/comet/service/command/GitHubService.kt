@@ -46,7 +46,7 @@ object GitHubService {
     }
 
     fun subscribeRepo(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
-        if (!user.hasPermission("nbot.commands.github") && !user.compareLevel(UserLevel.ADMIN) && (event is GroupMessageEvent && event.sender.isAdministrator())) {
+        if (!checkPermission(user, event)) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
@@ -114,7 +114,7 @@ object GitHubService {
     }
 
     fun unsubscribeRepo(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
-        if (!user.hasPermission("nbot.commands.github") && !user.compareLevel(UserLevel.ADMIN) && (event is GroupMessageEvent && event.sender.isAdministrator())) {
+        if (!checkPermission(user, event)) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
@@ -156,7 +156,7 @@ object GitHubService {
     }
 
     fun getRepoList(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
-        if (!user.hasPermission("nbot.commands.github") && !user.compareLevel(UserLevel.ADMIN) && (event is GroupMessageEvent && event.sender.isAdministrator())) {
+        if (!checkPermission(user, event)) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
@@ -180,7 +180,7 @@ object GitHubService {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
-        return if (repos.repos.count { it.repoTarget.contains(id) } < 1) {
+        return if (repos.repos.none { it.repoTarget.contains(id) }) {
             "还没订阅过任何项目".toChain()
         } else {
             buildString {
@@ -199,7 +199,7 @@ object GitHubService {
         command: ChatCommand,
         session: Session? = null
     ): MessageChain {
-        if (!user.hasPermission("nbot.commands.github") && !user.compareLevel(UserLevel.ADMIN)) {
+        if (!user.compareLevel(UserLevel.ADMIN) && !user.hasPermission("nbot.commands.github")) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
@@ -260,7 +260,7 @@ object GitHubService {
                 } else {
                     val id = args[1].toLongOrNull() ?: return "请输入正确的群号!".toChain()
 
-                    if (CometVariables.comet.getBot().getGroup(id) != null) {
+                    if (comet.getBot().getGroup(id) != null) {
                         currentRepo.repoTarget.add(id)
 
                         "添加订阅群聊 ($id) 成功!".toChain()
@@ -275,7 +275,7 @@ object GitHubService {
                 } else {
                     val id = args[1].toLongOrNull() ?: return "请输入正确的群号!".toChain()
 
-                    if (CometVariables.comet.getBot().getGroup(id) != null) {
+                    if (comet.getBot().getGroup(id) != null) {
                         currentRepo.repoTarget.remove(id)
 
                         "取消订阅群聊 ($id) 成功!".toChain()
@@ -301,5 +301,9 @@ object GitHubService {
                 """.trimIndent().toChain()
             }
         }
+    }
+
+    private fun checkPermission(user: CometUser, event: MessageEvent): Boolean {
+        return user.compareLevel(UserLevel.ADMIN) || user.hasPermission("nbot.commands.github") || (event is GroupMessageEvent && event.sender.isAdministrator())
     }
 }
