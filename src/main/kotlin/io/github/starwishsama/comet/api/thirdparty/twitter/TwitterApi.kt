@@ -27,9 +27,9 @@ import io.github.starwishsama.comet.exceptions.TwitterApiException
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.objects.config.api.TwitterConfig
 import io.github.starwishsama.comet.utils.FileUtil
-import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.network.isType
+import io.github.starwishsama.comet.utils.serialize.isUsable
 import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime

@@ -41,7 +41,7 @@ import net.mamoe.mirai.message.data.toMessageChain
 import kotlin.time.ExperimentalTime
 
 class TwitterCommand : ChatCommand {
-    @ExperimentalTime
+    @OptIn(ExperimentalTime::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (ApiManager.getConfig<TwitterConfig>().token.isEmpty()) {
             return toChain("推特推送未被正确设置, 请联系机器人管理员")

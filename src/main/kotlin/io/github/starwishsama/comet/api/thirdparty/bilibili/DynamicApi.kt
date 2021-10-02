@@ -24,8 +24,8 @@ import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.FileUtil
-import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
+import io.github.starwishsama.comet.utils.serialize.isUsable
 
 /**
  * BiliBili 动态 API

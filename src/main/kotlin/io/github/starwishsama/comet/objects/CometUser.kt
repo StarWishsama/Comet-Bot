@@ -70,7 +70,11 @@ data class CometUser(
     }
 
     fun addPermission(permission: String) {
-        permissions.plusAssign(permission)
+        permissions.add(permission)
+    }
+
+    fun removePermission(permission: String) {
+        permissions.remove(permission)
     }
 
     /**

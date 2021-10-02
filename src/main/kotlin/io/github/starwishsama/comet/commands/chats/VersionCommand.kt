@@ -23,7 +23,7 @@ import kotlin.time.ExperimentalTime
 
 
 class VersionCommand : ChatCommand {
-    @ExperimentalTime
+    @OptIn(ExperimentalTime::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return ("彗星 Bot " + BuildConfig.version +
                 "\n运行时长 ${CometUtil.getRunningTime()}" +

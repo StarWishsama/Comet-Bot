@@ -15,8 +15,8 @@ import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
+import io.github.starwishsama.comet.utils.serialize.isUsable
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.isBotMuted
@@ -34,8 +34,7 @@ object BiliBiliShareListener : NListener {
     private val bvPattern = Regex("""https://b23.tv/\w{1,6}""")
     private val longUrlPattern = Regex("""https://www.bilibili.com/video/(av|BV)\w{1,10}""")
 
-    @MiraiExperimentalApi
-    @ExperimentalTime
+    @OptIn(MiraiExperimentalApi::class, ExperimentalTime::class)
     override fun listen(event: Event) {
         if (event is GroupMessageEvent && !event.group.isBotMuted) {
             if (GroupConfigManager.getConfig(event.group.id)?.canParseBiliVideo != true) {
@@ -88,7 +87,11 @@ object BiliBiliShareListener : NListener {
     }
 
     private fun biliBiliLinkConvert(url: String, subject: Contact): MessageChain {
-        val videoID = parseVideoIDFromBili(NetUtil.getRedirectedURL(url) ?: return EmptyMessageChain)
+        val videoID = if (bvPattern.matches(url)) {
+            parseVideoIDFromBili(NetUtil.getRedirectedURL(url) ?: return EmptyMessageChain)
+        } else {
+            parseVideoIDFromBili(url)
+        }
 
         val videoInfo = if (videoID.contains("BV")) {
             VideoApi.videoService.getVideoInfoByBID(videoID)

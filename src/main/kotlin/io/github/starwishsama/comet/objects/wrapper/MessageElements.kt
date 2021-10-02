@@ -15,8 +15,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.github.starwishsama.comet.utils.StringUtil.base64ToImage
-import io.github.starwishsama.comet.utils.json.WrapperConverter
 import io.github.starwishsama.comet.utils.network.NetUtil
+import io.github.starwishsama.comet.utils.serialize.WrapperConverter
 import io.github.starwishsama.comet.utils.uploadAsImage
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable

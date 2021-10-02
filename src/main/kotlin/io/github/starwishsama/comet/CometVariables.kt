@@ -20,6 +20,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer
+import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
@@ -29,8 +30,8 @@ import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
 import io.github.starwishsama.comet.service.server.CometServiceServer
 import io.github.starwishsama.comet.utils.LoggerAppender
-import io.github.starwishsama.comet.utils.json.LocalDateTimeConverter
-import io.github.starwishsama.comet.utils.json.WrapperConverter
+import io.github.starwishsama.comet.utils.serialize.LocalDateTimeConverter
+import io.github.starwishsama.comet.utils.serialize.WrapperConverter
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.utils.MiraiInternalApi
 import okhttp3.OkHttpClient
@@ -109,7 +110,9 @@ object CometVariables {
                     LocalTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss"))
                 )
             },
-            KotlinModule(nullIsSameAsDefault = true, nullToEmptyCollection = true, nullToEmptyMap = true),
+            KotlinModule.Builder().enable(KotlinFeature.NullIsSameAsDefault)
+                .enable(KotlinFeature.NullToEmptyCollection)
+                .enable(KotlinFeature.NullToEmptyMap).build(),
             SimpleModule().also {
                 it.addDeserializer(LocalDateTime::class.java, LocalDateTimeConverter)
                 it.addDeserializer(WrapperElement::class.java, WrapperConverter)

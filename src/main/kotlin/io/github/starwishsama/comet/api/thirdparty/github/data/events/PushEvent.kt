@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 
 import java.time.Instant
 import java.time.LocalDateTime
@@ -32,7 +33,7 @@ data class PushEvent(
     @JsonProperty("commits")
     val commitInfo: List<CommitInfo>,
     @JsonProperty("head_commit")
-    val headCommitInfo: CommitInfo
+    val headCommitInfo: CommitInfo?
 ) : GithubEvent {
     data class RepoInfo(
         val id: Long,
@@ -54,7 +55,8 @@ data class PushEvent(
 
     data class PusherInfo(
         val name: String,
-        val email: String
+        // 推送者为 bot 时会为空
+        val email: String?
     )
 
     data class CommitInfo(
@@ -78,6 +80,10 @@ data class PushEvent(
     }
 
     override fun toMessageWrapper(): MessageWrapper {
+        if (headCommitInfo == null) {
+            return MessageWrapper().setUsable(false)
+        }
+
         val wrapper = MessageWrapper()
 
         wrapper.addText("⬆️${repoInfo.fullName} 有新提交啦\n")
@@ -85,7 +91,7 @@ data class PushEvent(
         wrapper.addText("| 推送分支 ${ref.replace("refs/heads/", "")}\n")
         wrapper.addText("| 提交者 ${headCommitInfo.committer.name}\n")
         wrapper.addText("| 提交信息 \n")
-        wrapper.addText("| ${headCommitInfo.message}\n")
+        wrapper.addText("| ${headCommitInfo.message.limitStringSize(100)}\n")
         wrapper.addText("| 查看差异 \n")
         wrapper.addText(compare)
 

@@ -11,6 +11,7 @@
 package io.github.starwishsama.comet.service.command
 
 import cn.hutool.core.util.RandomUtil
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.utils.CometUtil.toChain
@@ -51,6 +52,14 @@ object CheckInService {
                 user.checkInGroup = 0
             }
 
+            val position = getCheckInPosition(user)
+
+            if (position == 0) {
+                append("今日首位签到\n")
+            } else {
+                append("今日第${position}位签到\n")
+            }
+
             if (checkInPoint.getAllPoint() == 0.0) {
                 append("今天运气不佳, 没有积分")
             } else {
@@ -60,7 +69,7 @@ object CheckInService {
             append("\n")
 
             if (user.checkInTime >= 2) {
-                append("连续签到 ${user.checkInTime} 天 ${if (checkInPoint.extraPoint > 0) ", 幸运获得了 ${checkInPoint.extraPoint} 点积分~\n" else ""}")
+                append("连续签到 ${user.checkInTime} 天 ${if (checkInPoint.extraPoint > 0) ", 幸运获得了 ${checkInPoint.extraPoint} 点积分~\n" else "\n"}")
             }
 
             append("目前积分 > ${user.checkInPoint.fixDisplay()}\n")
@@ -113,6 +122,17 @@ object CheckInService {
         val extraPoint: Double
     ) {
         fun getAllPoint(): Double = basePoint + extraPoint
+    }
+
+    private fun getCheckInPosition(user: CometUser): Int {
+        val checkTime = LocalDateTime.now()
+        val sortedByDate = CometVariables.cometUsers.filter {
+            it.value.lastCheckInTime.dayOfMonth == checkTime.dayOfMonth
+                    && it.value.lastCheckInTime.dayOfYear == checkTime.dayOfYear
+                    && it.value.lastCheckInTime.dayOfWeek == checkTime.dayOfWeek
+        }.entries.sortedBy { it.value.lastCheckInTime }
+
+        return sortedByDate.indexOfFirst { it.value == user }
     }
 
     private fun getCurrentInstantString(): String {

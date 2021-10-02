@@ -32,9 +32,11 @@ object GithubPusher {
             consumer.forEach {
                 it.repoTarget.forEach { id ->
                     CometVariables.comet.getBot().getGroup(id)?.also { g ->
-                        g.sendMessage(
-                            event.toMessageWrapper().toMessageChain(g)
-                        )
+                        event.toMessageWrapper().let { mw ->
+                            if (mw.isUsable()) {
+                                g.sendMessage(mw.toMessageChain(g))
+                            }
+                        }
                     }
                 }
             }

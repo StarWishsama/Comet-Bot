@@ -23,20 +23,78 @@ data class UserInfo(
 ) : CommonResponse() {
     data class Data(
         val card: InfoCard,
-        val follower: Long
+        val follower: Long,
+        @JsonProperty("like_num")
+        val likeCount: Long
     ) {
         data class InfoCard(
             val mid: Long,
             val name: String,
             val sex: String,
             val face: String,
+            val sign: String,
             @JsonProperty("level_info")
             val levelInfo: LevelInfo,
+            @JsonProperty("Official")
+            val officialVerifyInfo: OfficialVerifyInfo,
+            @JsonProperty("vip")
+            val vipInfo: VipInfo,
         ) {
             data class LevelInfo(
                 @JsonProperty("current_level")
                 val currentLevel: Int,
             )
+
+            data class OfficialVerifyInfo(
+                val role: Int,
+                val title: String,
+                @JsonProperty("desc")
+                val description: String,
+            ) {
+                private fun getVerifyType(): String {
+                    return when (role) {
+                        in 1..2, 7 -> {
+                            "个人认证"
+                        }
+                        in 3..6 -> {
+                            "机构认证"
+                        }
+                        else -> {
+                            ""
+                        }
+                    }
+                }
+
+                override fun toString(): String {
+                    return if (getVerifyType().isEmpty()) {
+                        ""
+                    } else {
+                        getVerifyType() + " > $description"
+                    }
+                }
+            }
+
+            data class VipInfo(
+                val type: Int,
+                val status: Int,
+                @JsonProperty("due_date")
+                val dueDate: Long,
+                val label: LabelInfo
+            ) {
+                data class LabelInfo(
+                    val text: String,
+                )
+
+                private fun isVip(): Boolean = status == 1
+
+                override fun toString(): String {
+                    return if (!isVip()) {
+                        ""
+                    } else {
+                        label.text
+                    }
+                }
+            }
         }
     }
 }
