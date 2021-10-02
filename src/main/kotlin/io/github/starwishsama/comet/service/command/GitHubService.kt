@@ -46,11 +46,17 @@ object GitHubService {
     }
 
     fun subscribeRepo(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
-        if (!checkPermission(user, event)) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+        val isGroup = event is GroupMessageEvent
+
+        val id = if (isGroup) {
+            (event as GroupMessageEvent).group.id
+        } else {
+            args[2].toLongOrNull() ?: return "请填写正确的群号!".toChain()
         }
 
-        val isGroup = event is GroupMessageEvent
+        if (!checkPermission(user, event, id)) {
+            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+        }
 
         if (!isGroup && args.size < 3) {
             return "正确的命令: /github add [仓库名称] [群号] (仓库 Secret [可选])".toChain()
@@ -67,22 +73,12 @@ object GitHubService {
             ""
         }
 
-        val id = if (isGroup) {
-            (event as GroupMessageEvent).group.id
-        } else {
-            args[2].toLongOrNull() ?: return "请填写正确的群号!".toChain()
-        }
-
         if (!repoName.contains("/")) {
             return "请填写正确的仓库名称! 格式: 用户名/仓库名".toChain()
         }
 
         if (!isGroup && comet.getBot().getGroup(id) == null) {
             return "机器人不在你指定的群内.".toChain()
-        }
-
-        if (comet.getBot().getGroup(id)?.getMember(user.id)?.isAdministrator() != true) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
         val authorAndRepo = repoName.split("/")
@@ -114,11 +110,17 @@ object GitHubService {
     }
 
     fun unsubscribeRepo(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
-        if (!checkPermission(user, event)) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+        val isGroup = event is GroupMessageEvent
+
+        val id = if (isGroup) {
+            (event as GroupMessageEvent).group.id
+        } else {
+            args[2].toLongOrNull() ?: return "请填写正确的群号!".toChain()
         }
 
-        val isGroup = event is GroupMessageEvent
+        if (!checkPermission(user, event, id)) {
+            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+        }
 
         if (!isGroup && args.size < 3) {
             return "正确的命令: /github rm [仓库名称] [群号]".toChain()
@@ -132,18 +134,9 @@ object GitHubService {
             return "请填写正确的仓库名称! 格式: 用户名/仓库名".toChain()
         }
 
-        val id = if (isGroup) {
-            (event as GroupMessageEvent).group.id
-        } else {
-            args[2].toLongOrNull() ?: return "请填写正确的群号!".toChain()
-        }
 
         if (!isGroup && comet.getBot().getGroup(id) == null) {
             return "机器人不在你指定的群内.".toChain()
-        }
-
-        if (comet.getBot().getGroup(id)?.getMember(user.id)?.isAdministrator() != true) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
         val authorAndRepo = repoName.split("/")
@@ -156,10 +149,6 @@ object GitHubService {
     }
 
     fun getRepoList(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
-        if (!checkPermission(user, event)) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
-        }
-
         val isGroup = event is GroupMessageEvent
 
         val id = if (isGroup) {
@@ -172,12 +161,12 @@ object GitHubService {
             args[1].toLongOrNull() ?: return "请填写正确的群号!".toChain()
         }
 
-        if (!isGroup && comet.getBot().getGroup(id) == null) {
-            return "机器人不在你指定的群内.".toChain()
+        if (!checkPermission(user, event, id)) {
+            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
-        if (comet.getBot().getGroup(id)?.getMember(user.id)?.isAdministrator() != true) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+        if (!isGroup && comet.getBot().getGroup(id) == null) {
+            return "机器人不在你指定的群内.".toChain()
         }
 
         return if (repos.repos.none { it.repoTarget.contains(id) }) {
@@ -303,7 +292,12 @@ object GitHubService {
         }
     }
 
-    private fun checkPermission(user: CometUser, event: MessageEvent): Boolean {
-        return user.compareLevel(UserLevel.ADMIN) || user.hasPermission("nbot.commands.github") || (event is GroupMessageEvent && event.sender.isAdministrator())
+    private fun checkPermission(user: CometUser, event: MessageEvent, groupId: Long = 0): Boolean {
+        return when {
+            user.compareLevel(UserLevel.ADMIN) || user.hasPermission("nbot.commands.github") -> true
+            event is GroupMessageEvent -> event.sender.isAdministrator()
+            groupId != 0L -> comet.getBot().getGroup(groupId)?.getMember(user.id)?.isAdministrator() == true
+            else -> false
+        }
     }
 }
