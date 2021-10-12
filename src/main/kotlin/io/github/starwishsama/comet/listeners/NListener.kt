@@ -33,8 +33,10 @@ fun INListener.parseListener(): Pair<String, Map<KClass<out Event>, KFunction<*>
             return@forEach
         } else {
             it.parameters.forEach { kp ->
-                if (kp.type.isSubtypeOf(Event::class.createType()) && kp.type.classifier != null && kp.type.classifier is KClass<*>) {
-                    methodEvent[kp.type.classifier as KClass<out Event>] = it
+                val eventClass = kp.type.classifier
+
+                if (kp.type.isSubtypeOf(Event::class.createType()) && eventClass != null && eventClass is KClass<*>) {
+                    methodEvent[eventClass as KClass<out Event>] = it
                 }
             }
         }
