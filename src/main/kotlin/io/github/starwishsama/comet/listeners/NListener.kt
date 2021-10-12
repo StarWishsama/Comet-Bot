@@ -12,11 +12,33 @@ package io.github.starwishsama.comet.listeners
 
 import net.mamoe.mirai.event.Event
 import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
+import kotlin.reflect.full.createType
+import kotlin.reflect.full.functions
+import kotlin.reflect.full.isSubtypeOf
 
-interface NListener {
-    val eventToListen: List<KClass<out Event>>
+interface INListener
 
-    fun listen(event: Event)
+fun INListener.parseListener(): Pair<String, Map<KClass<out Event>, KFunction<*>>> {
+    val clazz = this::class
+    val nListener = clazz.annotations.firstOrNull { it.annotationClass == NListener::class }
+        ?: return Pair("", emptyMap())
 
-    fun getName(): String
+    val name = (nListener as NListener).name
+
+    val methodEvent = mutableMapOf<KClass<out Event>, KFunction<*>>()
+
+    clazz.functions.forEach {
+        if (it.annotations.find { clazz -> clazz.annotationClass == EventHandler::class } == null) {
+            return@forEach
+        } else {
+            it.parameters.forEach { kp ->
+                if (kp.type.isSubtypeOf(Event::class.createType()) && kp.type.classifier != null && kp.type.classifier is KClass<*>) {
+                    methodEvent[kp.type.classifier as KClass<out Event>] = it
+                }
+            }
+        }
+    }
+
+    return Pair(name, methodEvent)
 }

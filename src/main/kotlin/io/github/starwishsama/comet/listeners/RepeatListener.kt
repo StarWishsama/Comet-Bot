@@ -14,20 +14,15 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.isBotMuted
-import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
 
-object RepeatListener : NListener {
-    override val eventToListen = listOf(GroupMessageEvent::class)
-
+@NListener("复读机")
+object RepeatListener : INListener {
     private val repeatCachePool = mutableMapOf<Long, RepeatInfo>()
 
-    override fun listen(event: Event) {
-        if (event !is GroupMessageEvent) {
-            return
-        }
-
+    @EventHandler
+    fun listen(event: GroupMessageEvent) {
         if (event.group.isBotMuted) {
             return
         }
@@ -44,8 +39,6 @@ object RepeatListener : NListener {
             repeatInfo.handleRepeat(event.group, event.message)
         }
     }
-
-    override fun getName(): String = "复读机"
 }
 
 data class RepeatInfo(

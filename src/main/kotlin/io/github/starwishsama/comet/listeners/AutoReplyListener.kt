@@ -13,42 +13,37 @@ package io.github.starwishsama.comet.listeners
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
 import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 
-object AutoReplyListener : NListener {
-    override val eventToListen = listOf(GroupMessageEvent::class)
+@NListener("关键词回复")
+object AutoReplyListener : INListener {
+    @EventHandler
+    fun listen(event: GroupMessageEvent) {
+        event.apply {
+            val cfg = GroupConfigManager.getConfig(group.id)
 
-    override fun listen(event: Event) {
-        if (event is GroupMessageEvent) {
-            event.apply {
-                val cfg = GroupConfigManager.getConfig(group.id)
+            if (cfg?.keyWordReply == null || cfg.keyWordReply.isEmpty()) return
 
-                if (cfg?.keyWordReply == null || cfg.keyWordReply.isEmpty()) return
+            val user = CometUser.getUserOrRegister(sender.id)
 
-                val user = CometUser.getUserOrRegister(sender.id)
+            if (!user.checkCoolDown(true)) {
+                return
+            }
 
-                if (!user.checkCoolDown(true)) {
-                    return
-                }
+            val messageContent = message.contentToString()
 
-                val messageContent = message.contentToString()
+            cfg.keyWordReply.forEach {
 
-                cfg.keyWordReply.forEach {
+                if (it.keyWords.isEmpty()) return
 
-                    if (it.keyWords.isEmpty()) return
-
-                    it.keyWords.forEach { keyWord ->
-                        if (messageContent.contains(keyWord)) {
-                            runBlocking { subject.sendMessage(message.quote() + it.reply.toMessageChain(subject)) }
-                            return
-                        }
+                it.keyWords.forEach { keyWord ->
+                    if (messageContent.contains(keyWord)) {
+                        runBlocking { subject.sendMessage(message.quote() + it.reply.toMessageChain(subject)) }
+                        return
                     }
                 }
             }
         }
     }
-
-    override fun getName(): String = "关键词回复"
 }

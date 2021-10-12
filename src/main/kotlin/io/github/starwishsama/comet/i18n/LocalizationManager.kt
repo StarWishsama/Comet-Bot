@@ -25,6 +25,7 @@ class LocalizationManager {
         val localizedFolder = FileUtil.getResourceFolder().getChildFolder("i18n")
 
         val localizationFile = File(localizedFolder, currentLanguage.fileName)
+
         if (localizationFile.exists()) {
             localizationYaml = Default.decodeMapFromString(localizationFile.getContext())
             daemonLogger.info("多语言服务已启动! 使用语言: $currentLanguage")

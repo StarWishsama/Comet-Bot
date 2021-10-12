@@ -20,7 +20,6 @@ import io.github.starwishsama.comet.utils.serialize.isUsable
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.isBotMuted
-import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.LightApp
@@ -28,15 +27,16 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import kotlin.time.ExperimentalTime
 
-object BiliBiliShareListener : NListener {
-    override val eventToListen = listOf(GroupMessageEvent::class)
+@NListener("哔哩哔哩解析")
+object BiliBiliShareListener : INListener {
 
     private val bvPattern = Regex("""https://b23.tv/\w{1,6}""")
     private val longUrlPattern = Regex("""https://www.bilibili.com/video/(av|BV)\w{1,10}""")
 
     @OptIn(MiraiExperimentalApi::class, ExperimentalTime::class)
-    override fun listen(event: Event) {
-        if (event is GroupMessageEvent && !event.group.isBotMuted) {
+    @EventHandler
+    fun listen(event: GroupMessageEvent) {
+        if (!event.group.isBotMuted) {
             if (GroupConfigManager.getConfig(event.group.id)?.canParseBiliVideo != true) {
                 return
             }
@@ -113,6 +113,4 @@ object BiliBiliShareListener : NListener {
         val videoID = url.substring(0, url.indexOf("?")).replace("https", "").replace("https", "").split("/")
         return videoID.last()
     }
-
-    override fun getName(): String = "去你大爷的小程序"
 }

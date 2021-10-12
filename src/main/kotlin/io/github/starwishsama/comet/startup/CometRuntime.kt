@@ -49,6 +49,7 @@ import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.isActive
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.globalEventChannel
 import okhttp3.OkHttpClient
 import org.jline.reader.EndOfFileException
@@ -57,6 +58,7 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
+import kotlin.reflect.full.isSubclassOf
 
 object CometRuntime {
     fun postSetup() {
@@ -164,19 +166,25 @@ object CometRuntime {
         )
 
         listeners.forEach { listener ->
-            if (listener.eventToListen.isEmpty()) {
+            val result = listener.parseListener()
+
+            if (result.first.isEmpty() || result.second.isEmpty()) {
                 daemonLogger.warning("监听器 ${listener::class.java.simpleName} 没有监听任何一个事件!")
             } else {
-                listener.eventToListen.forEach { eventClass ->
-                    bot.globalEventChannel().subscribeAlways(eventClass) {
-                        if (CometVariables.switch) {
-                            listener.listen(this)
+                result.second.forEach { (clazz, method) ->
+
+                    if (clazz.isSubclassOf(Event::class)) {
+                        @Suppress("UNCHECKED_CAST")
+                        bot.globalEventChannel().subscribeAlways(clazz) {
+                            if (CometVariables.switch) {
+                                method.call(this)
+                            }
                         }
                     }
                 }
             }
 
-            logger.info("[监听器] 已注册 ${listener.getName()} 监听器")
+            logger.info("[监听器] 已注册 ${result.first} 监听器")
         }
 
         DataSetup.initPerGroupSetting(bot)
