@@ -54,7 +54,7 @@ data class PullRequestEvent(
     ) {
         fun convertCreatedTime(): String {
             val localTime =
-                LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.systemDefault())
+                LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.of("UTC"))
             return CometVariables.hmsPattern.format(localTime)
         }
     }
