@@ -97,7 +97,7 @@ dependencies {
 
     implementation 'com.github.StarWishsama:rkon-core:master-SNAPSHOT'
 
-    implementation 'org.reflections:reflections:0.9.12'
+    implementation 'org.reflections:reflections:0.10.1'
 }
 
 tasks {
