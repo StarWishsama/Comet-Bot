@@ -10,19 +10,23 @@
 
 package io.github.starwishsama.comet.listeners
 
+import io.github.starwishsama.comet.CometVariables
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.Event
+import net.mamoe.mirai.event.globalEventChannel
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.functions
+import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.isSubtypeOf
 
 interface INListener
 
-fun INListener.parseListener(): Pair<String, Map<KClass<out Event>, KFunction<*>>> {
+fun INListener.register(bot: Bot) {
     val clazz = this::class
     val nListener = clazz.annotations.firstOrNull { it.annotationClass == NListener::class }
-        ?: return Pair("", emptyMap())
+        ?: return
 
     val name = (nListener as NListener).name
 
@@ -36,11 +40,29 @@ fun INListener.parseListener(): Pair<String, Map<KClass<out Event>, KFunction<*>
                 val eventClass = kp.type.classifier
 
                 if (kp.type.isSubtypeOf(Event::class.createType()) && eventClass != null && eventClass is KClass<*>) {
+                    @Suppress("UNCHECKED_CAST")
                     methodEvent[eventClass as KClass<out Event>] = it
                 }
             }
         }
     }
 
-    return Pair(name, methodEvent)
+    if (name.isEmpty() || methodEvent.isEmpty()) {
+        CometVariables.daemonLogger.warning("监听器 ${clazz.java.simpleName} 没有监听任何一个事件!")
+        return
+    } else {
+        methodEvent.forEach { (clazz, method) ->
+            if (clazz.isSubclassOf(Event::class)) {
+                @Suppress("UNCHECKED_CAST")
+                bot.globalEventChannel().subscribeAlways(clazz) { subEvent ->
+                    if (CometVariables.switch) {
+                        method.call(this@register, subEvent)
+                    }
+                }
+            }
+        }
+    }
+
+    CometVariables.logger.info("[监听器] 已注册 $name 监听器")
+
 }

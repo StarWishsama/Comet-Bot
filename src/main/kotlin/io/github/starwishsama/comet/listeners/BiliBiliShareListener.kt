@@ -110,7 +110,10 @@ object BiliBiliShareListener : INListener {
     }
 
     private fun parseVideoIDFromBili(url: String): String {
-        val videoID = url.substring(0, url.indexOf("?")).replace("https", "").replace("https", "").split("/")
+        val videoID = url.substring(0, if (url.indexOf("?") == -1) url.length else url.indexOf("?"))
+            .replace("https", "")
+            .replace("https", "")
+            .split("/")
         return videoID.last()
     }
 }

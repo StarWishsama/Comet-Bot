@@ -19,6 +19,7 @@ import net.mamoe.mirai.event.events.MemberJoinEvent
 
 @NListener("群聊欢迎")
 object GroupMemberChangedListener : INListener {
+
     @EventHandler
     fun listen(event: MemberJoinEvent) {
         val cfg = GroupConfigManager.getConfig(event.groupId) ?: return
