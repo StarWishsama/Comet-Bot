@@ -14,8 +14,10 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 
-@NListener("入群申请自动通过")
 object GroupRequestListener : INListener {
+    override val name: String
+        get() = "自动通过入群申请"
+
     @EventHandler
     fun listen(event: MemberJoinRequestEvent) {
         val cfg = GroupConfigManager.getConfig(event.groupId) ?: return

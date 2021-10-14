@@ -10,6 +10,10 @@
 
 package io.github.starwishsama.comet.listeners
 
-annotation class NListener(val name: String)
-
+/**
+ * 标记该方法作为监听器的处理器
+ *
+ * @see [INListener]
+ */
+@Target(AnnotationTarget.FUNCTION)
 annotation class EventHandler

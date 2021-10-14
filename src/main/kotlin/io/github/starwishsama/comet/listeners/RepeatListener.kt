@@ -17,8 +17,10 @@ import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
 
-@NListener("复读机")
 object RepeatListener : INListener {
+    override val name: String
+        get() = "复读机"
+
     private val repeatCachePool = mutableMapOf<Long, RepeatInfo>()
 
     @EventHandler

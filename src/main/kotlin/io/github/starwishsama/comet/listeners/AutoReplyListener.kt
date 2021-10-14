@@ -16,8 +16,10 @@ import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 
-@NListener("关键词回复")
 object AutoReplyListener : INListener {
+    override val name: String
+        get() = "关键词回复"
+
     @EventHandler
     fun listen(event: GroupMessageEvent) {
         event.apply {

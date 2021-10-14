@@ -27,8 +27,9 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import kotlin.time.ExperimentalTime
 
-@NListener("哔哩哔哩解析")
 object BiliBiliShareListener : INListener {
+    override val name: String
+        get() = "哔哩哔哩解析"
 
     private val bvPattern = Regex("""https://b23.tv/\w{1,6}""")
     private val longUrlPattern = Regex("""https://www.bilibili.com/video/(av|BV)\w{1,10}""")

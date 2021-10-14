@@ -14,8 +14,9 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import net.mamoe.mirai.event.events.BotJoinGroupEvent
 import net.mamoe.mirai.event.events.BotLeaveEvent
 
-@NListener("群变动监听")
 object BotGroupStatusListener : INListener {
+    override val name: String
+        get() = "群变动监听"
 
     @EventHandler
     fun listenJoinGroup(event: BotJoinGroupEvent) {

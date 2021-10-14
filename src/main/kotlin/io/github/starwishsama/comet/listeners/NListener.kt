@@ -21,14 +21,23 @@ import kotlin.reflect.full.functions
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.isSubtypeOf
 
-interface INListener
+/**
+ * Comet 监听器
+ *
+ * 可以实现 [INListener] 后添加不同的方法
+ * 并加上 [EventHandler] 注解处理不同的 [Event]
+ */
+interface INListener {
+    val name: String
+}
 
+/**
+ * 快速注册该监听器到一个 [Bot] 上
+ *
+ * @param bot Bot 实例
+ */
 fun INListener.register(bot: Bot) {
     val clazz = this::class
-    val nListener = clazz.annotations.firstOrNull { it.annotationClass == NListener::class }
-        ?: return
-
-    val name = (nListener as NListener).name
 
     val methodEvent = mutableMapOf<KClass<out Event>, KFunction<*>>()
 

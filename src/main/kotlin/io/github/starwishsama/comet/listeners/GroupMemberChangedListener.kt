@@ -17,8 +17,9 @@ import io.github.starwishsama.comet.objects.wrapper.PureText
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.MemberJoinEvent
 
-@NListener("群聊欢迎")
 object GroupMemberChangedListener : INListener {
+    override val name: String
+        get() = "群聊欢迎"
 
     @EventHandler
     fun listen(event: MemberJoinEvent) {
