@@ -15,11 +15,13 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 data class JikiPediaSearchResult(
     val title: String,
     val content: String,
+    val date: String,
+    val view: String,
     val rateLimit: Boolean = false
 ) {
     companion object {
         fun empty(rateLimit: Boolean = false): JikiPediaSearchResult {
-            return JikiPediaSearchResult("", "", rateLimit)
+            return JikiPediaSearchResult("", "", "", "", rateLimit)
         }
     }
 
@@ -29,7 +31,14 @@ data class JikiPediaSearchResult(
         } else if (content.isEmpty()) {
             MessageWrapper()
         } else {
-            MessageWrapper().addText("搜索 $title 为你找到以下可能解释：\n$content")
+            MessageWrapper().addText(
+                """
+$title
+$date | 阅读 $view
+
+$content
+            """.trimIndent()
+            )
         }
     }
 }
