@@ -14,6 +14,8 @@ import cn.hutool.core.net.URLEncoder
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.utils.network.NetUtil
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import java.io.IOException
@@ -50,6 +52,8 @@ object JikiPediaApi : ApiExecutor {
             // 详细内容
 
             val detailedURL = "https://jikipedia.com/definition/$id"
+
+            runBlocking { delay(1_500) }
 
             val detailedConnection = Jsoup.connect(detailedURL)
 
