@@ -80,7 +80,7 @@ object JikiPediaApi : ApiExecutor {
             if (content == null) {
                 JikiPediaSearchResult.empty()
             } else {
-                return JikiPediaSearchResult(keyword, content, date, view)
+                return JikiPediaSearchResult(detailedURL, keyword, content, date, view)
             }
         } catch (e: IOException) {
             JikiPediaSearchResult.empty()

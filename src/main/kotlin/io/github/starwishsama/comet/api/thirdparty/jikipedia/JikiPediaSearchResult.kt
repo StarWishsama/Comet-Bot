@@ -11,8 +11,10 @@
 package io.github.starwishsama.comet.api.thirdparty.jikipedia
 
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 
 data class JikiPediaSearchResult(
+    val url: String,
     val title: String,
     val content: String,
     val date: String,
@@ -21,7 +23,7 @@ data class JikiPediaSearchResult(
 ) {
     companion object {
         fun empty(rateLimit: Boolean = false): JikiPediaSearchResult {
-            return JikiPediaSearchResult("", "", "", "", rateLimit)
+            return JikiPediaSearchResult("", "", "", "", "", rateLimit)
         }
     }
 
@@ -36,7 +38,7 @@ data class JikiPediaSearchResult(
 $title
 $date | 阅读 $view
 
-$content
+${if (content.length > 100) content.limitStringSize(100) + "\n🔗 查看全部 $url" else content}
             """.trimIndent()
             )
         }
