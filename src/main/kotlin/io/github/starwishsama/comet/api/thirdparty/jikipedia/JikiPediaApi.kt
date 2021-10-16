@@ -14,6 +14,8 @@ import cn.hutool.core.net.URLEncoder
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.utils.network.NetUtil
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import java.io.IOException
@@ -30,6 +32,8 @@ object JikiPediaApi : ApiExecutor {
 
             usedTime++
 
+            // 搜索内容
+
             val connection = Jsoup.connect(searchRoute + URLEncoder.DEFAULT.encode(keyword, StandardCharsets.UTF_8))
 
             connection.userAgent(NetUtil.defaultUA)
@@ -43,14 +47,40 @@ object JikiPediaApi : ApiExecutor {
             val tile = document.selectFirst("#search > div > div.masonry")
                 ?.getElementsByClass("tile")?.get(0)
 
-            val render = tile?.getElementsByClass("brax-render")
+            val id = tile?.attr("data-id")
 
-            val content = render?.first()?.allElements?.let { concatContent(it) }
+            // 详细内容
+
+            val detailedURL = "https://jikipedia.com/definition/$id"
+
+            runBlocking { delay(1_500) }
+
+            val detailedConnection = Jsoup.connect(detailedURL)
+
+            detailedConnection.userAgent(NetUtil.defaultUA)
+
+            if (CometVariables.cfg.proxySwitch) {
+                detailedConnection.proxy(CometVariables.cfg.proxyUrl, CometVariables.cfg.proxyPort)
+            }
+
+            val detailedDocument = detailedConnection.get()
+
+            val dateAndView = detailedDocument.getElementsByClass("basic-info-rela")
+
+            val date = if (dateAndView.isNotEmpty()) dateAndView[0]?.getElementsByClass("created")?.get(0)?.text()
+                ?: "未知" else "获取失败"
+
+            val view = if (dateAndView.isNotEmpty()) dateAndView[0]?.getElementsByClass("view-container")?.get(0)
+                ?.getElementsByClass("view")?.get(0)?.text() ?: "未知" else "获取失败"
+
+            val render = detailedDocument.getElementsByClass("brax-render")
+
+            val content = render.first()?.allElements?.let { concatContent(it) }
 
             if (content == null) {
                 JikiPediaSearchResult.empty()
             } else {
-                return JikiPediaSearchResult(keyword, content)
+                return JikiPediaSearchResult(detailedURL, keyword, content, date, view)
             }
         } catch (e: IOException) {
             JikiPediaSearchResult.empty()
@@ -61,7 +91,7 @@ object JikiPediaApi : ApiExecutor {
         return if (elements.isNotEmpty()) {
             buildString {
                 elements.forEach { ele ->
-                    if (ele.className() == "text") {
+                    if (ele.className().contains("text") || ele.className() == "highlight") {
                         append(ele.text())
                     }
                 }

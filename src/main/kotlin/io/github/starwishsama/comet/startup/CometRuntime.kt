@@ -39,7 +39,6 @@ import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.event.globalEventChannel
 import okhttp3.OkHttpClient
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -141,21 +140,7 @@ object CometRuntime {
             GroupRequestListener
         )
 
-        listeners.forEach { listener ->
-            if (listener.eventToListen.isEmpty()) {
-                daemonLogger.warning("监听器 ${listener::class.java.simpleName} 没有监听任何一个事件!")
-            } else {
-                listener.eventToListen.forEach { eventClass ->
-                    bot.globalEventChannel().subscribeAlways(eventClass) {
-                        if (CometVariables.switch) {
-                            listener.listen(this)
-                        }
-                    }
-                }
-            }
-
-            logger.info("[监听器] 已注册 ${listener.getName()} 监听器")
-        }
+        listeners.forEach { it.register(bot) }
 
         DataSetup.initPerGroupSetting(bot)
 

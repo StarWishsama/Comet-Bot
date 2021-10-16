@@ -40,6 +40,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentHashMap
 
@@ -132,11 +133,11 @@ object CometVariables {
     internal var switch: Boolean = true
 
     internal val hmsPattern: DateTimeFormatter by lazy {
-        DateTimeFormatter.ofPattern("HH:mm:ss")
+        DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault())
     }
 
     internal val yyMMddPattern: DateTimeFormatter by lazy {
-        DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
+        DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").withZone(ZoneId.systemDefault())
     }
 
     internal lateinit var client: OkHttpClient

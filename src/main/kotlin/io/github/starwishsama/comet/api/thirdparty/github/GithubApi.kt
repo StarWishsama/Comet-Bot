@@ -75,6 +75,7 @@ object GithubApi {
 
             return if (image.isNotEmpty()) {
                 MessageWrapper().addPictureByURL(image[0].attr("content"))
+                    .addText("\n🔗 > https://github.com/$author/$repo")
             } else {
                 MessageWrapper().addText("找不到指定的仓库")
             }

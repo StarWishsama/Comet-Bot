@@ -175,5 +175,5 @@ object DynamicApi : ApiExecutor {
         return result
     }
 
-    override fun getLimitTime(): Int = 500
+    override fun getLimitTime(): Int = 10000
 }
