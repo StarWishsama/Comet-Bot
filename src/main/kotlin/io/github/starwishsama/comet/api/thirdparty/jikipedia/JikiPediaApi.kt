@@ -63,7 +63,7 @@ object JikiPediaApi : ApiExecutor {
                 detailedConnection.proxy(CometVariables.cfg.proxyUrl, CometVariables.cfg.proxyPort)
             }
 
-            val detailedDocument = connection.get()
+            val detailedDocument = detailedConnection.get()
 
             val dateAndView = detailedDocument.getElementsByClass("basic-info-rela")
 
