@@ -30,6 +30,10 @@ object LiveApi : ApiExecutor {
             throw RateLimitException(apiRateLimit)
         }
 
+        if (roomId < 1L) {
+            throw IllegalArgumentException("直播间 ID 不能小于 1")
+        }
+
         val request = HttpRequest.get(liveUrl + roomId).timeout(2000)
             .header("User-Agent", "Bili live status checker")
         val response = request.executeAsync()
