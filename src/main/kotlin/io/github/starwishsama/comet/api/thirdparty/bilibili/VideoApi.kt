@@ -35,7 +35,7 @@ object VideoApi : ApiExecutor {
     override var usedTime: Int = 0
     override val duration: Int = 3
 
-    override fun getLimitTime(): Int = 2500
+    override fun getLimitTime(): Int = 3500
 }
 
 interface IVideoApi {

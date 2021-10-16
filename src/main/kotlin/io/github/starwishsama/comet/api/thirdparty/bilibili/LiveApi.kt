@@ -55,7 +55,7 @@ object LiveApi : ApiExecutor {
     override var usedTime: Int = 0
     override val duration: Int = 3
 
-    override fun getLimitTime(): Int = 1500
+    override fun getLimitTime(): Int = 15000
 
     private data class OldRoomInfo(
         val code: Int,
