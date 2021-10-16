@@ -26,7 +26,7 @@ class BiliBiliLivePusher(
         GroupConfigManager.getAllConfigs().forEach cfg@{ cfg ->
             if (cfg.biliPushEnabled) {
                 cfg.biliSubscribers.forEach user@{ user ->
-                    if (user.roomID < 0L) {
+                    if (user.roomID < 1L) {
                         return@user
                     }
 
