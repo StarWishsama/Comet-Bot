@@ -19,19 +19,19 @@ data class JikiPediaSearchResult(
     val content: String,
     val date: String,
     val view: String,
-    val rateLimit: Boolean = false
+    val responseCode: Int = 200
 ) {
     companion object {
-        fun empty(rateLimit: Boolean = false): JikiPediaSearchResult {
-            return JikiPediaSearchResult("", "", "", "", "", rateLimit)
+        fun empty(responseCode: Int): JikiPediaSearchResult {
+            return JikiPediaSearchResult("", "", "", "", "", responseCode)
         }
     }
 
     fun toMessageWrapper(): MessageWrapper {
-        return if (rateLimit) {
-            MessageWrapper().setUsable(false)
+        return if (responseCode != 200) {
+            MessageWrapper().addText("已达到小鸡百科搜索上限, 请稍后再尝试 | $responseCode")
         } else if (content.isEmpty()) {
-            MessageWrapper()
+            MessageWrapper().addText("找不到搜索结果")
         } else {
             MessageWrapper().addText(
                 """

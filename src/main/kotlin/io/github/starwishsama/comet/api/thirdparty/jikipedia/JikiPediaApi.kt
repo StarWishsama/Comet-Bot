@@ -14,6 +14,7 @@ import cn.hutool.core.net.URLEncoder
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.utils.network.NetUtil
+import io.ktor.http.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
@@ -27,7 +28,7 @@ object JikiPediaApi : ApiExecutor {
     fun search(keyword: String): JikiPediaSearchResult {
         return try {
             if (isReachLimit()) {
-                return JikiPediaSearchResult.empty(true)
+                return JikiPediaSearchResult.empty(HttpStatusCode.TooManyRequests.value)
             }
 
             usedTime++
@@ -63,7 +64,13 @@ object JikiPediaApi : ApiExecutor {
                 detailedConnection.proxy(CometVariables.cfg.proxyUrl, CometVariables.cfg.proxyPort)
             }
 
-            val detailedDocument = detailedConnection.get()
+            val detailedResp = detailedConnection.execute()
+
+            if (detailedResp.statusCode() != HttpStatusCode.OK.value) {
+                return JikiPediaSearchResult.empty(detailedResp.statusCode())
+            }
+
+            val detailedDocument = detailedResp.parse()
 
             val dateAndView = detailedDocument.getElementsByClass("basic-info-rela")
 
@@ -78,12 +85,12 @@ object JikiPediaApi : ApiExecutor {
             val content = render.first()?.allElements?.let { concatContent(it) }
 
             if (content == null) {
-                JikiPediaSearchResult.empty()
+                JikiPediaSearchResult.empty(detailedResp.statusCode())
             } else {
                 return JikiPediaSearchResult(detailedURL, keyword, content, date, view)
             }
         } catch (e: IOException) {
-            JikiPediaSearchResult.empty()
+            JikiPediaSearchResult.empty(HttpStatusCode.InternalServerError.value)
         }
     }
 
