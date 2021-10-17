@@ -77,11 +77,6 @@ object JikiPediaApi : ApiExecutor {
             return Pair("", HttpStatusCode.Unauthorized.value)
         }
 
-        if (CometVariables.cfg.debugMode) {
-            daemonLogger.debug("JikiPedia incoming body:")
-            daemonLogger.debug(resp.body())
-        }
-
         if (resp.statusCode() != HttpStatusCode.OK.value) {
             return Pair("", resp.statusCode())
         }
@@ -102,11 +97,6 @@ object JikiPediaApi : ApiExecutor {
         }
 
         val detailedResp = detailedConnection.execute()
-
-        if (CometVariables.cfg.debugMode) {
-            daemonLogger.debug("JikiPedia incoming body:")
-            daemonLogger.debug(detailedResp.body())
-        }
 
         if (detailedResp.statusCode() != HttpStatusCode.OK.value) {
             return JikiPediaSearchResult.empty(detailedResp.statusCode())
