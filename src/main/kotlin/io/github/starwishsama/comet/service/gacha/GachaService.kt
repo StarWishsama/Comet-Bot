@@ -12,6 +12,7 @@ package io.github.starwishsama.comet.service.gacha
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.file.ArkNightData
 import io.github.starwishsama.comet.objects.gacha.custom.CustomPool
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
@@ -24,9 +25,11 @@ import java.io.File
 import java.io.IOException
 import java.util.stream.Collectors
 
+// FIXME: Refactor to unified variety type of gacha pool
 object GachaService {
     val gachaPools = mutableSetOf<GachaPool>()
     private var arkNightUsable = true
+    private var isDownloading = false
     private val poolPath = FileUtil.getChildFolder("gacha")
 
     private val yamlFilePattern = Regex(".y[a]?ml")
@@ -146,13 +149,19 @@ object GachaService {
         return pool
     }
 
-    private fun loadArkNightData(data: File) {
+    fun downloadArkNightData() {
+        isDownloading = true
+
         try {
-            GachaUtil.arkNightDataCheck(data)
+            GachaUtil.arkNightDataCheck(ArkNightData.file)
         } catch (e: IOException) {
             CometVariables.daemonLogger.warning("解析明日方舟游戏数据失败, ${e.message}\n注意: 数据来源于 Github, 国内用户无法下载请自行下载替换\n替换位置: ./res/arkNights.json\n链接: ${GachaUtil.arkNightData}")
+        } finally {
+            isDownloading = false
         }
+    }
 
+    private fun loadArkNightData(data: File) {
         if (data.exists()) {
             CometVariables.mapper.readTree(data).elements().forEach { t ->
                 CometVariables.arkNight.add(CometVariables.mapper.readValue(t.traverse()))
@@ -194,5 +203,9 @@ object GachaService {
         }
 
         CometVariables.daemonLogger.info("加载默认明日方舟数据成功, 共 ${GachaConstants.arkNightDefault.size} 个干员")
+    }
+
+    fun isDownloading(): Boolean {
+        return isDownloading
     }
 }
