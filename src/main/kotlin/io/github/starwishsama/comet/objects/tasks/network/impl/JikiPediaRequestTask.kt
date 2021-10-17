@@ -22,7 +22,7 @@ class JikiPediaRequestTask(override val content: Contact, override val param: St
     INetworkRequestTask<JikiPediaSearchResult> {
     override fun request(param: String): JikiPediaSearchResult {
         return try {
-            JikiPediaApi.search(param)
+            JikiPediaApi.searchByKeyWord(param)
         } catch (e: IOException) {
             JikiPediaSearchResult.empty(403)
         }
