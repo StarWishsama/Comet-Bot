@@ -28,7 +28,7 @@ fun Response.isType(typeName: String): Boolean = headers["content-type"]?.contai
 
 object NetUtil {
     const val defaultUA =
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 Edg/92.0.902.67"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36 Edg/94.0.992.50"
 
     /**
      * 执行 Http 请求
