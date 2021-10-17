@@ -63,6 +63,19 @@ object JikiPediaApi : ApiExecutor {
         }
 
         val resp = connection.execute()
+        val document = resp.parse()
+
+        /**
+         * Hello moss
+         *
+         * 访问过于频繁，请登陆后重试
+         * 北京市第三交通委提醒您：
+         * 道路千万条，安全第一条。
+         * 行车不规范，亲人两行泪。
+         */
+        if (document.title().contains("moss")) {
+            return Pair("", HttpStatusCode.Unauthorized.value)
+        }
 
         if (CometVariables.cfg.debugMode) {
             daemonLogger.debug("JikiPedia incoming body:")
@@ -72,8 +85,6 @@ object JikiPediaApi : ApiExecutor {
         if (resp.statusCode() != HttpStatusCode.OK.value) {
             return Pair("", resp.statusCode())
         }
-
-        val document = resp.parse()
 
         val tile = document.selectFirst("#search > div > div.masonry")
             ?.getElementsByClass("tile")?.get(0)
