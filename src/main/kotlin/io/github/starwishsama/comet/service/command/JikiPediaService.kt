@@ -20,6 +20,6 @@ object JikiPediaService {
     fun searchJiki(event: MessageEvent, input: String): MessageChain {
         NetworkRequestManager.addTask(JikiPediaRequestTask(event.subject, input))
 
-        return "请稍后...".toChain()
+        return "请稍候...".toChain()
     }
 }
