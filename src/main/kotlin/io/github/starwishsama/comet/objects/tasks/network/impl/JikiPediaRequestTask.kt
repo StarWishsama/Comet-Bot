@@ -14,7 +14,6 @@ import io.github.starwishsama.comet.api.thirdparty.jikipedia.JikiPediaApi
 import io.github.starwishsama.comet.api.thirdparty.jikipedia.JikiPediaSearchResult
 import io.github.starwishsama.comet.objects.tasks.network.INetworkRequestTask
 import io.github.starwishsama.comet.objects.tasks.network.NetworkRequestTask
-import io.github.starwishsama.comet.utils.CometUtil.toChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import java.io.IOException
@@ -23,26 +22,16 @@ class JikiPediaRequestTask(override val content: Contact, override val param: St
     INetworkRequestTask<JikiPediaSearchResult> {
     override fun request(param: String): JikiPediaSearchResult {
         return try {
-            JikiPediaApi.search(param)
+            JikiPediaApi.searchByKeyWord(param)
         } catch (e: IOException) {
-            JikiPediaSearchResult.empty()
+            JikiPediaSearchResult.empty(403)
         }
     }
 
     override fun callback(result: Any?) {
         runBlocking {
             if (result is JikiPediaSearchResult) {
-                val wrapper = result.toMessageWrapper()
-
-                val chain = if (!wrapper.isUsable()) {
-                    "使用次数已达上限, 一会儿再试吧".toChain()
-                } else if (wrapper.isEmpty()) {
-                    "找不到对应结果".toChain()
-                } else {
-                    result.toMessageWrapper().toMessageChain(content)
-                }
-
-                content.sendMessage(chain)
+                content.sendMessage(result.toMessageWrapper().toMessageChain(content))
             }
         }
     }

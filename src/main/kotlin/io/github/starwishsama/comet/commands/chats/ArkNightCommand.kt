@@ -29,7 +29,12 @@ import net.mamoe.mirai.message.data.MessageChain
 class ArkNightCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!GachaService.isArkNightUsable()) {
-            return "还未下载明日方舟卡池数据, 无法使用".toChain()
+            return if (GachaService.isDownloading()) {
+                "正在下载明日方舟数据, 请稍后...".toChain()
+            } else {
+                GachaService.downloadArkNightData()
+                "还未下载明日方舟数据, 开始自动下载...".toChain()
+            }
         }
 
         if (args.isNotEmpty()) {
