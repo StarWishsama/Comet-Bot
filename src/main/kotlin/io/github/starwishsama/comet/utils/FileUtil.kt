@@ -16,6 +16,7 @@ import cn.hutool.core.net.URLDecoder
 import cn.hutool.crypto.SecureUtil
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.CometVariables
@@ -156,7 +157,7 @@ object FileUtil {
         location.createNewFile()
 
         val report =
-            "发生了一个错误:\n${if (t != null) getBeautyStackTrace(t) else "无报错堆栈"}\n可能有用的信息: ${message.limitStringSize(150)}\n\n原始获取内容:\n$content"
+            "发生了一个错误:\n${if (t != null) getBeautyStackTrace(t) else "无报错堆栈"}\n可能有用的信息: ${message.limitStringSize(150)}\nComet 版本: ${BuildConfig.version}\n\n原始获取内容:\n$content"
         location.writeString(report)
         daemonLogger.warning("$reason, 错误报告已生成! 保存在 ${location.path}")
         daemonLogger.warning("你可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")
@@ -325,7 +326,7 @@ object FileUtil {
                 if (entryName.startsWith("$resourcePath/")) {
                     val actualName = entryName.replace("${resourcePath}/", "").removeSuffix("/")
 
-                    processFileInJar(entry, actualName)
+                    processFileInJar(jar, entry, actualName)
                 } else {
                     continue
                 }
@@ -340,7 +341,7 @@ object FileUtil {
      * @param fileName 文件名
      * @param resourcePath 资源文件储存文件夹
      */
-    private fun processFileInJar(entry: JarEntry, fileName: String, resourcePath: String = "resources") {
+    private fun processFileInJar(jar: JarFile, entry: JarEntry, fileName: String, resourcePath: String = "resources") {
         var counter = 0
 
         if (fileName.isEmpty()) {
@@ -364,7 +365,7 @@ object FileUtil {
                 FileOutputStream(current).use { fos ->
                     val byteArray = ByteArray(1024)
                     var len: Int
-                    javaClass.classLoader.getResourceAsStream(entryName)?.use { fis ->
+                    jar.getInputStream(entry)?.use { fis ->
                         // While the input stream has bytes
                         while (fis.read(byteArray).also { len = it } > 0) {
                             fos.write(byteArray, 0, len)

@@ -11,9 +11,6 @@
 package io.github.starwishsama.comet.objects.config
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.github.starwishsama.comet.api.command.CommandExecutor
-import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
@@ -21,6 +18,7 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 data class PerGroupConfig(
     @JsonProperty("group_id")
     val id: Long,
+
     @JsonProperty("version")
     val version: String = "2",
 
@@ -59,17 +57,18 @@ data class PerGroupConfig(
      */
     @JsonProperty("bili_sub")
     val biliSubscribers: MutableSet<BiliBiliUser> = hashSetOf(),
+
+    /**
+     * 是否关闭对此群消息中的B站视频解析
+     */
+    @JsonProperty("can_parse_bili_video")
+    var canParseBiliVideo: Boolean = true,
+
     /**
      * 是否关闭对此群消息的复读
      */
     @JsonProperty("repeat_function")
     var canRepeat: Boolean = true,
-
-    /**
-     * 本群启用的命令
-     */
-    @JsonProperty("disabled_commands")
-    val disabledCommands: MutableSet<String> = mutableSetOf(),
 
     @JsonProperty("filter_words")
     val groupFilterWords: MutableList<String> = mutableListOf(),
@@ -87,7 +86,19 @@ data class PerGroupConfig(
     var autoAcceptCondition: String = "",
 
     @JsonProperty("github_repo_subs")
-    val githubRepoSubscribers: MutableList<String> = mutableListOf()
+    val githubRepoSubscribers: MutableList<String> = mutableListOf(),
+
+    @JsonProperty("old_file_clean_feature")
+    var oldFileCleanFeature: Boolean = false,
+
+    @JsonProperty("old_file_clean_delay")
+    var oldFileCleanDelay: Long = 1000L * 60 * 60 * 24,
+
+    @JsonProperty("old_file_match_pattern")
+    var oldFileMatchPattern: String = "",
+
+    @JsonProperty("disabled_commands")
+    val disabledCommands: MutableSet<String> = mutableSetOf()
 ) {
 
     fun addHelper(id: Long): Boolean {
@@ -114,40 +125,6 @@ data class PerGroupConfig(
         }
 
         GroupConfigManager.addConfig(this)
-    }
-
-    fun isDisabledCommand(command: ChatCommand): Boolean {
-        return try {
-            disabledCommands.contains(command.name)
-        } catch (npe: NullPointerException) {
-            false
-        }
-    }
-
-    fun disableCommand(commandName: String): ConfigureCommandStatus {
-        val command = CommandExecutor.getCommand(commandName)
-        if (command != null) {
-            if (command is UnDisableableCommand) {
-                return ConfigureCommandStatus.UnDisabled
-            }
-
-            return if (!disabledCommands.contains(command.name)) {
-                disabledCommands.add(command.name)
-                ConfigureCommandStatus.Disabled
-            } else {
-                disabledCommands.remove(command.name)
-                ConfigureCommandStatus.Enabled
-            }
-        } else {
-            return ConfigureCommandStatus.NotExist
-        }
-    }
-
-    sealed class ConfigureCommandStatus(val msg: String) {
-        object UnDisabled : ConfigureCommandStatus("该命令无法被禁用!")
-        object Enabled : ConfigureCommandStatus("成功启用该命令")
-        object Disabled : ConfigureCommandStatus("成功禁用该命令")
-        object NotExist : ConfigureCommandStatus("该命令不存在!")
     }
 
     data class ReplyKeyWord(

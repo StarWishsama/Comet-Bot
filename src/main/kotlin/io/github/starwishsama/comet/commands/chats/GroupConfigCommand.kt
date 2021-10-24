@@ -11,13 +11,14 @@
 package io.github.starwishsama.comet.commands.chats
 
 
+import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.toMessageWrapper
 import io.github.starwishsama.comet.utils.CometUtil
@@ -94,7 +95,9 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                             )
                         }
 
-                        return cfg.disableCommand(args[1]).msg.toChain()
+                        val cmd = CommandManager.getCommand(args[1])
+
+                        return cmd?.props?.disableCommand(event.group.id)?.msg?.toChain() ?: "找不到对应命令".toChain()
                     }
                     "autoreply", "ar", "自动回复", "关键词", "keyword", "kw" -> {
                         if (args.size == 1) {
@@ -142,6 +145,42 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                             return "已${if (cfg.newComerWelcome) "开启" else "关闭"}加群自动欢迎".toChain()
                         }
                     }
+                    "fileremove", "filerm", "frm", "群文件自动删除", "文件删除" -> {
+                        if (args.size > 1) {
+                            when (args[1]) {
+                                "switch" -> {
+                                    cfg.oldFileCleanFeature = !cfg.oldFileCleanFeature
+                                    return "自动删除文件功能: ${cfg.oldFileCleanFeature}".toChain()
+                                }
+                                "delay" -> {
+                                    if (args.size > 2) {
+                                        val delay = args[2].toLongOrNull() ?: return "请输入正确的数字".toChain()
+                                        cfg.oldFileCleanDelay = delay
+                                        return "已设置自动删除超过 $delay ms 的文件.".toChain()
+                                    } else {
+                                        return "/group frm delay [删除延迟]".toChain()
+                                    }
+                                }
+                                "pattern" -> {
+                                    return if (args.size > 2) {
+                                        cfg.oldFileMatchPattern = args[2]
+                                        "已设置文件匹配正则表达式为 [${cfg.oldFileMatchPattern}].".toChain()
+                                    } else {
+                                        "/group frm pattern [文件匹配正则表达式]".toChain()
+                                    }
+                                }
+                                else -> {
+                                    return """
+                                        /group frm switch 开启或关闭自动删除文件
+                                        /group frm pattern [文件匹配正则表达式] 设置文件匹配正则表达式
+                                        /group frm delay [删除延迟] 设置文件删除延迟
+                                    """.trimIndent().toChain()
+                                }
+                            }
+                        } else {
+                            return getHelp().toChain()
+                        }
+                    }
                     else -> {
                         return getHelp().toChain()
                     }
@@ -154,7 +193,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
         }
     }
 
-    override fun getProps(): CommandProps =
+    override val props: CommandProps =
         CommandProps("group", arrayListOf("群设置", "gs"), "设置群内设置", "nbot.commands.groupconfig", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
@@ -162,11 +201,13 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
         /group repeat 开启/关闭本群机器人复读功能
         /group autojoin 开启/关闭本群机器人自动接受加群请求
         /group func 启用/禁用本群可使用的命令
+        /group autoreply 设置自动回复
         /group newcomer 设置入群欢迎内容
+        /group frm 设置群文件自动删除
     """.trimIndent()
 
     override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        val level = getProps().level
+        val level = props.level
         if (user.compareLevel(level)) return true
         if (e is GroupMessageEvent && e.sender.permission > MemberPermission.MEMBER) return true
         return false

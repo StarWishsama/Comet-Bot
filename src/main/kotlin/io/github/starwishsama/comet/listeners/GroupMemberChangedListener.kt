@@ -15,33 +15,29 @@ import io.github.starwishsama.comet.objects.wrapper.AtElement
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.PureText
 import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.MemberJoinEvent
-import kotlin.reflect.KClass
 
-object GroupMemberChangedListener : NListener {
-    override val eventToListen: List<KClass<out Event>> = listOf(MemberJoinEvent::class)
+object GroupMemberChangedListener : INListener {
+    override val name: String
+        get() = "群聊欢迎"
 
-    override fun listen(event: Event) {
-        if (event is MemberJoinEvent) {
-            val cfg = GroupConfigManager.getConfig(event.groupId) ?: return
+    @EventHandler
+    fun listen(event: MemberJoinEvent) {
+        val cfg = GroupConfigManager.getConfig(event.groupId) ?: return
 
-            if (cfg.newComerWelcome && !cfg.newComerWelcomeText.isEmpty()) {
-                runBlocking {
-                    event.group.sendMessage(
-                        reWrapMessage(
-                            cfg.newComerWelcomeText,
-                            event
-                        ).toMessageChain(event.group)
-                    )
-                }
+        if (cfg.newComerWelcome && !cfg.newComerWelcomeText.isEmpty()) {
+            runBlocking {
+                event.group.sendMessage(
+                    reWrapMessage(
+                        cfg.newComerWelcomeText,
+                        event.user.id
+                    ).toMessageChain(event.group)
+                )
             }
         }
     }
 
-    override fun getName(): String = "群聊欢迎"
-
-    private fun reWrapMessage(original: MessageWrapper, event: MemberJoinEvent): MessageWrapper {
+    private fun reWrapMessage(original: MessageWrapper, memberID: Long): MessageWrapper {
         val newWrapper = MessageWrapper()
 
         for (wrapperElement in original.getMessageContent()) {
@@ -52,7 +48,7 @@ object GroupMemberChangedListener : NListener {
                     val after = wrapperElement.text.substring(index)
 
                     newWrapper.addText("$before ")
-                    newWrapper.addElement(AtElement(event.member.id))
+                    newWrapper.addElement(AtElement(memberID))
                     newWrapper.addText(" $after")
                 } else {
                     newWrapper.addElement(wrapperElement)

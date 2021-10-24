@@ -13,8 +13,8 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
@@ -24,7 +24,7 @@ class ShopCommand : ChatCommand {
         TODO("Shop command's priority is ultra low, sry :/")
     }
 
-    override fun getProps(): CommandProps =
+    override val props: CommandProps =
         CommandProps("shop", arrayListOf("sd", "商店"), "积分商店", "nbot.commands.shop", UserLevel.USER)
 
     override fun getHelp(): String = """

@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.utils
 
+import cn.hutool.core.util.NumberUtil
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.time.Instant
@@ -33,6 +34,10 @@ object NumberUtil {
             return String.format("%.${digest}f", this)
         }
         return this.toString()
+    }
+
+    fun Double.fixDisplay(): String {
+        return NumberUtil.decimalFormat("0.00", this)
     }
 
     /**

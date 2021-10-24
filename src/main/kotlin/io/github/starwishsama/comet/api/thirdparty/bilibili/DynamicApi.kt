@@ -17,20 +17,22 @@ import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicTypeSelector
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata.UnknownType
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.FileUtil
-import io.github.starwishsama.comet.utils.json.isUsable
 import io.github.starwishsama.comet.utils.network.NetUtil
+import io.github.starwishsama.comet.utils.serialize.isUsable
 
 /**
  * BiliBili 动态 API
  *
  * 获取用户的最新动态
  * 支持多种格式
+ *
  * @author StarWishsama
  */
 object DynamicApi : ApiExecutor {
@@ -42,6 +44,7 @@ object DynamicApi : ApiExecutor {
     private val agent = mutableMapOf("User-Agent" to "Nameless live status checker by StarWishsama")
     private const val apiRateLimit = "BiliBili API调用已达上限"
 
+    private val cacheDynamicData = mutableMapOf<DynamicData, Dynamic>()
     private val cacheDynamic = mutableMapOf<Long, Dynamic>()
 
     @Throws(RateLimitException::class)
@@ -58,6 +61,12 @@ object DynamicApi : ApiExecutor {
 
     @Throws(ApiException::class)
     fun getDynamicById(id: Long): Dynamic {
+        val cache = getCacheDynamic(id)
+
+        if (cache != null) {
+            return cache
+        }
+
         if (isReachLimit()) {
             throw RateLimitException(apiRateLimit)
         }
@@ -126,7 +135,9 @@ object DynamicApi : ApiExecutor {
                 if (singleDynamicObject.isUsable()) {
                     val dynamicType = DynamicTypeSelector.getType(card.description.type)
                     return if (dynamicType != UnknownType::class) {
-                        mapper.readValue(card.card, dynamicType).getContact()
+                        val dynamicData = mapper.readValue(card.card, dynamicType)
+                        insertDynamicData(dynamic, dynamicData)
+                        return dynamicData.asMessageWrapper()
                     } else {
                         MessageWrapper().addText("错误: 不支持的动态类型").setUsable(false)
                     }
@@ -139,29 +150,21 @@ object DynamicApi : ApiExecutor {
         }
     }
 
-    /**
-     * 搜索用户
-     *
-     * 上方搜索栏 -> 用户
-     *
-     *  order 排序维度. totalrank 默认排序,fans 粉丝, level 等级.
-     *  orderSort 排序顺序. 0 从高到低, 1 从低到高.
-     *  userType 用户类型. 0 全部用户, 1 up主, 2 普通用户, 3 认证用户.
-     *
-     */
-    /**@Suppress("SpellCheckingInspection")
-    fun searchUser(
-    @Query("highlight") highlight: Int = 1,
-    @Query("keyword") keyword: String,
-    @Query("order") order: String = "totalrank",
-    @Query("order_sort") orderSort: Int? = null,
-    @Query("pn") pageNumber: Int = 1,
-    @Query("ps") pageSize: Int = 20,
-    @Query("type") type: Int = 2,
-    @Query("user_type") userType: Int = 0
-    ): SearchUserResult {
-    val requestUrl = "https://app.bilibili.com/x/v2/search/type"
-    }*/
+    fun insertDynamicData(dynamic: Dynamic, data: DynamicData) {
+        cacheDynamicData[data] = dynamic
+    }
+
+    fun getDynamicByData(data: DynamicData): Dynamic? {
+        val result = cacheDynamicData[data]
+
+        if (result != null) {
+            cacheDynamicData.remove(data)
+        }
+
+        return result
+    }
+
+    fun getCacheDynamic(id: Long): Dynamic? = cacheDynamic[id]
 
     override var usedTime: Int = 0
     override val duration: Int = 3
@@ -172,5 +175,5 @@ object DynamicApi : ApiExecutor {
         return result
     }
 
-    override fun getLimitTime(): Int = 500
+    override fun getLimitTime(): Int = 10000
 }

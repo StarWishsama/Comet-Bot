@@ -13,9 +13,10 @@ package io.github.starwishsama.comet.commands.chats
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.GitHubService.getRepoList
+import io.github.starwishsama.comet.service.command.GitHubService.lookupRepo
 import io.github.starwishsama.comet.service.command.GitHubService.modifyRepo
 import io.github.starwishsama.comet.service.command.GitHubService.subscribeRepo
 import io.github.starwishsama.comet.service.command.GitHubService.unsubscribeRepo
@@ -31,30 +32,33 @@ class GithubCommand : ChatCommand, ConversationCommand {
         }
 
         return when (args[0]) {
-            "add", "sub" -> subscribeRepo(args, event)
-            "rm", "unsub" -> unsubscribeRepo(args, event)
-            "list", "ls" -> getRepoList(args, event)
-            "md", "modify" -> modifyRepo(args, event, this)
+            "add", "sub" -> subscribeRepo(user, args, event)
+            "rm", "unsub" -> unsubscribeRepo(user, args, event)
+            "list", "ls" -> getRepoList(user, args, event)
+            "md", "modify" -> modifyRepo(user, args, event, this)
+            "lookup", "cx" -> lookupRepo(args, event)
             else -> getHelp().convertToChain()
         }
     }
 
-    override fun getProps(): CommandProps =
+    override val props: CommandProps =
         CommandProps(
             "github",
             listOf("gh", "git"),
             "订阅 Github 项目推送动态",
             "nbot.commands.github",
-            UserLevel.ADMIN
+            UserLevel.USER,
         )
 
     override fun getHelp(): String = """
         /gh add [仓库名称] 订阅 Github 项目推送动态
         /gh rm [仓库名称] 取消订阅 Github 项目推送动态
         /gh list 列出所有已订阅 Github 项目动态
+        /gh md [仓库名称] 编辑 Github 仓库推送状态
+        /gh cx [仓库名称] 查看 Github 仓库简略详情
     """.trimIndent()
 
     override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
-        event.subject.sendMessage(modifyRepo(event.message.contentToString().split(" "), event, this, session))
+        event.subject.sendMessage(modifyRepo(user, event.message.contentToString().split(" "), event, this, session))
     }
 }

@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.sessions
 
 import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.api.command.CommandExecutor
+import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
@@ -74,14 +74,11 @@ object SessionHandler {
      */
     suspend fun handleSessions(e: MessageEvent, u: CometUser): Boolean {
         val time = LocalDateTime.now()
-        val target = SessionTarget()
 
-        target.apply {
-            if (e is GroupMessageEvent) {
-                groupId = e.group.id
-            }
-
-            privateId = e.sender.id
+        val target = if (e is GroupMessageEvent) {
+            SessionTarget(e.group.id, e.sender.id)
+        } else {
+            SessionTarget(privateId = e.sender.id)
         }
 
         val sessionStream = sessionPool.stream()
@@ -94,7 +91,7 @@ object SessionHandler {
         }
 
         for (session in sessionToHandle) {
-            if (session.silent || CommandExecutor.getCommandPrefix(e.message.contentToString()).isEmpty()) {
+            if (session.silent || CommandManager.getCommandPrefix(e.message.contentToString()).isEmpty()) {
                 if (session.creator is ConversationCommand) {
                     session.creator.handle(e, u, session)
                 }
@@ -115,7 +112,7 @@ object SessionHandler {
         }
 
         return sessionPool.stream()
-            .filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId && !it.silent }
+            .filter { (it.target.groupId == target.groupId || it.target.privateId == target.privateId) && !it.silent }
             .count() > 0
     }
 }

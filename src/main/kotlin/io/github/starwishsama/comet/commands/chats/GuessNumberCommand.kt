@@ -15,8 +15,8 @@ import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
@@ -77,7 +77,7 @@ class GuessNumberCommand : ChatCommand, ConversationCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps =
+    override val props: CommandProps =
         CommandProps("guessnumber", arrayListOf("csz"), "猜数字", "nbot.commands.guessnumber", UserLevel.USER)
 
     override fun getHelp(): String = """
@@ -115,7 +115,7 @@ class GuessNumberCommand : ChatCommand, ConversationCommand {
                         StringBuilder(CometUtil.sendMessageAsString("${event.sender.nameCardOrNick} 猜对了!\n总用时: ${session.usedTime.seconds}s\n\n"))
                     val list = session.users.sortedBy { (it as GuessNumberUser).guessTime }
                     list.forEach {
-                        sb.append((it as GuessNumberUser).username).append(" ").append(it.guessTime)
+                        sb.append("\n" + (it as GuessNumberUser).username).append(" ").append(it.guessTime)
                             .append("次\n")
                     }
                     event.subject.sendMessage(sb.toString().trim())

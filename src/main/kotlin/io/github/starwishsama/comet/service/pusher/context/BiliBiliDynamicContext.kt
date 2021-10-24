@@ -34,8 +34,6 @@ class BiliBiliDynamicContext(
     }
 
     override fun contentEquals(other: PushContext): Boolean {
-        if (other !is BiliBiliDynamicContext) return false
-
-        return dynamicId == other.dynamicId
+        return other is BiliBiliDynamicContext && dynamicId == other.dynamicId
     }
 }

@@ -11,16 +11,15 @@
 package io.github.starwishsama.comet.commands.chats
 
 
-import io.github.starwishsama.comet.api.command.CommandExecutor
+import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
-
 
 class HelpCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
@@ -28,25 +27,25 @@ class HelpCommand : ChatCommand {
             val sb = buildString {
                 append(CometUtil.sendMessageAsString("可用的命令:"))
                 append("\n[")
-                for (cmd in CommandExecutor.getCommands()) {
+                for (cmd in CommandManager.getCommands()) {
                     if (!cmd.isHidden) {
-                        append(cmd.getProps().name).append(", ")
+                        append(cmd.props.name).append(", ")
                     }
                 }
             }.removeSuffix(", ").plus("]")
 
             return sb.trim().convertToChain()
         } else {
-            val cmd = CommandExecutor.getCommand(args[0])
+            val cmd = CommandManager.getCommand(args[0])
             return if (cmd != null) {
-                CometUtil.toChain("关于 /${cmd.name} 的帮助信息\n${cmd.getHelp()}")
+                CometUtil.toChain("关于 /${cmd.name} 的帮助信息\n${cmd.getHelp()}\n\n该命令还有其他别名可以使用: ${cmd.props.aliases}")
             } else {
                 CometUtil.toChain("该命令不存在哦")
             }
         }
     }
 
-    override fun getProps(): CommandProps =
+    override val props: CommandProps =
         CommandProps("help", arrayListOf("?", "帮助", "菜单"), "帮助命令", "nbot.commands.help", UserLevel.USER)
 
     // 它自己就是帮助命令 不需要再帮了

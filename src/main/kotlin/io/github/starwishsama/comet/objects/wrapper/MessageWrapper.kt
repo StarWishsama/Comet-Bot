@@ -60,7 +60,14 @@ open class MessageWrapper {
         return usable
     }
 
-    fun toMessageChain(subject: Contact?): MessageChain {
+    /**
+     * [toMessageChain]
+     *
+     * 将一个 [MessageWrapper] 转换为 [MessageChain]
+     *
+     * @param subject Mirai 的 [Contact], 为空时一些需要 [Contact] 的元素会转为文字
+     */
+    fun toMessageChain(subject: Contact? = null): MessageChain {
         return MessageChainBuilder().apply {
             messageContent.forEach {
                 if (it is Picture) {
@@ -82,7 +89,7 @@ open class MessageWrapper {
         }.build()
     }
 
-    fun removeElements(type: Class<*>): MessageWrapper =
+    fun removeElementsByClass(type: Class<*>): MessageWrapper =
         MessageWrapper().setUsable(usable).also {
             it.addElements((getMessageContent()).parallelStream().filter { mw -> mw.className == type.name }
                 .collect(Collectors.toSet()))

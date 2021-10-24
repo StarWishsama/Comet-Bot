@@ -12,8 +12,8 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.PenguinStatService
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.event.events.MessageEvent
@@ -38,10 +38,10 @@ class PenguinStatCommand : ChatCommand {
         }
     }
 
-    override fun getProps(): CommandProps =
+    override val props: CommandProps =
         CommandProps(
-            "企鹅物流",
-            listOf("penguinstats", "pgs"),
+            "penguinstats",
+            listOf("企鹅物流", "pgs"),
             "查询明日方舟物品掉落信息",
             "nbot.commands.penguinstats",
             UserLevel.USER

@@ -14,12 +14,17 @@ import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.cfg
-import io.github.starwishsama.comet.CometVariables.cometServer
+import io.github.starwishsama.comet.CometVariables.comet
+import io.github.starwishsama.comet.CometVariables.cometServiceServer
 import io.github.starwishsama.comet.CometVariables.consoleCommandLogger
 import io.github.starwishsama.comet.CometVariables.daemonLogger
-import io.github.starwishsama.comet.api.command.CommandExecutor
-import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
+import io.github.starwishsama.comet.CometVariables.logger
+import io.github.starwishsama.comet.api.command.CommandManager
+import io.github.starwishsama.comet.api.command.MessageHandler
+import io.github.starwishsama.comet.api.thirdparty.bilibili.*
+import io.github.starwishsama.comet.api.thirdparty.jikipedia.JikiPediaApi
+import io.github.starwishsama.comet.api.thirdparty.noabbr.NoAbbrApi
+import io.github.starwishsama.comet.api.thirdparty.rainbowsix.R6StatsApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.chats.*
 import io.github.starwishsama.comet.commands.console.BroadcastCommand
@@ -30,21 +35,20 @@ import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.RetrofitLogger
+import io.github.starwishsama.comet.managers.NetworkRequestManager
+import io.github.starwishsama.comet.objects.tasks.GroupFileAutoRemover
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
-import io.github.starwishsama.comet.service.server.WebHookServer
-import io.github.starwishsama.comet.utils.CometUtil.getRestString
+import io.github.starwishsama.comet.service.server.CometServiceServer
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.isActive
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.event.globalEventChannel
-import net.mamoe.mirai.utils.MiraiLogger
 import okhttp3.OkHttpClient
 import org.jline.reader.EndOfFileException
 import org.jline.reader.UserInterruptException
@@ -55,7 +59,6 @@ import java.util.concurrent.TimeUnit
 
 object CometRuntime {
     fun postSetup() {
-        CometVariables.filePath = FileUtil.getJarLocation()
         CometVariables.startTime = LocalDateTime.now()
         CometVariables.loggerAppender = LoggerAppender(FileUtil.getLogLocation())
         CometVariables.miraiLoggerAppender = LoggerAppender(FileUtil.getLogLocation("mirai"))
@@ -63,7 +66,7 @@ object CometRuntime {
 
         Runtime.getRuntime().addShutdownHook(Thread { shutdownTask() })
 
-        CometVariables.logger.info(
+        logger.info(
             """
         
            ______                     __ 
@@ -95,22 +98,18 @@ object CometRuntime {
     }
 
     private fun shutdownTask() {
-        CometVariables.logger.info("[Bot] 正在关闭 Bot...")
+        logger.info("[Bot] 正在关闭 Bot...")
         DataSetup.saveAllResources()
         PusherManager.savePushers()
-        cometServer?.stop()
+        cometServiceServer?.stop()
         TaskUtil.service.shutdown()
         CometVariables.rCon?.disconnect()
         CometVariables.miraiLoggerAppender.close()
         CometVariables.loggerAppender.close()
     }
 
-    fun setupBot(bot: Bot, logger: MiraiLogger) {
-        setupRCon()
-
-        GachaService.loadAllPools()
-
-        CommandExecutor.setupCommand(
+    fun setupBot(bot: Bot) {
+        CommandManager.setupCommands(
             arrayOf(
                 AdminCommand(),
                 ArkNightCommand(),
@@ -124,6 +123,7 @@ object CometRuntime {
                 InfoCommand(),
                 MusicCommand(),
                 MuteCommand(),
+                UnMuteCommand(),
                 PictureSearchCommand(),
                 R6SCommand(),
                 RConCommand(),
@@ -138,6 +138,8 @@ object CometRuntime {
                 GithubCommand(),
                 DiceCommand(),
                 PenguinStatCommand(),
+                NoAbbrCommand(),
+                JikiPediaCommand(),
                 // Console Command
                 StopCommand(),
                 DebugCommand(),
@@ -146,11 +148,13 @@ object CometRuntime {
             )
         )
 
-        logger.info("[命令] 已注册 " + CommandExecutor.countCommands() + " 个命令")
+        logger.info("[命令] 已注册 " + CommandManager.countCommands() + " 个命令")
+
+        MessageHandler.startHandler(bot)
 
         /** 监听器 */
         val listeners = arrayOf(
-            ConvertLightAppListener,
+            BiliBiliShareListener,
             RepeatListener,
             BotGroupStatusListener,
             AutoReplyListener,
@@ -158,21 +162,11 @@ object CometRuntime {
             GroupRequestListener
         )
 
-        listeners.forEach { listener ->
-            if (listener.eventToListen.isEmpty()) {
-                daemonLogger.warning("监听器 ${listener::class.java.simpleName} 没有监听任何一个事件!")
-            } else {
-                listener.eventToListen.forEach { eventClass ->
-                    bot.globalEventChannel().subscribeAlways(eventClass) {
-                        if (CometVariables.switch) {
-                            listener.listen(this)
-                        }
-                    }
-                }
-            }
+        listeners.forEach { it.register(bot) }
 
-            logger.info("[监听器] 已注册 ${listener.getName()} 监听器")
-        }
+        DataSetup.initPerGroupSetting(bot)
+
+        setupRCon()
 
         runScheduleTasks()
 
@@ -180,13 +174,13 @@ object CometRuntime {
 
         startupServer()
 
-        DataSetup.initPerGroupSetting(bot)
+        TaskUtil.scheduleAtFixedRate(5, 5, TimeUnit.SECONDS) {
+            NetworkRequestManager.schedule()
+        }
 
         logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${CometVariables.startTime.getLastingTimeAsString()}")
 
-        RuntimeUtil.forceGC()
-
-        CommandExecutor.startHandler(bot)
+        TaskUtil.schedule { GachaService.loadAllPools() }
     }
 
     fun setupRCon() {
@@ -198,54 +192,62 @@ object CometRuntime {
     }
 
     private fun startupServer() {
+        if (!cfg.webHookSwitch) {
+            return
+        }
+
         try {
-            if (cfg.webHookSwitch) {
-                val customSuffix = cfg.webHookAddress.replace("http://", "").replace("https://", "").split("/")
-                cometServer = WebHookServer(cfg.webHookPort, customSuffix.getRestString(1, "/"))
-            }
+            val customSuffix = cfg.webHookAddress.replace("http://", "").replace("https://", "").split("/")
+            cometServiceServer = CometServiceServer(cfg.webHookPort, customSuffix.last())
         } catch (e: Exception) {
             daemonLogger.warning("Comet 服务端启动失败", e)
         }
     }
 
     private fun runScheduleTasks() {
-        TaskUtil.runAsync { DataSaveHelper.checkOldFiles() }
+        TaskUtil.schedule { DataSaveHelper.checkOldFiles() }
 
-        val apis = arrayOf(DynamicApi, TwitterApi, VideoApi)
+        val apis =
+            arrayOf(DynamicApi, JikiPediaApi, LiveApi, NoAbbrApi, R6StatsApi, SearchApi, TwitterApi, UserApi, VideoApi)
 
         /** 定时任务 */
         DataSaveHelper.scheduleBackup()
         DataSaveHelper.scheduleSave()
 
         apis.forEach {
-            TaskUtil.runScheduleTaskAsync(it.duration.toLong(), it.duration.toLong(), TimeUnit.HOURS) {
-                it.resetTime()
+            if (it.duration > 0) {
+                TaskUtil.scheduleAtFixedRate(it.duration.toLong(), it.duration.toLong(), TimeUnit.HOURS) {
+                    it.resetTime()
+                }
             }
         }
 
-        TaskUtil.runScheduleTaskAsync(1, 1, TimeUnit.HOURS) {
+        TaskUtil.scheduleAtFixedRate(1, 1, TimeUnit.HOURS) {
+            GroupFileAutoRemover.execute()
+        }
+
+        TaskUtil.scheduleAtFixedRate(1, 1, TimeUnit.HOURS) {
             RuntimeUtil.forceGC()
         }
     }
 
     fun handleConsoleCommand() {
-        TaskUtil.runAsync {
+        TaskUtil.schedule {
             consoleCommandLogger.log(HinaLogLevel.Info, "后台已启用", prefix = "后台管理")
 
-            while (true) {
+            while (comet.getBot().isActive) {
                 var line: String
 
-                runBlocking {
-                    try {
-                        line = CometApplication.console.readLine(">")
-                        val result = CommandExecutor.dispatchConsoleCommand(line)
-                        if (result.isNotEmpty()) {
-                            consoleCommandLogger.info(result)
-                        }
-                    } catch (ignored: EndOfFileException) {
-                    } catch (ignored: UserInterruptException) {
+                try {
+                    line = CometApplication.console.readLine(">")
+                    val result = MessageHandler.dispatchConsoleCommand(line)
+                    if (result.isNotEmpty()) {
+                        consoleCommandLogger.info(result)
                     }
+                } catch (ignored: EndOfFileException) {
+                } catch (ignored: UserInterruptException) {
                 }
+
             }
         }
     }

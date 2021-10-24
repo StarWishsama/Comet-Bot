@@ -74,7 +74,7 @@ data class Video(
         val name: String
     )
 
-    override fun getContact(): MessageWrapper {
+    override fun asMessageWrapper(): MessageWrapper {
         return MessageWrapper().addText(
             "投递了一个视频: $title\n" +
                     "发布时间: ${CometVariables.yyMMddPattern.format(publishTime.toLocalDateTime())}\n" +

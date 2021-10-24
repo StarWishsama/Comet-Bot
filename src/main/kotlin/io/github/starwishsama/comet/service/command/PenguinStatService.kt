@@ -11,8 +11,8 @@
 package io.github.starwishsama.comet.service.command
 
 import io.github.starwishsama.comet.api.thirdparty.penguinstats.PenguinStats
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.message.data.MessageChain
 

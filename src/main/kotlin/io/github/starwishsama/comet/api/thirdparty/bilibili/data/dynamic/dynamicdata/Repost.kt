@@ -49,7 +49,7 @@ data class Repost(
         fun getSentTime(): LocalDateTime = sentTime.toLocalDateTime()
     }
 
-    override fun getContact(): MessageWrapper {
+    override fun asMessageWrapper(): MessageWrapper {
         val originalDynamic = item?.originType?.let { getOriginalDynamic(originDynamic, it) }
             ?: return MessageWrapper().addText("\"源动态已被删除\"")
         val repostPicture =
@@ -79,7 +79,7 @@ data class Repost(
             if (dynamicType != UnknownType::class.java) {
                 val info = mapper.readValue(contact, dynamicType)
                 if (info != null) {
-                    return info.getContact()
+                    return info.asMessageWrapper()
                 }
             }
             return MessageWrapper().addText("无法解析此动态消息, 你还是另请高明吧")

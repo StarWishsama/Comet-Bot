@@ -11,11 +11,10 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.CometVariables
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.Mirai
@@ -31,15 +30,11 @@ import java.time.format.DateTimeFormatter
 class InfoCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
-            var reply =
+            val reply =
                 "\n积分: " + String.format("%.1f", user.checkInPoint) +
                         "\n累计连续签到了 " + user.checkInTime.toString() + " 天" + "\n上次签到于: " +
                         user.lastCheckInTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString() +
                         "\n权限组: " + user.level.toString()
-
-            if (user.bindServerAccount.isNotEmpty()) {
-                reply = reply + "绑定的游戏账号是: " + user.bindServerAccount
-            }
 
             return if (event is GroupMessageEvent) {
                 event.sender.at() + reply.convertToChain()
@@ -59,18 +54,17 @@ class InfoCommand : ChatCommand {
                 delay(500)
                 (sb.toString().trim { it <= ' ' }).convertToChain()
             } else {
-                "数据不足".convertToChain()
+                "数据不足, 请等待系统更新".convertToChain()
             }
         } else {
             return getHelp().convertToChain()
         }
     }
 
-    override fun getProps(): CommandProps =
+    override val props: CommandProps =
         CommandProps("info", arrayListOf("cx", "查询"), "查询积分等", "nbot.commands.info", UserLevel.USER)
 
     override fun getHelp(): String = """
-        ======= 命令帮助 =======
         /cx 查询自己的积分信息
         /cx ph 查询积分排行榜
     """.trimIndent()

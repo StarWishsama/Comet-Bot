@@ -12,9 +12,9 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.enums.MusicApiType
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.MusicApiType
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.MusicService
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.CometUtil.toChain
@@ -50,18 +50,17 @@ class MusicCommand : ChatCommand {
         }
     }
 
-    override fun getProps(): CommandProps =
+    override val props: CommandProps =
         CommandProps(
             "music",
             arrayListOf("dg", "点歌", "歌"),
             "点歌命令",
             "nbot.commands.music",
             UserLevel.USER,
-            consumePoint = 5
+            consumePoint = 5.0
         )
 
     override fun getHelp(): String = """
-        ======= 命令帮助 =======
         /music [歌名] 点歌
         /music api 修改点歌来源
         /music mode 切换显示模式

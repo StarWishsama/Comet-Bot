@@ -27,7 +27,7 @@ data class ShareContext(var vest: VestBean, var sketch: SketchBean) : DynamicDat
         var targetUrl: String?
     )
 
-    override fun getContact(): MessageWrapper {
+    override fun asMessageWrapper(): MessageWrapper {
         val wrapped = MessageWrapper().addText("分享了 ${vest.context}\n")
         if (!sketch.coverUrl.isNullOrEmpty()) {
             sketch.coverUrl.let {

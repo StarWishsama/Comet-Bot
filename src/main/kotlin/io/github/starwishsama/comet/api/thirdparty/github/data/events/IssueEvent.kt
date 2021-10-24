@@ -43,8 +43,8 @@ data class IssueEvent(
     ) {
         fun convertCreatedTime(): String {
             val localTime =
-                LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.systemDefault())
-            return CometVariables.yyMMddPattern.format(localTime)
+                LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.of("UTC"))
+            return CometVariables.hmsPattern.format(localTime)
         }
     }
 
@@ -76,14 +76,24 @@ data class IssueEvent(
     override fun toMessageWrapper(): MessageWrapper {
         val wrapper = MessageWrapper()
 
-        wrapper.addText("| 仓库 ${repository.fullName} 有新议题啦\n")
-        wrapper.addText("| 议题 #${issue.number}\n")
-        wrapper.addText("| 创建时间 ${issue.convertCreatedTime()}\n")
-        wrapper.addText("| 创建人 ${sender.login}\n")
-        wrapper.addText("| 查看详细信息: ${issue.url}\n")
-        wrapper.addText("| 简略信息: \n")
-        wrapper.addText("| ${issue.title}\n")
-        wrapper.addText("| ${issue.body.limitStringSize(30)}\n")
+        when (action) {
+            "opened" -> {
+                wrapper.addText("\uD83D\uDC1B ${repository.fullName} 有新议题啦\n")
+                wrapper.addText("| 议题 #${issue.number}\n")
+                wrapper.addText("| 创建时间 ${issue.convertCreatedTime()}\n")
+                wrapper.addText("| 创建人 ${sender.login}\n")
+                wrapper.addText("| 查看详细信息: ${issue.url}\n")
+                wrapper.addText("| 简略信息 \n")
+                wrapper.addText("| ${issue.title}\n")
+                wrapper.addText("| ${issue.body.limitStringSize(50).trim()}\n")
+            }
+
+            "closed" -> {
+                wrapper.addText("\uD83D\uDC1B ${repository.fullName} 议题 #${issue.number} 关闭\n")
+                wrapper.addText("| 创建人 ${sender.login}\n")
+                wrapper.addText("| 查看详细信息: ${issue.url}\n")
+            }
+        }
 
         return wrapper
     }
@@ -92,7 +102,7 @@ data class IssueEvent(
         return repository.fullName
     }
 
-    override fun sendable(): Boolean {
-        return action == "opened"
+    override fun isSendableEvent(): Boolean {
+        return action == "opened" || action == "closed"
     }
 }

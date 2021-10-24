@@ -10,51 +10,84 @@
 
 package io.github.starwishsama.comet.listeners
 
-import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.isBotMuted
-import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
-import java.util.*
-import kotlin.time.ExperimentalTime
 
-object RepeatListener : NListener {
-    override val eventToListen = listOf(GroupMessageEvent::class)
+object RepeatListener : INListener {
+    override val name: String
+        get() = "复读机"
 
     private val repeatCachePool = mutableMapOf<Long, RepeatInfo>()
 
-    @ExperimentalTime
-    override fun listen(event: Event) {
-        if (event is GroupMessageEvent && !event.group.isBotMuted && canRepeat(event.group.id)) {
+    @EventHandler
+    fun listen(event: GroupMessageEvent) {
+        if (event.group.isBotMuted) {
+            return
+        }
+
+        if (GroupConfigManager.getConfigOrNew(event.group.id).canRepeat) {
             val groupId = event.group.id
             val repeatInfo = repeatCachePool[groupId]
 
             if (repeatInfo == null) {
-                repeatCachePool[groupId] = RepeatInfo(
-                    mutableListOf(
-                        RepeatInfo.CacheMessage(
-                            event.sender.id,
-                            event.message
-                        )
-                    )
-                )
+                repeatCachePool[groupId] = RepeatInfo(mutableListOf(event.message))
                 return
             }
 
-            if (repeatInfo.check(event.sender.id, event.message)) {
-                runBlocking { event.subject.sendMessage(doRepeat(repeatInfo.messageCache.last().message)) }
+            repeatInfo.handleRepeat(event.group, event.message)
+        }
+    }
+}
+
+data class RepeatInfo(
+    val messageCache: MutableList<MessageChain> = mutableListOf(),
+    var lastRepeat: MessageChain = EmptyMessageChain
+) {
+    fun handleRepeat(group: Group, message: MessageChain) {
+        if (messageCache.isEmpty()) {
+            messageCache.add(message)
+            return
+        }
+
+        val lastMessage = messageCache.last()
+        val lastSender = lastMessage.source.fromId
+
+        if (lastSender != message.sourceOrNull?.fromId && lastMessage.contentEquals(
+                message,
+                ignoreCase = false,
+                strict = true
+            )
+        ) {
+            messageCache.add(message)
+        } else {
+            // No one repeat now, clear it
+            lastRepeat = EmptyMessageChain
+            messageCache.clear()
+            return
+        }
+
+        if (messageCache.size > 1 && !lastMessage.contentEquals(lastRepeat, ignoreCase = false, strict = true)) {
+            runBlocking {
+                group.sendMessage(processRepeatMessage(lastMessage))
             }
+
+            // Set last repeat message
+            lastRepeat = lastMessage
+
+            messageCache.clear()
         }
     }
 
-    private fun doRepeat(message: MessageChain): MessageChain {
+    private fun processRepeatMessage(message: MessageChain): MessageChain {
         // 避免复读过多图片刷屏
         val count = message.parallelStream().filter { it is Image }.count()
 
-        if (count <= 1L) {
-            val msgChain = ArrayList<Message>()
+        if (count <= 2L) {
+            val revampChain = ArrayList<Message>()
 
             message.forEach {
                 val msg: SingleMessage = if (it is PlainText) {
@@ -62,58 +95,12 @@ object RepeatListener : NListener {
                 } else {
                     it
                 }
-                msgChain.add(msg)
+                revampChain.add(msg)
             }
 
-            return msgChain.toMessageChain()
+            return revampChain.toMessageChain()
+        } else {
+            return EmptyMessageChain
         }
-
-        return EmptyMessageChain
-    }
-
-    private fun canRepeat(groupId: Long): Boolean {
-        return try {
-            GroupConfigManager.getConfigOrNew(groupId).canRepeat
-        } catch (e: NullPointerException) {
-            daemonLogger.warning("检测到群 $groupId 的配置文件异常无法获取, 请及时查看!")
-            false
-        }
-    }
-
-    override fun getName(): String = "复读机"
-}
-
-data class RepeatInfo(
-    val messageCache: MutableList<CacheMessage> = Collections.synchronizedList(mutableListOf()),
-    var hasRepeated: Boolean = false
-) {
-    data class CacheMessage(
-        val senderId: Long,
-        val message: MessageChain
-    )
-
-    fun check(id: Long, message: MessageChain): Boolean {
-        if (messageCache.isEmpty()) {
-            messageCache.add(CacheMessage(id, message))
-            return false
-        }
-
-        val last = messageCache.last()
-
-        if (last.senderId == id || !last.message.contentEquals(message, ignoreCase = false, strict = true)) {
-            messageCache.clear()
-            return false
-        }
-
-        if (last.senderId != id && last.message.contentEquals(message, ignoreCase = false, strict = true)) {
-            messageCache.add(CacheMessage(id, message))
-        }
-
-        if (messageCache.size > 1 && !hasRepeated) {
-            hasRepeated = true
-            return true
-        }
-
-        return false
     }
 }

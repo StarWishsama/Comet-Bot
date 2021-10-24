@@ -30,7 +30,7 @@ object TaskUtil {
             }.build()
     ).also { it.maximumPoolSize = CometVariables.cfg.maxPoolSize }
 
-    fun runAsync(delay: Long = 0, unit: TimeUnit = TimeUnit.SECONDS, task: () -> Unit): ScheduledFuture<*> {
+    fun schedule(delay: Long = 0, unit: TimeUnit = TimeUnit.SECONDS, task: () -> Unit): ScheduledFuture<*> {
         return service.schedule({
             try {
                 task()
@@ -40,7 +40,7 @@ object TaskUtil {
         }, delay, unit)
     }
 
-    fun runScheduleTaskAsync(firstTimeDelay: Long, period: Long, unit: TimeUnit, task: () -> Unit): ScheduledFuture<*> {
+    fun scheduleAtFixedRate(firstTimeDelay: Long, period: Long, unit: TimeUnit, task: () -> Unit): ScheduledFuture<*> {
         return service.scheduleAtFixedRate({
             try {
                 task()
@@ -50,7 +50,7 @@ object TaskUtil {
         }, firstTimeDelay, period, unit)
     }
 
-    fun executeRetry(retryTime: Int, task: () -> Unit): Throwable? {
+    fun executeWithRetry(retryTime: Int, task: () -> Unit): Throwable? {
         if (retryTime >= 5) return ReachRetryLimitException()
 
         repeat(retryTime) {

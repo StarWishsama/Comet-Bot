@@ -13,6 +13,7 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.video
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 
 data class VideoInfo(
     val code: Int,
@@ -30,12 +31,12 @@ data class VideoInfo(
                     """
 ${data.title}
 | ${data.uploader.userName}
-| ${data.description}
+| ${data.description.limitStringSize(80)}
 | 👍 ${data.stats.like} 💰 ${data.stats.coin} ⭐ ${data.stats.favorite}
 ${if (data.stats.historyRank > 0) "| 本站最高日排行第${data.stats.historyRank}名" else ""}
                 """.trim().removePrefix(" ")
                 )
-                .addPictureByURL(data.coverImg)
+                .addPictureByURL(data.coverImg).addText("\n直达链接: https://bilibili.com/video/${data.bvID}")
         } catch (e: Exception) {
             FileUtil.createErrorReportFile("解析视频消息失败", "bilibili", e, this.toString(), "")
         }

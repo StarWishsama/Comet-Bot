@@ -30,8 +30,6 @@ class TwitterContext(
     }
 
     override fun contentEquals(other: PushContext): Boolean {
-        if (other !is TwitterContext) return false
-
-        return twitterUserName == other.twitterUserName && tweetId == other.tweetId
+        return other is TwitterContext && tweetId == other.tweetId
     }
 }

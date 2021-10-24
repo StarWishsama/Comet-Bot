@@ -28,10 +28,10 @@ fun Response.isType(typeName: String): Boolean = headers["content-type"]?.contai
 
 object NetUtil {
     const val defaultUA =
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36 Edg/94.0.992.50"
 
     /**
-     * 执行 Http 请求 (Get)
+     * 执行 Http 请求
      *
      * 注意：响应需要使用 [Response.close] 关闭或使用 [use], 否则会导致泄漏
      *
@@ -50,6 +50,8 @@ object NetUtil {
         timeout: Long = 2,
         proxyUrl: String = cfg.proxyUrl,
         proxyPort: Int = cfg.proxyPort,
+        method: String = "GET",
+        body: RequestBody? = null,
         action: Request.Builder.() -> Request.Builder = {
             header("user-agent", defaultUA)
         }
@@ -71,7 +73,11 @@ object NetUtil {
         }
 
         val client = builder.build()
-        val request = Request.Builder().url(url).action().build()
+        val request = Request.Builder().url(url).action().also {
+            if (method == "POST" && body != null) {
+                it.method(method, body)
+            }
+        }.build()
         return client.newCall(request)
     }
 
@@ -115,12 +121,12 @@ object NetUtil {
         var result: Response? = null
 
         try {
-            result = executeRequest(url, timeout, proxyUrl, proxyPort, call).execute()
+            result = executeRequest(url, timeout, proxyUrl, proxyPort, action = call).execute()
         } catch (e: IOException) {
             netLogger.warning("执行网络操作失败: $url", e)
         } finally {
             if (autoClose) {
-                TaskUtil.runAsync(autoCloseDelay) {
+                TaskUtil.schedule(autoCloseDelay) {
                     if (result?.body != null) {
                         result.close()
                     }

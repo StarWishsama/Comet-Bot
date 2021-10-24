@@ -13,8 +13,8 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.ArkNightService.configGachaPool
 import io.github.starwishsama.comet.service.command.ArkNightService.getGachaResult
 import io.github.starwishsama.comet.service.command.ArkNightService.handleFreedomDraw
@@ -29,7 +29,12 @@ import net.mamoe.mirai.message.data.MessageChain
 class ArkNightCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!GachaService.isArkNightUsable()) {
-            return "还未下载明日方舟卡池数据, 无法使用".toChain()
+            return if (GachaService.isDownloading()) {
+                "正在下载明日方舟数据, 请稍后...".toChain()
+            } else {
+                GachaService.downloadArkNightData()
+                "还未下载明日方舟数据, 开始自动下载...".toChain()
+            }
         }
 
         if (args.isNotEmpty()) {
@@ -53,18 +58,18 @@ class ArkNightCommand : ChatCommand {
         }
     }
 
-    override fun getProps(): CommandProps =
+    override val props: CommandProps =
         CommandProps(
             "arknight",
             arrayListOf("ark", "xf", "方舟寻访"),
             "明日方舟寻访模拟器",
             "nbot.commands.arknight",
             UserLevel.USER,
-            consumePoint = 15
+            consumePoint = 5.0
         )
 
     override fun getHelp(): String = """
-         ============ 命令帮助 ============
-         /ark 单次寻访/十连寻访/[次数]
+         /ark 单次寻访/十连寻访/一井/[次数]
+         /ark pool 修改抽卡卡池
     """.trimIndent()
 }

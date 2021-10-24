@@ -12,8 +12,8 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
@@ -32,6 +32,8 @@ class MinecraftCommand : ChatCommand {
             1 -> {
                 if (args[0].contains(":")) {
                     val split = args[0].split(":")
+                    event.subject.sendMessage(toChain("查询中..."))
+
                     return query(split[0], split[1].toIntOrNull(), event.subject)
                 }
 
@@ -39,11 +41,13 @@ class MinecraftCommand : ChatCommand {
                 return if (convert.isEmpty()) {
                     "无法连接至服务器".toChain()
                 } else {
+                    event.subject.sendMessage(toChain("查询中..."))
                     query(convert.host, convert.port, event.subject)
                 }
             }
             2 -> {
                 return if (args[1].isNumeric()) {
+                    event.subject.sendMessage(toChain("查询中..."))
                     query(args[0], args[1].toIntOrNull(), event.subject)
                 } else {
                     "输入的端口号不合法.".toChain()
@@ -53,7 +57,7 @@ class MinecraftCommand : ChatCommand {
         }
     }
 
-    override fun getProps(): CommandProps = CommandProps(
+    override val props: CommandProps = CommandProps(
         "mc",
         listOf("我的世界", "mcquery", "mq", "服务器", "服务器查询", "mccx"),
         "查询我的世界服务器信息",
@@ -71,8 +75,21 @@ class MinecraftCommand : ChatCommand {
             if (port == null) {
                 return "输入的端口号不合法.".toChain()
             }
-            val result = MinecraftUtil.query(ip, port)
-            result.convertToWrapper().toMessageChain(subject)
+
+            val javaResult = MinecraftUtil.javaQuery(ip, port)
+            val javaWrapper = javaResult.convertToWrapper()
+
+            return if (!javaWrapper.isEmpty()) {
+                javaWrapper.toMessageChain(subject)
+            } else {
+                val bedrockResult = MinecraftUtil.bedrockQuery(ip, port)
+                val bedrockWrapper = bedrockResult.convertToWrapper()
+                if (!bedrockWrapper.isEmpty()) {
+                    bedrockResult.convertToWrapper().toMessageChain(subject)
+                } else {
+                    "查询失败, 服务器可能不在线, 请稍后再试.".toChain()
+                }
+            }
         } catch (e: IOException) {
             "查询失败, 服务器可能不在线, 请稍后再试.".toChain()
         }

@@ -10,14 +10,12 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.CometVariables
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
@@ -25,13 +23,15 @@ import io.github.starwishsama.comet.sessions.SessionUser
 import io.github.starwishsama.comet.sessions.commands.roll.RollSession
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.TaskUtil
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.messageChainOf
-import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 
 
 class RollCommand : ChatCommand, ConversationCommand {
@@ -68,6 +68,12 @@ class RollCommand : ChatCommand, ConversationCommand {
             )
 
             SessionHandler.insertSession(rollSession)
+            TaskUtil.schedule(rollSession.stopAfterMinute.toLong(), TimeUnit.MINUTES) {
+                runBlocking {
+                    generateResult(rollSession, event)
+                }
+                SessionHandler.removeSession(rollSession)
+            }
 
             return toChain(
                 """
@@ -82,7 +88,7 @@ class RollCommand : ChatCommand, ConversationCommand {
     }
 
     @Suppress("SpellCheckingInspection")
-    override fun getProps(): CommandProps = CommandProps(
+    override val props: CommandProps = CommandProps(
         "roll",
         arrayListOf("rl", "抽奖"),
         "roll东西",
@@ -98,13 +104,9 @@ class RollCommand : ChatCommand, ConversationCommand {
 
     override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
         if (session is RollSession && event is GroupMessageEvent) {
-            if (LocalDateTime.now().minusMinutes(session.stopAfterMinute.toLong()).isAfter(session.createdTime)) {
-                generateResult(session, event)
-                SessionHandler.removeSession(session)
+            if (session.rollStarter == event.sender.id) {
                 return
             }
-
-            if (session.rollStarter == event.sender.id) return
 
             if (session.keyWord.isEmpty()) {
                 session.users.add(SessionUser(event.sender.id))
@@ -118,25 +120,6 @@ class RollCommand : ChatCommand, ConversationCommand {
             }
         }
     }
-
-    private fun getRandomUser(users: MutableSet<SessionUser>): SessionUser {
-        val index = RandomUtil.randomInt(users.size)
-        val iter = users.iterator()
-        var current = 0
-
-        while (iter.hasNext()) {
-            val user = iter.next()
-            if (current == index) {
-                users.remove(user)
-                return user
-            } else {
-                current++
-            }
-        }
-
-        throw RuntimeException("Cannot found random user in Roll: ${users.size}")
-    }
-
 
     private suspend fun generateResult(session: RollSession, event: GroupMessageEvent) {
         val group = event.bot.getGroup(session.target.groupId)
@@ -153,7 +136,7 @@ class RollCommand : ChatCommand, ConversationCommand {
             }
 
             winners.forEach { su ->
-                winnerText = winnerText.plus(At(su.id))
+                winnerText = winnerText.plus(At(su.id)).plus(" ")
             }
 
             group.sendMessage(
@@ -174,7 +157,7 @@ class RollCommand : ChatCommand, ConversationCommand {
         val winners = mutableListOf<SessionUser>()
 
         for (i in 0 until count) {
-            winners.add(getRandomUser(users))
+            winners.add(users.random().also { users.remove(it) })
         }
 
         return winners

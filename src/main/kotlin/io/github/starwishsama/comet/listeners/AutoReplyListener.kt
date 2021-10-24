@@ -13,54 +13,39 @@ package io.github.starwishsama.comet.listeners
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
 import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 
-object AutoReplyListener : NListener {
-    override val eventToListen = listOf(GroupMessageEvent::class)
+object AutoReplyListener : INListener {
+    override val name: String
+        get() = "关键词回复"
 
-    override fun listen(event: Event) {
-        if (event is GroupMessageEvent) {
-            event.apply {
-                val cfg = GroupConfigManager.getConfig(group.id)
+    @EventHandler
+    fun listen(event: GroupMessageEvent) {
+        event.apply {
+            val cfg = GroupConfigManager.getConfig(group.id)
 
-                if (cfg?.keyWordReply == null || cfg.keyWordReply.isEmpty()) return
+            if (cfg?.keyWordReply == null || cfg.keyWordReply.isEmpty()) return
 
-                val user = CometUser.getUserOrRegister(sender.id)
+            val user = CometUser.getUserOrRegister(sender.id)
 
-                val currentTime = System.currentTimeMillis()
+            if (!user.checkCoolDown(true)) {
+                return
+            }
 
-                val hasCoolDown = when (user.lastExecuteTime) {
-                    -1L -> {
-                        user.lastExecuteTime = currentTime
-                        true
-                    }
-                    else -> {
-                        val result = currentTime - user.lastExecuteTime < 5000
-                        user.lastExecuteTime = currentTime
-                        result
-                    }
-                }
+            val messageContent = message.contentToString()
 
-                if (!hasCoolDown) return
+            cfg.keyWordReply.forEach {
 
-                val messageContent = message.contentToString()
+                if (it.keyWords.isEmpty()) return
 
-                cfg.keyWordReply.forEach {
-
-                    if (it.keyWords.isEmpty()) return
-
-                    it.keyWords.forEach { keyWord ->
-                        if (messageContent.contains(keyWord)) {
-                            runBlocking { subject.sendMessage(message.quote() + it.reply.toMessageChain(subject)) }
-                            return
-                        }
+                it.keyWords.forEach { keyWord ->
+                    if (messageContent.contains(keyWord)) {
+                        runBlocking { subject.sendMessage(message.quote() + it.reply.toMessageChain(subject)) }
+                        return
                     }
                 }
             }
         }
     }
-
-    override fun getName(): String = "关键词回复"
 }

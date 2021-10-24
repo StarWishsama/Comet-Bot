@@ -20,6 +20,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer
+import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
@@ -27,10 +28,11 @@ import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
-import io.github.starwishsama.comet.service.server.WebHookServer
+import io.github.starwishsama.comet.service.server.CometServiceServer
+import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
-import io.github.starwishsama.comet.utils.json.LocalDateTimeConverter
-import io.github.starwishsama.comet.utils.json.WrapperConverter
+import io.github.starwishsama.comet.utils.serialize.LocalDateTimeConverter
+import io.github.starwishsama.comet.utils.serialize.WrapperConverter
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.utils.MiraiInternalApi
 import okhttp3.OkHttpClient
@@ -39,6 +41,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentHashMap
 
@@ -51,7 +54,9 @@ import java.util.concurrent.ConcurrentHashMap
 
 @OptIn(MiraiInternalApi::class)
 object CometVariables {
-    internal lateinit var filePath: File
+    internal val filePath: File by lazy {
+        FileUtil.getJarLocation()
+    }
 
     val comet: Comet = Comet()
 
@@ -65,7 +70,7 @@ object CometVariables {
 
     internal var cfg = CometConfig()
 
-    internal var cometServer: WebHookServer? = null
+    internal var cometServiceServer: CometServiceServer? = null
 
     internal val logAction: (String) -> Unit = {
         CometApplication.console.printAbove(it)
@@ -132,7 +137,9 @@ object CometVariables {
                     LocalTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss"))
                 )
             },
-            KotlinModule(nullIsSameAsDefault = true, nullToEmptyCollection = true, nullToEmptyMap = true),
+            KotlinModule.Builder().enable(KotlinFeature.NullIsSameAsDefault)
+                .enable(KotlinFeature.NullToEmptyCollection)
+                .enable(KotlinFeature.NullToEmptyMap).build(),
             SimpleModule().also {
                 it.addDeserializer(LocalDateTime::class.java, LocalDateTimeConverter)
                 it.addDeserializer(WrapperElement::class.java, WrapperConverter)
@@ -152,11 +159,11 @@ object CometVariables {
     internal var switch: Boolean = true
 
     internal val hmsPattern: DateTimeFormatter by lazy {
-        DateTimeFormatter.ofPattern("HH:mm:ss")
+        DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault())
     }
 
     internal val yyMMddPattern: DateTimeFormatter by lazy {
-        DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
+        DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").withZone(ZoneId.systemDefault())
     }
 
     internal lateinit var client: OkHttpClient

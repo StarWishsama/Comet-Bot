@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.service.command
 
-import io.github.starwishsama.comet.api.command.CommandExecutor
+import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.toChain
@@ -41,12 +41,34 @@ object AdminService {
                 val target: CometUser? = CometUtil.parseAtAsBotUser(event, args[1])
 
                 val validate =
-                    CommandExecutor.getCommands().parallelStream().filter { it.getProps().permission == args[2] }
+                    CommandManager.getCommands().parallelStream().filter { it.props.permission == args[2] }
                         .findAny().isPresent
 
                 return if (validate) {
                     target?.addPermission(args[2])
                     toChain("添加权限成功")
+                } else {
+                    "找不到 ${args[2]} 对应的命令".toChain()
+                }
+            }
+        } else {
+            return toChain("你没有权限")
+        }
+        return EmptyMessageChain
+    }
+
+    fun removePermission(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
+        if (user.isBotOwner()) {
+            if (args.size > 1) {
+                val target: CometUser? = CometUtil.parseAtAsBotUser(event, args[1])
+
+                val validate =
+                    CommandManager.getCommands().parallelStream().filter { it.props.permission == args[2] }
+                        .findAny().isPresent
+
+                return if (validate) {
+                    target?.removePermission(args[2])
+                    toChain("删除权限成功")
                 } else {
                     "找不到 ${args[2]} 对应的命令".toChain()
                 }

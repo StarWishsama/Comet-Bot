@@ -14,11 +14,12 @@ package io.github.starwishsama.comet.commands.chats
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.AdminService.addPermission
 import io.github.starwishsama.comet.service.command.AdminService.giveCommandTime
 import io.github.starwishsama.comet.service.command.AdminService.listPermissions
+import io.github.starwishsama.comet.service.command.AdminService.removePermission
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -36,17 +37,17 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
                 "help", "帮助" -> getHelp().toChain()
                 "permlist", "权限列表", "qxlb" -> listPermissions(user, args, event)
                 "permadd", "添加权限", "tjqx" -> addPermission(user, args, event)
+                "permdel", "删除权限", "scqx", "sqx" -> removePermission(user, args, event)
                 "give", "增加次数" -> giveCommandTime(event, args)
                 else -> "命令不存在, 使用 /admin help 查看更多".toChain()
             }
         }
     }
 
-    override fun getProps(): CommandProps =
+    override val props: CommandProps =
         CommandProps("admin", arrayListOf("管理", "管", "gl"), "机器人管理员命令", "nbot.commands.admin", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
-        ======= 命令帮助 =======
         /admin help 展示此帮助列表
         /admin permlist [用户] 查看用户拥有的权限
         /admin permadd [用户] [权限名] 给一个用户添加权限
@@ -54,7 +55,7 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
     """.trimIndent()
 
     override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        val bLevel = getProps().level
+        val bLevel = props.level
         if (user.compareLevel(bLevel)) return true
         if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true
         return false

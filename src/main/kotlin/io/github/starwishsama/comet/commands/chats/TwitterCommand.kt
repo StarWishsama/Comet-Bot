@@ -11,25 +11,29 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.CometVariables.daemonLogger
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.data.TwitterUser
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.api.TwitterConfig
+import io.github.starwishsama.comet.objects.enums.UserLevel
+import io.github.starwishsama.comet.objects.tasks.network.INetworkRequestTask
+import io.github.starwishsama.comet.objects.tasks.network.NetworkRequestTask
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.NetUtil
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
+import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.PlainText
@@ -37,7 +41,7 @@ import net.mamoe.mirai.message.data.toMessageChain
 import kotlin.time.ExperimentalTime
 
 class TwitterCommand : ChatCommand {
-    @ExperimentalTime
+    @OptIn(ExperimentalTime::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (ApiManager.getConfig<TwitterConfig>().token.isEmpty()) {
             return toChain("推特推送未被正确设置, 请联系机器人管理员")
@@ -67,7 +71,27 @@ class TwitterCommand : ChatCommand {
                 }
                 "id" -> {
                     return if (args[1].isNumeric()) {
-                        getTweetByID(args[1].toLong(), event.subject)
+                        val task = object : NetworkRequestTask(), INetworkRequestTask<MessageChain> {
+                            override fun request(param: String): MessageChain {
+                                return getTweetByID(args[1].toLong(), event.subject)
+                            }
+
+                            override val content: Contact = event.subject
+                            override val param: String = ""
+
+                            override fun callback(result: Any?) {
+                                if (result is MessageChain) {
+                                    runBlocking {
+                                        content.sendMessage(result)
+                                    }
+                                }
+                            }
+
+                        }
+
+                        NetworkRequestManager.addTask(task)
+
+                        EmptyMessageChain
                     } else {
                         "请输入有效数字".convertToChain()
                     }
@@ -82,8 +106,8 @@ class TwitterCommand : ChatCommand {
         }
     }
 
-    override fun getProps(): CommandProps =
-        CommandProps("data", arrayListOf("twit", "推特", "tt"), "查询/订阅推特账号", "nbot.commands.data", UserLevel.ADMIN)
+    override val props: CommandProps =
+        CommandProps("twitter", arrayListOf("twit", "推特", "tt"), "查询/订阅推特账号", "nbot.commands.data", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
         /twit info [推特ID] 查询账号信息
@@ -106,13 +130,37 @@ class TwitterCommand : ChatCommand {
     @ExperimentalTime
     private suspend fun getTweetToMessageChain(args: List<String>, event: MessageEvent): MessageChain {
         return if (args.size > 1) {
-            event.subject.sendMessage(event.message.quote() + toChain("正在查询, 请稍等"))
-            try {
-                if (args.size > 2) getTweetWithDesc(args[1], event.subject, args[2].toInt(), 1 + args[2].toInt())
-                else getTweetWithDesc(args[1], event.subject, 0, 1)
-            } catch (e: NumberFormatException) {
-                toChain("请输入有效数字")
+            val task = object : NetworkRequestTask(), INetworkRequestTask<MessageChain> {
+                override fun request(param: String): MessageChain {
+                    return if (args.size > 2) {
+                        val index = args[2].toIntOrNull()
+
+                        if (index != null) {
+                            getTweetWithDesc(args[1], event.subject, index, 1 + index)
+                        } else {
+                            "请输入有效的数字".toChain()
+                        }
+                    } else {
+                        getTweetWithDesc(args[1], event.subject, 0, 1)
+                    }
+                }
+
+                override val content: Contact = event.subject
+                override val param: String = ""
+
+                override fun callback(result: Any?) {
+                    if (result is MessageChain) {
+                        runBlocking {
+                            content.sendMessage(result)
+                        }
+                    }
+                }
+
             }
+
+            NetworkRequestManager.addTask(task)
+
+            event.message.quote() + toChain("正在查询, 请稍等")
         } else {
             getHelp().convertToChain()
         }

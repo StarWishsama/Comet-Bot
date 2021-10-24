@@ -12,8 +12,7 @@ package io.github.starwishsama.comet.objects
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.enums.UserLevel
-import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import java.time.LocalDateTime
 
 data class CometUser(
@@ -22,13 +21,11 @@ data class CometUser(
     var lastCheckInTime: LocalDateTime = LocalDateTime.now().minusDays(1),
     var checkInPoint: Double = 0.0,
     var checkInTime: Int = 0,
-    var bindServerAccount: String = "",
     var r6sAccount: String = "",
     var level: UserLevel = UserLevel.USER,
     var checkInGroup: Long = 0,
     var lastExecuteTime: Long = -1,
-    private val permissions: MutableList<String> = mutableListOf(),
-    val savedContents: MutableList<MessageWrapper> = mutableListOf()
+    private val permissions: MutableSet<String> = mutableSetOf(),
 ) {
     fun addPoint(point: Number) {
         checkInPoint += point.toDouble()
@@ -73,7 +70,11 @@ data class CometUser(
     }
 
     fun addPermission(permission: String) {
-        permissions.plusAssign(permission)
+        permissions.add(permission)
+    }
+
+    fun removePermission(permission: String) {
+        permissions.remove(permission)
     }
 
     /**
@@ -87,6 +88,27 @@ data class CometUser(
         val period = lastCheckInTime.toLocalDate().until(now.toLocalDate())
 
         return period.days == 0
+    }
+
+    /**
+     * 判断是否处于冷却状态
+     *
+     * @param silent 检查时不更新调用时间
+     * @param coolDown 冷却时长, 单位秒
+     *
+     * @return 是否处于冷却状态
+     */
+    fun checkCoolDown(silent: Boolean = false, coolDown: Int = CometVariables.cfg.coolDownTime): Boolean {
+        val currentTime = System.currentTimeMillis()
+
+        return if (lastExecuteTime < 0) {
+            if (!silent) lastExecuteTime = currentTime
+            true
+        } else {
+            val hasCoolDown = currentTime - lastExecuteTime >= coolDown * 1000
+            if (!silent) lastExecuteTime = currentTime
+            hasCoolDown
+        }
     }
 
     companion object {

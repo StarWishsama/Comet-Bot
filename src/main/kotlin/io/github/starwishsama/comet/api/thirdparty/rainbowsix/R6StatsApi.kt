@@ -104,7 +104,7 @@ object R6StatsApi : ApiExecutor {
                     )
                 }%"
 
-        return MessageWrapper().addText(infoText)
+        return MessageWrapper().addPictureByURL(genericStat.avatarUrlSmall).addText(infoText)
     }
 }
 

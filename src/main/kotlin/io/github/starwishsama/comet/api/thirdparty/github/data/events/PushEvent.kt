@@ -14,9 +14,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 data class PushEvent(
     val ref: String,
@@ -30,7 +33,7 @@ data class PushEvent(
     @JsonProperty("commits")
     val commitInfo: List<CommitInfo>,
     @JsonProperty("head_commit")
-    val headCommitInfo: CommitInfo
+    val headCommitInfo: CommitInfo?
 ) : GithubEvent {
     data class RepoInfo(
         val id: Long,
@@ -52,7 +55,8 @@ data class PushEvent(
 
     data class PusherInfo(
         val name: String,
-        val email: String
+        // 推送者为 bot 时会为空
+        val email: String?
     )
 
     data class CommitInfo(
@@ -61,24 +65,34 @@ data class PushEvent(
         val timestamp: String,
         val url: String,
         val committer: PusherInfo
-    )
+    ) {
+        fun convertTimestamp(): String {
+            val localTime =
+                LocalDateTime.parse(timestamp, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.systemDefault())
+            return CometVariables.yyMMddPattern.format(localTime)
+        }
+    }
 
     private fun getLocalTime(time: Long): String {
-        return CometVariables.yyMMddPattern.format(
+        return CometVariables.hmsPattern.format(
             Instant.ofEpochMilli(time * 1000L).atZone(ZoneId.systemDefault()).toLocalDateTime()
         )
     }
 
     override fun toMessageWrapper(): MessageWrapper {
+        if (headCommitInfo == null) {
+            return MessageWrapper().setUsable(false)
+        }
+
         val wrapper = MessageWrapper()
 
-        wrapper.addText("| 仓库 ${repoInfo.fullName} 有新动态啦\n")
+        wrapper.addText("⬆️ ${repoInfo.fullName} 有新提交啦\n")
         wrapper.addText("| 推送时间 ${getLocalTime(repoInfo.pushTime)}\n")
         wrapper.addText("| 推送分支 ${ref.replace("refs/heads/", "")}\n")
         wrapper.addText("| 提交者 ${headCommitInfo.committer.name}\n")
         wrapper.addText("| 提交信息 \n")
-        wrapper.addText("| ${headCommitInfo.message}\n")
-        wrapper.addText("| 查看差异: \n")
+        wrapper.addText("| ${headCommitInfo.message.limitStringSize(100)}\n")
+        wrapper.addText("| 查看差异 \n")
         wrapper.addText(compare)
 
         return wrapper
@@ -88,5 +102,5 @@ data class PushEvent(
         return repoInfo.fullName
     }
 
-    override fun sendable(): Boolean = true
+    override fun isSendableEvent(): Boolean = true
 }

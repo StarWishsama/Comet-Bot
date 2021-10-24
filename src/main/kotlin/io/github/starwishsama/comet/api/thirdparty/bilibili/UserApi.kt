@@ -14,6 +14,7 @@ import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserInfo
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserSpaceInfo
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserVideoInfo
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -36,7 +37,7 @@ object UserApi : ApiExecutor {
     override var usedTime: Int = 0
     override val duration: Int = 3
 
-    override fun getLimitTime(): Int = 2500
+    override fun getLimitTime(): Int = 3500
 }
 
 interface IUserApi {
@@ -58,4 +59,7 @@ interface IUserApi {
         //@Query("pn") pageNumber: Int,
         //@Query("ps") pageSize: Int
     ): Call<UserVideoInfo>
+
+    @GET("/x/space/acc/info")
+    fun getUserInfo(@Query("mid") id: Long): Call<UserSpaceInfo>
 }

@@ -25,7 +25,7 @@ data class LiveRoom(
     /** 用户 UID, 例如 407106379 */
     @JsonProperty("uid")
     val uid: Long,
-    /** 用户名, 例如 绯赤艾莉欧Official*/
+    /** 用户名, 例如 绯赤艾莉欧Official */
     @JsonProperty("uname")
     val userName: String,
     /** 认证类型(?) */
@@ -47,7 +47,7 @@ data class LiveRoom(
     @JsonProperty("title")
     val title: String?,
     /**
-     * 直播间 Tag, 例如 "润羽露西娅,潤羽るしあ,VTuber,hololive,虚拟UP主"
+     * 直播间 Tag
      */
     @JsonProperty("tags")
     val tags: String,
@@ -118,7 +118,7 @@ data class LiveRoom(
         }
     }
 
-    override fun getContact(): MessageWrapper {
+    override fun asMessageWrapper(): MessageWrapper {
         val wrapped = MessageWrapper().addText(
             "分享了 ${DynamicApi.getUserNameByMid(uid)} 的直播间\n" +
                     "直播间标题: ${title}\n" +

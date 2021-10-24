@@ -13,8 +13,8 @@ package io.github.starwishsama.comet.commands.chats
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import net.mamoe.mirai.event.events.MessageEvent
@@ -23,7 +23,7 @@ import java.util.regex.Pattern
 
 class DiceCommand : ChatCommand {
     // 骰子正则表达式
-    private val pattern = Pattern.compile("(\\d)([dD])(\\d{1,3})")
+    private val pattern = Pattern.compile("""(\d{1,2})([dD])(\d{1,4})""")
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
@@ -32,24 +32,23 @@ class DiceCommand : ChatCommand {
 
         val input = parseInput(args[0])
 
-        if (input.size < 2) {
+        if (input.first < 1 || input.second < 1) {
             return "骰子格式错误! 格式示例: 1d100".toChain()
         }
 
-        val result = doDice(input[0], input[1])
+        val result = doDice(input.first, input.second)
 
         return "结果: ${args[0]}=${result.convertToString()}".toChain()
     }
 
-    override fun getProps(): CommandProps {
-        return CommandProps(
+    override val props: CommandProps =
+        CommandProps(
             "dice",
             listOf("tz", "骰子"),
             "投骰子",
             "nbot.commands.dice",
             UserLevel.USER
         )
-    }
 
     override fun getHelp(): String = """
         /dice [指定方法] 投骰子
@@ -58,41 +57,47 @@ class DiceCommand : ChatCommand {
         注意: 骰子最大只能投 10 个, 1000 面.
     """.trimIndent()
 
-    private fun parseInput(input: String): List<Int> {
+    private fun parseInput(input: String): Pair<Int, Int> {
         val matcher = pattern.matcher(input)
-        val result = mutableListOf<Int>()
 
         if (!Pattern.matches(pattern.pattern(), input)) {
-            return emptyList()
+            return Pair(0, 0)
         }
+
+        var diceTime = 0
+        var diceSize = 0
 
         while (matcher.find()) {
             val time = matcher.group(1)
             val d = matcher.group(2)
-            val diceSize = matcher.group(3)
+            val size = matcher.group(3)
 
-            if (time.isNumeric()) {
-                val parseTime = matcher.group(1).toIntOrNull() ?: return emptyList()
-                if (parseTime <= 10) {
-                    result.add(parseTime)
+            diceTime = if (time.isNumeric()) {
+                val parseTime = time.toIntOrNull() ?: return Pair(0, 0)
+                if (parseTime in 1..10) {
+                    parseTime
                 } else {
-                    return emptyList()
+                    return Pair(0, 0)
                 }
             } else if (time.isEmpty() && d.lowercase() == "d") {
-                result.add(1)
+                1
+            } else {
+                0
             }
 
-            if (diceSize.isNumeric()) {
-                val parseDiceSize = diceSize.toIntOrNull() ?: return emptyList()
+            diceSize = if (size.isNumeric()) {
+                val parseDiceSize = size.toIntOrNull() ?: return Pair(0, 0)
                 if (parseDiceSize <= 1000) {
-                    result.add(parseDiceSize)
+                    parseDiceSize
                 } else {
-                    return emptyList()
+                    return Pair(0, 0)
                 }
+            } else {
+                0
             }
         }
 
-        return result
+        return Pair(diceTime, diceSize)
     }
 
     private fun doDice(time: Int, base: Int): List<DiceResult> {

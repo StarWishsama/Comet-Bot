@@ -39,7 +39,7 @@ data class Music(
     @JsonProperty("playCnt")
     val playCount: Long
 ) : DynamicData {
-    override fun getContact(): MessageWrapper {
+    override fun asMessageWrapper(): MessageWrapper {
         return MessageWrapper().addText(
             "${dynamic ?: "获取失败"}\n" +
                     "发布了音乐: $songName\n" +

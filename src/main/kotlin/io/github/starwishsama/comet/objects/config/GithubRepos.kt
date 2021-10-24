@@ -40,7 +40,7 @@ data class GithubRepos(
         return repos.isEmpty()
     }
 
-    fun checkSecret(secret: List<String>?, requestBody: String, eventType: String): SecretStatus {
+    fun checkSecret(secret: String?, requestBody: String, eventType: String): SecretStatus {
         val parse: GithubEvent =
             GithubEventHandler.process(
                 URLDecoder.decode(requestBody.replace("payload=", ""), Charsets.UTF_8),
@@ -54,7 +54,7 @@ data class GithubRepos(
             return SecretStatus.NO_SECRET
         }
 
-        val checkStatus = ServerUtil.checkSignature(targetRepo.repoSecret, secret?.get(0) ?: "", requestBody)
+        val checkStatus = ServerUtil.checkSignature(targetRepo.repoSecret, secret ?: "", requestBody)
 
         return if (checkStatus) {
             SecretStatus.HAS_SECRET
@@ -63,10 +63,10 @@ data class GithubRepos(
         }
     }
 
-    fun contains(repoAuthor: String, repoName: String): GithubRepo? {
+    fun contains(repoAuthor: String, repoName: String, groupId: Long): GithubRepo? {
         val targetRepos = this.repos.filter { it.repoAuthor == repoAuthor }
         val targetRepo = targetRepos.find { it.repoName == repoName }
-        return targetRepos.find { it.repoName == "*" } ?: targetRepo
+        return targetRepos.find { it.repoName == "*" && it.repoTarget.contains(groupId) } ?: targetRepo
     }
 
     fun add(target: Long, repoAuthor: String, repoName: String, repoSecret: String = ""): Boolean {

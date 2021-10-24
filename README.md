@@ -10,7 +10,7 @@
 
 **一切开发旨在学习，请勿用于非法用途**
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/b26348aabf51452195dbc14846accd86)](https://www.codacy.com/manual/StarWishsama/Comet-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Comet-Bot&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/6d5507c8dc364b9a9cb2a04bd8d04e64)](https://www.codacy.com/gh/StarWishsama/Comet-Bot/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StarWishsama/Comet-Bot&amp;utm_campaign=Badge_Grade)
 [![Kotlin Gradle](https://github.com/StarWishsama/Comet-Bot/workflows/Kotlin%20Gradle/badge.svg)](https://github.com/StarWishsama/Comet-Bot/actions/)
 [![LICENSE](https://img.shields.io/github/license/StarWishsama/Comet-Bot.svg?style=popout)](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE)
 [![Issues](https://img.shields.io/github/issues/StarWishsama/Comet-Bot.svg?style=popout)](https://github.com/StarWishsama/Comet-Bot/issues)
@@ -23,13 +23,14 @@
 * 彩虹六号战绩查询
 * 打卡
 * 签到
-* bilibili UP主信息/动态查询
-* 点歌 (QQ小程序卡片样式)
+* 哔哩哔哩UP主信息/动态查询
+* 点歌 (卡片/纯文本样式)
 * 事件概率占卜
-* 明日方舟 / 公主连结抽卡模拟器
+* 明日方舟抽卡模拟器
 * 去你大爷的小程序 (将小程序转换为文本)
+    - 哔哩哔哩
 * 单推小助手
-    - 支持订阅 bilibili 用户动态/开播提醒
+    - 支持订阅哔哩哔哩用户动态/开播提醒
     - 支持订阅推特用户最新消息
 * rCon 功能, 支持连接到有 rCon 功能的游戏
 * 查询推特用户信息/推文
@@ -37,6 +38,9 @@
 * 禁言/踢出群员
 * 群抽奖
 * Github WebHook 推送
+* 能不能好好说话
+* 企鹅物流 [BETA]
+* 小鸡词典
 * 还在开发中...
 
 ## ☑ To-Do 列表
@@ -44,6 +48,14 @@
 详见 [Issues](https://github.com/StarWishsama/Comet-Bot/issues)
 
 ## 💽 如何使用
+
+### Mirai-Console 插件版 (实验性)
+
+- 实验性的支持, 可能存在无法使用的恶性 Bug, 欢迎反馈问题
+
+你可以在[这里](https://github.com/StarWishsama/Comet-Bot/tree/mirai-console)找到插件版本的 Comet, 可以如下编译
+
+或是从 [Github Actions](https://github.com/StarWishsama/Comet-Bot/actions?query=branch%3Amirai-console) 中下载
 
 ### 自编译
 

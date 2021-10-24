@@ -12,12 +12,12 @@ package io.github.starwishsama.comet.commands.console
 
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.file.DataSetup
-import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import java.io.IOException
 
@@ -73,7 +73,9 @@ class AdminCommand : ConsoleCommand {
                             return "输入的群号不合法!"
                         }
 
-                        return GroupConfigManager.getConfig(gid)?.disableCommand(args[2])?.msg ?: "输入的群号没有配置文件或不存在!"
+                        val cmd = CommandManager.getCommand(args[2])
+
+                        return cmd?.props?.disableCommand(gid)?.msg ?: "找不到对应命令"
                     }
                 }
                 "groups" -> {

@@ -11,12 +11,11 @@
 package io.github.starwishsama.comet.commands.chats
 
 import cn.hutool.core.util.RandomUtil
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
@@ -34,18 +33,20 @@ class RSPCommand : ChatCommand, ConversationCommand {
     private val inProgressPlayer = mutableSetOf<Long>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
-        if (SessionHandler.hasSessionByID(event.sender.id, this::class.java))
+        if (!SessionHandler.hasSessionByID(event.sender.id, this::class.java)) {
             SessionHandler.insertSession(Session(SessionTarget(0, event.sender.id), this, false))
+        }
+
         return "石头剪刀布... 开始! 你要出什么呢?".toChain()
     }
 
-    override fun getProps(): CommandProps =
+    override val props: CommandProps =
         CommandProps("janken", arrayListOf("猜拳", "石头剪刀布", "rsp", "cq"), "石头剪刀布", "nbot.commands.rsp", UserLevel.USER)
 
     override fun getHelp(): String = "/cq 石头剪刀布"
 
     override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
-        if (LocalDateTime.now().minusMinutes(1L).isBefore(session.createdTime)) {
+        if (LocalDateTime.now().minusMinutes(1L).isAfter(session.createdTime)) {
             SessionHandler.removeSession(session)
             return
         }

@@ -12,10 +12,11 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.MemberPermission
@@ -27,30 +28,29 @@ import net.mamoe.mirai.message.data.MessageChain
 
 class KickCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
-        if (event is GroupMessageEvent) {
-            if (hasPermission(user, event)) {
-                if (event.group.botPermission.isOperator()) {
-                    if (args.isNotEmpty()) {
-                        val at = CometUtil.parseAtToId(event, args[0])
-                        if (at > -1) {
-                            doKick(event, at, "")
-                        } else {
-                            getHelp().convertToChain()
-                        }
+        if (event is GroupMessageEvent && event.group.botPermission.isOperator()) {
+            if (args.isNotEmpty()) {
+                val at = CometUtil.parseAtToId(event, args[0])
+                if (at > -1) {
+                    if (args.size > 1) {
+                        doKick(event, at, args.getRestString(1))
                     } else {
-                        return getHelp().convertToChain()
+                        doKick(event, at, "")
                     }
                 } else {
-                    CometUtil.toChain("我不是绿帽 我爬 我爬")
+                    getHelp().convertToChain()
                 }
             } else {
-                CometUtil.toChain("你不是绿帽 你爬 你爬")
+                return getHelp().convertToChain()
             }
+        } else {
+            CometUtil.toChain("我不是绿帽 我爬 我爬")
         }
+
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps =
+    override val props: CommandProps =
         CommandProps("kick", arrayListOf("tr", "踢人"), "踢人", "nbot.commands.kick", UserLevel.USER)
 
     override fun getHelp(): String = """
@@ -65,7 +65,7 @@ class KickCommand : ChatCommand {
             if (cfg.isHelper(user.id)) return true
         }
 
-        return user.hasPermission(getProps().permission)
+        return user.hasPermission(props.permission)
     }
 
     private fun doKick(event: GroupMessageEvent, target: Long, reason: String) {

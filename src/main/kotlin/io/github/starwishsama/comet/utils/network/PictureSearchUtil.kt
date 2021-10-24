@@ -19,6 +19,7 @@ import io.github.starwishsama.comet.objects.config.api.SauceNaoConfig
 import io.github.starwishsama.comet.objects.pojo.PicSearchResult
 import io.github.starwishsama.comet.utils.FileUtil
 import org.jsoup.Jsoup
+import java.io.IOException
 
 /**
  * 图片搜索工具类
@@ -31,30 +32,39 @@ object PictureSearchUtil {
         val encodedUrl = URLUtil.encode(url)
         val key = ApiManager.getConfig<SauceNaoConfig>().token
 
-        NetUtil.executeHttpRequest(
-            url = "$sauceNaoApi$encodedUrl${if (key.isNotEmpty()) "&api_key=$key" else ""}",
-            timeout = 5
-        ).use { response ->
-            if (response.isSuccessful && response.isType(ContentType.JSON.value)) {
-                val body = response.body?.string() ?: return PicSearchResult.emptyResult()
-                try {
-                    val resultBody = mapper.readTree(body)
-                    if (!resultBody.isNull) {
-                        val resultJson = resultBody["results"][0]
-                        val similarity = resultJson["header"]["similarity"].asDouble()
-                        val pictureUrl = resultJson["header"]["thumbnail"].asText()
-                        val originalUrl = resultJson["data"]["ext_urls"][0].asText()
-                        return PicSearchResult(pictureUrl, originalUrl, similarity, response.request.url.toString())
+        if (key.isEmpty()) {
+            return PicSearchResult.emptyResult()
+        }
+
+        try {
+            NetUtil.executeHttpRequest(
+                url = "$sauceNaoApi$encodedUrl${if (key.isNotEmpty()) "&api_key=$key" else ""}",
+                timeout = 5
+            ).use { response ->
+                if (response.isSuccessful && response.isType(ContentType.JSON.value)) {
+                    val body = response.body?.string() ?: return PicSearchResult.emptyResult()
+                    try {
+                        val resultBody = mapper.readTree(body)
+                        if (!resultBody.isNull) {
+                            val resultJson = resultBody["results"][0]
+                            val similarity = resultJson["header"]["similarity"].asDouble()
+                            val pictureUrl = resultJson["header"]["thumbnail"].asText()
+                            val originalUrl = resultJson["data"]["ext_urls"][0].asText()
+                            return PicSearchResult(pictureUrl, originalUrl, similarity, response.request.url.toString())
+                        }
+                    } catch (e: Exception) {
+                        CometVariables.logger.error("[以图搜图] 在解析 API 传回的 json 时出现了问题", e)
+                        FileUtil.createErrorReportFile(
+                            type = "picsearch", t = e, content = body,
+                            message = "Request URL: ${response.request.url}"
+                        )
                     }
-                } catch (e: Exception) {
-                    CometVariables.logger.error("[以图搜图] 在解析 API 传回的 json 时出现了问题", e)
-                    FileUtil.createErrorReportFile(
-                        type = "picsearch", t = e, content = body,
-                        message = "Request URL: ${response.request.url}"
-                    )
                 }
             }
+        } catch (e: IOException) {
+            return PicSearchResult.emptyResult()
         }
+
         return PicSearchResult.emptyResult()
     }
 

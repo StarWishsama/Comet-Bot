@@ -11,12 +11,11 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.CometVariables
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
@@ -36,10 +35,10 @@ class RConCommand : ChatCommand, ConversationCommand {
     private val waitList = mutableMapOf<CometUser, Int>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
-        if (user.hasPermission(getProps().permission)) {
+        if (user.hasPermission(props.permission)) {
             if (args.isEmpty()) {
                 return getHelp().convertToChain()
-            } else if (SessionHandler.hasSessionByID(event.sender.id, this::class.java)) {
+            } else {
                 when (args[0]) {
                     "setup" -> {
                         SessionHandler.insertSession(
@@ -49,23 +48,23 @@ class RConCommand : ChatCommand, ConversationCommand {
                                 false
                             )
                         )
-                        return CometUtil.toChain("请在下一条消息发送 rCon 连接地址")
+                        return CometUtil.toChain("请在下一条消息发送 rcon 连接地址")
                     }
                     "cmd", "exec", "命令" -> {
-                        val rCon = CometVariables.rCon
-                        if (rCon != null) {
+                        val rcon = CometVariables.rCon
+                        if (rcon != null) {
                             if (args.size > 1) {
                                 return try {
                                     withContext(Dispatchers.IO) {
-                                        rCon.command(args.getRestString(1)).convertToChain()
+                                        rcon.command(args.getRestString(1)).convertToChain()
                                     }
                                 } catch (e: IOException) {
-                                    CometVariables.logger.error("在连接到 rCon 服务器时发生了错误", e)
-                                    CometUtil.toChain("在连接到 rCon 服务器时发生了错误")
+                                    CometVariables.logger.error("在连接到 rcon 服务器时发生了错误", e)
+                                    CometUtil.toChain("在连接到 rcon 服务器时发生了错误, 请查看后台")
                                 }
                             }
                         } else {
-                            return CometUtil.toChain("rCon 还没有设置\n你可以在支持 rCon 的游戏设置下打开 rCon 并设置地址&端口&密码")
+                            return CometUtil.toChain("rcon 还没有设置\n你可以在支持 rcon 的游戏设置下打开 rcon 并设置地址, 端口和密码")
                         }
                     }
                     else -> getHelp().convertToChain()
@@ -75,14 +74,14 @@ class RConCommand : ChatCommand, ConversationCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps =
-        CommandProps("rcon", arrayListOf("执行命令"), "远程遥控MC服务器", "nbot.commands.rcon", UserLevel.USER)
+    override val props: CommandProps =
+        CommandProps("rcon", arrayListOf("执行命令", "rc"), "远程遥控 rcon 服务器", "nbot.commands.rcon", UserLevel.USER)
 
     override fun getHelp(): String = """
-        /rcon setup(设置) 设置 rCon 参数
-        /rcon cmd/exec(命令) 遥控MC服务器执行命令
+        /rcon setup(设置) 设置 rcon 参数
+        /rcon cmd/exec/命令 [命令] 遥控MC服务器执行命令
         
-        还可以使用 mc, 执行命令 作为等效命令.
+        命令无须使用 / 开头
     """.trimIndent()
 
     override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
@@ -95,7 +94,7 @@ class RConCommand : ChatCommand, ConversationCommand {
         when (waitList[user] ?: 0) {
             0 -> {
                 CometVariables.cfg.rConUrl = event.message.contentToString()
-                event.subject.sendMessage(CometUtil.sendMessageAsString("已设置 rCon 连接地址为 ${CometVariables.cfg.rConUrl}\n请在下一条消息发送 rCon 密码\n如果需要退出设置 请回复退出"))
+                event.subject.sendMessage(CometUtil.sendMessageAsString("已设置 rcon 连接地址为 ${CometVariables.cfg.rConUrl}\n请在下一条消息发送 rcon 密码\n如果需要退出设置 请回复退出"))
                 waitList[user] = 1
             }
             1 -> {
@@ -105,7 +104,7 @@ class RConCommand : ChatCommand, ConversationCommand {
 
                     event.subject.sendMessage(
                         CometUtil.toChain(
-                            "设置密码成功!\n请在下一条消息发送 rCon 密码\n" +
+                            "设置密码成功!\n请在下一条消息发送 rcon 密码\n" +
                                     "如果需要退出设置 请回复退出"
                         )
                     )
@@ -121,8 +120,8 @@ class RConCommand : ChatCommand, ConversationCommand {
             }
             2 -> {
                 CometVariables.cfg.rConPassword = event.message.contentToString()
-                event.subject.sendMessage(CometUtil.toChain("设置 rCon 完成!"))
                 CometRuntime.setupRCon()
+                event.subject.sendMessage(CometUtil.toChain("设置 rcon 完成!"))
                 waitList.remove(user)
                 SessionHandler.removeSession(session)
             }

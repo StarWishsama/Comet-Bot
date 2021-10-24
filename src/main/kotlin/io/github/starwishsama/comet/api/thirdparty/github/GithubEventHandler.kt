@@ -13,10 +13,7 @@ package io.github.starwishsama.comet.api.thirdparty.github
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.mapper
-import io.github.starwishsama.comet.api.thirdparty.github.data.events.GithubEvent
-import io.github.starwishsama.comet.api.thirdparty.github.data.events.IssueEvent
-import io.github.starwishsama.comet.api.thirdparty.github.data.events.PingEvent
-import io.github.starwishsama.comet.api.thirdparty.github.data.events.PushEvent
+import io.github.starwishsama.comet.api.thirdparty.github.data.events.*
 import io.github.starwishsama.comet.logger.HinaLogLevel
 
 object GithubEventHandler {
@@ -30,6 +27,15 @@ object GithubEventHandler {
             }
             "push" -> {
                 mapper.readValue<PushEvent>(raw)
+            }
+            "issue_comment" -> {
+                mapper.readValue<IssueCommentEvent>(raw)
+            }
+            "release" -> {
+                mapper.readValue<ReleaseEvent>(raw)
+            }
+            "pull_request" -> {
+                mapper.readValue<PullRequestEvent>(raw)
             }
             else -> {
                 CometVariables.netLogger.log(HinaLogLevel.Debug, "解析 WebHook 消息失败, 不支持的事件类型", prefix = "WebHook")

@@ -12,7 +12,7 @@ package io.github.starwishsama.comet.service.command
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.utils.CometUtil
-import io.github.starwishsama.comet.utils.StringUtil.isNumeric
+import io.github.starwishsama.comet.utils.math.TimeUtil
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.isAdministrator
 import net.mamoe.mirai.contact.isOperator
@@ -21,24 +21,9 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 object MuteService {
-
     suspend fun doRandomMute(event: GroupMessageEvent) {
-        val iterator = event.group.members.iterator()
-        var index = 0
-        var randomIndex = RandomUtil.randomInt(0, event.group.members.size)
-        var target: Long = -1
-        while (iterator.hasNext()) {
-            val member = iterator.next()
-            if (index == randomIndex) {
-                if (member.isAdministrator()) {
-                    randomIndex++
-                    continue
-                }
-                target = member.id
-            }
-            index++
-        }
-        doMute(event.group, target, RandomUtil.randomLong(1, 2592000).toInt(), false)
+        val target: Long = event.group.members.filter { !it.isAdministrator() }.randomOrNull()?.id ?: -1
+        event.subject.sendMessage(doMute(event.group, target, RandomUtil.randomLong(1, 2592000).toInt(), false))
     }
 
     suspend fun doMute(group: Group, id: Long, muteTime: Int, isAll: Boolean): MessageChain {
@@ -46,32 +31,34 @@ object MuteService {
             if (isAll) {
                 group.settings.isMuteAll = !group.settings.isMuteAll
                 return if (group.settings.isMuteAll) {
-                    CometUtil.toChain("The World!")
+                    CometUtil.toChain("全体禁言已开启")
                 } else {
-                    CometUtil.toChain("然后时间开始流动")
+                    CometUtil.toChain("全体禁言已关闭")
                 }
             }
 
             if (group.botAsMember.id == id) {
-                return CometUtil.toChain("不能踢出机器人")
+                return CometUtil.toChain("不能禁言机器人")
             }
 
-            for (member in group.members) {
-                if (member.id == id) {
-                    if (member.isOperator()) {
-                        return CometUtil.toChain("不能踢出管理员")
-                    }
+            val member = group.members.find { it.id == id }
 
-                    return when (muteTime) {
-                        in 1..2592000 -> {
-                            member.mute(muteTime)
-                            CometUtil.toChain("禁言 ${member.nameCardOrNick} 成功")
-                        }
-                        0 -> {
-                            member.unmute()
-                            CometUtil.toChain("解禁 ${member.nameCardOrNick} 成功")
-                        }
-                        else -> CometUtil.toChain("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]")
+            if (member != null) {
+                if (member.isOperator()) {
+                    return CometUtil.toChain("不能禁言管理员")
+                }
+
+                return when (muteTime) {
+                    in 1..2592000 -> {
+                        member.mute(muteTime)
+                        CometUtil.toChain("禁言 ${member.nameCardOrNick} 成功")
+                    }
+                    0 -> {
+                        member.unmute()
+                        CometUtil.toChain("解禁 ${member.nameCardOrNick} 成功")
+                    }
+                    else -> {
+                        CometUtil.toChain("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]")
                     }
                 }
             }
@@ -82,41 +69,15 @@ object MuteService {
         }
     }
 
-    /**
-     * 这段代码看起来很神必
-     * 但是 It just works.
-     * FIXME: 更换为正则表达式更优雅的处理
-     */
     fun getMuteTime(message: String): Int {
-        if (message.isNumeric()) {
-            return message.toInt()
+        // 30*24*60*60, a month
+        val maxBanTime = 2592000
+        var banTime = TimeUtil.parseTextTime(message)
+
+        if (banTime > maxBanTime) {
+            banTime = maxBanTime
         }
 
-        var banTime = 0L
-        var tempTime: String = message
-        if (tempTime.indexOf('d') != -1) {
-            banTime += (tempTime.substring(0, tempTime.indexOf('d')).toInt() * 24
-                    * 60 * 60)
-            tempTime = tempTime.substring(tempTime.indexOf('d') + 1)
-        } else if (tempTime.contains("天")) {
-            banTime += (tempTime.substring(0, tempTime.indexOf('天')).toInt() * 24
-                    * 60 * 60)
-            tempTime = tempTime.substring(tempTime.indexOf('天') + 1)
-        }
-        if (tempTime.indexOf('h') != -1) {
-            banTime += (tempTime.substring(0, tempTime.indexOf('h')).toInt() * 60
-                    * 60)
-            tempTime = tempTime.substring(tempTime.indexOf('h') + 1)
-        } else if (tempTime.contains("小时")) {
-            banTime += (tempTime.substring(0, tempTime.indexOf("时")).toInt() * 60
-                    * 60)
-            tempTime = tempTime.substring(tempTime.indexOf("时") + 1)
-        }
-        if (tempTime.indexOf('m') != -1) {
-            banTime += tempTime.substring(0, tempTime.indexOf('m')).toInt() * 60
-        } else if (tempTime.contains("分钟")) {
-            banTime += tempTime.substring(0, tempTime.indexOf("分钟")).toInt() * 60
-        }
-        return banTime.toInt()
+        return banTime
     }
 }

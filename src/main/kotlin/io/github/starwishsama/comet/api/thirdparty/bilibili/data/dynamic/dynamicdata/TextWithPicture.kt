@@ -67,7 +67,7 @@ data class TextWithPicture(
         )
     }
 
-    override fun getContact(): MessageWrapper {
+    override fun asMessageWrapper(): MessageWrapper {
         val wrapped =
             MessageWrapper().addText("发布了动态:\n ${item.text ?: "获取失败"}\n" + "🕘 ${CometVariables.hmsPattern.format(item.uploadTime.toLocalDateTime())}\n")
 

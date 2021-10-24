@@ -15,7 +15,7 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import java.time.LocalDateTime
 
 class UnknownType : DynamicData {
-    override fun getContact(): MessageWrapper {
+    override fun asMessageWrapper(): MessageWrapper {
         return MessageWrapper().addText("无法解析此动态消息, 你还是另请高明吧")
     }
 

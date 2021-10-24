@@ -11,14 +11,17 @@
 package io.github.starwishsama.comet.api.thirdparty.github
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.github.data.api.RepoInfo
 import io.github.starwishsama.comet.api.thirdparty.github.data.api.UserInfo
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.network.NetUtil
+import org.jsoup.Jsoup
 
 object GithubApi {
     private const val apiUrl = "https://api.github.com"
-    private val caches = mutableMapOf<String, String>()
+    private val repoCache = mutableMapOf<String, String>()
     private val userCache = mutableSetOf<String>()
 
     fun getRepoInfo(owner: String, repoName: String): RepoInfo? {
@@ -42,15 +45,43 @@ object GithubApi {
     }
 
     fun isRepoExists(author: String, repo: String): Boolean {
-        return if (caches[author] == repo) {
+        return if (repoCache[author] == repo) {
             true
         } else {
             return if (getRepoInfo(author, repo) != null) {
-                caches.putIfAbsent(author, repo)
+                repoCache.putIfAbsent(author, repo)
                 true
             } else {
                 false
             }
+        }
+    }
+
+    fun getRepoInfoPicture(author: String, repo: String): MessageWrapper {
+        if (isRepoExists(author, repo)) {
+            val conn = Jsoup.connect("https://github.com/$author/$repo")
+
+            conn.header("user-agent", NetUtil.defaultUA).followRedirects(true)
+                .apply {
+                    if (CometVariables.cfg.proxySwitch) {
+                        proxy(CometVariables.cfg.proxyUrl, CometVariables.cfg.proxyPort)
+                    }
+                }
+
+            conn.timeout(5_000)
+
+            val doc = conn.get()
+            val image = doc.select("meta[property=og:image]")
+
+            return if (image.isNotEmpty()) {
+                MessageWrapper().addPictureByURL(image[0].attr("content"))
+                    .addText("\n🔗 > https://github.com/$author/$repo")
+            } else {
+                MessageWrapper().addText("找不到指定的仓库")
+            }
+
+        } else {
+            return MessageWrapper().addText("找不到指定的仓库")
         }
     }
 

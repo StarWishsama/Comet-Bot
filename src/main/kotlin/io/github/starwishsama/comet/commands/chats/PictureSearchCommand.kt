@@ -11,13 +11,14 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.CometVariables
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
-import io.github.starwishsama.comet.enums.PicSearchApiType
-import io.github.starwishsama.comet.enums.UserLevel
+import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.config.api.SauceNaoConfig
+import io.github.starwishsama.comet.objects.enums.PicSearchApiType
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
@@ -66,7 +67,7 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
         }
     }
 
-    override fun getProps(): CommandProps = CommandProps(
+    override val props: CommandProps = CommandProps(
         "ps",
         arrayListOf("ytst", "st", "搜图", "以图搜图"),
         "以图搜图",
@@ -75,7 +76,6 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
     )
 
     override fun getHelp(): String = """
-        ======= 命令帮助 =======
         /ytst 以图搜图
         /ytst source [API名称] 修改搜图源
     """.trimIndent()
@@ -97,6 +97,10 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
         val defaultSimilarity = 52.5
         when (CometVariables.cfg.pictureSearchApi) {
             PicSearchApiType.SAUCENAO -> {
+                if (ApiManager.getConfig<SauceNaoConfig>().token.isEmpty()) {
+                    return "SauceNao 搜索未被正确配置, 请联系管理员."
+                }
+
                 val result = PictureSearchUtil.sauceNaoSearch(url)
                 return when {
                     result.similarity >= defaultSimilarity -> {

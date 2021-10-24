@@ -12,8 +12,8 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
-import io.github.starwishsama.comet.enums.UserLevel
 import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.CheckInService.handleCheckIn
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
@@ -32,7 +32,7 @@ class CheckInCommand : ChatCommand {
         return handleCheckIn(event, user)
     }
 
-    override fun getProps(): CommandProps =
+    override val props: CommandProps =
         CommandProps("clock", arrayListOf("签到", "qd"), "签到命令", "nbot.commands.clock", UserLevel.USER)
 
     override fun getHelp(): String = "/qd 签到"

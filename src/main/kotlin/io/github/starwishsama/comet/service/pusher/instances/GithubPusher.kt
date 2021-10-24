@@ -18,7 +18,7 @@ import kotlinx.coroutines.runBlocking
 
 object GithubPusher {
     fun push(event: GithubEvent) {
-        if (!event.sendable()) {
+        if (!event.isSendableEvent()) {
             return
         }
 
@@ -32,9 +32,11 @@ object GithubPusher {
             consumer.forEach {
                 it.repoTarget.forEach { id ->
                     CometVariables.comet.getBot().getGroup(id)?.also { g ->
-                        g.sendMessage(
-                            event.toMessageWrapper().toMessageChain(g)
-                        )
+                        event.toMessageWrapper().let { mw ->
+                            if (mw.isUsable()) {
+                                g.sendMessage(mw.toMessageChain(g))
+                            }
+                        }
                     }
                 }
             }
