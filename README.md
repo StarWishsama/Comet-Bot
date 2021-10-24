@@ -53,13 +53,15 @@
 
 - 实验性的支持, 可能存在无法使用的恶性 Bug, 欢迎反馈问题
 
-你可以在[这里](https://github.com/StarWishsama/Comet-Bot/tree/mirai-console)找到插件版本的 Comet, 可以如下编译
+~~你可以在[这里](https://github.com/StarWishsama/Comet-Bot/tree/mirai-console)找到插件版本的 Comet, 可以如下编译
 
-或是从 [Github Actions](https://github.com/StarWishsama/Comet-Bot/actions?query=branch%3Amirai-console) 中下载
+或是从 [Github Actions](https://github.com/StarWishsama/Comet-Bot/actions?query=branch%3Amirai-console) 中下载~~
+
+自 0.6.3 起, Releases 中已提供插件版下载
 
 ### 自编译
 
-- 注意: 请使用 JDK 1.8 或更高版本打包, **推荐**使用 AdoptOpenJDK 11
+- 注意: 请使用 JDK 1.8 或更高版本打包, **推荐**使用 JDK 11+
 
 1. 编译
 
