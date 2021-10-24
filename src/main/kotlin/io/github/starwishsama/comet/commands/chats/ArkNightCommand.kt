@@ -30,7 +30,7 @@ class ArkNightCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!GachaService.isArkNightUsable()) {
             return if (GachaService.isDownloading()) {
-                "正在下载明日方舟数据, 请稍后...".toChain()
+                "正在下载明日方舟数据, 请稍候...".toChain()
             } else {
                 GachaService.downloadArkNightData()
                 "还未下载明日方舟数据, 开始自动下载...".toChain()

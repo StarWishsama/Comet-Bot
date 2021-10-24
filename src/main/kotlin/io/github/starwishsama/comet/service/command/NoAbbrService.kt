@@ -20,6 +20,6 @@ object NoAbbrService {
     fun parseAbbr(event: MessageEvent, input: String): MessageChain {
         NetworkRequestManager.addTask(NoAbbrRequestTask(event.subject, input))
 
-        return "请稍后...".toChain()
+        return "请稍候...".toChain()
     }
 }

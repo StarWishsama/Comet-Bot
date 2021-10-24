@@ -93,7 +93,7 @@ class BiliBiliCommand : ChatCommand {
                         }
                     }
 
-                    return "正在刷新动态, 请稍后".toChain()
+                    return "正在刷新动态, 请稍候".toChain()
                 } else {
                     toChain("抱歉, 该命令仅限群聊使用!")
                 }
