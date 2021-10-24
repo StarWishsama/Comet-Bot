@@ -40,7 +40,7 @@ jar {
 }
 
 group 'io.github.starwishsama.comet'
-version "0.6.3" + getGitBranchName() + getGitCommitID()
+version "0.6.5" + getGitBranchName() + getGitCommitID()
 
 repositories {
     mavenCentral()
