@@ -10,14 +10,15 @@
 
 package io.github.starwishsama.comet.utils.network
 
-import cn.hutool.http.HttpException
 import io.github.starwishsama.comet.CometVariables.cfg
 import io.github.starwishsama.comet.CometVariables.netLogger
 import io.github.starwishsama.comet.exceptions.ApiException
-import io.github.starwishsama.comet.logger.RetrofitLogger
+import io.github.starwishsama.comet.managers.NetworkRequestManager
+import io.github.starwishsama.comet.service.RetrofitLogger
 import io.github.starwishsama.comet.utils.StringUtil.containsEtc
 import io.github.starwishsama.comet.utils.TaskUtil
 import okhttp3.*
+import retrofit2.HttpException
 import java.io.*
 import java.net.*
 import java.time.Duration
@@ -63,13 +64,12 @@ object NetUtil {
             .hostnameVerifier { _, _ -> true }
             .addInterceptor(RetrofitLogger())
 
-
         try {
             if (checkProxyUsable()) {
                 builder.proxy(Proxy(cfg.proxyType, InetSocketAddress(proxyUrl, proxyPort)))
             }
         } catch (e: Exception) {
-            netLogger.warning("无法连接到代理服务器, ${e.message}")
+            netLogger.warning("无法连接到代理服务器, 将使用直连链接\n错误信息: ${e.message}")
         }
 
         val client = builder.build()
@@ -78,6 +78,7 @@ object NetUtil {
                 it.method(method, body)
             }
         }.build()
+
         return client.newCall(request)
     }
 
@@ -120,6 +121,8 @@ object NetUtil {
     ): Response {
         var result: Response? = null
 
+        NetworkRequestManager.logRequest(url)
+
         try {
             result = executeRequest(url, timeout, proxyUrl, proxyPort, action = call).execute()
         } catch (e: IOException) {
@@ -134,7 +137,7 @@ object NetUtil {
             }
         }
 
-        return result ?: throw RuntimeException("执行网络操作失败, 响应为空: $url")
+        return result?.also { NetworkRequestManager.logRequest(url) } ?: throw RuntimeException("执行网络操作失败, 响应为空: $url")
     }
 
     fun getPageContent(

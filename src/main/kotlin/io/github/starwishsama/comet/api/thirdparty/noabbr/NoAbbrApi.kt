@@ -16,6 +16,7 @@ import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.api.thirdparty.noabbr.data.AbbrSearchRequest
 import io.github.starwishsama.comet.api.thirdparty.noabbr.data.AbbrSearchResponse
+import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.utils.network.NetUtil
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -31,9 +32,13 @@ object NoAbbrApi : ApiExecutor {
                 .toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
         )
 
+        NetworkRequestManager.logRequest(apiRouteURL)
+
         val responseBody = call.execute().body ?: return AbbrSearchResponse.empty()
 
         val responseString = responseBody.string()
+
+        NetworkRequestManager.finishRequest(apiRouteURL)
 
         val tree = mapper.readTree(responseString)
 
