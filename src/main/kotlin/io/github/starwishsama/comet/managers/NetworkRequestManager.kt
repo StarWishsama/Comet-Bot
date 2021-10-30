@@ -15,7 +15,6 @@ import io.github.starwishsama.comet.objects.tasks.network.NetworkRequestTask
 
 object NetworkRequestManager {
     private val requestQueue = ArrayDeque<NetworkRequestTask>()
-    private val requestURLs = mutableListOf<String>()
 
     fun schedule() {
         if (requestQueue.isEmpty()) {
@@ -32,13 +31,5 @@ object NetworkRequestManager {
 
     fun addTask(task: NetworkRequestTask) {
         requestQueue.add(task)
-    }
-
-    fun logRequest(url: String) {
-        requestURLs.add(url)
-    }
-
-    fun finishRequest(url: String) {
-        requestURLs.remove(url)
     }
 }

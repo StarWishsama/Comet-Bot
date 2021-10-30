@@ -13,7 +13,6 @@ package io.github.starwishsama.comet.utils.network
 import io.github.starwishsama.comet.CometVariables.cfg
 import io.github.starwishsama.comet.CometVariables.netLogger
 import io.github.starwishsama.comet.exceptions.ApiException
-import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.service.RetrofitLogger
 import io.github.starwishsama.comet.utils.StringUtil.containsEtc
 import io.github.starwishsama.comet.utils.TaskUtil
@@ -121,8 +120,6 @@ object NetUtil {
     ): Response {
         var result: Response? = null
 
-        NetworkRequestManager.logRequest(url)
-
         try {
             result = executeRequest(url, timeout, proxyUrl, proxyPort, action = call).execute()
         } catch (e: IOException) {
@@ -137,7 +134,7 @@ object NetUtil {
             }
         }
 
-        return result?.also { NetworkRequestManager.logRequest(url) } ?: throw RuntimeException("执行网络操作失败, 响应为空: $url")
+        return result ?: throw RuntimeException("执行网络操作失败, 响应为空: $url")
     }
 
     fun getPageContent(
