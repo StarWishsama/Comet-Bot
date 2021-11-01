@@ -47,6 +47,7 @@ import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.runBlocking
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import okhttp3.OkHttpClient
@@ -82,9 +83,11 @@ object CometRuntime {
         DataSetup.init()
 
         CometVariables.client = OkHttpClient().newBuilder()
-            .connectTimeout(5, TimeUnit.SECONDS)
+            .callTimeout(3, TimeUnit.SECONDS)
+            .connectTimeout(3, TimeUnit.SECONDS)
+            .readTimeout(3, TimeUnit.SECONDS)
+            .writeTimeout(3, TimeUnit.SECONDS)
             .followRedirects(true)
-            .readTimeout(5, TimeUnit.SECONDS)
             .hostnameVerifier { _, _ -> true }
             .also {
                 if (cfg.proxySwitch) {
@@ -175,7 +178,7 @@ object CometRuntime {
         startupServer()
 
         TaskUtil.scheduleAtFixedRate(5, 5, TimeUnit.SECONDS) {
-            NetworkRequestManager.schedule()
+            runBlocking { NetworkRequestManager.schedule() }
         }
 
         logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${CometVariables.startTime.getLastingTimeAsString()}")
