@@ -149,11 +149,11 @@ object GachaService {
         return pool
     }
 
-    fun downloadArkNightData() {
+    fun downloadArkNightData(force: Boolean = false) {
         isDownloading = true
 
         try {
-            GachaUtil.arkNightDataCheck(ArkNightData.file)
+            GachaUtil.downloadArkNightData(ArkNightData.file, force)
         } catch (e: IOException) {
             CometVariables.daemonLogger.warning("解析明日方舟游戏数据失败, ${e.message}\n注意: 数据来源于 Github, 国内用户无法下载请自行下载替换\n替换位置: ./res/arkNights.json\n链接: ${GachaUtil.arkNightData}")
         } finally {

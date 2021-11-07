@@ -198,19 +198,18 @@ object GachaUtil {
         pictureReady = true
     }
 
-    fun arkNightDataCheck(location: File) {
-        var exists = true
+    fun downloadArkNightData(location: File, force: Boolean = false) {
+        val exists = location.exists()
 
-        daemonLogger.info("明日方舟 > 检查是否为旧版本数据...")
-        if (!location.exists()) {
-            daemonLogger.info("明日方舟 > 你还没有卡池数据, 正在自动下载新数据")
-            exists = false
+        if (!force) {
+            daemonLogger.info("明日方舟 > 检查是否为旧版本数据...")
         }
 
         val result = mapper.readTree(NetUtil.executeHttpRequest(arkNightDataApi).body?.string())
         val updateTime = LocalDateTime.parse(result["updated_at"].asText(), DateTimeFormatter.ISO_DATE_TIME)
 
-        if (!exists) {
+        if (!exists || force) {
+            daemonLogger.info("明日方舟 > 你还没有卡池数据, 正在自动下载新数据")
             val cache = NetUtil.downloadFile(FileUtil.getCacheFolder(), arkNightData, location.name)
             cache.deleteOnExit()
             Files.copy(cache.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)

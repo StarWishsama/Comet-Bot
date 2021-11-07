@@ -62,7 +62,8 @@ object CometApplication {
             }
 
         } catch (e: Exception) {
-            // 忽略
+            daemonLogger.serve("无法正常运行 Comet, 程序将自动关闭", e)
+            exitProcess(0)
         }
     }
 }

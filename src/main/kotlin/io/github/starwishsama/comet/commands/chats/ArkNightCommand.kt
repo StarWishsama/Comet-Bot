@@ -51,6 +51,10 @@ class ArkNightCommand : ChatCommand {
                 "pool", "卡池", "卡池信息" -> {
                     configGachaPool(args)
                 }
+                "update", "更新", "更新数据" -> {
+                    GachaService.downloadArkNightData(true)
+                    "已开始自动下载明日方舟数据...".toChain()
+                }
                 else -> handleFreedomDraw(event, user, args)
             }
         } else {
