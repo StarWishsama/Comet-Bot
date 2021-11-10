@@ -31,7 +31,7 @@ plugins {
 def mainClass = 'io.github.starwishsama.comet.CometApplication'
 def miraiVersion = '2.8.0'
 def jacksonVersion = '2.13.0'
-def hutoolVersion = '5.7.15'
+def hutoolVersion = '5.7.16'
 
 jar {
     manifest {
