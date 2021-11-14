@@ -33,7 +33,7 @@ class CheckInCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("clock", arrayListOf("签到", "qd"), "签到命令", "nbot.commands.clock", UserLevel.USER)
+        CommandProps("clock", arrayListOf("签到", "qd"), "签到命令", UserLevel.USER)
 
     override fun getHelp(): String = "/qd 签到"
 }

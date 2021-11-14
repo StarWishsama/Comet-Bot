@@ -40,7 +40,7 @@ class DivineCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("divine", arrayListOf("zb", "占卜"), "占卜命令", "nbot.commands.divine", UserLevel.USER)
+        CommandProps("divine", arrayListOf("zb", "占卜"), "占卜命令", UserLevel.USER)
 
     override fun getHelp(): String = """
          /zb [占卜内容] 占卜

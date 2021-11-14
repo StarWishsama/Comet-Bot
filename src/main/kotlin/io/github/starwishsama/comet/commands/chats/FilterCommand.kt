@@ -44,7 +44,7 @@ class FilterCommand : ChatCommand {
         "filter",
         listOf("屏蔽", "glq", "pb"),
         "加/删机器人禁止发送的词汇",
-        "nbot.commands.filter",
+
         UserLevel.ADMIN
     )
 

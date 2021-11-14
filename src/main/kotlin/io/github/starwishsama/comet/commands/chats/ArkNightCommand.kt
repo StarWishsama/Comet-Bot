@@ -67,7 +67,7 @@ class ArkNightCommand : ChatCommand {
             "arknight",
             arrayListOf("ark", "xf", "方舟寻访"),
             "明日方舟寻访模拟器",
-            "nbot.commands.arknight",
+
             UserLevel.USER,
             consumePoint = 5.0
         )

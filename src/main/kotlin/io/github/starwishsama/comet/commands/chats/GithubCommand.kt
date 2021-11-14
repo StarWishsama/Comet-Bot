@@ -46,7 +46,7 @@ class GithubCommand : ChatCommand, ConversationCommand {
             "github",
             listOf("gh", "git"),
             "订阅 Github 项目推送动态",
-            "nbot.commands.github",
+
             UserLevel.USER,
         )
 

@@ -44,7 +44,7 @@ class UnMuteCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("unmute", arrayListOf("jj", "解禁", "解除禁言"), "解除禁言", "nbot.commands.unmute", UserLevel.USER)
+        CommandProps("unmute", arrayListOf("jj", "解禁", "解除禁言"), "解除禁言", UserLevel.USER)
 
     override fun getHelp(): String = """
         /unmute [@/QQ] 解除禁言

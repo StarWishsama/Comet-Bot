@@ -33,7 +33,7 @@ class JikiPediaCommand : ChatCommand {
         "jiki",
         listOf("小鸡词典", "jikipedia"),
         "在小鸡词典上搜索",
-        "nbot.commands.jiki",
+
         UserLevel.USER,
         consumePoint = 10.0
     )

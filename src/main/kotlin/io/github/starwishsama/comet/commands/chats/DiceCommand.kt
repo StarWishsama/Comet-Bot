@@ -46,7 +46,7 @@ class DiceCommand : ChatCommand {
             "dice",
             listOf("tz", "骰子"),
             "投骰子",
-            "nbot.commands.dice",
+
             UserLevel.USER
         )
 

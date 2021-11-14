@@ -35,7 +35,7 @@ class NoAbbrCommand : ChatCommand {
             "noabbr",
             listOf("nbnhhsh", "hhsh", "解析缩写", "能不能好好说话"),
             "能不能好好说话?",
-            "nbot.commands.noabbr",
+
             UserLevel.USER,
             consumerType = CommandExecuteConsumerType.COOLDOWN,
             consumePoint = 15.0,

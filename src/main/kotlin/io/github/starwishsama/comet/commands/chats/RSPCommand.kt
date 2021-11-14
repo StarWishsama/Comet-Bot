@@ -41,7 +41,7 @@ class RSPCommand : ChatCommand, ConversationCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("janken", arrayListOf("猜拳", "石头剪刀布", "rsp", "cq"), "石头剪刀布", "nbot.commands.rsp", UserLevel.USER)
+        CommandProps("janken", arrayListOf("猜拳", "石头剪刀布", "rsp", "cq"), "石头剪刀布", UserLevel.USER)
 
     override fun getHelp(): String = "/cq 石头剪刀布"
 

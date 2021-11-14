@@ -55,7 +55,7 @@ class MusicCommand : ChatCommand {
             "music",
             arrayListOf("dg", "点歌", "歌"),
             "点歌命令",
-            "nbot.commands.music",
+
             UserLevel.USER,
             consumePoint = 5.0
         )

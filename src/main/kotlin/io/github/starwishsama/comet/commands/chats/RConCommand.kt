@@ -75,7 +75,7 @@ class RConCommand : ChatCommand, ConversationCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("rcon", arrayListOf("执行命令", "rc"), "远程遥控 rcon 服务器", "nbot.commands.rcon", UserLevel.USER)
+        CommandProps("rcon", arrayListOf("执行命令", "rc"), "远程遥控 rcon 服务器", UserLevel.USER)
 
     override fun getHelp(): String = """
         /rcon setup(设置) 设置 rcon 参数

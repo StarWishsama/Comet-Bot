@@ -62,7 +62,7 @@ class InfoCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("info", arrayListOf("cx", "查询"), "查询积分等", "nbot.commands.info", UserLevel.USER)
+        CommandProps("info", arrayListOf("cx", "查询"), "查询积分等", UserLevel.USER)
 
     override fun getHelp(): String = """
         /cx 查询自己的积分信息

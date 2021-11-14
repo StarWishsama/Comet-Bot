@@ -43,7 +43,7 @@ class PenguinStatCommand : ChatCommand {
             "penguinstats",
             listOf("企鹅物流", "pgs"),
             "查询明日方舟物品掉落信息",
-            "nbot.commands.penguinstats",
+
             UserLevel.USER
         )
 

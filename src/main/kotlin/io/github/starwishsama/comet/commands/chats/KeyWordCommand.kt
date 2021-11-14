@@ -10,35 +10,27 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
-import io.github.starwishsama.comet.utils.CometUtil
-import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
-import kotlin.time.ExperimentalTime
 
-
-class VersionCommand : ChatCommand {
-    @OptIn(ExperimentalTime::class)
+class KeyWordCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
-        return ("彗星 Bot " + BuildConfig.version +
-                "\n运行时长 ${CometUtil.getRunningTime()}" +
-                "\n构建时间: ${BuildConfig.buildTime}" +
-                "\nMade with ❤ & Mirai ${BuildConfig.miraiVersion}").convertToChain()
+        TODO("Not yet implemented")
     }
 
-    override val props: CommandProps =
-        CommandProps(
-            "version",
-            arrayListOf("v", "版本", "comet", "status"),
-            "查看版本号",
-
-            UserLevel.USER
+    override val props: CommandProps
+        get() = CommandProps(
+            name = "关键词",
+            aliases = listOf("keyword", "keywords"),
+            description = "查看当前`关键词",
+            level = UserLevel.USER
         )
 
-    override fun getHelp(): String = ""
+    override fun getHelp(): String {
+        TODO("Not yet implemented")
+    }
 }

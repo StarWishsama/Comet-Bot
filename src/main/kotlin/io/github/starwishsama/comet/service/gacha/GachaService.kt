@@ -75,6 +75,7 @@ object GachaService {
             CustomPool.GameType.ARKNIGHT -> {
                 parseArkNightPool(gachaPool).apply { gachaPools.add(this) }
             }
+            else -> null
         }
     }
 

@@ -63,7 +63,7 @@ class MuteCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("mute", arrayListOf("jy", "禁言"), "禁言", "nbot.commands.mute", UserLevel.USER)
+        CommandProps("mute", arrayListOf("jy", "禁言"), "禁言", UserLevel.USER)
 
     override fun getHelp(): String = """
         /mute [@/QQ] [禁言时长] 禁言

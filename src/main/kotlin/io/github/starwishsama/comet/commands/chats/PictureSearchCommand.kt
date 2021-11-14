@@ -71,7 +71,7 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
         "ps",
         arrayListOf("ytst", "st", "搜图", "以图搜图"),
         "以图搜图",
-        "nbot.commands.picturesearch",
+
         UserLevel.USER
     )
 

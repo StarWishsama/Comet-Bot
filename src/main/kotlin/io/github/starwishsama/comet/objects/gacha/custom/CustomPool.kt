@@ -17,7 +17,7 @@ import net.mamoe.yamlkt.Comment
 @Serializable
 @Suppress("SpellCheckingInspection")
 data class CustomPool(
-    @Comment("卡池游戏类型, 目前仅支持 ARKNIGHT, PCR")
+    @Comment("卡池游戏类型, 目前仅支持 ARKNIGHT")
     val gameType: GameType,
     @Comment("自定义卡池内部名称, 用于卡池选择")
     val poolName: String,
@@ -36,7 +36,8 @@ data class CustomPool(
 ) {
     @Serializable
     enum class GameType {
-        ARKNIGHT
+        ARKNIGHT,
+        GENSHIN,
     }
 
     @Serializable

@@ -120,7 +120,7 @@ class BiliBiliCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("bili", arrayListOf(), "订阅查询B站主播/用户动态", "nbot.commands.bili", UserLevel.USER)
+        CommandProps("bili", arrayListOf(), "订阅查询B站主播/用户动态", UserLevel.USER)
 
     override fun getHelp(): String = """
         /bili sub [用户名/UID] 订阅用户相关信息

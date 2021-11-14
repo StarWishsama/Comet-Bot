@@ -40,7 +40,7 @@ class PusherCommand : ChatCommand {
         "pusher",
         arrayListOf("推送器", "tsq"),
         "管理 Comet 的所有推送器",
-        "nbot.commands.pusher",
+
         UserLevel.OWNER
     )
 

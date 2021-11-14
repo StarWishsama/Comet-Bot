@@ -19,7 +19,7 @@ data class CommandProps(
     val name: String,
     val aliases: List<String> = mutableListOf(),
     val description: String,
-    val permission: String,
+    val permission: String = "comet.command.$name",
     val level: UserLevel,
     val consumerType: CommandExecuteConsumerType = CommandExecuteConsumerType.COOLDOWN,
     val consumePoint: Double = CometVariables.cfg.coolDownTime.toDouble(),

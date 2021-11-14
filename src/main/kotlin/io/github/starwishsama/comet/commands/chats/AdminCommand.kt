@@ -45,7 +45,7 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("admin", arrayListOf("管理", "管", "gl"), "机器人管理员命令", "nbot.commands.admin", UserLevel.ADMIN)
+        CommandProps("admin", arrayListOf("管理", "管", "gl"), "机器人管理员命令", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
         /admin help 展示此帮助列表

@@ -92,7 +92,7 @@ class RollCommand : ChatCommand, ConversationCommand {
         "roll",
         arrayListOf("rl", "抽奖"),
         "roll东西",
-        "nbot.commands.roll",
+
         UserLevel.USER
     )
 
