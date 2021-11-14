@@ -94,7 +94,7 @@ class AdminCommand : ConsoleCommand {
         return ""
     }
 
-    override fun getProps(): CommandProps = CommandProps("admin", mutableListOf(), "", "", UserLevel.CONSOLE)
+    override fun getProps(): CommandProps = CommandProps("admin", mutableListOf(), "", UserLevel.CONSOLE)
 
     override fun getHelp(): String = """
         /admin upgrade [ID] (权限组名) 修改权限组

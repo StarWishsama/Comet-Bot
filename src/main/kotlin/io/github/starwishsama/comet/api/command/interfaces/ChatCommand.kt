@@ -31,10 +31,6 @@ interface ChatCommand {
     /** 命令帮助文本 必填 */
     fun getHelp(): String
 
-    /** 判断用户是否有权限使用该命令, 有必要时可以重载 */
-    fun hasPermission(user: CometUser, e: MessageEvent): Boolean =
-        user.compareLevel(props.level) || user.hasPermission(props.permission)
-
     val name: String
         get() = props.name
 

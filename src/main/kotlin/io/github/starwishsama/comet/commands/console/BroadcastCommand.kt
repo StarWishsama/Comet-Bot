@@ -60,7 +60,7 @@ class BroadcastCommand : ConsoleCommand {
         }
     }
 
-    override fun getProps(): CommandProps = CommandProps("broadcast", mutableListOf("bc"), "", "", UserLevel.CONSOLE)
+    override fun getProps(): CommandProps = CommandProps("broadcast", mutableListOf("bc"), "", UserLevel.CONSOLE)
 
     override fun getHelp(): String {
         return "/bc [群号] [发送内容]"

@@ -141,4 +141,9 @@ object StringUtil {
             }
         }
     }
+
+    fun isAlphabetic(input: String): Boolean {
+        return input.matches("[a-zA-Z]+".toRegex())
+    }
+
 }

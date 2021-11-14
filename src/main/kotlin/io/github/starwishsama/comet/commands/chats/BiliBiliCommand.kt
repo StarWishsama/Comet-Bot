@@ -33,9 +33,12 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.lang.Thread.sleep
 
-
 class BiliBiliCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
+        if (!hasPermission(user, event)) {
+            return localizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         if (args.isEmpty()) {
             return getHelp().convertToChain()
         }
@@ -133,7 +136,7 @@ class BiliBiliCommand : ChatCommand {
         /bili parse 开启/关闭群聊消息视频解析
     """.trimIndent()
 
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
+    fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
         val level = props.level
         if (user.compareLevel(level)) return true
         if (e is GroupMessageEvent && e.sender.permission >= MemberPermission.MEMBER) return true

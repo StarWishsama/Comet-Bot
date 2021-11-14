@@ -11,6 +11,7 @@
 package io.github.starwishsama.comet.commands.chats
 
 
+import io.github.starwishsama.comet.CometVariables.localizationManager
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
@@ -35,6 +36,10 @@ import net.mamoe.mirai.message.data.PlainText
 class GroupConfigCommand : ChatCommand, UnDisableableCommand {
     // TODO 适配私聊设置
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
+        if (!hasPermission(user, event)) {
+            return localizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         if (event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
                 val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
@@ -108,14 +113,14 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
 
                             cfg.keyWordReply.forEach {
                                 if (it.reply.getAllText() == reply) {
-                                    it.keyWords.add(keyWord)
-                                    return "已发现现有配置, 成功添加关键词".toChain()
+                                    it.keyWord = keyWord
+                                    return "已发现现有配置, 成功替换关键词".toChain()
                                 }
                             }
 
                             return if (cfg.keyWordReply.add(
                                     PerGroupConfig.ReplyKeyWord(
-                                        mutableListOf(keyWord),
+                                        keyWord,
                                         MessageWrapper().addText(reply)
                                     )
                                 )
@@ -206,9 +211,8 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
         /group frm 设置群文件自动删除
     """.trimIndent()
 
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        val level = props.level
-        if (user.compareLevel(level)) return true
+    private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
+        if (user.hasPermission(props.permission) || user.isBotAdmin()) return true
         if (e is GroupMessageEvent && e.sender.permission > MemberPermission.MEMBER) return true
         return false
     }

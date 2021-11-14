@@ -146,14 +146,15 @@ object MessageHandler {
 
                     val status: CommandStatus
 
-                    /** 检查是否有权限执行命令 */
-                    val result: MessageChain = if (cmd.hasPermission(user, event)) {
-                        status = CommandStatus.Success()
-                        cmd.execute(event, splitMessage, user)
-                    } else {
-                        status = CommandStatus.NoPermission()
-                        CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
-                    }
+                    /** 检查是否有执行命令的基本权限 */
+                    val result: MessageChain =
+                        if (user.compareLevel(cmd.props.level) || user.hasPermission(cmd.props.permission)) {
+                            status = CommandStatus.Success()
+                            cmd.execute(event, splitMessage, user)
+                        } else {
+                            status = CommandStatus.NoPermission()
+                            CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+                        }
 
                     return ExecutedResult(result, cmd, status)
                 } else {

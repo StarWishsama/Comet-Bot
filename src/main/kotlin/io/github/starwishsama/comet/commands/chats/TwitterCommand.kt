@@ -11,6 +11,7 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.CometVariables.daemonLogger
+import io.github.starwishsama.comet.CometVariables.localizationManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
@@ -43,6 +44,10 @@ import kotlin.time.ExperimentalTime
 class TwitterCommand : ChatCommand {
     @OptIn(ExperimentalTime::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
+        if (!hasPermission(user, event)) {
+            return localizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         if (ApiManager.getConfig<TwitterConfig>().token.isEmpty()) {
             return toChain("推特推送未被正确设置, 请联系机器人管理员")
         }
@@ -121,8 +126,8 @@ class TwitterCommand : ChatCommand {
         命令别名: /推特 /tt /twitter
     """.trimIndent()
 
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        if (super.hasPermission(user, e)) return true
+    private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
+        if (user.hasPermission(props.permission) || user.isBotAdmin()) return true
         if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true
         return false
     }

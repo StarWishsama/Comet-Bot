@@ -10,7 +10,6 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.objects.CometUser
@@ -23,7 +22,6 @@ import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
-
 
 @Suppress("SpellCheckingInspection")
 class ArkNightCommand : ChatCommand {

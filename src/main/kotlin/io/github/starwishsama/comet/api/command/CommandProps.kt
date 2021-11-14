@@ -14,16 +14,23 @@ import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.enums.UserLevel
+import io.github.starwishsama.comet.utils.StringUtil
 
 data class CommandProps(
     val name: String,
     val aliases: List<String> = mutableListOf(),
     val description: String,
-    val permission: String = "comet.command.$name",
     val level: UserLevel,
+    val permission: String = "comet.command.$name",
     val consumerType: CommandExecuteConsumerType = CommandExecuteConsumerType.COOLDOWN,
     val consumePoint: Double = CometVariables.cfg.coolDownTime.toDouble(),
 ) {
+    init {
+        if (!StringUtil.isAlphabetic(name)) {
+            throw IllegalArgumentException("Command name must be alphabetic")
+        }
+    }
+
     fun isDisabledCommand(id: Long): Boolean {
         return GroupConfigManager.getConfig(id)?.disabledCommands?.contains(name) ?: false
     }

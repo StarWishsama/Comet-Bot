@@ -70,8 +70,6 @@ class ClockInCommand : ChatCommand {
 
     override fun getHelp(): String = "/dk 打卡"
 
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean = user.compareLevel(props.level)
-
     private fun isClockIn(data: ClockInData, event: GroupMessageEvent): Boolean {
         if (data.checkedUsers.isNotEmpty()) {
             data.checkedUsers.forEach { member ->

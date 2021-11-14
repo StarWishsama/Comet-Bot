@@ -128,7 +128,11 @@ data class PerGroupConfig(
     }
 
     data class ReplyKeyWord(
-        val keyWords: MutableList<String> = mutableListOf(),
-        val reply: MessageWrapper
+        var keyWord: String,
+        var reply: MessageWrapper
     )
+}
+
+fun MutableList<PerGroupConfig.ReplyKeyWord>.getAutoReplyByKeyWord(keyword: String): PerGroupConfig.ReplyKeyWord? {
+    return this.firstOrNull { it.keyWord == keyword }
 }

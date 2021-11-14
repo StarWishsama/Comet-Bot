@@ -60,7 +60,7 @@ class DebugCommand : ConsoleCommand {
         return ""
     }
 
-    override fun getProps(): CommandProps = CommandProps("debug", mutableListOf(), "", "", UserLevel.CONSOLE)
+    override fun getProps(): CommandProps = CommandProps("debug", mutableListOf(), "", UserLevel.CONSOLE)
 
     override fun getHelp(): String = "请自行查阅代码"
 }

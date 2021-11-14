@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-
+import io.github.starwishsama.comet.CometVariables.localizationManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
@@ -26,10 +26,13 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-
 @Suppress("SpellCheckingInspection")
 class AdminCommand : ChatCommand, UnDisableableCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
+        if (!hasPermission(user, event)) {
+            return localizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         return if (args.isEmpty()) {
             getHelp().toChain()
         } else {
@@ -54,9 +57,8 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
         /admin give [用户] [命令条数] 给一个用户添加命令条数
     """.trimIndent()
 
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        val bLevel = props.level
-        if (user.compareLevel(bLevel)) return true
+    private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
+        if (user.hasPermission(props.permission) || user.isBotAdmin()) return true
         if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true
         return false
     }

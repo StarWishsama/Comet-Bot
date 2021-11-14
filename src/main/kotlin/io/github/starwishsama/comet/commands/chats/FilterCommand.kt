@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.commands.chats
 
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.cfg
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
@@ -25,6 +26,10 @@ import net.mamoe.mirai.message.data.MessageChain
 
 class FilterCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
+        if (!hasPermission(user, event)) {
+            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         if (args.isEmpty()) return getHelp().toChain()
         return when (args[0]) {
             "add", "tj", "添加", "加" -> {
@@ -57,12 +62,12 @@ class FilterCommand : ChatCommand {
         该命令亦可使用 /屏蔽 /glq /pb 调用
     """.trimIndent()
 
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
+    private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
         if (e is GroupMessageEvent) {
-            return e.sender.isOperator() || super.hasPermission(user, e)
+            return e.sender.isOperator() || user.hasPermission(props.permission) || user.isBotAdmin()
         }
 
-        return super.hasPermission(user, e)
+        return user.hasPermission(props.permission) || user.isBotAdmin()
     }
 
     private fun handleAddFilterWord(words: List<String>, event: MessageEvent): MessageChain {

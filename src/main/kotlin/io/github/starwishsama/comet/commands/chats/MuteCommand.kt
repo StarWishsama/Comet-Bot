@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.commands.chats
 
+import io.github.starwishsama.comet.CometVariables.localizationManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
@@ -29,6 +30,10 @@ import net.mamoe.mirai.message.data.MessageChain
 
 class MuteCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
+        if (!hasPermission(user, event)) {
+            return localizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         return if (event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
                 val at = CometUtil.parseAtAsBotUser(event, args[0])
@@ -72,7 +77,7 @@ class MuteCommand : ChatCommand {
         时长为 0 时解禁
     """.trimIndent()
 
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
+    private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
         if (e is GroupMessageEvent) {
             if (e.sender.permission >= MemberPermission.ADMINISTRATOR) return true
             val cfg = GroupConfigManager.getConfigOrNew(e.group.id)
