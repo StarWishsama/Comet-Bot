@@ -21,6 +21,7 @@ import io.github.starwishsama.comet.service.command.KeyWordService
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.contact.getMember
+import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain

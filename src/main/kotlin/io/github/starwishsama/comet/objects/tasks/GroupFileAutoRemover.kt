@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.contact.isOperator
 import java.util.regex.Pattern
 import kotlin.streams.toList
 
