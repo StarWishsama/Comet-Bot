@@ -92,7 +92,7 @@ data class CometConfig(
     val webHookPort: Int = 6789,
 
     @Comment("Webhook 服务器链接, 将会在订阅成功后展示.\n不必写服务器 IP 地址, Comet 只会解析地址后路由路径\n如默认的地址在 Github 中需填写为 http://example.address.com/payload")
-    val webHookAddress: String = "http://example.address.com/payload",
+    val webHookAddress: String = "https://example.address.com/payload",
 
     @Comment("Webhook Secret, 为确保服务器安全, 推荐填写")
     val webHookSecret: String = "",

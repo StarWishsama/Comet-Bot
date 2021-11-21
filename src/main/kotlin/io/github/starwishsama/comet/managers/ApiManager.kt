@@ -58,7 +58,8 @@ object ApiManager {
 
     private fun createDefaultConfigs() {
         val apiConfigFile = FileUtil.getChildFolder("api")
-        val defaultConfigType = mutableListOf(BiliBiliConfig(), R6StatsConfig(), SauceNaoConfig(), TwitterConfig())
+        val defaultConfigType =
+            mutableListOf(BiliBiliConfig(), R6StatsConfig(), SauceNaoConfig(), TwitterConfig(), ThirdPartyMusicConfig())
 
         defaultConfigType.forEach { configType ->
             mapper.writeValue(File(apiConfigFile, configType.apiName + ".yml").also { it.createNewFile() }, configType)

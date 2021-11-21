@@ -142,8 +142,13 @@ object NetUtil {
         call: Request.Builder.() -> Request.Builder = {
             header("user-agent", defaultUA)
         },
-    ): String? =
-        executeHttpRequest(url, timeout, proxyUrl, proxyPort, call).body?.string()
+    ): String? {
+        return try {
+            executeHttpRequest(url, timeout, proxyUrl, proxyPort, call).body?.string()
+        } catch (e: Exception) {
+            null
+        }
+    }
 
     /**
      * 下载文件
