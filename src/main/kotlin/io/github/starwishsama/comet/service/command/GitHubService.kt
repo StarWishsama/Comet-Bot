@@ -50,13 +50,15 @@ object GitHubService {
     fun subscribeRepo(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
         val isGroup = event is GroupMessageEvent
 
-        val id = if (!isGroup) {
+        val id = if (isGroup) {
+            (event as GroupMessageEvent).group.id
+        } else {
             if (args.size == 1) {
                 return "请填写正确的群号!".toChain()
             }
 
             args[1].toLongOrNull() ?: return "请填写正确的群号!".toChain()
-        } else 0L
+        }
 
         if (!checkPermission(user, event.sender, id)) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
@@ -116,13 +118,15 @@ object GitHubService {
     fun unsubscribeRepo(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
         val isGroup = event is GroupMessageEvent
 
-        val id = if (!isGroup) {
+        val id = if (isGroup) {
+            (event as GroupMessageEvent).group.id
+        } else {
             if (args.size == 1) {
                 return "请填写正确的群号!".toChain()
             }
 
             args[1].toLongOrNull() ?: return "请填写正确的群号!".toChain()
-        } else 0L
+        }
 
         if (!checkPermission(user, event.sender, id)) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
@@ -157,13 +161,15 @@ object GitHubService {
     fun getRepoList(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
         val isGroup = event is GroupMessageEvent
 
-        val id = if (!isGroup) {
+        val id = if (isGroup) {
+            (event as GroupMessageEvent).group.id
+        } else {
             if (args.size == 1) {
                 return "请填写正确的群号!".toChain()
             }
 
             args[1].toLongOrNull() ?: return "请填写正确的群号!".toChain()
-        } else 0L
+        }
 
         if (!checkPermission(user, event.sender, id)) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
