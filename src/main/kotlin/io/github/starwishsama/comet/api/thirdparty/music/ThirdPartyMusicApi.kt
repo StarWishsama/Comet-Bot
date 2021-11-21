@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.api.thirdparty.music
 
+import cn.hutool.core.net.URLEncoder
 import cn.hutool.http.HttpStatus
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.CometVariables.mapper
@@ -21,7 +22,7 @@ import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.objects.config.api.ThirdPartyMusicConfig
 import io.github.starwishsama.comet.utils.network.NetUtil
 import org.jsoup.Jsoup
-import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 /**
  * 腾讯音乐, 网易云音乐搜索 API
@@ -43,7 +44,12 @@ object ThirdPartyMusicApi {
             isThirdParty = true
 
             NetUtil.executeHttpRequest(
-                "${apiConfig.netEaseCloudMusic.removeSuffix("/")}/cloudsearch?keywords=${name}",
+                "${apiConfig.netEaseCloudMusic.removeSuffix("/")}/cloudsearch?keywords=${
+                    URLEncoder.DEFAULT.encode(
+                        name,
+                        StandardCharsets.UTF_8
+                    )
+                }",
             )
         }
 
@@ -160,9 +166,9 @@ object ThirdPartyMusicApi {
         val songResult =
             NetUtil.getPageContent(
                 "https://c.y.qq.com/soso/fcgi-bin/client_search_cp?w=${
-                    URLEncoder.encode(
+                    URLEncoder.DEFAULT.encode(
                         name,
-                        "UTF-8"
+                        StandardCharsets.UTF_8
                     )
                 }&format=json&inCharset=utf8&outCharset=utf-8"
             )
