@@ -14,7 +14,7 @@ import net.mamoe.yamlkt.Comment
 import java.util.concurrent.TimeUnit
 
 data class ThirdPartyMusicConfig(
-    override val apiName: String = "音乐 API",
+    override val apiName: String = "music",
     override val interval: Int = 0,
     override val timeUnit: TimeUnit = TimeUnit.SECONDS,
     @Comment("QQ 音乐 API, 仅支持 https://github.com/jsososo/QQMusicApi")
