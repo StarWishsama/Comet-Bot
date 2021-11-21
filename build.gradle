@@ -155,7 +155,7 @@ compileKotlin {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11
-        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses"]
+        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn"]
         useIR = true
     }
 }

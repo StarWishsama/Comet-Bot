@@ -20,6 +20,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 data class PushEvent(
     val ref: String,
@@ -86,11 +87,10 @@ data class PushEvent(
 
         val wrapper = MessageWrapper()
 
-        wrapper.addText("⬆️ ${repoInfo.fullName} 有新提交啦\n")
-        wrapper.addText("| 推送时间 ${getLocalTime(repoInfo.pushTime)}\n")
-        wrapper.addText("| 推送分支 ${ref.replace("refs/heads/", "")}\n")
-        wrapper.addText("| 提交者 ${headCommitInfo.committer.name}\n")
-        wrapper.addText("| 提交信息 \n")
+        wrapper.addText("⬆️ ${repoInfo.fullName}\n")
+        wrapper.addText("|${headCommitInfo.committer.name} ${TimeZone.getDefault()} ${getLocalTime(repoInfo.pushTime)}\n")
+        wrapper.addText("| ${headCommitInfo.id} [${ref.replace("refs/heads/", "")}]\n")
+        wrapper.addText("| 提交信息: \n")
         wrapper.addText("| ${headCommitInfo.message.limitStringSize(100)}\n")
         wrapper.addText("| 查看差异 \n")
         wrapper.addText(compare)
