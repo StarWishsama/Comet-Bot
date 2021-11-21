@@ -88,7 +88,11 @@ data class PushEvent(
         val wrapper = MessageWrapper()
 
         wrapper.addText("⬆️ ${repoInfo.fullName}\n")
-        wrapper.addText("|${headCommitInfo.committer.name} ${TimeZone.getDefault()} ${getLocalTime(repoInfo.pushTime)}\n")
+        wrapper.addText(
+            "|${headCommitInfo.committer.name} ${
+                TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)
+            } ${getLocalTime(repoInfo.pushTime)}\n"
+        )
         wrapper.addText("| ${headCommitInfo.id} [${ref.replace("refs/heads/", "")}]\n")
         wrapper.addText("| 提交信息: \n")
         wrapper.addText("| ${headCommitInfo.message.limitStringSize(100)}\n")
