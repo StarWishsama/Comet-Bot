@@ -50,6 +50,7 @@ object ThirdPartyMusicApi {
                         StandardCharsets.UTF_8
                     )
                 }",
+                timeout = 12
             )
         }
 
