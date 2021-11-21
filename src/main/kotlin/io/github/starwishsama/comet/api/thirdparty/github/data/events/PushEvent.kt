@@ -93,7 +93,7 @@ data class PushEvent(
                 TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)
             } ${getLocalTime(repoInfo.pushTime)}\n"
         )
-        wrapper.addText("| ${headCommitInfo.id.substring(0, 6)} [${ref.replace("refs/heads/", "")}]\n")
+        wrapper.addText("| ${headCommitInfo.id.substring(0, 7)} [${ref.replace("refs/heads/", "")}]\n")
         wrapper.addText("| 提交信息: \n")
         wrapper.addText("| ${headCommitInfo.message.limitStringSize(100)}\n")
         wrapper.addText("| 查看差异 \n")
