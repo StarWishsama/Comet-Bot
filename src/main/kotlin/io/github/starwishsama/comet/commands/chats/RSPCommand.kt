@@ -26,7 +26,7 @@ import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import java.time.LocalDateTime
 
 
-class RSPCommand : ChatCommand, ConversationCommand {
+object RSPCommand : ChatCommand, ConversationCommand {
     /**
      * 储存正在石头剪刀布的用户
      */

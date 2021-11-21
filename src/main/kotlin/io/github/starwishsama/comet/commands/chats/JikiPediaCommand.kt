@@ -20,7 +20,7 @@ import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-class JikiPediaCommand : ChatCommand {
+object JikiPediaCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return if (args.isNotEmpty()) {
             JikiPediaService.searchJiki(event, args.getRestString(0))

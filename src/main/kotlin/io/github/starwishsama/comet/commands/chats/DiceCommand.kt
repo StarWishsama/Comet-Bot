@@ -21,7 +21,7 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import java.util.regex.Pattern
 
-class DiceCommand : ChatCommand {
+object DiceCommand : ChatCommand {
     // 骰子正则表达式
     private val pattern = Pattern.compile("""(\d{1,2})([dD])(\d{1,4})""")
 

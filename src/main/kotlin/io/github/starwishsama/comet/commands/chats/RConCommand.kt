@@ -31,7 +31,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
 
-class RConCommand : ChatCommand, ConversationCommand {
+object RConCommand : ChatCommand, ConversationCommand {
     private val waitList = mutableMapOf<CometUser, Int>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {

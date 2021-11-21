@@ -21,7 +21,7 @@ import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-class NoAbbrCommand : ChatCommand {
+object NoAbbrCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             return getHelp().toChain()
@@ -38,7 +38,7 @@ class NoAbbrCommand : ChatCommand {
 
             UserLevel.USER,
             consumerType = CommandExecuteConsumerType.COOLDOWN,
-            consumePoint = 15.0,
+            consumePoint = 5.0,
         )
 
     override fun getHelp(): String = """

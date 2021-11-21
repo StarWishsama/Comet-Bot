@@ -30,7 +30,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-class ClockInCommand : ChatCommand {
+object ClockInCommand : ChatCommand {
     private val hourMinuteFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {

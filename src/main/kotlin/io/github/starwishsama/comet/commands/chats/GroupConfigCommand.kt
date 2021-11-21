@@ -33,7 +33,7 @@ import net.mamoe.mirai.message.data.MessageChainBuilder
 import net.mamoe.mirai.message.data.PlainText
 
 
-class GroupConfigCommand : ChatCommand, UnDisableableCommand {
+object GroupConfigCommand : ChatCommand, UnDisableableCommand {
     // TODO 适配私聊设置
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!hasPermission(user, event)) {

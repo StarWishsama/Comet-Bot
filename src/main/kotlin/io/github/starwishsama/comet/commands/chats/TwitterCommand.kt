@@ -41,7 +41,7 @@ import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.toMessageChain
 import kotlin.time.ExperimentalTime
 
-class TwitterCommand : ChatCommand {
+object TwitterCommand : ChatCommand {
     @OptIn(ExperimentalTime::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!hasPermission(user, event)) {

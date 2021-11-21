@@ -19,7 +19,7 @@ import java.io.File
 
 class LocalizationManager {
     private val currentLanguage: Language = Language.ZH_CN
-    private var localizationYaml: Map<String?, Any?> = mutableMapOf()
+    private val localizationYaml: Map<String?, Any?>
 
     init {
         val localizedFolder = FileUtil.getResourceFolder().getChildFolder("i18n")
@@ -30,6 +30,7 @@ class LocalizationManager {
             localizationYaml = Default.decodeMapFromString(localizationFile.getContext())
             daemonLogger.info("多语言服务已启动! 使用语言: $currentLanguage")
         } else {
+            localizationYaml = mutableMapOf()
             daemonLogger.warning("多语言文件未被正确生成! 部分文本可能会受到影响")
         }
     }
@@ -42,9 +43,9 @@ class LocalizationManager {
         try {
             val nodes = target.split(".")
             if (nodes.size == 1) {
-                return localizationYaml[nodes[0]].toString()
+                return localizationYaml[nodes[0]]?.toString() ?: "$target - 占位符"
             } else {
-                var currentNode: Map<String, String> = mutableMapOf()
+                var currentNode: Map<String?, String?> = mutableMapOf()
                 nodes.forEach {
                     val current = localizationYaml[it]
 
@@ -64,9 +65,9 @@ class LocalizationManager {
     }
 
     @Suppress("UNCHECKED_CAST")
-    internal fun getDeepNode(deepNode: Any?): Map<String, String>? {
+    internal fun getDeepNode(deepNode: Any?): Map<String?, String?>? {
         if (deepNode != null && deepNode::class.java == LinkedHashMap::class.java) {
-            return deepNode as Map<String, String>
+            return deepNode as Map<String?, String?>
         }
 
         return null

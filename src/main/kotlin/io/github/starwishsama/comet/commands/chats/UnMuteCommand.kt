@@ -25,7 +25,7 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-class UnMuteCommand : ChatCommand {
+object UnMuteCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!hasPermission(user, event)) {
             return localizationManager.getLocalizationText("message.no-permission").toChain()

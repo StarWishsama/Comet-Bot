@@ -23,7 +23,7 @@ import io.github.starwishsama.comet.utils.RuntimeUtil
 import kotlin.time.ExperimentalTime
 
 
-class DebugCommand : ConsoleCommand {
+object DebugCommand : ConsoleCommand {
     @OptIn(ExperimentalTime::class)
     override suspend fun execute(args: List<String>): String {
         if (args.isNotEmpty()) {

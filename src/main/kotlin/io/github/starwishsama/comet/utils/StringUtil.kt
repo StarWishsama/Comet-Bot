@@ -142,8 +142,8 @@ object StringUtil {
         }
     }
 
-    fun isAlphabetic(input: String): Boolean {
-        return input.matches("[a-zA-Z]+".toRegex())
+    fun isAlphabeticAndDigit(input: String): Boolean {
+        return input.matches("[a-zA-Z0-9]*".toRegex())
     }
 
 }

@@ -16,6 +16,7 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.PureText
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.MemberJoinEvent
+import net.mamoe.mirai.utils.MiraiInternalApi
 
 object GroupMemberChangedListener : INListener {
     override val name: String
@@ -23,7 +24,7 @@ object GroupMemberChangedListener : INListener {
 
     @EventHandler
     fun listen(event: MemberJoinEvent) {
-        val cfg = GroupConfigManager.getConfig(event.groupId) ?: return
+        val cfg = GroupConfigManager.getConfig(@OptIn(MiraiInternalApi::class) event.groupId) ?: return
 
         if (cfg.newComerWelcome && !cfg.newComerWelcomeText.isEmpty()) {
             runBlocking {

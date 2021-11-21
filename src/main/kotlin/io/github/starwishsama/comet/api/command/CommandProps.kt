@@ -26,7 +26,7 @@ data class CommandProps(
     val consumePoint: Double = CometVariables.cfg.coolDownTime.toDouble(),
 ) {
     init {
-        if (!StringUtil.isAlphabetic(name)) {
+        if (!StringUtil.isAlphabeticAndDigit(name)) {
             throw IllegalArgumentException("Command name must be alphabetic")
         }
     }

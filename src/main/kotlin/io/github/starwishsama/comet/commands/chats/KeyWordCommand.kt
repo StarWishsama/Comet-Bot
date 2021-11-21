@@ -26,7 +26,7 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-class KeyWordCommand : ChatCommand, ConversationCommand {
+object KeyWordCommand : ChatCommand, ConversationCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!hasPermission(user, event)) {
             return localizationManager.getLocalizationText("message.no-permission").toChain()
@@ -41,7 +41,7 @@ class KeyWordCommand : ChatCommand, ConversationCommand {
         }
 
         return when (args[0]) {
-            "add", "new" -> KeyWordService.addKeyWord(event.sender.id, event.group.id, args.getOrElse(1) { "" }, this)
+            "add", "new" -> KeyWordService.addKeyWord(event.sender.id, event.group.id, args.getOrElse(1) { "" })
             "remove", "del", "rm" -> KeyWordService.removeKeyWord(event.group.id, args.getOrElse(1) { "" })
             "list", "ls" -> KeyWordService.listKeyWords(event.group.id)
             else -> getHelp().toChain()

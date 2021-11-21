@@ -23,7 +23,7 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 
-class DivineCommand : ChatCommand {
+object DivineCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return if (args.isNotEmpty()) {
             val randomEventName = args.getRestString(0)

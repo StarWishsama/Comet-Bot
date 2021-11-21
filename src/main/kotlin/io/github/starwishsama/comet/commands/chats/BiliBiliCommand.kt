@@ -33,7 +33,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.lang.Thread.sleep
 
-class BiliBiliCommand : ChatCommand {
+object BiliBiliCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!hasPermission(user, event)) {
             return localizationManager.getLocalizationText("message.no-permission").toChain()
@@ -44,10 +44,10 @@ class BiliBiliCommand : ChatCommand {
         }
 
         when (args[0]) {
-            "sub", "订阅" -> return BiliBiliService.callSubscribeUser(this, user, args, event)
+            "sub", "订阅" -> return BiliBiliService.callSubscribeUser(user, args, event)
             "unsub", "取消订阅" -> {
                 return if (event is GroupMessageEvent) {
-                    BiliBiliService.callUnsubscribeUser(this, args, event.group.id)
+                    BiliBiliService.callUnsubscribeUser(args, event.group.id)
                 } else {
                     toChain("抱歉, 该命令仅限群聊使用!")
                 }

@@ -42,11 +42,12 @@ import net.mamoe.mirai.message.data.PlainText
 
 object BiliBiliService {
     fun callSubscribeUser(
-        cmd: BiliBiliCommand,
         user: CometUser,
         args: List<String>,
         event: MessageEvent
     ): MessageChain {
+        val cmd = BiliBiliCommand
+
         if (args.size <= 1) {
             return cmd.getHelp().convertToChain()
         }
@@ -116,7 +117,9 @@ object BiliBiliService {
         return SubscribeResult(successList, failedList)
     }
 
-    fun callUnsubscribeUser(cmd: BiliBiliCommand, args: List<String>, groupId: Long): MessageChain {
+    fun callUnsubscribeUser(args: List<String>, groupId: Long): MessageChain {
+        val cmd = BiliBiliCommand
+
         return if (args.size > 1) {
             val cfg = GroupConfigManager.getConfigOrNew(groupId)
 

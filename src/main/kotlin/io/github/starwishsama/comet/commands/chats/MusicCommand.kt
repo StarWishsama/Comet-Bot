@@ -21,7 +21,7 @@ import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-class MusicCommand : ChatCommand {
+object MusicCommand : ChatCommand {
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {

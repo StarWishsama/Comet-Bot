@@ -17,7 +17,7 @@ import io.github.starwishsama.comet.objects.enums.UserLevel
 import kotlin.system.exitProcess
 
 
-class StopCommand : ConsoleCommand {
+object StopCommand : ConsoleCommand {
     override suspend fun execute(args: List<String>): String {
         exitProcess(0)
     }

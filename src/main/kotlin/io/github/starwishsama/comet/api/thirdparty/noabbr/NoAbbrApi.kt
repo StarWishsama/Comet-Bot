@@ -31,7 +31,7 @@ object NoAbbrApi : ApiExecutor {
                 .toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
         )
 
-        val responseBody = call.execute().body ?: return AbbrSearchResponse.empty()
+        val responseBody = call.execute().body ?: return AbbrSearchResponse.empty
 
         val responseString = responseBody.string()
 
@@ -39,11 +39,11 @@ object NoAbbrApi : ApiExecutor {
 
         if (tree.isNull || tree.isObject) {
             daemonLogger.warning("解析能不能好好说话回调失败: 回调结果异常 (${tree.nodeType})")
-            return AbbrSearchResponse.empty()
+            return AbbrSearchResponse.empty
         }
 
         if (tree.isEmpty) {
-            return AbbrSearchResponse.empty()
+            return AbbrSearchResponse.empty
         }
 
         val firstNode = tree[0]
@@ -52,7 +52,7 @@ object NoAbbrApi : ApiExecutor {
             mapper.readValue(firstNode.traverse())
         } else {
             daemonLogger.warning("解析能不能好好说话回调失败: 回调结果异常 ${firstNode.nodeType}")
-            AbbrSearchResponse.empty()
+            AbbrSearchResponse.empty
         }
     }
 

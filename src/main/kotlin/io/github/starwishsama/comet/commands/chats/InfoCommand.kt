@@ -26,8 +26,7 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import java.time.format.DateTimeFormatter
 
 @OptIn(MiraiExperimentalApi::class)
-
-class InfoCommand : ChatCommand {
+object InfoCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             val reply =

@@ -25,12 +25,12 @@ import net.mamoe.mirai.message.data.MessageChain
 object KeyWordService {
     private val inProgressAdder = mutableMapOf<Long, String>()
 
-    fun addKeyWord(senderID: Long, groupID: Long, keyWord: String, cmd: KeyWordCommand): MessageChain {
+    fun addKeyWord(senderID: Long, groupID: Long, keyWord: String): MessageChain {
         if (keyWord.isEmpty()) {
             return "请输入关键词".toChain()
         }
 
-        SessionHandler.insertSession(Session(SessionTarget(groupID, senderID), cmd))
+        SessionHandler.insertSession(Session(SessionTarget(groupID, senderID), KeyWordCommand))
         inProgressAdder[senderID] = keyWord
 
         return "接下来, 请发送该关键词需要自动回复的内容".toChain()

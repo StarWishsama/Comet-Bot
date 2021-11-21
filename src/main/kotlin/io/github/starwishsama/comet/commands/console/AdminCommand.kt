@@ -21,7 +21,7 @@ import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import java.io.IOException
 
-class AdminCommand : ConsoleCommand {
+object AdminCommand : ConsoleCommand {
     override suspend fun execute(args: List<String>): String {
         if (args.isNotEmpty()) {
             when (args[0]) {

@@ -33,7 +33,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
 import java.util.concurrent.ThreadPoolExecutor
 
-class DebugCommand : ChatCommand, UnDisableableCommand {
+object DebugCommand : ChatCommand, UnDisableableCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isNotEmpty()) {
             when (args[0]) {

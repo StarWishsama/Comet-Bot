@@ -20,11 +20,11 @@ data class AbbrSearchResponse(
     fun isEmpty(): Boolean = this.name.isEmpty() || this.trans.isEmpty()
 
     companion object {
-        fun empty(): AbbrSearchResponse = AbbrSearchResponse()
+        val empty: AbbrSearchResponse = AbbrSearchResponse()
     }
 
     fun toMessageWrapper(): MessageWrapper {
-        if (name.isEmpty()) {
+        if (name.isEmpty() || this == empty) {
             return MessageWrapper().addText("找不到对应结果")
         }
 

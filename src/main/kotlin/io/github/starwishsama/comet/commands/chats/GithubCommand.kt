@@ -25,7 +25,7 @@ import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-class GithubCommand : ChatCommand, ConversationCommand {
+object GithubCommand : ChatCommand, ConversationCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             return getHelp().convertToChain()
@@ -35,7 +35,7 @@ class GithubCommand : ChatCommand, ConversationCommand {
             "add", "sub" -> subscribeRepo(user, args, event)
             "rm", "unsub" -> unsubscribeRepo(user, args, event)
             "list", "ls" -> getRepoList(user, args, event)
-            "md", "modify" -> modifyRepo(user, args, event, this)
+            "md", "modify" -> modifyRepo(user, args, event)
             "lookup", "cx" -> lookupRepo(args, event)
             else -> getHelp().convertToChain()
         }
@@ -46,7 +46,6 @@ class GithubCommand : ChatCommand, ConversationCommand {
             "github",
             listOf("gh", "git"),
             "订阅 Github 项目推送动态",
-
             UserLevel.USER,
         )
 
@@ -59,6 +58,6 @@ class GithubCommand : ChatCommand, ConversationCommand {
     """.trimIndent()
 
     override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
-        event.subject.sendMessage(modifyRepo(user, event.message.contentToString().split(" "), event, this, session))
+        event.subject.sendMessage(modifyRepo(user, event.message.contentToString().split(" "), event, session))
     }
 }

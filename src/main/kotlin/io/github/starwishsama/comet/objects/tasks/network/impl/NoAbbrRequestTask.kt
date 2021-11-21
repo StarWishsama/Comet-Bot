@@ -26,7 +26,7 @@ class NoAbbrRequestTask(override val content: Contact, override val param: Strin
         return try {
             NoAbbrApi.guessMeaning(param)
         } catch (e: IOException) {
-            AbbrSearchResponse.empty()
+            AbbrSearchResponse.empty
         }
     }
 

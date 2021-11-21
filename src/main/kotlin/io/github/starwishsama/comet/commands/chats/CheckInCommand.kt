@@ -27,7 +27,7 @@ import net.mamoe.mirai.message.data.MessageChain
  * @author StivenDing
  */
 
-class CheckInCommand : ChatCommand {
+object CheckInCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return handleCheckIn(event, user)
     }

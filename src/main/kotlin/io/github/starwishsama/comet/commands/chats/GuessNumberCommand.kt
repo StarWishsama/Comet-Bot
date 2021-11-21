@@ -35,7 +35,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 
-class GuessNumberCommand : ChatCommand, ConversationCommand {
+object GuessNumberCommand : ChatCommand, ConversationCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (event is GroupMessageEvent) {
             if (!SessionHandler.hasSessionByGroup(event.group.id, this::class.java)) {

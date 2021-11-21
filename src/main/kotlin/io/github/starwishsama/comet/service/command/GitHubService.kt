@@ -12,8 +12,8 @@ package io.github.starwishsama.comet.service.command
 
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.comet
-import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.github.GithubApi
+import io.github.starwishsama.comet.commands.chats.GithubCommand
 import io.github.starwishsama.comet.file.GithubRepoData
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.GithubRepos
@@ -23,6 +23,8 @@ import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.getContext
+import net.mamoe.mirai.contact.Contact
+import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.getMember
 import net.mamoe.mirai.contact.isAdministrator
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -48,13 +50,15 @@ object GitHubService {
     fun subscribeRepo(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
         val isGroup = event is GroupMessageEvent
 
-        val id = if (isGroup) {
-            (event as GroupMessageEvent).group.id
-        } else {
-            args[2].toLongOrNull() ?: return "请填写正确的群号!".toChain()
-        }
+        val id = if (!isGroup) {
+            if (args.size == 1) {
+                return "请填写正确的群号!".toChain()
+            }
 
-        if (!checkPermission(user, event, id)) {
+            args[1].toLongOrNull() ?: return "请填写正确的群号!".toChain()
+        } else 0L
+
+        if (!checkPermission(user, event.sender, id)) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
@@ -112,13 +116,15 @@ object GitHubService {
     fun unsubscribeRepo(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
         val isGroup = event is GroupMessageEvent
 
-        val id = if (isGroup) {
-            (event as GroupMessageEvent).group.id
-        } else {
-            args[2].toLongOrNull() ?: return "请填写正确的群号!".toChain()
-        }
+        val id = if (!isGroup) {
+            if (args.size == 1) {
+                return "请填写正确的群号!".toChain()
+            }
 
-        if (!checkPermission(user, event, id)) {
+            args[1].toLongOrNull() ?: return "请填写正确的群号!".toChain()
+        } else 0L
+
+        if (!checkPermission(user, event.sender, id)) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
@@ -151,17 +157,15 @@ object GitHubService {
     fun getRepoList(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
         val isGroup = event is GroupMessageEvent
 
-        val id = if (isGroup) {
-            (event as GroupMessageEvent).group.id
-        } else {
+        val id = if (!isGroup) {
             if (args.size == 1) {
                 return "请填写正确的群号!".toChain()
             }
 
             args[1].toLongOrNull() ?: return "请填写正确的群号!".toChain()
-        }
+        } else 0L
 
-        if (!checkPermission(user, event, id)) {
+        if (!checkPermission(user, event.sender, id)) {
             return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
@@ -185,7 +189,6 @@ object GitHubService {
         user: CometUser,
         args: List<String>,
         event: MessageEvent,
-        command: ChatCommand,
         session: Session? = null
     ): MessageChain {
         if (!user.compareLevel(UserLevel.ADMIN) && !user.hasPermission("nbot.commands.github")) {
@@ -210,7 +213,7 @@ object GitHubService {
             return if (repo.isEmpty()) {
                 "找不到你想修改的 Github 仓库哟".toChain()
             } else {
-                val createdSession = Session(SessionTarget(privateId = event.sender.id), command)
+                val createdSession = Session(SessionTarget(privateId = event.sender.id), GithubCommand)
                 SessionHandler.insertSession(createdSession)
 
                 editorCache[createdSession] = repo[0]
@@ -292,10 +295,10 @@ object GitHubService {
         }
     }
 
-    private fun checkPermission(user: CometUser, event: MessageEvent, groupId: Long = 0): Boolean {
+    private fun checkPermission(user: CometUser, sender: Contact, groupId: Long = 0): Boolean {
         return when {
             user.compareLevel(UserLevel.ADMIN) || user.hasPermission("nbot.commands.github") -> true
-            event is GroupMessageEvent -> event.sender.isAdministrator()
+            sender is Member -> sender.isAdministrator()
             groupId != 0L -> comet.getBot().getGroup(groupId)?.getMember(user.id)?.isAdministrator() == true
             else -> false
         }

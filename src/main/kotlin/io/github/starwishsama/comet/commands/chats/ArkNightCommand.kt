@@ -24,7 +24,7 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 @Suppress("SpellCheckingInspection")
-class ArkNightCommand : ChatCommand {
+object ArkNightCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!GachaService.isArkNightUsable()) {
             return if (GachaService.isDownloading()) {
