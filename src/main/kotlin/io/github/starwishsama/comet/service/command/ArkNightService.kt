@@ -81,12 +81,12 @@ object ArkNightService {
             val gachaTime: Int = try {
                 args[0].toInt()
             } catch (e: NumberFormatException) {
-                return ArkNightCommand().getHelp().convertToChain()
+                return ArkNightCommand.getHelp().convertToChain()
             }
 
             return runBlocking { getGachaResult(event, user, gachaTime) }
         } else {
-            ArkNightCommand().getHelp().convertToChain()
+            ArkNightCommand.getHelp().convertToChain()
         }
     }
 
