@@ -23,7 +23,10 @@ import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.getContext
-import net.mamoe.mirai.contact.*
+import net.mamoe.mirai.contact.Contact
+import net.mamoe.mirai.contact.Member
+import net.mamoe.mirai.contact.getMember
+import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
@@ -296,7 +299,7 @@ object GitHubService {
         return when {
             user.compareLevel(UserLevel.ADMIN) || user.hasPermission("nbot.commands.github") -> true
             sender is Member -> sender.isOperator()
-            groupId != 0L -> comet.getBot().getGroup(groupId)?.getMember(user.id)?.isAdministrator() == true
+            groupId != 0L -> comet.getBot().getGroup(groupId)?.getMember(user.id)?.isOperator() == true
             else -> false
         }
     }

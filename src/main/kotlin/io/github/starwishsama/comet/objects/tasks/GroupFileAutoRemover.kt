@@ -17,7 +17,6 @@ import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.contact.isAdministrator
 import java.util.regex.Pattern
 import kotlin.streams.toList
 
@@ -47,7 +46,7 @@ object GroupFileAutoRemover {
         val group = comet.getBot().getGroup(cfg.id) ?: return
 
         runBlocking {
-            if (!group.botAsMember.isAdministrator()) {
+            if (!group.botAsMember.isOperator()) {
                 group.sendMessage("机器人没有权限删除群文件, 任务已取消".toChain())
             }
 

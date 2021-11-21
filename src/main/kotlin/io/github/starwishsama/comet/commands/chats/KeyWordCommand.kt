@@ -21,7 +21,6 @@ import io.github.starwishsama.comet.service.command.KeyWordService
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.contact.getMember
-import net.mamoe.mirai.contact.isAdministrator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
@@ -65,7 +64,7 @@ object KeyWordCommand : ChatCommand, ConversationCommand {
 
     private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
         if (e is GroupMessageEvent) {
-            return e.group.getMember(user.id)?.isAdministrator() ?: false
+            return e.group.getMember(user.id)?.isOperator() ?: false
         }
 
         return true
