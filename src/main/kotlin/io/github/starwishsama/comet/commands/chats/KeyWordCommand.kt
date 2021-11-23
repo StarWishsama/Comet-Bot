@@ -19,6 +19,7 @@ import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.KeyWordService
 import io.github.starwishsama.comet.sessions.Session
+import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.contact.getMember
 import net.mamoe.mirai.contact.isOperator
@@ -77,5 +78,7 @@ object KeyWordCommand : ChatCommand, ConversationCommand {
             val keyword = KeyWordService.getKeyWordBySender(event.sender.id)
             event.subject.sendMessage(KeyWordService.handleAddAutoReply(cfg, keyword, event.message))
         }
+
+        SessionHandler.removeSession(session)
     }
 }
