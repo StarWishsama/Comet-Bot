@@ -6,7 +6,7 @@
 
 本项目处于开发阶段, 部分功能可能无法使用 (除了写在下面的功能) ~~反正也没人用~~
 
-交流群：725656262
+Demo/交流群：725656262
 
 **一切开发旨在学习，请勿用于非法用途**
 
@@ -39,7 +39,6 @@
 * 群抽奖
 * Github WebHook 推送
 * 能不能好好说话
-* 企鹅物流 [BETA]
 * 小鸡词典
 * 还在开发中...
 
@@ -122,8 +121,4 @@
 
 特别感谢 [Kengxxiao](https://github.com/Kengxxiao/) 的项目 [ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData)
 提供明日方舟游戏数据资源
-
-特别感谢 [企鹅物流](https://penguin-stats.io/) 提供的明日方舟物品掉落数据
-
-![](https://penguin.upyun.galvincdn.com/logos/penguin_stats_logo.png)
 

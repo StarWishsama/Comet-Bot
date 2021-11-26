@@ -140,7 +140,6 @@ object CometRuntime {
                 PusherCommand,
                 GithubCommand,
                 DiceCommand,
-                PenguinStatCommand,
                 NoAbbrCommand,
                 JikiPediaCommand,
                 KeyWordCommand,
