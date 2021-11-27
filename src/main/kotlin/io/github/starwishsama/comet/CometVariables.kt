@@ -22,7 +22,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.CometConfig
@@ -150,7 +149,6 @@ object CometVariables {
     internal var rCon: Rcon? = null
 
     internal val cometUsers: MutableMap<Long, CometUser> = ConcurrentHashMap()
-    internal lateinit var localizationManager: LocalizationManager
 
     /** 明日方舟卡池数据 */
     internal val arkNight: MutableList<ArkNightOperator> = mutableListOf()

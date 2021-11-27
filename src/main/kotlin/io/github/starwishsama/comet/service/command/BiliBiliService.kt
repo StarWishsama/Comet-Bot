@@ -10,7 +10,6 @@
 
 package io.github.starwishsama.comet.service.command
 
-import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.SearchApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
@@ -19,6 +18,7 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convert
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserInfo
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserVideoInfo
 import io.github.starwishsama.comet.commands.chats.BiliBiliCommand
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.CometUser
@@ -53,7 +53,7 @@ object BiliBiliService {
         }
 
         if (!cmd.hasPermission(user, event)) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").convertToChain()
+            return LocalizationManager.getLocalizationText("message.no-permission").convertToChain()
         }
 
         return if (args[1].contains("|")) {

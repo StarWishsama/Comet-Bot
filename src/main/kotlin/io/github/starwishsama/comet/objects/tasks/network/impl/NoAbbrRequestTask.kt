@@ -10,9 +10,9 @@
 
 package io.github.starwishsama.comet.objects.tasks.network.impl
 
-import io.github.starwishsama.comet.CometVariables.localizationManager
 import io.github.starwishsama.comet.api.thirdparty.noabbr.NoAbbrApi
 import io.github.starwishsama.comet.api.thirdparty.noabbr.data.AbbrSearchResponse
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.objects.tasks.network.INetworkRequestTask
 import io.github.starwishsama.comet.objects.tasks.network.NetworkRequestTask
 import io.github.starwishsama.comet.utils.CometUtil.toChain
@@ -35,7 +35,7 @@ class NoAbbrRequestTask(override val content: Contact, override val param: Strin
             if (result is AbbrSearchResponse && !result.isEmpty()) {
                 content.sendMessage(result.toMessageWrapper().toMessageChain(content))
             } else {
-                content.sendMessage(localizationManager.getLocalizationText("network-error").toChain())
+                content.sendMessage(LocalizationManager.getLocalizationText("network-error").toChain())
             }
         }
     }

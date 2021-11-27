@@ -15,6 +15,7 @@ import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.api.thirdparty.github.GithubApi
 import io.github.starwishsama.comet.commands.chats.GithubCommand
 import io.github.starwishsama.comet.file.GithubRepoData
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.GithubRepos
 import io.github.starwishsama.comet.objects.enums.UserLevel
@@ -61,7 +62,7 @@ object GitHubService {
         }
 
         if (!checkPermission(user, event.sender, id)) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
         if (!isGroup && args.size < 3) {
@@ -129,7 +130,7 @@ object GitHubService {
         }
 
         if (!checkPermission(user, event.sender, id)) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
         if (!isGroup && args.size < 3) {
@@ -172,7 +173,7 @@ object GitHubService {
         }
 
         if (!checkPermission(user, event.sender, id)) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
         if (!isGroup && comet.getBot().getGroup(id) == null) {
@@ -198,7 +199,7 @@ object GitHubService {
         session: Session? = null
     ): MessageChain {
         if (!user.compareLevel(UserLevel.ADMIN) && !user.hasPermission("nbot.commands.github")) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
         if (session == null) {

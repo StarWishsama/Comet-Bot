@@ -17,7 +17,7 @@ import io.github.starwishsama.comet.utils.getContext
 import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
 
-class LocalizationManager {
+object LocalizationManager {
     private val currentLanguage: Language = Language.ZH_CN
     private val localizationYaml: Map<String?, Any?>
 

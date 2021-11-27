@@ -15,7 +15,6 @@ import io.github.starwishsama.comet.CometVariables.cfg
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.file.DataFiles.allDataFile
-import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.LoggerInstances
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
@@ -59,9 +58,9 @@ object DataSetup {
     }
 
     private fun load() {
-        cfg = Default.decodeFromString(CometConfig.serializer(), Config.file.getContext())
+        FileUtil.initResourceFile()
 
-        CometVariables.localizationManager = LocalizationManager()
+        cfg = Default.decodeFromString(CometConfig.serializer(), Config.file.getContext())
 
         LoggerInstances.instances.forEach {
             it.debugMode = cfg.debugMode
@@ -72,8 +71,6 @@ object DataSetup {
         }
 
         daemonLogger.info("已加载了 ${CometVariables.cometUsers.size} 个用户数据.")
-
-        FileUtil.initResourceFile()
 
         GachaService.loadGachaData(ArkNightData.file)
 

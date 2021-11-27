@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.utils
 
 import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.CometVariables.localizationManager
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.CometUser.Companion.getUser
 import io.github.starwishsama.comet.utils.RuntimeUtil.getJVMVersion
@@ -65,7 +65,7 @@ object CometUtil {
         if (otherText.isNullOrEmpty()) return ""
         return buildString {
             if (addPrefix) {
-                append(localizationManager.getLocalizationText("prefix")).append(" ")
+                append(LocalizationManager.getLocalizationText("prefix")).append(" ")
             }
             append(otherText)
         }.trim()

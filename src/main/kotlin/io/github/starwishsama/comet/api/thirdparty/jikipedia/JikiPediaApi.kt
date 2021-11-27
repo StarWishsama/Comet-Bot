@@ -56,7 +56,7 @@ object JikiPediaApi : ApiExecutor {
     private fun searchID(keyword: String): Pair<String, Int> {
         val connection = Jsoup.connect(searchRoute + URLEncoder.DEFAULT.encode(keyword, StandardCharsets.UTF_8))
 
-        connection.userAgent(NetUtil.defaultUA)
+        connection.userAgent(NetUtil.cometRequestUA)
 
         if (CometVariables.cfg.proxySwitch) {
             connection.proxy(CometVariables.cfg.proxyUrl, CometVariables.cfg.proxyPort)

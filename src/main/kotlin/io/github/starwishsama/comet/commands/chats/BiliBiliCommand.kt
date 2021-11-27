@@ -10,12 +10,12 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.CometVariables.localizationManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToWrapper
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
@@ -36,7 +36,7 @@ import java.lang.Thread.sleep
 object BiliBiliCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!hasPermission(user, event)) {
-            return localizationManager.getLocalizationText("message.no-permission").toChain()
+            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
         }
 
         if (args.isEmpty()) {
@@ -77,7 +77,7 @@ object BiliBiliCommand : ChatCommand {
                         cfg.biliPushEnabled = !cfg.biliPushEnabled
                         "B站动态推送功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}".toChain()
                     } else {
-                        localizationManager.getLocalizationText("message.no-permission").toChain()
+                        LocalizationManager.getLocalizationText("message.no-permission").toChain()
                     }
                 } else {
                     toChain("抱歉, 该命令仅限群聊使用!")

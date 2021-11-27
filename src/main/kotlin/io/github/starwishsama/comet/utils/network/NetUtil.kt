@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.utils.network
 
+import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometVariables.cfg
 import io.github.starwishsama.comet.CometVariables.netLogger
 import io.github.starwishsama.comet.exceptions.ApiException
@@ -29,6 +30,9 @@ fun Response.isType(typeName: String): Boolean = headers["content-type"]?.contai
 object NetUtil {
     const val defaultUA =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36 Edg/94.0.992.50"
+
+    const val cometRequestUA =
+        "Comet/${BuildConfig.version} AppleWebKit/537.36 (KHTML, like Gecko) Not Chrome/94.0.4606.81"
 
     /**
      * 执行 Http 请求

@@ -13,6 +13,7 @@ package io.github.starwishsama.comet.api.command
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.CallbackCommand
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.utils.CometUtil.toChain
@@ -124,7 +125,7 @@ object MessageHandler {
 
                 if (!useStatus) {
                     return if (cmd.props.consumerType == CommandExecuteConsumerType.POINT) {
-                        val response = CometVariables.localizationManager.getLocalizationText("message.no-enough-point")
+                        val response = LocalizationManager.getLocalizationText("message.no-enough-point")
                             .replace("%point%", user.checkInPoint.fixDisplay())
                             .replace("%cost%", cmd.props.consumePoint.fixDisplay())
                         ExecutedResult(response.toChain(), cmd, CommandStatus.ValidateFailed())
@@ -153,7 +154,7 @@ object MessageHandler {
                             cmd.execute(event, splitMessage, user)
                         } else {
                             status = CommandStatus.NoPermission()
-                            CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
+                            LocalizationManager.getLocalizationText("message.no-permission").toChain()
                         }
 
                     return ExecutedResult(result, cmd, status)
