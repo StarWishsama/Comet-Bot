@@ -59,9 +59,7 @@ data class PureText(val text: String) : WrapperElement {
         return PlainText(text)
     }
 
-    override fun asString(): String {
-        return text
-    }
+    override fun asString(): String = text
 }
 
 /**
@@ -103,9 +101,7 @@ data class Picture(val url: String = "", val filePath: String = "", val base64: 
         throw RuntimeException("Unable to convert Picture to Image, Picture raw content: $this")
     }
 
-    override fun asString(): String {
-        return filePath.ifEmpty { url }
-    }
+    override fun asString(): String = "[图片]"
 }
 
 /**
@@ -143,7 +139,7 @@ data class XmlElement(val content: String) : WrapperElement {
         return SimpleServiceMessage(serviceId = 60, content = content)
     }
 
-    override fun asString(): String = "XML 消息"
+    override fun asString(): String = "[XML 消息]"
 
 }
 
@@ -166,5 +162,5 @@ data class Voice(val filePath: String) : WrapperElement {
         throw RuntimeException("Unable to convert Voice to MessageChain, Raw path: $this")
     }
 
-    override fun asString(): String = "语音消息"
+    override fun asString(): String = "[语音消息]"
 }
