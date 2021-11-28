@@ -84,7 +84,7 @@ object CompatibilityService {
         }
 
         CometVariables.cometUsers.putAll(newUser)
-        return true
+        return false
     }
 
     fun checkConfigFile(cfgFile: File): Boolean {
