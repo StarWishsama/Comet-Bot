@@ -80,8 +80,6 @@ object CometRuntime {
     """
         )
 
-        DataSetup.init()
-
         CometVariables.client = OkHttpClient().newBuilder()
             .callTimeout(3, TimeUnit.SECONDS)
             .connectTimeout(3, TimeUnit.SECONDS)
@@ -98,20 +96,9 @@ object CometRuntime {
             }
             .addInterceptor(RetrofitLogger())
             .build()
-    }
 
-    private fun shutdownTask() {
-        logger.info("[Bot] 正在关闭 Bot...")
-        DataSetup.saveAllResources()
-        PusherManager.savePushers()
-        cometServiceServer?.stop()
-        TaskUtil.service.shutdown()
-        CometVariables.rCon?.disconnect()
-        CometVariables.miraiLoggerAppender.close()
-        CometVariables.loggerAppender.close()
-    }
+        DataSetup.init()
 
-    fun setupBot(bot: Bot) {
         CommandManager.setupCommands(
             arrayOf(
                 AdminCommand,
@@ -152,7 +139,20 @@ object CometRuntime {
         )
 
         logger.info("[命令] 已注册 " + CommandManager.countCommands() + " 个命令")
+    }
 
+    private fun shutdownTask() {
+        logger.info("[Bot] 正在关闭 Bot...")
+        DataSetup.saveAllResources()
+        PusherManager.savePushers()
+        cometServiceServer?.stop()
+        TaskUtil.service.shutdown()
+        CometVariables.rCon?.disconnect()
+        CometVariables.miraiLoggerAppender.close()
+        CometVariables.loggerAppender.close()
+    }
+
+    fun setupBot(bot: Bot) {
         MessageHandler.startHandler(bot)
 
         /** 监听器 */

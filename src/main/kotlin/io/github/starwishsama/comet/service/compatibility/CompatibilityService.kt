@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.service.compatibility
 
+import cn.hutool.core.lang.UUID
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.daemonLogger
@@ -18,9 +19,12 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.managers.PermissionManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
+import io.github.starwishsama.comet.objects.permission.CometPermission
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
+import io.github.starwishsama.comet.service.compatibility.data.OldCometUser
 import io.github.starwishsama.comet.service.compatibility.data.OldGroupConfig
 import io.github.starwishsama.comet.utils.copyAndRename
 import io.github.starwishsama.comet.utils.parseAsClass
@@ -37,14 +41,14 @@ import java.util.stream.Collectors
  * @see [PerGroupConfig]
  */
 object CompatibilityService {
-    fun checkUserFile(userData: File): Boolean {
+    fun upgradeUserData(userData: File): Boolean {
         try {
-            userData.parseAsClass<List<CometUser>>()
+            userData.parseAsClass<MutableMap<Long, CometUser>>()
             return true
         } catch (ignored: Exception) {
         }
 
-        val oldUser: MutableMap<Long, CometUser>
+        val oldUser: MutableMap<Long, OldCometUser>
 
         try {
             daemonLogger.log(HinaLogLevel.Info, "已检测到旧版本配置 ${userData.name}, 正在迁移...", prefix = "兼容性")
@@ -54,6 +58,33 @@ object CompatibilityService {
             daemonLogger.log(HinaLogLevel.Warn, "转换旧版本配置 ${userData.name} 数据失败!", e, prefix = "兼容性")
             return false
         }
+
+        val newUser = mutableMapOf<Long, CometUser>()
+
+        oldUser.forEach { (id, old) ->
+            val permissions = mutableSetOf<CometPermission>()
+
+            if (old.permissions.isNotEmpty()) {
+                old.permissions.forEach permission@{
+                    permissions.add(PermissionManager.getPermission(it) ?: return@permission)
+                }
+            }
+
+            newUser[id] = CometUser(
+                old.id,
+                UUID.randomUUID(),
+                old.lastCheckInTime,
+                old.checkInPoint,
+                old.checkInTime,
+                old.r6sAccount,
+                old.level,
+                old.lastExecuteTime,
+                permissions
+            )
+        }
+
+        CometVariables.cometUsers.putAll(newUser)
+        return true
     }
 
     fun checkConfigFile(cfgFile: File): Boolean {

@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.objects
 
+import cn.hutool.core.lang.UUID
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.managers.PermissionManager
 import io.github.starwishsama.comet.objects.enums.UserLevel
@@ -18,6 +19,7 @@ import java.time.LocalDateTime
 
 data class CometUser(
     val id: Long,
+    val uuid: UUID,
     var checkInDateTime: LocalDateTime = LocalDateTime.now().minusDays(1),
     var checkInPoint: Double = 0.0,
     var checkInCount: Int = 0,
@@ -113,7 +115,7 @@ data class CometUser(
     companion object {
         fun quickRegister(id: Long): CometUser {
             CometVariables.cometUsers[id].apply {
-                val register = CometUser(id)
+                val register = CometUser(id, UUID.randomUUID())
                 return this ?: register.also { CometVariables.cometUsers.putIfAbsent(id, register) }
             }
         }

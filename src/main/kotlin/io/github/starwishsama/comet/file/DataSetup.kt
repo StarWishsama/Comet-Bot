@@ -67,7 +67,9 @@ object DataSetup {
         }
 
         if (CompatibilityService.checkUserData(UserConfig.file)) {
-            CometVariables.cometUsers.putAll(UserConfig.file.parseAsClass())
+            if (CompatibilityService.upgradeUserData(UserConfig.file)) {
+                CometVariables.cometUsers.putAll(UserConfig.file.parseAsClass())
+            }
         }
 
         daemonLogger.info("已加载了 ${CometVariables.cometUsers.size} 个用户数据.")
