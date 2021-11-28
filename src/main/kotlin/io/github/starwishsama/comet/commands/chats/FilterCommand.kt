@@ -64,10 +64,10 @@ object FilterCommand : ChatCommand {
 
     private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
         if (e is GroupMessageEvent) {
-            return e.sender.isOperator() || user.hasPermission(props.permission) || user.isBotAdmin()
+            return e.sender.isOperator() || user.hasPermission(props.permissionNodeName)
         }
 
-        return user.hasPermission(props.permission) || user.isBotAdmin()
+        return user.hasPermission(props.permissionNodeName)
     }
 
     private fun handleAddFilterWord(words: List<String>, event: MessageEvent): MessageChain {

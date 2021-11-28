@@ -54,8 +54,8 @@ object KeyWordCommand : ChatCommand, ConversationCommand {
         get() = CommandProps(
             name = "keyword",
             aliases = listOf("关键词", "keywords", "kw", "gjc"),
-            description = "查看当前`关键词",
-            level = UserLevel.USER
+            description = "查看当前关键词",
+            level = UserLevel.ADMIN
         )
 
     override fun getHelp(): String =
@@ -70,14 +70,14 @@ object KeyWordCommand : ChatCommand, ConversationCommand {
             return e.group.getMember(user.id)?.isOperator() ?: false
         }
 
-        return true
+        return user.hasPermission(props.permissionNodeName)
     }
 
     override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
         if (event is GroupMessageEvent) {
             val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
             val keyword = KeyWordService.getKeyWordBySender(event.sender.id)
-            event.subject.sendMessage(KeyWordService.handleAddAutoReply(cfg, keyword, event.message))
+            event.subject.sendMessage(KeyWordService.handleAddAutoReply(user.id, cfg, keyword, event.message))
         }
 
         SessionHandler.removeSession(session)

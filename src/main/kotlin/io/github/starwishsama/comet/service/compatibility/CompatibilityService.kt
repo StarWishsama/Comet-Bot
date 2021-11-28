@@ -23,6 +23,7 @@ import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.service.compatibility.data.OldGroupConfig
 import io.github.starwishsama.comet.utils.copyAndRename
+import io.github.starwishsama.comet.utils.parseAsClass
 import io.github.starwishsama.comet.utils.serialize.isUsable
 import java.io.File
 import java.util.stream.Collectors
@@ -36,6 +37,25 @@ import java.util.stream.Collectors
  * @see [PerGroupConfig]
  */
 object CompatibilityService {
+    fun checkUserFile(userData: File): Boolean {
+        try {
+            userData.parseAsClass<List<CometUser>>()
+            return true
+        } catch (ignored: Exception) {
+        }
+
+        val oldUser: MutableMap<Long, CometUser>
+
+        try {
+            daemonLogger.log(HinaLogLevel.Info, "已检测到旧版本配置 ${userData.name}, 正在迁移...", prefix = "兼容性")
+
+            oldUser = userData.parseAsClass()
+        } catch (e: Exception) {
+            daemonLogger.log(HinaLogLevel.Warn, "转换旧版本配置 ${userData.name} 数据失败!", e, prefix = "兼容性")
+            return false
+        }
+    }
+
     fun checkConfigFile(cfgFile: File): Boolean {
         val tree = mapper.readTree(cfgFile)
         try {

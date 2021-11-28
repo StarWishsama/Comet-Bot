@@ -149,7 +149,7 @@ object MessageHandler {
 
                     /** 检查是否有执行命令的基本权限 */
                     val result: MessageChain =
-                        if (user.compareLevel(cmd.props.level) || user.hasPermission(cmd.props.permission)) {
+                        if (user.compareLevel(cmd.props.level) || user.hasPermission(cmd.props.permissionNodeName)) {
                             status = CommandStatus.Success()
                             cmd.execute(event, splitMessage, user)
                         } else {

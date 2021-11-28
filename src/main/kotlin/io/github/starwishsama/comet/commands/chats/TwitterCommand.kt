@@ -128,7 +128,7 @@ object TwitterCommand : ChatCommand {
     """.trimIndent()
 
     private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        if (user.hasPermission(props.permission) || user.isBotAdmin()) return true
+        if (user.hasPermission(props.permissionNodeName)) return true
         if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true
         return false
     }

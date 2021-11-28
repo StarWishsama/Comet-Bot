@@ -137,8 +137,7 @@ object BiliBiliCommand : ChatCommand {
     """.trimIndent()
 
     fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        val level = props.level
-        if (user.compareLevel(level)) return true
+        if (user.hasPermission(props.permissionNodeName)) return true
         if (e is GroupMessageEvent && e.sender.permission >= MemberPermission.MEMBER) return true
         return false
     }

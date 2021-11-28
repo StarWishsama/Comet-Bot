@@ -72,7 +72,7 @@ object KickCommand : ChatCommand {
             if (cfg.isHelper(user.id)) return true
         }
 
-        return user.hasPermission(props.permission)
+        return user.hasPermission(props.permissionNodeName)
     }
 
     private fun doKick(event: GroupMessageEvent, target: Long, reason: String) {

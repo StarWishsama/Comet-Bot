@@ -51,7 +51,7 @@ object KeyWordService {
         return "已移除关键词: $keyWord".toChain()
     }
 
-    fun handleAddAutoReply(cfg: PerGroupConfig, keyWord: String, reply: MessageChain): MessageChain {
+    fun handleAddAutoReply(trigger: Long, cfg: PerGroupConfig, keyWord: String, reply: MessageChain): MessageChain {
         if (keyWord.isEmpty()) {
             return "请输入关键词".toChain()
         }
@@ -73,6 +73,8 @@ object KeyWordService {
                 )
             )
         }
+
+        inProgressAdder.remove(trigger)
 
         return "已添加关键词: $keyWord".toChain()
     }

@@ -10,22 +10,21 @@
 
 package io.github.starwishsama.comet.objects
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.managers.PermissionManager
 import io.github.starwishsama.comet.objects.enums.UserLevel
+import io.github.starwishsama.comet.objects.permission.CometPermission
 import java.time.LocalDateTime
 
 data class CometUser(
-    @JsonProperty("userQQ")
     val id: Long,
-    var lastCheckInTime: LocalDateTime = LocalDateTime.now().minusDays(1),
+    var checkInDateTime: LocalDateTime = LocalDateTime.now().minusDays(1),
     var checkInPoint: Double = 0.0,
-    var checkInTime: Int = 0,
+    var checkInCount: Int = 0,
     var r6sAccount: String = "",
     var level: UserLevel = UserLevel.USER,
-    var checkInGroup: Long = 0,
-    var lastExecuteTime: Long = -1,
-    private val permissions: MutableSet<String> = mutableSetOf(),
+    var triggerCommandTime: Long = -1,
+    private val permissions: MutableSet<CometPermission> = mutableSetOf(),
 ) {
     fun addPoint(point: Number) {
         checkInPoint += point.toDouble()
@@ -36,20 +35,20 @@ data class CometUser(
     }
 
     fun plusDay() {
-        checkInTime++
+        checkInCount++
     }
 
     fun resetDay() {
-        checkInTime = 1
+        checkInCount = 1
     }
 
-    fun hasPermission(permission: String): Boolean {
-        return permissions.contains(permission) || isBotOwner()
+    fun hasPermission(nodeName: String): Boolean {
+        return permissions.find { it.name == nodeName } != null
     }
 
     fun getPermissions(): String = buildString {
         this@CometUser.permissions.forEach {
-            append("$it ")
+            append("${it.name} ")
         }
     }.trim()
 
@@ -69,12 +68,12 @@ data class CometUser(
         return level == UserLevel.OWNER
     }
 
-    fun addPermission(permission: String) {
-        permissions.add(permission)
+    fun addPermission(nodeName: String) {
+        permissions.add(PermissionManager.getPermission(nodeName) ?: return)
     }
 
-    fun removePermission(permission: String) {
-        permissions.remove(permission)
+    fun removePermission(nodeName: String) {
+        permissions.remove(PermissionManager.getPermission(nodeName) ?: return)
     }
 
     /**
@@ -85,7 +84,7 @@ data class CometUser(
      */
     fun isChecked(): Boolean {
         val now = LocalDateTime.now()
-        val period = lastCheckInTime.toLocalDate().until(now.toLocalDate())
+        val period = checkInDateTime.toLocalDate().until(now.toLocalDate())
 
         return period.days == 0
     }
@@ -101,12 +100,12 @@ data class CometUser(
     fun checkCoolDown(silent: Boolean = false, coolDown: Int = CometVariables.cfg.coolDownTime): Boolean {
         val currentTime = System.currentTimeMillis()
 
-        return if (lastExecuteTime < 0) {
-            if (!silent) lastExecuteTime = currentTime
+        return if (triggerCommandTime < 0) {
+            if (!silent) triggerCommandTime = currentTime
             true
         } else {
-            val hasCoolDown = currentTime - lastExecuteTime >= coolDown * 1000
-            if (!silent) lastExecuteTime = currentTime
+            val hasCoolDown = currentTime - triggerCommandTime >= coolDown * 1000
+            if (!silent) triggerCommandTime = currentTime
             hasCoolDown
         }
     }

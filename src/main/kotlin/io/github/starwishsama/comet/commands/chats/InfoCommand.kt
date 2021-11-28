@@ -31,8 +31,8 @@ object InfoCommand : ChatCommand {
         if (args.isEmpty()) {
             val reply =
                 "\n积分: " + String.format("%.1f", user.checkInPoint) +
-                        "\n累计连续签到了 " + user.checkInTime.toString() + " 天" + "\n上次签到于: " +
-                        user.lastCheckInTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString() +
+                        "\n累计连续签到了 " + user.checkInCount.toString() + " 天" + "\n上次签到于: " +
+                        user.checkInDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString() +
                         "\n权限组: " + user.level.toString()
 
             return if (event is GroupMessageEvent) {

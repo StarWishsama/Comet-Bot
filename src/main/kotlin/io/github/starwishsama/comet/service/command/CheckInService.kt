@@ -17,7 +17,6 @@ import io.github.starwishsama.comet.objects.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.NumberUtil.fixDisplay
 import net.mamoe.mirai.contact.nameCardOrNick
-import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import java.math.RoundingMode
@@ -46,12 +45,6 @@ object CheckInService {
         val checkInResult = buildString {
             append("${getCurrentInstantString()}好, ${sender.nameCardOrNick}~\n")
 
-            if (event is GroupMessageEvent) {
-                user.checkInGroup = event.group.id
-            } else {
-                user.checkInGroup = 0
-            }
-
             val position = getCheckInPosition(user)
 
             if (position == 0) {
@@ -68,8 +61,8 @@ object CheckInService {
 
             append("\n")
 
-            if (user.checkInTime >= 2) {
-                append("连续签到 ${user.checkInTime} 天 ${if (checkInPoint.extraPoint > 0) ", 幸运获得了 ${checkInPoint.extraPoint} 点积分~\n" else "\n"}")
+            if (user.checkInCount >= 2) {
+                append("连续签到 ${user.checkInCount} 天 ${if (checkInPoint.extraPoint > 0) ", 幸运获得了 ${checkInPoint.extraPoint} 点积分~\n" else "\n"}")
             }
 
             append("目前积分 > ${user.checkInPoint.fixDisplay()}\n")
@@ -88,7 +81,7 @@ object CheckInService {
     private fun calculatePoint(user: CometUser): CheckInResult {
         // 计算签到时间
         val currentTime = LocalDateTime.now()
-        val checkDuration = Duration.between(user.lastCheckInTime, currentTime)
+        val checkDuration = Duration.between(user.checkInDateTime, currentTime)
 
         if (checkDuration.toDays() <= 1) {
             user.plusDay()
@@ -96,14 +89,14 @@ object CheckInService {
             user.resetDay()
         }
 
-        user.lastCheckInTime = currentTime
+        user.checkInDateTime = currentTime
 
         // 使用随机数工具生成基础积分
         val basePoint = RandomUtil.randomDouble(-1.0, 10.0, 1, RoundingMode.HALF_DOWN)
 
         // 只取小数点后一位，将最大奖励点数限制到 3 倍
         val awardProp =
-            min(1.5, (RandomUtil.randomDouble(0.0, 0.2, 1, RoundingMode.HALF_DOWN) * (user.checkInTime - 1)))
+            min(1.5, (RandomUtil.randomDouble(0.0, 0.2, 1, RoundingMode.HALF_DOWN) * (user.checkInCount - 1)))
 
         // 连续签到的奖励积分
         val awardPoint = if (basePoint < 0) {
@@ -127,10 +120,10 @@ object CheckInService {
     private fun getCheckInPosition(user: CometUser): Int {
         val checkTime = LocalDateTime.now()
         val sortedByDate = CometVariables.cometUsers.filter {
-            it.value.lastCheckInTime.dayOfMonth == checkTime.dayOfMonth
-                    && it.value.lastCheckInTime.dayOfYear == checkTime.dayOfYear
-                    && it.value.lastCheckInTime.dayOfWeek == checkTime.dayOfWeek
-        }.entries.sortedBy { it.value.lastCheckInTime }
+            it.value.checkInDateTime.dayOfMonth == checkTime.dayOfMonth
+                    && it.value.checkInDateTime.dayOfYear == checkTime.dayOfYear
+                    && it.value.checkInDateTime.dayOfWeek == checkTime.dayOfWeek
+        }.entries.sortedBy { it.value.checkInDateTime }
 
         return sortedByDate.indexOfFirst { it.value == user }
     }

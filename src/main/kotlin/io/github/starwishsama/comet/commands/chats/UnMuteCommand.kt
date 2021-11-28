@@ -61,6 +61,6 @@ object UnMuteCommand : ChatCommand {
             val cfg = GroupConfigManager.getConfigOrNew(e.group.id)
             if (cfg.isHelper(e.sender.id)) return true
         }
-        return user.hasPermission(props.permission)
+        return user.hasPermission(props.permissionNodeName)
     }
 }

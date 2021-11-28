@@ -13,7 +13,9 @@ package io.github.starwishsama.comet.api.command
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.managers.PermissionManager
 import io.github.starwishsama.comet.objects.enums.UserLevel
+import io.github.starwishsama.comet.objects.permission.CometPermission
 import io.github.starwishsama.comet.utils.StringUtil
 
 data class CommandProps(
@@ -21,7 +23,7 @@ data class CommandProps(
     val aliases: List<String> = mutableListOf(),
     val description: String,
     val level: UserLevel,
-    val permission: String = "comet.command.$name",
+    val permissionNodeName: String = "comet.command.$name",
     val consumerType: CommandExecuteConsumerType = CommandExecuteConsumerType.COOLDOWN,
     val consumePoint: Double = CometVariables.cfg.coolDownTime.toDouble(),
 ) {
@@ -29,6 +31,10 @@ data class CommandProps(
         if (!StringUtil.isAlphabeticAndDigit(name)) {
             throw IllegalArgumentException("Command name must be alphabetic")
         }
+
+        PermissionManager.registerPermission(
+            CometPermission(permissionNodeName, level)
+        )
     }
 
     fun isDisabledCommand(id: Long): Boolean {
