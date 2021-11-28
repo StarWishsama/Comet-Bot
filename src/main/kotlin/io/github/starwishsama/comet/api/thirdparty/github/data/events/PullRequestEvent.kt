@@ -18,6 +18,7 @@ import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 data class PullRequestEvent(
     val action: String,
@@ -55,7 +56,9 @@ data class PullRequestEvent(
         fun convertCreatedTime(): String {
             val localTime =
                 LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.of("UTC"))
-            return CometVariables.hmsPattern.format(localTime)
+            return TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT) + " " + CometVariables.hmsPattern.format(
+                localTime
+            )
         }
     }
 

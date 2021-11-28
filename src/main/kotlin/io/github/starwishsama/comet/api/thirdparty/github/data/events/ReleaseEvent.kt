@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 data class ReleaseEvent(
     // created, prereleased
@@ -43,18 +44,18 @@ data class ReleaseEvent(
         fun convertCreatedTime(): String {
             val localTime =
                 LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.of("UTC"))
-            return CometVariables.hmsPattern.format(localTime)
+            return TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT) + " " + CometVariables.hmsPattern.format(
+                localTime
+            )
         }
     }
 
     override fun toMessageWrapper(): MessageWrapper {
         val wrapper = MessageWrapper()
 
-        wrapper.addText("\uD83D\uDCE6 ${repository.fullName} 有新版本发布\n")
-        wrapper.addText("| 版本 #${release.tagName}\n")
-        wrapper.addText("| 发布时间 ${release.convertCreatedTime()}\n")
-        wrapper.addText("| 发布人 ${release.author.login}\n")
-        wrapper.addText("| 发布版信息 \n")
+        wrapper.addText("\uD83D\uDCE6 ${repository.fullName} ${release.tagName} 发布\n")
+        wrapper.addText("| ${release.author.login} | ${release.convertCreatedTime()}\n")
+        wrapper.addText("| \n")
         wrapper.addText("| ${release.title}\n")
         wrapper.addText("| ${release.body.limitStringSize(50).trim()}\n")
         wrapper.addText("| 查看完整信息: ${release.url}")

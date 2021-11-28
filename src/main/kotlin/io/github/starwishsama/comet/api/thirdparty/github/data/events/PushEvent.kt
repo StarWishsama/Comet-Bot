@@ -75,7 +75,7 @@ data class PushEvent(
     }
 
     private fun getLocalTime(time: Long): String {
-        return CometVariables.hmsPattern.format(
+        return TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT) + " " + CometVariables.hmsPattern.format(
             Instant.ofEpochMilli(time * 1000L).atZone(ZoneId.systemDefault()).toLocalDateTime()
         )
     }
@@ -89,9 +89,7 @@ data class PushEvent(
 
         wrapper.addText("⬆️ ${repoInfo.fullName}\n")
         wrapper.addText(
-            "| ${headCommitInfo.committer.name} ${
-                TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)
-            } ${getLocalTime(repoInfo.pushTime)}\n"
+            "| ${headCommitInfo.committer.name} | ${getLocalTime(repoInfo.pushTime)}\n"
         )
         wrapper.addText("| ${headCommitInfo.id.substring(0, 7)} [${ref.replace("refs/heads/", "")}]\n")
         wrapper.addText("| 提交信息: \n")
