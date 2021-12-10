@@ -18,6 +18,7 @@ import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.GachaUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.uploadAsImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -27,7 +28,6 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.at
-import org.apache.commons.lang3.StringUtils
 
 object ArkNightService {
     private var pool = GachaService.getPoolsByType<ArkNightPool>()[0]
@@ -77,7 +77,7 @@ object ArkNightService {
     }
 
     fun handleFreedomDraw(event: MessageEvent, user: CometUser, args: List<String>): MessageChain {
-        return if (StringUtils.isNumeric(args[0])) {
+        return if (args[0].isNumeric()) {
             val gachaTime: Int = try {
                 args[0].toInt()
             } catch (e: NumberFormatException) {

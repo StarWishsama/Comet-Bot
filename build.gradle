@@ -60,9 +60,6 @@ dependencies {
     implementation "cn.hutool:hutool-http:$hutoolVersion"
     implementation "cn.hutool:hutool-crypto:$hutoolVersion"
 
-    implementation 'org.apache.commons:commons-lang3:3.12.0'
-    implementation 'org.apache.commons:commons-io:1.3.2'
-
     // yamlkt @ https://github.com/him188/yamlkt
     implementation("net.mamoe.yamlkt:yamlkt:0.10.2")
 
