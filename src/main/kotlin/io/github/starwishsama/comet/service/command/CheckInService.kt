@@ -102,7 +102,7 @@ object CheckInService {
         user.checkInDateTime = currentTime
 
         // 使用随机数工具生成基础积分
-        val basePoint = RandomUtil.randomDouble(-1.0, 10.0, 1, RoundingMode.HALF_DOWN)
+        val basePoint = RandomUtil.randomDouble(-5.0, 10.0, 1, RoundingMode.HALF_DOWN)
 
         // 只取小数点后一位，将最大奖励点数限制到 3 倍
         val awardProp =
