@@ -68,7 +68,11 @@ object CheckInService {
             append("\n")
 
             if (user.checkInCount >= 2) {
-                append("连续签到 ${user.checkInCount} 天 ${if (checkInPoint.extraPoint > 0) ", 幸运获得了 ${checkInPoint.extraPoint} 点积分~\n" else "\n"}")
+                append("连续签到 ${user.checkInCount} 天 ${if (checkInPoint.awardPoint > 0) ", 额外获得 ${checkInPoint.awardPoint} 点积分\n" else "\n"}")
+            }
+
+            if (checkInPoint.chancePoint > 0) {
+                append("随机事件: 额外获得了 ${checkInPoint.chancePoint} 点积分 (*^_^*)")
             }
 
             append("目前积分 > ${user.checkInPoint.fixDisplay()}\n")
@@ -111,16 +115,19 @@ object CheckInService {
             String.format("%.1f", awardProp * basePoint).toDouble()
         }
 
-        user.addPoint(basePoint + awardPoint)
+        val chancePoint = hasRandomEvent()
 
-        return CheckInResult(basePoint, awardPoint)
+        user.addPoint(basePoint + awardPoint + chancePoint)
+
+        return CheckInResult(basePoint, awardPoint, chancePoint)
     }
 
     private data class CheckInResult(
         val basePoint: Double,
-        val extraPoint: Double
+        val awardPoint: Double,
+        val chancePoint: Double,
     ) {
-        fun getAllPoint(): Double = basePoint + extraPoint
+        fun getAllPoint(): Double = basePoint + awardPoint + chancePoint
     }
 
     private fun getCheckInPosition(user: CometUser): Int {
@@ -144,6 +151,16 @@ object CheckInService {
             in 13..18 -> "下午"
             in 19..22 -> "晚上"
             else -> "凌晨"
+        }
+    }
+
+    private fun hasRandomEvent(): Double {
+        val randomEvent = RandomUtil.randomDouble(0.0, 1.0, 1, RoundingMode.HALF_DOWN)
+
+        return if (randomEvent in 0.499..0.501) {
+            RandomUtil.randomDouble(10.0, 25.0, 1, RoundingMode.HALF_DOWN)
+        } else {
+            0.0
         }
     }
 }
