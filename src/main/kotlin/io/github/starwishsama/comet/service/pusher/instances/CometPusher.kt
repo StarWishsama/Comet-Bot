@@ -98,6 +98,8 @@ abstract class CometPusher(
 
         if (!cfgFile.exists()) cfgFile.createNewFile()
 
+        daemonLogger.debug("推送器 > 正在保存 $name 缓存")
+
         cfgFile.writeClassToJson(config)
     }
 
