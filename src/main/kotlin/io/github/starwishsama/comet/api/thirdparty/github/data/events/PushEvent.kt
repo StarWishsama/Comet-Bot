@@ -80,6 +80,18 @@ data class PushEvent(
         )
     }
 
+    private fun buildCommitList(): String {
+        return buildString {
+            commitInfo.subList(0, commitInfo.size.coerceAtMost(10)).forEach {
+                append("🔨 (${it.id.substring(0, 7)}) ${it.message.limitStringSize(100)} - ${it.committer.name}\n")
+            }
+
+            if (commitInfo.size > 10) {
+                append("...等 ${commitInfo.size} 个提交\n")
+            }
+        }
+    }
+
     override fun toMessageWrapper(): MessageWrapper {
         if (headCommitInfo == null) {
             return MessageWrapper().setUsable(false)
@@ -87,15 +99,14 @@ data class PushEvent(
 
         val wrapper = MessageWrapper()
 
-        wrapper.addText("⬆️ ${repoInfo.fullName}\n")
+        wrapper.addText("⬆️ 新提交 ${repoInfo.fullName} [${ref.replace("refs/\\w*/".toRegex(), "")}]\n")
         wrapper.addText(
-            "| ${headCommitInfo.committer.name} | ${getLocalTime(repoInfo.pushTime)}\n"
+            "by ${headCommitInfo.committer.name} | ${getLocalTime(repoInfo.pushTime)}\n"
         )
-        wrapper.addText("| ${headCommitInfo.id.substring(0, 7)} [${ref.replace("refs/heads/", "")}]\n")
-        wrapper.addText("| 提交信息: \n")
-        wrapper.addText("| ${headCommitInfo.message.limitStringSize(100)}\n")
-        wrapper.addText("| 查看差异 \n")
-        wrapper.addText(compare)
+        wrapper.addText("\n")
+        wrapper.addText(buildCommitList())
+        wrapper.addText("\n")
+        wrapper.addText("查看差异 > $compare")
 
         return wrapper
     }

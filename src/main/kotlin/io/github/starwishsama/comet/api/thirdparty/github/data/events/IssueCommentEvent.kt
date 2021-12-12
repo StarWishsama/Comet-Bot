@@ -48,9 +48,9 @@ data class IssueCommentEvent(
     override fun toMessageWrapper(): MessageWrapper {
         return MessageWrapper().apply {
             addText("\uD83D\uDCAC ${repository.fullName} 议题 #${issue.number}\n")
-            addText("| ${comment.user.login} | ${comment.convertCreatedTime()}\n")
-            addText("| ${comment.body.limitStringSize(80).trim()}\n")
-            addText("| 查看详细信息: ${comment.url}\n")
+            addText("新回复 | ${comment.user.login} | ${comment.convertCreatedTime()}\n\n")
+            addText("${comment.body.limitStringSize(80).trim()}\n")
+            addText("查看全部 > ${comment.url}\n")
 
         }
     }

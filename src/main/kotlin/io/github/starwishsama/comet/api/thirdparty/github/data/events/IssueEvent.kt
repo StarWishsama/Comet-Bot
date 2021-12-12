@@ -86,18 +86,18 @@ data class IssueEvent(
 
         when (action) {
             "opened" -> {
-                wrapper.addText("\uD83D\uDC1B ${repository.fullName} 新议题 #${issue.number}\n")
-                wrapper.addText("| ${issue.user.login} | ${issue.convertCreatedTime()}\n")
-                wrapper.addText("| 简略信息 \n")
-                wrapper.addText("| ${issue.title}\n")
-                wrapper.addText("| ${issue.body.limitStringSize(50).trim()}\n")
-                wrapper.addText("| 查看详细信息: ${issue.url}\n")
+                wrapper.addText("\uD83D\uDC1B ${repository.fullName} 有新议题 #${issue.number}\n")
+                wrapper.addText("by ${issue.user.login} | ${issue.convertCreatedTime()} \n")
+                wrapper.addText("\n")
+                wrapper.addText("${issue.title}\n")
+                wrapper.addText("${issue.body.limitStringSize(50).trim()}\n")
+                wrapper.addText("查看全部 >: ${issue.url}\n")
             }
 
             "closed" -> {
                 wrapper.addText("\uD83D\uDC1B ${repository.fullName} 议题 #${issue.number} 关闭\n")
-                wrapper.addText("| 创建人 ${issue.user.login}\n")
-                wrapper.addText("| 查看详细信息: ${issue.url}\n")
+                wrapper.addText("由 ${issue.user.login} 创建\n")
+                wrapper.addText("查看全部 > ${issue.url}\n")
             }
         }
 
