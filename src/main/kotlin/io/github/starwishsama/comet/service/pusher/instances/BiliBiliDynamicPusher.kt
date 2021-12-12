@@ -53,14 +53,7 @@ class BiliBiliDynamicPusher(
                 )
 
                 if (target == null) {
-                    cachePool.add(
-                        BiliBiliDynamicContext(
-                            mutableSetOf(config.id),
-                            time,
-                            pushUser = user,
-                            dynamicId = dynamic.getDynamicID()
-                        )
-                    )
+                    cachePool.add(current)
                 } else if (!target.contentEquals(current)) {
                     target.apply {
                         status = PushStatus.PROGRESSING
