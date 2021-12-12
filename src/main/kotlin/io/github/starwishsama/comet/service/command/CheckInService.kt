@@ -32,7 +32,7 @@ import kotlin.math.min
 object CheckInService {
     fun handleCheckIn(event: MessageEvent, user: CometUser): MessageChain {
         return if (user.isChecked()) {
-            "你今天已经签到过了! 输入 /cx 可查询签到信息".toChain()
+            "你今天已经签到过了! 输入 /cx 可查询积分情况".toChain()
         } else {
             doCheckIn(event, user)
         }
