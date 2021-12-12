@@ -54,7 +54,13 @@ object CheckInService {
             }
 
             if (checkInPoint.getAllPoint() == 0.0) {
-                append("今天运气不佳, 没有积分")
+                append("今天运气不佳, 没有积分 (>_<)")
+            } else if (checkInPoint.basePoint < 0) {
+                if (user.checkInPoint - checkInPoint.basePoint < 0 || user.checkInPoint <= 0) {
+                    append("今天运气不佳, 但你的积分快不够扣了, 就算了吧 o(￣▽￣)ｄ")
+                } else {
+                    append("今天运气不佳, 被扣除了 ${checkInPoint.basePoint.fixDisplay()} 积分 (>_<)")
+                }
             } else {
                 append("获得了 ${checkInPoint.basePoint.fixDisplay()} 点积分")
             }
