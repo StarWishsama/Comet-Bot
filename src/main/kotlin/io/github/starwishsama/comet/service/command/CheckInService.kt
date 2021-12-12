@@ -50,7 +50,7 @@ object CheckInService {
             if (position == 0) {
                 append("今日首位签到\n")
             } else {
-                append("今日第${position}位签到\n")
+                append("今日第${position + 1}位签到\n")
             }
 
             if (checkInPoint.getAllPoint() == 0.0) {
