@@ -11,6 +11,7 @@
 package io.github.starwishsama.comet.service.compatibility
 
 import cn.hutool.core.lang.UUID
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.daemonLogger
@@ -42,10 +43,22 @@ import java.util.stream.Collectors
  */
 object CompatibilityService {
     fun upgradeUserData(userData: File): Boolean {
-        try {
-            userData.parseAsClass<MutableMap<Long, CometUser>>()
+        val userTree = mapper.readTree(userData)
+
+        if (userTree.all { !it.isNull && !it["uuid"].isNull && !it["uuid"].isEmpty }) {
+            // Fix user id missing, Github#355
+            if (userTree.any { !it.isNull && it["id"].isNull || it["id"].asLong() == 0L }) {
+                userTree.fields().forEach { (key, value) ->
+                    if (value["id"].asLong(-1) == 0L) {
+                        (value as ObjectNode).put("id", key.toLong())
+                    }
+                }
+
+                mapper.writeValue(userData, userTree)
+                daemonLogger.log(HinaLogLevel.Info, "已修复用户数据 ID", prefix = "兼容性")
+            }
+
             return true
-        } catch (ignored: Exception) {
         }
 
         val oldUser: MutableMap<Long, OldCometUser>

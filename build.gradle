@@ -29,7 +29,7 @@ plugins {
 }
 
 def mainClass = 'io.github.starwishsama.comet.CometApplication'
-def miraiVersion = '2.9.0-M1'
+def miraiVersion = '2.8.3'
 def jacksonVersion = '2.13.0'
 def hutoolVersion = '5.7.17'
 
@@ -150,6 +150,14 @@ compileKotlin {
     println "Comet >> Using Java " + System.getProperty("java.version") + " to build."
     println "Comet >> Now building Comet $version..."
 
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11
+        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn"]
+        useIR = true
+    }
+}
+
+compileTestKotlin {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11
         freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn"]
