@@ -10,12 +10,12 @@
 
 package io.github.starwishsama.comet.objects
 
-import cn.hutool.core.lang.UUID
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.managers.PermissionManager
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.objects.permission.CometPermission
 import java.time.LocalDateTime
+import java.util.*
 
 data class CometUser(
     val id: Long,

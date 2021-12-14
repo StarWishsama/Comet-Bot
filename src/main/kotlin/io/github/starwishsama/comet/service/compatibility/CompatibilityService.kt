@@ -10,7 +10,6 @@
 
 package io.github.starwishsama.comet.service.compatibility
 
-import cn.hutool.core.lang.UUID
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.CometVariables
@@ -31,6 +30,7 @@ import io.github.starwishsama.comet.utils.copyAndRename
 import io.github.starwishsama.comet.utils.parseAsClass
 import io.github.starwishsama.comet.utils.serialize.isUsable
 import java.io.File
+import java.util.*
 import java.util.stream.Collectors
 
 /**
@@ -46,6 +46,18 @@ object CompatibilityService {
         val userTree = mapper.readTree(userData)
 
         if (userTree.all { !it.isNull && !it["uuid"].isNull && !it["uuid"].isEmpty }) {
+
+            if (userTree.any { !it.isNull && !it["uuid"].isTextual }) {
+                userTree.fields().forEach { (key, value) ->
+                    if (!value["uuid"].isTextual) {
+                        (value as ObjectNode).put("uuid", UUID.randomUUID().toString())
+                    }
+                }
+
+                mapper.writeValue(userData, userTree)
+                daemonLogger.log(HinaLogLevel.Info, "已修复用户数据 UUID", prefix = "兼容性")
+            }
+
             // Fix user id missing, Github#355
             if (userTree.any { !it.isNull && it["id"].isNull || it["id"].asLong() == 0L }) {
                 userTree.fields().forEach { (key, value) ->
