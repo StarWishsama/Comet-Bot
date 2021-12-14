@@ -72,7 +72,7 @@ object CheckInService {
             }
 
             if (checkInPoint.chancePoint > 0) {
-                append("随机事件: 额外获得了 ${checkInPoint.chancePoint} 点积分 (*^_^*)")
+                append("随机事件: 额外获得了 ${checkInPoint.chancePoint} 点积分 (*^_^*)\n")
             }
 
             append("目前积分 > ${user.checkInPoint.fixDisplay()}\n")
