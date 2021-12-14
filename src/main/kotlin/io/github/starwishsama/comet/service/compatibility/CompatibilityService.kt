@@ -48,7 +48,7 @@ object CompatibilityService {
         if (userTree.all { !it.isNull && !it["uuid"].isNull && !it["uuid"].isEmpty }) {
 
             if (userTree.any { !it.isNull && !it["uuid"].isTextual }) {
-                userTree.fields().forEach { (key, value) ->
+                userTree.fields().forEach { (_, value) ->
                     if (!value["uuid"].isTextual) {
                         (value as ObjectNode).put("uuid", UUID.randomUUID().toString())
                     }
@@ -58,7 +58,21 @@ object CompatibilityService {
                 daemonLogger.log(HinaLogLevel.Info, "已修复用户数据 UUID", prefix = "兼容性")
             }
 
-            // Fix user id missing, Github#355
+            if (userTree.any { !it["permissions"].isNull && it["permissions"].isTextual }) {
+                userTree.fields().forEach { (_, value) ->
+                    if (!value["permissions"].isNull && value["permissions"].asText("").isEmpty()) {
+                        (value as ObjectNode).put(
+                            "permissions",
+                            mapper.writeValueAsString(mutableSetOf<CometPermission>())
+                        )
+                    }
+                }
+
+                mapper.writeValue(userData, userTree)
+                daemonLogger.log(HinaLogLevel.Info, "已修复用户数据权限", prefix = "兼容性")
+            }
+
+            // Fix user id missing, GitHub#355
             if (userTree.any { !it.isNull && it["id"].isNull || it["id"].asLong() == 0L }) {
                 userTree.fields().forEach { (key, value) ->
                     if (value["id"].asLong(-1) == 0L) {
