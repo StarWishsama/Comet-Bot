@@ -14,8 +14,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
-
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -83,7 +81,7 @@ data class PushEvent(
     private fun buildCommitList(): String {
         return buildString {
             commitInfo.subList(0, commitInfo.size.coerceAtMost(10)).forEach {
-                append("🔨 (${it.id.substring(0, 7)}) ${it.message.limitStringSize(100)} - ${it.committer.name}\n")
+                append("🔨 (${it.id.substring(0, 7)}) ${it.message.substringBefore("\n")} - ${it.committer.name}\n")
             }
 
             if (commitInfo.size > 10) {
@@ -101,11 +99,10 @@ data class PushEvent(
 
         wrapper.addText("⬆️ 新提交 ${repoInfo.fullName} [${ref.replace("refs/\\w*/".toRegex(), "")}]\n")
         wrapper.addText(
-            "by ${headCommitInfo.committer.name} | ${getLocalTime(repoInfo.pushTime)}\n"
+            "by ${headCommitInfo.committer.name} | ${getLocalTime(repoInfo.pushTime)}\n\n"
         )
-        wrapper.addText("\n")
         wrapper.addText(buildCommitList())
-        wrapper.addText("\n")
+        wrapper.addText("\n\n")
         wrapper.addText("查看差异 > $compare")
 
         return wrapper

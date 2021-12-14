@@ -87,10 +87,9 @@ data class IssueEvent(
         when (action) {
             "opened" -> {
                 wrapper.addText("\uD83D\uDC1B ${repository.fullName} 有新议题 #${issue.number}\n")
-                wrapper.addText("by ${issue.user.login} | ${issue.convertCreatedTime()} \n")
-                wrapper.addText("\n")
+                wrapper.addText("by ${issue.user.login} | ${issue.convertCreatedTime()} \n\n")
                 wrapper.addText("${issue.title}\n")
-                wrapper.addText("${issue.body.limitStringSize(50).trim()}\n")
+                wrapper.addText("${issue.body.limitStringSize(50).trim()}\n\n")
                 wrapper.addText("查看全部 >: ${issue.url}\n")
             }
 

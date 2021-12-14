@@ -49,7 +49,7 @@ data class IssueCommentEvent(
         return MessageWrapper().apply {
             addText("\uD83D\uDCAC ${repository.fullName} 议题 #${issue.number}\n")
             addText("新回复 | ${comment.user.login} | ${comment.convertCreatedTime()}\n\n")
-            addText("${comment.body.limitStringSize(80).trim()}\n")
+            addText("${comment.body.limitStringSize(80).trim()}\n\n")
             addText("查看全部 > ${comment.url}\n")
 
         }

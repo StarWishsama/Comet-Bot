@@ -66,10 +66,9 @@ data class PullRequestEvent(
         val wrapper = MessageWrapper()
 
         wrapper.addText("\uD83D\uDD27 新提交更改 ${repository.fullName}\n")
-        wrapper.addText("by ${sender.login} | ${pullRequestInfo.convertCreatedTime()}\n")
-        wrapper.addText("\n")
+        wrapper.addText("by ${sender.login} | ${pullRequestInfo.convertCreatedTime()}\n\n")
         wrapper.addText("${pullRequestInfo.title}\n")
-        wrapper.addText("${pullRequestInfo.body.limitStringSize(100).trim()}\n")
+        wrapper.addText("${pullRequestInfo.body.limitStringSize(100).trim()}\n\n")
         wrapper.addText("查看全部 > ${pullRequestInfo.url}")
 
         return wrapper
