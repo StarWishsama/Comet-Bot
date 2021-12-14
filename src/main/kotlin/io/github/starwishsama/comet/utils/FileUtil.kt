@@ -37,7 +37,9 @@ import kotlin.time.ExperimentalTime
 
 @Synchronized
 fun File.writeClassToJson(context: Any, mapper: ObjectMapper = CometVariables.mapper) {
-    FileWriter.create(this).write(mapper.writeValueAsString(context), false)
+    FileWriter.create(this).getWriter(false).use {
+        mapper.writeValue(it, context)
+    }
 }
 
 @Synchronized
