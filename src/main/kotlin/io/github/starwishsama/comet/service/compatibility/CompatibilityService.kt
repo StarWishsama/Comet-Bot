@@ -45,7 +45,7 @@ object CompatibilityService {
     fun upgradeUserData(userData: File): Boolean {
         val userTree = mapper.readTree(userData)
 
-        if (userTree.all { !it.isNull && !it["uuid"].isNull && !it["uuid"].isEmpty }) {
+        if (userTree.all { !it.isNull && !it["uuid"].isNull }) {
 
             if (userTree.any { !it.isNull && !it["uuid"].isTextual }) {
                 userTree.fields().forEach { (_, value) ->
