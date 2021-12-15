@@ -33,6 +33,7 @@ import java.io.File
 import java.util.*
 import java.util.stream.Collectors
 
+
 /**
  * [CompatibilityService]
  *
@@ -46,7 +47,6 @@ object CompatibilityService {
         val userTree = mapper.readTree(userData)
 
         if (userTree.all { !it.isNull && !it["uuid"].isNull }) {
-
             if (userTree.any { !it.isNull && !it["uuid"].isTextual }) {
                 userTree.fields().forEach { (_, value) ->
                     if (!value["uuid"].isTextual) {
@@ -56,20 +56,6 @@ object CompatibilityService {
 
                 mapper.writeValue(userData, userTree)
                 daemonLogger.log(HinaLogLevel.Info, "已修复用户数据 UUID", prefix = "兼容性")
-            }
-
-            if (userTree.any { !it["permissions"].isNull && it["permissions"].isTextual }) {
-                userTree.fields().forEach { (_, value) ->
-                    if (!value["permissions"].isNull && value["permissions"].asText("").isEmpty()) {
-                        (value as ObjectNode).put(
-                            "permissions",
-                            mapper.writeValueAsString(mutableSetOf<CometPermission>())
-                        )
-                    }
-                }
-
-                mapper.writeValue(userData, userTree)
-                daemonLogger.log(HinaLogLevel.Info, "已修复用户数据权限", prefix = "兼容性")
             }
 
             // Fix user id missing, GitHub#355

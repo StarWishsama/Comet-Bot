@@ -119,6 +119,8 @@ object CometVariables {
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         // 反序列化时忽略未知参数
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        // Fix GitHub#355
+        .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
         .registerModules(
             JavaTimeModule().also {
                 it.addSerializer(
