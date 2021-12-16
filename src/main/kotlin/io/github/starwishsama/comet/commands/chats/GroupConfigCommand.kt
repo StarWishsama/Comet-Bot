@@ -25,6 +25,7 @@ import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.contact.MemberPermission
+import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
@@ -211,7 +212,7 @@ object GroupConfigCommand : ChatCommand, UnDisableableCommand {
 
     private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
         if (user.hasPermission(props.permissionNodeName)) return true
-        if (e is GroupMessageEvent && e.sender.permission > MemberPermission.MEMBER) return true
+        if (e is GroupMessageEvent && e.sender.isOperator()) return true
         return false
     }
 }

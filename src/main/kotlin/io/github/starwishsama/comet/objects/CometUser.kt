@@ -45,7 +45,9 @@ data class CometUser(
     }
 
     fun hasPermission(nodeName: String): Boolean {
-        return permissions.find { it.name == nodeName } != null
+        val target = PermissionManager.getPermission(nodeName) ?: return true
+
+        return target.defaultLevel < level || permissions.find { it.name == target.name } != null
     }
 
     fun getPermissions(): String = buildString {
