@@ -102,7 +102,7 @@ data class PushEvent(
             "by ${headCommitInfo.committer.name} | ${getLocalTime(repoInfo.pushTime)}\n\n"
         )
         wrapper.addText(buildCommitList())
-        wrapper.addText("\n\n")
+        wrapper.addText("\n")
         wrapper.addText("查看差异 > $compare")
 
         return wrapper
