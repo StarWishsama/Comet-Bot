@@ -218,7 +218,7 @@ class ArkNightPool(
                 }
             }
         } else {
-            return GachaUtil.overTimeMessage + "\n剩余积分: ${user.checkInPoint}"
+            return GachaUtil.overTimeMessage + "\n剩余硬币: ${user.coin}"
         }
     }
 

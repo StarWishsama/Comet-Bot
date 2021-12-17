@@ -46,6 +46,18 @@ object CompatibilityService {
     fun upgradeUserData(userData: File): Boolean {
         val userTree = mapper.readTree(userData)
 
+        // Update point to coin
+        if (userTree.all { !it.isNull && it["checkInPoint"].isDouble }) {
+            userTree.fields().forEach { (_, value) ->
+                if (value["coin"].isNull) {
+                    (value as ObjectNode).put("coin", value["checkInPoint"].asDouble())
+                }
+            }
+
+            mapper.writeValue(userData, userTree)
+            daemonLogger.log(HinaLogLevel.Info, "已更新用户数据积分 -> 硬币", prefix = "兼容性")
+        }
+
         if (userTree.all { !it.isNull && !it["uuid"].isNull }) {
             if (userTree.any { !it.isNull && !it["uuid"].isTextual }) {
                 userTree.fields().forEach { (_, value) ->
@@ -196,7 +208,7 @@ object CompatibilityService {
             return current
         }
         for (du in duplicatedUser) {
-            if (du.checkInPoint > current.checkInPoint || current.checkInPoint == 0.0) {
+            if (du.coin > current.coin || current.coin == 0.0) {
                 return du
             }
         }

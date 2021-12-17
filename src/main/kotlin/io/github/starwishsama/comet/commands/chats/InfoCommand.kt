@@ -30,7 +30,7 @@ object InfoCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             val reply =
-                "\n积分: " + String.format("%.1f", user.checkInPoint) +
+                "\n硬币: " + String.format("%.1f", user.coin) +
                         "\n累计连续签到了 " + user.checkInCount.toString() + " 天" + "\n上次签到于: " +
                         user.checkInDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString() +
                         "\n权限组: " + user.level.toString()
@@ -41,14 +41,14 @@ object InfoCommand : ChatCommand {
                 reply.convertToChain()
             }
         } else if (args.size == 1 && args[0].contentEquals("排行") || args[0].contentEquals("ph")) {
-            val users = CometVariables.cometUsers.values.sortedByDescending { it.checkInPoint }
+            val users = CometVariables.cometUsers.values.sortedByDescending { it.coin }
             val sb = StringBuilder()
-            sb.append("积分排行榜").append("\n")
+            sb.append("硬币排行榜").append("\n")
             return if (users.size > 9) {
                 for (i in 0..9) {
                     sb.append(i + 1).append(" ")
                         .append(Mirai.queryProfile(event.bot, users[i].id).nickname)
-                        .append(" ").append(String.format("%.1f", users[i].checkInPoint)).append("\n")
+                        .append(" ").append(String.format("%.1f", users[i].coin)).append("\n")
                 }
                 delay(500)
                 (sb.toString().trim { it <= ' ' }).convertToChain()
@@ -61,11 +61,11 @@ object InfoCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("info", arrayListOf("cx", "查询"), "查询积分等", UserLevel.USER)
+        CommandProps("info", arrayListOf("cx", "查询"), "查询硬币等", UserLevel.USER)
 
     override fun getHelp(): String = """
-        /cx 查询自己的积分信息
-        /cx ph 查询积分排行榜
+        /cx 查询自己的硬币信息
+        /cx ph 查询硬币排行榜
     """.trimIndent()
 
 }

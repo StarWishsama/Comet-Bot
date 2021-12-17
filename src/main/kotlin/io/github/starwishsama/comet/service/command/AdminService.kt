@@ -88,7 +88,7 @@ object AdminService {
 
             if (commandTime <= maxCommandTime) {
                 target.addPoint(commandTime)
-                "成功为 $target 添加 $commandTime 点积分".toChain()
+                "成功为 $target 添加 $commandTime 点硬币".toChain()
             } else {
                 "给予的次数超过系统限制上限".toChain()
             }

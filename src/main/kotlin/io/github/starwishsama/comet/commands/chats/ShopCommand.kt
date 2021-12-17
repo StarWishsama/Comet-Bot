@@ -25,7 +25,7 @@ object ShopCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("shop", arrayListOf("sd", "商店"), "积分商店", UserLevel.USER)
+        CommandProps("shop", arrayListOf("sd", "商店"), "硬币商店", UserLevel.USER)
 
     override fun getHelp(): String = """
         /shop list 查看商品列表

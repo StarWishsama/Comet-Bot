@@ -32,7 +32,7 @@ import kotlin.math.min
 object CheckInService {
     fun handleCheckIn(event: MessageEvent, user: CometUser): MessageChain {
         return if (user.isChecked()) {
-            "你今天已经签到过了! 输入 /cx 可查询积分情况".toChain()
+            "你今天已经签到过了! 输入 /cx 可查询硬币详情".toChain()
         } else {
             doCheckIn(event, user)
         }
@@ -54,28 +54,28 @@ object CheckInService {
             }
 
             if (checkInPoint.getAllPoint() == 0.0) {
-                append("今天运气不佳, 没有积分 (>_<)")
+                append("今天运气不佳, 没有硬币 (>_<)")
             } else if (checkInPoint.basePoint < 0) {
-                if (user.checkInPoint - checkInPoint.basePoint < 0 || user.checkInPoint <= 0) {
-                    append("今天运气不佳, 但你的积分快不够扣了, 就算了吧 o(￣▽￣)ｄ")
+                if (user.coin - checkInPoint.basePoint < 0 || user.coin <= 0) {
+                    append("今天运气不佳, 但你的硬币快不够扣了, 就算了吧 o(￣▽￣)ｄ")
                 } else {
-                    append("今天运气不佳, 被扣除了 ${checkInPoint.basePoint.fixDisplay()} 积分 (>_<)")
+                    append("今天运气不佳, 被扣除了 ${checkInPoint.basePoint.fixDisplay()} 硬币 (>_<)")
                 }
             } else {
-                append("获得了 ${checkInPoint.basePoint.fixDisplay()} 点积分")
+                append("获得了 ${checkInPoint.basePoint.fixDisplay()} 点硬币")
             }
 
             append("\n")
 
             if (user.checkInCount >= 2) {
-                append("连续签到 ${user.checkInCount} 天 ${if (checkInPoint.awardPoint > 0) ", 额外获得 ${checkInPoint.awardPoint} 点积分\n" else "\n"}")
+                append("连续签到 ${user.checkInCount} 天 ${if (checkInPoint.awardPoint > 0) ", 额外获得 ${checkInPoint.awardPoint} 点硬币\n" else "\n"}")
             }
 
             if (checkInPoint.chancePoint > 0) {
-                append("随机事件: 额外获得了 ${checkInPoint.chancePoint} 点积分 (*^_^*)\n")
+                append("随机事件: 额外获得了 ${checkInPoint.chancePoint} 点硬币 (*^_^*)\n")
             }
 
-            append("目前积分 > ${user.checkInPoint.fixDisplay()}\n")
+            append("目前硬币 > ${user.coin.fixDisplay()}\n")
 
             append("今日一言 > ${HitokotoUpdater.getHitokoto(false)}\n")
         }
@@ -84,9 +84,9 @@ object CheckInService {
     }
 
     /**
-     * 计算签到所得积分
+     * 计算签到所得硬币
      *
-     * @return 获取积分情况, 详见 [CheckInResult]
+     * @return 获取硬币情况, 详见 [CheckInResult]
      */
     private fun calculatePoint(user: CometUser): CheckInResult {
         // 计算签到时间
@@ -101,14 +101,14 @@ object CheckInService {
 
         user.checkInDateTime = currentTime
 
-        // 使用随机数工具生成基础积分
+        // 使用随机数工具生成基础硬币
         val basePoint = RandomUtil.randomDouble(-5.0, 10.0, 1, RoundingMode.HALF_DOWN)
 
         // 只取小数点后一位，将最大奖励点数限制到 3 倍
         val awardProp =
             min(1.5, (RandomUtil.randomDouble(0.0, 0.2, 1, RoundingMode.HALF_DOWN) * (user.checkInCount - 1)))
 
-        // 连续签到的奖励积分
+        // 连续签到的奖励硬币
         val awardPoint = if (basePoint < 0) {
             0.0
         } else {

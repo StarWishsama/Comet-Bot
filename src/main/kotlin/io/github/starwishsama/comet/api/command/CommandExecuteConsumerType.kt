@@ -12,6 +12,6 @@ package io.github.starwishsama.comet.api.command
 
 enum class CommandExecuteConsumerType {
     COOLDOWN,
-    POINT,
+    COIN,
     NONE
 }

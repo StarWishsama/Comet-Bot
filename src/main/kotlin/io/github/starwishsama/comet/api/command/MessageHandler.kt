@@ -124,9 +124,9 @@ object MessageHandler {
                 }
 
                 if (!useStatus) {
-                    return if (cmd.props.consumerType == CommandExecuteConsumerType.POINT) {
+                    return if (cmd.props.consumerType == CommandExecuteConsumerType.COIN) {
                         val response = LocalizationManager.getLocalizationText("message.no-enough-point")
-                            .replace("%point%", user.checkInPoint.fixDisplay())
+                            .replace("%point%", user.coin.fixDisplay())
                             .replace("%cost%", cmd.props.consumePoint.fixDisplay())
                         ExecutedResult(response.toChain(), cmd, CommandStatus.ValidateFailed())
                     } else {
@@ -221,9 +221,9 @@ object MessageHandler {
             CommandExecuteConsumerType.COOLDOWN -> {
                 user.checkCoolDown(coolDown = props.consumePoint.toInt())
             }
-            CommandExecuteConsumerType.POINT -> {
-                if (user.checkInPoint >= props.consumePoint) {
-                    user.checkInPoint -= props.consumePoint
+            CommandExecuteConsumerType.COIN -> {
+                if (user.coin >= props.consumePoint) {
+                    user.coin -= props.consumePoint
                     true
                 } else {
                     false
@@ -247,7 +247,7 @@ object MessageHandler {
         class PassToSession : CommandStatus("移交会话处理", false)
         class NotACommand : CommandStatus("非命令", false)
         class CometIsClose : CommandStatus("Comet 已关闭", false)
-        class ValidateFailed : CommandStatus("冷却/无积分", true)
+        class ValidateFailed : CommandStatus("冷却/无硬币", true)
 
         fun isOk(): Boolean = this.isSuccessful
     }

@@ -126,7 +126,7 @@ object GachaUtil {
     }
 
     fun checkHasGachaTime(user: CometUser, time: Int): Boolean =
-        (user.checkInPoint >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
+        (user.coin >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
 
     @Suppress("HttpUrlsUsage")
     fun checkArkNightImage() {

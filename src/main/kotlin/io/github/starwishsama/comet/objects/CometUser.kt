@@ -21,7 +21,7 @@ data class CometUser(
     val id: Long,
     val uuid: UUID,
     var checkInDateTime: LocalDateTime = LocalDateTime.now().minusDays(1),
-    var checkInPoint: Double = 0.0,
+    var coin: Double = 0.0,
     var checkInCount: Int = 0,
     var r6sAccount: String = "",
     var level: UserLevel = UserLevel.USER,
@@ -29,11 +29,11 @@ data class CometUser(
     private val permissions: MutableSet<CometPermission> = mutableSetOf(),
 ) {
     fun addPoint(point: Number) {
-        checkInPoint += point.toDouble()
+        coin += point.toDouble()
     }
 
     fun consumePoint(point: Number) {
-        checkInPoint -= point.toDouble()
+        coin -= point.toDouble()
     }
 
     fun plusDay() {

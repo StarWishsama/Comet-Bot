@@ -21,7 +21,7 @@ import net.mamoe.mirai.message.data.MessageChain
 /**
  * [CheckInCommand]
  *
- * 签到命令, 可以获得积分
+ * 签到命令, 可以获得硬币
  *
  * @author StarWishsama
  * @author StivenDing
