@@ -49,7 +49,7 @@ object CompatibilityService {
         // Update point to coin
         if (userTree.all { !it.isNull && it["checkInPoint"].isDouble }) {
             userTree.fields().forEach { (_, value) ->
-                if (value["coin"].isNull) {
+                if (value.get("coin") == null) {
                     (value as ObjectNode).put("coin", value["checkInPoint"].asDouble())
                 }
             }
