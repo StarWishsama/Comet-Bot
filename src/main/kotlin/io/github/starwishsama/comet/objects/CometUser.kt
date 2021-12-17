@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.objects
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.managers.PermissionManager
 import io.github.starwishsama.comet.objects.enums.UserLevel
@@ -64,10 +65,12 @@ data class CometUser(
         return this.level >= cmdLevel
     }
 
+    @JsonIgnore
     fun isBotAdmin(): Boolean {
         return level >= UserLevel.ADMIN || isBotOwner()
     }
 
+    @JsonIgnore
     fun isBotOwner(): Boolean {
         return level == UserLevel.OWNER
     }
@@ -86,6 +89,7 @@ data class CometUser(
      * @author StarWishsama
      * @return 是否签到
      */
+    @JsonIgnore
     fun isChecked(): Boolean {
         val now = LocalDateTime.now()
         val period = checkInDateTime.toLocalDate().until(now.toLocalDate())
