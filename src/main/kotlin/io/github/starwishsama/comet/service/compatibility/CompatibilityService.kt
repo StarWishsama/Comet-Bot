@@ -47,7 +47,7 @@ object CompatibilityService {
         val userTree = mapper.readTree(userData)
 
         // Update point to coin
-        if (userTree.all { !it.isNull && it["checkInPoint"].isDouble }) {
+        if (userTree.all { !it.isNull && it["checkInPoint"] != null && it["checkInPoint"].isDouble }) {
             userTree.fields().forEach { (_, value) ->
                 if (value.get("coin") == null) {
                     (value as ObjectNode).put("coin", value["checkInPoint"].asDouble())
