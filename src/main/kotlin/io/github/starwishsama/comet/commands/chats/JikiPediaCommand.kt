@@ -35,7 +35,7 @@ object JikiPediaCommand : ChatCommand {
         "在小鸡词典上搜索",
 
         UserLevel.USER,
-        consumePoint = 10.0
+        cost = 10.0
     )
 
     override fun getHelp(): String = """

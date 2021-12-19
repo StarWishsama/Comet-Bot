@@ -38,7 +38,7 @@ object NoAbbrCommand : ChatCommand {
 
             UserLevel.USER,
             consumerType = CommandExecuteConsumerType.COOLDOWN,
-            consumePoint = 5.0,
+            cost = 5.0,
         )
 
     override fun getHelp(): String = """

@@ -10,36 +10,24 @@
 
 package io.github.starwishsama.comet.api.thirdparty.rainbowsix
 
-import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.CometVariables.daemonLogger
-import io.github.starwishsama.comet.CometVariables.mapper
+import de.jan.r6statsjava.R6Stats
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
-import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatsGenericStat
-import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.R6StatsSeasonalStat
-import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.Region
 import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.objects.config.api.R6StatsConfig
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import io.github.starwishsama.comet.utils.FileUtil
-import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.jackson.JacksonConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.HeaderMap
-import retrofit2.http.Path
 
 object R6StatsApi : ApiExecutor {
-    private val api: IR6StatsAPI
+    private val api: R6Stats
 
     init {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api2.r6stats.com/public-api/stats/")
-            .addConverterFactory(JacksonConverterFactory.create(mapper))
-            .client(CometVariables.client)
-            .build()
+        val token = ApiManager.getConfig<R6StatsConfig>().token
 
-        api = retrofit.create(IR6StatsAPI::class.java)
+        if (token.isEmpty()) {
+            throw ApiKeyIsEmptyException("未填写 R6Stats API, 无法调用 API")
+        }
+
+        api = R6Stats(token)
     }
 
     override var usedTime: Int = 0
@@ -47,7 +35,7 @@ object R6StatsApi : ApiExecutor {
 
     override fun getLimitTime(): Int = 60
 
-    fun getR6StatsAPI(): IR6StatsAPI {
+    private fun getR6StatsAPI(): R6Stats {
         if (ApiManager.getConfig<R6StatsConfig>().token.isEmpty()) {
             throw ApiKeyIsEmptyException("未填写 R6Stats API, 无法调用 API")
         }
@@ -57,79 +45,47 @@ object R6StatsApi : ApiExecutor {
         return api
     }
 
-    fun getPlayerStat(userName: String, platform: String = "pc"): MessageWrapper {
-        val genericStat: R6StatsGenericStat?
-        val seasonalStat: R6StatsSeasonalStat?
+    fun getPlayerStat(userName: String, platform: String = "pc"): MessageWrapper =
+        runCatching<MessageWrapper> {
+            val playerStat = getR6StatsAPI().getR6PlayerStats(userName, R6Stats.Platform.valueOf(platform))
 
-        val genericResult = getR6StatsAPI().getGenericInfo(userName, platform).execute()
-        val seasonalResult = getR6StatsAPI().getSeasonalInfo(userName, platform).execute()
+            val seasonalStat = getR6StatsAPI().getR6PlayerSeasonalStats(userName, R6Stats.Platform.valueOf(platform))
+                .getSeason("crime")
 
-        try {
-            genericStat = genericResult.body()
-            seasonalStat = seasonalResult.body()
-        } catch (e: Exception) {
-            return if (e is ApiKeyIsEmptyException) {
-                MessageWrapper().addText("R6Stats API 未正确配置, 请联系机器人管理员")
-            } else {
-                daemonLogger.warning("R6Stats API 异常", e)
-                MessageWrapper().addText("API 异常, 无法获取玩家 $userName 的信息")
-            }
-        }
+            val infoText = "|| ${playerStat.username} [${playerStat.level} 级]\n" +
+                    "|| 目前段位 ${seasonalStat.rankText}\n" +
+                    "|| MMR 状态 ${seasonalStat.mmr} (${seasonalStat.lastMatchMMRChange})\n" +
+                    "|| KD ${playerStat.generalStats.kd} / WL ${playerStat.generalStats.wl}\n" +
+                    "|| 胜率 ${
+                        String.format(
+                            "%.2f",
+                            (playerStat.generalStats.wins / playerStat.generalStats.gamesPlayed) * 100
+                        )
+                    }%"
 
-        if (genericStat == null || seasonalStat == null) {
-            FileUtil.createErrorReportFile(
-                "R6Stats API 异常",
-                "r6stats",
-                null,
-                genericResult.toString() + "\n" + seasonalResult.toString(),
-                "genericStat isNull = ${genericStat == null}, seasonalStat isNull = ${seasonalStat == null}"
-            )
-
-            return MessageWrapper().addText("无法获取玩家 $userName 的信息, 数据为空")
-        }
-
-        val cfg = ApiManager.getConfig<R6StatsConfig>()
-
-        val latestSeasonalStat = seasonalStat.getSeasonalStat(cfg.seasonName)?.getRegionStat(Region.EMEA)
-            ?: return MessageWrapper().addText("无法获取玩家 $userName 的信息, 赛季数据为空")
-
-        val infoText = "|| ${genericStat.username} [${genericStat.levelInfo.level} 级]\n" +
-                "|| 目前段位 ${latestSeasonalStat.getRankAsEnum().rankName}\n" +
-                "|| MMR 状态 ${latestSeasonalStat.currentMMR} (${latestSeasonalStat.lastMatchMMRChange})\n" +
-                "|| KD ${genericStat.stats.generalStat.kd} / WL ${genericStat.stats.generalStat.winLoss}\n" +
-                "|| 胜率 ${
-                    String.format(
-                        "%.2f",
-                        (genericStat.stats.generalStat.winTime / genericStat.stats.generalStat.playedGameTime.toDouble()) * 100
-                    )
-                }%"
-
-        return MessageWrapper().addPictureByURL(genericStat.avatarUrlSmall).addText(infoText)
-    }
+            return MessageWrapper().addPictureByURL(playerStat.avatarURL146).addText(infoText)
+        }.onFailure {
+            return MessageWrapper().addText("无法获取玩家 $userName 的信息, 服务器异常")
+        }.getOrThrow()
 }
 
-interface IR6StatsAPI {
-    @GET("{username}/{platform}/generic")
-    fun getGenericInfo(
-        @Path("username") userName: String,
-        @Path("platform") platform: String = "pc",
-        @HeaderMap headerMap: Map<String, String> = mapOf(
-            Pair(
-                "Authorization",
-                "Bearer ${ApiManager.getConfig<R6StatsConfig>().token}"
-            )
-        )
-    ): Call<R6StatsGenericStat>
+enum class SeasonName(val season: String) {
 
-    @GET("{username}/{platform}/seasonal")
-    fun getSeasonalInfo(
-        @Path("username") userName: String,
-        @Path("platform") platform: String = "pc",
-        @HeaderMap headerMap: Map<String, String> = mapOf(
-            Pair(
-                "Authorization",
-                "Bearer ${ApiManager.getConfig<R6StatsConfig>().token}"
-            )
-        )
-    ): Call<R6StatsSeasonalStat>
+    CRYSTAL_GUARD("crystal_guard"),
+
+    NORTH_STAR("north_star"),
+
+    CRIMSON_HEIST("crimson_heist"),
+
+    NEON_DAWN("neon_dawn"),
+
+    SHADOW_LEGACY("shadow_legacy"),
+
+    STEEL_WAVE("steel_wave"),
+
+    VOID_EDGE("void_edge"),
+
+    SHIFTING_TIDES("shifting_tides"),
+
+    EMBER_RISE("ember_rise")
 }

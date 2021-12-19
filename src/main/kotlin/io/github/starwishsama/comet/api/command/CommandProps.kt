@@ -23,9 +23,10 @@ data class CommandProps(
     val aliases: List<String> = mutableListOf(),
     val description: String,
     val level: UserLevel,
+    // Auto register, you can change it.
     val permissionNodeName: String = "comet.command.$name",
     val consumerType: CommandExecuteConsumerType = CommandExecuteConsumerType.COOLDOWN,
-    val consumePoint: Double = CometVariables.cfg.coolDownTime.toDouble(),
+    val cost: Double = CometVariables.cfg.coolDownTime.toDouble(),
 ) {
     init {
         if (!StringUtil.isAlphabeticAndDigit(name)) {

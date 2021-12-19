@@ -127,7 +127,7 @@ object MessageHandler {
                     return if (cmd.props.consumerType == CommandExecuteConsumerType.COIN) {
                         val response = LocalizationManager.getLocalizationText("message.no-enough-point")
                             .replace("%point%", user.coin.fixDisplay())
-                            .replace("%cost%", cmd.props.consumePoint.fixDisplay())
+                            .replace("%cost%", cmd.props.cost.fixDisplay())
                         ExecutedResult(response.toChain(), cmd, CommandStatus.ValidateFailed())
                     } else {
                         ExecutedResult(EmptyMessageChain, cmd, CommandStatus.ValidateFailed())
@@ -219,11 +219,11 @@ object MessageHandler {
 
         return when (props.consumerType) {
             CommandExecuteConsumerType.COOLDOWN -> {
-                user.checkCoolDown(coolDown = props.consumePoint.toInt())
+                user.checkCoolDown(coolDown = props.cost.toInt())
             }
             CommandExecuteConsumerType.COIN -> {
-                if (user.coin >= props.consumePoint) {
-                    user.coin -= props.consumePoint
+                if (user.coin >= props.cost) {
+                    user.coin -= props.cost
                     true
                 } else {
                     false

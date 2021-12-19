@@ -67,7 +67,7 @@ object ArkNightCommand : ChatCommand {
             "明日方舟寻访模拟器",
 
             UserLevel.USER,
-            consumePoint = 5.0
+            cost = 5.0
         )
 
     override fun getHelp(): String = """

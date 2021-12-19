@@ -57,7 +57,7 @@ object MusicCommand : ChatCommand {
             "点歌命令",
 
             UserLevel.USER,
-            consumePoint = 5.0
+            cost = 5.0
         )
 
     override fun getHelp(): String = """
