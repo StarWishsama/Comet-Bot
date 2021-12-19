@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.objects.config.api
 
-import io.github.starwishsama.comet.api.thirdparty.rainbowsix.SeasonName
+import io.github.starwishsama.comet.api.thirdparty.rainbowsix.data.SeasonName
 import kotlinx.serialization.Serializable
 import net.mamoe.yamlkt.Comment
 import java.util.concurrent.TimeUnit
