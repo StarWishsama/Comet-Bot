@@ -50,7 +50,7 @@ object R6StatsApi : ApiExecutor {
             val playerStat = getR6StatsAPI().getR6PlayerStats(userName, R6Stats.Platform.valueOf(platform))
 
             val seasonalStat = getR6StatsAPI().getR6PlayerSeasonalStats(userName, R6Stats.Platform.valueOf(platform))
-                .getSeason("crime")
+                .getSeason(SeasonName.NORTH_STAR.season)
 
             val infoText = "|| ${playerStat.username} [${playerStat.level} 级]\n" +
                     "|| 目前段位 ${seasonalStat.rankText}\n" +
