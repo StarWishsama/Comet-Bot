@@ -39,7 +39,7 @@ object KickCommand : ChatCommand {
             if (args.isNotEmpty()) {
                 val at = CometUtil.parseAtToId(event, args[0])
                 if (at > -1) {
-                    if (args.size > 1) {
+                    return if (args.size > 1) {
                         doKick(event, at, args.getRestString(1))
                     } else {
                         doKick(event, at, "")
@@ -51,7 +51,7 @@ object KickCommand : ChatCommand {
                 return getHelp().convertToChain()
             }
         } else {
-            CometUtil.toChain("我不是绿帽 我爬 我爬")
+            toChain("我不是绿帽 我爬 我爬")
         }
 
         return EmptyMessageChain
@@ -75,14 +75,18 @@ object KickCommand : ChatCommand {
         return user.hasPermission(props.permissionNodeName)
     }
 
-    private fun doKick(event: GroupMessageEvent, target: Long, reason: String) {
-        event.group.members.forEach {
-            if (it.id == target) {
+    private fun doKick(event: GroupMessageEvent, target: Long, reason: String): MessageChain {
+        event.group.members[target]?.let { member ->
+            return if (member.permission == MemberPermission.MEMBER) {
                 runBlocking {
-                    if (reason.isNotBlank()) it.kick(reason)
-                    else it.kick("管理员操作")
+                    if (reason.isNotBlank()) member.kick(reason)
+                    else member.kick("管理员操作")
                 }
+
+                "已踢出 ${member.nick}".convertToChain()
+            } else {
+                "${member.nick} 是管理员，无法踢出".convertToChain()
             }
-        }
+        } ?: return "找不到对应群员".convertToChain()
     }
 }
