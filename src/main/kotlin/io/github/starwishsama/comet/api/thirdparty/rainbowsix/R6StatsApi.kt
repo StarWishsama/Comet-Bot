@@ -11,6 +11,7 @@
 package io.github.starwishsama.comet.api.thirdparty.rainbowsix
 
 import de.jan.r6statsjava.R6Stats
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
 import io.github.starwishsama.comet.exceptions.ApiKeyIsEmptyException
 import io.github.starwishsama.comet.managers.ApiManager
@@ -47,7 +48,7 @@ object R6StatsApi : ApiExecutor {
 
     fun getPlayerStat(userName: String, platform: String = "pc"): MessageWrapper =
         runCatching<MessageWrapper> {
-            val playerStat = getR6StatsAPI().getR6PlayerStats(userName, R6Stats.Platform.valueOf(platform))
+            val playerStat = getR6StatsAPI().getR6PlayerStats(userName, R6Stats.Platform.valueOf(platform.uppercase()))
 
             val seasonalStat = getR6StatsAPI().getR6PlayerSeasonalStats(userName, R6Stats.Platform.valueOf(platform))
                 .getSeason(SeasonName.NORTH_STAR.season)
@@ -65,6 +66,7 @@ object R6StatsApi : ApiExecutor {
 
             return MessageWrapper().addPictureByURL(playerStat.avatarURL146).addText(infoText)
         }.onFailure {
+            daemonLogger.warning("获取 R6Stats 玩家信息失败", it)
             return MessageWrapper().addText("无法获取玩家 $userName 的信息, 服务器异常")
         }.getOrThrow()
 }
