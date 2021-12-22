@@ -54,11 +54,11 @@ object GitHubService {
         val id = if (isGroup) {
             (event as GroupMessageEvent).group.id
         } else {
-            if (args.size == 1) {
+            if (args.size == 2) {
                 return "请填写正确的群号!".toChain()
             }
 
-            args[1].toLongOrNull() ?: return "请填写正确的群号!".toChain()
+            args[2].toLongOrNull() ?: return "请填写正确的群号!".toChain()
         }
 
         if (!checkPermission(user, event.sender, id)) {
@@ -126,11 +126,11 @@ object GitHubService {
         val id = if (isGroup) {
             (event as GroupMessageEvent).group.id
         } else {
-            if (args.size == 1) {
+            if (args.size == 2) {
                 return "请填写正确的群号!".toChain()
             }
 
-            args[1].toLongOrNull() ?: return "请填写正确的群号!".toChain()
+            args[2].toLongOrNull() ?: return "请填写正确的群号!".toChain()
         }
 
         if (!checkPermission(user, event.sender, id)) {
@@ -172,11 +172,11 @@ object GitHubService {
         val id = if (isGroup) {
             (event as GroupMessageEvent).group.id
         } else {
-            if (args.size == 1) {
+            if (args.size == 2) {
                 return "请填写正确的群号!".toChain()
             }
 
-            args[1].toLongOrNull() ?: return "请填写正确的群号!".toChain()
+            args[2].toLongOrNull() ?: return "请填写正确的群号!".toChain()
         }
 
         if (!checkPermission(user, event.sender, id)) {
