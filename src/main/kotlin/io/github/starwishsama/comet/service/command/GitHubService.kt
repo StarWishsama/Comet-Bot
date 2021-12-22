@@ -81,11 +81,15 @@ object GitHubService {
         }
 
         if (!repoName.contains("/")) {
-            return "请填写正确的仓库名称! 格式: 用户名/仓库名".toChain()
+            return if (isGroup) {
+                "请填写正确的仓库名称! 格式: 用户名/仓库名".toChain()
+            } else {
+                "正确的命令: /github add [仓库名称] [群号] (仓库 Secret [可选])\n请填写正确的仓库名称! 格式: 用户名/仓库名".toChain()
+            }
         }
 
         if (!isGroup && comet.getBot().getGroup(id) == null) {
-            return "机器人不在你指定的群内.".toChain()
+            return "机器人不在你指定的群内, 无法推送信息, 请先邀请机器人加入对应群聊.".toChain()
         }
 
         val authorAndRepo = repoName.split("/")
@@ -142,9 +146,12 @@ object GitHubService {
         val repoName = args[1]
 
         if (!repoName.contains("/")) {
-            return "请填写正确的仓库名称! 格式: 用户名/仓库名".toChain()
+            return if (isGroup) {
+                "请填写正确的仓库名称! 格式: 用户名/仓库名".toChain()
+            } else {
+                "正确的命令: /github rm [仓库名称] [群号]\n请填写正确的仓库名称! 格式: 用户名/仓库名".toChain()
+            }
         }
-
 
         if (!isGroup && comet.getBot().getGroup(id) == null) {
             return "机器人不在你指定的群内.".toChain()
@@ -205,8 +212,6 @@ object GitHubService {
         if (session == null) {
             if (args.size < 2) {
                 return "正确的命令: /github modify [仓库名称]".toChain()
-            } else if (args.isEmpty()) {
-                return "正确的命令: /github add [仓库名称] (仓库 Secret [可选])".toChain()
             }
 
             val repoName = args[1]
