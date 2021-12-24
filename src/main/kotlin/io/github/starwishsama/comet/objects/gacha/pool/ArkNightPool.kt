@@ -12,6 +12,7 @@ package io.github.starwishsama.comet.objects.gacha.pool
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.api.gacha.impl.ArkNightInstance
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.gacha.GachaResult
@@ -48,7 +49,7 @@ class ArkNightPool(
     override val poolItems: MutableList<ArkNightOperator> = mutableListOf()
 
     init {
-        CometVariables.arkNight.stream().filter { condition(it) }.forEach {
+        ArkNightInstance.getArkNightOperators().stream().filter { condition(it) }.forEach {
             poolItems.add(it)
         }
 

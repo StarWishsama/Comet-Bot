@@ -10,13 +10,9 @@
 
 package io.github.starwishsama.comet.utils
 
-import cn.hutool.core.net.URLDecoder
-import io.github.starwishsama.comet.CometVariables.arkNight
 import io.github.starwishsama.comet.CometVariables.cfg
 import io.github.starwishsama.comet.CometVariables.daemonLogger
-import io.github.starwishsama.comet.CometVariables.mapper
-import io.github.starwishsama.comet.CometVariables.yyMMddPattern
-import io.github.starwishsama.comet.exceptions.ApiException
+import io.github.starwishsama.comet.api.gacha.impl.ArkNightInstance.pictureReady
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
@@ -24,34 +20,16 @@ import io.github.starwishsama.comet.objects.gacha.items.GachaItem
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
 import io.github.starwishsama.comet.service.gacha.GachaConstants
-import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
-import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
-import io.github.starwishsama.comet.utils.network.NetUtil
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import org.jsoup.Jsoup
+
 import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStream
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import javax.imageio.ImageIO
 
 object GachaUtil {
-    /**
-     * 明日方舟
-     */
-
     const val overTimeMessage = "抽卡次数到上限了, 可以少抽一点或者等待条数自动恢复哦~\n" +
             "命令条数现在每小时会恢复100次, 封顶1000次"
-    var pictureReady = false
-
-    private const val arkNightDataApi = "https://api.github.com/repos/Kengxxiao/ArknightsGameData"
-    const val arkNightData =
-        "https://raw.fastgit.org/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json"
 
     @Suppress("UNCHECKED_CAST")
     fun combineGachaImage(gachaResult: List<GachaItem>, poolType: GachaPool): CombinedResult {
@@ -127,100 +105,6 @@ object GachaUtil {
 
     fun checkHasGachaTime(user: CometUser, time: Int): Boolean =
         (user.coin >= time || user.compareLevel(UserLevel.ADMIN)) && time <= 10000
-
-    @Suppress("HttpUrlsUsage")
-    fun checkArkNightImage() {
-        val arkLoc = FileUtil.getResourceFolder().getChildFolder("ark")
-
-        if (arkLoc.filesCount() == 0) {
-            val startTime = LocalDateTime.now()
-            daemonLogger.info("正在下载 明日方舟图片资源文件")
-
-            val ele = Jsoup.connect(
-                "http://prts.wiki/w/PRTS:%E6%96%87%E4%BB%B6%E4%B8%80%E8%A7%88/%E5%B9%B2%E5%91%98%E7%B2%BE%E8%8B%B10%E5%8D%8A%E8%BA%AB%E5%83%8F"
-            ).timeout(5_000).get().getElementsByClass("mw-parser-output")[0].select("a")
-
-            var successCount = 0
-
-            val downloadList = mutableSetOf<String>()
-
-            ele.forEach {
-                try {
-                    val image = Jsoup.connect("http://prts.wiki/" + it.attr("href")).timeout(10_000).get()
-                    downloadList.plusAssign(image.getElementsByClass("fullImageLink")[0].select("a").attr("href"))
-
-                    // 休息 1.5 秒, 避免给 PRTS 服务器带来太大压力
-                    runBlocking {
-                        delay(1_500)
-                    }
-                } catch (e: Exception) {
-                    daemonLogger.warning("获取图片 http://prts.wiki/${it.attr("href")} 失败, 请手动下载.")
-                }
-            }
-
-            // http://prts.wiki/images/f/ff/半身像_诗怀雅_1.png
-
-            downloadList.forEach { url ->
-                val opName = URLDecoder.decode(url.split("/")[4].split("_")[1], Charsets.UTF_8)
-
-                if (arkNight.stream().filter { it.name == opName }.findFirst().isPresent) {
-                    try {
-                        val file = File(arkLoc, url)
-                        if (!file.exists()) {
-                            val result = TaskUtil.executeWithRetry(3) {
-                                NetUtil.downloadFile(arkLoc, "http://prts.wiki$url", "$opName.png")
-                            }
-                            if (result != null) throw result
-                            successCount++
-
-                            // 休息三秒钟, 避免给 PRTS 服务器带来太大压力
-                            runBlocking {
-                                delay(3_000)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        if (e !is ApiException)
-                            daemonLogger.warning("下载 $url 时出现了意外", e)
-                        else
-                            daemonLogger.warning("下载异常: ${e.message ?: "无信息"}")
-                        return@forEach
-                    } finally {
-                        if (successCount > 0 && successCount % 10 == 0) {
-                            daemonLogger.info("明日方舟 > 已下载 $successCount/${arkNight.size}")
-                        }
-                    }
-                }
-            }
-
-            daemonLogger.info("明日方舟 > 缺失资源文件下载完成 [$successCount/${arkNight.size}], 耗时 ${startTime.getLastingTimeAsString()}")
-        }
-
-        pictureReady = true
-    }
-
-    fun downloadArkNightData(location: File, force: Boolean = false) {
-        val exists = location.exists()
-
-        if (!force) {
-            daemonLogger.info("明日方舟 > 检查是否为旧版本数据...")
-        }
-
-        val result = mapper.readTree(NetUtil.executeHttpRequest(arkNightDataApi).body?.string())
-        val updateTime = LocalDateTime.parse(result["updated_at"].asText(), DateTimeFormatter.ISO_DATE_TIME)
-
-        if (!exists || force) {
-            daemonLogger.info("明日方舟 > 你还没有卡池数据, 正在自动下载新数据")
-            val cache = NetUtil.downloadFile(FileUtil.getCacheFolder(), arkNightData, location.name)
-            cache.deleteOnExit()
-            Files.copy(cache.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            daemonLogger.info("成功下载明日方舟卡池数据!")
-        } else if (location.exists() && location.lastModified().toLocalDateTime() < updateTime) {
-            // 这个检测并不准确, 因为其他服务器数据更新的时候也算, 而 Github API 似乎看不到最新 commit (?)
-            daemonLogger.info("明日方舟干员数据更新了 (在 ${yyMMddPattern.format(updateTime)}), 请自行更新")
-        } else {
-            daemonLogger.info("明日方舟干员数据为最新版本: ${yyMMddPattern.format(updateTime)}")
-        }
-    }
 
     fun arkPictureIsUsable(): Boolean = cfg.arkDrawUseImage && pictureReady
 

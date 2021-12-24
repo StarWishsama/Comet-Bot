@@ -10,16 +10,25 @@
 
 package io.github.starwishsama.comet.api.gacha
 
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.gacha.GachaResult
 import io.github.starwishsama.comet.objects.gacha.custom.CustomPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
+import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 
 abstract class GachaInstance(val name: String) {
+
+    abstract fun init()
 
     /**
      * 检查是否可以使用
      */
-    abstract fun isUsable()
+    abstract fun isUsable(): Boolean
+
+    /**
+     * 加载卡池数据
+     */
+    abstract fun loadGachaData()
 
     /**
      * 检查抽卡所需文件是否需要更新
@@ -32,9 +41,9 @@ abstract class GachaInstance(val name: String) {
     abstract fun downloadFile()
 
     /**
-     * 将抽卡结果解析为文本
+     * 将抽卡结果解析为 [MessageWrapper]
      */
-    abstract fun parseGachaResult(result: GachaResult): String
+    abstract fun parseGachaResult(user: CometUser, result: GachaResult): MessageWrapper
 
     /**
      * 解析自定义卡池文件到对应游戏卡池类

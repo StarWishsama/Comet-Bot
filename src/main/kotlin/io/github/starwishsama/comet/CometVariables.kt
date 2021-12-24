@@ -25,7 +25,6 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.github.starwishsama.comet.logger.HinaLogger
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.CometConfig
-import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
 import io.github.starwishsama.comet.service.server.CometServiceServer
 import io.github.starwishsama.comet.utils.FileUtil
@@ -151,9 +150,6 @@ object CometVariables {
     internal var rCon: Rcon? = null
 
     internal val cometUsers: MutableMap<Long, CometUser> = ConcurrentHashMap()
-
-    /** 明日方舟卡池数据 */
-    internal val arkNight: MutableList<ArkNightOperator> = mutableListOf()
 
     @Volatile
     internal var switch: Boolean = true

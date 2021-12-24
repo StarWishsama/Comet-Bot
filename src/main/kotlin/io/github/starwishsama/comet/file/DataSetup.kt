@@ -72,7 +72,7 @@ object DataSetup {
 
         daemonLogger.info("已加载了 ${CometVariables.cometUsers.size} 个用户数据.")
 
-        GachaService.loadGachaData(ArkNightData.file)
+        GachaService.loadGachaInstance()
 
         ApiManager.loadAllApiConfig()
 
