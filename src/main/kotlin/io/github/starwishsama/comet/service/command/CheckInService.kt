@@ -102,7 +102,7 @@ object CheckInService {
         user.checkInDateTime = currentTime
 
         // 使用随机数工具生成基础硬币
-        val basePoint = RandomUtil.randomDouble(-5.0, 10.0, 1, RoundingMode.HALF_DOWN)
+        val basePoint = RandomUtil.randomDouble(0.0, 10.0, 1, RoundingMode.HALF_DOWN)
 
         // 只取小数点后一位，将最大奖励点数限制到 3 倍
         val awardProp =
@@ -157,7 +157,7 @@ object CheckInService {
     private fun hasRandomEvent(): Double {
         val randomEvent = RandomUtil.randomDouble(0.0, 1.0, 1, RoundingMode.HALF_DOWN)
 
-        return if (randomEvent in 0.499..0.501) {
+        return if (randomEvent in 0.4999..0.5001) {
             RandomUtil.randomDouble(10.0, 25.0, 1, RoundingMode.HALF_DOWN)
         } else {
             0.0
