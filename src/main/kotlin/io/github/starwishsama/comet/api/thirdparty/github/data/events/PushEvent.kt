@@ -14,12 +14,11 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
-
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 data class PushEvent(
     val ref: String,
@@ -74,9 +73,21 @@ data class PushEvent(
     }
 
     private fun getLocalTime(time: Long): String {
-        return CometVariables.hmsPattern.format(
+        return TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT) + " " + CometVariables.hmsPattern.format(
             Instant.ofEpochMilli(time * 1000L).atZone(ZoneId.systemDefault()).toLocalDateTime()
         )
+    }
+
+    private fun buildCommitList(): String {
+        return buildString {
+            commitInfo.subList(0, commitInfo.size.coerceAtMost(10)).forEach {
+                append("🔨 (${it.id.substring(0, 7)}) ${it.message.substringBefore("\n")} - ${it.committer.name}\n")
+            }
+
+            if (commitInfo.size > 10) {
+                append("...等 ${commitInfo.size} 个提交\n")
+            }
+        }
     }
 
     override fun toMessageWrapper(): MessageWrapper {
@@ -86,14 +97,13 @@ data class PushEvent(
 
         val wrapper = MessageWrapper()
 
-        wrapper.addText("⬆️ ${repoInfo.fullName} 有新提交啦\n")
-        wrapper.addText("| 推送时间 ${getLocalTime(repoInfo.pushTime)}\n")
-        wrapper.addText("| 推送分支 ${ref.replace("refs/heads/", "")}\n")
-        wrapper.addText("| 提交者 ${headCommitInfo.committer.name}\n")
-        wrapper.addText("| 提交信息 \n")
-        wrapper.addText("| ${headCommitInfo.message.limitStringSize(100)}\n")
-        wrapper.addText("| 查看差异 \n")
-        wrapper.addText(compare)
+        wrapper.addText("⬆️ 新提交 ${repoInfo.fullName} [${ref.replace("refs/\\w*/".toRegex(), "")}]\n")
+        wrapper.addText(
+            "by ${headCommitInfo.committer.name} | ${getLocalTime(repoInfo.pushTime)}\n\n"
+        )
+        wrapper.addText(buildCommitList())
+        wrapper.addText("\n")
+        wrapper.addText("查看差异 > $compare")
 
         return wrapper
     }

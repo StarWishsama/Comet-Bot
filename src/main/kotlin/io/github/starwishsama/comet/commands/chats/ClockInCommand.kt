@@ -30,7 +30,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-class ClockInCommand : ChatCommand {
+object ClockInCommand : ChatCommand {
     private val hourMinuteFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
@@ -66,11 +66,9 @@ class ClockInCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("clockin", arrayListOf("打卡", "dk"), "打卡命令", "nbot.commands.clockin", UserLevel.USER)
+        CommandProps("clockin", arrayListOf("打卡", "dk"), "打卡命令", UserLevel.USER)
 
     override fun getHelp(): String = "/dk 打卡"
-
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean = user.compareLevel(props.level)
 
     private fun isClockIn(data: ClockInData, event: GroupMessageEvent): Boolean {
         if (data.checkedUsers.isNotEmpty()) {

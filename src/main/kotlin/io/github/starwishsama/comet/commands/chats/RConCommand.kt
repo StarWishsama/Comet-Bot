@@ -31,11 +31,11 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
 
-class RConCommand : ChatCommand, ConversationCommand {
+object RConCommand : ChatCommand, ConversationCommand {
     private val waitList = mutableMapOf<CometUser, Int>()
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
-        if (user.hasPermission(props.permission)) {
+        if (user.hasPermission(props.permissionNodeName)) {
             if (args.isEmpty()) {
                 return getHelp().convertToChain()
             } else {
@@ -75,7 +75,7 @@ class RConCommand : ChatCommand, ConversationCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("rcon", arrayListOf("执行命令", "rc"), "远程遥控 rcon 服务器", "nbot.commands.rcon", UserLevel.USER)
+        CommandProps("rcon", arrayListOf("执行命令", "rc"), "远程遥控 rcon 服务器", UserLevel.USER)
 
     override fun getHelp(): String = """
         /rcon setup(设置) 设置 rcon 参数

@@ -80,7 +80,7 @@ object StringUtil {
     }
 
     fun String.limitStringSize(size: Int): String {
-        return if (length <= size) this else substring(0, size) + "..."
+        return if (this.length <= size) this else substring(0, size) + "..."
     }
 
     /**
@@ -140,5 +140,9 @@ object StringUtil {
                 }
             }
         }
+    }
+
+    fun isAlphabeticAndDigit(input: String): Boolean {
+        return input.matches("[a-zA-Z0-9]*".toRegex())
     }
 }

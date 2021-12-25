@@ -20,8 +20,10 @@ import io.github.starwishsama.comet.utils.serialize.WrapperConverter
 import io.github.starwishsama.comet.utils.uploadAsImage
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
+import net.mamoe.mirai.contact.AudioSupported
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import java.io.File
@@ -57,9 +59,7 @@ data class PureText(val text: String) : WrapperElement {
         return PlainText(text)
     }
 
-    override fun asString(): String {
-        return text
-    }
+    override fun asString(): String = text
 }
 
 /**
@@ -101,9 +101,7 @@ data class Picture(val url: String = "", val filePath: String = "", val base64: 
         throw RuntimeException("Unable to convert Picture to Image, Picture raw content: $this")
     }
 
-    override fun asString(): String {
-        return filePath.ifEmpty { url }
-    }
+    override fun asString(): String = "[图片]"
 }
 
 /**
@@ -141,6 +139,28 @@ data class XmlElement(val content: String) : WrapperElement {
         return SimpleServiceMessage(serviceId = 60, content = content)
     }
 
-    override fun asString(): String = "XML 消息"
+    override fun asString(): String = "[XML 消息]"
 
+}
+
+data class Voice(val filePath: String) : WrapperElement {
+    override val className: String = this::class.java.name
+
+    override fun toMessageContent(subject: Contact?): MessageContent {
+        requireNotNull(subject) { "subject cannot be null!" }
+
+        if (subject !is AudioSupported) {
+            return PlainText("语音消息只能发送给好友或群")
+        }
+
+        if (filePath.isNotEmpty() && File(filePath).exists()) {
+            return runBlocking {
+                subject.uploadAudio(File(filePath).toExternalResource())
+            }
+        }
+
+        throw RuntimeException("Unable to convert Voice to MessageChain, Raw path: $this")
+    }
+
+    override fun asString(): String = "[语音消息]"
 }

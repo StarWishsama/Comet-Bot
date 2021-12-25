@@ -20,7 +20,7 @@ import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-class PusherCommand : ChatCommand {
+object PusherCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) return getHelp().toChain()
 
@@ -40,7 +40,7 @@ class PusherCommand : ChatCommand {
         "pusher",
         arrayListOf("推送器", "tsq"),
         "管理 Comet 的所有推送器",
-        "nbot.commands.pusher",
+
         UserLevel.OWNER
     )
 

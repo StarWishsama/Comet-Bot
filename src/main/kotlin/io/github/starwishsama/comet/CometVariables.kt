@@ -22,11 +22,9 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.CometConfig
-import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
 import io.github.starwishsama.comet.service.server.CometServiceServer
 import io.github.starwishsama.comet.utils.LoggerAppender
@@ -94,6 +92,8 @@ object CometVariables {
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         // 反序列化时忽略未知参数
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        // Fix GitHub#355
+        .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
         .registerModules(
             JavaTimeModule().also {
                 it.addSerializer(
@@ -124,10 +124,6 @@ object CometVariables {
     internal var rCon: Rcon? = null
 
     internal val cometUsers: MutableMap<Long, CometUser> = ConcurrentHashMap()
-    internal lateinit var localizationManager: LocalizationManager
-
-    /** 明日方舟卡池数据 */
-    internal val arkNight: MutableList<ArkNightOperator> = mutableListOf()
 
     @Volatile
     internal var switch: Boolean = true

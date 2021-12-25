@@ -15,8 +15,9 @@ import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.utils.CometUtil.toChain
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.contact.isAdministrator
+import net.mamoe.mirai.contact.isOperator
 import java.util.regex.Pattern
 import kotlin.streams.toList
 
@@ -46,32 +47,30 @@ object GroupFileAutoRemover {
         val group = comet.getBot().getGroup(cfg.id) ?: return
 
         runBlocking {
-            if (!group.botAsMember.isAdministrator()) {
+            if (!group.botAsMember.isOperator()) {
                 group.sendMessage("机器人没有权限删除群文件, 任务已取消".toChain())
             }
 
             val handleTime = System.currentTimeMillis()
 
-            val files = group.filesRoot.listFilesCollection()
+            val files = group.files.root.files()
 
             var counter = 0
 
-            for (file in files) {
-                if (file.isDirectory()) {
-                    continue
-                }
+            runBlocking {
+                files.collect { file ->
+                    val modifyTime = file.lastModifiedTime
 
-                val modifyTime = file.getInfo()?.lastModifyTime ?: continue
-
-                if (handleTime - cfg.oldFileCleanDelay >= modifyTime) {
-                    if (cfg.oldFileMatchPattern.isEmpty()) {
-                        file.delete()
-                        counter++
-                    } else if (Pattern.matches(cfg.oldFileMatchPattern, file.name)) {
-                        file.delete()
-                        counter++
-                    } else {
-                        continue
+                    if (handleTime - cfg.oldFileCleanDelay >= modifyTime) {
+                        if (cfg.oldFileMatchPattern.isEmpty()) {
+                            file.delete()
+                            counter++
+                        } else if (Pattern.matches(cfg.oldFileMatchPattern, file.name)) {
+                            file.delete()
+                            counter++
+                        } else {
+                            return@collect
+                        }
                     }
                 }
             }

@@ -31,7 +31,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 
 
-class PictureSearchCommand : ChatCommand, ConversationCommand {
+object PictureSearchCommand : ChatCommand, ConversationCommand {
     @OptIn(MiraiExperimentalApi::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
@@ -71,7 +71,7 @@ class PictureSearchCommand : ChatCommand, ConversationCommand {
         "ps",
         arrayListOf("ytst", "st", "搜图", "以图搜图"),
         "以图搜图",
-        "nbot.commands.picturesearch",
+
         UserLevel.USER
     )
 

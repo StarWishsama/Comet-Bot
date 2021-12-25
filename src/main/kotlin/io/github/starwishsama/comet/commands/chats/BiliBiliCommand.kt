@@ -10,12 +10,12 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-import io.github.starwishsama.comet.CometVariables.localizationManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToWrapper
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
@@ -33,18 +33,21 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import java.lang.Thread.sleep
 
-
-class BiliBiliCommand : ChatCommand {
+object BiliBiliCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
+        if (!hasPermission(user, event)) {
+            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         if (args.isEmpty()) {
             return getHelp().convertToChain()
         }
 
         when (args[0]) {
-            "sub", "订阅" -> return BiliBiliService.callSubscribeUser(this, user, args, event)
+            "sub", "订阅" -> return BiliBiliService.callSubscribeUser(user, args, event)
             "unsub", "取消订阅" -> {
                 return if (event is GroupMessageEvent) {
-                    BiliBiliService.callUnsubscribeUser(this, args, event.group.id)
+                    BiliBiliService.callUnsubscribeUser(args, event.group.id)
                 } else {
                     toChain("抱歉, 该命令仅限群聊使用!")
                 }
@@ -74,7 +77,7 @@ class BiliBiliCommand : ChatCommand {
                         cfg.biliPushEnabled = !cfg.biliPushEnabled
                         "B站动态推送功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}".toChain()
                     } else {
-                        localizationManager.getLocalizationText("message.no-permission").toChain()
+                        LocalizationManager.getLocalizationText("message.no-permission").toChain()
                     }
                 } else {
                     toChain("抱歉, 该命令仅限群聊使用!")
@@ -120,7 +123,7 @@ class BiliBiliCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("bili", arrayListOf(), "订阅查询B站主播/用户动态", "nbot.commands.bili", UserLevel.USER)
+        CommandProps("bili", arrayListOf(), "订阅查询B站主播/用户动态", UserLevel.USER)
 
     override fun getHelp(): String = """
         /bili sub [用户名/UID] 订阅用户相关信息
@@ -133,9 +136,8 @@ class BiliBiliCommand : ChatCommand {
         /bili parse 开启/关闭群聊消息视频解析
     """.trimIndent()
 
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        val level = props.level
-        if (user.compareLevel(level)) return true
+    fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
+        if (user.hasPermission(props.permissionNodeName)) return true
         if (e is GroupMessageEvent && e.sender.permission >= MemberPermission.MEMBER) return true
         return false
     }

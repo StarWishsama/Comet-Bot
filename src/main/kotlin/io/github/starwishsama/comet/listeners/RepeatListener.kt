@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.listeners
 
+import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Group
@@ -26,6 +27,10 @@ object RepeatListener : INListener {
     @EventHandler
     fun listen(event: GroupMessageEvent) {
         if (event.group.isBotMuted) {
+            return
+        }
+
+        if (CommandManager.getCommandPrefix(event.message.contentToString()).isNotEmpty()) {
             return
         }
 

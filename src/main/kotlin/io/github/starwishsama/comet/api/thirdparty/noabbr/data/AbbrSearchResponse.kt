@@ -20,26 +20,36 @@ data class AbbrSearchResponse(
     fun isEmpty(): Boolean = this.name.isEmpty() || this.trans.isEmpty()
 
     companion object {
-        fun empty(): AbbrSearchResponse = AbbrSearchResponse()
+        val empty: AbbrSearchResponse = AbbrSearchResponse()
     }
 
     fun toMessageWrapper(): MessageWrapper {
-        if (name.isEmpty()) {
+        if (name.isEmpty() || this == empty) {
             return MessageWrapper().addText("找不到对应结果")
         }
 
         if (trans.isEmpty() && inputting.isNotEmpty()) {
-            return MessageWrapper().addText(
-                "你输入的可能是: ${inputting.subList(0, inputting.size.coerceAtMost(5))}\n" +
-                        "仅显示前五条可能结果"
+            val result = MessageWrapper().addText(
+                "你输入的可能是: ${inputting.subList(0, inputting.size.coerceAtMost(5))}\n"
             )
+
+            if (inputting.size > 5) {
+                result.addText("仅显示前五条可能结果")
+            }
+
+            return result
         }
 
         if (trans.isNotEmpty()) {
-            return MessageWrapper().addText(
-                "缩写对应的可能结果: ${trans.subList(0, trans.size.coerceAtMost(5))}\n" +
-                        "仅显示前五条可能结果"
+            val result = MessageWrapper().addText(
+                "缩写对应的可能结果: ${trans.subList(0, trans.size.coerceAtMost(5))}\n"
             )
+
+            if (inputting.size > 5) {
+                result.addText("仅显示前五条可能结果")
+            }
+
+            return result
         }
 
         return MessageWrapper().addText("找不到对应结果")

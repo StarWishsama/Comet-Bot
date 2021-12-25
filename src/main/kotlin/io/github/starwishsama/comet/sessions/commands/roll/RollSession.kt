@@ -21,4 +21,4 @@ class RollSession(
     val keyWord: String,
     val rollStarter: Long,
     val count: Int,
-) : Session(target, RollCommand(), silent = true)
+) : Session(target, RollCommand, silent = true)

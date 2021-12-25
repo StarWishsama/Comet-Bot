@@ -49,20 +49,22 @@ data class PlainText(
             var cacheString = context
             val wrapper = MessageWrapper().addText("发布了动态: \n")
 
-            card.display["emoji_info"]["emoji_details"]?.forEach {
-                val displayName = it["emoji_name"].asText()
-                val emojiImage = it["url"].asText()
+            if (!card.display["emoji_info"].isNull && !card.display["emoji_info"]["emoji_details"].isNull) {
+                card.display["emoji_info"]["emoji_details"].forEach {
+                    val displayName = it["emoji_name"].asText()
+                    val emojiImage = it["url"].asText()
 
-                cacheString!!.split(displayName).also { list ->
-                    list.forEach { s ->
-                        wrapper.addText(s)
-                        if (list.last() != s) {
-                            wrapper.addPictureByURL(emojiImage)
+                    cacheString!!.split(displayName).also { list ->
+                        list.forEach { s ->
+                            wrapper.addText(s)
+                            if (list.last() != s) {
+                                wrapper.addPictureByURL(emojiImage)
+                            }
                         }
                     }
-                }
 
-                cacheString = cacheString!!.replace(displayName.toRegex(), "")
+                    cacheString = cacheString!!.replace(displayName.toRegex(), "")
+                }
             }
 
             wrapper.addText("\n🕘 ${hmsPattern.format(item.sentTimestamp.toLocalDateTime())}")

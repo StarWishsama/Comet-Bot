@@ -14,10 +14,12 @@ import io.github.starwishsama.comet.commands.chats.ArkNightCommand
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.gacha.GachaResult
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
+import io.github.starwishsama.comet.objects.gacha.pool.isAvailable
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.GachaUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.uploadAsImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -27,7 +29,6 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.at
-import org.apache.commons.lang3.StringUtils
 
 object ArkNightService {
     private var pool = GachaService.getPoolsByType<ArkNightPool>()[0]
@@ -72,21 +73,21 @@ object ArkNightService {
 
             if (event is GroupMessageEvent) event.sender.at().plus("\n").plus(reply) else reply
         } else {
-            (GachaUtil.overTimeMessage + "\n剩余积分: ${user.checkInPoint}").convertToChain()
+            (GachaUtil.overTimeMessage + "\n剩余硬币: ${user.coin}").convertToChain()
         }
     }
 
     fun handleFreedomDraw(event: MessageEvent, user: CometUser, args: List<String>): MessageChain {
-        return if (StringUtils.isNumeric(args[0])) {
+        return if (args[0].isNumeric()) {
             val gachaTime: Int = try {
                 args[0].toInt()
             } catch (e: NumberFormatException) {
-                return ArkNightCommand().getHelp().convertToChain()
+                return ArkNightCommand.getHelp().convertToChain()
             }
 
             return runBlocking { getGachaResult(event, user, gachaTime) }
         } else {
-            ArkNightCommand().getHelp().convertToChain()
+            ArkNightCommand.getHelp().convertToChain()
         }
     }
 
@@ -101,13 +102,16 @@ object ArkNightService {
                 append("\n\n卡池列表: ")
 
                 pools.forEach {
-                    append(it.name).append(",")
+                    if (it.isAvailable()) {
+                        append(it.name).append(",")
+                    }
                 }
             }.removeSuffix(",").toChain()
         } else {
             val poolName = args[1]
             val pools =
-                GachaService.getPoolsByType<ArkNightPool>().parallelStream().filter { it.name == poolName }.findFirst()
+                GachaService.getPoolsByType<ArkNightPool>().parallelStream()
+                    .filter { it.name == poolName && it.isAvailable() }.findFirst()
             if (pools.isPresent) {
                 pool = pools.get()
                 "成功修改卡池为: ${pool.name}".toChain()

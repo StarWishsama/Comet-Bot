@@ -17,11 +17,14 @@ import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.config.api.*
 import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.filesCount
 import io.github.starwishsama.comet.utils.folderIsEmpty
 
 import java.io.File
 
 object ApiManager {
+    private val defaultConfigType =
+        mutableListOf(BiliBiliConfig(), R6StatsConfig(), SauceNaoConfig(), TwitterConfig(), ThirdPartyMusicConfig())
     val apiConfigs = mutableSetOf<ApiConfig>()
 
     inline fun <reified T> getConfig(): T {
@@ -36,7 +39,7 @@ object ApiManager {
             apiConfigFile.mkdirs()
         }
 
-        if (apiConfigFile.folderIsEmpty()) {
+        if (apiConfigFile.folderIsEmpty() || apiConfigFile.filesCount() < defaultConfigType.size) {
             createDefaultConfigs()
             daemonLogger.log(HinaLogLevel.Info, "API 配置生成成功! 注意: 自新版本开始 API 配置请在 /api 文件夹下配置", prefix = "API设置")
         }
@@ -58,10 +61,12 @@ object ApiManager {
 
     private fun createDefaultConfigs() {
         val apiConfigFile = FileUtil.getChildFolder("api")
-        val defaultConfigType = mutableListOf(BiliBiliConfig(), R6StatsConfig(), SauceNaoConfig(), TwitterConfig())
 
         defaultConfigType.forEach { configType ->
-            mapper.writeValue(File(apiConfigFile, configType.apiName + ".yml").also { it.createNewFile() }, configType)
+            val target = File(apiConfigFile, configType.apiName + ".yml")
+            if (!target.exists()) {
+                mapper.writeValue(target.also { it.createNewFile() }, configType)
+            }
         }
     }
 

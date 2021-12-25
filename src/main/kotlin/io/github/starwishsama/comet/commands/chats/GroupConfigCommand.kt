@@ -10,11 +10,11 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
@@ -25,16 +25,20 @@ import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.contact.MemberPermission
+import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageChainBuilder
 import net.mamoe.mirai.message.data.PlainText
 
-
-class GroupConfigCommand : ChatCommand, UnDisableableCommand {
+object GroupConfigCommand : ChatCommand, UnDisableableCommand {
     // TODO 适配私聊设置
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
+        if (!hasPermission(user, event)) {
+            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         if (event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
                 val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
@@ -108,14 +112,14 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
 
                             cfg.keyWordReply.forEach {
                                 if (it.reply.getAllText() == reply) {
-                                    it.keyWords.add(keyWord)
-                                    return "已发现现有配置, 成功添加关键词".toChain()
+                                    it.keyWord = keyWord
+                                    return "已发现现有配置, 成功替换关键词".toChain()
                                 }
                             }
 
                             return if (cfg.keyWordReply.add(
                                     PerGroupConfig.ReplyKeyWord(
-                                        mutableListOf(keyWord),
+                                        keyWord,
                                         MessageWrapper().addText(reply)
                                     )
                                 )
@@ -194,7 +198,7 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("group", arrayListOf("群设置", "gs"), "设置群内设置", "nbot.commands.groupconfig", UserLevel.ADMIN)
+        CommandProps("group", arrayListOf("群设置", "gs"), "设置群内设置", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
         /group helper [@/QQ] 添加/删除群助理
@@ -206,10 +210,11 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
         /group frm 设置群文件自动删除
     """.trimIndent()
 
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        val level = props.level
-        if (user.compareLevel(level)) return true
-        if (e is GroupMessageEvent && e.sender.permission > MemberPermission.MEMBER) return true
-        return false
+    private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
+        return if (user.hasPermission(props.permissionNodeName)) {
+            true
+        } else {
+            e is GroupMessageEvent && e.sender.isOperator()
+        }
     }
 }

@@ -22,7 +22,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import kotlin.time.ExperimentalTime
 
 
-class VersionCommand : ChatCommand {
+object VersionCommand : ChatCommand {
     @OptIn(ExperimentalTime::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return ("彗星 Bot " + BuildConfig.version +
@@ -36,7 +36,7 @@ class VersionCommand : ChatCommand {
             "version",
             arrayListOf("v", "版本", "comet", "status"),
             "查看版本号",
-            "nbot.commands.version",
+
             UserLevel.USER
         )
 

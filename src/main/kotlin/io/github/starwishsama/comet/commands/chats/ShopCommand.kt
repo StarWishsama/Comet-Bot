@@ -19,13 +19,13 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 
-class ShopCommand : ChatCommand {
+object ShopCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         TODO("Shop command's priority is ultra low, sry :/")
     }
 
     override val props: CommandProps =
-        CommandProps("shop", arrayListOf("sd", "商店"), "积分商店", "nbot.commands.shop", UserLevel.USER)
+        CommandProps("shop", arrayListOf("sd", "商店"), "硬币商店", UserLevel.USER)
 
     override fun getHelp(): String = """
         /shop list 查看商品列表

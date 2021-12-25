@@ -12,20 +12,29 @@ package io.github.starwishsama.comet.managers
 
 import io.github.starwishsama.comet.objects.tasks.network.INetworkRequestTask
 import io.github.starwishsama.comet.objects.tasks.network.NetworkRequestTask
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 object NetworkRequestManager {
     private val requestQueue = ArrayDeque<NetworkRequestTask>()
+    private val mutex = Mutex()
 
-    fun schedule() {
+    suspend fun schedule() {
         if (requestQueue.isEmpty()) {
+            return
+        }
+
+        if (mutex.isLocked) {
             return
         }
 
         val task = requestQueue.removeFirst()
 
-        if (task is INetworkRequestTask<*>) {
-            val result = task.request(task.param)
-            task.callback(result)
+        mutex.withLock {
+            if (task is INetworkRequestTask<*>) {
+                val result = task.request(task.param)
+                task.callback(result)
+            }
         }
     }
 

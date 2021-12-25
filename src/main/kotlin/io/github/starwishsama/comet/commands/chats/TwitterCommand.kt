@@ -11,11 +11,13 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.CometVariables.daemonLogger
+
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.data.TwitterUser
 import io.github.starwishsama.comet.exceptions.RateLimitException
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.managers.NetworkRequestManager
@@ -40,9 +42,13 @@ import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.toMessageChain
 import kotlin.time.ExperimentalTime
 
-class TwitterCommand : ChatCommand {
+object TwitterCommand : ChatCommand {
     @OptIn(ExperimentalTime::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
+        if (!hasPermission(user, event)) {
+            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         if (ApiManager.getConfig<TwitterConfig>().token.isEmpty()) {
             return toChain("推特推送未被正确设置, 请联系机器人管理员")
         }
@@ -107,7 +113,7 @@ class TwitterCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("twitter", arrayListOf("twit", "推特", "tt"), "查询/订阅推特账号", "nbot.commands.data", UserLevel.ADMIN)
+        CommandProps("twitter", arrayListOf("twit", "推特", "tt"), "查询/订阅推特账号", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
         /twit info [推特ID] 查询账号信息
@@ -121,8 +127,8 @@ class TwitterCommand : ChatCommand {
         命令别名: /推特 /tt /twitter
     """.trimIndent()
 
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        if (super.hasPermission(user, e)) return true
+    private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
+        if (user.hasPermission(props.permissionNodeName)) return true
         if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true
         return false
     }

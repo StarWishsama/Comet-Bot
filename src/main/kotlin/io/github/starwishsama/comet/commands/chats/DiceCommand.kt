@@ -21,7 +21,7 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import java.util.regex.Pattern
 
-class DiceCommand : ChatCommand {
+object DiceCommand : ChatCommand {
     // 骰子正则表达式
     private val pattern = Pattern.compile("""(\d{1,2})([dD])(\d{1,4})""")
 
@@ -30,13 +30,13 @@ class DiceCommand : ChatCommand {
             return getHelp().toChain()
         }
 
-        val input = parseInput(args[0])
+        val (count, size) = parseInput(args[0])
 
-        if (input.first < 1 || input.second < 1) {
+        if (count < 1 || size < 1) {
             return "骰子格式错误! 格式示例: 1d100".toChain()
         }
 
-        val result = doDice(input.first, input.second)
+        val result = doDice(count, size)
 
         return "结果: ${args[0]}=${result.convertToString()}".toChain()
     }
@@ -46,7 +46,7 @@ class DiceCommand : ChatCommand {
             "dice",
             listOf("tz", "骰子"),
             "投骰子",
-            "nbot.commands.dice",
+
             UserLevel.USER
         )
 

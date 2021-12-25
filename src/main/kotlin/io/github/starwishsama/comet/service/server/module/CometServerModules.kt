@@ -61,7 +61,7 @@ object GithubWebHookHandler {
     suspend fun handle(call: ApplicationCall) {
         try {
             CometVariables.netLogger.debug("有新连接 ${call.request.httpMethod} - ${call.request.uri}")
-            CometVariables.netLogger.debug("请求 Headers ${call.request.headers}")
+            CometVariables.netLogger.debug("请求 Headers ${buildString { call.request.headers.forEach { k, v -> append("$k=$v") } }}}")
 
             // Get information from header to identity whether the request is from GitHub.
             if (!checkOrigin(call)) {

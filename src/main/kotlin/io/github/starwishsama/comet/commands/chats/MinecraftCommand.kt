@@ -23,7 +23,7 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
 
-class MinecraftCommand : ChatCommand {
+object MinecraftCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
 
         if (args.isEmpty()) return getHelp().convertToChain()
@@ -61,7 +61,7 @@ class MinecraftCommand : ChatCommand {
         "mc",
         listOf("我的世界", "mcquery", "mq", "服务器", "服务器查询", "mccx"),
         "查询我的世界服务器信息",
-        "nbot.commands.mc",
+
         UserLevel.USER
     )
 

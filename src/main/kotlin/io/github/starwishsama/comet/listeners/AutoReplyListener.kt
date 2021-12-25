@@ -36,14 +36,12 @@ object AutoReplyListener : INListener {
             val messageContent = message.contentToString()
 
             cfg.keyWordReply.forEach {
+                if (it.keyWord.isEmpty() || it.reply.isEmpty()) {
+                    return
+                }
 
-                if (it.keyWords.isEmpty()) return
-
-                it.keyWords.forEach { keyWord ->
-                    if (messageContent.contains(keyWord)) {
-                        runBlocking { subject.sendMessage(message.quote() + it.reply.toMessageChain(subject)) }
-                        return
-                    }
+                if (messageContent.matches(it.keyWord.toRegex())) {
+                    runBlocking { subject.sendMessage(message.quote() + it.reply.toMessageChain(subject)) }
                 }
             }
         }

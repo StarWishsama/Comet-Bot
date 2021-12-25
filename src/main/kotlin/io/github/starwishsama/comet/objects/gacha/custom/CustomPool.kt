@@ -17,10 +17,14 @@ import net.mamoe.yamlkt.Comment
 @Serializable
 @Suppress("SpellCheckingInspection")
 data class CustomPool(
-    @Comment("卡池游戏类型, 目前仅支持 ARKNIGHT, PCR")
+    @Comment("卡池游戏类型, 支持 ARKNIGHT, GENSHIN")
     val gameType: GameType,
     @Comment("自定义卡池内部名称, 用于卡池选择")
     val poolName: String,
+    @Comment("自定义卡池开始时间, 格式为 yyyy-MM-dd HH:mm:ss, 留空为无限期")
+    val startTime: String,
+    @Comment("自定义卡池结束时间, 格式为 yyyy-MM-dd HH:mm:ss, 留空为无限期")
+    val endTime: String,
     @Comment("自定义卡池展示名称")
     val displayPoolName: String,
     @Comment("自定义卡池简介")
@@ -36,7 +40,8 @@ data class CustomPool(
 ) {
     @Serializable
     enum class GameType {
-        ARKNIGHT
+        ARKNIGHT,
+        GENSHIN,
     }
 
     @Serializable
@@ -45,7 +50,7 @@ data class CustomPool(
         val name: String,
         @Comment("该物品的概率提升或降低值, 设为 0 不调整")
         val probability: Double,
-        @Comment("加成权值, 如 W 是 30% 中加成五倍权值. 如果这个干员没有权值填 1.")
+        @Comment("加成权值, 目前仅有明日方舟中使用该特性. 如果对应物品没有权值填 1")
         val weight: Int,
         @Comment("是否从卡池中移除该物品, 若不则填 false")
         val isHidden: Boolean

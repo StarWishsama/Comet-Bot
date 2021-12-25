@@ -24,7 +24,7 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.at
 
-class R6SCommand : ChatCommand {
+object R6SCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             return toChain(getHelp(), true)
@@ -69,7 +69,7 @@ class R6SCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("r6", arrayListOf("r6s", "彩六"), "彩虹六号数据查询", "nbot.commands.r6s", UserLevel.USER)
+        CommandProps("r6", arrayListOf("r6s", "彩六"), "彩虹六号数据查询", UserLevel.USER)
 
     override fun getHelp(): String = """
         /r6 info [Uplay账号名] 查询战绩

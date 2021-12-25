@@ -10,9 +10,11 @@
 
 package io.github.starwishsama.comet.objects.config.api
 
+import kotlinx.serialization.Serializable
 import net.mamoe.yamlkt.Comment
 import java.util.concurrent.TimeUnit
 
+@Serializable
 data class SauceNaoConfig(
     @Comment("SauceNao Token, 不填亦可")
     val token: String = "",

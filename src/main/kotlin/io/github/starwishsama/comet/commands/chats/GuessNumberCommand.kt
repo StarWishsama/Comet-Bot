@@ -35,7 +35,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 
-class GuessNumberCommand : ChatCommand, ConversationCommand {
+object GuessNumberCommand : ChatCommand, ConversationCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (event is GroupMessageEvent) {
             if (!SessionHandler.hasSessionByGroup(event.group.id, this::class.java)) {
@@ -78,7 +78,7 @@ class GuessNumberCommand : ChatCommand, ConversationCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("guessnumber", arrayListOf("csz"), "猜数字", "nbot.commands.guessnumber", UserLevel.USER)
+        CommandProps("guessnumber", arrayListOf("csz"), "猜数字", UserLevel.USER)
 
     override fun getHelp(): String = """
         /csz 猜数字

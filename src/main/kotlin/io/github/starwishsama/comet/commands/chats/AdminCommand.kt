@@ -10,10 +10,10 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.AdminService.addPermission
@@ -26,10 +26,13 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-
 @Suppress("SpellCheckingInspection")
-class AdminCommand : ChatCommand, UnDisableableCommand {
+object AdminCommand : ChatCommand, UnDisableableCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
+        if (!hasPermission(user, event)) {
+            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         return if (args.isEmpty()) {
             getHelp().toChain()
         } else {
@@ -45,7 +48,7 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("admin", arrayListOf("管理", "管", "gl"), "机器人管理员命令", "nbot.commands.admin", UserLevel.ADMIN)
+        CommandProps("admin", arrayListOf("管理", "管", "gl"), "机器人管理员命令", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
         /admin help 展示此帮助列表
@@ -54,9 +57,8 @@ class AdminCommand : ChatCommand, UnDisableableCommand {
         /admin give [用户] [命令条数] 给一个用户添加命令条数
     """.trimIndent()
 
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        val bLevel = props.level
-        if (user.compareLevel(bLevel)) return true
+    private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
+        if (user.hasPermission(props.permissionNodeName)) return true
         if (e is GroupMessageEvent && e.sender.permission != MemberPermission.MEMBER) return true
         return false
     }

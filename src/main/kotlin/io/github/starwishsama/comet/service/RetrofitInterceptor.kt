@@ -8,9 +8,10 @@
  *
  */
 
-package io.github.starwishsama.comet.logger
+package io.github.starwishsama.comet.service
 
 import io.github.starwishsama.comet.CometVariables.netLogger
+import io.github.starwishsama.comet.logger.HinaLogLevel
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.util.concurrent.TimeUnit
@@ -34,6 +35,7 @@ class RetrofitLogger : Interceptor {
             "收到响应 ${request.url}, 耗时 ${end}ms",
             prefix = "网络"
         )
+
         return response
     }
 }

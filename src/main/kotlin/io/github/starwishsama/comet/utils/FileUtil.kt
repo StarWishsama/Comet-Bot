@@ -21,12 +21,10 @@ import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.CometPlugin
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.daemonLogger
-import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import java.io.File
-import java.io.FileOutputStream
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -39,7 +37,9 @@ import kotlin.time.ExperimentalTime
 
 @Synchronized
 fun File.writeClassToJson(context: Any, mapper: ObjectMapper = CometVariables.mapper) {
-    FileWriter.create(this).write(mapper.writeValueAsString(context), false)
+    FileWriter.create(this).getWriter(false).use {
+        mapper.writeValue(it, context)
+    }
 }
 
 @Synchronized
@@ -326,7 +326,7 @@ object FileUtil {
                 if (entryName.startsWith("$resourcePath/")) {
                     val actualName = entryName.replace("${resourcePath}/", "").removeSuffix("/")
 
-                    processFileInJar(jar, entry, actualName)
+                    processFileInJar(jar, entry, actualName, "resources")
                 } else {
                     continue
                 }
@@ -341,7 +341,8 @@ object FileUtil {
      * @param fileName 文件名
      * @param resourcePath 资源文件储存文件夹
      */
-    private fun processFileInJar(jar: JarFile, entry: JarEntry, fileName: String, resourcePath: String = "resources") {
+    @Suppress("SameParameterValue")
+    private fun processFileInJar(jar: JarFile, entry: JarEntry, fileName: String, resourcePath: String) {
         var counter = 0
 
         if (fileName.isEmpty()) {
@@ -355,24 +356,14 @@ object FileUtil {
         } else {
             val current = File(getResourceFolder(), fileName)
 
-            if (!current.exists() || current.lastModified().toLocalDateTime() >
-                entry.lastModifiedTime.toMillis().toLocalDateTime(true)
-            ) {
+            if (!current.exists() || current.lastModified() > entry.lastModifiedTime.toMillis()) {
                 if (!current.exists()) {
                     current.createNewFile()
                 }
 
-                FileOutputStream(current).use { fos ->
-                    val byteArray = ByteArray(1024)
-                    var len: Int
-                    jar.getInputStream(entry)?.use { fis ->
-                        // While the input stream has bytes
-                        while (fis.read(byteArray).also { len = it } > 0) {
-                            fos.write(byteArray, 0, len)
-                        }
-
-                        counter++
-                    }
+                jar.getInputStream(entry).use {
+                    Files.copy(it, current.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                    counter++
                 }
             }
         }

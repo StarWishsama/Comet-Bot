@@ -33,7 +33,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
 import java.util.concurrent.ThreadPoolExecutor
 
-class DebugCommand : ChatCommand, UnDisableableCommand {
+object DebugCommand : ChatCommand, UnDisableableCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isNotEmpty()) {
             when (args[0]) {
@@ -116,8 +116,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("debug", mutableListOf(), "Debug", "nbot.commands.debug", UserLevel.ADMIN)
-
+        CommandProps("debug", mutableListOf(), "Debug", UserLevel.ADMIN)
 
     override fun getHelp(): String = "调试命令会随时变动, 请自行查阅代码"
 

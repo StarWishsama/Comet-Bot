@@ -27,6 +27,16 @@ abstract class GachaPool {
     abstract val name: String
 
     /**
+     * 卡池开始时间, 使用时间戳
+     */
+    abstract val startTime: Long
+
+    /**
+     * 卡池结束时间, 使用时间戳
+     */
+    abstract val endTime: Long
+
+    /**
      * 游戏卡池对外展示名称
      */
     abstract val displayName: String

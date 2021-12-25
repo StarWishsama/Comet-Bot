@@ -10,29 +10,27 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.api.gacha.impl.ArkNightInstance
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.ArkNightService.configGachaPool
 import io.github.starwishsama.comet.service.command.ArkNightService.getGachaResult
 import io.github.starwishsama.comet.service.command.ArkNightService.handleFreedomDraw
-import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-
 @Suppress("SpellCheckingInspection")
-class ArkNightCommand : ChatCommand {
+object ArkNightCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
-        if (!GachaService.isArkNightUsable()) {
-            return if (GachaService.isDownloading()) {
+        if (!ArkNightInstance.isUsable()) {
+            return if (ArkNightInstance.isDownloading) {
                 "正在下载明日方舟数据, 请稍候...".toChain()
             } else {
-                GachaService.downloadArkNightData()
+                ArkNightInstance.downloadFile()
                 "还未下载明日方舟数据, 开始自动下载...".toChain()
             }
         }
@@ -51,6 +49,10 @@ class ArkNightCommand : ChatCommand {
                 "pool", "卡池", "卡池信息" -> {
                     configGachaPool(args)
                 }
+                "update", "更新", "更新数据" -> {
+                    ArkNightInstance.downloadFile()
+                    "已开始自动下载明日方舟数据...".toChain()
+                }
                 else -> handleFreedomDraw(event, user, args)
             }
         } else {
@@ -63,9 +65,9 @@ class ArkNightCommand : ChatCommand {
             "arknight",
             arrayListOf("ark", "xf", "方舟寻访"),
             "明日方舟寻访模拟器",
-            "nbot.commands.arknight",
+
             UserLevel.USER,
-            consumePoint = 5.0
+            cost = 5.0
         )
 
     override fun getHelp(): String = """

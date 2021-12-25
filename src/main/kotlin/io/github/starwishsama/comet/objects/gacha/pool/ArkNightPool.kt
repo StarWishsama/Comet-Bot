@@ -12,6 +12,7 @@ package io.github.starwishsama.comet.objects.gacha.pool
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.api.gacha.impl.ArkNightInstance
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.gacha.GachaResult
@@ -39,16 +40,18 @@ class ArkNightPool(
     override val name: String = "标准寻访",
     override val displayName: String = "标准寻访",
     override val description: String = "适合多种场合的强力干员",
+    override val startTime: Long = -1,
+    override val endTime: Long = -1,
     val condition: ArkNightOperator.() -> Boolean = {
         GachaUtil.hasOperator(this.name) && obtain?.contains("招募寻访") == true
-    }
+    },
 ) : GachaPool() {
     override val tenjouCount: Int = -1
     override val tenjouRare: Int = -1
     override val poolItems: MutableList<ArkNightOperator> = mutableListOf()
 
     init {
-        CometVariables.arkNight.stream().filter { condition(it) }.forEach {
+        ArkNightInstance.getArkNightOperators().stream().filter { condition(it) }.forEach {
             poolItems.add(it)
         }
 
@@ -218,7 +221,7 @@ class ArkNightPool(
                 }
             }
         } else {
-            return GachaUtil.overTimeMessage + "\n剩余积分: ${user.checkInPoint}"
+            return GachaUtil.overTimeMessage + "\n剩余硬币: ${user.coin}"
         }
     }
 

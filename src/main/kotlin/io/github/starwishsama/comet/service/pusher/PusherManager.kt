@@ -36,7 +36,6 @@ object PusherManager {
             val cfgFile = File(pusherFolder, "${pusher.name}.json")
 
             try {
-
                 if (cfgFile.exists()) {
                     val cfg = CometVariables.mapper.readValue<PusherConfig>(cfgFile.getContext())
                     pusher.config = cfg

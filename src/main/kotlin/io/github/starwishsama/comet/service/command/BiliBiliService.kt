@@ -10,7 +10,6 @@
 
 package io.github.starwishsama.comet.service.command
 
-import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.SearchApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
@@ -19,6 +18,7 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convert
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserInfo
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserVideoInfo
 import io.github.starwishsama.comet.commands.chats.BiliBiliCommand
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.CometUser
@@ -42,17 +42,18 @@ import net.mamoe.mirai.message.data.PlainText
 
 object BiliBiliService {
     fun callSubscribeUser(
-        cmd: BiliBiliCommand,
         user: CometUser,
         args: List<String>,
         event: MessageEvent
     ): MessageChain {
+        val cmd = BiliBiliCommand
+
         if (args.size <= 1) {
             return cmd.getHelp().convertToChain()
         }
 
         if (!cmd.hasPermission(user, event)) {
-            return CometVariables.localizationManager.getLocalizationText("message.no-permission").convertToChain()
+            return LocalizationManager.getLocalizationText("message.no-permission").convertToChain()
         }
 
         return if (args[1].contains("|")) {
@@ -116,7 +117,9 @@ object BiliBiliService {
         return SubscribeResult(successList, failedList)
     }
 
-    fun callUnsubscribeUser(cmd: BiliBiliCommand, args: List<String>, groupId: Long): MessageChain {
+    fun callUnsubscribeUser(args: List<String>, groupId: Long): MessageChain {
+        val cmd = BiliBiliCommand
+
         return if (args.size > 1) {
             val cfg = GroupConfigManager.getConfigOrNew(groupId)
 

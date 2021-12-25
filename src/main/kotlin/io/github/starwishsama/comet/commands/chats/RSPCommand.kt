@@ -26,7 +26,7 @@ import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import java.time.LocalDateTime
 
 
-class RSPCommand : ChatCommand, ConversationCommand {
+object RSPCommand : ChatCommand, ConversationCommand {
     /**
      * 储存正在石头剪刀布的用户
      */
@@ -41,7 +41,7 @@ class RSPCommand : ChatCommand, ConversationCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("janken", arrayListOf("猜拳", "石头剪刀布", "rsp", "cq"), "石头剪刀布", "nbot.commands.rsp", UserLevel.USER)
+        CommandProps("janken", arrayListOf("猜拳", "石头剪刀布", "rsp", "cq"), "石头剪刀布", UserLevel.USER)
 
     override fun getHelp(): String = "/cq 石头剪刀布"
 

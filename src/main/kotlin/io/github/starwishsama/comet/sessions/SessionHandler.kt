@@ -72,7 +72,7 @@ object SessionHandler {
      *
      * @param e 消息事件
      */
-    suspend fun handleSessions(e: MessageEvent, u: CometUser): Boolean {
+    suspend fun handleSessions(e: MessageEvent, user: CometUser): Boolean {
         val time = LocalDateTime.now()
 
         val target = if (e is GroupMessageEvent) {
@@ -93,7 +93,7 @@ object SessionHandler {
         for (session in sessionToHandle) {
             if (session.silent || CommandManager.getCommandPrefix(e.message.contentToString()).isEmpty()) {
                 if (session.creator is ConversationCommand) {
-                    session.creator.handle(e, u, session)
+                    session.creator.handle(e, user, session)
                 }
             }
         }

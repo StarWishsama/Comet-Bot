@@ -13,6 +13,7 @@ package io.github.starwishsama.comet.api.command
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.CallbackCommand
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.utils.CometUtil.toChain
@@ -122,10 +123,10 @@ object MessageHandler {
                 }
 
                 if (!useStatus) {
-                    return if (cmd.props.consumerType == CommandExecuteConsumerType.POINT) {
-                        val response = CometVariables.localizationManager.getLocalizationText("message.no-enough-point")
-                            .replace("%point%", user.checkInPoint.fixDisplay())
-                            .replace("%cost%", cmd.props.consumePoint.fixDisplay())
+                    return if (cmd.props.consumerType == CommandExecuteConsumerType.COIN) {
+                        val response = LocalizationManager.getLocalizationText("message.no-enough-point")
+                            .replace("%point%", user.coin.fixDisplay())
+                            .replace("%cost%", cmd.props.cost.fixDisplay())
                         ExecutedResult(response.toChain(), cmd, CommandStatus.ValidateFailed())
                     } else {
                         ExecutedResult(EmptyMessageChain, cmd, CommandStatus.ValidateFailed())
@@ -145,14 +146,15 @@ object MessageHandler {
 
                     val status: CommandStatus
 
-                    /** 检查是否有权限执行命令 */
-                    val result: MessageChain = if (cmd.hasPermission(user, event)) {
-                        status = CommandStatus.Success()
-                        cmd.execute(event, splitMessage, user)
-                    } else {
-                        status = CommandStatus.NoPermission()
-                        CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
-                    }
+                    /** 检查是否有执行命令的基本权限 */
+                    val result: MessageChain =
+                        if (user.compareLevel(cmd.props.level) || user.hasPermission(cmd.props.permissionNodeName)) {
+                            status = CommandStatus.Success()
+                            cmd.execute(event, splitMessage, user)
+                        } else {
+                            status = CommandStatus.NoPermission()
+                            LocalizationManager.getLocalizationText("message.no-permission").toChain()
+                        }
 
                     return ExecutedResult(result, cmd, status)
                 } else {
@@ -195,11 +197,11 @@ object MessageHandler {
 
         return when (props.consumerType) {
             CommandExecuteConsumerType.COOLDOWN -> {
-                user.checkCoolDown(coolDown = props.consumePoint.toInt())
+                user.checkCoolDown(coolDown = props.cost.toInt())
             }
-            CommandExecuteConsumerType.POINT -> {
-                if (user.checkInPoint >= props.consumePoint) {
-                    user.checkInPoint -= props.consumePoint
+            CommandExecuteConsumerType.COIN -> {
+                if (user.coin >= props.cost) {
+                    user.coin -= props.cost
                     true
                 } else {
                     false
@@ -223,7 +225,7 @@ object MessageHandler {
         class PassToSession : CommandStatus("移交会话处理", false)
         class NotACommand : CommandStatus("非命令", false)
         class CometIsClose : CommandStatus("Comet 已关闭", false)
-        class ValidateFailed : CommandStatus("冷却/无积分", true)
+        class ValidateFailed : CommandStatus("冷却/无硬币", true)
 
         fun isOk(): Boolean = this.isSuccessful
     }

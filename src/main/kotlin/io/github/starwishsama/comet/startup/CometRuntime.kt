@@ -27,9 +27,11 @@ import io.github.starwishsama.comet.commands.chats.*
 import io.github.starwishsama.comet.file.DataSaveHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
+import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.tasks.GroupFileAutoRemover
+import io.github.starwishsama.comet.service.RetrofitLogger
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.server.CometServiceServer
@@ -37,6 +39,8 @@ import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.runBlocking
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import okhttp3.OkHttpClient
@@ -62,12 +66,12 @@ object CometRuntime {
     """
         )
 
-        DataSetup.init()
-
         CometVariables.client = OkHttpClient().newBuilder()
-            .connectTimeout(5, TimeUnit.SECONDS)
+            .callTimeout(3, TimeUnit.SECONDS)
+            .connectTimeout(3, TimeUnit.SECONDS)
+            .readTimeout(3, TimeUnit.SECONDS)
+            .writeTimeout(3, TimeUnit.SECONDS)
             .followRedirects(true)
-            .readTimeout(5, TimeUnit.SECONDS)
             .hostnameVerifier { _, _ -> true }
             .also {
                 if (cfg.proxySwitch) {
@@ -78,6 +82,49 @@ object CometRuntime {
             }
             .addInterceptor(RetrofitLogger())
             .build()
+
+        DataSetup.init()
+
+        CommandManager.setupCommands(
+            arrayOf(
+                AdminCommand,
+                ArkNightCommand,
+                BiliBiliCommand,
+                CheckInCommand,
+                ClockInCommand,
+                io.github.starwishsama.comet.commands.chats.DebugCommand,
+                DivineCommand,
+                GuessNumberCommand,
+                HelpCommand,
+                InfoCommand,
+                MusicCommand,
+                MuteCommand,
+                UnMuteCommand,
+                PictureSearchCommand,
+                R6SCommand,
+                RConCommand,
+                KickCommand,
+                TwitterCommand,
+                VersionCommand,
+                GroupConfigCommand,
+                RSPCommand,
+                RollCommand,
+                MinecraftCommand,
+                PusherCommand,
+                GithubCommand,
+                DiceCommand,
+                NoAbbrCommand,
+                JikiPediaCommand,
+                KeyWordCommand,
+                // Console Command
+                StopCommand,
+                DebugCommand,
+                io.github.starwishsama.comet.commands.console.AdminCommand,
+                BroadcastCommand
+            )
+        )
+
+        logger.info("[命令] 已注册 " + CommandManager.countCommands() + " 个命令")
     }
 
     fun shutdownTask() {
@@ -85,49 +132,18 @@ object CometRuntime {
         DataSetup.saveAllResources()
         PusherManager.savePushers()
         cometServiceServer?.stop()
-        TaskUtil.service.shutdown()
+        TaskUtil.dispatcher.close()
+
+        if (!TaskUtil.service.isShutdown) {
+            TaskUtil.service.shutdown()
+        }
+
         CometVariables.rCon?.disconnect()
         CometVariables.miraiLoggerAppender.close()
         CometVariables.loggerAppender.close()
     }
 
     fun setupBot(bot: Bot) {
-        CommandManager.setupCommands(
-            arrayOf(
-                AdminCommand(),
-                ArkNightCommand(),
-                BiliBiliCommand(),
-                CheckInCommand(),
-                ClockInCommand(),
-                DebugCommand(),
-                DivineCommand(),
-                GuessNumberCommand(),
-                HelpCommand(),
-                InfoCommand(),
-                MusicCommand(),
-                MuteCommand(),
-                UnMuteCommand(),
-                PictureSearchCommand(),
-                R6SCommand(),
-                RConCommand(),
-                KickCommand(),
-                TwitterCommand(),
-                VersionCommand(),
-                GroupConfigCommand(),
-                RSPCommand(),
-                RollCommand(),
-                MinecraftCommand(),
-                PusherCommand(),
-                GithubCommand(),
-                DiceCommand(),
-                PenguinStatCommand(),
-                NoAbbrCommand(),
-                JikiPediaCommand()
-            )
-        )
-
-        logger.info("[命令] 已注册 " + CommandManager.countCommands() + " 个命令")
-
         MessageHandler.startHandler(bot)
 
         /** 监听器 */
@@ -153,7 +169,7 @@ object CometRuntime {
         startupServer()
 
         TaskUtil.scheduleAtFixedRate(5, 5, TimeUnit.SECONDS) {
-            NetworkRequestManager.schedule()
+            runBlocking { NetworkRequestManager.schedule() }
         }
 
         logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${CometVariables.startTime.getLastingTimeAsString()}")
