@@ -24,11 +24,11 @@ import io.github.starwishsama.comet.api.thirdparty.noabbr.NoAbbrApi
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.R6StatsApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.commands.chats.*
+import io.github.starwishsama.comet.commands.console.BroadcastCommand
+import io.github.starwishsama.comet.commands.console.DebugCommand
 import io.github.starwishsama.comet.file.DataSaveHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
-import io.github.starwishsama.comet.logger.HinaLogLevel
-import io.github.starwishsama.comet.logger.RetrofitLogger
 import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.tasks.GroupFileAutoRemover
 import io.github.starwishsama.comet.service.RetrofitLogger
@@ -39,10 +39,10 @@ import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.console.command.Command
 import okhttp3.OkHttpClient
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -116,13 +116,16 @@ object CometRuntime {
                 NoAbbrCommand,
                 JikiPediaCommand,
                 KeyWordCommand,
-                // Console Command
-                StopCommand,
-                DebugCommand,
-                io.github.starwishsama.comet.commands.console.AdminCommand,
-                BroadcastCommand
             )
         )
+
+        val consoleCommand = listOf<Command>(
+            DebugCommand,
+            io.github.starwishsama.comet.commands.console.AdminCommand,
+            BroadcastCommand
+        )
+
+        consoleCommand.forEach(net.mamoe.mirai.console.command.CommandManager::registerCommand)
 
         logger.info("[命令] 已注册 " + CommandManager.countCommands() + " 个命令")
     }

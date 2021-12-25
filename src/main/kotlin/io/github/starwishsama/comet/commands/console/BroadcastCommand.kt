@@ -12,23 +12,21 @@ package io.github.starwishsama.comet.commands.console
 
 import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.CometVariables.daemonLogger
-import io.github.starwishsama.comet.api.command.CommandProps
-import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
-import io.github.starwishsama.comet.objects.enums.UserLevel
-import io.github.starwishsama.comet.utils.CometUtil.getRestString
-import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.console.command.ConsoleCommandOwner
+import net.mamoe.mirai.console.command.ConsoleCommandSender
+import net.mamoe.mirai.console.command.SimpleCommand
 
-object BroadcastCommand : ConsoleCommand {
-    override suspend fun execute(args: List<String>): String {
-        return if (args.size > 1 && args[0].isNumeric()) {
-            sendMessage(args[0].toLong(), args.getRestString(1))
-        } else if (args[0] == "all") {
-            sendMessage(-1, args.getRestString(1))
-        } else {
-            getHelp()
-        }
+object BroadcastCommand : SimpleCommand(ConsoleCommandOwner, "broadcast", description = "发送广播") {
+    @Handler
+    suspend fun ConsoleCommandSender.handle(message: String) {
+        sendMessage(sendMessage(-1, message))
+    }
+
+    @Handler
+    suspend fun ConsoleCommandSender.handle(groupId: Long, message: String) {
+        sendMessage(sendMessage(groupId, message))
     }
 
     private fun sendMessage(groupId: Long, message: String): String {
@@ -58,11 +56,5 @@ object BroadcastCommand : ConsoleCommand {
                 return@runBlocking "发送失败, 错误信息: ${e.message}"
             }
         }
-    }
-
-    override fun getProps(): CommandProps = CommandProps("broadcast", mutableListOf("bc"), "", UserLevel.CONSOLE)
-
-    override fun getHelp(): String {
-        return "/bc [群号] [发送内容]"
     }
 }

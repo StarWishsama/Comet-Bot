@@ -10,57 +10,48 @@
 
 package io.github.starwishsama.comet.commands.console
 
-import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.api.command.CommandManager
-import io.github.starwishsama.comet.api.command.CommandProps
-import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
-import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.RuntimeUtil
-import kotlin.time.ExperimentalTime
+import net.mamoe.mirai.console.command.CompositeCommand
+import net.mamoe.mirai.console.command.ConsoleCommandOwner
+import net.mamoe.mirai.console.command.ConsoleCommandSender
 
-
-object DebugCommand : ConsoleCommand {
-    @OptIn(ExperimentalTime::class)
-    override suspend fun execute(args: List<String>): String {
-        if (args.isNotEmpty()) {
-            when (args[0]) {
-                "sessions" -> {
-                    val sessions = SessionHandler.getSessions()
-                    return buildString {
-                        append("目前活跃的会话列表: \n")
-                        if (sessions.isEmpty()) {
-                            append("无")
-                            return@buildString
-                        }
-
-                        for ((i, session) in sessions.withIndex()) {
-                            append(i + 1).append(" ").append(session.toString()).append("\n")
-                        }
-                    }.trim()
-                }
-                "info" ->
-                    return ("彗星 Bot ${BuildConfig.version}\n" +
-                            "Comet 状态: ${comet.getBot().isOnline} | ${CometVariables.switch}\n" +
-                            "已注册命令数: ${CommandManager.countCommands()}\n" +
-                            CometUtil.getMemoryUsage() + "\n" +
-                            "CPU 负载: ${RuntimeUtil.getOperatingSystemBean().systemLoadAverage}\n" +
-                            "构建时间: ${BuildConfig.buildTime}"
-                            )
-                "switch" -> {
-                    CometVariables.switch = !CometVariables.switch
-                    return "Bot > 维护模式已${if (!CometVariables.switch) "开启" else "关闭"}"
-                }
-                else -> return getHelp()
+object DebugCommand : CompositeCommand(ConsoleCommandOwner, "debug") {
+    @SubCommand
+    suspend fun ConsoleCommandSender.sessions() {
+        val sessions = SessionHandler.getSessions()
+        sendMessage(buildString {
+            append("目前活跃的会话列表: \n")
+            if (sessions.isEmpty()) {
+                append("无")
+                return@buildString
             }
-        }
-        return ""
+
+            for ((i, session) in sessions.withIndex()) {
+                append(i + 1).append(" ").append(session.toString()).append("\n")
+            }
+        }.trim())
     }
 
-    override fun getProps(): CommandProps = CommandProps("debug", mutableListOf(), "", UserLevel.CONSOLE)
+    @SubCommand
+    suspend fun ConsoleCommandSender.switch() {
+        CometVariables.switch = !CometVariables.switch
+        sendMessage("Bot > 维护模式已${if (!CometVariables.switch) "开启" else "关闭"}")
+    }
 
-    override fun getHelp(): String = "请自行查阅代码"
+    @SubCommand
+    suspend fun ConsoleCommandSender.info() {
+        sendMessage(
+            "彗星 Bot ${BuildConfig.version}\n" +
+                    "Comet 状态: ${comet.getBot().isOnline} | ${CometVariables.switch}\n" +
+                    "已注册命令数: ${CommandManager.countCommands()}\n" +
+                    CometUtil.getMemoryUsage() + "\n" +
+                    "CPU 负载: ${RuntimeUtil.getOperatingSystemBean().systemLoadAverage}\n" +
+                    "构建时间: ${BuildConfig.buildTime}"
+        )
+    }
 }

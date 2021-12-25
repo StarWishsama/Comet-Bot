@@ -11,95 +11,90 @@
 package io.github.starwishsama.comet.commands.console
 
 import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.api.command.CommandManager
-import io.github.starwishsama.comet.api.command.CommandProps
-import io.github.starwishsama.comet.api.command.interfaces.ConsoleCommand
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
-import io.github.starwishsama.comet.utils.StringUtil.isNumeric
-import java.io.IOException
 
-object AdminCommand : ConsoleCommand {
-    override suspend fun execute(args: List<String>): String {
-        if (args.isNotEmpty()) {
-            when (args[0]) {
-                "upgrade" -> {
-                    when (args.size) {
-                        2 -> {
-                            if (args[1].isNumeric()) {
-                                val target = CometUser.getUser(args[1].toLong()) ?: return "目标没有使用过 Comet"
+import net.mamoe.mirai.console.command.CommandSender
+import net.mamoe.mirai.console.command.CompositeCommand
+import net.mamoe.mirai.console.command.ConsoleCommandOwner
 
-                                val targetLevel = target.level.ordinal + 1
+import java.util.*
 
-                                if (targetLevel >= UserLevel.values().size) {
-                                    target.level = UserLevel.USER
-                                } else {
-                                    target.level = UserLevel.values()[targetLevel]
-                                }
-
-                                return "成功将 ${target.id} 设为 ${target.level.name}"
-                            }
-                        }
-                        3 -> {
-                            if (args[1].isNumeric()) {
-                                try {
-                                    val target = CometUser.getUser(args[1].toLong()) ?: return "目标没有使用过 Comet"
-                                    val level = UserLevel.valueOf(args[2])
-                                    target.level = level
-
-                                    return "成功将 ${target.id} 设为 ${target.level.name}"
-                                } catch (e: IllegalArgumentException) {
-                                    return "不是有效的等级名字, 可用等级名: ${UserLevel.values()}"
-                                }
-                            }
-                        }
-                    }
-                }
-                "reload" -> {
-                    try {
-                        DataSetup.reload()
-                        return "重载成功."
-                    } catch (e: IOException) {
-                        daemonLogger.warning("在重载时发生了异常", e)
-                    }
-                }
-                "cmd" -> {
-                    if (args.size > 2 && args[1].isNumeric()) {
-                        val gid = try {
-                            args[1].toLong()
-                        } catch (e: NumberFormatException) {
-                            return "输入的群号不合法!"
-                        }
-
-                        val cmd = CommandManager.getCommand(args[2])
-
-                        return cmd?.props?.disableCommand(gid)?.msg ?: "找不到对应命令"
-                    }
-                }
-                "groups" -> {
-                    return buildString {
-                        append("已加入的群聊:\n")
-                        CometVariables.comet.getBot().groups.forEach {
-                            append("${it.name} (${it.id}),")
-                        }
-                    }.removeSuffix(",").trim()
-                }
-                else -> return getHelp()
-            }
-        } else {
-            return getHelp()
-        }
-        return ""
-    }
-
-    override fun getProps(): CommandProps = CommandProps("admin", mutableListOf(), "", UserLevel.CONSOLE)
-
-    override fun getHelp(): String = """
+object AdminCommand : CompositeCommand(
+    ConsoleCommandOwner, "admin",
+    description = """
         /admin upgrade [ID] (权限组名) 修改权限组
         /admin reload 重载配置文件
         /admin rp [硬币] 重置所有账号的硬币为指定硬币数
         /admin cmd [群号] 在指定群禁用命令
     """.trimIndent()
+) {
+
+    @SubCommand
+    suspend fun CommandSender.upgrade(target: Long) {
+        val targetUser = CometUser.getUser(target)
+
+        if (targetUser == null) {
+            sendMessage("目标没有使用过 Comet")
+            return
+        }
+
+        val targetLevel = targetUser.level.ordinal + 1
+
+        if (targetLevel >= UserLevel.values().size) {
+            targetUser.level = UserLevel.USER
+        } else {
+            targetUser.level = UserLevel.values()[targetLevel]
+        }
+
+        sendMessage("成功将 ${targetUser.id} 设为 ${targetUser.level.name}")
+    }
+
+    @SubCommand
+    suspend fun CommandSender.upgrade(target: Long, level: String) {
+        val targetUser = CometUser.getUser(target)
+
+        if (targetUser == null) {
+            sendMessage("目标没有使用过 Comet")
+            return
+        }
+
+        runCatching {
+            UserLevel.valueOf(level.uppercase(Locale.getDefault()))
+        }.onSuccess {
+            targetUser.level = it
+            sendMessage("成功将 ${targetUser.id} 设为 ${targetUser.level.name}")
+        }.onFailure {
+            sendMessage("无效的权限组名")
+        }
+    }
+
+    @SubCommand
+    suspend fun CommandSender.reload() {
+        DataSetup.reload()
+        sendMessage("配置文件已重载")
+    }
+
+    @SubCommand
+    suspend fun CommandSender.cmd(groupId: Long, cmdName: String) {
+        val cmd = CommandManager.getCommand(cmdName)
+
+        if (cmd == null) {
+            sendMessage("无效的命令名")
+        } else {
+            sendMessage(cmd.props.disableCommand(groupId).msg)
+        }
+    }
+
+    @SubCommand
+    suspend fun CommandSender.groups() {
+        sendMessage(buildString {
+            append("已加入的群聊:\n")
+            CometVariables.comet.getBot().groups.forEach {
+                append("${it.name} (${it.id}),")
+            }
+        }.removeSuffix(",").trim())
+    }
 }
