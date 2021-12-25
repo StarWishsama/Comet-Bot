@@ -36,6 +36,7 @@ import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -144,10 +145,22 @@ object ArkNightInstance : GachaInstance("明日方舟") {
     }
 
     override fun parseCustomPool(customPool: CustomPool): GachaPool {
+        // Parse LocalDateTime to timestamp
+        val startTime =
+            if (customPool.startTime.isNotEmpty()) Instant.from(CometVariables.yyMMddPattern.parse(customPool.startTime))
+                .toEpochMilli()
+            else -1L
+        val endTime =
+            if (customPool.endTime.isNotEmpty()) Instant.from(CometVariables.yyMMddPattern.parse(customPool.endTime))
+                .toEpochMilli()
+            else -1L
+
         val pool = ArkNightPool(
             customPool.poolName,
             customPool.displayPoolName,
-            customPool.poolDescription
+            customPool.poolDescription,
+            startTime,
+            endTime
         ) {
             (GachaUtil.hasOperator(this.name) || customPool.modifiedGachaItems.stream().filter { it.name == this.name }
                 .findAny().isPresent) &&
@@ -224,16 +237,16 @@ object ArkNightInstance : GachaInstance("明日方舟") {
                     val image = Jsoup.connect("http://prts.wiki/" + it.attr("href")).timeout(10_000).get()
                     downloadList.plusAssign(image.getElementsByClass("fullImageLink")[0].select("a").attr("href"))
 
-                    // 休息 1.5 秒, 避免给 PRTS 服务器带来太大压力
                     runBlocking {
-                        delay(1_500)
+                        // 休息 3 秒, 避免给 PRTS 服务器带来太大压力
+                        delay(3_000)
                     }
                 } catch (e: Exception) {
                     CometVariables.daemonLogger.warning("获取图片 http://prts.wiki/${it.attr("href")} 失败, 请手动下载.")
                 }
             }
 
-            // http://prts.wiki/images/f/ff/半身像_诗怀雅_1.png
+            // Example url: http://prts.wiki/images/f/ff/半身像_诗怀雅_1.png
 
             downloadList.forEach { url ->
                 val opName = URLDecoder.decode(url.split("/")[4].split("_")[1], Charsets.UTF_8)

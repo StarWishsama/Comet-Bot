@@ -21,6 +21,10 @@ data class CustomPool(
     val gameType: GameType,
     @Comment("自定义卡池内部名称, 用于卡池选择")
     val poolName: String,
+    @Comment("自定义卡池开始时间, 格式为 yyyy-MM-dd HH:mm:ss, 留空为无限期")
+    val startTime: String,
+    @Comment("自定义卡池结束时间, 格式为 yyyy-MM-dd HH:mm:ss, 留空为无限期")
+    val endTime: String,
     @Comment("自定义卡池展示名称")
     val displayPoolName: String,
     @Comment("自定义卡池简介")
