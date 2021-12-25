@@ -27,7 +27,6 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.1'
     id 'com.github.gmazzo.buildconfig' version '3.0.3'
     id("net.mamoe.mirai-console") version "2.9.0-RC"
-    id "org.jetbrains.kotlin.kapt" version "1.5.21"
 }
 
 def miraiVersion = '2.9.0-RC'
@@ -83,10 +82,6 @@ dependencies {
     implementation 'dnsjava:dnsjava:3.4.3'
 
     api 'org.fusesource.jansi:jansi:2.4.0'
-
-    def autoService = '1.0.1'
-    kapt("com.google.auto.service:auto-service:$autoService")
-    compileOnly("com.google.auto.service:auto-service-annotations:$autoService")
 
     implementation 'io.ktor:ktor-server-core:1.5.4'
     implementation 'io.ktor:ktor-server-netty:1.5.4'
