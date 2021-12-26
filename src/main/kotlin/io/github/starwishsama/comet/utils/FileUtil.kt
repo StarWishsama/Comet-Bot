@@ -37,6 +37,7 @@ import kotlin.time.ExperimentalTime
 
 @Synchronized
 fun File.writeClassToJson(context: Any, mapper: ObjectMapper = CometVariables.mapper) {
+    daemonLogger.debug("正在尝试写入文件: ${this.absolutePath}")
     FileWriter.create(this).getWriter(false).use {
         mapper.writeValue(it, context)
     }
@@ -49,6 +50,8 @@ fun File.writeString(
     isAppend: Boolean = false,
     newIfNotExists: Boolean = true
 ) {
+    daemonLogger.debug("正在尝试写入文件: ${this.absolutePath}")
+
     if (newIfNotExists) {
         createNewFile()
     }
