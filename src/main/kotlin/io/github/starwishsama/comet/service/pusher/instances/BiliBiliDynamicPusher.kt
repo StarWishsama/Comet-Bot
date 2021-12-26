@@ -48,7 +48,7 @@ class BiliBiliDynamicPusher(
                 val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@user
 
                 // Avoid too outdated dynamic
-                if (sentTime.plusDays(1).isAfter(LocalDateTime.now())) {
+                if (sentTime.plusDays(1).isBefore(LocalDateTime.now())) {
                     return@user
                 }
 
