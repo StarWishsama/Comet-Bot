@@ -13,12 +13,14 @@ package io.github.starwishsama.comet.service.pusher.instances
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToDynamicData
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.context.BiliBiliDynamicContext
 import io.github.starwishsama.comet.service.pusher.context.PushStatus
 import net.mamoe.mirai.Bot
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 class BiliBiliDynamicPusher(
@@ -42,6 +44,13 @@ class BiliBiliDynamicPusher(
                     }
                     null
                 } ?: return@user
+
+                val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@user
+
+                // Avoid too outdated dynamic
+                if (sentTime.plusDays(1).isAfter(LocalDateTime.now())) {
+                    return@user
+                }
 
                 val time = System.currentTimeMillis()
 
