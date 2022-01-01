@@ -32,7 +32,7 @@ import java.time.LocalDateTime
 abstract class CometPusher(
     val comet: Comet,
     val name: String,
-    var config: PusherConfig = PusherConfig(0)
+    var config: PusherConfig
 ) {
     var retrieveTime: Int = 0
 

@@ -19,23 +19,20 @@ import io.github.starwishsama.comet.service.pusher.instances.BiliBiliLivePusher
 import io.github.starwishsama.comet.service.pusher.instances.CometPusher
 import io.github.starwishsama.comet.service.pusher.instances.TwitterPusher
 import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.createBackupFile
 import io.github.starwishsama.comet.utils.getContext
 import io.github.starwishsama.comet.utils.writeClassToJson
 import java.io.File
 
 object PusherManager {
     val pusherFolder = FileUtil.getChildFolder("pushers")
-    private val usablePusher = mutableListOf<CometPusher>()
+    private val usablePusher = mutableListOf(
+        BiliBiliDynamicPusher(CometVariables.comet),
+        BiliBiliLivePusher(CometVariables.comet),
+        TwitterPusher(CometVariables.comet)
+    )
 
     fun initPushers() {
-        usablePusher.addAll(
-            listOf(
-                BiliBiliDynamicPusher(CometVariables.comet),
-                BiliBiliLivePusher(CometVariables.comet),
-                TwitterPusher(CometVariables.comet)
-            )
-        )
-
         usablePusher.forEach { pusher ->
             val cfgFile = File(pusherFolder, "${pusher.name}.json")
 
@@ -52,6 +49,7 @@ object PusherManager {
             } catch (e: Exception) {
                 if (e is JacksonException) {
                     CometVariables.daemonLogger.warning("在解析推送器配置 ${pusher.name} 时遇到了问题, 已自动重新生成", e)
+                    cfgFile.createBackupFile()
                     cfgFile.delete()
                     cfgFile.createNewFile().also { cfgFile.writeClassToJson(pusher.config) }
                 } else {
