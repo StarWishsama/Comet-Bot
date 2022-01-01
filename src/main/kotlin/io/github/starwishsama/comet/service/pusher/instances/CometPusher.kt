@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -11,6 +11,7 @@
 package io.github.starwishsama.comet.service.pusher.instances
 
 import cn.hutool.core.util.RandomUtil
+import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
@@ -19,7 +20,6 @@ import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.writeClassToJson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.Bot
 import java.io.File
 import java.time.LocalDateTime
 
@@ -30,7 +30,7 @@ import java.time.LocalDateTime
  * 可按需实现获取和推送, Comet 会按照配置依次推送
  */
 abstract class CometPusher(
-    val bot: Bot,
+    val comet: Comet,
     val name: String,
     var config: PusherConfig = PusherConfig(0)
 ) {
@@ -63,7 +63,7 @@ abstract class CometPusher(
                 context.getPushTarget().forEach group@{
                     try {
                         if (wrapper.isUsable()) {
-                            val group = bot.getGroup(it) ?: return@group
+                            val group = comet.getBot().getGroup(it) ?: return@group
 
                             runBlocking {
                                 group.sendMessage(wrapper.toMessageChain(group))

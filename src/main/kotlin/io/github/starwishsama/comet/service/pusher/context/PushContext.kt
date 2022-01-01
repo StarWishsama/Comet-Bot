@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -37,7 +37,7 @@ abstract class PushContext(
     /**
      * 获取该内容的时间, 为 [System.currentTimeMillis]
      */
-    var retrieveTime: Long,
+    val retrieveTime: Long,
     /**
      * 该内容的状态, 详见 [PushStatus]
      */
@@ -48,6 +48,13 @@ abstract class PushContext(
      */
     fun addPushTarget(id: Long) {
         pushTarget.add(id)
+    }
+
+    /**
+     * 添加推送对象
+     */
+    fun addPushTargets(ids: Collection<Long>) {
+        pushTarget.addAll(ids)
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -21,7 +21,6 @@ import io.github.starwishsama.comet.utils.FileUtil
 
 object LiveApi : ApiExecutor {
     private const val liveUrl = "http://api.live.bilibili.com/room/v1/Room/get_info?id="
-    private const val liveOldUrl = "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid="
     private const val apiRateLimit = "BiliBili API调用已达上限"
 
     @Throws(RateLimitException::class)

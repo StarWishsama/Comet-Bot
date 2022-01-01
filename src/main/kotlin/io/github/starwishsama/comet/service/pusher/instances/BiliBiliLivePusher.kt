@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -10,18 +10,17 @@
 
 package io.github.starwishsama.comet.service.pusher.instances
 
+import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.context.BiliBiliLiveContext
-import io.github.starwishsama.comet.service.pusher.context.PushStatus
-import net.mamoe.mirai.Bot
 import java.util.concurrent.TimeUnit
 
 class BiliBiliLivePusher(
-    bot: Bot
-) : CometPusher(bot, "bili_live", PusherConfig(5, TimeUnit.MINUTES)) {
+    comet: Comet
+) : CometPusher(comet, "bili_live", PusherConfig(5, TimeUnit.MINUTES)) {
     override fun retrieve() {
         GroupConfigManager.getAllConfigs().forEach cfg@{ cfg ->
             if (cfg.biliPushEnabled) {
@@ -46,11 +45,11 @@ class BiliBiliLivePusher(
                         cachePool.add(current)
                         retrieveTime++
                     } else if (!cache.contentEquals(current)) {
-                        cache.apply {
-                            retrieveTime = time
-                            this.liveRoomInfo = current.liveRoomInfo
-                            this.status = PushStatus.PROGRESSING
-                            addPushTarget(cfg.id)
+                        cachePool.remove(cache)
+
+                        current.apply {
+                            addPushTargets(cache.getPushTarget())
+                            cachePool.add(this)
                         }
                         retrieveTime++
                     }

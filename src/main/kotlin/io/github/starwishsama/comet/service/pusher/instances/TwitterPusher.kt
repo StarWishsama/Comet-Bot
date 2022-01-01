@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -10,16 +10,16 @@
 
 package io.github.starwishsama.comet.service.pusher.instances
 
+import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.context.PushStatus
 import io.github.starwishsama.comet.service.pusher.context.TwitterContext
-import net.mamoe.mirai.Bot
 import java.util.concurrent.TimeUnit
 
-class TwitterPusher(bot: Bot) : CometPusher(bot, "twitter", PusherConfig(5, TimeUnit.MINUTES)) {
+class TwitterPusher(comet: Comet) : CometPusher(comet, "twitter", PusherConfig(5, TimeUnit.MINUTES)) {
     override fun retrieve() {
         GroupConfigManager.getAllConfigs().parallelStream().forEach { cfg ->
             if (cfg.twitterPushEnabled) {
@@ -40,11 +40,11 @@ class TwitterPusher(bot: Bot) : CometPusher(bot, "twitter", PusherConfig(5, Time
                         cachePool.add(current.also { it.addPushTarget(cfg.id) })
                         retrieveTime++
                     } else if (!cache.contentEquals(current)) {
-                        cache.apply {
-                            this.retrieveTime = time
-                            this.tweetId = latestTweet.id
-                            this.status = PushStatus.PROGRESSING
-                            addPushTarget(cfg.id)
+                        cachePool.remove(cache)
+
+                        current.apply {
+                            addPushTargets(cache.getPushTarget())
+                            cachePool.add(this)
                         }
                         retrieveTime++
                     }

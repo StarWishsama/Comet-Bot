@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.service.pusher.instances
 
+import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
@@ -18,14 +19,12 @@ import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
 import io.github.starwishsama.comet.service.pusher.context.BiliBiliDynamicContext
-import io.github.starwishsama.comet.service.pusher.context.PushStatus
-import net.mamoe.mirai.Bot
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 class BiliBiliDynamicPusher(
-    bot: Bot
-) : CometPusher(bot, "bili_dynamic", PusherConfig(3, TimeUnit.MINUTES)) {
+    comet: Comet
+) : CometPusher(comet, "bili_dynamic", PusherConfig(3, TimeUnit.MINUTES)) {
     override fun retrieve() {
         GroupConfigManager.getAllConfigs().parallelStream().forEach { config ->
             if (!config.biliPushEnabled) {
@@ -33,7 +32,7 @@ class BiliBiliDynamicPusher(
             }
 
             config.biliSubscribers.forEach user@{ user ->
-                val target =
+                val cache =
                     cachePool.find { (it as BiliBiliDynamicContext).pushUser.id == user.id } as BiliBiliDynamicContext?
 
                 val dynamic: Dynamic = try {
@@ -61,16 +60,18 @@ class BiliBiliDynamicPusher(
                     dynamicId = dynamic.getDynamicID()
                 )
 
-                if (target == null) {
+                if (cache == null) {
                     cachePool.add(current)
-                } else if (!target.contentEquals(current)) {
-                    target.apply {
-                        status = PushStatus.PROGRESSING
-                        dynamicId = dynamic.getDynamicID()
-                        retrieveTime = time
+                    retrieveTime++
+                } else if (!cache.contentEquals(current)) {
+                    cachePool.remove(cache)
+
+                    current.apply {
+                        addPushTargets(cache.getPushTarget())
+                        cachePool.add(this)
                     }
 
-                    target.addPushTarget(config.id)
+                    retrieveTime++
                 }
             }
         }
