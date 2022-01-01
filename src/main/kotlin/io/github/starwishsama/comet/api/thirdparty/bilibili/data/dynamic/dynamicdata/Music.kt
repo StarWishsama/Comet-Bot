@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -42,7 +42,7 @@ data class Music(
     override fun asMessageWrapper(): MessageWrapper {
         return MessageWrapper().addText(
             "${dynamic ?: "获取失败"}\n" +
-                    "发布了音乐: $songName\n" +
+                    "$uploader 发布了音乐: $songName\n" +
                     "🕘 ${CometVariables.yyMMddPattern.format(uploadTime.toLocalDateTime())}"
         ).apply {
             if (coverURL != null) {

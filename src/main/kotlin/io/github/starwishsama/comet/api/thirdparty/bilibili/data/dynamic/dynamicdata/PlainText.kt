@@ -73,7 +73,7 @@ data class PlainText(
             return wrapper
         } else {
             return MessageWrapper().addText(
-                "发布了动态: \n" +
+                "${user.userName} 发布了动态: \n" +
                         "${context ?: "获取失败"}\n\n" +
                         "🕘 ${hmsPattern.format(item.sentTimestamp.toLocalDateTime())}"
             )

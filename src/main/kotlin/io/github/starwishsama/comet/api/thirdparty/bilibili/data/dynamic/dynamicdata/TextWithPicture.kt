@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -69,9 +69,15 @@ data class TextWithPicture(
 
     override fun asMessageWrapper(): MessageWrapper {
         val wrapped =
-            MessageWrapper().addText("发布了动态:\n ${item.text ?: "获取失败"}\n" + "🕘 ${CometVariables.hmsPattern.format(item.uploadTime.toLocalDateTime())}\n")
+            MessageWrapper().addText(
+                "${user.name} 发布了动态:\n ${item.text ?: "获取失败"}\n" + "🕘 ${
+                    CometVariables.hmsPattern.format(
+                        item.uploadTime.toLocalDateTime()
+                    )
+                }\n"
+            )
 
-        if (!item.pictures.isNullOrEmpty()) {
+        if (item.pictures.isNotEmpty()) {
             item.pictures.forEach {
                 wrapped.addPictureByURL(it.imgUrl)
             }
