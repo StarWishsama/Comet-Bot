@@ -15,11 +15,12 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToWrapper
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.service.pusher.PushStatus
 
 class BiliBiliDynamicContext(
     pushTarget: MutableSet<Long>,
     retrieveTime: Long,
-    status: PushStatus = PushStatus.CREATED,
+    status: PushStatus = PushStatus.PENDING,
     @JsonProperty("push_user")
     val pushUser: BiliBiliUser,
     @JsonProperty("dynamic_id")

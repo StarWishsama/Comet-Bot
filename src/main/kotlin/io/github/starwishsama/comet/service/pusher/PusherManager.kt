@@ -10,63 +10,27 @@
 
 package io.github.starwishsama.comet.service.pusher
 
-import com.fasterxml.jackson.core.JacksonException
-import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.service.pusher.config.PusherConfig
-import io.github.starwishsama.comet.service.pusher.instances.BiliBiliDynamicPusher
-import io.github.starwishsama.comet.service.pusher.instances.BiliBiliLivePusher
-import io.github.starwishsama.comet.service.pusher.instances.CometPusher
-import io.github.starwishsama.comet.service.pusher.instances.TwitterPusher
-import io.github.starwishsama.comet.utils.FileUtil
-import io.github.starwishsama.comet.utils.createBackupFile
-import io.github.starwishsama.comet.utils.getContext
-import io.github.starwishsama.comet.utils.writeClassToJson
-import java.io.File
+import io.github.starwishsama.comet.service.pusher.pushers.BiliBiliDynamicPusher
+import io.github.starwishsama.comet.service.pusher.pushers.BiliBiliLivePusher
+import io.github.starwishsama.comet.service.pusher.pushers.TwitterPusher
 
 object PusherManager {
-    val pusherFolder = FileUtil.getChildFolder("pushers")
-    private val usablePusher = mutableListOf(
-        BiliBiliDynamicPusher(CometVariables.comet),
-        BiliBiliLivePusher(CometVariables.comet),
-        TwitterPusher(CometVariables.comet)
+    private val pushers = mutableSetOf(
+        BiliBiliDynamicPusher(),
+        BiliBiliLivePusher(),
+        TwitterPusher()
     )
 
-    fun initPushers() {
-        usablePusher.forEach { pusher ->
-            val cfgFile = File(pusherFolder, "${pusher.name}.json")
-
-            try {
-                if (cfgFile.exists()) {
-                    val cfg = CometVariables.mapper.readValue<PusherConfig>(cfgFile.getContext())
-                    pusher.config = cfg
-                } else {
-                    cfgFile.createNewFile()
-                    cfgFile.writeClassToJson(pusher.config)
-                }
-
-                pusher.start()
-            } catch (e: Exception) {
-                if (e is JacksonException) {
-                    CometVariables.daemonLogger.warning("在解析推送器配置 ${pusher.name} 时遇到了问题, 已自动重新生成", e)
-                    cfgFile.createBackupFile()
-                    cfgFile.delete()
-                    cfgFile.createNewFile().also { cfgFile.writeClassToJson(pusher.config) }
-                } else {
-                    CometVariables.daemonLogger.warning("在初始化推送器 ${pusher.name} 时遇到了问题", e)
-                }
-            }
-        }
+    fun startPushers() {
+        pushers.forEach { it.start() }
     }
 
-    fun savePushers() {
-        usablePusher.forEach {
-            it.save()
-        }
+    fun stopPushers() {
+        pushers.forEach { it.stop() }
     }
 
-    fun getPushers(): MutableList<CometPusher> {
-        return usablePusher
+    fun getPushers(): MutableSet<CometPusher> {
+        return pushers
     }
 
     fun getPusherByName(name: String): CometPusher? {

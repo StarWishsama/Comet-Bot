@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -55,7 +55,7 @@ object PusherCommand : ChatCommand {
             ps.forEach {
                 append(it::class.java.simpleName + "\n")
                 append("上次推送了 ${it.pushTime} 次\n")
-                append("上次运行于 ${CometVariables.yyMMddPattern.format(it.latestTriggerTime)}\n")
+                append("上次运行于 ${CometVariables.yyMMddPattern.format(it.lastTriggerTime)}\n")
             }
             trim()
         }.toChain()
@@ -65,7 +65,8 @@ object PusherCommand : ChatCommand {
         if (args.size < 2) return "请填写推送器名!".toChain()
 
         val pusher = PusherManager.getPusherByName(args[1]) ?: return "找不到你要测试的推送器".toChain()
-        pusher.execute()
+        pusher.retrieve()
+        pusher.push()
         return toChain("${pusher.name} 运行完成!")
     }
 }

@@ -8,23 +8,22 @@
  *
  */
 
-package io.github.starwishsama.comet.service.pusher.instances
+package io.github.starwishsama.comet.service.pusher.pushers
 
-import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToDynamicData
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.service.pusher.config.PusherConfig
+import io.github.starwishsama.comet.service.pusher.CometPusher
+import io.github.starwishsama.comet.service.pusher.CometPusherData
 import io.github.starwishsama.comet.service.pusher.context.BiliBiliDynamicContext
+
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
-class BiliBiliDynamicPusher(
-    comet: Comet
-) : CometPusher(comet, "bili_dynamic", PusherConfig(3, TimeUnit.MINUTES)) {
+class BiliBiliDynamicPusher : CometPusher("bili_dynamic", CometPusherData(3, TimeUnit.MINUTES)) {
     override fun retrieve() {
         GroupConfigManager.getAllConfigs().parallelStream().forEach { config ->
             if (!config.biliPushEnabled) {
@@ -33,7 +32,7 @@ class BiliBiliDynamicPusher(
 
             config.biliSubscribers.forEach user@{ user ->
                 val cache =
-                    cachePool.find { (it as BiliBiliDynamicContext).pushUser.id == user.id } as BiliBiliDynamicContext?
+                    data.cache.find { (it as BiliBiliDynamicContext).pushUser.id == user.id } as BiliBiliDynamicContext?
 
                 val dynamic: Dynamic = try {
                     DynamicApi.getUserDynamicTimeline(user.id.toLong())
@@ -61,24 +60,15 @@ class BiliBiliDynamicPusher(
                 )
 
                 if (cache == null) {
-                    cachePool.add(current)
-                    retrieveTime++
+                    data.cache.add(current)
                 } else if (!cache.contentEquals(current)) {
-                    cachePool.remove(cache)
-
-                    current.apply {
-                        addPushTargets(cache.getPushTarget())
-                        cachePool.add(this)
-                    }
-
-                    retrieveTime++
+                    data.cache.remove(cache)
+                    data.cache.add(current.also {
+                        it.addPushTargets(cache.pushTarget)
+                    })
                 }
             }
         }
-
-
-        CometVariables.daemonLogger.verbose("已获取了 $retrieveTime 个动态")
-        retrieveTime = 0
 
     }
 }

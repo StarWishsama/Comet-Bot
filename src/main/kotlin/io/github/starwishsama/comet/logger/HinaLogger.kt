@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -36,7 +36,7 @@ class HinaLogger(
     fun log(
         level: HinaLogLevel,
         message: String?,
-        stacktrace: Throwable? = null,
+        throwable: Throwable? = null,
         prefix: String = "",
         bypass: Boolean = false
     ) {
@@ -55,12 +55,12 @@ class HinaLogger(
             "${StringUtil.simplyClassName(executor.className)}#${executor.methodName}:${executor.lineNumber}"
 
         val trace = buildString {
-            if (stacktrace != null) {
+            if (throwable != null) {
                 append(
                     try {
-                        formatStacktrace(stacktrace, null, outputBeautyTrace)
+                        formatStacktrace(throwable, null, outputBeautyTrace)
                     } catch (e: Exception) {
-                        stacktrace.stackTraceToString()
+                        throwable.stackTraceToString()
                     }
                 )
             }
@@ -107,7 +107,7 @@ class HinaLogger(
     }
 
     fun warning(stacktrace: Throwable?) {
-        log(HinaLogLevel.Warn, stacktrace = stacktrace, message = null)
+        log(HinaLogLevel.Warn, throwable = stacktrace, message = null)
     }
 
     fun debug(content: String?) {

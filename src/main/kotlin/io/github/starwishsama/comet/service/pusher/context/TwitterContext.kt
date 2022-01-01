@@ -12,11 +12,12 @@ package io.github.starwishsama.comet.service.pusher.context
 
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.service.pusher.PushStatus
 
 class TwitterContext(
     pushTarget: MutableSet<Long> = mutableSetOf(),
     retrieveTime: Long,
-    status: PushStatus = PushStatus.CREATED,
+    status: PushStatus = PushStatus.PENDING,
     val twitterUserName: String,
     val tweetId: Long
 ) : PushContext(pushTarget, retrieveTime, status), Pushable {

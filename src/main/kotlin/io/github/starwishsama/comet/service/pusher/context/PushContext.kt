@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import java.util.*
+import io.github.starwishsama.comet.service.pusher.PushStatus
 
 /**
  * [PushContext]
@@ -33,7 +33,7 @@ abstract class PushContext(
     /**
      * 需要被推送的对象
      */
-    private val pushTarget: MutableSet<Long>,
+    val pushTarget: MutableSet<Long> = mutableSetOf(),
     /**
      * 获取该内容的时间, 为 [System.currentTimeMillis]
      */
@@ -64,11 +64,6 @@ abstract class PushContext(
         pushTarget.clear()
     }
 
-    /**
-     * 获取推送对象的不可变副本 [Collections.unmodifiableSet]
-     */
-    fun getPushTarget(): Set<Long> = Collections.unmodifiableSet(pushTarget)
-
     override fun toMessageWrapper(): MessageWrapper {
         throw UnsupportedOperationException("Base PushContext can't convert to MessageWrapper")
     }
@@ -76,8 +71,4 @@ abstract class PushContext(
     override fun contentEquals(other: PushContext): Boolean {
         return this == other
     }
-}
-
-enum class PushStatus {
-    CREATED, PROGRESSING, PUSHING, PUSHED, INVAILD
 }

@@ -144,7 +144,7 @@ object CometRuntime {
     private fun shutdownTask() {
         logger.info("[Bot] 正在关闭 Bot...")
         DataSetup.saveAllResources()
-        PusherManager.savePushers()
+        PusherManager.stopPushers()
         cometServiceServer?.stop()
         TaskUtil.dispatcher.close()
 
@@ -178,7 +178,7 @@ object CometRuntime {
 
         runScheduleTasks()
 
-        PusherManager.initPushers()
+        PusherManager.startPushers()
 
         startupServer()
 
