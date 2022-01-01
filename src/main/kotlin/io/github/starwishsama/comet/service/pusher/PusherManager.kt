@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -10,8 +10,7 @@
 
 package io.github.starwishsama.comet.service.pusher
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.JsonMappingException
+import com.fasterxml.jackson.core.JacksonException
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.service.pusher.config.PusherConfig
@@ -22,15 +21,20 @@ import io.github.starwishsama.comet.service.pusher.instances.TwitterPusher
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.getContext
 import io.github.starwishsama.comet.utils.writeClassToJson
-import net.mamoe.mirai.Bot
 import java.io.File
 
 object PusherManager {
     val pusherFolder = FileUtil.getChildFolder("pushers")
     private val usablePusher = mutableListOf<CometPusher>()
 
-    fun initPushers(bot: Bot) {
-        usablePusher.addAll(listOf(BiliBiliDynamicPusher(bot), BiliBiliLivePusher(bot), TwitterPusher(bot)))
+    fun initPushers() {
+        usablePusher.addAll(
+            listOf(
+                BiliBiliDynamicPusher(CometVariables.comet),
+                BiliBiliLivePusher(CometVariables.comet),
+                TwitterPusher(CometVariables.comet)
+            )
+        )
 
         usablePusher.forEach { pusher ->
             val cfgFile = File(pusherFolder, "${pusher.name}.json")
@@ -46,7 +50,7 @@ object PusherManager {
 
                 pusher.start()
             } catch (e: Exception) {
-                if (e is JsonProcessingException || e is JsonMappingException) {
+                if (e is JacksonException) {
                     CometVariables.daemonLogger.warning("在解析推送器配置 ${pusher.name} 时遇到了问题, 已自动重新生成", e)
                     cfgFile.delete()
                     cfgFile.createNewFile().also { cfgFile.writeClassToJson(pusher.config) }
