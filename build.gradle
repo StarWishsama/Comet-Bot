@@ -29,7 +29,7 @@ plugins {
 }
 
 def mainClass = 'io.github.starwishsama.comet.CometApplication'
-def miraiVersion = '2.9.0'
+def miraiVersion = '2.9.1'
 def jacksonVersion = '2.13.1'
 def hutoolVersion = '5.7.18'
 
