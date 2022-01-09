@@ -50,7 +50,11 @@ data class PlainText(
             val wrapper = MessageWrapper().addText("发布了动态: \n")
 
             // convert bilibili emoji to image
-            if (!card.display["emoji_info"].isNull && !card.display["emoji_info"]["emoji_details"].isNull) {
+            if (card.display.has("emoji_info")
+                && !card.display["emoji_info"].isNull
+                && card.display["emoji_info"].has("emoji_details")
+                && !card.display["emoji_info"]["emoji_details"].isNull
+            ) {
                 card.display["emoji_info"]["emoji_details"].forEach {
                     val displayName = it["emoji_name"].asText()
                     val emojiImage = it["url"].asText()

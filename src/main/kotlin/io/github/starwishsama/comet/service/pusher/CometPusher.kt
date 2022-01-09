@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.service.pusher
 
 import cn.hutool.core.util.RandomUtil
-import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.logger.HinaLogLevel
@@ -39,6 +39,8 @@ abstract class CometPusher(
     abstract fun retrieve()
 
     fun push() {
+        println(data.cache)
+
         data.cache.forEach { context ->
             if (context.status == PushStatus.PENDING) {
                 context.status = PushStatus.PROGRESSING
@@ -48,9 +50,14 @@ abstract class CometPusher(
                 daemonLogger.debug("正在尝试推送消息 ${wrapper::class.simpleName}#${wrapper.hashCode()}, 可用状态: ${wrapper.isUsable()}")
 
                 context.pushTarget.forEach group@{
+
+                    if (!comet::isInitialized.invoke()) {
+                        return@group
+                    }
+
                     try {
                         if (wrapper.isUsable()) {
-                            val group = CometVariables.comet.getBot().getGroup(it) ?: return@group
+                            val group = comet.getBot().getGroup(it) ?: return@group
 
                             runBlocking {
                                 group.sendMessage(wrapper.toMessageChain(group))
@@ -103,6 +110,7 @@ abstract class CometPusher(
 
         task = TaskUtil.scheduleAtFixedRate(data.interval, data.interval, data.timeUnit) {
             retrieve()
+            push()
         }
     }
 
