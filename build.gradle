@@ -26,7 +26,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.31'
     id 'com.github.johnrengelman.shadow' version '7.1.1'
     id 'com.github.gmazzo.buildconfig' version '3.0.3'
-    id("net.mamoe.mirai-console") version "2.9.0"
+    id("net.mamoe.mirai-console") version "2.9.2"
 }
 
 def miraiVersion = '2.9.2'
@@ -123,9 +123,16 @@ def getGitBranchName() {
         if (result.exitValue() == 0) {
             gitBranch = "-" + result.text.trim()
         }
-    } catch (ignored) {}
+    } catch (ignored) {
+    }
 
     return gitBranch
+}
+
+sourceSets {
+    kotlin {
+        languageSettings.optIn("kotlin.RequiresOptIn")
+    }
 }
 
 shadowJar {
@@ -145,7 +152,6 @@ compileKotlin {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11
-        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn"]
         useIR = true
     }
 }
@@ -153,7 +159,6 @@ compileKotlin {
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11
-        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn"]
         useIR = true
     }
 }
