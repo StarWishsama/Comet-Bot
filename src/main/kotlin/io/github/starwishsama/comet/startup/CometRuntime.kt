@@ -21,6 +21,7 @@ import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.logger
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.MessageHandler
+import io.github.starwishsama.comet.api.command.MessageHandler.attachHandler
 import io.github.starwishsama.comet.api.thirdparty.bilibili.*
 import io.github.starwishsama.comet.api.thirdparty.jikipedia.JikiPediaApi
 import io.github.starwishsama.comet.api.thirdparty.noabbr.NoAbbrApi
@@ -158,7 +159,7 @@ object CometRuntime {
     }
 
     fun setupBot(bot: Bot) {
-        MessageHandler.startHandler(bot)
+        bot.attachHandler()
 
         /** 监听器 */
         val listeners = arrayOf(

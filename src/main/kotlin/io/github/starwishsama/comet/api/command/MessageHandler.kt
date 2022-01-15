@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -21,6 +21,7 @@ import io.github.starwishsama.comet.utils.NumberUtil.fixDisplay
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
+import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.doFilter
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
@@ -42,33 +43,35 @@ import java.time.LocalDateTime
  * @author StarWishsama
  */
 object MessageHandler {
-    fun startHandler(bot: Bot) {
-        bot.eventChannel.subscribeMessages {
+    fun Bot.attachHandler() {
+        this.eventChannel.subscribeMessages {
             always {
                 val executedTime = LocalDateTime.now()
                 if (sender.id != 80000000L) {
                     if (this is GroupMessageEvent && group.isBotMuted) return@always
 
-                    val result = dispatchCommand(this)
+                    TaskUtil.dispatcher.run {
+                        val result = dispatchCommand(this@always)
 
-                    try {
-                        val filtered = result.msg.doFilter()
+                        try {
+                            val filtered = result.msg.doFilter()
 
-                        if (result.status.isOk() && !filtered.isContentEmpty()) {
-                            val receipt = this.subject.sendMessage(filtered)
+                            if (result.status.isOk() && !filtered.isContentEmpty()) {
+                                val receipt = this@always.subject.sendMessage(filtered)
 
-                            if (result.cmd is CallbackCommand) {
-                                result.cmd.handleReceipt(receipt)
+                                if (result.cmd is CallbackCommand) {
+                                    result.cmd.handleReceipt(receipt)
+                                }
                             }
+                        } catch (e: IllegalArgumentException) {
+                            CometVariables.logger.warning("正在尝试发送空消息, 执行的命令为 $result")
                         }
-                    } catch (e: IllegalArgumentException) {
-                        CometVariables.logger.warning("正在尝试发送空消息, 执行的命令为 $result")
-                    }
 
-                    if (result.status.isOk()) {
-                        CometVariables.logger.debug(
-                            "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(msMode = true)}, 执行结果: ${result.status.name}"
-                        )
+                        if (result.status.isOk()) {
+                            CometVariables.logger.debug(
+                                "[命令] 命令执行耗时 ${executedTime.getLastingTimeAsString(msMode = true)}, 执行结果: ${result.status.name}"
+                            )
+                        }
                     }
                 }
             }
