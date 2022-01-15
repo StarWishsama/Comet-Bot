@@ -130,9 +130,16 @@ def getGitBranchName() {
         if (result.exitValue() == 0) {
             gitBranch = "-" + result.text.trim()
         }
-    } catch (ignored) {}
+    } catch (ignored) {
+    }
 
     return gitBranch
+}
+
+sourceSets {
+    kotlin {
+        languageSettings.optIn("kotlin.RequiresOptIn")
+    }
 }
 
 shadowJar {
@@ -152,7 +159,6 @@ compileKotlin {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11
-        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn"]
         useIR = true
     }
 }
@@ -160,7 +166,6 @@ compileKotlin {
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11
-        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn"]
         useIR = true
     }
 }
