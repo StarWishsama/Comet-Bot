@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -13,13 +13,14 @@ package io.github.starwishsama.comet.service.pusher.context
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.service.pusher.PushStatus
 
 class BiliBiliLiveContext(
     pushTarget: MutableSet<Long>,
     retrieveTime: Long,
-    status: PushStatus = PushStatus.CREATED,
+    status: PushStatus = PushStatus.PENDING,
     val pushUser: BiliBiliUser,
-    var liveRoomInfo: LiveRoomInfo,
+    val liveRoomInfo: LiveRoomInfo,
 ) : PushContext(pushTarget, retrieveTime, status), Pushable {
     override fun toMessageWrapper(): MessageWrapper {
         val data = liveRoomInfo.data

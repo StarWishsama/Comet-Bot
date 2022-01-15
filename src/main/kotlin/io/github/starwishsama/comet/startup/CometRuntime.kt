@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -18,6 +18,7 @@ import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.logger
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.MessageHandler
+import io.github.starwishsama.comet.api.command.MessageHandler.attachHandler
 import io.github.starwishsama.comet.api.thirdparty.bilibili.*
 import io.github.starwishsama.comet.api.thirdparty.jikipedia.JikiPediaApi
 import io.github.starwishsama.comet.api.thirdparty.noabbr.NoAbbrApi
@@ -133,7 +134,7 @@ object CometRuntime {
     fun shutdownTask() {
         logger.info("[Bot] 正在关闭 Bot...")
         DataSetup.saveAllResources()
-        PusherManager.savePushers()
+        PusherManager.stopPushers()
         cometServiceServer?.stop()
         TaskUtil.dispatcher.close()
 
@@ -147,7 +148,7 @@ object CometRuntime {
     }
 
     fun setupBot(bot: Bot) {
-        MessageHandler.startHandler(bot)
+        bot.attachHandler()
 
         /** 监听器 */
         val listeners = arrayOf(
@@ -167,7 +168,7 @@ object CometRuntime {
 
         runScheduleTasks()
 
-        PusherManager.initPushers(bot)
+        PusherManager.startPushers()
 
         startupServer()
 

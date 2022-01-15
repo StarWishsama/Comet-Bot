@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -88,11 +88,11 @@ object GuessNumberCommand : ChatCommand, ConversationCommand {
     override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
         val trueAnswer = (session as GuessNumberSession).answer
         session.lastAnswerTime = LocalDateTime.now()
-        val answer = event.message.content
+        val inputAnswer = event.message.content
         var gnUser = session.getGuessNumberUser(user.id)
 
-        if (answer.isNumeric()) {
-            val answerInInt = answer.toInt()
+        if (inputAnswer.isNumeric()) {
+            val answer = inputAnswer.toInt()
 
             if (gnUser == null) {
                 gnUser = GuessNumberUser(event.sender.id, event.sender.nameCardOrNick)
@@ -103,13 +103,13 @@ object GuessNumberCommand : ChatCommand, ConversationCommand {
 
 
             when {
-                answerInInt > trueAnswer -> {
+                answer > trueAnswer -> {
                     event.subject.sendMessage(CometUtil.toChain("你猜的数字大了"))
                 }
-                answerInInt < trueAnswer -> {
+                answer < trueAnswer -> {
                     event.subject.sendMessage(CometUtil.toChain("你猜的数字小了"))
                 }
-                answerInInt == trueAnswer -> {
+                answer == trueAnswer -> {
                     session.usedTime = Duration.between(session.createdTime, LocalDateTime.now())
                     val sb =
                         StringBuilder(CometUtil.sendMessageAsString("${event.sender.nameCardOrNick} 猜对了!\n总用时: ${session.usedTime.seconds}s\n\n"))
@@ -122,11 +122,11 @@ object GuessNumberCommand : ChatCommand, ConversationCommand {
                     SessionHandler.removeSession(session)
                 }
                 else -> {
-                    throw RuntimeException("GuessNumber: Impossible answer input: ${answerInInt}, answer: ${trueAnswer}")
+                    throw RuntimeException("GuessNumber: Impossible answer input: ${answer}, answer: ${trueAnswer}")
                 }
             }
         } else {
-            when (answer) {
+            when (inputAnswer) {
                 "不玩了", "结束游戏", "退出游戏" -> {
                     SessionHandler.removeSession(session)
                     event.subject.sendMessage(CometUtil.sendMessageAsString("游戏已结束"))

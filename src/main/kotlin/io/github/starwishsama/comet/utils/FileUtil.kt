@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -37,6 +37,7 @@ import kotlin.time.ExperimentalTime
 
 @Synchronized
 fun File.writeClassToJson(context: Any, mapper: ObjectMapper = CometVariables.mapper) {
+    daemonLogger.debug("正在尝试写入文件: ${this.absolutePath}")
     FileWriter.create(this).getWriter(false).use {
         mapper.writeValue(it, context)
     }
@@ -49,6 +50,8 @@ fun File.writeString(
     isAppend: Boolean = false,
     newIfNotExists: Boolean = true
 ) {
+    daemonLogger.debug("正在尝试写入文件: ${this.absolutePath}")
+
     if (newIfNotExists) {
         createNewFile()
     }
@@ -266,7 +269,7 @@ object FileUtil {
     fun initResourceFile() {
         val startTime = LocalDateTime.now()
         try {
-            daemonLogger.info("正在加载资源文件...")
+            daemonLogger.info("正在加载内嵌资源文件...")
             val resourcePath = "resources"
             val jarFile = File(CometPlugin.javaClass.protectionDomain.codeSource.location.path)
 
@@ -368,6 +371,6 @@ object FileUtil {
             }
         }
 
-        daemonLogger.info("已处理 $counter 个数据文件.")
+        daemonLogger.debug("在 ${entry.name} 下已处理 $counter 个数据文件.")
     }
 }

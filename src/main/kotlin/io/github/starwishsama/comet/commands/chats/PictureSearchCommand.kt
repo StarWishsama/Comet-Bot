@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -30,7 +30,6 @@ import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 
-
 object PictureSearchCommand : ChatCommand, ConversationCommand {
     @OptIn(MiraiExperimentalApi::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
@@ -42,25 +41,21 @@ object PictureSearchCommand : ChatCommand, ConversationCommand {
                     SessionHandler.insertSession(Session(SessionTarget(privateId = event.sender.id), this, true))
                 }
 
-                return toChain("请发送需要搜索的图片")
+                return "请发送需要搜索的图片".toChain()
             }
 
             return handlePicSearch(imageToSearch.queryUrl()).toChain()
-        } else if (args[0].contentEquals("source") && args.size > 1) {
-            return try {
-                val api = PicSearchApiType.valueOf(args[1].uppercase())
-                CometVariables.cfg.pictureSearchApi = api
-                toChain("已切换识图 API 为 ${api.name}", true)
-            } catch (ignored: IllegalArgumentException) {
-                toChain(
-                    "该识图 API 不存在, 可用的 API 类型:\n ${
-                        buildString {
-                            PicSearchApiType.values().forEach {
-                                append("${it.name} ${it.desc},")
-                            }
-                        }.removeSuffix(",")
-                    }", true
-                )
+        } else if (args[0].contentEquals("source")) {
+            if (args.size > 1) {
+                return try {
+                    val api = PicSearchApiType.valueOf(args[1].uppercase())
+                    CometVariables.cfg.pictureSearchApi = api
+                    toChain("已切换识图 API 为 ${api.name}", true)
+                } catch (ignored: IllegalArgumentException) {
+                    return getAllApi().toChain()
+                }
+            } else {
+                return getAllApi().toChain()
             }
         } else {
             return getHelp().toChain()
@@ -98,7 +93,7 @@ object PictureSearchCommand : ChatCommand, ConversationCommand {
         when (CometVariables.cfg.pictureSearchApi) {
             PicSearchApiType.SAUCENAO -> {
                 if (ApiManager.getConfig<SauceNaoConfig>().token.isEmpty()) {
-                    return "SauceNao 搜索未被正确配置, 请联系管理员."
+                    return "SauceNao 搜索没有配置, 请联系管理员."
                 }
 
                 val result = PictureSearchUtil.sauceNaoSearch(url)
@@ -128,4 +123,12 @@ object PictureSearchCommand : ChatCommand, ConversationCommand {
             }
         }
     }
+
+    private fun getAllApi(): String = "该识图 API 不存在, 可用的 API 类型:\n ${
+        buildString {
+            PicSearchApiType.values().forEach {
+                append("${it.name} ${it.desc},\n")
+            }
+        }.removeSuffix(",").trim()
+    }"
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -8,20 +8,16 @@
  *
  */
 
-package io.github.starwishsama.comet.service.pusher.instances
+package io.github.starwishsama.comet.service.pusher.pushers
 
-import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
-import io.github.starwishsama.comet.service.pusher.config.PusherConfig
+import io.github.starwishsama.comet.service.pusher.CometPusher
+import io.github.starwishsama.comet.service.pusher.CometPusherData
 import io.github.starwishsama.comet.service.pusher.context.BiliBiliLiveContext
-import io.github.starwishsama.comet.service.pusher.context.PushStatus
-import net.mamoe.mirai.Bot
 import java.util.concurrent.TimeUnit
 
-class BiliBiliLivePusher(
-    bot: Bot
-) : CometPusher(bot, "bili_live", PusherConfig(5, TimeUnit.MINUTES)) {
+class BiliBiliLivePusher : CometPusher("bili_live", CometPusherData(5, TimeUnit.MINUTES)) {
     override fun retrieve() {
         GroupConfigManager.getAllConfigs().forEach cfg@{ cfg ->
             if (cfg.biliPushEnabled) {
@@ -31,7 +27,7 @@ class BiliBiliLivePusher(
                     }
 
                     val cache =
-                        cachePool.find { (it as BiliBiliLiveContext).pushUser.id == user.id } as BiliBiliLiveContext?
+                        data.cache.find { (it as BiliBiliLiveContext).pushUser.id == user.id } as BiliBiliLiveContext?
 
                     val liveRoomInfo = LiveApi.getLiveInfo(user.roomID) ?: return@user
                     val time = System.currentTimeMillis()
@@ -43,23 +39,13 @@ class BiliBiliLivePusher(
                     )
 
                     if (cache == null) {
-                        cachePool.add(current)
-                        retrieveTime++
+                        data.cache.add(current)
                     } else if (!cache.contentEquals(current)) {
-                        cache.apply {
-                            retrieveTime = time
-                            this.liveRoomInfo = current.liveRoomInfo
-                            this.status = PushStatus.PROGRESSING
-                            addPushTarget(cfg.id)
-                        }
-                        retrieveTime++
+                        data.cache.remove(cache)
+                        data.cache.add(current.also { it.addPushTargets(cache.pushTarget) })
                     }
                 }
             }
-
-            retrieveTime = 0
         }
-
-        CometVariables.daemonLogger.verbose("已获取了 $retrieveTime 个开播消息")
     }
 }
