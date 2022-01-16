@@ -21,7 +21,7 @@ plugins {
 group = "io.github.starwishsama.comet"
 version = "0.6.5" + getGitInfo()
 
-tasks.getting(Jar::class) {
+tasks.jar {
     manifest {
         attributes["Main-Class"] = "io.github.starwishsama.comet.CometApplication"
         attributes["Author"] = "StarWishsama"
