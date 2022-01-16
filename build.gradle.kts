@@ -16,6 +16,7 @@ plugins {
     kotlin("plugin.serialization") version "1.6.10"
     id("com.github.johnrengelman.shadow") version "7.1.1"
     id("com.github.gmazzo.buildconfig") version "3.0.3"
+    id("net.mamoe.mirai-console") version Versions.miraiVersion
 }
 
 group = "io.github.starwishsama.comet"
@@ -41,8 +42,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.2")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    implementation("net.mamoe:mirai-core-all:${Versions.miraiVersion}")
-
     implementation("cn.hutool:hutool-http:${Versions.hutoolVersion}")
     implementation("cn.hutool:hutool-crypto:${Versions.hutoolVersion}")
 
@@ -66,12 +65,6 @@ dependencies {
     // Retrofit A type-safe HTTP client for Android and Java @ https://github.com/square/retrofit/
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-jackson:2.9.0")
-
-    // Jline a Java library for handling console input @ https://github.com/jline/jline3
-    implementation("org.jline:jline:3.21.0")
-
-    // Jansi needed by JLine
-    implementation("org.fusesource.jansi:jansi:2.4.0")
 
     // DNSJava used to srv lookup
     implementation("dnsjava:dnsjava:3.4.3")
