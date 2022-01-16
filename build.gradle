@@ -159,6 +159,7 @@ compileKotlin {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11
+        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn"]
         useIR = true
     }
 }
@@ -166,6 +167,7 @@ compileKotlin {
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11
+        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn"]
         useIR = true
     }
 }
