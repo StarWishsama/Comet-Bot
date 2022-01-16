@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -79,12 +79,14 @@ data class PushEvent(
     }
 
     private fun buildCommitList(): String {
+        val reversed = commitInfo.reversed()
+
         return buildString {
-            commitInfo.subList(0, commitInfo.size.coerceAtMost(10)).forEach {
+            reversed.subList(0, commitInfo.size.coerceAtMost(10)).forEach {
                 append("🔨 (${it.id.substring(0, 7)}) ${it.message.substringBefore("\n")} - ${it.committer.name}\n")
             }
 
-            if (commitInfo.size > 10) {
+            if (reversed.size > 10) {
                 append("...等 ${commitInfo.size} 个提交\n")
             }
         }
