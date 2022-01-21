@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -10,20 +10,18 @@
 
 package io.github.starwishsama.comet.commands.console
 
+import io.github.starwishsama.comet.CometPlugin
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
-
 import net.mamoe.mirai.console.command.CommandSender
 import net.mamoe.mirai.console.command.CompositeCommand
-import net.mamoe.mirai.console.command.ConsoleCommandOwner
-
 import java.util.*
 
 object AdminCommand : CompositeCommand(
-    ConsoleCommandOwner, "admin",
+    CometPlugin, "admin",
     description = """
         /admin upgrade [ID] (权限组名) 修改权限组
         /admin reload 重载配置文件

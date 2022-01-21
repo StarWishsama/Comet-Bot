@@ -11,6 +11,7 @@
 package io.github.starwishsama.comet.commands.console
 
 import io.github.starwishsama.comet.BuildConfig
+import io.github.starwishsama.comet.CometPlugin
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.api.command.CommandManager
@@ -18,10 +19,9 @@ import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.RuntimeUtil
 import net.mamoe.mirai.console.command.CompositeCommand
-import net.mamoe.mirai.console.command.ConsoleCommandOwner
 import net.mamoe.mirai.console.command.ConsoleCommandSender
 
-object DebugCommand : CompositeCommand(ConsoleCommandOwner, "debug") {
+object DebugCommand : CompositeCommand(CometPlugin, "debug") {
     @SubCommand
     suspend fun ConsoleCommandSender.sessions() {
         val sessions = SessionHandler.getSessions()
