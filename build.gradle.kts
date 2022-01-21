@@ -39,9 +39,6 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.2")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-
     implementation("cn.hutool:hutool-http:${Versions.hutoolVersion}")
     implementation("cn.hutool:hutool-crypto:${Versions.hutoolVersion}")
 
