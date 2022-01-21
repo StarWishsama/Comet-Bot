@@ -49,7 +49,7 @@ object CompatibilityService {
         // Update point to coin
         if (userTree.all { !it.isNull && it["checkInPoint"] != null && it["checkInPoint"].isDouble }) {
             userTree.fields().forEach { (_, value) ->
-                if (value.get("coin") == null) {
+                if (!value.has("coin")) {
                     (value as ObjectNode).put("coin", value["checkInPoint"].asDouble())
                 }
             }
@@ -58,10 +58,10 @@ object CompatibilityService {
             daemonLogger.log(HinaLogLevel.Info, "已更新用户数据积分 -> 硬币", prefix = "兼容性")
         }
 
-        if (userTree.all { !it.isNull && !it["uuid"].isNull }) {
-            if (userTree.any { !it.isNull && !it["uuid"].isTextual }) {
+        if (userTree.all { !it.isNull && it.has("uuid") && !it["uuid"].isNull }) {
+            if (userTree.any { !it.isNull && it.has("uuid") && !it["uuid"].isTextual }) {
                 userTree.fields().forEach { (_, value) ->
-                    if (!value["uuid"].isTextual) {
+                    if (!value.has("uuid") || !value["uuid"].isTextual) {
                         (value as ObjectNode).put("uuid", UUID.randomUUID().toString())
                     }
                 }
@@ -71,9 +71,9 @@ object CompatibilityService {
             }
 
             // Fix user id missing, GitHub#355
-            if (userTree.any { !it.isNull && it["id"].isNull || it["id"].asLong() == 0L }) {
+            if (userTree.any { !it.isNull && it.has("id") && (it["id"].isNull || it["id"].asLong() == 0L) }) {
                 userTree.fields().forEach { (key, value) ->
-                    if (value["id"].asLong(-1) == 0L) {
+                    if (!value.has("id") || value["id"].asLong(-1) == 0L) {
                         (value as ObjectNode).put("id", key.toLong())
                     }
                 }
