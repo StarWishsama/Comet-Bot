@@ -101,8 +101,8 @@ fun getGitInfo(): String {
 
 mirai {
     configureShadow {
-        val generateBuildConfig by tasks
-        dependsOn(generateBuildConfig)
+        dependsOn(tasks.generateBuildConfig)
+
         isZip64 = true
         exclude("META-INF/*.txt")
         exclude("META-INF/*.md")
@@ -110,10 +110,9 @@ mirai {
         exclude("META-INF/LICENSE")
         exclude("META-INF/NOTICE")
 
-        println("Comet >> Welcome to Comet!")
-        println("Comet >> Using Java " + System.getProperty("java.version") + " to build.")
-        println("Comet >> Now building Comet $project.version...")
-    }
+    println("Comet >> Welcome to Comet!")
+    println("Comet >> Using Java ${System.getProperty("java.version")} to build.")
+    println("Comet >> Now building Comet ${project.version}...")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
