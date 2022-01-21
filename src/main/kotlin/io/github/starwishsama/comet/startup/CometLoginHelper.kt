@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -30,16 +30,14 @@ class CometLoginHelper(val comet: Comet) {
                     break
                 }
 
-                var command: String
-
                 if (comet.id == 0L || status == LoginStatus.INPUT_ID) {
                     CometVariables.daemonLogger.info("请输入欲登录的机器人账号. 如需退出, 请输入 stop")
-                    command = CometApplication.console.readLine(">")
+                    val inputAccount = CometApplication.console.readLine(">")
 
-                    if (command == "stop") exitProcess(0)
+                    if (inputAccount == "stop") exitProcess(0)
 
-                    if (command.isNumeric() && command.toLongOrNull() != null) {
-                        comet.id = command.toLong()
+                    if (inputAccount.isNumeric() && inputAccount.toLongOrNull() != null) {
+                        comet.id = inputAccount.toLong()
                         CometVariables.daemonLogger.info("成功设置账号为 ${comet.id}")
                         status = LoginStatus.INPUT_PASSWORD
                     } else {
@@ -47,16 +45,16 @@ class CometLoginHelper(val comet: Comet) {
                     }
                 } else if (comet.password.isEmpty() || status == LoginStatus.INPUT_PASSWORD || status == LoginStatus.LOGIN_FAILED) {
                     CometVariables.daemonLogger.info("请输入欲登录的机器人密码. 如需返回上一步, 请输入 back; 如需退出, 请输入 stop.")
-                    command = CometApplication.console.readLine(">", '*')
+                    val inputPassword = CometApplication.console.readLine(">", '*')
 
-                    if (command == "back") {
+                    if (inputPassword == "back") {
                         status = LoginStatus.INPUT_ID
                         continue
                     }
 
-                    if (command == "stop") exitProcess(0)
+                    if (inputPassword == "stop") exitProcess(0)
 
-                    comet.password = command
+                    comet.password = inputPassword
                     CometVariables.daemonLogger.info("设置成功! 正在启动 Comet...")
                     status = LoginStatus.LOGGING
                     break
