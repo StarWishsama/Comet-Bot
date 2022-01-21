@@ -1,0 +1,43 @@
+/*
+ * Copyright (c) 2019-2022 StarWishsama.
+ *
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ *
+ */
+
+package ren.natsuyuk1.comet.commands.chats
+
+import io.github.starwishsama.comet.api.command.CommandProps
+import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.objects.CometUser
+import io.github.starwishsama.comet.objects.enums.UserLevel
+import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import net.mamoe.mirai.event.events.MessageEvent
+import net.mamoe.mirai.message.data.MessageChain
+import kotlin.time.ExperimentalTime
+
+
+object VersionCommand : ChatCommand {
+    @OptIn(ExperimentalTime::class)
+    override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
+        return ("彗星 Bot " + ren.natsuyuk1.comet.BuildConfig.version +
+                "\n运行时长 ${CometUtil.getRunningTime()}" +
+                "\n构建时间: ${ren.natsuyuk1.comet.BuildConfig.buildTime}" +
+                "\nMade with ❤ & Mirai ${ren.natsuyuk1.comet.BuildConfig.miraiVersion}").convertToChain()
+    }
+
+    override val props: CommandProps =
+        CommandProps(
+            "version",
+            arrayListOf("v", "版本", "comet", "status"),
+            "查看版本号",
+
+            UserLevel.USER
+        )
+
+    override fun getHelp(): String = ""
+}
