@@ -86,7 +86,7 @@ buildConfig {
     println("Comet >> Generating comet information.....")
 
     packageName("io.github.starwishsama.comet")
-    buildConfigField("String", "version", "\"${version}\"")
+    buildConfigField("String", "version", "\"${project.version}\"")
     buildConfigField(
         "String",
         "buildTime",
@@ -121,7 +121,7 @@ tasks.shadowJar {
 
     println("Comet >> Welcome to Comet!")
     println("Comet >> Using Java " + System.getProperty("java.version") + " to build.")
-    println("Comet >> Now building Comet $archiveVersion...")
+    println("Comet >> Now building Comet $project.version...")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
