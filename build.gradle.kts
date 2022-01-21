@@ -12,8 +12,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-    kotlin("jvm") version "1.5.30"
-    kotlin("plugin.serialization") version "1.5.30"
+    kotlin("jvm") version "1.5.31"
+    kotlin("plugin.serialization") version "1.5.31"
     id("com.github.johnrengelman.shadow") version "7.1.1"
     id("com.github.gmazzo.buildconfig") version "3.0.3"
     id("net.mamoe.mirai-console") version Versions.miraiVersion
