@@ -102,19 +102,21 @@ fun getGitInfo(): String {
     return "-$branch-$commitHash"
 }
 
-tasks.shadowJar {
-    val generateBuildConfig by tasks
-    dependsOn(generateBuildConfig)
-    isZip64 = true
-    exclude("META-INF/*.txt")
-    exclude("META-INF/*.md")
-    exclude("META-INF/CHANGES")
-    exclude("META-INF/LICENSE")
-    exclude("META-INF/NOTICE")
+mirai {
+    configureShadow {
+        val generateBuildConfig by tasks
+        dependsOn(generateBuildConfig)
+        isZip64 = true
+        exclude("META-INF/*.txt")
+        exclude("META-INF/*.md")
+        exclude("META-INF/CHANGES")
+        exclude("META-INF/LICENSE")
+        exclude("META-INF/NOTICE")
 
-    println("Comet >> Welcome to Comet!")
-    println("Comet >> Using Java " + System.getProperty("java.version") + " to build.")
-    println("Comet >> Now building Comet $project.version...")
+        println("Comet >> Welcome to Comet!")
+        println("Comet >> Using Java " + System.getProperty("java.version") + " to build.")
+        println("Comet >> Now building Comet $project.version...")
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
