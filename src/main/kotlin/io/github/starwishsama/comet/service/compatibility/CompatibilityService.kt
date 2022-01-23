@@ -47,7 +47,7 @@ object CompatibilityService {
         val userTree = mapper.readTree(userData)
 
         // Update point to coin
-        if (userTree.all { !it.isNull && it["checkInPoint"] != null && it["checkInPoint"].isDouble }) {
+        if (userTree.all { !it.isNull && it?.get("checkInPoint")?.isDouble == true }) {
             userTree.fields().forEach { (_, value) ->
                 if (!value.has("coin")) {
                     (value as ObjectNode).put("coin", value["checkInPoint"].asDouble())
@@ -73,7 +73,7 @@ object CompatibilityService {
             // Fix user id missing, GitHub#355
             if (userTree.any { !it.isNull && it.has("id") && (it["id"].isNull || it["id"].asLong() == 0L) }) {
                 userTree.fields().forEach { (key, value) ->
-                    if (!value.has("id") || value["id"].asLong(-1) == 0L) {
+                    if (!value.has("id") || value?.get("id")?.asLong() == 0L) {
                         (value as ObjectNode).put("id", key.toLong())
                     }
                 }
