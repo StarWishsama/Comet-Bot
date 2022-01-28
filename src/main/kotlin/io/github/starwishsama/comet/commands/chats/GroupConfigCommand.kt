@@ -181,10 +181,6 @@ object GroupConfigCommand : ChatCommand, UnDisableableCommand {
     """.trimIndent()
 
     private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        return if (user.hasPermission(props.permissionNodeName)) {
-            true
-        } else {
-            e is GroupMessageEvent && e.sender.isOperator()
-        }
+        return user.hasPermission(props.permissionNodeName) || (e is GroupMessageEvent && e.sender.isOperator())
     }
 }
