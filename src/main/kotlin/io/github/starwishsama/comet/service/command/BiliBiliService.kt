@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.service.command
 
+import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.SearchApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
@@ -293,30 +294,34 @@ class BiliBiliDynamicTask(
 ) : NetworkRequestTask(),
     INetworkRequestTask<Dynamic?> {
     override fun request(param: String): Dynamic? {
-        val userInfo: UserInfo = if (param.isNumeric()) {
-            UserApi.userApiService.getMemberInfoById(
-                param.toLongOrNull() ?: return null
-            ).execute().body() ?: return null
-        } else {
-            val searchResult =
-                SearchApi.searchApiService.searchUser(keyword = param).execute().body()
-
-            if (searchResult == null) {
-                return null
+        return runCatching<Dynamic?> {
+            val userInfo: UserInfo = if (param.isNumeric()) {
+                UserApi.userApiService.getMemberInfoById(
+                    param.toLongOrNull() ?: return null
+                ).execute().body() ?: return null
             } else {
-                UserApi.userApiService.getMemberInfoById(searchResult.data.result[0].mid).execute()
-                    .body() ?: return null
-            }
-        }
+                val searchResult =
+                    SearchApi.searchApiService.searchUser(keyword = param).execute().body()
 
-        return DynamicApi.getUserDynamicTimeline(userInfo.data.card.mid)
+                if (searchResult == null) {
+                    return null
+                } else {
+                    UserApi.userApiService.getMemberInfoById(searchResult.data.result[0].mid).execute()
+                        .body() ?: return null
+                }
+            }
+
+            return DynamicApi.getUserDynamicTimeline(userInfo.data.card.mid)
+        }.onFailure { e ->
+            daemonLogger.error("获取动态失败", e)
+        }.getOrNull()
     }
 
     override fun callback(result: Any?) {
         if (result is Dynamic?) {
             runBlocking {
                 if (result == null) {
-                    content.sendMessage(CometUtil.sendMessageAsString("获取动态失败, 可能是搜索的用户不存在或者没发送过动态"))
+                    content.sendMessage(CometUtil.sendMessageAsString("获取动态失败"))
                 } else {
                     val wrapper = result.convertToWrapper()
                     if (wrapper.isEmpty()) {
