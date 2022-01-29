@@ -42,26 +42,35 @@ object BiliBiliShareListener : INListener {
                 return
             }
 
-            val targetURL = bvPattern.find(event.message.contentToString())?.groups?.get(0)?.value
-                ?: longUrlPattern.find(event.message.contentToString())?.groups?.get(0)?.value
-                ?: return
+            val targetURL = parseBiliBiliURL(event.message.contentToString())
 
-            val checkResult = biliBiliLinkConvert(targetURL, event.subject)
-
-            if (checkResult.isNotEmpty()) {
-                runBlocking {
-                    event.subject.sendMessage(checkResult)
-                }
+            if (targetURL.isEmpty() && event.message.none { it is LightApp }) {
                 return
             }
 
-            val lightApp = event.message[LightApp] ?: return
+            if (targetURL.isEmpty()) {
+                val checkResult = biliBiliLinkConvert(targetURL, event.subject)
 
-            val result = parseJsonMessage(lightApp, event.subject)
-            if (result.isNotEmpty()) {
-                runBlocking { event.subject.sendMessage(result) }
+                if (checkResult.isNotEmpty()) {
+                    runBlocking {
+                        event.subject.sendMessage(checkResult)
+                    }
+                }
+            } else {
+                val lightApp = event.message[LightApp] ?: return
+
+                val result = parseJsonMessage(lightApp, event.subject)
+                if (result.isNotEmpty()) {
+                    runBlocking { event.subject.sendMessage(result) }
+                }
             }
         }
+    }
+
+    private fun parseBiliBiliURL(message: String): String {
+        return bvPattern.find(message)?.groups?.get(0)?.value
+            ?: longUrlPattern.find(message)?.groups?.get(0)?.value
+            ?: ""
     }
 
     private fun parseJsonMessage(lightApp: LightApp, subject: Contact): MessageChain {
