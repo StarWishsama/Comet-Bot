@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -263,11 +263,14 @@ class BiliBiliUserCheckTask(
                 """
 ${card.name}${if (card.vipInfo.toString().isEmpty()) "" else " | ${card.vipInfo}"}
 ${card.officialVerifyInfo.toString().ifEmpty { "" }}
+
 ${card.sign}
                                                                         
 粉丝 ${item.data.follower.getBetterNumber()} | 获赞 ${item.data.likeCount.getBetterNumber()}
                                     
-最近投递视频: ${if (recentVideos == null) "没有投稿过视频" else recentVideos.data.list.videoList[0].toString()}                             
+最近投递视频: ${if (recentVideos == null) "没有投稿过视频" else recentVideos.data.list.videoList[0].toString()}    
+                         
+🔗 https://space.bilibili.com/${card.mid}                         
 """.trimIndent().toChain()
             } else {
                 "找不到对应的B站用户".toChain()
