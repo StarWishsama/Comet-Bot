@@ -269,7 +269,7 @@ ${card.sign}
                                                                         
 粉丝 ${item.data.follower.getBetterNumber()} | 获赞 ${item.data.likeCount.getBetterNumber()}
                                     
-最近投递视频: ${if (recentVideos == null) "没有投稿过视频" else recentVideos.data.list.videoList[0].toString()}    
+最近投递视频: ${if (recentVideos == null || recentVideos.data.list.videoList.isEmpty()) "没有投稿过视频" else recentVideos.data.list.videoList[0].toString()}    
                          
 🔗 https://space.bilibili.com/${card.mid}                         
 """.trimIndent().toChain()
