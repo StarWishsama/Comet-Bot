@@ -15,7 +15,6 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.Picture
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 data class LiveRoom(
@@ -100,7 +99,7 @@ data class LiveRoom(
     val broadcastType: Int,
     @JsonProperty("face")
     val face: String
-) : DynamicData {
+) : DynamicData() {
     private val yyMMddPattern: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     private fun getRoomURL(): String = "https://live.bilibili.com/$roomID"
@@ -130,6 +129,4 @@ data class LiveRoom(
         }
         return wrapped
     }
-
-    override fun getSentTime(): LocalDateTime = LocalDateTime.from(yyMMddPattern.parse(liveTime))
 }

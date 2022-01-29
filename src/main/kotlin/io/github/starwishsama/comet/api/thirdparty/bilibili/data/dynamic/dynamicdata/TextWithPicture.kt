@@ -17,12 +17,11 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
-import java.time.LocalDateTime
 
 data class TextWithPicture(
     val item: Item,
     val user: User,
-) : DynamicData {
+) : DynamicData() {
     data class User(
         val uid: Long,
         @JsonProperty("head_url")
@@ -85,6 +84,4 @@ data class TextWithPicture(
 
         return wrapped
     }
-
-    override fun getSentTime(): LocalDateTime = item.uploadTime.toLocalDateTime()
 }

@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables.daemonLogger
@@ -18,21 +19,23 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata.*
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import kotlinx.coroutines.runBlocking
 import okhttp3.internal.toLongOrDefault
 import java.time.LocalDateTime
 
-interface DynamicData {
-    fun asMessageWrapper(): MessageWrapper
+abstract class DynamicData {
+    abstract fun asMessageWrapper(): MessageWrapper
 
     fun compare(other: Any?): Boolean {
         if (other == null) return false
         if (other !is DynamicData) return false
 
-        return asMessageWrapper().compare(other.asMessageWrapper()) && getSentTime() == other.getSentTime()
+        return asMessageWrapper().compare(other.asMessageWrapper()) && sentTime == other.sentTime
     }
 
-    fun getSentTime(): LocalDateTime
+    @JsonIgnore
+    lateinit var sentTime: LocalDateTime
 }
 
 object DynamicTypeSelector {
@@ -71,11 +74,10 @@ fun Dynamic.convertToDynamicData(): DynamicData? {
     val singleDynamicObject = mapper.readTree(dynamicJson)
     if (!singleDynamicObject.isNull) {
         val dynamicType = DynamicTypeSelector.getType(card.description.type)
-        if (dynamicType != UnknownType::class) {
-            val dynamicData = mapper.readValue(card.card, dynamicType)
-            DynamicApi.insertDynamicData(this, dynamicData)
-            return dynamicData
-        }
+        val dynamicData = mapper.readValue(card.card, dynamicType)
+        dynamicData.sentTime = card.description.timeStamp.toLocalDateTime()
+        DynamicApi.insertDynamicData(this, dynamicData)
+        return dynamicData
     }
 
     return null

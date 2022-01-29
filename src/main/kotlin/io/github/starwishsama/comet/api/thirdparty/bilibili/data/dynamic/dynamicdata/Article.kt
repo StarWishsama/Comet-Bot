@@ -35,7 +35,7 @@ data class Article(
     val stats: Stats,
     @JsonProperty("words")
     val wordLength: Long
-) : DynamicData {
+) : DynamicData() {
 
     data class Author(
         val mid: Long,
