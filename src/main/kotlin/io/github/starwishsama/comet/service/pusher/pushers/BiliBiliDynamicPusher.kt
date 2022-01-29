@@ -44,7 +44,7 @@ class BiliBiliDynamicPusher : CometPusher("bili_dynamic", CometPusherData(3, Tim
                         null
                     } ?: return@user
 
-                    val sentTime = dynamic.convertToDynamicData()?.getSentTime() ?: return@user
+                    val sentTime = dynamic.convertToDynamicData()?.sentTime ?: return@user
 
                     // Avoid too outdated dynamic
                     if (sentTime.plusDays(1).isBefore(LocalDateTime.now())) {
