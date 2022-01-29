@@ -80,6 +80,8 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:${Versions.ktorVersion}")
 
     implementation("com.github.StarWishsama:rkon-core:master-SNAPSHOT")
+
+    testImplementation(kotlin("test"))
 }
 
 buildConfig {
@@ -107,6 +109,10 @@ fun getGitInfo(): String {
     }
 
     return "-$branch-$commitHash"
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 tasks.shadowJar {

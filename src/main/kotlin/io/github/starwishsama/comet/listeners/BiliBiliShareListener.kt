@@ -50,7 +50,7 @@ object BiliBiliShareListener : INListener {
                 return
             }
 
-            if (targetURL.isEmpty()) {
+            if (targetURL.isNotEmpty()) {
                 val checkResult = biliBiliLinkConvert(targetURL, event.subject)
 
                 if (checkResult.isNotEmpty()) {
