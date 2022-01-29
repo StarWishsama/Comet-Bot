@@ -31,17 +31,19 @@ object BiliBiliShareListener : INListener {
     override val name: String
         get() = "哔哩哔哩解析"
 
-    private val bvPattern = Regex("""https://b23.tv/\w{1,6}""")
+    private val shortUrlPattern = Regex("""https://b23.tv/\w{1,7}""")
     private val longUrlPattern = Regex("""https://www.bilibili.com/video/(av|BV)\w{1,10}""")
 
     @OptIn(MiraiExperimentalApi::class, ExperimentalTime::class)
     @EventHandler
     fun listen(event: GroupMessageEvent) {
         if (!event.group.isBotMuted) {
+            // Check parse feature is available
             if (GroupConfigManager.getConfig(event.group.id)?.canParseBiliVideo != true) {
                 return
             }
 
+            // First check if the message contains bilibili video url or light app card
             val targetURL = parseBiliBiliURL(event.message.contentToString())
 
             if (targetURL.isEmpty() && event.message.none { it is LightApp }) {
@@ -68,7 +70,7 @@ object BiliBiliShareListener : INListener {
     }
 
     private fun parseBiliBiliURL(message: String): String {
-        return bvPattern.find(message)?.groups?.get(0)?.value
+        return shortUrlPattern.find(message)?.groups?.get(0)?.value
             ?: longUrlPattern.find(message)?.groups?.get(0)?.value
             ?: ""
     }
@@ -97,7 +99,7 @@ object BiliBiliShareListener : INListener {
     }
 
     private fun biliBiliLinkConvert(url: String, subject: Contact): MessageChain {
-        val videoID = if (bvPattern.matches(url)) {
+        val videoID = if (shortUrlPattern.matches(url)) {
             parseVideoIDFromBili(NetUtil.getRedirectedURL(url) ?: return EmptyMessageChain)
         } else {
             parseVideoIDFromBili(url)
