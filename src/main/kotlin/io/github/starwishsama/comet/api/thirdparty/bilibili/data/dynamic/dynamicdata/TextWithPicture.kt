@@ -33,32 +33,32 @@ data class TextWithPicture(
     )
 
     data class Item(
-        @JsonProperty("id")
-        val id: Long,
-        @JsonProperty("title")
-        val title: String?,
-        @JsonProperty("description")
-        val text: String?,
+        @JsonProperty("at_control")
+        val atControl: String,
         @JsonProperty("category")
         val category: String,
-        @JsonProperty("role")
-        val role: JsonNode,
-        @JsonProperty("sources")
-        val sources: JsonNode,
+        @JsonProperty("description")
+        val text: String?,
+        @JsonProperty("id")
+        val id: Long,
+        @JsonProperty("is_fav")
+        val isFavorite: Int,
         @JsonProperty("pictures")
         val pictures: List<Picture>,
         @JsonProperty("pictures_count")
         val pictureCount: Int,
-        @JsonProperty("upload_time")
-        val uploadTime: Long,
-        @JsonProperty("at_control")
-        val atControl: String,
         @JsonProperty("reply")
         val replyCount: Long,
+        @JsonProperty("role")
+        val role: JsonNode,
         @JsonProperty("settings")
         val settings: JsonNode,
-        @JsonProperty("is_fav")
-        val isFavorite: Int,
+        @JsonProperty("source")
+        val sources: JsonNode,
+        @JsonProperty("title")
+        val title: String,
+        @JsonProperty("upload_time")
+        val uploadTime: Long,
     ) {
         data class Picture(
             @JsonProperty("img_src")
