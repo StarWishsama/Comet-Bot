@@ -1,13 +1,11 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynamicdata
 
 import com.fasterxml.jackson.annotation.JsonProperty
-
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.buildMessageWrapper
 
-import kotlinx.serialization.Serializable
-
+// From Yabapi @ https://github.com/SDLMoe/Yabapi
 data class Bangumi(
     @JsonProperty("aid") val aid: Int? = null,
     @JsonProperty("apiSeasonInfo") val apiSeasonInfo: Season? = null,
@@ -33,7 +31,6 @@ data class Bangumi(
         @JsonProperty("type_name") val typeName: String? = null,
     )
 
-    @Serializable
     enum class BangumiType {
         UNKNOWN,
         @JsonProperty("1")
