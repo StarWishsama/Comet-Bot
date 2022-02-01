@@ -24,10 +24,16 @@ import net.mamoe.mirai.message.data.MessageChain
 
 
 object DivineCommand : ChatCommand {
+
+    val emojiPattern = Regex("[\uD83C-\uDBFF\uDC00-\uDFFF]+")
+
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return if (args.isNotEmpty()) {
             val randomEventName = args.getRestString(0)
-            if (randomEventName.isNotBlank() && randomEventName.length < 30) {
+            if (randomEventName.isNotBlank() && randomEventName.length < 30 && !emojiPattern.containsMatchIn(
+                    randomEventName
+                )
+            ) {
                 val result = RandomResult(-1000, RandomUtil.randomDouble(0.0, 1.0), randomEventName)
 
                 RandomResult.getChance(result).convertToChain()

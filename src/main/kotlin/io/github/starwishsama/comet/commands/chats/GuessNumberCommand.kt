@@ -36,7 +36,6 @@ import java.time.Duration
 import java.time.LocalDateTime
 import kotlin.time.toKotlinDuration
 
-
 object GuessNumberCommand : ChatCommand, ConversationCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (event is GroupMessageEvent) {
