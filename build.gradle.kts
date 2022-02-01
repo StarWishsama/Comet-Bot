@@ -32,6 +32,7 @@ tasks.jar {
 repositories {
     mavenCentral()
     google()
+    maven(url = "https://maven.aliyun.com/repository/public/")
     gradlePluginPortal()
     maven(url = "https://maven.aliyun.com/nexus/content/repositories/central/")
     maven(url = "https://jitpack.io")
