@@ -17,6 +17,10 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import java.util.stream.Collectors
 
+fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
+    return MessageWrapper().apply(builder)
+}
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class MessageWrapper {
     private val messageContent = mutableSetOf<WrapperElement>()

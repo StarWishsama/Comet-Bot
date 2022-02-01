@@ -48,6 +48,7 @@ object DynamicTypeSelector {
             16 -> MiniVideo::class.java
             64 -> Article::class.java
             256 -> Music::class.java
+            512 -> Bangumi::class.java
             2048 -> ShareContext::class.java
             4200 -> LiveRoom::class.java
             4308 -> LiveBroadcast::class.java
