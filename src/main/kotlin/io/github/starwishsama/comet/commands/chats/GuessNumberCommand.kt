@@ -25,7 +25,6 @@ import io.github.starwishsama.comet.sessions.commands.guessnumber.GuessNumberUse
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
-import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -34,7 +33,6 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.content
 import java.time.Duration
 import java.time.LocalDateTime
-import kotlin.time.toKotlinDuration
 
 object GuessNumberCommand : ChatCommand, ConversationCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
@@ -93,7 +91,7 @@ object GuessNumberCommand : ChatCommand, ConversationCommand {
         if (session.tryTimes == 9) {
             event.subject.sendMessage(
                 "你输了! 用时 ${
-                    session.usedTime.toKotlinDuration().toFriendly()
+                    session.usedTime
                 } 正确答案是 ${session.answer}"
             )
             SessionHandler.removeSession(session)
