@@ -30,8 +30,7 @@ object DivineCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return if (args.isNotEmpty()) {
             val randomEventName = args.getRestString(0)
-            if (randomEventName.isNotBlank() && randomEventName.length < 30 && !emojiPattern.containsMatchIn(randomEventName)
-            ) {
+            if (randomEventName.isNotBlank() && randomEventName.length < 30 && !emojiPattern.containsMatchIn(randomEventName)) {
                 val result = RandomResult(-1000, RandomUtil.randomDouble(0.0, 1.0), randomEventName)
 
                 RandomResult.getChance(result).convertToChain()
