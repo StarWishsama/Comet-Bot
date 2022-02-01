@@ -66,11 +66,9 @@ object KeyWordCommand : ChatCommand, ConversationCommand {
         """.trimIndent()
 
     private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        if (e is GroupMessageEvent) {
-            return e.group.getMember(user.id)?.isOperator() ?: false
-        }
+        val groupCheck = e is GroupMessageEvent && e.group.getMember(user.id)?.isOperator() == true
 
-        return user.hasPermission(props.permissionNodeName)
+        return groupCheck || user.hasPermission(props.permissionNodeName)
     }
 
     override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
