@@ -21,7 +21,6 @@ import io.github.starwishsama.comet.utils.network.MinecraftUtil
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
-import java.io.IOException
 
 object MinecraftCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
@@ -59,7 +58,7 @@ object MinecraftCommand : ChatCommand {
 
     override val props: CommandProps = CommandProps(
         "mc",
-        listOf("我的世界", "mcquery", "mq", "服务器", "服务器查询", "mccx"),
+        listOf("mcquery", "mq", "mccx", "minecraft"),
         "查询我的世界服务器信息",
 
         UserLevel.USER
@@ -90,8 +89,8 @@ object MinecraftCommand : ChatCommand {
                     "查询失败, 服务器可能不在线, 请稍后再试.".toChain()
                 }
             }
-        } catch (e: IOException) {
-            "查询失败, 服务器可能不在线, 请稍后再试.".toChain()
+        } catch (e: Exception) {
+            "查询失败, 提供的地址不正确或服务器不在线, 请稍后再试.".toChain()
         }
     }
 }

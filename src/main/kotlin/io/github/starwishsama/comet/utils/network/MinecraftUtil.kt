@@ -19,6 +19,7 @@ import org.xbill.DNS.SRVRecord
 import org.xbill.DNS.Type
 import java.io.*
 import java.net.*
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -39,7 +40,7 @@ object MinecraftUtil {
                 socket = Socket(host, port)
             }
 
-            socket.soTimeout = 1500
+            socket.soTimeout = TimeUnit.SECONDS.toMillis(5).toInt()
 
             val outputStream = socket.getOutputStream()
             val dataOutputStream = DataOutputStream(outputStream)

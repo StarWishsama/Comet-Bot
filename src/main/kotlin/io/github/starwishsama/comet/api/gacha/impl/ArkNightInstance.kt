@@ -42,7 +42,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 object ArkNightInstance : GachaInstance("明日方舟") {
-    var usable: Boolean = false
+    var usable: Boolean = true
         private set
     var isDownloading = false
         private set

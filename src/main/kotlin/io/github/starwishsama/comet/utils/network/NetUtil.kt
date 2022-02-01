@@ -113,7 +113,7 @@ object NetUtil {
      */
     fun executeHttpRequest(
         url: String,
-        timeout: Long = 2,
+        timeout: Long = 10,
         proxyUrl: String = cfg.proxyUrl,
         proxyPort: Int = cfg.proxyPort,
         call: Request.Builder.() -> Request.Builder = {

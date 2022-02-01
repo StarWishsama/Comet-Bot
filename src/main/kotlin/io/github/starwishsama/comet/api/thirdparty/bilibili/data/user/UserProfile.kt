@@ -14,16 +14,16 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class UserProfile(
     val info: Info,
-    val card: Card,
+    val card: Card? = null,
     @JsonProperty("vip")
-    val vipInfo: VipInfo,
-    val pendant: Pendant,
+    val vipInfo: VipInfo? = null,
+    val pendant: Pendant? = null,
     @JsonProperty("decorate_card")
-    val decorateCard: DecorateCard?,
-    val rank: Int,
-    val sign: String,
+    val decorateCard: DecorateCard? = null,
+    val rank: Int? = null,
+    val sign: String? = null,
     @JsonProperty("level_info")
-    val levelInfo: LevelInfo
+    val levelInfo: LevelInfo? = null
 ) {
     data class DecorateCard(
         val mid: Long,
@@ -71,9 +71,9 @@ data class UserProfile(
     data class Info(
         var uid: Int = 0,
         @JsonProperty("uname")
-        var userName: String?,
+        var userName: String? = null,
         @JsonProperty("face")
-        var avatarImgURL: String?
+        var avatarImgURL: String? = null
     )
 
     data class Card(

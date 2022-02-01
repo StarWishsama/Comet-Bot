@@ -48,7 +48,7 @@ class HinaLogger(
 
         val executor = st.firstOrNull {
             !it.className.startsWith("java.")
-                    && !it.className.startsWith("io.github.starwishsama.comet.logger")
+                    && !it.className.startsWith(HinaLogger::class.java.name)
         } ?: st.getOrNull(0) ?: st[0]
 
         val executorInfo =

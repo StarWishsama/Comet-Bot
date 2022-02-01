@@ -33,7 +33,7 @@ data class Repost(
     val item: ItemBean?,
     @JsonProperty("user")
     val profile: UserProfile.Info
-) : DynamicData {
+) : DynamicData() {
     data class ItemBean(
         @JsonProperty("content")
         val content: String,
@@ -69,8 +69,6 @@ data class Repost(
 
         return msg
     }
-
-    override fun getSentTime(): LocalDateTime = item?.getSentTime() ?: LocalDateTime.MIN
 
     private fun getOriginalDynamic(contact: String, type: Int): MessageWrapper {
         val dynamicType = DynamicTypeSelector.getType(type)

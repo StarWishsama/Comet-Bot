@@ -15,7 +15,6 @@ import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
-import java.time.LocalDateTime
 
 data class Video(
     @JsonProperty("aid")
@@ -46,8 +45,7 @@ data class Video(
     val stats: Stats,
     @JsonProperty("title")
     val title: String
-
-) : DynamicData {
+) : DynamicData() {
     data class Stats(
         val aid: Long,
         val coin: Long,
@@ -82,6 +80,4 @@ data class Video(
         )
             .addPictureByURL(cover)
     }
-
-    override fun getSentTime(): LocalDateTime = publishTime.toLocalDateTime()
 }

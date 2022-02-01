@@ -15,7 +15,6 @@ import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
-import java.time.LocalDateTime
 
 data class Music(
     @JsonProperty("id")
@@ -38,7 +37,7 @@ data class Music(
     val replyCount: Long,
     @JsonProperty("playCnt")
     val playCount: Long
-) : DynamicData {
+) : DynamicData() {
     override fun asMessageWrapper(): MessageWrapper {
         return MessageWrapper().addText(
             "${dynamic ?: "获取失败"}\n" +
@@ -50,6 +49,4 @@ data class Music(
             }
         }
     }
-
-    override fun getSentTime(): LocalDateTime = uploadTime.toLocalDateTime()
 }

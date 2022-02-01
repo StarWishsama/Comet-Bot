@@ -18,12 +18,11 @@ import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserProfile
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
-import java.time.LocalDateTime
 
 data class PlainText(
     val user: UserProfile.Info,
     val item: ItemBean
-) : DynamicData {
+) : DynamicData() {
     data class ItemBean(
         @JsonProperty("rp_id")
         val rpId: Long,
@@ -62,8 +61,6 @@ data class PlainText(
             )
         }
     }
-
-    override fun getSentTime(): LocalDateTime = item.sentTimestamp.toLocalDateTime()
 
     /**
      * 解析哔哩哔哩表情

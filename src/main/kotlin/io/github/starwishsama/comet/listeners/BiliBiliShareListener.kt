@@ -31,37 +31,48 @@ object BiliBiliShareListener : INListener {
     override val name: String
         get() = "哔哩哔哩解析"
 
-    private val bvPattern = Regex("""https://b23.tv/\w{1,6}""")
+    private val shortUrlPattern = Regex("""https://b23.tv/\w{1,7}""")
     private val longUrlPattern = Regex("""https://www.bilibili.com/video/(av|BV)\w{1,10}""")
 
     @OptIn(MiraiExperimentalApi::class, ExperimentalTime::class)
     @EventHandler
     fun listen(event: GroupMessageEvent) {
         if (!event.group.isBotMuted) {
+            // Check parse feature is available
             if (GroupConfigManager.getConfig(event.group.id)?.canParseBiliVideo != true) {
                 return
             }
 
-            val targetURL = bvPattern.find(event.message.contentToString())?.groups?.get(0)?.value
-                ?: longUrlPattern.find(event.message.contentToString())?.groups?.get(0)?.value
-                ?: return
+            // First check if the message contains bilibili video url or light app card
+            val targetURL = parseBiliBiliURL(event.message.contentToString())
 
-            val checkResult = biliBiliLinkConvert(targetURL, event.subject)
-
-            if (checkResult.isNotEmpty()) {
-                runBlocking {
-                    event.subject.sendMessage(checkResult)
-                }
+            if (targetURL.isEmpty() && event.message.none { it is LightApp }) {
                 return
             }
 
-            val lightApp = event.message[LightApp] ?: return
+            if (targetURL.isNotEmpty()) {
+                val checkResult = biliBiliLinkConvert(targetURL, event.subject)
 
-            val result = parseJsonMessage(lightApp, event.subject)
-            if (result.isNotEmpty()) {
-                runBlocking { event.subject.sendMessage(result) }
+                if (checkResult.isNotEmpty()) {
+                    runBlocking {
+                        event.subject.sendMessage(checkResult)
+                    }
+                }
+            } else {
+                val lightApp = event.message[LightApp] ?: return
+
+                val result = parseJsonMessage(lightApp, event.subject)
+                if (result.isNotEmpty()) {
+                    runBlocking { event.subject.sendMessage(result) }
+                }
             }
         }
+    }
+
+    private fun parseBiliBiliURL(message: String): String {
+        return shortUrlPattern.find(message)?.groups?.get(0)?.value
+            ?: longUrlPattern.find(message)?.groups?.get(0)?.value
+            ?: ""
     }
 
     private fun parseJsonMessage(lightApp: LightApp, subject: Contact): MessageChain {
@@ -88,7 +99,7 @@ object BiliBiliShareListener : INListener {
     }
 
     private fun biliBiliLinkConvert(url: String, subject: Contact): MessageChain {
-        val videoID = if (bvPattern.matches(url)) {
+        val videoID = if (shortUrlPattern.matches(url)) {
             parseVideoIDFromBili(NetUtil.getRedirectedURL(url) ?: return EmptyMessageChain)
         } else {
             parseVideoIDFromBili(url)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -17,9 +17,7 @@ import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
-import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.enums.UserLevel
-import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.toMessageWrapper
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
@@ -103,33 +101,6 @@ object GroupConfigCommand : ChatCommand, UnDisableableCommand {
 
                         return cmd?.props?.disableCommand(event.group.id)?.msg?.toChain() ?: "找不到对应命令".toChain()
                     }
-                    "autoreply", "ar", "自动回复", "关键词", "keyword", "kw" -> {
-                        if (args.size == 1) {
-                            return "/group ar [关键词] [回复内容]".toChain()
-                        } else {
-                            val keyWord = args[1]
-                            val reply = args.getRestString(2)
-
-                            cfg.keyWordReply.forEach {
-                                if (it.reply.getAllText() == reply) {
-                                    it.keyWord = keyWord
-                                    return "已发现现有配置, 成功替换关键词".toChain()
-                                }
-                            }
-
-                            return if (cfg.keyWordReply.add(
-                                    PerGroupConfig.ReplyKeyWord(
-                                        keyWord,
-                                        MessageWrapper().addText(reply)
-                                    )
-                                )
-                            ) {
-                                "添加关键词成功".toChain()
-                            } else {
-                                "添加关键词失败".toChain()
-                            }
-                        }
-                    }
                     "newcomer", "入群欢迎", "自动欢迎", "zdhy", "rqhy" -> {
                         if (args.size > 1) {
                             return if (args.size > 2) {
@@ -205,16 +176,11 @@ object GroupConfigCommand : ChatCommand, UnDisableableCommand {
         /group repeat 开启/关闭本群机器人复读功能
         /group autojoin 开启/关闭本群机器人自动接受加群请求
         /group func 启用/禁用本群可使用的命令
-        /group autoreply 设置自动回复
         /group newcomer 设置入群欢迎内容
         /group frm 设置群文件自动删除
     """.trimIndent()
 
     private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        return if (user.hasPermission(props.permissionNodeName)) {
-            true
-        } else {
-            e is GroupMessageEvent && e.sender.isOperator()
-        }
+        return user.hasPermission(props.permissionNodeName) || (e is GroupMessageEvent && e.sender.isOperator())
     }
 }

@@ -12,12 +12,9 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.dynami
 
 import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.DynamicData
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import java.time.LocalDateTime
 
-class UnknownType : DynamicData {
+class UnknownType : DynamicData() {
     override fun asMessageWrapper(): MessageWrapper {
         return MessageWrapper().addText("无法解析此动态消息, 你还是另请高明吧")
     }
-
-    override fun getSentTime(): LocalDateTime = LocalDateTime.now()
 }

@@ -70,6 +70,8 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:${Versions.ktorVersion}")
 
     implementation("com.github.StarWishsama:rkon-core:master-SNAPSHOT")
+
+    testImplementation(kotlin("test"))
 }
 
 buildConfig {
@@ -99,10 +101,13 @@ fun getGitInfo(): String {
     return "-$branch-$commitHash"
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 mirai {
     configureShadow {
         dependsOn(tasks.generateBuildConfig)
-
         isZip64 = true
         exclude("META-INF/*.txt")
         exclude("META-INF/*.md")
@@ -110,7 +115,6 @@ mirai {
         exclude("META-INF/LICENSE")
         exclude("META-INF/NOTICE")
 
-        println("Comet >> Welcome to Comet!")
         println("Comet >> Using Java ${System.getProperty("java.version")} to build.")
         println("Comet >> Now building Comet ${project.version}...")
     }

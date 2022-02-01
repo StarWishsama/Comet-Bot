@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -33,20 +33,18 @@ object NoAbbrApi : ApiExecutor {
 
         val responseBody = call.execute().body ?: return AbbrSearchResponse.empty
 
-        val responseString = responseBody.string()
+        val responseTree = mapper.readTree(responseBody.string())
 
-        val tree = mapper.readTree(responseString)
-
-        if (tree.isNull || tree.isObject) {
-            daemonLogger.warning("解析能不能好好说话回调失败: 回调结果异常 (${tree.nodeType})")
+        if (responseTree.isNull || responseTree.isObject) {
+            daemonLogger.warning("解析能不能好好说话回调失败: 回调结果异常 (${responseTree.nodeType})")
             return AbbrSearchResponse.empty
         }
 
-        if (tree.isEmpty) {
+        if (responseTree.isEmpty) {
             return AbbrSearchResponse.empty
         }
 
-        val firstNode = tree[0]
+        val firstNode = responseTree[0]
 
         return if (firstNode.isObject) {
             mapper.readValue(firstNode.traverse())

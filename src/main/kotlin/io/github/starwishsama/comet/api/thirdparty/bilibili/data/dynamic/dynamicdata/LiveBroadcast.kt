@@ -33,7 +33,7 @@ data class LiveBroadcast(
     val showStyle: Int,
     @JsonProperty("type")
     val type: Int
-) : DynamicData {
+) : DynamicData() {
     data class LivePlayInfo(
         @JsonProperty("area_id")
         val areaId: Int,
@@ -86,6 +86,4 @@ data class LiveBroadcast(
 
         return wrapped
     }
-
-    override fun getSentTime(): LocalDateTime = livePlayInfo.getLiveStartTime()
 }

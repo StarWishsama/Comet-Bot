@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -64,7 +64,7 @@ object BiliBiliCommand : ChatCommand {
                     getHelp().convertToChain()
                 }
             }
-            "info", "查询", "cx" -> {
+            "user", "用户", "yh" -> {
                 return if (args.size > 1) {
                     BiliBiliService.searchUserInfo(args.getRestString(1), event)
                     EmptyMessageChain
@@ -128,9 +128,9 @@ object BiliBiliCommand : ChatCommand {
     override fun getHelp(): String = """
         /bili sub [用户名/UID] 订阅用户相关信息
         /bili unsub [用户名/UID] 取消订阅用户相关信息
-        /bili info [用户名/UID] 查看指定用户信息
+        /bili user [用户名/UID] 查看指定用户信息
         /bili dynamic [用户名/UID] 查看指定用户动态
-        /bili push 开启/关闭本群开播推送
+        /bili push 开启/关闭本群动态/开播推送
         /bili refresh 刷新订阅UP主缓存
         /bili id [动态 ID] 通过动态 ID 查询动态
         /bili parse 开启/关闭群聊消息视频解析
