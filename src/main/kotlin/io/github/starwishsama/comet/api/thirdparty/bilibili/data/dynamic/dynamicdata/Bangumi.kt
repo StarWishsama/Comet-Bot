@@ -54,6 +54,7 @@ data class Bangumi(
         return buildMessageWrapper {
             addText("分享了番剧 > ${apiSeasonInfo?.title}\n")
             addText("${newDesc}\n")
+            addText("🔗 $url")
         }
     }
 }
