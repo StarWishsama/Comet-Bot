@@ -122,3 +122,7 @@ Demo/交流群：725656262
 特别感谢 [Kengxxiao](https://github.com/Kengxxiao/) 的项目 [ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData)
 提供明日方舟游戏数据资源
 
+特别感谢 [SDLMoe](https://github.com/SDLMoe) 的项目 [Yabapi](https://github.com/SDLMoe/Yabapi)
+提供可靠的哔哩哔哩 API 库
+![](https://github.com/SDLMoe/Yabapi/blob/kotlin-mt/imgs/yabapi-banner.png?raw=true)
+
