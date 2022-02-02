@@ -58,7 +58,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jacksonVersion}")
 
     // CUrl
-    implementation("com.github.rockswang:java-curl:1.2.2.2")
+    implementation("com.github.rockswang:java-curl:1.2.2.190107")
 
     // jsoup HTML parser library @ https://jsoup.org/
     implementation("org.jsoup:jsoup:1.14.3")
