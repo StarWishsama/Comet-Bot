@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomInfo
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.LiveRoomInfo
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.utils.FileUtil
 
@@ -24,7 +24,7 @@ object LiveApi : ApiExecutor {
     private const val apiRateLimit = "BiliBili API调用已达上限"
 
     @Throws(RateLimitException::class)
-    fun getLiveInfo(roomId: Long): LiveRoomInfo? {
+    fun getLiveInfo(roomId: Int): LiveRoomInfo? {
         if (isReachLimit()) {
             throw RateLimitException(apiRateLimit)
         }

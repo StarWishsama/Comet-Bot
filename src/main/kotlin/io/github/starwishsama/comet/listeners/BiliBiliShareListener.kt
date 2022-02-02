@@ -14,10 +14,12 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.video.toMessageWrapper
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.serialize.isUsable
 import kotlinx.coroutines.runBlocking
+import moe.sdl.yabapi.data.video.VideoInfo
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -105,11 +107,13 @@ object BiliBiliShareListener : INListener {
             parseVideoIDFromBili(url)
         }
 
-        val videoInfo = if (videoID.contains("BV")) {
-            VideoApi.videoService.getVideoInfoByBID(videoID)
-        } else {
-            VideoApi.videoService.getVideoInfo(videoID)
-        }.execute().body() ?: return EmptyMessageChain
+        val videoInfo: VideoInfo = runBlocking {
+            return@runBlocking if (videoID.contains("BV")) {
+                VideoApi.getVideoInfo(videoID)
+            } else {
+                VideoApi.getVideoInfo(videoID.lowercase().replace("av", "").toInt())
+            }
+        } ?: return EmptyMessageChain
 
         return runBlocking {
             val wrapper = videoInfo.toMessageWrapper()

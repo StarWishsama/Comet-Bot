@@ -26,7 +26,7 @@ open class MessageWrapper {
     private val messageContent = mutableSetOf<WrapperElement>()
 
     @Volatile
-    private var usable: Boolean = true
+    private var usable: Boolean = isEmpty()
 
     fun addElement(element: WrapperElement): MessageWrapper {
         messageContent.add(element)

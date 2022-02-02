@@ -10,7 +10,7 @@
 
 package io.github.starwishsama.comet.service.pusher.context
 
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomInfo
+import io.github.starwishsama.comet.api.thirdparty.bilibili.data.LiveRoomInfo
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.service.pusher.PushStatus

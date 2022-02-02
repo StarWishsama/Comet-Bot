@@ -10,56 +10,30 @@
 
 package io.github.starwishsama.comet.api.thirdparty.bilibili
 
-import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserInfo
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserSpaceInfo
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.user.UserVideoInfo
-import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.jackson.JacksonConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.Query
+import io.github.starwishsama.comet.exceptions.RateLimitException
+import kotlinx.coroutines.runBlocking
+import moe.sdl.yabapi.api.getUserCard
+import moe.sdl.yabapi.api.getUserSpace
+import moe.sdl.yabapi.data.info.UserCardGetData
+import moe.sdl.yabapi.data.info.UserSpace
 
 object UserApi : ApiExecutor {
-    val userApiService: IUserApi
+    suspend fun getUserCard(id: Int): UserCardGetData? {
+        return client.getUserCard(id, false).data
+    }
 
-    init {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.bilibili.com/")
-            .addConverterFactory(JacksonConverterFactory.create(mapper))
-            .client(CometVariables.client)
-            .build()
-        userApiService = retrofit.create(IUserApi::class.java)
+    suspend fun getUserSpace(id: Int): UserSpace? {
+        return client.getUserSpace(id).data
+    }
+
+    @Throws(RateLimitException::class)
+    fun getUserNameByMid(mid: Int): String {
+        return runBlocking { return@runBlocking getUserCard(mid)?.card?.name!! }
     }
 
     override var usedTime: Int = 0
     override val duration: Int = 3
 
     override fun getLimitTime(): Int = 3500
-}
-
-interface IUserApi {
-    @GET("/x/web-interface/card")
-    fun getMemberInfoById(@Query("mid") id: Long): Call<UserInfo>
-
-    @GET("/x/space/arc/search")
-    fun getMemberVideoById(
-        @Query("mid") id: Long,
-        /**
-         * 排序方式
-         *
-         * 默认为pubdate
-         * 最新发布：pubdate
-         * 最多播放：click
-         * 最多收藏：stow
-         */
-        @Query("order") order: String = "pubdate",
-        //@Query("pn") pageNumber: Int,
-        //@Query("ps") pageSize: Int
-    ): Call<UserVideoInfo>
-
-    @GET("/x/space/acc/info")
-    fun getUserInfo(@Query("mid") id: Long): Call<UserSpaceInfo>
 }

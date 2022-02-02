@@ -12,13 +12,14 @@ package io.github.starwishsama.comet.service.pusher.pushers
 
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.Dynamic
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToDynamicData
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.CometPusher
 import io.github.starwishsama.comet.service.pusher.CometPusherData
 import io.github.starwishsama.comet.service.pusher.context.BiliBiliDynamicContext
+import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
+import kotlinx.coroutines.runBlocking
+import moe.sdl.yabapi.data.feed.FeedCardNode
 
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
@@ -35,8 +36,8 @@ class BiliBiliDynamicPusher : CometPusher("bili_dynamic", CometPusherData(3, Tim
                     val cache =
                         data.cache.find { (it as BiliBiliDynamicContext).pushUser.id == user.id } as BiliBiliDynamicContext?
 
-                    val dynamic: Dynamic = try {
-                        DynamicApi.getUserDynamicTimeline(user.id.toLong())
+                    val dynamic: FeedCardNode = try {
+                        runBlocking { DynamicApi.getUserDynamicTimeline(user.id.toInt())?.firstOrNull() }
                     } catch (e: RuntimeException) {
                         if (e !is ApiException) {
                             CometVariables.daemonLogger.warning("在获取动态时出现了异常", e)
@@ -44,7 +45,7 @@ class BiliBiliDynamicPusher : CometPusher("bili_dynamic", CometPusherData(3, Tim
                         null
                     } ?: return@user
 
-                    val sentTime = dynamic.convertToDynamicData()?.sentTime ?: return@user
+                    val sentTime = dynamic.description?.timestamp?.toLocalDateTime() ?: return@user
 
                     // Avoid too outdated dynamic
                     if (sentTime.plusDays(1).isBefore(LocalDateTime.now())) {
@@ -57,7 +58,7 @@ class BiliBiliDynamicPusher : CometPusher("bili_dynamic", CometPusherData(3, Tim
                         mutableSetOf(config.id),
                         time,
                         pushUser = user,
-                        dynamicId = dynamic.getDynamicID()
+                        dynamicId = dynamic.description?.dynamicId!!.toLong()
                     )
 
                     if (cache == null) {

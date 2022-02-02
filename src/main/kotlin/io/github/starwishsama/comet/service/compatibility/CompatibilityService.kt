@@ -15,8 +15,8 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.mapper
-import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.managers.PermissionManager
@@ -29,6 +29,7 @@ import io.github.starwishsama.comet.service.compatibility.data.OldGroupConfig
 import io.github.starwishsama.comet.utils.copyAndRename
 import io.github.starwishsama.comet.utils.parseAsClass
 import io.github.starwishsama.comet.utils.serialize.isUsable
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.util.*
 import java.util.stream.Collectors
@@ -149,8 +150,8 @@ object CompatibilityService {
             biliUsers.add(
                 BiliBiliUser(
                     it.toString(),
-                    DynamicApi.getUserNameByMid(it),
-                    LiveApi.getLiveInfo(it)?.data?.roomId ?: -1
+                    UserApi.getUserNameByMid(it.toInt()),
+                    runBlocking { LiveApi.getLiveInfo(it)?.data?.roomId} ?: -1
                 )
             )
         }

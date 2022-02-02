@@ -14,7 +14,7 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToWrapper
+import io.github.starwishsama.comet.api.thirdparty.bilibili.feed.toMessageWrapper
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
@@ -25,6 +25,7 @@ import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.TaskUtil
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -89,9 +90,8 @@ object BiliBiliCommand : ChatCommand {
 
                     TaskUtil.schedule {
                         cfg.biliSubscribers.forEach {
-                            it.userName = DynamicApi.getUserNameByMid(it.id.toLong())
-                            it.roomID = UserApi.userApiService.getUserInfo(it.id.toLong()).execute()
-                                .body()?.data?.liveRoomInfo?.roomID ?: -1
+                            it.userName = UserApi.getUserNameByMid(it.id.toInt())
+                            runBlocking { it.roomID = UserApi.getUserSpace(it.id.toInt())?.liveRoom?.roomId ?: -1 }
                             sleep(1_500)
                         }
                     }
@@ -104,7 +104,7 @@ object BiliBiliCommand : ChatCommand {
             "id" -> {
                 if (args[1].isNumeric()) {
                     val dynamic = DynamicApi.getDynamicById(args[1].toLong())
-                    return dynamic.convertToWrapper().toMessageChain(event.subject)
+                    return dynamic?.toMessageWrapper()?.toMessageChain(event.subject) ?: "找不到对应的动态".toChain()
                 } else {
                     "请输入有效的动态 ID".toChain()
                 }
