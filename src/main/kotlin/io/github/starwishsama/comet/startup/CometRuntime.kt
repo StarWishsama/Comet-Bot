@@ -147,11 +147,8 @@ object CometRuntime {
         DataSetup.saveAllResources()
         PusherManager.stopPushers()
         cometServiceServer?.stop()
-        TaskUtil.dispatcher.close()
 
-        if (!TaskUtil.service.isShutdown) {
-            TaskUtil.service.shutdown()
-        }
+        TaskUtil.service.shutdown()
 
         CometVariables.rCon?.disconnect()
         CometVariables.miraiLoggerAppender.close()
