@@ -9,7 +9,7 @@
  */
 
 object Versions {
-    const val miraiVersion = "2.10.0"
+    const val miraiVersion = "2.9.2"
     const val jacksonVersion = "2.13.1"
     const val hutoolVersion = "5.7.19"
     const val yamlktVersion = "0.10.2"
