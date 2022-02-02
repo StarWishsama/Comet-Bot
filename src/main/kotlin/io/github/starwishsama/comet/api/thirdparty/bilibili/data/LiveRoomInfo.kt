@@ -8,11 +8,10 @@
  *
  */
 
-package io.github.starwishsama.comet.api.thirdparty.bilibili.data.live
+package io.github.starwishsama.comet.api.thirdparty.bilibili.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.CommonResponse
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -25,7 +24,7 @@ data class LiveRoomInfo(
     data class LiveRoomInfoData(
         val uid: Long,
         @JsonProperty("room_id")
-        val roomId: Long,
+        val roomId: Int,
         @JsonProperty("short_id")
         val shortRoomId: Int,
         @JsonProperty("attention")

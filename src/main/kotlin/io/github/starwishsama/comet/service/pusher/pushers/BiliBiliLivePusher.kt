@@ -16,6 +16,7 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.CometPusher
 import io.github.starwishsama.comet.service.pusher.CometPusherData
 import io.github.starwishsama.comet.service.pusher.context.BiliBiliLiveContext
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 
 class BiliBiliLivePusher : CometPusher("bili_live", CometPusherData(5, TimeUnit.MINUTES)) {
@@ -31,7 +32,7 @@ class BiliBiliLivePusher : CometPusher("bili_live", CometPusherData(5, TimeUnit.
                         val cache =
                             data.cache.find { (it as BiliBiliLiveContext).pushUser.id == user.id } as BiliBiliLiveContext?
 
-                        val liveRoomInfo = LiveApi.getLiveInfo(user.roomID) ?: return@user
+                        val liveRoomInfo = runBlocking { LiveApi.getLiveInfo(user.roomID) } ?: return@user
                         val time = System.currentTimeMillis()
                         val current = BiliBiliLiveContext(
                             mutableSetOf(cfg.id),

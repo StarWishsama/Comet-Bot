@@ -81,6 +81,8 @@ dependencies {
 
     implementation("com.github.StarWishsama:rkon-core:master-SNAPSHOT")
 
+    implementation("moe.sdl.yabapi:yabapi-core-jvm:${Versions.yabapiVersion}")
+
     testImplementation(kotlin("test"))
 }
 
