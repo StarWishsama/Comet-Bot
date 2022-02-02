@@ -172,7 +172,7 @@ class ArkNightPool(
      */
     fun getArkDrawResult(user: CometUser, time: Int = 1): GachaResult {
         return if (GachaUtil.checkHasGachaTime(user, time)) {
-            user.consumePoint(time * 0.1)
+            user.consumePoint(time * 0.05)
             doDraw(time)
         } else {
             GachaResult()
