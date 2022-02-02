@@ -217,6 +217,8 @@ class ArkNightPool(
                         }
                     }
 
+                    returnText += "\n\n本次消费硬币 ${drawResult.items.size * 0.05}"
+
                     return returnText
                 }
             }
