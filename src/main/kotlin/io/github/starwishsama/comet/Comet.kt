@@ -19,10 +19,8 @@ import io.github.starwishsama.comet.startup.LoginStatus
 import io.github.starwishsama.comet.utils.FileUtil
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
-import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.BotConfiguration
-import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
 
@@ -79,9 +77,10 @@ class Comet {
             protocol = CometVariables.cfg.botProtocol
 
             heartbeatStrategy = CometVariables.cfg.heartbeatStrategy
+
+            cacheDir = FileUtil.getCacheFolder()
         }
         bot = BotFactory.newBot(qq = id, password = password, configuration = config)
-        Mirai.FileCacheStrategy = FileCacheStrategy.TempCache(FileUtil.getCacheFolder())
     }
 
     fun getBot(): Bot {
