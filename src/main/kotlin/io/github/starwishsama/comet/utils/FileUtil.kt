@@ -70,6 +70,14 @@ fun File.getMD5(): String {
     return SecureUtil.md5(this)
 }
 
+fun File.createNewFileIfNotExists(extraAction: (File) -> Unit = {}) {
+    if (!this.exists()) {
+        this.parentFile.mkdirs()
+        this.createNewFile()
+        extraAction.invoke(this)
+    }
+}
+
 /**
  * 直接将文件内容 (json) 序列化为指定的类
  *
