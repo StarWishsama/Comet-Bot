@@ -151,7 +151,7 @@ object CompatibilityService {
                 BiliBiliUser(
                     it.toString(),
                     UserApi.getUserNameByMid(it.toInt()),
-                    runBlocking { LiveApi.getLiveInfo(it)?.data?.roomId} ?: -1
+                    runBlocking { LiveApi.getLiveInfo(it)?.roomId} ?: -1
                 )
             )
         }
