@@ -106,7 +106,6 @@ object CometRuntime {
                 ArkNightCommand,
                 BiliBiliCommand,
                 CheckInCommand,
-                ClockInCommand,
                 io.github.starwishsama.comet.commands.chats.DebugCommand,
                 DivineCommand,
                 GuessNumberCommand,

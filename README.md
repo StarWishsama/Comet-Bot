@@ -21,7 +21,6 @@ Demo/交流群：725656262
 
 * 以图搜图 (支持 ascii2d/SauceNao)
 * 彩虹六号战绩查询
-* 打卡
 * 签到
 * 哔哩哔哩UP主信息/动态查询
 * 点歌 (卡片/纯文本样式)
@@ -52,15 +51,15 @@ Demo/交流群：725656262
 
 - 实验性的支持, 可能存在无法使用的恶性 Bug, 欢迎反馈问题
 
-~~你可以在[这里](https://github.com/StarWishsama/Comet-Bot/tree/mirai-console)找到插件版本的 Comet, 可以如下编译
+~~你可以在[这里](https://github.com/StarWishsama/Comet-Bot/tree/mirai-console)找到插件版本的 Comet, 可以如下编译~~
 
-或是从 [Github Actions](https://github.com/StarWishsama/Comet-Bot/actions?query=branch%3Amirai-console) 中下载~~
+~~或是从 [Github Actions](https://github.com/StarWishsama/Comet-Bot/actions?query=branch%3Amirai-console) 中下载~~
 
 自 0.6.3 起, Releases 中已提供插件版下载
 
 ### 自编译
 
-- 注意: 请使用 JDK 11 或更高版本打包, **推荐**使用 JDK 11+
+- 注意: 请使用 JDK 11 或更高版本打包, **推荐**使用 JDK 17
 
 1. 编译
 
