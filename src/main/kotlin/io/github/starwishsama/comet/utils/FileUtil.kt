@@ -37,7 +37,6 @@ import kotlin.time.ExperimentalTime
 
 @Synchronized
 fun File.writeClassToJson(context: Any, mapper: ObjectMapper = CometVariables.mapper) {
-    daemonLogger.debug("正在尝试写入文件: ${this.absolutePath}")
     FileWriter.create(this).getWriter(false).use {
         mapper.writeValue(it, context)
     }
@@ -50,8 +49,6 @@ fun File.writeString(
     isAppend: Boolean = false,
     newIfNotExists: Boolean = true
 ) {
-    daemonLogger.debug("正在尝试写入文件: ${this.absolutePath}")
-
     if (newIfNotExists) {
         createNewFile()
     }
@@ -136,7 +133,7 @@ fun File.createBackupFile() {
 }
 
 object FileUtil {
-    private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
+    private val standardDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
 
     fun getChildFolder(childName: String): File = CometVariables.filePath.getChildFolder(childName)
 
@@ -153,7 +150,7 @@ object FileUtil {
         content: String,
         message: String
     ) {
-        val fileName = "$type-${dateFormatter.format(LocalDateTime.now())}.txt"
+        val fileName = "$type-${standardDateTimeFormatter.format(LocalDateTime.now())}.txt"
         val location = File(getErrorReportFolder(), fileName)
         if (location.exists()) return
 
@@ -164,6 +161,7 @@ object FileUtil {
         location.writeString(report)
         daemonLogger.warning("$reason, 错误报告已生成! 保存在 ${location.path}")
         daemonLogger.warning("你可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")
+        daemonLogger.warning("以下是错误堆栈: ", t)
     }
 
     /**
@@ -174,7 +172,7 @@ object FileUtil {
     fun getLogLocation(customPrefix: String = "log"): File {
         val initTime = LocalDateTime.now()
         val parent = getChildFolder("logs")
-        return File(parent, "$customPrefix-${dateFormatter.format(initTime)}.log").also {
+        return File(parent, "$customPrefix-${standardDateTimeFormatter.format(initTime)}.log").also {
             if (!it.exists()) {
                 it.createNewFile()
             }
