@@ -10,21 +10,18 @@
 
 package io.github.starwishsama.comet.api.thirdparty.bilibili
 
-import cn.hutool.http.HttpRequest
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.module.kotlin.readValue
-import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.live.LiveRoomInfo
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.utils.FileUtil
+import moe.sdl.yabapi.api.getRoomInfoByRoomId
+import moe.sdl.yabapi.data.live.LiveRoomData
+import moe.sdl.yabapi.data.live.LiveRoomInfoResponse
 
 object LiveApi : ApiExecutor {
-    private const val liveUrl = "http://api.live.bilibili.com/room/v1/Room/get_info?id="
     private const val apiRateLimit = "BiliBili API调用已达上限"
 
     @Throws(RateLimitException::class)
-    fun getLiveInfo(roomId: Long): LiveRoomInfo? {
+    suspend fun getLiveInfo(roomId: Int): LiveRoomData? {
         if (isReachLimit()) {
             throw RateLimitException(apiRateLimit)
         }
@@ -33,16 +30,14 @@ object LiveApi : ApiExecutor {
             throw IllegalArgumentException("直播间 ID 不能小于 1")
         }
 
-        val request = HttpRequest.get(liveUrl + roomId).timeout(2000)
-            .header("User-Agent", "Bili live status checker")
-        val response = request.executeAsync()
+        var resp: LiveRoomInfoResponse? = null
 
-        return try {
-            mapper.readValue(response.body())
-        } catch (t: Throwable) {
-            FileUtil.createErrorReportFile("在获取B站直播间信息时出现了意外", "bilibili", t, response.body(), request.url)
-            null
-        }
+        return kotlin.runCatching {
+            resp = client.getRoomInfoByRoomId(roomId)
+            resp?.data
+        }.onFailure {
+            FileUtil.createErrorReportFile("在获取B站直播间信息时出现了意外", "bilibili", it, "LiveApi#getLiveInfo() roomId = $roomId", "${resp?.code}\n${resp?.message}")
+        }.getOrNull()
     }
 
     override fun isReachLimit(): Boolean {
@@ -55,15 +50,4 @@ object LiveApi : ApiExecutor {
     override val duration: Int = 3
 
     override fun getLimitTime(): Int = 15000
-
-    private data class OldRoomInfo(
-        val code: Int,
-        val message: String,
-        val data: LiveInfoData
-    ) {
-        data class LiveInfoData(
-            @JsonProperty("roomid")
-            val roomId: Long
-        )
-    }
 }

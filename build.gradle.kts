@@ -12,9 +12,9 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-    kotlin("jvm") version "1.5.31"
-    kotlin("plugin.serialization") version "1.5.31"
-    id("com.github.johnrengelman.shadow") version "7.1.1"
+    kotlin("jvm") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     id("com.github.gmazzo.buildconfig") version "3.0.3"
     id("net.mamoe.mirai-console") version Versions.miraiVersion
 }
@@ -37,6 +37,7 @@ repositories {
     maven(url = "https://maven.aliyun.com/nexus/content/repositories/central/")
     maven(url = "https://jitpack.io")
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
@@ -55,7 +56,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jacksonVersion}")
 
     // CUrl
-    implementation("com.github.rockswang:java-curl:1.2.2.2")
+    implementation("com.github.rockswang:java-curl:1.2.2.190107")
 
     // jsoup HTML parser library @ https://jsoup.org/
     implementation("org.jsoup:jsoup:1.14.3")
@@ -72,7 +73,19 @@ dependencies {
 
     implementation("com.github.StarWishsama:rkon-core:master-SNAPSHOT")
 
+    implementation("moe.sdl.yabapi:yabapi-core-jvm:${Versions.yabapiVersion}") {
+        exclude("org.jetbrains.kotlinx", "atomicfu-jvm")
+        exclude("org.jetbrains.kotlinx", "atomicfu")
+    }
+
+    // Fix yabapi
+    implementation("org.jetbrains.kotlinx:atomicfu:0.17.0")
+
     testImplementation(kotlin("test"))
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor(0, "minutes")
 }
 
 buildConfig {

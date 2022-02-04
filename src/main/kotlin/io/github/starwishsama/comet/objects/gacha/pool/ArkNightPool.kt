@@ -172,7 +172,7 @@ class ArkNightPool(
      */
     fun getArkDrawResult(user: CometUser, time: Int = 1): GachaResult {
         return if (GachaUtil.checkHasGachaTime(user, time)) {
-            user.consumePoint(time * 0.1)
+            user.consumePoint(time * 0.05)
             doDraw(time)
         } else {
             GachaResult()
@@ -199,9 +199,9 @@ class ArkNightPool(
                     }.trim().toString()
                 }
                 else -> {
-                    val r6Count = drawResult.items.parallelStream().filter { it.rare + 1 == 6 }.count()
-                    val r5Count = drawResult.items.parallelStream().filter { it.rare + 1 == 4 }.count()
-                    val r4Count = drawResult.items.parallelStream().filter { it.rare + 1 == 3 }.count()
+                    val r6Count = drawResult.items.count { it.rare + 1 == 6 }
+                    val r5Count = drawResult.items.count { it.rare + 1 == 4 }
+                    val r4Count = drawResult.items.count { it.rare + 1 == 3 }
                     val r3Count = drawResult.items.size - r6Count - r5Count - r4Count
                     val perTimeUsed = 600
 
@@ -216,6 +216,8 @@ class ArkNightPool(
                             returnText += "${it.name} > ${GachaUtil.getStarText(it.rare + 1)}"
                         }
                     }
+
+                    returnText += "\n\n本次消费硬币 ${drawResult.items.size * 0.05}"
 
                     return returnText
                 }

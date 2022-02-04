@@ -37,6 +37,7 @@ object CommandManager {
      *
      * @param commands 要注册的命令集合
      */
+    @Suppress("unused")
     fun setupCommands(commands: Array<ChatCommand>) {
         commands.forEach {
             if (!CommandManager.commands.contains(it) && it.canRegister()) {
@@ -46,11 +47,7 @@ object CommandManager {
     }
 
     fun getCommand(cmdPrefix: String): ChatCommand? {
-        val command = commands.parallelStream().filter {
-            isCommandNameEquals(it, cmdPrefix)
-        }.findFirst()
-
-        return if (command.isPresent) command.get() else null
+        return commands.find { isCommandNameEquals(it, cmdPrefix) }
     }
 
     fun getCommandName(message: String): String {
@@ -85,8 +82,8 @@ object CommandManager {
                 return true
             }
             props.aliases.isNotEmpty() -> {
-                val aliases = props.aliases.parallelStream().filter { it!!.contentEquals(cmdName) }.findFirst()
-                if (aliases.isPresent) {
+                val aliases = props.aliases.find { it.contentEquals(cmdName) }
+                if (aliases != null) {
                     return true
                 }
             }

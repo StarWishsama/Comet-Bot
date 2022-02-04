@@ -16,7 +16,6 @@ import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.exceptions.ReachRetryLimitException
 import io.github.starwishsama.comet.utils.network.NetUtil
-import kotlinx.coroutines.asCoroutineDispatcher
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -30,8 +29,6 @@ object TaskUtil {
                 daemonLogger.warning("线程 ${t.name} 在执行任务时发生了错误", e)
             }.build()
     ).also { it.maximumPoolSize = CometVariables.cfg.maxPoolSize }
-
-    val dispatcher = service.asCoroutineDispatcher()
 
     fun schedule(delay: Long = 0, unit: TimeUnit = TimeUnit.SECONDS, task: () -> Unit): ScheduledFuture<*> {
         return service.schedule({

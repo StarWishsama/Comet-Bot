@@ -93,6 +93,10 @@ object TwitterCommand : ChatCommand {
                                 }
                             }
 
+                            override fun onFailure(t: Throwable?) {
+                                runBlocking { content.sendMessage("在获取推文时发生了异常".toChain()) }
+                            }
+
                         }
 
                         NetworkRequestManager.addTask(task)
@@ -159,6 +163,12 @@ object TwitterCommand : ChatCommand {
                         runBlocking {
                             content.sendMessage(result)
                         }
+                    }
+                }
+
+                override fun onFailure(t: Throwable?) {
+                    runBlocking {
+                        content.sendMessage("在获取推文时发生了异常".toChain())
                     }
                 }
 

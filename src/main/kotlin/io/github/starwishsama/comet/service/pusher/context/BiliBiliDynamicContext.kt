@@ -12,10 +12,11 @@ package io.github.starwishsama.comet.service.pusher.context
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.dynamic.convertToWrapper
+import io.github.starwishsama.comet.api.thirdparty.bilibili.feed.toMessageWrapper
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.service.pusher.PushStatus
+import kotlinx.coroutines.runBlocking
 
 class BiliBiliDynamicContext(
     pushTarget: MutableSet<Long>,
@@ -27,7 +28,7 @@ class BiliBiliDynamicContext(
     val dynamicId: Long,
 ) : PushContext(pushTarget, retrieveTime, status), Pushable {
     override fun toMessageWrapper(): MessageWrapper {
-        val before = DynamicApi.getDynamicById(dynamicId).convertToWrapper()
+        val before = runBlocking { DynamicApi.getDynamicById(dynamicId)?.toMessageWrapper() } ?: return MessageWrapper().setUsable(false)
 
         return MessageWrapper().addText(
             "${pushUser.userName}\n"

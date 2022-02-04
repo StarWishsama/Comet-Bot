@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.objects.tasks.network.impl
 
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.noabbr.NoAbbrApi
 import io.github.starwishsama.comet.api.thirdparty.noabbr.data.AbbrSearchResponse
 import io.github.starwishsama.comet.i18n.LocalizationManager
@@ -38,5 +39,10 @@ class NoAbbrRequestTask(override val content: Contact, override val param: Strin
                 content.sendMessage(LocalizationManager.getLocalizationText("message.network-error").toChain())
             }
         }
+    }
+
+    override fun onFailure(t: Throwable?) {
+        runBlocking { content.sendMessage("在搜索缩写时遇到了异常".toChain()) }
+        CometVariables.daemonLogger.warning("在搜索缩写时遇到了异常", t)
     }
 }

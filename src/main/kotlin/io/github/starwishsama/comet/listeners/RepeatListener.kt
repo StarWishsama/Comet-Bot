@@ -26,25 +26,22 @@ object RepeatListener : INListener {
 
     @EventHandler
     fun listen(event: GroupMessageEvent) {
-        if (event.group.isBotMuted) {
+        if (GroupConfigManager.getConfig(event.group.id)?.canRepeat != true
+            || event.group.isBotMuted
+            || CommandManager.getCommandPrefix(event.message.contentToString()).isNotEmpty()
+        ) {
             return
         }
 
-        if (CommandManager.getCommandPrefix(event.message.contentToString()).isNotEmpty()) {
+        val groupId = event.group.id
+        val repeatInfo = repeatCachePool[groupId]
+
+        if (repeatInfo == null) {
+            repeatCachePool[groupId] = RepeatInfo(mutableListOf(event.message))
             return
         }
 
-        if (GroupConfigManager.getConfigOrNew(event.group.id).canRepeat) {
-            val groupId = event.group.id
-            val repeatInfo = repeatCachePool[groupId]
-
-            if (repeatInfo == null) {
-                repeatCachePool[groupId] = RepeatInfo(mutableListOf(event.message))
-                return
-            }
-
-            repeatInfo.handleRepeat(event.group, event.message)
-        }
+        repeatInfo.handleRepeat(event.group, event.message)
     }
 }
 
@@ -58,10 +55,10 @@ data class RepeatInfo(
             return
         }
 
-        val lastMessage = messageCache.last()
-        val lastSender = lastMessage.source.fromId
+        val previousMessage = messageCache.last()
+        val previousSenderId = previousMessage.source.fromId
 
-        if (lastSender != message.sourceOrNull?.fromId && lastMessage.contentEquals(
+        if (previousSenderId != message.sourceOrNull?.fromId && previousMessage.contentEquals(
                 message,
                 ignoreCase = false,
                 strict = true
@@ -75,13 +72,13 @@ data class RepeatInfo(
             return
         }
 
-        if (messageCache.size > 1 && !lastMessage.contentEquals(lastRepeat, ignoreCase = false, strict = true)) {
+        if (messageCache.size > 1 && !previousMessage.contentEquals(lastRepeat, ignoreCase = false, strict = true)) {
             runBlocking {
-                group.sendMessage(processRepeatMessage(lastMessage))
+                group.sendMessage(processRepeatMessage(previousMessage))
             }
 
             // Set last repeat message
-            lastRepeat = lastMessage
+            lastRepeat = previousMessage
 
             messageCache.clear()
         }
@@ -89,14 +86,17 @@ data class RepeatInfo(
 
     private fun processRepeatMessage(message: MessageChain): MessageChain {
         // 避免复读过多图片刷屏
-        val count = message.parallelStream().filter { it is Image }.count()
+        val count = message.filterIsInstance<Image>().count()
 
         if (count <= 2L) {
             val revampChain = ArrayList<Message>()
 
             message.forEach {
                 val msg: SingleMessage = if (it is PlainText) {
-                    PlainText(it.content.replace("我".toRegex(), "你"))
+                    PlainText(
+                        it.content.replace("你".toRegex(), "他")
+                            .replace("我".toRegex(), "你")
+                    )
                 } else {
                     it
                 }

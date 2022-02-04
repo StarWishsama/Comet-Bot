@@ -30,6 +30,8 @@ import io.github.starwishsama.comet.commands.console.DebugCommand
 import io.github.starwishsama.comet.file.DataSaveHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
+import io.github.starwishsama.comet.logger.HinaLogLevel
+import io.github.starwishsama.comet.logger.YabapiLogRedirecter
 import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.tasks.GroupFileAutoRemover
 import io.github.starwishsama.comet.service.RetrofitLogger
@@ -92,7 +94,6 @@ object CometRuntime {
                 ArkNightCommand,
                 BiliBiliCommand,
                 CheckInCommand,
-                ClockInCommand,
                 io.github.starwishsama.comet.commands.chats.DebugCommand,
                 DivineCommand,
                 GuessNumberCommand,
@@ -128,6 +129,8 @@ object CometRuntime {
 
         consoleCommand.forEach(net.mamoe.mirai.console.command.CommandManager::registerCommand)
 
+        YabapiLogRedirecter.initYabapi()
+
         logger.info("[命令] 已注册 " + CommandManager.countCommands() + " 个命令")
     }
 
@@ -136,11 +139,8 @@ object CometRuntime {
         DataSetup.saveAllResources()
         PusherManager.stopPushers()
         cometServiceServer?.stop()
-        TaskUtil.dispatcher.close()
 
-        if (!TaskUtil.service.isShutdown) {
-            TaskUtil.service.shutdown()
-        }
+        TaskUtil.service.shutdown()
 
         CometVariables.rCon?.disconnect()
         CometVariables.miraiLoggerAppender.close()

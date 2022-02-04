@@ -130,6 +130,10 @@ data class CometUser(
             return CometVariables.cometUsers[id]
         }
 
+        fun getUser(uuid: UUID): CometUser? {
+            return CometVariables.cometUsers.entries.find { it.value.uuid == uuid }?.value
+        }
+
         fun getUserOrRegister(qq: Long): CometUser = getUser(qq) ?: quickRegister(qq)
     }
 }

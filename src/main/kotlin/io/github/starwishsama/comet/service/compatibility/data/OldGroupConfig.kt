@@ -45,7 +45,7 @@ data class OldGroupConfig(@JsonProperty("group_id") val id: Long) {
      * bilibili 订阅列表
      */
     @JsonProperty("bili_sub")
-    val biliSubscribers: MutableSet<Long> = hashSetOf()
+    val biliSubscribers: MutableSet<Int> = hashSetOf()
 
     /**
      * 是否关闭对此群消息的复读
