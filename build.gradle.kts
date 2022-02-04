@@ -89,7 +89,8 @@ dependencies {
         exclude("org.jetbrains.kotlinx", "atomicfu")
     }
 
-    compileOnly("org.jetbrains.kotlinx:atomicfu:0.17.0")
+    // Fix yabapi
+    implementation("org.jetbrains.kotlinx:atomicfu:0.17.0")
 
     testImplementation(kotlin("test"))
 }
