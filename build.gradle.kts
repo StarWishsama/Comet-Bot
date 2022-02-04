@@ -35,6 +35,7 @@ repositories {
     maven(url = "https://maven.aliyun.com/nexus/content/repositories/central/")
     maven(url = "https://jitpack.io")
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
