@@ -10,7 +10,7 @@ object YabapiLogRedirecter {
 
     internal fun initYabapi() = Yabapi.apply {
         if (!isInitializedYabapi) {
-            log.getAndSet { tag, level, throwable, message ->
+            log.getAndSet { tag: String, level: LogLevel, throwable: Throwable?, message: () -> String ->
                 when (level) {
                     LogLevel.VERBOSE -> loggerWrapper.verbose("$tag ${message()}", throwable)
                     LogLevel.DEBUG -> loggerWrapper.debug("$tag ${message()}", throwable)
@@ -20,6 +20,7 @@ object YabapiLogRedirecter {
                     LogLevel.ASSERT -> loggerWrapper.error("----- ASSERT ERROR ----- $tag ${message()}", throwable)
                 }
             }
+
             isInitializedYabapi = true
         }
     }

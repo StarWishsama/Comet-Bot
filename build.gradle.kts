@@ -42,7 +42,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.2")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    implementation("net.mamoe:mirai-core-all:${Versions.miraiVersion}")
+    implementation("net.mamoe:mirai-core-all:${Versions.miraiVersion}") {
+        exclude("org.jetbrains.kotlinx", "atomicfu-jvm")
+    }
 
     implementation("cn.hutool:hutool-http:${Versions.hutoolVersion}")
     implementation("cn.hutool:hutool-crypto:${Versions.hutoolVersion}")
@@ -82,7 +84,12 @@ dependencies {
 
     implementation("com.github.StarWishsama:rkon-core:master-SNAPSHOT")
 
-    implementation("moe.sdl.yabapi:yabapi-core-jvm:${Versions.yabapiVersion}")
+    implementation("moe.sdl.yabapi:yabapi-core-jvm:${Versions.yabapiVersion}") {
+        exclude("org.jetbrains.kotlinx", "atomicfu-jvm")
+        exclude("org.jetbrains.kotlinx", "atomicfu")
+    }
+
+    compileOnly("org.jetbrains.kotlinx:atomicfu:0.17.0")
 
     testImplementation(kotlin("test"))
 }

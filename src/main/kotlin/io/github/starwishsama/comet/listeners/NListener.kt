@@ -68,7 +68,7 @@ fun INListener.register(bot: Bot) {
                         try {
                             method.call(this@register, subEvent)
                         } catch (e: Exception) {
-                            CometVariables.daemonLogger.warning("${clazz.java.simpleName} 在运行时发生了异常", e)
+                            CometVariables.daemonLogger.warning("${this@register.name} 在运行时发生了异常", e.cause)
                         }
                     }
                 }

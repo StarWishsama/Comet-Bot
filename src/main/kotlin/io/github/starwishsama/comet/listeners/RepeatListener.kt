@@ -58,17 +58,6 @@ data class RepeatInfo(
         val previousMessage = messageCache.last()
         val previousSenderId = previousMessage.source.fromId
 
-        if (messageCache.size > 1 && !previousMessage.contentEquals(lastRepeat, ignoreCase = false, strict = true)) {
-            runBlocking {
-                group.sendMessage(processRepeatMessage(previousMessage))
-            }
-
-            // Set last repeat message
-            lastRepeat = previousMessage
-
-            messageCache.clear()
-        }
-
         if (previousSenderId != message.sourceOrNull?.fromId && previousMessage.contentEquals(
                 message,
                 ignoreCase = false,
@@ -79,6 +68,18 @@ data class RepeatInfo(
         } else {
             // No one repeat now, clear it
             lastRepeat = EmptyMessageChain
+            messageCache.clear()
+            return
+        }
+
+        if (messageCache.size > 1 && !previousMessage.contentEquals(lastRepeat, ignoreCase = false, strict = true)) {
+            runBlocking {
+                group.sendMessage(processRepeatMessage(previousMessage))
+            }
+
+            // Set last repeat message
+            lastRepeat = previousMessage
+
             messageCache.clear()
         }
     }
