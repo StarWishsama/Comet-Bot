@@ -89,7 +89,14 @@ object RConCommand : ChatCommand, ConversationCommand {
             return
         }
 
-        when (waitList[user] ?: 0) {
+        val status = waitList[user]
+
+        if (status == null) {
+            SessionHandler.removeSession(session)
+            return
+        }
+
+        when (status) {
             0 -> {
                 CometVariables.cfg.rConUrl = event.message.contentToString()
                 event.subject.sendMessage(CometUtil.sendMessageAsString("已设置 rcon 连接地址为 ${CometVariables.cfg.rConUrl}\n请在下一条消息发送 rcon 端口\n如果需要退出设置 请回复退出"))
@@ -118,8 +125,15 @@ object RConCommand : ChatCommand, ConversationCommand {
             }
             2 -> {
                 CometVariables.cfg.rConPassword = event.message.contentToString()
-                CometRuntime.setupRCon()
-                event.subject.sendMessage(toChain("设置 rcon 完成!"))
+                kotlin.runCatching {
+                    CometRuntime.setupRCon()
+                }.onSuccess {
+                    event.subject.sendMessage("设置 rcon 完成!".toChain())
+                }.onFailure {
+                    event.subject.sendMessage("连接至 rcon 服务器时出现了异常".toChain())
+                    CometVariables.daemonLogger.warning("连接至 rcon 服务器时出现了异常", it)
+                }
+
                 waitList.remove(user)
                 SessionHandler.removeSession(session)
             }
