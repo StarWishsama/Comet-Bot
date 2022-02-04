@@ -95,6 +95,10 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor(0, "minutes")
+}
+
 buildConfig {
     println("Comet >> Generating comet information.....")
 
