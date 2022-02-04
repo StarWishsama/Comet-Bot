@@ -43,7 +43,7 @@ object RConCommand : ChatCommand, ConversationCommand {
             } else {
                 when (args[0]) {
                     "setup" -> {
-                        SessionHandler.insertSession(Session(SessionTarget(user.id), this, false))
+                        SessionHandler.insertSession(Session(SessionTarget(privateId = user.id), this, false))
                         return toChain("请在下一条消息发送 rcon 连接地址")
                     }
                     "cmd", "exec", "命令" -> {
