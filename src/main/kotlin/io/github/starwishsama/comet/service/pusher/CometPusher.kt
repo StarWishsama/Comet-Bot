@@ -49,7 +49,7 @@ abstract class CometPusher(
 
                 context.pushTarget.forEach group@{
 
-                    if (!comet::isInitialized.invoke()) {
+                    if (comet.isInitialized()) {
                         return@group
                     }
 
