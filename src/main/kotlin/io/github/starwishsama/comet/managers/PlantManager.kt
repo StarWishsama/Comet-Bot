@@ -27,8 +27,14 @@ object PlantManager {
         }
     }
 
+    fun save() {
+        PLANT_FILE.writeClassToJson(cfg)
+    }
+
     fun claimPlant(user: CometUser) {
-        PLANTS.random()
+        val claimedPlant = PLANTS.random().also { it.owner = user.uuid }
+        cfg.plants.add(claimedPlant)
+        save()
     }
 
     fun getPlantByUser(user: CometUser): Plant? = cfg.plants.find { it.owner == user.uuid }
