@@ -32,8 +32,12 @@ object NetworkRequestManager {
 
         mutex.withLock {
             if (task is INetworkRequestTask<*>) {
-                val result = task.request(task.param)
-                task.callback(result)
+                kotlin.runCatching {
+                    val result = task.request(task.param)
+                    task.callback(result)
+                }.onFailure {
+                    task.onFailure(it)
+                }
             }
         }
     }

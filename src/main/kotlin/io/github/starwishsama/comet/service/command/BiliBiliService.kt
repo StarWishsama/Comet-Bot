@@ -294,6 +294,13 @@ class BiliBiliUserCheckTask(
             }
         }
     }
+
+    override fun onFailure(t: Throwable?) {
+        runBlocking {
+            content.sendMessage("查询对应B站用户信息时出现错误".toChain())
+        }
+        daemonLogger.warning("查询哔哩哔哩用户信息时出现异常", t)
+    }
 }
 
 class BiliBiliDynamicTask(
@@ -338,5 +345,10 @@ class BiliBiliDynamicTask(
                 }
             }
         }
+    }
+
+    override fun onFailure(t: Throwable?) {
+        runBlocking { content.sendMessage(CometUtil.sendMessageAsString("获取动态失败").toChain()) }
+        daemonLogger.warning("获取动态失败", t)
     }
 }
