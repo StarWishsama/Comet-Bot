@@ -20,7 +20,6 @@ import net.mamoe.mirai.event.events.MessageEvent
 import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
 
 object SessionHandler {
     private val sessionPool: MutableSet<Session> = Collections.synchronizedSet(mutableSetOf())
@@ -44,20 +43,20 @@ object SessionHandler {
     fun hasSessionByGroup(groupID: Long): Boolean = getSessionsByGroup(groupID).isNotEmpty()
 
     fun hasSessionByGroup(groupID: Long, cmd: Class<*>): Boolean {
-        return getSessionsByGroup(groupID).stream().filter { it.creator::class.java == cmd }.count() > 0
+        return getSessionsByGroup(groupID).any { it.creator::class.java == cmd }
     }
 
-    fun getSessionsByGroup(groupID: Long): List<Session> =
-        sessionPool.stream().filter { it.target.groupId == groupID }.collect(Collectors.toList())
+    private fun getSessionsByGroup(groupID: Long): List<Session> =
+        sessionPool.filter { it.target.groupId == groupID }
 
     fun hasSessionByID(id: Long): Boolean = getSessionsByID(id).isNotEmpty()
 
     fun hasSessionByID(id: Long, cmd: Class<*>): Boolean {
-        return getSessionsByID(id).stream().filter { it.creator::class.java == cmd }.count() > 0
+        return getSessionsByID(id).any { it.creator::class.java == cmd }
     }
 
     fun getSessionsByID(id: Long): List<Session> =
-        sessionPool.stream().filter { it.target.privateId == id }.collect(Collectors.toList())
+        sessionPool.filter { it.target.privateId == id }
 
     /**
      * 获取所有活跃中的会话列表副本.
@@ -65,7 +64,7 @@ object SessionHandler {
      *
      * @return 会话列表副本
      */
-    fun getSessions(): MutableSet<Session> = sessionPool.toMutableSet()
+    fun getSessions(): MutableSet<Session> = Collections.unmodifiableSet(sessionPool)
 
     /**
      * 传入消息处理会话
@@ -81,13 +80,14 @@ object SessionHandler {
             SessionTarget(privateId = e.sender.id)
         }
 
-        val sessionToHandle = sessionPool.filter { it.target.groupId == target.groupId && it.target.privateId == target.privateId }
+        val sessions = sessionPool.filter { it.target.groupId == target.groupId && it.target.privateId == target.privateId }
 
-        if (sessionToHandle.isEmpty()) {
+        if (sessions.isEmpty()) {
             return false
         }
 
-        for (session in sessionToHandle) {
+        /** Handle [ConversationCommand] */
+        for (session in sessions) {
             if (session.silent || CommandManager.getCommandPrefix(e.message.contentToString()).isEmpty()) {
                 if (session.creator is ConversationCommand) {
                     session.creator.handle(e, user, session)
@@ -95,19 +95,15 @@ object SessionHandler {
             }
         }
 
-        if (sessionPool.any { it.target.groupId == target.groupId || it.target.privateId == target.privateId }) {
-            CometVariables.logger.debug(
-                "[会话] 处理 ${sessionToHandle.count()} 个会话耗时 ${
-                    time.getLastingTimeAsString(
-                        unit = TimeUnit.SECONDS,
-                        msMode = true
-                    )
-                }"
-            )
-        }
+        CometVariables.logger.debug(
+            "[会话] 处理 ${sessions.size} 个会话耗时 ${
+                time.getLastingTimeAsString(
+                    unit = TimeUnit.SECONDS,
+                    msMode = true
+                )
+            }"
+        )
 
-        return sessionPool.stream()
-            .filter { (it.target.groupId == target.groupId || it.target.privateId == target.privateId) && !it.silent }
-            .count() > 0
+        return sessions.any { !it.silent }
     }
 }
