@@ -35,6 +35,7 @@ import io.github.starwishsama.comet.file.DataSaveHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
 import io.github.starwishsama.comet.logger.HinaLogLevel
+import io.github.starwishsama.comet.logger.YabapiLogRedirecter
 import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.tasks.GroupFileAutoRemover
 import io.github.starwishsama.comet.service.RetrofitLogger
@@ -137,6 +138,8 @@ object CometRuntime {
                 BroadcastCommand
             )
         )
+
+        YabapiLogRedirecter.initYabapi()
 
         logger.info("[命令] 已注册 " + CommandManager.countCommands() + " 个命令")
     }
