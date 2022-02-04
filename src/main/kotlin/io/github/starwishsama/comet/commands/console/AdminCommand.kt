@@ -16,7 +16,6 @@ import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
-import net.mamoe.mirai.console.command.CommandSender
 import net.mamoe.mirai.console.command.CompositeCommand
 import java.util.*
 
@@ -87,7 +86,7 @@ object AdminCommand : CompositeCommand(
     }
 
     @SubCommand
-    suspend fun CommandSender.groups() {
+    suspend fun ConsoleCommandSender.groups() {
         sendMessage(buildString {
             append("已加入的群聊:\n")
             CometVariables.comet.getBot().groups.forEach {
