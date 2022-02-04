@@ -117,7 +117,9 @@ abstract class CometPusher(
     }
 
     fun stop() {
-        task.cancel(true)
+        if (::task.isInitialized) {
+            task.cancel(true)
+        }
         saveData()
     }
 }
