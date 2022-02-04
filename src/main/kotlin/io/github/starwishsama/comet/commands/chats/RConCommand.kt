@@ -92,7 +92,7 @@ object RConCommand : ChatCommand, ConversationCommand {
         when (waitList[user] ?: 0) {
             0 -> {
                 CometVariables.cfg.rConUrl = event.message.contentToString()
-                event.subject.sendMessage(CometUtil.sendMessageAsString("已设置 rcon 连接地址为 ${CometVariables.cfg.rConUrl}\n请在下一条消息发送 rcon 密码\n如果需要退出设置 请回复退出"))
+                event.subject.sendMessage(CometUtil.sendMessageAsString("已设置 rcon 连接地址为 ${CometVariables.cfg.rConUrl}\n请在下一条消息发送 rcon 端口\n如果需要退出设置 请回复退出"))
                 waitList[user] = 1
             }
             1 -> {
@@ -102,7 +102,7 @@ object RConCommand : ChatCommand, ConversationCommand {
 
                     event.subject.sendMessage(
                         toChain(
-                            "设置密码成功!\n请在下一条消息发送 rcon 密码\n" +
+                            "设置端口成功!\n请在下一条消息发送 rcon 密码\n" +
                                     "如果需要退出设置 请回复退出"
                         )
                     )
