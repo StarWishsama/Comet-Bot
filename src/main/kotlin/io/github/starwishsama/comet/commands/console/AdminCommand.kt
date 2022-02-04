@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import net.mamoe.mirai.console.command.CompositeCommand
+import net.mamoe.mirai.console.command.ConsoleCommandSender
 import java.util.*
 
 object AdminCommand : CompositeCommand(
