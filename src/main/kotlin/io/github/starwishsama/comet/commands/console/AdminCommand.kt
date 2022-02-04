@@ -31,7 +31,7 @@ object AdminCommand : CompositeCommand(
 ) {
 
     @SubCommand
-    suspend fun CommandSender.upgrade(target: Long) {
+    suspend fun ConsoleCommandSender.upgrade(target: Long) {
         val targetUser = CometUser.getUser(target)
 
         if (targetUser == null) {
@@ -51,7 +51,7 @@ object AdminCommand : CompositeCommand(
     }
 
     @SubCommand
-    suspend fun CommandSender.upgrade(target: Long, level: String) {
+    suspend fun ConsoleCommandSender.upgrade(target: Long, level: String) {
         val targetUser = CometUser.getUser(target)
 
         if (targetUser == null) {
@@ -70,13 +70,13 @@ object AdminCommand : CompositeCommand(
     }
 
     @SubCommand
-    suspend fun CommandSender.reload() {
+    suspend fun ConsoleCommandSender.reload() {
         DataSetup.reload()
         sendMessage("配置文件已重载")
     }
 
     @SubCommand
-    suspend fun CommandSender.cmd(groupId: Long, cmdName: String) {
+    suspend fun ConsoleCommandSender.cmd(groupId: Long, cmdName: String) {
         val cmd = CommandManager.getCommand(cmdName)
 
         if (cmd == null) {
