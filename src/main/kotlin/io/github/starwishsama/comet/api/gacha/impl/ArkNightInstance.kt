@@ -164,8 +164,7 @@ object ArkNightInstance : GachaInstance("明日方舟") {
             startTime,
             endTime
         ) {
-            (GachaUtil.hasOperator(this.name) || customPool.modifiedGachaItems.stream().filter { it.name == this.name }
-                .findAny().isPresent) &&
+            (GachaUtil.hasOperator(this.name) || customPool.modifiedGachaItems.any { it.name == this.name }) &&
                     (if (customPool.condition.isNotEmpty()) !customPool.condition.contains(obtain) else true)
         }
 

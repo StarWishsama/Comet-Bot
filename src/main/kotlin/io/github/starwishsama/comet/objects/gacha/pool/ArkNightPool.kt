@@ -199,9 +199,9 @@ class ArkNightPool(
                     }.trim().toString()
                 }
                 else -> {
-                    val r6Count = drawResult.items.parallelStream().filter { it.rare + 1 == 6 }.count()
-                    val r5Count = drawResult.items.parallelStream().filter { it.rare + 1 == 4 }.count()
-                    val r4Count = drawResult.items.parallelStream().filter { it.rare + 1 == 3 }.count()
+                    val r6Count = drawResult.items.count { it.rare + 1 == 6 }
+                    val r5Count = drawResult.items.count { it.rare + 1 == 4 }
+                    val r4Count = drawResult.items.count { it.rare + 1 == 3 }
                     val r3Count = drawResult.items.size - r6Count - r5Count - r4Count
                     val perTimeUsed = 600
 
