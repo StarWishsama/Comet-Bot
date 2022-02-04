@@ -72,6 +72,7 @@ object ArkNightInstance : GachaInstance("明日方舟") {
         if (!dataLocation.exists()) {
             CometVariables.daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
             usable = false
+            return
         }
 
         CometVariables.mapper.readTree(dataLocation).elements().forEach { t ->
