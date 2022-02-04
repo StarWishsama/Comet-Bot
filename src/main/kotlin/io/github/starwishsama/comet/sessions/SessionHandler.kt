@@ -81,10 +81,7 @@ object SessionHandler {
             SessionTarget(privateId = e.sender.id)
         }
 
-        val sessionStream = sessionPool.stream()
-            .filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }
-
-        val sessionToHandle = sessionStream.collect(Collectors.toList())
+        val sessionToHandle = sessionPool.filter { it.target.groupId == target.groupId && it.target.privateId == target.privateId }
 
         if (sessionToHandle.isEmpty()) {
             return false
@@ -98,9 +95,7 @@ object SessionHandler {
             }
         }
 
-        if (sessionPool.stream()
-                .filter { it.target.groupId == target.groupId || it.target.privateId == target.privateId }.count() > 0
-        ) {
+        if (sessionPool.any { it.target.groupId == target.groupId || it.target.privateId == target.privateId }) {
             CometVariables.logger.debug(
                 "[会话] 处理 ${sessionToHandle.count()} 个会话耗时 ${
                     time.getLastingTimeAsString(

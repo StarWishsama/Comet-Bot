@@ -39,8 +39,6 @@ abstract class CometPusher(
     abstract fun retrieve()
 
     fun push() {
-        println(data.cache)
-
         data.cache.forEach { context ->
             if (context.status == PushStatus.PENDING) {
                 context.status = PushStatus.PROGRESSING
