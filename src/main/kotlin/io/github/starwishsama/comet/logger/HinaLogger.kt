@@ -188,7 +188,7 @@ internal fun formatStacktrace(exception: Throwable, packageFilter: String? = nul
     }
 }
 
-private fun List<String>.hasFiltered(log: String): Boolean = any { it.toRegex().matches(log) }
+private fun List<String>.hasFiltered(log: String): Boolean = isNotEmpty() && any { it.toRegex().matches(log) }
 
 enum class HinaLogLevel(val internalName: String, val simpleName: String, val color: AnsiUtil.Color) {
     Debug("DEBUG", "D", AnsiUtil.Color.LIGHT_BLUE),
