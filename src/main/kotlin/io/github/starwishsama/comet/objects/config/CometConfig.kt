@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.objects.config
 
+import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.enums.MusicApiType
 import io.github.starwishsama.comet.objects.enums.PicSearchApiType
 import kotlinx.serialization.Serializable
@@ -49,8 +50,11 @@ data class CometConfig(
     @Comment("明日方舟抽卡模拟器是否使用图片")
     var arkDrawUseImage: Boolean = false,
 
-    @Comment("调试模式, 打开后会有更多 Log 并启用调试功能")
-    var debugMode: Boolean = false,
+    @Comment("日志等级")
+    var logLevel: HinaLogLevel = HinaLogLevel.Verbose,
+
+    @Comment("日志过滤器, 过滤指定字符")
+    val logFilter: List<String> = listOf(),
 
     @Comment("Webhook 功能开关")
     val webHookSwitch: Boolean = false,

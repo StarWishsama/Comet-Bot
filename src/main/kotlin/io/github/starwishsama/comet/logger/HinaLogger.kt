@@ -23,6 +23,7 @@ class HinaLogger(
         CometApplication.console.printAbove(it)
     },
     var defaultLevel: HinaLogLevel = HinaLogLevel.Verbose,
+    val filterList: List<String> = mutableListOf(),
     var outputBeautyTrace: Boolean = false,
     val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yy/M/dd HH:mm:ss")
 ) {
@@ -39,7 +40,9 @@ class HinaLogger(
         throwable: Throwable? = null,
         prefix: String = ""
     ) {
-        if (level <= defaultLevel) return
+        if (level <= defaultLevel || (message != null && filterList.hasFiltered(message))) {
+            return
+        }
 
         val st = Thread.currentThread().stackTrace.toMutableList().also {
             it.subList(2, it.size)
@@ -184,6 +187,8 @@ internal fun formatStacktrace(exception: Throwable, packageFilter: String? = nul
         append("========================= 发生了错误 =========================")
     }
 }
+
+private fun List<String>.hasFiltered(log: String): Boolean = any { it.toRegex().matches(log) }
 
 enum class HinaLogLevel(val internalName: String, val simpleName: String, val color: AnsiUtil.Color) {
     Verbose("VERBOSE", "V", AnsiUtil.Color.GRAY),

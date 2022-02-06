@@ -77,18 +77,18 @@ object CometVariables {
         }
     }
 
-    val logger: HinaLogger = HinaLogger("Comet", logAction = { logAction(it) }, defaultLevel = cfg.debugMode)
+    val logger: HinaLogger = HinaLogger("Comet", logAction = { logAction(it) }, filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
 
     internal val netLogger: HinaLogger by lazy {
-        HinaLogger("CometNet", logAction = { logAction(it) }, defaultLevel = cfg.debugMode)
+        HinaLogger("CometNet", logAction = { logAction(it) }, filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
     }
 
     internal val daemonLogger: HinaLogger by lazy {
-        HinaLogger("CometService", logAction = { logAction(it) }, defaultLevel = cfg.debugMode)
+        HinaLogger("CometService", logAction = { logAction(it) }, filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
     }
 
     internal val consoleCommandLogger: HinaLogger by lazy {
-        HinaLogger("CometConsole", logAction = { logAction(it) }, defaultLevel = cfg.debugMode)
+        HinaLogger("CometConsole", logAction = { logAction(it) }, filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
     }
 
     internal val miraiLogger: HinaLogger by lazy {
@@ -97,7 +97,7 @@ object CometVariables {
             if (::miraiLoggerAppender.isInitialized) {
                 miraiLoggerAppender.appendLog(it)
             }
-        }, defaultLevel = cfg.debugMode)
+        }, filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
     }
 
     internal val miraiNetLogger: HinaLogger by lazy {
@@ -106,7 +106,7 @@ object CometVariables {
             if (::miraiNetLoggerAppender.isInitialized) {
                 miraiNetLoggerAppender.appendLog(it)
             }
-        }, defaultLevel = cfg.debugMode)
+        }, filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
     }
 
     val mapper: ObjectMapper = ObjectMapper()
