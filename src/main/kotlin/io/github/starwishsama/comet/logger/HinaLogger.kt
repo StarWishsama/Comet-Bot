@@ -40,7 +40,7 @@ class HinaLogger(
         throwable: Throwable? = null,
         prefix: String = ""
     ) {
-        if (level >= defaultLevel || (message != null && filterList.hasFiltered(message))) {
+        if (level <= defaultLevel || (message != null && filterList.hasFiltered(message))) {
             return
         }
 
@@ -191,9 +191,9 @@ internal fun formatStacktrace(exception: Throwable, packageFilter: String? = nul
 private fun List<String>.hasFiltered(log: String): Boolean = any { it.toRegex().matches(log) }
 
 enum class HinaLogLevel(val internalName: String, val simpleName: String, val color: AnsiUtil.Color) {
+    Debug("DEBUG", "D", AnsiUtil.Color.LIGHT_BLUE),
     Verbose("VERBOSE", "V", AnsiUtil.Color.GRAY),
     Info("INFO", "I", AnsiUtil.Color.RESET),
-    Debug("DEBUG", "D", AnsiUtil.Color.LIGHT_BLUE),
     Error("ERROR", "E", AnsiUtil.Color.LIGHT_RED),
     Warn("WARN", "W", AnsiUtil.Color.LIGHT_YELLOW),
     Serve("SERVE", "S", AnsiUtil.Color.RED),
