@@ -12,6 +12,7 @@ package io.github.starwishsama.comet.service.pusher.pushers
 
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.live.toSimpleLiveRoomData
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.CometPusher
 import io.github.starwishsama.comet.service.pusher.CometPusherData
@@ -38,7 +39,7 @@ class BiliBiliLivePusher : CometPusher("bili_live", CometPusherData(5, TimeUnit.
                             mutableSetOf(cfg.id),
                             time,
                             pushUser = user,
-                            liveRoomInfo = liveRoomInfo
+                            liveRoomInfo = liveRoomInfo.toSimpleLiveRoomData()
                         )
 
                         if (cache == null) {
