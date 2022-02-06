@@ -63,7 +63,7 @@ object DataSetup {
         cfg = Default.decodeFromString(CometConfig.serializer(), Config.file.getContext())
 
         LoggerInstances.instances.forEach {
-            it.debugMode = cfg.debugMode
+            it.defaultLevel = cfg.debugMode
         }
 
         if (CompatibilityService.upgradeUserData(UserConfig.file)) {

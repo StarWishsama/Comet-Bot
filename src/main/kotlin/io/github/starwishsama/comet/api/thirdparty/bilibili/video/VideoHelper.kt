@@ -14,7 +14,7 @@ fun VideoInfo.toMessageWrapper(): MessageWrapper =
             | ${description.limitStringSize(80)}
             | 👍 ${stat?.like} 💰 ${stat?.coin} ⭐ ${stat?.collect}
             ${if (stat?.highestRank?.let { it > 0 } == true) "| 本站最高日排行第${stat?.highestRank}名" else ""}
-                """.trim().removePrefix(" "))
+            """.trimIndent().removePrefix(" "))
 
         addPictureByURL(cover).addText("\n直达链接: https://bilibili.com/video/${bvid}")
     }
