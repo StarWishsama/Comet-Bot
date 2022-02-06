@@ -15,7 +15,6 @@ import io.github.starwishsama.comet.CometVariables.cfg
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.file.DataFiles.allDataFile
-import io.github.starwishsama.comet.logger.LoggerInstances
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.config.CometConfig
@@ -61,10 +60,6 @@ object DataSetup {
         FileUtil.initResourceFile()
 
         cfg = Default.decodeFromString(CometConfig.serializer(), Config.file.getContext())
-
-        LoggerInstances.instances.forEach {
-            it.defaultLevel = cfg.debugMode
-        }
 
         if (CompatibilityService.upgradeUserData(UserConfig.file)) {
             CometVariables.cometUsers.putAll(UserConfig.file.parseAsClass())
