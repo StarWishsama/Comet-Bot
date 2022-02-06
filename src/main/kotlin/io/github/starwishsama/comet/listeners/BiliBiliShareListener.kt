@@ -33,8 +33,8 @@ object BiliBiliShareListener : INListener {
     override val name: String
         get() = "哔哩哔哩解析"
 
-    private val shortUrlPattern = Regex("""https://b23.tv/\w{1,7}""")
-    private val longUrlPattern = Regex("""https://www.bilibili.com/video/(av|BV)\w{1,10}""")
+    private val shortUrlPattern = Regex("""https://b23.tv/\w+""")
+    private val longUrlPattern = Regex("""https://www.bilibili.com/video/(av|BV)\w+""")
 
     @OptIn(MiraiExperimentalApi::class, ExperimentalTime::class)
     @EventHandler
