@@ -96,23 +96,28 @@ object PictureSearchCommand : ChatCommand, ConversationCommand {
                     return "SauceNao 搜索没有配置, 请联系管理员."
                 }
 
-                val result = PictureSearchUtil.sauceNaoSearch(url)
-                return when {
-                    result.similarity >= defaultSimilarity -> {
-                        "相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n"
+                return runCatching<String> {
+                    val result = PictureSearchUtil.sauceNaoSearch(url)
+                    return when {
+                        result.similarity >= defaultSimilarity -> {
+                            "相似度:${result.similarity}%\n原图链接:${result.originalUrl}\n"
+                        }
+                        result.similarity == -1.0 -> {
+                            "在识图时发生了问题, 请联系管理员"
+                        }
+                        else -> {
+                            "相似度过低 (${result.similarity}%), 请尝试更换图片重试"
+                        }
                     }
-                    result.similarity == -1.0 -> {
-                        "在识图时发生了问题, 请联系管理员"
-                    }
-                    else -> {
-                        "相似度过低 (${result.similarity}%), 请尝试更换图片重试"
-                    }
-                }
+                }.onFailure {
+                    CometVariables.daemonLogger.warning("在 SauceNao 识图时发生了问题", it)
+                    return "在识图时发生了问题, 请联系管理员"
+                }.getOrDefault("在识图时发生了问题, 请联系管理员")
             }
             PicSearchApiType.ASCII2D -> {
                 val result = PictureSearchUtil.ascii2dSearch(url)
                 return if (result.isNotEmpty()) {
-                    "已找到可能相似的图片\n图片来源${result.originalUrl}\n打开 ascii2d 页面查看更多\n${result.openUrl}"
+                    "已找到可能相似的图片\n打开 ascii2d 页面查看更多\n${result}"
                 } else {
                     "找不到相似的图片"
                 }

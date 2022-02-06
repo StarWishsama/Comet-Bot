@@ -18,7 +18,6 @@ import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.objects.config.api.SauceNaoConfig
 import io.github.starwishsama.comet.objects.pojo.PicSearchResult
 import io.github.starwishsama.comet.utils.FileUtil
-import org.jsoup.Jsoup
 import java.io.IOException
 
 /**
@@ -68,27 +67,8 @@ object PictureSearchUtil {
         return PicSearchResult.emptyResult()
     }
 
-    fun ascii2dSearch(url: String): PicSearchResult {
-        val request = Jsoup.connect("$ascii2d$url")
-        request.header("user-agent", NetUtil.defaultUA).followRedirects(true)
-            .apply {
-                if (CometVariables.cfg.proxySwitch) {
-                    proxy(CometVariables.cfg.proxyUrl, CometVariables.cfg.proxyPort)
-                }
-            }
-
-        val html = request.get()
-        val elements = html.body().getElementsByClass("container")
-        val imgUrl: String
-        val sources = elements.select(".info-box")[1].select("a")
-        val original: String
-        try {
-            imgUrl =
-                "https://ascii2d.net/" + elements.select(".image-box")[1].select("img")[0].attributes()["src"]
-            original = sources[0].attributes()["href"]
-        } catch (ignored: IndexOutOfBoundsException) {
-            return PicSearchResult.emptyResult()
-        }
-        return PicSearchResult(imgUrl, original, -1.0, "$ascii2d$url")
+    // ascii2d now use cloudflare
+    fun ascii2dSearch(url: String): String {
+        return ascii2d + url
     }
 }

@@ -174,7 +174,13 @@ object CometRuntime {
 
         DataSetup.initPerGroupSetting(bot)
 
-        setupRCon()
+        runCatching {
+            setupRCon()
+        }.onSuccess {
+           daemonLogger.info("成功连接至 rcon 服务器")
+        }.onFailure {
+            daemonLogger.warning("无法连接至 rcon 服务器", it)
+        }
 
         runScheduleTasks()
 
