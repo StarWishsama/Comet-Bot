@@ -51,7 +51,7 @@ data class CometConfig(
     var arkDrawUseImage: Boolean = false,
 
     @Comment("日志等级")
-    var logLevel: HinaLogLevel = HinaLogLevel.Verbose,
+    var logLevel: HinaLogLevel = HinaLogLevel.Info,
 
     @Comment("日志过滤器, 过滤指定字符")
     val logFilter: List<String> = listOf(),

@@ -40,7 +40,7 @@ class HinaLogger(
         throwable: Throwable? = null,
         prefix: String = ""
     ) {
-        if (level <= defaultLevel || (message != null && filterList.hasFiltered(message))) {
+        if (level < defaultLevel || (message != null && filterList.hasFiltered(message))) {
             return
         }
 
