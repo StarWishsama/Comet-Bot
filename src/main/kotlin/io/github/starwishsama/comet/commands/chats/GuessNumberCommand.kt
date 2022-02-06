@@ -91,6 +91,7 @@ object GuessNumberCommand : ChatCommand, ConversationCommand {
         val session = (session as GuessNumberSession)
 
         if (session.tryTimes == 9) {
+            session.usedTime = Duration.between(session.createdTime, LocalDateTime.now())
             event.subject.sendMessage(
                 "你输了! 用时 ${
                     session.usedTime.toKotlinDuration().toFriendly()
