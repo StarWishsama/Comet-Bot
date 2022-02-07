@@ -48,10 +48,10 @@ open class MessageWrapper {
         return this
     }
 
-    fun addPictureByURL(url: String?): MessageWrapper {
+    fun addPictureByURL(url: String?, imageFormat: String = ""): MessageWrapper {
         if (url == null) return this
 
-        messageContent.add(Picture(url))
+        messageContent.add(Picture(url, fileFormat = imageFormat))
         return this
     }
 

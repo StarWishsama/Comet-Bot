@@ -22,7 +22,7 @@ class HinaLogger(
     val logAction: (String) -> Unit = {
         CometApplication.console.printAbove(it)
     },
-    var defaultLevel: HinaLogLevel = HinaLogLevel.Verbose,
+    var defaultLevel: HinaLogLevel,
     val filterList: List<String> = mutableListOf(),
     var outputBeautyTrace: Boolean = false,
     val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yy/M/dd HH:mm:ss")
@@ -40,7 +40,12 @@ class HinaLogger(
         throwable: Throwable? = null,
         prefix: String = ""
     ) {
-        if (level < defaultLevel || (message != null && filterList.hasFiltered(message))) {
+        if (defaultLevel > level) {
+            println("My level is $level, default is ${defaultLevel}")
+            return
+        }
+
+        if (message != null && filterList.hasFiltered(message)) {
             return
         }
 
