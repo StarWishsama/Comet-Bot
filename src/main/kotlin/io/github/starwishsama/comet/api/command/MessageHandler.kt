@@ -225,7 +225,7 @@ object MessageHandler {
 
         return when (props.consumerType) {
             CommandExecuteConsumerType.COOLDOWN -> {
-                user.checkCoolDown(coolDown = props.cost.toInt())
+                !user.checkCoolDown(coolDown = props.cost.toInt())
             }
             CommandExecuteConsumerType.COIN -> {
                 if (user.coin >= props.cost) {

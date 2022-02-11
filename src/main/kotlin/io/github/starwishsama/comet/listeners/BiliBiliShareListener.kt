@@ -41,7 +41,7 @@ object BiliBiliShareListener : INListener {
     @EventHandler
     fun listen(event: GroupMessageEvent) {
         if (!event.group.isBotMuted) {
-            if (CometUser.getUser(event.sender.id)?.checkCoolDown() == true) {
+            if (CometUser.getUser(event.sender.id)?.checkCoolDown() == false) {
                 return
             }
 
