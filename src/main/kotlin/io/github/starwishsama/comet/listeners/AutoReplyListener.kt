@@ -23,6 +23,10 @@ object AutoReplyListener : INListener {
     @EventHandler
     fun listen(event: GroupMessageEvent) {
         event.apply {
+            if (CometUser.getUser(sender.id)?.checkCoolDown() == true) {
+                return
+            }
+
             val cfg = GroupConfigManager.getConfig(group.id)
 
             if (cfg?.keyWordReply == null || cfg.keyWordReply.isEmpty()) return

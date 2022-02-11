@@ -16,6 +16,7 @@ import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.video.toMessageWrapper
 import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.serialize.isUsable
 import kotlinx.coroutines.runBlocking
@@ -40,6 +41,10 @@ object BiliBiliShareListener : INListener {
     @EventHandler
     fun listen(event: GroupMessageEvent) {
         if (!event.group.isBotMuted) {
+            if (CometUser.getUser(event.sender.id)?.checkCoolDown() == true) {
+                return
+            }
+
             // Check parse feature is available
             if (GroupConfigManager.getConfig(event.group.id)?.canParseBiliVideo != true) {
                 return
