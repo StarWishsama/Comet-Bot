@@ -41,7 +41,6 @@ class HinaLogger(
         prefix: String = ""
     ) {
         if (defaultLevel > level) {
-            println("My level is $level, default is ${defaultLevel}")
             return
         }
 
