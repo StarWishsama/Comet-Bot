@@ -10,14 +10,14 @@ internal class TestUser {
     fun testCoolDown() {
         val fakeUser = CometUser.quickRegister(1)
 
-        assertFalse("CometUser couldn't have cooldown!") { fakeUser.checkCoolDown() }
+        assertTrue("CometUser couldn't have cooldown!") { fakeUser.isNoCoolDown() }
 
         fakeUser.triggerCommandTime = System.currentTimeMillis() - 6000
 
-        assertFalse("CometUser couldn't have cooldown!") { fakeUser.checkCoolDown() }
+        assertTrue("CometUser couldn't have cooldown!") { fakeUser.isNoCoolDown() }
 
         fakeUser.triggerCommandTime = System.currentTimeMillis()
 
-        assertTrue("CometUser must have cooldown!") { fakeUser.checkCoolDown() }
+        assertFalse("CometUser must have cooldown!") { fakeUser.isNoCoolDown() }
     }
 }

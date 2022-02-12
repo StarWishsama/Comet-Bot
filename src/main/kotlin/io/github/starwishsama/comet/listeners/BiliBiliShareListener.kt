@@ -41,10 +41,6 @@ object BiliBiliShareListener : INListener {
     @EventHandler
     fun listen(event: GroupMessageEvent) {
         if (!event.group.isBotMuted) {
-            if (CometUser.getUser(event.sender.id)?.checkCoolDown() == false) {
-                return
-            }
-
             // Check parse feature is available
             if (GroupConfigManager.getConfig(event.group.id)?.canParseBiliVideo != true) {
                 return
@@ -57,21 +53,19 @@ object BiliBiliShareListener : INListener {
                 return
             }
 
-            if (targetURL.isNotEmpty()) {
-                val checkResult = biliBiliLinkConvert(targetURL, event.subject)
+            if (CometUser.getUser(event.sender.id)?.isNoCoolDown() == true) {
+                val resultChain = if (targetURL.isNotEmpty()) {
+                    val checkResult = biliBiliLinkConvert(targetURL, event.subject)
 
-                if (checkResult.isNotEmpty()) {
-                    runBlocking {
-                        event.subject.sendMessage(checkResult)
-                    }
-                }
-            } else {
-                val lightApp = event.message[LightApp] ?: return
+                    checkResult.ifEmpty { EmptyMessageChain }
+                } else {
+                    val lightApp = event.message[LightApp] ?: return
 
-                val result = parseJsonMessage(lightApp, event.subject)
-                if (result.isNotEmpty()) {
-                    runBlocking { event.subject.sendMessage(result) }
+                    val result = parseJsonMessage(lightApp, event.subject)
+                    result.ifEmpty { EmptyMessageChain }
                 }
+
+                runBlocking { event.subject.sendMessage(resultChain) }
             }
         }
     }
