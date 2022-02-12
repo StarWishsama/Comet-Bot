@@ -23,6 +23,7 @@ import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import io.github.starwishsama.comet.utils.doFilter
 import io.github.starwishsama.comet.utils.network.NetUtil
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
@@ -172,6 +173,10 @@ object MessageHandler {
                     CometVariables.logger.warning("执行网络操作失败: ", e)
                     ExecutedResult("Bot > 在执行网络操作时连接超时: ${e.message ?: ""}".convertToChain(), cmd)
                 } else {
+                    if (e is CancellationException) {
+                        throw e
+                    }
+
                     CometVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message}, 发送者: $senderId", e)
                     if (user.isBotOwner()) {
                         ExecutedResult(
@@ -203,7 +208,9 @@ object MessageHandler {
             }
         } catch (t: Throwable) {
             CometVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $content", t)
-            return ""
+            return "".also { if (t is CancellationException) {
+                throw t
+            }}
         }
         return ""
     }
@@ -225,7 +232,7 @@ object MessageHandler {
 
         return when (props.consumerType) {
             CommandExecuteConsumerType.COOLDOWN -> {
-                !user.checkCoolDown(coolDown = props.cost.toInt())
+                user.checkCoolDown(coolDown = props.cost.toInt())
             }
             CommandExecuteConsumerType.COIN -> {
                 if (user.coin >= props.cost) {
