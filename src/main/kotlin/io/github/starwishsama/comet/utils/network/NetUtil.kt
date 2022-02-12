@@ -23,6 +23,7 @@ import java.io.*
 import java.net.*
 import java.time.Duration
 import java.time.LocalDateTime
+import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 
 fun Response.isType(typeName: String): Boolean = headers["content-type"]?.contains(typeName) == true
@@ -204,6 +205,10 @@ object NetUtil {
     }
 
     fun isTimeout(t: Throwable): Boolean {
+        if (t is CancellationException) {
+            return false
+        }
+
         val msg = t.message?.lowercase() ?: return false
         return msg.containsEtc(true, "time", "out") || t.javaClass.simpleName.lowercase().contains("timeout")
     }

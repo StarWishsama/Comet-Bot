@@ -14,6 +14,7 @@ import io.github.starwishsama.comet.CometVariables.cfg
 import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.startup.CometRuntime
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
@@ -62,6 +63,9 @@ object CometApplication {
             }
 
         } catch (e: Exception) {
+            if (e is CancellationException) {
+                throw e
+            }
             daemonLogger.serve("无法正常运行 Comet, 程序将自动关闭", e)
             exitProcess(0)
         }

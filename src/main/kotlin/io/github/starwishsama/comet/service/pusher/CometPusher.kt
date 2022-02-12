@@ -19,6 +19,7 @@ import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.createBackupFile
 import io.github.starwishsama.comet.utils.writeClassToJson
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -68,6 +69,9 @@ abstract class CometPusher(
                             return@group
                         }
                     } catch (e: Exception) {
+                        if (e is CancellationException) {
+                            throw e
+                        }
                         daemonLogger.warning("在推送消息至群 $it 时出现异常", e)
                         context.status = PushStatus.FAILED
                         return@group
