@@ -109,8 +109,6 @@ data class CometUser(
         val currentTime = System.currentTimeMillis()
         val period = currentTime - triggerCommandTime
 
-        CometVariables.daemonLogger.debug("period [$period] is greater than cooldown [${coolDown * 1000}]? ${period >= coolDown * 1000}")
-
         if (!silent) {
             triggerCommandTime = currentTime
         }
