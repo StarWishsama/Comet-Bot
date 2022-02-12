@@ -26,7 +26,7 @@ jobs:
       - name: Gradle clean
         run: ./gradlew clean
       - name: Gradle shadowjar 打包
-        run: ./gradlew shadowjar
+        run: ./gradlew shadowjar check
       - uses: actions/upload-artifact@v2
         with:
           name: Nameless-Bot.jar

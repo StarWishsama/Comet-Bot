@@ -112,9 +112,7 @@ data class CometUser(
             if (!silent) triggerCommandTime = currentTime
             false
         } else {
-            val hasCoolDown = currentTime - triggerCommandTime < coolDown * 1000
-            if (!silent) triggerCommandTime = currentTime
-            hasCoolDown
+            (currentTime - triggerCommandTime < coolDown * 1000).also { if (!silent) triggerCommandTime = currentTime }
         }
     }
 
