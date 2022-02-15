@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.CometPusher
 import io.github.starwishsama.comet.service.pusher.CometPusherData
 import io.github.starwishsama.comet.service.pusher.context.BiliBiliLiveContext
+import io.github.starwishsama.comet.utils.noCatchCancellation
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 
@@ -51,7 +52,7 @@ class BiliBiliLivePusher : CometPusher("bili_live", CometPusherData(5, TimeUnit.
                             return@user
                         }
 
-                    }.onFailure {
+                    }.noCatchCancellation {
                         CometVariables.logger.error("获取 ${user.id} 直播间失败", it)
                     }
                 }
