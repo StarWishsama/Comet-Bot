@@ -11,7 +11,6 @@
 package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.thread.ThreadFactoryBuilder
-import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.exceptions.ReachRetryLimitException
@@ -29,7 +28,7 @@ object TaskUtil {
             .setUncaughtExceptionHandler { t, e ->
                 daemonLogger.warning("线程 ${t.name} 在执行任务时发生了错误", e)
             }.build()
-    ).also { it.maximumPoolSize = CometVariables.cfg.maxPoolSize }
+    )
 
     fun schedule(delay: Long = 0, unit: TimeUnit = TimeUnit.SECONDS, task: () -> Unit): ScheduledFuture<*> {
         return service.schedule({

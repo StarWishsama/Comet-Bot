@@ -60,7 +60,10 @@ object DataSetup {
     private fun load() {
         cfg = Default.decodeFromString(CometConfig.serializer(), Config.file.getContext())
 
-        LoggerInstances.instances.forEach { it.defaultLevel = cfg.logLevel }
+        run {
+            TaskUtil.service.maximumPoolSize = cfg.maxPoolSize
+            LoggerInstances.instances.forEach { it.defaultLevel = cfg.logLevel }
+        }
 
         FileUtil.initResourceFile()
 

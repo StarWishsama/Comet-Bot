@@ -176,8 +176,6 @@ object CometRuntime {
 
         runCatching {
             setupRCon()
-        }.onSuccess {
-           daemonLogger.info("成功连接至 rcon 服务器")
         }.onFailure {
             daemonLogger.warning("无法连接至 rcon 服务器", it)
         }
@@ -202,9 +200,11 @@ object CometRuntime {
         val password = cfg.rConPassword
         if (address != null && password != null && CometVariables.rCon == null) {
             CometVariables.rCon = Rcon(address, cfg.rConPort, password.toByteArray())
+            daemonLogger.info("成功连接至 rcon 服务器")
         }
     }
 
+    @Suppress("HttpUrlsUsage")
     private fun startupServer() {
         if (!cfg.webHookSwitch) {
             return
