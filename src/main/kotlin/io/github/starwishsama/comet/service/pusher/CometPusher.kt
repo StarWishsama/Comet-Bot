@@ -41,7 +41,7 @@ abstract class CometPusher(
 
     fun push() {
         data.cache.forEach { context ->
-            if (context.status != PushStatus.PROGRESSING) {
+            if (context.status != PushStatus.DONE) {
                 context.status = PushStatus.PROGRESSING
 
                 val wrapper = context.toMessageWrapper()

@@ -14,6 +14,7 @@ import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.CometPusher
 import io.github.starwishsama.comet.service.pusher.CometPusherData
+import io.github.starwishsama.comet.service.pusher.PushStatus
 import io.github.starwishsama.comet.service.pusher.context.TwitterContext
 import java.util.concurrent.TimeUnit
 
@@ -38,7 +39,7 @@ class TwitterPusher : CometPusher("twitter", CometPusherData(5, TimeUnit.MINUTES
                     } else if (!cache.contentEquals(current)) {
                         data.cache.remove(cache)
                         data.cache.add(current.also { it.addPushTargets(cache.pushTarget) })
-                    } else {
+                    } else if (cache.status == PushStatus.PENDING) {
                         cache.addPushTarget(cfg.id)
                     }
                 }
