@@ -68,6 +68,10 @@ abstract class PushContext(
         throw UnsupportedOperationException("Base PushContext can't convert to MessageWrapper")
     }
 
+    override fun toString(): String {
+        return "${this::class::simpleName} [pushTarget=${pushTarget}, retrieveTime=$retrieveTime, status=$status]"
+    }
+
     override fun contentEquals(other: PushContext): Boolean {
         return this == other
     }

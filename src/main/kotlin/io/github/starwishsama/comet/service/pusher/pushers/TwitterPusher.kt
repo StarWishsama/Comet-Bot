@@ -14,7 +14,6 @@ import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.CometPusher
 import io.github.starwishsama.comet.service.pusher.CometPusherData
-import io.github.starwishsama.comet.service.pusher.PushStatus
 import io.github.starwishsama.comet.service.pusher.context.TwitterContext
 import java.util.concurrent.TimeUnit
 
@@ -30,7 +29,6 @@ class TwitterPusher : CometPusher("twitter", CometPusherData(5, TimeUnit.MINUTES
 
                     val current = TwitterContext(
                         retrieveTime = time,
-                        status = PushStatus.PENDING,
                         twitterUserName = user,
                         tweetId = latestTweet.id
                     )

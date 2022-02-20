@@ -104,7 +104,7 @@ open class MessageWrapper {
     }
 
     override fun toString(): String {
-        return "MessageWrapper {content=${messageContent}}"
+        return "MessageWrapper {content=${messageContent}, usable=${usable}}"
     }
 
     fun getAllText(): String {

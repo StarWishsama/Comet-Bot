@@ -41,12 +41,12 @@ abstract class CometPusher(
 
     fun push() {
         data.cache.forEach { context ->
-            if (context.status == PushStatus.PENDING) {
+            if (context.status != PushStatus.PROGRESSING) {
                 context.status = PushStatus.PROGRESSING
 
                 val wrapper = context.toMessageWrapper()
 
-                daemonLogger.debug("正在尝试推送消息 ${wrapper::class.simpleName}#${wrapper.hashCode()}, 可用状态: ${wrapper.isUsable()}")
+                daemonLogger.debug("正在尝试推送消息 ${wrapper::class.simpleName}#${wrapper.hashCode()}, 可用状态: ${wrapper.isUsable()}, 目标群 ${context.pushTarget}")
 
                 context.pushTarget.forEach group@{
                     if (comet.isInitialized()) {
@@ -59,6 +59,7 @@ abstract class CometPusher(
 
                             runBlocking {
                                 group.sendMessage(wrapper.toMessageChain(group))
+                                daemonLogger.debug("已推送 ${context::class.simpleName} 至群 ${group.id}")
                                 delay(RandomUtil.randomLong(1000, 2000))
                             }
 
@@ -77,8 +78,9 @@ abstract class CometPusher(
                     }
                 }
 
-                context.status = PushStatus.DONE
-
+                if (context.status == PushStatus.PROGRESSING) {
+                    context.status = PushStatus.DONE
+                }
             }
         }
 
