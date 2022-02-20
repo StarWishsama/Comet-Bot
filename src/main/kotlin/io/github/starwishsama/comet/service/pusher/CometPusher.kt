@@ -49,7 +49,8 @@ abstract class CometPusher(
                 daemonLogger.debug("正在尝试推送消息 ${wrapper::class.simpleName}#${wrapper.hashCode()}, 可用状态: ${wrapper.isUsable()}, 目标群 ${context.pushTarget}")
 
                 context.pushTarget.forEach group@{
-                    if (comet.isInitialized()) {
+                    if (!comet.isInitialized()) {
+                        context.status = PushStatus.FAILED
                         return@group
                     }
 
