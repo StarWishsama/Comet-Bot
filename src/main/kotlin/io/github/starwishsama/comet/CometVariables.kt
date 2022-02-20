@@ -69,18 +69,18 @@ object CometVariables {
 
     internal var cometServiceServer: CometServiceServer? = null
 
-    val logger: HinaLogger = HinaLogger("Comet", debugMode = cfg.debugMode)
+    val logger: HinaLogger = HinaLogger("Comet", filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
 
     internal val netLogger: HinaLogger by lazy {
-        HinaLogger("CometNet", debugMode = cfg.debugMode)
+        HinaLogger("CometNet", filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
     }
 
     internal val daemonLogger: HinaLogger by lazy {
-        HinaLogger("CometService", debugMode = cfg.debugMode)
+        HinaLogger("CometService", filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
     }
 
     internal val consoleCommandLogger: HinaLogger by lazy {
-        HinaLogger("CometConsole", debugMode = cfg.debugMode)
+        HinaLogger("CometConsole", filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
     }
 
     val mapper: ObjectMapper = ObjectMapper()

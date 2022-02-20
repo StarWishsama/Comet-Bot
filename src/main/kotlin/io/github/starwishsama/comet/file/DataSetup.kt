@@ -58,13 +58,14 @@ object DataSetup {
     }
 
     private fun load() {
-        FileUtil.initResourceFile()
-
         cfg = Default.decodeFromString(CometConfig.serializer(), Config.file.getContext())
 
-        LoggerInstances.instances.forEach {
-            it.debugMode = cfg.debugMode
+        run {
+            TaskUtil.service.maximumPoolSize = cfg.maxPoolSize
+            LoggerInstances.instances.forEach { it.defaultLevel = cfg.logLevel }
         }
+
+        FileUtil.initResourceFile()
 
         if (CompatibilityService.upgradeUserData(UserConfig.file)) {
             CometVariables.cometUsers.putAll(UserConfig.file.parseAsClass())

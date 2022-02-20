@@ -118,7 +118,7 @@ object MinecraftUtil {
             socket.close()
 
             return QueryInfo(json, QueryType.JAVA, System.currentTimeMillis() - now)
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             return QueryInfo("", QueryType.JAVA, -1)
         }
     }

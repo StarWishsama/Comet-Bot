@@ -40,7 +40,7 @@ data class IssueEvent(
         val locked: Boolean,
         @JsonProperty("created_at")
         val createdTime: String,
-        val body: String,
+        val body: String?,
         val user: UserObject,
     ) {
         data class UserObject(
@@ -89,7 +89,7 @@ data class IssueEvent(
                 wrapper.addText("\uD83D\uDC1B ${repository.fullName} 有新议题 #${issue.number}\n")
                 wrapper.addText("by ${issue.user.login} | ${issue.convertCreatedTime()} \n\n")
                 wrapper.addText("${issue.title}\n")
-                wrapper.addText("${issue.body.limitStringSize(50).trim()}\n\n")
+                wrapper.addText("${issue.body?.limitStringSize(50)?.trim()}\n\n")
                 wrapper.addText("查看全部 >: ${issue.url}\n")
             }
 

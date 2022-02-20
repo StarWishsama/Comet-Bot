@@ -25,6 +25,7 @@ data class ThirdPartyNetEaseSearchResult(
         val id: Long,
         @JsonProperty("name")
         val songName: String,
+        @JsonProperty("ar")
         val artists: List<Artist>,
         @JsonProperty("al")
         val album: Album

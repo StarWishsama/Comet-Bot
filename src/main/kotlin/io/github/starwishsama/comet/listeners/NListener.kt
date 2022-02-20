@@ -11,6 +11,7 @@
 package io.github.starwishsama.comet.listeners
 
 import io.github.starwishsama.comet.CometVariables
+import kotlinx.coroutines.CancellationException
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.globalEventChannel
@@ -69,6 +70,10 @@ fun INListener.register(bot: Bot) {
                             method.call(this@register, subEvent)
                         } catch (e: Exception) {
                             CometVariables.daemonLogger.warning("${this@register.name} 在运行时发生了异常", e.cause)
+
+                            if (e is CancellationException) {
+                                throw e
+                            }
                         }
                     }
                 }

@@ -15,4 +15,4 @@ hs_err_pid*
 .classpath
 .project
 .idea/
-src/test
+src/test/kotlin/io/github/starwishsama/comet/test/TestEntry.kt

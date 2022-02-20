@@ -89,7 +89,6 @@ object ThirdPartyMusicApi {
                 }
 
                 searchResult.result.songs.forEach { song: NetEaseSearchResult.Song ->
-
                     songResults.add(
                         MusicSearchResult(
                             song.name,

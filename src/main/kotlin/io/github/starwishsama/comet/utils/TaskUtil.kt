@@ -11,11 +11,11 @@
 package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.thread.ThreadFactoryBuilder
-import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.exceptions.ApiException
 import io.github.starwishsama.comet.exceptions.ReachRetryLimitException
 import io.github.starwishsama.comet.utils.network.NetUtil
+import kotlinx.coroutines.CancellationException
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -28,7 +28,7 @@ object TaskUtil {
             .setUncaughtExceptionHandler { t, e ->
                 daemonLogger.warning("线程 ${t.name} 在执行任务时发生了错误", e)
             }.build()
-    ).also { it.maximumPoolSize = CometVariables.cfg.maxPoolSize }
+    )
 
     fun schedule(delay: Long = 0, unit: TimeUnit = TimeUnit.SECONDS, task: () -> Unit): ScheduledFuture<*> {
         return service.schedule({
@@ -65,6 +65,9 @@ object TaskUtil {
                     daemonLogger.info("Retried $it time(s), connect times out")
                     return@repeat
                 } else if (e !is ApiException) {
+                    if (e is CancellationException) {
+                        throw e
+                    }
                     return e
                 }
             }

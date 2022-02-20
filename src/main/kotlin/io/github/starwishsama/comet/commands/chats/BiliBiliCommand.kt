@@ -71,6 +71,13 @@ object BiliBiliCommand : ChatCommand {
                     EmptyMessageChain
                 } else getHelp().convertToChain()
             }
+            "video", "vd", "视频" -> {
+                return if (args.size > 1) {
+                    BiliBiliService.searchVideo(args.getRestString(1), event)
+                } else {
+                    getHelp().toChain()
+                }
+            }
             "push" -> {
                 return if (event is GroupMessageEvent) {
                     if (user.isBotAdmin() || event.sender.isOperator()) {

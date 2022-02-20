@@ -14,10 +14,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.utils.StringUtil.base64ToImage
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.serialize.WrapperConverter
 import io.github.starwishsama.comet.utils.uploadAsImage
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.contact.AudioSupported
@@ -73,7 +75,7 @@ data class PureText(val text: String) : WrapperElement {
  * @param filePath 图片本地路径
  */
 @Serializable
-data class Picture(val url: String = "", val filePath: String = "", val base64: String = "") : WrapperElement {
+data class Picture(val url: String = "", val filePath: String = "", val base64: String = "", val fileFormat: String = "") : WrapperElement {
 
     init {
         if (url.isEmpty() && filePath.isEmpty() && base64.isEmpty()) {
@@ -86,16 +88,26 @@ data class Picture(val url: String = "", val filePath: String = "", val base64: 
     override fun toMessageContent(subject: Contact?): Image {
         requireNotNull(subject) { "subject cannot be null!" }
 
-        if (url.isNotEmpty()) {
-            NetUtil.getInputStream(url)?.use {
-                return runBlocking { it.uploadAsImage(subject) }
+        try {
+            if (url.isNotEmpty()) {
+                NetUtil.getInputStream(url)?.use {
+                    return runBlocking {
+                        it.uploadAsImage(subject, fileFormat.ifEmpty { null })
+                    }
+                }
+            } else if (filePath.isNotEmpty()) {
+                if (filePath.isNotEmpty() && File(filePath).exists()) {
+                    return runBlocking { File(filePath).uploadAsImage(subject, fileFormat.ifEmpty { null }) }
+                }
+            } else if (base64.isNotEmpty()) {
+                return base64.toByteArray().base64ToImage().uploadAsImage(subject)
             }
-        } else if (filePath.isNotEmpty()) {
-            if (filePath.isNotEmpty() && File(filePath).exists()) {
-                return runBlocking { File(filePath).uploadAsImage(subject) }
+        } catch (e: Exception) {
+            if (e is CancellationException) {
+                throw e
             }
-        } else if (base64.isNotEmpty()) {
-            return base64.toByteArray().base64ToImage().uploadAsImage(subject)
+            CometVariables.daemonLogger.warning("在转换图片时出现了问题, Wrapper 原始内容为: ${toString()}")
+            throw e
         }
 
         throw RuntimeException("Unable to convert Picture to Image, Picture raw content: $this")

@@ -19,6 +19,7 @@ import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.createBackupFile
 import io.github.starwishsama.comet.utils.writeClassToJson
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -39,19 +40,17 @@ abstract class CometPusher(
     abstract fun retrieve()
 
     fun push() {
-        println(data.cache)
-
         data.cache.forEach { context ->
-            if (context.status == PushStatus.PENDING) {
+            if (context.status != PushStatus.PROGRESSING) {
                 context.status = PushStatus.PROGRESSING
 
                 val wrapper = context.toMessageWrapper()
 
-                daemonLogger.debug("正在尝试推送消息 ${wrapper::class.simpleName}#${wrapper.hashCode()}, 可用状态: ${wrapper.isUsable()}")
+                daemonLogger.debug("正在尝试推送消息 ${wrapper::class.simpleName}#${wrapper.hashCode()}, 可用状态: ${wrapper.isUsable()}, 目标群 ${context.pushTarget}")
 
                 context.pushTarget.forEach group@{
-
-                    if (!comet::isInitialized.invoke()) {
+                    if (!comet.isInitialized()) {
+                        context.status = PushStatus.FAILED
                         return@group
                     }
 
@@ -61,6 +60,7 @@ abstract class CometPusher(
 
                             runBlocking {
                                 group.sendMessage(wrapper.toMessageChain(group))
+                                daemonLogger.debug("已推送 ${context::class.simpleName} 至群 ${group.id}")
                                 delay(RandomUtil.randomLong(1000, 2000))
                             }
 
@@ -70,14 +70,18 @@ abstract class CometPusher(
                             return@group
                         }
                     } catch (e: Exception) {
+                        if (e is CancellationException) {
+                            throw e
+                        }
                         daemonLogger.warning("在推送消息至群 $it 时出现异常", e)
                         context.status = PushStatus.FAILED
                         return@group
                     }
                 }
 
-                context.status = PushStatus.DONE
-
+                if (context.status == PushStatus.PROGRESSING) {
+                    context.status = PushStatus.DONE
+                }
             }
         }
 
@@ -119,7 +123,10 @@ abstract class CometPusher(
     }
 
     fun stop() {
-        task.cancel(true)
+        if (::task.isInitialized) {
+            task.cancel(true)
+        }
+
         saveData()
     }
 }

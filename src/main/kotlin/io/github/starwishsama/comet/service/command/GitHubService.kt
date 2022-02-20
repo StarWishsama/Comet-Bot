@@ -244,6 +244,10 @@ object GitHubService {
     }
 
     fun lookupRepo(args: List<String>, event: MessageEvent): MessageChain {
+        if (!args[1].contains("/")) {
+            "请填写正确的仓库名称! 格式: 用户名/仓库名".toChain()
+        }
+
         val repoName = args[1].split("/")
 
         return GithubApi.getRepoInfoPicture(repoName[0], repoName[1]).toMessageChain(event.subject)

@@ -18,6 +18,7 @@ import io.github.starwishsama.comet.service.pusher.CometPusher
 import io.github.starwishsama.comet.service.pusher.CometPusherData
 import io.github.starwishsama.comet.service.pusher.context.BiliBiliDynamicContext
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
+import io.github.starwishsama.comet.utils.noCatchCancellation
 import kotlinx.coroutines.runBlocking
 import moe.sdl.yabapi.data.feed.FeedCardNode
 
@@ -26,7 +27,7 @@ import java.util.concurrent.TimeUnit
 
 class BiliBiliDynamicPusher : CometPusher("bili_dynamic", CometPusherData(3, TimeUnit.MINUTES)) {
     override fun retrieve() {
-        GroupConfigManager.getAllConfigs().parallelStream().forEach { config ->
+        GroupConfigManager.getAllConfigs().forEach { config ->
             if (!config.biliPushEnabled) {
                 return@forEach
             }
@@ -69,10 +70,10 @@ class BiliBiliDynamicPusher : CometPusher("bili_dynamic", CometPusherData(3, Tim
                             it.addPushTargets(cache.pushTarget)
                         })
                     } else {
-                        return@user
+                        cache.addPushTarget(config.id)
                     }
 
-                }.onFailure {
+                }.noCatchCancellation {
                     CometVariables.daemonLogger.warning("在获取 ${user.id} 的动态时出现了异常", it)
                 }
             }

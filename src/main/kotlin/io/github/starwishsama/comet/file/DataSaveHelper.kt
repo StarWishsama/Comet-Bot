@@ -15,6 +15,7 @@ import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.cfg
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.NumberUtil.fixDisplay
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.TaskUtil
 import java.io.File
@@ -65,7 +66,7 @@ object DataSaveHelper {
         if (cfg.autoCleanDuration < 1) return
 
         var counter = 0
-        var totalSize = 0L
+        var totalSize = 0.0
 
         val files = mutableListOf<File>()
 
@@ -76,7 +77,7 @@ object DataSaveHelper {
         files.forEach { f ->
             val modifiedTime = f.lastModified().toLocalDateTime(true)
             val currentTime = LocalDateTime.now()
-            if (Duration.between(modifiedTime, currentTime).toKotlinDuration().inWholeDays > cfg.autoCleanDuration) {
+            if (Duration.between(modifiedTime, currentTime).toKotlinDuration().inWholeDays >= cfg.autoCleanDuration) {
                 try {
                     totalSize += f.length()
                     f.delete()
@@ -87,6 +88,6 @@ object DataSaveHelper {
             }
         }
 
-        if (counter > 0) daemonLogger.info("已成功清理 $counter 个旧文件, 节省了 ${totalSize / 1024 / 1024} MB")
+        if (counter > 0) daemonLogger.info("已成功清理 $counter 个旧文件, 节省了 ${(totalSize / 1024 / 1024).fixDisplay()} MB")
     }
 }

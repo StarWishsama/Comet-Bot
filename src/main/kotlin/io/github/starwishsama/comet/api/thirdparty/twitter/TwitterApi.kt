@@ -11,7 +11,6 @@
 package io.github.starwishsama.comet.api.thirdparty.twitter
 
 import cn.hutool.http.ContentType
-import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.roxstudio.utils.CUrl
 import io.github.starwishsama.comet.CometVariables
@@ -24,6 +23,7 @@ import io.github.starwishsama.comet.api.thirdparty.twitter.data.TwitterUser
 import io.github.starwishsama.comet.exceptions.EmptyTweetException
 import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.exceptions.TwitterApiException
+import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.objects.config.api.TwitterConfig
 import io.github.starwishsama.comet.utils.FileUtil
@@ -227,7 +227,6 @@ object TwitterApi : ApiExecutor {
                         ?: return null, request.request.url.toString()
                 )
                 if (tweet.isNotEmpty()) {
-                    addCacheTweet(tweet[0])
                     tweet[0]
                 } else {
                     throw EmptyTweetException()
@@ -262,7 +261,6 @@ object TwitterApi : ApiExecutor {
 
         val list = getUserTweets(username, max)
         result = if (list.isNotEmpty()) {
-            addCacheTweet(list[index])
             list[index]
         } else {
             null
@@ -274,8 +272,9 @@ object TwitterApi : ApiExecutor {
     }
 
     private fun addCacheTweet(tweet: Tweet) {
-        if (getCacheByID(tweet.id) == null) {
+        if (cacheTweet.find { tweet.id == it.id } == null) {
             cacheTweet.add(tweet)
+            daemonLogger.log(HinaLogLevel.Debug, prefix = "Twitter", message = "添加缓存推文 #${tweet.id}")
         }
     }
 
@@ -286,7 +285,7 @@ object TwitterApi : ApiExecutor {
      * @return 推文, 找不到时返回空
      */
     fun getCacheByID(id: Long): Tweet? {
-        return cacheTweet.firstOrNull { it.id == id }
+        return cacheTweet.find { it.id == id }
     }
 
     /**
@@ -300,10 +299,12 @@ object TwitterApi : ApiExecutor {
      */
     private fun parseJsonToTweet(json: String, url: String): List<Tweet> {
         return try {
-            listOf(mapper.readValue(json, Tweet::class.java))
-        } catch (e: MismatchedInputException) {
+            listOf(mapper.readValue(json, Tweet::class.java)).onEach {
+                addCacheTweet(it)
+            }
+        } catch (e: IOException) {
             try {
-                mapper.readValue(json)
+                mapper.readValue<List<Tweet>>(json).onEach { tweet -> addCacheTweet(tweet) }
             } catch (e: RuntimeException) {
                 FileUtil.createErrorReportFile("在解析推文时出现了问题", "tweet", e, json, url)
                 return emptyList()

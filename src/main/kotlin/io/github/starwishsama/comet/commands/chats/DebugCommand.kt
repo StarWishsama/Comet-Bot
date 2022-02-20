@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.file.DataSetup
+import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.SessionHandler
@@ -124,5 +125,5 @@ object DebugCommand : ChatCommand, UnDisableableCommand {
         get() = true
 
     override val canRegister: () -> Boolean
-        get() = { CometVariables.cfg.debugMode }
+        get() = { CometVariables.cfg.logLevel == HinaLogLevel.Debug }
 }

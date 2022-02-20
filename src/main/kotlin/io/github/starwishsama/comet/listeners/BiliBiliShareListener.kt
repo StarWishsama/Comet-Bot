@@ -16,6 +16,7 @@ import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.video.toMessageWrapper
 import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.serialize.isUsable
 import kotlinx.coroutines.runBlocking
@@ -33,8 +34,8 @@ object BiliBiliShareListener : INListener {
     override val name: String
         get() = "哔哩哔哩解析"
 
-    private val shortUrlPattern = Regex("""https://b23.tv/\w{1,7}""")
-    private val longUrlPattern = Regex("""https://www.bilibili.com/video/(av|BV)\w{1,10}""")
+    private val shortUrlPattern = Regex("""https://b23.tv/\w+""")
+    private val longUrlPattern = Regex("""https://www.bilibili.com/video/(av|BV)\w+""")
 
     @OptIn(MiraiExperimentalApi::class, ExperimentalTime::class)
     @EventHandler
@@ -52,21 +53,19 @@ object BiliBiliShareListener : INListener {
                 return
             }
 
-            if (targetURL.isNotEmpty()) {
-                val checkResult = biliBiliLinkConvert(targetURL, event.subject)
+            if (CometUser.getUser(event.sender.id)?.isNoCoolDown() == true) {
+                val resultChain = if (targetURL.isNotEmpty()) {
+                    val checkResult = biliBiliLinkConvert(targetURL, event.subject)
 
-                if (checkResult.isNotEmpty()) {
-                    runBlocking {
-                        event.subject.sendMessage(checkResult)
-                    }
-                }
-            } else {
-                val lightApp = event.message[LightApp] ?: return
+                    checkResult.ifEmpty { EmptyMessageChain }
+                } else {
+                    val lightApp = event.message[LightApp] ?: return
 
-                val result = parseJsonMessage(lightApp, event.subject)
-                if (result.isNotEmpty()) {
-                    runBlocking { event.subject.sendMessage(result) }
+                    val result = parseJsonMessage(lightApp, event.subject)
+                    result.ifEmpty { EmptyMessageChain }
                 }
+
+                runBlocking { event.subject.sendMessage(resultChain) }
             }
         }
     }

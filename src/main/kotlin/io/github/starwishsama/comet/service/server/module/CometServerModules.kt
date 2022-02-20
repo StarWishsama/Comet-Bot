@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.config.SecretStatus
 import io.github.starwishsama.comet.service.command.GitHubService
 import io.github.starwishsama.comet.service.pusher.pushers.GithubPusher
+import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.serialize.isUsable
 import io.ktor.application.*
 import io.ktor.http.*
@@ -112,7 +113,7 @@ object GithubWebHookHandler {
                     return
                 }
             } catch (e: IOException) {
-                CometVariables.netLogger.log(HinaLogLevel.Warn, "推送 WebHook 消息失败", e, prefix = "WebHook")
+                FileUtil.createErrorReportFile("推送 WebHook 消息失败", "Github Webhook", e, payload, e.message ?: "")
                 hasError = true
             }
 

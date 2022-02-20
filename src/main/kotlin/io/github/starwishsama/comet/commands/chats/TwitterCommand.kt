@@ -11,12 +11,10 @@
 package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.CometVariables.daemonLogger
-
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.data.TwitterUser
-import io.github.starwishsama.comet.exceptions.RateLimitException
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
@@ -209,9 +207,14 @@ object TwitterCommand : ChatCommand {
                     val twitterUser: TwitterUser
 
                     try {
-                        twitterUser = TwitterApi.getUserProfile(-1, args[1])[0]
-                    } catch (e: RateLimitException) {
-                        return toChain("订阅 @${args[1]} 失败")
+                        val result = TwitterApi.getUserProfile(-1, args[1])
+                        if (result.isNotEmpty()) {
+                            twitterUser = result.first()
+                        } else {
+                            return "找不到 @${args[1]}".toChain()
+                        }
+                    } catch (e: Exception) {
+                        return "订阅 @${args[1]} 失败".toChain()
                     }
 
                     cfg.twitterSubscribers.add(args[1])

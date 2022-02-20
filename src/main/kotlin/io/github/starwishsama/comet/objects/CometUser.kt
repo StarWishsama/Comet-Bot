@@ -105,17 +105,15 @@ data class CometUser(
      *
      * @return 是否处于冷却状态
      */
-    fun checkCoolDown(silent: Boolean = false, coolDown: Int = CometVariables.cfg.coolDownTime): Boolean {
+    fun isNoCoolDown(silent: Boolean = false, coolDown: Int = CometVariables.cfg.coolDownTime): Boolean {
         val currentTime = System.currentTimeMillis()
+        val period = currentTime - triggerCommandTime
 
-        return if (triggerCommandTime < 0) {
-            if (!silent) triggerCommandTime = currentTime
-            true
-        } else {
-            val hasCoolDown = currentTime - triggerCommandTime >= coolDown * 1000
-            if (!silent) triggerCommandTime = currentTime
-            hasCoolDown
+        if (!silent) {
+            triggerCommandTime = currentTime
         }
+
+        return triggerCommandTime < 0 || period >= coolDown * 1000
     }
 
     companion object {

@@ -10,12 +10,21 @@
 
 package io.github.starwishsama.comet.sessions
 
-import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import java.time.LocalDateTime
 
+/**
+ * [Session]
+ *
+ * 会话，可通过 [ConversationCommand] 处理聊天消息
+ *
+ * @param target [SessionTarget] 会话需要监听的对象, 可以是群或人
+ * @param creator [ConversationCommand] 处理会话的命令
+ * @param silent 是否打断命令执行, 为真时不处理其他命令
+ */
 open class Session(
     open val target: SessionTarget,
-    val creator: ChatCommand,
+    val creator: ConversationCommand,
     open val silent: Boolean = false,
 ) {
     val users: MutableSet<SessionUser> = mutableSetOf()

@@ -12,10 +12,12 @@ package io.github.starwishsama.comet.service.pusher.pushers
 
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.live.toSimpleLiveRoomData
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.service.pusher.CometPusher
 import io.github.starwishsama.comet.service.pusher.CometPusherData
 import io.github.starwishsama.comet.service.pusher.context.BiliBiliLiveContext
+import io.github.starwishsama.comet.utils.noCatchCancellation
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 
@@ -38,7 +40,7 @@ class BiliBiliLivePusher : CometPusher("bili_live", CometPusherData(5, TimeUnit.
                             mutableSetOf(cfg.id),
                             time,
                             pushUser = user,
-                            liveRoomInfo = liveRoomInfo
+                            liveRoomInfo = liveRoomInfo.toSimpleLiveRoomData()
                         )
 
                         if (cache == null) {
@@ -47,10 +49,10 @@ class BiliBiliLivePusher : CometPusher("bili_live", CometPusherData(5, TimeUnit.
                             data.cache.remove(cache)
                             data.cache.add(current.also { it.addPushTargets(cache.pushTarget) })
                         } else {
-                            return@user
+                            cache.addPushTarget(cfg.id)
                         }
 
-                    }.onFailure {
+                    }.noCatchCancellation {
                         CometVariables.logger.error("获取 ${user.id} 直播间失败", it)
                     }
                 }

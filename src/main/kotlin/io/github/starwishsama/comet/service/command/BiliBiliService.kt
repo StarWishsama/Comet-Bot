@@ -14,8 +14,10 @@ import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.SearchApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.feed.toMessageWrapper
 import io.github.starwishsama.comet.api.thirdparty.bilibili.user.asReadable
+import io.github.starwishsama.comet.api.thirdparty.bilibili.video.toMessageWrapper
 import io.github.starwishsama.comet.commands.chats.BiliBiliCommand
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
@@ -37,9 +39,11 @@ import moe.sdl.yabapi.data.info.UserCardGetData
 import moe.sdl.yabapi.data.info.UserSpace
 import moe.sdl.yabapi.data.search.results.SearchResult
 import moe.sdl.yabapi.data.search.results.UserResult
+import moe.sdl.yabapi.data.video.VideoInfo
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
+import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.PlainText
@@ -194,6 +198,25 @@ object BiliBiliService {
         cfg.canParseBiliVideo = !cfg.canParseBiliVideo
 
         return "群聊视频解析已${if (cfg.canParseBiliVideo) "开启" else "关闭"}".toChain()
+    }
+
+    fun searchVideo(videoId: String, event: MessageEvent): MessageChain {
+        val videoInfo: VideoInfo = runBlocking {
+            return@runBlocking when {
+                videoId.startsWith("BV") -> VideoApi.getVideoInfo(videoId)
+                videoId.lowercase().startsWith("av") -> VideoApi.getVideoInfo(videoId.lowercase().replace("av", "").toInt())
+                else -> null
+            }
+        } ?: return "请输入有效的 av/bv 号!".toChain()
+
+        return runBlocking {
+            val wrapper = videoInfo.toMessageWrapper()
+            return@runBlocking if (!wrapper.isUsable()) {
+                EmptyMessageChain
+            } else {
+                wrapper.toMessageChain(event.subject)
+            }
+        }
     }
 }
 
