@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -21,12 +21,10 @@ import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.daemonLogger
-import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTime
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import java.io.File
-import java.io.FileOutputStream
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -39,7 +37,9 @@ import kotlin.time.ExperimentalTime
 
 @Synchronized
 fun File.writeClassToJson(context: Any, mapper: ObjectMapper = CometVariables.mapper) {
-    FileWriter.create(this).write(mapper.writeValueAsString(context), false)
+    FileWriter.create(this).getWriter(false).use {
+        mapper.writeValue(it, context)
+    }
 }
 
 @Synchronized
@@ -68,6 +68,14 @@ fun File.getContext(): String {
 @Suppress("unused")
 fun File.getMD5(): String {
     return SecureUtil.md5(this)
+}
+
+fun File.createNewFileIfNotExists(extraAction: (File) -> Unit = {}) {
+    if (!this.exists()) {
+        this.parentFile.mkdirs()
+        this.createNewFile()
+        extraAction.invoke(this)
+    }
 }
 
 /**
@@ -133,7 +141,7 @@ fun File.createBackupFile() {
 }
 
 object FileUtil {
-    private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
+    private val standardDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
 
     fun getChildFolder(childName: String): File = CometVariables.filePath.getChildFolder(childName)
 
@@ -150,7 +158,7 @@ object FileUtil {
         content: String,
         message: String
     ) {
-        val fileName = "$type-${dateFormatter.format(LocalDateTime.now())}.txt"
+        val fileName = "$type-${standardDateTimeFormatter.format(LocalDateTime.now())}.txt"
         val location = File(getErrorReportFolder(), fileName)
         if (location.exists()) return
 
@@ -161,6 +169,7 @@ object FileUtil {
         location.writeString(report)
         daemonLogger.warning("$reason, 错误报告已生成! 保存在 ${location.path}")
         daemonLogger.warning("你可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")
+        daemonLogger.warning("以下是错误堆栈: ", t)
     }
 
     /**
@@ -171,7 +180,7 @@ object FileUtil {
     fun getLogLocation(customPrefix: String = "log"): File {
         val initTime = LocalDateTime.now()
         val parent = getChildFolder("logs")
-        return File(parent, "$customPrefix-${dateFormatter.format(initTime)}.log").also {
+        return File(parent, "$customPrefix-${standardDateTimeFormatter.format(initTime)}.log").also {
             if (!it.exists()) {
                 it.createNewFile()
             }
@@ -266,7 +275,7 @@ object FileUtil {
     fun initResourceFile() {
         val startTime = LocalDateTime.now()
         try {
-            daemonLogger.info("正在加载资源文件...")
+            daemonLogger.info("正在加载内嵌资源文件...")
             val resourcePath = "resources"
             val jarFile = File(CometApplication.javaClass.protectionDomain.codeSource.location.path)
 
@@ -326,7 +335,7 @@ object FileUtil {
                 if (entryName.startsWith("$resourcePath/")) {
                     val actualName = entryName.replace("${resourcePath}/", "").removeSuffix("/")
 
-                    processFileInJar(jar, entry, actualName)
+                    processFileInJar(jar, entry, actualName, "resources")
                 } else {
                     continue
                 }
@@ -341,7 +350,8 @@ object FileUtil {
      * @param fileName 文件名
      * @param resourcePath 资源文件储存文件夹
      */
-    private fun processFileInJar(jar: JarFile, entry: JarEntry, fileName: String, resourcePath: String = "resources") {
+    @Suppress("SameParameterValue")
+    private fun processFileInJar(jar: JarFile, entry: JarEntry, fileName: String, resourcePath: String) {
         var counter = 0
 
         if (fileName.isEmpty()) {
@@ -355,28 +365,18 @@ object FileUtil {
         } else {
             val current = File(getResourceFolder(), fileName)
 
-            if (!current.exists() || current.lastModified().toLocalDateTime() >
-                entry.lastModifiedTime.toMillis().toLocalDateTime(true)
-            ) {
+            if (!current.exists() || current.lastModified() > entry.lastModifiedTime.toMillis()) {
                 if (!current.exists()) {
                     current.createNewFile()
                 }
 
-                FileOutputStream(current).use { fos ->
-                    val byteArray = ByteArray(1024)
-                    var len: Int
-                    jar.getInputStream(entry)?.use { fis ->
-                        // While the input stream has bytes
-                        while (fis.read(byteArray).also { len = it } > 0) {
-                            fos.write(byteArray, 0, len)
-                        }
-
-                        counter++
-                    }
+                jar.getInputStream(entry).use {
+                    Files.copy(it, current.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                    counter++
                 }
             }
         }
 
-        daemonLogger.info("已处理 $counter 个数据文件.")
+        daemonLogger.debug("在 ${entry.name} 下已处理 $counter 个数据文件.")
     }
 }

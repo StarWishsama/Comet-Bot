@@ -12,6 +12,7 @@ package io.github.starwishsama.comet.objects.gacha.pool
 
 import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.api.gacha.impl.ArkNightInstance
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.gacha.GachaResult
@@ -39,16 +40,18 @@ class ArkNightPool(
     override val name: String = "标准寻访",
     override val displayName: String = "标准寻访",
     override val description: String = "适合多种场合的强力干员",
+    override val startTime: Long = -1,
+    override val endTime: Long = -1,
     val condition: ArkNightOperator.() -> Boolean = {
         GachaUtil.hasOperator(this.name) && obtain?.contains("招募寻访") == true
-    }
+    },
 ) : GachaPool() {
     override val tenjouCount: Int = -1
     override val tenjouRare: Int = -1
     override val poolItems: MutableList<ArkNightOperator> = mutableListOf()
 
     init {
-        CometVariables.arkNight.stream().filter { condition(it) }.forEach {
+        ArkNightInstance.getArkNightOperators().stream().filter { condition(it) }.forEach {
             poolItems.add(it)
         }
 
@@ -169,7 +172,7 @@ class ArkNightPool(
      */
     fun getArkDrawResult(user: CometUser, time: Int = 1): GachaResult {
         return if (GachaUtil.checkHasGachaTime(user, time)) {
-            user.consumePoint(time * 0.1)
+            user.consumePoint(time * 0.05)
             doDraw(time)
         } else {
             GachaResult()
@@ -196,9 +199,9 @@ class ArkNightPool(
                     }.trim().toString()
                 }
                 else -> {
-                    val r6Count = drawResult.items.parallelStream().filter { it.rare + 1 == 6 }.count()
-                    val r5Count = drawResult.items.parallelStream().filter { it.rare + 1 == 4 }.count()
-                    val r4Count = drawResult.items.parallelStream().filter { it.rare + 1 == 3 }.count()
+                    val r6Count = drawResult.items.count { it.rare + 1 == 6 }
+                    val r5Count = drawResult.items.count { it.rare + 1 == 4 }
+                    val r4Count = drawResult.items.count { it.rare + 1 == 3 }
                     val r3Count = drawResult.items.size - r6Count - r5Count - r4Count
                     val perTimeUsed = 600
 
@@ -214,11 +217,13 @@ class ArkNightPool(
                         }
                     }
 
+                    returnText += "\n\n本次消费硬币 ${drawResult.items.size * 0.05}"
+
                     return returnText
                 }
             }
         } else {
-            return GachaUtil.overTimeMessage + "\n剩余积分: ${user.checkInPoint}"
+            return GachaUtil.overTimeMessage + "\n剩余硬币: ${user.coin}"
         }
     }
 

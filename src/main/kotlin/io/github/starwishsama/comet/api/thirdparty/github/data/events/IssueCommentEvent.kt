@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 data class IssueCommentEvent(
     val action: String,
@@ -38,18 +39,18 @@ data class IssueCommentEvent(
         fun convertCreatedTime(): String {
             val localTime =
                 LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.of("UTC"))
-            return CometVariables.hmsPattern.format(localTime)
+            return TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT) + " " + CometVariables.hmsPattern.format(
+                localTime
+            )
         }
     }
 
     override fun toMessageWrapper(): MessageWrapper {
         return MessageWrapper().apply {
-            addText("\uD83D\uDCAC ${repository.fullName} 议题 #${issue.number} 下有新回复\n")
-            addText("| 创建时间 ${comment.convertCreatedTime()}\n")
-            addText("| 创建人 ${comment.user.login}\n")
-            addText("| 查看详细信息: ${comment.url}\n")
-            addText("| 简略信息: \n")
-            addText("| ${comment.body.limitStringSize(80).trim()}\n")
+            addText("\uD83D\uDCAC ${repository.fullName} 议题 #${issue.number}\n")
+            addText("新回复 | ${comment.user.login} | ${comment.convertCreatedTime()}\n\n")
+            addText("${comment.body.limitStringSize(80).trim()}\n\n")
+            addText("查看全部 > ${comment.url}\n")
 
         }
     }

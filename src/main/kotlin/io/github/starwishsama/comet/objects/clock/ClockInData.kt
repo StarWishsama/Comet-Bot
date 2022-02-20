@@ -27,7 +27,7 @@ data class ClockInData(val startTime: LocalDateTime, val endTime: LocalDateTime,
         var lateText = StringBuilder()
         var unCheckedText = StringBuilder()
 
-        val unCheckedUsers = groupUsers.minus(checkedUsers).minus(lateUsers)
+        val unCheckedUsers = groupUsers.minus(checkedUsers.toSet()).minus(lateUsers.toSet())
 
         unCheckedUsers.forEach { member ->
             run {

@@ -21,7 +21,7 @@ import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import java.io.IOException
 
-class AdminCommand : ConsoleCommand {
+object AdminCommand : ConsoleCommand {
     override suspend fun execute(args: List<String>): String {
         if (args.isNotEmpty()) {
             when (args[0]) {
@@ -94,12 +94,12 @@ class AdminCommand : ConsoleCommand {
         return ""
     }
 
-    override fun getProps(): CommandProps = CommandProps("admin", mutableListOf(), "", "", UserLevel.CONSOLE)
+    override fun getProps(): CommandProps = CommandProps("admin", mutableListOf(), "", UserLevel.CONSOLE)
 
     override fun getHelp(): String = """
         /admin upgrade [ID] (权限组名) 修改权限组
         /admin reload 重载配置文件
-        /admin rp [积分] 重置所有账号的积分为指定积分数
+        /admin rp [硬币] 重置所有账号的硬币为指定硬币数
         /admin cmd [群号] 在指定群禁用命令
     """.trimIndent()
 }

@@ -23,11 +23,17 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
 
-class DivineCommand : ChatCommand {
+object DivineCommand : ChatCommand {
+
+    private val emojiPattern = Regex("[\uD83C-\uDBFF\uDC00-\uDFFF]+")
+
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return if (args.isNotEmpty()) {
             val randomEventName = args.getRestString(0)
             if (randomEventName.isNotBlank() && randomEventName.length < 30) {
+                if (!emojiPattern.containsMatchIn(randomEventName)) {
+                    "不允许使用 emoji 字符".toChain()
+                }
                 val result = RandomResult(-1000, RandomUtil.randomDouble(0.0, 1.0), randomEventName)
 
                 RandomResult.getChance(result).convertToChain()
@@ -40,7 +46,7 @@ class DivineCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("divine", arrayListOf("zb", "占卜"), "占卜命令", "nbot.commands.divine", UserLevel.USER)
+        CommandProps("divine", arrayListOf("zb", "占卜"), "占卜命令", UserLevel.USER)
 
     override fun getHelp(): String = """
          /zb [占卜内容] 占卜

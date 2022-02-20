@@ -17,12 +17,16 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import java.util.stream.Collectors
 
+fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
+    return MessageWrapper().apply(builder)
+}
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class MessageWrapper {
     private val messageContent = mutableSetOf<WrapperElement>()
 
     @Volatile
-    private var usable: Boolean = true
+    private var usable: Boolean = isEmpty()
 
     fun addElement(element: WrapperElement): MessageWrapper {
         messageContent.add(element)
@@ -44,10 +48,10 @@ open class MessageWrapper {
         return this
     }
 
-    fun addPictureByURL(url: String?): MessageWrapper {
+    fun addPictureByURL(url: String?, imageFormat: String = ""): MessageWrapper {
         if (url == null) return this
 
-        messageContent.add(Picture(url))
+        messageContent.add(Picture(url, fileFormat = imageFormat))
         return this
     }
 
@@ -100,7 +104,7 @@ open class MessageWrapper {
     }
 
     override fun toString(): String {
-        return "MessageWrapper {content=${messageContent}}"
+        return "MessageWrapper {content=${messageContent}, usable=${usable}}"
     }
 
     fun getAllText(): String {

@@ -10,18 +10,20 @@
 
 package io.github.starwishsama.comet.utils.network
 
-import cn.hutool.http.HttpException
+import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometVariables.cfg
 import io.github.starwishsama.comet.CometVariables.netLogger
 import io.github.starwishsama.comet.exceptions.ApiException
-import io.github.starwishsama.comet.logger.RetrofitLogger
+import io.github.starwishsama.comet.service.RetrofitLogger
 import io.github.starwishsama.comet.utils.StringUtil.containsEtc
 import io.github.starwishsama.comet.utils.TaskUtil
 import okhttp3.*
+import retrofit2.HttpException
 import java.io.*
 import java.net.*
 import java.time.Duration
 import java.time.LocalDateTime
+import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 
 fun Response.isType(typeName: String): Boolean = headers["content-type"]?.contains(typeName) == true
@@ -29,6 +31,9 @@ fun Response.isType(typeName: String): Boolean = headers["content-type"]?.contai
 object NetUtil {
     const val defaultUA =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36 Edg/94.0.992.50"
+
+    const val cometRequestUA =
+        "Comet/${BuildConfig.version} AppleWebKit/537.36 (KHTML, like Gecko) Not Chrome/94.0.4606.81"
 
     /**
      * 执行 Http 请求
@@ -63,13 +68,12 @@ object NetUtil {
             .hostnameVerifier { _, _ -> true }
             .addInterceptor(RetrofitLogger())
 
-
         try {
             if (checkProxyUsable()) {
                 builder.proxy(Proxy(cfg.proxyType, InetSocketAddress(proxyUrl, proxyPort)))
             }
         } catch (e: Exception) {
-            netLogger.warning("无法连接到代理服务器, ${e.message}")
+            netLogger.warning("无法连接到代理服务器, 将使用直连链接\n错误信息: ${e.message}")
         }
 
         val client = builder.build()
@@ -78,6 +82,7 @@ object NetUtil {
                 it.method(method, body)
             }
         }.build()
+
         return client.newCall(request)
     }
 
@@ -109,7 +114,7 @@ object NetUtil {
      */
     fun executeHttpRequest(
         url: String,
-        timeout: Long = 2,
+        timeout: Long = 10,
         proxyUrl: String = cfg.proxyUrl,
         proxyPort: Int = cfg.proxyPort,
         call: Request.Builder.() -> Request.Builder = {
@@ -142,8 +147,13 @@ object NetUtil {
         call: Request.Builder.() -> Request.Builder = {
             header("user-agent", defaultUA)
         },
-    ): String? =
-        executeHttpRequest(url, timeout, proxyUrl, proxyPort, call).body?.string()
+    ): String? {
+        return try {
+            executeHttpRequest(url, timeout, proxyUrl, proxyPort, call).body?.string()
+        } catch (e: Exception) {
+            null
+        }
+    }
 
     /**
      * 下载文件
@@ -195,6 +205,10 @@ object NetUtil {
     }
 
     fun isTimeout(t: Throwable): Boolean {
+        if (t is CancellationException) {
+            return false
+        }
+
         val msg = t.message?.lowercase() ?: return false
         return msg.containsEtc(true, "time", "out") || t.javaClass.simpleName.lowercase().contains("timeout")
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -25,6 +25,7 @@ import io.github.starwishsama.comet.sessions.commands.guessnumber.GuessNumberUse
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
+import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -33,9 +34,9 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.content
 import java.time.Duration
 import java.time.LocalDateTime
+import kotlin.time.toKotlinDuration
 
-
-class GuessNumberCommand : ChatCommand, ConversationCommand {
+object GuessNumberCommand : ChatCommand, ConversationCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (event is GroupMessageEvent) {
             if (!SessionHandler.hasSessionByGroup(event.group.id, this::class.java)) {
@@ -78,21 +79,37 @@ class GuessNumberCommand : ChatCommand, ConversationCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("guessnumber", arrayListOf("csz"), "猜数字", "nbot.commands.guessnumber", UserLevel.USER)
+        CommandProps("guessnumber", arrayListOf("csz"), "猜数字", UserLevel.USER)
 
     override fun getHelp(): String = """
         /csz 猜数字
         /csz [最小值] [最大值] 猜指定范围内的数字
     """.trimIndent()
 
+    @Suppress("NAME_SHADOWING")
     override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
-        val trueAnswer = (session as GuessNumberSession).answer
+        val session = (session as GuessNumberSession)
+
+        if (session.tryTimes == 9) {
+            session.usedTime = Duration.between(session.createdTime, LocalDateTime.now())
+            event.subject.sendMessage(
+                "你输了! 用时 ${
+                    session.usedTime.toKotlinDuration().toFriendly()
+                } 正确答案是 ${session.answer}"
+            )
+            SessionHandler.removeSession(session)
+            return
+        }
+
+        val trueAnswer = session.answer
         session.lastAnswerTime = LocalDateTime.now()
-        val answer = event.message.content
+        val inputAnswer = event.message.content
         var gnUser = session.getGuessNumberUser(user.id)
 
-        if (answer.isNumeric()) {
-            val answerInInt = answer.toInt()
+        if (inputAnswer.isNumeric()) {
+            session.tryTimes++
+
+            val answer = inputAnswer.toInt()
 
             if (gnUser == null) {
                 gnUser = GuessNumberUser(event.sender.id, event.sender.nameCardOrNick)
@@ -101,32 +118,29 @@ class GuessNumberCommand : ChatCommand, ConversationCommand {
 
             gnUser.guessTime += 1
 
-
             when {
-                answerInInt > trueAnswer -> {
+                answer > trueAnswer -> {
                     event.subject.sendMessage(CometUtil.toChain("你猜的数字大了"))
                 }
-                answerInInt < trueAnswer -> {
+                answer < trueAnswer -> {
                     event.subject.sendMessage(CometUtil.toChain("你猜的数字小了"))
                 }
-                answerInInt == trueAnswer -> {
-                    session.usedTime = Duration.between(session.createdTime, LocalDateTime.now())
-                    val sb =
-                        StringBuilder(CometUtil.sendMessageAsString("${event.sender.nameCardOrNick} 猜对了!\n总用时: ${session.usedTime.seconds}s\n\n"))
-                    val list = session.users.sortedBy { (it as GuessNumberUser).guessTime }
-                    list.forEach {
-                        sb.append("\n" + (it as GuessNumberUser).username).append(" ").append(it.guessTime)
-                            .append("次\n")
-                    }
-                    event.subject.sendMessage(sb.toString().trim())
-                    SessionHandler.removeSession(session)
-                }
                 else -> {
-                    throw RuntimeException("GuessNumber: Impossible answer input: ${answerInInt}, answer: ${trueAnswer}")
+                    session.usedTime = Duration.between(session.createdTime, LocalDateTime.now())
+                    val resp = buildString {
+                        append(CometUtil.sendMessageAsString("${event.sender.nameCardOrNick} 猜对了!\n总用时: ${session.usedTime.seconds}s\n\n"))
+                        val list = session.users.sortedBy { (it as GuessNumberUser).guessTime }
+                        list.forEach {
+                            append("\n" + (it as GuessNumberUser).username).append(" ").append(it.guessTime)
+                                .append("次\n")
+                        }
+                    }
+                    event.subject.sendMessage(resp.trim())
+                    SessionHandler.removeSession(session)
                 }
             }
         } else {
-            when (answer) {
+            when (inputAnswer) {
                 "不玩了", "结束游戏", "退出游戏" -> {
                     SessionHandler.removeSession(session)
                     event.subject.sendMessage(CometUtil.sendMessageAsString("游戏已结束"))

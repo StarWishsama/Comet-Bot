@@ -17,7 +17,8 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 open class GuessNumberSession(override val target: SessionTarget, val answer: Int) :
-    Session(target, GuessNumberCommand(), false) {
+    Session(target, GuessNumberCommand, false) {
+    var tryTimes = 0
     lateinit var usedTime: Duration
     lateinit var lastAnswerTime: LocalDateTime
 

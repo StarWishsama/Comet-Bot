@@ -10,40 +10,20 @@
 
 package io.github.starwishsama.comet.api.thirdparty.bilibili
 
-import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.ApiExecutor
-import io.github.starwishsama.comet.api.thirdparty.bilibili.data.search.SearchUserResult
-import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.jackson.JacksonConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.Query
+import moe.sdl.yabapi.api.searchByType
+import moe.sdl.yabapi.data.search.SearchNormalData
+import moe.sdl.yabapi.data.search.SearchOption
+import moe.sdl.yabapi.enums.search.SearchType
 
 object SearchApi : ApiExecutor {
-    val searchApiService: ISearchApi
 
-    init {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.bilibili.com/")
-            .addConverterFactory(JacksonConverterFactory.create(CometVariables.mapper))
-            .client(CometVariables.client)
-            .build()
-        searchApiService = retrofit.create(ISearchApi::class.java)
+    suspend fun searchUser(keyword: String, searchType: SearchOption = SearchOption(SearchType.USER)): SearchNormalData? {
+        return client.searchByType(keyword, searchType).data
     }
 
     override var usedTime: Int = 0
     override val duration: Int = 3
 
     override fun getLimitTime(): Int = 3000
-}
-
-interface ISearchApi {
-    @GET("/x/web-interface/search/type")
-    fun searchUser(
-        @Query("search_type")
-        searchType: String = "bili_user",
-
-        @Query("keyword")
-        keyword: String
-    ): Call<SearchUserResult>
 }

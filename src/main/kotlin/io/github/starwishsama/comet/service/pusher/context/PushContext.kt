@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
-import java.util.*
+import io.github.starwishsama.comet.service.pusher.PushStatus
 
 /**
  * [PushContext]
@@ -33,11 +33,11 @@ abstract class PushContext(
     /**
      * 需要被推送的对象
      */
-    private val pushTarget: MutableSet<Long>,
+    val pushTarget: MutableSet<Long> = mutableSetOf(),
     /**
      * 获取该内容的时间, 为 [System.currentTimeMillis]
      */
-    var retrieveTime: Long,
+    val retrieveTime: Long,
     /**
      * 该内容的状态, 详见 [PushStatus]
      */
@@ -51,26 +51,28 @@ abstract class PushContext(
     }
 
     /**
+     * 添加推送对象
+     */
+    fun addPushTargets(ids: Collection<Long>) {
+        pushTarget.addAll(ids)
+    }
+
+    /**
      * 清空所有推送对象
      */
     fun clearPushTarget() {
         pushTarget.clear()
     }
 
-    /**
-     * 获取推送对象的不可变副本 [Collections.unmodifiableSet]
-     */
-    fun getPushTarget(): Set<Long> = Collections.unmodifiableSet(pushTarget)
-
     override fun toMessageWrapper(): MessageWrapper {
         throw UnsupportedOperationException("Base PushContext can't convert to MessageWrapper")
+    }
+
+    override fun toString(): String {
+        return "${this::class::simpleName} [pushTarget=${pushTarget}, retrieveTime=$retrieveTime, status=$status]"
     }
 
     override fun contentEquals(other: PushContext): Boolean {
         return this == other
     }
-}
-
-enum class PushStatus {
-    CREATED, PROGRESSING, PUSHING, PUSHED, INVAILD
 }

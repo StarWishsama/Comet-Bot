@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -10,31 +10,33 @@
 
 package io.github.starwishsama.comet.commands.chats
 
-
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
-import io.github.starwishsama.comet.objects.config.PerGroupConfig
 import io.github.starwishsama.comet.objects.enums.UserLevel
-import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.toMessageWrapper
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
 import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.contact.MemberPermission
+import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageChainBuilder
 import net.mamoe.mirai.message.data.PlainText
 
-
-class GroupConfigCommand : ChatCommand, UnDisableableCommand {
+object GroupConfigCommand : ChatCommand, UnDisableableCommand {
     // TODO 适配私聊设置
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
+        if (!hasPermission(user, event)) {
+            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         if (event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
                 val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
@@ -98,33 +100,6 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
                         val cmd = CommandManager.getCommand(args[1])
 
                         return cmd?.props?.disableCommand(event.group.id)?.msg?.toChain() ?: "找不到对应命令".toChain()
-                    }
-                    "autoreply", "ar", "自动回复", "关键词", "keyword", "kw" -> {
-                        if (args.size == 1) {
-                            return "/group ar [关键词] [回复内容]".toChain()
-                        } else {
-                            val keyWord = args[1]
-                            val reply = args.getRestString(2)
-
-                            cfg.keyWordReply.forEach {
-                                if (it.reply.getAllText() == reply) {
-                                    it.keyWords.add(keyWord)
-                                    return "已发现现有配置, 成功添加关键词".toChain()
-                                }
-                            }
-
-                            return if (cfg.keyWordReply.add(
-                                    PerGroupConfig.ReplyKeyWord(
-                                        mutableListOf(keyWord),
-                                        MessageWrapper().addText(reply)
-                                    )
-                                )
-                            ) {
-                                "添加关键词成功".toChain()
-                            } else {
-                                "添加关键词失败".toChain()
-                            }
-                        }
                     }
                     "newcomer", "入群欢迎", "自动欢迎", "zdhy", "rqhy" -> {
                         if (args.size > 1) {
@@ -194,22 +169,18 @@ class GroupConfigCommand : ChatCommand, UnDisableableCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("group", arrayListOf("群设置", "gs"), "设置群内设置", "nbot.commands.groupconfig", UserLevel.ADMIN)
+        CommandProps("group", arrayListOf("群设置", "gs"), "设置群内设置", UserLevel.ADMIN)
 
     override fun getHelp(): String = """
         /group helper [@/QQ] 添加/删除群助理
         /group repeat 开启/关闭本群机器人复读功能
         /group autojoin 开启/关闭本群机器人自动接受加群请求
         /group func 启用/禁用本群可使用的命令
-        /group autoreply 设置自动回复
         /group newcomer 设置入群欢迎内容
         /group frm 设置群文件自动删除
     """.trimIndent()
 
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        val level = props.level
-        if (user.compareLevel(level)) return true
-        if (e is GroupMessageEvent && e.sender.permission > MemberPermission.MEMBER) return true
-        return false
+    private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
+        return user.hasPermission(props.permissionNodeName) || (e is GroupMessageEvent && e.sender.isOperator())
     }
 }

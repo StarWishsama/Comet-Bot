@@ -18,6 +18,7 @@ import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 data class IssueEvent(
     /**
@@ -39,12 +40,19 @@ data class IssueEvent(
         val locked: Boolean,
         @JsonProperty("created_at")
         val createdTime: String,
-        val body: String,
+        val body: String?,
+        val user: UserObject,
     ) {
+        data class UserObject(
+            val login: String
+        )
+
         fun convertCreatedTime(): String {
             val localTime =
                 LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.of("UTC"))
-            return CometVariables.hmsPattern.format(localTime)
+            return TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT) + " " + CometVariables.hmsPattern.format(
+                localTime
+            )
         }
     }
 
@@ -78,20 +86,17 @@ data class IssueEvent(
 
         when (action) {
             "opened" -> {
-                wrapper.addText("\uD83D\uDC1B ${repository.fullName} 有新议题啦\n")
-                wrapper.addText("| 议题 #${issue.number}\n")
-                wrapper.addText("| 创建时间 ${issue.convertCreatedTime()}\n")
-                wrapper.addText("| 创建人 ${sender.login}\n")
-                wrapper.addText("| 查看详细信息: ${issue.url}\n")
-                wrapper.addText("| 简略信息 \n")
-                wrapper.addText("| ${issue.title}\n")
-                wrapper.addText("| ${issue.body.limitStringSize(50).trim()}\n")
+                wrapper.addText("\uD83D\uDC1B ${repository.fullName} 有新议题 #${issue.number}\n")
+                wrapper.addText("by ${issue.user.login} | ${issue.convertCreatedTime()} \n\n")
+                wrapper.addText("${issue.title}\n")
+                wrapper.addText("${issue.body?.limitStringSize(50)?.trim()}\n\n")
+                wrapper.addText("查看全部 >: ${issue.url}\n")
             }
 
             "closed" -> {
                 wrapper.addText("\uD83D\uDC1B ${repository.fullName} 议题 #${issue.number} 关闭\n")
-                wrapper.addText("| 创建人 ${sender.login}\n")
-                wrapper.addText("| 查看详细信息: ${issue.url}\n")
+                wrapper.addText("由 ${issue.user.login} 创建\n")
+                wrapper.addText("查看全部 > ${issue.url}\n")
             }
         }
 

@@ -20,7 +20,7 @@ import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
-class BroadcastCommand : ConsoleCommand {
+object BroadcastCommand : ConsoleCommand {
     override suspend fun execute(args: List<String>): String {
         return if (args.size > 1 && args[0].isNumeric()) {
             sendMessage(args[0].toLong(), args.getRestString(1))
@@ -60,7 +60,7 @@ class BroadcastCommand : ConsoleCommand {
         }
     }
 
-    override fun getProps(): CommandProps = CommandProps("broadcast", mutableListOf("bc"), "", "", UserLevel.CONSOLE)
+    override fun getProps(): CommandProps = CommandProps("broadcast", mutableListOf("bc"), "", UserLevel.CONSOLE)
 
     override fun getHelp(): String {
         return "/bc [群号] [发送内容]"

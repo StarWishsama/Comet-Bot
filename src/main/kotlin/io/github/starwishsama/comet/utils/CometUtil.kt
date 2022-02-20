@@ -11,7 +11,7 @@
 package io.github.starwishsama.comet.utils
 
 import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.CometVariables.localizationManager
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.CometUser.Companion.getUser
 import io.github.starwishsama.comet.utils.RuntimeUtil.getJVMVersion
@@ -19,6 +19,7 @@ import io.github.starwishsama.comet.utils.RuntimeUtil.getMaxMemory
 import io.github.starwishsama.comet.utils.RuntimeUtil.getOsInfo
 import io.github.starwishsama.comet.utils.RuntimeUtil.getUsedMemory
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
+import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
@@ -27,7 +28,6 @@ import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
-import org.apache.commons.lang3.StringUtils
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -65,7 +65,7 @@ object CometUtil {
         if (otherText.isNullOrEmpty()) return ""
         return buildString {
             if (addPrefix) {
-                append(localizationManager.getLocalizationText("prefix")).append(" ")
+                append(LocalizationManager.getLocalizationText("prefix")).append(" ")
             }
             append(otherText)
         }.trim()
@@ -102,7 +102,7 @@ object CometUtil {
             }
         }
 
-        return if (StringUtils.isNumeric(possibleID)) {
+        return if (possibleID.isNumeric()) {
             possibleID.toLong()
         } else {
             -1

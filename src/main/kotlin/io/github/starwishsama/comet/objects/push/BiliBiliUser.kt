@@ -13,5 +13,5 @@ package io.github.starwishsama.comet.objects.push
 class BiliBiliUser(
     id: String,
     userName: String,
-    var roomID: Long,
+    var roomID: Int,
 ) : PushUser(id, userName)

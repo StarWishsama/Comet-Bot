@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -21,6 +21,7 @@ import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.logger
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.MessageHandler
+import io.github.starwishsama.comet.api.command.MessageHandler.attachHandler
 import io.github.starwishsama.comet.api.thirdparty.bilibili.*
 import io.github.starwishsama.comet.api.thirdparty.jikipedia.JikiPediaApi
 import io.github.starwishsama.comet.api.thirdparty.noabbr.NoAbbrApi
@@ -34,9 +35,10 @@ import io.github.starwishsama.comet.file.DataSaveHelper
 import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
 import io.github.starwishsama.comet.logger.HinaLogLevel
-import io.github.starwishsama.comet.logger.RetrofitLogger
+import io.github.starwishsama.comet.logger.YabapiLogRedirecter
 import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.tasks.GroupFileAutoRemover
+import io.github.starwishsama.comet.service.RetrofitLogger
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.server.CometServiceServer
@@ -47,6 +49,7 @@ import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.runBlocking
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.Bot
 import okhttp3.OkHttpClient
@@ -79,12 +82,12 @@ object CometRuntime {
     """
         )
 
-        DataSetup.init()
-
         CometVariables.client = OkHttpClient().newBuilder()
-            .connectTimeout(5, TimeUnit.SECONDS)
+            .callTimeout(3, TimeUnit.SECONDS)
+            .connectTimeout(3, TimeUnit.SECONDS)
+            .readTimeout(3, TimeUnit.SECONDS)
+            .writeTimeout(3, TimeUnit.SECONDS)
             .followRedirects(true)
-            .readTimeout(5, TimeUnit.SECONDS)
             .hostnameVerifier { _, _ -> true }
             .also {
                 if (cfg.proxySwitch) {
@@ -95,62 +98,67 @@ object CometRuntime {
             }
             .addInterceptor(RetrofitLogger())
             .build()
+
+        DataSetup.init()
+
+        CommandManager.setupCommands(
+            arrayOf(
+                AdminCommand,
+                ArkNightCommand,
+                BiliBiliCommand,
+                CheckInCommand,
+                io.github.starwishsama.comet.commands.chats.DebugCommand,
+                DivineCommand,
+                GuessNumberCommand,
+                HelpCommand,
+                InfoCommand,
+                MusicCommand,
+                MuteCommand,
+                UnMuteCommand,
+                PictureSearchCommand,
+                R6SCommand,
+                RConCommand,
+                KickCommand,
+                TwitterCommand,
+                VersionCommand,
+                GroupConfigCommand,
+                RSPCommand,
+                RollCommand,
+                MinecraftCommand,
+                PusherCommand,
+                GithubCommand,
+                DiceCommand,
+                NoAbbrCommand,
+                JikiPediaCommand,
+                KeyWordCommand,
+                // Console Command
+                StopCommand,
+                DebugCommand,
+                io.github.starwishsama.comet.commands.console.AdminCommand,
+                BroadcastCommand
+            )
+        )
+
+        YabapiLogRedirecter.initYabapi()
+
+        logger.info("[命令] 已注册 " + CommandManager.countCommands() + " 个命令")
     }
 
     private fun shutdownTask() {
         logger.info("[Bot] 正在关闭 Bot...")
         DataSetup.saveAllResources()
-        PusherManager.savePushers()
+        PusherManager.stopPushers()
         cometServiceServer?.stop()
+
         TaskUtil.service.shutdown()
+
         CometVariables.rCon?.disconnect()
         CometVariables.miraiLoggerAppender.close()
         CometVariables.loggerAppender.close()
     }
 
     fun setupBot(bot: Bot) {
-        CommandManager.setupCommands(
-            arrayOf(
-                AdminCommand(),
-                ArkNightCommand(),
-                BiliBiliCommand(),
-                CheckInCommand(),
-                ClockInCommand(),
-                io.github.starwishsama.comet.commands.chats.DebugCommand(),
-                DivineCommand(),
-                GuessNumberCommand(),
-                HelpCommand(),
-                InfoCommand(),
-                MusicCommand(),
-                MuteCommand(),
-                UnMuteCommand(),
-                PictureSearchCommand(),
-                R6SCommand(),
-                RConCommand(),
-                KickCommand(),
-                TwitterCommand(),
-                VersionCommand(),
-                GroupConfigCommand(),
-                RSPCommand(),
-                RollCommand(),
-                MinecraftCommand(),
-                PusherCommand(),
-                GithubCommand(),
-                DiceCommand(),
-                PenguinStatCommand(),
-                NoAbbrCommand(),
-                JikiPediaCommand(),
-                // Console Command
-                StopCommand(),
-                DebugCommand(),
-                io.github.starwishsama.comet.commands.console.AdminCommand(),
-                BroadcastCommand()
-            )
-        )
-
-        logger.info("[命令] 已注册 " + CommandManager.countCommands() + " 个命令")
-
-        MessageHandler.startHandler(bot)
+        bot.attachHandler()
 
         /** 监听器 */
         val listeners = arrayOf(
@@ -166,16 +174,20 @@ object CometRuntime {
 
         DataSetup.initPerGroupSetting(bot)
 
-        setupRCon()
+        runCatching {
+            setupRCon()
+        }.onFailure {
+            daemonLogger.warning("无法连接至 rcon 服务器", it)
+        }
 
         runScheduleTasks()
 
-        PusherManager.initPushers(bot)
+        PusherManager.startPushers()
 
         startupServer()
 
         TaskUtil.scheduleAtFixedRate(5, 5, TimeUnit.SECONDS) {
-            NetworkRequestManager.schedule()
+            runBlocking { NetworkRequestManager.schedule() }
         }
 
         logger.info("彗星 Bot 启动成功, 版本 ${BuildConfig.version}, 耗时 ${CometVariables.startTime.getLastingTimeAsString()}")
@@ -188,9 +200,11 @@ object CometRuntime {
         val password = cfg.rConPassword
         if (address != null && password != null && CometVariables.rCon == null) {
             CometVariables.rCon = Rcon(address, cfg.rConPort, password.toByteArray())
+            daemonLogger.info("成功连接至 rcon 服务器")
         }
     }
 
+    @Suppress("HttpUrlsUsage")
     private fun startupServer() {
         if (!cfg.webHookSwitch) {
             return

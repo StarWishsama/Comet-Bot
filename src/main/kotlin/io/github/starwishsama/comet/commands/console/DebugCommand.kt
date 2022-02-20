@@ -23,7 +23,7 @@ import io.github.starwishsama.comet.utils.RuntimeUtil
 import kotlin.time.ExperimentalTime
 
 
-class DebugCommand : ConsoleCommand {
+object DebugCommand : ConsoleCommand {
     @OptIn(ExperimentalTime::class)
     override suspend fun execute(args: List<String>): String {
         if (args.isNotEmpty()) {
@@ -60,7 +60,7 @@ class DebugCommand : ConsoleCommand {
         return ""
     }
 
-    override fun getProps(): CommandProps = CommandProps("debug", mutableListOf(), "", "", UserLevel.CONSOLE)
+    override fun getProps(): CommandProps = CommandProps("debug", mutableListOf(), "", UserLevel.CONSOLE)
 
     override fun getHelp(): String = "请自行查阅代码"
 }

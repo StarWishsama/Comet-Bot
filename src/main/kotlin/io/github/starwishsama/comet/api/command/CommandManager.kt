@@ -69,11 +69,7 @@ object CommandManager {
     }
 
     fun getCommand(cmdPrefix: String): ChatCommand? {
-        val command = commands.parallelStream().filter {
-            isCommandNameEquals(it, cmdPrefix)
-        }.findFirst()
-
-        return if (command.isPresent) command.get() else null
+        return commands.find { isCommandNameEquals(it, cmdPrefix) }
     }
 
     fun getConsoleCommand(cmdPrefix: String): ConsoleCommand? {
@@ -117,8 +113,8 @@ object CommandManager {
                 return true
             }
             props.aliases.isNotEmpty() -> {
-                val aliases = props.aliases.parallelStream().filter { it!!.contentEquals(cmdName) }.findFirst()
-                if (aliases.isPresent) {
+                val aliases = props.aliases.find { it.contentEquals(cmdName) }
+                if (aliases != null) {
                     return true
                 }
             }
@@ -137,8 +133,8 @@ object CommandManager {
                 return true
             }
             props.aliases.isNotEmpty() -> {
-                val name = props.aliases.parallelStream().filter { alias -> alias!!.contentEquals(cmdName) }.findFirst()
-                if (name.isPresent) {
+                val name = props.aliases.find { alias -> alias.contentEquals(cmdName) }
+                if (name != null) {
                     return true
                 }
             }

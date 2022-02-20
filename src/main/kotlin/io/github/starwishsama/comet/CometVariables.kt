@@ -22,11 +22,9 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.HinaLogger
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.CometConfig
-import io.github.starwishsama.comet.objects.gacha.items.ArkNightOperator
 import io.github.starwishsama.comet.objects.wrapper.WrapperElement
 import io.github.starwishsama.comet.service.server.CometServiceServer
 import io.github.starwishsama.comet.utils.FileUtil
@@ -79,18 +77,18 @@ object CometVariables {
         }
     }
 
-    val logger: HinaLogger = HinaLogger("Comet", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+    val logger: HinaLogger = HinaLogger("Comet", logAction = { logAction(it) }, filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
 
     internal val netLogger: HinaLogger by lazy {
-        HinaLogger("CometNet", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+        HinaLogger("CometNet", logAction = { logAction(it) }, filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
     }
 
     internal val daemonLogger: HinaLogger by lazy {
-        HinaLogger("CometService", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+        HinaLogger("CometService", logAction = { logAction(it) }, filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
     }
 
     internal val consoleCommandLogger: HinaLogger by lazy {
-        HinaLogger("CometConsole", logAction = { logAction(it) }, debugMode = cfg.debugMode)
+        HinaLogger("CometConsole", logAction = { logAction(it) }, filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
     }
 
     internal val miraiLogger: HinaLogger by lazy {
@@ -99,7 +97,7 @@ object CometVariables {
             if (::miraiLoggerAppender.isInitialized) {
                 miraiLoggerAppender.appendLog(it)
             }
-        }, debugMode = cfg.debugMode)
+        }, filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
     }
 
     internal val miraiNetLogger: HinaLogger by lazy {
@@ -108,7 +106,7 @@ object CometVariables {
             if (::miraiNetLoggerAppender.isInitialized) {
                 miraiNetLoggerAppender.appendLog(it)
             }
-        }, debugMode = cfg.debugMode)
+        }, filterList = cfg.filterWords, defaultLevel = cfg.logLevel)
     }
 
     val mapper: ObjectMapper = ObjectMapper()
@@ -120,6 +118,8 @@ object CometVariables {
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         // 反序列化时忽略未知参数
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        // Fix GitHub#355
+        .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
         .registerModules(
             JavaTimeModule().also {
                 it.addSerializer(
@@ -150,10 +150,6 @@ object CometVariables {
     internal var rCon: Rcon? = null
 
     internal val cometUsers: MutableMap<Long, CometUser> = ConcurrentHashMap()
-    internal lateinit var localizationManager: LocalizationManager
-
-    /** 明日方舟卡池数据 */
-    internal val arkNight: MutableList<ArkNightOperator> = mutableListOf()
 
     @Volatile
     internal var switch: Boolean = true

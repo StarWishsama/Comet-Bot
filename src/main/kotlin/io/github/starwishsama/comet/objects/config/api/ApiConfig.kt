@@ -19,7 +19,8 @@ import java.util.concurrent.TimeUnit
     JsonSubTypes.Type(value = BiliBiliConfig::class),
     JsonSubTypes.Type(value = R6StatsConfig::class),
     JsonSubTypes.Type(value = TwitterConfig::class),
-    JsonSubTypes.Type(value = SauceNaoConfig::class)
+    JsonSubTypes.Type(value = SauceNaoConfig::class),
+    JsonSubTypes.Type(value = ThirdPartyMusicConfig::class),
 )
 interface ApiConfig {
     val apiName: String

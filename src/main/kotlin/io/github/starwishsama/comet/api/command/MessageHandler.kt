@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -13,6 +13,7 @@ package io.github.starwishsama.comet.api.command
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.command.interfaces.CallbackCommand
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.utils.CometUtil.toChain
@@ -22,10 +23,12 @@ import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import io.github.starwishsama.comet.utils.doFilter
 import io.github.starwishsama.comet.utils.network.NetUtil
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.events.GroupMessageEvent
+import net.mamoe.mirai.event.events.GroupTempMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -41,20 +44,25 @@ import java.time.LocalDateTime
  * @author StarWishsama
  */
 object MessageHandler {
-    fun startHandler(bot: Bot) {
-        bot.eventChannel.subscribeMessages {
+    fun Bot.attachHandler() {
+        this.eventChannel.subscribeMessages {
             always {
+                // https://github.com/mamoe/mirai/issues/1850
+                if (this is GroupTempMessageEvent) {
+                    return@always
+                }
+
                 val executedTime = LocalDateTime.now()
                 if (sender.id != 80000000L) {
                     if (this is GroupMessageEvent && group.isBotMuted) return@always
 
-                    val result = dispatchCommand(this)
+                    val result = dispatchCommand(this@always)
 
                     try {
                         val filtered = result.msg.doFilter()
 
                         if (result.status.isOk() && !filtered.isContentEmpty()) {
-                            val receipt = this.subject.sendMessage(filtered)
+                            val receipt = this@always.subject.sendMessage(filtered)
 
                             if (result.cmd is CallbackCommand) {
                                 result.cmd.handleReceipt(receipt)
@@ -123,10 +131,10 @@ object MessageHandler {
                 }
 
                 if (!useStatus) {
-                    return if (cmd.props.consumerType == CommandExecuteConsumerType.POINT) {
-                        val response = CometVariables.localizationManager.getLocalizationText("message.no-enough-point")
-                            .replace("%point%", user.checkInPoint.fixDisplay())
-                            .replace("%cost%", cmd.props.consumePoint.fixDisplay())
+                    return if (cmd.props.consumerType == CommandExecuteConsumerType.COIN) {
+                        val response = LocalizationManager.getLocalizationText("message.no-enough-point")
+                            .replace("%point%", user.coin.fixDisplay())
+                            .replace("%cost%", cmd.props.cost.fixDisplay())
                         ExecutedResult(response.toChain(), cmd, CommandStatus.ValidateFailed())
                     } else {
                         ExecutedResult(EmptyMessageChain, cmd, CommandStatus.ValidateFailed())
@@ -146,14 +154,15 @@ object MessageHandler {
 
                     val status: CommandStatus
 
-                    /** 检查是否有权限执行命令 */
-                    val result: MessageChain = if (cmd.hasPermission(user, event)) {
-                        status = CommandStatus.Success()
-                        cmd.execute(event, splitMessage, user)
-                    } else {
-                        status = CommandStatus.NoPermission()
-                        CometVariables.localizationManager.getLocalizationText("message.no-permission").toChain()
-                    }
+                    /** 检查是否有执行命令的基本权限 */
+                    val result: MessageChain =
+                        if (user.compareLevel(cmd.props.level) || user.hasPermission(cmd.props.permissionNodeName)) {
+                            status = CommandStatus.Success()
+                            cmd.execute(event, splitMessage, user)
+                        } else {
+                            status = CommandStatus.NoPermission()
+                            LocalizationManager.getLocalizationText("message.no-permission").toChain()
+                        }
 
                     return ExecutedResult(result, cmd, status)
                 } else {
@@ -164,6 +173,10 @@ object MessageHandler {
                     CometVariables.logger.warning("执行网络操作失败: ", e)
                     ExecutedResult("Bot > 在执行网络操作时连接超时: ${e.message ?: ""}".convertToChain(), cmd)
                 } else {
+                    if (e is CancellationException) {
+                        throw e
+                    }
+
                     CometVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message}, 发送者: $senderId", e)
                     if (user.isBotOwner()) {
                         ExecutedResult(
@@ -195,7 +208,9 @@ object MessageHandler {
             }
         } catch (t: Throwable) {
             CometVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $content", t)
-            return ""
+            return "".also { if (t is CancellationException) {
+                throw t
+            }}
         }
         return ""
     }
@@ -217,11 +232,11 @@ object MessageHandler {
 
         return when (props.consumerType) {
             CommandExecuteConsumerType.COOLDOWN -> {
-                user.checkCoolDown(coolDown = props.consumePoint.toInt())
+                user.isNoCoolDown(coolDown = props.cost.toInt())
             }
-            CommandExecuteConsumerType.POINT -> {
-                if (user.checkInPoint >= props.consumePoint) {
-                    user.checkInPoint -= props.consumePoint
+            CommandExecuteConsumerType.COIN -> {
+                if (user.coin >= props.cost) {
+                    user.coin -= props.cost
                     true
                 } else {
                     false
@@ -245,7 +260,7 @@ object MessageHandler {
         class PassToSession : CommandStatus("移交会话处理", false)
         class NotACommand : CommandStatus("非命令", false)
         class CometIsClose : CommandStatus("Comet 已关闭", false)
-        class ValidateFailed : CommandStatus("冷却/无积分", true)
+        class ValidateFailed : CommandStatus("冷却/无硬币", true)
 
         fun isOk(): Boolean = this.isSuccessful
     }

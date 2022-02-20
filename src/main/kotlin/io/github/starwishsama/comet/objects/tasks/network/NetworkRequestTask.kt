@@ -15,4 +15,6 @@ abstract class NetworkRequestTask {
     abstract val param: String
 
     abstract fun callback(result: Any?)
+
+    abstract fun onFailure(t: Throwable?)
 }

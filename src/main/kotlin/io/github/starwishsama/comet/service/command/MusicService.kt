@@ -40,47 +40,58 @@ object MusicService {
     }
 
     fun handleMusicSearch(name: String, subject: Contact?): MessageChain {
-        return when (CometVariables.cfg.musicApi) {
-            MusicApiType.NETEASE -> handleNetEaseMusic(name, subject)
-            MusicApiType.QQ -> handleQQMusic(name, subject)
-        }
+        return kotlin.runCatching {
+            when (CometVariables.cfg.musicApi) {
+                MusicApiType.NETEASE -> handleNetEaseMusic(name, subject)
+                MusicApiType.QQ -> handleQQMusic(name, subject)
+            }
+        }.onFailure {
+            CometVariables.daemonLogger.warning("点歌时出现了意外", it)
+            return "❌ 点歌系统开小差了, 稍后再试试吧".toChain()
+        }.onSuccess {
+            return it
+        }.getOrDefault("❌ 点歌系统开小差了, 稍后再试试吧".toChain())
     }
 
     fun handleNetEaseMusic(name: String, subject: Contact?): MessageChain {
-        try {
+        return kotlin.runCatching {
             val result = ThirdPartyMusicApi.searchNetEaseMusic(name)
 
             if (result.isEmpty()) {
                 return "❌ 找不到你想搜索的音乐".toChain()
             }
 
-            return if (plainText) {
+            if (plainText) {
                 result[0].toMessageWrapper().toMessageChain(subject)
             } else {
                 result[0].toMusicShare(MusicKind.NeteaseCloudMusic)
             }
-        } catch (e: Exception) {
-            CometVariables.daemonLogger.warning("点歌时出现了意外", e)
+        }.onFailure {
+            CometVariables.daemonLogger.warning("点歌时出现了意外", it)
             return "❌ 点歌系统开小差了, 稍后再试试吧".toChain()
-        }
+        }.onSuccess {
+            return it
+        }.getOrDefault("❌ 点歌系统开小差了, 稍后再试试吧".toChain())
     }
 
     fun handleQQMusic(name: String, subject: Contact?): MessageChain {
-        try {
+        return kotlin.runCatching {
             val result = ThirdPartyMusicApi.searchQQMusic(name)
 
             if (result.isEmpty()) {
                 return "❌ 找不到你想搜索的音乐".toChain()
             }
 
-            return if (plainText) {
+            if (plainText) {
                 result[0].toMessageWrapper().toMessageChain(subject)
             } else {
                 result[0].toMusicShare(MusicKind.QQMusic)
             }
-        } catch (e: Exception) {
-            CometVariables.daemonLogger.warning("点歌时出现了意外", e)
+        }.onFailure {
+            CometVariables.daemonLogger.warning("点歌时出现了意外", it)
             return "❌ 点歌系统开小差了, 稍后再试试吧".toChain()
-        }
+        }.onSuccess {
+            return it
+        }.getOrDefault("❌ 点歌系统开小差了, 稍后再试试吧".toChain())
     }
 }

@@ -12,6 +12,7 @@ package io.github.starwishsama.comet.commands.chats
 
 import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
+import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
@@ -24,8 +25,12 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-class UnMuteCommand : ChatCommand {
+object UnMuteCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
+        if (!hasPermission(user, event)) {
+            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
+        }
+
         return if (event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
                 val at = CometUtil.parseAtAsBotUser(event, args[0])
@@ -44,18 +49,18 @@ class UnMuteCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("unmute", arrayListOf("jj", "解禁", "解除禁言"), "解除禁言", "nbot.commands.unmute", UserLevel.USER)
+        CommandProps("unmute", arrayListOf("jj", "解禁", "解除禁言"), "解除禁言", UserLevel.USER)
 
     override fun getHelp(): String = """
         /unmute [@/QQ] 解除禁言
     """.trimIndent()
 
-    override fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
+    private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
         if (e is GroupMessageEvent) {
             if (e.sender.permission >= MemberPermission.ADMINISTRATOR) return true
             val cfg = GroupConfigManager.getConfigOrNew(e.group.id)
             if (cfg.isHelper(e.sender.id)) return true
         }
-        return user.hasPermission(props.permission)
+        return user.hasPermission(props.permissionNodeName)
     }
 }

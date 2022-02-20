@@ -15,7 +15,6 @@ import io.github.starwishsama.comet.CometVariables.cfg
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.file.DataFiles.allDataFile
-import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.logger.LoggerInstances
 import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
@@ -61,21 +60,20 @@ object DataSetup {
     private fun load() {
         cfg = Default.decodeFromString(CometConfig.serializer(), Config.file.getContext())
 
-        CometVariables.localizationManager = LocalizationManager()
-
-        LoggerInstances.instances.forEach {
-            it.debugMode = cfg.debugMode
+        run {
+            TaskUtil.service.maximumPoolSize = cfg.maxPoolSize
+            LoggerInstances.instances.forEach { it.defaultLevel = cfg.logLevel }
         }
 
-        if (CompatibilityService.checkUserData(UserConfig.file)) {
+        FileUtil.initResourceFile()
+
+        if (CompatibilityService.upgradeUserData(UserConfig.file)) {
             CometVariables.cometUsers.putAll(UserConfig.file.parseAsClass())
         }
 
         daemonLogger.info("已加载了 ${CometVariables.cometUsers.size} 个用户数据.")
 
-        FileUtil.initResourceFile()
-
-        GachaService.loadGachaData(ArkNightData.file)
+        GachaService.loadGachaInstance()
 
         ApiManager.loadAllApiConfig()
 

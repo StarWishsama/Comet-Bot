@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.UnDisableableCommand
 import io.github.starwishsama.comet.file.DataSetup
+import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.SessionHandler
@@ -33,7 +34,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import java.io.IOException
 import java.util.concurrent.ThreadPoolExecutor
 
-class DebugCommand : ChatCommand, UnDisableableCommand {
+object DebugCommand : ChatCommand, UnDisableableCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isNotEmpty()) {
             when (args[0]) {
@@ -116,8 +117,7 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("debug", mutableListOf(), "Debug", "nbot.commands.debug", UserLevel.ADMIN)
-
+        CommandProps("debug", mutableListOf(), "Debug", UserLevel.ADMIN)
 
     override fun getHelp(): String = "调试命令会随时变动, 请自行查阅代码"
 
@@ -125,5 +125,5 @@ class DebugCommand : ChatCommand, UnDisableableCommand {
         get() = true
 
     override val canRegister: () -> Boolean
-        get() = { CometVariables.cfg.debugMode }
+        get() = { CometVariables.cfg.logLevel == HinaLogLevel.Debug }
 }

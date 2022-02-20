@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -16,7 +16,8 @@ import io.github.starwishsama.comet.api.thirdparty.github.GithubEventHandler
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.objects.config.SecretStatus
 import io.github.starwishsama.comet.service.command.GitHubService
-import io.github.starwishsama.comet.service.pusher.instances.GithubPusher
+import io.github.starwishsama.comet.service.pusher.pushers.GithubPusher
+import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.serialize.isUsable
 import io.ktor.application.*
 import io.ktor.http.*
@@ -61,7 +62,7 @@ object GithubWebHookHandler {
     suspend fun handle(call: ApplicationCall) {
         try {
             CometVariables.netLogger.debug("有新连接 ${call.request.httpMethod} - ${call.request.uri}")
-            CometVariables.netLogger.debug("请求 Headers ${call.request.headers}")
+            CometVariables.netLogger.debug("请求 Headers ${buildString { call.request.headers.forEach { k, v -> append("$k=$v") } }}}")
 
             // Get information from header to identity whether the request is from GitHub.
             if (!checkOrigin(call)) {
@@ -112,7 +113,7 @@ object GithubWebHookHandler {
                     return
                 }
             } catch (e: IOException) {
-                CometVariables.netLogger.log(HinaLogLevel.Warn, "推送 WebHook 消息失败", e, prefix = "WebHook")
+                FileUtil.createErrorReportFile("推送 WebHook 消息失败", "Github Webhook", e, payload, e.message ?: "")
                 hasError = true
             }
 

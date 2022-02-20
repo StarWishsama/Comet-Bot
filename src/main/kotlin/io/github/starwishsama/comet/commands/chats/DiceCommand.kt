@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -21,22 +21,22 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import java.util.regex.Pattern
 
-class DiceCommand : ChatCommand {
+object DiceCommand : ChatCommand {
     // 骰子正则表达式
-    private val pattern = Pattern.compile("""(\d{1,2})([dD])(\d{1,4})""")
+    private val dicePattern = Pattern.compile("""(\d{1,2})([dD])(\d{1,4})""")
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             return getHelp().toChain()
         }
 
-        val input = parseInput(args[0])
+        val (count, size) = parseInput(args[0])
 
-        if (input.first < 1 || input.second < 1) {
+        if (count < 1 || size < 1) {
             return "骰子格式错误! 格式示例: 1d100".toChain()
         }
 
-        val result = doDice(input.first, input.second)
+        val result = doDice(count, size)
 
         return "结果: ${args[0]}=${result.convertToString()}".toChain()
     }
@@ -46,7 +46,7 @@ class DiceCommand : ChatCommand {
             "dice",
             listOf("tz", "骰子"),
             "投骰子",
-            "nbot.commands.dice",
+
             UserLevel.USER
         )
 
@@ -58,9 +58,9 @@ class DiceCommand : ChatCommand {
     """.trimIndent()
 
     private fun parseInput(input: String): Pair<Int, Int> {
-        val matcher = pattern.matcher(input)
+        val matcher = dicePattern.matcher(input)
 
-        if (!Pattern.matches(pattern.pattern(), input)) {
+        if (!Pattern.matches(dicePattern.pattern(), input)) {
             return Pair(0, 0)
         }
 

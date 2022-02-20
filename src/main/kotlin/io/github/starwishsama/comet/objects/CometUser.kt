@@ -10,46 +10,50 @@
 
 package io.github.starwishsama.comet.objects
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonIgnore
 import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.managers.PermissionManager
 import io.github.starwishsama.comet.objects.enums.UserLevel
+import io.github.starwishsama.comet.objects.permission.CometPermission
 import java.time.LocalDateTime
+import java.util.*
 
 data class CometUser(
-    @JsonProperty("userQQ")
     val id: Long,
-    var lastCheckInTime: LocalDateTime = LocalDateTime.now().minusDays(1),
-    var checkInPoint: Double = 0.0,
-    var checkInTime: Int = 0,
+    val uuid: UUID,
+    var checkInDateTime: LocalDateTime = LocalDateTime.now().minusDays(1),
+    var coin: Double = 0.0,
+    var checkInCount: Int = 0,
     var r6sAccount: String = "",
     var level: UserLevel = UserLevel.USER,
-    var checkInGroup: Long = 0,
-    var lastExecuteTime: Long = -1,
-    private val permissions: MutableSet<String> = mutableSetOf(),
+    var triggerCommandTime: Long = -1,
+    private val permissions: MutableSet<CometPermission> = mutableSetOf(),
 ) {
     fun addPoint(point: Number) {
-        checkInPoint += point.toDouble()
+        coin += point.toDouble()
     }
 
     fun consumePoint(point: Number) {
-        checkInPoint -= point.toDouble()
+        coin -= point.toDouble()
     }
 
     fun plusDay() {
-        checkInTime++
+        checkInCount++
     }
 
     fun resetDay() {
-        checkInTime = 1
+        checkInCount = 1
     }
 
-    fun hasPermission(permission: String): Boolean {
-        return permissions.contains(permission) || isBotOwner()
+    fun hasPermission(nodeName: String): Boolean {
+        val target = PermissionManager.getPermission(nodeName) ?: return true
+
+        return target.defaultLevel < level || permissions.find { it.name == target.name } != null
     }
 
     fun getPermissions(): String = buildString {
         this@CometUser.permissions.forEach {
-            append("$it ")
+            append("${it.name} ")
         }
     }.trim()
 
@@ -61,20 +65,22 @@ data class CometUser(
         return this.level >= cmdLevel
     }
 
+    @JsonIgnore
     fun isBotAdmin(): Boolean {
         return level >= UserLevel.ADMIN || isBotOwner()
     }
 
+    @JsonIgnore
     fun isBotOwner(): Boolean {
         return level == UserLevel.OWNER
     }
 
-    fun addPermission(permission: String) {
-        permissions.add(permission)
+    fun addPermission(nodeName: String) {
+        permissions.add(PermissionManager.getPermission(nodeName) ?: return)
     }
 
-    fun removePermission(permission: String) {
-        permissions.remove(permission)
+    fun removePermission(nodeName: String) {
+        permissions.remove(PermissionManager.getPermission(nodeName) ?: return)
     }
 
     /**
@@ -83,9 +89,10 @@ data class CometUser(
      * @author StarWishsama
      * @return 是否签到
      */
+    @JsonIgnore
     fun isChecked(): Boolean {
         val now = LocalDateTime.now()
-        val period = lastCheckInTime.toLocalDate().until(now.toLocalDate())
+        val period = checkInDateTime.toLocalDate().until(now.toLocalDate())
 
         return period.days == 0
     }
@@ -98,29 +105,31 @@ data class CometUser(
      *
      * @return 是否处于冷却状态
      */
-    fun checkCoolDown(silent: Boolean = false, coolDown: Int = CometVariables.cfg.coolDownTime): Boolean {
+    fun isNoCoolDown(silent: Boolean = false, coolDown: Int = CometVariables.cfg.coolDownTime): Boolean {
         val currentTime = System.currentTimeMillis()
+        val period = currentTime - triggerCommandTime
 
-        return if (lastExecuteTime < 0) {
-            if (!silent) lastExecuteTime = currentTime
-            true
-        } else {
-            val hasCoolDown = currentTime - lastExecuteTime >= coolDown * 1000
-            if (!silent) lastExecuteTime = currentTime
-            hasCoolDown
+        if (!silent) {
+            triggerCommandTime = currentTime
         }
+
+        return triggerCommandTime < 0 || period >= coolDown * 1000
     }
 
     companion object {
         fun quickRegister(id: Long): CometUser {
             CometVariables.cometUsers[id].apply {
-                val register = CometUser(id)
+                val register = CometUser(id, UUID.randomUUID())
                 return this ?: register.also { CometVariables.cometUsers.putIfAbsent(id, register) }
             }
         }
 
         fun getUser(id: Long): CometUser? {
             return CometVariables.cometUsers[id]
+        }
+
+        fun getUser(uuid: UUID): CometUser? {
+            return CometVariables.cometUsers.entries.find { it.value.uuid == uuid }?.value
         }
 
         fun getUserOrRegister(qq: Long): CometUser = getUser(qq) ?: quickRegister(qq)

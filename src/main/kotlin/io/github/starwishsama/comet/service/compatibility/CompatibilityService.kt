@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 StarWishsama.
+ * Copyright (c) 2019-2022 StarWishsama.
  *
  * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
  *  Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
@@ -10,22 +10,30 @@
 
 package io.github.starwishsama.comet.service.compatibility
 
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.CometVariables.mapper
-import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
 import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.managers.GroupConfigManager
+import io.github.starwishsama.comet.managers.PermissionManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
+import io.github.starwishsama.comet.objects.permission.CometPermission
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
+import io.github.starwishsama.comet.service.compatibility.data.OldCometUser
 import io.github.starwishsama.comet.service.compatibility.data.OldGroupConfig
 import io.github.starwishsama.comet.utils.copyAndRename
+import io.github.starwishsama.comet.utils.parseAsClass
 import io.github.starwishsama.comet.utils.serialize.isUsable
+import kotlinx.coroutines.runBlocking
 import java.io.File
+import java.util.*
 import java.util.stream.Collectors
+
 
 /**
  * [CompatibilityService]
@@ -36,6 +44,87 @@ import java.util.stream.Collectors
  * @see [PerGroupConfig]
  */
 object CompatibilityService {
+    fun upgradeUserData(userData: File): Boolean {
+        val userTree = mapper.readTree(userData)
+
+        // Update point to coin
+        if (userTree.all { !it.isNull && it?.get("checkInPoint")?.isDouble == true }) {
+            userTree.fields().forEach { (_, value) ->
+                if (!value.has("coin")) {
+                    (value as ObjectNode).put("coin", value["checkInPoint"].asDouble())
+                }
+            }
+
+            mapper.writeValue(userData, userTree)
+            daemonLogger.log(HinaLogLevel.Info, "已更新用户数据积分 -> 硬币", prefix = "兼容性")
+        }
+
+        if (userTree.all { !it.isNull && it.has("uuid") && !it["uuid"].isNull }) {
+            if (userTree.any { !it.isNull && it.has("uuid") && !it["uuid"].isTextual }) {
+                userTree.fields().forEach { (_, value) ->
+                    if (!value.has("uuid") || !value["uuid"].isTextual) {
+                        (value as ObjectNode).put("uuid", UUID.randomUUID().toString())
+                    }
+                }
+
+                mapper.writeValue(userData, userTree)
+                daemonLogger.log(HinaLogLevel.Info, "已修复用户数据 UUID", prefix = "兼容性")
+            }
+
+            // Fix user id missing, GitHub#355
+            if (userTree.any { !it.isNull && it.has("id") && (it["id"].isNull || it["id"].asLong() == 0L) }) {
+                userTree.fields().forEach { (key, value) ->
+                    if (!value.has("id") || value?.get("id")?.asLong() == 0L) {
+                        (value as ObjectNode).put("id", key.toLong())
+                    }
+                }
+
+                mapper.writeValue(userData, userTree)
+                daemonLogger.log(HinaLogLevel.Info, "已修复用户数据 ID", prefix = "兼容性")
+            }
+
+            return true
+        }
+
+        val oldUser: MutableMap<Long, OldCometUser>
+
+        try {
+            daemonLogger.log(HinaLogLevel.Info, "已检测到旧版本配置 ${userData.name}, 正在迁移...", prefix = "兼容性")
+
+            oldUser = userData.parseAsClass()
+        } catch (e: Exception) {
+            daemonLogger.log(HinaLogLevel.Warn, "转换旧版本配置 ${userData.name} 数据失败!", e, prefix = "兼容性")
+            return false
+        }
+
+        val newUser = mutableMapOf<Long, CometUser>()
+
+        oldUser.forEach { (id, old) ->
+            val permissions = mutableSetOf<CometPermission>()
+
+            if (old.permissions.isNotEmpty()) {
+                old.permissions.forEach permission@{
+                    permissions.add(PermissionManager.getPermission(it) ?: return@permission)
+                }
+            }
+
+            newUser[id] = CometUser(
+                old.id,
+                UUID.randomUUID(),
+                old.lastCheckInTime,
+                old.checkInPoint,
+                old.checkInTime,
+                old.r6sAccount,
+                old.level,
+                old.lastExecuteTime,
+                permissions
+            )
+        }
+
+        CometVariables.cometUsers.putAll(newUser)
+        return false
+    }
+
     fun checkConfigFile(cfgFile: File): Boolean {
         val tree = mapper.readTree(cfgFile)
         try {
@@ -61,8 +150,8 @@ object CompatibilityService {
             biliUsers.add(
                 BiliBiliUser(
                     it.toString(),
-                    DynamicApi.getUserNameByMid(it),
-                    LiveApi.getLiveInfo(it)?.data?.roomId ?: -1
+                    UserApi.getUserNameByMid(it.toInt()),
+                    runBlocking { LiveApi.getLiveInfo(it)?.roomId} ?: -1
                 )
             )
         }
@@ -76,7 +165,6 @@ object CompatibilityService {
             this.twitterPushEnabled = cfg.twitterPushEnabled
             this.biliPushEnabled = cfg.biliPushEnabled
             this.canRepeat = cfg.doRepeat
-            this.groupFilterWords.addAll(cfg.groupFilterWords)
         }
 
         GroupConfigManager.addConfig(new)
@@ -120,7 +208,7 @@ object CompatibilityService {
             return current
         }
         for (du in duplicatedUser) {
-            if (du.checkInPoint > current.checkInPoint || current.checkInPoint == 0.0) {
+            if (du.coin > current.coin || current.coin == 0.0) {
                 return du
             }
         }

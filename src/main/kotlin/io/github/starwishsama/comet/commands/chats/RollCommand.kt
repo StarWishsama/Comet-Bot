@@ -34,7 +34,7 @@ import net.mamoe.mirai.message.data.messageChainOf
 import java.util.concurrent.TimeUnit
 
 
-class RollCommand : ChatCommand, ConversationCommand {
+object RollCommand : ChatCommand, ConversationCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (event !is GroupMessageEvent) return "本命令仅限群聊使用".toChain()
 
@@ -92,7 +92,7 @@ class RollCommand : ChatCommand, ConversationCommand {
         "roll",
         arrayListOf("rl", "抽奖"),
         "roll东西",
-        "nbot.commands.roll",
+
         UserLevel.USER
     )
 

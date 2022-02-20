@@ -18,12 +18,14 @@ import io.github.starwishsama.comet.utils.CometUtil.toChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.MinecraftUtil
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.time.withTimeout
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
-import java.io.IOException
+import java.time.Duration
 
-class MinecraftCommand : ChatCommand {
+object MinecraftCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
 
         if (args.isEmpty()) return getHelp().convertToChain()
@@ -59,10 +61,10 @@ class MinecraftCommand : ChatCommand {
 
     override val props: CommandProps = CommandProps(
         "mc",
-        listOf("我的世界", "mcquery", "mq", "服务器", "服务器查询", "mccx"),
+        listOf("mcquery", "mq", "mccx", "minecraft"),
         "查询我的世界服务器信息",
-        "nbot.commands.mc",
-        UserLevel.USER
+        UserLevel.USER,
+        cost = 5.0
     )
 
     override fun getHelp(): String = """
@@ -70,28 +72,34 @@ class MinecraftCommand : ChatCommand {
         /mc [服务器地址] 查询服务器信息 (使用 SRV)
     """.trimIndent()
 
-    private fun query(ip: String, port: Int?, subject: Contact): MessageChain {
-        return try {
-            if (port == null) {
-                return "输入的端口号不合法.".toChain()
-            }
+    private suspend fun query(ip: String, port: Int?, subject: Contact): MessageChain {
+        return runCatching<MessageChain> {
+            return withTimeout(Duration.ofSeconds(5)) {
+                return@withTimeout runCatching<MessageChain> handleQuery@ {
+                    if (port == null) {
+                        return@handleQuery "输入的端口号不合法.".toChain()
+                    }
 
-            val javaResult = MinecraftUtil.javaQuery(ip, port)
-            val javaWrapper = javaResult.convertToWrapper()
+                    val javaResult = MinecraftUtil.javaQuery(ip, port)
+                    val javaWrapper = javaResult.convertToWrapper()
 
-            return if (!javaWrapper.isEmpty()) {
-                javaWrapper.toMessageChain(subject)
-            } else {
-                val bedrockResult = MinecraftUtil.bedrockQuery(ip, port)
-                val bedrockWrapper = bedrockResult.convertToWrapper()
-                if (!bedrockWrapper.isEmpty()) {
-                    bedrockResult.convertToWrapper().toMessageChain(subject)
-                } else {
-                    "查询失败, 服务器可能不在线, 请稍后再试.".toChain()
-                }
+                    return@handleQuery if (!javaWrapper.isEmpty()) {
+                        javaWrapper.toMessageChain(subject)
+                    } else {
+                        val bedrockResult = MinecraftUtil.bedrockQuery(ip, port)
+                        val bedrockWrapper = bedrockResult.convertToWrapper()
+                        if (!bedrockWrapper.isEmpty()) {
+                            bedrockResult.convertToWrapper().toMessageChain(subject)
+                        } else {
+                            "查询失败, 服务器可能不在线, 请稍后再试.".toChain()
+                        }
+                    }
+                }.getOrElse { "查询失败, 提供的地址不正确或服务器不在线, 请稍后再试.".toChain() }
             }
-        } catch (e: IOException) {
-            "查询失败, 服务器可能不在线, 请稍后再试.".toChain()
-        }
+        }.onFailure {
+            if (it is TimeoutCancellationException) {
+                return "连接至服务器超时, 请稍后再试".toChain()
+            }
+        }.getOrElse { "查询失败, 提供的地址不正确或服务器不在线, 请稍后再试.".toChain() }
     }
 }

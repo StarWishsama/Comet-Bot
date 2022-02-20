@@ -21,19 +21,19 @@ import net.mamoe.mirai.message.data.MessageChain
 /**
  * [CheckInCommand]
  *
- * 签到命令, 可以获得积分
+ * 签到命令, 可以获得硬币
  *
  * @author StarWishsama
  * @author StivenDing
  */
 
-class CheckInCommand : ChatCommand {
+object CheckInCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return handleCheckIn(event, user)
     }
 
     override val props: CommandProps =
-        CommandProps("clock", arrayListOf("签到", "qd"), "签到命令", "nbot.commands.clock", UserLevel.USER)
+        CommandProps("clock", arrayListOf("签到", "qd"), "签到命令", UserLevel.USER)
 
     override fun getHelp(): String = "/qd 签到"
 }

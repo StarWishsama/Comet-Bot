@@ -21,7 +21,7 @@ import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-class HelpCommand : ChatCommand {
+object HelpCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             val sb = buildString {
@@ -46,7 +46,7 @@ class HelpCommand : ChatCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("help", arrayListOf("?", "帮助", "菜单"), "帮助命令", "nbot.commands.help", UserLevel.USER)
+        CommandProps("help", arrayListOf("?", "帮助", "菜单"), "帮助命令", UserLevel.USER)
 
     // 它自己就是帮助命令 不需要再帮了
     override fun getHelp(): String = ""

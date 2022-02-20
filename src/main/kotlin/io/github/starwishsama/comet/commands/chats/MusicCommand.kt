@@ -21,8 +21,7 @@ import io.github.starwishsama.comet.utils.CometUtil.toChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
-class MusicCommand : ChatCommand {
-
+object MusicCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             return getHelp().toChain()
@@ -55,9 +54,9 @@ class MusicCommand : ChatCommand {
             "music",
             arrayListOf("dg", "点歌", "歌"),
             "点歌命令",
-            "nbot.commands.music",
+
             UserLevel.USER,
-            consumePoint = 5.0
+            cost = 5.0
         )
 
     override fun getHelp(): String = """

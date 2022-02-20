@@ -29,20 +29,16 @@ object AutoReplyListener : INListener {
 
             val user = CometUser.getUserOrRegister(sender.id)
 
-            if (!user.checkCoolDown(true)) {
-                return
-            }
-
             val messageContent = message.contentToString()
 
             cfg.keyWordReply.forEach {
+                if (it.keyWord.isEmpty() || it.reply.isEmpty()) {
+                    return
+                }
 
-                if (it.keyWords.isEmpty()) return
-
-                it.keyWords.forEach { keyWord ->
-                    if (messageContent.contains(keyWord)) {
+                if (messageContent.matches(it.keyWord.toRegex())) {
+                    if (user.isNoCoolDown()) {
                         runBlocking { subject.sendMessage(message.quote() + it.reply.toMessageChain(subject)) }
-                        return
                     }
                 }
             }

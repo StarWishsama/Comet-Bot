@@ -10,14 +10,13 @@
 
 package io.github.starwishsama.comet.service.gacha
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.file.ArkNightData
+import io.github.starwishsama.comet.api.gacha.impl.ArkNightInstance
 import io.github.starwishsama.comet.objects.gacha.custom.CustomPool
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.GachaPool
-import io.github.starwishsama.comet.utils.*
-import io.github.starwishsama.comet.utils.math.MathUtil
+import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.getContext
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import net.mamoe.yamlkt.Yaml.Default
@@ -28,25 +27,19 @@ import java.util.stream.Collectors
 // FIXME: Refactor to unified variety type of gacha pool
 object GachaService {
     val gachaPools = mutableSetOf<GachaPool>()
-    private var arkNightUsable = true
-    private var isDownloading = false
     private val poolPath = FileUtil.getChildFolder("gacha")
 
     private val yamlFilePattern = Regex(".y[a]?ml")
 
-    fun loadGachaData(arkNight: File) {
-        loadArkNightData(arkNight)
-
-        if (arkNightUsable) {
-            loadDefaultArkNightData()
-        }
+    fun loadGachaInstance() {
+        ArkNightInstance.init()
     }
 
     fun loadAllPools() {
         gachaPools.clear()
 
         // 载入默认卡池
-        if (arkNightUsable) {
+        if (ArkNightInstance.isUsable()) {
             gachaPools.add(ArkNightPool())
         }
 
@@ -59,7 +52,6 @@ object GachaService {
             addPoolFromFile(it)
         }
 
-        // Unreachable
         CometVariables.daemonLogger.info("成功载入了 ${gachaPools.size - 1} 个自定义卡池!")
     }
 
@@ -73,8 +65,9 @@ object GachaService {
 
         return when (gachaPool.gameType) {
             CustomPool.GameType.ARKNIGHT -> {
-                parseArkNightPool(gachaPool).apply { gachaPools.add(this) }
+                ArkNightInstance.parseCustomPool(gachaPool).apply { gachaPools.add(this) }
             }
+            else -> null
         }
     }
 
@@ -102,110 +95,5 @@ object GachaService {
         } catch (e: SerializationException) {
             FileUtil.createErrorReportFile("解析卡池信息失败", "gacha", e, poolFile.name, e.message ?: "")
         }
-    }
-
-    fun isArkNightUsable(): Boolean {
-        return arkNightUsable
-    }
-
-    private fun parseArkNightPool(customPool: CustomPool): ArkNightPool {
-        val pool = ArkNightPool(
-            customPool.poolName,
-            customPool.displayPoolName,
-            customPool.poolDescription
-        ) {
-            (GachaUtil.hasOperator(this.name) || customPool.modifiedGachaItems.stream().filter { it.name == this.name }
-                .findAny().isPresent) &&
-                    (if (customPool.condition.isNotEmpty()) !customPool.condition.contains(obtain) else true)
-        }
-
-        customPool.modifiedGachaItems.forEach { item ->
-            val result = pool.poolItems.stream().filter { it.name == item.name }.findAny()
-
-            result.ifPresent {
-                if (item.isHidden) {
-                    pool.poolItems.remove(it)
-                    return@ifPresent
-                }
-
-                if (item.probability > 0) {
-                    if (item.weight <= 1) {
-                        pool.highProbabilityItems[it] = item.probability
-                    } else {
-                        pool.highProbabilityItems[it] = MathUtil.calculateWeight(
-                            pool.poolItems.size,
-                            pool.poolItems.filter { poolItem -> poolItem.rare == result.get().rare }.size,
-                            item.weight
-                        )
-                    }
-                }
-            }.also {
-                if (!result.isPresent) {
-                    CometVariables.daemonLogger.warning("名为 ${item.name} 的抽卡物品不存在于游戏数据中")
-                }
-            }
-        }
-
-        return pool
-    }
-
-    fun downloadArkNightData() {
-        isDownloading = true
-
-        try {
-            GachaUtil.arkNightDataCheck(ArkNightData.file)
-        } catch (e: IOException) {
-            CometVariables.daemonLogger.warning("解析明日方舟游戏数据失败, ${e.message}\n注意: 数据来源于 Github, 国内用户无法下载请自行下载替换\n替换位置: ./res/arkNights.json\n链接: ${GachaUtil.arkNightData}")
-        } finally {
-            isDownloading = false
-        }
-    }
-
-    private fun loadArkNightData(data: File) {
-        if (data.exists()) {
-            CometVariables.mapper.readTree(data).elements().forEach { t ->
-                CometVariables.arkNight.add(CometVariables.mapper.readValue(t.traverse()))
-            }
-
-            CometVariables.daemonLogger.info("成功载入明日方舟游戏数据, 共 ${CometVariables.arkNight.size} 个干员")
-            if (CometVariables.cfg.arkDrawUseImage) {
-                if (System.getProperty("java.awt.headless") != "true" && RuntimeUtil.getOsName().lowercase()
-                        .contains("linux")
-                ) {
-                    CometVariables.daemonLogger.info("检测到 Linux 系统, 正在启用无头模式")
-                    System.setProperty("java.awt.headless", "true")
-                }
-
-                TaskUtil.schedule {
-                    GachaUtil.checkArkNightImage()
-                }
-            }
-        } else {
-            CometVariables.daemonLogger.info("未检测到明日方舟游戏数据, 抽卡模拟器将无法使用")
-            arkNightUsable = false
-        }
-    }
-
-    private fun loadDefaultArkNightData() {
-        val default = File(FileUtil.getResourceFolder(), "default_arknight.json")
-
-        if (!default.exists()) {
-            CometVariables.daemonLogger.warning("无法加载默认明日方舟数据: ${default.name} 不存在")
-            return
-        }
-
-        val node = CometVariables.mapper.readTree(default)
-
-        node.forEach {
-            it.forEach { inside ->
-                GachaConstants.arkNightDefault.add(inside.asText())
-            }
-        }
-
-        CometVariables.daemonLogger.info("加载默认明日方舟数据成功, 共 ${GachaConstants.arkNightDefault.size} 个干员")
-    }
-
-    fun isDownloading(): Boolean {
-        return isDownloading
     }
 }

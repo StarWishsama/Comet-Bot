@@ -18,6 +18,7 @@ import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 data class PullRequestEvent(
     val action: String,
@@ -55,21 +56,20 @@ data class PullRequestEvent(
         fun convertCreatedTime(): String {
             val localTime =
                 LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.of("UTC"))
-            return CometVariables.hmsPattern.format(localTime)
+            return TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT) + " " + CometVariables.hmsPattern.format(
+                localTime
+            )
         }
     }
 
     override fun toMessageWrapper(): MessageWrapper {
         val wrapper = MessageWrapper()
 
-        wrapper.addText("\uD83D\uDD27 ${repository.fullName} 有新的提交更改\n")
-        wrapper.addText("| ${pullRequestInfo.body}\n")
-        wrapper.addText("| 发布时间 ${pullRequestInfo.convertCreatedTime()}\n")
-        wrapper.addText("| 发布人 ${sender.login}\n")
-        wrapper.addText("| 提交更改信息 \n")
-        wrapper.addText("| ${pullRequestInfo.title.limitStringSize(50)}\n")
-        wrapper.addText("| ${pullRequestInfo.body.limitStringSize(100).trim()}\n")
-        wrapper.addText("| 查看完整信息: ${pullRequestInfo.url}")
+        wrapper.addText("\uD83D\uDD27 新提交更改 ${repository.fullName}\n")
+        wrapper.addText("by ${sender.login} | ${pullRequestInfo.convertCreatedTime()}\n\n")
+        wrapper.addText("${pullRequestInfo.title}\n")
+        wrapper.addText("${pullRequestInfo.body.limitStringSize(100).trim()}\n\n")
+        wrapper.addText("查看全部 > ${pullRequestInfo.url}")
 
         return wrapper
     }
