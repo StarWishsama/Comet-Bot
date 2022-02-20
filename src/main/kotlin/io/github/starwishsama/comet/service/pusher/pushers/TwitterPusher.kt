@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
 
 class TwitterPusher : CometPusher("twitter", CometPusherData(5, TimeUnit.MINUTES)) {
     override fun retrieve() {
-        GroupConfigManager.getAllConfigs().parallelStream().forEach { cfg ->
+        GroupConfigManager.getAllConfigs().forEach { cfg ->
             if (cfg.twitterPushEnabled) {
                 cfg.twitterSubscribers.forEach tweet@{ user ->
                     val cache = data.cache.find { (it as TwitterContext).twitterUserName == user } as TwitterContext?
@@ -38,6 +38,8 @@ class TwitterPusher : CometPusher("twitter", CometPusherData(5, TimeUnit.MINUTES
                     } else if (!cache.contentEquals(current)) {
                         data.cache.remove(cache)
                         data.cache.add(current.also { it.addPushTargets(cache.pushTarget) })
+                    } else {
+                        cache.addPushTarget(cfg.id)
                     }
                 }
             }

@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
 
 class BiliBiliDynamicPusher : CometPusher("bili_dynamic", CometPusherData(3, TimeUnit.MINUTES)) {
     override fun retrieve() {
-        GroupConfigManager.getAllConfigs().parallelStream().forEach { config ->
+        GroupConfigManager.getAllConfigs().forEach { config ->
             if (!config.biliPushEnabled) {
                 return@forEach
             }
@@ -70,7 +70,7 @@ class BiliBiliDynamicPusher : CometPusher("bili_dynamic", CometPusherData(3, Tim
                             it.addPushTargets(cache.pushTarget)
                         })
                     } else {
-                        return@user
+                        cache.addPushTarget(config.id)
                     }
 
                 }.noCatchCancellation {

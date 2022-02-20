@@ -49,7 +49,7 @@ class BiliBiliLivePusher : CometPusher("bili_live", CometPusherData(5, TimeUnit.
                             data.cache.remove(cache)
                             data.cache.add(current.also { it.addPushTargets(cache.pushTarget) })
                         } else {
-                            return@user
+                            cache.addPushTarget(cfg.id)
                         }
 
                     }.noCatchCancellation {
