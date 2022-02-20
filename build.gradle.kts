@@ -19,7 +19,7 @@ plugins {
 }
 
 group = "io.github.starwishsama.comet"
-version = "0.6.5" + getGitInfo()
+version = "0.6.5"
 
 tasks.jar {
     manifest {
@@ -110,20 +110,6 @@ buildConfig {
         "\"${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))}\""
     )
     buildConfigField("String", "miraiVersion", "\"${Versions.miraiVersion}\"")
-}
-
-fun getGitInfo(): String {
-    val commitHashCommand = "git rev-parse --short HEAD"
-    val commitHash = Runtime.getRuntime().exec(commitHashCommand).inputStream.bufferedReader().readLine()
-
-    val branchCommand = "git rev-parse --abbrev-ref HEAD"
-    var branch = Runtime.getRuntime().exec(branchCommand).inputStream.bufferedReader().readLine()
-
-    if (branch.isEmpty()) {
-        branch = "UnknownBranch"
-    }
-
-    return "-$branch-$commitHash"
 }
 
 tasks.test {
