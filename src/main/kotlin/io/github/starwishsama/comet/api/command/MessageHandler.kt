@@ -28,7 +28,6 @@ import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.events.GroupMessageEvent
-import net.mamoe.mirai.event.events.GroupTempMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -48,7 +47,7 @@ object MessageHandler {
         this.eventChannel.subscribeMessages {
             always {
                 // https://github.com/mamoe/mirai/issues/1850
-                if (this is GroupTempMessageEvent) {
+                if (sender.id == bot.id) {
                     return@always
                 }
 
