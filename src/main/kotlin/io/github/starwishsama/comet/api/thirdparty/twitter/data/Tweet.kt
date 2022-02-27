@@ -19,6 +19,7 @@ import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.data.tweetEntity.Media
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
+import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
@@ -72,39 +73,41 @@ data class Tweet(
             "❤${likeCount?.getBetterNumber()} | \uD83D\uDD01${retweetCount} | 🕘${hmsPattern.format(getSentTime())}"
 
         if (retweetStatus != null) {
-            return "转发了 ${retweetStatus.user.name} 的推文\n" +
-                    "${cleanShortUrlAtEnd(retweetStatus.text)}\n" +
+            return "\uD83D\uDD03 ${retweetStatus.user.name} >\n" +
+                    "${cleanShortUrlAtEnd(retweetStatus.text).limitStringSize(30)}\n" +
                     "$extraText\n" +
                     "\uD83D\uDD17 > ${getTweetURL()}\n" +
-                    "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
+                    "\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前"
         }
 
         if (isQuoted && quotedStatus != null) {
-            return "对于 ${quotedStatus.user.name} 的推文\n" +
-                    "${cleanShortUrlAtEnd(quotedStatus.text)}\n" +
-                    "\n${user.name} 进行了评论\n" +
-                    "${cleanShortUrlAtEnd(text)}\n" +
-                    "$extraText\n🔗 > ${getTweetURL()}\n" +
-                    "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
+            return buildString {
+                append("\uD83D\uDD03 ${user.name} >\n")
+                append(cleanShortUrlAtEnd(text) + "\n\n")
+                append("💬 ${quotedStatus.user.name} >\n")
+                append(cleanShortUrlAtEnd(text).limitStringSize(30) + "\n")
+                append("$extraText\n🔗 > ${getTweetURL()}\n")
+                append("\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前")
+            }
         }
 
         if (replyTweetId != null) {
-            val repliedTweet = TwitterApi.getTweetById(replyTweetId) ?: return "${cleanShortUrlAtEnd(text)}\n" +
+            val repliedTweet = TwitterApi.getTweetById(replyTweetId) ?: return "$text\n" +
                     "$extraText\n" +
                     "🔗 > ${getTweetURL()}\n" +
-                    "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
+                    "\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前"
 
             return "对于 ${repliedTweet.user.name} 的推文:\n" +
-                    "${cleanShortUrlAtEnd(repliedTweet.text)}\n\n" +
+                    "${cleanShortUrlAtEnd(repliedTweet.text).limitStringSize(30)}\n\n" +
                     "${user.name} 进行了回复\n${cleanShortUrlAtEnd(text)}\n" +
                     "$extraText\n🔗 > ${getTweetURL()}\n" +
-                    "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
+                    "\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前"
         }
 
         return "${cleanShortUrlAtEnd(text)}\n" +
                 "$extraText\n" +
                 "🔗 > ${getTweetURL()}\n" +
-                "在 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前发送"
+                "\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前"
     }
 
     /**
