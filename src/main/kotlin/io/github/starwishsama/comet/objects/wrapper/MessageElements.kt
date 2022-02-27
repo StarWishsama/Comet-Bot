@@ -24,7 +24,10 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.contact.AudioSupported
 import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.At
+import net.mamoe.mirai.message.data.MessageContent
+import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.SimpleServiceMessage
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.MiraiExperimentalApi
@@ -85,8 +88,10 @@ data class Picture(val url: String = "", val filePath: String = "", val base64: 
 
     override val className: String = this::class.java.name
 
-    override fun toMessageContent(subject: Contact?): Image {
-        requireNotNull(subject) { "subject cannot be null!" }
+    override fun toMessageContent(subject: Contact?): MessageContent {
+        if (subject == null) {
+            return PlainText("[图片]")
+        }
 
         try {
             if (url.isNotEmpty()) {

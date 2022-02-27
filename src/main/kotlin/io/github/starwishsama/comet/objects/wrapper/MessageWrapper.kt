@@ -93,23 +93,11 @@ open class MessageWrapper {
         return MessageChainBuilder().apply {
             messageContent.forEach {
                 kotlin.runCatching {
-                    if (it is Picture) {
-                        if (isPictureReachLimit()) {
-                            return@forEach
-                        }
-
-                        if (subject == null) {
-                            add("[图片]")
-                        } else {
-                            add(it.toMessageContent(subject))
-                        }
-
-                        return@forEach
+                    if ((it is Picture && !isPictureReachLimit()) || it !is Picture) {
+                        add(it.toMessageContent(subject))
                     }
-
-                    add(it.toMessageContent(subject))
                 }.onFailure {
-                    CometVariables.daemonLogger.log(HinaLogLevel.Warn, prefix = "MessageWrapper", throwable = it, message = "")
+                    CometVariables.daemonLogger.log(HinaLogLevel.Warn, prefix = "MessageWrapper", throwable = it, message = "在转换消息时出现了问题")
                 }
             }
         }.build()
