@@ -48,6 +48,25 @@ interface WrapperElement {
 }
 
 /**
+ * [Unit]
+ *
+ * 相当于 Kotlin 的 [Unit]
+ * 禁止直接加入至 [MessageWrapper] 中
+ *
+ */
+class Unit : WrapperElement {
+    override val className: String = this::className.name
+
+    override fun toMessageContent(subject: Contact?): MessageContent {
+        throw RuntimeException("A Unit cannot be convert to MessageContent!")
+    }
+
+    override fun asString(): String {
+        throw RuntimeException("A Unit cannot be convert to String!")
+    }
+}
+
+/**
  * [PureText]
  *
  * 纯文本消息

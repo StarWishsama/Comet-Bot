@@ -45,6 +45,10 @@ open class MessageWrapper {
 
     fun addElements(elements: Collection<WrapperElement>): MessageWrapper {
         for (element in elements) {
+            if (element is Unit) {
+                continue
+            }
+
             if (!::lastInsertElement.isInitialized) {
                 lastInsertElement = atomic(element)
             } else {
@@ -53,8 +57,13 @@ open class MessageWrapper {
                 } else {
                     messageContent.add(element)
                 }
+
+                lastInsertElement.lazySet(element)
             }
         }
+
+        lastInsertElement.lazySet(Unit())
+
         return this
     }
 
