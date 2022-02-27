@@ -169,7 +169,7 @@ object GroupConfigCommand : ChatCommand, UnDisableableCommand {
     }
 
     override val props: CommandProps =
-        CommandProps("group", arrayListOf("群设置", "gs"), "设置群内设置", UserLevel.ADMIN)
+        CommandProps("group", arrayListOf("群设置", "gs"), "设置群内设置", UserLevel.USER)
 
     override fun getHelp(): String = """
         /group helper [@/QQ] 添加/删除群助理

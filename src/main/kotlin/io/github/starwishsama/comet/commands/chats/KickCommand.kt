@@ -37,7 +37,7 @@ object KickCommand : ChatCommand {
 
         if (event is GroupMessageEvent && event.group.botPermission.isOperator()) {
             if (args.isNotEmpty()) {
-                val at = CometUtil.parseAtToId(event, args[0])
+                val at = CometUtil.parseAtToId(event.message, args[0])
                 if (at > -1) {
                     return if (args.size > 1) {
                         doKick(event, at, args.getRestString(1))
