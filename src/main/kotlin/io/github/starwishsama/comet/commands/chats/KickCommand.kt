@@ -19,7 +19,7 @@ import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.MemberPermission
@@ -32,7 +32,7 @@ import net.mamoe.mirai.message.data.MessageChain
 object KickCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!hasPermission(user, event)) {
-            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
+            return LocalizationManager.getLocalizationText("message.no-permission").toMessageChain()
         }
 
         if (event is GroupMessageEvent && event.group.botPermission.isOperator()) {
@@ -51,7 +51,7 @@ object KickCommand : ChatCommand {
                 return getHelp().convertToChain()
             }
         } else {
-            toChain("我不是绿帽 我爬 我爬")
+            toMessageChain("我不是绿帽 我爬 我爬")
         }
 
         return EmptyMessageChain

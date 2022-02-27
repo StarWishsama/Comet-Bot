@@ -12,7 +12,7 @@ package io.github.starwishsama.comet.service.command
 
 import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.tasks.network.impl.JikiPediaRequestTask
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
@@ -20,6 +20,6 @@ object JikiPediaService {
     fun searchJiki(event: MessageEvent, input: String): MessageChain {
         NetworkRequestManager.addTask(JikiPediaRequestTask(event.subject, input))
 
-        return "请稍候...".toChain()
+        return "请稍候...".toMessageChain()
     }
 }

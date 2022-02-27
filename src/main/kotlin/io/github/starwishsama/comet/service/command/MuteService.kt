@@ -30,41 +30,41 @@ object MuteService {
             if (isAll) {
                 group.settings.isMuteAll = !group.settings.isMuteAll
                 return if (group.settings.isMuteAll) {
-                    CometUtil.toChain("全体禁言已开启")
+                    CometUtil.toMessageChain("全体禁言已开启")
                 } else {
-                    CometUtil.toChain("全体禁言已关闭")
+                    CometUtil.toMessageChain("全体禁言已关闭")
                 }
             }
 
             if (group.botAsMember.id == id) {
-                return CometUtil.toChain("不能禁言机器人")
+                return CometUtil.toMessageChain("不能禁言机器人")
             }
 
             val member = group.members.find { it.id == id }
 
             if (member != null) {
                 if (member.isOperator()) {
-                    return CometUtil.toChain("不能禁言管理员")
+                    return CometUtil.toMessageChain("不能禁言管理员")
                 }
 
                 return when (muteTime) {
                     in 1..2592000 -> {
                         member.mute(muteTime)
-                        CometUtil.toChain("禁言 ${member.nameCardOrNick} 成功")
+                        CometUtil.toMessageChain("禁言 ${member.nameCardOrNick} 成功")
                     }
                     0 -> {
                         member.unmute()
-                        CometUtil.toChain("解禁 ${member.nameCardOrNick} 成功")
+                        CometUtil.toMessageChain("解禁 ${member.nameCardOrNick} 成功")
                     }
                     else -> {
-                        CometUtil.toChain("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]")
+                        CometUtil.toMessageChain("禁言时间有误, 可能是格式错误, 范围: (0s, 30days]")
                     }
                 }
             }
 
-            return CometUtil.toChain("找不到此用户")
+            return CometUtil.toMessageChain("找不到此用户")
         } else {
-            return CometUtil.toChain("机器人需要管理员权限才能进行禁言")
+            return CometUtil.toMessageChain("机器人需要管理员权限才能进行禁言")
         }
     }
 

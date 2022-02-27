@@ -21,7 +21,7 @@ import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.KeyWordService
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import net.mamoe.mirai.contact.getMember
 import net.mamoe.mirai.contact.isOperator
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -31,22 +31,22 @@ import net.mamoe.mirai.message.data.MessageChain
 object KeyWordCommand : ChatCommand, ConversationCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!hasPermission(user, event)) {
-            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
+            return LocalizationManager.getLocalizationText("message.no-permission").toMessageChain()
         }
 
         if (event !is GroupMessageEvent) {
-            return "请在群聊中使用该命令!".toChain()
+            return "请在群聊中使用该命令!".toMessageChain()
         }
 
         if (args.isEmpty()) {
-            return getHelp().toChain()
+            return getHelp().toMessageChain()
         }
 
         return when (args[0]) {
             "add", "new" -> KeyWordService.addKeyWord(event.sender.id, event.group.id, args.getOrElse(1) { "" })
             "remove", "del", "rm" -> KeyWordService.removeKeyWord(event.group.id, args.getOrElse(1) { "" })
             "list", "ls" -> KeyWordService.listKeyWords(event.group.id)
-            else -> getHelp().toChain()
+            else -> getHelp().toMessageChain()
         }
     }
 

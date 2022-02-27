@@ -18,7 +18,7 @@ import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.ArkNightService.configGachaPool
 import io.github.starwishsama.comet.service.command.ArkNightService.getGachaResult
 import io.github.starwishsama.comet.service.command.ArkNightService.handleFreedomDraw
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
@@ -28,10 +28,10 @@ object ArkNightCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!ArkNightInstance.isUsable()) {
             return if (ArkNightInstance.isDownloading) {
-                "正在下载明日方舟数据, 请稍候...".toChain()
+                "正在下载明日方舟数据, 请稍候...".toMessageChain()
             } else {
                 ArkNightInstance.downloadFile()
-                "还未下载明日方舟数据, 开始自动下载...".toChain()
+                "还未下载明日方舟数据, 开始自动下载...".toMessageChain()
             }
         }
 
@@ -51,7 +51,7 @@ object ArkNightCommand : ChatCommand {
                 }
                 "update", "更新", "更新数据" -> {
                     ArkNightInstance.downloadFile()
-                    "已开始自动下载明日方舟数据...".toChain()
+                    "已开始自动下载明日方舟数据...".toMessageChain()
                 }
                 else -> handleFreedomDraw(event, user, args)
             }

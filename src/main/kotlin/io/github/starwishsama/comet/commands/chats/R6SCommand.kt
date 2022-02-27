@@ -15,7 +15,7 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.R6StatsApi
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.IDGuidelineType
 import io.github.starwishsama.comet.utils.StringUtil.isLegitId
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -27,7 +27,7 @@ import net.mamoe.mirai.message.data.at
 object R6SCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
-            return toChain(getHelp(), true)
+            return toMessageChain(getHelp(), true)
         } else {
             when (args[0].lowercase()) {
                 "info", "查询", "cx" -> {
@@ -35,19 +35,19 @@ object R6SCommand : ChatCommand {
 
                     return if (args.size <= 1) {
                         if (account.isNotEmpty()) {
-                            event.subject.sendMessage(toChain("查询中..."))
+                            event.subject.sendMessage(toMessageChain("查询中..."))
                             val result = R6StatsApi.getPlayerStat(account).toMessageChain(event.subject)
                             if (event is GroupMessageEvent) event.sender.at() + result else result
                         } else {
-                            "你还未绑定育碧账号, 输入 /r6s bind [账号] 绑定快速查询战绩".toChain()
+                            "你还未绑定育碧账号, 输入 /r6s bind [账号] 绑定快速查询战绩".toMessageChain()
                         }
                     } else {
                         if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
-                            event.subject.sendMessage(toChain("查询中..."))
+                            event.subject.sendMessage(toMessageChain("查询中..."))
                             val result = R6StatsApi.getPlayerStat(args[1]).toMessageChain(event.subject)
                             if (event is GroupMessageEvent) event.sender.at() + result else result
                         } else {
-                            toChain("你输入的 ID 不符合育碧用户名规范!")
+                            toMessageChain("你输入的 ID 不符合育碧用户名规范!")
                         }
                     }
                 }
@@ -55,13 +55,13 @@ object R6SCommand : ChatCommand {
                     if (args[1].isNotEmpty() && args.size > 1) {
                         return if (isLegitId(args[1], IDGuidelineType.UBISOFT)) {
                             user.r6sAccount = args[1]
-                            toChain("绑定成功!")
+                            toMessageChain("绑定成功!")
                         } else {
-                            toChain("ID 格式有误!")
+                            toMessageChain("ID 格式有误!")
                         }
                     }
                 else -> {
-                    return toChain("/r6s info [Uplay账号名]")
+                    return toMessageChain("/r6s info [Uplay账号名]")
                 }
             }
         }

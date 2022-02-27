@@ -23,7 +23,7 @@ import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.startup.CometRuntime
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +44,7 @@ object RConCommand : ChatCommand, ConversationCommand {
                 when (args[0]) {
                     "setup" -> {
                         SessionHandler.insertSession(Session(SessionTarget(privateId = user.id), this, false))
-                        return toChain("请在下一条消息发送 rcon 连接地址")
+                        return toMessageChain("请在下一条消息发送 rcon 连接地址")
                     }
                     "cmd", "exec", "命令" -> {
                         val rcon = CometVariables.rCon
@@ -56,18 +56,18 @@ object RConCommand : ChatCommand, ConversationCommand {
                                     }
                                 } catch (e: IOException) {
                                     CometVariables.logger.error("在连接到 rcon 服务器时发生了错误", e)
-                                    toChain("在连接到 rcon 服务器时发生了错误, 请查看后台")
+                                    toMessageChain("在连接到 rcon 服务器时发生了错误, 请查看后台")
                                 }
                             }
                         } else {
-                            return toChain("rcon 还没有设置\n你可以在支持 rcon 的游戏设置下打开 rcon 并设置地址, 端口和密码")
+                            return toMessageChain("rcon 还没有设置\n你可以在支持 rcon 的游戏设置下打开 rcon 并设置地址, 端口和密码")
                         }
                     }
                     else -> getHelp().convertToChain()
                 }
             }
         } else {
-            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
+            return LocalizationManager.getLocalizationText("message.no-permission").toMessageChain()
         }
         return EmptyMessageChain
     }
@@ -108,7 +108,7 @@ object RConCommand : ChatCommand, ConversationCommand {
                     CometVariables.cfg.rConPort = event.message.contentToString().toInt()
 
                     event.subject.sendMessage(
-                        toChain(
+                        toMessageChain(
                             "设置端口成功!\n请在下一条消息发送 rcon 密码\n" +
                                     "如果需要退出设置 请回复退出"
                         )
@@ -116,7 +116,7 @@ object RConCommand : ChatCommand, ConversationCommand {
                     waitList[user] = 2
                 } else {
                     event.subject.sendMessage(
-                        toChain(
+                        toMessageChain(
                             "不是有效的端口\n" +
                                     "如果需要退出设置 请回复退出"
                         )
@@ -128,9 +128,9 @@ object RConCommand : ChatCommand, ConversationCommand {
                 kotlin.runCatching {
                     CometRuntime.setupRCon()
                 }.onSuccess {
-                    event.subject.sendMessage("设置 rcon 完成!".toChain())
+                    event.subject.sendMessage("设置 rcon 完成!".toMessageChain())
                 }.onFailure {
-                    event.subject.sendMessage("连接至 rcon 服务器时出现了异常".toChain())
+                    event.subject.sendMessage("连接至 rcon 服务器时出现了异常".toMessageChain())
                     CometVariables.daemonLogger.warning("连接至 rcon 服务器时出现了异常", it)
                 }
 

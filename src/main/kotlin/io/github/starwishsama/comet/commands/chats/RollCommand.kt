@@ -21,7 +21,7 @@ import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
 import io.github.starwishsama.comet.sessions.SessionUser
 import io.github.starwishsama.comet.sessions.commands.roll.RollSession
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.TaskUtil
 import kotlinx.coroutines.runBlocking
@@ -36,10 +36,10 @@ import java.util.concurrent.TimeUnit
 
 object RollCommand : ChatCommand, ConversationCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
-        if (event !is GroupMessageEvent) return "本命令仅限群聊使用".toChain()
+        if (event !is GroupMessageEvent) return "本命令仅限群聊使用".toMessageChain()
 
         if (SessionHandler.hasSessionByGroup(event.group.id, RollSession::class.java)) {
-            return "该群已经有一个正在进行中的抽奖了!".toChain()
+            return "该群已经有一个正在进行中的抽奖了!".toMessageChain()
         }
 
         if (args.size < 2) {
@@ -51,11 +51,11 @@ object RollCommand : ChatCommand, ConversationCommand {
             val rollDelay = args.getOrNull(3)?.toIntOrNull()
 
             if (rollThingCount == -1 || (args.getOrNull(3) != null && rollDelay == null)) {
-                return "请输入有效的物品数量!".toChain()
+                return "请输入有效的物品数量!".toMessageChain()
             }
 
             if (rollDelay != null && rollDelay !in 1..15) {
-                return "开奖时间设置错误! 范围为 (0, 15] 分钟".toChain()
+                return "开奖时间设置错误! 范围为 (0, 15] 分钟".toMessageChain()
             }
 
             val rollSession = RollSession(
@@ -75,7 +75,7 @@ object RollCommand : ChatCommand, ConversationCommand {
                 SessionHandler.removeSession(rollSession)
             }
 
-            return toChain(
+            return toMessageChain(
                 """
                 ${event.senderName} 发起了一个抽奖!
                 抽奖物品: ${rollSession.rollItem}
@@ -131,7 +131,7 @@ object RollCommand : ChatCommand, ConversationCommand {
             val winners = session.getWinningUsers()
 
             if (winners.isEmpty()) {
-                group.sendMessage(toChain("没有人参加抽奖, 本次抽奖已结束..."))
+                group.sendMessage(toMessageChain("没有人参加抽奖, 本次抽奖已结束..."))
                 return
             }
 
@@ -140,7 +140,7 @@ object RollCommand : ChatCommand, ConversationCommand {
             }
 
             group.sendMessage(
-                toChain(
+                toMessageChain(
                     "由${group[session.rollStarter]?.nameCardOrNick}发起的抽奖开奖了!\n" +
                             "奖品: ${session.rollItem}\n" +
                             "中奖者: "

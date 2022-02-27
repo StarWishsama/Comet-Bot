@@ -21,7 +21,7 @@ import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.BiliBiliService
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.TaskUtil
@@ -37,7 +37,7 @@ import java.lang.Thread.sleep
 object BiliBiliCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!hasPermission(user, event)) {
-            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
+            return LocalizationManager.getLocalizationText("message.no-permission").toMessageChain()
         }
 
         if (args.isEmpty()) {
@@ -50,7 +50,7 @@ object BiliBiliCommand : ChatCommand {
                 return if (event is GroupMessageEvent) {
                     BiliBiliService.callUnsubscribeUser(args, event.group.id)
                 } else {
-                    toChain("抱歉, 该命令仅限群聊使用!")
+                    toMessageChain("抱歉, 该命令仅限群聊使用!")
                 }
             }
             "list" -> {
@@ -75,7 +75,7 @@ object BiliBiliCommand : ChatCommand {
                 return if (args.size > 1) {
                     BiliBiliService.searchVideo(args.getRestString(1), event)
                 } else {
-                    getHelp().toChain()
+                    getHelp().toMessageChain()
                 }
             }
             "push" -> {
@@ -83,17 +83,17 @@ object BiliBiliCommand : ChatCommand {
                     if (user.isBotAdmin() || event.sender.isOperator()) {
                         val cfg = GroupConfigManager.getConfigOrNew(event.group.id)
                         cfg.biliPushEnabled = !cfg.biliPushEnabled
-                        "B站动态推送功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}".toChain()
+                        "B站动态推送功能已${if (cfg.biliPushEnabled) "开启" else "关闭"}".toMessageChain()
                     } else {
-                        LocalizationManager.getLocalizationText("message.no-permission").toChain()
+                        LocalizationManager.getLocalizationText("message.no-permission").toMessageChain()
                     }
                 } else {
-                    toChain("抱歉, 该命令仅限群聊使用!")
+                    toMessageChain("抱歉, 该命令仅限群聊使用!")
                 }
             }
             "refresh" -> {
                 if (event is GroupMessageEvent) {
-                    val cfg = GroupConfigManager.getConfig(event.group.id) ?: return "本群尚未注册至 Comet".toChain()
+                    val cfg = GroupConfigManager.getConfig(event.group.id) ?: return "本群尚未注册至 Comet".toMessageChain()
 
                     TaskUtil.schedule {
                         cfg.biliSubscribers.forEach {
@@ -103,24 +103,24 @@ object BiliBiliCommand : ChatCommand {
                         }
                     }
 
-                    return "正在刷新动态, 请稍候".toChain()
+                    return "正在刷新动态, 请稍候".toMessageChain()
                 } else {
-                    toChain("抱歉, 该命令仅限群聊使用!")
+                    toMessageChain("抱歉, 该命令仅限群聊使用!")
                 }
             }
             "id" -> {
                 if (args[1].isNumeric()) {
                     val dynamic = DynamicApi.getDynamicById(args[1].toLong())
-                    return dynamic?.toMessageWrapper()?.toMessageChain(event.subject) ?: "找不到对应的动态".toChain()
+                    return dynamic?.toMessageWrapper()?.toMessageChain(event.subject) ?: "找不到对应的动态".toMessageChain()
                 } else {
-                    "请输入有效的动态 ID".toChain()
+                    "请输入有效的动态 ID".toMessageChain()
                 }
             }
             "parse" -> {
                 return if (event is GroupMessageEvent) {
                     BiliBiliService.setParseVideo(event.group.id)
                 } else {
-                    toChain("抱歉, 该命令仅限群聊使用!")
+                    toMessageChain("抱歉, 该命令仅限群聊使用!")
                 }
             }
             else -> return getHelp().convertToChain()

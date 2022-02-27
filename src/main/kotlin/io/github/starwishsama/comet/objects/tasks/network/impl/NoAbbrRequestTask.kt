@@ -16,7 +16,7 @@ import io.github.starwishsama.comet.api.thirdparty.noabbr.data.AbbrSearchRespons
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.objects.tasks.network.INetworkRequestTask
 import io.github.starwishsama.comet.objects.tasks.network.NetworkRequestTask
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import java.io.IOException
@@ -36,13 +36,13 @@ class NoAbbrRequestTask(override val content: Contact, override val param: Strin
             if (result is AbbrSearchResponse && !result.isEmpty()) {
                 content.sendMessage(result.toMessageWrapper().toMessageChain(content))
             } else {
-                content.sendMessage(LocalizationManager.getLocalizationText("message.network-error").toChain())
+                content.sendMessage(LocalizationManager.getLocalizationText("message.network-error").toMessageChain())
             }
         }
     }
 
     override fun onFailure(t: Throwable?) {
-        runBlocking { content.sendMessage("在搜索缩写时遇到了异常".toChain()) }
+        runBlocking { content.sendMessage("在搜索缩写时遇到了异常".toMessageChain()) }
         CometVariables.daemonLogger.warning("在搜索缩写时遇到了异常", t)
     }
 }

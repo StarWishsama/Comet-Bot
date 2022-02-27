@@ -14,12 +14,10 @@ import io.github.starwishsama.comet.CometVariables.comet
 import io.github.starwishsama.comet.CometVariables.daemonLogger
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
-import io.github.starwishsama.comet.utils.CometUtil.toChain
-import kotlinx.coroutines.flow.collect
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.isOperator
 import java.util.regex.Pattern
-import kotlin.streams.toList
 
 object GroupFileAutoRemover {
     private val cachePool = mutableSetOf<PerGroupConfig>()
@@ -48,7 +46,7 @@ object GroupFileAutoRemover {
 
         runBlocking {
             if (!group.botAsMember.isOperator()) {
-                group.sendMessage("机器人没有权限删除群文件, 任务已取消".toChain())
+                group.sendMessage("机器人没有权限删除群文件, 任务已取消".toMessageChain())
             }
 
             val handleTime = System.currentTimeMillis()
@@ -76,7 +74,7 @@ object GroupFileAutoRemover {
             }
 
             if (counter > 0) {
-                group.sendMessage("已自动删除本群过期文件, 共 $counter 个文件.".toChain())
+                group.sendMessage("已自动删除本群过期文件, 共 $counter 个文件.".toMessageChain())
             }
         }
     }

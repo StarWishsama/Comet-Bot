@@ -13,7 +13,7 @@ package io.github.starwishsama.comet.service.command
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.utils.CometUtil
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
@@ -21,76 +21,73 @@ import net.mamoe.mirai.message.data.MessageChain
 object AdminService {
     private const val maxCommandTime = 1000000
 
-    fun listPermissions(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
-        return if (args.size > 1) {
-            val target: CometUser? = CometUtil.parseAtAsBotUser(event, args[1])
+    fun listPermissions(user: CometUser, id: String, messageChain: MessageChain): MessageChain {
+        return if (id.isNotEmpty()) {
+            val target: CometUser? = CometUtil.parseAtAsBotUser(messageChain, id)
             val permissions = target?.getPermissions()
             if (permissions != null) {
-                "该用户拥有的权限: $permissions".toChain()
+                "该用户拥有的权限: $permissions".toMessageChain()
             } else {
-                toChain("该用户没有任何权限")
+                toMessageChain("该用户没有任何权限")
             }
         } else {
-            "你拥有的权限: ${user.getPermissions()}".toChain()
+            "你拥有的权限: ${user.getPermissions()}".toMessageChain()
         }
     }
 
-    fun addPermission(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
+    fun addPermission(user: CometUser, id: String, nodeName: String, messageChain: MessageChain): MessageChain {
         if (user.isBotOwner()) {
-            if (args.size > 1) {
-                val target: CometUser? = CometUtil.parseAtAsBotUser(event, args[1])
+            if (id.isNotBlank()) {
+                val target: CometUser? = CometUtil.parseAtAsBotUser(messageChain, id)
 
-                val validate =
-                    CommandManager.getCommands().parallelStream().filter { it.props.permissionNodeName == args[2] }
-                        .findAny().isPresent
+                val targetNode = CommandManager.getCommands().find { it.props.permissionNodeName == nodeName }?.props?.permissionNodeName
 
-                return if (validate) {
-                    target?.addPermission(args[2])
-                    toChain("添加权限成功")
+                return if (targetNode?.isNotEmpty() == true) {
+                    target?.addPermission(targetNode)
+                    "添加权限成功".toMessageChain()
                 } else {
-                    "找不到 ${args[2]} 对应的命令".toChain()
+                    "找不到 $nodeName 对应的命令".toMessageChain()
                 }
             }
         } else {
-            return toChain("你没有权限")
+            return toMessageChain("你没有权限")
         }
         return EmptyMessageChain
     }
 
-    fun removePermission(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
+    fun removePermission(user: CometUser, id: String, nodeName: String, messageChain: MessageChain): MessageChain {
         if (user.isBotOwner()) {
-            if (args.size > 1) {
-                val target: CometUser? = CometUtil.parseAtAsBotUser(event, args[1])
+            if (id.isNotBlank()) {
+                val target: CometUser? = CometUtil.parseAtAsBotUser(messageChain, id)
 
-                val validate =
-                    CommandManager.getCommands().parallelStream().filter { it.props.permissionNodeName == args[2] }
-                        .findAny().isPresent
+                val targetPermission =
+                    CommandManager.getCommands().find { it.props.permissionNodeName == nodeName }?.props?.permissionNodeName
 
-                return if (validate) {
-                    target?.removePermission(args[2])
-                    toChain("删除权限成功")
+                return if (targetPermission?.isNotBlank() == true) {
+                    target?.removePermission(targetPermission)
+                    toMessageChain("删除权限成功")
                 } else {
-                    "找不到 ${args[2]} 对应的命令".toChain()
+                    "找不到 $nodeName 对应的命令".toMessageChain()
                 }
             }
         } else {
-            return toChain("你没有权限")
+            return toMessageChain("你没有权限")
         }
         return EmptyMessageChain
     }
 
     fun giveCommandTime(event: MessageEvent, args: List<String>): MessageChain {
         if (args.size > 1) {
-            val target: CometUser = CometUtil.parseAtAsBotUser(event, args[1]) ?: return "找不到此用户".toChain()
+            val target: CometUser = CometUtil.parseAtAsBotUser(event.message, args[1]) ?: return "找不到此用户".toMessageChain()
 
-            val commandTime = args[2].toIntOrNull() ?: return "请输入正确的数字!".toChain()
+            val commandTime = args[2].toIntOrNull() ?: return "请输入正确的数字!".toMessageChain()
 
 
             if (commandTime <= maxCommandTime) {
                 target.addPoint(commandTime)
-                "成功为 $target 添加 $commandTime 点硬币".toChain()
+                "成功为 $target 添加 $commandTime 点硬币".toMessageChain()
             } else {
-                "给予的次数超过系统限制上限".toChain()
+                "给予的次数超过系统限制上限".toMessageChain()
             }
         }
         return EmptyMessageChain

@@ -18,7 +18,7 @@ import io.github.starwishsama.comet.objects.wrapper.toMessageWrapper
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import net.mamoe.mirai.message.data.MessageChain
 
@@ -27,18 +27,18 @@ object KeyWordService {
 
     fun addKeyWord(senderID: Long, groupID: Long, keyWord: String): MessageChain {
         if (keyWord.isEmpty()) {
-            return "请输入关键词".toChain()
+            return "请输入关键词".toMessageChain()
         }
 
         SessionHandler.insertSession(Session(SessionTarget(groupID, senderID), KeyWordCommand))
         inProgressAdder[senderID] = keyWord
 
-        return "接下来, 请发送该关键词需要自动回复的内容".toChain()
+        return "接下来, 请发送该关键词需要自动回复的内容".toMessageChain()
     }
 
     fun removeKeyWord(id: Long, keyWord: String): MessageChain {
         if (keyWord.isEmpty()) {
-            return "请输入关键词".toChain()
+            return "请输入关键词".toMessageChain()
         }
 
         val groupCfg = GroupConfigManager.getConfigOrNew(id)
@@ -48,16 +48,16 @@ object KeyWordService {
             groupCfg.keyWordReply.remove(autoReply)
         }
 
-        return "已移除关键词: $keyWord".toChain()
+        return "已移除关键词: $keyWord".toMessageChain()
     }
 
     fun handleAddAutoReply(trigger: Long, cfg: PerGroupConfig, keyWord: String, reply: MessageChain): MessageChain {
         if (keyWord.isEmpty()) {
-            return "请输入关键词".toChain()
+            return "请输入关键词".toMessageChain()
         }
 
         if (reply.isEmpty()) {
-            return "请输入自动回复内容".toChain()
+            return "请输入自动回复内容".toMessageChain()
         }
 
         val autoReply = cfg.keyWordReply.getAutoReplyByKeyWord(keyWord)
@@ -76,7 +76,7 @@ object KeyWordService {
 
         inProgressAdder.remove(trigger)
 
-        return "已添加关键词: $keyWord".toChain()
+        return "已添加关键词: $keyWord".toMessageChain()
     }
 
     fun listKeyWords(groupID: Long): MessageChain {
@@ -89,7 +89,7 @@ object KeyWordService {
             }
         }
 
-        return result.toChain()
+        return result.toMessageChain()
     }
 
     fun getKeyWordBySender(id: Long): String {

@@ -17,7 +17,7 @@ import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.RandomResult
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
@@ -32,13 +32,13 @@ object DivineCommand : ChatCommand {
             val randomEventName = args.getRestString(0)
             if (randomEventName.isNotBlank() && randomEventName.length < 30) {
                 if (!emojiPattern.containsMatchIn(randomEventName)) {
-                    "不允许使用 emoji 字符".toChain()
+                    "不允许使用 emoji 字符".toMessageChain()
                 }
                 val result = RandomResult(-1000, RandomUtil.randomDouble(0.0, 1.0), randomEventName)
 
                 RandomResult.getChance(result).convertToChain()
             } else {
-                toChain("请检查需要占卜的字符是否超过上限或为空!")
+                toMessageChain("请检查需要占卜的字符是否超过上限或为空!")
             }
         } else {
             return getHelp().convertToChain()

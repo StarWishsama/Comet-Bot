@@ -38,9 +38,9 @@ object HelpCommand : ChatCommand {
         } else {
             val cmd = CommandManager.getCommand(args[0])
             return if (cmd != null) {
-                CometUtil.toChain("关于 /${cmd.name} 的帮助信息\n${cmd.getHelp()}\n\n该命令还有其他别名可以使用: ${cmd.props.aliases}")
+                CometUtil.toMessageChain("关于 /${cmd.name} 的帮助信息\n${cmd.getHelp()}\n\n该命令还有其他别名可以使用: ${cmd.props.aliases}")
             } else {
-                CometUtil.toChain("该命令不存在哦")
+                CometUtil.toMessageChain("该命令不存在哦")
             }
         }
     }

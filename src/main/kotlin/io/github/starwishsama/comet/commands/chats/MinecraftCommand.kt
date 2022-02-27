@@ -14,7 +14,7 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.network.MinecraftUtil
@@ -34,28 +34,28 @@ object MinecraftCommand : ChatCommand {
             1 -> {
                 if (args[0].contains(":")) {
                     val split = args[0].split(":")
-                    event.subject.sendMessage(toChain("查询中..."))
+                    event.subject.sendMessage(toMessageChain("查询中..."))
 
                     return query(split[0], split[1].toIntOrNull(), event.subject)
                 }
 
                 val convert = MinecraftUtil.convert(args[0])
                 return if (convert.isEmpty()) {
-                    "无法连接至服务器".toChain()
+                    "无法连接至服务器".toMessageChain()
                 } else {
-                    event.subject.sendMessage(toChain("查询中..."))
+                    event.subject.sendMessage(toMessageChain("查询中..."))
                     query(convert.host, convert.port, event.subject)
                 }
             }
             2 -> {
                 return if (args[1].isNumeric()) {
-                    event.subject.sendMessage(toChain("查询中..."))
+                    event.subject.sendMessage(toMessageChain("查询中..."))
                     query(args[0], args[1].toIntOrNull(), event.subject)
                 } else {
-                    "输入的端口号不合法.".toChain()
+                    "输入的端口号不合法.".toMessageChain()
                 }
             }
-            else -> return getHelp().toChain()
+            else -> return getHelp().toMessageChain()
         }
     }
 
@@ -77,7 +77,7 @@ object MinecraftCommand : ChatCommand {
             return withTimeout(Duration.ofSeconds(5)) {
                 return@withTimeout runCatching<MessageChain> handleQuery@ {
                     if (port == null) {
-                        return@handleQuery "输入的端口号不合法.".toChain()
+                        return@handleQuery "输入的端口号不合法.".toMessageChain()
                     }
 
                     val javaResult = MinecraftUtil.javaQuery(ip, port)
@@ -91,15 +91,15 @@ object MinecraftCommand : ChatCommand {
                         if (!bedrockWrapper.isEmpty()) {
                             bedrockResult.convertToWrapper().toMessageChain(subject)
                         } else {
-                            "查询失败, 服务器可能不在线, 请稍后再试.".toChain()
+                            "查询失败, 服务器可能不在线, 请稍后再试.".toMessageChain()
                         }
                     }
-                }.getOrElse { "查询失败, 提供的地址不正确或服务器不在线, 请稍后再试.".toChain() }
+                }.getOrElse { "查询失败, 提供的地址不正确或服务器不在线, 请稍后再试.".toMessageChain() }
             }
         }.onFailure {
             if (it is TimeoutCancellationException) {
-                return "连接至服务器超时, 请稍后再试".toChain()
+                return "连接至服务器超时, 请稍后再试".toMessageChain()
             }
-        }.getOrElse { "查询失败, 提供的地址不正确或服务器不在线, 请稍后再试.".toChain() }
+        }.getOrElse { "查询失败, 提供的地址不正确或服务器不在线, 请稍后再试.".toMessageChain() }
     }
 }

@@ -16,7 +16,7 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.i18n.LocalizationManager
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.sessions.SessionHandler
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.NumberUtil.fixDisplay
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
@@ -123,7 +123,7 @@ object MessageHandler {
                 if (event is GroupMessageEvent && cmd.props.isDisabledCommand(event.group.id)
                 ) {
                     return if (useStatus) {
-                        ExecutedResult(toChain("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
+                        ExecutedResult(toMessageChain("该命令已被管理员禁用"), cmd, CommandStatus.Disabled())
                     } else {
                         ExecutedResult(EmptyMessageChain, cmd, CommandStatus.Disabled())
                     }
@@ -134,7 +134,7 @@ object MessageHandler {
                         val response = LocalizationManager.getLocalizationText("message.no-enough-point")
                             .replace("%point%", user.coin.fixDisplay())
                             .replace("%cost%", cmd.props.cost.fixDisplay())
-                        ExecutedResult(response.toChain(), cmd, CommandStatus.ValidateFailed())
+                        ExecutedResult(response.toMessageChain(), cmd, CommandStatus.ValidateFailed())
                     } else {
                         ExecutedResult(EmptyMessageChain, cmd, CommandStatus.ValidateFailed())
                     }
@@ -160,7 +160,7 @@ object MessageHandler {
                             cmd.execute(event, splitMessage, user)
                         } else {
                             status = CommandStatus.NoPermission()
-                            LocalizationManager.getLocalizationText("message.no-permission").toChain()
+                            LocalizationManager.getLocalizationText("message.no-permission").toMessageChain()
                         }
 
                     return ExecutedResult(result, cmd, status)
@@ -179,12 +179,12 @@ object MessageHandler {
                     CometVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${message}, 发送者: $senderId", e)
                     if (user.isBotOwner()) {
                         ExecutedResult(
-                            toChain(
+                            toMessageChain(
                                 "在试图执行命令时发生了一个错误\n简易报错信息 :\n${e.javaClass.name}: ${e.message?.limitStringSize(30)}"
                             ), cmd
                         )
                     } else {
-                        ExecutedResult(toChain("在试图执行命令时发生了一个错误, 请联系管理员"), cmd)
+                        ExecutedResult(toMessageChain("在试图执行命令时发生了一个错误, 请联系管理员"), cmd)
                     }
                 }
             }

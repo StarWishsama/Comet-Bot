@@ -15,7 +15,7 @@ import io.github.starwishsama.comet.api.thirdparty.jikipedia.JikiPediaApi
 import io.github.starwishsama.comet.api.thirdparty.jikipedia.JikiPediaSearchResult
 import io.github.starwishsama.comet.objects.tasks.network.INetworkRequestTask
 import io.github.starwishsama.comet.objects.tasks.network.NetworkRequestTask
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import java.io.IOException
@@ -39,7 +39,7 @@ class JikiPediaRequestTask(override val content: Contact, override val param: St
     }
 
     override fun onFailure(t: Throwable?) {
-        runBlocking { content.sendMessage("在搜索时遇到了异常".toChain()) }
+        runBlocking { content.sendMessage("在搜索时遇到了异常".toMessageChain()) }
         CometVariables.daemonLogger.warning("在搜索小鸡百科时遇到了异常", t)
     }
 }
