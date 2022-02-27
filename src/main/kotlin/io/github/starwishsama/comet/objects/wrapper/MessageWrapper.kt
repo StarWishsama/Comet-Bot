@@ -13,8 +13,6 @@ package io.github.starwishsama.comet.objects.wrapper
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.logger.HinaLogLevel
-import kotlinx.atomicfu.AtomicRef
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
@@ -28,7 +26,7 @@ fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
 open class MessageWrapper {
     private val messageContent = mutableSetOf<WrapperElement>()
 
-    private lateinit var lastInsertElement: AtomicRef<WrapperElement>
+    private lateinit var lastInsertElement: WrapperElement
 
     @Volatile
     private var usable: Boolean = isEmpty()
@@ -45,24 +43,20 @@ open class MessageWrapper {
 
     fun addElements(elements: Collection<WrapperElement>): MessageWrapper {
         for (element in elements) {
-            if (element is Unit) {
-                continue
-            }
-
-            if (!::lastInsertElement.isInitialized) {
-                lastInsertElement = atomic(element)
+            lastInsertElement = if (!::lastInsertElement.isInitialized) {
+                element
             } else {
-                if (lastInsertElement.value is PureText && element is PureText) {
-                    messageContent.add(PureText((lastInsertElement.value as PureText).text + element.text))
+                if (lastInsertElement is PureText && element is PureText) {
+                    messageContent.remove(lastInsertElement)
+                    val merge = PureText((lastInsertElement as PureText).text + element.text)
+                    messageContent.add(merge)
+                    merge
                 } else {
                     messageContent.add(element)
+                    element
                 }
-
-                lastInsertElement.lazySet(element)
             }
         }
-
-        lastInsertElement.lazySet(Unit())
 
         return this
     }

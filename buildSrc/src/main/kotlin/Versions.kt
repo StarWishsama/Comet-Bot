@@ -9,6 +9,7 @@
  */
 
 object Versions {
+    const val kotlinVersion = "1.6.10"
     const val miraiVersion = "2.10.0"
     const val jacksonVersion = "2.13.1"
     const val hutoolVersion = "5.7.19"
