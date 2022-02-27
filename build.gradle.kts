@@ -8,7 +8,6 @@
  *
  */
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -145,8 +144,7 @@ tasks.shadowJar {
     println("Comet >> Now building Comet ${project.version}...")
 }
 
-tasks.withType<KotlinCompile> {
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
     kotlinOptions.freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
 }
-val compileKotlin: KotlinCompile by tasks
