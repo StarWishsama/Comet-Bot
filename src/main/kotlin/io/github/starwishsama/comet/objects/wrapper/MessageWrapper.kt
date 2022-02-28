@@ -13,7 +13,6 @@ package io.github.starwishsama.comet.objects.wrapper
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.logger.HinaLogLevel
-import io.github.starwishsama.comet.utils.noCatchCancellation
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
@@ -44,18 +43,20 @@ open class MessageWrapper {
 
     fun addElements(elements: Collection<WrapperElement>): MessageWrapper {
         for (element in elements) {
-            lastInsertElement = if (!::lastInsertElement.isInitialized) {
-                element
+            if (!::lastInsertElement.isInitialized) {
+                lastInsertElement = element
+                messageContent.add(element)
+                continue
+            }
+
+            lastInsertElement = if (lastInsertElement is PureText && element is PureText) {
+                messageContent.remove(lastInsertElement)
+                val merge = PureText((lastInsertElement as PureText).text + element.text)
+                messageContent.add(merge)
+                merge
             } else {
-                if (lastInsertElement is PureText && element is PureText) {
-                    messageContent.remove(lastInsertElement)
-                    val merge = PureText((lastInsertElement as PureText).text + element.text)
-                    messageContent.add(merge)
-                    merge
-                } else {
-                    messageContent.add(element)
-                    element
-                }
+                messageContent.add(element)
+                element
             }
         }
 
@@ -97,7 +98,7 @@ open class MessageWrapper {
                     if ((it is Picture && !isPictureReachLimit()) || it !is Picture) {
                         add(it.toMessageContent(subject))
                     }
-                }.noCatchCancellation {
+                }.onFailure {
                     CometVariables.daemonLogger.log(HinaLogLevel.Warn, prefix = "MessageWrapper", throwable = it, message = "在转换消息时出现了问题")
                 }
             }

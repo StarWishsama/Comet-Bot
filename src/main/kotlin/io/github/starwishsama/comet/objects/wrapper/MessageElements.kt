@@ -19,7 +19,6 @@ import io.github.starwishsama.comet.utils.StringUtil.base64ToImage
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.serialize.WrapperConverter
 import io.github.starwishsama.comet.utils.uploadAsImage
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.contact.AudioSupported
@@ -108,11 +107,8 @@ data class Picture(val url: String = "", val filePath: String = "", val base64: 
                 return base64.toByteArray().base64ToImage().uploadAsImage(subject)
             }
         } catch (e: Exception) {
-            if (e is CancellationException) {
-                throw e
-            }
             CometVariables.daemonLogger.warning("在转换图片时出现了问题, Wrapper 原始内容为: ${toString()}")
-            throw e
+            return PlainText("[图片]")
         }
 
         throw RuntimeException("Unable to convert Picture to Image, Picture raw content: $this")
