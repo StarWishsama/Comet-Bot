@@ -36,51 +36,55 @@ object RepeatListener : INListener {
         val groupId = event.group.id
         val repeatInfo = repeatCachePool[groupId]
 
-        if (repeatInfo == null) {
-            repeatCachePool[groupId] = RepeatInfo(mutableListOf(event.message))
-            return
+        runBlocking {
+            if (repeatInfo == null) {
+                repeatCachePool[groupId] = RepeatInfo().also { it.handleRepeat(event.group, event.message) }
+            } else {
+                repeatInfo.handleRepeat(event.group, event.message)
+            }
         }
-
-        repeatInfo.handleRepeat(event.group, event.message)
     }
 }
 
 data class RepeatInfo(
-    val messageCache: MutableList<MessageChain> = mutableListOf(),
-    var lastRepeat: MessageChain = EmptyMessageChain
+    var counter: Int = 0,
+    var pendingRepeatMessage: MessageChain = EmptyMessageChain
 ) {
-    fun handleRepeat(group: Group, message: MessageChain) {
-        if (messageCache.isEmpty()) {
-            messageCache.add(message)
-            return
-        }
-
-        val previousMessage = messageCache.last()
-        val previousSenderId = previousMessage.source.fromId
-
-        if (previousSenderId != message.sourceOrNull?.fromId && previousMessage.contentEquals(
-                message,
-                ignoreCase = false,
-                strict = true
-            )
-        ) {
-            messageCache.add(message)
-        } else {
-            // No one repeat now, clear it
-            lastRepeat = EmptyMessageChain
-            messageCache.clear()
-            return
-        }
-
-        if (messageCache.size > 1 && !previousMessage.contentEquals(lastRepeat, ignoreCase = false, strict = true)) {
-            runBlocking {
-                group.sendMessage(processRepeatMessage(previousMessage))
+    suspend fun handleRepeat(group: Group, message: MessageChain) {
+        if (counter < 2) {
+            // First time repeat here.
+            if (pendingRepeatMessage == EmptyMessageChain) {
+                pendingRepeatMessage = message
+                counter++
+                return
             }
 
-            // Set last repeat message
-            lastRepeat = previousMessage
+            val previousSenderId = pendingRepeatMessage.source.fromId
+            val currentSenderId = message.sourceOrNull?.fromId
 
-            messageCache.clear()
+            // Validate the current message is same as pending one
+            if (previousSenderId != currentSenderId
+                && pendingRepeatMessage.contentEquals(message, ignoreCase = false, strict = true)
+            ) {
+                counter++
+            } else {
+                // Repeat has been interrupted, reset the counter
+                pendingRepeatMessage = EmptyMessageChain
+                counter = 0
+                return
+            }
+        } else {
+            if (pendingRepeatMessage.contentEquals(message, ignoreCase = false, strict = true)) {
+                group.sendMessage(pendingRepeatMessage)
+
+                counter = 0
+                pendingRepeatMessage = EmptyMessageChain
+            } else {
+                // Repeat has been interrupted, reset the counter
+                pendingRepeatMessage = EmptyMessageChain
+                counter = 0
+                return
+            }
         }
     }
 

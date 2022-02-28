@@ -13,6 +13,7 @@ package io.github.starwishsama.comet.objects.wrapper
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.logger.HinaLogLevel
+import io.github.starwishsama.comet.utils.noCatchCancellation
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
@@ -96,7 +97,7 @@ open class MessageWrapper {
                     if ((it is Picture && !isPictureReachLimit()) || it !is Picture) {
                         add(it.toMessageContent(subject))
                     }
-                }.onFailure {
+                }.noCatchCancellation {
                     CometVariables.daemonLogger.log(HinaLogLevel.Warn, prefix = "MessageWrapper", throwable = it, message = "在转换消息时出现了问题")
                 }
             }

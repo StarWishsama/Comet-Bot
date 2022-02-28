@@ -17,5 +17,6 @@ fun VideoInfo.toMessageWrapper(): MessageWrapper =
             append(if (stat?.highestRank?.let { it > 0 } == true) "| 本站最高日排行第${stat?.highestRank}名\n" else "\n")
         })
 
-        addPictureByURL(buildImageUrl(cover, ImageFormat.PNG, weight = 800, height = 600)).addText("\n直达链接: https://bilibili.com/video/${bvid}")
+        addPictureByURL(buildImageUrl(cover, ImageFormat.PNG, weight = 800, height = 600))
+        addText("\n直达链接: https://bilibili.com/video/${bvid}")
     }
