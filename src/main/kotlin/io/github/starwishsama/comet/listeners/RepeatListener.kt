@@ -13,7 +13,6 @@ package io.github.starwishsama.comet.listeners
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
@@ -38,9 +37,12 @@ object RepeatListener : INListener {
 
         runBlocking {
             if (repeatInfo == null) {
-                repeatCachePool[groupId] = RepeatInfo().also { it.handleRepeat(event.group, event.message) }
+                repeatCachePool[groupId] = RepeatInfo().also { it.handleRepeat(event.message) }
             } else {
-                repeatInfo.handleRepeat(event.group, event.message)
+                val result = repeatInfo.handleRepeat(event.message)
+                if (result.isNotEmpty()) {
+                    event.group.sendMessage(result)
+                }
             }
         }
     }
@@ -50,16 +52,16 @@ data class RepeatInfo(
     var counter: Int = 0,
     var pendingRepeatMessage: MessageChain = EmptyMessageChain
 ) {
-    suspend fun handleRepeat(group: Group, message: MessageChain) {
+    fun handleRepeat(message: MessageChain): MessageChain {
         if (counter < 2) {
             // First time repeat here.
             if (pendingRepeatMessage == EmptyMessageChain) {
                 pendingRepeatMessage = message
                 counter++
-                return
+                return EmptyMessageChain
             }
 
-            val previousSenderId = pendingRepeatMessage.source.fromId
+            val previousSenderId = pendingRepeatMessage.sourceOrNull?.fromId
             val currentSenderId = message.sourceOrNull?.fromId
 
             // Validate the current message is same as pending one
@@ -71,19 +73,20 @@ data class RepeatInfo(
                 // Repeat has been interrupted, reset the counter
                 pendingRepeatMessage = EmptyMessageChain
                 counter = 0
-                return
             }
-        } else {
-            if (pendingRepeatMessage.contentEquals(message, ignoreCase = false, strict = true)) {
-                group.sendMessage(pendingRepeatMessage)
 
+            return EmptyMessageChain
+        } else {
+            return if (pendingRepeatMessage.contentEquals(message, ignoreCase = false, strict = true)) {
+                val result = pendingRepeatMessage
                 counter = 0
                 pendingRepeatMessage = EmptyMessageChain
+                result
             } else {
                 // Repeat has been interrupted, reset the counter
                 pendingRepeatMessage = EmptyMessageChain
                 counter = 0
-                return
+                EmptyMessageChain
             }
         }
     }
