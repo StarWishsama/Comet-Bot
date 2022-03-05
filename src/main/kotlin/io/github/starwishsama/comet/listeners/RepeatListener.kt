@@ -78,7 +78,7 @@ data class RepeatInfo(
             return EmptyMessageChain
         } else {
             return if (pendingRepeatMessage.contentEquals(message, ignoreCase = false, strict = true)) {
-                val result = pendingRepeatMessage
+                val result = processRepeatMessage(pendingRepeatMessage)
                 counter = 0
                 pendingRepeatMessage = EmptyMessageChain
                 result
