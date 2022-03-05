@@ -43,8 +43,8 @@ object KeyWordCommand : ChatCommand, ConversationCommand {
         }
 
         return when (args[0]) {
-            "add", "new" -> KeyWordService.addKeyWord(event.sender.id, event.group.id, args.getOrElse(1) { "" })
-            "remove", "del", "rm" -> KeyWordService.removeKeyWord(event.group.id, args.getOrElse(1) { "" })
+            "add", "new" -> KeyWordService.addKeyWord(event.sender.id, event.group.id, args.getRestString(1))
+            "remove", "del", "rm" -> KeyWordService.removeKeyWord(event.group.id, args.getRestString(1))
             "list", "ls" -> KeyWordService.listKeyWords(event.group.id)
             else -> getHelp().toMessageChain()
         }
