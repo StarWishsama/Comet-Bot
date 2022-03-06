@@ -141,6 +141,7 @@ object BiliBiliCommand : ChatCommand {
         /bili refresh 刷新订阅UP主缓存
         /bili id [动态 ID] 通过动态 ID 查询动态
         /bili parse 开启/关闭群聊消息视频解析
+        /bili video [av/BV号] 解析视频
     """.trimIndent()
 
     fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
