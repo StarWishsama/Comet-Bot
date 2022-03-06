@@ -84,6 +84,9 @@ object GithubWebHookHandler {
             }
 
             val payload = URLDecoder.decode(request.replace("payload=", ""), Charsets.UTF_8)
+
+            CometVariables.netLogger.log(HinaLogLevel.Debug, "接收到传入请求: $payload")
+
             val validate = CometVariables.mapper.readTree(payload).isUsable()
 
             if (!validate) {
