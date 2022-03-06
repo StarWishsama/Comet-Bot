@@ -13,7 +13,13 @@ package io.github.starwishsama.comet.api.thirdparty.github.data.events
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.starwishsama.comet.api.thirdparty.github.data.api.RepoInfo
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
+import io.github.starwishsama.comet.objects.wrapper.buildMessageWrapper
 
+/**
+ * [PingEvent]
+ *
+ * 该事件通常只在首次添加时触发.
+ */
 data class PingEvent(
     val zen: String,
     @JsonProperty("hook_id")
@@ -33,12 +39,14 @@ data class PingEvent(
 
     // Ping 事件无需转换
     override fun toMessageWrapper(): MessageWrapper {
-        return MessageWrapper().setUsable(false)
+        return buildMessageWrapper {
+            addText("🎉 成功添加 ${repositoryInfo.repoFullName} 仓库的推送")
+        }
     }
 
     override fun repoName(): String {
         return repositoryInfo.repoFullName
     }
 
-    override fun isSendableEvent(): Boolean = false
+    override fun isSendableEvent(): Boolean = true
 }
