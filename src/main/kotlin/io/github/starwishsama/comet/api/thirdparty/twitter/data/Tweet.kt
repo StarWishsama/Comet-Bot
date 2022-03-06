@@ -73,8 +73,8 @@ data class Tweet(
             "❤${likeCount?.getBetterNumber()} | \uD83D\uDD01${retweetCount} | 🕘${hmsPattern.format(getSentTime())}"
 
         if (retweetStatus != null) {
-            return "\uD83D\uDD03 ${retweetStatus.user.name} >\n" +
-                    "${cleanShortUrlAtEnd(retweetStatus.text).limitStringSize(30)}\n" +
+            return "♻ ${retweetStatus.user.name} 转推了\n" +
+                    "${retweetStatus.text.cleanShortUrl().limitStringSize(30)}\n" +
                     "$extraText\n" +
                     "\uD83D\uDD17 > ${getTweetURL()}\n" +
                     "\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前"
@@ -82,29 +82,29 @@ data class Tweet(
 
         if (isQuoted && quotedStatus != null) {
             return buildString {
-                append("\uD83D\uDD03 ${user.name} >\n")
-                append(cleanShortUrlAtEnd(text) + "\n\n")
+                append("♻ ${user.name} 转推并评论说\n")
+                append(text.cleanShortUrl() + "\n\n")
                 append("💬 ${quotedStatus.user.name} >\n")
-                append(cleanShortUrlAtEnd(text).limitStringSize(30) + "\n")
+                append(quotedStatus.text.cleanShortUrl().limitStringSize(30) + "\n")
                 append("$extraText\n🔗 > ${getTweetURL()}\n")
                 append("\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前")
             }
         }
 
         if (replyTweetId != null) {
-            val repliedTweet = TwitterApi.getTweetById(replyTweetId) ?: return "$text\n" +
-                    "$extraText\n" +
-                    "🔗 > ${getTweetURL()}\n" +
-                    "\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前"
+            val repliedTweet = TwitterApi.getTweetById(replyTweetId)
 
-            return "对于 ${repliedTweet.user.name} 的推文:\n" +
-                    "${cleanShortUrlAtEnd(repliedTweet.text).limitStringSize(30)}\n\n" +
-                    "${user.name} 进行了回复\n${cleanShortUrlAtEnd(text)}\n" +
-                    "$extraText\n🔗 > ${getTweetURL()}\n" +
-                    "\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前"
+            return buildString {
+                append("\uD83D\uDCAC ${user.name} 回复推文\n")
+                append(text.cleanShortUrl() + "\n\n")
+                append("\uD83D\uDCAC ${repliedTweet?.user?.name}\n")
+                append("${repliedTweet?.text?.cleanShortUrl()?.limitStringSize(20)}")
+                append("$extraText\n🔗 > ${getTweetURL()}\n")
+                append("\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前")
+            }
         }
 
-        return "${cleanShortUrlAtEnd(text)}\n" +
+        return "${text.cleanShortUrl()}\n" +
                 "$extraText\n" +
                 "🔗 > ${getTweetURL()}\n" +
                 "\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前"
@@ -170,16 +170,16 @@ data class Tweet(
     /**
      * 清理推文中末尾的 t.co 短链
      */
-    private fun cleanShortUrlAtEnd(tweet: String): String {
+    private fun String.cleanShortUrl(): String {
         val tcoUrl = mutableListOf<String>()
 
-        tcoPattern.matcher(tweet).run {
+        tcoPattern.matcher(this).run {
             while (find()) {
                 tcoUrl.add(group())
             }
         }
 
-        return if (tcoUrl.isNotEmpty()) tweet.replace(tcoUrl.last(), "") else tweet
+        return if (tcoUrl.isNotEmpty()) this.replace(tcoUrl.last(), "") else this
     }
 
     fun toMessageWrapper(): MessageWrapper {
