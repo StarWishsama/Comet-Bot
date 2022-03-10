@@ -26,6 +26,7 @@ import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import io.github.starwishsama.comet.utils.StringUtil.toFriendly
+import io.github.starwishsama.comet.utils.TaskUtil
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -34,6 +35,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.content
 import java.time.Duration
 import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 import kotlin.time.toKotlinDuration
 
 object GuessNumberCommand : ChatCommand, ConversationCommand {
@@ -64,7 +66,16 @@ object GuessNumberCommand : ChatCommand, ConversationCommand {
                         }
                         val answer = RandomUtil.randomInt(min, max + 1)
                         CometVariables.logger.info("[猜数字] 群 ${event.group.id} 生成的随机数为 $answer")
-                        SessionHandler.insertSession(GuessNumberSession(SessionTarget(event.group.id), answer))
+
+                        val session = GuessNumberSession(SessionTarget(event.group.id), answer)
+                        SessionHandler.insertSession(session)
+
+                        TaskUtil.scheduleAtFixedRate(30, 30, TimeUnit.SECONDS) {
+                            if (session.lastTriggerTime.plus(Duration.ofSeconds(30)).isAfter(LocalDateTime.now())) {
+                                SessionHandler.removeSession(session)
+                            }
+                        }
+
                         return CometUtil.toMessageChain("猜一个数字吧! 范围 [$min, $max]")
                     }
                     else -> {

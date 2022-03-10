@@ -29,6 +29,11 @@ open class Session(
 ) {
     val users: MutableSet<SessionUser> = mutableSetOf()
     val createdTime: LocalDateTime = LocalDateTime.now()
+    var lastTriggerTime: LocalDateTime = createdTime
+
+    fun update() {
+        lastTriggerTime = LocalDateTime.now()
+    }
 
     override fun toString(): String {
         return "Session#${hashCode()} {target=$target, silent=${silent}, usersCount=${users.size}}"

@@ -90,6 +90,7 @@ object SessionHandler {
         for (session in sessions) {
             if (session.silent || CommandManager.getCommandPrefix(e.message.contentToString()).isEmpty()) {
                 session.creator.handle(e, user, session)
+                session.update()
             }
         }
 
