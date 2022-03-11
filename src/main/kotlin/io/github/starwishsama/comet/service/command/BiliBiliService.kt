@@ -28,7 +28,7 @@ import io.github.starwishsama.comet.objects.tasks.network.INetworkRequestTask
 import io.github.starwishsama.comet.objects.tasks.network.NetworkRequestTask
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.CometUtil
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.NumberUtil.getBetterNumber
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
@@ -137,34 +137,34 @@ object BiliBiliService {
 
             if (args[1] == "all" || args[1] == "全部") {
                 cfg.biliSubscribers.clear()
-                return toChain("退订全部成功")
+                return toMessageChain("退订全部成功")
             }
 
             val item = if (args[1].isNumeric()) {
                 val item = cfg.biliSubscribers.parallelStream().filter { it.id == args[1] }.findFirst()
                 if (!item.isPresent) {
-                    return "找不到你要退订的用户".toChain()
+                    return "找不到你要退订的用户".toMessageChain()
                 }
 
                 item.get()
             } else {
                 val item = cfg.biliSubscribers.parallelStream().filter { it.userName == args[1] }.findFirst()
                 if (!item.isPresent) {
-                    return "找不到你要退订的用户".toChain()
+                    return "找不到你要退订的用户".toMessageChain()
                 }
 
                 item.get()
             }
 
             cfg.biliSubscribers.remove(item)
-            "取消订阅用户 ${item.userName} 成功".toChain()
+            "取消订阅用户 ${item.userName} 成功".toMessageChain()
         } else {
             cmd.getHelp().convertToChain()
         }
     }
 
     fun getSubscribers(event: MessageEvent): MessageChain {
-        if (event !is GroupMessageEvent) return "只能在群里查看订阅列表".toChain()
+        if (event !is GroupMessageEvent) return "只能在群里查看订阅列表".toMessageChain()
         val list = GroupConfigManager.getConfig(event.group.id)?.biliSubscribers
 
         if (list?.isNotEmpty() == true) {
@@ -175,9 +175,9 @@ object BiliBiliService {
                     trim()
                 }
             }
-            return toChain(subs)
+            return toMessageChain(subs)
         }
-        return toChain("未订阅任何用户")
+        return toMessageChain("未订阅任何用户")
     }
 
     suspend fun searchUserInfo(userName: String, event: MessageEvent) {
@@ -193,11 +193,11 @@ object BiliBiliService {
     }
 
     fun setParseVideo(groupId: Long): MessageChain {
-        val cfg = GroupConfigManager.getConfig(groupId) ?: return "请求的群聊不存在!".toChain()
+        val cfg = GroupConfigManager.getConfig(groupId) ?: return "请求的群聊不存在!".toMessageChain()
 
         cfg.canParseBiliVideo = !cfg.canParseBiliVideo
 
-        return "群聊视频解析已${if (cfg.canParseBiliVideo) "开启" else "关闭"}".toChain()
+        return "群聊视频解析已${if (cfg.canParseBiliVideo) "开启" else "关闭"}".toMessageChain()
     }
 
     fun searchVideo(videoId: String, event: MessageEvent): MessageChain {
@@ -207,7 +207,7 @@ object BiliBiliService {
                 videoId.lowercase().startsWith("av") -> VideoApi.getVideoInfo(videoId.lowercase().replace("av", "").toInt())
                 else -> null
             }
-        } ?: return "请输入有效的 av/bv 号!".toChain()
+        } ?: return "请输入有效的 av/bv 号!".toMessageChain()
 
         return runBlocking {
             val wrapper = videoInfo.toMessageWrapper()
@@ -303,9 +303,9 @@ class BiliBiliUserCheckTask(
                 粉丝 ${card?.follower?.getBetterNumber()} | 获赞 ${card?.like?.getBetterNumber()}
                                          
                 🔗 https://space.bilibili.com/${space.mid}                         
-                """.trimIndent().toChain()
+                """.trimIndent().toMessageChain()
             } else {
-                "找不到对应的B站用户".toChain()
+                "找不到对应的B站用户".toMessageChain()
             }
 
             runBlocking {
@@ -313,14 +313,14 @@ class BiliBiliUserCheckTask(
             }
         } else {
             runBlocking {
-                content.sendMessage("无法查询到对应B站用户信息".toChain())
+                content.sendMessage("无法查询到对应B站用户信息".toMessageChain())
             }
         }
     }
 
     override fun onFailure(t: Throwable?) {
         runBlocking {
-            content.sendMessage("查询对应B站用户信息时出现错误".toChain())
+            content.sendMessage("查询对应B站用户信息时出现错误".toMessageChain())
         }
         daemonLogger.warning("查询哔哩哔哩用户信息时出现异常", t)
     }
@@ -371,7 +371,7 @@ class BiliBiliDynamicTask(
     }
 
     override fun onFailure(t: Throwable?) {
-        runBlocking { content.sendMessage(CometUtil.sendMessageAsString("获取动态失败").toChain()) }
+        runBlocking { content.sendMessage(CometUtil.sendMessageAsString("获取动态失败").toMessageChain()) }
         daemonLogger.warning("获取动态失败", t)
     }
 }

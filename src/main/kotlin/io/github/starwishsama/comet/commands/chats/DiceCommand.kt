@@ -15,7 +15,7 @@ import io.github.starwishsama.comet.api.command.CommandProps
 import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
@@ -27,18 +27,18 @@ object DiceCommand : ChatCommand {
 
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
-            return getHelp().toChain()
+            return getHelp().toMessageChain()
         }
 
         val (count, size) = parseInput(args[0])
 
         if (count < 1 || size < 1) {
-            return "骰子格式错误! 格式示例: 1d100".toChain()
+            return "骰子格式错误! 格式示例: 1d100".toMessageChain()
         }
 
         val result = doDice(count, size)
 
-        return "结果: ${args[0]}=${result.convertToString()}".toChain()
+        return "结果: ${args[0]}=${result.convertToString()}".toMessageChain()
     }
 
     override val props: CommandProps =

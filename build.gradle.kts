@@ -12,8 +12,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-    kotlin("jvm") version "1.6.10"
-    kotlin("plugin.serialization") version "1.6.10"
+    kotlin("jvm") version Versions.kotlinVersion
+    kotlin("plugin.serialization") version Versions.kotlinVersion
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("com.github.gmazzo.buildconfig") version "3.0.3"
     id("net.mamoe.mirai-console") version Versions.miraiVersion
@@ -136,5 +136,5 @@ mirai {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
-    kotlinOptions.freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
+    kotlinOptions.freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+UnitConversion")
 }

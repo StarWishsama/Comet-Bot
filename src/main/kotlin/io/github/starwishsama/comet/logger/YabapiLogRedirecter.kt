@@ -1,6 +1,7 @@
 package io.github.starwishsama.comet.logger
 
 import io.github.starwishsama.comet.CometVariables
+import kotlinx.serialization.json.Json
 import moe.sdl.yabapi.Yabapi
 import moe.sdl.yabapi.enums.LogLevel
 
@@ -9,6 +10,13 @@ object YabapiLogRedirecter {
     private var isInitializedYabapi = false
 
     internal fun initYabapi() = Yabapi.apply {
+        defaultJson.lazySet(Json {
+            prettyPrint = true
+            isLenient = true
+            coerceInputValues = true
+            ignoreUnknownKeys = true
+        })
+
         if (!isInitializedYabapi) {
             log.getAndSet { tag: String, level: LogLevel, throwable: Throwable?, message: () -> String ->
                 when (level) {

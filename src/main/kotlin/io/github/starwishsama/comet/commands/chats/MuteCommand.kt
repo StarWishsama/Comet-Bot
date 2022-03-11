@@ -19,7 +19,7 @@ import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.MuteService
 import io.github.starwishsama.comet.utils.CometUtil
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.TaskUtil
 import kotlinx.coroutines.runBlocking
@@ -31,12 +31,12 @@ import net.mamoe.mirai.message.data.MessageChain
 object MuteCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!hasPermission(user, event)) {
-            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
+            return LocalizationManager.getLocalizationText("message.no-permission").toMessageChain()
         }
 
         return if (event is GroupMessageEvent) {
             if (args.isNotEmpty()) {
-                val at = CometUtil.parseAtAsBotUser(event, args[0])
+                val at = CometUtil.parseAtAsBotUser(event.message, args[0])
 
                 if (at != null) {
                     if (args.size > 1) {
@@ -54,7 +54,7 @@ object MuteCommand : ChatCommand {
                                 }
                             }
 
-                            "下面将抽取一位幸运群友禁言".toChain()
+                            "下面将抽取一位幸运群友禁言".toMessageChain()
                         }
                         else -> getHelp().convertToChain()
                     }
@@ -63,7 +63,7 @@ object MuteCommand : ChatCommand {
                 getHelp().convertToChain()
             }
         } else {
-            "仅限群聊使用".toChain()
+            "仅限群聊使用".toMessageChain()
         }
     }
 

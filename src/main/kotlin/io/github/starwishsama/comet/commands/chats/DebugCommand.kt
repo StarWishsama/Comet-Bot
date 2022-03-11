@@ -22,7 +22,7 @@ import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.utils.CometUtil
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.TaskUtil
@@ -42,9 +42,9 @@ object DebugCommand : ChatCommand, UnDisableableCommand {
                     if (user.isBotOwner()) {
                         return try {
                             DataSetup.reload()
-                            "重载成功.".toChain()
+                            "重载成功.".toMessageChain()
                         } catch (e: IOException) {
-                            "在重载时发生了异常.".toChain()
+                            "在重载时发生了异常.".toMessageChain()
                         }
                     }
                 }
@@ -61,7 +61,7 @@ object DebugCommand : ChatCommand, UnDisableableCommand {
                                 }
                             }
                         }
-                        return sb.toString().trim().toChain()
+                        return sb.toString().trim().toMessageChain()
                     }
                 }
                 "info" -> {
@@ -76,11 +76,11 @@ object DebugCommand : ChatCommand, UnDisableableCommand {
                                 "与服务器的延迟为 $ping ms\n" +
                                 "运行时长 ${CometUtil.getRunningTime()}\n" +
                                 "构建时间: ${BuildConfig.buildTime}"
-                                ).toChain()
+                                ).toMessageChain()
                     } else {
                         return when (args[1]) {
                             "memory", "ram" -> {
-                                RuntimeUtil.getMemoryInfo().toChain(false)
+                                RuntimeUtil.getMemoryInfo().toMessageChain(false)
                             }
                             "thread", "thr" -> {
                                 val executor = TaskUtil.service as ThreadPoolExecutor
@@ -97,13 +97,13 @@ object DebugCommand : ChatCommand, UnDisableableCommand {
 总线程数：$taskCount
                     """.trimIndent().convertToChain()
                             }
-                            else -> "无效参数".toChain()
+                            else -> "无效参数".toMessageChain()
                         }
                     }
                 }
                 "switch" -> {
                     CometVariables.switch = !CometVariables.switch
-                    return "维护模式已${if (!CometVariables.switch) "开启" else "关闭"}".toChain()
+                    return "维护模式已${if (!CometVariables.switch) "开启" else "关闭"}".toMessageChain()
                 }
                 "quit" -> {
                     if (event is GroupMessageEvent) {

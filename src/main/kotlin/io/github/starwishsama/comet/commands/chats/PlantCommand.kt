@@ -5,7 +5,7 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.PlantService
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
@@ -13,7 +13,7 @@ import net.mamoe.mirai.message.data.MessageChain
 object PlantCommand: ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
-            return getHelp().toChain()
+            return getHelp().toMessageChain()
         }
 
         return when (args[0]) {
@@ -21,7 +21,7 @@ object PlantCommand: ChatCommand {
             "info", "cx" -> PlantService.queryPlantStatus(user)
             "rename", "mm" -> PlantService.renamePlant(user)
             "claim", "lq" -> PlantService.claimPlant(user)
-            else -> getHelp().toChain()
+            else -> getHelp().toMessageChain()
         }
     }
 

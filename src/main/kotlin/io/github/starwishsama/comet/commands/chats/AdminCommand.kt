@@ -20,7 +20,7 @@ import io.github.starwishsama.comet.service.command.AdminService.addPermission
 import io.github.starwishsama.comet.service.command.AdminService.giveCommandTime
 import io.github.starwishsama.comet.service.command.AdminService.listPermissions
 import io.github.starwishsama.comet.service.command.AdminService.removePermission
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
@@ -30,19 +30,19 @@ import net.mamoe.mirai.message.data.MessageChain
 object AdminCommand : ChatCommand, UnDisableableCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!hasPermission(user, event)) {
-            return LocalizationManager.getLocalizationText("message.no-permission").toChain()
+            return LocalizationManager.getLocalizationText("message.no-permission").toMessageChain()
         }
 
         return if (args.isEmpty()) {
-            getHelp().toChain()
+            getHelp().toMessageChain()
         } else {
             when (args[0]) {
-                "help", "帮助" -> getHelp().toChain()
-                "permlist", "权限列表", "qxlb" -> listPermissions(user, args, event)
-                "permadd", "添加权限", "tjqx" -> addPermission(user, args, event)
-                "permdel", "删除权限", "scqx", "sqx" -> removePermission(user, args, event)
+                "help", "帮助" -> getHelp().toMessageChain()
+                "permlist", "权限列表", "qxlb" -> listPermissions(user, args.getOrElse(1) { "" }, event.message)
+                "permadd", "添加权限", "tjqx" -> addPermission(user, args.getOrElse(1) { "" }, args.getOrElse(2) { "" }, event.message)
+                "permdel", "删除权限", "scqx", "sqx" -> removePermission(user, args.getOrElse(1) { "" }, args.getOrElse(2) { "" }, event.message)
                 "give", "增加次数" -> giveCommandTime(event, args)
-                else -> "命令不存在, 使用 /admin help 查看更多".toChain()
+                else -> "命令不存在, 使用 /admin help 查看更多".toMessageChain()
             }
         }
     }

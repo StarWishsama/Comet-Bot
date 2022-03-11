@@ -11,11 +11,12 @@
 package io.github.starwishsama.comet.objects.wrapper
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.logger.HinaLogLevel
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
-import java.util.stream.Collectors
 
 fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
     return MessageWrapper().apply(builder)
@@ -25,33 +26,52 @@ fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
 open class MessageWrapper {
     private val messageContent = mutableSetOf<WrapperElement>()
 
+    private lateinit var lastInsertElement: WrapperElement
+
     @Volatile
     private var usable: Boolean = isEmpty()
 
     fun addElement(element: WrapperElement): MessageWrapper {
-        messageContent.add(element)
+        addElements(element)
         return this
     }
 
     fun addElements(vararg element: WrapperElement): MessageWrapper {
-        messageContent.addAll(element)
+        addElements(element.toList())
         return this
     }
 
     fun addElements(elements: Collection<WrapperElement>): MessageWrapper {
-        messageContent.addAll(elements)
+        for (element in elements) {
+            if (!::lastInsertElement.isInitialized) {
+                lastInsertElement = element
+                messageContent.add(element)
+                continue
+            }
+
+            lastInsertElement = if (lastInsertElement is PureText && element is PureText) {
+                messageContent.remove(lastInsertElement)
+                val merge = PureText((lastInsertElement as PureText).text + element.text)
+                messageContent.add(merge)
+                merge
+            } else {
+                messageContent.add(element)
+                element
+            }
+        }
+
         return this
     }
 
     fun addText(text: String): MessageWrapper {
-        messageContent.add(PureText(text))
+        addElement(PureText(text))
         return this
     }
 
     fun addPictureByURL(url: String?, imageFormat: String = ""): MessageWrapper {
         if (url == null) return this
 
-        messageContent.add(Picture(url, fileFormat = imageFormat))
+        addElement(Picture(url, fileFormat = imageFormat))
         return this
     }
 
@@ -74,33 +94,24 @@ open class MessageWrapper {
     fun toMessageChain(subject: Contact? = null): MessageChain {
         return MessageChainBuilder().apply {
             messageContent.forEach {
-                if (it is Picture) {
-                    if (isPictureReachLimit()) {
-                        return@forEach
-                    }
-
-                    if (subject == null) {
-                        add("[图片]")
-                    } else {
+                kotlin.runCatching {
+                    if ((it is Picture && !isPictureReachLimit()) || it !is Picture) {
                         add(it.toMessageContent(subject))
                     }
-
-                    return@forEach
+                }.onFailure {
+                    CometVariables.daemonLogger.log(HinaLogLevel.Warn, prefix = "MessageWrapper", throwable = it, message = "在转换消息时出现了问题")
                 }
-
-                add(it.toMessageContent(subject))
             }
         }.build()
     }
 
     fun removeElementsByClass(type: Class<*>): MessageWrapper =
         MessageWrapper().setUsable(usable).also {
-            it.addElements((getMessageContent()).parallelStream().filter { mw -> mw.className == type.name }
-                .collect(Collectors.toSet()))
+            it.addElements(getMessageContent().filter { mw -> mw.className == type.name })
         }
 
     private fun isPictureReachLimit(): Boolean {
-        return messageContent.parallelStream().filter { it is Picture }.count() > 9
+        return messageContent.count { it is Picture } > 9
     }
 
     override fun toString(): String {
@@ -108,7 +119,7 @@ open class MessageWrapper {
     }
 
     fun getAllText(): String {
-        val texts = messageContent.parallelStream().filter { it is PureText }.collect(Collectors.toList())
+        val texts = messageContent.filterIsInstance<PureText>()
         return buildString {
             texts.forEach {
                 append(it.asString())

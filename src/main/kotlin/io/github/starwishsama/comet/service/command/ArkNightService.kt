@@ -16,7 +16,7 @@ import io.github.starwishsama.comet.objects.gacha.GachaResult
 import io.github.starwishsama.comet.objects.gacha.pool.ArkNightPool
 import io.github.starwishsama.comet.objects.gacha.pool.isAvailable
 import io.github.starwishsama.comet.service.gacha.GachaService
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.GachaUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.isNumeric
@@ -38,7 +38,7 @@ object ArkNightService {
         return if (GachaUtil.arkPictureIsUsable()) {
             generatePictureGachaResult(pool, event, user, gachaResult)
         } else {
-            pool.getArkDrawResultAsString(user, gachaResult).toChain()
+            pool.getArkDrawResultAsString(user, gachaResult).toMessageChain()
         }
     }
 
@@ -58,7 +58,7 @@ object ArkNightService {
                 GachaUtil.combineGachaImage(if (ops.size <= 10) ops else ops.subList(ops.size - 11, ops.size - 1), pool)
             if (result.lostItem.isNotEmpty())
                 event.subject.sendMessage(
-                    event.message.quote() + toChain(
+                    event.message.quote() + toMessageChain(
                         "由于缺失资源文件, 以下干员无法显示 :(\n" +
                                 buildString {
                                     result.lostItem.forEach {
@@ -106,7 +106,7 @@ object ArkNightService {
                         append(it.name).append(",")
                     }
                 }
-            }.removeSuffix(",").toChain()
+            }.removeSuffix(",").toMessageChain()
         } else {
             val poolName = args[1]
             val pools =
@@ -114,9 +114,9 @@ object ArkNightService {
                     .filter { it.name == poolName && it.isAvailable() }.findFirst()
             if (pools.isPresent) {
                 pool = pools.get()
-                "成功修改卡池为: ${pool.name}".toChain()
+                "成功修改卡池为: ${pool.name}".toMessageChain()
             } else {
-                "找不到名为 $poolName 的卡池".toChain()
+                "找不到名为 $poolName 的卡池".toMessageChain()
             }
         }
     }

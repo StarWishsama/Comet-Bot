@@ -16,7 +16,7 @@ import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.service.command.JikiPediaService
 import io.github.starwishsama.comet.utils.CometUtil.getRestString
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 
@@ -25,7 +25,7 @@ object JikiPediaCommand : ChatCommand {
         return if (args.isNotEmpty()) {
             JikiPediaService.searchJiki(event, args.getRestString(0))
         } else {
-            getHelp().toChain()
+            getHelp().toMessageChain()
         }
     }
 

@@ -13,7 +13,6 @@ package io.github.starwishsama.comet.listeners
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
@@ -36,51 +35,59 @@ object RepeatListener : INListener {
         val groupId = event.group.id
         val repeatInfo = repeatCachePool[groupId]
 
-        if (repeatInfo == null) {
-            repeatCachePool[groupId] = RepeatInfo(mutableListOf(event.message))
-            return
+        runBlocking {
+            if (repeatInfo == null) {
+                repeatCachePool[groupId] = RepeatInfo().also { it.handleRepeat(event.message) }
+            } else {
+                val result = repeatInfo.handleRepeat(event.message)
+                if (result.isNotEmpty()) {
+                    event.group.sendMessage(result)
+                }
+            }
         }
-
-        repeatInfo.handleRepeat(event.group, event.message)
     }
 }
 
 data class RepeatInfo(
-    val messageCache: MutableList<MessageChain> = mutableListOf(),
-    var lastRepeat: MessageChain = EmptyMessageChain
+    var counter: Int = 0,
+    var pendingRepeatMessage: MessageChain = EmptyMessageChain
 ) {
-    fun handleRepeat(group: Group, message: MessageChain) {
-        if (messageCache.isEmpty()) {
-            messageCache.add(message)
-            return
-        }
-
-        val previousMessage = messageCache.last()
-        val previousSenderId = previousMessage.source.fromId
-
-        if (previousSenderId != message.sourceOrNull?.fromId && previousMessage.contentEquals(
-                message,
-                ignoreCase = false,
-                strict = true
-            )
-        ) {
-            messageCache.add(message)
-        } else {
-            // No one repeat now, clear it
-            lastRepeat = EmptyMessageChain
-            messageCache.clear()
-            return
-        }
-
-        if (messageCache.size > 1 && !previousMessage.contentEquals(lastRepeat, ignoreCase = false, strict = true)) {
-            runBlocking {
-                group.sendMessage(processRepeatMessage(previousMessage))
+    fun handleRepeat(message: MessageChain): MessageChain {
+        if (counter < 2) {
+            // First time repeat here.
+            if (pendingRepeatMessage == EmptyMessageChain) {
+                pendingRepeatMessage = message
+                counter++
+                return EmptyMessageChain
             }
 
-            // Set last repeat message
-            lastRepeat = previousMessage
+            val previousSenderId = pendingRepeatMessage.sourceOrNull?.fromId
+            val currentSenderId = message.sourceOrNull?.fromId
 
-            messageCache.clear()
+            // Validate the current message is same as pending one
+            if (previousSenderId != currentSenderId
+                && pendingRepeatMessage.contentEquals(message, ignoreCase = false, strict = true)
+            ) {
+                counter++
+            } else {
+                // Repeat has been interrupted, reset the counter
+                pendingRepeatMessage = EmptyMessageChain
+                counter = 0
+            }
+
+            return EmptyMessageChain
+        } else {
+            return if (pendingRepeatMessage.contentEquals(message, ignoreCase = false, strict = true)) {
+                val result = processRepeatMessage(pendingRepeatMessage)
+                counter = 0
+                pendingRepeatMessage = EmptyMessageChain
+                result
+            } else {
+                // Repeat has been interrupted, reset the counter
+                pendingRepeatMessage = EmptyMessageChain
+                counter = 0
+                EmptyMessageChain
+            }
         }
     }
 

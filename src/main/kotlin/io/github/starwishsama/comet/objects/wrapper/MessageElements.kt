@@ -19,12 +19,14 @@ import io.github.starwishsama.comet.utils.StringUtil.base64ToImage
 import io.github.starwishsama.comet.utils.network.NetUtil
 import io.github.starwishsama.comet.utils.serialize.WrapperConverter
 import io.github.starwishsama.comet.utils.uploadAsImage
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.contact.AudioSupported
 import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.At
+import net.mamoe.mirai.message.data.MessageContent
+import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.SimpleServiceMessage
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.MiraiExperimentalApi
@@ -85,8 +87,10 @@ data class Picture(val url: String = "", val filePath: String = "", val base64: 
 
     override val className: String = this::class.java.name
 
-    override fun toMessageContent(subject: Contact?): Image {
-        requireNotNull(subject) { "subject cannot be null!" }
+    override fun toMessageContent(subject: Contact?): MessageContent {
+        if (subject == null) {
+            return PlainText("[图片]")
+        }
 
         try {
             if (url.isNotEmpty()) {
@@ -103,11 +107,8 @@ data class Picture(val url: String = "", val filePath: String = "", val base64: 
                 return base64.toByteArray().base64ToImage().uploadAsImage(subject)
             }
         } catch (e: Exception) {
-            if (e is CancellationException) {
-                throw e
-            }
             CometVariables.daemonLogger.warning("在转换图片时出现了问题, Wrapper 原始内容为: ${toString()}")
-            throw e
+            return PlainText("[图片]")
         }
 
         throw RuntimeException("Unable to convert Picture to Image, Picture raw content: $this")

@@ -14,7 +14,7 @@ import cn.hutool.core.util.RandomUtil
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.tasks.HitokotoUpdater
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.NumberUtil.fixDisplay
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.MessageEvent
@@ -32,7 +32,7 @@ import kotlin.math.min
 object CheckInService {
     fun handleCheckIn(event: MessageEvent, user: CometUser): MessageChain {
         return if (user.isChecked()) {
-            "你今天已经签到过了! 输入 /cx 可查询硬币详情".toChain()
+            "你今天已经签到过了! 输入 /cx 可查询硬币详情".toMessageChain()
         } else {
             doCheckIn(event, user)
         }
@@ -80,7 +80,7 @@ object CheckInService {
             append("今日一言 > ${HitokotoUpdater.getHitokoto(false)}\n")
         }
 
-        return checkInResult.toChain()
+        return checkInResult.toMessageChain()
     }
 
     /**

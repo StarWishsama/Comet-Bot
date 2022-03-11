@@ -75,12 +75,20 @@ data class CometUser(
         return level == UserLevel.OWNER
     }
 
+    fun addPermission(permission: CometPermission) {
+        permissions.add(permission)
+    }
+
     fun addPermission(nodeName: String) {
-        permissions.add(PermissionManager.getPermission(nodeName) ?: return)
+        addPermission(PermissionManager.getPermission(nodeName) ?: return)
+    }
+
+    fun removePermission(permission: CometPermission) {
+        permissions.remove(permission)
     }
 
     fun removePermission(nodeName: String) {
-        permissions.remove(PermissionManager.getPermission(nodeName) ?: return)
+        removePermission(PermissionManager.getPermission(nodeName) ?: return)
     }
 
     /**

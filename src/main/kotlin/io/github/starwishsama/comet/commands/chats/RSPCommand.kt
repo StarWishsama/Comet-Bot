@@ -19,7 +19,7 @@ import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
@@ -37,7 +37,7 @@ object RSPCommand : ChatCommand, ConversationCommand {
             SessionHandler.insertSession(Session(SessionTarget(0, event.sender.id), this, false))
         }
 
-        return "石头剪刀布... 开始! 你要出什么呢?".toChain()
+        return "石头剪刀布... 开始! 你要出什么呢?".toMessageChain()
     }
 
     override val props: CommandProps =
@@ -62,17 +62,17 @@ object RSPCommand : ChatCommand, ConversationCommand {
                     val gameStatus = RockPaperScissors.isWin(player, system)
 
                     when (RockPaperScissors.isWin(player, system)) {
-                        -1 -> event.subject.sendMessage(event.message.quote() + toChain("平局! 我出的是${system.display[0]}"))
-                        0 -> event.subject.sendMessage(event.message.quote() + toChain("你输了! 我出的是${system.display[0]}"))
-                        1 -> event.subject.sendMessage(event.message.quote() + toChain("你赢了! 我出的是${system.display[0]}"))
-                        else -> event.subject.sendMessage(event.message.quote() + toChain("这合理吗?"))
+                        -1 -> event.subject.sendMessage(event.message.quote() + toMessageChain("平局! 我出的是${system.display[0]}"))
+                        0 -> event.subject.sendMessage(event.message.quote() + toMessageChain("你输了! 我出的是${system.display[0]}"))
+                        1 -> event.subject.sendMessage(event.message.quote() + toMessageChain("你赢了! 我出的是${system.display[0]}"))
+                        else -> event.subject.sendMessage(event.message.quote() + toMessageChain("这合理吗?"))
                     }
 
                     if (gameStatus in -1..1) {
                         SessionHandler.removeSession(session)
                     }
                 } else {
-                    event.subject.sendMessage(event.message.quote() + toChain("你的拳法杂乱无章, 这合理吗?"))
+                    event.subject.sendMessage(event.message.quote() + toMessageChain("你的拳法杂乱无章, 这合理吗?"))
                 }
             } finally {
                 inProgressPlayer.remove(user.id)

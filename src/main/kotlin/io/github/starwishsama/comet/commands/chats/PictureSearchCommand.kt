@@ -22,7 +22,7 @@ import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.Session
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.sessions.SessionTarget
-import io.github.starwishsama.comet.utils.CometUtil.toChain
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.network.PictureSearchUtil
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.Image
@@ -41,24 +41,24 @@ object PictureSearchCommand : ChatCommand, ConversationCommand {
                     SessionHandler.insertSession(Session(SessionTarget(privateId = event.sender.id), this, true))
                 }
 
-                return "请发送需要搜索的图片".toChain()
+                return "请发送需要搜索的图片".toMessageChain()
             }
 
-            return handlePicSearch(imageToSearch.queryUrl()).toChain()
+            return handlePicSearch(imageToSearch.queryUrl()).toMessageChain()
         } else if (args[0].contentEquals("source")) {
             if (args.size > 1) {
                 return try {
                     val api = PicSearchApiType.valueOf(args[1].uppercase())
                     CometVariables.cfg.pictureSearchApi = api
-                    toChain("已切换识图 API 为 ${api.name}", true)
+                    toMessageChain("已切换识图 API 为 ${api.name}", true)
                 } catch (ignored: IllegalArgumentException) {
-                    return getAllApi().toChain()
+                    return getAllApi().toMessageChain()
                 }
             } else {
-                return getAllApi().toChain()
+                return getAllApi().toMessageChain()
             }
         } else {
-            return getHelp().toChain()
+            return getHelp().toMessageChain()
         }
     }
 
