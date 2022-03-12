@@ -167,7 +167,8 @@ object CometRuntime {
             BotGroupStatusListener,
             AutoReplyListener,
             GroupMemberChangedListener,
-            GroupRequestListener
+            GroupRequestListener,
+            NormalizeMessageSendListener
         )
 
         listeners.forEach { it.register(bot) }
