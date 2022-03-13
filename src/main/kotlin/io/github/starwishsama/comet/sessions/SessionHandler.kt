@@ -56,7 +56,7 @@ object SessionHandler {
     }
 
     fun getSessionsByID(id: Long): List<Session> =
-        sessionPool.filter { it.target.privateId == id }
+        sessionPool.filter { it.target.targetId == id }
 
     /**
      * 获取所有活跃中的会话列表副本.
@@ -77,10 +77,10 @@ object SessionHandler {
         val target = if (e is GroupMessageEvent) {
             SessionTarget(e.group.id, e.sender.id)
         } else {
-            SessionTarget(privateId = e.sender.id)
+            SessionTarget(targetId = e.sender.id)
         }
 
-        val sessions = sessionPool.filter { it.target.groupId == target.groupId && it.target.privateId == target.privateId }
+        val sessions = sessionPool.filter { it.target.groupId == target.groupId && it.target.targetId == target.targetId }
 
         if (sessions.isEmpty()) {
             return false

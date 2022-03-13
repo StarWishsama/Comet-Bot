@@ -22,6 +22,8 @@ fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
     return MessageWrapper().apply(builder)
 }
 
+object EmptyMessageWrapper : MessageWrapper()
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class MessageWrapper {
     private val messageContent = mutableSetOf<WrapperElement>()
@@ -118,7 +120,7 @@ open class MessageWrapper {
         return "MessageWrapper {content=${messageContent}, usable=${usable}}"
     }
 
-    fun getAllText(): String {
+    fun parseToString(): String {
         val texts = messageContent.filterIsInstance<PureText>()
         return buildString {
             texts.forEach {

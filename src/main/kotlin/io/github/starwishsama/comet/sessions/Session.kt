@@ -12,6 +12,7 @@ package io.github.starwishsama.comet.sessions
 
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 
 /**
  * [Session]
@@ -33,6 +34,10 @@ open class Session(
 
     fun update() {
         lastTriggerTime = LocalDateTime.now()
+    }
+
+    fun isExpired(second: Long): Boolean {
+        return lastTriggerTime.plusSeconds(second).isBefore(LocalDateTime.now())
     }
 
     override fun toString(): String {

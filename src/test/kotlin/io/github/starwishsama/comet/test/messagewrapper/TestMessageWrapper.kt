@@ -21,8 +21,8 @@ internal class TestMessageWrapper {
         wrapper.addText(testText3)
         wrapper.addText(testText4)
 
-        assertTrue("Text must be merge! wrapper: ${wrapper.getAllText()}") {
-            testText1 + testText2 + testText3 + testText4 == wrapper.getAllText()
+        assertTrue("Text must be merge! wrapper: ${wrapper.parseToString()}") {
+            testText1 + testText2 + testText3 + testText4 == wrapper.parseToString()
         }
     }
 

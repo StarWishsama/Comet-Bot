@@ -225,7 +225,7 @@ object GitHubService {
             return if (repo.isEmpty()) {
                 "找不到你想修改的 Github 仓库哟".toMessageChain()
             } else {
-                val createdSession = Session(SessionTarget(privateId = event.sender.id), GithubCommand)
+                val createdSession = Session(SessionTarget(targetId = event.sender.id), GithubCommand)
                 SessionHandler.insertSession(createdSession)
 
                 editorCache[createdSession] = repo[0]

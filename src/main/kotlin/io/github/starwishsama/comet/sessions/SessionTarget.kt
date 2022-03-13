@@ -10,7 +10,17 @@
 
 package io.github.starwishsama.comet.sessions
 
+import net.mamoe.mirai.contact.Contact
+import net.mamoe.mirai.contact.Member
+
 data class SessionTarget(
     val groupId: Long = 0,
-    val privateId: Long = 0
+    val targetId: Long = 0
 )
+
+fun Contact.toSessionTarget(): SessionTarget {
+    return when (this) {
+        is Member -> SessionTarget(this.group.id, this.id)
+        else -> SessionTarget(targetId = this.id)
+    }
+}
