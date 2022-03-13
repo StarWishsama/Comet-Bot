@@ -119,7 +119,7 @@ abstract class CometPusher(
     }
 
     private fun saveData() {
-        dataFile.writeClassToJson(data)
+        if (::data.isInitialized) dataFile.writeClassToJson(data)
     }
 
     fun stop() {
