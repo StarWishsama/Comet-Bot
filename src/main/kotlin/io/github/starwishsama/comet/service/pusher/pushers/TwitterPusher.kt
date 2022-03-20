@@ -16,10 +16,15 @@ import io.github.starwishsama.comet.service.pusher.CometPusher
 import io.github.starwishsama.comet.service.pusher.CometPusherData
 import io.github.starwishsama.comet.service.pusher.PushStatus
 import io.github.starwishsama.comet.service.pusher.context.TwitterContext
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 class TwitterPusher : CometPusher("twitter", CometPusherData(5, TimeUnit.MINUTES)) {
     override fun retrieve() {
+        if (LocalDateTime.now().hour in 0..6) {
+            return
+        }
+
         GroupConfigManager.getAllConfigs().forEach { cfg ->
             if (cfg.twitterPushEnabled) {
                 cfg.twitterSubscribers.forEach tweet@{ user ->
