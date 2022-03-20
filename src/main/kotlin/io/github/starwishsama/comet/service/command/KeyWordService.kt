@@ -64,12 +64,12 @@ object KeyWordService {
 
         if (autoReply != null) {
             autoReply.keyWord = keyWord
-            autoReply.reply = reply.toMessageWrapper()
+            autoReply.reply = reply.toMessageWrapper(true)
         } else {
             cfg.keyWordReply.add(
                 PerGroupConfig.ReplyKeyWord(
                     keyWord,
-                    reply.toMessageWrapper()
+                    reply.toMessageWrapper(true)
                 )
             )
         }

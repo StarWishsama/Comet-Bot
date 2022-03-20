@@ -13,16 +13,22 @@ package io.github.starwishsama.comet.objects.wrapper
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.logger.HinaLogLevel
+import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
+import net.mamoe.mirai.utils.MiraiInternalApi
+import java.io.File
 
 fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
     return MessageWrapper().apply(builder)
 }
 
 object EmptyMessageWrapper : MessageWrapper()
+
+private val storedLocation = FileUtil.getChildFolder("messagewrapper")
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class MessageWrapper {
@@ -146,7 +152,8 @@ open class MessageWrapper {
     }
 }
 
-fun MessageChain.toMessageWrapper(): MessageWrapper {
+@OptIn(MiraiInternalApi::class)
+fun MessageChain.toMessageWrapper(localImage: Boolean = false): MessageWrapper {
     val wrapper = MessageWrapper()
     for (message in this) {
         when (message) {
@@ -154,7 +161,14 @@ fun MessageChain.toMessageWrapper(): MessageWrapper {
                 wrapper.addText(message.content)
             }
             is Image -> {
-                runBlocking { wrapper.addPictureByURL(message.queryUrl()) }
+                runBlocking {
+                    if (localImage) {
+                        val location = NetUtil.downloadFile(storedLocation, message.queryUrl(), message.imageId + ".${message.imageType.formatName}")
+                        wrapper.addElement(Picture(filePath = location.canonicalPath))
+                    } else {
+                        wrapper.addPictureByURL(message.queryUrl())
+                    }
+                }
             }
             is At -> {
                 wrapper.addElement(AtElement(message.target))
