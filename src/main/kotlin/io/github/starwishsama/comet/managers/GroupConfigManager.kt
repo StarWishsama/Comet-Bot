@@ -37,10 +37,13 @@ object GroupConfigManager {
     }
 
     fun createNewConfig(groupId: Long, instantInit: Boolean = true): PerGroupConfig {
+        require(groupId > 0) { "群号不允许小于0" }
+        requireNotNull(comet.getBot().getGroup(groupId)) { "所获取的群不存在" }
+
         return PerGroupConfig(groupId).also { if (instantInit) it.init() }
     }
 
-    fun expireConfig(groupId: Long) {
+    fun removeConfig(groupId: Long) {
         groupConfigs.removeIf { groupId == it.id }
     }
 

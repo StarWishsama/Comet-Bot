@@ -28,7 +28,7 @@ object BotGroupStatusListener : INListener {
     @EventHandler
     fun listenLeaveGroup(event: BotLeaveEvent) {
         if (GroupConfigManager.getConfig(event.group.id) != null) {
-            GroupConfigManager.expireConfig(event.group.id)
+            GroupConfigManager.removeConfig(event.group.id)
         }
     }
 }
