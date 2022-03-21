@@ -48,11 +48,15 @@ object BiliBiliShareListener : INListener {
                 return
             }
 
+            val message = event.message.contentToString()
+
+            val convertResult = biliBiliLinkConvert(message, event.subject)
+
+            if (convertResult.isEmpty() && event.message.none { it is LightApp }) {
+                return
+            }
+
             if (CometUser.getUser(event.sender.id)?.isNoCoolDown() == true) {
-                val message = event.message.contentToString()
-
-                val convertResult = biliBiliLinkConvert(message, event.subject)
-
                 val result = convertResult.ifEmpty {
                     val lightApp = event.message[LightApp] ?: return
 
