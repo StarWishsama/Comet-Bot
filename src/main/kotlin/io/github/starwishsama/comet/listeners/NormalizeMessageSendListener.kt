@@ -5,7 +5,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.MessagePreSendEvent
 import net.mamoe.mirai.message.data.toMessageChain
-import kotlin.math.max
+import kotlin.math.min
 
 object NormalizeMessageSendListener: INListener {
     override val name: String = "消息发送处理"
@@ -21,6 +21,6 @@ object NormalizeMessageSendListener: INListener {
         val length = this.length
         val multiply = 0.001
 
-        return max((multiply * length).toLong(), 4000)
+        return min((multiply * length).toLong(), 4000)
     }
 }
