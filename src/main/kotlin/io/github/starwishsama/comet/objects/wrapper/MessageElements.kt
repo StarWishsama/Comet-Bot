@@ -13,6 +13,7 @@ package io.github.starwishsama.comet.objects.wrapper
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.utils.StringUtil.base64ToImage
 import io.github.starwishsama.comet.utils.network.NetUtil
@@ -31,12 +32,12 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import java.io.File
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NONE, include = JsonTypeInfo.As.PROPERTY)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "className")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = PureText::class, name = "PureText"),
-    JsonSubTypes.Type(value = Picture::class, name = "Picture"),
-    JsonSubTypes.Type(value = AtElement::class, name = "AtElement"),
-    JsonSubTypes.Type(value = XmlElement::class, name = "XmlElement")
+    JsonSubTypes.Type(value = PureText::class, name = "io.github.starwishsama.comet.objects.wrapper.PureText"),
+    JsonSubTypes.Type(value = Picture::class, name = "io.github.starwishsama.comet.objects.wrapper.Picture"),
+    JsonSubTypes.Type(value = AtElement::class, name = "io.github.starwishsama.comet.objects.wrapper.AtElement"),
+    JsonSubTypes.Type(value = XmlElement::class, name = "io.github.starwishsama.comet.objects.wrapper.XmlElement")
 )
 interface WrapperElement {
     val className: String

@@ -25,7 +25,6 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.github.starwishsama.comet.logger.HinaLogger
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.CometConfig
-import io.github.starwishsama.comet.objects.wrapper.WrapperElement
 import io.github.starwishsama.comet.service.server.CometServiceServer
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
