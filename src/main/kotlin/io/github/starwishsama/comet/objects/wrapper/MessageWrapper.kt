@@ -163,7 +163,7 @@ fun MessageChain.toMessageWrapper(localImage: Boolean = false): MessageWrapper {
             is Image -> {
                 runBlocking {
                     if (localImage) {
-                        val location = NetUtil.downloadFile(storedLocation, message.queryUrl(), message.imageId + ".${message.imageType.formatName}")
+                        val location = NetUtil.downloadFile(storedLocation, message.queryUrl(), message.imageId)
                         wrapper.addElement(Picture(filePath = location.canonicalPath))
                     } else {
                         wrapper.addPictureByURL(message.queryUrl())
