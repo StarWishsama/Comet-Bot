@@ -77,14 +77,12 @@ data class PureText(val text: String) : WrapperElement {
  * @param filePath 图片本地路径
  */
 @Serializable
-data class Picture(val url: String = "", val filePath: String = "", val base64: String = "", val fileFormat: String = "") : WrapperElement {
-
-    init {
-        if (url.isEmpty() && filePath.isEmpty() && base64.isEmpty()) {
-            throw IllegalArgumentException("url or filePath can't be null or empty!")
-        }
-    }
-
+data class Picture(
+    val url: String = "",
+    val filePath: String = "",
+    val base64: String = "",
+    val fileFormat: String = ""
+) : WrapperElement {
     override val className: String = this::class.java.name
 
     override fun toMessageContent(subject: Contact?): MessageContent {
