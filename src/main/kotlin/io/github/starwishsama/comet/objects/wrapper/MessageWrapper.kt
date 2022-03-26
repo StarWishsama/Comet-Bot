@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.objects.wrapper
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.logger.HinaLogLevel
@@ -30,12 +31,15 @@ object EmptyMessageWrapper : MessageWrapper()
 
 private val storedLocation = FileUtil.getChildFolder("messagewrapper")
 
+@kotlinx.serialization.Serializable
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class MessageWrapper {
     private val messageContent = mutableSetOf<WrapperElement>()
 
+    @JsonIgnore
     private lateinit var lastInsertElement: WrapperElement
 
+    @JsonIgnore
     @Volatile
     private var usable: Boolean = isEmpty()
 

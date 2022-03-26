@@ -13,11 +13,9 @@ package io.github.starwishsama.comet.objects.wrapper
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.utils.StringUtil.base64ToImage
 import io.github.starwishsama.comet.utils.network.NetUtil
-import io.github.starwishsama.comet.utils.serialize.WrapperConverter
 import io.github.starwishsama.comet.utils.uploadAsImage
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
@@ -33,7 +31,6 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import java.io.File
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonDeserialize(using = WrapperConverter::class)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NONE, include = JsonTypeInfo.As.PROPERTY)
 @JsonSubTypes(
     JsonSubTypes.Type(value = PureText::class, name = "PureText"),
@@ -83,6 +80,13 @@ data class Picture(
     val base64: String = "",
     val fileFormat: String = ""
 ) : WrapperElement {
+
+    init {
+        if (url.isEmpty() && filePath.isEmpty() && base64.isEmpty()) {
+            throw IllegalArgumentException("url/filePath/base64 can't be null or empty!")
+        }
+    }
+
     override val className: String = this::class.java.name
 
     override fun toMessageContent(subject: Contact?): MessageContent {
