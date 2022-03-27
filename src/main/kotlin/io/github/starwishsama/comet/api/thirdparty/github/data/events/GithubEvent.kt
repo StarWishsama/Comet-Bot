@@ -17,5 +17,7 @@ interface GithubEvent {
 
     fun repoName(): String
 
+    fun branchName(): String
+
     fun isSendableEvent(): Boolean
 }

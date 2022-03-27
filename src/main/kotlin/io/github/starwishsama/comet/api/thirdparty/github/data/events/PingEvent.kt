@@ -48,5 +48,9 @@ data class PingEvent(
         return repositoryInfo.repoFullName
     }
 
+    override fun branchName(): String {
+        return ""
+    }
+
     override fun isSendableEvent(): Boolean = true
 }

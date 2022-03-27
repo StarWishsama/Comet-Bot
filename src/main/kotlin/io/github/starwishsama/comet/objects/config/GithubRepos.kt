@@ -25,7 +25,8 @@ data class GithubRepos(
         val repoAuthor: String,
         val repoName: String,
         val repoSecret: String,
-        val repoTarget: MutableSet<Long>
+        val repoTarget: MutableSet<Long>,
+        val branchFilter: MutableSet<String> = mutableSetOf(),
     ) {
         fun getFullName(): String {
             return "${repoAuthor}/${repoName}"

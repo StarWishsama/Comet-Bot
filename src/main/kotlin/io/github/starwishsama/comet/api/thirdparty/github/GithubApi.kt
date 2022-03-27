@@ -19,6 +19,8 @@ import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.utils.network.NetUtil
 import org.jsoup.Jsoup
 
+val refsPattern = "refs/\\w*/".toRegex()
+
 object GithubApi {
     private const val apiUrl = "https://api.github.com"
     private val repoCache = mutableMapOf<String, String>()

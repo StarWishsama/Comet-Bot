@@ -107,6 +107,10 @@ data class IssueEvent(
         return repository.fullName
     }
 
+    override fun branchName(): String {
+        return ""
+    }
+
     override fun isSendableEvent(): Boolean {
         return action == "opened" || action == "closed"
     }
