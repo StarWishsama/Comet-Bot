@@ -40,8 +40,8 @@ object GithubCommand : ChatCommand, ConversationCommand {
             "md", "modify" -> modifyRepo(user, args, event)
             "lookup", "cx" -> lookupRepo(args, event)
             "filter" -> {
-                if (args.size == 2) {
-                    when (args[1]) {
+                if (args.size == 3) {
+                    when (args[2]) {
                         "add", "tj" -> addBranchFilter(args, event, user)
                         "remove", "rm", "sc" -> removeBranchFilter(args, event, user)
                         else -> getHelp().convertToChain()
