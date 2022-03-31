@@ -27,7 +27,7 @@ object GithubPusher {
         val consumer = GitHubService.repos.repos.filter {
             it.repoAuthor == authorAndRepo[0]
                     && (it.repoName == "*" || it.repoName == authorAndRepo[1])
-                    && it.branchFilter.any { branchPattern -> !Regex(branchPattern).matches(event.branchName()) }
+                    && (it.branchFilter.isEmpty() || it.branchFilter.any { branchPattern -> !Regex(branchPattern).matches(event.branchName()) })
         }
 
         runBlocking {
