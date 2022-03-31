@@ -10,7 +10,9 @@
 
 package io.github.starwishsama.comet.exceptions
 
-open class ApiException(reason: String = "", cause: Exception? = null) : RuntimeException(reason, cause)
+import java.io.IOException
+
+open class ApiException(reason: String = "", cause: Exception? = null) : IOException(reason, cause)
 
 /**
  * API 调用达到上限
