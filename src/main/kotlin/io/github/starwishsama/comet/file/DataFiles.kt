@@ -43,7 +43,7 @@ object Config : DataFileEntity(File(CometVariables.filePath, "config.yml")) {
     }
 
     override fun save() {
-        file.writeString(Default.encodeToString(CometVariables.cfg))
+        // No need to init
     }
 }
 
