@@ -73,7 +73,7 @@ data class Tweet(
             "❤${likeCount?.getBetterNumber()} | \uD83D\uDD01${retweetCount} | 🕘${hmsPattern.format(getSentTime())}"
 
         if (retweetStatus != null) {
-            return "♻ ${retweetStatus.user.name} 转推了\n" +
+            return "♻ 转推自 ${retweetStatus.user.name}:\n" +
                     "${retweetStatus.text.cleanShortUrl().limitStringSize(30)}\n" +
                     "$extraText\n" +
                     "\uD83D\uDD17 > ${getTweetURL()}\n" +
