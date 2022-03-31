@@ -16,3 +16,17 @@ hs_err_pid*
 .project
 .idea/
 src/test/kotlin/io/github/starwishsama/comet/test/TestEntry.kt
+
+config.yml
+device.json
+users.json
+res/
+api/
+cache/
+groups/
+logs/
+pushers/
+gacha/
+error-reports/
+backup/
+backups/

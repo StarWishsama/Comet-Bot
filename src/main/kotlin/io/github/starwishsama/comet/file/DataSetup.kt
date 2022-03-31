@@ -81,7 +81,6 @@ object DataSetup {
     }
 
     fun saveAllResources() {
-        Config.save()
         UserConfig.save()
         GroupConfig.save()
         GithubRepoData.save()
