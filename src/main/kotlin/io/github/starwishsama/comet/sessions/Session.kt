@@ -12,7 +12,6 @@ package io.github.starwishsama.comet.sessions
 
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import java.time.LocalDateTime
-import java.util.concurrent.TimeUnit
 
 /**
  * [Session]

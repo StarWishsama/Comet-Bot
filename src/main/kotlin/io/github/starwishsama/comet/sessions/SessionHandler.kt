@@ -80,7 +80,7 @@ object SessionHandler {
             SessionTarget(targetId = e.sender.id)
         }
 
-        val sessions = sessionPool.filter { it.target.groupId == target.groupId && it.target.targetId == target.targetId }
+        val sessions = sessionPool.filter { ((it.target.groupId == target.groupId) || (it.target.groupId == 0L)) && ((it.target.targetId == target.targetId) || (it.target.targetId == 0L)) }
 
         if (sessions.isEmpty()) {
             return false
