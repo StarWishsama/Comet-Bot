@@ -29,7 +29,11 @@ enum class IDGuidelineType(val rule: Regex) {
 }
 
 object StringUtil {
-    fun String.withoutColor() = this.replace("\u001B\\[[;\\d]*m".toRegex(), "")
+    private val colorRegex = Regex("\u001B\\[[;\\d]*m")
+    private val numberRegex = Regex("[-+]?\\d*\\.?\\d+")
+    private val alphabetNumberRegex = Regex("[a-zA-Z0-9]*")
+
+    fun String.withoutColor() = this.replace(colorRegex, "")
 
     fun ByteArray.base64ToImage(): BufferedImage {
         if (this.isEmpty()) {
@@ -76,7 +80,7 @@ object StringUtil {
      * @return 是否为整数
      */
     fun String.isNumeric(): Boolean {
-        return matches("[-+]?\\d*\\.?\\d+".toRegex()) && !this.contains(".")
+        return matches(numberRegex) && !this.contains(".")
     }
 
     fun String.limitStringSize(size: Int): String {
@@ -143,6 +147,6 @@ object StringUtil {
     }
 
     fun isAlphabeticAndDigit(input: String): Boolean {
-        return input.matches("[a-zA-Z0-9]*".toRegex())
+        return input.matches(alphabetNumberRegex)
     }
 }
