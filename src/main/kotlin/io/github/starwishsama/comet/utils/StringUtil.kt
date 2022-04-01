@@ -54,17 +54,14 @@ object StringUtil {
 
     @OptIn(ExperimentalTime::class)
     fun Duration.toFriendly(maxUnit: TimeUnit = TimeUnit.DAYS, msMode: Boolean = true): String {
-        val days = toInt(DurationUnit.DAYS)
-        val hours = toInt(DurationUnit.HOURS) % 24
-        val minutes = toInt(DurationUnit.MINUTES) % 60
-        val seconds = (toInt(DurationUnit.SECONDS) % 60 * 1000) / 1000
-        val ms = (toInt(DurationUnit.MILLISECONDS) % 60 * 1000 * 1000) / 1000 / 1000
-        return buildString {
-            if (days != 0 && maxUnit >= TimeUnit.DAYS) append("${days}天")
-            if (hours != 0 && maxUnit >= TimeUnit.HOURS) append("${hours}时")
-            if (minutes != 0 && maxUnit >= TimeUnit.MINUTES) append("${minutes}分")
-            if (seconds != 0 && maxUnit >= TimeUnit.SECONDS) append("${seconds}秒")
-            if (maxUnit >= TimeUnit.MILLISECONDS && msMode) append("${ms}毫秒")
+        toComponents { days, hours, minutes, seconds, ns ->
+            return buildString {
+                if (days != 0L && maxUnit >= TimeUnit.DAYS) append("${days}天")
+                if (hours != 0 && maxUnit >= TimeUnit.HOURS) append("${hours}时")
+                if (minutes != 0 && maxUnit >= TimeUnit.MINUTES) append("${minutes}分")
+                if (seconds != 0 && maxUnit >= TimeUnit.SECONDS) append("${seconds}秒")
+                if (maxUnit >= TimeUnit.MILLISECONDS && msMode) append("${ns / 1_000_000}毫秒")
+            }
         }
     }
 
