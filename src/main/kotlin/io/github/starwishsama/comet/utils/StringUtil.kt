@@ -69,7 +69,7 @@ object StringUtil {
     }
 
     /**
-     * 将字符串转换为消息链
+     * 将字符串转换为消息链 [MessageChain]
      */
     fun String.convertToChain(): MessageChain {
         return PlainText(this).toMessageChain()
