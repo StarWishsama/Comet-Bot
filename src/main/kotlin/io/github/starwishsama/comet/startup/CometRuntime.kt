@@ -38,6 +38,7 @@ import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.YabapiLogRedirecter
 import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.tasks.GroupFileAutoRemover
+import io.github.starwishsama.comet.objects.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.service.RetrofitLogger
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
@@ -243,6 +244,10 @@ object CometRuntime {
 
         TaskUtil.scheduleAtFixedRate(1, 1, TimeUnit.HOURS) {
             RuntimeUtil.forceGC()
+        }
+
+        TaskUtil.scheduleAtFixedRate(5, 5, TimeUnit.MINUTES) {
+            HitokotoUpdater.run()
         }
     }
 
