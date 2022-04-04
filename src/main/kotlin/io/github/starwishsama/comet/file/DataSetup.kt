@@ -20,7 +20,6 @@ import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
-import io.github.starwishsama.comet.service.compatibility.CompatibilityService
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.utils.*
 import net.mamoe.mirai.Bot
