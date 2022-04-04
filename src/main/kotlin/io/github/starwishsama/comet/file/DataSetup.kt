@@ -67,8 +67,10 @@ object DataSetup {
 
         FileUtil.initResourceFile()
 
-        if (CompatibilityService.upgradeUserData(UserConfig.file)) {
+        try {
             CometVariables.cometUsers.putAll(UserConfig.file.parseAsClass())
+        } catch (e: Exception){
+            daemonLogger.warning("加载用户配置文件失败! 似乎你正在使用以前版本的配置?", e)
         }
 
         daemonLogger.info("已加载了 ${CometVariables.cometUsers.size} 个用户数据.")
