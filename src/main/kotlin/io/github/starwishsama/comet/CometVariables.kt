@@ -13,7 +13,6 @@ package io.github.starwishsama.comet
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer
@@ -27,7 +26,6 @@ import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.service.server.CometServiceServer
 import io.github.starwishsama.comet.utils.LoggerAppender
-import io.github.starwishsama.comet.utils.serialize.LocalDateTimeConverter
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.utils.MiraiInternalApi
 import okhttp3.OkHttpClient
@@ -111,10 +109,7 @@ object CometVariables {
             },
             KotlinModule.Builder().enable(KotlinFeature.NullIsSameAsDefault)
                 .enable(KotlinFeature.NullToEmptyCollection)
-                .enable(KotlinFeature.NullToEmptyMap).build(),
-            SimpleModule().also {
-                it.addDeserializer(LocalDateTime::class.java, LocalDateTimeConverter)
-            }
+                .enable(KotlinFeature.NullToEmptyMap).build()
         )
         .setDateFormat(SimpleDateFormat("yyyy/MM/dd HH:mm:ss"))
 
