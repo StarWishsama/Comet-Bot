@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
@@ -131,6 +132,10 @@ object CometVariables {
                 it.addDeserializer(
                     LocalTime::class.java,
                     LocalTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss"))
+                )
+                it.addDeserializer(
+                    LocalDateTime::class.java,
+                    LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
                 )
             },
             KotlinModule.Builder().enable(KotlinFeature.NullIsSameAsDefault)
