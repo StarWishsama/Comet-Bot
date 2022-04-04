@@ -26,7 +26,6 @@ internal class TestMessageWrapper {
         }
     }
 
-    @Test
     fun testMultipleElements() {
         val text = PureText("Good night, ")
         val text2 = PureText("Kizuna AI. ")
