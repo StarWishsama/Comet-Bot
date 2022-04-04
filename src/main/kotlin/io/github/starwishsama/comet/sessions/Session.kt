@@ -35,6 +35,10 @@ open class Session(
         lastTriggerTime = LocalDateTime.now()
     }
 
+    fun isExpired(second: Long): Boolean {
+        return lastTriggerTime.plusSeconds(second).isBefore(LocalDateTime.now())
+    }
+
     override fun toString(): String {
         return "Session#${hashCode()} {target=$target, silent=${silent}, usersCount=${users.size}}"
     }

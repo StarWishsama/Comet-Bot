@@ -64,12 +64,12 @@ object KeyWordService {
 
         if (autoReply != null) {
             autoReply.keyWord = keyWord
-            autoReply.reply = reply.toMessageWrapper()
+            autoReply.reply = reply.toMessageWrapper(true)
         } else {
             cfg.keyWordReply.add(
                 PerGroupConfig.ReplyKeyWord(
                     keyWord,
-                    reply.toMessageWrapper()
+                    reply.toMessageWrapper(true)
                 )
             )
         }
@@ -85,7 +85,7 @@ object KeyWordService {
         val result = buildString {
             append("关键词列表: \n")
             groupCfg.keyWordReply.forEach {
-                append("${it.keyWord} -> ${it.reply.getAllText().limitStringSize(10)} \n")
+                append("${it.keyWord} -> ${it.reply.parseToString().limitStringSize(10)} \n")
             }
         }
 

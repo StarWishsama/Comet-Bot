@@ -29,7 +29,11 @@ enum class IDGuidelineType(val rule: Regex) {
 }
 
 object StringUtil {
-    fun String.withoutColor() = this.replace("\u001B\\[[;\\d]*m".toRegex(), "")
+    private val colorRegex = Regex("\u001B\\[[;\\d]*m")
+    private val numberRegex = Regex("[-+]?\\d*\\.?\\d+")
+    private val alphabetNumberRegex = Regex("[a-zA-Z0-9]*")
+
+    fun String.withoutColor() = this.replace(colorRegex, "")
 
     fun ByteArray.base64ToImage(): BufferedImage {
         if (this.isEmpty()) {
@@ -50,22 +54,19 @@ object StringUtil {
 
     @OptIn(ExperimentalTime::class)
     fun Duration.toFriendly(maxUnit: TimeUnit = TimeUnit.DAYS, msMode: Boolean = true): String {
-        val days = toInt(DurationUnit.DAYS)
-        val hours = toInt(DurationUnit.HOURS) % 24
-        val minutes = toInt(DurationUnit.MINUTES) % 60
-        val seconds = (toInt(DurationUnit.SECONDS) % 60 * 1000) / 1000
-        val ms = (toInt(DurationUnit.MILLISECONDS) % 60 * 1000 * 1000) / 1000 / 1000
-        return buildString {
-            if (days != 0 && maxUnit >= TimeUnit.DAYS) append("${days}天")
-            if (hours != 0 && maxUnit >= TimeUnit.HOURS) append("${hours}时")
-            if (minutes != 0 && maxUnit >= TimeUnit.MINUTES) append("${minutes}分")
-            if (seconds != 0 && maxUnit >= TimeUnit.SECONDS) append("${seconds}秒")
-            if (maxUnit >= TimeUnit.MILLISECONDS && msMode) append("${ms}毫秒")
+        toComponents { days, hours, minutes, seconds, ns ->
+            return buildString {
+                if (days != 0L && maxUnit >= TimeUnit.DAYS) append("${days}天")
+                if (hours != 0 && maxUnit >= TimeUnit.HOURS) append("${hours}时")
+                if (minutes != 0 && maxUnit >= TimeUnit.MINUTES) append("${minutes}分")
+                if (seconds != 0 && maxUnit >= TimeUnit.SECONDS) append("${seconds}秒")
+                if (maxUnit >= TimeUnit.MILLISECONDS && msMode) append("${ns / 1_000_000}毫秒")
+            }
         }
     }
 
     /**
-     * 将字符串转换为消息链
+     * 将字符串转换为消息链 [MessageChain]
      */
     fun String.convertToChain(): MessageChain {
         return PlainText(this).toMessageChain()
@@ -76,7 +77,7 @@ object StringUtil {
      * @return 是否为整数
      */
     fun String.isNumeric(): Boolean {
-        return matches("[-+]?\\d*\\.?\\d+".toRegex()) && !this.contains(".")
+        return matches(numberRegex) && !this.contains(".")
     }
 
     fun String.limitStringSize(size: Int): String {
@@ -143,6 +144,6 @@ object StringUtil {
     }
 
     fun isAlphabeticAndDigit(input: String): Boolean {
-        return input.matches("[a-zA-Z0-9]*".toRegex())
+        return input.matches(alphabetNumberRegex)
     }
 }

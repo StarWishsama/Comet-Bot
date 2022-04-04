@@ -57,5 +57,7 @@ data class IssueCommentEvent(
 
     override fun repoName(): String = repository.fullName
 
+    override fun branchName(): String = ""
+
     override fun isSendableEvent(): Boolean = true
 }

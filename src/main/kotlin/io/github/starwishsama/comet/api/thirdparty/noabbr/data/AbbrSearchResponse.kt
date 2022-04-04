@@ -29,13 +29,13 @@ data class AbbrSearchResponse(
 
         val result = MessageWrapper().addText(
             """
-                🔍 $name 对应的可能结果 >
-                ${
-                buildString {
-                    trans.subList(0, trans.size.coerceAtMost(5)).forEach { append("${it}, ") }
-                }.removeSuffix(", ")
+            🔍 $name 对应的可能结果 >
+            ${
+            buildString { 
+                trans.subList(0, trans.size.coerceAtMost(5)).forEach { append("${it}, ") }
+            }.removeSuffix(", ")
             }
-                """.trimIndent()
+            """.trimIndent()
         )
 
         if (trans.size > 5) {

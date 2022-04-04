@@ -13,11 +13,10 @@ package io.github.starwishsama.comet.objects.wrapper
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.utils.StringUtil.base64ToImage
 import io.github.starwishsama.comet.utils.network.NetUtil
-import io.github.starwishsama.comet.utils.serialize.WrapperConverter
 import io.github.starwishsama.comet.utils.uploadAsImage
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
@@ -33,13 +32,12 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import java.io.File
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonDeserialize(using = WrapperConverter::class)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NONE, include = JsonTypeInfo.As.PROPERTY)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "className")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = PureText::class, name = "PureText"),
-    JsonSubTypes.Type(value = Picture::class, name = "Picture"),
-    JsonSubTypes.Type(value = AtElement::class, name = "AtElement"),
-    JsonSubTypes.Type(value = XmlElement::class, name = "XmlElement")
+    JsonSubTypes.Type(value = PureText::class, name = "io.github.starwishsama.comet.objects.wrapper.PureText"),
+    JsonSubTypes.Type(value = Picture::class, name = "io.github.starwishsama.comet.objects.wrapper.Picture"),
+    JsonSubTypes.Type(value = AtElement::class, name = "io.github.starwishsama.comet.objects.wrapper.AtElement"),
+    JsonSubTypes.Type(value = XmlElement::class, name = "io.github.starwishsama.comet.objects.wrapper.XmlElement")
 )
 interface WrapperElement {
     val className: String
@@ -77,11 +75,16 @@ data class PureText(val text: String) : WrapperElement {
  * @param filePath 图片本地路径
  */
 @Serializable
-data class Picture(val url: String = "", val filePath: String = "", val base64: String = "", val fileFormat: String = "") : WrapperElement {
+data class Picture(
+    val url: String = "",
+    val filePath: String = "",
+    val base64: String = "",
+    val fileFormat: String = ""
+) : WrapperElement {
 
     init {
         if (url.isEmpty() && filePath.isEmpty() && base64.isEmpty()) {
-            throw IllegalArgumentException("url or filePath can't be null or empty!")
+            throw IllegalArgumentException("url/filePath/base64 can't be null or empty!")
         }
     }
 

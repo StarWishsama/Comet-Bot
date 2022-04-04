@@ -38,7 +38,7 @@ object PictureSearchCommand : ChatCommand, ConversationCommand {
 
             if (imageToSearch == null) {
                 if (!SessionHandler.hasSessionByID(event.sender.id, this::class.java)) {
-                    SessionHandler.insertSession(Session(SessionTarget(privateId = event.sender.id), this, true))
+                    SessionHandler.insertSession(Session(SessionTarget(targetId = event.sender.id), this, true))
                 }
 
                 return "请发送需要搜索的图片".toMessageChain()

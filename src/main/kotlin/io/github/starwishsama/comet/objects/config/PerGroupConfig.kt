@@ -77,7 +77,7 @@ data class PerGroupConfig(
     var newComerWelcome: Boolean = false,
 
     @JsonProperty("newcomer_welcome_text")
-    var newComerWelcomeText: MessageWrapper = MessageWrapper().setUsable(true),
+    var newComerWelcomeText: MessageWrapper = MessageWrapper(),
 
     @JsonProperty("auto_accept_condition")
     var autoAcceptCondition: String = "",

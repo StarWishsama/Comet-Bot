@@ -13,6 +13,7 @@ package io.github.starwishsama.comet.api.thirdparty.github.data.events
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.api.thirdparty.github.refsPattern
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import java.time.Instant
 import java.time.LocalDateTime
@@ -99,7 +100,7 @@ data class PushEvent(
 
         val wrapper = MessageWrapper()
 
-        wrapper.addText("⬆️ 新提交 ${repoInfo.fullName} [${ref.replace("refs/\\w*/".toRegex(), "")}]\n")
+        wrapper.addText("⬆️ 新提交 ${repoInfo.fullName} [${ref.replace(refsPattern, "")}]\n")
         wrapper.addText(
             "by ${headCommitInfo.committer.name} | ${getLocalTime(repoInfo.pushTime)}\n\n"
         )
@@ -112,6 +113,10 @@ data class PushEvent(
 
     override fun repoName(): String {
         return repoInfo.fullName
+    }
+
+    override fun branchName(): String {
+        return ref.replace(refsPattern, "")
     }
 
     override fun isSendableEvent(): Boolean = true

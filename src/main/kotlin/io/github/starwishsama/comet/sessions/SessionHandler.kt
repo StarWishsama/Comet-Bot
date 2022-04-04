@@ -56,7 +56,7 @@ object SessionHandler {
     }
 
     fun getSessionsByID(id: Long): List<Session> =
-        sessionPool.filter { it.target.privateId == id }
+        sessionPool.filter { it.target.targetId == id }
 
     /**
      * 获取所有活跃中的会话列表副本.
@@ -74,13 +74,10 @@ object SessionHandler {
     suspend fun handleSessions(e: MessageEvent, user: CometUser): Boolean {
         val time = LocalDateTime.now()
 
-        val target = if (e is GroupMessageEvent) {
-            SessionTarget(e.group.id, e.sender.id)
-        } else {
-            SessionTarget(privateId = e.sender.id)
-        }
+        val groupId = if (e is GroupMessageEvent) e.group.id else 0L
+        val senderId = e.sender.id
 
-        val sessions = sessionPool.filter { it.target.groupId == target.groupId && it.target.privateId == target.privateId }
+        val sessions = sessionPool.filter { it.target.isTargetFor(groupId, senderId) }
 
         if (sessions.isEmpty()) {
             return false

@@ -21,7 +21,6 @@ import io.github.starwishsama.comet.utils.NumberUtil.fixDisplay
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
-import io.github.starwishsama.comet.utils.doFilter
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.CancellationException
 import net.mamoe.mirai.Bot
@@ -57,10 +56,8 @@ object MessageHandler {
                     val result = dispatchCommand(this@always)
 
                     try {
-                        val filtered = result.msg.doFilter()
-
-                        if (result.status.isOk() && !filtered.isContentEmpty()) {
-                            val receipt = this@always.subject.sendMessage(filtered)
+                        if (result.status.isOk() && !result.msg.isContentEmpty()) {
+                            val receipt = this@always.subject.sendMessage(result.msg)
 
                             if (result.cmd is CallbackCommand) {
                                 result.cmd.handleReceipt(receipt)

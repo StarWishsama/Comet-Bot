@@ -49,16 +49,10 @@ object GitHubService {
     }
 
     fun subscribeRepo(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
-        val isGroup = event is GroupMessageEvent
+        val (isGroup, id) = getCurrentGroup(event, args)
 
-        val id = if (isGroup) {
-            (event as GroupMessageEvent).group.id
-        } else {
-            if (args.size == 2) {
-                return "请填写正确的群号!".toMessageChain()
-            }
-
-            args[2].toLongOrNull() ?: return "请填写正确的群号!".toMessageChain()
+        if (id == null) {
+            return "请填写正确的群号!".toMessageChain()
         }
 
         if (!checkPermission(user, event.sender, id)) {
@@ -121,16 +115,10 @@ object GitHubService {
     }
 
     fun unsubscribeRepo(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
-        val isGroup = event is GroupMessageEvent
+        val (isGroup, id) = getCurrentGroup(event, args)
 
-        val id = if (isGroup) {
-            (event as GroupMessageEvent).group.id
-        } else {
-            if (args.size == 2) {
-                return "请填写正确的群号!".toMessageChain()
-            }
-
-            args[2].toLongOrNull() ?: return "请填写正确的群号!".toMessageChain()
+        if (id == null) {
+            return "请填写正确的群号!".toMessageChain()
         }
 
         if (!checkPermission(user, event.sender, id)) {
@@ -167,16 +155,10 @@ object GitHubService {
     }
 
     fun getRepoList(user: CometUser, args: List<String>, event: MessageEvent): MessageChain {
-        val isGroup = event is GroupMessageEvent
+        val (isGroup, id) = getCurrentGroup(event, args)
 
-        val id = if (isGroup) {
-            (event as GroupMessageEvent).group.id
-        } else {
-            if (args.size == 2) {
-                return "请填写正确的群号!".toMessageChain()
-            }
-
-            args[2].toLongOrNull() ?: return "请填写正确的群号!".toMessageChain()
+        if (id == null) {
+            return "请填写正确的群号!".toMessageChain()
         }
 
         if (!checkPermission(user, event.sender, id)) {
@@ -225,7 +207,7 @@ object GitHubService {
             return if (repo.isEmpty()) {
                 "找不到你想修改的 Github 仓库哟".toMessageChain()
             } else {
-                val createdSession = Session(SessionTarget(privateId = event.sender.id), GithubCommand)
+                val createdSession = Session(SessionTarget(targetId = event.sender.id), GithubCommand)
                 SessionHandler.insertSession(createdSession)
 
                 editorCache[createdSession] = repo[0]
@@ -251,6 +233,124 @@ object GitHubService {
         val repoName = args[1].split("/")
 
         return GithubApi.getRepoInfoPicture(repoName[0], repoName[1]).toMessageChain(event.subject)
+    }
+
+    fun addBranchFilter(args: List<String>, event: MessageEvent, user: CometUser): MessageChain {
+        val (isGroup, id) = getCurrentGroup(event, args)
+
+        if (id == null) {
+            return "请填写正确的群号!".toMessageChain()
+        }
+
+        if (!checkPermission(user, event.sender, id)) {
+            return LocalizationManager.getLocalizationText("message.no-permission").toMessageChain()
+        }
+
+        if (!isGroup && args.size < 3) {
+            return "正确的命令: /github filter [仓库名称] [群号] add [规则]".toMessageChain()
+        } else if (args.size < 2) {
+            return "正确的命令: /github filter [仓库名称] add [规则]".toMessageChain()
+        }
+
+        val repoName = args[1]
+
+        val filter = if (isGroup) args[4] else args[3]
+
+        if (!repoName.contains("/")) {
+            return if (isGroup) {
+                "请填写正确的仓库名称! 格式: 用户名/仓库名".toMessageChain()
+            } else {
+                "正确的命令: /github filter [仓库名称] add [规则]\n请填写正确的仓库名称! 格式: 用户名/仓库名".toMessageChain()
+            }
+        }
+
+        if (!isGroup && comet.getBot().getGroup(id) == null) {
+            return "机器人不在你指定的群内, 无法推送信息, 请先邀请机器人加入对应群聊.".toMessageChain()
+        }
+
+        val authorAndRepo = repoName.split("/")
+
+        val repo = repos.repos.find { it.repoAuthor == authorAndRepo[0] && it.repoName == authorAndRepo[1] && it.repoTarget.contains(id) }
+
+        return if (repo == null) {
+            "你还没有订阅过 $repoName".toMessageChain()
+        } else {
+            val filterList = repo.branchFilter
+
+            if (filterList.contains(filter)) {
+                "你已经添加过对应规则: $filter".toMessageChain()
+            } else {
+                filterList.add(filter)
+                "已成功添加过滤规则 $filter".toMessageChain()
+            }
+        }
+    }
+
+    fun removeBranchFilter(args: List<String>, event: MessageEvent, user: CometUser): MessageChain {
+        val (isGroup, id) = getCurrentGroup(event, args)
+
+        if (id == null) {
+            return "请填写正确的群号!".toMessageChain()
+        }
+
+        if (!checkPermission(user, event.sender, id)) {
+            return LocalizationManager.getLocalizationText("message.no-permission").toMessageChain()
+        }
+
+        if (!isGroup && args.size < 3) {
+            return "正确的命令: /github filter [仓库名称] [群号] remove [规则]".toMessageChain()
+        } else if (args.size < 2) {
+            return "正确的命令: /github filter [仓库名称] remove [规则]".toMessageChain()
+        }
+
+        val repoName = args[1]
+
+        val filter = if (isGroup) args[4] else args[3]
+
+        if (!repoName.contains("/")) {
+            return if (isGroup) {
+                "请填写正确的仓库名称! 格式: 用户名/仓库名".toMessageChain()
+            } else {
+                "正确的命令: /github filter [仓库名称] remove [规则]\n请填写正确的仓库名称! 格式: 用户名/仓库名".toMessageChain()
+            }
+        }
+
+        if (!isGroup && comet.getBot().getGroup(id) == null) {
+            return "机器人不在你指定的群内, 无法推送信息, 请先邀请机器人加入对应群聊.".toMessageChain()
+        }
+
+        val authorAndRepo = repoName.split("/")
+
+        val repo = repos.repos.find { it.repoAuthor == authorAndRepo[0] && it.repoName == authorAndRepo[1] && it.repoTarget.contains(id) }
+
+        return if (repo == null) {
+            "你还没有订阅过 $repoName".toMessageChain()
+        } else {
+            val filterList = repo.branchFilter
+
+            if (filterList.contains(filter)) {
+                filterList.remove(filter)
+                "已成功删除过滤规则: $filter".toMessageChain()
+            } else {
+                "你还没有添加过对应规则 $filter".toMessageChain()
+            }
+        }
+    }
+
+    private fun getCurrentGroup(event: MessageEvent, input: List<String>): Pair<Boolean, Long?> {
+        val isGroup = event is GroupMessageEvent
+
+        val id = if (isGroup) {
+            (event as GroupMessageEvent).group.id
+        } else {
+            if (input.size == 2) {
+                null
+            } else {
+                input[2].toLongOrNull()
+            }
+        }
+
+        return Pair(isGroup, id)
     }
 
     private fun handleModifyMode(args: List<String>, session: Session): MessageChain {

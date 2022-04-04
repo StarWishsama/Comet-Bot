@@ -15,9 +15,11 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.api.command.interfaces.ConversationCommand
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
+import io.github.starwishsama.comet.service.command.GitHubService.addBranchFilter
 import io.github.starwishsama.comet.service.command.GitHubService.getRepoList
 import io.github.starwishsama.comet.service.command.GitHubService.lookupRepo
 import io.github.starwishsama.comet.service.command.GitHubService.modifyRepo
+import io.github.starwishsama.comet.service.command.GitHubService.removeBranchFilter
 import io.github.starwishsama.comet.service.command.GitHubService.subscribeRepo
 import io.github.starwishsama.comet.service.command.GitHubService.unsubscribeRepo
 import io.github.starwishsama.comet.sessions.Session
@@ -37,6 +39,17 @@ object GithubCommand : ChatCommand, ConversationCommand {
             "list", "ls" -> getRepoList(user, args, event)
             "md", "modify" -> modifyRepo(user, args, event)
             "lookup", "cx" -> lookupRepo(args, event)
+            "filter" -> {
+                if (args.size == 3) {
+                    when (args[2]) {
+                        "add", "tj" -> addBranchFilter(args, event, user)
+                        "remove", "rm", "sc" -> removeBranchFilter(args, event, user)
+                        else -> getHelp().convertToChain()
+                    }
+                } else {
+                    getHelp().convertToChain()
+                }
+            }
             else -> getHelp().convertToChain()
         }
     }
@@ -55,6 +68,7 @@ object GithubCommand : ChatCommand, ConversationCommand {
         /gh list 列出所有已订阅 Github 项目动态
         /gh md [仓库名称] 编辑 Github 仓库推送状态
         /gh cx [仓库名称] 查看 Github 仓库简略详情
+        /gh filter [仓库名称] add/remove [规则] 添加推送分支过滤规则
     """.trimIndent()
 
     override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {

@@ -51,7 +51,7 @@ object ArkNightInstance : GachaInstance("明日方舟") {
 
     private const val arkNightDataApi = "https://api.github.com/repos/Kengxxiao/ArknightsGameData"
     private const val dataURL =
-        "https://raw.fastgit.org/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/character_table.json"
+        "https://cdn.jsdelivr.net/gh/Kengxxiao/ArknightsGameData@master/zh_CN/gamedata/excel/character_table.json"
 
     /** 明日方舟卡池数据 */
     private val arkNight: MutableList<ArkNightOperator> = mutableListOf()

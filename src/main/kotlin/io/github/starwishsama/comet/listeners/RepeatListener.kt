@@ -12,6 +12,8 @@ package io.github.starwishsama.comet.listeners
 
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
+import kotlinx.atomicfu.AtomicInt
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -49,15 +51,15 @@ object RepeatListener : INListener {
 }
 
 data class RepeatInfo(
-    var counter: Int = 0,
+    var counter: AtomicInt = atomic(0),
     var pendingRepeatMessage: MessageChain = EmptyMessageChain
 ) {
     fun handleRepeat(message: MessageChain): MessageChain {
-        if (counter < 2) {
+        if (counter.value < 2) {
             // First time repeat here.
             if (pendingRepeatMessage == EmptyMessageChain) {
                 pendingRepeatMessage = message
-                counter++
+                counter.addAndGet(1)
                 return EmptyMessageChain
             }
 
@@ -68,24 +70,24 @@ data class RepeatInfo(
             if (previousSenderId != currentSenderId
                 && pendingRepeatMessage.contentEquals(message, ignoreCase = false, strict = true)
             ) {
-                counter++
+                counter.addAndGet(1)
             } else {
                 // Repeat has been interrupted, reset the counter
                 pendingRepeatMessage = EmptyMessageChain
-                counter = 0
+                counter.getAndSet(0)
             }
 
             return EmptyMessageChain
         } else {
             return if (pendingRepeatMessage.contentEquals(message, ignoreCase = false, strict = true)) {
                 val result = processRepeatMessage(pendingRepeatMessage)
-                counter = 0
+                counter.getAndSet(0)
                 pendingRepeatMessage = EmptyMessageChain
                 result
             } else {
                 // Repeat has been interrupted, reset the counter
                 pendingRepeatMessage = EmptyMessageChain
-                counter = 0
+                counter.getAndSet(0)
                 EmptyMessageChain
             }
         }

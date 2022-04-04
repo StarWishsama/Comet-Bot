@@ -34,9 +34,9 @@ repositories {
     google()
     maven(url = "https://maven.aliyun.com/repository/public/")
     gradlePluginPortal()
-    maven(url = "https://maven.aliyun.com/nexus/content/repositories/central/")
-    maven(url = "https://jitpack.io")
-    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
+    maven("https://maven.aliyun.com/nexus/content/repositories/central/")
+    maven("https://jitpack.io")
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
@@ -103,14 +103,10 @@ buildConfig {
 
 fun getGitInfo(): String {
     val commitHashCommand = "git rev-parse --short HEAD"
-    val commitHash = Runtime.getRuntime().exec(commitHashCommand).inputStream.bufferedReader().readLine()
+    val commitHash = Runtime.getRuntime().exec(commitHashCommand).inputStream.bufferedReader().readLine() ?: "UnknownCommit"
 
     val branchCommand = "git rev-parse --abbrev-ref HEAD"
-    var branch = Runtime.getRuntime().exec(branchCommand).inputStream.bufferedReader().readLine()
-
-    if (branch.isEmpty()) {
-        branch = "UnknownBranch"
-    }
+    var branch = Runtime.getRuntime().exec(branchCommand).inputStream.bufferedReader().readLine() ?: "UnknownBranch"
 
     return "-$branch-$commitHash"
 }

@@ -57,13 +57,17 @@ data class ReleaseEvent(
         wrapper.addText("| ${release.author.login} | ${release.convertCreatedTime()}\n")
         wrapper.addText("| \n")
         wrapper.addText("| ${release.title}\n")
-        wrapper.addText("| ${release.body.limitStringSize(50).trim()}\n")
-        wrapper.addText("| 查看完整信息: ${release.url}")
+        wrapper.addText("| ${release.body.limitStringSize(30).trim()}\n")
+        wrapper.addText("| 查看详细信息: ${release.url}")
 
         return wrapper
     }
 
     override fun repoName(): String = repository.fullName
+
+    override fun branchName(): String {
+        return ""
+    }
 
     override fun isSendableEvent(): Boolean = action == "released" || action == "prereleased"
 }
