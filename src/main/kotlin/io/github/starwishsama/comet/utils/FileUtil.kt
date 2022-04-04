@@ -143,7 +143,7 @@ fun File.createBackupFile() {
 object FileUtil {
     private val standardDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
 
-    fun getChildFolder(childName: String): File = CometVariables.filePath.getChildFolder(childName)
+    fun getChildFolder(childName: String, createIfNotExists: Boolean = true): File = CometVariables.filePath.getChildFolder(childName, createIfNotExists)
 
     fun getCacheFolder(): File = getChildFolder("cache")
 

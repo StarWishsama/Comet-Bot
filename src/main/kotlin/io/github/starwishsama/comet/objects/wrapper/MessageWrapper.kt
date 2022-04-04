@@ -29,7 +29,7 @@ fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
 
 object EmptyMessageWrapper : MessageWrapper()
 
-private val storedLocation = FileUtil.getChildFolder("messagewrapper")
+private val storedLocation = FileUtil.getChildFolder("messagewrapper", false)
 
 @kotlinx.serialization.Serializable
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -166,6 +166,10 @@ fun MessageChain.toMessageWrapper(localImage: Boolean = false): MessageWrapper {
             is Image -> {
                 runBlocking {
                     if (localImage) {
+                        if (!storedLocation.exists()) {
+                            storedLocation.mkdirs()
+                        }
+
                         val location = NetUtil.downloadFile(storedLocation, message.queryUrl(), message.imageId)
                         wrapper.addElement(Picture(filePath = location.canonicalPath))
                     } else {
