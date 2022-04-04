@@ -131,9 +131,8 @@ open class MessageWrapper {
     }
 
     fun parseToString(): String {
-        val texts = messageContent.filterIsInstance<PureText>()
         return buildString {
-            texts.forEach {
+            messageContent.forEach {
                 append(it.asString())
             }
         }

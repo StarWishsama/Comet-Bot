@@ -74,7 +74,7 @@ data class Tweet(
 
         if (retweetStatus != null) {
             return "♻ 转推自 ${retweetStatus.user.name}:\n" +
-                    "${retweetStatus.text.cleanShortUrl().limitStringSize(30)}\n" +
+                    "${retweetStatus.text.cleanShortUrl().limitStringSize(50)}\n" +
                     "$extraText\n" +
                     "\uD83D\uDD17 > ${getTweetURL()}\n" +
                     "\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前"
@@ -85,7 +85,7 @@ data class Tweet(
                 append("♻ ${user.name} 转推并评论说\n")
                 append(text.cleanShortUrl() + "\n\n")
                 append("💬 ${quotedStatus.user.name} >\n")
-                append(quotedStatus.text.cleanShortUrl().limitStringSize(30) + "\n")
+                append(quotedStatus.text.cleanShortUrl().limitStringSize(50) + "\n")
                 append("$extraText\n🔗 > ${getTweetURL()}\n")
                 append("\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前")
             }
@@ -98,7 +98,7 @@ data class Tweet(
                 append("\uD83D\uDCAC ${user.name} 回复推文\n")
                 append(text.cleanShortUrl() + "\n\n")
                 append("\uD83D\uDCAC ${repliedTweet?.user?.name}\n")
-                append("${repliedTweet?.text?.cleanShortUrl()?.limitStringSize(20)}")
+                append("${repliedTweet?.text?.cleanShortUrl()?.limitStringSize(50)}")
                 append("$extraText\n🔗 > ${getTweetURL()}\n")
                 append("\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前")
             }
