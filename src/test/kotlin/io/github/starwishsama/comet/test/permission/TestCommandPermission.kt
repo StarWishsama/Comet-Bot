@@ -10,6 +10,7 @@ internal class TestCommandPermission {
         CheckInCommand,
         DebugCommand,
         DivineCommand,
+        GaokaoCommand,
         GuessNumberCommand,
         HelpCommand,
         InfoCommand,
