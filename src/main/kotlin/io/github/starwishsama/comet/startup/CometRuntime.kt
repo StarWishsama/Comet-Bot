@@ -148,6 +148,7 @@ object CometRuntime {
 
     private fun shutdownTask() {
         logger.info("[Bot] 正在关闭 Bot...")
+        CronUtil.stop()
         DataSetup.saveAllResources()
         PusherManager.stopPushers()
         cometServiceServer?.stop()
@@ -262,6 +263,8 @@ object CometRuntime {
                 }
             }
         })
+
+        CronUtil.start()
     }
 
     fun handleConsoleCommand() {
