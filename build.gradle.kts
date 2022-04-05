@@ -19,7 +19,7 @@ plugins {
 }
 
 group = "io.github.starwishsama.comet"
-version = "0.6.5" + getGitInfo()
+version = "0.6.7" + getGitInfo()
 
 tasks.jar {
     manifest {
