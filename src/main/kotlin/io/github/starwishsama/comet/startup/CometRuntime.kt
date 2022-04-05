@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.startup
 
+import cn.hutool.cron.CronUtil
 import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.CometVariables
@@ -36,6 +37,7 @@ import io.github.starwishsama.comet.file.DataSetup
 import io.github.starwishsama.comet.listeners.*
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.YabapiLogRedirecter
+import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.tasks.GroupFileAutoRemover
 import io.github.starwishsama.comet.objects.tasks.HitokotoUpdater
@@ -43,11 +45,8 @@ import io.github.starwishsama.comet.service.RetrofitLogger
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
 import io.github.starwishsama.comet.service.server.CometServiceServer
-import io.github.starwishsama.comet.utils.FileUtil
-import io.github.starwishsama.comet.utils.LoggerAppender
-import io.github.starwishsama.comet.utils.RuntimeUtil
+import io.github.starwishsama.comet.utils.*
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
-import io.github.starwishsama.comet.utils.TaskUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
@@ -60,6 +59,7 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
+
 
 object CometRuntime {
     fun postSetup() {
@@ -250,6 +250,18 @@ object CometRuntime {
         TaskUtil.scheduleAtFixedRate(5, 5, TimeUnit.MINUTES) {
             HitokotoUpdater.run()
         }
+
+        CronUtil.schedule("* * 8 * * ?", Runnable {
+            GroupConfigManager.getAllConfigs().filter { it.gaokaoPushEnabled }.forEach {
+                runBlocking {
+                    comet.getBot().getGroup(it.id)?.sendMessage(
+                        "现在距离${LocalDateTime.now().year}年普通高等学校招生全国统一考试还有${
+                            gaokaoDateTime.getLastingTimeAsString(TimeUnit.DAYS)
+                        }。"
+                    )
+                }
+            }
+        })
     }
 
     fun handleConsoleCommand() {

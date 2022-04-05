@@ -90,4 +90,8 @@ object GroupConfigService {
         return MessageWrapper().addText("已${if (cfg.oldFileCleanFeature) "开启" else "关闭"}群文件自动删除功能")
     }
 
+    fun setGaokaoPush(cfg: PerGroupConfig): MessageWrapper {
+        cfg.gaokaoPushEnabled = !cfg.gaokaoPushEnabled
+        return MessageWrapper().addText("已${if (cfg.gaokaoPushEnabled) "开启" else "关闭"}高考倒计时推送")
+    }
 }
