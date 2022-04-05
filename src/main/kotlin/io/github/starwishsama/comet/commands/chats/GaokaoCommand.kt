@@ -8,7 +8,7 @@ import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.gaokaoDateTime
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.QuoteReply
+import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.buildMessageChain
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 object GaokaoCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain =
         buildMessageChain {
-            add(QuoteReply(event.source))
+            add(event.message.quote())
             add("现在距离${LocalDateTime.now().year}年普通高等学校招生全国统一考试还有${gaokaoDateTime.getLastingTimeAsString(TimeUnit.DAYS)}。")
         }
 
