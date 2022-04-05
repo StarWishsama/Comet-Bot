@@ -39,7 +39,7 @@ class BiliBiliDynamicPusher : CometPusher("bili_dynamic", CometPusherData(3, Tim
 
                     val dynamic: FeedCardNode = try {
                         runBlocking { DynamicApi.getUserDynamicTimeline(user.id.toInt())?.firstOrNull() }
-                    } catch (e: RuntimeException) {
+                    } catch (e: Exception) {
                         if (e !is ApiException) {
                             CometVariables.daemonLogger.warning("在获取动态时出现了异常", e)
                         }
