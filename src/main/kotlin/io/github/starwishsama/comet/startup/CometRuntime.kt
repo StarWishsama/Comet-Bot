@@ -110,6 +110,7 @@ object CometRuntime {
                 CheckInCommand,
                 io.github.starwishsama.comet.commands.chats.DebugCommand,
                 DivineCommand,
+                GaokaoCommand,
                 GuessNumberCommand,
                 HelpCommand,
                 InfoCommand,
