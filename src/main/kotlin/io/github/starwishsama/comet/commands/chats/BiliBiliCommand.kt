@@ -146,7 +146,7 @@ object BiliBiliCommand : ChatCommand {
 
     fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
         if (user.hasPermission(props.permissionNodeName)) return true
-        if (e is GroupMessageEvent && e.sender.permission >= MemberPermission.MEMBER) return true
+        if (e is GroupMessageEvent && e.sender.permission > MemberPermission.MEMBER) return true
         return false
     }
 
