@@ -43,6 +43,7 @@ repositories {
 dependencies {
     implementation("cn.hutool:hutool-http:${Versions.hutoolVersion}")
     implementation("cn.hutool:hutool-crypto:${Versions.hutoolVersion}")
+    implementation("cn.hutool:hutool-cron:${Versions.hutoolVersion}")
 
     // yamlkt @ https://github.com/him188/yamlkt
     implementation("net.mamoe.yamlkt:yamlkt:${Versions.yamlktVersion}")

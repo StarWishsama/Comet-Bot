@@ -20,7 +20,6 @@ import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import kotlin.time.Duration
-import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
@@ -56,11 +55,16 @@ object StringUtil {
     fun Duration.toFriendly(maxUnit: TimeUnit = TimeUnit.DAYS, msMode: Boolean = true): String {
         toComponents { days, hours, minutes, seconds, ns ->
             return buildString {
-                if (days != 0L && maxUnit >= TimeUnit.DAYS) append("${days}天")
-                if (hours != 0 && maxUnit >= TimeUnit.HOURS) append("${hours}时")
-                if (minutes != 0 && maxUnit >= TimeUnit.MINUTES) append("${minutes}分")
-                if (seconds != 0 && maxUnit >= TimeUnit.SECONDS) append("${seconds}秒")
-                if (maxUnit >= TimeUnit.MILLISECONDS && msMode) append("${ns / 1_000_000}毫秒")
+                if (days != 0L && maxUnit >= TimeUnit.DAYS)
+                    append("${days}天")
+                if (hours != 0 && maxUnit >= TimeUnit.HOURS)
+                    append("${hours}时")
+                if (minutes != 0 && maxUnit >= TimeUnit.MINUTES)
+                    append("${minutes}分")
+                if (seconds != 0 && maxUnit >= TimeUnit.SECONDS)
+                    append("${seconds}秒")
+                if (maxUnit >= TimeUnit.MILLISECONDS && msMode)
+                    append("${ns / 1_000_000}毫秒")
             }
         }
     }
@@ -90,8 +94,13 @@ object StringUtil {
      */
     @OptIn(ExperimentalTime::class)
     fun LocalDateTime.getLastingTime(): Duration {
-        return java.time.Duration.between(this, LocalDateTime.now()).toKotlinDuration()
+        val now = LocalDateTime.now()
+        return java.time.Duration.between(min(this, now), max(this, now)).toKotlinDuration()
     }
+
+    fun max(dateTime: LocalDateTime, other: LocalDateTime) = if (dateTime > other) dateTime else other
+
+    fun min(dateTime: LocalDateTime, other: LocalDateTime) = if (dateTime < other) dateTime else other
 
     /**
      * 获取该 [LocalDateTime] 距今的时间并转换为友好的字符串
