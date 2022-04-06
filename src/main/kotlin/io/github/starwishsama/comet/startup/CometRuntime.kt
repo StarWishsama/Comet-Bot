@@ -252,7 +252,7 @@ object CometRuntime {
             HitokotoUpdater.run()
         }
 
-        CronUtil.schedule("* * 8 * * ?", Runnable {
+        CronUtil.schedule("0 0 8 * * ?", Runnable {
             GroupConfigManager.getAllConfigs().filter { it.gaokaoPushEnabled }.forEach {
                 runBlocking {
                     comet.getBot().getGroup(it.id)?.sendMessage(
