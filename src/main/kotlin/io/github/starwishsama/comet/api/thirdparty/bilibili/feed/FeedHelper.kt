@@ -11,7 +11,9 @@ import kotlinx.coroutines.runBlocking
 import moe.sdl.yabapi.data.feed.FeedCardNode
 import moe.sdl.yabapi.data.feed.FeedDescription
 import moe.sdl.yabapi.data.feed.cards.*
+import moe.sdl.yabapi.enums.ImageFormat
 import moe.sdl.yabapi.util.encoding.bv
+import moe.sdl.yabapi.util.string.buildImageUrl
 
 fun FeedCardNode.toMessageWrapper(): MessageWrapper {
     val description = this.description!!
@@ -62,7 +64,14 @@ fun ImageCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
         addText("⏰ ${description.getReadableSentTime()}\n\n")
         addText("${item?.description}\n\n")
         item?.pictures?.forEach {
-            this.addPictureByURL(it.imgSrc)
+            this.addPictureByURL(it.imgSrc?.let { url ->
+                buildImageUrl(
+                    url,
+                    ImageFormat.JPEG,
+                    height = 800,
+                    weight = 600
+                )
+            })
         }
     }
 
@@ -72,7 +81,7 @@ fun LiveCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
         addText("⏰ ${description.getReadableSentTime()}\n\n")
         addText("直播间标题 > ${livePlayInfo!!.title}\n")
         addText("直播间地址 > ${livePlayInfo!!.link}\n")
-        addPictureByURL(livePlayInfo!!.cover)
+        addPictureByURL(livePlayInfo!!.cover?.let { buildImageUrl(it, ImageFormat.JPEG, 800, 600) })
     }
 
 fun RepostCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
@@ -106,7 +115,7 @@ fun VideoCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
         addText("${description.userProfile?.info?.uname} 投递了视频\n")
         addText("⏰ ${description.getReadableSentTime()}\n\n")
         addText("查看 > https://www.bilibili.com/video/${aid?.bv}\n")
-        addPictureByURL(pic)
+        addPictureByURL(pic?.let { buildImageUrl(it, ImageFormat.JPEG, 800, 600) })
     }
 
 fun ShareCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
@@ -115,5 +124,5 @@ fun ShareCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
         addText("⏰ ${description.getReadableSentTime()}\n\n")
         addText("${vest?.content}\n\n")
 
-        addPictureByURL(sketch?.coverUrl)
+        addPictureByURL(sketch?.coverUrl?.let { buildImageUrl(it, ImageFormat.JPEG, 800, 600) })
     }
