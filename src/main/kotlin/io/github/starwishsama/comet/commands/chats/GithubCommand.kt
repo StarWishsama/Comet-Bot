@@ -60,6 +60,7 @@ object GithubCommand : ChatCommand, ConversationCommand {
             listOf("gh", "git"),
             "订阅 Github 项目推送动态",
             UserLevel.USER,
+            permissionLevel = UserLevel.ADMIN
         )
 
     override fun getHelp(): String = """
