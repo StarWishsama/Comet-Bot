@@ -117,7 +117,7 @@ fun getGitInfo(): String {
     val commitHash = Runtime.getRuntime().exec(commitHashCommand).inputStream.bufferedReader().readLine() ?: "UnknownCommit"
 
     val branchCommand = "git rev-parse --abbrev-ref HEAD"
-    var branch = Runtime.getRuntime().exec(branchCommand).inputStream.bufferedReader().readLine() ?: "UnknownBranch"
+    val branch = Runtime.getRuntime().exec(branchCommand).inputStream.bufferedReader().readLine() ?: "UnknownBranch"
 
     return "-$branch-$commitHash"
 }

@@ -14,6 +14,6 @@ object Versions {
     const val jacksonVersion = "2.13.1"
     const val hutoolVersion = "5.7.19"
     const val yamlktVersion = "0.10.2"
-    const val ktorVersion = "1.5.4"
+    const val ktorVersion = "1.6.8"
     const val yabapiVersion = "0.10.0"
 }
