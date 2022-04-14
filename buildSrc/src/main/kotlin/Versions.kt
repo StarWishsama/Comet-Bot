@@ -9,11 +9,11 @@
  */
 
 object Versions {
-    const val kotlinVersion = "1.6.10"
-    const val miraiVersion = "2.10.1"
-    const val jacksonVersion = "2.13.1"
-    const val hutoolVersion = "5.7.19"
-    const val yamlktVersion = "0.10.2"
-    const val ktorVersion = "1.6.8"
-    const val yabapiVersion = "0.10.0"
+    const val kotlin = "1.6.10"
+    const val mirai = "2.10.1"
+    const val jackson = "2.13.1"
+    const val hutool = "5.7.19"
+    const val yamlKt = "0.10.2"
+    const val ktor = "1.6.8"
+    const val yabapi = "0.10.0"
 }

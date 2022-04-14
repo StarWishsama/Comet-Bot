@@ -12,8 +12,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-    kotlin("jvm") version Versions.kotlinVersion
-    kotlin("plugin.serialization") version Versions.kotlinVersion
+    kotlin("jvm") version Versions.kotlin
+    kotlin("plugin.serialization") version Versions.kotlin
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("com.github.gmazzo.buildconfig") version "3.0.3"
 }
@@ -41,24 +41,24 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.2")
 
-    implementation("net.mamoe:mirai-core-all:${Versions.miraiVersion}") {
+    implementation("net.mamoe:mirai-core-all:${Versions.mirai}") {
         exclude("org.jetbrains.kotlinx", "atomicfu-jvm")
     }
 
-    implementation("cn.hutool:hutool-http:${Versions.hutoolVersion}")
-    implementation("cn.hutool:hutool-crypto:${Versions.hutoolVersion}")
-    implementation("cn.hutool:hutool-cron:${Versions.hutoolVersion}")
+    implementation("cn.hutool:hutool-http:${Versions.hutool}")
+    implementation("cn.hutool:hutool-crypto:${Versions.hutool}")
+    implementation("cn.hutool:hutool-cron:${Versions.hutool}")
 
     // yamlkt @ https://github.com/him188/yamlkt
-    implementation("net.mamoe.yamlkt:yamlkt:${Versions.yamlktVersion}")
+    implementation("net.mamoe.yamlkt:yamlkt:${Versions.yamlKt}")
 
     // jackson @ https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation("com.fasterxml.jackson.core:jackson-core:${Versions.jacksonVersion}")
-    implementation("com.fasterxml.jackson.core:jackson-databind:${Versions.jacksonVersion}")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:${Versions.jacksonVersion}")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jacksonVersion}")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jacksonVersion}")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jacksonVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-core:${Versions.jackson}")
+    implementation("com.fasterxml.jackson.core:jackson-databind:${Versions.jackson}")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:${Versions.jackson}")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jackson}")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jackson}")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jackson}")
 
     // CUrl
     implementation("com.github.rockswang:java-curl:1.2.2.190107")
@@ -79,12 +79,15 @@ dependencies {
     // DNSJava used to srv lookup
     implementation("dnsjava:dnsjava:3.5.0")
 
-    implementation("io.ktor:ktor-server-core:${Versions.ktorVersion}")
-    implementation("io.ktor:ktor-server-netty:${Versions.ktorVersion}")
+    implementation("io.ktor:ktor-server-core:${Versions.ktor}")
+    implementation("io.ktor:ktor-server-netty:${Versions.ktor}")
+
+    implementation("io.ktor:ktor-client-encoding:${Versions.ktor}")
+    implementation("io.ktor:ktor-client-cio:${Versions.ktor}")
 
     implementation("com.github.StarWishsama:rkon-core:master-SNAPSHOT")
 
-    implementation("moe.sdl.yabapi:yabapi-core-jvm:${Versions.yabapiVersion}") {
+    implementation("moe.sdl.yabapi:yabapi-core-jvm:${Versions.yabapi}") {
         exclude("org.jetbrains.kotlinx", "atomicfu-jvm")
         exclude("org.jetbrains.kotlinx", "atomicfu")
     }
@@ -109,12 +112,13 @@ buildConfig {
         "buildTime",
         "\"${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))}\""
     )
-    buildConfigField("String", "miraiVersion", "\"${Versions.miraiVersion}\"")
+    buildConfigField("String", "miraiVersion", "\"${Versions.mirai}\"")
 }
 
 fun getGitInfo(): String {
     val commitHashCommand = "git rev-parse --short HEAD"
-    val commitHash = Runtime.getRuntime().exec(commitHashCommand).inputStream.bufferedReader().readLine() ?: "UnknownCommit"
+    val commitHash =
+        Runtime.getRuntime().exec(commitHashCommand).inputStream.bufferedReader().readLine() ?: "UnknownCommit"
 
     val branchCommand = "git rev-parse --abbrev-ref HEAD"
     val branch = Runtime.getRuntime().exec(branchCommand).inputStream.bufferedReader().readLine() ?: "UnknownBranch"
