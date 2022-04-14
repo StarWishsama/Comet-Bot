@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.hmsPattern
+import io.github.starwishsama.comet.CometVariables.hmPattern
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.data.tweetEntity.Media
