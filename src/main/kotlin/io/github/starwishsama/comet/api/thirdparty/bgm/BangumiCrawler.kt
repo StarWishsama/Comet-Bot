@@ -14,6 +14,10 @@ import io.github.starwishsama.comet.api.thirdparty.bgm.data.common.SearchType
 import io.github.starwishsama.comet.api.thirdparty.bgm.parser.Subject
 import io.github.starwishsama.comet.api.thirdparty.bgm.parser.SubjectSearchResults
 
+internal val bgmCrawler by lazy {
+    BangumiCrawler()
+}
+
 @JvmInline
 value class BangumiCrawler(
     private val client: HttpClient = HttpClient(CIO) {
