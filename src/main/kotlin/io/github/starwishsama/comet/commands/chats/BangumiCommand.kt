@@ -25,7 +25,7 @@ object BangumiCommand : ChatCommand {
                         append("🌟 评分 $score")
                         rank?.let { append(" | 🪜 排名 #$it") }
                         appendLine()
-                        appendLine(summary?.limitStringSize(150) ?: "暂无简介")
+                        appendLine(summary?.limitStringSize(100) ?: "暂无简介")
                         append("标签: ")
                         if (tags.isEmpty()) {
                             append("暂无")
