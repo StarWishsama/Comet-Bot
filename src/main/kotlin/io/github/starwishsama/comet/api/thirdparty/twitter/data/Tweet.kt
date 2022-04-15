@@ -13,7 +13,7 @@ package io.github.starwishsama.comet.api.thirdparty.twitter.data
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.starwishsama.comet.CometVariables
-import io.github.starwishsama.comet.CometVariables.hmsPattern
+import io.github.starwishsama.comet.CometVariables.hmPattern
 import io.github.starwishsama.comet.CometVariables.mapper
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.data.tweetEntity.Media
@@ -69,20 +69,17 @@ data class Tweet(
         val duration =
             Duration.between(getSentTime(), LocalDateTime.now())
         val extraText =
-            "❤${likeCount?.getBetterNumber()} | \uD83D\uDD01${retweetCount} | 🕘${hmsPattern.format(getSentTime())}"
+            "❤${likeCount?.getBetterNumber()} | \uD83D\uDD01${retweetCount} | 🕘${hmPattern.format(getSentTime())} - ${
+                duration.toKotlinDuration().toFriendly(msMode = false)
+            } 前"
 
         if (retweetStatus != null) {
             return buildMessageWrapper {
-                addText(
-                    "♻ 转推自 ${retweetStatus.user.name}:\n" +
-                            "${retweetStatus.text.cleanShortUrl().limitStringSize(50)}\n"
-                )
+                addText("♻ 转推自 ${retweetStatus.user.name}:\n")
+                addText("${retweetStatus.text.cleanShortUrl().limitStringSize(50)}\n")
                 addPictureByURL(getPictureUrl())
-                addText(
-                    "$extraText\n" +
-                            "\uD83D\uDD17 > ${getTweetURL()}\n" +
-                            "\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前"
-                )
+                addText("$extraText\n")
+                addText("\uD83D\uDD17 > ${getTweetURL()}\n")
             }
         }
 
@@ -94,7 +91,6 @@ data class Tweet(
                 addText(quotedStatus.text.cleanShortUrl().limitStringSize(50) + "\n")
                 addPictureByURL(getPictureUrl())
                 addText("$extraText\n🔗 > ${getTweetURL()}\n")
-                addText("\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前")
             }
         }
 
@@ -108,7 +104,6 @@ data class Tweet(
                 addText("${repliedTweet?.text?.cleanShortUrl()?.limitStringSize(50)}")
                 addPictureByURL(getPictureUrl())
                 addText("$extraText\n🔗 > ${getTweetURL()}\n")
-                addText("\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前")
             }
         }
 
@@ -117,7 +112,6 @@ data class Tweet(
             addText("$extraText\n")
             addPictureByURL(getPictureUrl())
             addText("🔗 > ${getTweetURL()}\n")
-            addText("\uD83D\uDD52 ${duration.toKotlinDuration().toFriendly(msMode = false)} 前")
         }
     }
 
