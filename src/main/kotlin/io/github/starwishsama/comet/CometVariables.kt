@@ -151,6 +151,10 @@ object CometVariables {
     @Volatile
     internal var switch: Boolean = true
 
+    internal val hmPattern: DateTimeFormatter by lazy {
+        DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault())
+    }
+
     internal val hmsPattern: DateTimeFormatter by lazy {
         DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault())
     }

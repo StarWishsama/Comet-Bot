@@ -19,7 +19,6 @@ import java.io.IOException
 
 object HitokotoUpdater : Runnable {
     private var hitokoto: Hitokoto? = null
-
     override fun run() {
         try {
             val hitokotoJson = NetUtil.getPageContent("https://v1.hitokoto.cn/")
