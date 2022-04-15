@@ -15,5 +15,5 @@ object Versions {
     const val hutoolVersion = "5.7.19"
     const val yamlktVersion = "0.10.2"
     const val ktorVersion = "1.5.4"
-    const val yabapiVersion = "0.10.0"
+    const val yabapiVersion = "0.11.0-SNAPSHOT"
 }
