@@ -241,14 +241,8 @@ object CometRuntime {
         }
 
         TaskUtil.scheduleAtFixedRate(1, 1, TimeUnit.HOURS) {
-            GroupFileAutoRemover.execute()
-        }
-
-        TaskUtil.scheduleAtFixedRate(1, 1, TimeUnit.HOURS) {
             RuntimeUtil.forceGC()
-        }
-
-        TaskUtil.scheduleAtFixedRate(5, 5, TimeUnit.MINUTES) {
+            GroupFileAutoRemover.execute()
             HitokotoUpdater.run()
         }
 
