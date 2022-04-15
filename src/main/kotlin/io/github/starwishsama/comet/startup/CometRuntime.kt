@@ -106,6 +106,7 @@ object CometRuntime {
             arrayOf(
                 AdminCommand,
                 ArkNightCommand,
+                BangumiCommand,
                 BiliBiliCommand,
                 CheckInCommand,
                 io.github.starwishsama.comet.commands.chats.DebugCommand,

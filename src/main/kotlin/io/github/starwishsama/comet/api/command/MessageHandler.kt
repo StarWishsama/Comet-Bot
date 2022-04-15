@@ -167,7 +167,7 @@ object MessageHandler {
             } catch (e: Exception) {
                 return if (NetUtil.isTimeout(e)) {
                     CometVariables.logger.warning("执行网络操作失败: ", e)
-                    ExecutedResult("Bot > 在执行网络操作时连接超时: ${e.message ?: ""}".convertToChain(), cmd)
+                    ExecutedResult("Bot > 在执行网络操作时连接超时: ${e.message?.limitStringSize(100) ?: ""}".convertToChain(), cmd)
                 } else {
                     if (e is CancellationException) {
                         throw e
@@ -204,9 +204,11 @@ object MessageHandler {
             }
         } catch (t: Throwable) {
             CometVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $content", t)
-            return "".also { if (t is CancellationException) {
-                throw t
-            }}
+            return "".also {
+                if (t is CancellationException) {
+                    throw t
+                }
+            }
         }
         return ""
     }
