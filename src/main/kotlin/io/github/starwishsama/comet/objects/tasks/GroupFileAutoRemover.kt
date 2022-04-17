@@ -18,7 +18,6 @@ import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.isOperator
 import java.util.regex.Pattern
-import kotlin.streams.toList
 
 object GroupFileAutoRemover {
     private val cachePool = mutableSetOf<PerGroupConfig>()

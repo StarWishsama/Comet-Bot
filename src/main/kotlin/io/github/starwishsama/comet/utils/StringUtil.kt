@@ -20,7 +20,6 @@ import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
 enum class IDGuidelineType(val rule: Regex) {
@@ -50,8 +49,6 @@ object StringUtil {
     /**
      * 来自 Mirai 的 asHumanReadable
      */
-
-    @OptIn(ExperimentalTime::class)
     fun Duration.toFriendly(maxUnit: TimeUnit = TimeUnit.DAYS, msMode: Boolean = true): String {
         toComponents { days, hours, minutes, seconds, ns ->
             return buildString {
@@ -92,7 +89,6 @@ object StringUtil {
      * 获取该 [LocalDateTime] 距今的时间
      *
      */
-    @OptIn(ExperimentalTime::class)
     fun LocalDateTime.getLastingTime(): Duration {
         val now = LocalDateTime.now()
         return java.time.Duration.between(min(this, now), max(this, now)).toKotlinDuration()
@@ -107,7 +103,6 @@ object StringUtil {
      *
      * @param msMode 是否精准到毫秒
      */
-    @OptIn(ExperimentalTime::class)
     fun LocalDateTime.getLastingTimeAsString(unit: TimeUnit = TimeUnit.SECONDS, msMode: Boolean = false): String {
         val duration = getLastingTime()
         return duration.toFriendly(maxUnit = unit, msMode = msMode)

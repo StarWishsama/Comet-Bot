@@ -2,8 +2,8 @@ package io.github.starwishsama.comet.test.api.thirdparty.bgm
 
 import io.github.starwishsama.comet.api.thirdparty.bgm.data.common.SearchType
 import io.github.starwishsama.comet.api.thirdparty.bgm.parser.SubjectSearchResults
-import kotlinx.coroutines.runBlocking
 import io.github.starwishsama.comet.test.util.alsoPrint
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.Test

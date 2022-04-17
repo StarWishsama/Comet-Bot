@@ -11,11 +11,15 @@
 package io.github.starwishsama.comet.utils
 
 import io.github.starwishsama.comet.CometVariables
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.SingleMessage
+import net.mamoe.mirai.message.data.content
+import net.mamoe.mirai.message.data.toMessageChain
 import java.util.*
 
 fun MessageChain.doFilter(): MessageChain {
-    if (CometVariables.cfg.filterWords.isNullOrEmpty()) {
+    if (CometVariables.cfg.filterWords.isEmpty()) {
         return this
     }
 

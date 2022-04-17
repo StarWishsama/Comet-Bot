@@ -17,8 +17,16 @@ import io.github.starwishsama.comet.objects.minecraft.SRVConvertResult
 import org.xbill.DNS.Lookup
 import org.xbill.DNS.SRVRecord
 import org.xbill.DNS.Type
-import java.io.*
-import java.net.*
+import java.io.ByteArrayOutputStream
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.io.IOException
+import java.io.InputStreamReader
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.net.InetAddress
+import java.net.Proxy
+import java.net.Socket
 import java.util.concurrent.TimeUnit
 
 

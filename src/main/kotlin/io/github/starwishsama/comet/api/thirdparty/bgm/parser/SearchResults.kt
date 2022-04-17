@@ -1,6 +1,5 @@
 package io.github.starwishsama.comet.api.thirdparty.bgm.parser
 
-import kotlinx.serialization.Serializable
 import io.github.starwishsama.comet.api.thirdparty.bgm.Crawler
 import io.github.starwishsama.comet.api.thirdparty.bgm.const.buildSubjectUrl
 import io.github.starwishsama.comet.api.thirdparty.bgm.data.common.SearchType
@@ -8,6 +7,7 @@ import io.github.starwishsama.comet.api.thirdparty.bgm.data.resp.SearchTopicItem
 import io.github.starwishsama.comet.api.thirdparty.bgm.util.byClass
 import io.github.starwishsama.comet.api.thirdparty.bgm.util.byId
 import io.github.starwishsama.comet.api.thirdparty.bgm.util.byTag
+import kotlinx.serialization.Serializable
 import moe.sdl.crawler.bgm.util.searchSubjectId
 import moe.sdl.crawler.bgm.util.subjectVoteRegex
 import org.jsoup.nodes.Element

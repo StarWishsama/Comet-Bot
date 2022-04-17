@@ -1,6 +1,5 @@
 package io.github.starwishsama.comet.api.thirdparty.bgm.parser
 
-import kotlinx.serialization.Serializable
 import io.github.starwishsama.comet.api.thirdparty.bgm.const.MAIN_DOMAIN
 import io.github.starwishsama.comet.api.thirdparty.bgm.data.resp.FollowStatus
 import io.github.starwishsama.comet.api.thirdparty.bgm.data.resp.FollowType
@@ -10,6 +9,7 @@ import io.github.starwishsama.comet.api.thirdparty.bgm.data.resp.Unique
 import io.github.starwishsama.comet.api.thirdparty.bgm.util.byClass
 import io.github.starwishsama.comet.api.thirdparty.bgm.util.byId
 import io.github.starwishsama.comet.api.thirdparty.bgm.util.byTag
+import kotlinx.serialization.Serializable
 import moe.sdl.crawler.bgm.util.episodeIdRegex
 import moe.sdl.crawler.bgm.util.startNumRegex
 import moe.sdl.crawler.bgm.util.subjectIdRegex
@@ -175,7 +175,7 @@ class Subject(override val htmlPage: String) : Parser(), Unique {
         val text = it.text()
         val num = startNumRegex.find(text)?.groupValues?.getOrNull(1)
         val type = FollowType.parse(text)
-        val path: String = it.attr("href") ?: return@map null
+        val path: String = it.attr("href")
         FollowStatus(
           num = num ?: return@map null,
           link = MAIN_DOMAIN + path,

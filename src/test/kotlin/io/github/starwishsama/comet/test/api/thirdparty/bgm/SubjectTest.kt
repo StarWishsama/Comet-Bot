@@ -1,8 +1,8 @@
 package io.github.starwishsama.comet.test.api.thirdparty.bgm
 
 import io.github.starwishsama.comet.api.thirdparty.bgm.parser.Subject
-import kotlinx.coroutines.runBlocking
 import io.github.starwishsama.comet.test.util.alsoPrint
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

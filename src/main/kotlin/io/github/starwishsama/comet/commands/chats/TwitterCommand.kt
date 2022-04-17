@@ -38,10 +38,8 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.toMessageChain
-import kotlin.time.ExperimentalTime
 
 object TwitterCommand : ChatCommand {
-    @OptIn(ExperimentalTime::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (!hasPermission(user, event)) {
             return LocalizationManager.getLocalizationText("message.no-permission").toMessageChain()
@@ -135,7 +133,6 @@ object TwitterCommand : ChatCommand {
         return false
     }
 
-    @ExperimentalTime
     private suspend fun getTweetToMessageChain(args: List<String>, event: MessageEvent): MessageChain {
         return if (args.size > 1) {
             val task = object : NetworkRequestTask(), INetworkRequestTask<MessageChain> {
@@ -180,7 +177,6 @@ object TwitterCommand : ChatCommand {
         }
     }
 
-    @ExperimentalTime
     private fun getTweetWithDesc(name: String, subject: Contact, index: Int = 1, max: Int = 10): MessageChain {
         return try {
             val tweet = TwitterApi.getTweetInTimeline(name, index, max)
@@ -251,7 +247,6 @@ object TwitterCommand : ChatCommand {
         }
     }
 
-    @ExperimentalTime
     private fun getTweetByID(id: Long, target: Contact): MessageChain =
         TwitterApi.getTweetById(id)?.toMessageChain(target)
             ?: PlainText("找不到对应ID的推文").toMessageChain()
