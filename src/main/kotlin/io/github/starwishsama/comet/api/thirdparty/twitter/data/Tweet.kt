@@ -76,7 +76,7 @@ data class Tweet(
         if (retweetStatus != null) {
             return buildMessageWrapper {
                 addText("♻ 转推自 ${retweetStatus.user.name}:\n")
-                addText("${retweetStatus.text.cleanShortUrl().limitStringSize(50)}\n")
+                addText("${retweetStatus.text.cleanShortUrl().limitStringSize(150)}\n")
                 addPictureByURL(getPictureUrl())
                 addText("$extraText\n")
                 addText("\uD83D\uDD17 > ${getTweetURL()}\n")
