@@ -10,37 +10,36 @@
 
 package io.github.starwishsama.comet.utils
 
-import io.github.starwishsama.comet.CometVariables
-import net.mamoe.mirai.message.data.MessageChain
+import io.github.starwishsama.comet.CometVariables.cfg
+import io.github.starwishsama.comet.utils.StringUtil.removeTrailingNewline
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.SingleMessage
-import net.mamoe.mirai.message.data.content
-import net.mamoe.mirai.message.data.toMessageChain
-import java.util.*
 
-fun MessageChain.doFilter(): MessageChain {
-    if (CometVariables.cfg.filterWords.isEmpty()) {
-        return this
+fun Sequence<SingleMessage>.doFilter(): Sequence<SingleMessage> {
+    if (cfg.filterWords.isEmpty()) return this
+
+    return fold(sequenceOf()) { chain, single ->
+        chain.plus(
+            if (single is PlainText) {
+                PlainText(single.content.filterWords())
+            } else single
+        )
     }
-
-    val revampChain = LinkedList<SingleMessage>()
-    this.forEach { revampChain.add(it) }
-
-    for (i in revampChain.indices) {
-        if (revampChain[i] is PlainText) {
-            var context = revampChain[i].content
-            CometVariables.cfg.filterWords.forEach {
-                if (context.contains(it)) {
-                    var replaceText = ""
-                    repeat(it.length) {
-                        replaceText += "*"
-                    }
-                    context = context.replace(it.toRegex(), replaceText)
-                }
-            }
-            revampChain[i] = PlainText(context)
-        }
-    }
-
-    return revampChain.toMessageChain()
 }
+
+private fun String.filterWords() =
+    cfg.filterWords.fold(this) { acc, i ->
+        if (acc.contains(i)) {
+            val replaceText = "*".repeat(i.length)
+            acc.replace(i.toRegex(), replaceText)
+        } else acc
+    }
+
+fun Sequence<SingleMessage>.removeTrailingNewline(): Sequence<SingleMessage> =
+    fold(sequenceOf()) { acc, i ->
+        acc.plus(
+            if (i is PlainText) {
+                PlainText(i.content.removeTrailingNewline())
+            } else i
+        )
+    }
