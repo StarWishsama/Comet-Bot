@@ -28,10 +28,8 @@ import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.utils.MiraiExperimentalApi
 
 object PictureSearchCommand : ChatCommand, ConversationCommand {
-    @OptIn(MiraiExperimentalApi::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {
             val imageToSearch = event.message[Image]
@@ -75,7 +73,6 @@ object PictureSearchCommand : ChatCommand, ConversationCommand {
         /ytst source [API名称] 修改搜图源
     """.trimIndent()
 
-    @OptIn(MiraiExperimentalApi::class)
     override suspend fun handle(event: MessageEvent, user: CometUser, session: Session) {
         SessionHandler.removeSession(session)
         val image = event.message[Image]

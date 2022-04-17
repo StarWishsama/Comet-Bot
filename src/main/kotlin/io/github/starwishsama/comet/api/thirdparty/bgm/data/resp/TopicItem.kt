@@ -1,7 +1,7 @@
 package io.github.starwishsama.comet.api.thirdparty.bgm.data.resp
 
-import kotlinx.serialization.Serializable
 import io.github.starwishsama.comet.api.thirdparty.bgm.data.common.SearchType
+import kotlinx.serialization.Serializable
 
 @Serializable
 abstract class TopicItem : Unique {

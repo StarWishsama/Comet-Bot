@@ -22,10 +22,8 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.at
-import net.mamoe.mirai.utils.MiraiExperimentalApi
 import java.time.format.DateTimeFormatter
 
-@OptIn(MiraiExperimentalApi::class)
 object InfoCommand : ChatCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         if (args.isEmpty()) {

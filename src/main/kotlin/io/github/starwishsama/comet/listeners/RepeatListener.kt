@@ -17,7 +17,14 @@ import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.events.GroupMessageEvent
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.message.data.Image
+import net.mamoe.mirai.message.data.Message
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.SingleMessage
+import net.mamoe.mirai.message.data.sourceOrNull
+import net.mamoe.mirai.message.data.toMessageChain
 
 object RepeatListener : INListener {
     override val name: String

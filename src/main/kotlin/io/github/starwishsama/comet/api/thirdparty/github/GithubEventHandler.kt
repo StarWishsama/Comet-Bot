@@ -13,7 +13,13 @@ package io.github.starwishsama.comet.api.thirdparty.github
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.mapper
-import io.github.starwishsama.comet.api.thirdparty.github.data.events.*
+import io.github.starwishsama.comet.api.thirdparty.github.data.events.GithubEvent
+import io.github.starwishsama.comet.api.thirdparty.github.data.events.IssueCommentEvent
+import io.github.starwishsama.comet.api.thirdparty.github.data.events.IssueEvent
+import io.github.starwishsama.comet.api.thirdparty.github.data.events.PingEvent
+import io.github.starwishsama.comet.api.thirdparty.github.data.events.PullRequestEvent
+import io.github.starwishsama.comet.api.thirdparty.github.data.events.PushEvent
+import io.github.starwishsama.comet.api.thirdparty.github.data.events.ReleaseEvent
 import io.github.starwishsama.comet.logger.HinaLogLevel
 
 object GithubEventHandler {

@@ -20,11 +20,8 @@ import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.sessions.SessionHandler
 import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.RuntimeUtil
-import kotlin.time.ExperimentalTime
-
 
 object DebugCommand : ConsoleCommand {
-    @OptIn(ExperimentalTime::class)
     override suspend fun execute(args: List<String>): String {
         if (args.isNotEmpty()) {
             when (args[0]) {

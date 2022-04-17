@@ -18,10 +18,15 @@ import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.At
+import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.MessageChainBuilder
+import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.ServiceMessage
+import net.mamoe.mirai.message.data.toMessageChain
 import net.mamoe.mirai.utils.MiraiInternalApi
-import java.io.File
 
 fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
     return MessageWrapper().apply(builder)
