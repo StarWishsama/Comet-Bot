@@ -82,9 +82,6 @@ dependencies {
     implementation("io.ktor:ktor-server-core:${Versions.ktorVersion}")
     implementation("io.ktor:ktor-server-netty:${Versions.ktorVersion}")
 
-    implementation("io.ktor:ktor-client-encoding:${Versions.ktorVersion}")
-    implementation("io.ktor:ktor-client-cio:${Versions.ktorVersion}")
-
     implementation("com.github.StarWishsama:rkon-core:master-SNAPSHOT")
 
     implementation("moe.sdl.yabapi:yabapi-core-jvm:${Versions.yabapiVersion}") {
