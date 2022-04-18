@@ -21,9 +21,8 @@ import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.utils.MiraiInternalApi
-import java.io.File
 
-fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
+inline fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
     return MessageWrapper().apply(builder)
 }
 

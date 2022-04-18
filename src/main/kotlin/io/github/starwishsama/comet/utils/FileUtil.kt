@@ -70,7 +70,7 @@ fun File.getMD5(): String {
     return SecureUtil.md5(this)
 }
 
-fun File.createNewFileIfNotExists(extraAction: (File) -> Unit = {}) {
+inline fun File.createNewFileIfNotExists(extraAction: (File) -> Unit = {}) {
     if (!this.exists()) {
         this.parentFile.mkdirs()
         this.createNewFile()

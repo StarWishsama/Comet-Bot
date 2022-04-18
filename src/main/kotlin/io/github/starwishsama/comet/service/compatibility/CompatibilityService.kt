@@ -117,6 +117,7 @@ object CompatibilityService {
                 old.r6sAccount,
                 old.level,
                 old.lastExecuteTime,
+                0,
                 permissions
             )
         }

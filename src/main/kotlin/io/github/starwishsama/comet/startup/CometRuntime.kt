@@ -33,6 +33,7 @@ import io.github.starwishsama.comet.commands.console.DebugCommand
 import io.github.starwishsama.comet.commands.console.StopCommand
 import io.github.starwishsama.comet.file.DataSaveHelper
 import io.github.starwishsama.comet.file.DataSetup
+import io.github.starwishsama.comet.genshin.gacha.pool.GachaPoolManager
 import io.github.starwishsama.comet.listeners.*
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.YabapiLogRedirecter
@@ -131,6 +132,7 @@ object CometRuntime {
                 NoAbbrCommand,
                 JikiPediaCommand,
                 KeyWordCommand,
+                GenshinGachaCommand,
                 // Console Command
                 StopCommand,
                 DebugCommand,
@@ -184,6 +186,8 @@ object CometRuntime {
         runScheduleTasks()
 
         PusherManager.startPushers()
+
+        GachaPoolManager.init()
 
         startupServer()
 
