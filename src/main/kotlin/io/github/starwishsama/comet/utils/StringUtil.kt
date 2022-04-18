@@ -33,6 +33,12 @@ object StringUtil {
 
     fun String.withoutColor() = this.replace(colorRegex, "")
 
+    fun Char.isNewline() = when (this) {
+        '\n' -> true
+        '\r' -> true
+        else -> false
+    }
+
     fun ByteArray.base64ToImage(): BufferedImage {
         if (this.isEmpty()) {
             throw IllegalArgumentException("Image byte array cannot be empty!")
@@ -149,5 +155,18 @@ object StringUtil {
 
     fun isAlphabeticAndDigit(input: String): Boolean {
         return input.matches(alphabetNumberRegex)
+    }
+
+    fun String.removeTrailingNewline(includeSpace: Boolean = false): String {
+        if (this.isEmpty()) return this
+
+        var newStr = this
+        while (
+            newStr.lastOrNull()?.isNewline() == true ||
+            (includeSpace && newStr.lastOrNull()?.isWhitespace() == true)
+        ) {
+            newStr = newStr.dropLast(1)
+        }
+        return newStr
     }
 }
