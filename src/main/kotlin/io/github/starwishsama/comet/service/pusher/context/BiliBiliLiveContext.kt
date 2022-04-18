@@ -13,12 +13,11 @@ package io.github.starwishsama.comet.service.pusher.context
 import io.github.starwishsama.comet.api.thirdparty.bilibili.live.LiveStatus
 import io.github.starwishsama.comet.api.thirdparty.bilibili.live.isLiveTimeInvalid
 import io.github.starwishsama.comet.api.thirdparty.bilibili.live.parseLiveTime
+import io.github.starwishsama.comet.api.thirdparty.bilibili.util.buildImagePreview
 import io.github.starwishsama.comet.objects.push.BiliBiliUser
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.service.pusher.PushStatus
 import kotlinx.serialization.Serializable
-import moe.sdl.yabapi.enums.ImageFormat
-import moe.sdl.yabapi.util.string.buildImageUrl
 
 class BiliBiliLiveContext(
     pushTarget: MutableSet<Long>,
@@ -37,7 +36,7 @@ class BiliBiliLiveContext(
                     "\n直播间标题: ${liveRoomInfo.roomTitle}" +
                     "\n开播时间: ${liveRoomInfo.liveTime}" +
                     "\n传送门: https://live.bilibili.com/${liveRoomInfo.roomId}",
-        ).addPictureByURL(liveRoomInfo.cover?.let { buildImageUrl(it, ImageFormat.JPEG, 800, 600) })
+        ).addPictureByURL(liveRoomInfo.cover?.let(::buildImagePreview))
     }
 
     override fun contentEquals(other: PushContext): Boolean {
