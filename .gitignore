@@ -11,6 +11,7 @@ dependencies/
 *.zip
 *.tar.gz
 *.rar
+*.backup
 hs_err_pid*
 .classpath
 .project
@@ -20,6 +21,7 @@ src/test/kotlin/io/github/starwishsama/comet/test/TestEntry.kt
 config.yml
 device.json
 users.json
+/img
 /res
 /api
 /cache
@@ -30,3 +32,7 @@ users.json
 /error-reports
 /backup
 /backups
+/gachaPools.json
+/users.json
+/itemPool.json
+/gachaCache

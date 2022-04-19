@@ -155,6 +155,7 @@ object CometRuntime {
                 io.github.starwishsama.comet.commands.chats.DebugCommand,
                 DivineCommand,
                 GaokaoCommand,
+                GenshinGachaCommand,
                 GuessNumberCommand,
                 HelpCommand,
                 InfoCommand,
@@ -231,6 +232,8 @@ object CometRuntime {
         runScheduleTasks()
 
         PusherManager.startPushers()
+
+        GachaPoolManager.init()
 
         startupServer()
 

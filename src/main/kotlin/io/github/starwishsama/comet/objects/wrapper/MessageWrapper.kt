@@ -28,7 +28,7 @@ import net.mamoe.mirai.message.data.ServiceMessage
 import net.mamoe.mirai.message.data.toMessageChain
 import net.mamoe.mirai.utils.MiraiInternalApi
 
-fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
+inline fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
     return MessageWrapper().apply(builder)
 }
 

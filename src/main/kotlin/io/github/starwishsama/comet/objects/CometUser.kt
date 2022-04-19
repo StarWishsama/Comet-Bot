@@ -27,6 +27,7 @@ data class CometUser(
     var r6sAccount: String = "",
     var level: UserLevel = UserLevel.USER,
     var triggerCommandTime: Long = -1,
+    var genshinGachaPool: Int = 0,
     private val permissions: MutableSet<CometPermission> = mutableSetOf(),
 ) {
     fun addPoint(point: Number) {
