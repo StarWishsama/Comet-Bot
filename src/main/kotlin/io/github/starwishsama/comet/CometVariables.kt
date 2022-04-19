@@ -13,9 +13,9 @@ package io.github.starwishsama.comet
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
@@ -28,7 +28,6 @@ import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.service.server.CometServiceServer
 import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.LoggerAppender
-import io.github.starwishsama.comet.utils.serialize.LocalDateTimeConverter
 import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.utils.MiraiInternalApi
 import okhttp3.OkHttpClient
@@ -134,13 +133,14 @@ object CometVariables {
                     LocalTime::class.java,
                     LocalTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss"))
                 )
+                it.addDeserializer(
+                    LocalDateTime::class.java,
+                    LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
+                )
             },
             KotlinModule.Builder().enable(KotlinFeature.NullIsSameAsDefault)
                 .enable(KotlinFeature.NullToEmptyCollection)
-                .enable(KotlinFeature.NullToEmptyMap).build(),
-            SimpleModule().also {
-                it.addDeserializer(LocalDateTime::class.java, LocalDateTimeConverter)
-            }
+                .enable(KotlinFeature.NullToEmptyMap).build()
         )
         .setDateFormat(SimpleDateFormat("yyyy/MM/dd HH:mm:ss"))
 
@@ -150,6 +150,10 @@ object CometVariables {
 
     @Volatile
     internal var switch: Boolean = true
+
+    internal val hmPattern: DateTimeFormatter by lazy {
+        DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault())
+    }
 
     internal val hmsPattern: DateTimeFormatter by lazy {
         DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault())

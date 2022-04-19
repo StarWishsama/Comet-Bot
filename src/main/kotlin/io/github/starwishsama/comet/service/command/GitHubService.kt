@@ -247,12 +247,12 @@ object GitHubService {
         }
 
         if (!isGroup && args.size < 3) {
-            return "正确的命令: /github filter [仓库名称] [群号] add [规则]".toMessageChain()
+            return "正确的命令: /github filter add [仓库名称] [群号] [规则]".toMessageChain()
         } else if (args.size < 2) {
-            return "正确的命令: /github filter [仓库名称] add [规则]".toMessageChain()
+            return "正确的命令: /github filter add [仓库名称] [规则]".toMessageChain()
         }
 
-        val repoName = args[1]
+        val repoName = args[2]
 
         val filter = if (isGroup) args[4] else args[3]
 
@@ -298,12 +298,12 @@ object GitHubService {
         }
 
         if (!isGroup && args.size < 3) {
-            return "正确的命令: /github filter [仓库名称] [群号] remove [规则]".toMessageChain()
+            return "正确的命令: /github filter remove [仓库名称] [群号] [规则]".toMessageChain()
         } else if (args.size < 2) {
-            return "正确的命令: /github filter [仓库名称] remove [规则]".toMessageChain()
+            return "正确的命令: /github filter remove [仓库名称] [规则]".toMessageChain()
         }
 
-        val repoName = args[1]
+        val repoName = args[2]
 
         val filter = if (isGroup) args[4] else args[3]
 

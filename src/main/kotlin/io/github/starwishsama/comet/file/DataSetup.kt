@@ -20,9 +20,13 @@ import io.github.starwishsama.comet.managers.ApiManager
 import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.objects.config.CometConfig
 import io.github.starwishsama.comet.objects.config.PerGroupConfig
-import io.github.starwishsama.comet.service.compatibility.CompatibilityService
 import io.github.starwishsama.comet.service.gacha.GachaService
-import io.github.starwishsama.comet.utils.*
+import io.github.starwishsama.comet.utils.FileUtil
+import io.github.starwishsama.comet.utils.TaskUtil
+import io.github.starwishsama.comet.utils.createBackupFile
+import io.github.starwishsama.comet.utils.getContext
+import io.github.starwishsama.comet.utils.parseAsClass
+import io.github.starwishsama.comet.utils.writeClassToJson
 import net.mamoe.mirai.Bot
 import net.mamoe.yamlkt.Yaml.Default
 import java.io.File
@@ -67,8 +71,10 @@ object DataSetup {
 
         FileUtil.initResourceFile()
 
-        if (CompatibilityService.upgradeUserData(UserConfig.file)) {
+        try {
             CometVariables.cometUsers.putAll(UserConfig.file.parseAsClass())
+        } catch (e: Exception){
+            daemonLogger.warning("加载用户配置文件失败! 似乎你正在使用以前版本的配置?", e)
         }
 
         daemonLogger.info("已加载了 ${CometVariables.cometUsers.size} 个用户数据.")

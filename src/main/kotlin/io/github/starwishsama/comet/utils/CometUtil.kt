@@ -34,7 +34,6 @@ import java.io.InputStream
 import java.time.Duration
 import java.time.LocalDateTime
 import javax.imageio.ImageIO
-import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
 /**
@@ -88,7 +87,6 @@ object CometUtil {
         }.trim().removeSuffix(joinRune)
     }
 
-    @OptIn(ExperimentalTime::class)
     fun getRunningTime(): String {
         val remain = Duration.between(CometVariables.startTime, LocalDateTime.now())
         return remain.toKotlinDuration().toFriendly()
@@ -110,7 +108,6 @@ object CometUtil {
 
     fun parseAtAsBotUser(chain: MessageChain, id: String): CometUser? = getUser(parseAtToId(chain, id))
 
-    @OptIn(ExperimentalTime::class)
     fun getMemoryUsage(): String =
         "OS 信息: ${getOsInfo()}\n" +
                 "JVM 版本: ${getJVMVersion()}\n" +

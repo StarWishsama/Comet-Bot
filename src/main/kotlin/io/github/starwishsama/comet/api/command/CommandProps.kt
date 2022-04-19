@@ -27,6 +27,7 @@ data class CommandProps(
     val permissionNodeName: String = "comet.command.$name",
     val consumerType: CommandExecuteConsumerType = CommandExecuteConsumerType.COOLDOWN,
     val cost: Double = CometVariables.cfg.coolDownTime.toDouble(),
+    val permissionLevel: UserLevel = level,
 ) {
     init {
         if (!StringUtil.isAlphabeticAndDigit(name)) {
@@ -34,7 +35,7 @@ data class CommandProps(
         }
 
         PermissionManager.registerPermission(
-            CometPermission(permissionNodeName, level)
+            CometPermission(permissionNodeName, permissionLevel)
         )
     }
 

@@ -41,7 +41,7 @@ object GithubCommand : ChatCommand, ConversationCommand {
             "lookup", "cx" -> lookupRepo(args, event)
             "filter" -> {
                 if (args.size == 3) {
-                    when (args[2]) {
+                    when (args[1]) {
                         "add", "tj" -> addBranchFilter(args, event, user)
                         "remove", "rm", "sc" -> removeBranchFilter(args, event, user)
                         else -> getHelp().convertToChain()
@@ -60,6 +60,7 @@ object GithubCommand : ChatCommand, ConversationCommand {
             listOf("gh", "git"),
             "订阅 Github 项目推送动态",
             UserLevel.USER,
+            permissionLevel = UserLevel.ADMIN
         )
 
     override fun getHelp(): String = """

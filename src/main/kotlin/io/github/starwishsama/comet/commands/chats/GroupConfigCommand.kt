@@ -181,6 +181,9 @@ object GroupConfigCommand : ChatCommand, UnDisableableCommand, ConversationComma
                     getHelp().toMessageChain()
                 }
             }
+            "gaokao" -> {
+                return GroupConfigService.setGaokaoPush(cfg).toMessageChain()
+            }
             else -> {
                 return getHelp().toMessageChain()
             }

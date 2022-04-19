@@ -10,6 +10,7 @@
 
 package io.github.starwishsama.comet.startup
 
+import cn.hutool.cron.CronUtil
 import io.github.starwishsama.comet.BuildConfig
 import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.CometVariables
@@ -22,23 +23,63 @@ import io.github.starwishsama.comet.CometVariables.logger
 import io.github.starwishsama.comet.api.command.CommandManager
 import io.github.starwishsama.comet.api.command.MessageHandler
 import io.github.starwishsama.comet.api.command.MessageHandler.attachHandler
-import io.github.starwishsama.comet.api.thirdparty.bilibili.*
+import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.LiveApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.SearchApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.UserApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.VideoApi
 import io.github.starwishsama.comet.api.thirdparty.jikipedia.JikiPediaApi
 import io.github.starwishsama.comet.api.thirdparty.noabbr.NoAbbrApi
 import io.github.starwishsama.comet.api.thirdparty.rainbowsix.R6StatsApi
 import io.github.starwishsama.comet.api.thirdparty.twitter.TwitterApi
-import io.github.starwishsama.comet.commands.chats.*
+import io.github.starwishsama.comet.commands.chats.AdminCommand
+import io.github.starwishsama.comet.commands.chats.ArkNightCommand
+import io.github.starwishsama.comet.commands.chats.BangumiCommand
+import io.github.starwishsama.comet.commands.chats.BiliBiliCommand
+import io.github.starwishsama.comet.commands.chats.CheckInCommand
+import io.github.starwishsama.comet.commands.chats.DiceCommand
+import io.github.starwishsama.comet.commands.chats.DivineCommand
+import io.github.starwishsama.comet.commands.chats.GaokaoCommand
+import io.github.starwishsama.comet.commands.chats.GithubCommand
+import io.github.starwishsama.comet.commands.chats.GroupConfigCommand
+import io.github.starwishsama.comet.commands.chats.GuessNumberCommand
+import io.github.starwishsama.comet.commands.chats.HelpCommand
+import io.github.starwishsama.comet.commands.chats.InfoCommand
+import io.github.starwishsama.comet.commands.chats.JikiPediaCommand
+import io.github.starwishsama.comet.commands.chats.KeyWordCommand
+import io.github.starwishsama.comet.commands.chats.KickCommand
+import io.github.starwishsama.comet.commands.chats.MinecraftCommand
+import io.github.starwishsama.comet.commands.chats.MusicCommand
+import io.github.starwishsama.comet.commands.chats.MuteCommand
+import io.github.starwishsama.comet.commands.chats.NoAbbrCommand
+import io.github.starwishsama.comet.commands.chats.PictureSearchCommand
+import io.github.starwishsama.comet.commands.chats.PusherCommand
+import io.github.starwishsama.comet.commands.chats.R6SCommand
+import io.github.starwishsama.comet.commands.chats.RConCommand
+import io.github.starwishsama.comet.commands.chats.RSPCommand
+import io.github.starwishsama.comet.commands.chats.RollCommand
+import io.github.starwishsama.comet.commands.chats.TwitterCommand
+import io.github.starwishsama.comet.commands.chats.UnMuteCommand
+import io.github.starwishsama.comet.commands.chats.VersionCommand
 import io.github.starwishsama.comet.commands.console.BroadcastCommand
 import io.github.starwishsama.comet.commands.console.DebugCommand
 import io.github.starwishsama.comet.commands.console.StopCommand
 import io.github.starwishsama.comet.file.DataSaveHelper
 import io.github.starwishsama.comet.file.DataSetup
-import io.github.starwishsama.comet.genshin.gacha.pool.GachaPoolManager
-import io.github.starwishsama.comet.listeners.*
+import io.github.starwishsama.comet.listeners.AutoReplyListener
+import io.github.starwishsama.comet.listeners.BiliBiliShareListener
+import io.github.starwishsama.comet.listeners.BotGroupStatusListener
+import io.github.starwishsama.comet.listeners.GroupMemberChangedListener
+import io.github.starwishsama.comet.listeners.GroupRequestListener
+import io.github.starwishsama.comet.listeners.NormalizeMessageSendListener
+import io.github.starwishsama.comet.listeners.RepeatListener
+import io.github.starwishsama.comet.listeners.register
 import io.github.starwishsama.comet.logger.HinaLogLevel
 import io.github.starwishsama.comet.logger.YabapiLogRedirecter
+import io.github.starwishsama.comet.managers.GroupConfigManager
 import io.github.starwishsama.comet.managers.NetworkRequestManager
 import io.github.starwishsama.comet.objects.tasks.GroupFileAutoRemover
+import io.github.starwishsama.comet.objects.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.service.RetrofitLogger
 import io.github.starwishsama.comet.service.gacha.GachaService
 import io.github.starwishsama.comet.service.pusher.PusherManager
@@ -48,6 +89,7 @@ import io.github.starwishsama.comet.utils.LoggerAppender
 import io.github.starwishsama.comet.utils.RuntimeUtil
 import io.github.starwishsama.comet.utils.StringUtil.getLastingTimeAsString
 import io.github.starwishsama.comet.utils.TaskUtil
+import io.github.starwishsama.comet.utils.gaokaoDateTime
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
@@ -60,6 +102,7 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
+
 
 object CometRuntime {
     fun postSetup() {
@@ -106,10 +149,13 @@ object CometRuntime {
             arrayOf(
                 AdminCommand,
                 ArkNightCommand,
+                BangumiCommand,
                 BiliBiliCommand,
                 CheckInCommand,
                 io.github.starwishsama.comet.commands.chats.DebugCommand,
                 DivineCommand,
+                GaokaoCommand,
+                GenshinGachaCommand,
                 GuessNumberCommand,
                 HelpCommand,
                 InfoCommand,
@@ -132,7 +178,6 @@ object CometRuntime {
                 NoAbbrCommand,
                 JikiPediaCommand,
                 KeyWordCommand,
-                GenshinGachaCommand,
                 // Console Command
                 StopCommand,
                 DebugCommand,
@@ -148,6 +193,7 @@ object CometRuntime {
 
     private fun shutdownTask() {
         logger.info("[Bot] 正在关闭 Bot...")
+        CronUtil.stop()
         DataSetup.saveAllResources()
         PusherManager.stopPushers()
         cometServiceServer?.stop()
@@ -242,12 +288,24 @@ object CometRuntime {
         }
 
         TaskUtil.scheduleAtFixedRate(1, 1, TimeUnit.HOURS) {
+            RuntimeUtil.forceGC()
             GroupFileAutoRemover.execute()
+            HitokotoUpdater.run()
         }
 
-        TaskUtil.scheduleAtFixedRate(1, 1, TimeUnit.HOURS) {
-            RuntimeUtil.forceGC()
-        }
+        CronUtil.schedule("0 0 8 * * ?", Runnable {
+            GroupConfigManager.getAllConfigs().filter { it.gaokaoPushEnabled }.forEach {
+                runBlocking {
+                    comet.getBot().getGroup(it.id)?.sendMessage(
+                        "现在距离${LocalDateTime.now().year}年普通高等学校招生全国统一考试还有${
+                            gaokaoDateTime.getLastingTimeAsString(TimeUnit.DAYS)
+                        }。"
+                    )
+                }
+            }
+        })
+
+        CronUtil.start()
     }
 
     fun handleConsoleCommand() {

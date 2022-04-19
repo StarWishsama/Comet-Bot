@@ -11,5 +11,5 @@
 package io.github.starwishsama.comet.objects.enums
 
 enum class UserLevel {
-    USER, VIP, ADMIN, OWNER, CONSOLE;
+    USER, ADMIN, OWNER, CONSOLE;
 }

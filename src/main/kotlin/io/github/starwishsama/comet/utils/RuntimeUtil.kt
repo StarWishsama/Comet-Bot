@@ -52,8 +52,8 @@ object RuntimeUtil {
 
     fun getMemoryInfo(): String {
         val memory = ManagementFactory.getMemoryMXBean()
-        val head = memory.heapMemoryUsage
-        val nonHead = memory.nonHeapMemoryUsage
+        val heap = memory.heapMemoryUsage
+        val nonHeap = memory.nonHeapMemoryUsage
         return buildString {
             append(String.format("> %-4s %-4s %-4s", "内存信息", "堆内", "堆外"))
             append("\n")
@@ -61,8 +61,8 @@ object RuntimeUtil {
                 String.format(
                     "| %-4s %-4s %-4s",
                     "初始",
-                    (head.init / byteToMB).formatDigests(),
-                    (nonHead.init / byteToMB).formatDigests()
+                    (heap.init / byteToMB).formatDigests(),
+                    (nonHeap.init / byteToMB).formatDigests()
                 )
             )
             append("\n")
@@ -70,8 +70,8 @@ object RuntimeUtil {
                 String.format(
                     "| %-4s %-4s %-4s",
                     "已使用",
-                    (head.used / byteToMB).formatDigests(),
-                    (nonHead.used / byteToMB).formatDigests()
+                    (heap.used / byteToMB).formatDigests(),
+                    (nonHeap.used / byteToMB).formatDigests()
                 )
             )
             append("\n")
@@ -79,8 +79,8 @@ object RuntimeUtil {
                 String.format(
                     "| %-4s %-4s %-4s",
                     "提交",
-                    (head.committed / byteToMB).formatDigests(),
-                    (nonHead.committed / byteToMB).formatDigests()
+                    (heap.committed / byteToMB).formatDigests(),
+                    (nonHeap.committed / byteToMB).formatDigests()
                 )
             )
             append("\n")
@@ -88,8 +88,8 @@ object RuntimeUtil {
                 String.format(
                     "| %-4s %-4s %-4s",
                     "最大",
-                    (head.max / byteToMB).formatDigests(),
-                    (nonHead.max / byteToMB).formatDigests()
+                    (heap.max / byteToMB).formatDigests(),
+                    (nonHeap.max / byteToMB).formatDigests()
                 )
             )
         }.trim()

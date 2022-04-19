@@ -19,7 +19,7 @@ plugins {
 }
 
 group = "io.github.starwishsama.comet"
-version = "0.6.5" + getGitInfo()
+version = "0.6.7" + getGitInfo()
 
 tasks.jar {
     manifest {
@@ -47,6 +47,7 @@ dependencies {
 
     implementation("cn.hutool:hutool-http:${Versions.hutoolVersion}")
     implementation("cn.hutool:hutool-crypto:${Versions.hutoolVersion}")
+    implementation("cn.hutool:hutool-cron:${Versions.hutoolVersion}")
 
     // yamlkt @ https://github.com/him188/yamlkt
     implementation("net.mamoe.yamlkt:yamlkt:${Versions.yamlktVersion}")
@@ -113,10 +114,11 @@ buildConfig {
 
 fun getGitInfo(): String {
     val commitHashCommand = "git rev-parse --short HEAD"
-    val commitHash = Runtime.getRuntime().exec(commitHashCommand).inputStream.bufferedReader().readLine() ?: "UnknownCommit"
+    val commitHash =
+        Runtime.getRuntime().exec(commitHashCommand).inputStream.bufferedReader().readLine() ?: "UnknownCommit"
 
     val branchCommand = "git rev-parse --abbrev-ref HEAD"
-    var branch = Runtime.getRuntime().exec(branchCommand).inputStream.bufferedReader().readLine() ?: "UnknownBranch"
+    val branch = Runtime.getRuntime().exec(branchCommand).inputStream.bufferedReader().readLine() ?: "UnknownBranch"
 
     return "-$branch-$commitHash"
 }

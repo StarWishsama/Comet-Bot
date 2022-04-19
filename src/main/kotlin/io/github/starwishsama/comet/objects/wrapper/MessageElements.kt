@@ -13,7 +13,6 @@ package io.github.starwishsama.comet.objects.wrapper
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.utils.StringUtil.base64ToImage
 import io.github.starwishsama.comet.utils.network.NetUtil

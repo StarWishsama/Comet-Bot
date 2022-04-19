@@ -1,11 +1,10 @@
 package io.github.starwishsama.comet.api.thirdparty.bilibili.video
 
+import io.github.starwishsama.comet.api.thirdparty.bilibili.util.buildImagePreview
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.buildMessageWrapper
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import moe.sdl.yabapi.data.video.VideoInfo
-import moe.sdl.yabapi.enums.ImageFormat
-import moe.sdl.yabapi.util.string.buildImageUrl
 
 fun VideoInfo.toMessageWrapper(): MessageWrapper =
     buildMessageWrapper {
@@ -17,6 +16,6 @@ fun VideoInfo.toMessageWrapper(): MessageWrapper =
             append(if (stat?.highestRank?.let { it > 0 } == true) "| 本站最高日排行第${stat?.highestRank}名\n" else "\n")
         })
 
-        addPictureByURL(buildImageUrl(cover, ImageFormat.PNG, weight = 800, height = 600))
+        addPictureByURL(buildImagePreview(cover))
         addText("\n直达链接: https://bilibili.com/video/${bvid}")
     }

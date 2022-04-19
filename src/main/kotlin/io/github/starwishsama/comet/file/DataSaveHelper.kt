@@ -24,7 +24,6 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
-import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
 object DataSaveHelper {
@@ -61,7 +60,6 @@ object DataSaveHelper {
     fun scheduleSave() =
         TaskUtil.scheduleAtFixedRate(cfg.autoSaveTime, cfg.autoSaveTime, TimeUnit.MINUTES, DataSetup::saveAllResources)
 
-    @OptIn(ExperimentalTime::class)
     fun checkOldFiles() {
         if (cfg.autoCleanDuration < 1) return
 

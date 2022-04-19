@@ -12,12 +12,10 @@ package io.github.starwishsama.comet.utils
 
 import cn.hutool.core.io.file.FileReader
 import cn.hutool.core.io.file.FileWriter
-import cn.hutool.core.net.URLDecoder
 import cn.hutool.crypto.SecureUtil
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.starwishsama.comet.BuildConfig
-import io.github.starwishsama.comet.Comet
 import io.github.starwishsama.comet.CometApplication
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.CometVariables.daemonLogger
@@ -33,7 +31,6 @@ import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
-import kotlin.time.ExperimentalTime
 
 @Synchronized
 fun File.writeClassToJson(context: Any, mapper: ObjectMapper = CometVariables.mapper) {
@@ -143,7 +140,8 @@ fun File.createBackupFile() {
 object FileUtil {
     private val standardDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
 
-    fun getChildFolder(childName: String): File = CometVariables.filePath.getChildFolder(childName)
+    fun getChildFolder(childName: String, createIfNotExists: Boolean = true): File =
+        CometVariables.filePath.getChildFolder(childName, createIfNotExists)
 
     fun getCacheFolder(): File = getChildFolder("cache")
 
@@ -263,7 +261,6 @@ object FileUtil {
     /**
      * 初始化资源文件
      */
-    @OptIn(ExperimentalTime::class)
     fun initResourceFile() {
         val startTime = LocalDateTime.now()
         try {

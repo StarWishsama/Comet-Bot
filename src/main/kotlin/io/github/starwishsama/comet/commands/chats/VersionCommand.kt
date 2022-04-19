@@ -19,11 +19,8 @@ import io.github.starwishsama.comet.utils.CometUtil
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
-import kotlin.time.ExperimentalTime
-
 
 object VersionCommand : ChatCommand {
-    @OptIn(ExperimentalTime::class)
     override suspend fun execute(event: MessageEvent, args: List<String>, user: CometUser): MessageChain {
         return ("彗星 Bot " + BuildConfig.version +
                 "\n运行时长 ${CometUtil.getRunningTime()}" +

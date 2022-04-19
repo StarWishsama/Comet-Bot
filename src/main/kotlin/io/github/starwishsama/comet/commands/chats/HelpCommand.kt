@@ -17,6 +17,7 @@ import io.github.starwishsama.comet.api.command.interfaces.ChatCommand
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.enums.UserLevel
 import io.github.starwishsama.comet.utils.CometUtil
+import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
 import io.github.starwishsama.comet.utils.StringUtil.convertToChain
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
@@ -38,9 +39,16 @@ object HelpCommand : ChatCommand {
         } else {
             val cmd = CommandManager.getCommand(args[0])
             return if (cmd != null) {
-                CometUtil.toMessageChain("关于 /${cmd.name} 的帮助信息\n${cmd.getHelp()}\n\n该命令还有其他别名可以使用: ${cmd.props.aliases}")
+                buildString {
+                    appendLine("关于 /${cmd.name} 的帮助信息")
+                    appendLine(cmd.getHelp())
+                    if (cmd.props.aliases.isNotEmpty()) {
+                        appendLine()
+                        appendLine("该命令还有其他别名可以使用: ${cmd.props.aliases}")
+                    }
+                }.toMessageChain()
             } else {
-                CometUtil.toMessageChain("该命令不存在哦")
+                toMessageChain("该命令不存在哦")
             }
         }
     }

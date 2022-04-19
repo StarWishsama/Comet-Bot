@@ -18,8 +18,14 @@ import io.github.starwishsama.comet.utils.FileUtil
 import io.github.starwishsama.comet.utils.network.NetUtil
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.At
+import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.MessageChainBuilder
+import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.ServiceMessage
+import net.mamoe.mirai.message.data.toMessageChain
 import net.mamoe.mirai.utils.MiraiInternalApi
 
 inline fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
@@ -28,7 +34,7 @@ inline fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapp
 
 object EmptyMessageWrapper : MessageWrapper()
 
-private val storedLocation = FileUtil.getChildFolder("messagewrapper")
+private val storedLocation = FileUtil.getChildFolder("messagewrapper", false)
 
 @kotlinx.serialization.Serializable
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -130,9 +136,8 @@ open class MessageWrapper {
     }
 
     fun parseToString(): String {
-        val texts = messageContent.filterIsInstance<PureText>()
         return buildString {
-            texts.forEach {
+            messageContent.forEach {
                 append(it.asString())
             }
         }
@@ -166,6 +171,10 @@ fun MessageChain.toMessageWrapper(localImage: Boolean = false): MessageWrapper {
             is Image -> {
                 runBlocking {
                     if (localImage) {
+                        if (!storedLocation.exists()) {
+                            storedLocation.mkdirs()
+                        }
+
                         val location = NetUtil.downloadFile(storedLocation, message.queryUrl(), message.imageId)
                         wrapper.addElement(Picture(filePath = location.canonicalPath))
                     } else {

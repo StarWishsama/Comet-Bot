@@ -21,7 +21,6 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.BotConfiguration
-import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
 
 class Comet {
@@ -38,7 +37,6 @@ class Comet {
             field = value
         }
 
-    @OptIn(MiraiInternalApi::class)
     suspend fun login() {
         cometLoginHelper.solve()
 

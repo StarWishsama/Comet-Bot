@@ -77,7 +77,7 @@ object CheckInService {
 
             append("目前硬币 > ${user.coin.fixDisplay()}\n")
 
-            append("今日一言 > ${HitokotoUpdater.getHitokoto(false)}\n")
+            append("今日一言 > ${HitokotoUpdater.getHitokoto()}\n")
         }
 
         return checkInResult.toMessageChain()

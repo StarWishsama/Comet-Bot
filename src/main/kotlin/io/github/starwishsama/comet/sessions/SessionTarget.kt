@@ -18,6 +18,10 @@ data class SessionTarget(
     val targetId: Long = 0
 )
 
+fun SessionTarget.isTargetFor(groupId: Long, targetId: Long): Boolean {
+    return this.groupId.let { it == groupId || it == 0L } && this.targetId.let { it == targetId || it == 0L }
+}
+
 fun Contact.toSessionTarget(): SessionTarget {
     return when (this) {
         is Member -> SessionTarget(this.group.id, this.id)

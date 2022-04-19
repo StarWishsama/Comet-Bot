@@ -31,15 +31,12 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.utils.MiraiExperimentalApi
 import okhttp3.internal.toLongOrDefault
-import kotlin.time.ExperimentalTime
 
 object BiliBiliShareListener : INListener {
     override val name: String
         get() = "哔哩哔哩解析"
 
-    @OptIn(MiraiExperimentalApi::class, ExperimentalTime::class)
     @EventHandler
     fun listen(event: GroupMessageEvent) {
         if (!event.group.isBotMuted) {

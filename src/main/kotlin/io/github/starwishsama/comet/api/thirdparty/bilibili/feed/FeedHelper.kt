@@ -2,15 +2,23 @@ package io.github.starwishsama.comet.api.thirdparty.bilibili.feed
 
 import io.github.starwishsama.comet.CometVariables
 import io.github.starwishsama.comet.api.thirdparty.bilibili.DynamicApi
+import io.github.starwishsama.comet.api.thirdparty.bilibili.util.buildImagePreview
 import io.github.starwishsama.comet.objects.wrapper.MessageWrapper
 import io.github.starwishsama.comet.objects.wrapper.buildMessageWrapper
 import io.github.starwishsama.comet.utils.NumberUtil.toLocalDateTime
 import io.github.starwishsama.comet.utils.StringUtil.limitStringSize
 import kotlinx.coroutines.runBlocking
-
 import moe.sdl.yabapi.data.feed.FeedCardNode
 import moe.sdl.yabapi.data.feed.FeedDescription
-import moe.sdl.yabapi.data.feed.cards.*
+import moe.sdl.yabapi.data.feed.cards.ArticleCard
+import moe.sdl.yabapi.data.feed.cards.BangumiCard
+import moe.sdl.yabapi.data.feed.cards.CollectionCard
+import moe.sdl.yabapi.data.feed.cards.ImageCard
+import moe.sdl.yabapi.data.feed.cards.LiveCard
+import moe.sdl.yabapi.data.feed.cards.RepostCard
+import moe.sdl.yabapi.data.feed.cards.ShareCard
+import moe.sdl.yabapi.data.feed.cards.TextCard
+import moe.sdl.yabapi.data.feed.cards.VideoCard
 import moe.sdl.yabapi.util.encoding.bv
 
 fun FeedCardNode.toMessageWrapper(): MessageWrapper {
@@ -30,8 +38,7 @@ fun FeedCardNode.toMessageWrapper(): MessageWrapper {
     }
 }
 
-fun FeedDescription.getReadableSentTime(): String =
-    timestamp!!.toLocalDateTime().format(CometVariables.yyMMddPattern)
+fun FeedDescription.getReadableSentTime(): String = timestamp!!.toLocalDateTime().format(CometVariables.yyMMddPattern)
 
 fun ArticleCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
     buildMessageWrapper {
@@ -56,15 +63,14 @@ fun CollectionCard.toMessageWrapper(description: FeedDescription): MessageWrappe
         addText("暂不支持该类型动态")
     }
 
-fun ImageCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
-    buildMessageWrapper {
-        addText("${description.userProfile?.info?.uname} 发布了动态\n")
-        addText("⏰ ${description.getReadableSentTime()}\n\n")
-        addText("${item?.description}\n\n")
-        item?.pictures?.forEach {
-            this.addPictureByURL(it.imgSrc)
-        }
+fun ImageCard.toMessageWrapper(description: FeedDescription): MessageWrapper = buildMessageWrapper {
+    addText("${description.userProfile?.info?.uname} 发布了动态\n")
+    addText("⏰ ${description.getReadableSentTime()}\n\n")
+    addText("${item?.description}\n\n")
+    item?.pictures?.forEach {
+        this.addPictureByURL(it.imgSrc?.let(::buildImagePreview))
     }
+}
 
 fun LiveCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
     buildMessageWrapper {
@@ -72,7 +78,7 @@ fun LiveCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
         addText("⏰ ${description.getReadableSentTime()}\n\n")
         addText("直播间标题 > ${livePlayInfo!!.title}\n")
         addText("直播间地址 > ${livePlayInfo!!.link}\n")
-        addPictureByURL(livePlayInfo!!.cover)
+        addPictureByURL(livePlayInfo!!.cover?.let(::buildImagePreview))
     }
 
 fun RepostCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
@@ -106,7 +112,7 @@ fun VideoCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
         addText("${description.userProfile?.info?.uname} 投递了视频\n")
         addText("⏰ ${description.getReadableSentTime()}\n\n")
         addText("查看 > https://www.bilibili.com/video/${aid?.bv}\n")
-        addPictureByURL(pic)
+        addPictureByURL(pic?.let(::buildImagePreview))
     }
 
 fun ShareCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
@@ -115,5 +121,5 @@ fun ShareCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
         addText("⏰ ${description.getReadableSentTime()}\n\n")
         addText("${vest?.content}\n\n")
 
-        addPictureByURL(sketch?.coverUrl)
+        addPictureByURL(sketch?.coverUrl?.let(::buildImagePreview))
     }
