@@ -135,6 +135,7 @@ object CometRuntime {
                 NoAbbrCommand,
                 JikiPediaCommand,
                 KeyWordCommand,
+                ToUnicodeCommand,
                 // Console Command
                 StopCommand,
                 DebugCommand,
