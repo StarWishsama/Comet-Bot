@@ -169,4 +169,34 @@ object StringUtil {
         }
         return newStr
     }
+
+    private const val HEX_BIT = 16
+
+    /**
+     * to hex by little endian
+     * @param lineSize minimal unit are 1 bytes, i.e., 8 bit
+     */
+    @OptIn(ExperimentalUnsignedTypes::class)
+    fun String.toHex(lineSize: Int = 8, padding: Boolean = true): String {
+        require(lineSize >= 1) { "Line Size parameter must be >= 1." }
+        return toByteArray().toUByteArray().asSequence()
+            .windowed(1, 1)
+            .map { (byte) ->
+                byte.toString(HEX_BIT)
+            }
+            .windowed(lineSize, lineSize, partialWindows = true)
+            .map {
+                if (!padding) return@map it
+                if (it.size >= lineSize) return@map it
+                buildList {
+                    addAll(it)
+                    repeat(lineSize - it.size) {
+                        add("00")
+                    }
+                }
+            }
+            .joinToString(separator = "\n") {
+                it.joinToString(" ")
+            }
+    }
 }
