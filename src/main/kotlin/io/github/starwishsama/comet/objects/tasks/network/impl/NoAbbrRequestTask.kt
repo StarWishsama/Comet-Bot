@@ -37,7 +37,7 @@ class NoAbbrRequestTask(override val content: Contact, override val param: Strin
                 if (!result.isEmpty()) {
                     content.sendMessage(result.toMessageWrapper().toMessageChain(content))
                 } else {
-                    content.sendMessage("❌ 找不到对应结果".toMessageChain())
+                    content.sendMessage("❌ 找不到该缩写对应的意思".toMessageChain())
                 }
             } else {
                 content.sendMessage(LocalizationManager.getLocalizationText("message.network-error").toMessageChain())
