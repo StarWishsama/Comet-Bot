@@ -33,8 +33,12 @@ class NoAbbrRequestTask(override val content: Contact, override val param: Strin
 
     override fun callback(result: Any?) {
         runBlocking {
-            if (result is AbbrSearchResponse && !result.isEmpty()) {
-                content.sendMessage(result.toMessageWrapper().toMessageChain(content))
+            if (result is AbbrSearchResponse) {
+                if (!result.isEmpty()) {
+                    content.sendMessage(result.toMessageWrapper().toMessageChain(content))
+                } else {
+                    content.sendMessage("❌ 找不到对应结果".toMessageChain())
+                }
             } else {
                 content.sendMessage(LocalizationManager.getLocalizationText("message.network-error").toMessageChain())
             }
