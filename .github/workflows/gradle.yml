@@ -23,8 +23,6 @@ jobs:
           architecture: x64
       - name: 给予 gradlew 权限
         run: chmod +x gradlew
-      - name: Gradle clean
-        run: ./gradlew clean
       - name: Gradle shadowjar 打包
         run: ./gradlew shadowjar check
       - uses: actions/upload-artifact@v2
