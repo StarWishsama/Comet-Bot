@@ -12,8 +12,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-    kotlin("jvm") version Versions.kotlinVersion
-    kotlin("plugin.serialization") version Versions.kotlinVersion
+    kotlin("jvm") version Dependency.kotlinVersion
+    kotlin("plugin.serialization") version Dependency.kotlinVersion
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("com.github.gmazzo.buildconfig") version "3.0.3"
 }
@@ -41,24 +41,24 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.2")
 
-    implementation("net.mamoe:mirai-core-all:${Versions.miraiVersion}") {
+    implementation("net.mamoe:mirai-core-all:${Dependency.miraiVersion}") {
         exclude("org.jetbrains.kotlinx", "atomicfu-jvm")
     }
 
-    implementation("cn.hutool:hutool-http:${Versions.hutoolVersion}")
-    implementation("cn.hutool:hutool-crypto:${Versions.hutoolVersion}")
-    implementation("cn.hutool:hutool-cron:${Versions.hutoolVersion}")
+    implementation("cn.hutool:hutool-http:${Dependency.hutoolVersion}")
+    implementation("cn.hutool:hutool-crypto:${Dependency.hutoolVersion}")
+    implementation("cn.hutool:hutool-cron:${Dependency.hutoolVersion}")
 
     // yamlkt @ https://github.com/him188/yamlkt
-    implementation("net.mamoe.yamlkt:yamlkt:${Versions.yamlktVersion}")
+    implementation("net.mamoe.yamlkt:yamlkt:${Dependency.yamlktVersion}")
 
     // jackson @ https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation("com.fasterxml.jackson.core:jackson-core:${Versions.jacksonVersion}")
-    implementation("com.fasterxml.jackson.core:jackson-databind:${Versions.jacksonVersion}")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:${Versions.jacksonVersion}")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jacksonVersion}")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jacksonVersion}")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jacksonVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-core:${Dependency.jacksonVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-databind:${Dependency.jacksonVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:${Dependency.jacksonVersion}")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${Dependency.jacksonVersion}")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${Dependency.jacksonVersion}")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Dependency.jacksonVersion}")
 
     // CUrl
     implementation("com.github.rockswang:java-curl:1.2.2.190107")
@@ -79,12 +79,12 @@ dependencies {
     // DNSJava used to srv lookup
     implementation("dnsjava:dnsjava:3.5.0")
 
-    implementation("io.ktor:ktor-server-core:${Versions.ktorVersion}")
-    implementation("io.ktor:ktor-server-netty:${Versions.ktorVersion}")
+    implementation("io.ktor:ktor-server-core:${Dependency.ktorVersion}")
+    implementation("io.ktor:ktor-server-netty:${Dependency.ktorVersion}")
 
     implementation("com.github.StarWishsama:rkon-core:master-SNAPSHOT")
 
-    implementation("moe.sdl.yabapi:yabapi-core-jvm:${Versions.yabapiVersion}") {
+    implementation("moe.sdl.yabapi:yabapi-core-jvm:${Dependency.yabapiVersion}") {
         exclude("org.jetbrains.kotlinx", "atomicfu-jvm")
         exclude("org.jetbrains.kotlinx", "atomicfu")
     }
@@ -109,7 +109,7 @@ buildConfig {
         "buildTime",
         "\"${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))}\""
     )
-    buildConfigField("String", "miraiVersion", "\"${Versions.miraiVersion}\"")
+    buildConfigField("String", "miraiVersion", "\"${Dependency.miraiVersion}\"")
 }
 
 fun getGitInfo(): String {
