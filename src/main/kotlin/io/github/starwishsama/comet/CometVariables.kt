@@ -32,6 +32,7 @@ import net.kronos.rkon.core.Rcon
 import net.mamoe.mirai.utils.MiraiInternalApi
 import okhttp3.OkHttpClient
 import java.io.File
+import java.security.SecureRandom
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -164,4 +165,6 @@ object CometVariables {
     }
 
     internal lateinit var client: OkHttpClient
+
+    internal val random = SecureRandom()
 }

@@ -10,8 +10,9 @@
 
 package io.github.starwishsama.comet.service.command
 
-import cn.hutool.core.util.RandomUtil
+import cn.hutool.core.util.NumberUtil
 import io.github.starwishsama.comet.CometVariables
+import io.github.starwishsama.comet.CometVariables.random
 import io.github.starwishsama.comet.objects.CometUser
 import io.github.starwishsama.comet.objects.tasks.HitokotoUpdater
 import io.github.starwishsama.comet.utils.CometUtil.toMessageChain
@@ -102,11 +103,15 @@ object CheckInService {
         user.checkInDateTime = currentTime
 
         // 使用随机数工具生成基础硬币
-        val basePoint = RandomUtil.randomDouble(0.0, 10.0, 1, RoundingMode.HALF_DOWN)
+        val basePoint = NumberUtil.round(random.nextDouble(0.0, 10.0), 1, RoundingMode.HALF_DOWN).toDouble()
 
         // 只取小数点后一位，将最大奖励点数限制到 3 倍
         val awardProp =
-            min(1.5, (RandomUtil.randomDouble(0.0, 0.2, 1, RoundingMode.HALF_DOWN) * (user.checkInCount - 1)))
+            min(
+                1.5,
+                NumberUtil.round((random.nextDouble(0.0, 0.2) * (user.checkInCount - 1)), 1, RoundingMode.HALF_DOWN)
+                    .toDouble()
+            )
 
         // 连续签到的奖励硬币
         val awardPoint = if (basePoint < 0) {
@@ -155,10 +160,10 @@ object CheckInService {
     }
 
     private fun hasRandomEvent(): Double {
-        val randomEvent = RandomUtil.randomDouble(0.0, 1.0, 1, RoundingMode.HALF_DOWN)
+        val randomEvent = random.nextDouble(0.0, 1.0)
 
-        return if (randomEvent in 0.4999..0.5001) {
-            RandomUtil.randomDouble(10.0, 25.0, 1, RoundingMode.HALF_DOWN)
+        return if (randomEvent in 0.49999..0.50001) {
+            random.nextDouble(10.0, 25.0)
         } else {
             0.0
         }
