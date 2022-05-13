@@ -39,7 +39,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.3")
 
     implementation("net.mamoe:mirai-core-all:${Dependency.miraiVersion}") {
         exclude("org.jetbrains.kotlinx", "atomicfu-jvm")
