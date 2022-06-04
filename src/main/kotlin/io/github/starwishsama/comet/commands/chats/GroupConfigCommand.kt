@@ -73,11 +73,7 @@ object GroupConfigCommand : ChatCommand, UnDisableableCommand, ConversationComma
     """.trimIndent()
 
     private fun hasPermission(user: CometUser, e: MessageEvent): Boolean {
-        return when {
-            e is GroupMessageEvent -> e.sender.isOperator()
-            user.hasPermission(props.permissionNodeName) -> true
-            else -> false
-        }
+        return user.hasPermission(props.permissionNodeName) || (e is GroupMessageEvent && e.sender.isOperator())
     }
 
     private fun handleCommand(args: List<String>, cfg: PerGroupConfig, event: MessageEvent, bot: Bot): MessageChain {
