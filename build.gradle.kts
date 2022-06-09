@@ -7,16 +7,17 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-rootProject.name = "Comet-Bot"
-include("comet-core", "comet-cli", "comet-mirai-wrapper", "comet-telegram-wrapper")
-
-pluginManagement {
-    repositories {
-        google()
-        gradlePluginPortal()
-    }
+plugins {
+    kotlin("plugin.serialization") version "1.6.21" apply false
 }
 
-plugins {
-    id("de.fayard.refreshVersions") version "0.40.2"
+repositories {
+    mavenCentral()
+}
+
+subprojects {
+    repositories {
+        mavenCentral()
+    }
+    apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
 }

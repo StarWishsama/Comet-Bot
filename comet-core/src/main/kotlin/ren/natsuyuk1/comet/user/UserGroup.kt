@@ -7,16 +7,11 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-rootProject.name = "Comet-Bot"
-include("comet-core", "comet-cli", "comet-mirai-wrapper", "comet-telegram-wrapper")
+package ren.natsuyuk1.comet.user
 
-pluginManagement {
-    repositories {
-        google()
-        gradlePluginPortal()
-    }
-}
+/**
+ * [UserGroup] 代表 [CometUser] 的权限组
+ */
+class UserGroup(val name: String) {
 
-plugins {
-    id("de.fayard.refreshVersions") version "0.40.2"
 }

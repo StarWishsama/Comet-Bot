@@ -7,16 +7,9 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-rootProject.name = "Comet-Bot"
-include("comet-core", "comet-cli", "comet-mirai-wrapper", "comet-telegram-wrapper")
+package ren.natsuyuk1.comet.exception
 
-pluginManagement {
-    repositories {
-        google()
-        gradlePluginPortal()
-    }
-}
-
-plugins {
-    id("de.fayard.refreshVersions") version "0.40.2"
-}
+/**
+ * 没有所需权限
+ */
+class NoPermissionException(reason: String = "You have no permission to do that") : IllegalStateException(reason)

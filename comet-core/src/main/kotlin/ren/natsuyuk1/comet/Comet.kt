@@ -7,16 +7,12 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-rootProject.name = "Comet-Bot"
-include("comet-core", "comet-cli", "comet-mirai-wrapper", "comet-telegram-wrapper")
+package ren.natsuyuk1.comet
 
-pluginManagement {
-    repositories {
-        google()
-        gradlePluginPortal()
-    }
-}
+/**
+ * [Comet] 代表单个对应多平台的机器人实例
+ *
+ */
+class Comet {
 
-plugins {
-    id("de.fayard.refreshVersions") version "0.40.2"
 }
