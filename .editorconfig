@@ -1,0 +1,25 @@
+# If IDE warn you 'Unsupported Entry'
+# Just ignore it, it's for ktlint program
+
+[*]
+insert_final_newline = true
+charset = utf-8
+indent_style = space
+
+[{*.kt,*.kts}]
+disabled_rules = no-wildcard-imports, import-ordering
+
+indent_size = 4
+max_line_length = 120
+
+[**/test/**.kt]
+ktlint_ignore_back_ticked_identifier = true
+
+[*.{bash,sh,zsh,fish}]
+indent_size = 2
+
+[*.yml]
+indent_size = 2
+
+[*.md]
+indent_size = 2
