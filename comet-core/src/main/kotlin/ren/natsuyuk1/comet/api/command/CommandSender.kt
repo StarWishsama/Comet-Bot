@@ -7,23 +7,16 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-package ren.natsuyuk1.comet
+package ren.natsuyuk1.comet.api.command
 
-import mu.KotlinLogging
-import ren.natsuyuk1.comet.config.CometConfig
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 
-/**
- * [Comet] 代表单个对应多平台的机器人实例
- *
- * 不同平台应实现此实例
- *
- */
-abstract class Comet(
-    /**
-     * 一个 Comet 实例的 [CometConfig]
-     */
-    val config: CometConfig,
+interface CommandSender {
+    fun sendMessage(message: MessageWrapper)
+}
 
-    val logger: KotlinLogging
-) {
+class ConsoleCommandSender : CommandSender {
+    override fun sendMessage(message: MessageWrapper) {
+        TODO("Not yet implemented")
+    }
 }

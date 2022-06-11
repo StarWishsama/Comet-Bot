@@ -9,9 +9,39 @@
 
 package ren.natsuyuk1.comet.user
 
+import kotlinx.serialization.Serializable
+import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.Table
+import ren.natsuyuk1.comet.utils.sql.SetTable
+
 /**
  * [UserGroup] 代表 [CometUser] 的权限组
  */
-class UserGroup(val name: String) {
+@Serializable
+data class UserGroup(
+    val name: String,
+    val alias: List<String>,
+    val ownPermission: List<UserPermission>
+)
 
+object UserGroupTable : Table("user_group") {
+    val name: Column<String> = text("name")
+
+    override val primaryKey = PrimaryKey(name)
+}
+
+object UserGroupAliasTable : SetTable<String, String>("user_group_own_permission") {
+    override val id = reference("name", UserGroupTable.name).entityId()
+
+    override val value: Column<String> = varchar("alias", 255)
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object UserGroupOwnPermissionTable : SetTable<String, String>("user_group_own_permission") {
+    override val id = reference("name", UserGroupTable.name).entityId()
+
+    override val value: Column<String> = varchar("permission", 255)
+
+    override val primaryKey = PrimaryKey(id)
 }

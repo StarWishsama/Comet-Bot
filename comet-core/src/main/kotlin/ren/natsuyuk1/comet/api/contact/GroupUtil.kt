@@ -7,23 +7,15 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-package ren.natsuyuk1.comet
+package ren.natsuyuk1.comet.api.contact
 
-import mu.KotlinLogging
-import ren.natsuyuk1.comet.config.CometConfig
+import ren.natsuyuk1.comet.user.Group
 
 /**
- * [Comet] 代表单个对应多平台的机器人实例
+ * 设置群名称
  *
- * 不同平台应实现此实例
- *
+ * 在无权限时会返回 [NoPermissionException]
  */
-abstract class Comet(
-    /**
-     * 一个 Comet 实例的 [CometConfig]
-     */
-    val config: CometConfig,
-
-    val logger: KotlinLogging
-) {
+fun Group.setGroupName(groupName: String) {
+    TODO()
 }

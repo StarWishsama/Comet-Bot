@@ -7,23 +7,10 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-package ren.natsuyuk1.comet
+package ren.natsuyuk1.comet.commands
 
-import mu.KotlinLogging
-import ren.natsuyuk1.comet.config.CometConfig
+import ren.natsuyuk1.comet.api.command.CometCommand
 
-/**
- * [Comet] 代表单个对应多平台的机器人实例
- *
- * 不同平台应实现此实例
- *
- */
-abstract class Comet(
-    /**
-     * 一个 Comet 实例的 [CometConfig]
-     */
-    val config: CometConfig,
+class HelpCommand : CometCommand() {
 
-    val logger: KotlinLogging
-) {
 }

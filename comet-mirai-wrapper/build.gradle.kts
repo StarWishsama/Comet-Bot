@@ -16,12 +16,10 @@ plugins {
 
 repositories {
     mavenCentral()
-
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
-    implementation(project(":comet-utils"))
+    implementation(project(":comet-core"))
 
     implementation(KotlinX.serialization.json)
 
@@ -30,6 +28,4 @@ dependencies {
     api("org.jetbrains.exposed:exposed-jdbc:_")
     api("org.jetbrains.exposed:exposed-kotlin-datetime:_")
     implementation("com.zaxxer:HikariCP:_")
-
-    implementation("moe.sdl.yac:core:_")
 }

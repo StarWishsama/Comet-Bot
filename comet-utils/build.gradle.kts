@@ -7,17 +7,23 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
+@file:Suppress("GradlePackageUpdate")
+
 plugins {
-    kotlin("plugin.serialization") apply false
+    `comet-conventions`
+    kotlin("plugin.serialization")
 }
 
 repositories {
     mavenCentral()
 }
 
-subprojects {
-    repositories {
-        mavenCentral()
-    }
-    apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+dependencies {
+    implementation(KotlinX.serialization.json)
+
+    api("org.jetbrains.exposed:exposed-core:_")
+    api("org.jetbrains.exposed:exposed-dao:_")
+    api("org.jetbrains.exposed:exposed-jdbc:_")
+    api("org.jetbrains.exposed:exposed-kotlin-datetime:_")
+    implementation("com.zaxxer:HikariCP:_")
 }

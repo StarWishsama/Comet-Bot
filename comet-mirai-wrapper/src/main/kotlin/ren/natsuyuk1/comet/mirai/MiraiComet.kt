@@ -7,23 +7,24 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-package ren.natsuyuk1.comet
+package ren.natsuyuk1.comet.mirai
 
-import mu.KotlinLogging
+import ren.natsuyuk1.comet.Comet
 import ren.natsuyuk1.comet.config.CometConfig
 
-/**
- * [Comet] 代表单个对应多平台的机器人实例
+/*
+ * Copyright (c) 2019-2022 StarWishsama.
  *
- * 不同平台应实现此实例
+ * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ * Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
  *
+ * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
-abstract class Comet(
+
+class MiraiComet(
     /**
      * 一个 Comet 实例的 [CometConfig]
      */
-    val config: CometConfig,
-
-    val logger: KotlinLogging
-) {
+    config: CometConfig,
+) : Comet(config) {
 }

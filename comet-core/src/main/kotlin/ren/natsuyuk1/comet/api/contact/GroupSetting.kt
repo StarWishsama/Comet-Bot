@@ -7,7 +7,7 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-package ren.natsuyuk1.comet.user
+package ren.natsuyuk1.comet.api.contact
 
 class GroupSetting {
 }

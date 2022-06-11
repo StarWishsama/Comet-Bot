@@ -9,6 +9,8 @@
 
 package ren.natsuyuk1.comet.user
 
+import org.jetbrains.exposed.dao.Entity
+import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -23,8 +25,9 @@ import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
  * 用户数据表
  *
  */
-object UserTable : IdTable<Long>("id") {
-    override val id: Column<EntityID<Long>> = long("id").entityId()
+object UserTable : IdTable<ULong>("id") {
+    override val id: Column<EntityID<ULong>> = ulong("id").entityId()
+    override val primaryKey = PrimaryKey(id)
 
     val checkInDate = timestamp("check_in_date")
     val coin = double("coin")
@@ -40,8 +43,8 @@ object UserTable : IdTable<Long>("id") {
  *
  * 用户数据
  */
-class CometUser(id: EntityID<Long>) : LongEntity(id) {
-    companion object : LongEntityClass<CometUser>(UserTable)
+class CometUser(id: EntityID<ULong>) : Entity<ULong>(id) {
+    companion object : EntityClass<ULong, CometUser>(UserTable)
 
     var checkInDate by UserTable.checkInDate
     var coin by UserTable.coin
@@ -59,12 +62,12 @@ class CometUser(id: EntityID<Long>) : LongEntity(id) {
  */
 object UserPermissionTable : LongIdTable() {
     val user = reference("user", UserTable.id).index()
-    val permission = varchar("permission", 255)
+    val permissionNode = varchar("permission_node", 255)
 }
 
 class UserPermission(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<UserPermission>(UserPermissionTable)
 
     val user by UserPermissionTable.user
-    val permission by UserPermissionTable.permission
+    val permissionNode by UserPermissionTable.permissionNode
 }

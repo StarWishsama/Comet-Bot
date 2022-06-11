@@ -1,0 +1,42 @@
+<!--
+  ~ Copyright (c) 2019-2022 StarWishsama.
+  ~
+  ~ 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+  ~ Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+  ~
+  ~ https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+  -->
+
+<configuration debug="false">
+    <!--NopStatus for remove long beginning notice-->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+    <!--stdout logger, for non-info level-->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
+        <encoder class="ren.natsuyuk1.utils.logging.PatternLayoutNoLambda">
+            <pattern>%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1le) [%t] %green([%lo{40}]) >>> %highlight(%m) %n%rEx{full}
+            </pattern>
+        </encoder>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>./logs/%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>15</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ren.natsuyuk1.utils.logging.PatternLayoutNoLambda">
+            <pattern>%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1le) [%t] %green([%lo{60}]) >>> %highlight(%m) %n%rEx{full}
+            </pattern>
+        </encoder>
+    </appender>
+    <!--Root Logger-->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+    <!--Sub-loggers, the name is NOT same as package path-->
+    <logger name="Exposed" level="WARN"/>
+    <logger name="ktor" level="WARN"/>
+    <logger name="com.zaxxer.hikari" level="WARN"/>
+</configuration>
