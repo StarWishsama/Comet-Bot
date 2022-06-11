@@ -11,6 +11,8 @@ package ren.natsuyuk1.comet.api.command
 
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 private val logger = mu.KotlinLogging.logger {}
 

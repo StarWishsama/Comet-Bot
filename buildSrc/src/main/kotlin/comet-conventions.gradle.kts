@@ -7,13 +7,12 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-import org.jetbrains.kotlin.gradle.dsl.Coroutines
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
     id("com.github.gmazzo.buildconfig")
-    id("com.github.johnrengelman.shadow:7.1.2")
+    id("com.github.johnrengelman.shadow")
     java
 }
 
@@ -58,16 +57,16 @@ tasks.test {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.apply {
-        jvmTarget = "17"
         OptInAnnotations.list.forEach {
             freeCompilerArgs = freeCompilerArgs + "-opt-in=$it"
         }
     }
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 configurations {
