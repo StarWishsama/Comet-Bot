@@ -30,4 +30,13 @@ dependencies {
     api("org.jetbrains.exposed:exposed-jdbc:_")
     api("org.jetbrains.exposed:exposed-kotlin-datetime:_")
     implementation("com.zaxxer:HikariCP:_")
+
+    // Ktor
+    implementation(Ktor.client.core)
+    implementation(Ktor.client.cio)
+    implementation(Ktor.client.logging)
+    implementation(Ktor.client.encoding)
+    implementation(Ktor.client.serialization)
+    implementation("io.ktor:ktor-client-content-negotiation:_")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:_")
 }

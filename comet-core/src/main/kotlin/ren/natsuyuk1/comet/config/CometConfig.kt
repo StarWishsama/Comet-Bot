@@ -11,12 +11,10 @@ package ren.natsuyuk1.comet.config
 
 import kotlinx.serialization.Serializable
 
-object DefaultCometConfig : CometConfig() {
-    override val id: String = "0"
-}
+var config = CometConfig()
 
 @Serializable
-abstract class CometConfig {
+data class CometConfig(
     /**
      * 机器人的 ID
      *
@@ -24,15 +22,20 @@ abstract class CometConfig {
      *
      * 在 Telegram 平台, 如果你担心安全问题, 可以自主设计加解密转换.
      */
-    abstract val id: String
+    val id: Long = 0,
 
     /**
      * 自动保存数据的周期, 单位为分钟
      */
-    open var dataSaveDuration: Long = 60
+    var dataSaveDuration: Long = 60,
 
     /**
      * 机器人调用冷却时间, 单位为秒
      */
-    open var defaultCoolDownTime: Int = 5
-}
+    var defaultCoolDownTime: Int = 5,
+
+    /**
+     * 进行网络请求时的 User-Agent, 部分特殊请求时不遵循该 User-Agent
+     */
+    var useragent: String = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.41"
+)

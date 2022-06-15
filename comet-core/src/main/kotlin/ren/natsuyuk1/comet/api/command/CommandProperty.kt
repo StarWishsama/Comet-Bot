@@ -9,7 +9,7 @@
 
 package ren.natsuyuk1.comet.api.command
 
-import ren.natsuyuk1.comet.config.DefaultCometConfig
+import ren.natsuyuk1.comet.config.config
 import ren.natsuyuk1.comet.user.UserLevel
 
 /**
@@ -24,6 +24,6 @@ data class CommandProperty(
     val helpText: String,
     val permission: String = "comet.command.${name}",
     val permissionLevel: UserLevel = UserLevel.USER,
-    val executeConsumePoint: Int = DefaultCometConfig.defaultCoolDownTime,
+    val executeConsumePoint: Int = config.defaultCoolDownTime,
     val executeConsumeType: CommandConsumeType = CommandConsumeType.COOLDOWN
 )
