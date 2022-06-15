@@ -15,6 +15,9 @@ inline fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapp
     return MessageWrapper().apply(builder)
 }
 
+/**
+ * 代表一个空的 [MessageWrapper]
+ */
 object EmptyMessageWrapper : MessageWrapper()
 
 @kotlinx.serialization.Serializable
@@ -27,65 +30,57 @@ open class MessageWrapper {
     @kotlinx.serialization.Transient
     private var usable: Boolean = isEmpty()
 
-    fun addElement(element: WrapperElement): MessageWrapper {
-        addElements(element)
-        return this
-    }
+    fun appendText(text: String, autoNewline: Boolean = false): MessageWrapper =
+        apply {
+            appendElement(Text(text))
+            if (autoNewline) appendLine()
+        }
 
-    fun addElements(vararg element: WrapperElement): MessageWrapper {
-        addElements(element.toList())
-        return this
-    }
+    fun appendLine(): MessageWrapper = apply { appendElement(Text("\n")) }
 
-    fun addElements(elements: Collection<WrapperElement>): MessageWrapper {
-        for (element in elements) {
-            if (!::lastInsertElement.isInitialized) {
-                lastInsertElement = element
-                messageContent.add(element)
-                continue
-            }
+    fun appendElement(element: WrapperElement): MessageWrapper =
+        apply { appendElements(element) }
 
-            lastInsertElement = if (lastInsertElement is Text && element is Text) {
-                messageContent.remove(lastInsertElement)
-                val merge = Text((lastInsertElement as Text).text + element.text)
-                messageContent.add(merge)
-                merge
-            } else {
-                messageContent.add(element)
-                element
+    fun appendElements(vararg element: WrapperElement): MessageWrapper =
+        apply { appendElements(element.toList()) }
+
+    fun appendElements(elements: Collection<WrapperElement>): MessageWrapper =
+        apply {
+            for (element in elements) {
+                if (!::lastInsertElement.isInitialized) {
+                    lastInsertElement = element
+                    messageContent.add(element)
+                    continue
+                }
+
+                lastInsertElement = if (lastInsertElement is Text && element is Text) {
+                    messageContent.remove(lastInsertElement)
+                    val merge = Text((lastInsertElement as Text).text + element.text)
+                    messageContent.add(merge)
+                    merge
+                } else {
+                    messageContent.add(element)
+                    element
+                }
             }
         }
 
-        return this
-    }
+    fun setUsable(usable: Boolean): MessageWrapper = apply { this.usable = usable }
 
-    fun setUsable(usable: Boolean): MessageWrapper {
-        this.usable = usable
-        return this
-    }
-
-    fun isUsable(): Boolean {
-        return usable
-    }
+    fun isUsable(): Boolean = usable
 
     fun removeElementsByClass(type: Class<*>): MessageWrapper =
         MessageWrapper().setUsable(usable).also {
-            it.addElements(getMessageContent().filter { mw -> mw.className == type.name })
+            it.appendElements(getMessageContent().filter { mw -> mw.className == type.name })
         }
 
-    private fun isPictureReachLimit(): Boolean {
-        return messageContent.count { it is Image } > 9
-    }
+    private fun isPictureReachLimit(): Boolean = messageContent.count { it is Image } > 9
 
-    override fun toString(): String {
-        return "MessageWrapper {content=${messageContent}, usable=${usable}}"
-    }
+    override fun toString(): String = "MessageWrapper {content=${messageContent}, usable=${usable}}"
 
-    fun parseToString(): String {
-        return buildString {
-            messageContent.forEach {
-                append(it.asString())
-            }
+    fun parseToString(): String = buildString {
+        messageContent.forEach {
+            append(it.asString())
         }
     }
 

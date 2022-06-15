@@ -23,6 +23,7 @@ import ren.natsuyuk1.comet.user.CometUser
  * @param user 调用该命令的用户
  */
 abstract class CometCommand(
+    val sender: CommandSender,
     raw: String,
     message: MessageWrapper,
     user: CometUser,
