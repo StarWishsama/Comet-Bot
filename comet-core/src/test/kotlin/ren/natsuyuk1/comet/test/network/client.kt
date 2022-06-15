@@ -33,6 +33,7 @@ val client = HttpClient(CIO) {
         json(Json {
             prettyPrint = true
             isLenient = true
+            ignoreUnknownKeys = true
         })
     }
 }

@@ -33,5 +33,6 @@ object ProjectSekaiDataTable : IdTable<ULong>("pjsk_data") {
 class ProjectSekaiData(id: EntityID<ULong>) : Entity<ULong>(id) {
     companion object : EntityClass<ULong, ProjectSekaiData>(ProjectSekaiDataTable)
 
+    // 代表玩家的 Project Sekai 唯一 ID
     var userID by ProjectSekaiDataTable.userID
 }

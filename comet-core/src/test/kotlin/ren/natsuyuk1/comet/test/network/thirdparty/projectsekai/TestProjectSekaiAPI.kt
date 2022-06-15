@@ -12,6 +12,7 @@ package ren.natsuyuk1.comet.test.network.thirdparty.projectsekai
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getEventList
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserEventInfo
 import ren.natsuyuk1.comet.test.network.client
 
@@ -27,5 +28,10 @@ class TestProjectSekaiAPI {
     @Test
     fun testEventProfileFetch() {
         runBlocking { client.getUserEventInfo(eventID, id) }
+    }
+
+    @Test
+    fun testEventListFetch() {
+        runBlocking { println(client.getEventList()) }
     }
 }
