@@ -30,6 +30,4 @@ dependencies {
     api("org.jetbrains.exposed:exposed-jdbc:_")
     api("org.jetbrains.exposed:exposed-kotlin-datetime:_")
     implementation("com.zaxxer:HikariCP:_")
-
-    implementation("moe.sdl.yac:core:_")
 }

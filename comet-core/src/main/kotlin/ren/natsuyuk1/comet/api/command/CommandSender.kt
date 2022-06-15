@@ -11,10 +11,30 @@ package ren.natsuyuk1.comet.api.command
 
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 
+/**
+ * [CommandSender]
+ *
+ *
+ */
 interface CommandSender {
     fun sendMessage(message: MessageWrapper)
 }
 
+/**
+ * [PlatformCommandSender]
+ *
+ * 不同平台实现的 `sendMessage`
+ * 代表来自不同平台的用户
+ */
+abstract class PlatformCommandSender : CommandSender {
+    abstract override fun sendMessage(message: MessageWrapper)
+}
+
+/**
+ * [ConsoleCommandSender]
+ *
+ * 代表来自终端的命令发送者
+ */
 class ConsoleCommandSender : CommandSender {
     override fun sendMessage(message: MessageWrapper) {
         TODO("Not yet implemented")

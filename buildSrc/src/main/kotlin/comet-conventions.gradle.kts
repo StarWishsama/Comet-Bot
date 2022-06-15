@@ -35,6 +35,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
 
     testImplementation(kotlin("test"))
+
+    implementation("moe.sdl.yac:core:_")
 }
 
 sourceSets {
@@ -57,6 +59,8 @@ tasks.test {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.apply {
+        jvmTarget = "17"
+
         OptInAnnotations.list.forEach {
             freeCompilerArgs = freeCompilerArgs + "-opt-in=$it"
         }

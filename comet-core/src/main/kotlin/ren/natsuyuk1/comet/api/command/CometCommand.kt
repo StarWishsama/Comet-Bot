@@ -29,7 +29,7 @@ abstract class CometCommand(
     /**
      * 该命令的配置 [CommandProperty]
      */
-    property: CommandProperty,
+    val property: CommandProperty,
     option: CliktOption = CliktOption()
 ) : CliktCommand(
     name = property.name,

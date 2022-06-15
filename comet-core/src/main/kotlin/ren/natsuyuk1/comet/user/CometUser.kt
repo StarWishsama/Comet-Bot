@@ -12,12 +12,12 @@ package ren.natsuyuk1.comet.user
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.LongEntity
-import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
-import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
+import ren.natsuyuk1.comet.utils.sql.SQLDatabaseSet
+import ren.natsuyuk1.comet.utils.sql.SetTable
 
 /**
  * [UserTable]
@@ -25,14 +25,14 @@ import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
  * 用户数据表
  *
  */
-object UserTable : IdTable<ULong>("id") {
+object UserTable : IdTable<ULong>("user_data") {
     override val id: Column<EntityID<ULong>> = ulong("id").entityId()
     override val primaryKey = PrimaryKey(id)
 
     val checkInDate = timestamp("check_in_date")
     val coin = double("coin")
     val checkInTime = integer("check_in_time")
-    val userGroup = varchar("user_group", 30)
+    val userLevel = enumeration<UserLevel>("user_level")
     val r6sAccount = varchar("r6s_account", 15)
     val triggerCommandTime = timestamp("trigger_command_time")
     val genshinGachaPool: Column<Int> = integer("genshin_gacha_pool")
@@ -49,7 +49,8 @@ class CometUser(id: EntityID<ULong>) : Entity<ULong>(id) {
     var checkInDate by UserTable.checkInDate
     var coin by UserTable.coin
     var checkInTime by UserTable.checkInTime
-    var userGroup by UserTable.userGroup
+    val permissions = SQLDatabaseSet(id, UserPermissionTable)
+    var userLevel by UserTable.userLevel
     var r6sAccount by UserTable.r6sAccount
     var triggerCommandTime by UserTable.triggerCommandTime
     var genshinGachaPool by UserTable.genshinGachaPool
@@ -60,14 +61,14 @@ class CometUser(id: EntityID<ULong>) : Entity<ULong>(id) {
  *
  *
  */
-object UserPermissionTable : LongIdTable() {
-    val user = reference("user", UserTable.id).index()
-    val permissionNode = varchar("permission_node", 255)
+object UserPermissionTable : SetTable<ULong, String>("user_permission") {
+    override val id: Column<EntityID<ULong>> = reference("user", UserTable.id).index()
+    override val value: Column<String> = varchar("permission_node", 255)
 }
 
 class UserPermission(id: EntityID<Long>) : LongEntity(id) {
-    companion object : LongEntityClass<UserPermission>(UserPermissionTable)
+    companion object : EntityClass<ULong, Entity<ULong>>(UserPermissionTable)
 
-    val user by UserPermissionTable.user
-    val permissionNode by UserPermissionTable.permissionNode
+    val user by UserPermissionTable.id
+    val permissionNode by UserPermissionTable.value
 }
