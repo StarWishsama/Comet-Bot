@@ -13,21 +13,27 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getEventList
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserEventInfo
 import ren.natsuyuk1.comet.test.network.client
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TestProjectSekaiAPI {
 
-    // 迷い子の手を引く、そのさきは
+    // Represent to event named 迷い子の手を引く、そのさきは
     private val eventID = 61
 
     // Welcome to add me as friend :D
-    private val id = 210043933010767872
+    private val id = 210043933010767872u
 
     @Test
     fun testEventProfileFetch() {
         runBlocking { client.getUserEventInfo(eventID, id) }
+    }
+
+    @Test
+    fun testEventRankingPositionFetch() {
+        runBlocking { client.getSpecificRankInfo(eventID, 10000u) }
     }
 
     @Test

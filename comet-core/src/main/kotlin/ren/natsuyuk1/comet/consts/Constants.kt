@@ -16,7 +16,7 @@ import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
-import ren.natsuyuk1.comet.config.config
+import ren.natsuyuk1.comet.api.config.config
 
 val json = Json {
     prettyPrint = true
@@ -24,7 +24,7 @@ val json = Json {
     ignoreUnknownKeys = true
 }
 
-val client = HttpClient(CIO) {
+val defaultClient = HttpClient(CIO) {
     install(UserAgent) {
         agent = config.useragent
     }

@@ -9,7 +9,7 @@
 
 package ren.natsuyuk1.comet.api.command
 
-import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 /**
  * [CommandSender]
@@ -27,8 +27,21 @@ interface CommandSender {
  * 代表来自不同平台的用户
  */
 abstract class PlatformCommandSender : CommandSender {
+
+    /**
+     * 用户名
+     */
+    abstract val name: String
+
+    /**
+     * 群名片, 仅在 [PlatformCommandSender] 为来自 QQ 群的用户时存在
+     */
+    abstract val card: String
+
     abstract override fun sendMessage(message: MessageWrapper)
 }
+
+fun PlatformCommandSender.nameOrCard(): String = card.ifEmpty { name }
 
 /**
  * [ConsoleCommandSender]

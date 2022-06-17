@@ -7,15 +7,11 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-package ren.natsuyuk1.comet.api.contact
+package ren.natsuyuk1.comet.api.permission
 
-import ren.natsuyuk1.comet.user.Group
+import ren.natsuyuk1.comet.api.user.UserLevel
 
-/**
- * 设置群名称
- *
- * 在无权限时会返回 [NoPermissionException]
- */
-fun Group.setGroupName(groupName: String) {
-    TODO()
-}
+data class CometPermission(
+    val nodeName: String,
+    val level: UserLevel
+)

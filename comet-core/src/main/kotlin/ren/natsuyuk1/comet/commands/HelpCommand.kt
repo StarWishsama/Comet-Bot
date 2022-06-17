@@ -20,9 +20,9 @@ import ren.natsuyuk1.comet.api.command.CometCommand
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
-import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.message.buildMessageWrapper
-import ren.natsuyuk1.comet.user.CometUser
+import ren.natsuyuk1.comet.api.user.CometUser
+import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 
 private val property by lazy {
     CommandProperty(
@@ -33,7 +33,7 @@ private val property by lazy {
     )
 }
 
-abstract class HelpCommand(sender: PlatformCommandSender, raw: String, message: MessageWrapper, user: CometUser) :
+class HelpCommand(sender: PlatformCommandSender, raw: String, message: MessageWrapper, user: CometUser) :
     CometCommand(sender, raw, message, user, property) {
 
     private val pageNum by argument(

@@ -7,7 +7,7 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-package ren.natsuyuk1.comet.api.message
+package ren.natsuyuk1.comet.utils.message
 
 import kotlinx.serialization.Serializable
 

@@ -7,16 +7,15 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-rootProject.name = "Comet-Bot"
-include("comet-api", "comet-core", "comet-cli", "comet-utils", "comet-mirai-wrapper", "comet-telegram-wrapper")
+package ren.natsuyuk1.comet.api.contact
 
-pluginManagement {
-    repositories {
-        google()
-        gradlePluginPortal()
-    }
-}
+import ren.natsuyuk1.comet.api.user.Group
 
-plugins {
-    id("de.fayard.refreshVersions") version "0.40.2"
+/**
+ * 设置群名称
+ *
+ * 在无权限时会返回 [NoPermissionException]
+ */
+fun Group.setGroupName(groupName: String) {
+    TODO()
 }

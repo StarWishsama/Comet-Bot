@@ -7,12 +7,14 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-package ren.natsuyuk1.comet.user
+package ren.natsuyuk1.comet.network
 
-enum class UserLevel {
-    USER,
-    PREMIUM,
-    ADMIN,
-    OWNER,
-    CONSOLE
-}
+import io.ktor.client.*
+import kotlinx.coroutines.CoroutineName
+import ren.natsuyuk1.comet.consts.defaultClient
+import kotlin.coroutines.CoroutineContext
+
+class CometClient(
+    var client: HttpClient = defaultClient,
+    val context: CoroutineContext = CoroutineName("comet-client")
+)

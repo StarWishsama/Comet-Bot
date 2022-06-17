@@ -14,7 +14,7 @@ import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
-import ren.natsuyuk1.comet.user.UserTable
+import ren.natsuyuk1.comet.api.user.UserTable
 
 /**
  * 储存与 Project Sekai: Colorful Stage 有关的数据

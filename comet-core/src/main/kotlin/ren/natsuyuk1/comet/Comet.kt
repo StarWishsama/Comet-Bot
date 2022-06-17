@@ -10,7 +10,7 @@
 package ren.natsuyuk1.comet
 
 import mu.KotlinLogging
-import ren.natsuyuk1.comet.config.CometConfig
+import ren.natsuyuk1.comet.api.config.CometConfig
 
 /**
  * [Comet] 代表单个对应多平台的机器人实例

@@ -7,16 +7,9 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-rootProject.name = "Comet-Bot"
-include("comet-api", "comet-core", "comet-cli", "comet-utils", "comet-mirai-wrapper", "comet-telegram-wrapper")
+package ren.natsuyuk1.comet.utils.datetime
 
-pluginManagement {
-    repositories {
-        google()
-        gradlePluginPortal()
-    }
-}
+import java.time.LocalDateTime
+import java.time.ZoneId
 
-plugins {
-    id("de.fayard.refreshVersions") version "0.40.2"
-}
+fun LocalDateTime.utcNow() = LocalDateTime.now(ZoneId.of("UTC"))

@@ -9,13 +9,13 @@
 
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 
-import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.serialization.decodeFromString
 import ren.natsuyuk1.comet.consts.json
+import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiEventList
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiProfile
 
@@ -36,10 +36,10 @@ object ProjectSekaiAPI {
      */
     private const val PJSEKAI_URL = "https://api.pjsek.ai/database/master"
 
-    suspend fun HttpClient.getUserEventInfo(eventID: Int, userID: Long): ProjectSekaiProfile {
-        logger.debug { "Fetching project sekai event $eventID for user $userID" }
+    suspend fun CometClient.getUserEventInfo(eventID: Int, userID: ULong): ProjectSekaiProfile {
+        logger.debug { "Fetching project sekai event $eventID rank for user $userID" }
 
-        val resp = get("$PROFILE_URL/event/$eventID/ranking") {
+        val resp = client.get("$PROFILE_URL/event/$eventID/ranking") {
             url {
                 parameters.append("targetUserId", userID.toString())
             }
@@ -48,10 +48,22 @@ object ProjectSekaiAPI {
         return resp.bodyAsChannel().toInputStream().bufferedReader().use { json.decodeFromString(it.readText()) }
     }
 
-    suspend fun HttpClient.getEventList(limit: Int = 12, startAt: Int = -1, skip: Int = 0): ProjectSekaiEventList {
+    suspend fun CometClient.getSpecificRankInfo(eventID: Int, rankPosition: ULong): ProjectSekaiProfile {
+        logger.debug { "Fetching project sekai event $eventID rank position at $rankPosition" }
+
+        val resp = client.get("$PROFILE_URL/event/$eventID/ranking") {
+            url {
+                parameters.append("targetRank", rankPosition.toString())
+            }
+        }
+
+        return resp.bodyAsChannel().toInputStream().bufferedReader().use { json.decodeFromString(it.readText()) }
+    }
+
+    suspend fun CometClient.getEventList(limit: Int = 12, startAt: Int = -1, skip: Int = 0): ProjectSekaiEventList {
         logger.debug { "Fetching project sekai event list" }
 
-        return get("$PJSEKAI_URL/events") {
+        return client.get("$PJSEKAI_URL/events") {
             url {
                 parameters.apply {
                     append("$" + "limit", limit.toString())

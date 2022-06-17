@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import moe.sdl.yac.core.CommandResult
 import ren.natsuyuk1.comet.api.permission.hasPermission
-import ren.natsuyuk1.comet.user.CometUser
+import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
 import java.util.concurrent.ConcurrentHashMap

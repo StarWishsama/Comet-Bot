@@ -16,16 +16,14 @@ plugins {
 
 repositories {
     mavenCentral()
-
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
-    implementation(project(":comet-api"))
-    implementation(project(":comet-utils"))
-
     implementation(KotlinX.serialization.json)
-    implementation(KotlinX.datetime)
+
+    implementation("cn.hutool:hutool-http:_")
+    implementation("cn.hutool:hutool-crypto:_")
+    implementation("cn.hutool:hutool-cron:_")
 
     api("org.jetbrains.exposed:exposed-core:_")
     api("org.jetbrains.exposed:exposed-dao:_")
@@ -33,12 +31,5 @@ dependencies {
     api("org.jetbrains.exposed:exposed-kotlin-datetime:_")
     implementation("com.zaxxer:HikariCP:_")
 
-    // Ktor
-    implementation(Ktor.client.core)
-    implementation(Ktor.client.cio)
-    implementation(Ktor.client.logging)
-    implementation(Ktor.client.encoding)
-    implementation(Ktor.client.serialization)
-    implementation("io.ktor:ktor-client-content-negotiation:_")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:_")
+    implementation(project(":comet-utils"))
 }

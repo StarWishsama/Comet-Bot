@@ -10,6 +10,8 @@
 package ren.natsuyuk1.comet.utils.string
 
 import cn.hutool.core.codec.Base64Decoder
+import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.time.LocalDateTime
@@ -186,4 +188,6 @@ object StringUtil {
         }
         return newStr
     }
+
+    fun String.toMessageWrapper(): MessageWrapper = buildMessageWrapper { appendText(this@toMessageWrapper) }
 }

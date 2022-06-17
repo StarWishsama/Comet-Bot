@@ -9,8 +9,8 @@
 
 package ren.natsuyuk1.comet.api.permission
 
-import ren.natsuyuk1.comet.user.CometUser
-import ren.natsuyuk1.comet.user.UserLevel
+import ren.natsuyuk1.comet.api.user.CometUser
+import ren.natsuyuk1.comet.api.user.UserLevel
 
 object PermissionManager {
     val permissions = mutableListOf<CometPermission>()

@@ -7,11 +7,12 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-package ren.natsuyuk1.comet.api.permission
+package ren.natsuyuk1.comet.api.user
 
-import ren.natsuyuk1.comet.user.UserLevel
-
-data class CometPermission(
-    val nodeName: String,
-    val level: UserLevel
-)
+enum class UserLevel {
+    USER,
+    PREMIUM,
+    ADMIN,
+    OWNER,
+    CONSOLE
+}

@@ -9,8 +9,8 @@
 
 package ren.natsuyuk1.comet.api.command
 
-import ren.natsuyuk1.comet.config.config
-import ren.natsuyuk1.comet.user.UserLevel
+import ren.natsuyuk1.comet.api.config.config
+import ren.natsuyuk1.comet.api.user.UserLevel
 
 /**
  * [CommandProperty]

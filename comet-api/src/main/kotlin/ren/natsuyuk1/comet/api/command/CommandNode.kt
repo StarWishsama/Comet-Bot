@@ -9,7 +9,7 @@
 
 package ren.natsuyuk1.comet.api.command
 
-import ren.natsuyuk1.comet.user.CometUser
+import ren.natsuyuk1.comet.api.user.CometUser
 
 /**
  * [AbstractCommandNode]
