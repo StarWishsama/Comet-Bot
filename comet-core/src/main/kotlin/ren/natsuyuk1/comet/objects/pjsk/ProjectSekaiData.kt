@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2019-2022 StarWishsama.
  *
- * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
- * Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ * 此源代码的使用受 MIT 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ * Use of this source code is governed by the MIT License which can be found through the following link.
  *
- * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
 package ren.natsuyuk1.comet.objects.pjsk
@@ -16,6 +16,21 @@ import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import ren.natsuyuk1.comet.api.user.UserTable
 
+object ProjectSekaiDataTable : IdTable<UInt>("pjsk_data") {
+    override val id: Column<EntityID<UInt>> = uinteger("current_event_id").entityId()
+    val startTime: Column<Long> = long("start_time")
+    val endTime: Column<Long> = long("end_time")
+}
+
+class ProjectSekaiData(id: EntityID<UInt>) : Entity<UInt>(id) {
+    companion object : EntityClass<UInt, ProjectSekaiData>(ProjectSekaiDataTable)
+
+    val currentEventID by ProjectSekaiDataTable.id
+    val startTime by ProjectSekaiDataTable.startTime
+    val endTime by ProjectSekaiDataTable.endTime
+}
+
+
 /**
  * 储存与 Project Sekai: Colorful Stage 有关的数据
  *
@@ -23,16 +38,16 @@ import ren.natsuyuk1.comet.api.user.UserTable
  * user_id -> 绑定用户的唯一 ID
  *
  */
-object ProjectSekaiDataTable : IdTable<ULong>("pjsk_data") {
+object ProjectSekaiUserDataTable : IdTable<ULong>("pjsk_user_data") {
     override val id: Column<EntityID<ULong>> = UserTable.ulong("id").entityId()
     override val primaryKey = PrimaryKey(id)
 
     val userID = ulong("user_id")
 }
 
-class ProjectSekaiData(id: EntityID<ULong>) : Entity<ULong>(id) {
-    companion object : EntityClass<ULong, ProjectSekaiData>(ProjectSekaiDataTable)
+class ProjectSekaiUserData(id: EntityID<ULong>) : Entity<ULong>(id) {
+    companion object : EntityClass<ULong, ProjectSekaiUserData>(ProjectSekaiUserDataTable)
 
     // 代表玩家的 Project Sekai 唯一 ID
-    var userID by ProjectSekaiDataTable.userID
+    var userID by ProjectSekaiUserDataTable.userID
 }
