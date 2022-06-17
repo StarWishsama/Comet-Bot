@@ -25,8 +25,6 @@ val json = Json {
     ignoreUnknownKeys = true
 }
 
-val client: CometClient = CometClient()
-
 val defaultClient = HttpClient(CIO) {
     install(UserAgent) {
         agent = config.useragent
@@ -42,3 +40,5 @@ val defaultClient = HttpClient(CIO) {
         json(json)
     }
 }
+
+val client: CometClient = CometClient()

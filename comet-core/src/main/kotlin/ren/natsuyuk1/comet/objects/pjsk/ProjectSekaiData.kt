@@ -23,7 +23,7 @@ object ProjectSekaiDataTable : IdTable<UInt>("pjsk_data") {
 }
 
 class ProjectSekaiData(id: EntityID<UInt>) : Entity<UInt>(id) {
-    companion object : EntityClass<UInt, ProjectSekaiData>(ProjectSekaiDataTable)
+    companion object : EntityClass<Int, ProjectSekaiData>(ProjectSekaiDataTable)
 
     val currentEventID by ProjectSekaiDataTable.id
     val startTime by ProjectSekaiDataTable.startTime
@@ -38,15 +38,15 @@ class ProjectSekaiData(id: EntityID<UInt>) : Entity<UInt>(id) {
  * user_id -> 绑定用户的唯一 ID
  *
  */
-object ProjectSekaiUserDataTable : IdTable<ULong>("pjsk_user_data") {
-    override val id: Column<EntityID<ULong>> = UserTable.ulong("id").entityId()
+object ProjectSekaiUserDataTable : IdTable<Long>("pjsk_user_data") {
+    override val id: Column<EntityID<Long>> = UserTable.ulong("id").entityId()
     override val primaryKey = PrimaryKey(id)
 
     val userID = ulong("user_id")
 }
 
-class ProjectSekaiUserData(id: EntityID<ULong>) : Entity<ULong>(id) {
-    companion object : EntityClass<ULong, ProjectSekaiUserData>(ProjectSekaiUserDataTable)
+class ProjectSekaiUserData(id: EntityID<Long>) : Entity<Long>(id) {
+    companion object : EntityClass<Long, ProjectSekaiUserData>(ProjectSekaiUserDataTable)
 
     // 代表玩家的 Project Sekai 唯一 ID
     var userID by ProjectSekaiUserDataTable.userID

@@ -7,13 +7,7 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
-package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest
+package ren.natsuyuk1.comet.cli
 
-import kotlinx.serialization.json.JsonObject
-
-@kotlinx.serialization.Serializable
-data class SekaiBestPredictionInfo(
-    val status: String,
-    val data: JsonObject,
-    val message: String
-)
+suspend fun main(args: Array<String>) {
+}

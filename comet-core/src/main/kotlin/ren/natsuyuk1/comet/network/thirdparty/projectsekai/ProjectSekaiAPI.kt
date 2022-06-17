@@ -38,7 +38,7 @@ object ProjectSekaiAPI {
      */
     private const val PJSEKAI_URL = "https://api.pjsek.ai/database/master"
 
-    suspend fun CometClient.getUserEventInfo(eventID: Int, userID: ULong): ProjectSekaiProfile {
+    suspend fun CometClient.getUserEventInfo(eventID: Int, userID: Long): ProjectSekaiProfile {
         logger.debug { "Fetching project sekai event $eventID rank for user $userID" }
 
         val resp = client.get("$PROFILE_URL/event/$eventID/ranking") {
@@ -50,7 +50,7 @@ object ProjectSekaiAPI {
         return resp.bodyAsChannel().toInputStream().bufferedReader().use { json.decodeFromString(it.readText()) }
     }
 
-    suspend fun CometClient.getSpecificRankInfo(eventID: Int, rankPosition: ULong): ProjectSekaiProfile {
+    suspend fun CometClient.getSpecificRankInfo(eventID: Int, rankPosition: Int): ProjectSekaiProfile {
         logger.debug { "Fetching project sekai event $eventID rank position at $rankPosition" }
 
         val resp = client.get("$PROFILE_URL/event/$eventID/ranking") {
