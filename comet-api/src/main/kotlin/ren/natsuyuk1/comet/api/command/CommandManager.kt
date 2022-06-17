@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2019-2022 StarWishsama.
  *
- * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
- * Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ * 此源代码的使用受 MIT 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ * Use of this source code is governed by the MIT License which can be found through the following link.
  *
- * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
 package ren.natsuyuk1.comet.api.command
@@ -16,10 +16,10 @@ import moe.sdl.yac.core.CommandResult
 import ren.natsuyuk1.comet.api.permission.hasPermission
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import ren.natsuyuk1.comet.utils.string.StringUtil.getLastingTimeAsString
 import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
+import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Duration.Companion.seconds
 
 private val logger = mu.KotlinLogging.logger {}
@@ -28,10 +28,6 @@ object CommandManager {
     private val commands: MutableMap<String, AbstractCommandNode<*>> = ConcurrentHashMap()
 
     private var commandScope = ModuleScope("CommandManager")
-
-    internal fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
-        commandScope = ModuleScope("CommandManager", parentContext)
-    }
 
     @Suppress("unused")
     fun registerCommand(
@@ -61,6 +57,8 @@ object CommandManager {
         user: CometUser,
         rawMsg: String,
     ): Job = commandScope.launch {
+        val executeTime = LocalDateTime.now()
+
         if (rawMsg.isEmpty()) {
             return@launch
         }
@@ -109,12 +107,24 @@ object CommandManager {
                 }
 
                 is ConsoleCommandNode -> {
-                    TODO()
+                    if (sender is ConsoleCommandSender) {
+                        when (val cmdStatus = cmd.handler(sender, user).main(args.drop(1))) {
+                            is CommandResult.Error -> {
+                                logger.warn(cmdStatus.cause) { "在执行命令时发生了意外, ${cmdStatus.message}" }
+                                return@run CommandStatus.Error()
+                            }
+                            is CommandResult.Success -> {
+                                return@run CommandStatus.Success()
+                            }
+                        }
+                    }
                 }
             }
 
             return@run CommandStatus.Failed()
         }
+
+        logger.debug { "命令 ${cmd.property.name} 执行状态 $result, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}" }
     }
 
     /**

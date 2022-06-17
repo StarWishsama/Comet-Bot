@@ -7,23 +7,13 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
-package ren.natsuyuk1.comet
-
-import mu.KLogger
-import ren.natsuyuk1.comet.api.config.CometConfig
+package ren.natsuyuk1.comet.api.event
 
 /**
- * [Comet] 代表单个对应多平台的机器人实例
+ * [EventPriopity]
  *
- * 不同平台应实现此实例
- *
+ * 事件优先级, 从左到右优先级逐次减小.
  */
-abstract class Comet(
-    /**
-     * 一个 Comet 实例的 [CometConfig]
-     */
-    val config: CometConfig,
-
-    val logger: KLogger
-) {
+enum class EventPriopity {
+    HIGHEST, HIGH, NORMAL, LOW, LOWEST, MONITOR;
 }
