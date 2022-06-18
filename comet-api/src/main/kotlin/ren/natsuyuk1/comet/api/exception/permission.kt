@@ -7,8 +7,6 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
-package ren.natsuyuk1.comet.api.event
+package ren.natsuyuk1.comet.api.exception
 
-object EventManager {
-
-}
+class PermissionDeniedException(reason: String = "No Permission") : IllegalStateException(reason)

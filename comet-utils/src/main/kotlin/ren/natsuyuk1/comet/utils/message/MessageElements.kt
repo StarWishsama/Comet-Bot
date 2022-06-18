@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2019-2022 StarWishsama.
  *
- * 此源代码的使用受 GNU General Affero Public License v3.0 许可证约束, 欲阅读此许可证, 可在以下链接查看.
- * Use of this source code is governed by the GNU AGPLv3 license which can be found through the following link.
+ * 此源代码的使用受 MIT 许可证约束, 欲阅读此许可证, 可在以下链接查看.
+ * Use of this source code is governed by the MIT License which can be found through the following link.
  *
- * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
+ * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
 package ren.natsuyuk1.comet.utils.message
@@ -12,8 +12,6 @@ package ren.natsuyuk1.comet.utils.message
 import kotlinx.serialization.Serializable
 
 interface WrapperElement {
-    val className: String
-
     fun asString(): String
 }
 
@@ -25,8 +23,6 @@ interface WrapperElement {
  * @param text 文本
  */
 data class Text(val text: String) : WrapperElement {
-    override val className: String = this::class.java.name
-
     override fun asString(): String = text
 }
 
@@ -53,8 +49,6 @@ data class Image(
         }
     }
 
-    override val className: String = this::class.java.name
-
     override fun asString(): String = "[图片]"
 }
 
@@ -67,8 +61,6 @@ data class Image(
  */
 @Serializable
 data class AtElement(val target: Long) : WrapperElement {
-    override val className: String = this::class.java.name
-
     override fun asString(): String = "@${target}"
 
 }
@@ -82,8 +74,6 @@ data class AtElement(val target: Long) : WrapperElement {
  */
 @Serializable
 data class XmlElement(val content: String) : WrapperElement {
-    override val className: String = this::class.java.name
-
     override fun asString(): String = "[XML 消息]"
 
 }
@@ -95,7 +85,9 @@ data class XmlElement(val content: String) : WrapperElement {
  */
 @Serializable
 data class Voice(val filePath: String) : WrapperElement {
-    override val className: String = this::class.java.name
-
     override fun asString(): String = "[语音消息]"
+}
+
+data class Nudge(val target: Long) : WrapperElement {
+    override fun asString(): String = "[戳一戳]"
 }

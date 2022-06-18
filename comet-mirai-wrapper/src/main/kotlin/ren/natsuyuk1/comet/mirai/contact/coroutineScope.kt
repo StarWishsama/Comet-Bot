@@ -7,8 +7,8 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
-package ren.natsuyuk1.comet.api.event
+package ren.natsuyuk1.comet.mirai.contact
 
-object EventManager {
+import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 
-}
+val contactScope = ModuleScope("comet_contact_wrapper")

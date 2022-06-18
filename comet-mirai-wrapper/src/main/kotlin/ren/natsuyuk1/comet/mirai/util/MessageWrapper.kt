@@ -49,11 +49,11 @@ suspend fun WrapperElement.toMessageContent(subject: Contact?): MessageContent {
                     return base64.toByteArray().toExternalResource().uploadAsImage(subject)
                 }
             } catch (e: Exception) {
-                logger.warn { "在转换图片时出现了问题, Wrapper 原始内容为: ${toString()}" }
+                logger.warn { "A error occurred when converting Image, raw content: ${toString()}" }
                 return PlainText("[图片]")
             }
 
-            throw RuntimeException("Unable to convert Picture to Image, Picture raw content: $this")
+            throw RuntimeException("Unable to convert image, Image raw content: $this")
         }
 
         is AtElement -> return At(target)
@@ -64,7 +64,7 @@ suspend fun WrapperElement.toMessageContent(subject: Contact?): MessageContent {
             requireNotNull(subject) { "subject cannot be null!" }
 
             if (subject !is AudioSupported) {
-                return PlainText("语音消息只能发送给好友或群")
+                throw UnsupportedOperationException("Sending voice message to unsupported subject: must be friend or group")
             }
 
             if (filePath.isNotEmpty() && File(filePath).exists()) {
@@ -73,10 +73,10 @@ suspend fun WrapperElement.toMessageContent(subject: Contact?): MessageContent {
                 }
             }
 
-            throw RuntimeException("Unable to convert Voice to MessageChain, Raw path: $this")
+            throw RuntimeException("Unable to convert Voice to MessageChain, Raw content: $this")
         }
 
-        else -> throw UnsupportedOperationException("暂不支持转换此消息类型: ${this.className}")
+        else -> throw UnsupportedOperationException("Unsupported message wrapper ${this::class.simpleName} in mirai side")
     }
 }
 
@@ -95,7 +95,7 @@ fun MessageWrapper.toMessageChain(subject: Contact? = null): MessageChain {
                     add(it.toMessageContent(subject))
                 }
             }.onFailure {
-                logger.warn(it) { "在转换消息时出现了意外" }
+                logger.warn(it) { "A error occurred when converting message wrapper" }
             }
         }
     }.build()

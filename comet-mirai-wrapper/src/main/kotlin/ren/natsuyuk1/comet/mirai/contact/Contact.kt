@@ -10,18 +10,17 @@
 package ren.natsuyuk1.comet.mirai.contact
 
 import kotlinx.coroutines.launch
-import net.mamoe.mirai.contact.Group
+import net.mamoe.mirai.contact.getMember
+import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.mirai.util.toMessageChain
-import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
-private val scope = ModuleScope("comet_contact_wrapper")
-
-fun Group.toCometGroup(): ren.natsuyuk1.comet.api.user.Group {
+fun net.mamoe.mirai.contact.Group.toCometGroup(): Group {
     val group = this@toCometGroup
 
-    return object : ren.natsuyuk1.comet.api.user.Group(
+    return object : Group(
         group.id,
         group.name,
         group.owner.toGroupMember(),
@@ -39,10 +38,17 @@ fun Group.toCometGroup(): ren.natsuyuk1.comet.api.user.Group {
 
         override val avatarUrl: String = group.avatarUrl
 
+        override fun getMember(id: Long): GroupMember? = group.getMember(id)?.toGroupMember()
+
+        override suspend fun quit(): Boolean = group.quit()
+
+        override fun contains(id: Long): Boolean = group.contains(id)
+
+        // Group doesn't have card
         override val card: String = ""
 
         override fun sendMessage(message: MessageWrapper) {
-            scope.launch {
+            contactScope.launch {
                 group.sendMessage(message.toMessageChain(group))
             }
         }

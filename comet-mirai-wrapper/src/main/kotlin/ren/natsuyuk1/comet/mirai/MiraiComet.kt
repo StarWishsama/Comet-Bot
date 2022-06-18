@@ -9,8 +9,13 @@
 
 package ren.natsuyuk1.comet.mirai
 
+import net.mamoe.mirai.Bot
+import net.mamoe.mirai.BotFactory
+import net.mamoe.mirai.utils.BotConfiguration
 import ren.natsuyuk1.comet.Comet
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.mirai.config.MiraiConfig
+import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
 
 /*
  * Copyright (c) 2019-2022 StarWishsama.
@@ -28,5 +33,30 @@ class MiraiComet(
      * 一个 Comet 实例的 [CometConfig]
      */
     config: CometConfig,
+
+    val miraiConfig: MiraiConfig,
 ) : Comet(config, logger) {
+    lateinit var bot: Bot
+
+    override fun login() {
+        val config = BotConfiguration.Default.apply {
+            botLoggerSupplier = { it ->
+                LoggerRedirector(mu.KotlinLogging.logger("mirai (${it.id})"))
+            }
+            networkLoggerSupplier = { it ->
+                LoggerRedirector(mu.KotlinLogging.logger("mirai-net (${it.id})"))
+            }
+
+            fileBasedDeviceInfo()
+
+            protocol = miraiConfig.protocol
+
+            heartbeatStrategy = miraiConfig.heartbeatStrategy
+        }
+        bot = BotFactory.newBot(qq = miraiConfig.id, password = miraiConfig.password, configuration = config)
+    }
+
+    override fun logout() {
+        bot.close()
+    }
 }

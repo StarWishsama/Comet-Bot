@@ -12,6 +12,9 @@ package ren.natsuyuk1.comet.api.user
 import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
+import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 /**
  * [Contact] 联系人, 是所有可聊天对象的父类
@@ -44,7 +47,55 @@ abstract class User : Contact() {
 abstract class GroupMember : Contact() {
     abstract override val id: Long
 
-    abstract var namecard: String
+    abstract var nameCard: String
+
+    abstract val joinTimestamp: Int
+
+    abstract val lastActiveTimestamp: Int
+
+    abstract val remainMuteTime: Int
+
+    val isMuted: Boolean get() = remainMuteTime != 0
+
+    /**
+     * 禁言此群员1
+     */
+    abstract suspend fun mute(seconds: Int)
+
+    suspend fun mute(duration: Duration) {
+        require(duration.toDouble(DurationUnit.DAYS) <= 30) { "max duration is 1 month" }
+        require(duration.toDouble(DurationUnit.SECONDS) > 0) { "min duration is 1 second" }
+
+        mute(duration.toDouble(DurationUnit.SECONDS).toInt())
+    }
+
+    /**
+     * 解禁此群员
+     *
+     * @throws PermissionDeniedException
+     */
+    abstract suspend fun unmute()
+
+    /**
+     * 踢出此群员
+     *
+     * @param reason 踢出原因
+     * @param block 是否拉黑
+     *
+     * @throws PermissionDeniedException
+     */
+    abstract suspend fun kick(reason: String, block: Boolean)
+
+    suspend fun kick(reason: String) = kick(reason, false)
+
+    /**
+     * 给予该群员管理员权限.
+     *
+     * @param operation 是否给予
+     */
+    abstract suspend fun operateAdminPermission(operation: Boolean)
+
+    abstract override fun sendMessage(message: MessageWrapper)
 }
 
 /**
@@ -57,7 +108,7 @@ abstract class Group(
     /**
      * 群名称
      */
-    var name: String,
+    override var name: String,
 
     val owner: GroupMember,
 
@@ -74,7 +125,7 @@ abstract class Group(
 
     abstract val avatarUrl: String
 
-    abstract fun getMember(id: Long): GroupMember
+    abstract fun getMember(id: Long): GroupMember?
 
     abstract suspend fun quit(): Boolean
 

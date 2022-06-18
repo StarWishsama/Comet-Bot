@@ -26,4 +26,7 @@ abstract class Comet(
 
     val logger: KLogger
 ) {
+    abstract fun login()
+
+    abstract fun logout()
 }
