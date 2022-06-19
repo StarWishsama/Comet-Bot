@@ -32,6 +32,9 @@ dependencies {
 
     implementation("io.github.microutils:kotlin-logging-jvm:_")
     implementation("ch.qos.logback:logback-classic:_")
+
+    // Kotlinx
+    implementation("org.jetbrains.kotlinx:atomicfu:_")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
 
     testImplementation(kotlin("test"))

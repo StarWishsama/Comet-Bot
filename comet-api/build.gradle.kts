@@ -20,6 +20,7 @@ repositories {
 
 dependencies {
     implementation(KotlinX.serialization.json)
+    implementation("net.mamoe.yamlkt:yamlkt:_")
 
     api("org.jetbrains.exposed:exposed-core:_")
     api("org.jetbrains.exposed:exposed-dao:_")

@@ -11,14 +11,23 @@ package ren.natsuyuk1.comet.utils.file
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.util.jar.JarFile
 
-val globalWorkDir by lazy {
+val globalDirectory by lazy {
     File(System.getProperty("user.dir"))
 }
+
+fun resolveDirectory(path: String) = File(globalDirectory, path)
+
+fun resolveResourceDirectory(path: String) = File(resourceDirectory, path)
+
+val configDirectory by lazy { resolveDirectory("./config") }
+
+val resourceDirectory by lazy { resolveDirectory("./resources") }
 
 /**
  * Create a file and its parents
@@ -26,6 +35,14 @@ val globalWorkDir by lazy {
 suspend fun File.touch(): Boolean = withContext(Dispatchers.IO) {
     parentFile?.mkdirs()
     createNewFile()
+}
+
+suspend fun File.writeTextBuffered(text: String) = withContext(Dispatchers.IO) {
+    outputStream().bufferedWriter().use { it.write(text) }
+}
+
+suspend fun File.readTextBuffered() = withContext(Dispatchers.IO) {
+    inputStream().bufferedReader().use(BufferedReader::readText)
 }
 
 /**

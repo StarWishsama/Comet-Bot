@@ -18,6 +18,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jline.reader.EndOfFileException
 import org.jline.reader.UserInterruptException
+import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
 import ren.natsuyuk1.comet.api.user.CometUser
@@ -27,6 +28,7 @@ import ren.natsuyuk1.comet.config.hash
 import ren.natsuyuk1.comet.config.version
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
+import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
 
@@ -34,6 +36,8 @@ private val logger = mu.KotlinLogging.logger {}
 
 object CometTerminal {
     private var scope = ModuleScope("CometTerminal")
+
+    val instance = ConcurrentLinkedDeque<Comet>()
 
     fun init(parentContext: CoroutineContext) {
         scope = ModuleScope("CometTerminal", parentContext)
