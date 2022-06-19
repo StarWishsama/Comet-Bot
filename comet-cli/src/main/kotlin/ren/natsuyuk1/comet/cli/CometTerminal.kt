@@ -27,9 +27,19 @@ import ren.natsuyuk1.comet.config.hash
 import ren.natsuyuk1.comet.config.version
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
+import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
 
 private val logger = mu.KotlinLogging.logger {}
+
+object CometTerminal {
+    private var scope = ModuleScope("CometTerminal")
+
+    fun init(parentContext: CoroutineContext) {
+        scope = ModuleScope("CometTerminal", parentContext)
+        CommandManager.init(scope.coroutineContext)
+    }
+}
 
 class CometTerminalCommand : CliktCommand(name = "comet") {
     override suspend fun run() = scope.launch {
@@ -37,7 +47,11 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
         logger.info { "Running Comet Terminal ${version}-${branch}-${hash}" }
 
-        CommandManager.init(scope.coroutineContext)
+        CometTerminal.init(scope.coroutineContext)
+
+        // Load config
+
+        // Load database
 
         setupConsole()
     }.join()
@@ -46,7 +60,8 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         val consoleSender = ConsoleCommandSender(ModuleScope("ConsoleCommandSenderScope"))
         Console.initReader()
         Console.redirectToJLine()
-        while (isActive) {
+
+        while (scope.isActive) {
             try {
                 CommandManager.executeCommand(consoleSender, CometUser(EntityID(1L, LongIdTable())), Console.readln())
                     .join()
@@ -77,7 +92,9 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 }
 
 suspend fun main(args: Array<String>) {
-    when (val result = CometTerminalCommand().main(args)) {
+    val cmd = CometTerminalCommand()
+
+    when (val result = cmd.main(args)) {
         is CommandResult.Success -> {
             exitProcess(0)
         }
