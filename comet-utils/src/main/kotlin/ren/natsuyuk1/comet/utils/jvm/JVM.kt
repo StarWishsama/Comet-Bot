@@ -7,8 +7,10 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
-package ren.natsuyuk1.comet.mirai.contact
+package ren.natsuyuk1.comet.utils.jvm
 
-import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
-
-val contactScope = ModuleScope("comet_contact_wrapper")
+fun addShutdownHook(block: () -> Unit) {
+    Runtime.getRuntime().addShutdownHook(
+        Thread { block() }
+    )
+}

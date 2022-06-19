@@ -20,6 +20,8 @@ import ren.natsuyuk1.comet.utils.string.StringUtil.getLastingTimeAsString
 import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Duration.Companion.seconds
 
 private val logger = mu.KotlinLogging.logger {}
@@ -28,6 +30,10 @@ object CommandManager {
     private val commands: MutableMap<String, AbstractCommandNode<*>> = ConcurrentHashMap()
 
     private var commandScope = ModuleScope("CommandManager")
+
+    fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
+        commandScope = ModuleScope("CommandManager", parentContext)
+    }
 
     @Suppress("unused")
     fun registerCommand(
@@ -52,6 +58,13 @@ object CommandManager {
     fun registerCommands(collection: Collection<AbstractCommandNode<*>>): Unit =
         collection.forEach { registerCommand(it) }
 
+    /**
+     * 调用命令
+     *
+     * @param sender 发送者
+     * @param user [CometUser], 在调用后台命令时 **禁止** 调用!
+     * @param rawMsg 原始消息
+     */
     suspend fun executeCommand(
         sender: CommandSender,
         user: CometUser,
@@ -71,24 +84,26 @@ object CommandManager {
         val property = cmd.property
 
         val result: CommandStatus = run {
-            if (!user.hasPermission(property.permission)) {
+            if (sender !is ConsoleCommandSender && !user.hasPermission(property.permission)) {
                 return@run CommandStatus.NoPermission()
             }
 
             val currentTime = Clock.System.now()
 
-            when (property.executeConsumeType) {
-                CommandConsumeType.COOLDOWN -> {
-                    if (user.triggerCommandTime.plus(property.executeConsumePoint.seconds) >= currentTime) {
-                        return@run CommandStatus.ValidateFailed()
+            if (sender !is ConsoleCommandSender) {
+                when (property.executeConsumeType) {
+                    CommandConsumeType.COOLDOWN -> {
+                        if (user.triggerCommandTime.plus(property.executeConsumePoint.seconds) >= currentTime) {
+                            return@run CommandStatus.ValidateFailed()
+                        }
                     }
-                }
 
-                CommandConsumeType.COIN -> {
-                    if (user.coin < property.executeConsumePoint) {
-                        return@run CommandStatus.ValidateFailed()
-                    } else {
-                        user.coin = user.coin - property.executeConsumePoint
+                    CommandConsumeType.COIN -> {
+                        if (user.coin < property.executeConsumePoint) {
+                            return@run CommandStatus.ValidateFailed()
+                        } else {
+                            user.coin = user.coin - property.executeConsumePoint
+                        }
                     }
                 }
             }

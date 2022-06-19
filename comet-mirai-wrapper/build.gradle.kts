@@ -19,9 +19,9 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":comet-api"))
-    implementation(project(":comet-core"))
-    implementation(project(":comet-utils"))
+    api(project(":comet-api"))
+    api(project(":comet-core"))
+    api(project(":comet-utils"))
 
     implementation(KotlinX.serialization.json)
     implementation("net.mamoe.yamlkt:yamlkt:_")

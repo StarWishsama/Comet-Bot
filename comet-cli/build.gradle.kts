@@ -30,4 +30,7 @@ dependencies {
     implementation("moe.sdl.yac:core:_")
 
     implementation("org.jline:jline:_")
+
+    implementation(project(":comet-mirai-wrapper"))
+    implementation(project(":comet-telegram-wrapper"))
 }

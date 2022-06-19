@@ -16,13 +16,13 @@ import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import ren.natsuyuk1.comet.api.user.UserTable
 
-object ProjectSekaiDataTable : IdTable<UInt>("pjsk_data") {
-    override val id: Column<EntityID<UInt>> = uinteger("current_event_id").entityId()
+object ProjectSekaiDataTable : IdTable<Int>("pjsk_data") {
+    override val id: Column<EntityID<Int>> = integer("current_event_id").entityId()
     val startTime: Column<Long> = long("start_time")
     val endTime: Column<Long> = long("end_time")
 }
 
-class ProjectSekaiData(id: EntityID<UInt>) : Entity<UInt>(id) {
+class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
     companion object : EntityClass<Int, ProjectSekaiData>(ProjectSekaiDataTable)
 
     val currentEventID by ProjectSekaiDataTable.id
@@ -39,7 +39,7 @@ class ProjectSekaiData(id: EntityID<UInt>) : Entity<UInt>(id) {
  *
  */
 object ProjectSekaiUserDataTable : IdTable<Long>("pjsk_user_data") {
-    override val id: Column<EntityID<Long>> = UserTable.ulong("id").entityId()
+    override val id: Column<EntityID<Long>> = UserTable.long("id").entityId()
     override val primaryKey = PrimaryKey(id)
 
     val userID = ulong("user_id")

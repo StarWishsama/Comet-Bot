@@ -9,13 +9,15 @@
 
 package ren.natsuyuk1.comet.mirai
 
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.utils.BotConfiguration
-import ren.natsuyuk1.comet.Comet
+import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.mirai.config.MiraiConfig
 import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
+import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 
 /*
  * Copyright (c) 2019-2022 StarWishsama.
@@ -35,7 +37,7 @@ class MiraiComet(
     config: CometConfig,
 
     val miraiConfig: MiraiConfig,
-) : Comet(config, logger) {
+) : Comet(config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
     lateinit var bot: Bot
 
     override fun login() {
@@ -54,9 +56,13 @@ class MiraiComet(
             heartbeatStrategy = miraiConfig.heartbeatStrategy
         }
         bot = BotFactory.newBot(qq = miraiConfig.id, password = miraiConfig.password, configuration = config)
+
+        scope.launch {
+            bot.login()
+        }
     }
 
-    override fun logout() {
+    override fun close() {
         bot.close()
     }
 }

@@ -14,23 +14,30 @@ import net.mamoe.mirai.contact.ContactList
 import net.mamoe.mirai.contact.NormalMember
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.mirai.util.toMessageChain
+import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 fun net.mamoe.mirai.contact.NormalMember.toGroupMember(): GroupMember {
     val contact = this@toGroupMember
 
     return object : GroupMember() {
+        override val scope: ModuleScope = ModuleScope("group_member_${contact.id}")
+
         override val id: Long
             get() = contact.id
+
         override var nameCard: String
             get() = contact.nameCard
             set(value) {
                 contact.nameCard = value
             }
+
         override val joinTimestamp: Int
             get() = contact.joinTimestamp
+
         override val lastActiveTimestamp: Int
             get() = contact.lastSpeakTimestamp
+
         override val remainMuteTime: Int
             get() = contact.muteTimeRemaining
 
@@ -49,16 +56,19 @@ fun net.mamoe.mirai.contact.NormalMember.toGroupMember(): GroupMember {
         }
 
         override fun sendMessage(message: MessageWrapper) {
-            contactScope.launch {
+            scope.launch {
                 contact.sendMessage(message.toMessageChain(contact))
             }
         }
 
         override val name: String
             get() = contact.nick
-        override val card: String
-            get() = contact.nameCard
 
+        override var card: String
+            get() = contact.nameCard
+            set(value) {
+                contact.nameCard = value
+            }
     }
 }
 

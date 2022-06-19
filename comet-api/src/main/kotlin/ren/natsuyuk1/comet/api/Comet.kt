@@ -7,10 +7,11 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
-package ren.natsuyuk1.comet
+package ren.natsuyuk1.comet.api
 
 import mu.KLogger
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 
 /**
  * [Comet] 代表单个对应多平台的机器人实例
@@ -24,9 +25,11 @@ abstract class Comet(
      */
     val config: CometConfig,
 
-    val logger: KLogger
+    val logger: KLogger,
+
+    val scope: ModuleScope
 ) {
     abstract fun login()
 
-    abstract fun logout()
+    abstract fun close()
 }

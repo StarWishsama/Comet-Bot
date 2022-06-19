@@ -13,7 +13,7 @@ import mu.KLogger
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
 
 internal class LoggerRedirector(private val redirect: KLogger) : MiraiLoggerPlatformBase() {
-    override val identity: String = name
+    override val identity: String = redirect.name
 
     override fun debug0(message: String?, e: Throwable?) {
         redirect.debug(e) { message }

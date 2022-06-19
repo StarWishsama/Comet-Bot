@@ -57,7 +57,7 @@ fun ProjectSekaiProfile.toMessageWrapper(): MessageWrapper {
     }
 }
 
-private fun UInt.getSurroundingRank(): Pair<Int, Int> {
+private fun Int.getSurroundingRank(): Pair<Int, Int> {
     for (i in rankPosition.indices) {
         if (i == rankPosition.size - 1) {
             break
@@ -66,7 +66,7 @@ private fun UInt.getSurroundingRank(): Pair<Int, Int> {
         val before = rankPosition[i]
         val after = rankPosition[i + 1]
 
-        if (this > before.toUInt() && this <= after.toUInt()) {
+        if (this in (before + 1)..after) {
             return Pair(before, after)
         }
     }

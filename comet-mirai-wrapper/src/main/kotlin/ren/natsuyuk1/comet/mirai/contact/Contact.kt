@@ -15,6 +15,7 @@ import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.mirai.util.toMessageChain
+import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 fun net.mamoe.mirai.contact.Group.toCometGroup(): Group {
@@ -26,6 +27,8 @@ fun net.mamoe.mirai.contact.Group.toCometGroup(): Group {
         group.owner.toGroupMember(),
         group.members.toGroupMemberList()
     ) {
+        override val scope = ModuleScope("group#${group.id}")
+
         override fun updateGroupName(groupName: String) {
             group.name = groupName
         }
@@ -45,10 +48,10 @@ fun net.mamoe.mirai.contact.Group.toCometGroup(): Group {
         override fun contains(id: Long): Boolean = group.contains(id)
 
         // Group doesn't have card
-        override val card: String = ""
+        override var card: String = ""
 
         override fun sendMessage(message: MessageWrapper) {
-            contactScope.launch {
+            scope.launch {
                 group.sendMessage(message.toMessageChain(group))
             }
         }

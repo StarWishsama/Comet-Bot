@@ -9,5 +9,81 @@
 
 package ren.natsuyuk1.comet.cli
 
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import moe.sdl.yac.core.CliktCommand
+import moe.sdl.yac.core.CommandResult
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.LongIdTable
+import org.jline.reader.EndOfFileException
+import org.jline.reader.UserInterruptException
+import ren.natsuyuk1.comet.api.command.CommandManager
+import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
+import ren.natsuyuk1.comet.api.user.CometUser
+import ren.natsuyuk1.comet.cli.console.Console
+import ren.natsuyuk1.comet.config.branch
+import ren.natsuyuk1.comet.config.hash
+import ren.natsuyuk1.comet.config.version
+import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
+import kotlin.system.exitProcess
+
+private val logger = mu.KotlinLogging.logger {}
+
+class CometTerminalCommand : CliktCommand(name = "comet") {
+    override suspend fun run() = scope.launch {
+        setupShutdownHook()
+
+        logger.info { "Running Comet Terminal ${version}-${branch}-${hash}" }
+
+        CommandManager.init(scope.coroutineContext)
+
+        setupConsole()
+    }.join()
+
+    private fun setupConsole() = scope.launch {
+        val consoleSender = ConsoleCommandSender(ModuleScope("ConsoleCommandSenderScope"))
+        Console.initReader()
+        Console.redirectToJLine()
+        while (isActive) {
+            try {
+                CommandManager.executeCommand(consoleSender, CometUser(EntityID(1L, LongIdTable())), Console.readln())
+                    .join()
+            } catch (e: UserInterruptException) { // Ctrl + C
+                println("<Interrupted> use 'quit' command to exit process")
+            } catch (e: EndOfFileException) { // Ctrl + D
+                exitProcess(0)
+            }
+        }
+    }
+
+    private fun setupShutdownHook() {
+        addShutdownHook {
+            closeAll()
+            println("\nExiting Comet Terminal...")
+            Console.redirectToNull()
+        }
+    }
+
+    companion object {
+        private val scope = ModuleScope("CometFrontendRootScope")
+
+        internal fun closeAll() {
+            scope.dispose()
+            scope.cancel()
+        }
+    }
+}
+
 suspend fun main(args: Array<String>) {
+    when (val result = CometTerminalCommand().main(args)) {
+        is CommandResult.Success -> {
+            exitProcess(0)
+        }
+        is CommandResult.Error -> {
+            println(result.userMessage)
+            exitProcess(1)
+        }
+    }
 }
