@@ -19,6 +19,8 @@ import kotlin.coroutines.CoroutineContext
  *
  * 不同平台应实现此实例
  *
+ * 使用前请先在前端侧 init
+ *
  */
 abstract class Comet(
     /**
@@ -26,8 +28,14 @@ abstract class Comet(
      */
     val config: CometConfig,
 
+    /**
+     * 一个 Comet 实例的 [KLogger]
+     */
     val logger: KLogger,
 
+    /**
+     * 一个 Comet 实例的 [ModuleScope]
+     */
     var scope: ModuleScope
 ) {
     fun init(parentContext: CoroutineContext) {

@@ -57,18 +57,20 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
         // Load database
 
-        setupConsole()
+        setupConsole().join()
     }.join()
 
     private fun setupConsole() = scope.launch {
-        val consoleSender = ConsoleCommandSender()
         Console.initReader()
         Console.redirectToJLine()
 
-        while (scope.isActive) {
+        while (isActive) {
             try {
-                CommandManager.executeCommand(consoleSender, CometUser(EntityID(1L, LongIdTable())), Console.readln())
-                    .join()
+                CommandManager.executeCommand(
+                    ConsoleCommandSender(),
+                    CometUser(EntityID(1L, LongIdTable())),
+                    Console.readln()
+                ).join()
             } catch (e: UserInterruptException) { // Ctrl + C
                 println("<Interrupted> use 'quit' command to exit process")
             } catch (e: EndOfFileException) { // Ctrl + D
@@ -96,9 +98,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 }
 
 suspend fun main(args: Array<String>) {
-    val cmd = CometTerminalCommand()
-
-    when (val result = cmd.main(args)) {
+    when (val result = CometTerminalCommand().main(args)) {
         is CommandResult.Success -> {
             exitProcess(0)
         }

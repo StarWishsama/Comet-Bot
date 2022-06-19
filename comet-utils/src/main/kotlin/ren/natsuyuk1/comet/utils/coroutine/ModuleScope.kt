@@ -41,7 +41,7 @@ open class ModuleScope(
         { _, e, _, _ -> logger.error(e) { "Caught Exception on $moduleName" } }
 ) : CoroutineScope {
 
-    val parentJob = SupervisorJob(parentContext[Job])
+    private val parentJob = SupervisorJob(parentContext[Job])
 
     override val coroutineContext: CoroutineContext =
         parentContext + parentJob + CoroutineName(moduleName) + dispatcher +
