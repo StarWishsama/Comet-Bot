@@ -32,8 +32,7 @@ open class PersistDataFile<T : Any>(
     },
     final override val scope: CoroutineScope =
         ModuleScope("DataFilePersist", dispatcher = Dispatchers.IO)
-) : FilePersist<T> {
-
+) : PersistFile<T> {
     private val clazz = defaultValue::class
 
     /**

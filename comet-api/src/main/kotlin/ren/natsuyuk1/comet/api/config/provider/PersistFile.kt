@@ -17,7 +17,7 @@ import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.full.hasAnnotation
 
-interface FilePersist<T : Any> {
+interface PersistFile<T : Any> {
 
     /**
      * Stored data
