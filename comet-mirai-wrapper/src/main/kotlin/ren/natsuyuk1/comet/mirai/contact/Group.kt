@@ -13,16 +13,14 @@ import kotlinx.coroutines.launch
 import net.mamoe.mirai.contact.ContactList
 import net.mamoe.mirai.contact.NormalMember
 import ren.natsuyuk1.comet.api.user.GroupMember
+import ren.natsuyuk1.comet.mirai.MiraiComet
 import ren.natsuyuk1.comet.mirai.util.toMessageChain
-import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
-fun net.mamoe.mirai.contact.NormalMember.toGroupMember(): GroupMember {
+fun net.mamoe.mirai.contact.NormalMember.toGroupMember(comet: MiraiComet): GroupMember {
     val contact = this@toGroupMember
 
     return object : GroupMember() {
-        override val scope: ModuleScope = ModuleScope("group_member_${contact.id}")
-
         override val id: Long
             get() = contact.id
 
@@ -56,7 +54,7 @@ fun net.mamoe.mirai.contact.NormalMember.toGroupMember(): GroupMember {
         }
 
         override fun sendMessage(message: MessageWrapper) {
-            scope.launch {
+            comet.scope.launch {
                 contact.sendMessage(message.toMessageChain(contact))
             }
         }
@@ -73,10 +71,10 @@ fun net.mamoe.mirai.contact.NormalMember.toGroupMember(): GroupMember {
 }
 
 // FIXME: Unsafe convert (?)
-fun ContactList<NormalMember>.toGroupMemberList(): List<GroupMember> {
+fun ContactList<NormalMember>.toGroupMemberList(comet: MiraiComet): List<GroupMember> {
     val converted = mutableListOf<GroupMember>()
     for (normalMember in this) {
-        converted.add(normalMember.toGroupMember())
+        converted.add(normalMember.toGroupMember(comet))
     }
 
     return converted

@@ -57,7 +57,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
     }.join()
 
     private fun setupConsole() = scope.launch {
-        val consoleSender = ConsoleCommandSender(ModuleScope("ConsoleCommandSenderScope"))
+        val consoleSender = ConsoleCommandSender()
         Console.initReader()
         Console.redirectToJLine()
 

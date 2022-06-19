@@ -56,4 +56,6 @@ open class ModuleScope(
 
     open fun onClosed() {
     }
+
+    fun name() = moduleName
 }

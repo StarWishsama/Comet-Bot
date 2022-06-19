@@ -12,6 +12,7 @@ package ren.natsuyuk1.comet.api
 import mu.KLogger
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import kotlin.coroutines.CoroutineContext
 
 /**
  * [Comet] 代表单个对应多平台的机器人实例
@@ -27,8 +28,12 @@ abstract class Comet(
 
     val logger: KLogger,
 
-    val scope: ModuleScope
+    var scope: ModuleScope
 ) {
+    fun init(parentContext: CoroutineContext) {
+        scope = ModuleScope(scope.name(), parentContext)
+    }
+
     abstract fun login()
 
     abstract fun close()

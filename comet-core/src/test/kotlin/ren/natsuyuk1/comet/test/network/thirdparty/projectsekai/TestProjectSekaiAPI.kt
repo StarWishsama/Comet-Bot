@@ -25,7 +25,7 @@ class TestProjectSekaiAPI {
     private val eventID = 61
 
     // Welcome to add me as friend :D
-    private val id = 210043933010767872u
+    private val id = 210043933010767872
 
     @Test
     fun testEventProfileFetch() {

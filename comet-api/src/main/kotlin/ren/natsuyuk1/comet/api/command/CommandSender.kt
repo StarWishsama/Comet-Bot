@@ -9,7 +9,6 @@
 
 package ren.natsuyuk1.comet.api.command
 
-import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 /**
@@ -18,8 +17,6 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
  *
  */
 interface CommandSender {
-    val scope: ModuleScope
-
     fun sendMessage(message: MessageWrapper)
 }
 
@@ -51,7 +48,7 @@ fun PlatformCommandSender.nameOrCard(): String = card.ifEmpty { name }
  *
  * 代表来自终端的命令发送者
  */
-class ConsoleCommandSender(override val scope: ModuleScope) : CommandSender {
+class ConsoleCommandSender : CommandSender {
     override fun sendMessage(message: MessageWrapper) {
         println(message.parseToString())
     }

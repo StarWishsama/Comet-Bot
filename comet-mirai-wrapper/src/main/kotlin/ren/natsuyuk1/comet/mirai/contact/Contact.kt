@@ -14,21 +14,19 @@ import net.mamoe.mirai.contact.getMember
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
+import ren.natsuyuk1.comet.mirai.MiraiComet
 import ren.natsuyuk1.comet.mirai.util.toMessageChain
-import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
-fun net.mamoe.mirai.contact.Group.toCometGroup(): Group {
+fun net.mamoe.mirai.contact.Group.toCometGroup(comet: MiraiComet): Group {
     val group = this@toCometGroup
 
     return object : Group(
         group.id,
         group.name,
-        group.owner.toGroupMember(),
-        group.members.toGroupMemberList()
+        group.owner.toGroupMember(comet),
+        group.members.toGroupMemberList(comet)
     ) {
-        override val scope = ModuleScope("group#${group.id}")
-
         override fun updateGroupName(groupName: String) {
             group.name = groupName
         }
@@ -41,7 +39,7 @@ fun net.mamoe.mirai.contact.Group.toCometGroup(): Group {
 
         override val avatarUrl: String = group.avatarUrl
 
-        override fun getMember(id: Long): GroupMember? = group.getMember(id)?.toGroupMember()
+        override fun getMember(id: Long): GroupMember? = group.getMember(id)?.toGroupMember(comet)
 
         override suspend fun quit(): Boolean = group.quit()
 
@@ -51,7 +49,7 @@ fun net.mamoe.mirai.contact.Group.toCometGroup(): Group {
         override var card: String = ""
 
         override fun sendMessage(message: MessageWrapper) {
-            scope.launch {
+            comet.scope.launch {
                 group.sendMessage(message.toMessageChain(group))
             }
         }
