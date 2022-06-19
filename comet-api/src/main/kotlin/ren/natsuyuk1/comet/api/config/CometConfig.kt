@@ -15,10 +15,9 @@ import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.utils.file.configDirectory
 import java.io.File
 
-var config: CometConfig.Data = CometConfig.data
+var config: CometConfig.Data
     set(value) {
         CometConfig.updateData { value }
-        field = value
     }
     get() = CometConfig.data
 
