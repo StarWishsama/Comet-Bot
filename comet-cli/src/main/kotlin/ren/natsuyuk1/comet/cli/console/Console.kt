@@ -38,8 +38,8 @@ object Console {
     inline fun println(string: String?) = println(any = string)
 
     internal fun redirectToJLine() {
-        System.setErr(JlineRedirector)
-        System.setOut(JlineRedirector)
+        System.setErr(JLineRedirector)
+        System.setOut(JLineRedirector)
     }
 
     internal fun redirectToNull() {

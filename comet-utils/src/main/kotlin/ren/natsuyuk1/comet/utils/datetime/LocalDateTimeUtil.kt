@@ -9,7 +9,3 @@
 
 package ren.natsuyuk1.comet.utils.datetime
 
-import java.time.LocalDateTime
-import java.time.ZoneId
-
-fun LocalDateTime.utcNow() = LocalDateTime.now(ZoneId.of("UTC"))

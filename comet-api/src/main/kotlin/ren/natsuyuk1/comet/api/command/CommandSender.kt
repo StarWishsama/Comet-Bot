@@ -48,7 +48,7 @@ fun PlatformCommandSender.nameOrCard(): String = card.ifEmpty { name }
  *
  * 代表来自终端的命令发送者
  */
-class ConsoleCommandSender : CommandSender {
+object ConsoleCommandSender : CommandSender {
     override fun sendMessage(message: MessageWrapper) {
         println(message.parseToString())
     }

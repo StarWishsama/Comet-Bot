@@ -13,6 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import moe.sdl.yac.core.CommandResult
+import ren.natsuyuk1.comet.api.permission.PermissionManager
 import ren.natsuyuk1.comet.api.permission.hasPermission
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
@@ -53,6 +54,8 @@ object CommandManager {
         commands.putIfAbsent(name, commandNode)?.also {
             logger.warn { "Command name '$name' conflict, please check command property." }
         }
+
+        PermissionManager.register(commandNode.property.permission, commandNode.property.permissionLevel)
     }
 
     fun registerCommands(collection: Collection<AbstractCommandNode<*>>): Unit =

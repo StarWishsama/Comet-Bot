@@ -9,12 +9,16 @@
 
 package ren.natsuyuk1.comet.api.user
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import ren.natsuyuk1.comet.utils.sql.SQLDatabaseSet
 import ren.natsuyuk1.comet.utils.sql.SetTable
@@ -29,13 +33,14 @@ object UserTable : IdTable<Long>("user_data") {
     override val id: Column<EntityID<Long>> = long("id").entityId()
     override val primaryKey = PrimaryKey(id)
 
-    val checkInDate = timestamp("check_in_date")
-    val coin = double("coin")
-    val checkInTime = integer("check_in_time")
-    val userLevel = enumeration<UserLevel>("user_level")
-    val r6sAccount = varchar("r6s_account", 15)
-    val triggerCommandTime = timestamp("trigger_command_time")
-    val genshinGachaPool: Column<Int> = integer("genshin_gacha_pool")
+    val checkInDate =
+        datetime("check_in_date").default(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
+    val coin = double("coin").default(0.0)
+    val checkInTime = integer("check_in_time").default(0)
+    val userLevel = enumeration<UserLevel>("user_level").default(UserLevel.USER)
+    val r6sAccount = varchar("r6s_account", 15).default("")
+    val triggerCommandTime = timestamp("trigger_command_time").default(Clock.System.now())
+    val genshinGachaPool: Column<Int> = integer("genshin_gacha_pool").default(0)
 }
 
 /**
@@ -59,7 +64,7 @@ class CometUser(id: EntityID<Long>) : Entity<Long>(id) {
 /**
  * [UserPermissionTable]
  *
- *
+ * 用户所拥有的权限列表
  */
 object UserPermissionTable : SetTable<Long, String>("user_permission") {
     override val id: Column<EntityID<Long>> = reference("user", UserTable.id).index()

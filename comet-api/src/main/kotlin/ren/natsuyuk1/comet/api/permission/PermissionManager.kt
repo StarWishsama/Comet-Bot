@@ -13,7 +13,7 @@ import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
 
 object PermissionManager {
-    val permissions = mutableListOf<CometPermission>()
+    private val permissions = mutableListOf<CometPermission>()
 
     fun register(permission: CometPermission) {
         if (permissions.contains(permission)) {
@@ -27,11 +27,36 @@ object PermissionManager {
         register(CometPermission(node, level))
     }
 
+    fun checkWildCardPermission(user: CometUser, permission: CometPermission): Boolean {
+        val nodePart = permission.nodeName.split(".")
+        val wildcard = nodePart.lastIndexOf("*")
+
+        if (wildcard == -1) {
+            return user.permissions.contains(permission.nodeName)
+        } else {
+            permissions.forEach { p ->
+                val targetPart = p.nodeName.split(".")
+                val sameNodePart = nodePart.subList(0, wildcard)
+
+                for (i in sameNodePart.indices) {
+                    if (sameNodePart[i] != targetPart[i]) {
+                        return false
+                    }
+                }
+            }
+
+            return true
+        }
+    }
+
     fun getPermission(node: String): CometPermission? = permissions.find { it.nodeName == node }
 }
 
 fun CometUser.hasPermission(node: String): Boolean {
     val target = PermissionManager.getPermission(node) ?: return true
 
-    return permissions.contains(target.nodeName) || userLevel >= target.level
+    return permissions.contains(target.nodeName) || PermissionManager.checkWildCardPermission(
+        this,
+        target
+    ) || userLevel >= target.level
 }
