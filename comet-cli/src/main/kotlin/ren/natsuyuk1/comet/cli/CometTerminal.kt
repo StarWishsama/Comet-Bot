@@ -53,21 +53,21 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
         CometTerminal.init(scope.coroutineContext)
 
-        // Load config
+        // TODO: Load config
 
-        // Load database
+        // TODO: Load database
 
-        setupConsole().join()
+        setupConsole()
     }.join()
 
-    private fun setupConsole() = scope.launch {
+    private suspend fun setupConsole() = scope.launch {
         Console.initReader()
         Console.redirectToJLine()
 
         while (isActive) {
             try {
                 CommandManager.executeCommand(
-                    ConsoleCommandSender(),
+                    ConsoleCommandSender,
                     CometUser(EntityID(1L, LongIdTable())),
                     Console.readln()
                 ).join()
@@ -77,7 +77,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
                 exitProcess(0)
             }
         }
-    }
+    }.join()
 
     private fun setupShutdownHook() {
         addShutdownHook {
@@ -88,7 +88,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
     }
 
     companion object {
-        private val scope = ModuleScope("CometFrontendRootScope")
+        private val scope = ModuleScope("CometFrontendScope")
 
         internal fun closeAll() {
             scope.dispose()
@@ -102,6 +102,7 @@ suspend fun main(args: Array<String>) {
         is CommandResult.Success -> {
             exitProcess(0)
         }
+
         is CommandResult.Error -> {
             println(result.userMessage)
             exitProcess(1)

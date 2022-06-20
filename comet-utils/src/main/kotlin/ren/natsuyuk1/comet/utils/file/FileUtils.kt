@@ -16,6 +16,8 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.util.jar.JarFile
+import kotlin.io.path.absolute
+import kotlin.io.path.pathString
 
 val globalDirectory by lazy {
     File(System.getProperty("user.dir"))
@@ -28,6 +30,9 @@ fun resolveResourceDirectory(path: String) = File(resourceDirectory, path)
 val configDirectory by lazy { resolveDirectory("./config") }
 
 val resourceDirectory by lazy { resolveDirectory("./resources") }
+
+val File.absPath
+    get() = toPath().normalize().absolute().pathString
 
 /**
  * Create a file and its parents
