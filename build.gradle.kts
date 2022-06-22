@@ -15,7 +15,7 @@ plugins {
     kotlin("jvm") version Dependency.kotlinVersion
     kotlin("plugin.serialization") version Dependency.kotlinVersion
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("com.github.gmazzo.buildconfig") version "3.0.3"
+    id("com.github.gmazzo.buildconfig") version "3.1.0"
 }
 
 group = "io.github.starwishsama.comet"
