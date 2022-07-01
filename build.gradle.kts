@@ -90,7 +90,7 @@ dependencies {
     }
 
     // Fix yabapi
-    implementation("org.jetbrains.kotlinx:atomicfu:0.17.2")
+    implementation("org.jetbrains.kotlinx:atomicfu:0.18.2")
 
     testImplementation(kotlin("test"))
 }
