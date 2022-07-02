@@ -13,9 +13,10 @@ import ren.natsuyuk1.comet.api.command.CometCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.user.CometUser
+import ren.natsuyuk1.comet.commands.service.SignInService
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
-private val property by lazy {
+val SIGNIN by lazy {
     CommandProperty(
         "signin",
         listOf("qd", "签到", "sign"),
@@ -26,10 +27,15 @@ private val property by lazy {
     )
 }
 
-class SignInCommand(sender: PlatformCommandSender, raw: String, message: MessageWrapper, user: CometUser) :
-    CometCommand(sender, raw, message, user, property) {
+class SignInCommand(
+    override val sender: PlatformCommandSender,
+    raw: String,
+    message: MessageWrapper,
+    private val user: CometUser
+) :
+    CometCommand(sender, raw, message, user, SIGNIN) {
 
     override suspend fun run() {
-        TODO("Not yet implemented")
+        sender.sendMessage(SignInService.processSignIn(sender, user))
     }
 }

@@ -24,7 +24,7 @@ abstract class Contact : PlatformCommandSender() {
     /**
      * 可以是用户或群聊
      */
-    abstract val id: Long
+    abstract override val id: Long
 }
 
 /**

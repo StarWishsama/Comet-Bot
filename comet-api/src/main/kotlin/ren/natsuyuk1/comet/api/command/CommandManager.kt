@@ -13,13 +13,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import moe.sdl.yac.core.CommandResult
+import org.jetbrains.exposed.sql.SizedIterable
 import ren.natsuyuk1.comet.api.permission.PermissionManager
 import ren.natsuyuk1.comet.api.permission.hasPermission
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.getLastingTimeAsString
 import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
-import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -31,7 +32,6 @@ object CommandManager {
     private val commands: MutableMap<String, AbstractCommandNode<*>> = ConcurrentHashMap()
 
     private var commandScope = ModuleScope("CommandManager")
-
     fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
         commandScope = ModuleScope("CommandManager", parentContext)
     }
@@ -39,7 +39,7 @@ object CommandManager {
     @Suppress("unused")
     fun registerCommand(
         entry: CommandProperty,
-        handler: (CommandSender, CometUser) -> CometCommand
+        handler: (CommandSender, String, MessageWrapper, CometUser) -> CometCommand
     ) {
         registerCommand(CommandNode(entry, handler))
     }
@@ -70,10 +70,10 @@ object CommandManager {
      */
     suspend fun executeCommand(
         sender: CommandSender,
-        user: CometUser,
         rawMsg: String,
+        wrapper: MessageWrapper
     ): Job = commandScope.launch {
-        val executeTime = LocalDateTime.now()
+        val executeTime = Clock.System.now()
 
         if (rawMsg.isEmpty()) {
             return@launch
@@ -87,46 +87,11 @@ object CommandManager {
         val property = cmd.property
 
         val result: CommandStatus = run {
-            if (sender !is ConsoleCommandSender && !user.hasPermission(property.permission)) {
-                return@run CommandStatus.NoPermission()
-            }
-
-            val currentTime = Clock.System.now()
-
-            if (sender !is ConsoleCommandSender) {
-                when (property.executeConsumeType) {
-                    CommandConsumeType.COOLDOWN -> {
-                        if (user.triggerCommandTime.plus(property.executeConsumePoint.seconds) >= currentTime) {
-                            return@run CommandStatus.ValidateFailed()
-                        }
-                    }
-
-                    CommandConsumeType.COIN -> {
-                        if (user.coin < property.executeConsumePoint) {
-                            return@run CommandStatus.ValidateFailed()
-                        } else {
-                            user.coin = user.coin - property.executeConsumePoint
-                        }
-                    }
-                }
-            }
-
-            when (cmd) {
-                is CommandNode -> {
-                    when (val cmdStatus = cmd.handler(sender, user).main(args.drop(1))) {
-                        is CommandResult.Error -> {
-                            logger.warn(cmdStatus.cause) { "在执行命令时发生了意外, ${cmdStatus.message}" }
-                            return@run CommandStatus.Error()
-                        }
-                        is CommandResult.Success -> {
-                            return@run CommandStatus.Success()
-                        }
-                    }
-                }
-
-                is ConsoleCommandNode -> {
-                    if (sender is ConsoleCommandSender) {
-                        when (val cmdStatus = cmd.handler(sender, user).main(args.drop(1))) {
+            when (sender) {
+                is ConsoleCommandSender -> {
+                    if (cmd is ConsoleCommandNode) {
+                        when (val cmdStatus =
+                            cmd.handler(sender, rawMsg, wrapper, CometUser.dummyUser).main(args.drop(1))) {
                             is CommandResult.Error -> {
                                 logger.warn(cmdStatus.cause) { "在执行命令时发生了意外, ${cmdStatus.message}" }
                                 return@run CommandStatus.Error()
@@ -135,11 +100,59 @@ object CommandManager {
                                 return@run CommandStatus.Success()
                             }
                         }
+                    } else {
+                        return@run CommandStatus.Success()
+                    }
+                }
+                is PlatformCommandSender -> {
+                    if (cmd is CommandNode) {
+                        val user = kotlin.run findUser@{
+                            val findByQQ: SizedIterable<CometUser> = CometUser.findByQQ(sender.id)
+                            if (findByQQ.empty()) {
+                                val findByTelegram = CometUser.findByTelegramID(sender.id)
+
+                                if (findByTelegram.empty()) return@findUser findByTelegram else return@run CommandStatus.Success()
+                            } else {
+                                return@findUser findByQQ
+                            }
+                        }.first()
+
+                        if (!user.hasPermission(property.permission)) {
+                            return@run CommandStatus.NoPermission()
+                        }
+
+                        when (property.executeConsumeType) {
+                            CommandConsumeType.COOLDOWN -> {
+                                if (user.triggerCommandTime.plus(property.executeConsumePoint.seconds) >= executeTime) {
+                                    return@run CommandStatus.ValidateFailed()
+                                }
+                            }
+
+                            CommandConsumeType.COIN -> {
+                                if (user.coin < property.executeConsumePoint) {
+                                    return@run CommandStatus.ValidateFailed()
+                                } else {
+                                    user.coin = user.coin - property.executeConsumePoint
+                                }
+                            }
+                        }
+
+                        when (val cmdStatus = cmd.handler(sender, rawMsg, wrapper, user).main(args.drop(1))) {
+                            is CommandResult.Error -> {
+                                logger.warn(cmdStatus.cause) { "在执行命令时发生了意外, ${cmdStatus.message}" }
+                                return@run CommandStatus.Error()
+                            }
+                            is CommandResult.Success -> {
+                                return@run CommandStatus.Success()
+                            }
+                        }
+                    } else {
+                        return@run CommandStatus.Success()
                     }
                 }
             }
 
-            return@run CommandStatus.Failed()
+            return@run CommandStatus.Error()
         }
 
         logger.debug { "命令 ${cmd.property.name} 执行状态 $result, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}" }

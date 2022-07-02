@@ -9,25 +9,25 @@
 
 package ren.natsuyuk1.comet.cli
 
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import moe.sdl.yac.core.CliktCommand
 import moe.sdl.yac.core.CommandResult
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jline.reader.EndOfFileException
 import org.jline.reader.UserInterruptException
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
-import ren.natsuyuk1.comet.api.user.CometUser
+import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.cli.console.Console
 import ren.natsuyuk1.comet.config.branch
 import ren.natsuyuk1.comet.config.hash
 import ren.natsuyuk1.comet.config.version
+import ren.natsuyuk1.comet.consts.cometConfigs
+import ren.natsuyuk1.comet.consts.cometTables
+import ren.natsuyuk1.comet.consts.defaultCommands
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
+import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
@@ -53,12 +53,29 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
         CometTerminal.init(scope.coroutineContext)
 
-        // TODO: Load config
+        setupConfig()
+        setupDatabase()
 
-        // TODO: Load database
+        CommandManager.registerCommands(defaultCommands)
 
         setupConsole()
     }.join()
+
+    private fun setupConfig(): Job = scope.launch {
+        logger.info { "Loading config file..." }
+        cometConfigs.map {
+            launch {
+                it.init()
+                it.save()
+            }
+        }.joinAll()
+    }
+
+    private fun setupDatabase(): Job = scope.launch {
+        logger.info { "Loading database..." }
+        DatabaseManager.loadDatabase()
+        DatabaseManager.loadTables(cometTables)
+    }
 
     private suspend fun setupConsole() = scope.launch {
         Console.initReader()
@@ -68,8 +85,8 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
             try {
                 CommandManager.executeCommand(
                     ConsoleCommandSender,
-                    CometUser(EntityID(1L, LongIdTable())),
-                    Console.readln()
+                    Console.readln(),
+                    MessageWrapper()
                 ).join()
             } catch (e: UserInterruptException) { // Ctrl + C
                 println("<Interrupted> use 'quit' command to exit process")

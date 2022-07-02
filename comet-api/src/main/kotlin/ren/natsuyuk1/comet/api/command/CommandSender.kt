@@ -29,6 +29,11 @@ interface CommandSender {
 abstract class PlatformCommandSender : CommandSender {
 
     /**
+     * ID
+     */
+    abstract val id: Long
+
+    /**
      * 用户名
      */
     abstract val name: String

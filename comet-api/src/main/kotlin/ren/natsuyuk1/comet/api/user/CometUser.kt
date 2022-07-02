@@ -12,16 +12,22 @@ package ren.natsuyuk1.comet.api.user
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import mu.KotlinLogging
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
-import org.jetbrains.exposed.dao.LongEntity
+import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
+import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import ren.natsuyuk1.comet.utils.sql.SQLDatabaseSet
 import ren.natsuyuk1.comet.utils.sql.SetTable
+import java.util.*
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * [UserTable]
@@ -29,12 +35,12 @@ import ren.natsuyuk1.comet.utils.sql.SetTable
  * 用户数据表
  *
  */
-object UserTable : IdTable<Long>("user_data") {
-    override val id: Column<EntityID<Long>> = long("id").entityId()
-    override val primaryKey = PrimaryKey(id)
+object UserTable : UUIDTable("user_data") {
 
+    val qq = long("qq").default(0)
+    val telegramID = long("telegramID").default(0)
     val checkInDate =
-        datetime("check_in_date").default(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
+        datetime("check_in_date").default(Clock.System.now().toLocalDateTime(TimeZone.UTC))
     val coin = double("coin").default(0.0)
     val checkInTime = integer("check_in_time").default(0)
     val userLevel = enumeration<UserLevel>("user_level").default(UserLevel.USER)
@@ -48,9 +54,55 @@ object UserTable : IdTable<Long>("user_data") {
  *
  * 用户数据
  */
-class CometUser(id: EntityID<Long>) : Entity<Long>(id) {
-    companion object : EntityClass<Long, CometUser>(UserTable)
+class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
+    companion object : EntityClass<UUID, CometUser>(UserTable) {
+        /**
+         * 获取一个不可操作的用户
+         */
+        val dummyUser = CometUser(EntityID(UUID.randomUUID(), object : IdTable<UUID>("fake_table") {
+            override val id: Column<EntityID<UUID>> = uuid("fake_uuid").entityId()
+        }))
 
+        /**
+         * 通过 QQ 号搜索对应用户
+         *
+         * @param qq QQ 号
+         */
+        fun findByQQ(qq: Long) = find { UserTable.qq eq qq }
+
+        /**
+         * 通过 Telegram 账号 ID 搜索对应用户
+         *
+         * @param telegramID Telegram 账号 ID
+         */
+        fun findByTelegramID(telegramID: Long) = find { UserTable.telegramID eq telegramID }
+
+        /**
+         * Create a user to database
+         *
+         * When register a new user, you **must** provide qid or tgID.
+         *
+         * @param qid qq ID
+         * @param tgID telegram ID
+         *
+         * @return user id in database
+         */
+        fun create(qid: Long = 0, tgID: Long = 0): EntityID<UUID> {
+            logger.info { "Creating comet user for ${if (qid != 0L) "qq $qid" else "telegram $tgID"}" }
+            return UserTable.insertAndGetId {
+                if (qid != 0L) {
+                    it[qq] = qid
+                }
+
+                if (tgID != 0L) {
+                    it[telegramID] = tgID
+                }
+            }
+        }
+    }
+
+    var qq by UserTable.qq
+    var telegramID by UserTable.telegramID
     var checkInDate by UserTable.checkInDate
     var coin by UserTable.coin
     var checkInTime by UserTable.checkInTime
@@ -66,13 +118,13 @@ class CometUser(id: EntityID<Long>) : Entity<Long>(id) {
  *
  * 用户所拥有的权限列表
  */
-object UserPermissionTable : SetTable<Long, String>("user_permission") {
-    override val id: Column<EntityID<Long>> = reference("user", UserTable.id).index()
+object UserPermissionTable : SetTable<UUID, String>("user_permission") {
+    override val id: Column<EntityID<UUID>> = reference("user", UserTable.id).index()
     override val value: Column<String> = varchar("permission_node", 255)
 }
 
-class UserPermission(id: EntityID<Long>) : LongEntity(id) {
-    companion object : EntityClass<Long, Entity<Long>>(UserPermissionTable)
+class UserPermission(id: EntityID<UUID>) : UUIDEntity(id) {
+    companion object : EntityClass<UUID, Entity<UUID>>(UserPermissionTable)
 
     val user by UserPermissionTable.id
     val permissionNode by UserPermissionTable.value

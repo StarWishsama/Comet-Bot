@@ -44,5 +44,7 @@ abstract class Comet(
 
     abstract fun login()
 
+    abstract fun afterLogin()
+
     abstract fun close()
 }

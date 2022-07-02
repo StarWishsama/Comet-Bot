@@ -24,7 +24,7 @@ import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 
-private val property by lazy {
+val HELP by lazy {
     CommandProperty(
         "help",
         listOf("?"),
@@ -34,7 +34,7 @@ private val property by lazy {
 }
 
 class HelpCommand(sender: PlatformCommandSender, raw: String, message: MessageWrapper, user: CometUser) :
-    CometCommand(sender, raw, message, user, property) {
+    CometCommand(sender, raw, message, user, HELP) {
 
     private val pageNum by argument(
         name = "帮助菜单的页数"

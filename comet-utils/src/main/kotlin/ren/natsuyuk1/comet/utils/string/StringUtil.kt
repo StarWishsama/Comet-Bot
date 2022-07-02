@@ -10,6 +10,8 @@
 package ren.natsuyuk1.comet.utils.string
 
 import cn.hutool.core.codec.Base64Decoder
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import java.awt.image.BufferedImage
@@ -130,6 +132,11 @@ object StringUtil {
      */
     fun LocalDateTime.getLastingTimeAsString(unit: TimeUnit = TimeUnit.SECONDS, msMode: Boolean = false): String {
         val duration = getLastingTime()
+        return duration.toFriendly(maxUnit = unit, msMode = msMode)
+    }
+
+    fun Instant.getLastingTimeAsString(unit: TimeUnit = TimeUnit.SECONDS, msMode: Boolean = false): String {
+        val duration = Clock.System.now() - this
         return duration.toFriendly(maxUnit = unit, msMode = msMode)
     }
 

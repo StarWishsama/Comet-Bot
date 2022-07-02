@@ -16,6 +16,7 @@ import net.mamoe.mirai.utils.BotConfiguration
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.mirai.config.MiraiConfig
+import ren.natsuyuk1.comet.mirai.event.EventRedirector.redirectToComet
 import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 
@@ -59,6 +60,12 @@ class MiraiComet(
 
         scope.launch {
             bot.login()
+        }
+    }
+
+    override fun afterLogin() {
+        bot.eventChannel.subscribeAlways<net.mamoe.mirai.event.Event> {
+            it.redirectToComet()
         }
     }
 
