@@ -53,7 +53,7 @@ object SignInService {
 
             if (position == 0) {
                 append("今日首位签到\n")
-            } else {
+            } else if (position != -1) {
                 append("今日第${position + 1}位签到\n")
             }
 
