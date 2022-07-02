@@ -44,7 +44,7 @@ abstract class User : Contact() {
 }
 
 @Serializable
-abstract class GroupMember : Contact() {
+abstract class GroupMember : User() {
     abstract override val id: Long
 
     abstract var nameCard: String

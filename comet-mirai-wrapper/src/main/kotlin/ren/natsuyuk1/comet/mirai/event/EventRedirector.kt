@@ -10,9 +10,14 @@
 package ren.natsuyuk1.comet.mirai.event
 
 import net.mamoe.mirai.event.Event
+import net.mamoe.mirai.event.events.MessageEvent
 
 object EventRedirector {
     fun Event.redirectToComet() {
+        when (this) {
+            is MessageEvent -> {
 
+            }
+        }
     }
 }

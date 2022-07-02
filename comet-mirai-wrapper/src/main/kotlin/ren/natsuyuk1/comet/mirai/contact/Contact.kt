@@ -11,6 +11,7 @@ package ren.natsuyuk1.comet.mirai.contact
 
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.contact.getMember
+import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
@@ -44,6 +45,8 @@ fun net.mamoe.mirai.contact.Group.toCometGroup(comet: MiraiComet): Group {
         override suspend fun quit(): Boolean = group.quit()
 
         override fun contains(id: Long): Boolean = group.contains(id)
+        override val comet: Comet
+            get() = comet
 
         // Group doesn't have card
         override var card: String = ""

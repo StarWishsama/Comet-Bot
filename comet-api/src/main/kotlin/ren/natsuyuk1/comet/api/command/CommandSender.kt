@@ -9,6 +9,7 @@
 
 package ren.natsuyuk1.comet.api.command
 
+import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 /**
@@ -27,6 +28,11 @@ interface CommandSender {
  * 代表来自不同平台的用户
  */
 abstract class PlatformCommandSender : CommandSender {
+
+    /**
+     * 获取到此用户的 [Comet]
+     */
+    abstract val comet: Comet
 
     /**
      * ID
