@@ -5,7 +5,7 @@ import ren.natsuyuk1.comet.api.event.AbstractEvent
 import ren.natsuyuk1.comet.api.user.Contact
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
-sealed interface MessageEvent {
+sealed interface IMessageEvent {
     val comet: Comet
 
     val subject: Contact
@@ -19,4 +19,4 @@ sealed interface MessageEvent {
     val time: Int
 }
 
-abstract class AbstractMessageEvent : AbstractEvent(), MessageEvent
+abstract class MessageEvent : AbstractEvent(), IMessageEvent

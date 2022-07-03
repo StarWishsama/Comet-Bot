@@ -29,11 +29,10 @@ val SIGNIN by lazy {
 
 class SignInCommand(
     override val sender: PlatformCommandSender,
-    raw: String,
     message: MessageWrapper,
     private val user: CometUser
 ) :
-    CometCommand(sender, raw, message, user, SIGNIN) {
+    CometCommand(sender, message, user, SIGNIN) {
 
     override suspend fun run() {
         sender.sendMessage(SignInService.processSignIn(sender, user))

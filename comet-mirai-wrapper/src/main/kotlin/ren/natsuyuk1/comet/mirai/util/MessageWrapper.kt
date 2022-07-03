@@ -15,10 +15,14 @@ import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.AudioSupported
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import ren.natsuyuk1.comet.consts.client
+import ren.natsuyuk1.comet.utils.file.messageWrapperDirectory
+import ren.natsuyuk1.comet.utils.file.touch
+import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.message.*
 import ren.natsuyuk1.comet.utils.message.Image
 import java.io.File
@@ -99,4 +103,43 @@ fun MessageWrapper.toMessageChain(subject: Contact? = null): MessageChain {
             }
         }
     }.build()
+}
+
+fun MessageChain.toMessageWrapper(localImage: Boolean = false): MessageWrapper {
+    val wrapper = MessageWrapper()
+    for (message in this) {
+        when (message) {
+            is PlainText -> {
+                wrapper.appendText(message.content)
+            }
+            is net.mamoe.mirai.message.data.Image -> {
+                runBlocking {
+                    if (localImage) {
+                        messageWrapperDirectory.touch()
+                        val location = client.client.downloadFile(
+                            message.queryUrl(),
+                            File(messageWrapperDirectory, message.imageId)
+                        )
+                        wrapper.appendElement(Image(filePath = location.canonicalPath))
+                    } else {
+                        wrapper.appendElement(Image(url = message.queryUrl()))
+                    }
+                }
+            }
+            is At -> {
+                wrapper.appendElement(AtElement(message.target))
+            }
+            is ServiceMessage -> {
+                wrapper.appendElement(XmlElement(message.content))
+            }
+            is Audio -> {
+                TODO("Not implemented")
+            }
+            else -> {
+                continue
+            }
+        }
+    }
+
+    return wrapper
 }

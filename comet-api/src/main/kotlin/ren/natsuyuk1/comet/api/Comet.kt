@@ -10,7 +10,10 @@
 package ren.natsuyuk1.comet.api
 
 import mu.KLogger
+import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.event.impl.message.MessageEvent
+import ren.natsuyuk1.comet.api.event.registerListener
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import kotlin.coroutines.CoroutineContext
 
@@ -47,4 +50,10 @@ abstract class Comet(
     abstract fun afterLogin()
 
     abstract fun close()
+}
+
+fun Comet.attachCommandManager() {
+    registerListener<MessageEvent> {
+        CommandManager.executeCommand(it.sender, it.message)
+    }
 }

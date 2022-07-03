@@ -33,8 +33,8 @@ val HELP by lazy {
     )
 }
 
-class HelpCommand(sender: PlatformCommandSender, raw: String, message: MessageWrapper, user: CometUser) :
-    CometCommand(sender, raw, message, user, HELP) {
+class HelpCommand(sender: PlatformCommandSender, message: MessageWrapper, user: CometUser) :
+    CometCommand(sender, message, user, HELP) {
 
     private val pageNum by argument(
         name = "帮助菜单的页数"

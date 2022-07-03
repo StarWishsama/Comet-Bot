@@ -50,4 +50,13 @@ dependencies {
     implementation("cn.hutool:hutool-http:_")
     implementation("cn.hutool:hutool-crypto:_")
     implementation("cn.hutool:hutool-cron:_")
+
+    // Ktor
+    implementation(Ktor.client.core)
+    implementation(Ktor.client.cio)
+    implementation(Ktor.client.logging)
+    implementation(Ktor.client.encoding)
+    implementation(Ktor.client.serialization)
+    implementation("io.ktor:ktor-client-content-negotiation:_")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:_")
 }

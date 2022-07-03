@@ -10,14 +10,14 @@
 package ren.natsuyuk1.comet.mirai.event
 
 import net.mamoe.mirai.event.Event
-import net.mamoe.mirai.event.events.MessageEvent
+import net.mamoe.mirai.event.events.GroupMessageEvent
+import ren.natsuyuk1.comet.api.event.EventManager
+import ren.natsuyuk1.comet.mirai.MiraiComet
 
-object EventRedirector {
-    fun Event.redirectToComet() {
-        when (this) {
-            is MessageEvent -> {
-
-            }
+suspend fun Event.redirectToComet(comet: MiraiComet) {
+    when (this) {
+        is GroupMessageEvent -> {
+            EventManager.broadcastEvent(this.toCometEvent(comet))
         }
     }
 }

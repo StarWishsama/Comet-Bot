@@ -31,6 +31,8 @@ val configDirectory by lazy { resolveDirectory("./config") }
 
 val resourceDirectory by lazy { resolveDirectory("./resources") }
 
+val messageWrapperDirectory by lazy { resolveDirectory("./msgwrapper") }
+
 val File.absPath
     get() = toPath().normalize().absolute().pathString
 

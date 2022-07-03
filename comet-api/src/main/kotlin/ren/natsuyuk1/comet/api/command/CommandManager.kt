@@ -39,7 +39,7 @@ object CommandManager {
     @Suppress("unused")
     fun registerCommand(
         entry: CommandProperty,
-        handler: (CommandSender, String, MessageWrapper, CometUser) -> CometCommand
+        handler: (CommandSender, MessageWrapper, CometUser) -> CometCommand
     ) {
         registerCommand(CommandNode(entry, handler))
     }
@@ -70,16 +70,15 @@ object CommandManager {
      */
     suspend fun executeCommand(
         sender: CommandSender,
-        rawMsg: String,
         wrapper: MessageWrapper
     ): Job = commandScope.launch {
         val executeTime = Clock.System.now()
 
-        if (rawMsg.isEmpty()) {
+        if (wrapper.isEmpty()) {
             return@launch
         }
 
-        val args = rawMsg.toArgs()
+        val args = wrapper.parseToString().toArgs()
 
         // TODO: 模糊搜索命令系统
         val cmd = getCommand(args[0]) ?: return@launch
@@ -91,7 +90,7 @@ object CommandManager {
                 is ConsoleCommandSender -> {
                     if (cmd is ConsoleCommandNode) {
                         when (val cmdStatus =
-                            cmd.handler(sender, rawMsg, wrapper, CometUser.dummyUser).main(args.drop(1))) {
+                            cmd.handler(sender, wrapper, CometUser.dummyUser).main(args.drop(1))) {
                             is CommandResult.Error -> {
                                 logger.warn(cmdStatus.cause) { "在执行命令时发生了意外, ${cmdStatus.message}" }
                                 return@run CommandStatus.Error()
@@ -137,7 +136,7 @@ object CommandManager {
                             }
                         }
 
-                        when (val cmdStatus = cmd.handler(sender, rawMsg, wrapper, user).main(args.drop(1))) {
+                        when (val cmdStatus = cmd.handler(sender, wrapper, user).main(args.drop(1))) {
                             is CommandResult.Error -> {
                                 logger.warn(cmdStatus.cause) { "在执行命令时发生了意外, ${cmdStatus.message}" }
                                 return@run CommandStatus.Error()
@@ -155,7 +154,9 @@ object CommandManager {
             return@run CommandStatus.Error()
         }
 
-        logger.debug { "命令 ${cmd.property.name} 执行状态 $result, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}" }
+        if (result.isPassed()) {
+            logger.debug { "命令 ${cmd.property.name} 执行状态 $result, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}" }
+        }
     }
 
     /**

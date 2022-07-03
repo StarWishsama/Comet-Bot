@@ -17,11 +17,10 @@ val PROJECTSEKAI by lazy {
 
 class ProjectSekaiCommand(
     override val sender: PlatformCommandSender,
-    raw: String,
     message: MessageWrapper,
     user: CometUser
 ) :
-    CometCommand(sender, raw, message, user, PROJECTSEKAI) {
+    CometCommand(sender, message, user, PROJECTSEKAI) {
 
     override suspend fun run() {
         TODO("Not yet implemented")

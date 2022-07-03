@@ -3,7 +3,6 @@ package ren.natsuyuk1.comet.consts
 import org.jetbrains.exposed.sql.Table
 import ren.natsuyuk1.comet.api.command.AbstractCommandNode
 import ren.natsuyuk1.comet.api.command.CommandNode
-import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.api.database.DatabaseConfig
@@ -32,20 +31,6 @@ val cometTables: List<Table> =
 
 val defaultCommands: List<AbstractCommandNode<*>> =
     listOf(
-        CommandNode(HELP) { sender, raw, wrapper, user ->
-            HelpCommand(
-                sender as PlatformCommandSender,
-                raw,
-                wrapper,
-                user
-            )
-        },
-        CommandNode(SIGNIN) { sender, raw, wrapper, user ->
-            SignInCommand(
-                sender as PlatformCommandSender,
-                raw,
-                wrapper,
-                user
-            )
-        }
+        CommandNode(HELP) { sender, wrapper, user -> HelpCommand(sender, wrapper, user) },
+        CommandNode(SIGNIN) { sender, wrapper, user -> SignInCommand(sender, wrapper, user) }
     )

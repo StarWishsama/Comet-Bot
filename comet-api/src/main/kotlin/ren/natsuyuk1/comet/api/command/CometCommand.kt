@@ -24,13 +24,12 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
  */
 abstract class CometCommand(
     open val sender: CommandSender,
-    raw: String,
     message: MessageWrapper,
     user: CometUser,
     /**
      * 该命令的配置 [CommandProperty]
      */
-    val property: CommandProperty,
+    property: CommandProperty,
     option: CliktOption = CliktOption()
 ) : CliktCommand(
     name = property.name,

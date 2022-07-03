@@ -8,9 +8,3 @@
  */
 
 package ren.natsuyuk1.comet.utils.clikt
-
-import moe.sdl.yac.parameters.options.RawOption
-
-fun RawOption.at() {
-    TODO()
-}

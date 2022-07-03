@@ -22,7 +22,7 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
  */
 abstract class AbstractCommandNode<CSender : CommandSender>(
     val property: CommandProperty,
-    val handler: (sender: CSender, raw: String, wrapper: MessageWrapper, user: CometUser) -> CometCommand,
+    val handler: (sender: CSender, wrapper: MessageWrapper, user: CometUser) -> CometCommand,
 )
 
 /**
@@ -32,8 +32,8 @@ abstract class AbstractCommandNode<CSender : CommandSender>(
  */
 class CommandNode(
     property: CommandProperty,
-    handler: (sender: CommandSender, raw: String, wrapper: MessageWrapper, user: CometUser) -> CometCommand
-) : AbstractCommandNode<CommandSender>(property, handler)
+    handler: (sender: PlatformCommandSender, wrapper: MessageWrapper, user: CometUser) -> CometCommand
+) : AbstractCommandNode<PlatformCommandSender>(property, handler)
 
 /**
  * [ConsoleCommandNode]
@@ -42,5 +42,5 @@ class CommandNode(
  */
 class ConsoleCommandNode(
     property: CommandProperty,
-    handler: (sender: ConsoleCommandSender, raw: String, wrapper: MessageWrapper, user: CometUser) -> CometCommand
+    handler: (sender: ConsoleCommandSender, wrapper: MessageWrapper, user: CometUser) -> CometCommand
 ) : AbstractCommandNode<ConsoleCommandSender>(property, handler)

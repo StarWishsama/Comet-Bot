@@ -98,6 +98,14 @@ abstract class GroupMember : User() {
     abstract override fun sendMessage(message: MessageWrapper)
 }
 
+@Serializable
+abstract class AnonymousMember : GroupMember() {
+    /**
+     * 该匿名群成员 ID
+     */
+    abstract val anonymousId: String
+}
+
 /**
  * [Group] 群组
  */

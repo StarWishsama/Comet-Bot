@@ -11,6 +11,5 @@ class GroupMessageEvent(
     override val senderName: String,
     override val message: MessageWrapper,
     override val time: Int
-
-) : AbstractMessageEvent() {
+) : MessageEvent() {
 }
