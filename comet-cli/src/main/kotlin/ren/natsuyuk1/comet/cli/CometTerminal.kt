@@ -27,7 +27,7 @@ import ren.natsuyuk1.comet.consts.cometTables
 import ren.natsuyuk1.comet.consts.defaultCommands
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
@@ -85,8 +85,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
             try {
                 CommandManager.executeCommand(
                     ConsoleCommandSender,
-                    Console.readln(),
-                    MessageWrapper()
+                    buildMessageWrapper { appendText(Console.readln()) }
                 ).join()
             } catch (e: UserInterruptException) { // Ctrl + C
                 println("<Interrupted> use 'quit' command to exit process")

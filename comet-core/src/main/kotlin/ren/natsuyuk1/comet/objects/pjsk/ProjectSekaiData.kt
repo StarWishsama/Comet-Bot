@@ -15,6 +15,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import ren.natsuyuk1.comet.api.user.UserTable
+import java.util.*
 
 object ProjectSekaiDataTable : IdTable<Int>("pjsk_data") {
     override val id: Column<EntityID<Int>> = integer("current_event_id").entityId()
@@ -34,19 +35,19 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
 /**
  * 储存与 Project Sekai: Colorful Stage 有关的数据
  *
- * id -> Project Sekai 游戏用户唯一 ID
- * user_id -> 绑定用户的唯一 ID
+ * id -> 绑定用户唯一 ID
+ * user_id -> roject Sekai 游戏用户唯一 ID
  *
  */
-object ProjectSekaiUserDataTable : IdTable<Long>("pjsk_user_data") {
-    override val id: Column<EntityID<Long>> = UserTable.long("id").entityId()
+object ProjectSekaiUserDataTable : IdTable<UUID>("pjsk_user_data") {
+    override val id: Column<EntityID<UUID>> = reference("user", UserTable.id).index()
     override val primaryKey = PrimaryKey(id)
 
     val userID = ulong("user_id")
 }
 
-class ProjectSekaiUserData(id: EntityID<Long>) : Entity<Long>(id) {
-    companion object : EntityClass<Long, ProjectSekaiUserData>(ProjectSekaiUserDataTable)
+class ProjectSekaiUserData(id: EntityID<UUID>) : Entity<UUID>(id) {
+    companion object : EntityClass<UUID, ProjectSekaiUserData>(ProjectSekaiUserDataTable)
 
     // 代表玩家的 Project Sekai 唯一 ID
     var userID by ProjectSekaiUserDataTable.userID
