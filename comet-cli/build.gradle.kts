@@ -32,6 +32,5 @@ dependencies {
     implementation("org.jline:jline:_")
 
     implementation(project(":comet-mirai-wrapper"))
-    implementation("net.mamoe:mirai-core-all:_")
     implementation(project(":comet-telegram-wrapper"))
 }
