@@ -27,9 +27,7 @@ dependencies {
     implementation("net.mamoe.yamlkt:yamlkt:_")
 
     implementation("net.mamoe:mirai-core-all:_") {
-        exclude("io.ktor", "ktor-client-core")
-        exclude("io.ktor", "ktor-client-java")
-        exclude("io.ktor", "ktor-client-resources")
+        exclude("io.ktor")
     }
 
     api("org.jetbrains.exposed:exposed-core:_")

@@ -22,11 +22,6 @@ repositories {
 dependencies {
     implementation(KotlinX.serialization.json)
 
-    api("org.jetbrains.exposed:exposed-core:_")
-    api("org.jetbrains.exposed:exposed-dao:_")
-    api("org.jetbrains.exposed:exposed-jdbc:_")
-    api("org.jetbrains.exposed:exposed-kotlin-datetime:_")
-    implementation("com.zaxxer:HikariCP:_")
     implementation("moe.sdl.yac:core:_")
 
     implementation("org.jline:jline:_")

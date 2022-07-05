@@ -35,7 +35,7 @@ enum class DatabaseType {
 }
 
 object DatabaseConfig : PersistDataFile<DatabaseConfig.Data>(
-    File(configDirectory, "database.json"),
+    File(configDirectory, "database.yml"),
     Data(),
     Yaml()
 ) {
