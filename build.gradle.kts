@@ -64,7 +64,7 @@ dependencies {
     implementation("com.github.rockswang:java-curl:1.2.2.190107")
 
     // jsoup HTML parser library @ https://jsoup.org/
-    implementation("org.jsoup:jsoup:1.14.3")
+    implementation("org.jsoup:jsoup:1.15.2")
 
     // Retrofit A type-safe HTTP client for Android and Java @ https://github.com/square/retrofit/
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
