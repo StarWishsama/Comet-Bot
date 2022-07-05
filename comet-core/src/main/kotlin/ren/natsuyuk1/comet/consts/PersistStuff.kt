@@ -1,6 +1,5 @@
 package ren.natsuyuk1.comet.consts
 
-import org.jetbrains.exposed.sql.Table
 import ren.natsuyuk1.comet.api.command.AbstractCommandNode
 import ren.natsuyuk1.comet.api.command.CommandNode
 import ren.natsuyuk1.comet.api.config.CometConfig
@@ -21,8 +20,8 @@ val cometConfigs: List<PersistDataFile<*>> =
         DatabaseConfig,
     )
 
-val cometTables: List<Table> =
-    listOf(
+val cometTables =
+    arrayOf(
         UserTable,
         UserPermissionTable,
         ProjectSekaiDataTable,

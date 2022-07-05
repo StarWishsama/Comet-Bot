@@ -20,6 +20,7 @@ import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.cli.command.registerTerminalCommands
 import ren.natsuyuk1.comet.cli.console.Console
+import ren.natsuyuk1.comet.cli.storage.AccountDataTable
 import ren.natsuyuk1.comet.config.branch
 import ren.natsuyuk1.comet.config.hash
 import ren.natsuyuk1.comet.config.version
@@ -74,7 +75,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
     private fun setupDatabase(): Job = scope.launch {
         logger.info { "Loading database..." }
         DatabaseManager.loadDatabase()
-        DatabaseManager.loadTables(cometTables)
+        DatabaseManager.loadTables(*cometTables, AccountDataTable)
     }
 
     private fun setupCommands(): Job = scope.launch {

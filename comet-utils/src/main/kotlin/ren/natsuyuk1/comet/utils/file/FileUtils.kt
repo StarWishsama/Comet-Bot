@@ -24,7 +24,6 @@ val globalDirectory by lazy {
 }
 
 fun resolveDirectory(path: String) = File(globalDirectory, path)
-
 fun resolveResourceDirectory(path: String) = File(resourceDirectory, path)
 
 val configDirectory by lazy { resolveDirectory("./config") }
