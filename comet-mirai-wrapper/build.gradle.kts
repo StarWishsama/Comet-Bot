@@ -26,7 +26,11 @@ dependencies {
     implementation(KotlinX.serialization.json)
     implementation("net.mamoe.yamlkt:yamlkt:_")
 
-    implementation("net.mamoe:mirai-core-all:_")
+    implementation("net.mamoe:mirai-core-all:_") {
+        exclude("io.ktor", "ktor-client-core")
+        exclude("io.ktor", "ktor-client-java")
+        exclude("io.ktor", "ktor-client-resources")
+    }
 
     api("org.jetbrains.exposed:exposed-core:_")
     api("org.jetbrains.exposed:exposed-dao:_")
