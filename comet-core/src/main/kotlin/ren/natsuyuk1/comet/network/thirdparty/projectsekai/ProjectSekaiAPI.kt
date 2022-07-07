@@ -9,9 +9,9 @@
 
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.serialization.decodeFromString
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.CometClient
@@ -19,6 +19,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiE
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiProfile
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestPredictionInfo
+import java.io.InputStream
 
 private val logger = mu.KotlinLogging.logger {}
 
@@ -44,9 +45,9 @@ object ProjectSekaiAPI {
             url {
                 parameters.append("targetUserId", userID.toString())
             }
-        }.execute()
+        }.execute().receive<InputStream>()
 
-        return resp.content.toInputStream().bufferedReader().use { json.decodeFromString(it.readText()) }
+        return resp.bufferedReader().use { json.decodeFromString(it.readText()) }
     }
 
     suspend fun CometClient.getSpecificRankInfo(eventID: Int, rankPosition: Int): ProjectSekaiProfile {
@@ -56,9 +57,9 @@ object ProjectSekaiAPI {
             url {
                 parameters.append("targetRank", rankPosition.toString())
             }
-        }.execute()
+        }.execute().receive<InputStream>()
 
-        return resp.content.toInputStream().bufferedReader().use { json.decodeFromString(it.readText()) }
+        return resp.bufferedReader().use { json.decodeFromString(it.readText()) }
     }
 
     suspend fun CometClient.getEventList(limit: Int = 12, startAt: Int = -1, skip: Int = 0): ProjectSekaiEventList {

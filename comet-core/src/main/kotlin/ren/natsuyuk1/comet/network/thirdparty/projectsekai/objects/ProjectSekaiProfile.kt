@@ -15,7 +15,7 @@ import kotlinx.serialization.SerialName
 data class ProjectSekaiProfile(
     val rankings: List<EventInfo>
 ) {
-    fun getScore(): Long = rankings.first().score.toLong()
+    fun getScore(): Long = rankings.first().score
 
     @kotlinx.serialization.Serializable
     data class EventInfo(
