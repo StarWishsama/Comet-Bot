@@ -6,7 +6,7 @@ import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.transactions.transaction
 
 private val logger = KotlinLogging.logger {}
 
@@ -14,29 +14,38 @@ enum class LoginPlatform {
     QQ, TELEGRAM,
 }
 
-object AccountDataTable : IdTable<Long>() {
+object AccountDataTable : IdTable<Long>("account_data") {
     override val id: Column<EntityID<Long>> = long("id").entityId()
     val password: Column<String> = text("password")
     val platform = enumeration<LoginPlatform>("platform")
 }
 
 class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
-    val password by AccountDataTable.password
-    val platform by AccountDataTable.platform
+    var password by AccountDataTable.password
+    var platform by AccountDataTable.platform
 
     companion object : EntityClass<Long, AccountData>(AccountDataTable) {
-        fun hasAccount(id: Long, platform: LoginPlatform): Boolean = !find {
-            AccountDataTable.id eq id
-            AccountDataTable.platform eq platform
-        }.empty()
+        fun hasAccount(id: Long, platform: LoginPlatform): Boolean = transaction {
+            !find {
+                AccountDataTable.id eq id
+                AccountDataTable.platform eq platform
+            }.empty()
+        }
 
-        fun registerAccount(id: Long, password: String, platform: LoginPlatform): EntityID<Long> {
+        fun registerAccount(id: Long, password: String, platform: LoginPlatform): AccountData {
+            val target = transaction { findById(id) }
+
+            if (hasAccount(id, platform) && target != null) {
+                return target
+            }
+
             logger.debug { "Creating comet bot account ($id) in $platform platform" }
 
-            return AccountDataTable.insertAndGetId {
-                it[AccountDataTable.id] = id
-                it[AccountDataTable.password] = password
-                it[AccountDataTable.platform] = platform
+            return transaction {
+                AccountData.new(id) {
+                    this.password = password
+                    this.platform = platform
+                }
             }
         }
     }

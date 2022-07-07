@@ -1,7 +1,6 @@
 package ren.natsuyuk1.comet.cli.command
 
 import moe.sdl.yac.parameters.arguments.argument
-import moe.sdl.yac.parameters.options.default
 import moe.sdl.yac.parameters.options.option
 import moe.sdl.yac.parameters.types.enum
 import moe.sdl.yac.parameters.types.long
@@ -39,12 +38,17 @@ class Login(
 
     private val id by argument(name = "账户 ID", help = "登录账户的 ID").long()
 
-    private val password by option("-pwd", "--password", help = "登录账户的密码").default("")
+    private val password by option("-p", "--password", help = "登录账户的密码")
 
     override suspend fun run() {
+        if (password == null) {
+            sender.sendMessage(buildMessageWrapper { appendText("请输入密码, 例子: login qq 123456 -p=password") })
+            return
+        }
+
         when (platform) {
-            LoginPlatform.QQ -> handleQQLogin(id, password)
-            LoginPlatform.TELEGRAM -> handleTelegramLogin(id, password)
+            LoginPlatform.QQ -> handleQQLogin(id, password!!)
+            LoginPlatform.TELEGRAM -> handleTelegramLogin(id, password!!)
         }
     }
 

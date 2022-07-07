@@ -23,6 +23,7 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
+import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.utils.sql.SQLDatabaseSet
 import ren.natsuyuk1.comet.utils.sql.SetTable
 import java.util.*
@@ -68,14 +69,14 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
          *
          * @param qq QQ 号
          */
-        fun findByQQ(qq: Long) = find { UserTable.qq eq qq }
+        fun findByQQ(qq: Long) = transaction { find { UserTable.qq eq qq } }
 
         /**
          * 通过 Telegram 账号 ID 搜索对应用户
          *
          * @param telegramID Telegram 账号 ID
          */
-        fun findByTelegramID(telegramID: Long) = find { UserTable.telegramID eq telegramID }
+        fun findByTelegramID(telegramID: Long) = transaction { find { UserTable.telegramID eq telegramID } }
 
         /**
          * Create a user to database
@@ -89,13 +90,15 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
          */
         fun create(qid: Long = 0, tgID: Long = 0): EntityID<UUID> {
             logger.info { "Creating comet user for ${if (qid != 0L) "qq $qid" else "telegram $tgID"}" }
-            return UserTable.insertAndGetId {
-                if (qid != 0L) {
-                    it[qq] = qid
-                }
+            return transaction {
+                UserTable.insertAndGetId {
+                    if (qid != 0L) {
+                        it[qq] = qid
+                    }
 
-                if (tgID != 0L) {
-                    it[telegramID] = tgID
+                    if (tgID != 0L) {
+                        it[telegramID] = tgID
+                    }
                 }
             }
         }
