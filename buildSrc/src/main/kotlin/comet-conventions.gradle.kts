@@ -45,14 +45,12 @@ dependencies {
     implementation("cn.hutool:hutool-crypto:_")
     implementation("cn.hutool:hutool-cron:_")
 
-    // Ktor
+    // Ktor FIXME: USING 1.X now, migrate to v2 when mirai supports
     implementation("io.ktor:ktor-client-core:_")
     implementation("io.ktor:ktor-client-cio:_")
     implementation("io.ktor:ktor-client-logging:_")
     implementation("io.ktor:ktor-client-encoding:_")
     implementation("io.ktor:ktor-client-serialization:_")
-    implementation("io.ktor:ktor-client-content-negotiation:_")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:_")
 }
 
 sourceSets {

@@ -11,6 +11,7 @@ package ren.natsuyuk1.comet.mirai.util
 
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.AudioSupported
 import net.mamoe.mirai.contact.Contact
@@ -42,7 +43,7 @@ suspend fun WrapperElement.toMessageContent(subject: Contact?): MessageContent {
 
             try {
                 if (url.isNotEmpty()) {
-                    client.client.get(url).body<InputStream>().use {
+                    client.client.get<HttpStatement>(url).execute().receive<InputStream>().use {
                         it.uploadAsImage(subject)
                     }
                 } else if (filePath.isNotEmpty()) {

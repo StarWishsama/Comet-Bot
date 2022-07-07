@@ -9,7 +9,6 @@
 
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 
-import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.utils.io.jvm.javaio.*
@@ -41,25 +40,25 @@ object ProjectSekaiAPI {
     suspend fun CometClient.getUserEventInfo(eventID: Int, userID: Long): ProjectSekaiProfile {
         logger.debug { "Fetching project sekai event $eventID rank for user $userID" }
 
-        val resp = client.get("$PROFILE_URL/event/$eventID/ranking") {
+        val resp = client.get<HttpStatement>("$PROFILE_URL/event/$eventID/ranking") {
             url {
                 parameters.append("targetUserId", userID.toString())
             }
-        }
+        }.execute()
 
-        return resp.bodyAsChannel().toInputStream().bufferedReader().use { json.decodeFromString(it.readText()) }
+        return resp.content.toInputStream().bufferedReader().use { json.decodeFromString(it.readText()) }
     }
 
     suspend fun CometClient.getSpecificRankInfo(eventID: Int, rankPosition: Int): ProjectSekaiProfile {
         logger.debug { "Fetching project sekai event $eventID rank position at $rankPosition" }
 
-        val resp = client.get("$PROFILE_URL/event/$eventID/ranking") {
+        val resp = client.get<HttpStatement>("$PROFILE_URL/event/$eventID/ranking") {
             url {
                 parameters.append("targetRank", rankPosition.toString())
             }
-        }
+        }.execute()
 
-        return resp.bodyAsChannel().toInputStream().bufferedReader().use { json.decodeFromString(it.readText()) }
+        return resp.content.toInputStream().bufferedReader().use { json.decodeFromString(it.readText()) }
     }
 
     suspend fun CometClient.getEventList(limit: Int = 12, startAt: Int = -1, skip: Int = 0): ProjectSekaiEventList {
@@ -73,13 +72,13 @@ object ProjectSekaiAPI {
                     append("$" + "skip", skip.toString())
                 }
             }
-        }.body()
+        }
     }
 
     suspend fun CometClient.getCurrentEventInfo(): SekaiBestEventInfo {
         logger.debug { "Fetching project sekai current event" }
 
-        return client.get("https://strapi.sekai.best/sekai-current-event").body()
+        return client.get("https://strapi.sekai.best/sekai-current-event")
     }
 
     suspend fun CometClient.getRankPredictionInfo(region: String = "jp"): SekaiBestPredictionInfo {
@@ -89,6 +88,6 @@ object ProjectSekaiAPI {
             url {
                 parameters.append("region", region)
             }
-        }.body()
+        }
     }
 }

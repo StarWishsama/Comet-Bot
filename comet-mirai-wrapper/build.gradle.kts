@@ -16,6 +16,7 @@ plugins {
 
 repositories {
     mavenCentral()
+    maven("https://repo.mirai.mamoe.net/snapshots")
 }
 
 dependencies {
@@ -26,9 +27,7 @@ dependencies {
     implementation(KotlinX.serialization.json)
     implementation("net.mamoe.yamlkt:yamlkt:_")
 
-    implementation("net.mamoe:mirai-core-all:_") {
-        exclude("io.ktor")
-    }
+    api("net.mamoe:mirai-core-all:_")
 
     api("org.jetbrains.exposed:exposed-core:_")
     api("org.jetbrains.exposed:exposed-dao:_")
