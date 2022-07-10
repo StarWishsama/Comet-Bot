@@ -10,11 +10,12 @@
 package ren.natsuyuk1.comet.api.command
 
 import moe.sdl.yac.core.CliktCommand
+import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 /**
- * [CometCommand]
+ * [BaseCommand]
  *
  * Comet 的命令
  *
@@ -22,7 +23,7 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
  * @param message 获取由 [MessageWrapper] 包装后的信息, 包含非纯文本信息
  * @param user 调用该命令的用户
  */
-abstract class CometCommand(
+abstract class BaseCommand(
     open val sender: CommandSender,
     message: MessageWrapper,
     user: CometUser,
@@ -46,3 +47,14 @@ abstract class CometCommand(
         val treatUnknownOptionsAsArgs: Boolean = false,
     )
 }
+
+abstract class CometCommand(
+    val comet: Comet,
+    override val sender: CommandSender,
+    message: MessageWrapper,
+    user: CometUser,
+    /**
+     * 该命令的配置 [CommandProperty]
+     */
+    property: CommandProperty,
+) : BaseCommand(sender, message, user, property)

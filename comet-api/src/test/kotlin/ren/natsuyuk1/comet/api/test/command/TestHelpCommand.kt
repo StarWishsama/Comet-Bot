@@ -7,7 +7,7 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-package ren.natsuyuk1.comet.commands
+package ren.natsuyuk1.comet.api.test.command
 
 import moe.sdl.yac.core.UsageError
 import moe.sdl.yac.parameters.arguments.argument
@@ -31,7 +31,7 @@ val HELP by lazy {
     )
 }
 
-class HelpCommand(comet: Comet, sender: PlatformCommandSender, message: MessageWrapper, user: CometUser) :
+class TestHelpCommand(comet: Comet, sender: PlatformCommandSender, message: MessageWrapper, user: CometUser) :
     CometCommand(comet, sender, message, user, HELP) {
 
     private val pageNum by argument(

@@ -30,6 +30,6 @@ val cometTables =
 
 val defaultCommands: List<AbstractCommandNode<*>> =
     listOf(
-        CommandNode(HELP) { sender, wrapper, user -> HelpCommand(sender, wrapper, user) },
-        CommandNode(SIGNIN) { sender, wrapper, user -> SignInCommand(sender, wrapper, user) }
+        CommandNode(HELP) { comet, sender, wrapper, user -> HelpCommand(comet, sender, wrapper, user) },
+        CommandNode(SIGNIN) { comet, sender, wrapper, user -> SignInCommand(comet, sender, wrapper, user) }
     )

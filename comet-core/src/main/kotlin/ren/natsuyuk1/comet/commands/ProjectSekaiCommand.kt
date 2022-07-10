@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.commands
 
+import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.CometCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
@@ -10,17 +11,18 @@ val PROJECTSEKAI by lazy {
     CommandProperty(
         "projectsekai",
         listOf("pjsk", "啤酒烧烤"),
-        "展示 Comet 的帮助菜单",
-        "输入 /help 查询命令列表"
+        "查询 Project Sekai: Colorful Stage 相关信息",
+        "TODO"
     )
 }
 
 class ProjectSekaiCommand(
+    comet: Comet,
     override val sender: PlatformCommandSender,
     message: MessageWrapper,
     user: CometUser
 ) :
-    CometCommand(sender, message, user, PROJECTSEKAI) {
+    CometCommand(comet, sender, message, user, PROJECTSEKAI) {
 
     override suspend fun run() {
         TODO("Not yet implemented")

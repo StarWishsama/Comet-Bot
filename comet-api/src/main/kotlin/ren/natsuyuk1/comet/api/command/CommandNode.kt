@@ -9,6 +9,7 @@
 
 package ren.natsuyuk1.comet.api.command
 
+import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
@@ -22,17 +23,17 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
  */
 abstract class AbstractCommandNode<CSender : CommandSender>(
     val property: CommandProperty,
-    val handler: (sender: CSender, wrapper: MessageWrapper, user: CometUser) -> CometCommand,
+    val handler: (comet: Comet, sender: CSender, wrapper: MessageWrapper, user: CometUser) -> BaseCommand,
 )
 
 /**
  * [CommandNode]
  *
- * 一个 [CometCommand] 命令的处理节点
+ * 一个 [BaseCommand] 命令的处理节点
  */
 class CommandNode(
     property: CommandProperty,
-    handler: (sender: PlatformCommandSender, wrapper: MessageWrapper, user: CometUser) -> CometCommand
+    handler: (comet: Comet, sender: PlatformCommandSender, wrapper: MessageWrapper, user: CometUser) -> BaseCommand
 ) : AbstractCommandNode<PlatformCommandSender>(property, handler)
 
 /**
@@ -42,5 +43,5 @@ class CommandNode(
  */
 class ConsoleCommandNode(
     property: CommandProperty,
-    handler: (sender: ConsoleCommandSender, wrapper: MessageWrapper, user: CometUser) -> CometCommand
+    handler: (comet: Comet, sender: ConsoleCommandSender, wrapper: MessageWrapper, user: CometUser) -> BaseCommand
 ) : AbstractCommandNode<ConsoleCommandSender>(property, handler)

@@ -12,15 +12,19 @@ package ren.natsuyuk1.comet.cli
 import kotlinx.coroutines.*
 import moe.sdl.yac.core.CliktCommand
 import moe.sdl.yac.core.CommandResult
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.jline.reader.EndOfFileException
 import org.jline.reader.UserInterruptException
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
 import ren.natsuyuk1.comet.api.database.DatabaseManager
+import ren.natsuyuk1.comet.api.event.EventManager
 import ren.natsuyuk1.comet.cli.command.registerTerminalCommands
 import ren.natsuyuk1.comet.cli.console.Console
 import ren.natsuyuk1.comet.cli.storage.AccountDataTable
+import ren.natsuyuk1.comet.cli.util.login
 import ren.natsuyuk1.comet.config.branch
 import ren.natsuyuk1.comet.config.hash
 import ren.natsuyuk1.comet.config.version
@@ -48,19 +52,24 @@ object CometTerminal {
 }
 
 class CometTerminalCommand : CliktCommand(name = "comet") {
-    override suspend fun run() = scope.launch {
-        setupShutdownHook()
+    override suspend fun run() {
+        scope.launch {
+            setupShutdownHook()
 
-        logger.info { "Running Comet Terminal ${version}-${branch}-${hash}" }
+            logger.info { "Running Comet Terminal ${version}-${branch}-${hash}" }
 
-        CometTerminal.init(scope.coroutineContext)
+            CometTerminal.init(scope.coroutineContext)
 
-        setupConfig()
-        setupDatabase()
-        setupCommands()
-        setupConsole()
+            setupConfig()
+            setupDatabase()
+            setupCommands()
 
-    }.join()
+            autoLogin()
+
+            setupConsole()
+
+        }.join()
+    }
 
     private fun setupConfig(): Job = scope.launch {
         logger.info { "Loading config file..." }
@@ -72,7 +81,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         }.joinAll()
     }
 
-    private fun setupDatabase(): Job = scope.launch {
+    private fun setupDatabase() {
         logger.info { "Loading database..." }
         DatabaseManager.loadDatabase()
         DatabaseManager.loadTables(*cometTables, AccountDataTable)
@@ -82,6 +91,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         logger.info { "Registering commands..." }
         registerTerminalCommands()
         CommandManager.registerCommands(defaultCommands)
+        EventManager.init(coroutineContext)
     }
 
     private suspend fun setupConsole() = scope.launch {
@@ -91,6 +101,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         while (isActive) {
             try {
                 CommandManager.executeCommand(
+                    CometTerminal.instance.first,
                     ConsoleCommandSender,
                     buildMessageWrapper { appendText(Console.readln()) }
                 ).join()
@@ -107,6 +118,25 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
             closeAll()
             println("\nExiting Comet Terminal...")
             Console.redirectToNull()
+        }
+    }
+
+    private fun autoLogin() {
+        logger.info { "正在登录历史账号..." }
+
+        transaction {
+            val accounts = AccountDataTable.selectAll()
+
+            accounts.forEach {
+                logger.info { "正在自动登录账号 ${it[AccountDataTable.id]} (${it[AccountDataTable.platform]})" }
+                scope.launch {
+                    login(
+                        it[AccountDataTable.id].value,
+                        it[AccountDataTable.password],
+                        it[AccountDataTable.platform]
+                    )
+                }
+            }
         }
     }
 

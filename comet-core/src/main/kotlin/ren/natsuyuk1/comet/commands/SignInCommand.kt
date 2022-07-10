@@ -9,6 +9,7 @@
 
 package ren.natsuyuk1.comet.commands
 
+import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.CometCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
@@ -28,11 +29,12 @@ val SIGNIN by lazy {
 }
 
 class SignInCommand(
+    comet: Comet,
     override val sender: PlatformCommandSender,
     message: MessageWrapper,
     private val user: CometUser
 ) :
-    CometCommand(sender, message, user, SIGNIN) {
+    CometCommand(comet, sender, message, user, SIGNIN) {
 
     override suspend fun run() {
         sender.sendMessage(SignInService.processSignIn(sender, user))

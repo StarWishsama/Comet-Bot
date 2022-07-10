@@ -140,6 +140,22 @@ object StringUtil {
         return duration.toFriendly(maxUnit = unit, msMode = msMode)
     }
 
+    fun String.containsEtc(strict: Boolean = true, string: List<String>): Boolean {
+        var counter = 0
+
+        string.forEach {
+            if (this.contains(it)) {
+                if (!strict) {
+                    return true
+                } else if (counter < string.size) {
+                    counter++
+                }
+            }
+        }
+
+        return counter >= string.size
+    }
+
     fun String.containsEtc(strict: Boolean = true, vararg string: String): Boolean {
         var counter = 0
 
@@ -197,4 +213,14 @@ object StringUtil {
     }
 
     fun String.toMessageWrapper(): MessageWrapper = buildMessageWrapper { appendText(this@toMessageWrapper) }
+
+    fun String.replaceAll(toReplace: List<String>): String {
+        var result = this
+
+        toReplace.forEach {
+            result = result.replace(it, "")
+        }
+
+        return result
+    }
 }

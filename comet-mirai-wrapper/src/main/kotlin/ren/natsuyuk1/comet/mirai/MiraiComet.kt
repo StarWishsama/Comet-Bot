@@ -14,6 +14,7 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.utils.BotConfiguration
 import ren.natsuyuk1.comet.api.Comet
+import ren.natsuyuk1.comet.api.attachCommandManager
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.mirai.config.MiraiConfig
 import ren.natsuyuk1.comet.mirai.event.redirectToComet
@@ -67,6 +68,8 @@ class MiraiComet(
         bot.eventChannel.subscribeAlways<net.mamoe.mirai.event.Event> {
             it.redirectToComet(this@MiraiComet)
         }
+
+        attachCommandManager()
     }
 
     override fun close() {

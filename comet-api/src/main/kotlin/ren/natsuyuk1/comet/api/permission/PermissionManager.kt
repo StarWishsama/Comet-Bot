@@ -9,6 +9,7 @@
 
 package ren.natsuyuk1.comet.api.permission
 
+import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
 
@@ -53,10 +54,12 @@ object PermissionManager {
 }
 
 fun CometUser.hasPermission(node: String): Boolean {
-    val target = PermissionManager.getPermission(node) ?: return true
+    return transaction {
+        val target = PermissionManager.getPermission(node) ?: return@transaction true
 
-    return permissions.contains(target.nodeName) || PermissionManager.checkWildCardPermission(
-        this,
-        target
-    ) || userLevel >= target.level
+        return@transaction permissions.contains(target.nodeName) || PermissionManager.checkWildCardPermission(
+            this@hasPermission,
+            target
+        ) || userLevel >= target.level
+    }
 }

@@ -9,17 +9,20 @@
 
 package ren.natsuyuk1.comet.api.command
 
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.datetime.Clock
 import moe.sdl.yac.core.CommandResult
-import org.jetbrains.exposed.sql.SizedIterable
+import org.jetbrains.exposed.sql.transactions.transaction
+import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.permission.PermissionManager
 import ren.natsuyuk1.comet.api.permission.hasPermission
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.utils.string.StringUtil.containsEtc
 import ren.natsuyuk1.comet.utils.string.StringUtil.getLastingTimeAsString
+import ren.natsuyuk1.comet.utils.string.StringUtil.replaceAll
 import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
@@ -39,7 +42,7 @@ object CommandManager {
     @Suppress("unused")
     fun registerCommand(
         entry: CommandProperty,
-        handler: (CommandSender, MessageWrapper, CometUser) -> CometCommand
+        handler: (Comet, PlatformCommandSender, MessageWrapper, CometUser) -> BaseCommand
     ) {
         registerCommand(CommandNode(entry, handler))
     }
@@ -69,19 +72,25 @@ object CommandManager {
      * @param rawMsg 原始消息
      */
     suspend fun executeCommand(
+        comet: Comet,
         sender: CommandSender,
         wrapper: MessageWrapper
-    ): Job = commandScope.launch {
+    ): Deferred<CommandStatus> = commandScope.async {
         val executeTime = Clock.System.now()
 
         if (wrapper.isEmpty()) {
-            return@launch
+            return@async CommandStatus.NotACommand()
         }
 
         val args = wrapper.parseToString().toArgs()
 
+        if (sender !is ConsoleCommandSender && !args[0].containsEtc(false, comet.config.data.commandPrefix)) {
+            return@async CommandStatus.NotACommand()
+        }
+
         // TODO: 模糊搜索命令系统
-        val cmd = getCommand(args[0]) ?: return@launch
+        val cmd =
+            getCommand(args[0].replaceAll(comet.config.data.commandPrefix)) ?: return@async CommandStatus.NotACommand()
 
         val property = cmd.property
 
@@ -90,7 +99,7 @@ object CommandManager {
                 is ConsoleCommandSender -> {
                     if (cmd is ConsoleCommandNode) {
                         when (val cmdStatus =
-                            cmd.handler(sender, wrapper, CometUser.dummyUser).main(args.drop(1))) {
+                            cmd.handler(comet, sender, wrapper, CometUser.dummyUser).main(args.drop(1))) {
                             is CommandResult.Error -> {
                                 logger.warn(cmdStatus.cause) { "在执行命令时发生了意外, ${cmdStatus.message}" }
                                 return@run CommandStatus.Error()
@@ -105,16 +114,27 @@ object CommandManager {
                 }
                 is PlatformCommandSender -> {
                     if (cmd is CommandNode) {
-                        val user = kotlin.run findUser@{
-                            val findByQQ: SizedIterable<CometUser> = CometUser.findByQQ(sender.id)
+                        val user: CometUser = transaction findUser@{
+                            val findByQQ = CometUser.findByQQ(sender.id)
                             if (findByQQ.empty()) {
                                 val findByTelegram = CometUser.findByTelegramID(sender.id)
 
-                                if (findByTelegram.empty()) return@findUser findByTelegram else return@run CommandStatus.Success()
+                                if (!findByTelegram.empty()) {
+                                    return@findUser findByTelegram.first()
+                                } else {
+                                    val className = sender::class.java.name
+                                    return@findUser if (className.contains("mirai")) {
+                                        CometUser.create(sender.id)
+                                    } else if (className.contains("telegram")) {
+                                        CometUser.create(tgID = sender.id)
+                                    } else {
+                                        null
+                                    }
+                                }
                             } else {
-                                return@findUser findByQQ
+                                return@findUser findByQQ.first()
                             }
-                        }.first()
+                        } ?: return@run CommandStatus.Success()
 
                         if (!user.hasPermission(property.permission)) {
                             return@run CommandStatus.NoPermission()
@@ -136,7 +156,7 @@ object CommandManager {
                             }
                         }
 
-                        when (val cmdStatus = cmd.handler(sender, wrapper, user).main(args.drop(1))) {
+                        when (val cmdStatus = cmd.handler(comet, sender, wrapper, user).main(args.drop(1))) {
                             is CommandResult.Error -> {
                                 logger.warn(cmdStatus.cause) { "在执行命令时发生了意外, ${cmdStatus.message}" }
                                 return@run CommandStatus.Error()
@@ -155,8 +175,10 @@ object CommandManager {
         }
 
         if (result.isPassed()) {
-            logger.debug { "命令 ${cmd.property.name} 执行状态 $result, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}" }
+            logger.debug { "命令 ${cmd.property.name} 执行状态 ${result.name}, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}" }
         }
+
+        return@async result
     }
 
     /**

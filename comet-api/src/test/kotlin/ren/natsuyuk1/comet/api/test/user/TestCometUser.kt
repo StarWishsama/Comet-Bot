@@ -14,7 +14,7 @@ import ren.natsuyuk1.comet.api.user.UserTable
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class CometUserTest {
+class TestCometUser {
     @BeforeAll
     fun init() {
         initTestDatabase()

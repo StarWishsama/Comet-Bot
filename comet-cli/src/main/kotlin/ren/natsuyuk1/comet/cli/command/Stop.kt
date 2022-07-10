@@ -1,6 +1,6 @@
 package ren.natsuyuk1.comet.cli.command
 
-import ren.natsuyuk1.comet.api.command.CometCommand
+import ren.natsuyuk1.comet.api.command.BaseCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
 import ren.natsuyuk1.comet.api.user.CometUser
@@ -18,7 +18,7 @@ class Stop(
     override val sender: ConsoleCommandSender,
     message: MessageWrapper,
     user: CometUser
-) : CometCommand(sender, message, user, STOP) {
+) : BaseCommand(sender, message, user, STOP) {
 
     override suspend fun run() {
         exitProcess(0)

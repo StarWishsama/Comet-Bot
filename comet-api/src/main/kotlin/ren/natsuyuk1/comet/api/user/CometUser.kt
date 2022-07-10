@@ -88,10 +88,10 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
          *
          * @return user id in database
          */
-        fun create(qid: Long = 0, tgID: Long = 0): EntityID<UUID> {
+        fun create(qid: Long = 0, tgID: Long = 0): CometUser {
             logger.info { "Creating comet user for ${if (qid != 0L) "qq $qid" else "telegram $tgID"}" }
             return transaction {
-                UserTable.insertAndGetId {
+                val uuid = UserTable.insertAndGetId {
                     if (qid != 0L) {
                         it[qq] = qid
                     }
@@ -100,6 +100,9 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
                         it[telegramID] = tgID
                     }
                 }
+
+
+                CometUser.find { UserTable.id eq uuid.value }.first()
             }
         }
     }
