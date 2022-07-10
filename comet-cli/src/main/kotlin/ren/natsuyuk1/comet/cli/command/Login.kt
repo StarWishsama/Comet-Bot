@@ -26,22 +26,22 @@ class Login(
     user: CometUser
 ) : BaseCommand(sender, message, user, LOGIN) {
 
-    private val platform by argument(
-        name = "登录平台",
+    private val platform by option(
+        "-p", "--platform",
         help = "登录 Comet 机器人的平台 (例如 QQ, Telegram)"
     ).enum<LoginPlatform>(true)
 
     private val id by argument(name = "账户 ID", help = "登录账户的 ID").long()
 
-    private val password by option("-p", "--password", help = "登录账户的密码")
+    private val password by option("-pwd", "--password", help = "登录账户的密码")
 
     override suspend fun run() {
-        if (password == null) {
-            sender.sendMessage(buildMessageWrapper { appendText("请输入密码, 例子: login qq 123456 -p=password") })
+        if (password == null || platform == null) {
+            sender.sendMessage(buildMessageWrapper { appendText("请输入密码, 例子: login 123456 -p qq -pwd password") })
             return
         }
 
-        when (platform) {
+        when (platform!!) {
             LoginPlatform.QQ -> handleQQLogin(id, password!!)
             LoginPlatform.TELEGRAM -> handleTelegramLogin(id, password!!)
         }
