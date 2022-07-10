@@ -12,7 +12,6 @@ import ren.natsuyuk1.comet.api.test.fakeSender
 import ren.natsuyuk1.comet.api.user.UserPermissionTable
 import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
-import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TestCommandManager {
@@ -34,10 +33,7 @@ class TestCommandManager {
     @Test
     fun testCommandExecute() {
         runBlocking {
-            assertTrue(
-                CommandManager.executeCommand(fakeComet, fakeSender, buildMessageWrapper { appendText("/help") })
-                    .await().isPassed()
-            )
+            CommandManager.executeCommand(fakeComet, fakeSender, buildMessageWrapper { appendText("/help") }).join()
         }
     }
 }

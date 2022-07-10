@@ -9,8 +9,8 @@
 
 package ren.natsuyuk1.comet.api.command
 
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import moe.sdl.yac.core.CommandResult
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -75,22 +75,21 @@ object CommandManager {
         comet: Comet,
         sender: CommandSender,
         wrapper: MessageWrapper
-    ): Deferred<CommandStatus> = commandScope.async {
+    ): Job = commandScope.launch {
         val executeTime = Clock.System.now()
 
         if (wrapper.isEmpty()) {
-            return@async CommandStatus.NotACommand()
+            return@launch
         }
 
         val args = wrapper.parseToString().toArgs()
 
         if (sender !is ConsoleCommandSender && !args[0].containsEtc(false, comet.config.data.commandPrefix)) {
-            return@async CommandStatus.NotACommand()
+            return@launch
         }
 
         // TODO: 模糊搜索命令系统
-        val cmd =
-            getCommand(args[0].replaceAll(comet.config.data.commandPrefix)) ?: return@async CommandStatus.NotACommand()
+        val cmd = getCommand(args[0].replaceAll(comet.config.data.commandPrefix)) ?: return@launch
 
         val property = cmd.property
 
@@ -175,10 +174,8 @@ object CommandManager {
         }
 
         if (result.isPassed()) {
-            logger.debug { "命令 ${cmd.property.name} 执行状态 ${result.name}, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}" }
+            logger.debug { "命令 ${cmd.property.name} 执行状态 $result, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}" }
         }
-
-        return@async result
     }
 
     /**
