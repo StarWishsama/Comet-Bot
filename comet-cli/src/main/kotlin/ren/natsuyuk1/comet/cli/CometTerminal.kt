@@ -103,6 +103,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
                 CommandManager.executeCommand(
                     CometTerminal.instance.first,
                     ConsoleCommandSender,
+                    ConsoleCommandSender,
                     buildMessageWrapper { appendText(Console.readln()) }
                 ).join()
             } catch (e: UserInterruptException) { // Ctrl + C

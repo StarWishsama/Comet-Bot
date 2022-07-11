@@ -32,4 +32,7 @@ dependencies {
     api("org.jetbrains.exposed:exposed-jdbc:_")
     api("org.jetbrains.exposed:exposed-kotlin-datetime:_")
     implementation("com.zaxxer:HikariCP:_")
+
+    implementation("io.ktor:ktor-server-core:_")
+    implementation("io.ktor:ktor-server-netty:_")
 }

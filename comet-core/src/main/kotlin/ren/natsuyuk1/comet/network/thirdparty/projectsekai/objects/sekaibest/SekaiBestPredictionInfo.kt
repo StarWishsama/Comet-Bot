@@ -10,6 +10,10 @@
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest
 
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
+import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 
 @kotlinx.serialization.Serializable
 data class SekaiBestPredictionInfo(
@@ -17,3 +21,14 @@ data class SekaiBestPredictionInfo(
     val data: JsonObject,
     val message: String
 )
+
+fun SekaiBestPredictionInfo.toMessageWrapper(): MessageWrapper =
+    buildMessageWrapper {
+        val eventInfo = ProjectSekaiData.getCurrentEventInfo()
+
+        appendText("${eventInfo?.name} 活动分数最终档位预测")
+
+        data.forEach { k, v ->
+            if (k != "ts") appendText("$k => ${v.jsonPrimitive.content}")
+        }
+    }

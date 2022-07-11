@@ -20,10 +20,11 @@ class TestCommandManager {
         initTestDatabase()
         DatabaseManager.loadTables(UserTable, UserPermissionTable)
         CommandManager.init()
-        CommandManager.registerCommand(HELP) { comet, sender, wrapper, user ->
+        CommandManager.registerCommand(HELP) { comet, sender, subject, wrapper, user ->
             TestHelpCommand(
                 comet,
                 sender,
+                subject,
                 wrapper,
                 user
             )
@@ -33,7 +34,11 @@ class TestCommandManager {
     @Test
     fun testCommandExecute() {
         runBlocking {
-            CommandManager.executeCommand(fakeComet, fakeSender, buildMessageWrapper { appendText("/help") }).join()
+            CommandManager.executeCommand(
+                fakeComet,
+                fakeSender,
+                fakeSender,
+                buildMessageWrapper { appendText("/help") }).join()
         }
     }
 }

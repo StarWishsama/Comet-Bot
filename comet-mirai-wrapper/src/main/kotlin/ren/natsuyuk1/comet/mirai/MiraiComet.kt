@@ -16,7 +16,9 @@ import net.mamoe.mirai.utils.BotConfiguration
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachCommandManager
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.mirai.config.MiraiConfig
+import ren.natsuyuk1.comet.mirai.contact.toCometGroup
 import ren.natsuyuk1.comet.mirai.event.redirectToComet
 import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
@@ -30,7 +32,7 @@ import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-private val logger = mu.KotlinLogging.logger("CometMirai")
+private val logger = mu.KotlinLogging.logger("Comet-Mirai")
 
 class MiraiComet(
     /**
@@ -75,4 +77,6 @@ class MiraiComet(
     override fun close() {
         bot.close()
     }
+
+    override fun getGroup(id: Long): Group? = bot.getGroup(id)?.toCometGroup(this)
 }

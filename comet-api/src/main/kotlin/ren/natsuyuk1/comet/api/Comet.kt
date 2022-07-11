@@ -40,7 +40,7 @@ abstract class Comet(
      * 一个 Comet 实例的 [ModuleScope]
      */
     var scope: ModuleScope
-) {
+) : IComet {
     fun init(parentContext: CoroutineContext) {
         scope = ModuleScope(scope.name(), parentContext)
     }
@@ -54,6 +54,6 @@ abstract class Comet(
 
 fun Comet.attachCommandManager() {
     registerListener<MessageEvent> {
-        CommandManager.executeCommand(this, it.subject, it.message)
+        CommandManager.executeCommand(this, it.sender, it.subject, it.message)
     }
 }

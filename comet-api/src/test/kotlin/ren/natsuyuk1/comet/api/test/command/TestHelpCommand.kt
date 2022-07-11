@@ -31,8 +31,14 @@ val HELP by lazy {
     )
 }
 
-class TestHelpCommand(comet: Comet, sender: PlatformCommandSender, message: MessageWrapper, user: CometUser) :
-    CometCommand(comet, sender, message, user, HELP) {
+class TestHelpCommand(
+    comet: Comet,
+    sender: PlatformCommandSender,
+    subject: PlatformCommandSender,
+    message: MessageWrapper,
+    user: CometUser
+) :
+    CometCommand(comet, sender, subject, message, user, HELP) {
 
     private val pageNum by argument(
         name = "帮助菜单的页数"
@@ -56,7 +62,7 @@ class TestHelpCommand(comet: Comet, sender: PlatformCommandSender, message: Mess
         }
 
         // Build the message and send to the sender
-        sender.sendMessage(
+        subject.sendMessage(
             buildMessageWrapper {
                 appendText("Comet 帮助菜单 $pageNum / $pageSize", true)
                 val entries = pageItems[pageNum - 1]

@@ -16,14 +16,16 @@ plugins {
 
 repositories {
     mavenCentral()
+    maven("https://jitpack.io")
 }
 
 dependencies {
-    implementation(KotlinX.serialization.json)
+    api(project(":comet-api"))
+    api(project(":comet-core"))
+    api(project(":comet-utils"))
 
-    api("org.jetbrains.exposed:exposed-core:_")
-    api("org.jetbrains.exposed:exposed-dao:_")
-    api("org.jetbrains.exposed:exposed-jdbc:_")
-    api("org.jetbrains.exposed:exposed-kotlin-datetime:_")
-    implementation("com.zaxxer:HikariCP:_")
+    implementation(KotlinX.serialization.json)
+    implementation("net.mamoe.yamlkt:yamlkt:_")
+
+    implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:_")
 }

@@ -4,8 +4,8 @@ import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.command.ConsoleCommandNode
 
 val DEFAULT_COMMANDS = listOf(
-    ConsoleCommandNode(STOP) { _, sender, wrapper, user -> Stop(sender, wrapper, user) },
-    ConsoleCommandNode(LOGIN) { _, sender, wrapper, user -> Login(sender, wrapper, user) }
+    ConsoleCommandNode(STOP) { _, sender, _, wrapper, user -> Stop(sender, wrapper, user) },
+    ConsoleCommandNode(LOGIN) { _, sender, _, wrapper, user -> Login(sender, wrapper, user) }
 )
 
 fun registerTerminalCommands() = CommandManager.registerCommands(DEFAULT_COMMANDS)

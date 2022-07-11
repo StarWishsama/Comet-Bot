@@ -23,41 +23,54 @@ import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 
 private val rankPosition = listOf(100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000)
 
-fun ProjectSekaiProfile.toMessageWrapper(): MessageWrapper {
-    val profile = this@toMessageWrapper.rankings[0]
+fun ProjectSekaiProfile.toMessageWrapper(eventId: Int): MessageWrapper {
+    val profile = this@toMessageWrapper.rankings.first()
     val (ahead, behind) = profile.rank.getSurroundingRank()
-
-    // FIXME: 此处 eventID 为占位符, 记得更改
-    val aheadEventStatus = runBlocking { client.getSpecificRankInfo(61, ahead) }
-    val behindEventStatus = runBlocking { client.getSpecificRankInfo(61, behind) }
-
-    val aheadScore = aheadEventStatus.getScore()
-    val behindScore = behindEventStatus.getScore()
-
-    val aheadPredictScore = ProjectSekaiHelper.predictionCache.data[ahead.toString()]?.toString()
-    val behindPredictScore = ProjectSekaiHelper.predictionCache.data[behind.toString()]?.toString()
 
     return buildMessageWrapper {
         appendText("${profile.name} - ${profile.userId}", true)
         appendLine()
         appendText("分数 ${profile.score} | 排名 ${profile.rank}", true)
         appendLine()
-        appendText(
-            "上一档排名 $ahead 的分数为 ${aheadScore.getBetterNumber()}, 相差 ${(aheadScore - profile.score.toLong()).getBetterNumber()}",
-            true
-        )
-        appendText(
-            "下一档排名 $behind 的分数为 ${behindScore.getBetterNumber()}, 相差 ${(profile.score.toLong() - behindScore).getBetterNumber()}",
-            true
-        )
+
+        if (ahead != 0) {
+            val aheadEventStatus = runBlocking { client.getSpecificRankInfo(eventId, ahead) }
+            val aheadScore = aheadEventStatus.getScore()
+
+            appendText(
+                "上一档排名 $ahead 的分数为 ${aheadScore.getBetterNumber()}, 相差 ${(aheadScore - profile.score).getBetterNumber()}",
+                true
+            )
+        }
+
+        if (behind in 100..1000001) {
+            val behindEventStatus = runBlocking { client.getSpecificRankInfo(eventId, behind) }
+            val behindScore = behindEventStatus.getScore()
+
+            appendText(
+                "下一档排名 $behind 的分数为 ${behindScore.getBetterNumber()}, 相差 ${(profile.score - behindScore).getBetterNumber()}",
+                true
+            )
+        }
+
         appendLine()
-        appendText("预测 $ahead 档最终分数为 $aheadPredictScore", true)
-        appendText("$behind 档最终分数为 $behindPredictScore", true)
+        if (ahead != 0) {
+            val aheadPredictScore = ProjectSekaiHelper.predictionCache.data[ahead.toString()]?.toString()
+            appendText("$ahead 档预测分数为 $aheadPredictScore", true)
+        }
+        if (behind in 100..1000001) {
+            val behindPredictScore = ProjectSekaiHelper.predictionCache.data[behind.toString()]?.toString()
+            appendText("$behind 档预测分数为 $behindPredictScore", true)
+        }
         appendText("数据来自 sekai.best")
     }
 }
 
 private fun Int.getSurroundingRank(): Pair<Int, Int> {
+    if (this < rankPosition.first()) {
+        return Pair(0, rankPosition.first())
+    }
+
     for (i in rankPosition.indices) {
         if (i == rankPosition.size - 1) {
             break

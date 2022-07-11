@@ -12,8 +12,8 @@ package ren.natsuyuk1.comet.commands.service
 import cn.hutool.core.util.NumberUtil
 import kotlinx.datetime.*
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
-import ren.natsuyuk1.comet.api.command.nameOrCard
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
@@ -35,7 +35,7 @@ fun CometUser.isSigned(): Boolean {
 object SignInService {
     private val random = SecureRandom()
 
-    fun processSignIn(sender: PlatformCommandSender, user: CometUser): MessageWrapper {
+    fun processSignIn(user: CometUser, sender: PlatformCommandSender): MessageWrapper {
         return if (user.isSigned()) {
             "你今天已经签到过了! 输入 /cx 可查询硬币详情".toMessageWrapper()
         } else {
@@ -47,7 +47,7 @@ object SignInService {
         val signInCoin = calculateCoin(user)
 
         val checkInResult = buildString {
-            append("${getCurrentInstantString()}好, ${sender.nameOrCard()}~\n")
+            append("${getCurrentInstantString()}好, ${sender.name}~\n")
 
             val position = getSignInPosition(user)
 
@@ -99,12 +99,18 @@ object SignInService {
         val checkDuration = currentTime - lastSignInTime
 
         if (checkDuration.inWholeDays <= 1) {
-            user.checkInTime += 1
+            transaction {
+                user.checkInTime += 1
+            }
         } else {
-            user.checkInTime = 1
+            transaction {
+                user.checkInTime = 1
+            }
         }
 
-        user.checkInDate = currentTime.toLocalDateTime(TimeZone.UTC)
+        transaction {
+            user.checkInDate = currentTime.toLocalDateTime(TimeZone.UTC)
+        }
 
         // 使用随机数工具生成基础硬币
         val basePoint = NumberUtil.round(random.nextDouble(0.0, 10.0), 1, RoundingMode.HALF_DOWN).toDouble()
@@ -125,7 +131,9 @@ object SignInService {
 
         val chancePoint = hasRandomEvent()
 
-        user.coin += (basePoint + awardPoint + chancePoint)
+        transaction {
+            user.coin += (basePoint + awardPoint + chancePoint)
+        }
 
         return CheckInResult(basePoint, awardPoint, chancePoint)
     }
@@ -154,12 +162,14 @@ object SignInService {
             checkLDT.monthNumber, checkTime.plus(1.days).toLocalDateTime(TimeZone.UTC).dayOfMonth, 8, 0, 0, 0
         )
 
-        val sortedByDate = UserTable.select {
-            UserTable.checkInDate greater before
-            UserTable.checkInDate lessEq after
-        }
+        return transaction {
+            val sortedByDate = UserTable.select {
+                UserTable.checkInDate greater before
+                UserTable.checkInDate lessEq after
+            }
 
-        return sortedByDate.sortedBy { it[UserTable.checkInDate] }.indexOfFirst { it[UserTable.id] == user.id }
+            sortedByDate.sortedBy { it[UserTable.checkInDate] }.indexOfFirst { it[UserTable.id] == user.id }
+        }
     }
 
     private fun getCurrentInstantString(): String {

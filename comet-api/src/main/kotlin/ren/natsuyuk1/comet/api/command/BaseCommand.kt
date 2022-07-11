@@ -51,6 +51,7 @@ abstract class BaseCommand(
 abstract class CometCommand(
     val comet: Comet,
     override val sender: CommandSender,
+    open val subject: CommandSender,
     message: MessageWrapper,
     user: CometUser,
     /**

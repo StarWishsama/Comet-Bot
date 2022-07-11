@@ -42,7 +42,7 @@ object CommandManager {
     @Suppress("unused")
     fun registerCommand(
         entry: CommandProperty,
-        handler: (Comet, PlatformCommandSender, MessageWrapper, CometUser) -> BaseCommand
+        handler: (Comet, PlatformCommandSender, PlatformCommandSender, MessageWrapper, CometUser) -> BaseCommand
     ) {
         registerCommand(CommandNode(entry, handler))
     }
@@ -74,6 +74,7 @@ object CommandManager {
     suspend fun executeCommand(
         comet: Comet,
         sender: CommandSender,
+        subject: CommandSender,
         wrapper: MessageWrapper
     ): Job = commandScope.launch {
         val executeTime = Clock.System.now()
@@ -93,22 +94,22 @@ object CommandManager {
 
         val property = cmd.property
 
-        val result: CommandStatus = run {
+        val result: CommandStatus = runCatching {
             when (sender) {
                 is ConsoleCommandSender -> {
                     if (cmd is ConsoleCommandNode) {
                         when (val cmdStatus =
-                            cmd.handler(comet, sender, wrapper, CometUser.dummyUser).main(args.drop(1))) {
+                            cmd.handler(comet, sender, sender, wrapper, CometUser.dummyUser).main(args.drop(1))) {
                             is CommandResult.Error -> {
                                 logger.warn(cmdStatus.cause) { "在执行命令时发生了意外, ${cmdStatus.message}" }
-                                return@run CommandStatus.Error()
+                                return@runCatching CommandStatus.Error()
                             }
                             is CommandResult.Success -> {
-                                return@run CommandStatus.Success()
+                                return@runCatching CommandStatus.Success()
                             }
                         }
                     } else {
-                        return@run CommandStatus.Success()
+                        return@runCatching CommandStatus.Success()
                     }
                 }
                 is PlatformCommandSender -> {
@@ -133,45 +134,50 @@ object CommandManager {
                             } else {
                                 return@findUser findByQQ.first()
                             }
-                        } ?: return@run CommandStatus.Success()
+                        } ?: return@runCatching CommandStatus.Success()
 
                         if (!user.hasPermission(property.permission)) {
-                            return@run CommandStatus.NoPermission()
+                            return@runCatching CommandStatus.NoPermission()
                         }
 
                         when (property.executeConsumeType) {
                             CommandConsumeType.COOLDOWN -> {
                                 if (user.triggerCommandTime.plus(property.executeConsumePoint.seconds) >= executeTime) {
-                                    return@run CommandStatus.ValidateFailed()
+                                    return@runCatching CommandStatus.ValidateFailed()
                                 }
                             }
 
                             CommandConsumeType.COIN -> {
                                 if (user.coin < property.executeConsumePoint) {
-                                    return@run CommandStatus.ValidateFailed()
+                                    return@runCatching CommandStatus.ValidateFailed()
                                 } else {
                                     user.coin = user.coin - property.executeConsumePoint
                                 }
                             }
                         }
 
-                        when (val cmdStatus = cmd.handler(comet, sender, wrapper, user).main(args.drop(1))) {
+                        when (val cmdStatus =
+                            cmd.handler(comet, sender, subject as PlatformCommandSender, wrapper, user)
+                                .main(args.drop(1))) {
                             is CommandResult.Error -> {
                                 logger.warn(cmdStatus.cause) { "在执行命令时发生了意外, ${cmdStatus.message}" }
-                                return@run CommandStatus.Error()
+                                return@runCatching CommandStatus.Error()
                             }
                             is CommandResult.Success -> {
-                                return@run CommandStatus.Success()
+                                return@runCatching CommandStatus.Success()
                             }
                         }
                     } else {
-                        return@run CommandStatus.Success()
+                        return@runCatching CommandStatus.Success()
                     }
                 }
             }
 
-            return@run CommandStatus.Error()
-        }
+            return@runCatching CommandStatus.Error()
+        }.onFailure {
+            logger.warn(it) { "在尝试执行命令 ${cmd.property.name} 时出现异常" }
+            CommandStatus.Error()
+        }.getOrDefault(CommandStatus.Failed())
 
         if (result.isPassed()) {
             logger.debug { "命令 ${cmd.property.name} 执行状态 $result, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}" }

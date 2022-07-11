@@ -10,16 +10,25 @@
 package ren.natsuyuk1.comet.test.network.thirdparty.projectsekai
 
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getEventList
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserEventInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiHelper
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.test.network.client
+
+private val logger = mu.KotlinLogging.logger {}
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TestProjectSekaiAPI {
+    @BeforeAll
+    fun init() {
+        ProjectSekaiHelper.refreshCache()
+    }
 
     // Represent to event named 迷い子の手を引く、そのさきは
     private val eventID = 61
@@ -29,7 +38,10 @@ class TestProjectSekaiAPI {
 
     @Test
     fun testEventProfileFetch() {
-        runBlocking { client.getUserEventInfo(eventID, id) }
+        runBlocking {
+            client.getUserEventInfo(eventID, id)
+                .also { it.toMessageWrapper(eventID).apply { logger.debug { this.parseToString() } } }
+        }
     }
 
     @Test

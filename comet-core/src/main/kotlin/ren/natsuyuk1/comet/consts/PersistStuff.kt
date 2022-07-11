@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.consts
 
+import moe.sdl.yac.core.subcommands
 import ren.natsuyuk1.comet.api.command.AbstractCommandNode
 import ren.natsuyuk1.comet.api.command.CommandNode
 import ren.natsuyuk1.comet.api.config.CometConfig
@@ -7,10 +8,7 @@ import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.api.database.DatabaseConfig
 import ren.natsuyuk1.comet.api.user.UserPermissionTable
 import ren.natsuyuk1.comet.api.user.UserTable
-import ren.natsuyuk1.comet.commands.HELP
-import ren.natsuyuk1.comet.commands.HelpCommand
-import ren.natsuyuk1.comet.commands.SIGNIN
-import ren.natsuyuk1.comet.commands.SignInCommand
+import ren.natsuyuk1.comet.commands.*
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserDataTable
 
@@ -30,6 +28,30 @@ val cometTables =
 
 val defaultCommands: List<AbstractCommandNode<*>> =
     listOf(
-        CommandNode(HELP) { comet, sender, wrapper, user -> HelpCommand(comet, sender, wrapper, user) },
-        CommandNode(SIGNIN) { comet, sender, wrapper, user -> SignInCommand(comet, sender, wrapper, user) }
+        CommandNode(HELP) { comet, sender, subject, wrapper, user ->
+            HelpCommand(
+                comet,
+                sender,
+                subject,
+                wrapper,
+                user
+            )
+        },
+        CommandNode(SIGNIN) { comet, sender, subject, wrapper, user ->
+            SignInCommand(
+                comet,
+                sender,
+                subject,
+                wrapper,
+                user
+            )
+        },
+        CommandNode(PROJECTSEKAI) { comet, sender, subject, wrapper, user ->
+            ProjectSekaiCommand(comet, sender, subject, wrapper, user)
+                .subcommands(
+                    ProjectSekaiCommand.Bind(sender, subject, user),
+                    ProjectSekaiCommand.Event(sender, subject, user),
+                    ProjectSekaiCommand.Prediction(sender, subject)
+                )
+        },
     )
