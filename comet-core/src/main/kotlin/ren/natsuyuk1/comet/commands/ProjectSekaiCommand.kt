@@ -44,7 +44,6 @@ class ProjectSekaiCommand(
     }
 
     class Bind(
-        private val sender: PlatformCommandSender,
         private val subject: PlatformCommandSender,
         val user: CometUser
     ) : CliktCommand() {
@@ -74,7 +73,6 @@ class ProjectSekaiCommand(
     }
 
     class Event(
-        private val sender: PlatformCommandSender,
         private val subject: PlatformCommandSender,
         val user: CometUser
     ) : CliktCommand() {
@@ -85,7 +83,7 @@ class ProjectSekaiCommand(
         }
     }
 
-    class Prediction(private val sender: PlatformCommandSender, private val subject: PlatformCommandSender) :
+    class Prediction(private val subject: PlatformCommandSender) :
         CliktCommand("pred") {
         override suspend fun run() {
             subject.sendMessage(ProjectSekaiService.fetchPrediction())

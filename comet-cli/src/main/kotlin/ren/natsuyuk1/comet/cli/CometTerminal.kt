@@ -31,6 +31,7 @@ import ren.natsuyuk1.comet.config.version
 import ren.natsuyuk1.comet.consts.cometConfigs
 import ren.natsuyuk1.comet.consts.cometTables
 import ren.natsuyuk1.comet.consts.defaultCommands
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiHelper
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
@@ -122,6 +123,11 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         }
     }
 
+    private fun startService() = scope.launch {
+        ProjectSekaiHelper.init(coroutineContext)
+
+    }
+
     private fun autoLogin() {
         logger.info { "正在登录历史账号..." }
 
@@ -142,7 +148,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
     }
 
     companion object {
-        private val scope = ModuleScope("CometFrontendScope")
+        internal val scope = ModuleScope("CometFrontendScope")
 
         internal fun closeAll() {
             scope.dispose()

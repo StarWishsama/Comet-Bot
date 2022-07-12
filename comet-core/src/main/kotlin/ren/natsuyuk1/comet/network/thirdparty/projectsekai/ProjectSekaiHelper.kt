@@ -20,6 +20,7 @@ import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
+import kotlin.coroutines.CoroutineContext
 
 private val rankPosition = listOf(100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000)
 
@@ -90,7 +91,11 @@ private fun Int.getSurroundingRank(): Pair<Int, Int> {
 object ProjectSekaiHelper {
     lateinit var predictionCache: SekaiBestPredictionInfo
 
-    private val scope = ModuleScope("projectsekai_helper")
+    private var scope = ModuleScope("projectsekai_helper")
+
+    fun init(parentContext: CoroutineContext) {
+        scope = ModuleScope("projectsekai_helper", parentContext)
+    }
 
     fun refreshCache() {
         scope.launch {
