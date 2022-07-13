@@ -29,3 +29,10 @@ dependencies {
     api(project(":comet-mirai-wrapper"))
     api(project(":comet-telegram-wrapper"))
 }
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "ren.natsuyuk1.comet.cli.CometTerminalKt"
+        attributes["Author"] = "StarWishsama"
+    }
+}

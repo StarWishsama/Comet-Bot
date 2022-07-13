@@ -12,13 +12,13 @@ import ren.natsuyuk1.comet.commands.*
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserDataTable
 
-internal val cometConfigs: List<PersistDataFile<*>> =
+val cometConfigs: List<PersistDataFile<*>> =
     listOf(
         CometConfig,
         DatabaseConfig,
     )
 
-internal val cometTables =
+val cometTables =
     arrayOf(
         UserTable,
         UserPermissionTable,
@@ -26,7 +26,7 @@ internal val cometTables =
         ProjectSekaiUserDataTable,
     )
 
-internal val defaultCommands: List<AbstractCommandNode<*>> =
+val defaultCommands: List<AbstractCommandNode<*>> =
     listOf(
         CommandNode(HELP) { comet, sender, subject, wrapper, user ->
             HelpCommand(comet, sender, subject, wrapper, user)

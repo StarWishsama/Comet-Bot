@@ -28,7 +28,7 @@ class TestSignService {
     }
 
     @Test
-    fun testCheckInPosition() {
+    fun testSignInPosition() {
         val testCheckInTime = Clock.System.now()
 
         val testUser = CometUser.create(114514L).also {
