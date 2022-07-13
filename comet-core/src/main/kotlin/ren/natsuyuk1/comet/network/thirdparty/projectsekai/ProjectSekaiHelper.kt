@@ -11,6 +11,7 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.client
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
@@ -21,6 +22,7 @@ import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.hours
 
 private val rankPosition = listOf(100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000)
 
@@ -95,6 +97,8 @@ object ProjectSekaiHelper {
 
     fun init(parentContext: CoroutineContext) {
         scope = ModuleScope("projectsekai_helper", parentContext)
+
+        TaskManager.registerTask(1.hours, ProjectSekaiHelper::refreshCache)
     }
 
     fun refreshCache() {

@@ -22,6 +22,7 @@ import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.event.EventManager
+import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.cli.command.registerTerminalCommands
 import ren.natsuyuk1.comet.cli.console.Console
@@ -69,7 +70,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         scope.launch {
             setupShutdownHook()
 
-            logger.info { "Running Comet Terminal ${version}-${branch}-${hash}" }
+            logger.info { "正在运行 Comet Terminal ${version}-${branch}-${hash}" }
 
             CometTerminal.init(scope.coroutineContext)
 
@@ -79,13 +80,15 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
             autoLogin()
 
+            startService()
+
             setupConsole()
 
         }.join()
     }
 
     private fun setupConfig(): Job = scope.launch {
-        logger.info { "Loading config file..." }
+        logger.info { "加载配置文件..." }
         cometConfigs.map {
             launch {
                 it.init()
@@ -95,13 +98,13 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
     }
 
     private fun setupDatabase() {
-        logger.info { "Loading database..." }
+        logger.info { "加载数据库..." }
         DatabaseManager.loadDatabase()
         DatabaseManager.loadTables(*cometTables, AccountDataTable)
     }
 
     private fun setupCommands(): Job = scope.launch {
-        logger.info { "Registering commands..." }
+        logger.info { "注册命令..." }
         registerTerminalCommands()
         CommandManager.registerCommands(defaultCommands)
         EventManager.init(coroutineContext)
@@ -130,19 +133,17 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
     private fun setupShutdownHook() {
         addShutdownHook {
             closeAll()
-            println("\nExiting Comet Terminal...")
+            println("\n正在退出 Comet Terminal...")
             Console.redirectToNull()
         }
     }
 
     private fun startService() = scope.launch {
+        TaskManager.init(coroutineContext)
         ProjectSekaiHelper.init(coroutineContext)
-
     }
 
     private fun autoLogin() {
-        logger.info { "正在登录历史账号..." }
-
         transaction {
             val accounts = AccountDataTable.selectAll()
 
