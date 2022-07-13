@@ -27,6 +27,7 @@ class TestCometUser {
             UserTable.deleteWhere { UserTable.qq eq 114514L }
             CometUser.create(114514L)
             assertEquals(1, CometUser.findByQQ(114514L).count())
+            UserTable.deleteWhere { UserTable.qq eq 114514L }
         }
     }
 }

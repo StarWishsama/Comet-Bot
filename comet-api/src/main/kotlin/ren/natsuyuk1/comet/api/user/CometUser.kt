@@ -41,7 +41,7 @@ object UserTable : UUIDTable("user_data") {
     val qq = long("qq").default(0)
     val telegramID = long("telegramID").default(0)
     val checkInDate =
-        datetime("check_in_date").default(Clock.System.now().toLocalDateTime(TimeZone.UTC))
+        datetime("check_in_date").default(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
     val coin = double("coin").default(0.0)
     val checkInTime = integer("check_in_time").default(0)
     val userLevel = enumeration<UserLevel>("user_level").default(UserLevel.USER)

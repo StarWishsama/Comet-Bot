@@ -25,7 +25,7 @@ import java.security.SecureRandom
 import kotlin.time.Duration.Companion.days
 
 fun CometUser.isSigned(): Boolean {
-    val currentTime = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+    val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     return checkInDate.year != currentTime.year
         && checkInDate.month != currentTime.month
         && checkInDate.dayOfMonth != currentTime.dayOfMonth
@@ -95,7 +95,7 @@ object SignInService {
     private fun calculateCoin(user: CometUser): CheckInResult {
         // 计算签到时间
         val currentTime = Clock.System.now()
-        val lastSignInTime = user.checkInDate.toInstant(TimeZone.UTC)
+        val lastSignInTime = user.checkInDate.toInstant(TimeZone.currentSystemDefault())
         val checkDuration = currentTime - lastSignInTime
 
         if (checkDuration.inWholeDays <= 1) {
@@ -109,7 +109,7 @@ object SignInService {
         }
 
         transaction {
-            user.checkInDate = currentTime.toLocalDateTime(TimeZone.UTC)
+            user.checkInDate = currentTime.toLocalDateTime(TimeZone.currentSystemDefault())
         }
 
         // 使用随机数工具生成基础硬币
@@ -146,20 +146,30 @@ object SignInService {
         fun getAllPoint(): Double = basePoint + awardPoint + chancePoint
     }
 
-    private fun getSignInPosition(user: CometUser): Int {
+    fun getSignInPosition(user: CometUser): Int {
         val checkTime = Clock.System.now()
-        val checkLDT = checkTime.toLocalDateTime(TimeZone.UTC)
+        val checkLDT = checkTime.toLocalDateTime(TimeZone.currentSystemDefault())
 
         /**
-         * 签到刷新时间为 UTC +8 0:00
+         * 签到刷新时间为 6:00
          */
         val before = LocalDateTime(
             checkLDT.year,
-            checkLDT.monthNumber, checkTime.minus(1.days).toLocalDateTime(TimeZone.UTC).dayOfMonth, 8, 0, 0, 0
+            checkLDT.monthNumber,
+            checkTime.minus(1.days).toLocalDateTime(TimeZone.currentSystemDefault()).dayOfMonth,
+            6,
+            0,
+            0,
+            0
         )
         val after = LocalDateTime(
             checkLDT.year,
-            checkLDT.monthNumber, checkTime.plus(1.days).toLocalDateTime(TimeZone.UTC).dayOfMonth, 8, 0, 0, 0
+            checkLDT.monthNumber,
+            checkTime.plus(1.days).toLocalDateTime(TimeZone.currentSystemDefault()).dayOfMonth,
+            6,
+            0,
+            0,
+            0
         )
 
         return transaction {
