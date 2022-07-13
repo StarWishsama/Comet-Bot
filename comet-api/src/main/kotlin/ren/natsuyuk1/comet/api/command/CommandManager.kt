@@ -13,7 +13,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import moe.sdl.yac.core.CommandResult
-import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.permission.PermissionManager
 import ren.natsuyuk1.comet.api.permission.hasPermission
@@ -67,9 +66,10 @@ object CommandManager {
     /**
      * 调用命令
      *
+     * @param comet 触发命令的 [Comet] 实例
      * @param sender 发送者
-     * @param user [CometUser], 在调用后台命令时 **禁止** 调用!
-     * @param rawMsg 原始消息
+     * @param subject 发送来源, 非群聊时与 sender 一致
+     * @param wrapper 消息内容 [MessageWrapper]
      */
     suspend fun executeCommand(
         comet: Comet,
@@ -85,102 +85,75 @@ object CommandManager {
 
         val args = wrapper.parseToString().toArgs()
 
+        // 检查消息是否含命令前缀
         if (sender !is ConsoleCommandSender && !args[0].containsEtc(false, comet.config.data.commandPrefix)) {
             return@launch
         }
 
         // TODO: 模糊搜索命令系统
-        val cmd = getCommand(args[0].replaceAll(comet.config.data.commandPrefix)) ?: return@launch
+        val cmd = getCommand(args[0].replaceAll(comet.config.data.commandPrefix), sender) ?: return@launch
 
         val property = cmd.property
 
-        val result: CommandStatus = runCatching {
-            when (sender) {
-                is ConsoleCommandSender -> {
-                    if (cmd is ConsoleCommandNode) {
-                        when (val cmdStatus =
-                            cmd.handler(comet, sender, sender, wrapper, CometUser.dummyUser).main(args.drop(1))) {
-                            is CommandResult.Error -> {
-                                logger.warn(cmdStatus.cause) { "在执行命令时发生了意外, ${cmdStatus.message}" }
-                                return@runCatching CommandStatus.Error()
-                            }
-                            is CommandResult.Success -> {
-                                return@runCatching CommandStatus.Success()
-                            }
-                        }
-                    } else {
-                        return@runCatching CommandStatus.Success()
-                    }
+        runCatching {
+            var user: CometUser = CometUser.dummyUser
+
+            if (sender is PlatformCommandSender) {
+                user = CometUser.getUserOrCreate(sender.id, sender.platformName)
+                    ?: return@runCatching CommandStatus.Success()
+
+                if (!user.hasPermission(property.permission)) {
+                    return@runCatching CommandStatus.NoPermission()
                 }
-                is PlatformCommandSender -> {
-                    if (cmd is CommandNode) {
-                        val user: CometUser = transaction findUser@{
-                            val findByQQ = CometUser.findByQQ(sender.id)
-                            if (findByQQ.empty()) {
-                                val findByTelegram = CometUser.findByTelegramID(sender.id)
 
-                                if (!findByTelegram.empty()) {
-                                    return@findUser findByTelegram.first()
-                                } else {
-                                    val className = sender::class.java.name
-                                    return@findUser if (className.contains("mirai")) {
-                                        CometUser.create(sender.id)
-                                    } else if (className.contains("telegram")) {
-                                        CometUser.create(tgID = sender.id)
-                                    } else {
-                                        null
-                                    }
-                                }
-                            } else {
-                                return@findUser findByQQ.first()
-                            }
-                        } ?: return@runCatching CommandStatus.Success()
-
-                        if (!user.hasPermission(property.permission)) {
-                            return@runCatching CommandStatus.NoPermission()
+                when (property.executeConsumeType) {
+                    CommandConsumeType.COOLDOWN -> {
+                        if (user.triggerCommandTime.plus(property.executeConsumePoint.seconds) >= executeTime) {
+                            return@runCatching CommandStatus.ValidateFailed()
                         }
+                    }
 
-                        when (property.executeConsumeType) {
-                            CommandConsumeType.COOLDOWN -> {
-                                if (user.triggerCommandTime.plus(property.executeConsumePoint.seconds) >= executeTime) {
-                                    return@runCatching CommandStatus.ValidateFailed()
-                                }
-                            }
-
-                            CommandConsumeType.COIN -> {
-                                if (user.coin < property.executeConsumePoint) {
-                                    return@runCatching CommandStatus.ValidateFailed()
-                                } else {
-                                    user.coin = user.coin - property.executeConsumePoint
-                                }
-                            }
+                    CommandConsumeType.COIN -> {
+                        if (user.coin < property.executeConsumePoint) {
+                            return@runCatching CommandStatus.ValidateFailed()
+                        } else {
+                            user.coin = user.coin - property.executeConsumePoint
                         }
-
-                        when (val cmdStatus =
-                            cmd.handler(comet, sender, subject as PlatformCommandSender, wrapper, user)
-                                .main(args.drop(1))) {
-                            is CommandResult.Error -> {
-                                logger.warn(cmdStatus.cause) { "在执行命令时发生了意外, ${cmdStatus.message}" }
-                                return@runCatching CommandStatus.Error()
-                            }
-                            is CommandResult.Success -> {
-                                return@runCatching CommandStatus.Success()
-                            }
-                        }
-                    } else {
-                        return@runCatching CommandStatus.Success()
                     }
                 }
             }
 
-            return@runCatching CommandStatus.Error()
+            val cmdStatus = if (sender is PlatformCommandSender) {
+                (cmd as CommandNode).handler(comet, sender, subject as PlatformCommandSender, wrapper, user)
+                    .main(args.drop(1))
+            } else {
+                (cmd as ConsoleCommandNode).handler(
+                    comet,
+                    sender as ConsoleCommandSender,
+                    subject as ConsoleCommandSender,
+                    wrapper,
+                    user
+                )
+                    .main(args.drop(1))
+            }
+
+            when (cmdStatus) {
+                is CommandResult.Error -> {
+                    logger.warn(cmdStatus.cause) { "在执行命令时发生了意外, ${cmdStatus.message}" }
+                    return@runCatching CommandStatus.Error()
+                }
+                is CommandResult.Success -> {
+                    return@runCatching CommandStatus.Success()
+                }
+            }
+
+        }.onSuccess {
+            if (it.isPassed()) {
+                logger.debug { "命令 ${cmd.property.name} 执行状态 ${it.name}, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}" }
+            }
         }.onFailure {
             logger.warn(it) { "在尝试执行命令 ${cmd.property.name} 时出现异常" }
             CommandStatus.Error()
-        }.getOrDefault(CommandStatus.Failed())
-
-        if (result.isPassed()) {
-            logger.debug { "命令 ${cmd.property.name} 执行状态 $result, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}" }
         }
     }
 
@@ -190,8 +163,12 @@ object CommandManager {
      * @param name 主命令名或命令别称
      * @return 命令节点, 不存在时为空
      */
-    fun getCommand(name: String): AbstractCommandNode<*>? =
-        commands.filter { it.value.property.name == name || it.value.property.alias.contains(name) }.values.firstOrNull()
+    fun getCommand(name: String, sender: CommandSender): AbstractCommandNode<*>? =
+        commands.filter {
+            (sender is ConsoleCommandSender && it.value is ConsoleCommandNode)
+                || (sender is PlatformCommandSender && it.value is CommandNode)
+                && (it.value.property.name == name || it.value.property.alias.contains(name))
+        }.values.firstOrNull()
 
     /**
      * 是否存在对应名称的命令

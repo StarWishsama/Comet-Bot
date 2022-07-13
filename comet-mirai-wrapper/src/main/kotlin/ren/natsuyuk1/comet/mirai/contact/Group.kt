@@ -32,6 +32,9 @@ fun NormalMember.toGroupMember(comet: MiraiComet): GroupMember {
     val contact = this@toGroupMember
 
     return object : GroupMember() {
+        override val platformName: String
+            get() = "mirai"
+
         override val id: Long
             get() = contact.id
 
@@ -90,6 +93,8 @@ fun AnonymousMember.toGroupMember(comet: MiraiComet): GroupMember {
     val contact = this@toGroupMember
 
     return object : ren.natsuyuk1.comet.api.user.AnonymousMember() {
+        override val platformName: String
+            get() = "mirai"
 
         override val anonymousId: String = contact.anonymousId
 

@@ -28,6 +28,9 @@ fun net.mamoe.mirai.contact.Group.toCometGroup(comet: MiraiComet): Group {
         group.owner.toGroupMember(comet),
         group.members.toGroupMemberList(comet)
     ) {
+        override val platformName: String
+            get() = "mirai"
+
         override fun updateGroupName(groupName: String) {
             group.name = groupName
         }

@@ -65,6 +65,30 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
         }))
 
         /**
+         * 获取一个 [CometUser] 实例，在不存在时手动创建
+         *
+         * @return 获取或创建的 [CometUser]
+         */
+        fun getUserOrCreate(id: Long, platform: String): CometUser? = transaction {
+            val findByQQ = findByQQ(id)
+            return@transaction if (findByQQ.empty()) {
+                val findByTelegram = findByTelegramID(id)
+
+                if (!findByTelegram.empty()) {
+                    findByTelegram.first()
+                } else {
+                    when (platform) {
+                        "mirai" -> create(qid = id)
+                        "telegram" -> create(tgID = id)
+                        else -> null
+                    }
+                }
+            } else {
+                findByQQ.first()
+            }
+        }
+
+        /**
          * 通过 QQ 号搜索对应用户
          *
          * @param qq QQ 号

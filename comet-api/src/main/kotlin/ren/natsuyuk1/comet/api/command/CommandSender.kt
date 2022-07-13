@@ -49,6 +49,11 @@ abstract class PlatformCommandSender : CommandSender {
      */
     abstract var card: String
 
+    /**
+     * 平台名称
+     */
+    abstract val platformName: String
+
     abstract override fun sendMessage(message: MessageWrapper)
 }
 
