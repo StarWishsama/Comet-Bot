@@ -19,8 +19,10 @@ import org.jline.reader.UserInterruptException
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
+import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.event.EventManager
+import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.cli.command.registerTerminalCommands
 import ren.natsuyuk1.comet.cli.console.Console
 import ren.natsuyuk1.comet.cli.storage.AccountDataTable
@@ -40,6 +42,16 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
 
 private val logger = mu.KotlinLogging.logger {}
+
+private val dummyComet = object : Comet(CometConfig, logger, ModuleScope("dummy-comet")) {
+    override fun login() {}
+
+    override fun afterLogin() {}
+
+    override fun close() {}
+
+    override fun getGroup(id: Long): Group? = null
+}
 
 object CometTerminal {
     private var scope = ModuleScope("CometTerminal")
@@ -102,7 +114,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         while (isActive) {
             try {
                 CommandManager.executeCommand(
-                    CometTerminal.instance.first,
+                    dummyComet,
                     ConsoleCommandSender,
                     ConsoleCommandSender,
                     buildMessageWrapper { appendText(Console.readln()) }
