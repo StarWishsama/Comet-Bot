@@ -38,7 +38,7 @@ class ProjectSekaiCommand(
     val user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, PROJECTSEKAI) {
     override suspend fun run() {
-        if (message.parseToString().toArgs().isEmpty()) {
+        if (message.parseToString().toArgs().size == 1) {
             subject.sendMessage(PROJECTSEKAI.helpText.toMessageWrapper())
         }
     }
@@ -54,7 +54,7 @@ class ProjectSekaiCommand(
 
         override suspend fun run() {
             if (userID == -1L || userID.toString().length != 18) {
-                subject.sendMessage("请填写你的世界计划账号 ID! 例如 /pjsk bind -i 1234567890".toMessageWrapper())
+                subject.sendMessage("请正确填写你的世界计划账号 ID! 例如 /pjsk bind -i 210043933010767872".toMessageWrapper())
                 return
             }
 
