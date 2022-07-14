@@ -24,7 +24,9 @@ val PROJECTSEKAI by lazy {
         "查询 Project Sekai: Colorful Stage 相关信息",
         """
         /pjsk bind -i [账号 ID] - 绑定账号
+        
         /pjsk event (排名) 查询当前活动信息
+        
         /pjsk pred 查询当前活动结束预测分数    
         """.trimIndent()
     )

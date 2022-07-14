@@ -44,7 +44,7 @@ abstract class BaseCommand(
 ) {
     class CliktOption(
         val invokeWithoutSubCommand: Boolean = false,
-        val printHelpOnEmptyArgs: Boolean = true,
+        val printHelpOnEmptyArgs: Boolean = false,
         val allowMultipleSubcommands: Boolean = false,
         val treatUnknownOptionsAsArgs: Boolean = false,
     )
