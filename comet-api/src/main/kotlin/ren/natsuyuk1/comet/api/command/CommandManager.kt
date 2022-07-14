@@ -12,6 +12,7 @@ package ren.natsuyuk1.comet.api.command
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import moe.sdl.yac.core.CliktError
 import moe.sdl.yac.core.CommandResult
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.permission.PermissionManager
@@ -19,6 +20,7 @@ import ren.natsuyuk1.comet.api.permission.hasPermission
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.containsEtc
 import ren.natsuyuk1.comet.utils.string.StringUtil.getLastingTimeAsString
 import ren.natsuyuk1.comet.utils.string.StringUtil.replaceAll
@@ -139,7 +141,10 @@ object CommandManager {
 
             when (cmdStatus) {
                 is CommandResult.Error -> {
-                    logger.warn(cmdStatus.cause) { "在执行命令时发生了意外, ${cmdStatus.message}" }
+                    subject.sendMessage(buildMessageWrapper { cmdStatus.userMessage?.let { appendText(it) } })
+
+                    if (cmdStatus.cause !is CliktError)
+                        logger.warn(cmdStatus.cause) { "在执行命令时发生了意外" }
                     return@runCatching CommandStatus.Error()
                 }
                 is CommandResult.Success -> {
@@ -153,7 +158,6 @@ object CommandManager {
             }
         }.onFailure {
             logger.warn(it) { "在尝试执行命令 ${cmd.property.name} 时出现异常" }
-            CommandStatus.Error()
         }
     }
 

@@ -38,7 +38,11 @@ class HelpCommand(
     message: MessageWrapper,
     user: CometUser
 ) :
-    CometCommand(comet, sender, subject, message, user, HELP) {
+    CometCommand(
+        comet, sender, subject, message, user, HELP, CliktOption(
+            printHelpOnEmptyArgs = false
+        )
+    ) {
 
     private val pageNum by argument(
         name = "帮助菜单的页数"

@@ -3,7 +3,7 @@ package ren.natsuyuk1.comet.commands.service
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.user.CometUser
-import ren.natsuyuk1.comet.consts.client
+import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserEventInfo
@@ -28,6 +28,7 @@ object ProjectSekaiService {
         }
 
         ProjectSekaiHelper.refreshCache()
+        runBlocking { ProjectSekaiData.updateData() }
     }
 
     fun bindAccount(user: CometUser, userID: Long): MessageWrapper {
@@ -45,14 +46,14 @@ object ProjectSekaiService {
             ?: return "你还没有绑定过世界计划账号, 使用 /pjsk bind -i [你的ID] 绑定".toMessageWrapper()
 
         return if (position == 0) {
-            val currentInfo = client.getUserEventInfo(currentEventId, userId)
+            val currentInfo = cometClient.getUserEventInfo(currentEventId, userId)
             currentInfo.toMessageWrapper(currentEventId)
         } else {
-            client.getSpecificRankInfo(currentEventId, position).toMessageWrapper(currentEventId)
+            cometClient.getSpecificRankInfo(currentEventId, position).toMessageWrapper(currentEventId)
         }
     }
 
     suspend fun fetchPrediction(): MessageWrapper {
-        return client.getRankPredictionInfo().toMessageWrapper()
+        return cometClient.getRankPredictionInfo().toMessageWrapper()
     }
 }

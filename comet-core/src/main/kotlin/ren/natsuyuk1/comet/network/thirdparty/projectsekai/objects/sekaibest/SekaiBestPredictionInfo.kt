@@ -14,6 +14,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
+import ren.natsuyuk1.comet.utils.string.StringUtil.isNumeric
 
 @kotlinx.serialization.Serializable
 data class SekaiBestPredictionInfo(
@@ -26,9 +27,9 @@ fun SekaiBestPredictionInfo.toMessageWrapper(): MessageWrapper =
     buildMessageWrapper {
         val eventInfo = ProjectSekaiData.getCurrentEventInfo()
 
-        appendText("${eventInfo?.name} 活动分数最终档位预测")
+        appendText("活动 ${eventInfo?.name} PT预测\n")
 
         data.forEach { k, v ->
-            if (k != "ts") appendText("$k => ${v.jsonPrimitive.content}")
+            if (k.isNumeric()) appendText("$k => ${v.jsonPrimitive.content}\n")
         }
     }

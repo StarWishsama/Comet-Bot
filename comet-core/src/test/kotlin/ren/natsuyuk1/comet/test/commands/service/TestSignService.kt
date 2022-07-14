@@ -5,6 +5,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -16,8 +17,6 @@ import ren.natsuyuk1.comet.commands.service.SignInService
 import ren.natsuyuk1.comet.test.initTestDatabase
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.minutes
-
-private val logger = mu.KotlinLogging.logger {}
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TestSignService {
@@ -36,24 +35,27 @@ class TestSignService {
                 it.checkInDate = testCheckInTime.plus(1.minutes).toLocalDateTime(TimeZone.currentSystemDefault())
             }
         }
-        val testUser2 = CometUser.create(114515L).also {
+        CometUser.create(114515L).also {
             transaction {
                 it.checkInDate = testCheckInTime.toLocalDateTime(TimeZone.currentSystemDefault())
             }
         }
-        val testUser3 = CometUser.create(114516L).also {
+        CometUser.create(114516L).also {
             transaction {
                 it.checkInDate = testCheckInTime.plus(2.minutes).toLocalDateTime(TimeZone.currentSystemDefault())
             }
         }
 
         assertEquals(1, SignInService.getSignInPosition(testUser))
+    }
 
+    @AfterAll
+    fun cleanup() {
         transaction {
             UserTable.deleteWhere {
-                UserTable.id eq testUser.id
-                UserTable.id eq testUser2.id
-                UserTable.id eq testUser3.id
+                UserTable.qq eq 114514L
+                UserTable.qq eq 114515L
+                UserTable.qq eq 114516L
             }
         }
     }

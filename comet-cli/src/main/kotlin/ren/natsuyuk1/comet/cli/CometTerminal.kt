@@ -103,7 +103,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         DatabaseManager.loadTables(*cometTables, AccountDataTable)
     }
 
-    private fun setupCommands(): Job = scope.launch {
+    private fun setupCommands() = scope.launch {
         logger.info { "注册命令..." }
         registerTerminalCommands()
         CommandManager.registerCommands(defaultCommands)

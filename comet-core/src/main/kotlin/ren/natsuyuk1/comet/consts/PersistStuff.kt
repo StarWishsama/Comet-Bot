@@ -37,9 +37,9 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         CommandNode(PROJECTSEKAI) { comet, sender, subject, wrapper, user ->
             ProjectSekaiCommand(comet, sender, subject, wrapper, user)
                 .subcommands(
-                    ProjectSekaiCommand.Bind(sender, user),
-                    ProjectSekaiCommand.Event(sender, user),
-                    ProjectSekaiCommand.Prediction(sender)
+                    ProjectSekaiCommand.Bind(subject, user),
+                    ProjectSekaiCommand.Event(subject, user),
+                    ProjectSekaiCommand.Prediction(subject)
                 )
         },
     )

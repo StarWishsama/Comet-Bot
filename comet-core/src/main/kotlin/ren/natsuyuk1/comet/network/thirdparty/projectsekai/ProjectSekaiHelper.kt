@@ -12,7 +12,7 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import ren.natsuyuk1.comet.api.task.TaskManager
-import ren.natsuyuk1.comet.consts.client
+import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiProfile
@@ -37,7 +37,7 @@ fun ProjectSekaiProfile.toMessageWrapper(eventId: Int): MessageWrapper {
         appendLine()
 
         if (ahead != 0) {
-            val aheadEventStatus = runBlocking { client.getSpecificRankInfo(eventId, ahead) }
+            val aheadEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, ahead) }
             val aheadScore = aheadEventStatus.getScore()
 
             appendText(
@@ -47,7 +47,7 @@ fun ProjectSekaiProfile.toMessageWrapper(eventId: Int): MessageWrapper {
         }
 
         if (behind in 100..1000001) {
-            val behindEventStatus = runBlocking { client.getSpecificRankInfo(eventId, behind) }
+            val behindEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, behind) }
             val behindScore = behindEventStatus.getScore()
 
             appendText(
@@ -103,7 +103,7 @@ object ProjectSekaiHelper {
 
     fun refreshCache() {
         scope.launch {
-            predictionCache = client.getRankPredictionInfo()
+            predictionCache = cometClient.getRankPredictionInfo()
         }
     }
 }

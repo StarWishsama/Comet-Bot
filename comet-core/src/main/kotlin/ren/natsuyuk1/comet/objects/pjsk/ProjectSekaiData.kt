@@ -19,7 +19,7 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.user.UserTable
-import ren.natsuyuk1.comet.consts.client
+import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getCurrentEventInfo
 import java.util.*
 
@@ -34,7 +34,7 @@ object ProjectSekaiDataTable : IdTable<Int>("pjsk_data") {
 class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
     companion object : EntityClass<Int, ProjectSekaiData>(ProjectSekaiDataTable) {
         suspend fun initData() {
-            val currentEvent = client.getCurrentEventInfo()
+            val currentEvent = cometClient.getCurrentEventInfo()
 
             transaction {
                 new(0) {
@@ -48,7 +48,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
 
         suspend fun updateData() {
             val timestamp = Clock.System.now().epochSeconds
-            val currentEvent = client.getCurrentEventInfo()
+            val currentEvent = cometClient.getCurrentEventInfo()
 
             transaction {
                 val data = ProjectSekaiData.all()

@@ -1,7 +1,7 @@
 package ren.natsuyuk1.comet.service
 
 import io.ktor.client.request.*
-import ren.natsuyuk1.comet.consts.client
+import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.objects.hitokito.Hitokoto
 import java.io.IOException
 
@@ -12,7 +12,7 @@ object HitokotoUpdater {
 
     suspend fun fetch() {
         try {
-            hitokoto = client.client.get<Hitokoto>("https://v1.hitokoto.cn/")
+            hitokoto = cometClient.client.get<Hitokoto>("https://v1.hitokoto.cn/")
             logger.info { "已获取到今日一言" }
         } catch (e: IOException) {
             logger.warn(e) { "在获取一言时发生了问题" }
@@ -24,7 +24,7 @@ object HitokotoUpdater {
             return if (useCache) {
                 hitokoto.toString()
             } else {
-                client.client.get<Hitokoto>("https://v1.hitokoto.cn/").toString()
+                cometClient.client.get<Hitokoto>("https://v1.hitokoto.cn/").toString()
             }
         } catch (e: IOException) {
             logger.warn(e) { "获取一言时发生错误" }

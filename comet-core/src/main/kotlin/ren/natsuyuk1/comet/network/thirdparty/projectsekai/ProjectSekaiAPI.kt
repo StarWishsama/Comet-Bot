@@ -59,7 +59,8 @@ object ProjectSekaiAPI {
             }
         }.execute().receive<InputStream>()
 
-        return resp.bufferedReader().use { json.decodeFromString(it.readText()) }
+        return resp.bufferedReader()
+            .use { json.decodeFromString(it.readText().also { logger.debug { "Raw content: $it" } }) }
     }
 
     suspend fun CometClient.getEventList(limit: Int = 12, startAt: Int = -1, skip: Int = 0): ProjectSekaiEventList {
@@ -77,18 +78,14 @@ object ProjectSekaiAPI {
     }
 
     suspend fun CometClient.getCurrentEventInfo(): SekaiBestEventInfo {
-        logger.debug { "Fetching project sekai current event" }
+        logger.debug { "Fetching project sekai current event info" }
 
         return client.get("https://strapi.sekai.best/sekai-current-event")
     }
 
-    suspend fun CometClient.getRankPredictionInfo(region: String = "jp"): SekaiBestPredictionInfo {
+    suspend fun CometClient.getRankPredictionInfo(): SekaiBestPredictionInfo {
         logger.debug { "Fetching project sekai rank prediction info" }
 
-        return client.get("https://api.sekai.best/event/pred") {
-            url {
-                parameters.append("region", region)
-            }
-        }
+        return client.get("https://33.dsml.hk/pred")
     }
 }

@@ -41,4 +41,4 @@ val defaultClient = HttpClient(CIO) {
     }
 }
 
-val client: CometClient = CometClient()
+val cometClient: CometClient = CometClient()

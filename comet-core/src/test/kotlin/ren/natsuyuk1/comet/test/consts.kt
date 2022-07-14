@@ -38,3 +38,5 @@ fun generateFakeSender(id: Long): PlatformCommandSender = object : PlatformComma
         logger.info { "Message sent to user ${id}: ${message.parseToString()}" }
     }
 }
+
+fun Any.print() = println(this)

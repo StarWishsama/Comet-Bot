@@ -8,11 +8,11 @@ import ren.natsuyuk1.comet.mirai.util.toMessageWrapper
 
 fun GroupMessageEvent.toCometEvent(comet: MiraiComet): ren.natsuyuk1.comet.api.event.impl.message.GroupMessageEvent {
     return ren.natsuyuk1.comet.api.event.impl.message.GroupMessageEvent(
-        comet,
-        this.subject.toCometGroup(comet),
-        this.sender.toGroupMember(comet),
-        this.senderName,
-        this.message.toMessageWrapper(false),
-        this.time
+        comet = comet,
+        subject = this.subject.toCometGroup(comet),
+        sender = this.sender.toGroupMember(comet),
+        senderName = this.senderName,
+        message = this.message.toMessageWrapper(false),
+        time = this.time
     )
 }

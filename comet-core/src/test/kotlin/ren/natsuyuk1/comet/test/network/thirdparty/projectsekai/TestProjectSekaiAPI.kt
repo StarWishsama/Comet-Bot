@@ -13,13 +13,20 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getEventList
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiHelper
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.toMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
+import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
+import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
+import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserDataTable
+import ren.natsuyuk1.comet.test.initTestDatabase
 import ren.natsuyuk1.comet.test.network.client
+import ren.natsuyuk1.comet.test.print
 
 private val logger = mu.KotlinLogging.logger {}
 
@@ -27,6 +34,9 @@ private val logger = mu.KotlinLogging.logger {}
 class TestProjectSekaiAPI {
     @BeforeAll
     fun init() {
+        initTestDatabase()
+        DatabaseManager.loadTables(ProjectSekaiDataTable, ProjectSekaiUserDataTable)
+        runBlocking { ProjectSekaiData.updateData() }
         ProjectSekaiHelper.refreshCache()
     }
 
@@ -56,6 +66,6 @@ class TestProjectSekaiAPI {
 
     @Test
     fun testRankPredictionFetch() {
-        runBlocking { client.getRankPredictionInfo() }
+        runBlocking { client.getRankPredictionInfo().toMessageWrapper().print() }
     }
 }

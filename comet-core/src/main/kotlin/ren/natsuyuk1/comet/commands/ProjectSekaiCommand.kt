@@ -38,7 +38,7 @@ class ProjectSekaiCommand(
     val user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, PROJECTSEKAI) {
     override suspend fun run() {
-        if (message.parseToString().toArgs().size == 1) {
+        if (message.parseToString().toArgs().isEmpty()) {
             subject.sendMessage(PROJECTSEKAI.helpText.toMessageWrapper())
         }
     }
@@ -84,7 +84,7 @@ class ProjectSekaiCommand(
     }
 
     class Prediction(private val subject: PlatformCommandSender) :
-        CliktCommand("pred") {
+        CliktCommand(name = "pred") {
         override suspend fun run() {
             subject.sendMessage(ProjectSekaiService.fetchPrediction())
         }

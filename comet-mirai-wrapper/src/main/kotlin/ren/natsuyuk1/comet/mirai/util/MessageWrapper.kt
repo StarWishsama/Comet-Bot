@@ -20,7 +20,7 @@ import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.MiraiExperimentalApi
-import ren.natsuyuk1.comet.consts.client
+import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.utils.file.messageWrapperDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
@@ -43,7 +43,7 @@ suspend fun WrapperElement.toMessageContent(subject: Contact?): MessageContent {
 
             try {
                 if (url.isNotEmpty()) {
-                    client.client.get<HttpStatement>(url).execute().receive<InputStream>().use {
+                    cometClient.client.get<HttpStatement>(url).execute().receive<InputStream>().use {
                         it.uploadAsImage(subject)
                     }
                 } else if (filePath.isNotEmpty()) {
@@ -117,7 +117,7 @@ fun MessageChain.toMessageWrapper(localImage: Boolean = false): MessageWrapper {
                 runBlocking {
                     if (localImage) {
                         messageWrapperDirectory.touch()
-                        val location = client.client.downloadFile(
+                        val location = cometClient.client.downloadFile(
                             message.queryUrl(),
                             File(messageWrapperDirectory, message.imageId)
                         )
