@@ -96,6 +96,6 @@ open class MessageWrapper {
         return messageContent.isEmpty()
     }
 
-    inline fun <reified T : WrapperElement> find(): T =
-        getMessageContent().find { it::class == T::class } as T? ?: error("Not found")
+    inline fun <reified T : WrapperElement> find(): T? =
+        getMessageContent().find { it::class == T::class } as T?
 }

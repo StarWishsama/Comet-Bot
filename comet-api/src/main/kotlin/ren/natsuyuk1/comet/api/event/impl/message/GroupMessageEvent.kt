@@ -13,6 +13,7 @@ class GroupMessageEvent(
     override val sender: Contact,
     override val senderName: String,
     override val message: MessageWrapper,
-    override val time: Int
+    override val time: Long,
+    override val messageID: Long
 ) : MessageEvent() {
 }

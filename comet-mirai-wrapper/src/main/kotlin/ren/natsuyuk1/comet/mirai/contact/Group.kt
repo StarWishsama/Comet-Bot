@@ -22,21 +22,16 @@ fun Member.toGroupMember(comet: MiraiComet): GroupMember {
     }
 }
 
+abstract class MiraiGroupMember : GroupMember() {
+    override val platformName: String = "mirai"
+}
+
 fun NormalMember.toGroupMember(comet: MiraiComet): GroupMember {
     val contact = this@toGroupMember
 
-    class MiraiGroupMemberImpl : GroupMember() {
-        override val platformName: String
-            get() = "mirai"
-
+    class MiraiGroupMemberImpl : MiraiGroupMember() {
         override val id: Long
             get() = contact.id
-
-        override var nameCard: String
-            get() = contact.nameCard
-            set(value) {
-                contact.nameCard = value
-            }
 
         override val joinTimestamp: Int
             get() = contact.joinTimestamp
@@ -104,12 +99,6 @@ fun AnonymousMember.toGroupMember(comet: MiraiComet): GroupMember {
 
         override val id: Long
             get() = contact.id
-
-        override var nameCard: String
-            get() = contact.nameCard
-            set(_) {
-                error("Unsupported operation: Anomymous member cannot modify namecard")
-            }
 
         /**
          * 匿名成员无此变量, 默认返回 -1

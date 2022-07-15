@@ -60,7 +60,11 @@ data class Image(
  * @param target At 目标
  */
 @Serializable
-data class AtElement(val target: Long) : WrapperElement {
+data class AtElement(
+    val target: Long,
+    // For Telegram
+    val userName: String = ""
+) : WrapperElement {
     override fun asString(): String = "@${target}"
 
 }

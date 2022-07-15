@@ -16,7 +16,9 @@ sealed interface IMessageEvent {
 
     val message: MessageWrapper
 
-    val time: Int
+    val time: Long
+
+    val messageID: Long
 }
 
 abstract class MessageEvent : AbstractEvent(), IMessageEvent

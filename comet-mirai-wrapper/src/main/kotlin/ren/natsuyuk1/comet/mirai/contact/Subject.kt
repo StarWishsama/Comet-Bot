@@ -13,18 +13,24 @@ import ren.natsuyuk1.comet.mirai.MiraiComet
 import ren.natsuyuk1.comet.mirai.util.toMessageChain
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
+abstract class MiraiGroup(
+    override val id: Long,
+    override var name: String,
+    override val owner: GroupMember,
+    override val members: List<GroupMember>
+) : Group(id, name, owner, members) {
+    override val platformName: String = "mirai"
+}
+
 fun net.mamoe.mirai.contact.Group.toCometGroup(comet: MiraiComet): Group {
     val group = this@toCometGroup
 
-    class MiraiGroupImpl : Group(
+    class MiraiGroupImpl : MiraiGroup(
         group.id,
         group.name,
         group.owner.toGroupMember(comet),
         group.members.toGroupMemberList(comet)
     ) {
-        override val platformName: String
-            get() = "mirai"
-
         override fun updateGroupName(groupName: String) {
             group.name = groupName
         }

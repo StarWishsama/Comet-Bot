@@ -47,8 +47,6 @@ abstract class User : Contact() {
 abstract class GroupMember : User() {
     abstract override val id: Long
 
-    abstract var nameCard: String
-
     abstract val joinTimestamp: Int
 
     abstract val lastActiveTimestamp: Int
@@ -118,9 +116,9 @@ abstract class Group(
      */
     override var name: String,
 
-    val owner: GroupMember,
+    open val owner: GroupMember,
 
-    val members: List<GroupMember>
+    open val members: List<GroupMember>
 ) : Contact() {
     abstract fun updateGroupName(groupName: String)
 

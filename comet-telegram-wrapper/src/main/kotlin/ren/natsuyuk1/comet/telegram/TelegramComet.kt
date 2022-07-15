@@ -4,11 +4,14 @@ import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.text
+import kotlinx.coroutines.launch
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachCommandManager
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.telegram.config.TelegramConfig
+import ren.natsuyuk1.comet.telegram.event.toCometEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 
 private val logger = mu.KotlinLogging.logger("Comet-Telegram")
@@ -28,7 +31,7 @@ class TelegramComet(
             token = telegramConfig.token
             dispatch {
                 text {
-                    //scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
+                    scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
                 }
             }
         }
