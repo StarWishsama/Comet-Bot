@@ -38,7 +38,7 @@ Demo/交流群：725656262
 
 本项目使用 [MIT](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE) 协议
 
-comet-mirai-wrapper 使用 [AGPL v3]()
+comet-mirai-wrapper 使用 [AGPL v3](https://github.com/StarWishsama/Comet-Bot/blob/dev/comet-mirai-wrapper/LICENSE) 协议, 在使用此子项目代码时必须遵守.
 
 ------
 
@@ -70,14 +70,9 @@ comet-mirai-wrapper 使用 [AGPL v3]()
 为开源项目提供免费的 [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=comet-bot) 等 IDE 的授权  
 [<img src=".github/jetbrains.png" width="200"/>](https://www.jetbrains.com/?from=comet-bot)
 
-> [Sorapointa](https://github.com/Sorapointa/Sorapointa) 提供的高质量基础架构设计
-
-> [sekai.best](https://sekai.best) 查询 Project Sekai 游戏信息及活动积分预测
-
-> [Project Sekai Profile](https://profile.pjsekai.moe) 提供 Project Sekai 游戏信息
-
-> [PRTS Wiki](http://prts.wiki/) 提供的明日方舟干员数据以及立绘
-
-> [ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData) 提供明日方舟游戏数据资源
-
-> [Yabapi](https://github.com/SDLMoe/Yabapi) 提供可靠的哔哩哔哩 API 库
+- [Sorapointa](https://github.com/Sorapointa/Sorapointa) 提供的高质量基础架构设计
+- [sekai.best](https://sekai.best) 查询 Project Sekai 游戏信息及活动积分预测
+- [Project Sekai Profile](https://profile.pjsekai.moe) 提供 Project Sekai 游戏信息
+- [PRTS Wiki](http://prts.wiki/) 提供的明日方舟干员数据以及立绘
+- [ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData) 提供明日方舟游戏数据资源
+- [Yabapi](https://github.com/SDLMoe/Yabapi) 提供可靠的哔哩哔哩 API 库
