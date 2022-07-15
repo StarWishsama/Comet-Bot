@@ -38,6 +38,8 @@ Demo/交流群：725656262
 
 本项目使用 [MIT](https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE) 协议
 
+comet-mirai-wrapper 使用 [AGPL v3]()
+
 ------
 
     Copyright (c) StarWishsama
