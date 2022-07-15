@@ -13,6 +13,7 @@ fun GroupMessageEvent.toCometEvent(comet: MiraiComet): ren.natsuyuk1.comet.api.e
         sender = this.sender.toGroupMember(comet),
         senderName = this.senderName,
         message = this.message.toMessageWrapper(false),
-        time = this.time
+        time = this.time.toLong(),
+        messageID = source.ids.first().toLong()
     )
 }
