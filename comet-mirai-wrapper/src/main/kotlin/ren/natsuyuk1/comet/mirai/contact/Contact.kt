@@ -10,8 +10,11 @@
 package ren.natsuyuk1.comet.mirai.contact
 
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import net.mamoe.mirai.contact.getMember
 import ren.natsuyuk1.comet.api.Comet
+import ren.natsuyuk1.comet.api.event.broadcast
+import ren.natsuyuk1.comet.api.event.impl.comet.MessageSendEvent
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
@@ -22,7 +25,7 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
 fun net.mamoe.mirai.contact.Group.toCometGroup(comet: MiraiComet): Group {
     val group = this@toCometGroup
 
-    return object : Group(
+    class MiraiGroupImpl : Group(
         group.id,
         group.name,
         group.owner.toGroupMember(comet),
@@ -56,8 +59,18 @@ fun net.mamoe.mirai.contact.Group.toCometGroup(comet: MiraiComet): Group {
 
         override fun sendMessage(message: MessageWrapper) {
             comet.scope.launch {
-                group.sendMessage(message.toMessageChain(group))
+                val event = MessageSendEvent(
+                    comet,
+                    this@MiraiGroupImpl,
+                    message,
+                    Clock.System.now().epochSeconds
+                ).also { it.broadcast() }
+
+                if (!event.isCancelled)
+                    group.sendMessage(message.toMessageChain(group))
             }
         }
     }
+
+    return MiraiGroupImpl()
 }

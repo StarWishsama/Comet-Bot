@@ -23,6 +23,7 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.utils.file.messageWrapperDirectory
 import ren.natsuyuk1.comet.utils.file.touch
+import ren.natsuyuk1.comet.utils.file.writeToFile
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.message.*
 import ren.natsuyuk1.comet.utils.message.Image
@@ -133,8 +134,19 @@ fun MessageChain.toMessageWrapper(localImage: Boolean = false): MessageWrapper {
             is ServiceMessage -> {
                 wrapper.appendElement(XmlElement(message.content))
             }
-            is Audio -> {
-                TODO("Not implemented")
+            is OnlineAudio -> {
+                runBlocking {
+                    val fileName = message.filename
+                    val downloadedAudio =
+                        cometClient.client.get<HttpStatement>(message.urlForDownload).execute().receive<InputStream>()
+
+                    downloadedAudio.use {
+                        val location = File(messageWrapperDirectory, fileName)
+                        location.touch()
+
+                        writeToFile(it, location)
+                    }
+                }
             }
             else -> {
                 continue

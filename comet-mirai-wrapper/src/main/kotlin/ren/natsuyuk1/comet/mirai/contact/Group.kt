@@ -10,11 +10,14 @@
 package ren.natsuyuk1.comet.mirai.contact
 
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import net.mamoe.mirai.contact.AnonymousMember
 import net.mamoe.mirai.contact.ContactList
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.NormalMember
 import ren.natsuyuk1.comet.api.Comet
+import ren.natsuyuk1.comet.api.event.broadcast
+import ren.natsuyuk1.comet.api.event.impl.comet.MessageSendEvent
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.mirai.MiraiComet
 import ren.natsuyuk1.comet.mirai.util.toMessageChain
@@ -31,7 +34,7 @@ fun Member.toGroupMember(comet: MiraiComet): GroupMember {
 fun NormalMember.toGroupMember(comet: MiraiComet): GroupMember {
     val contact = this@toGroupMember
 
-    return object : GroupMember() {
+    class MiraiGroupMemberImpl : GroupMember() {
         override val platformName: String
             get() = "mirai"
 
@@ -69,7 +72,15 @@ fun NormalMember.toGroupMember(comet: MiraiComet): GroupMember {
 
         override fun sendMessage(message: MessageWrapper) {
             comet.scope.launch {
-                contact.sendMessage(message.toMessageChain(contact))
+                val event = MessageSendEvent(
+                    comet,
+                    this@MiraiGroupMemberImpl,
+                    message,
+                    Clock.System.now().epochSeconds
+                ).also { it.broadcast() }
+
+                if (!event.isCancelled)
+                    contact.sendMessage(message.toMessageChain(contact))
             }
         }
 
@@ -87,6 +98,8 @@ fun NormalMember.toGroupMember(comet: MiraiComet): GroupMember {
                 contact.nameCard = value
             }
     }
+
+    return MiraiGroupMemberImpl()
 }
 
 fun AnonymousMember.toGroupMember(comet: MiraiComet): GroupMember {
