@@ -98,6 +98,7 @@ object ProjectSekaiHelper {
     fun init(parentContext: CoroutineContext) {
         scope = ModuleScope("projectsekai_helper", parentContext)
 
+        refreshCache()
         TaskManager.registerTask(1.hours, ProjectSekaiHelper::refreshCache)
     }
 
