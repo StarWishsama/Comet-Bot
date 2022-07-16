@@ -213,8 +213,6 @@ inline fun <reified T : Event> registerListener(
     noinline listener: suspend (T) -> Unit
 ) {
     EventManager.registerEventListener(priority) {
-        logger.warn { "${it::class.simpleName} is same as ${T::class.simpleName}: ${it is T}" }
-
         if (it is T) {
             listener(it)
         }
