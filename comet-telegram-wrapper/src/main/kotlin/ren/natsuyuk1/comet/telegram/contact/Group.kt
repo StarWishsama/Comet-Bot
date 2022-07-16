@@ -1,6 +1,6 @@
 package ren.natsuyuk1.comet.telegram.contact
 
-import com.github.kotlintelegrambot.dispatcher.handlers.TextHandlerEnvironment
+import com.github.kotlintelegrambot.entities.Chat
 import com.github.kotlintelegrambot.entities.ChatMember
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.user.Group
@@ -21,12 +21,12 @@ abstract class TelegramGroup(
         get() = "telegram"
 }
 
-fun TextHandlerEnvironment.toCometGroup(comet: TelegramComet): Group {
-    if (message.chat.type != "group" && message.chat.type != "supergroup") {
+fun Chat.toCometGroup(comet: TelegramComet): Group {
+    if (type != "group" && type != "supergroup") {
         error("Cannot cast a non-group chat to Comet Group")
     }
 
-    val chat = message.chat
+    val chat = this
 
     class TelegramGroupImpl : TelegramGroup(
         chat.id,
@@ -121,7 +121,7 @@ fun TextHandlerEnvironment.toCometGroup(comet: TelegramComet): Group {
             }
 
         override fun sendMessage(message: MessageWrapper) {
-            message.send(comet, this@toCometGroup.message.chat.id.chatID())
+            message.send(comet, chat.id.chatID())
         }
     }
 

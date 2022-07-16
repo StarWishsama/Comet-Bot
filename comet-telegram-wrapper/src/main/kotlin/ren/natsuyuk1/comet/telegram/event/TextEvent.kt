@@ -18,7 +18,7 @@ suspend fun TextHandlerEnvironment.toCometEvent(comet: TelegramComet): MessageEv
 suspend fun TextHandlerEnvironment.toCometGroupEvent(comet: TelegramComet): GroupMessageEvent {
     return GroupMessageEvent(
         comet = comet,
-        subject = this.toCometGroup(comet),
+        subject = this.message.chat.toCometGroup(comet),
         sender = this.message.from!!.toCometGroupMember(comet, this.message.chat.id),
         senderName = this.message.from?.firstName + this.message.from?.lastName,
         message = this.message.toMessageWrapper(comet),

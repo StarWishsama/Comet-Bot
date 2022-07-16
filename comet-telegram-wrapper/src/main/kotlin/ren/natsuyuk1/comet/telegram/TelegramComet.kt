@@ -11,7 +11,9 @@ import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.telegram.config.TelegramConfig
+import ren.natsuyuk1.comet.telegram.contact.toCometGroup
 import ren.natsuyuk1.comet.telegram.event.toCometEvent
+import ren.natsuyuk1.comet.telegram.util.chatID
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 
 private val logger = mu.KotlinLogging.logger("Comet-Telegram")
@@ -49,5 +51,11 @@ class TelegramComet(
     /**
      * Telegram Bot 并不能获取到某个群
      */
-    override fun getGroup(id: Long): Group? = null
+    override fun getGroup(id: Long): Group? {
+        val resp = bot.getChat(id.chatID())
+
+        if (resp.isError) return null
+
+        return resp.getOrNull()?.toCometGroup(this)
+    }
 }
