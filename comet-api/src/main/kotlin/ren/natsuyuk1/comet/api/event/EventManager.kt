@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-private val logger = mu.KotlinLogging.logger {}
+val logger = mu.KotlinLogging.logger {}
 
 /**
  * Must call `init()` before any registration and `broadcastEvent(event)`
@@ -213,6 +213,8 @@ inline fun <reified T : Event> registerListener(
     noinline listener: suspend (T) -> Unit
 ) {
     EventManager.registerEventListener(priority) {
+        logger.warn { "${it::class.simpleName} is same as ${T::class.simpleName}: ${it is T}" }
+
         if (it is T) {
             listener(it)
         }

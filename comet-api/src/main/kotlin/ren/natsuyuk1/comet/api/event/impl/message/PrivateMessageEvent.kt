@@ -6,8 +6,8 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 class PrivateMessageEvent(
     override val comet: Comet,
-    override val subject: Contact,
     override val sender: Contact,
+    override val subject: Contact = sender,
     override val senderName: String,
     override val message: MessageWrapper,
     override val time: Long,

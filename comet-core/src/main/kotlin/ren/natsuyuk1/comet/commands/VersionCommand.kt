@@ -29,7 +29,7 @@ class VersionCommand(
 ) : CometCommand(comet, sender, subject, message, user, VERSION) {
 
     override suspend fun run() {
-        sender.sendMessage(
+        subject.sendMessage(
             buildMessageWrapper {
                 appendText("☄ Comet Bot - $version", true)
                 appendText("已运行了 ${timer.measureDuration().toFriendly()}", true)

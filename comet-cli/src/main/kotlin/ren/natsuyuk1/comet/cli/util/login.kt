@@ -15,15 +15,15 @@ import ren.natsuyuk1.comet.telegram.config.findTelegramConfigByID
 
 private val logger = KotlinLogging.logger {}
 
-internal suspend fun login(id: String, password: String, platform: LoginPlatform) {
+internal suspend fun login(id: Long, password: String, platform: LoginPlatform) {
     logger.info { "正在尝试登录账号 $id 于 ${platform.name} 平台" }
 
     when (platform) {
         LoginPlatform.QQ -> {
-            var instanceConfig = findMiraiConfigByID(id.toLong())
+            var instanceConfig = findMiraiConfigByID(id)
 
             if (instanceConfig == null) {
-                instanceConfig = MiraiConfig(id.toLong(), password).also { it.init() }
+                instanceConfig = MiraiConfig(id, password).also { it.init() }
                 AccountData.registerAccount(id, password, platform)
             }
 
@@ -35,10 +35,10 @@ internal suspend fun login(id: String, password: String, platform: LoginPlatform
             miraiComet.afterLogin()
         }
         LoginPlatform.TELEGRAM -> {
-            var instanceConfig = findTelegramConfigByID(id)
+            var instanceConfig = findTelegramConfigByID(password)
 
             if (instanceConfig == null) {
-                instanceConfig = TelegramConfig(id).also { it.init() }
+                instanceConfig = TelegramConfig(password).also { it.init() }
                 AccountData.registerAccount(id, "", platform)
             }
 
