@@ -3,7 +3,9 @@ package ren.natsuyuk1.comet.telegram
 import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
-import com.github.kotlintelegrambot.dispatcher.text
+import com.github.kotlintelegrambot.dispatcher.contact
+import com.github.kotlintelegrambot.dispatcher.message
+import com.github.kotlintelegrambot.extensions.filters.Filter
 import kotlinx.coroutines.launch
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachCommandManager
@@ -25,15 +27,24 @@ class TelegramComet(
     config: CometConfig,
 
     val telegramConfig: TelegramConfig
-) : Comet(config, logger, ModuleScope("telegram ${telegramConfig.token.take(6)}")) {
+) : Comet(config, logger, ModuleScope("telegram ${telegramConfig.token.split(":").firstOrNull() ?: "Unknown"}")) {
     lateinit var bot: Bot
 
     override fun login() {
         bot = bot {
             token = telegramConfig.token
             dispatch {
-                text {
+                message(Filter.Text) {
                     scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
+                }
+
+                // When bot no access to message
+                message(Filter.Command) {
+                    scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
+                }
+
+                contact {
+                    //scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
                 }
             }
         }
@@ -41,6 +52,9 @@ class TelegramComet(
 
     override fun afterLogin() {
         bot.startPolling()
+
+        logger.info { "成功登录 Telegram Bot ${telegramConfig.token.split(":").firstOrNull()}" }
+
         attachCommandManager()
     }
 

@@ -18,6 +18,7 @@ import io.ktor.client.features.json.serializer.*
 import kotlinx.serialization.json.Json
 import ren.natsuyuk1.comet.api.config.config
 import ren.natsuyuk1.comet.network.CometClient
+import ren.natsuyuk1.comet.utils.time.Timer
 
 val json = Json {
     prettyPrint = true
@@ -42,3 +43,5 @@ val defaultClient = HttpClient(CIO) {
 }
 
 val cometClient: CometClient = CometClient()
+
+val timer = Timer()

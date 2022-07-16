@@ -1,6 +1,6 @@
 package ren.natsuyuk1.comet.telegram.event
 
-import com.github.kotlintelegrambot.dispatcher.handlers.TextHandlerEnvironment
+import com.github.kotlintelegrambot.dispatcher.handlers.MessageHandlerEnvironment
 import ren.natsuyuk1.comet.api.event.impl.message.GroupMessageEvent
 import ren.natsuyuk1.comet.api.event.impl.message.MessageEvent
 import ren.natsuyuk1.comet.telegram.TelegramComet
@@ -8,14 +8,15 @@ import ren.natsuyuk1.comet.telegram.contact.toCometGroup
 import ren.natsuyuk1.comet.telegram.contact.toCometGroupMember
 import ren.natsuyuk1.comet.telegram.util.toMessageWrapper
 
-suspend fun TextHandlerEnvironment.toCometEvent(comet: TelegramComet): MessageEvent? {
+suspend fun MessageHandlerEnvironment.toCometEvent(comet: TelegramComet): MessageEvent? {
     return when (message.chat.type) {
         "group", "supergroup" -> this.toCometGroupEvent(comet)
+        //"private" -> this.toCometPrivateEvent(comet)
         else -> null
     }
 }
 
-suspend fun TextHandlerEnvironment.toCometGroupEvent(comet: TelegramComet): GroupMessageEvent {
+suspend fun MessageHandlerEnvironment.toCometGroupEvent(comet: TelegramComet): GroupMessageEvent {
     return GroupMessageEvent(
         comet = comet,
         subject = this.message.chat.toCometGroup(comet),

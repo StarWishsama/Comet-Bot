@@ -106,7 +106,7 @@ object EventManager {
         var isCancelled by atomic(false)
         var isIntercepted by atomic(false)
         val eventName = event::class.simpleName
-        logger.trace { "Try to broadcast event $eventName" }
+        logger.trace { "Broadcasting event $eventName" }
         registeredListener.forEach { (priority, pListener) ->
             eventScope.launch {
                 pListener.forEach { listener ->

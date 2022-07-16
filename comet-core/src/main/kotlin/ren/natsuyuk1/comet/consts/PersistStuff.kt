@@ -42,4 +42,7 @@ val defaultCommands: List<AbstractCommandNode<*>> =
                     ProjectSekaiCommand.Prediction(subject)
                 )
         },
+        CommandNode(VERSION) { comet, sender, subject, wrapper, user ->
+            VersionCommand(comet, sender, subject, wrapper, user)
+        },
     )

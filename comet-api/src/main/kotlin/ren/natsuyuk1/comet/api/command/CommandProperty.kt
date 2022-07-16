@@ -15,7 +15,7 @@ import ren.natsuyuk1.comet.api.user.UserLevel
 /**
  * [CommandProperty]
  *
- * 一个命令的相关配置，适用于主命令及子命令
+ * 一个命令的相关配置
  */
 data class CommandProperty(
     val name: String,
