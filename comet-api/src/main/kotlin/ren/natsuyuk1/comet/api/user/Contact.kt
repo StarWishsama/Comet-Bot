@@ -115,11 +115,11 @@ abstract class Group(
      * 群名称
      */
     override var name: String,
-
-    open val owner: GroupMember,
-
-    open val members: List<GroupMember>
 ) : Contact() {
+    abstract val owner: GroupMember
+
+    abstract val members: List<GroupMember>
+
     abstract fun updateGroupName(groupName: String)
 
     /**

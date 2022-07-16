@@ -3,7 +3,7 @@ package ren.natsuyuk1.comet.test.commands.service
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -52,11 +52,7 @@ class TestSignService {
     @AfterAll
     fun cleanup() {
         transaction {
-            UserTable.deleteWhere {
-                UserTable.qq eq 114514L
-                UserTable.qq eq 114515L
-                UserTable.qq eq 114516L
-            }
+            UserTable.deleteAll()
         }
     }
 }

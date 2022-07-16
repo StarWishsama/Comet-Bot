@@ -23,7 +23,7 @@ class TelegramComet(
     config: CometConfig,
 
     val telegramConfig: TelegramConfig
-) : Comet(config, logger, ModuleScope("telegram $")) {
+) : Comet(config, logger, ModuleScope("telegram ${telegramConfig.token.take(6)}")) {
     lateinit var bot: Bot
 
     override fun login() {
@@ -38,11 +38,12 @@ class TelegramComet(
     }
 
     override fun afterLogin() {
+        bot.startPolling()
         attachCommandManager()
     }
 
     override fun close() {
-        TODO("Not yet implemented")
+        bot.stopPolling()
     }
 
     /**

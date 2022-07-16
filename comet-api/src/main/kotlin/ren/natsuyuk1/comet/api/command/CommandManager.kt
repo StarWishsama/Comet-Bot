@@ -169,9 +169,9 @@ object CommandManager {
      */
     fun getCommand(name: String, sender: CommandSender): AbstractCommandNode<*>? =
         commands.filter {
-            (sender is ConsoleCommandSender && it.value is ConsoleCommandNode)
+            ((sender is ConsoleCommandSender && it.value is ConsoleCommandNode)
                 || (sender is PlatformCommandSender && it.value is CommandNode)
-                && (it.value.property.name == name || it.value.property.alias.contains(name))
+                ) && (it.value.property.name == name || it.value.property.alias.contains(name))
         }.values.firstOrNull()
 
     /**

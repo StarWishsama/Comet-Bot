@@ -14,25 +14,25 @@ enum class LoginPlatform {
     QQ, TELEGRAM,
 }
 
-object AccountDataTable : IdTable<Long>("account_data") {
-    override val id: Column<EntityID<Long>> = long("id").entityId()
+object AccountDataTable : IdTable<String>("account_data") {
+    override val id: Column<EntityID<String>> = text("id").entityId()
     val password: Column<String> = text("password")
     val platform = enumeration<LoginPlatform>("platform")
 }
 
-class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
+class AccountData(id: EntityID<String>) : Entity<String>(id) {
     var password by AccountDataTable.password
     var platform by AccountDataTable.platform
 
-    companion object : EntityClass<Long, AccountData>(AccountDataTable) {
-        fun hasAccount(id: Long, platform: LoginPlatform): Boolean = transaction {
+    companion object : EntityClass<String, AccountData>(AccountDataTable) {
+        fun hasAccount(id: String, platform: LoginPlatform): Boolean = transaction {
             !find {
                 AccountDataTable.id eq id
                 AccountDataTable.platform eq platform
             }.empty()
         }
 
-        fun registerAccount(id: Long, password: String, platform: LoginPlatform): AccountData {
+        fun registerAccount(id: String, password: String, platform: LoginPlatform): AccountData {
             val target = transaction { findById(id) }
 
             if (hasAccount(id, platform) && target != null) {

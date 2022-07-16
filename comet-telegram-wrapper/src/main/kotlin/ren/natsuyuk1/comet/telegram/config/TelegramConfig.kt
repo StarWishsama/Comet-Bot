@@ -8,15 +8,14 @@ import java.io.File
 
 val telegramConfigs = mutableListOf<TelegramConfig>()
 
-fun findTelegramConfigByID(id: Long): TelegramConfig? = telegramConfigs.find { it.id == id }
+fun findTelegramConfigByID(token: String): TelegramConfig? = telegramConfigs.find { it.token == token }
 
 @kotlinx.serialization.Serializable
 data class TelegramConfig(
-    val id: Long,
-    val token: String,
+    val token: String
 ) {
     suspend fun init() {
-        val configFile = File(configDirectory, "telegram-$id.yml")
+        val configFile = File(configDirectory, "telegram-${token.take(6)}.yml")
         configFile.touch()
         configFile.writeTextBuffered(Yaml.Default.encodeToString(this))
         telegramConfigs.add(this)

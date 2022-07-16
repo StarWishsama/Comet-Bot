@@ -132,6 +132,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
     private fun setupShutdownHook() {
         addShutdownHook {
+            CometTerminal.instance.forEach(Comet::close)
             closeAll()
             println("\n正在退出 Comet Terminal...")
             Console.redirectToNull()

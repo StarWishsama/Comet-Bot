@@ -29,7 +29,7 @@ fun User.toCometGroupMember(comet: TelegramComet, groupChatID: Long): GroupMembe
             get() = this@toCometGroupMember.firstName + " " + this@toCometGroupMember.lastName
         override var card: String
             get() = name
-            set(value) {
+            set(_) {
                 error("You cannot set card in telegram platform")
             }
         override val remark: String
