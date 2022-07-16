@@ -54,6 +54,8 @@ abstract class Comet(
 
 fun Comet.attachCommandManager() {
     registerListener<MessageEvent> {
-        CommandManager.executeCommand(comet = this, sender = it.sender, subject = it.subject, wrapper = it.message)
+        if (it.comet == this) {
+            CommandManager.executeCommand(comet = this, sender = it.sender, subject = it.subject, wrapper = it.message)
+        }
     }
 }
