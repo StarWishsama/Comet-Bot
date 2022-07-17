@@ -98,14 +98,12 @@ object ProjectSekaiHelper {
     fun init(parentContext: CoroutineContext) {
         scope = ModuleScope("projectsekai_helper", parentContext)
 
-        refreshCache()
+        scope.launch { refreshCache() }
         TaskManager.registerTask(1.hours, ProjectSekaiHelper::refreshCache)
     }
 
     fun refreshCache() {
-        scope.launch {
-            predictionCache = cometClient.getRankPredictionInfo()
-        }
+        predictionCache = runBlocking { cometClient.getRankPredictionInfo() }
     }
 }
 
