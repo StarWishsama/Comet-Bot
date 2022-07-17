@@ -11,6 +11,7 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.jsonPrimitive
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
@@ -58,11 +59,11 @@ fun ProjectSekaiProfile.toMessageWrapper(eventId: Int): MessageWrapper {
 
         appendLine()
         if (ahead != 0) {
-            val aheadPredictScore = ProjectSekaiHelper.predictionCache.data[ahead.toString()]?.toString()
+            val aheadPredictScore = ProjectSekaiHelper.predictionCache.data[ahead.toString()]?.jsonPrimitive?.content
             appendText("$ahead 档预测分数为 $aheadPredictScore", true)
         }
         if (behind in 100..1000001) {
-            val behindPredictScore = ProjectSekaiHelper.predictionCache.data[behind.toString()]?.toString()
+            val behindPredictScore = ProjectSekaiHelper.predictionCache.data[behind.toString()]?.jsonPrimitive?.content
             appendText("$behind 档预测分数为 $behindPredictScore", true)
         }
         appendText("数据来自 sekai.best")
