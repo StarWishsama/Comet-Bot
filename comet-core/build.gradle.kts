@@ -35,4 +35,6 @@ dependencies {
 
     implementation("io.ktor:ktor-server-core:_")
     implementation("io.ktor:ktor-server-netty:_")
+
+    implementation("org.jsoup:jsoup:_")
 }

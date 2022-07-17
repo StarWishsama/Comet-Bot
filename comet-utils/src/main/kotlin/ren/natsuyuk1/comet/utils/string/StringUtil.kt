@@ -111,7 +111,7 @@ object StringUtil {
         return matches(numberRegex) && !this.contains(".")
     }
 
-    fun String.limitStringSize(size: Int): String {
+    fun String.limit(size: Int): String {
         return if (this.length <= size) this else substring(0, size) + "..."
     }
 

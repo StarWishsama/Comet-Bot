@@ -86,16 +86,12 @@ open class MessageWrapper {
 
     fun getMessageContent(): Set<WrapperElement> = Collections.unmodifiableSet(messageContent)
 
-    fun compare(other: Any?): Boolean {
-        if (other !is MessageWrapper) return false
-
-        return getMessageContent() == other.getMessageContent()
-    }
+    fun compare(other: MessageWrapper) = getMessageContent() == other.getMessageContent()
 
     fun isEmpty(): Boolean {
         return messageContent.isEmpty()
     }
 
     inline fun <reified T : WrapperElement> find(): T? =
-        getMessageContent().find { it::class == T::class } as T?
+        getMessageContent().asSequence().filterIsInstance<T?>().firstOrNull()
 }

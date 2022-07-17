@@ -12,9 +12,6 @@ disabled_rules = no-wildcard-imports, import-ordering
 indent_size = 4
 max_line_length = 120
 
-[**/test/**.kt]
-ktlint_ignore_back_ticked_identifier = true
-
 [*.{bash,sh,zsh,fish}]
 indent_size = 2
 

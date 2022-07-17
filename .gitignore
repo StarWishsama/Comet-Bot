@@ -33,9 +33,6 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-### Proto ###
-generated/
-
 ### Tmp ###
 **/tmp
 
@@ -52,3 +49,12 @@ local.properties
 ### Database ###
 *.db
 *.db-journal
+
+## Mirai Cache ##
+/cache/
+
+## Mirai Generated File ##
+device.json
+
+## Comet Generated Config ##
+*.yml

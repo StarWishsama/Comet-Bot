@@ -45,4 +45,7 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         CommandNode(VERSION) { comet, sender, subject, wrapper, user ->
             VersionCommand(comet, sender, subject, wrapper, user)
         },
+        CommandNode(JIKI) { comet, sender, subject, wrapper, user ->
+            JikiPediaCommand(comet, sender, subject, wrapper, user)
+        },
     )
