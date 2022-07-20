@@ -12,7 +12,7 @@ package ren.natsuyuk1.comet.utils.message
 import kotlinx.serialization.Serializable
 
 interface WrapperElement {
-    fun asString(): String
+    fun parseToString(): String
 }
 
 /**
@@ -23,7 +23,7 @@ interface WrapperElement {
  * @param text 文本
  */
 data class Text(val text: String) : WrapperElement {
-    override fun asString(): String = text
+    override fun parseToString(): String = text
 }
 
 /**
@@ -49,7 +49,7 @@ data class Image(
         }
     }
 
-    override fun asString(): String = "[图片]"
+    override fun parseToString(): String = "[图片]"
 }
 
 /**
@@ -65,7 +65,7 @@ data class AtElement(
     // For Telegram
     val userName: String = ""
 ) : WrapperElement {
-    override fun asString(): String = "@${target}"
+    override fun parseToString(): String = "@${target}"
 
 }
 
@@ -78,7 +78,7 @@ data class AtElement(
  */
 @Serializable
 data class XmlElement(val content: String) : WrapperElement {
-    override fun asString(): String = "[XML 消息]"
+    override fun parseToString(): String = "[XML 消息]"
 
 }
 
@@ -89,9 +89,9 @@ data class XmlElement(val content: String) : WrapperElement {
  */
 @Serializable
 data class Voice(val filePath: String) : WrapperElement {
-    override fun asString(): String = "[语音消息]"
+    override fun parseToString(): String = "[语音消息]"
 }
 
 data class Nudge(val target: Long) : WrapperElement {
-    override fun asString(): String = "[戳一戳]"
+    override fun parseToString(): String = "[戳一戳]"
 }

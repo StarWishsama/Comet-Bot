@@ -8,8 +8,8 @@ import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.config.version
 import ren.natsuyuk1.comet.consts.timer
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.toFriendly
+import ren.natsuyuk1.comet.utils.string.StringUtil.toMessageWrapper
 
 val VERSION by lazy {
     CommandProperty(
@@ -30,11 +30,11 @@ class VersionCommand(
 
     override suspend fun run() {
         subject.sendMessage(
-            buildMessageWrapper {
-                appendText("☄ Comet Bot - $version", true)
-                appendText("已运行了 ${timer.measureDuration().toFriendly()}", true)
-                appendText("Made with ❤")
-            }
+            """
+            ☄ Comet Bot - $version    
+            已运行了 ${timer.measureDuration().toFriendly()}
+            Made with ❤
+            """.trimIndent().toMessageWrapper()
         )
     }
 }

@@ -37,4 +37,6 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:_")
 
     implementation("org.jsoup:jsoup:_")
+
+    implementation("moe.sdl.yabapi:yabapi-core-jvm:_")
 }

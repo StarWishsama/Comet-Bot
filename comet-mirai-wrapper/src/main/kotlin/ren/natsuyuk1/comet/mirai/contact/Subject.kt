@@ -8,6 +8,7 @@ import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.impl.comet.MessageSendEvent
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
+import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.mirai.MiraiComet
 import ren.natsuyuk1.comet.mirai.util.toMessageChain
@@ -70,4 +71,38 @@ fun net.mamoe.mirai.contact.Group.toCometGroup(comet: MiraiComet): Group {
     }
 
     return MiraiGroupImpl()
+}
+
+abstract class MiraiUser : User() {
+    override val platformName: String = "mirai"
+}
+
+fun net.mamoe.mirai.contact.User.toCometUser(miraiComet: MiraiComet): User {
+
+    val miraiUser = this@toCometUser
+
+    class MiraiUserImpl(
+        override val comet: Comet = miraiComet,
+        override val name: String = miraiUser.nick,
+        override var card: String = "",
+        override val id: Long = miraiUser.id,
+        override val remark: String = miraiUser.remark
+    ) : MiraiUser() {
+        override fun sendMessage(message: MessageWrapper) {
+            comet.scope.launch {
+                val event = MessageSendEvent(
+                    comet,
+                    this@MiraiUserImpl,
+                    message,
+                    Clock.System.now().epochSeconds
+                ).also { it.broadcast() }
+
+                if (!event.isCancelled)
+                    miraiUser.sendMessage(message.toMessageChain(miraiUser))
+            }
+        }
+
+    }
+
+    return MiraiUserImpl()
 }

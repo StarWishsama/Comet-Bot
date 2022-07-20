@@ -80,7 +80,7 @@ open class MessageWrapper {
 
     fun parseToString(): String = buildString {
         messageContent.forEach {
-            append(it.asString())
+            append(it.parseToString())
         }
     }
 

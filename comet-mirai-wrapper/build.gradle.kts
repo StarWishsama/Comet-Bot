@@ -27,7 +27,9 @@ dependencies {
     implementation(KotlinX.serialization.json)
     implementation("net.mamoe.yamlkt:yamlkt:_")
 
-    api("net.mamoe:mirai-core-all:_")
+    api("net.mamoe:mirai-core-jvm:_")
+    api("net.mamoe:mirai-core-api-jvm:_")
+    api("net.mamoe:mirai-core-utils-jvm:_")
 
     api("org.jetbrains.exposed:exposed-core:_")
     api("org.jetbrains.exposed:exposed-dao:_")
