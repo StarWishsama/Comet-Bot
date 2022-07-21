@@ -54,6 +54,11 @@ class ProjectSekaiCommand(
             help = "要绑定的世界计划账号 ID"
         ).long().default(-1)
 
+        override fun aliases(): Map<String, List<String>> =
+            mapOf(
+                "绑定" to listOf("bind")
+            )
+
         override suspend fun run() {
             if (userID == -1L || userID.toString().length != 18) {
                 subject.sendMessage("请正确填写你的世界计划账号 ID! 例如 /pjsk bind -i 210043933010767872".toMessageWrapper())
@@ -78,6 +83,13 @@ class ProjectSekaiCommand(
         private val subject: PlatformCommandSender,
         val user: CometUser
     ) : CliktCommand() {
+
+        override fun aliases(): Map<String, List<String>> =
+            mapOf(
+                "活动排名" to listOf("event"),
+                "活排" to listOf("event")
+            )
+
         private val position by argument("排名位置", "欲查询的指定排名").int().default(0)
 
         override suspend fun run() {
@@ -87,6 +99,14 @@ class ProjectSekaiCommand(
 
     class Prediction(private val subject: PlatformCommandSender) :
         CliktCommand(name = "pred") {
+
+        override fun aliases(): Map<String, List<String>> =
+            mapOf(
+                "prediction" to listOf("pred"),
+                "预测" to listOf("pred")
+            )
+
+
         override suspend fun run() {
             subject.sendMessage(ProjectSekaiService.fetchPrediction())
         }

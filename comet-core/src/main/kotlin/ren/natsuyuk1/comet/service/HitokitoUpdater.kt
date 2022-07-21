@@ -7,7 +7,7 @@ import java.io.IOException
 
 private val logger = mu.KotlinLogging.logger {}
 
-object HitokotoUpdater {
+object HitokotoManager {
     private var hitokoto: Hitokoto? = null
 
     suspend fun fetch() {

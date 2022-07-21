@@ -16,6 +16,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserTable
+import ren.natsuyuk1.comet.service.HitokotoManager
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.toMessageWrapper
@@ -35,7 +36,7 @@ fun CometUser.isSigned(): Boolean {
 object SignInService {
     private val random = SecureRandom()
 
-    fun processSignIn(user: CometUser, sender: PlatformCommandSender): MessageWrapper {
+    suspend fun processSignIn(user: CometUser, sender: PlatformCommandSender): MessageWrapper {
         return if (user.isSigned()) {
             "你今天已经签到过了! 输入 /cx 可查询硬币详情".toMessageWrapper()
         } else {
@@ -43,7 +44,7 @@ object SignInService {
         }
     }
 
-    private fun signIn(sender: PlatformCommandSender, user: CometUser): MessageWrapper {
+    private suspend fun signIn(sender: PlatformCommandSender, user: CometUser): MessageWrapper {
         val signInCoin = calculateCoin(user)
 
         val checkInResult = buildString {
@@ -81,7 +82,7 @@ object SignInService {
 
             append("目前硬币 > ${user.coin.fixDisplay()}\n")
 
-            //append("今日一言 > ${HitokotoUpdater.getHitokoto()}\n")
+            append("今日一言 > ${HitokotoManager.getHitokoto()}\n")
         }
 
         return checkInResult.toMessageWrapper()
