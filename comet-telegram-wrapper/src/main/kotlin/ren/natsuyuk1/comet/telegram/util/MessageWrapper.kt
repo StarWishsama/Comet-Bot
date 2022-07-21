@@ -16,7 +16,7 @@ private val logger = mu.KotlinLogging.logger {}
 fun MessageWrapper.send(comet: TelegramComet, target: ChatId) {
     val textBuffer = StringBuffer()
 
-    getMessageContent().asSequence().filterIsInstance<Text>().forEach { textBuffer.append(it.parseToString()) }
+    getMessageContent().filterIsInstance<Text>().forEach { textBuffer.append(it.parseToString()) }
 
     if (find<Image>() != null) {
         find<Image>()?.toTelegramFile()?.let { comet.bot.sendPhoto(target, it, caption = textBuffer.toString()) }

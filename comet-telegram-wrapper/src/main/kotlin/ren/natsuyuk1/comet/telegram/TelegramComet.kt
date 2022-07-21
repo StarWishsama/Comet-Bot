@@ -3,7 +3,6 @@ package ren.natsuyuk1.comet.telegram
 import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
-import com.github.kotlintelegrambot.dispatcher.contact
 import com.github.kotlintelegrambot.dispatcher.message
 import com.github.kotlintelegrambot.extensions.filters.Filter
 import kotlinx.coroutines.launch
@@ -34,6 +33,14 @@ class TelegramComet(
         bot = bot {
             token = telegramConfig.token
             dispatch {
+                message(Filter.Group) {
+                    scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
+                }
+
+                message(Filter.Private) {
+                    scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
+                }
+
                 message(Filter.Text) {
                     scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
                 }
@@ -41,10 +48,6 @@ class TelegramComet(
                 // When bot no access to message
                 message(Filter.Command) {
                     scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
-                }
-
-                contact {
-                    //scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
                 }
             }
         }

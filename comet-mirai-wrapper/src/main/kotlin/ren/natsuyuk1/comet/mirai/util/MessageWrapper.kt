@@ -86,13 +86,16 @@ suspend fun WrapperElement.toMessageContent(subject: Contact?): MessageContent {
  */
 fun MessageWrapper.toMessageChain(subject: Contact? = null): MessageChain {
     return MessageChainBuilder().apply {
-        getMessageContent().forEach {
+        getMessageContent().forEach { elem ->
             kotlin.runCatching {
                 runBlocking {
-                    add(it.toMessageContent(subject))
+                    add(elem.toMessageContent(subject))
                 }
             }.onFailure {
-                logger.warn(it) { "A error occurred when converting message wrapper" }
+                if (it !is UnsupportedOperationException)
+                    logger.warn(it) { "A error occurred when converting message wrapper" }
+                else
+                    logger.debug { "Unsupported message element: ${elem::class.simpleName}" }
             }
         }
     }.build()
