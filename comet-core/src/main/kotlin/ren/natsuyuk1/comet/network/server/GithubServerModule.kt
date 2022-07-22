@@ -42,7 +42,7 @@ object GithubWebHookHandler {
     suspend fun handle(call: ApplicationCall) {
         try {
             logger.debug { "有新连接 ${call.request.httpMethod} - ${call.request.uri}" }
-            logger.debug { "请求 Headers ${buildString { call.request.headers.forEach { k, v -> append("$k=$v") } }}}" }
+            logger.debug { "Request Headers ${buildString { call.request.headers.forEach { k, v -> append("$k=$v") } }}}" }
 
             // Get information from header to identity whether the request is from GitHub.
             if (!isGitHubRequest(call.request)) {

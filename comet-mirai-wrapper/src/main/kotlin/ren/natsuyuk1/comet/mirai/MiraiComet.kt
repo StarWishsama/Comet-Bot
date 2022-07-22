@@ -21,6 +21,7 @@ import ren.natsuyuk1.comet.mirai.config.MiraiConfig
 import ren.natsuyuk1.comet.mirai.contact.toCometGroup
 import ren.natsuyuk1.comet.mirai.event.redirectToComet
 import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
+import ren.natsuyuk1.comet.service.subscribeGithubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 
 private val logger = mu.KotlinLogging.logger("Comet-Mirai")
@@ -63,6 +64,7 @@ class MiraiComet(
         }
 
         attachCommandManager()
+        subscribeGithubEvent()
     }
 
     override fun close() {

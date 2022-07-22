@@ -11,6 +11,7 @@ import ren.natsuyuk1.comet.api.attachCommandManager
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.service.subscribeGithubEvent
 import ren.natsuyuk1.comet.telegram.config.TelegramConfig
 import ren.natsuyuk1.comet.telegram.contact.toCometGroup
 import ren.natsuyuk1.comet.telegram.event.toCometEvent
@@ -59,6 +60,7 @@ class TelegramComet(
         logger.info { "成功登录 Telegram Bot ${telegramConfig.token.split(":").firstOrNull()}" }
 
         attachCommandManager()
+        subscribeGithubEvent()
     }
 
     override fun close() {

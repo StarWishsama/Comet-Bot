@@ -3,10 +3,13 @@ package ren.natsuyuk1.comet.service
 import cn.hutool.core.net.URLDecoder
 import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
+import ren.natsuyuk1.comet.api.Comet
+import ren.natsuyuk1.comet.api.event.registerListener
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.objects.github.data.SecretStatus
 import ren.natsuyuk1.comet.objects.github.events.*
+import ren.natsuyuk1.comet.utils.string.toHMAC
 
 private val logger = KotlinLogging.logger {}
 
@@ -65,8 +68,16 @@ object GitHubService {
     }
 
     fun checkSignature(secret: String, remote: String, requestBody: String): Boolean {
-        val local = "sha256=$secret"
+        val local = "sha256=${requestBody.toHMAC(secret)}"
         logger.debug("本地解析签名为: $local, 远程签名为: $remote")
         return local == remote
+    }
+}
+
+fun Comet.subscribeGithubEvent() = run {
+    registerListener<GithubEvent> { event ->
+        event.broadcastTargets.forEach {
+            getGroup(it.id)?.sendMessage(event.eventData.toMessageWrapper())
+        }
     }
 }

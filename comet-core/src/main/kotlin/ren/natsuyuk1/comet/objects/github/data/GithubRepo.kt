@@ -14,7 +14,6 @@ object GithubRepoData : PersistDataFile<GithubRepoData.Data>(
         data class GithubRepo(
             val repoName: String,
             val owner: String,
-            // 储存加密后的 Secret, 储存先必须先进行 String#toHMAC()
             val secret: String,
             val subscribers: List<GithubRepoSubscriber>
         ) {

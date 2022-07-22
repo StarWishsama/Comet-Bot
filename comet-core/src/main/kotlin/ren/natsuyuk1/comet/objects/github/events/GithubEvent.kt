@@ -6,7 +6,7 @@ import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 
 class GithubEvent(
     repo: GithubRepoData.Data.GithubRepo,
-    eventData: GithubEventData
+    val eventData: GithubEventData
 ) : CometBroadcastEvent() {
     init {
         val eventType = eventData.type()
