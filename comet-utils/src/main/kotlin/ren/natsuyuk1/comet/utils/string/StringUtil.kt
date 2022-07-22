@@ -10,6 +10,7 @@
 package ren.natsuyuk1.comet.utils.string
 
 import cn.hutool.core.codec.Base64Decoder
+import cn.hutool.crypto.SecureUtil
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
@@ -257,4 +258,8 @@ fun String.replaceWithOrder(vararg args: Any?): String {
         i++
     }
     return builder.toString()
+}
+
+fun String.toHMAC(key: String): String {
+    return SecureUtil.hmacSha256(key).digestHex(this)
 }

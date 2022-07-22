@@ -1,10 +1,20 @@
 package ren.natsuyuk1.comet.network.server
 
+import cn.hutool.core.net.URLDecoder
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import kotlinx.serialization.json.JsonObject
+import ren.natsuyuk1.comet.api.event.broadcast
+import ren.natsuyuk1.comet.consts.json
+import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
+import ren.natsuyuk1.comet.objects.github.data.SecretStatus
+import ren.natsuyuk1.comet.objects.github.events.GithubEvent
+import ren.natsuyuk1.comet.service.GitHubService
+import ren.natsuyuk1.comet.utils.error.ErrorHelper
+import java.io.IOException
 
 private val logger = mu.KotlinLogging.logger {}
 
@@ -44,104 +54,95 @@ object GithubWebHookHandler {
             val signature = call.request.header(signature256)
             val eventType = call.request.header(eventTypeHeader) ?: ""
             val request = call.receiveText()
-            //val secretStatus = GitHubService.repos.checkSecret(signature, request, eventType)
+            val secretStatus = GitHubService.checkSecret(signature, request, eventType)
 
             logger.debug { "GitHub WebHook 收到新事件" }
 
-            /**if (!checkSecretStatus(call, secretStatus, signature)) {
-            CometVariables.netLogger.log(HinaLogLevel.Debug, "Secret 校验失败", prefix = "WebHook")
-            return
+            if (!checkSecretStatus(call, secretStatus, signature)) {
+                logger.debug("Secret 校验失败")
+                return
             }
 
             val payload = URLDecoder.decode(request.replace("payload=", ""), Charsets.UTF_8)
 
-            CometVariables.netLogger.log(HinaLogLevel.Debug, "接收到传入请求: $payload")
+            logger.debug("接收到传入请求: $payload")
 
-            val validate = CometVariables.mapper.readTree(payload).isUsable()
+            val validate = json.parseToJsonElement(payload) !is JsonObject
 
             if (!validate) {
-            CometVariables.netLogger.log(HinaLogLevel.Warn, "解析请求失败, 回调的 JSON 不合法.\n${payload}", prefix = "WebHook")
-            call.respondText("Unknown request", status = HttpStatusCode.InternalServerError)
-            return
+                logger.warn("解析请求失败, Github 侧传入事件不合法.\n${payload}")
+                call.respondText("Unknown request", status = HttpStatusCode.InternalServerError)
+                return
             }
 
             var hasError = false
 
             try {
-            val info = GithubEventHandler.process(payload, eventType)
-            if (info != null) {
-            GithubPusher.push(info)
-            } else {
-            CometVariables.netLogger.log(
-            HinaLogLevel.Debug,
-            "推送 WebHook 消息失败, 不支持的事件类型",
-            prefix = "WebHook"
-            )
+                val event = GitHubService.processEvent(payload, eventType)
 
-            call.respondText(
-            "Comet 已收到事件, 但所请求的事件类型不支持 (${eventType})",
-            status = HttpStatusCode.InternalServerError
-            )
+                if (event != null) {
+                    GithubRepoData.find(event.repoName())?.let {
+                        GithubEvent(it, event).broadcast()
+                    }
+                } else {
+                    logger.debug("推送 WebHook 消息失败, 不支持的事件类型")
 
-            return
-            }
+                    call.respondText(
+                        "Comet 已收到事件, 但所请求的事件类型不支持 (${eventType})",
+                        status = HttpStatusCode.InternalServerError
+                    )
+
+                    return
+                }
             } catch (e: IOException) {
-            FileUtil.createErrorReportFile("推送 WebHook 消息失败", "Github Webhook", e, payload, e.message ?: "")
-            hasError = true
+                ErrorHelper.createErrorReportFile("推送 WebHook 消息失败", "Github Webhook", e, payload)
+                hasError = true
             }
 
             when {
-            secretStatus == SecretStatus.NO_SECRET -> {
-            call.respondText("Comet 已收到事件, 推荐使用密钥加密以保证服务器安全")
+                secretStatus == SecretStatus.NO_SECRET -> {
+                    call.respondText("Comet 已收到事件, 推荐使用密钥加密以保证服务器安全")
+                }
+                hasError -> {
+                    call.respondText("Comet 发生内部错误", status = HttpStatusCode.InternalServerError)
+                }
+                else -> {
+                    call.respondText("Comet 已收到事件")
+                }
             }
-            hasError -> {
-            call.respondText("Comet 发生内部错误", status = HttpStatusCode.InternalServerError)
-            }
-            else -> {
-            call.respondText("Comet 已收到事件")
-            }
-            }*/
         } catch (e: Exception) {
             logger.warn(e) { "推送 WebHook 消息失败" }
             call.respondText("Comet 发生内部错误", status = HttpStatusCode.InternalServerError)
         }
     }
 
-    /**private suspend fun checkSecretStatus(
-    call: ApplicationCall,
-    secretStatus: SecretStatus,
-    signature: String?
+    private suspend fun checkSecretStatus(
+        call: ApplicationCall,
+        secretStatus: SecretStatus,
+        signature: String?
     ): Boolean {
-    if (secretStatus == SecretStatus.HAS_SECRET && signature != null) {
-    return true
-    }
+        if (secretStatus == SecretStatus.HAS_SECRET && signature != null) {
+            return true
+        }
 
-    if (signature == null && secretStatus == SecretStatus.NO_SECRET) {
-    return true
-    }
+        if (signature == null && secretStatus == SecretStatus.NO_SECRET) {
+            return true
+        }
 
-    if (secretStatus == SecretStatus.FAILED) {
-    CometVariables.netLogger.log(
-    HinaLogLevel.Debug,
-    "获取 Secret 失败",
-    prefix = "WebHook"
-    )
-    call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
-    return false
-    }
+        if (secretStatus == SecretStatus.FAILED) {
+            logger.debug("获取 Secret 失败")
+            call.respondText(status = HttpStatusCode.InternalServerError, text = "Internal Server Error")
+            return false
+        }
 
-    if (secretStatus == SecretStatus.UNAUTHORIZED) {
-    CometVariables.netLogger.log(
-    HinaLogLevel.Debug,
-    "收到新事件, 未通过安全验证. 请求的签名为: ${signature?.get(0) ?: "无"}",
-    prefix = "WebHook"
-    )
-    call.respondText(status = HttpStatusCode.Forbidden, text = "The request isn't verified")
-    return false
-    }
+        if (secretStatus == SecretStatus.UNAUTHORIZED) {
+            logger.debug { "收到新事件, 未通过安全验证. 请求的签名为: ${signature?.firstOrNull() ?: "无"}" }
+            call.respondText(status = HttpStatusCode.Forbidden, text = "The request isn't verified")
+            return false
+        }
 
-    return false
-    }*/
+        return false
+    }
 
     /**
      * [isGitHubRequest]

@@ -24,7 +24,7 @@ abstract class CometBroadcastEvent : AbstractEvent() {
     /**
      * 推送对象
      */
-    val broadcastTargets: List<BroadcastTarget> = mutableListOf()
+    val broadcastTargets: MutableList<BroadcastTarget> = mutableListOf()
 }
 
 data class BroadcastTarget(
