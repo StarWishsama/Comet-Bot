@@ -33,6 +33,7 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserDataTable
 import ren.natsuyuk1.comet.test.initTestDatabase
+import ren.natsuyuk1.comet.test.isCI
 import ren.natsuyuk1.comet.test.network.client
 import ren.natsuyuk1.comet.test.print
 
@@ -42,6 +43,10 @@ private val logger = mu.KotlinLogging.logger {}
 class TestProjectSekaiAPI {
     @BeforeAll
     fun init() {
+        if (isCI()) {
+            return
+        }
+
         initTestDatabase()
         DatabaseManager.loadTables(ProjectSekaiDataTable, ProjectSekaiUserDataTable)
         runBlocking { ProjectSekaiData.updateData() }
@@ -56,6 +61,10 @@ class TestProjectSekaiAPI {
 
     @Test
     fun testEventProfileFetch() {
+        if (isCI()) {
+            return
+        }
+
         runBlocking {
             val user = CometUser.create(id)
 
@@ -80,16 +89,28 @@ class TestProjectSekaiAPI {
 
     @Test
     fun testEventRankingPositionFetch() {
+        if (isCI()) {
+            return
+        }
+
         runBlocking { client.getSpecificRankInfo(eventID, 10000) }
     }
 
     @Test
     fun testEventListFetch() {
+        if (isCI()) {
+            return
+        }
+
         runBlocking { println(client.getEventList()) }
     }
 
     @Test
     fun testRankPredictionFetch() {
+        if (isCI()) {
+            return
+        }
+
         runBlocking {
             try {
                 client.getRankPredictionInfo().toMessageWrapper().print()
@@ -100,6 +121,10 @@ class TestProjectSekaiAPI {
 
     @Test
     fun testUserInfoFetch() {
+        if (isCI()) {
+            return
+        }
+
         runBlocking {
             client.getUserInfo(id).toMessageWrapper().print()
         }

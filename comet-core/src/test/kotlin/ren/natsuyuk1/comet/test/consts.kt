@@ -40,3 +40,5 @@ fun generateFakeSender(id: Long): PlatformCommandSender = object : PlatformComma
 }
 
 fun Any.print() = println(this)
+
+fun isCI() = System.getenv("CI") != null
