@@ -13,12 +13,13 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
+import org.jetbrains.exposed.dao.UUIDEntity
+import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
-import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getCurrentEventInfo
 import java.util.*
@@ -89,7 +90,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
  *
  */
 object ProjectSekaiUserDataTable : IdTable<UUID>("pjsk_user_data") {
-    override val id: Column<EntityID<UUID>> = reference("user", UserTable.id).index()
+    override val id: Column<EntityID<UUID>> = uuid("user").entityId()
     override val primaryKey = PrimaryKey(id)
 
     val userID = long("user_id")
@@ -97,7 +98,7 @@ object ProjectSekaiUserDataTable : IdTable<UUID>("pjsk_user_data") {
     val lastQueryPosition = integer("last_query_position").default(0)
 }
 
-class ProjectSekaiUserData(id: EntityID<UUID>) : Entity<UUID>(id) {
+class ProjectSekaiUserData(id: EntityID<UUID>) : UUIDEntity(id) {
     // 代表玩家的 Project Sekai 唯一 ID
     var userID by ProjectSekaiUserDataTable.userID
 
@@ -107,7 +108,14 @@ class ProjectSekaiUserData(id: EntityID<UUID>) : Entity<UUID>(id) {
     // 上次查询时的活动排名
     var lastQueryPosition by ProjectSekaiUserDataTable.lastQueryPosition
 
-    companion object : EntityClass<UUID, ProjectSekaiUserData>(ProjectSekaiUserDataTable) {
+    fun updateInfo(score: Long, rank: Int) {
+        transaction {
+            lastQueryScore = score
+            lastQueryPosition = rank
+        }
+    }
+
+    companion object : UUIDEntityClass<ProjectSekaiUserData>(ProjectSekaiUserDataTable) {
         fun isBound(uuid: UUID): Boolean = transaction {
             !find { ProjectSekaiUserDataTable.id eq uuid }.empty()
         }

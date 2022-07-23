@@ -13,11 +13,10 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
             appendLine()
         }
         appendText("歌曲信息 >", true)
-        val clear = userMusic.count { it.musicStatus.firstOrNull()?.userMusicResult?.firstOrNull() != null }
-        val fc =
-            userMusic.count { it.musicStatus.firstOrNull()?.userMusicResult?.firstOrNull()?.playResult == "full_combo" }
-        val ap =
-            userMusic.count { it.musicStatus.firstOrNull()?.userMusicResult?.firstOrNull()?.playResult == "all_perfect" }
+
+        val clear = getSpecificMusicCount(MusicDifficulty.CLEAR)
+        val fc = getSpecificMusicCount(MusicDifficulty.FULL_COMBO)
+        val ap = getSpecificMusicCount(MusicDifficulty.ALL_PERFECT)
         appendText("Clear $clear / FC $fc / AP $ap")
     }
 
@@ -27,10 +26,25 @@ data class ProjectSekaiUserInfo(
     val userProfile: UserProfile,
     //val userDecks
     //val userCards
-    val userMusic: List<UserMusic>
+    val userMusics: List<UserMusic>
 ) {
+    fun getSpecificMusicCount(playResult: MusicDifficulty): Int {
+        var counter = 0
+
+        userMusics.forEach {
+            it.musicStatus.forEach ms@{ ms ->
+                if (ms.userMusicResult.any { umr -> umr.playResult == playResult }) {
+                    counter += 1
+                }
+            }
+        }
+
+        return counter
+    }
+
     @kotlinx.serialization.Serializable
     data class UserGameData(
+        @SerialName("userGamedata")
         val userGameData: Data
     ) {
         @kotlinx.serialization.Serializable
@@ -76,8 +90,21 @@ data class ProjectSekaiUserInfo(
                 // easy, normal, hard, expert, master
                 val musicDifficulty: String,
                 // clear, full_combo, all_perfect
-                val playResult: String,
+                val playResult: MusicDifficulty,
             )
         }
     }
+}
+
+
+@kotlinx.serialization.Serializable
+enum class MusicDifficulty {
+    @SerialName("clear")
+    CLEAR,
+
+    @SerialName("full_combo")
+    FULL_COMBO,
+
+    @SerialName("all_perfect")
+    ALL_PERFECT
 }

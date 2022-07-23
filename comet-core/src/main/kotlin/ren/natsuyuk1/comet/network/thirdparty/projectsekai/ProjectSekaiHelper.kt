@@ -12,7 +12,6 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.jsonPrimitive
-import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
@@ -112,13 +111,6 @@ private fun Int.getSurroundingRank(): Pair<Int, Int> {
     }
 
     return Pair(rankPosition.last(), 1000001)
-}
-
-private fun ProjectSekaiUserData.updateInfo(score: Long, rank: Int) {
-    transaction {
-        lastQueryScore = score
-        lastQueryPosition = rank
-    }
 }
 
 object ProjectSekaiHelper {

@@ -1,3 +1,5 @@
 package ren.natsuyuk1.comet.event.pusher.bilibili
 
-class BiliBiliLiveEvent
+import ren.natsuyuk1.comet.event.CometBroadcastEvent
+
+class BiliBiliLiveEvent : CometBroadcastEvent()

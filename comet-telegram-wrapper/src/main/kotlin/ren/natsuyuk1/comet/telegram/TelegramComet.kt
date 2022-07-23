@@ -34,14 +34,6 @@ class TelegramComet(
         bot = bot {
             token = telegramConfig.token
             dispatch {
-                message(Filter.Group) {
-                    scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
-                }
-
-                message(Filter.Private) {
-                    scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
-                }
-
                 message(Filter.Text) {
                     scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
                 }

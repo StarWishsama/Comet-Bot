@@ -1,8 +1,9 @@
-package ren.natsuyuk1.comet.objects.github.events
+package ren.natsuyuk1.comet.event.pusher.github
 
 import ren.natsuyuk1.comet.event.BroadcastTarget
 import ren.natsuyuk1.comet.event.CometBroadcastEvent
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
+import ren.natsuyuk1.comet.objects.github.events.GithubEventData
 
 class GithubEvent(
     repo: GithubRepoData.Data.GithubRepo,

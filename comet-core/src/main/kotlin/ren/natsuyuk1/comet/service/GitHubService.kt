@@ -6,6 +6,7 @@ import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.event.registerListener
 import ren.natsuyuk1.comet.consts.json
+import ren.natsuyuk1.comet.event.pusher.github.GithubEvent
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.objects.github.data.SecretStatus
 import ren.natsuyuk1.comet.objects.github.events.*

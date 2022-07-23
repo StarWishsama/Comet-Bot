@@ -9,9 +9,9 @@ import io.ktor.routing.*
 import kotlinx.serialization.json.JsonObject
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.consts.json
+import ren.natsuyuk1.comet.event.pusher.github.GithubEvent
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.objects.github.data.SecretStatus
-import ren.natsuyuk1.comet.objects.github.events.GithubEvent
 import ren.natsuyuk1.comet.service.GitHubService
 import ren.natsuyuk1.comet.utils.error.ErrorHelper
 import java.io.IOException
