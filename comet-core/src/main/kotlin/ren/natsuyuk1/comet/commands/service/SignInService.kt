@@ -26,11 +26,8 @@ import java.security.SecureRandom
 import kotlin.time.Duration.Companion.days
 
 fun CometUser.isSigned(): Boolean {
-    val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-    return checkInDate.year != currentTime.year
-        && checkInDate.month != currentTime.month
-        && checkInDate.dayOfMonth != currentTime.dayOfMonth
-        && checkInDate.hour >= 8
+    val currentTime = Clock.System.now()
+    return (currentTime - checkInDate.toInstant(TimeZone.currentSystemDefault())).inWholeDays < 1
 }
 
 object SignInService {
