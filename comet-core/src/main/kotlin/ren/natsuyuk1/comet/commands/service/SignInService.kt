@@ -43,13 +43,14 @@ object SignInService {
 
     private suspend fun signIn(sender: PlatformCommandSender, user: CometUser): MessageWrapper {
         val (coinResult, expResult) = calculate(user)
-        val newLevel = levelUp(user.level, expResult.getAllPoint().toLong())
-        val levelUp = newLevel > user.level
+        val levelUp = levelUp(user.level, expResult.getAllPoint().toLong())
 
         transaction {
             user.exp += expResult.getAllPoint().toLong()
             user.coin += coinResult.getAllPoint()
-            user.level = newLevel
+
+            if (levelUp)
+                user.level += 1
         }
 
         val checkInResult = buildString {
@@ -66,7 +67,7 @@ object SignInService {
             append("\n")
 
             if (levelUp) {
-                append("升级! 现在等级为 $newLevel")
+                append("升级! 现在等级为 ${user.level}")
                 append("\n")
             }
 
@@ -218,37 +219,21 @@ object SignInService {
         }
     }
 
-    private fun levelUp(currentLevel: Int, earnExp: Long): Int {
-        return when (currentLevel) {
+    private fun levelUp(currentLevel: Int, earnExp: Long): Boolean {
+        val targetExp = when (currentLevel) {
             in 0..15 -> {
-                val targetExp = 2 * currentLevel + 7
-
-                if (earnExp > targetExp) {
-                    currentLevel + 1
-                } else {
-                    currentLevel
-                }
+                2 * currentLevel + 7
             }
 
             in 16..30 -> {
-                val targetExp = 5 * currentLevel - 38
-
-                if (earnExp > targetExp) {
-                    currentLevel + 1
-                } else {
-                    currentLevel
-                }
+                5 * currentLevel - 38
             }
 
             else -> {
-                val targetExp = 9 * currentLevel - 158
-
-                if (earnExp > targetExp) {
-                    currentLevel + 1
-                } else {
-                    currentLevel
-                }
+                9 * currentLevel - 158
             }
         }
+
+        return earnExp > targetExp
     }
 }
