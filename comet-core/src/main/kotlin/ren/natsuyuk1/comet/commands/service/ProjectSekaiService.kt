@@ -7,8 +7,10 @@ import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserEventInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiHelper
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.toMessageWrapper
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.toMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
@@ -41,19 +43,30 @@ object ProjectSekaiService {
         }
     }
 
-    suspend fun lookupUserInfo(user: CometUser, position: Int): MessageWrapper {
-        val userId = ProjectSekaiUserData.getProjectSekaiUserID(user.id.value)
+    suspend fun queryUserEventInfo(user: CometUser, position: Int): MessageWrapper {
+        val userData = ProjectSekaiUserData.getUserPJSKData(user.id.value)
             ?: return "你还没有绑定过世界计划账号, 使用 /pjsk bind -i [你的ID] 绑定".toMessageWrapper()
+
+        val userId = userData.userID
 
         return if (position == 0) {
             val currentInfo = cometClient.getUserEventInfo(currentEventId, userId)
-            currentInfo.toMessageWrapper(currentEventId)
+            currentInfo.toMessageWrapper(userData, currentEventId)
         } else {
-            cometClient.getSpecificRankInfo(currentEventId, position).toMessageWrapper(currentEventId)
+            cometClient.getSpecificRankInfo(currentEventId, position).toMessageWrapper(userData, currentEventId)
         }
     }
 
     suspend fun fetchPrediction(): MessageWrapper {
         return cometClient.getRankPredictionInfo().toMessageWrapper()
+    }
+
+    suspend fun queryUserInfo(user: CometUser): MessageWrapper {
+        val userData = ProjectSekaiUserData.getUserPJSKData(user.id.value)
+            ?: return "你还没有绑定过世界计划账号, 使用 /pjsk bind -i [你的ID] 绑定".toMessageWrapper()
+
+        val userId = userData.userID
+
+        return cometClient.getUserInfo(userId).toMessageWrapper()
     }
 }

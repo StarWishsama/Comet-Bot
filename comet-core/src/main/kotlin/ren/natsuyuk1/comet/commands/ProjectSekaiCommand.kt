@@ -70,12 +70,16 @@ class ProjectSekaiCommand(
     }
 
     class Info(
-        private val sender: PlatformCommandSender,
         private val subject: PlatformCommandSender,
         val user: CometUser
     ) : CliktCommand() {
+        override fun aliases(): Map<String, List<String>> =
+            mapOf(
+                "查询" to listOf("info"),
+            )
+
         override suspend fun run() {
-            TODO()
+            subject.sendMessage(ProjectSekaiService.queryUserInfo(user))
         }
     }
 
@@ -93,7 +97,7 @@ class ProjectSekaiCommand(
         private val position by argument("排名位置", "欲查询的指定排名").int().default(0)
 
         override suspend fun run() {
-            subject.sendMessage(ProjectSekaiService.lookupUserInfo(user, position))
+            subject.sendMessage(ProjectSekaiService.queryUserEventInfo(user, position))
         }
     }
 

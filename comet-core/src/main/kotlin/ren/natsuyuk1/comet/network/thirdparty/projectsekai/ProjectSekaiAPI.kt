@@ -17,6 +17,7 @@ import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiEventList
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiProfile
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestPredictionInfo
 import java.io.InputStream
@@ -29,7 +30,7 @@ object ProjectSekaiAPI {
      *
      * 注意: %user_id% 就是原本的请求 URL, 不是参数
      */
-    private const val PROFILE_URL = "https://api.pjsekai.moe/api/user/%7Buser_id%7D/"
+    private const val PROFILE_URL = "https://api.pjsekai.moe"
 
     /**
      * pjsek.ai Route
@@ -38,22 +39,29 @@ object ProjectSekaiAPI {
      */
     private const val PJSEKAI_URL = "https://api.pjsek.ai/database/master"
 
+    /**
+     * 33 Kit
+     * https://3-3.dev/
+     */
+    private const val THREE3KIT_URL = "https://33.dsml.hk/pred"
+
     suspend fun CometClient.getUserEventInfo(eventID: Int, userID: Long): ProjectSekaiProfile {
         logger.debug { "Fetching project sekai event $eventID rank for user $userID" }
 
-        val resp = client.get<HttpStatement>("$PROFILE_URL/event/$eventID/ranking") {
+        val resp = client.get<HttpStatement>("$PROFILE_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
             url {
                 parameters.append("targetUserId", userID.toString())
             }
         }.execute().receive<InputStream>()
 
-        return resp.bufferedReader().use { json.decodeFromString(it.readText()) }
+        return resp.bufferedReader()
+            .use { json.decodeFromString(it.readText().also { logger.debug { "Raw content: $it" } }) }
     }
 
     suspend fun CometClient.getSpecificRankInfo(eventID: Int, rankPosition: Int): ProjectSekaiProfile {
         logger.debug { "Fetching project sekai event $eventID rank position at $rankPosition" }
 
-        val resp = client.get<HttpStatement>("$PROFILE_URL/event/$eventID/ranking") {
+        val resp = client.get<HttpStatement>("$PROFILE_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
             url {
                 parameters.append("targetRank", rankPosition.toString())
             }
@@ -86,6 +94,15 @@ object ProjectSekaiAPI {
     suspend fun CometClient.getRankPredictionInfo(): SekaiBestPredictionInfo {
         logger.debug { "Fetching project sekai rank prediction info" }
 
-        return client.get("https://33.dsml.hk/pred")
+        return client.get(THREE3KIT_URL)
+    }
+
+    suspend fun CometClient.getUserInfo(id: Long): ProjectSekaiUserInfo {
+        logger.debug { "Fetching project sekai user info for $id" }
+
+        val resp = client.get<HttpStatement>("$PROFILE_URL/api/user/$id/profile").execute().receive<InputStream>()
+
+        return resp.bufferedReader()
+            .use { json.decodeFromString(it.readText().also { logger.debug { "Raw content: $it" } }) }
     }
 }

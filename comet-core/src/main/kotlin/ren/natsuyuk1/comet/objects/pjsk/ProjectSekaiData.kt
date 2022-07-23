@@ -93,9 +93,20 @@ object ProjectSekaiUserDataTable : IdTable<UUID>("pjsk_user_data") {
     override val primaryKey = PrimaryKey(id)
 
     val userID = long("user_id")
+    val lastQueryScore = long("last_query_score").default(0L)
+    val lastQueryPosition = integer("last_query_position").default(0)
 }
 
 class ProjectSekaiUserData(id: EntityID<UUID>) : Entity<UUID>(id) {
+    // 代表玩家的 Project Sekai 唯一 ID
+    var userID by ProjectSekaiUserDataTable.userID
+
+    // 上次查询时的活动 pt
+    var lastQueryScore by ProjectSekaiUserDataTable.lastQueryScore
+
+    // 上次查询时的活动排名
+    var lastQueryPosition by ProjectSekaiUserDataTable.lastQueryPosition
+
     companion object : EntityClass<UUID, ProjectSekaiUserData>(ProjectSekaiUserDataTable) {
         fun isBound(uuid: UUID): Boolean = transaction {
             !find { ProjectSekaiUserDataTable.id eq uuid }.empty()
@@ -112,11 +123,8 @@ class ProjectSekaiUserData(id: EntityID<UUID>) : Entity<UUID>(id) {
             (findById(uuid) ?: return@transaction).userID = userID
         }
 
-        fun getProjectSekaiUserID(uuid: UUID): Long? = transaction {
-            find { ProjectSekaiUserDataTable.id eq uuid }.firstOrNull()?.userID
+        fun getUserPJSKData(uuid: UUID) = transaction {
+            find { ProjectSekaiUserDataTable.id eq uuid }.firstOrNull()
         }
     }
-
-    // 代表玩家的 Project Sekai 唯一 ID
-    var userID by ProjectSekaiUserDataTable.userID
 }
