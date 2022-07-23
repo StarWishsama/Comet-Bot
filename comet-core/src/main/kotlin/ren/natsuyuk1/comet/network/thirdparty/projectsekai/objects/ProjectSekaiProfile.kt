@@ -25,8 +25,7 @@ data class ProjectSekaiProfile(
         val isOwn: Boolean,
         val name: String,
         val userCard: UserCard,
-        val userProfile: UserProfile,
-        val userProfileHonors: List<UserProfileHonor>
+        val userProfile: UserProfile
     ) {
         @kotlinx.serialization.Serializable
         data class UserCard(
@@ -44,16 +43,6 @@ data class ProjectSekaiProfile(
             val bio: String,
             val twitterId: String,
             val profileImageType: String
-        )
-
-        @kotlinx.serialization.Serializable
-        data class UserProfileHonor(
-            val seq: Int,
-            val profileHonorType: String,
-            val honorId: Int,
-            val honorLevel: Int,
-            val bondsHonorViewType: String,
-            val bondsHonorWordId: UInt
         )
     }
 }

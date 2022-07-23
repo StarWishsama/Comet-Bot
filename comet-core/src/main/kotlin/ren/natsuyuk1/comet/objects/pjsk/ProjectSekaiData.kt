@@ -10,7 +10,6 @@
 package ren.natsuyuk1.comet.objects.pjsk
 
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.Clock
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.UUIDEntity
@@ -48,7 +47,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
         }
 
         suspend fun updateData() {
-            val timestamp = Clock.System.now().epochSeconds
+            val timestamp = System.currentTimeMillis()
             val currentEvent = cometClient.getCurrentEventInfo()
 
             transaction {

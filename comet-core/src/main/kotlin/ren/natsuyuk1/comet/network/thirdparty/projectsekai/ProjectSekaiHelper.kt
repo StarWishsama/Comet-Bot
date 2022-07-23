@@ -41,14 +41,20 @@ fun ProjectSekaiProfile.toMessageWrapper(userData: ProjectSekaiUserData, eventId
         if (userData.lastQueryScore != 0L && userData.lastQueryPosition != 0) {
             val scoreDiff = getDifference(userData.lastQueryScore, profile.score)
             val rankDiff = getDifference(userData.lastQueryPosition.toLong(), profile.rank.toLong())
-            appendText(
-                "上升 ↑ $scoreDiff 分 | " +
-                    (if (profile.rank < userData.lastQueryPosition) "↑" else "↓") + "$rankDiff 名"
-            )
+
+            if (scoreDiff != 0L && rankDiff != 0L) {
+                appendText(
+                    "上升 ↑ $scoreDiff 分 | " +
+                        (if (profile.rank < userData.lastQueryPosition) "↑" else "↓") + " $rankDiff 名",
+                    true
+                )
+            }
         }
 
         // Refresh user pjsk score and rank
         userData.updateInfo(profile.score, profile.rank)
+
+        appendLine()
 
         if (ahead != 0) {
             val aheadEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, ahead) }

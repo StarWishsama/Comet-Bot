@@ -1,7 +1,6 @@
 package ren.natsuyuk1.comet.commands.service
 
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
@@ -21,16 +20,12 @@ object ProjectSekaiService {
     private var currentEventId = 1
 
     init {
-        transaction {
-            if (!ProjectSekaiData.all().empty()) {
-                currentEventId = ProjectSekaiData.getCurrentEventInfo()!!.currentEventID
-            } else {
-                runBlocking { ProjectSekaiData.initData() }
-            }
-        }
+        runBlocking {
+            ProjectSekaiData.updateData()
+            ProjectSekaiHelper.refreshCache()
 
-        ProjectSekaiHelper.refreshCache()
-        runBlocking { ProjectSekaiData.updateData() }
+            currentEventId = ProjectSekaiData.getCurrentEventInfo()?.currentEventID!!
+        }
     }
 
     fun bindAccount(user: CometUser, userID: Long): MessageWrapper {
