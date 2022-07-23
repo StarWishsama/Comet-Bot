@@ -17,14 +17,12 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.toMessageWrapper
 
 object ProjectSekaiService {
-    private var currentEventId = 1
+    private val currentEventId = ProjectSekaiData.getCurrentEventInfo()?.currentEventID!!
 
     init {
         runBlocking {
             ProjectSekaiData.updateData()
             ProjectSekaiHelper.refreshCache()
-
-            currentEventId = ProjectSekaiData.getCurrentEventInfo()?.currentEventID!!
         }
     }
 

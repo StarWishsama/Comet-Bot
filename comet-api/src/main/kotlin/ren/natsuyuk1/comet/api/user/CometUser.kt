@@ -43,6 +43,8 @@ object UserTable : UUIDTable("user_data") {
     val checkInDate =
         datetime("check_in_date").default(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
     val coin = double("coin").default(0.0)
+    val level = integer("level").default(0)
+    val exp = long("exp").default(0L)
     val checkInTime = integer("check_in_time").default(0)
     val userLevel = enumeration<UserLevel>("user_level").default(UserLevel.USER)
     val r6sAccount = varchar("r6s_account", 15).default("")
@@ -56,6 +58,20 @@ object UserTable : UUIDTable("user_data") {
  * 用户数据
  */
 class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
+
+    var qq by UserTable.qq
+    var telegramID by UserTable.telegramID
+    var checkInDate by UserTable.checkInDate
+    var coin by UserTable.coin
+    var level by UserTable.level
+    var exp by UserTable.exp
+    var checkInTime by UserTable.checkInTime
+    val permissions = SQLDatabaseSet(id, UserPermissionTable)
+    var userLevel by UserTable.userLevel
+    var r6sAccount by UserTable.r6sAccount
+    var triggerCommandTime by UserTable.triggerCommandTime
+    var genshinGachaPool by UserTable.genshinGachaPool
+
     companion object : EntityClass<UUID, CometUser>(UserTable) {
         /**
          * 获取一个不可操作的用户
@@ -130,17 +146,6 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
             }
         }
     }
-
-    var qq by UserTable.qq
-    var telegramID by UserTable.telegramID
-    var checkInDate by UserTable.checkInDate
-    var coin by UserTable.coin
-    var checkInTime by UserTable.checkInTime
-    val permissions = SQLDatabaseSet(id, UserPermissionTable)
-    var userLevel by UserTable.userLevel
-    var r6sAccount by UserTable.r6sAccount
-    var triggerCommandTime by UserTable.triggerCommandTime
-    var genshinGachaPool by UserTable.genshinGachaPool
 }
 
 /**

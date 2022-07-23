@@ -42,7 +42,15 @@ object SignInService {
     }
 
     private suspend fun signIn(sender: PlatformCommandSender, user: CometUser): MessageWrapper {
-        val signInCoin = calculateCoin(user)
+        val (coinResult, expResult) = calculate(user)
+        val newLevel = levelUp(user.level, user.exp)
+        val levelUp = newLevel > user.level
+
+        transaction {
+            user.exp += expResult.getAllPoint().toLong()
+            user.coin += coinResult.getAllPoint()
+            user.level = newLevel
+        }
 
         val checkInResult = buildString {
             append("${getCurrentInstantString()}好, ${sender.name}~\n")
@@ -50,31 +58,34 @@ object SignInService {
             val position = getSignInPosition(user)
 
             if (position == 0) {
-                append("今日首位签到\n")
+                append("今日首位签到")
             } else if (position != -1) {
-                append("今日第${position + 1}位签到\n")
+                append("今日第${position + 1}位签到")
             }
 
-            if (signInCoin.getAllPoint() == 0.0) {
+            append("\n")
+
+            if (levelUp) {
+                append("升级! 现在等级为 $newLevel")
+                append("\n")
+            }
+
+            if (coinResult.getAllPoint() == 0.0) {
                 append("今天运气不佳, 没有硬币 (>_<)")
-            } else if (signInCoin.basePoint < 0) {
-                if (user.coin - signInCoin.basePoint < 0 || user.coin <= 0) {
-                    append("今天运气不佳, 但你的硬币快不够扣了, 就算了吧 o(￣▽￣)ｄ")
-                } else {
-                    append("今天运气不佳, 被扣除了 ${signInCoin.basePoint.fixDisplay()} 硬币 (>_<)")
-                }
+            } else if (coinResult.basePoint < 0) {
+                append("今天运气不佳, 被扣除了 ${coinResult.basePoint.fixDisplay()} 硬币 (>_<)")
             } else {
-                append("获得了 ${signInCoin.basePoint.fixDisplay()} 点硬币")
+                append("获得了 ${coinResult.basePoint.fixDisplay()} 点硬币")
             }
 
             append("\n")
 
             if (user.checkInTime >= 2) {
-                append("连续签到 ${user.checkInTime} 天 ${if (signInCoin.awardPoint > 0) ", 额外获得 ${signInCoin.awardPoint} 点硬币\n" else "\n"}")
+                append("连续签到 ${user.checkInTime} 天 ${if (coinResult.awardPoint > 0) ", 额外获得 ${coinResult.awardPoint} 点硬币\n" else "\n"}")
             }
 
-            if (signInCoin.chancePoint > 0) {
-                append("随机事件: 额外获得了 ${signInCoin.chancePoint} 点硬币 (*^_^*)\n")
+            if (coinResult.chancePoint > 0) {
+                append("随机事件: 额外获得了 ${coinResult.chancePoint} 点硬币 (*^_^*)\n")
             }
 
             append("目前硬币 > ${user.coin.fixDisplay()}\n")
@@ -88,9 +99,9 @@ object SignInService {
     /**
      * 计算签到所得硬币
      *
-     * @return 获取硬币情况, 详见 [CheckInResult]
+     * @return 获取硬币情况, 详见 [SignInResult]
      */
-    private fun calculateCoin(user: CometUser): CheckInResult {
+    private fun calculate(user: CometUser): Pair<SignInResult, SignInResult> {
         // 计算签到时间
         val currentTime = Clock.System.now()
         val lastSignInTime = user.checkInDate.toInstant(TimeZone.currentSystemDefault())
@@ -111,9 +122,11 @@ object SignInService {
         }
 
         // 使用随机数工具生成基础硬币
-        val basePoint = NumberUtil.round(random.nextDouble(0.0, 10.0), 1, RoundingMode.HALF_DOWN).toDouble()
+        val coinBase = NumberUtil.round(random.nextDouble(0.0, 3.0), 1, RoundingMode.HALF_DOWN).toDouble()
 
-        // 只取小数点后一位，将最大奖励点数限制到 3 倍
+        val expBase = NumberUtil.round(random.nextDouble(0.0, 10.0), 1, RoundingMode.HALF_DOWN).toDouble()
+
+        // 只取小数点后一位，将最大奖励点数限制到 1.5 倍
         val awardProp = min(
             1.5,
             NumberUtil.round((random.nextDouble(0.0, 0.2) * (user.checkInTime - 1)), 1, RoundingMode.HALF_DOWN)
@@ -121,22 +134,24 @@ object SignInService {
         )
 
         // 连续签到的奖励硬币
-        val awardPoint = if (basePoint < 0) {
+        val awardPoint = if (coinBase < 0) {
             0.0
         } else {
-            String.format("%.1f", awardProp * basePoint).toDouble()
+            String.format("%.1f", awardProp * coinBase).toDouble()
         }
 
-        val chancePoint = hasRandomEvent()
-
-        transaction {
-            user.coin += (basePoint + awardPoint + chancePoint)
+        val awardExp = if (coinBase < 0) {
+            0.0
+        } else {
+            String.format("%.1f", awardProp * coinBase).toDouble()
         }
 
-        return CheckInResult(basePoint, awardPoint, chancePoint)
+        val chancePoint = getRandomEventCoin()
+
+        return Pair(SignInResult(coinBase, awardPoint, chancePoint), SignInResult(expBase, awardExp, 0.0))
     }
 
-    private data class CheckInResult(
+    private data class SignInResult(
         val basePoint: Double,
         val awardPoint: Double,
         val chancePoint: Double,
@@ -193,13 +208,49 @@ object SignInService {
         }
     }
 
-    private fun hasRandomEvent(): Double {
+    private fun getRandomEventCoin(): Double {
         val randomEvent = random.nextDouble(0.0, 1.0)
 
         return if (randomEvent in 0.499999..0.500001) {
             random.nextDouble(50.0, 100.0)
         } else {
             0.0
+        }
+    }
+
+    private fun levelUp(currentLevel: Int, exp: Long): Int {
+        val targetLevel = currentLevel + 1
+
+        return when (currentLevel) {
+            in 0..15 -> {
+                val targetExp = targetLevel * targetLevel + 6 * targetLevel
+
+                if (exp > targetExp) {
+                    targetLevel
+                } else {
+                    currentLevel
+                }
+            }
+
+            in 16..30 -> {
+                val targetExp = (2.5 * targetLevel * targetLevel - 40.5 * targetLevel + 360).toLong()
+
+                if (exp > targetExp) {
+                    targetLevel
+                } else {
+                    currentLevel
+                }
+            }
+
+            else -> {
+                val targetExp = (4.5 * targetLevel * targetLevel - 162.5 * targetLevel + 2220).toLong()
+
+                if (exp > targetExp) {
+                    targetLevel
+                } else {
+                    currentLevel
+                }
+            }
         }
     }
 }
