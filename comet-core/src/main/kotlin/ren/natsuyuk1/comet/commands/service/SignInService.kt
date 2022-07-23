@@ -43,7 +43,7 @@ object SignInService {
 
     private suspend fun signIn(sender: PlatformCommandSender, user: CometUser): MessageWrapper {
         val (coinResult, expResult) = calculate(user)
-        val newLevel = levelUp(user.level, user.exp)
+        val newLevel = levelUp(user.level, expResult.getAllPoint().toLong())
         val levelUp = newLevel > user.level
 
         transaction {
@@ -218,35 +218,33 @@ object SignInService {
         }
     }
 
-    private fun levelUp(currentLevel: Int, exp: Long): Int {
-        val targetLevel = currentLevel + 1
-
+    private fun levelUp(currentLevel: Int, earnExp: Long): Int {
         return when (currentLevel) {
             in 0..15 -> {
-                val targetExp = targetLevel * targetLevel + 6 * targetLevel
+                val targetExp = 2 * currentLevel + 7
 
-                if (exp > targetExp) {
-                    targetLevel
+                if (earnExp > targetExp) {
+                    currentLevel + 1
                 } else {
                     currentLevel
                 }
             }
 
             in 16..30 -> {
-                val targetExp = (2.5 * targetLevel * targetLevel - 40.5 * targetLevel + 360).toLong()
+                val targetExp = 5 * currentLevel - 38
 
-                if (exp > targetExp) {
-                    targetLevel
+                if (earnExp > targetExp) {
+                    currentLevel + 1
                 } else {
                     currentLevel
                 }
             }
 
             else -> {
-                val targetExp = (4.5 * targetLevel * targetLevel - 162.5 * targetLevel + 2220).toLong()
+                val targetExp = 9 * currentLevel - 158
 
-                if (exp > targetExp) {
-                    targetLevel
+                if (earnExp > targetExp) {
+                    currentLevel + 1
                 } else {
                     currentLevel
                 }
