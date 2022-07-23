@@ -42,12 +42,12 @@ fun ProjectSekaiProfile.toMessageWrapper(userData: ProjectSekaiUserData, eventId
             val scoreDiff = getDifference(userData.lastQueryScore, profile.score)
             val rankDiff = getDifference(userData.lastQueryPosition.toLong(), profile.rank.toLong())
 
-            if (scoreDiff != 0L && rankDiff != 0L) {
-                appendText(
-                    "上升 ↑ $scoreDiff 分 | " +
-                        (if (profile.rank < userData.lastQueryPosition) "↑" else "↓") + " $rankDiff 名",
-                    true
-                )
+            if (scoreDiff != 0L) {
+                appendText("↑ 上升 $scoreDiff 分 ")
+            }
+
+            if (rankDiff != 0L) {
+                appendText((if (profile.rank < userData.lastQueryPosition) "↑ 上升" else "↓ 下降") + " $rankDiff 名")
             }
         }
 
@@ -78,11 +78,11 @@ fun ProjectSekaiProfile.toMessageWrapper(userData: ProjectSekaiUserData, eventId
 
         appendLine()
 
-        if (ahead != 0) {
+        if (ahead in 100..100000) {
             val aheadPredictScore = ProjectSekaiHelper.predictionCache.data[ahead.toString()]?.jsonPrimitive?.content
             appendText("$ahead 档预测分数为 $aheadPredictScore", true)
         }
-        if (behind in 100..1000001) {
+        if (behind in 100..100000) {
             val behindPredictScore = ProjectSekaiHelper.predictionCache.data[behind.toString()]?.jsonPrimitive?.content
             appendText("$behind 档预测分数为 $behindPredictScore", true)
         }
