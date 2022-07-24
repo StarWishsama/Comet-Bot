@@ -16,7 +16,7 @@ import ren.natsuyuk1.comet.service.refsPattern
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.time.hmsPattern
-import ren.natsuyuk1.comet.utils.time.yyMMddPattern
+import ren.natsuyuk1.comet.utils.time.yyMMddWithTimePattern
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -71,7 +71,7 @@ data class PushEventData(
         fun convertTimestamp(): String {
             val localTime =
                 LocalDateTime.parse(timestamp, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.systemDefault())
-            return yyMMddPattern.format(localTime)
+            return yyMMddWithTimePattern.format(localTime)
         }
     }
 

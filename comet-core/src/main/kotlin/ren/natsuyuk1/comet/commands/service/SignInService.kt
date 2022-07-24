@@ -35,7 +35,7 @@ object SignInService {
 
     suspend fun processSignIn(user: CometUser, sender: PlatformCommandSender): MessageWrapper {
         return if (user.isSigned()) {
-            "你今天已经签到过了! 输入 /cx 可查询硬币详情".toMessageWrapper()
+            "你今天已经签到过了! 输入 /info 可查询详情".toMessageWrapper()
         } else {
             signIn(sender, user)
         }

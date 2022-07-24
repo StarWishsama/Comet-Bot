@@ -32,19 +32,20 @@ fun Chat.toCometGroup(comet: TelegramComet): Group {
         chat.id,
         chat.username ?: "未知群聊",
     ) {
-        override val owner: GroupMember = run {
-            val resp = comet.bot.getChatAdministrators(chat.id.chatID())
-            var result: com.github.kotlintelegrambot.entities.User? = null
+        override val owner: GroupMember
+            get() = run {
+                val resp = comet.bot.getChatAdministrators(chat.id.chatID())
+                var result: com.github.kotlintelegrambot.entities.User? = null
 
-            resp.fold(
-                ifSuccess = { cm ->
-                    result = cm.find { it.status == "creator" }?.user
-                },
-                ifError = {}
-            )
+                resp.fold(
+                    ifSuccess = { cm ->
+                        result = cm.find { it.status == "creator" }?.user
+                    },
+                    ifError = {}
+                )
 
-            result?.toCometGroupMember(comet, chat.id) ?: error("Unable to retrieve group owner")
-        }
+                result?.toCometGroupMember(comet, chat.id) ?: error("Unable to retrieve group owner")
+            }
 
         // FIXME
         override val members: List<GroupMember> = listOf()

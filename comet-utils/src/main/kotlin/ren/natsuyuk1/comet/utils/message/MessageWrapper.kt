@@ -30,10 +30,10 @@ open class MessageWrapper {
     @kotlinx.serialization.Transient
     private var usable: Boolean = isEmpty()
 
-    fun appendText(text: String, autoNewline: Boolean = false): MessageWrapper =
+    fun appendText(text: String, newline: Boolean = false): MessageWrapper =
         apply {
             appendElement(Text(text))
-            if (autoNewline) appendLine()
+            if (newline) appendLine()
         }
 
     fun appendLine(): MessageWrapper = apply { appendElement(Text("\n")) }

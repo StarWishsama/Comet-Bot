@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.commands
 
 import moe.sdl.yac.parameters.arguments.argument
+import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.CometCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
@@ -8,6 +9,10 @@ import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.network.thirdparty.jikipedia.JikiPediaAPI
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.utils.string.StringUtil.toMessageWrapper
+import java.io.IOException
+
+private val logger = KotlinLogging.logger {}
 
 val JIKI = CommandProperty(
     "jiki",
@@ -29,6 +34,11 @@ class JikiPediaCommand(
     private val keyword by argument(help = "搜索关键词")
 
     override suspend fun run() {
-        subject.sendMessage(JikiPediaAPI.searchByKeyWord(keyword).toMessageWrapper())
+        try {
+            subject.sendMessage(JikiPediaAPI.search(keyword).toMessageWrapper())
+        } catch (e: IOException) {
+            subject.sendMessage("❌ 在搜索时出现了问题".toMessageWrapper())
+            logger.error(e) { "在搜索小鸡百科内容时出现问题" }
+        }
     }
 }

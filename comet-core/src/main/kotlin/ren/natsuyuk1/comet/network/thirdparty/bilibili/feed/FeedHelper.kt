@@ -12,7 +12,7 @@ import ren.natsuyuk1.comet.utils.message.Image
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
-import ren.natsuyuk1.comet.utils.time.yyMMddPattern
+import ren.natsuyuk1.comet.utils.time.yyMMddWithTimePattern
 
 fun FeedCardNode.toMessageWrapper(): MessageWrapper {
     val description = this.description!!
@@ -31,7 +31,7 @@ fun FeedCardNode.toMessageWrapper(): MessageWrapper {
     }
 }
 
-fun FeedDescription.getReadableSentTime(): String = timestamp!!.toLocalDateTime().format(yyMMddPattern)
+fun FeedDescription.getReadableSentTime(): String = timestamp!!.toLocalDateTime().format(yyMMddWithTimePattern)
 
 fun ArticleCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
     buildMessageWrapper {

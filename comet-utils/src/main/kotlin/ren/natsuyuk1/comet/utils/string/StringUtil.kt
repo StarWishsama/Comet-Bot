@@ -13,11 +13,14 @@ import cn.hutool.core.codec.Base64Decoder
 import cn.hutool.crypto.SecureUtil
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.toJavaInstant
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
+import ren.natsuyuk1.comet.utils.time.yyMMddPattern
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import kotlin.time.Duration
@@ -141,23 +144,9 @@ object StringUtil {
         return duration.toFriendly(maxUnit = unit, msMode = msMode)
     }
 
+    fun Instant.format(formatter: DateTimeFormatter = yyMMddPattern): String = formatter.format(toJavaInstant())
+
     fun String.containsEtc(strict: Boolean = true, string: List<String>): Boolean {
-        var counter = 0
-
-        string.forEach {
-            if (this.contains(it)) {
-                if (!strict) {
-                    return true
-                } else if (counter < string.size) {
-                    counter++
-                }
-            }
-        }
-
-        return counter >= string.size
-    }
-
-    fun String.containsEtc(strict: Boolean = true, vararg string: String): Boolean {
         var counter = 0
 
         string.forEach {
