@@ -1,7 +1,6 @@
 package ren.natsuyuk1.comet.telegram.contact
 
 import com.github.kotlintelegrambot.entities.Chat
-import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.telegram.util.chatID
@@ -17,23 +16,19 @@ abstract class TelegramUser(
         get() = "telegram"
 }
 
-fun Chat.toCometUser(comet: TelegramComet): TelegramUser {
-    val chat = this
+class TelegramUserImpl(
+    private val chat: Chat,
+    override val comet: TelegramComet,
+) : TelegramUser(chat.id, chat.getDisplayName()) {
+    override var card: String = chat.getDisplayName()
 
-    class TelegramUserImpl : TelegramUser(chat.id, chat.getDisplayName()) {
-        override val comet: Comet
-            get() = comet
+    override val id: Long = chat.id
 
-        override var card: String = chat.getDisplayName()
+    override val remark: String = chat.getDisplayName()
 
-        override val id: Long = chat.id
-
-        override val remark: String = chat.getDisplayName()
-
-        override fun sendMessage(message: MessageWrapper) {
-            message.send(comet, chat.id.chatID())
-        }
+    override fun sendMessage(message: MessageWrapper) {
+        message.send(comet, chat.id.chatID())
     }
-
-    return TelegramUserImpl()
 }
+
+fun Chat.toCometUser(comet: TelegramComet): TelegramUser = TelegramUserImpl(this, comet)

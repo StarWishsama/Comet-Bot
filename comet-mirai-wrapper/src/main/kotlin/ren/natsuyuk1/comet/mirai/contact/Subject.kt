@@ -21,57 +21,54 @@ abstract class MiraiGroup(
     override val platformName: String = "mirai"
 }
 
-fun net.mamoe.mirai.contact.Group.toCometGroup(comet: MiraiComet): Group {
-    val group = this@toCometGroup
+internal class MiraiGroupImpl(
+    private val group: net.mamoe.mirai.contact.Group,
+    override val comet: MiraiComet
+) : MiraiGroup(
+    group.id,
+    group.name
+) {
+    override val owner: GroupMember = group.owner.toGroupMember(comet)
 
-    class MiraiGroupImpl : MiraiGroup(
-        group.id,
-        group.name
-    ) {
-        override val owner: GroupMember = group.owner.toGroupMember(comet)
+    override val members: List<GroupMember> = group.members.toGroupMemberList(comet)
 
-        override val members: List<GroupMember> = group.members.toGroupMemberList(comet)
-
-        override fun updateGroupName(groupName: String) {
-            group.name = groupName
-        }
-
-        override fun getBotMuteRemaining(): Int = group.botMuteRemaining
-
-        override fun getBotPermission(): GroupPermission {
-            return GroupPermission.valueOf(group.botPermission.name)
-        }
-
-        override val avatarUrl: String = group.avatarUrl
-
-        override fun getMember(id: Long): GroupMember? = group.getMember(id)?.toGroupMember(comet)
-
-        override suspend fun quit(): Boolean = group.quit()
-
-        override fun contains(id: Long): Boolean = group.contains(id)
-        override val comet: Comet
-            get() = comet
-
-        // Group doesn't have card
-        override var card: String = ""
-
-        override fun sendMessage(message: MessageWrapper) {
-            comet.scope.launch {
-                val event = MessageSendEvent(
-                    comet,
-                    this@MiraiGroupImpl,
-                    message,
-                    Clock.System.now().epochSeconds
-                ).also { it.broadcast() }
-
-                if (!event.isCancelled)
-                    group.sendMessage(message.toMessageChain(group))
-            }
-        }
+    override fun updateGroupName(groupName: String) {
+        group.name = groupName
     }
 
-    return MiraiGroupImpl()
+    override fun getBotMuteRemaining(): Int = group.botMuteRemaining
+
+    override fun getBotPermission(): GroupPermission {
+        return GroupPermission.valueOf(group.botPermission.name)
+    }
+
+    override val avatarUrl: String = group.avatarUrl
+
+    override fun getMember(id: Long): GroupMember? = group.getMember(id)?.toGroupMember(comet)
+
+    override suspend fun quit(): Boolean = group.quit()
+
+    override fun contains(id: Long): Boolean = group.contains(id)
+
+    // Group doesn't have card
+    override var card: String = ""
+
+    override fun sendMessage(message: MessageWrapper) {
+        comet.scope.launch {
+            val event = MessageSendEvent(
+                comet,
+                this@MiraiGroupImpl,
+                message,
+                Clock.System.now().epochSeconds
+            ).also { it.broadcast() }
+
+            if (!event.isCancelled)
+                group.sendMessage(message.toMessageChain(group))
+        }
+    }
 }
+
+fun net.mamoe.mirai.contact.Group.toCometGroup(comet: MiraiComet): Group = MiraiGroupImpl(this, comet)
 
 abstract class MiraiUser : User() {
     override val platformName: String = "mirai"
