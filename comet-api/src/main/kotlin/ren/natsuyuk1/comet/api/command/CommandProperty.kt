@@ -17,13 +17,20 @@ import ren.natsuyuk1.comet.api.user.UserLevel
  *
  * 一个命令的相关配置
  */
-data class CommandProperty(
-    val name: String,
-    val alias: List<String>,
+open class CommandProperty(
+    open val name: String,
+    open val alias: List<String> = listOf(),
     val description: String,
     val helpText: String,
     val permission: String = "comet.command.${name}",
-    val permissionLevel: UserLevel = UserLevel.USER,
+    open val permissionLevel: UserLevel = UserLevel.USER,
     val executeConsumePoint: Int = config.defaultCoolDownTime,
     val executeConsumeType: CommandConsumeType = CommandConsumeType.COOLDOWN
 )
+
+data class SubCommandProperty(
+    override val name: String,
+    override val alias: List<String>,
+    val parentCommandProperty: CommandProperty,
+    override val permissionLevel: UserLevel = UserLevel.USER
+) : CommandProperty(name, alias, "", "", "${parentCommandProperty.permission}.$name", permissionLevel)

@@ -1,14 +1,13 @@
 package ren.natsuyuk1.comet.commands
 
-import moe.sdl.yac.core.CliktCommand
 import moe.sdl.yac.parameters.options.option
+import moe.sdl.yac.parameters.types.int
 import ren.natsuyuk1.comet.api.Comet
-import ren.natsuyuk1.comet.api.command.CometCommand
-import ren.natsuyuk1.comet.api.command.CommandProperty
-import ren.natsuyuk1.comet.api.command.PlatformCommandSender
+import ren.natsuyuk1.comet.api.command.*
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.BiliBiliService
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
 import ren.natsuyuk1.comet.utils.string.StringUtil.toMessageWrapper
 
 val BILIBILI = CommandProperty(
@@ -19,7 +18,8 @@ val BILIBILI = CommandProperty(
     /bili user 查询用户信息
     /bili video 查询视频信息
     /bili dynamic 查询用户动态
-    /bili subscribe 订阅用户动态 (含开播信息)   
+    /bili sub 订阅用户动态 (含开播信息)   
+    /bili unsub 取消订阅用户动态
      
     Powered by yabapi 
     """.trimIndent()
@@ -34,40 +34,77 @@ class BiliBiliCommand(
 ) : CometCommand(comet, sender, subject, message, user, BILIBILI) {
 
     override suspend fun run() {
-        TODO("Not yet implemented")
+        if (message.parseToString().toArgs().size == 1) {
+            subject.sendMessage(BILIBILI.helpText.toMessageWrapper())
+        }
     }
 
     class User(
-        private val subject: PlatformCommandSender,
-        val user: CometUser
-    ) : CliktCommand(name = "user") {
-        override fun aliases(): Map<String, List<String>> =
-            mapOf(
-                "用户" to listOf("user"),
-                "yh" to listOf("user")
+        override val subject: PlatformCommandSender,
+        override val user: CometUser
+    ) : CometSubCommand(subject, user, USER) {
+
+        companion object {
+            val USER = SubCommandProperty(
+                "user",
+                listOf("用户", "yh"),
+                BILIBILI
             )
+        }
+
+        private val name by option("-n", "--name", "-i", "--id", help = "欲查询用户的名称")
+        private val uid by option("-i", "--id", help = "欲查询用户的 UID").int()
+
+        override suspend fun run() {
+            if (uid != null) {
+                BiliBiliService.processUserSearch(subject, id = uid!!)
+            } else if (name != null) {
+                BiliBiliService.processUserSearch(subject, keyword = name!!)
+            } else {
+                subject.sendMessage("请提供欲查询用户的名称或 ID!".toMessageWrapper())
+            }
+        }
+    }
+
+    class Video(
+        override val subject: PlatformCommandSender,
+        override val user: CometUser
+    ) : CometSubCommand(subject, user, VIDEO) {
+
+        companion object {
+            val VIDEO = SubCommandProperty(
+                "video",
+                listOf("视频", "vid", "sp"),
+                BILIBILI
+            )
+        }
 
         override suspend fun run() {
             TODO("Not yet implemented")
         }
+
     }
 
     class Dynamic(
-        private val subject: PlatformCommandSender,
-        val user: CometUser
-    ) : CliktCommand(name = "dynamic") {
+        override val subject: PlatformCommandSender,
+        override val user: CometUser
+    ) : CometSubCommand(subject, user, DYNAMIC) {
 
-        private val nameOrUID by option("-n", "--name", "-i", "--id", help = "欲查询用户的名称或 UID")
+        companion object {
+            val DYNAMIC = SubCommandProperty(
+                "dynamic",
+                listOf("动态", "dyna"),
+                BILIBILI
+            )
+        }
 
-        override fun aliases(): Map<String, List<String>> =
-            mapOf("用户" to listOf("user"))
+        private val dynamicID by option("-i", "--id", help = "欲查询动态的 ID").int()
 
         override suspend fun run() {
-            if (nameOrUID == null) {
-                subject.sendMessage("请提供欲查询用户的名称或 UID!".toMessageWrapper())
+            if (dynamicID == null) {
+                subject.sendMessage("请提供欲查询动态的 ID!".toMessageWrapper())
+                return
             }
-
-            BiliBiliService
         }
     }
 }

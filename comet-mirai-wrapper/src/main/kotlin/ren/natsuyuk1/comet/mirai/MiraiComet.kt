@@ -14,7 +14,7 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.utils.BotConfiguration
 import ren.natsuyuk1.comet.api.Comet
-import ren.natsuyuk1.comet.api.attachCommandManager
+import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.mirai.config.MiraiConfig
@@ -63,7 +63,7 @@ class MiraiComet(
             it.redirectToComet(this@MiraiComet)
         }
 
-        attachCommandManager()
+        attachMessageProcessor()
         subscribeGithubEvent()
     }
 

@@ -14,6 +14,7 @@ import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.event.impl.message.MessageEvent
 import ren.natsuyuk1.comet.api.event.registerListener
+import ren.natsuyuk1.comet.api.session.SessionManager
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import kotlin.coroutines.CoroutineContext
 
@@ -52,10 +53,18 @@ abstract class Comet(
     abstract fun close()
 }
 
-fun Comet.attachCommandManager() {
+fun Comet.attachMessageProcessor() {
     registerListener<MessageEvent> {
         if (it.comet == this) {
-            CommandManager.executeCommand(comet = this, sender = it.sender, subject = it.subject, wrapper = it.message)
+            val sessionProcessed = SessionManager.handleSession(it.subject, it.message)
+
+            if (!sessionProcessed)
+                CommandManager.executeCommand(
+                    comet = this,
+                    sender = it.sender,
+                    subject = it.subject,
+                    wrapper = it.message
+                )
         }
     }
 }

@@ -7,7 +7,7 @@ import com.github.kotlintelegrambot.dispatcher.message
 import com.github.kotlintelegrambot.extensions.filters.Filter
 import kotlinx.coroutines.launch
 import ren.natsuyuk1.comet.api.Comet
-import ren.natsuyuk1.comet.api.attachCommandManager
+import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.user.Group
@@ -51,7 +51,7 @@ class TelegramComet(
 
         logger.info { "成功登录 Telegram Bot ${telegramConfig.token.split(":").firstOrNull()}" }
 
-        attachCommandManager()
+        attachMessageProcessor()
         subscribeGithubEvent()
     }
 

@@ -57,9 +57,16 @@ object CommandManager {
 
         commands.putIfAbsent(name, commandNode)?.also {
             logger.warn { "Command name '$name' conflict, please check command property." }
+            return
         }
 
         PermissionManager.register(commandNode.property.permission, commandNode.property.permissionLevel)
+
+        if (commandNode.subCommandProperty.isNotEmpty()) {
+            commandNode.subCommandProperty.forEach {
+                PermissionManager.register(it.permission, it.permissionLevel)
+            }
+        }
     }
 
     fun registerCommands(collection: Collection<AbstractCommandNode<*>>): Unit =
