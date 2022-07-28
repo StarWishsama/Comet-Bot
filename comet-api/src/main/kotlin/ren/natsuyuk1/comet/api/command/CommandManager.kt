@@ -43,9 +43,10 @@ object CommandManager {
     @Suppress("unused")
     fun registerCommand(
         entry: CommandProperty,
+        subCommandProperty: List<SubCommandProperty> = listOf(),
         handler: (Comet, PlatformCommandSender, PlatformCommandSender, MessageWrapper, CometUser) -> BaseCommand
     ) {
-        registerCommand(CommandNode(entry, handler))
+        registerCommand(CommandNode(entry, subCommandProperty, handler))
     }
 
     /**
