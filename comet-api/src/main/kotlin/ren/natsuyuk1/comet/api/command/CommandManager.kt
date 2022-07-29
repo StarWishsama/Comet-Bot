@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import moe.sdl.yac.core.CliktError
 import moe.sdl.yac.core.CommandResult
+import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.permission.PermissionManager
 import ren.natsuyuk1.comet.api.permission.hasPermission
@@ -132,7 +133,9 @@ object CommandManager {
                     }
                 }
 
-                user.triggerCommandTime = executeTime
+                transaction {
+                    user.triggerCommandTime = executeTime
+                }
             }
 
             val cmdStatus = if (sender is PlatformCommandSender) {
