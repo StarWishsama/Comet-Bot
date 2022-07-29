@@ -131,6 +131,8 @@ object CommandManager {
                         }
                     }
                 }
+
+                user.triggerCommandTime = executeTime
             }
 
             val cmdStatus = if (sender is PlatformCommandSender) {

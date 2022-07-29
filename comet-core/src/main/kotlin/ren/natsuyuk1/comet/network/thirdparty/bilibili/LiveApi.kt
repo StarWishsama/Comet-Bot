@@ -13,8 +13,6 @@ package ren.natsuyuk1.comet.network.thirdparty.bilibili
 import moe.sdl.yabapi.api.getRoomInfoByRoomId
 
 object LiveApi {
-    private const val apiRateLimit = "BiliBili API调用已达上限"
-
     suspend fun getLiveInfo(roomId: Int) = runCatching {
         if (roomId < 1L) {
             throw IllegalArgumentException("直播间 ID 不能小于 1")

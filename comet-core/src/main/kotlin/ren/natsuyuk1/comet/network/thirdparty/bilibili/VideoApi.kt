@@ -17,10 +17,10 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger {}
 
 object VideoApi {
-    suspend fun getVideoInfo(av: Int): VideoInfo? {
+    suspend fun getVideoInfo(av: Int): Result<VideoInfo?> {
         return kotlin.runCatching { client.getVideoInfo(av).data }.onFailure {
             logger.warn("在获取哔哩哔哩视频信息时遇到了问题", it)
-        }.getOrNull()
+        }
     }
 
     suspend fun getVideoInfo(bv: String): Result<VideoInfo?> {
