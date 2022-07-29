@@ -14,14 +14,7 @@ class TestJikiPediaAPI {
         if (isCI()) return
 
         runBlocking {
-            println(JikiPediaAPI.search("叩").toMessageWrapper())
+           JikiPediaAPI.search("叩").toMessageWrapper().print()
         }
-    }
-
-    @Test
-    fun testXIDGenerate() {
-        if (isCI()) return
-
-        JikiPediaAPI.encodeToJikiXID().print()
     }
 }
