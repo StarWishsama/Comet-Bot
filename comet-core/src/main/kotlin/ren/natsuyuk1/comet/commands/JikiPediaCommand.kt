@@ -35,7 +35,11 @@ class JikiPediaCommand(
 
     override suspend fun run() {
         try {
-            subject.sendMessage(JikiPediaAPI.search(keyword).toMessageWrapper())
+            if (keyword.length > 60) {
+                subject.sendMessage("请缩短搜索内容至64个字符以内".toMessageWrapper())
+            } else {
+                subject.sendMessage(JikiPediaAPI.search(keyword).toMessageWrapper())
+            }
         } catch (e: IOException) {
             subject.sendMessage("❌ 在搜索时出现了问题".toMessageWrapper())
             logger.error(e) { "在搜索小鸡百科内容时出现问题" }

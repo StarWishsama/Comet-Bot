@@ -50,7 +50,10 @@ abstract class BaseCommand(
     )
 
     init {
-        context { localization = CommandLocalization }
+        context {
+            localization = CommandLocalization
+            expandArgumentFiles = false
+        }
     }
 }
 

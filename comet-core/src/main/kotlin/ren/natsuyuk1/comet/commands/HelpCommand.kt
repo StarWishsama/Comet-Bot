@@ -63,7 +63,7 @@ class HelpCommand(
         // Build the message and send to the sender
         subject.sendMessage(
             buildMessageWrapper {
-                appendText("Comet 帮助菜单 $pageNum / $pageItems.size", true)
+                appendText("Comet 帮助菜单 $pageNum / ${pageItems.size}", true)
                 val entries = pageItems[pageNum - 1]
                 val maxLen = entries.map { it.key }.maxOf { it.length }
                 entries.filter { it.value !is ConsoleCommandNode }.forEach {

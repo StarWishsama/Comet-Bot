@@ -252,3 +252,5 @@ fun String.replaceWithOrder(vararg args: Any?): String {
 fun String.toHMAC(key: String): String {
     return SecureUtil.hmacSha256(key).digestHex(this)
 }
+
+fun String?.emptyIfNull() = if (this.isNullOrEmpty()) "" else this
