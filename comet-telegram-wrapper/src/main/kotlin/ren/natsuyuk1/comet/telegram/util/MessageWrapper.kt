@@ -22,9 +22,9 @@ fun MessageWrapper.send(comet: TelegramComet, target: ChatId) {
         find<Image>()?.toTelegramFile()?.let { comet.bot.sendPhoto(target, it, caption = textBuffer.toString()) }
     } else if (find<Voice>() != null) {
         find<Voice>()?.toTelegramFile()?.let { comet.bot.sendAudio(target, it) }
+    } else {
+        comet.bot.sendMessage(target, textBuffer.toString())
     }
-
-    comet.bot.sendMessage(target, textBuffer.toString())
 }
 
 suspend fun Message.toMessageWrapper(comet: TelegramComet, permanent: Boolean = false): MessageWrapper {

@@ -12,6 +12,10 @@ import kotlin.time.Duration
 
 fun Session.register() = SessionManager.registerSession(this)
 
+fun Session.registerTimeout(timeout: Duration) = SessionManager.registerTimeoutSession(this, timeout)
+
+fun Session.expire() = SessionManager.expireSession(this)
+
 object SessionManager {
     private var scope = ModuleScope("comet-session-manager")
 
@@ -33,7 +37,7 @@ object SessionManager {
      * @param session 欲注册的会话
      * @param timeout 自动注销的期限
      */
-    fun insertTimeoutSession(session: Session, timeout: Duration) {
+    fun registerTimeoutSession(session: Session, timeout: Duration) {
         registerSession(session)
 
         TaskManager.registerTask(timeout) {

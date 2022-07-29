@@ -1,5 +1,7 @@
 package ren.natsuyuk1.comet.commands
 
+import moe.sdl.yac.parameters.arguments.argument
+import moe.sdl.yac.parameters.arguments.default
 import moe.sdl.yac.parameters.options.option
 import moe.sdl.yac.parameters.types.int
 import ren.natsuyuk1.comet.api.Comet
@@ -15,11 +17,11 @@ val BILIBILI = CommandProperty(
     listOf("bili", "哔哩哔哩"),
     "查询哔哩哔哩用户/视频/动态等相关信息",
     """
-    /bili user 查询用户信息
-    /bili video 查询视频信息
-    /bili dynamic 查询用户动态
-    /bili sub 订阅用户动态 (含开播信息)   
-    /bili unsub 取消订阅用户动态
+    /bili user 查询用户信息\n
+    /bili video 查询视频信息\n
+    /bili dynamic 查询用户动态\n
+    /bili sub 订阅用户动态 (含开播信息)\n 
+    /bili unsub 取消订阅用户动态\n
      
     Powered by yabapi 
     """.trimIndent()
@@ -52,7 +54,7 @@ class BiliBiliCommand(
             )
         }
 
-        private val name by option("-n", "--name", "-i", "--id", help = "欲查询用户的名称")
+        private val name by option("-n", "--name", help = "欲查询用户的名称")
         private val uid by option("-i", "--id", help = "欲查询用户的 UID").int()
 
         override suspend fun run() {
@@ -71,6 +73,8 @@ class BiliBiliCommand(
         override val user: CometUser
     ) : CometSubCommand(subject, user, VIDEO) {
 
+        private val video by argument(help = "视频 av/bv号/链接").default("")
+
         companion object {
             val VIDEO = SubCommandProperty(
                 "video",
@@ -80,7 +84,11 @@ class BiliBiliCommand(
         }
 
         override suspend fun run() {
-            TODO("Not yet implemented")
+            if (video.isBlank()) {
+                subject.sendMessage(BILIBILI.helpText.toMessageWrapper())
+            } else {
+                BiliBiliService.processVideoSearch(subject, video)
+            }
         }
 
     }
@@ -98,12 +106,14 @@ class BiliBiliCommand(
             )
         }
 
-        private val dynamicID by option("-i", "--id", help = "欲查询动态的 ID").int()
+        private val dynamicID by argument(help = "欲查询动态的 ID").default("")
 
         override suspend fun run() {
-            if (dynamicID == null) {
-                subject.sendMessage("请提供欲查询动态的 ID!".toMessageWrapper())
+            if (dynamicID.isEmpty()) {
+                subject.sendMessage("请提供欲查询动态的 ID 或链接!".toMessageWrapper())
                 return
+            } else {
+                BiliBiliService.processDynamicSearch(subject, dynamicID)
             }
         }
     }
