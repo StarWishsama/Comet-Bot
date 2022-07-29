@@ -36,7 +36,7 @@ class JikiPediaCommand(
     override suspend fun run() {
         try {
             if (keyword.length > 60) {
-                subject.sendMessage("请缩短搜索内容至64个字符以内".toMessageWrapper())
+                subject.sendMessage("❌ 请缩短搜索内容至64个字符以内".toMessageWrapper())
             } else {
                 subject.sendMessage(JikiPediaAPI.search(keyword).toMessageWrapper())
             }

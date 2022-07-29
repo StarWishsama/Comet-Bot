@@ -17,13 +17,11 @@ val BILIBILI = CommandProperty(
     listOf("bili", "哔哩哔哩"),
     "查询哔哩哔哩用户/视频/动态等相关信息",
     """
-    /bili user 查询用户信息\n
-    /bili video 查询视频信息\n
-    /bili dynamic 查询用户动态\n
-    /bili sub 订阅用户动态 (含开播信息)\n 
-    /bili unsub 取消订阅用户动态\n
-     
-    Powered by yabapi 
+    /bili user 查询用户信息
+    /bili video 查询视频信息
+    /bili dynamic 查询用户动态
+    /bili sub 订阅用户动态 (含开播信息) 
+    /bili unsub 取消订阅用户动态
     """.trimIndent()
 )
 
@@ -43,8 +41,9 @@ class BiliBiliCommand(
 
     class User(
         override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
         override val user: CometUser
-    ) : CometSubCommand(subject, user, USER) {
+    ) : CometSubCommand(subject, sender, user, USER) {
 
         companion object {
             val USER = SubCommandProperty(
@@ -70,8 +69,9 @@ class BiliBiliCommand(
 
     class Video(
         override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
         override val user: CometUser
-    ) : CometSubCommand(subject, user, VIDEO) {
+    ) : CometSubCommand(subject, sender, user, VIDEO) {
 
         private val video by argument(help = "视频 av/bv号/链接").default("")
 
@@ -95,8 +95,9 @@ class BiliBiliCommand(
 
     class Dynamic(
         override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
         override val user: CometUser
-    ) : CometSubCommand(subject, user, DYNAMIC) {
+    ) : CometSubCommand(subject, sender, user, DYNAMIC) {
 
         companion object {
             val DYNAMIC = SubCommandProperty(

@@ -44,8 +44,9 @@ class ProjectSekaiCommand(
 
     class Bind(
         override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
         override val user: CometUser
-    ) : CometSubCommand(subject, user, BIND) {
+    ) : CometSubCommand(subject, sender, user, BIND) {
 
         companion object {
             val BIND = SubCommandProperty(
@@ -72,8 +73,9 @@ class ProjectSekaiCommand(
 
     class Info(
         override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
         override val user: CometUser
-    ) : CometSubCommand(subject, user, INFO) {
+    ) : CometSubCommand(subject, sender, user, INFO) {
 
         companion object {
             val INFO = SubCommandProperty(
@@ -90,8 +92,9 @@ class ProjectSekaiCommand(
 
     class Event(
         override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
         override val user: CometUser
-    ) : CometSubCommand(subject, user, EVENT) {
+    ) : CometSubCommand(subject, sender, user, EVENT) {
 
         companion object {
             val EVENT = SubCommandProperty(
@@ -110,8 +113,9 @@ class ProjectSekaiCommand(
 
     class Prediction(
         override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
         override val user: CometUser
-    ) : CometSubCommand(subject, user, PREDICTION) {
+    ) : CometSubCommand(subject, sender, user, PREDICTION) {
 
         companion object {
             val PREDICTION = SubCommandProperty(

@@ -15,7 +15,6 @@ import kotlinx.datetime.toLocalDateTime
 import mu.KotlinLogging
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
-import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
@@ -156,11 +155,4 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
 object UserPermissionTable : SetTable<UUID, String>("user_permission") {
     override val id: Column<EntityID<UUID>> = reference("user", UserTable.id).index()
     override val value: Column<String> = varchar("permission_node", 255)
-}
-
-class UserPermission(id: EntityID<UUID>) : UUIDEntity(id) {
-    companion object : EntityClass<UUID, Entity<UUID>>(UserPermissionTable)
-
-    val user by UserPermissionTable.id
-    val permissionNode by UserPermissionTable.value
 }

@@ -72,6 +72,7 @@ abstract class CometCommand(
 
 abstract class CometSubCommand(
     open val subject: CommandSender,
+    open val sender: CommandSender,
     open val user: CometUser,
     open val property: CommandProperty
 ) : CliktCommand(name = property.name) {
