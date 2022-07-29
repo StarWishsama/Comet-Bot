@@ -7,6 +7,7 @@
 Demo/交流群：725656262
 
 **一切开发旨在学习，请勿用于非法用途**
+
 [![Issues](https://img.shields.io/github/issues/StarWishsama/Comet-Bot.svg?style=popout)](https://github.com/StarWishsama/Comet-Bot/issues)
 ![Stars](https://img.shields.io/github/stars/starwishsama/Comet-Bot)
 [![Release](https://img.shields.io/github/v/release/StarWishSama/Comet-Bot?include_prereleases)](https://github.com/StarWishsama/Comet-Bot/releases)
@@ -29,7 +30,7 @@ Demo/交流群：725656262
 
 1. 在[此处](https://github.com/StarWishsama/Comet-Bot/releases)下载最新版本
 2. 使用 ```java -jar Comet本体路径``` 启动 Bot
-3. 输入 /login 登录指定平台账号 (QQ, Telegram [WIP])
+3. 输入 /login 登录指定平台账号 (QQ, Telegram)
 4. 提示登录成功后, 在机器人加入的群内发送 /help 就可开始了解 Comet 的各项功能了
 
 ## 📜 协议
@@ -71,8 +72,9 @@ comet-mirai-wrapper 使用 [AGPL v3](https://github.com/StarWishsama/Comet-Bot/b
 [<img src=".github/jetbrains.png" width="200"/>](https://www.jetbrains.com/?from=comet-bot)
 
 - [Sorapointa](https://github.com/Sorapointa/Sorapointa) 提供的高质量基础架构设计
-- [sekai.best](https://sekai.best) 查询 Project Sekai 游戏信息及活动积分预测
+- [sekai.best](https://sekai.best) 查询 Project Sekai 游戏信息
 - [Project Sekai Profile](https://profile.pjsekai.moe) 提供 Project Sekai 游戏信息
+- [33Kit](https://3-3.dev/) 提供 Project Sekai 活动积分预测
 - [PRTS Wiki](http://prts.wiki/) 提供的明日方舟干员数据以及立绘
 - [ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData) 提供明日方舟游戏数据资源
 - [Yabapi](https://github.com/SDLMoe/Yabapi) 提供可靠的哔哩哔哩 API 库
