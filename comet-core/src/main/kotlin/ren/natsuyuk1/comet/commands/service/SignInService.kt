@@ -11,6 +11,7 @@ package ren.natsuyuk1.comet.commands.service
 
 import cn.hutool.core.util.NumberUtil
 import kotlinx.datetime.*
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
@@ -163,9 +164,6 @@ object SignInService {
         val checkTime = Clock.System.now()
         val checkLDT = checkTime.toLocalDateTime(TimeZone.currentSystemDefault())
 
-        /**
-         * 签到刷新时间为 6:00
-         */
         val before = LocalDateTime(
             checkLDT.year,
             checkLDT.monthNumber,
@@ -187,8 +185,7 @@ object SignInService {
 
         return transaction {
             val sortedByDate = UserTable.select {
-                UserTable.checkInDate greaterEq before
-                UserTable.checkInDate lessEq after
+                UserTable.checkInDate greaterEq before and (UserTable.checkInDate lessEq after)
             }
 
             sortedByDate.sortedBy { it[UserTable.checkInDate] }.indexOfFirst { it[UserTable.id] == user.id }
