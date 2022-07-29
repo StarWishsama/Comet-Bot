@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.service
 
 import kotlinx.coroutines.launch
+import ren.natsuyuk1.comet.api.group.GroupSettingManager
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiHelper
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
@@ -20,6 +21,7 @@ object CometCoreService {
 
     private suspend fun initCoreService() {
         ProjectSekaiHelper.init(scope.coroutineContext)
+        GroupSettingManager.init(scope.coroutineContext)
         TaskManager.registerTask(1.hours) { HitokotoManager.fetch() }
     }
 }

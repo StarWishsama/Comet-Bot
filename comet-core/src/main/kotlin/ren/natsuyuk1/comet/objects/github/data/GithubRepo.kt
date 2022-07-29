@@ -15,13 +15,13 @@ object GithubRepoData : PersistDataFile<GithubRepoData.Data>(
             val repoName: String,
             val owner: String,
             val secret: String,
-            val subscribers: List<GithubRepoSubscriber>
+            val subscribers: List<GithubRepoSubscriber>,
         ) {
             fun getName(): String = "$owner/$repoName"
 
             data class GithubRepoSubscriber(
                 val id: Long,
-                val subscribeEvent: List<String> = mutableListOf()
+                val subscribeEvent: List<String> = mutableListOf("push", "release", "issue", "issue_comment")
             )
         }
     }

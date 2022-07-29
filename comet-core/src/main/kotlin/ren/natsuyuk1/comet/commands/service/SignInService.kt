@@ -23,7 +23,6 @@ import ren.natsuyuk1.comet.utils.string.StringUtil.toMessageWrapper
 import java.lang.Double.min
 import java.math.RoundingMode
 import java.security.SecureRandom
-import kotlin.time.Duration.Companion.days
 
 fun CometUser.isSigned(): Boolean {
     val currentTime = Clock.System.now()
@@ -170,8 +169,8 @@ object SignInService {
         val before = LocalDateTime(
             checkLDT.year,
             checkLDT.monthNumber,
-            checkTime.minus(1.days).toLocalDateTime(TimeZone.currentSystemDefault()).dayOfMonth,
-            6,
+            checkLDT.dayOfMonth,
+            0,
             0,
             0,
             0
@@ -179,16 +178,16 @@ object SignInService {
         val after = LocalDateTime(
             checkLDT.year,
             checkLDT.monthNumber,
-            checkTime.plus(1.days).toLocalDateTime(TimeZone.currentSystemDefault()).dayOfMonth,
-            6,
-            0,
-            0,
+            checkLDT.dayOfMonth,
+            23,
+            59,
+            59,
             0
         )
 
         return transaction {
             val sortedByDate = UserTable.select {
-                UserTable.checkInDate greater before
+                UserTable.checkInDate greaterEq before
                 UserTable.checkInDate lessEq after
             }
 
@@ -197,7 +196,7 @@ object SignInService {
     }
 
     private fun getCurrentInstantString(): String {
-        val timeNow = Clock.System.now().toLocalDateTime(TimeZone.of("Asia/Hong_Kong"))
+        val timeNow = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
         return when (timeNow.hour) {
             in 6..8 -> "早上"

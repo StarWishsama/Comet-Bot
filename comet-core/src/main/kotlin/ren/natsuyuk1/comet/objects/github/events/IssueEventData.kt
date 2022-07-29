@@ -11,6 +11,7 @@
 package ren.natsuyuk1.comet.objects.github.events
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
@@ -19,6 +20,15 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
+
+@Serializable
+enum class IssueStateReason(val display: String) {
+    @SerialName("completed")
+    COMPLETED("已完成"),
+
+    @SerialName("not_planned")
+    NOT_PLANNED("未计划")
+}
 
 data class IssueEventData(
     /**
@@ -42,6 +52,8 @@ data class IssueEventData(
         val createdTime: String,
         val body: String?,
         val user: UserObject,
+        @SerialName("state_reason")
+        val stateReason: IssueStateReason,
     ) {
         data class UserObject(
             val login: String
@@ -87,16 +99,15 @@ data class IssueEventData(
         when (action) {
             "opened" -> {
                 wrapper.appendText("\uD83D\uDC1B ${repository.fullName} 有新议题 #${issue.number}\n")
-                wrapper.appendText("by ${issue.user.login} | ${issue.convertCreatedTime()} \n\n")
-                wrapper.appendText("${issue.title}\n")
+                wrapper.appendText("by ${issue.user.login} | ${issue.convertCreatedTime()}\n\n")
+                wrapper.appendText(issue.title, true)
                 wrapper.appendText("${issue.body?.limit(50)?.trim() ?: "没有描述"}\n\n")
                 wrapper.appendText("查看全部 >: ${issue.url}\n")
             }
 
             "closed" -> {
                 wrapper.appendText("\uD83D\uDC1B ${repository.fullName} 议题 #${issue.number} 关闭\n")
-                wrapper.appendText("由 ${issue.user.login} 创建\n")
-                wrapper.appendText("查看全部 > ${issue.url}\n")
+                wrapper.appendText("by ${issue.user.login}\n关闭理由为 ${issue.stateReason.display}\n")
             }
         }
 
