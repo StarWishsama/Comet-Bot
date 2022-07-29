@@ -23,7 +23,7 @@ val globalDirectory by lazy {
     File(System.getProperty("user.dir"))
 }
 
-fun resolveDirectory(path: String) = File(globalDirectory, path)
+fun resolveDirectory(path: String) = File(globalDirectory, "/$path")
 fun resolveResourceDirectory(path: String) = File(resourceDirectory, path)
 
 val configDirectory by lazy { resolveDirectory("./config") }
