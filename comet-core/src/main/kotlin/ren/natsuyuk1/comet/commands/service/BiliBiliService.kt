@@ -124,6 +124,7 @@ object BiliBiliService {
                 }
 
                 appendLine()
+                appendLine()
 
                 appendText("签名 >> ${space.bio}", true)
                 appendLine()
