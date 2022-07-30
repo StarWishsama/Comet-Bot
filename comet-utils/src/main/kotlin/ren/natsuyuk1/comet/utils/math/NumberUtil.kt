@@ -81,4 +81,9 @@ object NumberUtil {
      */
     fun Long.toLocalDateTime(isMillis: Boolean = false): LocalDateTime =
         Instant.ofEpochMilli(if (isMillis) this else this * 1000).atZone(ZoneId.of("UTC")).toLocalDateTime()
+
+    fun Long.toInstant(isMillis: Boolean = false): kotlinx.datetime.Instant =
+        if (isMillis) kotlinx.datetime.Instant.fromEpochMilliseconds(this) else kotlinx.datetime.Instant.fromEpochSeconds(
+            this
+        )
 }

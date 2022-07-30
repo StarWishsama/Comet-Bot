@@ -45,10 +45,10 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         ) { comet, sender, subject, wrapper, user ->
             ProjectSekaiCommand(comet, sender, subject, wrapper, user)
                 .subcommands(
-                    ProjectSekaiCommand.Bind(subject, user),
-                    ProjectSekaiCommand.Event(subject, user),
-                    ProjectSekaiCommand.Prediction(subject, user),
-                    ProjectSekaiCommand.Info(subject, user),
+                    ProjectSekaiCommand.Bind(subject, sender, user),
+                    ProjectSekaiCommand.Event(subject, sender, user),
+                    ProjectSekaiCommand.Prediction(subject, sender, user),
+                    ProjectSekaiCommand.Info(subject, sender, user),
                 )
         },
         CommandNode(VERSION) { comet, sender, subject, wrapper, user ->
@@ -63,9 +63,9 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         ) { comet, sender, subject, wrapper, user ->
             BiliBiliCommand(comet, sender, subject, wrapper, user)
                 .subcommands(
-                    BiliBiliCommand.User(subject, user),
-                    BiliBiliCommand.Dynamic(subject, user),
-                    BiliBiliCommand.Video(subject, user)
+                    BiliBiliCommand.User(subject, sender, user),
+                    BiliBiliCommand.Dynamic(subject, sender, user),
+                    BiliBiliCommand.Video(subject, sender, user)
                 )
         }
     )

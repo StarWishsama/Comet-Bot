@@ -9,6 +9,8 @@
 
 package ren.natsuyuk1.comet.api
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import mu.KLogger
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.config.CometConfig
@@ -42,8 +44,12 @@ abstract class Comet(
      */
     var scope: ModuleScope
 ) : IComet {
+    lateinit var initTime: Instant
+
     fun init(parentContext: CoroutineContext) {
         scope = ModuleScope(scope.name(), parentContext)
+
+        initTime = Clock.System.now()
     }
 
     abstract fun login()

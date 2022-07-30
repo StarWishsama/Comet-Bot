@@ -17,6 +17,7 @@ import ren.natsuyuk1.comet.telegram.contact.toCometGroup
 import ren.natsuyuk1.comet.telegram.event.toCometEvent
 import ren.natsuyuk1.comet.telegram.util.chatID
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
 
 private val logger = mu.KotlinLogging.logger("Comet-Telegram")
 
@@ -35,12 +36,14 @@ class TelegramComet(
             token = telegramConfig.token
             dispatch {
                 message(Filter.Text) {
-                    scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
+                    if (this.message.date.toInstant() >= initTime)
+                        scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
                 }
 
                 // When bot no access to message
                 message(Filter.Command) {
-                    scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
+                    if (this.message.date.toInstant() >= initTime)
+                        scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
                 }
             }
         }
