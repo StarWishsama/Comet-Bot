@@ -45,7 +45,7 @@ class TelegramComet(
                 message(Filter.Command) {
                     if (this.message.date.toInstant() >= initTime)
                         logger.trace { "Incoming Telegram command: ${this.message}" }
-                    scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
+                    scope.launch { toCometEvent(this@TelegramComet, true)?.broadcast() }
                 }
             }
         }
