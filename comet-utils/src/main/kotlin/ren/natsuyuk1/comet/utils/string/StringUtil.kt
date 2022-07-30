@@ -207,7 +207,7 @@ object StringUtil {
         appendText(this@toMessageWrapper)
     }
 
-    fun String.replaceAll(toReplace: List<String>): String {
+    fun String.replaceAllToBlank(toReplace: List<String>): String {
         var result = this
 
         toReplace.forEach {

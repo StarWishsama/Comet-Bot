@@ -24,7 +24,7 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.containsEtc
 import ren.natsuyuk1.comet.utils.string.StringUtil.getLastingTimeAsString
-import ren.natsuyuk1.comet.utils.string.StringUtil.replaceAll
+import ren.natsuyuk1.comet.utils.string.StringUtil.replaceAllToBlank
 import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
@@ -37,6 +37,9 @@ object CommandManager {
     private val commands: MutableMap<String, AbstractCommandNode<*>> = ConcurrentHashMap()
 
     private var commandScope = ModuleScope("CommandManager")
+
+    private val commandAtRegex by lazy { """(@\w*)""".toRegex() }
+
     fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
         commandScope = ModuleScope("CommandManager", parentContext)
     }
@@ -101,8 +104,14 @@ object CommandManager {
             return@launch
         }
 
+        val commandName = if (sender is PlatformCommandSender && sender.platformName == "telegram") {
+            args[0].replaceAllToBlank(comet.config.data.commandPrefix).replace(commandAtRegex, "")
+        } else {
+            args[0].replaceAllToBlank(comet.config.data.commandPrefix)
+        }
+
         // TODO: 模糊搜索命令系统
-        val cmd = getCommand(args[0].replaceAll(comet.config.data.commandPrefix), sender) ?: return@launch
+        val cmd = getCommand(commandName, sender) ?: return@launch
 
         val property = cmd.property
 
