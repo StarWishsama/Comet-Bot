@@ -3,7 +3,6 @@ package ren.natsuyuk1.comet.telegram
 import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
-import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.message
 import com.github.kotlintelegrambot.extensions.filters.Filter
 import kotlinx.coroutines.launch
@@ -47,10 +46,6 @@ class TelegramComet(
                     if (this.message.date.toInstant() >= initTime)
                         logger.trace { "Incoming Telegram command: ${this.message}" }
                     scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
-                }
-
-                command("test") {
-
                 }
             }
         }

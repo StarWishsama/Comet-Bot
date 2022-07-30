@@ -13,6 +13,8 @@ import java.io.File
 
 private val logger = mu.KotlinLogging.logger {}
 
+private val commandAtRegex by lazy { """(@\w*)""".toRegex() }
+
 fun MessageWrapper.send(comet: TelegramComet, target: ChatId) {
     val textBuffer = StringBuffer()
 
@@ -27,7 +29,7 @@ fun MessageWrapper.send(comet: TelegramComet, target: ChatId) {
     }
 }
 
-suspend fun Message.toMessageWrapper(comet: TelegramComet, permanent: Boolean = false): MessageWrapper {
+suspend fun Message.toMessageWrapper(comet: TelegramComet, isCommand: Boolean): MessageWrapper {
     return when {
         photo != null -> {
             buildMessageWrapper {
@@ -38,7 +40,7 @@ suspend fun Message.toMessageWrapper(comet: TelegramComet, permanent: Boolean = 
                 photoIDs.forEach {
                     val tempFile = File(cacheDirectory, it)
                     tempFile.touch()
-                    if (!permanent) tempFile.deleteOnExit()
+                    tempFile.deleteOnExit()
 
                     val (file, e) = comet.bot.getFile(it)
 
@@ -62,7 +64,10 @@ suspend fun Message.toMessageWrapper(comet: TelegramComet, permanent: Boolean = 
             }
         }
         else -> buildMessageWrapper {
-            this@toMessageWrapper.text?.let { appendText(it) }
+            if (isCommand)
+                this@toMessageWrapper.text?.replace(commandAtRegex, "")?.let { appendText(it) }
+            else
+                this@toMessageWrapper.text?.let { appendText(it) }
         }
     }
 }

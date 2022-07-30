@@ -38,8 +38,6 @@ object CommandManager {
 
     private var commandScope = ModuleScope("CommandManager")
 
-    private val commandAtRegex by lazy { """(@\w*)""".toRegex() }
-
     fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
         commandScope = ModuleScope("CommandManager", parentContext)
     }
@@ -104,14 +102,8 @@ object CommandManager {
             return@launch
         }
 
-        val commandName = if (sender is PlatformCommandSender && sender.platformName == "telegram") {
-            args[0].replaceAllToBlank(comet.config.data.commandPrefix).replace(commandAtRegex, "")
-        } else {
-            args[0].replaceAllToBlank(comet.config.data.commandPrefix)
-        }
-
         // TODO: 模糊搜索命令系统
-        val cmd = getCommand(commandName, sender) ?: return@launch
+        val cmd = getCommand(args[0].replaceAllToBlank(comet.config.data.commandPrefix), sender) ?: return@launch
 
         val property = cmd.property
 

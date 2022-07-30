@@ -10,33 +10,36 @@ import ren.natsuyuk1.comet.telegram.contact.toCometGroupMember
 import ren.natsuyuk1.comet.telegram.contact.toCometUser
 import ren.natsuyuk1.comet.telegram.util.toMessageWrapper
 
-suspend fun MessageHandlerEnvironment.toCometEvent(comet: TelegramComet): MessageEvent? {
+suspend fun MessageHandlerEnvironment.toCometEvent(comet: TelegramComet, isCommand: Boolean = false): MessageEvent? {
     return when (message.chat.type) {
-        "group", "supergroup" -> this.toCometGroupEvent(comet)
-        "private" -> this.toCometPrivateEvent(comet)
+        "group", "supergroup" -> this.toCometGroupEvent(comet, isCommand)
+        "private" -> this.toCometPrivateEvent(comet, isCommand)
         else -> null
     }
 }
 
-suspend fun MessageHandlerEnvironment.toCometGroupEvent(comet: TelegramComet): GroupMessageEvent {
+suspend fun MessageHandlerEnvironment.toCometGroupEvent(comet: TelegramComet, isCommand: Boolean): GroupMessageEvent {
     return GroupMessageEvent(
         comet = comet,
         subject = this.message.chat.toCometGroup(comet),
         sender = this.message.from!!.toCometGroupMember(comet, this.message.chat.id),
-        senderName = this.message.from?.firstName + " " + this.message.from?.lastName,
-        message = this.message.toMessageWrapper(comet),
+        senderName = "${this.message.from?.firstName} ${this.message.from?.lastName}",
+        message = this.message.toMessageWrapper(comet, isCommand),
         time = this.message.date,
         messageID = this.message.messageId
     )
 }
 
-suspend fun MessageHandlerEnvironment.toCometPrivateEvent(comet: TelegramComet): PrivateMessageEvent {
+suspend fun MessageHandlerEnvironment.toCometPrivateEvent(
+    comet: TelegramComet,
+    isCommand: Boolean
+): PrivateMessageEvent {
     return PrivateMessageEvent(
         comet = comet,
         subject = this.message.chat.toCometUser(comet),
         sender = this.message.chat.toCometUser(comet),
-        senderName = this.message.from?.firstName + " " + this.message.from?.lastName,
-        message = this.message.toMessageWrapper(comet),
+        senderName = "${this.message.from?.firstName} ${this.message.from?.lastName}",
+        message = this.message.toMessageWrapper(comet, isCommand),
         time = this.message.date,
         messageID = this.message.messageId
     )
