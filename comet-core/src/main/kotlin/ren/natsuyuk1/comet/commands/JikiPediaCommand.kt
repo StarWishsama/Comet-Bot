@@ -20,7 +20,7 @@ val JIKI = CommandProperty(
     "小鸡词典 - 网络梗百科全书",
     "/jiki [关键词] 搜索对应词可能的意思" +
         "\n\n数据源来自小鸡词典 \uD83D\uDC25 ",
-    executeConsumePoint = 10
+    executeConsumePoint = 8
 )
 
 class JikiPediaCommand(

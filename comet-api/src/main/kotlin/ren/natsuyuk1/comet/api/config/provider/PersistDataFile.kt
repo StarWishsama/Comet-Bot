@@ -11,11 +11,9 @@ package ren.natsuyuk1.comet.api.config.provider
 
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.update
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
@@ -25,6 +23,9 @@ import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.file.writeTextBuffered
 import java.io.File
+import java.nio.file.FileSystems
+import java.nio.file.Path
+import java.nio.file.StandardWatchEventKinds
 import kotlin.reflect.full.createType
 
 private val logger = mu.KotlinLogging.logger { }
@@ -67,11 +68,13 @@ open class PersistDataFile<T : Any>(
 
     override suspend fun init(): Unit =
         withContext(scope.coroutineContext) {
+            monitorFileChange()
             load()
         }
 
     suspend fun initAndLoad(): T =
         withContext(scope.coroutineContext) {
+            monitorFileChange()
             load()
         }
 
@@ -111,4 +114,30 @@ open class PersistDataFile<T : Any>(
             }
         }
     }
+
+    override suspend fun monitorFileChange(): Unit =
+        withContext(Dispatchers.IO) {
+            val watchService = FileSystems.getDefault().newWatchService()
+            file.parentFile.toPath().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY)
+
+            scope.launch {
+                while (scope.isActive) {
+                    val wk = withContext(Dispatchers.IO) {
+                        watchService.take()
+                    }
+
+                    for (e in wk.pollEvents()) {
+                        val changeContext = e.context() as Path
+                        if (changeContext == file.toPath()) {
+                            logger.debug { "Detected ${this@PersistDataFile.clazz.simpleName} data file has been changed, reloading..." }
+                            load()
+                        }
+                    }
+
+                    if (!wk.reset()) break
+                }
+            }
+        }
+
+
 }
