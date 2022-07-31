@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.commands
 
+import kotlinx.datetime.toJavaLocalDateTime
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.CometCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
@@ -9,6 +10,7 @@ import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.message.AtElement
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
+import ren.natsuyuk1.comet.utils.time.yyMMddWithTimePattern
 
 val INFO = CommandProperty(
     "info",
@@ -30,6 +32,7 @@ class InfoCommand(
                 appendElement(AtElement(sender.id, sender.name))
                 appendLine()
                 appendText("等级 ${user.level} | 硬币 ${user.coin.getBetterNumber()}", true)
+                appendText("上次签到于 ${yyMMddWithTimePattern.format(user.checkInDate.toJavaLocalDateTime())}", true)
 
             }
         )

@@ -68,14 +68,12 @@ open class PersistDataFile<T : Any>(
 
     override suspend fun init(): Unit =
         withContext(scope.coroutineContext) {
-            monitorFileChange()
-            load()
+            load().also { monitorFileChange() }
         }
 
     suspend fun initAndLoad(): T =
         withContext(scope.coroutineContext) {
-            monitorFileChange()
-            load()
+            load().also { monitorFileChange() }
         }
 
     /**
