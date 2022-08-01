@@ -5,7 +5,8 @@ import ren.natsuyuk1.comet.api.command.ConsoleCommandNode
 
 internal val DEFAULT_COMMANDS = listOf(
     ConsoleCommandNode(STOP) { _, sender, _, wrapper, user -> Stop(sender, wrapper, user) },
-    ConsoleCommandNode(LOGIN) { _, sender, _, wrapper, user -> Login(sender, wrapper, user) }
+    ConsoleCommandNode(LOGIN) { _, sender, _, wrapper, user -> Login(sender, wrapper, user) },
+    ConsoleCommandNode(PROMOTE) { _, sender, _, wrapper, user -> Promote(sender, wrapper, user) }
 )
 
 internal fun registerTerminalCommands() = CommandManager.registerCommands(DEFAULT_COMMANDS)

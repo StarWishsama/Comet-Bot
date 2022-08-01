@@ -1,5 +1,7 @@
 package ren.natsuyuk1.comet.commands
 
+import io.ktor.client.features.*
+import io.ktor.http.*
 import moe.sdl.yac.parameters.arguments.argument
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.Comet
@@ -10,7 +12,6 @@ import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.network.thirdparty.jikipedia.JikiPediaAPI
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.toMessageWrapper
-import java.io.IOException
 
 private val logger = KotlinLogging.logger {}
 
@@ -40,9 +41,16 @@ class JikiPediaCommand(
             } else {
                 subject.sendMessage(JikiPediaAPI.search(keyword).toMessageWrapper())
             }
-        } catch (e: IOException) {
-            subject.sendMessage("❌ 在搜索时出现了问题".toMessageWrapper())
-            logger.error(e) { "在搜索小鸡百科内容时出现问题" }
+        } catch (e: Exception) {
+            if (e is ClientRequestException) {
+                when (e.response.status) {
+                    HttpStatusCode.Unauthorized -> subject.sendMessage("\uD83D\uDEA7 已到达小鸡百科搜索上限, 等一会再试吧~".toMessageWrapper())
+                    else -> subject.sendMessage("❓ 搜索内容遁入了黑洞之中, 等一会再试试吧".toMessageWrapper())
+                }
+            } else {
+                subject.sendMessage("❌ 在搜索时出现了问题".toMessageWrapper())
+                logger.error(e) { "在搜索小鸡百科内容时出现问题" }
+            }
         }
     }
 }
