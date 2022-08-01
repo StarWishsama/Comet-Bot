@@ -10,6 +10,7 @@ import ren.natsuyuk1.comet.api.event.impl.comet.MessageSendEvent
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.telegram.util.chatID
+import ren.natsuyuk1.comet.telegram.util.getDisplayName
 import ren.natsuyuk1.comet.telegram.util.send
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import kotlin.time.Duration.Companion.seconds
@@ -30,11 +31,11 @@ class TelegramGroupMemberImpl(
     override val comet: TelegramComet,
 ) : TelegramGroupMember() {
     override val name: String
-        get() = user.username ?: "Nameless"
+        get() = user.getDisplayName()
     override var card: String
         get() = name
         set(_) {
-            error("You cannot set card in telegram platform")
+            error("Card doesn't exist in telegram platform")
         }
     override val remark: String
         get() = name
@@ -45,7 +46,15 @@ class TelegramGroupMemberImpl(
     override val lastActiveTimestamp: Int
         get() = 0
     override val remainMuteTime: Int
-        get() = 0
+        get() = run<Int> {
+            val resp = comet.bot.getChatMember(groupChatID.chatID(), user.id)
+
+            if (resp.isError) {
+                return@run -1
+            } else {
+                Clock.System.now().epochSeconds.toInt() - (resp.getOrNull()?.forceReply ?: return@run -1)
+            }
+        }
     override val groupID: Long
         get() = groupChatID
 
