@@ -20,20 +20,11 @@ repositories {
 }
 
 dependencies {
-    api(project(":comet-api"))
-    api(project(":comet-core"))
-    api(project(":comet-utils"))
-
-    implementation(KotlinX.serialization.json)
-    implementation("net.mamoe.yamlkt:yamlkt:_")
+    compileOnly(project(":comet-api"))
+    compileOnly(project(":comet-core"))
+    compileOnly(project(":comet-utils"))
 
     api("net.mamoe:mirai-core-jvm:_")
     api("net.mamoe:mirai-core-api-jvm:_")
     api("net.mamoe:mirai-core-utils-jvm:_")
-
-    api("org.jetbrains.exposed:exposed-core:_")
-    api("org.jetbrains.exposed:exposed-dao:_")
-    api("org.jetbrains.exposed:exposed-jdbc:_")
-    api("org.jetbrains.exposed:exposed-kotlin-datetime:_")
-    implementation("com.zaxxer:HikariCP:_")
 }

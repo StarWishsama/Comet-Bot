@@ -26,6 +26,10 @@ dependencies {
 
     implementation("org.jline:jline:_")
 
+    api(project(":comet-api"))
+    api(project(":comet-core"))
+    api(project(":comet-utils"))
+
     api(project(":comet-mirai-wrapper"))
     api(project(":comet-telegram-wrapper"))
 }

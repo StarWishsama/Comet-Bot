@@ -18,7 +18,7 @@ object GroupSettingManager {
     suspend fun init(parentContext: CoroutineContext) {
         scope = ModuleScope(scope.name(), parentContext)
 
-        val folder = resolveDirectory("groupSettings")
+        val folder = resolveDirectory("./groupSettings")
         folder.touch()
 
         folder.listFiles()?.forEach {
@@ -43,7 +43,7 @@ object GroupSettingManager {
 }
 
 class GroupSetting(val id: Long) : PersistDataFile<GroupSetting.Data>(
-    File(resolveDirectory("groupSettings"), "${id}.yml"),
+    File(resolveDirectory("./groupSettings"), "${id}.yml"),
     Data()
 ) {
     data class Data(

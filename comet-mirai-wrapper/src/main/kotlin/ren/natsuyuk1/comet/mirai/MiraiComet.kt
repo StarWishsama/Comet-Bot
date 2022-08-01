@@ -32,7 +32,7 @@ class MiraiComet(
      */
     config: CometConfig,
 
-    val miraiConfig: MiraiConfig,
+    private val miraiConfig: MiraiConfig,
 ) : Comet(config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
     lateinit var bot: Bot
 

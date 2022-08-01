@@ -20,12 +20,9 @@ repositories {
 }
 
 dependencies {
-    api(project(":comet-api"))
-    api(project(":comet-core"))
-    api(project(":comet-utils"))
+    compileOnly(project(":comet-api"))
+    compileOnly(project(":comet-core"))
+    compileOnly(project(":comet-utils"))
 
-    implementation(KotlinX.serialization.json)
-    implementation("net.mamoe.yamlkt:yamlkt:_")
-
-    implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:_")
+    api("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:_")
 }
