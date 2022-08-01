@@ -30,6 +30,8 @@ class TelegramComet(
     val telegramConfig: TelegramConfig
 ) : Comet(config, logger, ModuleScope("telegram ${telegramConfig.token.split(":").firstOrNull() ?: "Unknown"}")) {
     lateinit var bot: Bot
+    override val id: String
+        get() = telegramConfig.token.split(":").firstOrNull() ?: "Unknown"
 
     override fun login() {
         bot = bot {

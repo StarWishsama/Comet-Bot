@@ -28,21 +28,6 @@ object CometConfig : PersistDataFile<CometConfig.Data>(
     @Serializable
     data class Data(
         /**
-         * 机器人的 ID
-         *
-         * 在 Mirai 平台, 该变量为 QQ 号. 而 Telegram 则是 token.
-         *
-         * 在 Telegram 平台, 如果你担心安全问题, 可以自主设计加解密转换.
-         */
-        @Comment(
-            """
-        机器人的 ID
-        在 Mirai 平台, 该变量为 QQ 号. 而 Telegram 则是 token.
-        """
-        )
-        val id: Long = 0,
-
-        /**
          * 自动保存数据的周期, 单位为分钟
          */
         @Comment("自动保存数据的周期, 单位为分钟")

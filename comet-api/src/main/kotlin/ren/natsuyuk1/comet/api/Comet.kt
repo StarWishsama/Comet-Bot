@@ -46,6 +46,8 @@ abstract class Comet(
 ) : IComet {
     lateinit var initTime: Instant
 
+    abstract val id: String
+
     fun init(parentContext: CoroutineContext) {
         scope = ModuleScope(scope.name(), parentContext)
 

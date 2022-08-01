@@ -36,6 +36,9 @@ class MiraiComet(
 ) : Comet(config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
     lateinit var bot: Bot
 
+    override val id: String
+        get() = miraiConfig.id.toString()
+
     override fun login() {
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->

@@ -45,6 +45,9 @@ import kotlin.system.exitProcess
 private val logger = mu.KotlinLogging.logger {}
 
 private val dummyComet = object : Comet(CometConfig, logger, ModuleScope("dummy-comet")) {
+    override val id: String
+        get() = "0"
+
     override fun login() {}
 
     override fun afterLogin() {}

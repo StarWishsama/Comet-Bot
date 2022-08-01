@@ -10,6 +10,9 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
 private val logger = mu.KotlinLogging.logger {}
 
 val fakeComet = object : Comet(CometConfig, logger, ModuleScope("TestInstance")) {
+    override val id: String
+        get() = ""
+
     override fun login() {}
 
     override fun afterLogin() {}

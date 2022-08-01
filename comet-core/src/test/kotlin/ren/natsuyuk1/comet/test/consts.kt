@@ -11,6 +11,9 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
 private val logger = KotlinLogging.logger {}
 
 val fakeComet = object : Comet(CometConfig, logger, ModuleScope("fake-comet-core")) {
+    override val id: String
+        get() = ""
+
     override fun login() {}
 
     override fun afterLogin() {}
