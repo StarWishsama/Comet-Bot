@@ -2,6 +2,7 @@ package ren.natsuyuk1.comet.telegram.util
 
 import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.Message
+import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.TelegramFile
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.telegram.TelegramComet
@@ -18,14 +19,20 @@ private val commandAtRegex by lazy { """(@\w*)""".toRegex() }
 fun MessageWrapper.send(comet: TelegramComet, target: ChatId) {
     val textBuffer = StringBuffer()
 
-    getMessageContent().filterIsInstance<Text>().forEach { textBuffer.append(it.parseToString()) }
+    getMessageContent().forEach {
+        if (it is Text) {
+            textBuffer.append(it.parseToString())
+        } else if (it is AtElement) {
+            textBuffer.append("@${it.userName}")
+        }
+    }
 
     if (find<Image>() != null) {
         find<Image>()?.toTelegramFile()?.let { comet.bot.sendPhoto(target, it, caption = textBuffer.toString()) }
     } else if (find<Voice>() != null) {
         find<Voice>()?.toTelegramFile()?.let { comet.bot.sendAudio(target, it) }
     } else {
-        comet.bot.sendMessage(target, textBuffer.toString())
+        comet.bot.sendMessage(target, textBuffer.toString(), parseMode = ParseMode.MARKDOWN_V2)
     }
 }
 

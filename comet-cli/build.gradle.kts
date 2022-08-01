@@ -30,8 +30,8 @@ dependencies {
     api(project(":comet-core"))
     api(project(":comet-utils"))
 
-    api(project(":comet-mirai-wrapper"))
-    api(project(":comet-telegram-wrapper"))
+    implementation(project(":comet-mirai-wrapper"))
+    implementation(project(":comet-telegram-wrapper"))
 }
 
 tasks.jar {

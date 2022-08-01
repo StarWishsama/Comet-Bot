@@ -67,5 +67,8 @@ val defaultCommands: List<AbstractCommandNode<*>> =
                     BiliBiliCommand.Dynamic(subject, sender, user),
                     BiliBiliCommand.Video(subject, sender, user)
                 )
+        },
+        CommandNode(INFO) { comet, sender, subject, wrapper, user ->
+            InfoCommand(comet, sender, subject, wrapper, user)
         }
     )

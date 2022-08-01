@@ -66,7 +66,6 @@ data class AtElement(
     val userName: String = ""
 ) : WrapperElement {
     override fun parseToString(): String = "@${target}"
-
 }
 
 /**

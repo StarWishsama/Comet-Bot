@@ -33,7 +33,6 @@ class InfoCommand(
                 appendLine()
                 appendText("等级 ${user.level} | 硬币 ${user.coin.getBetterNumber()}", true)
                 appendText("上次签到于 ${yyMMddWithTimePattern.format(user.checkInDate.toJavaLocalDateTime())}", true)
-
             }
         )
     }

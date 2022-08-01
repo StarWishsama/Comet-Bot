@@ -27,7 +27,7 @@ class TelegramGroupMemberImpl(
     override val comet: TelegramComet,
 ) : TelegramGroupMember() {
     override val name: String
-        get() = "${user.firstName} ${user.lastName}"
+        get() = user.username ?: "Nameless"
     override var card: String
         get() = name
         set(_) {

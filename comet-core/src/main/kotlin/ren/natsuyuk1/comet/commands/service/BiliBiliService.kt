@@ -4,6 +4,7 @@ import io.ktor.client.features.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.launch
 import moe.sdl.yabapi.data.search.results.UserResult
+import moe.sdl.yabapi.data.video.VideoInfo
 import moe.sdl.yabapi.util.encoding.bv
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.session.Session
@@ -177,7 +178,11 @@ object BiliBiliService {
             subject.sendMessage("找不到你想要搜索的视频".toMessageWrapper())
         } else {
             videoInfo.onSuccess {
-                it?.toMessageWrapper()?.let { mw -> subject.sendMessage(mw) }
+                if (it !is VideoInfo) {
+                    subject.sendMessage("找不到你想要搜索的视频".toMessageWrapper())
+                } else {
+                    it.toMessageWrapper().let { mw -> subject.sendMessage(mw) }
+                }
             }.onFailure {
                 subject.sendMessage("获取视频信息失败, 等一会再试试吧".toMessageWrapper())
             }
