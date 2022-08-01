@@ -34,11 +34,13 @@ object GitHubApi {
         repoCache.any { it == "$owner/$name" } || getRepoInfo(owner, name).getOrNull() != null
 
     suspend fun getRepoPreviewImage(owner: String, name: String): String? {
-        if (!isRepoExist(owner, name)) return null
+        if (!isRepoExist(owner, name)) {
+            return null
+        }
 
         val conn = Jsoup.connect("https://github.com/$owner/$name")
 
-        conn.header("user-agent", CometConfig.data.useragent).followRedirects(true)
+        conn.header("user-agent", CometConfig.data.useragent)
         conn.timeout(5_000)
 
         val doc = conn.get()

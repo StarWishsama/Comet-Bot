@@ -2,7 +2,6 @@ package ren.natsuyuk1.comet.telegram.util
 
 import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.Message
-import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.TelegramFile
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.telegram.TelegramComet
@@ -32,7 +31,7 @@ fun MessageWrapper.send(comet: TelegramComet, target: ChatId) {
     } else if (find<Voice>() != null) {
         find<Voice>()?.toTelegramFile()?.let { comet.bot.sendAudio(target, it) }
     } else {
-        comet.bot.sendMessage(target, textBuffer.toString(), parseMode = ParseMode.MARKDOWN_V2)
+        comet.bot.sendMessage(target, textBuffer.toString())
     }
 }
 

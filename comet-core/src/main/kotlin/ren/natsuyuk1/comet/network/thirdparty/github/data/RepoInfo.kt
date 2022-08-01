@@ -1,7 +1,9 @@
 package ren.natsuyuk1.comet.network.thirdparty.github.data
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class RepoInfo(
     val id: Int,
     @SerialName("node_id")
@@ -19,6 +21,7 @@ data class RepoInfo(
     @SerialName("description")
     val description: String?
 ) {
+    @Serializable
     data class OwnerInfo(
         val login: String,
         val id: Int,

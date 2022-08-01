@@ -2,6 +2,10 @@ package ren.natsuyuk1.comet.telegram.contact
 
 import com.github.kotlintelegrambot.entities.Chat
 import com.github.kotlintelegrambot.entities.ChatMember
+import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import ren.natsuyuk1.comet.api.event.broadcast
+import ren.natsuyuk1.comet.api.event.impl.comet.MessageSendEvent
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
@@ -115,7 +119,18 @@ internal class TelegramGroupImpl(
         }
 
     override fun sendMessage(message: MessageWrapper) {
-        message.send(comet, chat.id.chatID())
+
+        comet.scope.launch {
+            val event = MessageSendEvent(
+                comet,
+                this@TelegramGroupImpl,
+                message,
+                Clock.System.now().epochSeconds
+            ).also { it.broadcast() }
+
+            if (!event.isCancelled)
+                message.send(comet, chat.id.chatID())
+        }
     }
 }
 
