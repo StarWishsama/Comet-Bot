@@ -50,7 +50,11 @@ internal class TelegramGroupImpl(
     override val members: List<GroupMember> = emptyList()
 
     override fun updateGroupName(groupName: String) {
-        error("You cannot update group name in telegram!")
+        if (getBotPermission() == GroupPermission.ADMIN) {
+            comet.bot.setChatTitle(chat.id.chatID(), groupName)
+        } else {
+            throw IllegalAccessException("Bot doesn't permission to modify group name")
+        }
     }
 
     override fun getBotMuteRemaining(): Int {
@@ -71,14 +75,22 @@ internal class TelegramGroupImpl(
     }
 
     /**
-     * 在 Telegram 侧, 你只能获得对应头像的 fileId
+     * 在 Telegram 侧, 获得的头像链接有效期仅有 1 小时
      *
-     * 你需要通过 comet.bot.getFile(...) 获取一个文件的 ID
-     *
-     * 并调用 https://api.telegram.org/file/bot<token>/<file_id> 下载
+     * 获取后请尽快使用
      */
     override val avatarUrl: String
-        get() = chat.photo?.bigFileId ?: ""
+        get() = run<String> {
+            val bigFileId = chat.photo?.bigFileId ?: return@run ""
+
+            val (resp, _) = comet.bot.getFile(bigFileId)
+
+            if (resp?.isSuccessful == true) {
+                return@run "https://api.telegram.org/file/bot${comet.telegramConfig.token}/${resp.body()?.result?.fileId}"
+            } else {
+                return@run ""
+            }
+        }
 
     override fun getMember(id: Long): GroupMember? {
         val resp = comet.bot.getChatMember(this.id.chatID(), id)
@@ -115,7 +127,7 @@ internal class TelegramGroupImpl(
     }
 
     override var card: String
-        get() = name
+        get() = ""
         set(_) {
             error("You cannot set card in telegram!")
         }
