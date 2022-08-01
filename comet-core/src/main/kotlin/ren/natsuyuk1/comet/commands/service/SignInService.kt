@@ -43,14 +43,12 @@ object SignInService {
 
     private suspend fun signIn(sender: PlatformCommandSender, user: CometUser): MessageWrapper {
         val (coinResult, expResult) = calculate(user)
-        val levelUp = levelUp(user.level, expResult.getAllPoint().toLong())
+        val earnLevel = levelUp(user.level, expResult.getAllPoint().toLong())
 
         transaction {
             user.exp += expResult.getAllPoint().toLong()
             user.coin += coinResult.getAllPoint()
-
-            if (levelUp)
-                user.level += 1
+            user.level += earnLevel
         }
 
         val checkInResult = buildString {
@@ -66,7 +64,7 @@ object SignInService {
 
             append("\n")
 
-            if (levelUp) {
+            if (earnLevel > 0) {
                 append("升级! 现在等级为 ${user.level}")
                 append("\n")
             }
@@ -215,8 +213,8 @@ object SignInService {
         }
     }
 
-    private fun levelUp(currentLevel: Int, earnExp: Long): Boolean {
-        val targetExp = when (currentLevel) {
+    private fun getTargetExp(currentLevel: Int): Int =
+        when (currentLevel) {
             in 0..15 -> {
                 2 * currentLevel + 7
             }
@@ -230,6 +228,23 @@ object SignInService {
             }
         }
 
-        return earnExp > targetExp
+    private fun levelUp(currentLevel: Int, earnExp: Long): Int {
+        val targetExp = getTargetExp(currentLevel)
+
+        return if (earnExp > targetExp) {
+            var earnLevel = 1
+
+            while (true) {
+                if (earnExp > getTargetExp(currentLevel + earnLevel)) {
+                    earnLevel++
+                } else {
+                    break
+                }
+            }
+
+            earnLevel
+        } else {
+            0
+        }
     }
 }
