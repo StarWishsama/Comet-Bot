@@ -34,6 +34,8 @@ import ren.natsuyuk1.comet.config.version
 import ren.natsuyuk1.comet.consts.cometConfigs
 import ren.natsuyuk1.comet.consts.cometTables
 import ren.natsuyuk1.comet.consts.defaultCommands
+import ren.natsuyuk1.comet.network.CometServer
+import ren.natsuyuk1.comet.objects.config.CometServerConfig
 import ren.natsuyuk1.comet.service.CometCoreService
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
@@ -144,6 +146,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
     private fun startService() = scope.launch {
         TaskManager.init(coroutineContext)
         CometCoreService.init(coroutineContext)
+        CometServer.init(CometServerConfig)
     }
 
     private fun autoLogin() {

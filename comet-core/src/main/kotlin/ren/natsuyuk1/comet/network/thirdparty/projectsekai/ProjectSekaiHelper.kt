@@ -18,6 +18,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRa
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiProfile
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestPredictionInfo
+import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
@@ -34,6 +35,8 @@ fun ProjectSekaiProfile.toMessageWrapper(userData: ProjectSekaiUserData, eventId
 
     return buildMessageWrapper {
         appendText("${profile.name} - ${profile.userId}", true)
+        appendLine()
+        appendText("当前活动 ${ProjectSekaiData.getCurrentEventInfo()?.name}", true)
         appendLine()
         appendText("分数 ${profile.score} | 排名 ${profile.rank}", true)
         appendLine()

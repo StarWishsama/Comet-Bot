@@ -18,6 +18,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getCurrentEventInfo
@@ -65,6 +66,13 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
                             startTime = currentEvent.eventInfo.startAt
                             endTime = currentEvent.eventInfo.closedAt
                             name = currentEvent.eventInfo.name
+                        }
+
+                        transaction {
+                            ProjectSekaiUserDataTable.selectAll().forEach {
+                                it[ProjectSekaiUserDataTable.lastQueryPosition] = 0
+                                it[ProjectSekaiUserDataTable.lastQueryScore] = 0
+                            }
                         }
                     }
                 }
