@@ -46,8 +46,8 @@ internal class TelegramGroupImpl(
             result?.toCometGroupMember(comet, chat.id) ?: error("Unable to retrieve group owner")
         }
 
-    // FIXME
-    override val members: List<GroupMember> = listOf()
+    // Telegram couldn't get all members
+    override val members: List<GroupMember> = emptyList()
 
     override fun updateGroupName(groupName: String) {
         error("You cannot update group name in telegram!")
@@ -57,15 +57,17 @@ internal class TelegramGroupImpl(
         error("You cannot get bot mute remaining time in telegram!")
     }
 
-    // FIXME: implement true permission
     override fun getBotPermission(): GroupPermission {
-        val perms = chat.permissions!!
+        val cm = comet.bot.getChatMember(chat.id.chatID(), comet.id.toLongOrNull() ?: return GroupPermission.MEMBER)
 
-        return if (perms.canChangeInfo!!) {
-            GroupPermission.ADMIN
-        } else {
-            GroupPermission.MEMBER
-        }
+        cm.fold(
+            ifSuccess = {
+                return if (it.status == "administrator" || it.status == "creator") GroupPermission.ADMIN else GroupPermission.MEMBER
+            },
+            ifError = {
+                return GroupPermission.MEMBER
+            }
+        )
     }
 
     /**
