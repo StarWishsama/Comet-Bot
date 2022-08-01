@@ -82,4 +82,7 @@ val defaultCommands: List<AbstractCommandNode<*>> =
                     GithubCommand.Info(subject, sender, user)
                 )
         },
+        CommandNode(NOABBR) { comet, sender, subject, wrapper, user ->
+            NoAbbrCommand(comet, sender, subject, wrapper, user)
+        }
     )
