@@ -70,5 +70,16 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         },
         CommandNode(INFO) { comet, sender, subject, wrapper, user ->
             InfoCommand(comet, sender, subject, wrapper, user)
-        }
+        },
+        CommandNode(
+            GITHUB,
+            listOf(GithubCommand.Subscribe.SUBSCRIBE, GithubCommand.UnSubscribe.UNSUBSCRIBE, GithubCommand.Info.INFO)
+        ) { comet, sender, subject, wrapper, user ->
+            GithubCommand(comet, sender, subject, wrapper, user)
+                .subcommands(
+                    GithubCommand.Subscribe(subject, sender, user),
+                    GithubCommand.UnSubscribe(subject, sender, user),
+                    GithubCommand.Info(subject, sender, user)
+                )
+        },
     )

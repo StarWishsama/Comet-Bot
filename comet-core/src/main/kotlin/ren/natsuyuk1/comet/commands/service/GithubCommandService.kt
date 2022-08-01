@@ -9,16 +9,15 @@ import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.network.thirdparty.github.GitHubApi
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
+import ren.natsuyuk1.comet.utils.message.Image
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.toMessageWrapper
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object GithubCommandService {
     private val repoRegex = "(\\w*)/(\\w*)".toRegex()
-
-    // 3, 4
-    private val githubLinkRegex by lazy { Regex("""^(https?://)?(www\.)?github\.com/(\w+)/(\w+)$""") }
 
     class GitHubSubscribeSession(
         contact: PlatformCommandSender,
@@ -60,7 +59,7 @@ object GithubCommandService {
     ) {
         if (repoName.matches(repoRegex)) {
             val slice = repoName.split("/")
-            val owner = slice[0];
+            val owner = slice[0]
             val name = slice[1]
 
             val repos = GithubRepoData.data.repos
@@ -96,6 +95,78 @@ object GithubCommandService {
             }
         } else {
             subject.sendMessage("请输入有效的 GitHub 仓库名称, 例如 StarWishsama/Comet-Bot".toMessageWrapper())
+        }
+    }
+
+    fun processUnsubscribe(
+        subject: PlatformCommandSender,
+        groupID: Long,
+        repoName: String
+    ) {
+        if (repoName.matches(repoRegex)) {
+            val slice = repoName.split("/")
+            val owner = slice[0]
+            val name = slice[1]
+
+            val repos = GithubRepoData.data.repos
+            val repo = repos.find { it.getName() == "$owner/$name" }
+
+            if (repo != null) {
+                repo.subscribers.removeIf { it.id == groupID }
+                subject.sendMessage("成功退订 $repoName!".toMessageWrapper())
+
+                if (repo.subscribers.isEmpty()) {
+                    repos.remove(repo)
+                }
+            } else {
+                subject.sendMessage("找不到你想要取消订阅的 GitHub 仓库".toMessageWrapper())
+            }
+        } else {
+            subject.sendMessage("请输入有效的 GitHub 仓库名称, 例如 StarWishsama/Comet-Bot".toMessageWrapper())
+        }
+    }
+
+    // 3, 4
+    private val githubLinkRegex by lazy { Regex("""^(https?://)?(www\.)?github\.com/(\w+)/(\w+)$""") }
+
+    suspend fun fetchRepoInfo(subject: PlatformCommandSender, repoName: String) {
+        var owner: String? = null
+        var name: String? = null
+
+        if (repoRegex.matches(repoName)) {
+            val split = repoName.split("/")
+
+            owner = split[0]
+            name = split[1]
+        } else if (githubLinkRegex.matches(repoName)) {
+            val groupVar = githubLinkRegex.find(repoName)?.groupValues
+
+            if (groupVar.isNullOrEmpty() || groupVar.size < 4) {
+                subject.sendMessage("请输入有效的仓库名/链接!".toMessageWrapper())
+                return
+            }
+
+            owner = groupVar[3]
+            name = groupVar[4]
+        }
+
+
+        if (owner == null || name == null) {
+            subject.sendMessage("请输入有效的仓库名/链接!".toMessageWrapper())
+            return
+        }
+
+        val image = GitHubApi.getRepoPreviewImage(owner, name)
+
+        if (image == null) {
+            subject.sendMessage("搜索不到这个仓库, 等会再试试吧~".toMessageWrapper())
+        } else {
+            subject.sendMessage(
+                buildMessageWrapper {
+                    appendElement(Image(url = image))
+                    appendText("🔗 https://github.com/$owner/$name")
+                }
+            )
         }
     }
 }
