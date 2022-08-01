@@ -1,10 +1,14 @@
 package ren.natsuyuk1.comet.cli.util
 
 import mu.KotlinLogging
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.cli.CometTerminal
 import ren.natsuyuk1.comet.cli.CometTerminalCommand
 import ren.natsuyuk1.comet.cli.storage.AccountData
+import ren.natsuyuk1.comet.cli.storage.AccountDataTable
 import ren.natsuyuk1.comet.cli.storage.LoginPlatform
 import ren.natsuyuk1.comet.mirai.MiraiComet
 import ren.natsuyuk1.comet.mirai.config.MiraiConfig
@@ -47,6 +51,22 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
             telegramComet.init(CometTerminalCommand.scope.coroutineContext)
             telegramComet.login()
             telegramComet.afterLogin()
+        }
+    }
+}
+
+internal fun logout(id: Long, platform: LoginPlatform) {
+    logger.info { "正在尝试注销账号 $id 于 ${platform.name} 平台" }
+
+    if (!AccountData.hasAccount(id, platform)) {
+        logger.info { "注销账号失败: 找不到对应账号" }
+    } else {
+        transaction {
+            AccountDataTable.deleteWhere {
+                AccountDataTable.id eq id and (AccountDataTable.platform eq platform)
+            }
+
+            logger.info { "注销账号成功" }
         }
     }
 }

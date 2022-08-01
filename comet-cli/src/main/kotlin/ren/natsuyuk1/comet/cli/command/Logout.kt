@@ -10,19 +10,18 @@ import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.cli.storage.LoginPlatform
-import ren.natsuyuk1.comet.cli.util.login
+import ren.natsuyuk1.comet.cli.util.logout
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 
-internal val LOGIN = CommandProperty(
-    "login",
+internal val LOGOUT = CommandProperty(
+    "logout",
     listOf(),
-    "登录机器人账号",
-    "/login [id] --password [密码] --platform (登录平台 默认为 QQ)\n" +
+    "注销机器人账号",
+    "/logout [id] --platform (登录平台 默认为 QQ)\n" +
         "注意: Telegram 平台下, 你的 ID 为 token 中的数字."
 )
 
-internal class Login(
+internal class Logout(
     override val sender: ConsoleCommandSender,
     message: MessageWrapper,
     user: CometUser
@@ -30,30 +29,21 @@ internal class Login(
 
     private val id by argument(name = "账户 ID", help = "登录账户的 ID").long()
 
-    private val password by option("-pwd", "--password", help = "登录账户的密码")
-
     private val platform by option(
         "-p", "--platform",
         help = "登录 Comet 机器人的平台 (例如 QQ, Telegram)"
     ).enum<LoginPlatform>(true).default(LoginPlatform.QQ)
 
     override suspend fun run() {
-        if (password == null) {
-            sender.sendMessage(buildMessageWrapper { appendText("请输入密码, 例子: login 123456 -p qq -pwd password") })
-            return
-        }
-
         when (platform) {
             LoginPlatform.QQ -> {
-                sender.sendMessage(buildMessageWrapper { appendText("正在尝试登录账号 $id 于 QQ 平台") })
-
-                login(id, password!!, LoginPlatform.QQ)
+                logout(id, LoginPlatform.QQ)
             }
-            LoginPlatform.TELEGRAM -> {
-                sender.sendMessage(buildMessageWrapper { appendText("正在尝试登录账号于 Telegram 平台") })
 
-                login(id, password!!, LoginPlatform.TELEGRAM)
+            LoginPlatform.TELEGRAM -> {
+                logout(id, LoginPlatform.TELEGRAM)
             }
         }
     }
 }
+
