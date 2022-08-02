@@ -8,7 +8,7 @@ import ren.natsuyuk1.comet.api.wrapper.CometWrapper
 import ren.natsuyuk1.comet.telegram.config.TelegramConfig
 import ren.natsuyuk1.comet.telegram.config.findTelegramConfigByID
 
-object TelegramWrapper : CometWrapper {
+class TelegramWrapper : CometWrapper {
     override suspend fun createInstance(config: CometConfig): Comet {
         var telegramConfig = findTelegramConfigByID(config.data.botPassword)
 
@@ -19,4 +19,6 @@ object TelegramWrapper : CometWrapper {
 
         return TelegramComet(config, telegramConfig)
     }
+
+    override fun platform(): LoginPlatform = LoginPlatform.TELEGRAM
 }

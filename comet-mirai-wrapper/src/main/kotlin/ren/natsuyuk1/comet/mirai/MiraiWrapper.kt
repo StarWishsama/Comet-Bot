@@ -8,7 +8,7 @@ import ren.natsuyuk1.comet.api.wrapper.CometWrapper
 import ren.natsuyuk1.comet.mirai.config.MiraiConfig
 import ren.natsuyuk1.comet.mirai.config.findMiraiConfigByID
 
-object MiraiWrapper : CometWrapper {
+class MiraiWrapper : CometWrapper {
     override suspend fun createInstance(config: CometConfig): Comet {
         var miraiConfig = findMiraiConfigByID(config.data.botId)
 
@@ -19,4 +19,6 @@ object MiraiWrapper : CometWrapper {
 
         return MiraiComet(config, miraiConfig)
     }
+
+    override fun platform(): LoginPlatform = LoginPlatform.MIRAI
 }

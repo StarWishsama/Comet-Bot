@@ -10,8 +10,7 @@ import ren.natsuyuk1.comet.api.database.AccountDataTable
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.cli.CometTerminal
 import ren.natsuyuk1.comet.cli.CometTerminalCommand
-import ren.natsuyuk1.comet.mirai.MiraiWrapper
-import ren.natsuyuk1.comet.telegram.TelegramWrapper
+import ren.natsuyuk1.comet.cli.WrapperLoader
 
 private val logger = KotlinLogging.logger {}
 
@@ -20,7 +19,9 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
 
     when (platform) {
         LoginPlatform.MIRAI -> {
-            val miraiComet = MiraiWrapper.createInstance(CometConfig(id, password, platform))
+            val miraiService = WrapperLoader.getService(platform) ?: error("未安装 Mirai Wrapper")
+
+            val miraiComet = miraiService.createInstance(CometConfig(id, password, platform))
 
             CometTerminal.instance.push(miraiComet)
             miraiComet.init(CometTerminalCommand.scope.coroutineContext)
@@ -29,7 +30,9 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
         }
 
         LoginPlatform.TELEGRAM -> {
-            val telegramComet = TelegramWrapper.createInstance(CometConfig(id, password, platform))
+            val telegramService = WrapperLoader.getService(platform) ?: error("未安装 Telegram Wrapper")
+
+            val telegramComet = telegramService.createInstance(CometConfig(id, password, platform))
 
             CometTerminal.instance.push(telegramComet)
             telegramComet.init(CometTerminalCommand.scope.coroutineContext)
