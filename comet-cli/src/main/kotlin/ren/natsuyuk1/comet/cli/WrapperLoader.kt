@@ -15,7 +15,7 @@ private val logger = KotlinLogging.logger {}
 object WrapperLoader {
     private val modules = resolveDirectory("./modules")
     private lateinit var serviceLoader: ServiceLoader<CometWrapper>
-    var classLoader: ClassLoader = ClassLoader.getPlatformClassLoader()
+    var wrapperClassLoader: ClassLoader = ClassLoader.getPlatformClassLoader()
         private set
 
     suspend fun load() {
@@ -25,9 +25,17 @@ object WrapperLoader {
 
         val urls = Array<URL>(possibleModules.size) { possibleModules[it].toURI().toURL() }
 
-        classLoader = URLClassLoader.newInstance(urls)
+        wrapperClassLoader = URLClassLoader.newInstance(urls)
 
-        serviceLoader = ServiceLoader.load(CometWrapper::class.java, classLoader)
+        serviceLoader = ServiceLoader.load(CometWrapper::class.java, wrapperClassLoader)
+
+        val serviceCount = serviceLoader.count()
+
+        if (serviceCount == 0) {
+            logger.warn { "未检测到任何 Comet Wrapper, Comet 将无法正常工作!" }
+        } else {
+            logger.info { "已加载 ${serviceLoader.count()} 个 Comet Wrapper." }
+        }
     }
 
     fun getService(platform: LoginPlatform): CometWrapper? {
