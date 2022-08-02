@@ -21,7 +21,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
         LoginPlatform.MIRAI -> {
             val miraiService = WrapperLoader.getService(platform) ?: error("未安装 Mirai Wrapper")
 
-            val miraiComet = miraiService.createInstance(CometConfig(id, password, platform))
+            val miraiComet = miraiService.createInstance(CometConfig(id, password, platform), WrapperLoader.classLoader)
 
             CometTerminal.instance.push(miraiComet)
             miraiComet.init(CometTerminalCommand.scope.coroutineContext)
@@ -32,7 +32,8 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
         LoginPlatform.TELEGRAM -> {
             val telegramService = WrapperLoader.getService(platform) ?: error("未安装 Telegram Wrapper")
 
-            val telegramComet = telegramService.createInstance(CometConfig(id, password, platform))
+            val telegramComet =
+                telegramService.createInstance(CometConfig(id, password, platform), WrapperLoader.classLoader)
 
             CometTerminal.instance.push(telegramComet)
             telegramComet.init(CometTerminalCommand.scope.coroutineContext)

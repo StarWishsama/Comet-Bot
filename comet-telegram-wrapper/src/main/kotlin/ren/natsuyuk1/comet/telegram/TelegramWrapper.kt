@@ -9,7 +9,7 @@ import ren.natsuyuk1.comet.telegram.config.TelegramConfig
 import ren.natsuyuk1.comet.telegram.config.findTelegramConfigByID
 
 class TelegramWrapper : CometWrapper {
-    override suspend fun createInstance(config: CometConfig): Comet {
+    override suspend fun createInstance(config: CometConfig, classLoader: ClassLoader): Comet {
         var telegramConfig = findTelegramConfigByID(config.data.botPassword)
 
         if (telegramConfig == null) {

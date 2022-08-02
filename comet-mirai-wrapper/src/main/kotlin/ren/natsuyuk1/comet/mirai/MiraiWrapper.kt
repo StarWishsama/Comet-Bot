@@ -9,7 +9,7 @@ import ren.natsuyuk1.comet.mirai.config.MiraiConfig
 import ren.natsuyuk1.comet.mirai.config.findMiraiConfigByID
 
 class MiraiWrapper : CometWrapper {
-    override suspend fun createInstance(config: CometConfig): Comet {
+    override suspend fun createInstance(config: CometConfig, classLoader: ClassLoader): Comet {
         var miraiConfig = findMiraiConfigByID(config.data.botId)
 
         if (miraiConfig == null) {
@@ -17,7 +17,7 @@ class MiraiWrapper : CometWrapper {
             AccountData.registerAccount(config.data.botId, config.data.botPassword, platform())
         }
 
-        return MiraiComet(config, miraiConfig)
+        return MiraiComet(config, classLoader, miraiConfig)
     }
 
     override fun platform(): LoginPlatform = LoginPlatform.MIRAI

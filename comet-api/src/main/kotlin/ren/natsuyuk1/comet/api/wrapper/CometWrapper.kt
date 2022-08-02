@@ -5,7 +5,7 @@ import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 
 interface CometWrapper {
-    suspend fun createInstance(config: CometConfig): Comet
+    suspend fun createInstance(config: CometConfig, classLoader: ClassLoader): Comet
 
     fun platform(): LoginPlatform
 }

@@ -1,6 +1,6 @@
 package ren.natsuyuk1.comet.mirai
 
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.utils.BotConfiguration
@@ -16,6 +16,7 @@ import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
 import ren.natsuyuk1.comet.service.subscribeGithubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 
+
 private val logger = mu.KotlinLogging.logger("Comet-Mirai")
 
 class MiraiComet(
@@ -23,6 +24,8 @@ class MiraiComet(
      * 一个 Comet 实例的 [CometConfig]
      */
     config: CometConfig,
+
+    private val cl: ClassLoader,
 
     private val miraiConfig: MiraiConfig,
 ) : Comet(config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
@@ -47,8 +50,13 @@ class MiraiComet(
         }
         bot = BotFactory.newBot(qq = miraiConfig.id, password = miraiConfig.password, configuration = config)
 
-        scope.launch {
+        runBlocking {
+            val previous = Thread.currentThread().contextClassLoader
+            Thread.currentThread().contextClassLoader = cl
+
             bot.login()
+
+            Thread.currentThread().contextClassLoader = previous
         }
     }
 

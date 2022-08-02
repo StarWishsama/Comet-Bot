@@ -15,6 +15,8 @@ private val logger = KotlinLogging.logger {}
 object WrapperLoader {
     private val modules = resolveDirectory("./modules")
     private lateinit var serviceLoader: ServiceLoader<CometWrapper>
+    var classLoader: ClassLoader = ClassLoader.getPlatformClassLoader()
+        private set
 
     suspend fun load() {
         modules.touch()
@@ -23,9 +25,9 @@ object WrapperLoader {
 
         val urls = Array<URL>(possibleModules.size) { possibleModules[it].toURI().toURL() }
 
-        val cl = URLClassLoader.newInstance(urls)
+        classLoader = URLClassLoader.newInstance(urls)
 
-        serviceLoader = ServiceLoader.load(CometWrapper::class.java, cl)
+        serviceLoader = ServiceLoader.load(CometWrapper::class.java, classLoader)
     }
 
     fun getService(platform: LoginPlatform): CometWrapper? {
