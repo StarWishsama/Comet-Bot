@@ -9,6 +9,7 @@ import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.mirai.config.MiraiConfig
+import ren.natsuyuk1.comet.mirai.config.toMiraiProtocol
 import ren.natsuyuk1.comet.mirai.contact.toCometGroup
 import ren.natsuyuk1.comet.mirai.event.redirectToComet
 import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
@@ -41,9 +42,8 @@ class MiraiComet(
 
             fileBasedDeviceInfo()
 
-            protocol = miraiConfig.protocol
+            protocol = miraiConfig.protocol.toMiraiProtocol()
 
-            heartbeatStrategy = miraiConfig.heartbeatStrategy
         }
         bot = BotFactory.newBot(qq = miraiConfig.id, password = miraiConfig.password, configuration = config)
 

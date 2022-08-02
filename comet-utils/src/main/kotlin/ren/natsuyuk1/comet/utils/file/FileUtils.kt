@@ -42,7 +42,11 @@ val File.absPath
  */
 suspend fun File.touch(): Boolean = withContext(Dispatchers.IO) {
     parentFile?.mkdirs()
-    createNewFile()
+    if (!isDirectory) {
+        createNewFile()
+    } else {
+        mkdirs()
+    }
 }
 
 suspend fun File.writeTextBuffered(text: String) = withContext(Dispatchers.IO) {

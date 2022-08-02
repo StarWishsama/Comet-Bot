@@ -24,5 +24,5 @@ dependencies {
     compileOnly(project(":comet-core"))
     compileOnly(project(":comet-utils"))
 
-    api("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:_")
+    implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:_")
 }

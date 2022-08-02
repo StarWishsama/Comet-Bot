@@ -64,14 +64,11 @@ internal class TelegramGroupImpl(
     override fun getBotPermission(): GroupPermission {
         val cm = comet.bot.getChatMember(chat.id.chatID(), comet.id.toLongOrNull() ?: return GroupPermission.MEMBER)
 
-        cm.fold(
-            ifSuccess = {
-                return if (it.status == "administrator" || it.status == "creator") GroupPermission.ADMIN else GroupPermission.MEMBER
-            },
-            ifError = {
-                return GroupPermission.MEMBER
-            }
-        )
+        return if (cm.isSuccess) {
+            if (cm.get().status == "administrator" || cm.get().status == "creator") GroupPermission.ADMIN else GroupPermission.MEMBER
+        } else {
+            GroupPermission.MEMBER
+        }
     }
 
     /**

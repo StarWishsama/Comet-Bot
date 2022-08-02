@@ -97,6 +97,10 @@ object CommandManager {
 
         val args = wrapper.parseToString().toArgs()
 
+        if (args.isEmpty()) {
+            return@launch
+        }
+
         // 检查消息是否含命令前缀
         if (sender !is ConsoleCommandSender && !args[0].containsEtc(false, comet.config.data.commandPrefix)) {
             return@launch
