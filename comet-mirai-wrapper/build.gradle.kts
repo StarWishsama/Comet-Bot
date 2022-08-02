@@ -24,7 +24,5 @@ dependencies {
     compileOnly(project(":comet-core"))
     compileOnly(project(":comet-utils"))
 
-    implementation("net.mamoe:mirai-core-jvm:_")
-    implementation("net.mamoe:mirai-core-api-jvm:_")
-    implementation("net.mamoe:mirai-core-utils-jvm:_")
+    implementation("net.mamoe:mirai-core-all:_")
 }
