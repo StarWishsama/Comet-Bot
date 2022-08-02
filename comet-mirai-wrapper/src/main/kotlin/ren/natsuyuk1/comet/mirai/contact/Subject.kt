@@ -6,6 +6,7 @@ import net.mamoe.mirai.contact.getMember
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.impl.comet.MessageSendEvent
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.User
@@ -18,7 +19,7 @@ abstract class MiraiGroup(
     override val id: Long,
     override var name: String,
 ) : Group(id, name) {
-    override val platformName: String = "mirai"
+    override val platform: LoginPlatform = LoginPlatform.MIRAI
 }
 
 internal class MiraiGroupImpl(
@@ -71,7 +72,7 @@ internal class MiraiGroupImpl(
 fun net.mamoe.mirai.contact.Group.toCometGroup(comet: MiraiComet): Group = MiraiGroupImpl(this, comet)
 
 abstract class MiraiUser : User() {
-    override val platformName: String = "mirai"
+    override val platform: LoginPlatform = LoginPlatform.MIRAI
 }
 
 fun net.mamoe.mirai.contact.User.toCometUser(miraiComet: MiraiComet): User {

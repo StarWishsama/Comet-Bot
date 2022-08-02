@@ -90,7 +90,7 @@ object BiliBiliService {
                     queryUser(subject, (searchResult as PendingSearchResult).first().mid!!)
                 } else {
                     val user: CometUser? =
-                        if (subject is User) CometUser.getUserOrCreate(subject.id, subject.platformName) else null
+                        if (subject is User) CometUser.getUserOrCreate(subject.id, subject.platform) else null
                     BiliBiliUserQuerySession(
                         subject,
                         user,

@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.impl.comet.MessageSendEvent
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.telegram.util.chatID
@@ -16,8 +17,8 @@ abstract class TelegramUser(
     override val id: Long,
     override var name: String,
 ) : User() {
-    override val platformName: String
-        get() = "telegram"
+    override val platform: LoginPlatform
+        get() = LoginPlatform.TELEGRAM
 }
 
 class TelegramUserImpl(

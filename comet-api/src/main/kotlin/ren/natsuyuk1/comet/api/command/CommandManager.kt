@@ -115,7 +115,7 @@ object CommandManager {
             var user: CometUser = CometUser.dummyUser
 
             if (sender is PlatformCommandSender) {
-                user = CometUser.getUserOrCreate(sender.id, sender.platformName)
+                user = CometUser.getUserOrCreate(sender.id, sender.platform)
                     ?: return@runCatching CommandStatus.Success()
 
                 if (!user.hasPermission(property.permission)) {

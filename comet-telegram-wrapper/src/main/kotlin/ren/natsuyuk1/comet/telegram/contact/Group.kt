@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.impl.comet.MessageSendEvent
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
@@ -20,8 +21,8 @@ internal abstract class TelegramGroup(
     override val id: Long,
     override var name: String,
 ) : Group(id, name) {
-    override val platformName: String
-        get() = "telegram"
+    override val platform: LoginPlatform
+        get() = LoginPlatform.TELEGRAM
 }
 
 internal class TelegramGroupImpl(
@@ -62,7 +63,7 @@ internal class TelegramGroupImpl(
     }
 
     override fun getBotPermission(): GroupPermission {
-        val cm = comet.bot.getChatMember(chat.id.chatID(), comet.id.toLongOrNull() ?: return GroupPermission.MEMBER)
+        val cm = comet.bot.getChatMember(chat.id.chatID(), comet.id)
 
         return if (cm.isSuccess) {
             if (cm.get().status == "administrator" || cm.get().status == "creator") GroupPermission.ADMIN else GroupPermission.MEMBER

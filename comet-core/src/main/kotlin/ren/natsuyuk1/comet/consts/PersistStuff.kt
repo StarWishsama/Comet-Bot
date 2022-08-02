@@ -3,7 +3,6 @@ package ren.natsuyuk1.comet.consts
 import moe.sdl.yac.core.subcommands
 import ren.natsuyuk1.comet.api.command.AbstractCommandNode
 import ren.natsuyuk1.comet.api.command.CommandNode
-import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.api.database.DatabaseConfig
 import ren.natsuyuk1.comet.api.user.UserPermissionTable
@@ -14,8 +13,7 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserDataTable
 
 val cometConfigs: List<PersistDataFile<*>> =
     listOf(
-        CometConfig,
-        DatabaseConfig,
+        DatabaseConfig
     )
 
 val cometTables =
@@ -79,7 +77,7 @@ val defaultCommands: List<AbstractCommandNode<*>> =
                 .subcommands(
                     GithubCommand.Subscribe(subject, sender, user),
                     GithubCommand.UnSubscribe(subject, sender, user),
-                    GithubCommand.Info(subject, sender, user)
+                    GithubCommand.Info(comet, subject, sender, user)
                 )
         },
         CommandNode(NOABBR) { comet, sender, subject, wrapper, user ->

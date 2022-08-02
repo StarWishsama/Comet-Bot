@@ -3,7 +3,7 @@ package ren.natsuyuk1.comet.network.thirdparty.github
 import cn.hutool.core.collection.ConcurrentHashSet
 import io.ktor.client.request.*
 import org.jsoup.Jsoup
-import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.github.data.RepoInfo
 import ren.natsuyuk1.comet.network.thirdparty.github.data.UserInfo
@@ -33,14 +33,14 @@ object GitHubApi {
     suspend fun isRepoExist(owner: String, name: String): Boolean =
         repoCache.any { it == "$owner/$name" } || getRepoInfo(owner, name).getOrNull() != null
 
-    suspend fun getRepoPreviewImage(owner: String, name: String): String? {
+    suspend fun getRepoPreviewImage(comet: Comet, owner: String, name: String): String? {
         if (!isRepoExist(owner, name)) {
             return null
         }
 
         val conn = Jsoup.connect("https://github.com/$owner/$name")
 
-        conn.header("user-agent", CometConfig.data.useragent)
+        conn.header("user-agent", comet.config.data.useragent)
         conn.timeout(5_000)
 
         val doc = conn.get()

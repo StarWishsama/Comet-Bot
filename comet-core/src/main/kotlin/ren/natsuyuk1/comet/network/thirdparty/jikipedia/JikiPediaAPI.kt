@@ -1,13 +1,13 @@
 package ren.natsuyuk1.comet.network.thirdparty.jikipedia
 
 import io.ktor.client.request.*
-import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.consts.cometClient
 
 private val logger = mu.KotlinLogging.logger {}
 
 object JikiPediaAPI {
-    suspend fun search(keyword: String): JikiPediaSearchResult {
+    suspend fun search(comet: Comet, keyword: String): JikiPediaSearchResult {
         return cometClient.client.post<JikiPediaSearchResult>("https://api.jikipedia.com/go/search_entities") {
             headers {
                 append("Origin", "https://jikipedia.com")
@@ -16,7 +16,7 @@ object JikiPediaAPI {
                     "xid",
                     "pZBzqk4B5uHQDyU2satS+FKft78gvi+PruIpjhHJdfudi4PAcYs/TdhfQQeYZxvF8WR0KZM4FHUxK3dPm7rLfC3hexA1MFvsSw3R/eVPw48="
                 )
-                append("User-Agent", CometConfig.data.useragent)
+                append("User-Agent", comet.config.data.useragent)
                 append("Client", "web")
                 append("Client-Version", "2.7.3a")
                 append("Content-Type", "application/json;charset=UTF-8")

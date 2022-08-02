@@ -13,31 +13,25 @@ import kotlinx.serialization.Serializable
 import net.mamoe.yamlkt.Comment
 import net.mamoe.yamlkt.Yaml
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.utils.file.configDirectory
 import java.io.File
 
-var config: CometConfig.Data
-    set(value) {
-        CometConfig.updateData { value }
-    }
-    get() = CometConfig.data
-
-object CometConfig : PersistDataFile<CometConfig.Data>(
-    File(configDirectory, "config.yml"), Data(), Yaml
+class CometConfig(id: Long, password: String, val platform: LoginPlatform) : PersistDataFile<CometConfig.Data>(
+    File(configDirectory, "${platform.name.lowercase()}-$id-config.yml"), Data(id, password), Yaml
 ) {
     @Serializable
     data class Data(
+        @Comment("机器人的登录 ID")
+        val botId: Long,
+
+        @Comment("机器人的登录密码")
+        val botPassword: String,
         /**
          * 自动保存数据的周期, 单位为分钟
          */
         @Comment("自动保存数据的周期, 单位为分钟")
         var dataSaveDuration: Long = 60,
-
-        /**
-         * 机器人调用冷却时间, 单位为秒
-         */
-        @Comment("机器人调用冷却时间, 单位为秒")
-        var defaultCoolDownTime: Int = 5,
 
         /**
          * 进行网络请求时的 User-Agent, 进行部分特殊请求时不使用该 User-Agent

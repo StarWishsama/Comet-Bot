@@ -8,8 +8,8 @@ import moe.sdl.yac.parameters.types.long
 import ren.natsuyuk1.comet.api.command.BaseCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
-import ren.natsuyuk1.comet.cli.storage.LoginPlatform
 import ren.natsuyuk1.comet.cli.util.login
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
@@ -35,7 +35,7 @@ internal class Login(
     private val platform by option(
         "-p", "--platform",
         help = "登录 Comet 机器人的平台 (例如 QQ, Telegram)"
-    ).enum<LoginPlatform>(true).default(LoginPlatform.QQ)
+    ).enum<LoginPlatform>(true).default(LoginPlatform.MIRAI)
 
     override suspend fun run() {
         if (password == null) {
@@ -44,16 +44,19 @@ internal class Login(
         }
 
         when (platform) {
-            LoginPlatform.QQ -> {
+            LoginPlatform.MIRAI -> {
                 sender.sendMessage(buildMessageWrapper { appendText("正在尝试登录账号 $id 于 QQ 平台") })
 
-                login(id, password!!, LoginPlatform.QQ)
+                login(id, password!!, LoginPlatform.MIRAI)
             }
+
             LoginPlatform.TELEGRAM -> {
                 sender.sendMessage(buildMessageWrapper { appendText("正在尝试登录账号于 Telegram 平台") })
 
                 login(id, password!!, LoginPlatform.TELEGRAM)
             }
+
+            else -> {}
         }
     }
 }

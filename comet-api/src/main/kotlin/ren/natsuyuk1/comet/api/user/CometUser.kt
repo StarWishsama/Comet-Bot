@@ -23,6 +23,7 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import org.jetbrains.exposed.sql.transactions.transaction
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.utils.sql.SQLDatabaseSet
 import ren.natsuyuk1.comet.utils.sql.SetTable
 import java.util.*
@@ -84,7 +85,7 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
          *
          * @return 获取或创建的 [CometUser]
          */
-        fun getUserOrCreate(id: Long, platform: String): CometUser? = transaction {
+        fun getUserOrCreate(id: Long, platform: LoginPlatform): CometUser? = transaction {
             val findByQQ = findByQQ(id)
             return@transaction if (findByQQ.empty()) {
                 val findByTelegram = findByTelegramID(id)
@@ -93,8 +94,8 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
                     findByTelegram.first()
                 } else {
                     when (platform) {
-                        "mirai" -> create(qid = id)
-                        "telegram" -> create(tgID = id)
+                        LoginPlatform.MIRAI -> create(qid = id)
+                        LoginPlatform.TELEGRAM -> create(tgID = id)
                         else -> null
                     }
                 }

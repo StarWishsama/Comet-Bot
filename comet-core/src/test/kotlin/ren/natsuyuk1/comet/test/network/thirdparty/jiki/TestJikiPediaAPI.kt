@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.network.thirdparty.jikipedia.JikiPediaAPI
+import ren.natsuyuk1.comet.test.fakeComet
 import ren.natsuyuk1.comet.test.isCI
 import ren.natsuyuk1.comet.test.print
 
@@ -14,7 +15,7 @@ class TestJikiPediaAPI {
         if (isCI()) return
 
         runBlocking {
-           JikiPediaAPI.search("叩").toMessageWrapper().print()
+            JikiPediaAPI.search(fakeComet, "叩").toMessageWrapper().print()
         }
     }
 }

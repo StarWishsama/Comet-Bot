@@ -28,8 +28,8 @@ class MiraiComet(
 ) : Comet(config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
     lateinit var bot: Bot
 
-    override val id: String
-        get() = miraiConfig.id.toString()
+    override val id: Long
+        get() = miraiConfig.id
 
     override fun login() {
         val config = BotConfiguration.Default.apply {

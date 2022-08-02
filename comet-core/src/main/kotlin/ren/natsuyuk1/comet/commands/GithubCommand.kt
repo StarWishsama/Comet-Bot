@@ -88,6 +88,7 @@ class GithubCommand(
     }
 
     class Info(
+        val comet: Comet,
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
         override val user: CometUser
@@ -102,7 +103,7 @@ class GithubCommand(
             if (repoName.isBlank()) {
                 subject.sendMessage("请输入 GitHub 仓库名称或链接!".toMessageWrapper())
             } else {
-                GithubCommandService.fetchRepoInfo(subject, repoName)
+                GithubCommandService.fetchRepoInfo(comet, subject, repoName)
             }
         }
     }

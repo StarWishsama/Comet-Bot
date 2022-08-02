@@ -3,11 +3,13 @@ package ren.natsuyuk1.comet.cli.command
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.options.default
 import moe.sdl.yac.parameters.options.option
+import moe.sdl.yac.parameters.types.enum
 import moe.sdl.yac.parameters.types.long
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.command.BaseCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
@@ -28,7 +30,8 @@ class Promote(
 ) : BaseCommand(sender, message, user, STOP) {
 
     private val id by argument("QQ/Telegram 平台用户ID").long()
-    private val platformName by option("-p", "--platform", help = "平台名称").default("mirai")
+    private val platformName by option("-p", "--platform", help = "平台名称").enum<LoginPlatform>(true)
+        .default(LoginPlatform.MIRAI)
 
     override suspend fun run() {
         val user = CometUser.getUserOrCreate(id, platformName)

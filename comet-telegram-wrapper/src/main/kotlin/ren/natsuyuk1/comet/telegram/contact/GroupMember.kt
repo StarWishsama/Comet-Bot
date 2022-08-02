@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.impl.comet.MessageSendEvent
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.telegram.util.chatID
@@ -18,7 +19,7 @@ import kotlin.time.Duration.Companion.seconds
 abstract class TelegramGroupMember : GroupMember() {
     abstract val groupID: Long
 
-    override val platformName: String = "telegram"
+    override val platform: LoginPlatform = LoginPlatform.TELEGRAM
 }
 
 private val MUTE = ChatPermissions(canSendMessages = false, canSendMediaMessages = false, canSendOtherMessages = false)

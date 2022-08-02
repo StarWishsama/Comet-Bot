@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.commands.service
 
 import kotlinx.coroutines.delay
+import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.session.Session
 import ren.natsuyuk1.comet.api.session.expire
@@ -129,7 +130,7 @@ object GithubCommandService {
     // 3, 4
     private val githubLinkRegex by lazy { Regex("""^(https?://)?(www\.)?github\.com/(\w+)/(\w+)$""") }
 
-    suspend fun fetchRepoInfo(subject: PlatformCommandSender, repoName: String) {
+    suspend fun fetchRepoInfo(comet: Comet, subject: PlatformCommandSender, repoName: String) {
         var owner: String? = null
         var name: String? = null
 
@@ -156,7 +157,7 @@ object GithubCommandService {
             return
         }
 
-        val image = GitHubApi.getRepoPreviewImage(owner, name)
+        val image = GitHubApi.getRepoPreviewImage(comet, owner, name)
 
         if (image == null) {
             subject.sendMessage("搜索不到这个仓库, 等会再试试吧~".toMessageWrapper())

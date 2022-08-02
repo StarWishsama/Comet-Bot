@@ -10,6 +10,7 @@
 package ren.natsuyuk1.comet.api.command
 
 import ren.natsuyuk1.comet.api.Comet
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 /**
@@ -52,7 +53,7 @@ abstract class PlatformCommandSender : CommandSender {
     /**
      * 平台名称
      */
-    abstract val platformName: String
+    abstract val platform: LoginPlatform
 
     abstract override fun sendMessage(message: MessageWrapper)
 }

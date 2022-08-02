@@ -39,7 +39,7 @@ class JikiPediaCommand(
             if (keyword.length > 60) {
                 subject.sendMessage("❌ 请缩短搜索内容至64个字符以内".toMessageWrapper())
             } else {
-                subject.sendMessage(JikiPediaAPI.search(keyword).toMessageWrapper())
+                subject.sendMessage(JikiPediaAPI.search(comet, keyword).toMessageWrapper())
             }
         } catch (e: Exception) {
             if (e is ClientRequestException) {

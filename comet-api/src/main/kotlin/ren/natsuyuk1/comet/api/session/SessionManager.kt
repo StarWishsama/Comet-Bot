@@ -58,7 +58,7 @@ object SessionManager {
      */
     fun handleSession(subject: Contact, message: MessageWrapper): Boolean {
         val user: CometUser? = if (subject !is Group) {
-            CometUser.getUserOrCreate(subject.id, subject.platformName)
+            CometUser.getUserOrCreate(subject.id, subject.platform)
         } else null
 
         val targetSession = sessions.filter {

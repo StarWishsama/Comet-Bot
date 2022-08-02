@@ -20,13 +20,14 @@ import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.database.AccountDataTable
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.event.EventManager
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.cli.command.registerTerminalCommands
 import ren.natsuyuk1.comet.cli.console.Console
-import ren.natsuyuk1.comet.cli.storage.AccountDataTable
 import ren.natsuyuk1.comet.cli.util.login
 import ren.natsuyuk1.comet.config.branch
 import ren.natsuyuk1.comet.config.hash
@@ -46,9 +47,8 @@ import kotlin.system.exitProcess
 
 private val logger = mu.KotlinLogging.logger {}
 
-private val dummyComet = object : Comet(CometConfig, logger, ModuleScope("dummy-comet")) {
-    override val id: String
-        get() = "0"
+private val dummyComet = object : Comet(CometConfig(0, "", LoginPlatform.TEST), logger, ModuleScope("dummy-comet")) {
+    override val id: Long = 0
 
     override fun login() {}
 

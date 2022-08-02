@@ -1,4 +1,4 @@
-package ren.natsuyuk1.comet.cli.storage
+package ren.natsuyuk1.comet.api.database
 
 import mu.KotlinLogging
 import org.jetbrains.exposed.dao.Entity
@@ -7,12 +7,9 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.transactions.transaction
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 
 private val logger = KotlinLogging.logger {}
-
-enum class LoginPlatform {
-    QQ, TELEGRAM,
-}
 
 object AccountDataTable : IdTable<Long>("account_data") {
     override val id: Column<EntityID<Long>> = long("id").entityId()
