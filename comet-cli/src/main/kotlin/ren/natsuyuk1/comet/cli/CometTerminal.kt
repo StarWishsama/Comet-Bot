@@ -83,7 +83,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
             setupDatabase()
             setupCommands()
 
-            WrapperLoader.autoDiscovery()
+            WrapperLoader.load()
 
             autoLogin()
 

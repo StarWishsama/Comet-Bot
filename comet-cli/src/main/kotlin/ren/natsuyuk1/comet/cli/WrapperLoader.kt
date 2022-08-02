@@ -16,14 +16,14 @@ object WrapperLoader {
     private val modules = resolveDirectory("./modules")
     private lateinit var serviceLoader: ServiceLoader<CometWrapper>
 
-    suspend fun autoDiscovery() {
+    suspend fun load() {
         modules.touch()
 
         val possibleModules = (modules.listFiles() ?: emptyArray<File>()).filter { it.name.endsWith(".jar") }
 
         val urls = Array<URL>(possibleModules.size) { possibleModules[it].toURI().toURL() }
 
-        val cl = URLClassLoader(urls, CometTerminal::class.java.classLoader)
+        val cl = URLClassLoader.newInstance(urls)
 
         serviceLoader = ServiceLoader.load(CometWrapper::class.java, cl)
     }

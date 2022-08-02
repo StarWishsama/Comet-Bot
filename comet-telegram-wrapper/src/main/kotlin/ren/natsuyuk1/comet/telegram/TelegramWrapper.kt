@@ -14,7 +14,7 @@ class TelegramWrapper : CometWrapper {
 
         if (telegramConfig == null) {
             telegramConfig = TelegramConfig(config.data.botPassword).also { it.init() }
-            AccountData.registerAccount(config.data.botId, config.data.botPassword, LoginPlatform.MIRAI)
+            AccountData.registerAccount(config.data.botId, config.data.botPassword, platform())
         }
 
         return TelegramComet(config, telegramConfig)

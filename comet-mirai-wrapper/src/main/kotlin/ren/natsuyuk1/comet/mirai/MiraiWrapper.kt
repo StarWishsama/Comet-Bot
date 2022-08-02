@@ -14,7 +14,7 @@ class MiraiWrapper : CometWrapper {
 
         if (miraiConfig == null) {
             miraiConfig = MiraiConfig(config.data.botId, config.data.botPassword).also { it.init() }
-            AccountData.registerAccount(config.data.botId, config.data.botPassword, LoginPlatform.MIRAI)
+            AccountData.registerAccount(config.data.botId, config.data.botPassword, platform())
         }
 
         return MiraiComet(config, miraiConfig)
