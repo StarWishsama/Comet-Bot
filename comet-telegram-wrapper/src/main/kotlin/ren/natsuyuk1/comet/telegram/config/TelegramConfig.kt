@@ -12,10 +12,11 @@ fun findTelegramConfigByID(token: String): TelegramConfig? = telegramConfigs.fin
 
 @kotlinx.serialization.Serializable
 data class TelegramConfig(
+    val id: Long,
     val token: String
 ) {
     suspend fun init() {
-        val configFile = File(configDirectory, "telegram-${token.take(6)}.yml")
+        val configFile = File(configDirectory, "telegram-${id}.yml")
         configFile.touch()
         configFile.writeTextBuffered(Yaml.Default.encodeToString(this))
         telegramConfigs.add(this)

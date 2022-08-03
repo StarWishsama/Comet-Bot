@@ -29,7 +29,7 @@ class TelegramComet(
     config: CometConfig,
 
     val telegramConfig: TelegramConfig
-) : Comet(config, logger, ModuleScope("telegram ${telegramConfig.token.split(":").firstOrNull() ?: "Unknown"}")) {
+) : Comet(config, logger, ModuleScope("telegram ${config.data.botId}")) {
     lateinit var bot: Bot
     override val id: Long
         get() = config.data.botId
@@ -54,13 +54,13 @@ class TelegramComet(
                 }
             }
         }
+
+        bot.startPolling()
+
+        logger.info { "成功登录 Telegram Bot ${config.data.botId}" }
     }
 
     override fun afterLogin() {
-        bot.startPolling()
-
-        logger.info { "成功登录 Telegram Bot ${telegramConfig.token.split(":").firstOrNull()}" }
-
         attachMessageProcessor()
         subscribeGithubEvent()
     }

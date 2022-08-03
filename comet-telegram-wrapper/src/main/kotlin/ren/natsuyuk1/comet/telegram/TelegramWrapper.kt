@@ -13,7 +13,7 @@ class TelegramWrapper : CometWrapper {
         var telegramConfig = findTelegramConfigByID(config.data.botPassword)
 
         if (telegramConfig == null) {
-            telegramConfig = TelegramConfig(config.data.botPassword).also { it.init() }
+            telegramConfig = TelegramConfig(config.data.botId, config.data.botPassword).also { it.init() }
             AccountData.registerAccount(config.data.botId, config.data.botPassword, platform())
         }
 
