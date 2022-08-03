@@ -1,6 +1,6 @@
 package ren.natsuyuk1.comet.mirai
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.utils.BotConfiguration
@@ -13,6 +13,7 @@ import ren.natsuyuk1.comet.mirai.config.toMiraiProtocol
 import ren.natsuyuk1.comet.mirai.contact.toCometGroup
 import ren.natsuyuk1.comet.mirai.event.redirectToComet
 import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
+import ren.natsuyuk1.comet.mirai.util.runWithSuspend
 import ren.natsuyuk1.comet.service.subscribeGithubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 
@@ -29,7 +30,7 @@ class MiraiComet(
 
     private val miraiConfig: MiraiConfig,
 ) : Comet(config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
-    lateinit var bot: Bot
+    lateinit var miraiBot: Bot
 
     override val id: Long
         get() = miraiConfig.id
@@ -48,28 +49,32 @@ class MiraiComet(
             protocol = miraiConfig.protocol.toMiraiProtocol()
 
         }
-        bot = BotFactory.newBot(qq = miraiConfig.id, password = miraiConfig.password, configuration = config)
 
-        runBlocking {
-            // Switch context class loader for mirai service loading
-            Thread.currentThread().contextClassLoader = cl
+        miraiBot = BotFactory.newBot(qq = miraiConfig.id, password = miraiConfig.password, configuration = config)
 
-            bot.login()
+        scope.launch {
+            cl.runWithSuspend {
+                miraiBot.login()
+            }
+
+            miraiBot.eventChannel.subscribeAlways<net.mamoe.mirai.event.Event> {
+                cl.runWithSuspend {
+                    it.redirectToComet(this@MiraiComet)
+                }
+            }
+
+            miraiBot.join()
         }
     }
 
     override fun afterLogin() {
-        bot.eventChannel.subscribeAlways<net.mamoe.mirai.event.Event> {
-            it.redirectToComet(this@MiraiComet)
-        }
-
         attachMessageProcessor()
         subscribeGithubEvent()
     }
 
     override fun close() {
-        bot.close()
+        miraiBot.close()
     }
 
-    override fun getGroup(id: Long): Group? = bot.getGroup(id)?.toCometGroup(this)
+    override fun getGroup(id: Long): Group? = miraiBot.getGroup(id)?.toCometGroup(this)
 }

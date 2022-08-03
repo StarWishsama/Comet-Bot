@@ -1,8 +1,9 @@
-package ren.natsuyuk1.comet.cli
+package ren.natsuyuk1.comet.cli.wrapper
 
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.wrapper.CometWrapper
+import ren.natsuyuk1.comet.cli.CometTerminal
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import java.io.File
@@ -13,7 +14,7 @@ import java.util.*
 private val logger = KotlinLogging.logger {}
 
 object WrapperLoader {
-    private val modules = resolveDirectory("./modules")
+    private val modules = resolveDirectory("/modules/")
     private lateinit var serviceLoader: ServiceLoader<CometWrapper>
     var wrapperClassLoader: ClassLoader = ClassLoader.getPlatformClassLoader()
         private set

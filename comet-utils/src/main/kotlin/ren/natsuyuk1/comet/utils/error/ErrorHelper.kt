@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter
 private val logger = KotlinLogging.logger {}
 
 object ErrorHelper {
-    private val errorReportsFolder = resolveDirectory("./error-reports")
+    private val errorReportsFolder = resolveDirectory("/error-reports/")
     private val standardDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
 
     suspend fun createErrorReportFile(

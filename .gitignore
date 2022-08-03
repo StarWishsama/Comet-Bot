@@ -58,3 +58,6 @@ device.json
 
 ## Comet Generated Config ##
 *.yml
+
+## Comet Modules ##
+/modules

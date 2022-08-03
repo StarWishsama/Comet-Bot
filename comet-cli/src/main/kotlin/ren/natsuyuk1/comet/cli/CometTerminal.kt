@@ -29,6 +29,7 @@ import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.cli.command.registerTerminalCommands
 import ren.natsuyuk1.comet.cli.console.Console
 import ren.natsuyuk1.comet.cli.util.login
+import ren.natsuyuk1.comet.cli.wrapper.WrapperLoader
 import ren.natsuyuk1.comet.config.branch
 import ren.natsuyuk1.comet.config.hash
 import ren.natsuyuk1.comet.config.version
@@ -79,11 +80,11 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
             CometTerminal.init(scope.coroutineContext)
 
+            WrapperLoader.load()
+
             setupConfig()
             setupDatabase()
             setupCommands()
-
-            WrapperLoader.load()
 
             autoLogin()
 

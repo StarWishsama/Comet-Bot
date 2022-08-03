@@ -10,7 +10,7 @@ import ren.natsuyuk1.comet.api.database.AccountDataTable
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.cli.CometTerminal
 import ren.natsuyuk1.comet.cli.CometTerminalCommand
-import ren.natsuyuk1.comet.cli.WrapperLoader
+import ren.natsuyuk1.comet.cli.wrapper.WrapperLoader
 
 private val logger = KotlinLogging.logger {}
 
