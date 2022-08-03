@@ -8,7 +8,7 @@ import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.NormalMember
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.event.broadcast
-import ren.natsuyuk1.comet.api.event.impl.comet.MessageSendEvent
+import ren.natsuyuk1.comet.api.event.impl.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.mirai.MiraiComet
@@ -59,7 +59,7 @@ internal class MiraiGroupMemberImpl(
 
     override fun sendMessage(message: MessageWrapper) {
         comet.scope.launch {
-            val event = MessageSendEvent(
+            val event = MessagePreSendEvent(
                 comet,
                 this@MiraiGroupMemberImpl,
                 message,

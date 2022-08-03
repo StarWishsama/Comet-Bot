@@ -16,6 +16,7 @@ import ren.natsuyuk1.comet.telegram.config.TelegramConfig
 import ren.natsuyuk1.comet.telegram.contact.toCometGroup
 import ren.natsuyuk1.comet.telegram.event.toCometEvent
 import ren.natsuyuk1.comet.telegram.util.chatID
+import ren.natsuyuk1.comet.telegram.util.format
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
 
@@ -39,7 +40,7 @@ class TelegramComet(
             dispatch {
                 message(Filter.Text) {
                     if (this.message.date.toInstant() >= initTime) {
-                        logger.trace { "Incoming Telegram message: ${this.message}" }
+                        logger.trace { this.message.format() }
                         scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
                     }
                 }
@@ -47,7 +48,7 @@ class TelegramComet(
                 // When bot no access to message
                 message(Filter.Command) {
                     if (this.message.date.toInstant() >= initTime) {
-                        logger.trace { "Incoming Telegram command: ${this.message}" }
+                        logger.trace { this.message.format() }
                         scope.launch { toCometEvent(this@TelegramComet, true)?.broadcast() }
                     }
                 }

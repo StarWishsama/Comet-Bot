@@ -4,7 +4,7 @@ import com.github.kotlintelegrambot.entities.Chat
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
-import ren.natsuyuk1.comet.api.event.impl.comet.MessageSendEvent
+import ren.natsuyuk1.comet.api.event.impl.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.telegram.TelegramComet
@@ -33,7 +33,7 @@ class TelegramUserImpl(
 
     override fun sendMessage(message: MessageWrapper) {
         comet.scope.launch {
-            val event = MessageSendEvent(
+            val event = MessagePreSendEvent(
                 comet,
                 this@TelegramUserImpl,
                 message,

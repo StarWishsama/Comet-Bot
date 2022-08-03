@@ -5,7 +5,7 @@ import kotlinx.datetime.Clock
 import net.mamoe.mirai.contact.getMember
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.event.broadcast
-import ren.natsuyuk1.comet.api.event.impl.comet.MessageSendEvent
+import ren.natsuyuk1.comet.api.event.impl.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
@@ -56,7 +56,7 @@ internal class MiraiGroupImpl(
 
     override fun sendMessage(message: MessageWrapper) {
         comet.scope.launch {
-            val event = MessageSendEvent(
+            val event = MessagePreSendEvent(
                 comet,
                 this@MiraiGroupImpl,
                 message,
@@ -88,7 +88,7 @@ fun net.mamoe.mirai.contact.User.toCometUser(miraiComet: MiraiComet): User {
     ) : MiraiUser() {
         override fun sendMessage(message: MessageWrapper) {
             comet.scope.launch {
-                val event = MessageSendEvent(
+                val event = MessagePreSendEvent(
                     comet,
                     this@MiraiUserImpl,
                     message,

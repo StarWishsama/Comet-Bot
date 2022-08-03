@@ -31,7 +31,7 @@ object DynamicApi {
         val feedResp = client.getFeedContent(id.toULong())
 
         if (feedResp.code != GeneralCode.SUCCESS || feedResp.data == null || feedResp.data?.card == null) {
-            throw ApiException("获取动态失败")
+            throw ApiException("获取动态失败, 状态码 ${feedResp.code.name}")
         }
 
         val card = feedResp.data!!.card
@@ -63,7 +63,7 @@ object DynamicApi {
             return resp.data?.cards
         } catch (e: Exception) {
             if (e is SerializationException) {
-                throw ApiException("解析动态失败, 无法解析传入 Json")
+                throw ApiException("解析动态失败, 无法解析传入 Json", e)
             } else {
                 logger.warn(e) { "解析动态时出现异常" }
             }
@@ -72,5 +72,5 @@ object DynamicApi {
         }
     }
 
-    fun getCacheDynamic(id: Long): FeedCardNode? = cacheDynamic[id]
+    private fun getCacheDynamic(id: Long): FeedCardNode? = cacheDynamic[id]
 }

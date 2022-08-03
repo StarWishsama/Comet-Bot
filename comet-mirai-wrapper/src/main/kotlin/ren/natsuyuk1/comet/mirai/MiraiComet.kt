@@ -51,12 +51,10 @@ class MiraiComet(
         bot = BotFactory.newBot(qq = miraiConfig.id, password = miraiConfig.password, configuration = config)
 
         runBlocking {
-            val previous = Thread.currentThread().contextClassLoader
+            // Switch context class loader for mirai service loading
             Thread.currentThread().contextClassLoader = cl
 
             bot.login()
-
-            Thread.currentThread().contextClassLoader = previous
         }
     }
 

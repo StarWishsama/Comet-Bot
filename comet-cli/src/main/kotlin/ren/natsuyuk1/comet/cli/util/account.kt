@@ -14,6 +14,10 @@ import ren.natsuyuk1.comet.cli.WrapperLoader
 
 private val logger = KotlinLogging.logger {}
 
+suspend fun findCometConfig(id: Long, password: String, platform: LoginPlatform): CometConfig {
+    return CometConfig(id, password, platform).also { it.init() }
+}
+
 internal suspend fun login(id: Long, password: String, platform: LoginPlatform) {
     logger.info { "正在尝试登录账号 $id 于 ${platform.name} 平台" }
 
@@ -23,12 +27,18 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
                 ?: error("未安装 Mirai Wrapper, 请下载 Mirai Wrapper 并放置在 ./modules 下")
 
             val miraiComet =
-                miraiService.createInstance(CometConfig(id, password, platform), WrapperLoader.wrapperClassLoader)
+                miraiService.createInstance(findCometConfig(id, password, platform), WrapperLoader.wrapperClassLoader)
 
             CometTerminal.instance.push(miraiComet)
             miraiComet.init(CometTerminalCommand.scope.coroutineContext)
-            miraiComet.login()
-            miraiComet.afterLogin()
+
+            try {
+                miraiComet.login()
+                miraiComet.afterLogin()
+            } catch (e: RuntimeException) {
+                logger.warn(e) { "Mirai $id 登录失败, 请尝试重新登录" }
+                CometTerminal.instance.removeIf { it.id == id }
+            }
         }
 
         LoginPlatform.TELEGRAM -> {
@@ -36,12 +46,21 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
                 ?: error("未安装 Telegram Wrapper, 请下载 Telegram Wrapper 并放置在 ./modules 下")
 
             val telegramComet =
-                telegramService.createInstance(CometConfig(id, password, platform), WrapperLoader.wrapperClassLoader)
+                telegramService.createInstance(
+                    findCometConfig(id, password, platform),
+                    WrapperLoader.wrapperClassLoader
+                )
 
             CometTerminal.instance.push(telegramComet)
             telegramComet.init(CometTerminalCommand.scope.coroutineContext)
-            telegramComet.login()
-            telegramComet.afterLogin()
+
+            try {
+                telegramComet.login()
+                telegramComet.afterLogin()
+            } catch (e: Exception) {
+                logger.warn(e) { "Telegram $id 登录失败, 请尝试重新登录" }
+                CometTerminal.instance.removeIf { it.id == id }
+            }
         }
 
         else -> {}

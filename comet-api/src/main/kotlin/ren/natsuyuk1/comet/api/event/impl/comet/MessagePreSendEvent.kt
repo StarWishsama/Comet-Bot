@@ -14,7 +14,7 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
  * @param message 将要发出的消息 [MessageWrapper]
  * @param timestamp 发送该消息时的时间戳
  */
-class MessageSendEvent(
+class MessagePreSendEvent(
     val comet: Comet,
     val target: CommandSender,
     val message: MessageWrapper,

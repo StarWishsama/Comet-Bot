@@ -25,7 +25,7 @@ object WrapperLoader {
 
         val urls = Array<URL>(possibleModules.size) { possibleModules[it].toURI().toURL() }
 
-        wrapperClassLoader = URLClassLoader.newInstance(urls)
+        wrapperClassLoader = URLClassLoader.newInstance(urls, CometTerminal::class.java.classLoader)
 
         serviceLoader = ServiceLoader.load(CometWrapper::class.java, wrapperClassLoader)
 

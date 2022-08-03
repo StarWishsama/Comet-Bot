@@ -1,4 +1,4 @@
-package ren.natsuyuk1.comet.api.protocol
+package ren.natsuyuk1.comet.api.platform
 
 enum class MiraiLoginProtocol {
     ANDROID_PHONE,

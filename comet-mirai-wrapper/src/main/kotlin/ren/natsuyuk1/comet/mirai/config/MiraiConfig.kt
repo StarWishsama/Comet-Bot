@@ -2,7 +2,7 @@ package ren.natsuyuk1.comet.mirai.config
 
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.yamlkt.Yaml
-import ren.natsuyuk1.comet.api.protocol.MiraiLoginProtocol
+import ren.natsuyuk1.comet.api.platform.MiraiLoginProtocol
 import ren.natsuyuk1.comet.utils.file.configDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.file.writeTextBuffered
