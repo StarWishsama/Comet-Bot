@@ -13,6 +13,7 @@ import ren.natsuyuk1.comet.mirai.config.toMiraiProtocol
 import ren.natsuyuk1.comet.mirai.contact.toCometGroup
 import ren.natsuyuk1.comet.mirai.event.redirectToComet
 import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
+import ren.natsuyuk1.comet.mirai.util.runWith
 import ren.natsuyuk1.comet.mirai.util.runWithSuspend
 import ren.natsuyuk1.comet.service.subscribeGithubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
@@ -76,5 +77,5 @@ class MiraiComet(
         miraiBot.close()
     }
 
-    override fun getGroup(id: Long): Group? = miraiBot.getGroup(id)?.toCometGroup(this)
+    override fun getGroup(id: Long): Group? = cl.runWith { miraiBot.getGroup(id)?.toCometGroup(this) }
 }

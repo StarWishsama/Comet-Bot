@@ -2,23 +2,26 @@ package ren.natsuyuk1.comet.mirai.util
 
 import kotlinx.coroutines.runBlocking
 
-fun ClassLoader.runWith(runnable: () -> Unit) {
+fun <T> ClassLoader.runWith(runnable: () -> T): T {
     val previous = Thread.currentThread().contextClassLoader
 
     Thread.currentThread().contextClassLoader = this
 
-    runnable()
-
-    Thread.currentThread().contextClassLoader = previous
+    try {
+        return runnable()
+    } finally {
+        Thread.currentThread().contextClassLoader = previous
+    }
 }
 
-fun ClassLoader.runWithSuspend(runnable: suspend () -> Unit) {
-    runBlocking {
-        val previous = Thread.currentThread().contextClassLoader
+fun <T> ClassLoader.runWithSuspend(runnable: suspend () -> T): T = runBlocking {
+    val previous = Thread.currentThread().contextClassLoader
 
-        Thread.currentThread().contextClassLoader = this@runWithSuspend
+    Thread.currentThread().contextClassLoader = this@runWithSuspend
 
-        runnable()
+    try {
+        return@runBlocking runnable()
+    } finally {
         Thread.currentThread().contextClassLoader = previous
     }
 }
