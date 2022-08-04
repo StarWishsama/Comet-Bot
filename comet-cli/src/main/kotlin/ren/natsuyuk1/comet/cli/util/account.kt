@@ -35,6 +35,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
             try {
                 miraiComet.login()
                 miraiComet.afterLogin()
+
             } catch (e: RuntimeException) {
                 logger.warn(e) { "Mirai $id 登录失败, 请尝试重新登录" }
                 CometTerminal.instance.removeIf { it.id == id }

@@ -18,7 +18,7 @@ import ren.natsuyuk1.comet.utils.file.configDirectory
 import java.io.File
 
 class CometConfig(val id: Long, val password: String, val platform: LoginPlatform) : PersistDataFile<CometConfig.Data>(
-    File(configDirectory, "${platform.name.lowercase()}-$id-config.yml"), Data(id, password), Yaml
+    File(configDirectory, "$id.yml"), Data(), Yaml
 ) {
     @Serializable
     data class Data(

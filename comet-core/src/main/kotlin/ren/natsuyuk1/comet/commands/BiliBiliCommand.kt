@@ -73,7 +73,7 @@ class BiliBiliCommand(
         override val user: CometUser
     ) : CometSubCommand(subject, sender, user, VIDEO) {
 
-        private val video by argument(help = "视频 av/bv号/链接").default("")
+        private val video by argument(help = "视频 av/bv号/链接")
 
         companion object {
             val VIDEO = SubCommandProperty(

@@ -30,7 +30,7 @@ internal class Login(
 
     private val id by argument(name = "账户 ID", help = "登录账户的 ID").long()
 
-    private val password by option("-pwd", "--password", help = "登录账户的密码")
+    private val password by argument(name = "账户密码/Token", help = "登录账户的密码/Token")
 
     private val platform by option(
         "-p", "--platform",
@@ -38,7 +38,7 @@ internal class Login(
     ).enum<LoginPlatform>(true).default(LoginPlatform.MIRAI)
 
     override suspend fun run() {
-        if (password == null) {
+        if (password.isBlank()) {
             sender.sendMessage(buildMessageWrapper { appendText("请输入密码, 例子: login 123456 -p qq -pwd password") })
             return
         }
@@ -47,13 +47,13 @@ internal class Login(
             LoginPlatform.MIRAI -> {
                 sender.sendMessage(buildMessageWrapper { appendText("正在尝试登录账号 $id 于 QQ 平台") })
 
-                login(id, password!!, LoginPlatform.MIRAI)
+                login(id, password, LoginPlatform.MIRAI)
             }
 
             LoginPlatform.TELEGRAM -> {
                 sender.sendMessage(buildMessageWrapper { appendText("正在尝试登录账号于 Telegram 平台") })
 
-                login(id, password!!, LoginPlatform.TELEGRAM)
+                login(id, password, LoginPlatform.TELEGRAM)
             }
 
             else -> {}

@@ -14,9 +14,9 @@ import ren.natsuyuk1.comet.utils.file.writeTextBuffered
 import java.io.File
 
 private val logger = KotlinLogging.logger {}
+private val configFile = File(configDirectory, "./mirai")
 
 object MiraiConfigManager {
-    private val configFile = File(configDirectory, "./mirai")
     private val miraiConfigs = mutableListOf<MiraiConfig>()
     private var isInit = false
 
@@ -65,7 +65,7 @@ data class MiraiConfig(
     val heartbeatPeriodMillis: Long = 60.secondsToMillis,
 ) {
     suspend fun init() {
-        val configFile = File(configDirectory, "mirai-config-$id.yml")
+        val configFile = File(configFile, "mirai-config-$id.yml")
 
         configFile.touch()
         configFile.writeTextBuffered(Yaml.Default.encodeToString(this))
