@@ -11,6 +11,7 @@
 package ren.natsuyuk1.comet.objects.github.events
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import ren.natsuyuk1.comet.service.refsPattern
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
@@ -23,6 +24,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+@Serializable
 data class PushEventData(
     val ref: String,
     val before: String,
@@ -37,6 +39,7 @@ data class PushEventData(
     @SerialName("head_commit")
     val headCommitInfo: CommitInfo?
 ) : GithubEventData {
+    @Serializable
     data class RepoInfo(
         val id: Long,
         @SerialName("node_id")
@@ -55,12 +58,14 @@ data class PushEventData(
         val pushTime: Long,
     )
 
+    @Serializable
     data class PusherInfo(
         val name: String,
         // 推送者为 bot 时会为空
         val email: String?
     )
 
+    @Serializable
     data class CommitInfo(
         val id: String,
         val message: String,

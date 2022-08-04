@@ -30,6 +30,7 @@ enum class IssueStateReason(val display: String) {
     NOT_PLANNED("未计划")
 }
 
+@Serializable
 data class IssueEventData(
     /**
      * Issue 动作, 可以是 opened, edited, deleted, pinned, unpinned, closed, reopened, assigned, unassigned, labeled, unlabeled, locked, unlocked, transferred, milestoned, 或 demilestoned.
@@ -40,6 +41,7 @@ data class IssueEventData(
     val sender: SenderInfo
 ) : GithubEventData {
 
+    @Serializable
     data class IssueObject(
         @SerialName("html_url")
         val url: String,
@@ -55,6 +57,7 @@ data class IssueEventData(
         @SerialName("state_reason")
         val stateReason: IssueStateReason,
     ) {
+        @Serializable
         data class UserObject(
             val login: String
         )
@@ -68,11 +71,13 @@ data class IssueEventData(
         }
     }
 
+    @Serializable
     data class SenderInfo(
         val login: String,
         val id: Long
     )
 
+    @Serializable
     data class RepoInfo(
         val id: Long,
         @SerialName("node_id")

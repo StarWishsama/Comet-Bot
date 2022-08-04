@@ -11,6 +11,7 @@
 package ren.natsuyuk1.comet.objects.github.events
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
@@ -21,6 +22,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+@Serializable
 data class PullRequestEventData(
     val action: String,
     @SerialName("pull_request")
@@ -29,7 +31,7 @@ data class PullRequestEventData(
     val repository: RepoInfo,
     val sender: IssueEventData.SenderInfo
 ) : GithubEventData {
-
+    @Serializable
     data class RepoInfo(
         val id: Long,
         @SerialName("node_id")
@@ -46,6 +48,7 @@ data class PullRequestEventData(
         val repoUrl: String,
     )
 
+    @Serializable
     data class PullRequestInfo(
         @SerialName("html_url")
         val url: String,

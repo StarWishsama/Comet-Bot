@@ -11,6 +11,7 @@
 package ren.natsuyuk1.comet.objects.github.events
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
@@ -20,6 +21,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+@Serializable
 data class ReleaseEventData(
     // created, prereleased
     val action: String,
@@ -28,6 +30,7 @@ data class ReleaseEventData(
     val sender: IssueEventData.SenderInfo,
 ) : GithubEventData {
 
+    @Serializable
     data class ReleaseInfo(
         @SerialName("html_url")
         val url: String,

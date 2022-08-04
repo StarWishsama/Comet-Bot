@@ -11,6 +11,7 @@
 package ren.natsuyuk1.comet.objects.github.events
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.objects.github.api.RepoInfo
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
@@ -20,6 +21,7 @@ import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
  *
  * 该事件通常只在首次添加时触发.
  */
+@Serializable
 data class PingEventData(
     val zen: String,
     @SerialName("hook_id")
@@ -29,6 +31,7 @@ data class PingEventData(
     @SerialName("repository")
     val repositoryInfo: RepoInfo
 ) : GithubEventData {
+    @Serializable
     data class HookInfo(
         val type: String,
         val id: Long,

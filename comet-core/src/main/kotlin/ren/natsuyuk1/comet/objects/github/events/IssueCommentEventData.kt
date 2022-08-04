@@ -11,6 +11,7 @@
 package ren.natsuyuk1.comet.objects.github.events
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import ren.natsuyuk1.comet.utils.time.hmsPattern
@@ -19,12 +20,14 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+@Serializable
 data class IssueCommentEventData(
     val action: String,
     val issue: IssueEventData.IssueObject,
     val comment: CommentObject,
     val repository: IssueEventData.RepoInfo,
 ) : GithubEventData {
+    @Serializable
     data class CommentObject(
         @SerialName("html_url")
         val url: String,
