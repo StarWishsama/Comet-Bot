@@ -5,15 +5,21 @@ import ren.natsuyuk1.comet.api.command.AbstractCommandNode
 import ren.natsuyuk1.comet.api.command.CommandNode
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.api.database.DatabaseConfig
+import ren.natsuyuk1.comet.api.event.EventManagerConfig
 import ren.natsuyuk1.comet.api.user.UserPermissionTable
 import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.commands.*
+import ren.natsuyuk1.comet.objects.config.CometServerConfig
+import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserDataTable
 
-val cometConfigs: List<PersistDataFile<*>> =
+val cometPersistDataFile: List<PersistDataFile<*>> =
     listOf(
-        DatabaseConfig
+        DatabaseConfig,
+        GithubRepoData,
+        EventManagerConfig,
+        CometServerConfig,
     )
 
 val cometTables =

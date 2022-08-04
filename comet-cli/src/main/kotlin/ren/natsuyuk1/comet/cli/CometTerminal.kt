@@ -33,7 +33,7 @@ import ren.natsuyuk1.comet.cli.wrapper.WrapperLoader
 import ren.natsuyuk1.comet.config.branch
 import ren.natsuyuk1.comet.config.hash
 import ren.natsuyuk1.comet.config.version
-import ren.natsuyuk1.comet.consts.cometConfigs
+import ren.natsuyuk1.comet.consts.cometPersistDataFile
 import ren.natsuyuk1.comet.consts.cometTables
 import ren.natsuyuk1.comet.consts.defaultCommands
 import ren.natsuyuk1.comet.network.CometServer
@@ -94,7 +94,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
     private fun setupConfig(): Job = scope.launch {
         logger.info { "加载配置文件..." }
-        cometConfigs.map {
+        cometPersistDataFile.map {
             launch {
                 it.init()
                 it.save()

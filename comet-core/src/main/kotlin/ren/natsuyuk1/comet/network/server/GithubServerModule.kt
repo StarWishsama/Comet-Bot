@@ -56,7 +56,7 @@ object GithubWebHookHandler {
             val request = call.receiveText()
             val secretStatus = GitHubService.checkSecret(signature, request, eventType)
 
-            logger.debug { "GitHub WebHook 收到新事件" }
+            logger.debug { "GitHub WebHook 收到新事件, secretStatus = $secretStatus" }
 
             if (!checkSecretStatus(call, secretStatus, signature)) {
                 logger.debug("Secret 校验失败")

@@ -49,8 +49,7 @@ object GitHubService {
             processEvent(
                 URLDecoder.decode(requestBody.replace("payload=", ""), Charsets.UTF_8),
                 eventType
-            )
-                ?: return SecretStatus.FAILED
+            ) ?: return SecretStatus.FAILED
 
         val targetRepo =
             GithubRepoData.data.repos.find { it.getName() == parse.repoName() } ?: return SecretStatus.NOT_FOUND
