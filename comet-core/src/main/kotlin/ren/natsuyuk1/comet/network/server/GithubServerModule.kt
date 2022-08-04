@@ -6,9 +6,7 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import kotlinx.serialization.json.JsonObject
 import ren.natsuyuk1.comet.api.event.broadcast
-import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.event.pusher.github.GithubEvent
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.objects.github.data.SecretStatus
@@ -66,14 +64,6 @@ object GithubWebHookHandler {
             val payload = URLDecoder.decode(request.replace("payload=", ""), Charsets.UTF_8)
 
             logger.debug("接收到传入请求: $payload")
-
-            val validate = json.parseToJsonElement(payload) !is JsonObject
-
-            if (!validate) {
-                logger.warn("解析请求失败, Github 侧传入事件不合法.\n${payload}")
-                call.respondText("Unknown request", status = HttpStatusCode.InternalServerError)
-                return
-            }
 
             var hasError = false
 

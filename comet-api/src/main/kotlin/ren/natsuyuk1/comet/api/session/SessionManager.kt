@@ -26,7 +26,7 @@ object SessionManager {
 
     private val sessions = ConcurrentLinkedQueue<Session>()
 
-    private val autoExpireJobs = ConcurrentHashMap<Int, Job>()
+    private val autoExpireJobs = ConcurrentHashMap<Session, Job>()
 
     fun init(parentContext: CoroutineContext) {
         scope = ModuleScope(scope.name(), parentContext)
@@ -55,7 +55,7 @@ object SessionManager {
             expireSession(session)
         }
 
-        autoExpireJobs[hashCode()] = job
+        autoExpireJobs[session] = job
     }
 
     /**
@@ -66,7 +66,8 @@ object SessionManager {
 
         sessions.remove(session)
 
-        autoExpireJobs[session.hashCode()]?.cancel()
+        autoExpireJobs[session]?.cancel()
+        autoExpireJobs.remove(session)
     }
 
     /**

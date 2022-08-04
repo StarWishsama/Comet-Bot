@@ -101,7 +101,7 @@ data class PushEventData(
     }
 
     override fun toMessageWrapper(): MessageWrapper {
-        if (headCommitInfo == null) {
+        if (headCommitInfo == null || commitInfo.isEmpty()) {
             return MessageWrapper().setUsable(false)
         }
 
