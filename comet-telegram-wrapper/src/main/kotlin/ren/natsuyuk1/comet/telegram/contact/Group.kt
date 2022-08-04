@@ -131,7 +131,6 @@ internal class TelegramGroupImpl(
         }
 
     override fun sendMessage(message: MessageWrapper) {
-
         comet.scope.launch {
             val event = MessagePreSendEvent(
                 comet,

@@ -170,4 +170,31 @@ object GithubCommandService {
             )
         }
     }
+
+    class ModifyRepoSettingSession(
+        contact: PlatformCommandSender,
+        cometUser: CometUser?,
+    ) : Session(contact, cometUser) {
+        override fun handle(message: MessageWrapper) {
+        }
+    }
+
+    suspend fun modifyRepoSetting(
+        subject: PlatformCommandSender,
+        user: CometUser,
+        groupID: Long,
+        repoName: String
+    ) {
+        if (!repoRegex.matches(repoName)) {
+            subject.sendMessage("请输入有效的仓库名!".toMessageWrapper())
+            return
+        }
+
+        if (!GithubRepoData.exists(repoName, groupID)) {
+            subject.sendMessage("对应群没有订阅过这个仓库".toMessageWrapper())
+            return
+        }
+
+
+    }
 }

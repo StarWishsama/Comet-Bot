@@ -5,7 +5,6 @@ import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
-import ren.natsuyuk1.comet.utils.file.touch
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 
@@ -18,8 +17,11 @@ object GroupSettingManager {
     suspend fun init(parentContext: CoroutineContext) {
         scope = ModuleScope(scope.name(), parentContext)
 
-        val folder = resolveDirectory("/group-setting/")
-        folder.touch()
+        val folder = resolveDirectory("./group-setting")
+
+        if (!folder.exists()) {
+            folder.mkdir()
+        }
 
         folder.listFiles()?.forEach {
             val setting = GroupSetting(it.nameWithoutExtension.toLongOrNull() ?: return@forEach)
@@ -43,7 +45,7 @@ object GroupSettingManager {
 }
 
 class GroupSetting(val id: Long) : PersistDataFile<GroupSetting.Data>(
-    File(resolveDirectory("/group-setting/"), "${id}.yml"),
+    File(resolveDirectory("./group-setting"), "${id}.yml"),
     Data()
 ) {
     data class Data(

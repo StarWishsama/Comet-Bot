@@ -5,7 +5,6 @@ import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.wrapper.CometWrapper
 import ren.natsuyuk1.comet.cli.CometTerminal
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
-import ren.natsuyuk1.comet.utils.file.touch
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
@@ -14,13 +13,17 @@ import java.util.*
 private val logger = KotlinLogging.logger {}
 
 object WrapperLoader {
-    private val modules = resolveDirectory("/modules/")
+    private val modules = resolveDirectory("./modules")
     private lateinit var serviceLoader: ServiceLoader<CometWrapper>
     var wrapperClassLoader: ClassLoader = ClassLoader.getPlatformClassLoader()
         private set
 
-    suspend fun load() {
-        modules.touch()
+    fun load() {
+        if (modules.exists()) {
+            modules.mkdir()
+            logger.warn { "未检测到任何 Comet Wrapper, Comet 将无法正常工作!" }
+            return
+        }
 
         val possibleModules = (modules.listFiles() ?: emptyArray<File>()).filter { it.name.endsWith(".jar") }
 

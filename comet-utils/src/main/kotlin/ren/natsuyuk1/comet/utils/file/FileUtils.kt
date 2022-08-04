@@ -26,13 +26,13 @@ val globalDirectory by lazy {
 fun resolveDirectory(path: String) = File(globalDirectory, path)
 fun resolveResourceDirectory(path: String) = File(resourceDirectory, path)
 
-val configDirectory by lazy { resolveDirectory("/config/") }
+val configDirectory by lazy { resolveDirectory("./config") }
 
-val resourceDirectory by lazy { resolveDirectory("/resources/") }
+val resourceDirectory by lazy { resolveDirectory("./resources") }
 
-val messageWrapperDirectory by lazy { resolveDirectory("/wrapper-cache/") }
+val messageWrapperDirectory by lazy { resolveDirectory("./wrapper-cache") }
 
-val cacheDirectory by lazy { resolveDirectory("/cache/") }
+val cacheDirectory by lazy { resolveDirectory("./cache") }
 
 val File.absPath
     get() = toPath().normalize().absolute().pathString
@@ -42,11 +42,7 @@ val File.absPath
  */
 suspend fun File.touch(): Boolean = withContext(Dispatchers.IO) {
     parentFile?.mkdirs()
-    if (!isDirectory) {
-        createNewFile()
-    } else {
-        mkdirs()
-    }
+    createNewFile()
 }
 
 suspend fun File.writeTextBuffered(text: String) = withContext(Dispatchers.IO) {
