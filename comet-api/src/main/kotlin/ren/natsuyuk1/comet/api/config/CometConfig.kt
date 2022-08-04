@@ -17,16 +17,11 @@ import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.utils.file.configDirectory
 import java.io.File
 
-class CometConfig(id: Long, password: String, val platform: LoginPlatform) : PersistDataFile<CometConfig.Data>(
+class CometConfig(val id: Long, val password: String, val platform: LoginPlatform) : PersistDataFile<CometConfig.Data>(
     File(configDirectory, "${platform.name.lowercase()}-$id-config.yml"), Data(id, password), Yaml
 ) {
     @Serializable
     data class Data(
-        @Comment("机器人的登录 ID")
-        val botId: Long,
-
-        @Comment("机器人的登录密码")
-        val botPassword: String,
         /**
          * 自动保存数据的周期, 单位为分钟
          */

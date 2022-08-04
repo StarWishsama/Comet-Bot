@@ -84,7 +84,7 @@ internal class TelegramGroupImpl(
             val (resp, _) = comet.bot.getFile(bigFileId)
 
             if (resp?.isSuccessful == true) {
-                return@run "https://api.telegram.org/file/bot${comet.telegramConfig.token}/${resp.body()?.result?.fileId}"
+                return@run "https://api.telegram.org/file/bot${comet.config.password}/${resp.body()?.result?.fileId}"
             } else {
                 return@run ""
             }

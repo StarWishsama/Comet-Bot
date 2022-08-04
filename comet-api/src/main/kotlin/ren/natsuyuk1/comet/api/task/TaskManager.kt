@@ -39,6 +39,11 @@ interface ITaskManager {
         delayMillis: Long,
         task: suspend () -> Unit,
     ): Job
+
+    fun registerTaskDelayed(
+        delay: Duration,
+        task: suspend () -> Unit,
+    ): Job
 }
 
 object TaskManager : ITaskManager {
@@ -86,6 +91,16 @@ object TaskManager : ITaskManager {
         while (isActive) {
             task()
             delay(delayMillis)
+        }
+    }
+
+    override fun registerTaskDelayed(
+        delay: Duration,
+        task: suspend () -> Unit
+    ): Job = scope.launch {
+        while (isActive) {
+            delay(delay)
+            task()
         }
     }
 }

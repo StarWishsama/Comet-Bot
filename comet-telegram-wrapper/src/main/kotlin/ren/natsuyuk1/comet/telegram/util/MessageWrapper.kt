@@ -57,7 +57,7 @@ suspend fun Message.toMessageWrapper(comet: TelegramComet, isCommand: Boolean): 
 
                     kotlin.runCatching {
                         cometClient.client.downloadFile(
-                            "https://api.telegram.org/file/bot${comet.telegramConfig.token}/${file.body()?.result?.fileId}",
+                            "https://api.telegram.org/file/bot${comet.config.password}/${file.body()?.result?.fileId}",
                             tempFile
                         )
                     }.onFailure { t ->

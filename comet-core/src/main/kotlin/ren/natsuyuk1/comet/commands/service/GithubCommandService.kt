@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object GithubCommandService {
-    private val repoRegex = "(\\w*)/(\\w*)".toRegex()
+    private val repoRegex = """(\w*)/(.*)""".toRegex()
 
     class GitHubSubscribeSession(
         contact: PlatformCommandSender,
@@ -95,7 +95,7 @@ object GithubCommandService {
                 subject.sendMessage("找不到你想要订阅的 GitHub 仓库".toMessageWrapper())
             }
         } else {
-            subject.sendMessage("请输入有效的 GitHub 仓库名称, 例如 StarWishsama/Comet-Bot".toMessageWrapper())
+            subject.sendMessage("请输入有效的 GitHub 仓库名称 (输入了 $repoName), 例如 StarWishsama/Comet-Bot".toMessageWrapper())
         }
     }
 
@@ -123,12 +123,12 @@ object GithubCommandService {
                 subject.sendMessage("找不到你想要取消订阅的 GitHub 仓库".toMessageWrapper())
             }
         } else {
-            subject.sendMessage("请输入有效的 GitHub 仓库名称, 例如 StarWishsama/Comet-Bot".toMessageWrapper())
+            subject.sendMessage("请输入有效的 GitHub 仓库名称 (输入了 $repoName), 例如 StarWishsama/Comet-Bot".toMessageWrapper())
         }
     }
 
     // 3, 4
-    private val githubLinkRegex by lazy { Regex("""^(https?://)?(www\.)?github\.com/(\w+)/(\w+)$""") }
+    private val githubLinkRegex by lazy { Regex("""^(https?://)?(www\.)?github\.com/(\w+)/(.+)""") }
 
     suspend fun fetchRepoInfo(comet: Comet, subject: PlatformCommandSender, repoName: String) {
         var owner: String? = null

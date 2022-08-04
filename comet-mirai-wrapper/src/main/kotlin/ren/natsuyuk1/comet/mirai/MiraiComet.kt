@@ -49,9 +49,12 @@ class MiraiComet(
 
             protocol = miraiConfig.protocol.toMiraiProtocol()
 
+            heartbeatStrategy = miraiConfig.heartbeatStrategy
+
+            heartbeatPeriodMillis = miraiConfig.heartbeatPeriodMillis
         }
 
-        miraiBot = BotFactory.newBot(qq = miraiConfig.id, password = miraiConfig.password, configuration = config)
+        miraiBot = BotFactory.newBot(qq = this.config.id, password = this.config.password, configuration = config)
 
         scope.launch {
             cl.runWithSuspend {

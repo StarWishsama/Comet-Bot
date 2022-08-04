@@ -5,19 +5,12 @@ import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.database.AccountData
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.wrapper.CometWrapper
-import ren.natsuyuk1.comet.telegram.config.TelegramConfig
-import ren.natsuyuk1.comet.telegram.config.findTelegramConfigByID
 
 class TelegramWrapper : CometWrapper {
     override suspend fun createInstance(config: CometConfig, classLoader: ClassLoader): Comet {
-        var telegramConfig = findTelegramConfigByID(config.data.botPassword)
+        AccountData.registerAccount(config.id, config.password, platform())
 
-        if (telegramConfig == null) {
-            telegramConfig = TelegramConfig(config.data.botId, config.data.botPassword).also { it.init() }
-            AccountData.registerAccount(config.data.botId, config.data.botPassword, platform())
-        }
-
-        return TelegramComet(config, telegramConfig)
+        return TelegramComet(config)
     }
 
     override fun platform(): LoginPlatform = LoginPlatform.TELEGRAM

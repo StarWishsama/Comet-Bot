@@ -45,5 +45,10 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
                 }
             }
         }
+
+        fun getAccountData(id: Long): AccountData? =
+            transaction {
+                findById(id)
+            }
     }
 }

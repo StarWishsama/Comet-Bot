@@ -1,14 +1,19 @@
 package ren.natsuyuk1.comet.api.session
 
+import kotlinx.coroutines.Job
+import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.Contact
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
+
+private val logger = KotlinLogging.logger {}
 
 fun Session.register() = SessionManager.registerSession(this)
 
@@ -21,6 +26,8 @@ object SessionManager {
 
     private val sessions = ConcurrentLinkedQueue<Session>()
 
+    private val autoExpireJobs = ConcurrentHashMap<Int, Job>()
+
     fun init(parentContext: CoroutineContext) {
         scope = ModuleScope(scope.name(), parentContext)
     }
@@ -28,7 +35,11 @@ object SessionManager {
     /**
      * 注册一个会话 [Session] 以备监听
      */
-    fun registerSession(session: Session) = sessions.add(session)
+    fun registerSession(session: Session) {
+        logger.debug { "Registering session ${session::class.simpleName}#${session.hashCode()}" }
+
+        sessions.add(session)
+    }
 
     /**
      * 注册一个 [Session] 以备监听
@@ -40,15 +51,23 @@ object SessionManager {
     fun registerTimeoutSession(session: Session, timeout: Duration) {
         registerSession(session)
 
-        TaskManager.registerTask(timeout) {
+        val job = TaskManager.registerTaskDelayed(timeout) {
             expireSession(session)
         }
+
+        autoExpireJobs[hashCode()] = job
     }
 
     /**
      * 注销一个会话 [Session]
      */
-    fun expireSession(session: Session) = sessions.remove(session)
+    fun expireSession(session: Session) {
+        logger.debug { "Expiring session ${session::class.simpleName}#${session.hashCode()}" }
+
+        sessions.remove(session)
+
+        autoExpireJobs[session.hashCode()]?.cancel()
+    }
 
     /**
      * 处理会话

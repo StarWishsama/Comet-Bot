@@ -127,7 +127,7 @@ open class PersistDataFile<T : Any>(
                     for (e in wk.pollEvents()) {
                         val changeContext = e.context() as Path
                         if (changeContext == file.toPath()) {
-                            logger.debug { "Detected ${this@PersistDataFile.clazz.simpleName} data file has been changed, reloading..." }
+                            logger.info { "Detected ${this@PersistDataFile.clazz.simpleName} data file has been changed, reloading..." }
                             load()
                         }
                     }

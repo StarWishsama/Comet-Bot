@@ -12,7 +12,6 @@ import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.service.subscribeGithubEvent
-import ren.natsuyuk1.comet.telegram.config.TelegramConfig
 import ren.natsuyuk1.comet.telegram.contact.toCometGroup
 import ren.natsuyuk1.comet.telegram.event.toCometEvent
 import ren.natsuyuk1.comet.telegram.util.chatID
@@ -26,17 +25,15 @@ class TelegramComet(
     /**
      * 一个 Comet 实例的 [CometConfig]
      */
-    config: CometConfig,
-
-    val telegramConfig: TelegramConfig
-) : Comet(config, logger, ModuleScope("telegram ${config.data.botId}")) {
+    config: CometConfig
+) : Comet(config, logger, ModuleScope("telegram ${config.id}")) {
     lateinit var bot: Bot
     override val id: Long
-        get() = config.data.botId
+        get() = config.id
 
     override fun login() {
         bot = bot {
-            token = telegramConfig.token
+            token = config.password
             dispatch {
                 message(Filter.Text) {
                     if (this.message.date.toInstant() >= initTime) {
@@ -57,7 +54,7 @@ class TelegramComet(
 
         bot.startPolling()
 
-        logger.info { "成功登录 Telegram Bot ${config.data.botId}" }
+        logger.info { "成功登录 Telegram Bot ${config.password}" }
     }
 
     override fun afterLogin() {

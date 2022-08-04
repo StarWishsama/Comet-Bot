@@ -14,6 +14,7 @@ import kotlinx.datetime.Instant
 import mu.KLogger
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.database.AccountData
 import ren.natsuyuk1.comet.api.event.impl.message.MessageEvent
 import ren.natsuyuk1.comet.api.event.registerListener
 import ren.natsuyuk1.comet.api.session.SessionManager
@@ -53,6 +54,8 @@ abstract class Comet(
 
         initTime = Clock.System.now()
     }
+
+    fun getAccountData(): AccountData? = AccountData.getAccountData(config.id)
 
     abstract fun login()
 

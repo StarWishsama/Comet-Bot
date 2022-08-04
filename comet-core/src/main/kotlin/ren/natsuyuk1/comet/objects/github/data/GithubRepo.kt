@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.objects.github.data
 
+import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.utils.file.configDirectory
 import java.io.File
@@ -8,9 +9,11 @@ object GithubRepoData : PersistDataFile<GithubRepoData.Data>(
     File(configDirectory, "github_repos.json"),
     Data()
 ) {
+    @Serializable
     data class Data(
         val repos: MutableList<GithubRepo> = mutableListOf()
     ) {
+        @Serializable
         data class GithubRepo(
             val repoName: String,
             val owner: String,
@@ -19,6 +22,7 @@ object GithubRepoData : PersistDataFile<GithubRepoData.Data>(
         ) {
             fun getName(): String = "$owner/$repoName"
 
+            @Serializable
             data class GithubRepoSubscriber(
                 val id: Long,
                 val subscribeEvent: List<String> = mutableListOf("push", "release", "issue", "issue_comment")

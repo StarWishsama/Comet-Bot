@@ -52,12 +52,12 @@ fun ProjectSekaiProfile.toMessageWrapper(userData: ProjectSekaiUserData, eventId
             if (rankDiff != 0L) {
                 appendText((if (profile.rank < userData.lastQueryPosition) "↑ 上升" else "↓ 下降") + " $rankDiff 名")
             }
+
+            appendLine()
         }
 
         // Refresh user pjsk score and rank
         userData.updateInfo(profile.score, profile.rank)
-
-        appendLine()
 
         if (ahead != 0) {
             val aheadEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, ahead) }
@@ -90,7 +90,7 @@ fun ProjectSekaiProfile.toMessageWrapper(userData: ProjectSekaiUserData, eventId
             appendText("$behind 档预测分数为 $behindPredictScore", true)
         }
 
-        appendText("数据来自 Sekai Viewer | 33Kit")
+        appendText("数据来自 Project Sekai Profile | 33Kit")
     }
 }
 
