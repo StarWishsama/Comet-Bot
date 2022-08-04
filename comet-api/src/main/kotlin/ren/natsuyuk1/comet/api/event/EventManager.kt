@@ -26,6 +26,7 @@ import java.io.File
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.reflect.KClass
 
 val logger = mu.KotlinLogging.logger {}
 
@@ -214,6 +215,18 @@ inline fun <reified T : Event> registerListener(
 ) {
     EventManager.registerEventListener(priority) {
         if (it is T) {
+            listener(it)
+        }
+    }
+}
+
+fun registerListener(
+    eventClass: KClass<out Event>,
+    priority: EventPriority = EventPriority.NORMAL,
+    listener: suspend (Event) -> Unit
+) {
+    EventManager.registerEventListener(priority) {
+        if (it::class == eventClass) {
             listener(it)
         }
     }

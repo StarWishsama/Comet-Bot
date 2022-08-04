@@ -27,6 +27,7 @@ import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.utils.sql.SQLDatabaseSet
 import ren.natsuyuk1.comet.utils.sql.SetTable
 import java.util.*
+import kotlin.time.Duration.Companion.days
 
 private val logger = KotlinLogging.logger {}
 
@@ -41,7 +42,9 @@ object UserTable : UUIDTable("user_data") {
     val qq = long("qq").default(0)
     val telegramID = long("telegramID").default(0)
     val checkInDate =
-        datetime("check_in_date").default(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
+        datetime("check_in_date").default(
+            Clock.System.now().minus(1.days).toLocalDateTime(TimeZone.currentSystemDefault())
+        )
     val coin = double("coin").default(0.0)
     val level = integer("level").default(0)
     val exp = long("exp").default(0L)

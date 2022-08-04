@@ -1,7 +1,7 @@
 package ren.natsuyuk1.comet.api.event.impl.message
 
 import ren.natsuyuk1.comet.api.Comet
-import ren.natsuyuk1.comet.api.event.AbstractEvent
+import ren.natsuyuk1.comet.api.event.CometEvent
 import ren.natsuyuk1.comet.api.user.Contact
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
@@ -21,4 +21,4 @@ sealed interface IMessageEvent {
     val messageID: Long
 }
 
-abstract class MessageEvent : AbstractEvent(), IMessageEvent
+abstract class MessageEvent(override val comet: Comet) : CometEvent(comet), IMessageEvent

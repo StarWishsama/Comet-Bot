@@ -80,8 +80,6 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
             CometTerminal.init(scope.coroutineContext)
 
-            WrapperLoader.load()
-
             setupConfig()
             setupDatabase()
             setupCommands()
@@ -180,6 +178,9 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 }
 
 suspend fun main(args: Array<String>) {
+    WrapperLoader.load()
+    Thread.currentThread().contextClassLoader = WrapperLoader.wrapperClassLoader
+
     when (val result = CometTerminalCommand().main(args)) {
         is CommandResult.Success -> {
             exitProcess(0)

@@ -15,10 +15,10 @@ fun Message.format(): String {
     }
 
     val sender = buildString {
-        if (msg.senderChat == null) {
+        if (msg.from == null) {
             append("${msg.chat.usernameOrDisplay()}(${msg.chat.id})")
         } else {
-            append("${msg.senderChat!!.usernameOrDisplay()}(${msg.senderChat!!.id})")
+            append("${msg.from?.getDisplayName()}(${msg.from?.id})")
         }
     }
 

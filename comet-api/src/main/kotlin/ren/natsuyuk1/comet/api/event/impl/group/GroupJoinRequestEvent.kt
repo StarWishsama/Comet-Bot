@@ -6,4 +6,4 @@ import ren.natsuyuk1.comet.api.user.Contact
 class GroupJoinRequestEvent(
     override val comet: Comet,
     override val group: Contact
-) : GroupEvent()
+) : GroupEvent(comet)

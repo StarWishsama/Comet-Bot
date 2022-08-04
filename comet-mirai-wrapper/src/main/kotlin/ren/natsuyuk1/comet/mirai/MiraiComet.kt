@@ -56,15 +56,15 @@ class MiraiComet(
         scope.launch {
             cl.runWithSuspend {
                 miraiBot.login()
-            }
 
-            miraiBot.eventChannel.subscribeAlways<net.mamoe.mirai.event.Event> {
-                cl.runWithSuspend {
-                    it.redirectToComet(this@MiraiComet)
+                miraiBot.eventChannel.subscribeAlways<net.mamoe.mirai.event.Event> {
+                    cl.runWithSuspend {
+                        it.redirectToComet(this@MiraiComet)
+                    }
                 }
-            }
 
-            miraiBot.join()
+                miraiBot.join()
+            }
         }
     }
 

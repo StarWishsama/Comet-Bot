@@ -3,7 +3,6 @@ package ren.natsuyuk1.comet.cli.wrapper
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.wrapper.CometWrapper
-import ren.natsuyuk1.comet.cli.CometTerminal
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import java.io.File
 import java.net.URL
@@ -19,7 +18,7 @@ object WrapperLoader {
         private set
 
     fun load() {
-        if (modules.exists()) {
+        if (!modules.exists()) {
             modules.mkdir()
             logger.warn { "未检测到任何 Comet Wrapper, Comet 将无法正常工作!" }
             return
@@ -29,7 +28,7 @@ object WrapperLoader {
 
         val urls = Array<URL>(possibleModules.size) { possibleModules[it].toURI().toURL() }
 
-        wrapperClassLoader = URLClassLoader.newInstance(urls, CometTerminal::class.java.classLoader)
+        wrapperClassLoader = URLClassLoader.newInstance(urls)
 
         serviceLoader = ServiceLoader.load(CometWrapper::class.java, wrapperClassLoader)
 
