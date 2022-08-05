@@ -16,6 +16,7 @@ import io.ktor.client.features.compression.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import kotlinx.serialization.json.Json
+import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.utils.time.Timer
 
@@ -28,7 +29,7 @@ val json = Json {
 val defaultClient = HttpClient(CIO) {
     install(UserAgent) {
         agent =
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.41"
+            CometGlobalConfig.data.useragent
     }
 
     install(ContentEncoding) {

@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.commands
 
+import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.arguments.default
 import moe.sdl.yac.parameters.options.default
@@ -36,6 +37,16 @@ class ProjectSekaiCommand(
     val message: MessageWrapper,
     val user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, PROJECTSEKAI) {
+
+    init {
+        subcommands(
+            Bind(subject, sender, user),
+            Event(subject, sender, user),
+            Prediction(subject, sender, user),
+            Info(subject, sender, user),
+        )
+    }
+
     override suspend fun run() {
         if (message.parseToString().toArgs().size == 1) {
             subject.sendMessage(PROJECTSEKAI.helpText.toMessageWrapper())

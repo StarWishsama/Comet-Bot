@@ -8,3 +8,16 @@
  */
 
 package ren.natsuyuk1.comet.utils.datetime
+
+import java.time.DayOfWeek
+
+fun DayOfWeek.toChinese(): String =
+    when (this) {
+        DayOfWeek.MONDAY -> "星期一"
+        DayOfWeek.TUESDAY -> "星期二"
+        DayOfWeek.WEDNESDAY -> "星期三"
+        DayOfWeek.THURSDAY -> "星期四"
+        DayOfWeek.FRIDAY -> "星期五"
+        DayOfWeek.SATURDAY -> "星期六"
+        DayOfWeek.SUNDAY -> "星期日"
+    }

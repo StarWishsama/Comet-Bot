@@ -1,6 +1,5 @@
 package ren.natsuyuk1.comet.consts
 
-import moe.sdl.yac.core.subcommands
 import ren.natsuyuk1.comet.api.command.AbstractCommandNode
 import ren.natsuyuk1.comet.api.command.CommandNode
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
@@ -48,12 +47,6 @@ val defaultCommands: List<AbstractCommandNode<*>> =
             )
         ) { comet, sender, subject, wrapper, user ->
             ProjectSekaiCommand(comet, sender, subject, wrapper, user)
-                .subcommands(
-                    ProjectSekaiCommand.Bind(subject, sender, user),
-                    ProjectSekaiCommand.Event(subject, sender, user),
-                    ProjectSekaiCommand.Prediction(subject, sender, user),
-                    ProjectSekaiCommand.Info(subject, sender, user),
-                )
         },
         CommandNode(VERSION) { comet, sender, subject, wrapper, user ->
             VersionCommand(comet, sender, subject, wrapper, user)
@@ -66,11 +59,6 @@ val defaultCommands: List<AbstractCommandNode<*>> =
             listOf(BiliBiliCommand.User.USER, BiliBiliCommand.Dynamic.DYNAMIC, BiliBiliCommand.Video.VIDEO)
         ) { comet, sender, subject, wrapper, user ->
             BiliBiliCommand(comet, sender, subject, wrapper, user)
-                .subcommands(
-                    BiliBiliCommand.User(subject, sender, user),
-                    BiliBiliCommand.Dynamic(subject, sender, user),
-                    BiliBiliCommand.Video(subject, sender, user)
-                )
         },
         CommandNode(INFO) { comet, sender, subject, wrapper, user ->
             InfoCommand(comet, sender, subject, wrapper, user)
@@ -80,13 +68,14 @@ val defaultCommands: List<AbstractCommandNode<*>> =
             listOf(GithubCommand.Subscribe.SUBSCRIBE, GithubCommand.UnSubscribe.UNSUBSCRIBE, GithubCommand.Info.INFO)
         ) { comet, sender, subject, wrapper, user ->
             GithubCommand(comet, sender, subject, wrapper, user)
-                .subcommands(
-                    GithubCommand.Subscribe(subject, sender, user),
-                    GithubCommand.UnSubscribe(subject, sender, user),
-                    GithubCommand.Info(comet, subject, sender, user)
-                )
         },
         CommandNode(NOABBR) { comet, sender, subject, wrapper, user ->
             NoAbbrCommand(comet, sender, subject, wrapper, user)
+        },
+        CommandNode(
+            BANGUMI,
+            listOf(BangumiCommand.Schedule.SCHEDULE, BangumiCommand.Search.SEARCH)
+        ) { comet, sender, subject, wrapper, user ->
+            BangumiCommand(comet, sender, subject, wrapper, user)
         }
     )

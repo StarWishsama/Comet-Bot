@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.commands
 
+import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.arguments.default
 import moe.sdl.yac.parameters.options.option
@@ -11,6 +12,7 @@ import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.commands.service.GithubCommandService
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
 import ren.natsuyuk1.comet.utils.string.StringUtil.toMessageWrapper
 
 val GITHUB = CommandProperty(
@@ -30,7 +32,20 @@ class GithubCommand(
     val message: MessageWrapper,
     val user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, GITHUB) {
-    override suspend fun run() {}
+
+    init {
+        subcommands(
+            Subscribe(subject, sender, user),
+            UnSubscribe(subject, sender, user),
+            Info(comet, subject, sender, user)
+        )
+    }
+
+    override suspend fun run() {
+        if (message.parseToString().toArgs().size == 1) {
+            subject.sendMessage(GITHUB.helpText.toMessageWrapper())
+        }
+    }
 
     class Subscribe(
         override val subject: PlatformCommandSender,

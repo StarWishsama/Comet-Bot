@@ -28,11 +28,12 @@ buildConfig {
 }
 
 dependencies {
-    implementation(KotlinX.serialization.json)
-
-    api("org.jetbrains.exposed:exposed-core:_")
-    api("org.jetbrains.exposed:exposed-dao:_")
-    api("org.jetbrains.exposed:exposed-jdbc:_")
-    api("org.jetbrains.exposed:exposed-kotlin-datetime:_")
-    implementation("com.zaxxer:HikariCP:_")
+    compileOnly(project(":comet-api"))
+    compileOnly(KotlinX.serialization.json)
+    compileOnly("org.jetbrains.exposed:exposed-core:_")
+    compileOnly("org.jetbrains.exposed:exposed-dao:_")
+    compileOnly("org.jetbrains.exposed:exposed-jdbc:_")
+    compileOnly("org.jetbrains.exposed:exposed-kotlin-datetime:_")
+    compileOnly("com.zaxxer:HikariCP:_")
+    compileOnly("org.jsoup:jsoup:_")
 }

@@ -17,11 +17,15 @@ import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.utils.file.configDirectory
 import java.io.File
 
-class CometConfig(val id: Long, val password: String, val platform: LoginPlatform) : PersistDataFile<CometConfig.Data>(
-    File(configDirectory, "$id.yml"), Data(), Yaml
+object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
+    File(configDirectory, "config.yml"),
+    Data(),
+    Yaml
 ) {
     @Serializable
     data class Data(
+        @Comment("Comet 消息前缀")
+        val prefix: String = "Comet > ",
         /**
          * 自动保存数据的周期, 单位为分钟
          */
@@ -38,3 +42,5 @@ class CometConfig(val id: Long, val password: String, val platform: LoginPlatfor
         val commandPrefix: List<String> = mutableListOf("/", "!")
     )
 }
+
+data class CometConfig(val id: Long, val password: String, val platform: LoginPlatform)

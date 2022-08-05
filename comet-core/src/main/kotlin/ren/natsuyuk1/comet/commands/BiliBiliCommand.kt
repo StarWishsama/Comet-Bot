@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.commands
 
+import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.arguments.default
 import moe.sdl.yac.parameters.options.option
@@ -32,6 +33,14 @@ class BiliBiliCommand(
     val message: MessageWrapper,
     val user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, BILIBILI) {
+
+    init {
+        subcommands(
+            User(subject, sender, user),
+            Dynamic(subject, sender, user),
+            Video(subject, sender, user)
+        )
+    }
 
     override suspend fun run() {
         if (message.parseToString().toArgs().size == 1) {
