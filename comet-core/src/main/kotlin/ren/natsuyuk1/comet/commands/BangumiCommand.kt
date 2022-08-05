@@ -9,9 +9,9 @@ import ren.natsuyuk1.comet.network.thirdparty.bangumi.BangumiOnlineApi
 import ren.natsuyuk1.comet.network.thirdparty.bangumi.bgmCrawler
 import ren.natsuyuk1.comet.network.thirdparty.bangumi.data.common.SearchType
 import ren.natsuyuk1.comet.network.thirdparty.bangumi.parser.toMessageWrapper
+import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
-import ren.natsuyuk1.comet.utils.string.StringUtil.toMessageWrapper
 
 val BANGUMI = CommandProperty(
     "bangumi",

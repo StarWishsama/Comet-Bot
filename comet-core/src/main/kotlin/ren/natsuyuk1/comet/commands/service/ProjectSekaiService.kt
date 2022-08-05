@@ -13,8 +13,8 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.toMessageWrap
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
+import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.string.StringUtil.toMessageWrapper
 
 object ProjectSekaiService {
     private val currentEventId = ProjectSekaiData.getCurrentEventInfo()?.currentEventID!!

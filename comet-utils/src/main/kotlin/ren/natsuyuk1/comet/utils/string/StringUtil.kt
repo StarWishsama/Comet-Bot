@@ -14,9 +14,6 @@ import cn.hutool.crypto.SecureUtil
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toJavaInstant
-import ren.natsuyuk1.comet.api.config.CometGlobalConfig
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.time.yyMMddPattern
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -202,12 +199,6 @@ object StringUtil {
         }
         return newStr
     }
-
-    fun String.toMessageWrapper(appendPrefix: String = CometGlobalConfig.data.prefix): MessageWrapper =
-        buildMessageWrapper {
-            appendText(appendPrefix)
-            appendText(this@toMessageWrapper)
-        }
 
     fun String.replaceAllToBlank(toReplace: List<String>): String {
         var result = this

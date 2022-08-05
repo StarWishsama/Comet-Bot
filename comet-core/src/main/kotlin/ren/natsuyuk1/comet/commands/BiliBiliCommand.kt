@@ -9,9 +9,9 @@ import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.BiliBiliService
+import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
-import ren.natsuyuk1.comet.utils.string.StringUtil.toMessageWrapper
 
 val BILIBILI = CommandProperty(
     "bilibili",

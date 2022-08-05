@@ -20,12 +20,12 @@ import ren.natsuyuk1.comet.network.thirdparty.bilibili.VideoApi
 import ren.natsuyuk1.comet.network.thirdparty.bilibili.feed.toMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.bilibili.user.asReadable
 import ren.natsuyuk1.comet.network.thirdparty.bilibili.video.toMessageWrapper
+import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.isNumeric
-import ren.natsuyuk1.comet.utils.string.StringUtil.toMessageWrapper
 import kotlin.time.Duration.Companion.seconds
 
 typealias PendingSearchResult = List<UserResult>

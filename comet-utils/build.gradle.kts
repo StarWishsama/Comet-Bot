@@ -28,7 +28,6 @@ buildConfig {
 }
 
 dependencies {
-    compileOnly(project(":comet-api"))
     compileOnly(KotlinX.serialization.json)
     compileOnly("org.jetbrains.exposed:exposed-core:_")
     compileOnly("org.jetbrains.exposed:exposed-dao:_")
