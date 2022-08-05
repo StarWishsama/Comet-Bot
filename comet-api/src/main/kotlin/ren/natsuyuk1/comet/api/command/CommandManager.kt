@@ -16,6 +16,7 @@ import moe.sdl.yac.core.CliktError
 import moe.sdl.yac.core.CommandResult
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.Comet
+import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.api.permission.PermissionManager
 import ren.natsuyuk1.comet.api.permission.hasPermission
 import ren.natsuyuk1.comet.api.user.CometUser
@@ -102,12 +103,12 @@ object CommandManager {
         }
 
         // 检查消息是否含命令前缀
-        if (sender !is ConsoleCommandSender && !args[0].containsEtc(false, comet.config.data.commandPrefix)) {
+        if (sender !is ConsoleCommandSender && !args[0].containsEtc(false, CometGlobalConfig.data.commandPrefix)) {
             return@launch
         }
 
         // TODO: 模糊搜索命令系统
-        val cmd = getCommand(args[0].replaceAllToBlank(comet.config.data.commandPrefix), sender) ?: return@launch
+        val cmd = getCommand(args[0].replaceAllToBlank(CometGlobalConfig.data.commandPrefix), sender) ?: return@launch
 
         val property = cmd.property
 
