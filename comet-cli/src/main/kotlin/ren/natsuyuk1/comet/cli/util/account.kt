@@ -14,8 +14,8 @@ import ren.natsuyuk1.comet.cli.wrapper.WrapperLoader
 
 private val logger = KotlinLogging.logger {}
 
-suspend fun findCometConfig(id: Long, password: String, platform: LoginPlatform): CometConfig {
-    return CometConfig(id, password, platform).also { it.init() }
+fun createCometConfig(id: Long, password: String, platform: LoginPlatform): CometConfig {
+    return CometConfig(id, password, platform)
 }
 
 internal suspend fun login(id: Long, password: String, platform: LoginPlatform) {
@@ -27,7 +27,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
                 ?: error("未安装 Mirai Wrapper, 请下载 Mirai Wrapper 并放置在 ./modules 下")
 
             val miraiComet =
-                miraiService.createInstance(findCometConfig(id, password, platform), WrapperLoader.wrapperClassLoader)
+                miraiService.createInstance(createCometConfig(id, password, platform), WrapperLoader.wrapperClassLoader)
 
             CometTerminal.instance.push(miraiComet)
             miraiComet.init(CometTerminalCommand.scope.coroutineContext)
@@ -48,7 +48,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
 
             val telegramComet =
                 telegramService.createInstance(
-                    findCometConfig(id, password, platform),
+                    createCometConfig(id, password, platform),
                     WrapperLoader.wrapperClassLoader
                 )
 
