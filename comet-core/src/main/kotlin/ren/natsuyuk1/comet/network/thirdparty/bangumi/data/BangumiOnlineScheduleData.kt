@@ -48,8 +48,7 @@ data class BangumiOnlineScheduleData(
                                 }
                             }
                         }
-                    }.removeSuffix(" | "),
-                    true
+                    }.removeSuffix(" | ")
                 )
             }
         }
