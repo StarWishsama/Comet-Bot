@@ -32,6 +32,8 @@ object GroupSettingManager {
 
     fun findGroupConfig(id: Long) = groupSettings.find { it.id == id }
 
+    suspend fun save() = groupSettings.forEach { it.save() }
+
     fun createGroupConfig(id: Long) = scope.launch {
         logger.info { "正在创建群 $id 的配置文件..." }
 
