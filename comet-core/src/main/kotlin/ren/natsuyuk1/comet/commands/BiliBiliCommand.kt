@@ -33,7 +33,6 @@ class BiliBiliCommand(
     val message: MessageWrapper,
     val user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, BILIBILI) {
-
     init {
         subcommands(
             User(subject, sender, user),

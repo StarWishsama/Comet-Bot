@@ -68,7 +68,22 @@ abstract class CometCommand(
      */
     property: CommandProperty,
     option: CliktOption = CliktOption()
-) : BaseCommand(sender, message, user, property, option)
+) : BaseCommand(sender, message, user, property, option) {
+    override fun aliases(): Map<String, List<String>> {
+        val aliasesMap = mutableMapOf<String, List<String>>()
+
+        registeredSubcommands().forEach { cmd ->
+            if (cmd is CometSubCommand)
+                cmd.property.apply {
+                    alias.forEach {
+                        aliasesMap[it] = listOf(name)
+                    }
+                }
+        }
+
+        return aliasesMap
+    }
+}
 
 abstract class CometSubCommand(
     open val subject: CommandSender,
@@ -79,8 +94,13 @@ abstract class CometSubCommand(
     override fun aliases(): Map<String, List<String>> {
         val aliasesMap = mutableMapOf<String, List<String>>()
 
-        property.alias.forEach {
-            aliasesMap[it] = listOf(property.name)
+        registeredSubcommands().forEach { cmd ->
+            if (cmd is CometSubCommand)
+                cmd.property.apply {
+                    alias.forEach {
+                        aliasesMap[it] = listOf(name)
+                    }
+                }
         }
 
         return aliasesMap
