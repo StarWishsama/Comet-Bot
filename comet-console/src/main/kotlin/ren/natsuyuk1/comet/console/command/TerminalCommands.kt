@@ -1,4 +1,4 @@
-package ren.natsuyuk1.comet.cli.command
+package ren.natsuyuk1.comet.console.command
 
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.command.ConsoleCommandNode

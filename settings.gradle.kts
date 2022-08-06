@@ -8,7 +8,7 @@
  */
 
 rootProject.name = "Comet-Bot"
-include("comet-api", "comet-core", "comet-cli", "comet-utils", "comet-mirai-wrapper", "comet-telegram-wrapper")
+include("comet-api", "comet-core", "comet-console", "comet-utils", "comet-mirai-wrapper", "comet-telegram-wrapper")
 
 pluginManagement {
     repositories {

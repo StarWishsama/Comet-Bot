@@ -1,4 +1,4 @@
-package ren.natsuyuk1.comet.cli.wrapper
+package ren.natsuyuk1.comet.console.wrapper
 
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.platform.LoginPlatform

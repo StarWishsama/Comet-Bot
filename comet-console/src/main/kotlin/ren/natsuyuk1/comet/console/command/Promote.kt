@@ -1,4 +1,4 @@
-package ren.natsuyuk1.comet.cli.command
+package ren.natsuyuk1.comet.console.command
 
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.options.default
