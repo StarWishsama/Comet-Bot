@@ -12,14 +12,19 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
             appendText(userProfile.bio, true)
             appendLine()
         }
-        appendText("歌曲信息 >", true)
+        appendText("歌曲游玩情况 >>", true)
 
-        val clear = getSpecificMusicCount(MusicDifficulty.CLEAR)
-        val fc = getSpecificMusicCount(MusicDifficulty.FULL_COMBO)
-        val ap = getSpecificMusicCount(MusicDifficulty.ALL_PERFECT)
+        val clear = getSpecificMusicCount(MusicPlayResult.CLEAR)
+        val fc = getSpecificMusicCount(MusicPlayResult.FULL_COMBO)
+        val ap = getSpecificMusicCount(MusicPlayResult.ALL_PERFECT)
         appendText("Clear $clear / FC $fc / AP $ap")
     }
 
+/**
+ * [ProjectSekaiUserInfo]
+ *
+ * 代表一个玩家的 `Project Sekai` 游戏数据.
+ */
 @kotlinx.serialization.Serializable
 data class ProjectSekaiUserInfo(
     val user: UserGameData,
@@ -28,14 +33,12 @@ data class ProjectSekaiUserInfo(
     //val userCards
     val userMusics: List<UserMusic>
 ) {
-    fun getSpecificMusicCount(playResult: MusicDifficulty): Int {
+    fun getSpecificMusicCount(playResult: MusicPlayResult): Int {
         var counter = 0
 
         userMusics.forEach {
-            it.musicStatus.forEach ms@{ ms ->
-                if (ms.userMusicResult.any { umr -> umr.playResult == playResult }) {
-                    counter += 1
-                }
+            counter += it.musicStatus.count { ms ->
+                ms.userMusicResult.any { umr -> umr.playResult == playResult }
             }
         }
 
@@ -88,17 +91,44 @@ data class ProjectSekaiUserInfo(
             @kotlinx.serialization.Serializable
             data class UserMusicResult(
                 // easy, normal, hard, expert, master
-                val musicDifficulty: String,
+                val musicDifficulty: MusicDifficulty,
                 // clear, full_combo, all_perfect
-                val playResult: MusicDifficulty,
+                val playResult: MusicPlayResult,
             )
         }
     }
 }
 
-
+/**
+ * [MusicDifficulty]
+ *
+ * 代表玩家游玩曲的难度.
+ */
 @kotlinx.serialization.Serializable
 enum class MusicDifficulty {
+    @SerialName("easy")
+    EASY,
+
+    @SerialName("normal")
+    NORMAL,
+
+    @SerialName("hard")
+    HARD,
+
+    @SerialName("expert")
+    EXPERT,
+
+    @SerialName("master")
+    MASTER,
+}
+
+/**
+ * [MusicPlayResult]
+ *
+ * 代表玩家游玩过曲目的状态.
+ */
+@kotlinx.serialization.Serializable
+enum class MusicPlayResult {
     @SerialName("clear")
     CLEAR,
 

@@ -26,6 +26,8 @@ val PROJECTSEKAI by lazy {
         /pjsk event (排名) 查询当前活动信息
         
         /pjsk pred 查询当前活动结束预测分数    
+        
+        /pjsk info 查询账号信息
         """.trimIndent()
     )
 }

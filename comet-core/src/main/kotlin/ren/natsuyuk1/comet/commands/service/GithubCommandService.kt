@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object GithubCommandService {
-    private val repoRegex = """(\w*)/(.*)""".toRegex()
+    private val repoRegex = """(.*)/(.*)""".toRegex()
 
     class GitHubSubscribeSession(
         contact: PlatformCommandSender,
@@ -128,7 +128,7 @@ object GithubCommandService {
     }
 
     // 3, 4
-    private val githubLinkRegex by lazy { Regex("""^(https?://)?(www\.)?github\.com/(\w+)/(.+)""") }
+    private val githubLinkRegex by lazy { Regex("""^(https?://)?(www\.)?github\.com/(.+)/(.+)""") }
 
     suspend fun fetchRepoInfo(comet: Comet, subject: PlatformCommandSender, repoName: String) {
         var owner: String? = null
