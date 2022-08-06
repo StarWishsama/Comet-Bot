@@ -158,7 +158,7 @@ class GithubCommand(
             private val repoName by argument(help = "GitHub 仓库名称").default("")
             private val groupID by option("-g", "--group", help = "群号").long()
             private val branch by option("-b", "--branch", help = "分支名")
-            private val eventName by option("-e", "--event", help = "分支名")
+            private val eventName by option("-e", "--event", help = "事件名称")
 
             override suspend fun run() {
                 if (repoName.isBlank()) {
@@ -212,7 +212,7 @@ class GithubCommand(
             private val repoName by argument(help = "GitHub 仓库名称").default("")
             private val groupID by option("-g", "--group", help = "群号").long()
             private val branch by option("-b", "--branch", help = "分支名")
-            private val eventName by option("-e", "--event", help = "分支名")
+            private val eventName by option("-e", "--event", help = "事件名称")
 
             override suspend fun run() {
                 if (repoName.isBlank()) {
