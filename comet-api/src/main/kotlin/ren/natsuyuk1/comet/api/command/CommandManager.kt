@@ -173,7 +173,13 @@ object CommandManager {
 
         }.onSuccess {
             if (it.isPassed()) {
-                logger.debug { "命令 ${cmd.property.name} 执行状态 ${it.name}, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}" }
+                logger.info {
+                    "命令 ${cmd.property.name} 执行状态 ${it.name}, 耗时 ${
+                        executeTime.getLastingTimeAsString(
+                            msMode = true
+                        )
+                    }"
+                }
             }
         }.onFailure {
             logger.warn(it) { "在尝试执行命令 ${cmd.property.name} 时出现异常" }

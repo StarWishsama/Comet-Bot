@@ -38,7 +38,7 @@ data class BangumiOnlineScheduleData(
                             ele.jsonObject["title_zh"]?.jsonPrimitive?.contentOrNull.let {
                                 if (it != null) {
                                     hasZhName = true
-                                    append("$it, ")
+                                    append("$it | ")
                                 }
                             }
 
@@ -50,6 +50,7 @@ data class BangumiOnlineScheduleData(
                         }
                     }.removeSuffix(" | ")
                 )
+                appendLine()
             }
         }
     }
