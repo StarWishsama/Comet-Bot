@@ -90,22 +90,7 @@ abstract class CometSubCommand(
     open val sender: CommandSender,
     open val user: CometUser,
     open val property: CommandProperty
-) : CliktCommand(name = property.name) {
-    override fun aliases(): Map<String, List<String>> {
-        val aliasesMap = mutableMapOf<String, List<String>>()
-
-        registeredSubcommands().forEach { cmd ->
-            if (cmd is CometSubCommand)
-                cmd.property.apply {
-                    alias.forEach {
-                        aliasesMap[it] = listOf(name)
-                    }
-                }
-        }
-
-        return aliasesMap
-    }
-}
+) : CliktCommand(name = property.name)
 
 object CommandLocalization : Localization {
     override fun usageError(message: String) = "错误: $message"
