@@ -183,10 +183,11 @@ fun Subject.toMessageWrapper(url: String) =
     buildMessageWrapper {
         title?.let { appendText(it, true) }
         if (title != translatedTitle) appendText("📖 中译 $translatedTitle", true)
-        appendText("🌟 评分 $score", true)
+        appendText("🌟 评分 $score")
         rank?.let { appendText(" | 🪜 排名 #$it") }
         appendLine()
         appendText(summary?.limit(100) ?: "暂无简介")
+        appendLine()
         appendText("标签: ")
         if (tags.isEmpty()) {
             appendText("暂无")
