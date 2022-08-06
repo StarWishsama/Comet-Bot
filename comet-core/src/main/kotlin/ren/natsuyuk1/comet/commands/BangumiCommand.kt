@@ -2,6 +2,8 @@ package ren.natsuyuk1.comet.commands
 
 import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
+import moe.sdl.yac.parameters.arguments.default
+import moe.sdl.yac.parameters.types.enum
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
 import ren.natsuyuk1.comet.api.user.CometUser
@@ -12,6 +14,8 @@ import ren.natsuyuk1.comet.network.thirdparty.bangumi.parser.toMessageWrapper
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
+import java.time.DayOfWeek
+import java.time.LocalDate
 
 val BANGUMI = CommandProperty(
     "bangumi",
@@ -77,8 +81,10 @@ class BangumiCommand(
             val SCHEDULE = SubCommandProperty("schedule", listOf("搜索"), BANGUMI)
         }
 
+        private val dayOfWeek by argument("-d", "--day").enum<DayOfWeek>(true).default(LocalDate.now().dayOfWeek)
+
         override suspend fun run() {
-            subject.sendMessage(BangumiOnlineApi.getCache().getSpecificDaySchedule())
+            subject.sendMessage(BangumiOnlineApi.getCache().getSpecificDaySchedule(dayOfWeek))
         }
     }
 }

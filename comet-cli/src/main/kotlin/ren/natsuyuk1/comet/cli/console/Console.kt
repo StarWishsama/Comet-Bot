@@ -11,21 +11,30 @@ package ren.natsuyuk1.comet.cli.console
 
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
+import org.jline.reader.impl.history.DefaultHistory
 import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
+import ren.natsuyuk1.comet.utils.file.resolveDirectory
+import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
 import java.io.OutputStream
 import java.io.PrintStream
 
 object Console {
     private val terminal: Terminal = TerminalBuilder.terminal()
+    private const val HISTORY_FILE = ".comet_history"
 
     private var reader: LineReader? = null
 
     internal fun initReader() {
+        if (reader != null)
+            return
+
         reader = LineReaderBuilder.builder()
             .appName("CometTerminal")
             .terminal(terminal)
-            .build()
+            .build().apply {
+                initHistory()
+            }
     }
 
     fun readln(prompt: String = "> "): String = reader?.readLine(prompt) ?: error("Reader not prepared")
@@ -46,5 +55,17 @@ object Console {
         val out = PrintStream(OutputStream.nullOutputStream())
         System.setOut(out)
         System.setErr(out)
+    }
+
+    private fun LineReader.initHistory() {
+        setVariable(
+            LineReader.HISTORY_FILE,
+            resolveDirectory(HISTORY_FILE)
+        )
+        DefaultHistory(this).apply {
+            addShutdownHook {
+                save()
+            }
+        }
     }
 }
