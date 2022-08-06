@@ -33,7 +33,7 @@ dependencies {
 
 tasks.jar {
     manifest {
-        attributes["Main-Class"] = "ren.natsuyuk1.comet.cli.CometTerminalKt"
+        attributes["Main-Class"] = "ren.natsuyuk1.comet.console.CometTerminalKt"
         attributes["Author"] = "StarWishsama"
     }
 }
