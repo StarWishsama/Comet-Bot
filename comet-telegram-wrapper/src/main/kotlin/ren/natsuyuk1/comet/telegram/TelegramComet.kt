@@ -55,7 +55,7 @@ class TelegramComet(
 
         bot.startPolling()
 
-        logger.info { "成功登录 Telegram Bot ${config.password}" }
+        logger.info { "成功登录 Telegram Bot ${config.id}" }
     }
 
     override fun afterLogin() {
