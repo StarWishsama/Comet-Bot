@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import moe.sdl.yac.core.CliktError
 import moe.sdl.yac.core.CommandResult
+import moe.sdl.yac.core.parseToArgs
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
@@ -26,7 +27,6 @@ import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.containsEtc
 import ren.natsuyuk1.comet.utils.string.StringUtil.getLastingTimeAsString
 import ren.natsuyuk1.comet.utils.string.StringUtil.replaceAllToBlank
-import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -96,7 +96,7 @@ object CommandManager {
             return@launch
         }
 
-        val args = wrapper.parseToString().toArgs()
+        val args = wrapper.parseToString().parseToArgs()
 
         if (args.isEmpty()) {
             return@launch
