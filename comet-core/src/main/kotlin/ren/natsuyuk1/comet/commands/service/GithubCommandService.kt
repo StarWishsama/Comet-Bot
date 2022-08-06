@@ -45,7 +45,7 @@ object GithubCommandService {
                 )
             )
 
-            sender.sendMessage("订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置添加 Comet 管理提供的链接!".toMessageWrapper())
+            sender.sendMessage("订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置 Comet 回调链接!".toMessageWrapper())
 
             expire()
         }
@@ -75,14 +75,14 @@ object GithubCommandService {
 
                 if (repo == null) {
                     if (subject is Group) {
-                        subject.sendMessage("请在私聊中继续完成你的订阅".toMessageWrapper())
+                        subject.sendMessage("请在私聊中继续完成订阅".toMessageWrapper())
                     }
 
                     delay(1.seconds)
 
                     sender.sendMessage(
                         ("你正在订阅仓库 $owner/$name, 是否需要添加仓库机密 (Secret)?\n" +
-                            "添加机密后, 能够使接收仓库信息更加安全, 但千万别忘记了!\n" +
+                            "添加机密可以保证传输仓库信息更加安全, 但千万别忘记了你设置的机密!\n" +
                             "如果无需添加, 请回复「完成订阅」, 反之直接发送你欲设置的机密.").toMessageWrapper()
                     )
 
@@ -95,7 +95,7 @@ object GithubCommandService {
                 subject.sendMessage("找不到你想要订阅的 GitHub 仓库".toMessageWrapper())
             }
         } else {
-            subject.sendMessage("请输入有效的 GitHub 仓库名称 (输入了 $repoName), 例如 StarWishsama/Comet-Bot".toMessageWrapper())
+            subject.sendMessage("请输入有效的 GitHub 仓库名称, 例如 StarWishsama/Comet-Bot".toMessageWrapper())
         }
     }
 
@@ -123,7 +123,7 @@ object GithubCommandService {
                 subject.sendMessage("找不到你想要取消订阅的 GitHub 仓库".toMessageWrapper())
             }
         } else {
-            subject.sendMessage("请输入有效的 GitHub 仓库名称 (输入了 $repoName), 例如 StarWishsama/Comet-Bot".toMessageWrapper())
+            subject.sendMessage("请输入有效的 GitHub 仓库名称, 例如 StarWishsama/Comet-Bot".toMessageWrapper())
         }
     }
 
@@ -169,32 +169,5 @@ object GithubCommandService {
                 }
             )
         }
-    }
-
-    class ModifyRepoSettingSession(
-        contact: PlatformCommandSender,
-        cometUser: CometUser?,
-    ) : Session(contact, cometUser) {
-        override fun handle(message: MessageWrapper) {
-        }
-    }
-
-    suspend fun modifyRepoSetting(
-        subject: PlatformCommandSender,
-        user: CometUser,
-        groupID: Long,
-        repoName: String
-    ) {
-        if (!repoRegex.matches(repoName)) {
-            subject.sendMessage("请输入有效的仓库名!".toMessageWrapper())
-            return
-        }
-
-        if (!GithubRepoData.exists(repoName, groupID)) {
-            subject.sendMessage("对应群没有订阅过这个仓库".toMessageWrapper())
-            return
-        }
-
-
     }
 }

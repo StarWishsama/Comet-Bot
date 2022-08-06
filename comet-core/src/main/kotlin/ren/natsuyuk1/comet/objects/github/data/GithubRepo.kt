@@ -25,7 +25,8 @@ object GithubRepoData : PersistDataFile<GithubRepoData.Data>(
             @Serializable
             data class GithubRepoSubscriber(
                 val id: Long,
-                val subscribeEvent: List<String> = mutableListOf("push", "release", "issue", "issue_comment")
+                val subscribeBranch: MutableList<String> = mutableListOf("master", "main"),
+                val subscribeEvent: MutableList<String> = mutableListOf("push", "release", "issue", "issue_comment")
             )
         }
     }

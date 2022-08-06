@@ -14,7 +14,11 @@ class GithubEvent(
 
         repo.subscribers.forEach {
             if (it.subscribeEvent.contains(eventType)) {
-                broadcastTargets.add(BroadcastTarget(BroadcastTarget.BroadcastType.GROUP, it.id))
+                if (it.subscribeBranch.isEmpty() || it.subscribeBranch.any { br ->
+                        eventData.branchName().matches(Regex(br))
+                    }) {
+                    broadcastTargets.add(BroadcastTarget(BroadcastTarget.BroadcastType.GROUP, it.id))
+                }
             }
         }
     }
