@@ -33,19 +33,16 @@ data class BangumiOnlineScheduleData(
                 appendText("${k.toLong().convertToTime()} => ")
                 appendText(
                     buildString {
-                        v.jsonArray.forEach { ele ->
-                            var hasZhName = false
+                        v.jsonArray.forEach bgmName@{ ele ->
                             ele.jsonObject["title_zh"]?.jsonPrimitive?.contentOrNull.let {
                                 if (it != null) {
-                                    hasZhName = true
                                     append("$it | ")
+                                    return@bgmName
                                 }
                             }
 
-                            if (!hasZhName) {
-                                ele.jsonObject["title_ja"]?.jsonPrimitive?.contentOrNull?.let {
-                                    append("$it | ")
-                                }
+                            ele.jsonObject["title_ja"]?.jsonPrimitive?.contentOrNull?.let {
+                                append("$it | ")
                             }
                         }
                     }.removeSuffix(" | ")
