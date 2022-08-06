@@ -9,6 +9,7 @@ import ren.natsuyuk1.comet.api.session.registerTimeout
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.network.thirdparty.github.GitHubApi
+import ren.natsuyuk1.comet.objects.config.CometServerConfig
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.message.Image
@@ -89,7 +90,11 @@ object GithubCommandService {
                     GitHubSubscribeSession(subject, sender, user, owner, name, groupID).registerTimeout(1.minutes)
                 } else {
                     repo.subscribers.add(GithubRepoData.Data.GithubRepo.GithubRepoSubscriber(groupID))
-                    subject.sendMessage("订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置添加 Comet 管理提供的链接!".toMessageWrapper())
+                    if (CometServerConfig.data.serverName.isBlank()) {
+                        subject.sendMessage("订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置添加 Comet 管理提供的链接!".toMessageWrapper())
+                    } else {
+                        subject.sendMessage("订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置添加以下链接!\n>> ${CometServerConfig.data.serverName}/github".toMessageWrapper())
+                    }
                 }
             } else {
                 subject.sendMessage("找不到你想要订阅的 GitHub 仓库".toMessageWrapper())
