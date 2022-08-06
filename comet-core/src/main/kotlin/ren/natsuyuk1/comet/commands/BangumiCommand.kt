@@ -76,7 +76,7 @@ class BangumiCommand(
         override val user: CometUser
     ) : CometSubCommand(subject, sender, user, SCHEDULE) {
         companion object {
-            val SCHEDULE = SubCommandProperty("schedule", listOf("搜索"), BANGUMI)
+            val SCHEDULE = SubCommandProperty("schedule", listOf("搜索", "sch", "calendar", "cal"), BANGUMI)
         }
 
         private val dayOfWeek by argument("星期几").default("")
