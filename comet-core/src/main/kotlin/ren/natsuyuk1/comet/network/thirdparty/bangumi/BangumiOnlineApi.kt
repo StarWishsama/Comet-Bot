@@ -19,7 +19,7 @@ object BangumiOnlineApi {
             cache = fetchBangumiSchedule()
         }
 
-        TaskManager.registerTask(3.days) {
+        TaskManager.registerTask(7.days) {
             cache = fetchBangumiSchedule()
         }
     }

@@ -21,11 +21,13 @@ import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.api.permission.PermissionManager
 import ren.natsuyuk1.comet.api.permission.hasPermission
 import ren.natsuyuk1.comet.api.user.CometUser
+import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.containsEtc
 import ren.natsuyuk1.comet.utils.string.StringUtil.getLastingTimeAsString
+import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import ren.natsuyuk1.comet.utils.string.StringUtil.replaceAllToBlank
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
@@ -111,10 +113,9 @@ object CommandManager {
         val cmd = getCommand(args[0].replaceAllToBlank(CometGlobalConfig.data.commandPrefix), sender) ?: return@launch
 
         val property = cmd.property
+        var user: CometUser = CometUser.dummyUser
 
         runCatching {
-            var user: CometUser = CometUser.dummyUser
-
             if (sender is PlatformCommandSender) {
                 user = CometUser.getUserOrCreate(sender.id, sender.platform)
                     ?: return@runCatching CommandStatus.Success()
@@ -155,8 +156,7 @@ object CommandManager {
                     subject as ConsoleCommandSender,
                     wrapper,
                     user
-                )
-                    .main(args.drop(1))
+                ).main(args.drop(1))
             }
 
             when (cmdStatus) {
@@ -175,14 +175,24 @@ object CommandManager {
         }.onSuccess {
             if (it.isPassed()) {
                 logger.info {
-                    "命令 ${cmd.property.name} 执行状态 ${it.name}, 耗时 ${
-                        executeTime.getLastingTimeAsString(
-                            msMode = true
-                        )
-                    }"
+                    "命令 ${cmd.property.name} 执行状态 ${it.name}, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}"
                 }
             }
         }.onFailure {
+            if (user.userLevel == UserLevel.OWNER) {
+                subject.sendMessage(buildMessageWrapper {
+                    appendText(
+                        "在尝试执行命令时发生异常, 报错信息如下, 详细请查看后台\n${
+                            it.message?.limit(
+                                25
+                            ) ?: "无"
+                        }"
+                    )
+                })
+            } else {
+                subject.sendMessage(buildMessageWrapper { appendText("这条命令突然坏掉了 (っ °Д °;)っ") })
+            }
+
             logger.warn(it) { "在尝试执行命令 ${cmd.property.name} 时出现异常" }
         }
     }

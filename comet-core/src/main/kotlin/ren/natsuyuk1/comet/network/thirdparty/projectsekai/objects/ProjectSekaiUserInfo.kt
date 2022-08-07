@@ -14,10 +14,33 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
         }
         appendText("歌曲游玩情况 >>", true)
 
-        val clear = getSpecificMusicCount(MusicPlayResult.CLEAR)
-        val fc = getSpecificMusicCount(MusicPlayResult.FULL_COMBO)
-        val ap = getSpecificMusicCount(MusicPlayResult.ALL_PERFECT)
-        appendText("Clear $clear / FC $fc / AP $ap")
+        appendText(
+            "EXPERT | Clear ${
+                getSpecificMusicCount(
+                    MusicDifficulty.EXPERT,
+                    MusicPlayResult.CLEAR
+                )
+            } / FC ${
+                getSpecificMusicCount(
+                    MusicDifficulty.EXPERT,
+                    MusicPlayResult.FULL_COMBO
+                )
+            } / AP ${getSpecificMusicCount(MusicDifficulty.EXPERT, MusicPlayResult.ALL_PERFECT)}"
+        )
+        appendLine()
+        appendText(
+            "MASTER | Clear ${
+                getSpecificMusicCount(
+                    MusicDifficulty.MASTER,
+                    MusicPlayResult.CLEAR
+                )
+            } / FC ${
+                getSpecificMusicCount(
+                    MusicDifficulty.MASTER,
+                    MusicPlayResult.FULL_COMBO
+                )
+            } / AP ${getSpecificMusicCount(MusicDifficulty.MASTER, MusicPlayResult.ALL_PERFECT)}"
+        )
     }
 
 /**
@@ -33,12 +56,12 @@ data class ProjectSekaiUserInfo(
     //val userCards
     val userMusics: List<UserMusic>
 ) {
-    fun getSpecificMusicCount(playResult: MusicPlayResult): Int {
+    fun getSpecificMusicCount(difficulty: MusicDifficulty, playResult: MusicPlayResult): Int {
         var counter = 0
 
         userMusics.forEach {
             counter += it.musicStatus.count { ms ->
-                ms.userMusicResult.any { umr -> umr.playResult == playResult }
+                ms.userMusicResult.any { umr -> umr.musicDifficulty == difficulty && umr.playResult == playResult }
             }
         }
 

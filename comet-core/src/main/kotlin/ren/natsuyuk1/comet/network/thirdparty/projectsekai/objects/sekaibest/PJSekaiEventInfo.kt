@@ -13,7 +13,7 @@ import kotlinx.serialization.SerialName
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiEventList
 
 @kotlinx.serialization.Serializable
-data class SekaiBestEventInfo(
+data class PJSekaiEventInfo(
     val id: Int,
     val eventId: Int,
     @SerialName("eventJson")

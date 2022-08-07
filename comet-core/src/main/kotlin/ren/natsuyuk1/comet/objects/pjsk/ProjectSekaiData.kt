@@ -21,7 +21,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.consts.cometClient
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getCurrentEventInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getEventList
 import java.util.*
 
 object ProjectSekaiDataTable : IdTable<Int>("pjsk_data") {
@@ -35,21 +35,21 @@ object ProjectSekaiDataTable : IdTable<Int>("pjsk_data") {
 class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
     companion object : EntityClass<Int, ProjectSekaiData>(ProjectSekaiDataTable) {
         suspend fun initData() {
-            val currentEvent = cometClient.getCurrentEventInfo()
+            val currentEvent = cometClient.getEventList(1).data.first()
 
             transaction {
                 new(0) {
-                    currentEventID = currentEvent.eventId
-                    startTime = currentEvent.eventInfo.startAt
-                    endTime = currentEvent.eventInfo.closedAt
-                    name = currentEvent.eventInfo.name
+                    currentEventID = currentEvent.id
+                    startTime = currentEvent.startAt
+                    endTime = currentEvent.closedAt
+                    name = currentEvent.name
                 }
             }
         }
 
         suspend fun updateData() {
             val timestamp = System.currentTimeMillis()
-            val currentEvent = cometClient.getCurrentEventInfo()
+            val currentEvent = cometClient.getEventList(1).data.first()
 
             transaction {
                 val data = ProjectSekaiData.all()
@@ -62,10 +62,10 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
 
                     if (info.endTime < timestamp) {
                         info.apply {
-                            currentEventID = currentEvent.eventId
-                            startTime = currentEvent.eventInfo.startAt
-                            endTime = currentEvent.eventInfo.closedAt
-                            name = currentEvent.eventInfo.name
+                            currentEventID = currentEvent.id
+                            startTime = currentEvent.startAt
+                            endTime = currentEvent.closedAt
+                            name = currentEvent.name
                         }
 
                         transaction {

@@ -18,7 +18,6 @@ import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiEventList
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiProfile
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestPredictionInfo
 import java.io.InputStream
 
@@ -83,12 +82,6 @@ object ProjectSekaiAPI {
                 }
             }
         }
-    }
-
-    suspend fun CometClient.getCurrentEventInfo(): SekaiBestEventInfo {
-        logger.debug { "Fetching project sekai current event info" }
-
-        return client.get("https://strapi.sekai.best/sekai-current-event")
     }
 
     suspend fun CometClient.getRankPredictionInfo(): SekaiBestPredictionInfo {

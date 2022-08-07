@@ -17,12 +17,13 @@ import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 object ProjectSekaiService {
-    private val currentEventId = ProjectSekaiData.getCurrentEventInfo()?.currentEventID!!
+    private var currentEventId: Int?
 
     init {
         runBlocking {
             ProjectSekaiData.updateData()
             ProjectSekaiHelper.refreshCache()
+            currentEventId = ProjectSekaiData.getCurrentEventInfo()?.currentEventID
         }
     }
 
@@ -42,11 +43,16 @@ object ProjectSekaiService {
 
         val userId = userData.userID
 
+        if (currentEventId == null) {
+            ProjectSekaiData.updateData()
+            currentEventId = ProjectSekaiData.getCurrentEventInfo()?.currentEventID!!
+        }
+
         return if (position == 0) {
-            val currentInfo = cometClient.getUserEventInfo(currentEventId, userId)
-            currentInfo.toMessageWrapper(userData, currentEventId)
+            val currentInfo = cometClient.getUserEventInfo(currentEventId!!, userId)
+            currentInfo.toMessageWrapper(userData, currentEventId!!)
         } else {
-            cometClient.getSpecificRankInfo(currentEventId, position).toMessageWrapper(userData, currentEventId)
+            cometClient.getSpecificRankInfo(currentEventId!!, position).toMessageWrapper(userData, currentEventId!!)
         }
     }
 

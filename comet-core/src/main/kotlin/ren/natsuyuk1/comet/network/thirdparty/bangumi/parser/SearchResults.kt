@@ -1,8 +1,8 @@
 package ren.natsuyuk1.comet.network.thirdparty.bangumi.parser
 
+import io.ktor.http.*
 import kotlinx.serialization.Serializable
 import org.jsoup.nodes.Element
-import ren.natsuyuk1.comet.network.thirdparty.bangumi.Crawler
 import ren.natsuyuk1.comet.network.thirdparty.bangumi.const.buildSubjectUrl
 import ren.natsuyuk1.comet.network.thirdparty.bangumi.data.common.SearchType
 import ren.natsuyuk1.comet.network.thirdparty.bangumi.data.resp.SearchTopicItem
@@ -42,7 +42,7 @@ class SubjectSearchResults(override val htmlPage: String) : Parser() {
             ?.byClass("image")
             ?.children()?.byTag("img")
             ?.attr("src")
-            ?.let { "${Crawler.defaultProtocol.name}:$it" } ?: return null
+            ?.let { "${URLProtocol.HTTPS.name}:$it" } ?: return null
 
         val zhTitle = h3.children().byClass("l")?.text() ?: return null
         val title = h3.children().byClass("grey")?.text() ?: return null

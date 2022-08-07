@@ -40,7 +40,7 @@ object DatabaseManager {
             maximumPoolSize = dbConfig.maxPoolSize
             if (dbConfig.type == DatabaseType.SQLITE && dbConfig.maxPoolSize > 1) {
                 logger.warn { "你正在使用 SQLite, 但 maxPoolSize 被设置为了大于 1 的数," }
-                logger.warn { "这将会导致 SQLite 文件出现死锁, 影响使用." }
+                logger.warn { "这将会导致 SQLite 文件出现死锁, 影响数据库使用." }
             }
 
             val processors = Runtime.getRuntime().availableProcessors()
