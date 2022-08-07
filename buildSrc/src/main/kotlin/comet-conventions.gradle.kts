@@ -85,6 +85,10 @@ tasks.withType<KotlinCompile> {
     }
 }
 
+java {
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 kotlin {
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(17))

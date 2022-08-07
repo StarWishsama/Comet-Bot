@@ -7,8 +7,6 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/master/LICENSE
  */
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     `kotlin-dsl`
 }
@@ -42,6 +40,10 @@ sourceSets {
             setSrcDirs(setOf("kotlin"))
         }
     }
+}
+
+java {
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 kotlin {
