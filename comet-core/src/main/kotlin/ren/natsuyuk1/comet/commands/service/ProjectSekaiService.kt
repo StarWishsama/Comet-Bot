@@ -44,8 +44,7 @@ object ProjectSekaiService {
         val userId = userData.userID
 
         if (currentEventId == null) {
-            ProjectSekaiData.updateData()
-            currentEventId = ProjectSekaiData.getCurrentEventInfo()?.currentEventID!!
+            return "获取当前活动信息失败, 请稍后再试".toMessageWrapper()
         }
 
         return if (position == 0) {

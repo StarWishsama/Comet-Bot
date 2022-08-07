@@ -20,6 +20,7 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import ren.natsuyuk1.comet.api.event.logger
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getEventList
 import java.util.*
@@ -34,48 +35,56 @@ object ProjectSekaiDataTable : IdTable<Int>("pjsk_data") {
 
 class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
     companion object : EntityClass<Int, ProjectSekaiData>(ProjectSekaiDataTable) {
-        suspend fun initData() {
-            val currentEvent = cometClient.getEventList(1).data.first()
-
-            transaction {
-                new(0) {
-                    currentEventID = currentEvent.id
-                    startTime = currentEvent.startAt
-                    endTime = currentEvent.closedAt
-                    name = currentEvent.name
+        private suspend fun initData() {
+            kotlin.runCatching {
+                cometClient.getEventList(1).data.first()
+            }.onSuccess { currentEvent ->
+                transaction {
+                    new(0) {
+                        currentEventID = currentEvent.id
+                        startTime = currentEvent.startAt
+                        endTime = currentEvent.closedAt
+                        name = currentEvent.name
+                    }
                 }
+            }.onFailure {
+                logger.warn(it) { "获取 Project Sekai 活动信息失败, 可能是上游服务器异常" }
             }
         }
 
         suspend fun updateData() {
             val timestamp = System.currentTimeMillis()
-            val currentEvent = cometClient.getEventList(1).data.first()
+            kotlin.runCatching {
+                cometClient.getEventList(1).data.first()
+            }.onSuccess { currentEvent ->
+                transaction {
+                    val data = ProjectSekaiData.all()
 
-            transaction {
-                val data = ProjectSekaiData.all()
+                    if (data.empty()) {
+                        runBlocking { initData() }
+                        return@transaction
+                    } else {
+                        val info = data.first()
 
-                if (data.empty()) {
-                    runBlocking { initData() }
-                    return@transaction
-                } else {
-                    val info = data.first()
+                        if (info.endTime < timestamp) {
+                            info.apply {
+                                currentEventID = currentEvent.id
+                                startTime = currentEvent.startAt
+                                endTime = currentEvent.closedAt
+                                name = currentEvent.name
+                            }
 
-                    if (info.endTime < timestamp) {
-                        info.apply {
-                            currentEventID = currentEvent.id
-                            startTime = currentEvent.startAt
-                            endTime = currentEvent.closedAt
-                            name = currentEvent.name
-                        }
-
-                        transaction {
-                            ProjectSekaiUserDataTable.selectAll().forEach {
-                                it[ProjectSekaiUserDataTable.lastQueryPosition] = 0
-                                it[ProjectSekaiUserDataTable.lastQueryScore] = 0
+                            transaction {
+                                ProjectSekaiUserDataTable.selectAll().forEach {
+                                    it[ProjectSekaiUserDataTable.lastQueryPosition] = 0
+                                    it[ProjectSekaiUserDataTable.lastQueryScore] = 0
+                                }
                             }
                         }
                     }
                 }
+            }.onFailure {
+                logger.warn(it) { "获取 Project Sekai 活动信息失败, 可能是上游服务器异常" }
             }
         }
 
