@@ -47,8 +47,8 @@ object ProjectSekaiService {
             return "获取当前活动信息失败, 请稍后再试".toMessageWrapper()
         }
 
-        return when {
-            pjskHelper.getCurrentEventStatus() == SekaiEventStatus.ONGOING -> {
+        return when (pjskHelper.getCurrentEventStatus()) {
+            SekaiEventStatus.ONGOING -> {
                 if (position == 0) {
                     val currentInfo = cometClient.getUserEventInfo(currentEventId!!, userId)
                     currentInfo.toMessageWrapper(userData, currentEventId!!)
@@ -58,8 +58,12 @@ object ProjectSekaiService {
                 }
             }
 
-            pjskHelper.getCurrentEventStatus() == SekaiEventStatus.COUNTING -> {
+            SekaiEventStatus.COUNTING -> {
                 "活动数据统计中, 首先别急, 其次不要急".toMessageWrapper()
+            }
+
+            SekaiEventStatus.END -> {
+                "当期活动已结束, 请等待下期活动".toMessageWrapper()
             }
 
             else -> {
@@ -69,7 +73,6 @@ object ProjectSekaiService {
     }
 
     suspend fun fetchPrediction(): MessageWrapper {
-
         return cometClient.getRankPredictionInfo().toMessageWrapper()
     }
 
@@ -80,5 +83,14 @@ object ProjectSekaiService {
         val userId = userData.userID
 
         return cometClient.getUserInfo(userId).toMessageWrapper()
+    }
+
+    suspend fun b30(user: CometUser): MessageWrapper {
+        val userData = ProjectSekaiUserData.getUserPJSKData(user.id.value)
+            ?: return "你还没有绑定过世界计划账号, 使用 /pjsk bind -i [你的ID] 绑定".toMessageWrapper()
+
+        val userId = userData.userID
+
+        return cometClient.getUserInfo(userId).generateBest30()
     }
 }

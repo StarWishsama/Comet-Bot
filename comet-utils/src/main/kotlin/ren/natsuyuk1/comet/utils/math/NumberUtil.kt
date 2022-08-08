@@ -35,8 +35,14 @@ object NumberUtil {
         return this.toString()
     }
 
-    fun Double.fixDisplay(): String {
-        return NumberUtil.decimalFormat("0.00", this)
+    fun Double.fixDisplay(digit: Int = 2): String {
+        val scale = buildString {
+            append("0.")
+            repeat(digit) {
+                append("0")
+            }
+        }
+        return NumberUtil.decimalFormat(scale, this)
     }
 
     /**

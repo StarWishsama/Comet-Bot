@@ -1,6 +1,11 @@
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import ren.natsuyuk1.comet.service.ProjectSekaiManager
+import ren.natsuyuk1.comet.util.toMessageWrapper
+import ren.natsuyuk1.comet.utils.file.absPath
+import ren.natsuyuk1.comet.utils.message.Image
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 
@@ -48,14 +53,33 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
  *
  * 代表一个玩家的 `Project Sekai` 游戏数据.
  */
-@kotlinx.serialization.Serializable
+@Serializable
 data class ProjectSekaiUserInfo(
     val user: UserGameData,
     val userProfile: UserProfile,
     //val userDecks
     //val userCards
-    val userMusics: List<UserMusic>
+    val userMusics: List<UserMusic>,
+    val userMusicResults: List<MusicResult>
 ) {
+    fun generateBest30(): MessageWrapper {
+        if (ProjectSekaiManager.musicDiffDatabase.isEmpty() || ProjectSekaiManager.musicDatabase.isEmpty()) {
+            return "Project Sekai 歌曲数据还没有加载好噢".toMessageWrapper()
+        }
+
+        val musicDiff = userMusicResults.filter {
+            it.musicDifficulty >= MusicDifficulty.EXPERT && (it.isAllPerfect || it.isFullCombo)
+        }.sortedBy {
+            ProjectSekaiManager.getSongAdjustedLevel(it.musicId, it.musicDifficulty)
+        }.distinct().asReversed()
+
+        val result = ProjectSekaiManager.drawB30(user, musicDiff.take(30))
+
+        return buildMessageWrapper {
+            appendElement(Image(filePath = result.absPath))
+        }
+    }
+
     fun getSpecificMusicCount(difficulty: MusicDifficulty, playResult: MusicPlayResult): Int {
         var counter = 0
 
@@ -68,12 +92,28 @@ data class ProjectSekaiUserInfo(
         return counter
     }
 
-    @kotlinx.serialization.Serializable
+    @Serializable
+    data class MusicResult(
+        val userId: Long,
+        val musicId: Int,
+        val musicDifficulty: MusicDifficulty,
+        val playType: String,
+        val playResult: MusicPlayResult,
+        val highScore: Int,
+        @SerialName("fullComboFlg")
+        val isFullCombo: Boolean,
+        @SerialName("fullPerfectFlg")
+        val isAllPerfect: Boolean,
+        val mvpCount: Int,
+        val superStarCount: Int,
+    )
+
+    @Serializable
     data class UserGameData(
         @SerialName("userGamedata")
         val userGameData: Data
     ) {
-        @kotlinx.serialization.Serializable
+        @Serializable
         data class Data(
             @SerialName("userId")
             val userID: Long,
@@ -83,7 +123,7 @@ data class ProjectSekaiUserInfo(
         )
     }
 
-    @kotlinx.serialization.Serializable
+    @Serializable
     data class UserProfile(
         @SerialName("userId")
         val userID: Long,
@@ -93,7 +133,7 @@ data class ProjectSekaiUserInfo(
         val twitterID: String
     )
 
-    @kotlinx.serialization.Serializable
+    @Serializable
     data class UserMusic(
         @SerialName("userId")
         val userID: Long,
@@ -102,7 +142,7 @@ data class ProjectSekaiUserInfo(
         @SerialName("userMusicDifficultyStatuses")
         val musicStatus: List<MusicStatus>
     ) {
-        @kotlinx.serialization.Serializable
+        @Serializable
         data class MusicStatus(
             @SerialName("musicId")
             val musicID: Int,
@@ -111,7 +151,7 @@ data class ProjectSekaiUserInfo(
             @SerialName("userMusicResults")
             val userMusicResult: List<UserMusicResult>
         ) {
-            @kotlinx.serialization.Serializable
+            @Serializable
             data class UserMusicResult(
                 // easy, normal, hard, expert, master
                 val musicDifficulty: MusicDifficulty,
@@ -127,7 +167,7 @@ data class ProjectSekaiUserInfo(
  *
  * 代表玩家游玩曲的难度.
  */
-@kotlinx.serialization.Serializable
+@Serializable
 enum class MusicDifficulty {
     @SerialName("easy")
     EASY,
@@ -150,7 +190,7 @@ enum class MusicDifficulty {
  *
  * 代表玩家游玩过曲目的状态.
  */
-@kotlinx.serialization.Serializable
+@Serializable
 enum class MusicPlayResult {
     @SerialName("clear")
     CLEAR,

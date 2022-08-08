@@ -46,6 +46,7 @@ class ProjectSekaiCommand(
             Event(subject, sender, user),
             Prediction(subject, sender, user),
             Info(subject, sender, user),
+            Best30(subject, sender, user),
         )
     }
 
@@ -141,6 +142,26 @@ class ProjectSekaiCommand(
 
         override suspend fun run() {
             subject.sendMessage(ProjectSekaiService.fetchPrediction())
+        }
+    }
+
+    class Best30(
+        override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
+        override val user: CometUser
+    ) : CometSubCommand(subject, sender, user, BEST30) {
+
+        companion object {
+            val BEST30 = SubCommandProperty(
+                "best30",
+                listOf("b30"),
+                PROJECTSEKAI
+            )
+        }
+
+
+        override suspend fun run() {
+            subject.sendMessage(ProjectSekaiService.b30(user))
         }
     }
 }

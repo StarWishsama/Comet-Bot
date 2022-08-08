@@ -131,5 +131,9 @@ class TestProjectSekaiAPI {
         runBlocking {
             client.getUserInfo(id).toMessageWrapper().print()
         }
+
+        runBlocking {
+            client.getUserInfo(id).generateBest30().print()
+        }
     }
 }

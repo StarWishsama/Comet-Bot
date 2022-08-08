@@ -36,6 +36,14 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
         appendText("${profile.name} - ${profile.userId}", true)
         appendLine()
         appendText("当前活动 ${ProjectSekaiData.getCurrentEventInfo()?.name}", true)
+        if (profile.userCheerfulCarnival != null) {
+            val teamName =
+                ProjectSekaiManager.getCarnivalTeamI18nName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
+
+            if (teamName != null) {
+                appendText("当前队伍为 $teamName", true)
+            }
+        }
         appendLine()
         appendText("分数 ${profile.score} | 排名 ${profile.rank}", true)
         appendLine()
@@ -58,16 +66,6 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
         // Refresh user pjsk score and rank
         userData.updateInfo(profile.score, profile.rank)
 
-        if (profile.userCheerfulCarnival != null) {
-            val teamName =
-                ProjectSekaiManager.getCarnivalTeamI18nName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
-
-            if (teamName != null) {
-                appendText("队伍为 $teamName", true)
-            }
-        }
-
-        appendLine()
 
         if (ahead != 0) {
             val aheadEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, ahead) }

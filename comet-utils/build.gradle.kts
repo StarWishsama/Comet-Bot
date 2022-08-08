@@ -5,6 +5,7 @@ plugins {
 
 repositories {
     mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 val commitHash by lazy {
@@ -35,4 +36,5 @@ dependencies {
     compileOnly("org.jetbrains.exposed:exposed-kotlin-datetime:_")
     compileOnly("com.zaxxer:HikariCP:_")
     compileOnly("org.jsoup:jsoup:_")
+    compileOnly("org.jetbrains.skiko:skiko:_")
 }

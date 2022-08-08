@@ -16,12 +16,12 @@ plugins {
 
 repositories {
     mavenCentral()
-
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 val osName = System.getProperty("os.name")
+
 val hostOs = when {
     osName == "Mac OS X" -> "macos"
     osName.startsWith("Win") -> "windows"
@@ -30,6 +30,7 @@ val hostOs = when {
 }
 
 val osArch = System.getProperty("os.arch")
+
 var hostArch = when (osArch) {
     "x86_64", "amd64" -> "x64"
     "aarch64" -> "arm64"
@@ -56,6 +57,6 @@ dependencies {
 
     implementation("moe.sdl.yabapi:yabapi-core-jvm:_")
 
-    testImplementation("org.jetbrains.skiko:skiko:_")
-    testImplementation("org.jetbrains.skiko:skiko-awt-runtime-$hostOs-$hostArch:_")
+    implementation("org.jetbrains.skiko:skiko:_")
+    implementation("org.jetbrains.skiko:skiko-awt-runtime-linux-x64:_")
 }
