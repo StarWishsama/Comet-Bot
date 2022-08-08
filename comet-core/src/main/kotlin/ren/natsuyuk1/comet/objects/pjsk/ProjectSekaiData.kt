@@ -29,6 +29,7 @@ object ProjectSekaiDataTable : IdTable<Int>("pjsk_data") {
     override val id: Column<EntityID<Int>> = integer("id").entityId()
     val currentEventID = integer("current_event_id")
     val startTime: Column<Long> = long("start_time")
+    val aggregateTime: Column<Long> = long("aggregate_at")
     val endTime: Column<Long> = long("end_time")
     val name = text("name")
 }
@@ -43,6 +44,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
                     new(0) {
                         currentEventID = currentEvent.id
                         startTime = currentEvent.startAt
+                        aggregateTime = currentEvent.aggregateAt
                         endTime = currentEvent.closedAt
                         name = currentEvent.name
                     }
@@ -70,6 +72,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
                             info.apply {
                                 currentEventID = currentEvent.id
                                 startTime = currentEvent.startAt
+                                aggregateTime = currentEvent.aggregateAt
                                 endTime = currentEvent.closedAt
                                 name = currentEvent.name
                             }
@@ -93,6 +96,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
 
     var currentEventID by ProjectSekaiDataTable.currentEventID
     var startTime by ProjectSekaiDataTable.startTime
+    var aggregateTime by ProjectSekaiDataTable.aggregateTime
     var endTime by ProjectSekaiDataTable.endTime
     var name by ProjectSekaiDataTable.name
 }

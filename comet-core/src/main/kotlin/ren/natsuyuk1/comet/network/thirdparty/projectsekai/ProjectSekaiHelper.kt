@@ -9,27 +9,26 @@
 
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.jsonPrimitive
-import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiProfile
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestPredictionInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
-import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import ren.natsuyuk1.comet.service.ProjectSekaiManager
+import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
-import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration.Companion.hours
 
 private val rankPosition = listOf(100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000)
 
-fun ProjectSekaiProfile.toMessageWrapper(userData: ProjectSekaiUserData, eventId: Int): MessageWrapper {
+fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, eventId: Int): MessageWrapper {
+    if (rankings.isEmpty()) {
+        return "你还没打这期活动捏".toMessageWrapper()
+    }
+
     val profile = this@toMessageWrapper.rankings.first()
     val (ahead, behind) = profile.rank.getSurroundingRank()
 
@@ -46,11 +45,11 @@ fun ProjectSekaiProfile.toMessageWrapper(userData: ProjectSekaiUserData, eventId
             val rankDiff = getDifference(userData.lastQueryPosition.toLong(), profile.rank.toLong())
 
             if (scoreDiff != 0L) {
-                appendText("↑ 上升 $scoreDiff 分 ")
+                appendText("↑ 上升 $scoreDiff 分")
             }
 
             if (rankDiff != 0L) {
-                appendText((if (profile.rank < userData.lastQueryPosition) "↑ 上升" else "↓ 下降") + " $rankDiff 名")
+                appendText((if (profile.rank < userData.lastQueryPosition) " ↑ 上升" else " ↓ 下降") + " $rankDiff 名")
             }
 
             appendLine()
@@ -58,6 +57,17 @@ fun ProjectSekaiProfile.toMessageWrapper(userData: ProjectSekaiUserData, eventId
 
         // Refresh user pjsk score and rank
         userData.updateInfo(profile.score, profile.rank)
+
+        if (profile.userCheerfulCarnival != null) {
+            val teamName =
+                ProjectSekaiManager.getCarnivalTeamI18nName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
+
+            if (teamName != null) {
+                appendText("队伍为 $teamName", true)
+            }
+        }
+
+        appendLine()
 
         if (ahead != 0) {
             val aheadEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, ahead) }
@@ -82,11 +92,11 @@ fun ProjectSekaiProfile.toMessageWrapper(userData: ProjectSekaiUserData, eventId
         appendLine()
 
         if (ahead in 100..100000) {
-            val aheadPredictScore = ProjectSekaiHelper.predictionCache.data[ahead.toString()]?.jsonPrimitive?.content
+            val aheadPredictScore = ProjectSekaiManager.predictionCache.data[ahead.toString()]?.jsonPrimitive?.content
             appendText("$ahead 档预测分数为 $aheadPredictScore", true)
         }
         if (behind in 100..100000) {
-            val behindPredictScore = ProjectSekaiHelper.predictionCache.data[behind.toString()]?.jsonPrimitive?.content
+            val behindPredictScore = ProjectSekaiManager.predictionCache.data[behind.toString()]?.jsonPrimitive?.content
             appendText("$behind 档预测分数为 $behindPredictScore", true)
         }
 
@@ -120,22 +130,5 @@ private fun Int.getSurroundingRank(): Pair<Int, Int> {
     }
 
     return Pair(rankPosition.last(), 1000001)
-}
-
-object ProjectSekaiHelper {
-    lateinit var predictionCache: SekaiBestPredictionInfo
-
-    private var scope = ModuleScope("projectsekai_helper")
-
-    fun init(parentContext: CoroutineContext) {
-        scope = ModuleScope("projectsekai_helper", parentContext)
-
-        scope.launch { refreshCache() }
-        TaskManager.registerTask(1.hours, ProjectSekaiHelper::refreshCache)
-    }
-
-    fun refreshCache() {
-        predictionCache = runBlocking { cometClient.getRankPredictionInfo() }
-    }
 }
 

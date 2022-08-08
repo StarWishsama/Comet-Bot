@@ -162,7 +162,7 @@ object GithubCommandService {
             return
         }
 
-        val image = GitHubApi.getRepoPreviewImage(comet, owner, name)
+        val image = GitHubApi.getRepoPreviewImage(owner, name)
 
         if (image == null) {
             subject.sendMessage("搜索不到这个仓库, 等会再试试吧~".toMessageWrapper())

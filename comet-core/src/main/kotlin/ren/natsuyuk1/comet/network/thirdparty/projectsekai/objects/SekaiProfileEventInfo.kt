@@ -10,14 +10,15 @@
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@kotlinx.serialization.Serializable
-data class ProjectSekaiProfile(
+@Serializable
+data class SekaiProfileEventInfo(
     val rankings: List<EventInfo>
 ) {
     fun getScore(): Long = rankings.first().score
 
-    @kotlinx.serialization.Serializable
+    @Serializable
     data class EventInfo(
         val userId: Long,
         val score: Long,
@@ -25,9 +26,10 @@ data class ProjectSekaiProfile(
         val isOwn: Boolean,
         val name: String,
         val userCard: UserCard,
-        val userProfile: UserProfile
+        val userProfile: UserProfile,
+        val userCheerfulCarnival: UserCheerfulCarnival?
     ) {
-        @kotlinx.serialization.Serializable
+        @Serializable
         data class UserCard(
             val cardId: String,
             val level: Int,
@@ -36,13 +38,21 @@ data class ProjectSekaiProfile(
             val defaultImage: String
         )
 
-        @kotlinx.serialization.Serializable
+        @Serializable
         data class UserProfile(
             val userId: Long,
             @SerialName("word")
             val bio: String,
             val twitterId: String,
             val profileImageType: String
+        )
+
+        @Serializable
+        data class UserCheerfulCarnival(
+            val eventId: Int,
+            val cheerfulCarnivalTeamId: Int,
+            val teamChangeCount: Int,
+            val registerAt: Long
         )
     }
 }

@@ -24,7 +24,6 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRa
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserInfo
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiHelper
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.toMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.toMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
@@ -32,10 +31,12 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserDataTable
+import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.test.initTestDatabase
 import ren.natsuyuk1.comet.test.isCI
 import ren.natsuyuk1.comet.test.network.client
 import ren.natsuyuk1.comet.test.print
+import kotlin.coroutines.EmptyCoroutineContext
 
 private val logger = mu.KotlinLogging.logger {}
 
@@ -49,8 +50,10 @@ class TestProjectSekaiAPI {
 
         initTestDatabase()
         DatabaseManager.loadTables(ProjectSekaiDataTable, ProjectSekaiUserDataTable)
-        runBlocking { ProjectSekaiData.updateData() }
-        ProjectSekaiHelper.refreshCache()
+        runBlocking {
+            ProjectSekaiManager.init(EmptyCoroutineContext)
+            ProjectSekaiData.updateData()
+        }
     }
 
     // Represent to event named 迷い子の手を引く、そのさきは

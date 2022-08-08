@@ -16,8 +16,8 @@ import kotlinx.serialization.decodeFromString
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiEventList
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiProfile
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestPredictionInfo
 import java.io.InputStream
 
@@ -44,7 +44,7 @@ object ProjectSekaiAPI {
      */
     private const val THREE3KIT_URL = "https://33.dsml.hk/pred"
 
-    suspend fun CometClient.getUserEventInfo(eventID: Int, userID: Long): ProjectSekaiProfile {
+    suspend fun CometClient.getUserEventInfo(eventID: Int, userID: Long): SekaiProfileEventInfo {
         logger.debug { "Fetching project sekai event $eventID rank for user $userID" }
 
         val resp = client.get<HttpStatement>("$PROFILE_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
@@ -57,7 +57,7 @@ object ProjectSekaiAPI {
             .use { json.decodeFromString(it.readText().also { logger.debug { "Raw content: $it" } }) }
     }
 
-    suspend fun CometClient.getSpecificRankInfo(eventID: Int, rankPosition: Int): ProjectSekaiProfile {
+    suspend fun CometClient.getSpecificRankInfo(eventID: Int, rankPosition: Int): SekaiProfileEventInfo {
         logger.debug { "Fetching project sekai event $eventID rank position at $rankPosition" }
 
         val resp = client.get<HttpStatement>("$PROFILE_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {

@@ -112,9 +112,10 @@ fun MessageChain.toMessageWrapper(localImage: Boolean = false): MessageWrapper {
                 runBlocking {
                     if (localImage) {
                         messageWrapperDirectory.touch()
-                        val location = cometClient.client.downloadFile(
+                        val location = File(messageWrapperDirectory, message.imageId)
+                        cometClient.client.downloadFile(
                             message.queryUrl(),
-                            File(messageWrapperDirectory, message.imageId)
+                            location
                         )
                         wrapper.appendElement(Image(filePath = location.canonicalPath))
                     } else {

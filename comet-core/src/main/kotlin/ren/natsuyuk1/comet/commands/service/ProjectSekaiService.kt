@@ -7,7 +7,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRa
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserInfo
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiHelper
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.toMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.toMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
@@ -15,6 +15,7 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.service.ProjectSekaiManager as pjskHelper
 
 object ProjectSekaiService {
     private var currentEventId: Int?
@@ -22,7 +23,6 @@ object ProjectSekaiService {
     init {
         runBlocking {
             ProjectSekaiData.updateData()
-            ProjectSekaiHelper.refreshCache()
             currentEventId = ProjectSekaiData.getCurrentEventInfo()?.currentEventID
         }
     }
@@ -47,15 +47,29 @@ object ProjectSekaiService {
             return "获取当前活动信息失败, 请稍后再试".toMessageWrapper()
         }
 
-        return if (position == 0) {
-            val currentInfo = cometClient.getUserEventInfo(currentEventId!!, userId)
-            currentInfo.toMessageWrapper(userData, currentEventId!!)
-        } else {
-            cometClient.getSpecificRankInfo(currentEventId!!, position).toMessageWrapper(userData, currentEventId!!)
+        return when {
+            pjskHelper.getCurrentEventStatus() == SekaiEventStatus.ONGOING -> {
+                if (position == 0) {
+                    val currentInfo = cometClient.getUserEventInfo(currentEventId!!, userId)
+                    currentInfo.toMessageWrapper(userData, currentEventId!!)
+                } else {
+                    cometClient.getSpecificRankInfo(currentEventId!!, position)
+                        .toMessageWrapper(userData, currentEventId!!)
+                }
+            }
+
+            pjskHelper.getCurrentEventStatus() == SekaiEventStatus.COUNTING -> {
+                "活动数据统计中, 首先别急, 其次不要急".toMessageWrapper()
+            }
+
+            else -> {
+                "获取当前活动信息失败, 请稍后再试".toMessageWrapper()
+            }
         }
     }
 
     suspend fun fetchPrediction(): MessageWrapper {
+
         return cometClient.getRankPredictionInfo().toMessageWrapper()
     }
 
