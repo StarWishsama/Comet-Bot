@@ -38,6 +38,7 @@ import java.awt.Color
 import java.io.File
 import java.nio.file.Files
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 private val logger = KotlinLogging.logger {}
@@ -299,14 +300,16 @@ object ProjectSekaiManager {
 
             builder.addText("由 Comet 生成 | 数据来源于 profile.pjsekai.moe")
 
-            builder.build().layout(700f).paint(this, 10f, 10f)
+            builder.build().layout(650f).paint(this, 10f, 10f)
         }
 
         val image = surface.makeImageSnapshot()
 
         val imageData = image.encodeToData(EncodedImageFormat.PNG)
         val tmpFile = File(cacheDirectory, "${System.currentTimeMillis()}.png").apply {
-            deleteOnExit()
+            TaskManager.registerTask(1.hours) {
+                delete()
+            }
         }
 
         imageData?.bytes?.let {
