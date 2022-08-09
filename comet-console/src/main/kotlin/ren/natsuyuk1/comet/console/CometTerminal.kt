@@ -31,6 +31,7 @@ import ren.natsuyuk1.comet.config.hash
 import ren.natsuyuk1.comet.config.version
 import ren.natsuyuk1.comet.console.command.registerTerminalCommands
 import ren.natsuyuk1.comet.console.util.Console
+import ren.natsuyuk1.comet.console.util.SkikoFinder
 import ren.natsuyuk1.comet.console.util.login
 import ren.natsuyuk1.comet.console.wrapper.WrapperLoader
 import ren.natsuyuk1.comet.consts.cometPersistDataFile
@@ -149,6 +150,8 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         TaskManager.init(coroutineContext)
         CometCoreService.init(coroutineContext)
         CometServer.init(CometServerConfig)
+
+        SkikoFinder.findSkikoLibrary()
     }
 
     private fun autoLogin() {

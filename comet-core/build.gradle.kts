@@ -58,5 +58,4 @@ dependencies {
     implementation("moe.sdl.yabapi:yabapi-core-jvm:_")
 
     implementation("org.jetbrains.skiko:skiko:_")
-    implementation("org.jetbrains.skiko:skiko-awt-runtime-linux-x64:_")
 }

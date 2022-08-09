@@ -30,6 +30,8 @@ dependencies {
     api(project(":comet-api"))
     api(project(":comet-core"))
     api(project(":comet-utils"))
+
+    compileOnly("org.jetbrains.skiko:skiko:_")
 }
 
 tasks.jar {

@@ -13,6 +13,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.toMessageWrap
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
+import ren.natsuyuk1.comet.util.skikoUsable
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.service.ProjectSekaiManager as pjskHelper
@@ -86,6 +87,10 @@ object ProjectSekaiService {
     }
 
     suspend fun b30(user: CometUser): MessageWrapper {
+        if (!skikoUsable) {
+            return "Comet 的图像生成库还没加载, 生成不了图片捏".toMessageWrapper()
+        }
+
         val userData = ProjectSekaiUserData.getUserPJSKData(user.id.value)
             ?: return "你还没有绑定过世界计划账号, 使用 /pjsk bind -i [你的ID] 绑定".toMessageWrapper()
 
