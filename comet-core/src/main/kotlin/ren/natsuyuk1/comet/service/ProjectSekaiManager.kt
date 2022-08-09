@@ -260,7 +260,7 @@ object ProjectSekaiManager {
                     color = Color.BLACK.rgb
                     fontSize = 20f
                     fontStyle = FontStyle.NORMAL.withWeight(500)
-                    fontFamilies = arrayOf("Hiragino Sans")
+                    fontFamilies = arrayOf("Source Han Sans")
                 }
             }, FontUtil.fonts)
 
