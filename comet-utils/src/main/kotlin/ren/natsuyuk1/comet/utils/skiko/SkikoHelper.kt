@@ -1,13 +1,17 @@
-package ren.natsuyuk1.comet.console.util
+package ren.natsuyuk1.comet.utils.skiko
 
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
 import io.ktor.client.features.*
+import io.ktor.client.features.compression.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
 import mu.KotlinLogging
 import org.jetbrains.skiko.Library
 import org.jetbrains.skiko.hostId
-import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
@@ -19,9 +23,30 @@ import kotlin.io.path.outputStream
 
 private val logger = KotlinLogging.logger {}
 
-object SkikoFinder {
+object SkikoHelper {
+    private val client = HttpClient(CIO) {
+        install(UserAgent) {
+            agent =
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.41"
+        }
+
+        install(ContentEncoding) {
+            gzip()
+            deflate()
+            identity()
+        }
+
+        install(JsonFeature) {
+            serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+                prettyPrint = true
+                isLenient = true
+                ignoreUnknownKeys = true
+            })
+        }
+    }
     private const val SKIKO_LIBRARY_PATH_PROPERTY = "skiko.library.path"
     private const val SKIKO_VERSION = "0.7.27"
+    private var isLoaded = false
 
     private val skikoLibraryPath = System.getProperty(SKIKO_LIBRARY_PATH_PROPERTY)
 
@@ -64,7 +89,7 @@ object SkikoFinder {
             kotlin.runCatching {
                 val tmpDownloadFile =
                     skikoLibFolder.resolve("skiko-awt-runtime-${hostOs}-${hostArch}-$SKIKO_VERSION.jar")
-                cometClient.client.downloadFile(downloadURL, tmpDownloadFile)
+                client.downloadFile(downloadURL, tmpDownloadFile)
                 val zip = runInterruptible {
                     ZipFile(tmpDownloadFile)
                 }
@@ -99,6 +124,7 @@ object SkikoFinder {
                 }
             }.onSuccess {
                 loadSkikoLibrary()
+                FontUtil.loadDefaultFont()
             }.onFailure {
                 if (it is ResponseException) {
                     if (it.response.status == HttpStatusCode.NotFound) {
@@ -112,6 +138,7 @@ object SkikoFinder {
             }
         } else {
             loadSkikoLibrary()
+            FontUtil.loadDefaultFont()
         }
     }
 
@@ -119,9 +146,12 @@ object SkikoFinder {
         try {
             System.setProperty(SKIKO_LIBRARY_PATH_PROPERTY, skikoLibFolder.absPath)
             Library.load()
+            isLoaded = true
             logger.info { "成功加载 Skiko $SKIKO_VERSION, Skiko 存放在 ${skikoLibFolder.absPath}" }
         } catch (t: Throwable) {
             logger.warn(t) { "在加载 Skiko 库时出现异常, 版本 $SKIKO_VERSION" }
         }
     }
+
+    fun isSkikoLoaded() = isLoaded
 }

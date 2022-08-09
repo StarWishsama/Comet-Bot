@@ -31,7 +31,6 @@ import ren.natsuyuk1.comet.config.hash
 import ren.natsuyuk1.comet.config.version
 import ren.natsuyuk1.comet.console.command.registerTerminalCommands
 import ren.natsuyuk1.comet.console.util.Console
-import ren.natsuyuk1.comet.console.util.SkikoFinder
 import ren.natsuyuk1.comet.console.util.login
 import ren.natsuyuk1.comet.console.wrapper.WrapperLoader
 import ren.natsuyuk1.comet.consts.cometPersistDataFile
@@ -43,6 +42,7 @@ import ren.natsuyuk1.comet.service.CometCoreService
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
+import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
@@ -151,7 +151,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         CometCoreService.init(coroutineContext)
         CometServer.init(CometServerConfig)
 
-        SkikoFinder.findSkikoLibrary()
+        SkikoHelper.findSkikoLibrary()
     }
 
     private fun autoLogin() {
