@@ -252,50 +252,51 @@ object ProjectSekaiManager {
         surface.canvas.apply {
             clear(Color.WHITE.rgb)
 
-            val builder = ParagraphBuilder(ParagraphStyle().apply {
+            ParagraphBuilder(ParagraphStyle().apply {
                 alignment = Alignment.LEFT
                 textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
-            }, FontUtil.fonts)
+            }, FontUtil.fonts).apply {
+                addText("${user.userGameData.name} - ${user.userGameData.userID} - BEST 30\n")
 
-            builder.addText("${user.userGameData.name} - ${user.userGameData.userID} - BEST 30\n")
+                popStyle().pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 18f))
 
-            builder.popStyle().pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 18f))
+                addText("\n")
 
-            builder.addText("\n")
+                b30.forEach { mr ->
+                    val status = if (mr.isAllPerfect) "AP" else "FC"
 
-            b30.forEach { mr ->
-                val status = if (mr.isAllPerfect) "AP" else "FC"
-                val multiplier = if (mr.isAllPerfect) 1 else 0.95
+                    addText(
+                        "${getSongName(mr.musicId)} [${mr.musicDifficulty.name.uppercase()} ${
+                            getSongLevel(
+                                mr.musicId,
+                                mr.musicDifficulty
+                            )
+                        }] $status (${
+                            getSongAdjustedLevel(
+                                mr.musicId,
+                                mr.musicDifficulty
+                            )?.fixDisplay(1)
+                        })\n"
+                    )
+                }
 
-                builder.addText(
-                    "${getSongName(mr.musicId)} [${mr.musicDifficulty.name.uppercase()} ${
-                        getSongLevel(
-                            mr.musicId,
-                            mr.musicDifficulty
-                        )
-                    }] $status (${getSongAdjustedLevel(mr.musicId, mr.musicDifficulty)?.fixDisplay(1)}x$multiplier)\n"
-                )
-            }
+                addText("\n")
 
-            builder.addText("\n")
+                popStyle().pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 13f))
 
-            builder.popStyle().pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 13f))
-
-            builder.addText("由 Comet 生成 | 数据来源于 profile.pjsekai.moe")
-
-            builder.build().layout(650f).paint(this, 10f, 10f)
+                addText("由 Comet 生成 | 数据来源于 profile.pjsekai.moe")
+            }.build().layout(650f).paint(this, 10f, 10f)
         }
 
         val image = surface.makeImageSnapshot()
 
-        val imageData = image.encodeToData(EncodedImageFormat.PNG)
         val tmpFile = File(cacheDirectory, "${System.currentTimeMillis()}.png").apply {
             TaskManager.registerTaskDelayed(1.hours) {
                 delete()
             }
         }
 
-        imageData?.bytes?.let {
+        image.encodeToData(EncodedImageFormat.PNG)?.bytes?.let {
             Files.write(tmpFile.toPath(), it)
         }
 
