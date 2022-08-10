@@ -290,7 +290,7 @@ object ProjectSekaiManager {
 
         val imageData = image.encodeToData(EncodedImageFormat.PNG)
         val tmpFile = File(cacheDirectory, "${System.currentTimeMillis()}.png").apply {
-            TaskManager.registerTask(1.hours) {
+            TaskManager.registerTaskDelayed(1.hours) {
                 delete()
             }
         }

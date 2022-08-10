@@ -19,6 +19,7 @@ import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.message.*
 import ren.natsuyuk1.comet.utils.message.Image
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.InputStream
 
 private val logger = mu.KotlinLogging.logger("MessageWrapperConverter")
@@ -41,16 +42,20 @@ suspend fun WrapperElement.toMessageContent(subject: Contact?): MessageContent {
                 } else if (filePath.isNotEmpty()) {
                     if (filePath.isNotEmpty() && File(filePath).exists()) {
                         return runBlocking { File(filePath).uploadAsImage(subject) }
+                    } else {
+                        throw FileNotFoundException(filePath)
                     }
                 } else if (base64.isNotEmpty()) {
                     return base64.toByteArray().toExternalResource().uploadAsImage(subject)
+                } else {
+                    throw IllegalArgumentException("Image have no argument to access image")
                 }
             } catch (e: Exception) {
                 logger.warn { "A error occurred when converting Image, raw content: ${toString()}" }
                 return PlainText("[图片]")
             }
 
-            throw RuntimeException("Unable to convert image, Image raw content: $this")
+            return PlainText("[图片]")
         }
 
         is AtElement -> return At(target)
