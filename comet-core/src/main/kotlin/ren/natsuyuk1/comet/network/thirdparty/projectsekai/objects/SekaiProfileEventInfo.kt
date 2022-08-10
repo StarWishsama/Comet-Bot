@@ -27,7 +27,7 @@ data class SekaiProfileEventInfo(
         val name: String,
         val userCard: UserCard,
         val userProfile: UserProfile,
-        val userCheerfulCarnival: UserCheerfulCarnival?
+        val userCheerfulCarnival: UserCheerfulCarnival? = null
     ) {
         @Serializable
         data class UserCard(
