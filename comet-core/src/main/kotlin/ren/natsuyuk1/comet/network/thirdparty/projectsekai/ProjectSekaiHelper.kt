@@ -36,7 +36,7 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
         appendText("${profile.name} - ${profile.userId}", true)
         appendLine()
         appendText("当前活动 ${ProjectSekaiData.getCurrentEventInfo()?.name}", true)
-        if (profile.userCheerfulCarnival != null) {
+        if (profile.userCheerfulCarnival.cheerfulCarnivalTeamId != null) {
             val teamName =
                 ProjectSekaiManager.getCarnivalTeamI18nName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
 

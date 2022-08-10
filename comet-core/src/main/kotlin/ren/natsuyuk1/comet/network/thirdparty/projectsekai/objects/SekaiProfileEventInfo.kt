@@ -27,7 +27,7 @@ data class SekaiProfileEventInfo(
         val name: String,
         val userCard: UserCard,
         val userProfile: UserProfile,
-        val userCheerfulCarnival: UserCheerfulCarnival? = null
+        val userCheerfulCarnival: UserCheerfulCarnival
     ) {
         @Serializable
         data class UserCard(
@@ -49,10 +49,10 @@ data class SekaiProfileEventInfo(
 
         @Serializable
         data class UserCheerfulCarnival(
-            val eventId: Int,
-            val cheerfulCarnivalTeamId: Int,
-            val teamChangeCount: Int,
-            val registerAt: Long
+            val eventId: Int? = null,
+            val cheerfulCarnivalTeamId: Int? = null,
+            val teamChangeCount: Int? = null,
+            val registerAt: Long? = null
         )
     }
 }
