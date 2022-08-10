@@ -9,6 +9,8 @@ import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skia.paragraph.TypefaceFontProvider
 import ren.natsuyuk1.comet.utils.file.absPath
+import ren.natsuyuk1.comet.utils.file.copyResourceDirectory
+import ren.natsuyuk1.comet.utils.file.jar
 import ren.natsuyuk1.comet.utils.file.resolveResourceDirectory
 import java.awt.Color
 
@@ -21,26 +23,38 @@ object FontUtil {
 
     private val fontFolder = resolveResourceDirectory("/fonts")
 
-    fun loadDefaultFont() {
+    suspend fun loadDefaultFont() {
         if (!fontFolder.exists()) {
             fontFolder.mkdirs()
+
+            val source = jar(this::class.java)
+            if (source != null) {
+                copyResourceDirectory(source, "fonts", fontFolder)
+            }
         }
+
+        var counter = 0
 
         fontFolder.listFiles()?.let { list ->
             list.forEach { f ->
                 try {
-                    fontProvider.registerTypeface(Typeface.makeFromFile(f.absPath))
-                } catch (e: IllegalArgumentException) {
+                    fontProvider.registerTypeface(Typeface.makeFromFile(f.absPath).also {
+                        logger.debug { "Init typeface ${it.familyName}" }
+                    })
+                    counter++
+                } catch (e: Exception) {
                     logger.warn { "无效的字体文件 ${f.absPath}" }
                 }
             }
         }
+
+        logger.info { "已加载 $counter 个字体." }
     }
 
     fun defaultFontStyle(c: Color, size: Float) = TextStyle().apply {
         color = c.rgb
         fontSize = size
         fontStyle = FontStyle.NORMAL.withWeight(500)
-        fontFamilies = arrayOf("Source Han Sans")
+        fontFamilies = arrayOf("Source Han Sans SC")
     }
 }

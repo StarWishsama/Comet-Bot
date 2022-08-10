@@ -78,3 +78,4 @@ comet-mirai-wrapper 使用 [AGPL v3](https://github.com/StarWishsama/Comet-Bot/b
 - [PRTS Wiki](http://prts.wiki/) 提供的明日方舟干员数据以及立绘
 - [ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData) 提供明日方舟游戏数据资源
 - [Yabapi](https://github.com/SDLMoe/Yabapi) 提供可靠的哔哩哔哩 API 库
+- [SourceHanSans](https://github.com/adobe-fonts/source-han-sans/) 思源黑体字体
