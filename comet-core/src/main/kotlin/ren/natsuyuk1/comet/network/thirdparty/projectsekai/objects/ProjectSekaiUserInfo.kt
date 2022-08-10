@@ -62,18 +62,18 @@ data class ProjectSekaiUserInfo(
     val userMusics: List<UserMusic>,
     val userMusicResults: List<MusicResult>
 ) {
+    fun getBest30Songs(): List<MusicResult> = userMusicResults.filter {
+        it.musicDifficulty >= MusicDifficulty.EXPERT && (it.isAllPerfect || it.isFullCombo)
+    }.sortedBy {
+        ProjectSekaiManager.getSongAdjustedLevel(it.musicId, it.musicDifficulty)
+    }.distinctBy { it.musicId }.asReversed().take(30)
+
     fun generateBest30(): MessageWrapper {
         if (ProjectSekaiManager.musicDiffDatabase.isEmpty() || ProjectSekaiManager.musicDatabase.isEmpty()) {
             return "Project Sekai 歌曲数据还没有加载好噢".toMessageWrapper()
         }
 
-        val musicDiff = userMusicResults.filter {
-            it.musicDifficulty >= MusicDifficulty.EXPERT && (it.isAllPerfect || it.isFullCombo)
-        }.sortedBy {
-            ProjectSekaiManager.getSongAdjustedLevel(it.musicId, it.musicDifficulty)
-        }.distinct().asReversed()
-
-        val result = ProjectSekaiManager.drawB30(user, musicDiff.take(30))
+        val result = ProjectSekaiManager.drawB30(user, getBest30Songs())
 
         return buildMessageWrapper {
             appendElement(Image(filePath = result.absPath))

@@ -11,6 +11,8 @@ package ren.natsuyuk1.comet.test.network.thirdparty.projectsekai
 
 import io.ktor.client.features.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.BeforeAll
@@ -37,6 +39,7 @@ import ren.natsuyuk1.comet.test.isCI
 import ren.natsuyuk1.comet.test.network.client
 import ren.natsuyuk1.comet.test.print
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.test.assertTrue
 
 private val logger = mu.KotlinLogging.logger {}
 
@@ -131,9 +134,15 @@ class TestProjectSekaiAPI {
         runBlocking {
             client.getUserInfo(id).toMessageWrapper().print()
         }
+    }
 
+    @Test
+    fun testB30() {
         runBlocking {
-            client.getUserInfo(id).generateBest30().print()
+            val b30 = client.getUserInfo(id).getBest30Songs()
+            Json.encodeToString(b30).print()
+
+            assertTrue { b30.size == 30 }
         }
     }
 }

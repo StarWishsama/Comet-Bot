@@ -11,12 +11,10 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import mu.KotlinLogging
 import org.jetbrains.skia.EncodedImageFormat
-import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.paragraph.Alignment
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
-import org.jetbrains.skia.paragraph.TextStyle
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
@@ -256,22 +254,12 @@ object ProjectSekaiManager {
 
             val builder = ParagraphBuilder(ParagraphStyle().apply {
                 alignment = Alignment.LEFT
-                textStyle = TextStyle().apply {
-                    color = Color.BLACK.rgb
-                    fontSize = 20f
-                    fontStyle = FontStyle.NORMAL.withWeight(500)
-                    fontFamilies = arrayOf("Source Han Sans")
-                }
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
             }, FontUtil.fonts)
 
             builder.addText("${user.userGameData.name} - ${user.userGameData.userID} - BEST 30\n")
 
-            builder.popStyle().pushStyle(TextStyle().apply {
-                color = Color.BLACK.rgb
-                fontSize = 18f
-                fontStyle = FontStyle.NORMAL.withWeight(500)
-                fontFamilies = arrayOf("Source Han Sans")
-            })
+            builder.popStyle().pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 18f))
 
             builder.addText("\n")
 
@@ -291,12 +279,7 @@ object ProjectSekaiManager {
 
             builder.addText("\n")
 
-            builder.popStyle().pushStyle(TextStyle().apply {
-                color = Color.BLACK.rgb
-                fontSize = 13f
-                fontStyle = FontStyle.NORMAL.withWeight(500)
-                fontFamilies = arrayOf("Source Han Sans")
-            })
+            builder.popStyle().pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 13f))
 
             builder.addText("由 Comet 生成 | 数据来源于 profile.pjsekai.moe")
 
