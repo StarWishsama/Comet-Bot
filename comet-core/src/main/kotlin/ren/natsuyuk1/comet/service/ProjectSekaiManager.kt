@@ -4,6 +4,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.JsonObject
@@ -24,11 +25,15 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficul
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.official.PJSKMusicInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.official.PJSKRankSeasonInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.profile.PJSKMusicDifficultyInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestPredictionInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
-import ren.natsuyuk1.comet.utils.file.*
+import ren.natsuyuk1.comet.utils.file.cacheDirectory
+import ren.natsuyuk1.comet.utils.file.readTextBuffered
+import ren.natsuyuk1.comet.utils.file.resolveResourceDirectory
+import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 import ren.natsuyuk1.comet.utils.skiko.FontUtil
@@ -54,6 +59,8 @@ object ProjectSekaiManager {
     val musicDiffDatabase = mutableListOf<PJSKMusicDifficultyInfo>()
 
     val musicDatabase = mutableListOf<PJSKMusicInfo>()
+
+    private val rankSeasonInfo = mutableListOf<PJSKRankSeasonInfo>()
 
     suspend fun init(parentContext: CoroutineContext) {
         scope = ModuleScope("projectsekai_helper", parentContext)
@@ -144,77 +151,62 @@ object ProjectSekaiManager {
         /**
          * Load Sekai Music Difficulties Info
          */
-
-        val musicDiffFile = File(pjskFolder, "musicDifficulties.json")
-
-        suspend fun loadMusicDiff() {
-            try {
-                musicDiffDatabase.addAll(
-                    json.decodeFromString(
-                        ListSerializer(PJSKMusicDifficultyInfo.serializer()),
-                        musicDiffFile.readTextBuffered()
-                    )
-                )
-            } catch (e: SerializationException) {
-                logger.warn(e) { "解析音乐数据时出现问题, 路径 ${musicDiffFile.absPath}" }
-            }
-        }
-
-        if (musicDiffFile.exists()) {
-            loadMusicDiff()
-        } else {
-            musicDiffFile.touch()
-            scope.launch {
-                cometClient.client.downloadFile("https://musics.pjsekai.moe/musicDifficulties.json", musicDiffFile)
-                loadMusicDiff()
-            }
-        }
+        loadSpecificDatabase("musicDifficulties.json", PJSKMusicDifficultyInfo.serializer(), musicDiffDatabase)
 
         /**
          * Load Sekai Music Info
          */
+        loadSpecificDatabase("musics.json", PJSKMusicInfo.serializer(), musicDatabase)
 
-        val musicFile = File(pjskFolder, "musics.json")
-        val musicURL = "https://raw.githubusercontent.com/Sekai-World/sekai-master-db-diff/main/musics.json"
+        /**
+         * Load rank season info
+         */
+        loadSpecificDatabase("rankMatchSeasons.json", PJSKRankSeasonInfo.serializer(), rankSeasonInfo)
+    }
 
-        suspend fun loadMusic() {
+    private suspend fun <T> loadSpecificDatabase(
+        fileName: String,
+        serializer: KSerializer<T>,
+        database: MutableList<T>
+    ) {
+        val file = File(pjskFolder, fileName)
+        val url = "https://raw.githubusercontent.com/Sekai-World/sekai-master-db-diff/main/$fileName"
+
+        suspend fun loadDatabase() {
             try {
-                musicDatabase.addAll(
+                database.addAll(
                     json.decodeFromString(
-                        ListSerializer(PJSKMusicInfo.serializer()),
-                        musicFile.readTextBuffered()
+                        ListSerializer(serializer),
+                        file.readTextBuffered()
                     )
                 )
             } catch (e: SerializationException) {
-                logger.warn(e) { "解析音乐数据时出现问题" }
+                logger.warn(e) { "解析 $fileName 数据时出现问题" }
             }
         }
 
-        GitHubApi.getSpecificFileCommits("Sekai-World", "sekai-master-db-diff", "musics.json")
+        GitHubApi.getSpecificFileCommits("Sekai-World", "sekai-master-db-diff", fileName)
             .onSuccess {
                 val current = Clock.System.now()
                 val lastUpdate = Instant.parse(it.first().commit.committer.date)
 
-                if (!musicFile.exists() || lastUpdate > current) {
+                if (!file.exists() || lastUpdate > current) {
                     scope.launch {
-                        musicFile.touch()
-                        cometClient.client.downloadFile(musicURL, musicFile)
-                        loadMusic()
+                        file.touch()
+                        cometClient.client.downloadFile(url, file)
+                        loadDatabase()
                     }
                 } else {
-                    loadMusic()
+                    loadDatabase()
                 }
             }.onFailure {
-                if (musicFile.exists()) {
-                    loadMusic()
+                if (file.exists()) {
+                    loadDatabase()
                 } else {
                     scope.launch {
-                        musicFile.touch()
-                        cometClient.client.downloadFile(
-                            "https://raw.githubusercontent.com/Sekai-World/sekai-master-db-diff/main/musics.json",
-                            musicFile
-                        )
-                        loadMusic()
+                        file.touch()
+                        cometClient.client.downloadFile(url, file)
+                        loadDatabase()
                     }
                 }
             }
