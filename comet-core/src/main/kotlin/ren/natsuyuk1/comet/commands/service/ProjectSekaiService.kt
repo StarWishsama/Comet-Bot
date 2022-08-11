@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankSeasonInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserInfo
@@ -13,6 +14,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.toMessageWrap
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
+import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
@@ -83,7 +85,15 @@ object ProjectSekaiService {
 
         val userId = userData.userID
 
-        return cometClient.getUserInfo(userId).toMessageWrapper()
+        val rankSeason = ProjectSekaiManager.getLatestRankSeason() ?: return "查询排位数据时出现异常".toMessageWrapper()
+
+        val rankInfo = cometClient.getRankSeasonInfo(userId, rankSeason)
+
+        return cometClient.getUserInfo(userId).toMessageWrapper().apply {
+            appendLine()
+            appendLine()
+            appendText(rankInfo.getRankInfo())
+        }
     }
 
     suspend fun b30(user: CometUser): MessageWrapper {

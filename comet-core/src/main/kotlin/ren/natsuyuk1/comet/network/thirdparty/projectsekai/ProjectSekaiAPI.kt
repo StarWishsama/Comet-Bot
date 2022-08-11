@@ -16,6 +16,7 @@ import kotlinx.serialization.decodeFromString
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiEventList
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiRankSeasonInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestPredictionInfo
@@ -94,6 +95,20 @@ object ProjectSekaiAPI {
         logger.debug { "Fetching project sekai user info for $id" }
 
         val resp = client.get<HttpStatement>("$PROFILE_URL/api/user/$id/profile").execute().receive<InputStream>()
+
+        return resp.bufferedReader()
+            .use { json.decodeFromString(it.readText().also { logger.debug { "Raw content: $it" } }) }
+    }
+
+    suspend fun CometClient.getRankSeasonInfo(userId: Long, rankSeasonId: Int): ProjectSekaiRankSeasonInfo {
+        logger.debug { "Fetching project sekai rank season #$rankSeasonId info for $userId" }
+
+        val resp =
+            client.get<HttpStatement>("$PROFILE_URL/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
+                url {
+                    parameters.append("targetUserId", userId.toString())
+                }
+            }.execute().receive<InputStream>()
 
         return resp.bufferedReader()
             .use { json.decodeFromString(it.readText().also { logger.debug { "Raw content: $it" } }) }

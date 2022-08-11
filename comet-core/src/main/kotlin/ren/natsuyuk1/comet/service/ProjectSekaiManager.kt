@@ -238,6 +238,8 @@ object ProjectSekaiManager {
         return diffInfo.playLevel + diffInfo.playLevelAdjust
     }
 
+    fun getLatestRankSeason(): Int? = rankSeasonInfo.lastOrNull()?.id
+
     fun drawB30(user: ProjectSekaiUserInfo.UserGameData, b30: List<ProjectSekaiUserInfo.MusicResult>): File {
         val surface = Surface.makeRasterN32Premul(650, 900)
 
