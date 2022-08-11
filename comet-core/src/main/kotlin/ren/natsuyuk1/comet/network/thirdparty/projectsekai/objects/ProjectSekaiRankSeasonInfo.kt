@@ -59,11 +59,11 @@ data class ProjectSekaiRankSeasonInfo(
 }
 
 private fun Int.parseToPJSKRank(): String {
-    val grade = ((this - 1) / 4) + 1
-    val rank = PJSKRank.values()[max(grade, 7)]
+    val grade = (((this - 1) / 4) + 1) - 1
+    val rank = PJSKRank.values()[max(grade, 6)]
     val subGrade = this - 4 * (grade - 1)
 
-    return "$rank $subGrade 级"
+    return "${rank.i18n} $subGrade 级"
 }
 
 enum class PJSKRank(val i18n: String) {
