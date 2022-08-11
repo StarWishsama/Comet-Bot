@@ -3,7 +3,6 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
-import java.lang.Integer.max
 
 @Serializable
 data class ProjectSekaiRankSeasonInfo(
@@ -52,6 +51,7 @@ data class ProjectSekaiRankSeasonInfo(
             append("Win ${info.win} | Lose ${info.lose}${if (info.draw > 0) " | Draw ${info.draw}" else ""} ")
             appendLine()
             append("当前连胜数 >> ${info.consecutiveWinCount} | 最高连胜 ${info.maxConsecutiveWinCount}")
+            appendLine()
             append("胜率 >> ${((info.win.toDouble() / (info.win + info.lose)) * 100.0).fixDisplay()}%")
             appendLine()
         }
@@ -60,7 +60,7 @@ data class ProjectSekaiRankSeasonInfo(
 
 private fun Int.parseToPJSKRank(): String {
     val grade = (((this - 1) / 4) + 1) - 1
-    val rank = PJSKRank.values()[max(grade, 6)]
+    val rank = PJSKRank.values()[min(grade, 6)]
     val subGrade = this - 4 * (grade - 1)
 
     return "${rank.i18n} $subGrade 级"
