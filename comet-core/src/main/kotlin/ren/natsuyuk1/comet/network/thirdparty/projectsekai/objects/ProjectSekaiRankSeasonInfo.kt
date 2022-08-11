@@ -50,7 +50,10 @@ data class ProjectSekaiRankSeasonInfo(
             appendLine()
             append("Win ${info.win} | Lose ${info.lose}${if (info.draw > 0) " | Draw ${info.draw}" else ""} ")
             appendLine()
-            append("当前连胜数 >> ${info.consecutiveWinCount} | 最高连胜 ${info.maxConsecutiveWinCount}")
+            append("最高连胜 ${info.maxConsecutiveWinCount}")
+            if (info.consecutiveWinCount > 0) {
+                append(" | 当前连胜 ${info.consecutiveWinCount}")
+            }
             appendLine()
             append("胜率 >> ${((info.win.toDouble() / (info.win + info.lose)) * 100.0).fixDisplay()}%")
             appendLine()
