@@ -76,6 +76,8 @@ object GitHubService {
 
 fun Comet.subscribeGithubEvent() = run {
     registerListener<GithubEvent> { event ->
+        logger.debug { "Processing GithubEvent: $event" }
+
         event.broadcastTargets.forEach {
             getGroup(it.id)?.sendMessage(event.eventData.toMessageWrapper())
         }
