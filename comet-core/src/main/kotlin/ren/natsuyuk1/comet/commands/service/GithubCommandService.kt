@@ -1,7 +1,6 @@
 package ren.natsuyuk1.comet.commands.service
 
 import kotlinx.coroutines.delay
-import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.session.Session
 import ren.natsuyuk1.comet.api.session.expire
@@ -135,7 +134,7 @@ object GithubCommandService {
     // 3, 4
     private val githubLinkRegex by lazy { Regex("""^(https?://)?(www\.)?github\.com/(.+)/(.+)""") }
 
-    suspend fun fetchRepoInfo(comet: Comet, subject: PlatformCommandSender, repoName: String) {
+    suspend fun fetchRepoInfo(subject: PlatformCommandSender, repoName: String) {
         var owner: String? = null
         var name: String? = null
 

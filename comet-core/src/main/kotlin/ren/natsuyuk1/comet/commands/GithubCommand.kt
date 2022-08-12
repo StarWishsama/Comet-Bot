@@ -39,7 +39,7 @@ class GithubCommand(
         subcommands(
             Subscribe(subject, sender, user),
             UnSubscribe(subject, sender, user),
-            Info(comet, subject, sender, user),
+            Info(subject, sender, user),
             Setting(message, subject, sender, user),
             List(subject, sender, user)
         )
@@ -108,7 +108,6 @@ class GithubCommand(
     }
 
     class Info(
-        val comet: Comet,
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
         override val user: CometUser
@@ -123,7 +122,7 @@ class GithubCommand(
             if (repoName.isBlank()) {
                 subject.sendMessage("请输入 GitHub 仓库名称或链接!".toMessageWrapper())
             } else {
-                GithubCommandService.fetchRepoInfo(comet, subject, repoName)
+                GithubCommandService.fetchRepoInfo(subject, repoName)
             }
         }
     }
@@ -154,7 +153,7 @@ class GithubCommand(
             override val user: CometUser
         ) : CometSubCommand(subject, sender, user, ADD) {
             companion object {
-                val ADD = SubCommandProperty("add", listOf("新增", "添加"), SETTING)
+                val ADD = SubCommandProperty("add", listOf("新增", "添加"), SETTING, UserLevel.ADMIN)
             }
 
             private val repoName by argument(help = "GitHub 仓库名称").default("")
@@ -220,7 +219,7 @@ class GithubCommand(
             override val user: CometUser
         ) : CometSubCommand(subject, sender, user, REMOVE) {
             companion object {
-                val REMOVE = SubCommandProperty("remove", listOf("rm", "删除"), SETTING)
+                val REMOVE = SubCommandProperty("remove", listOf("rm", "删除"), SETTING, UserLevel.ADMIN)
             }
 
             private val repoName by argument(help = "GitHub 仓库名称").default("")
