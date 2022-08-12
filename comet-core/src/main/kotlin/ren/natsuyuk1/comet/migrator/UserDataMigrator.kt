@@ -35,8 +35,8 @@ object UserDataMigrator : IMigrator {
             val pendingRemove = mutableListOf<Long>()
 
             userCache.forEach { (id, user) ->
-                if (CometUser.findByQQ(id).empty()) {
-                    transaction {
+                transaction {
+                    if (CometUser.findByQQ(id).empty()) {
                         UserTable.insert {
                             it[qq] = id
                             it[coin] = user.coin
@@ -55,9 +55,9 @@ object UserDataMigrator : IMigrator {
                             )
                             it[userLevel] = user.level.toUserLevel()
                         }
+                    } else {
+                        pendingRemove.add(id)
                     }
-                } else {
-                    pendingRemove.add(id)
                 }
             }
 
