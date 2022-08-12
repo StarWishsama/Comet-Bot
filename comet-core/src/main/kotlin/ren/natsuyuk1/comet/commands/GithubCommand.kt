@@ -277,7 +277,6 @@ class GithubCommand(
             val LIST = SubCommandProperty("list", listOf("ls", "列表"), GITHUB)
         }
 
-        private val repoName by argument(help = "GitHub 仓库名称")
         private val groupID by option("-g", "--group", help = "群号").long()
 
         override suspend fun run() {
@@ -286,7 +285,7 @@ class GithubCommand(
                 return
             }
 
-            GithubCommandService.fetchSubscribeRepos(subject, repoName, groupID!!)
+            GithubCommandService.fetchSubscribeRepos(subject, groupID!!)
         }
     }
 }

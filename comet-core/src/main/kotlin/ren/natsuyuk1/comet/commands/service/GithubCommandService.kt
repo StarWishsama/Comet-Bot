@@ -176,18 +176,9 @@ object GithubCommandService {
         }
     }
 
-    fun fetchSubscribeRepos(subject: PlatformCommandSender, repoName: String, groupID: Long) {
-        if (!repoRegex.matches(repoName)) {
-            subject.sendMessage("请输入有效的仓库名/链接!".toMessageWrapper())
-            return
-        }
-
-        val slice = repoName.split("/")
-        val owner = slice[0]
-        val name = slice[1]
-
+    fun fetchSubscribeRepos(subject: PlatformCommandSender, groupID: Long) {
         val repos =
-            GithubRepoData.data.repos.filter { it.getName() == "$owner/$name" && it.subscribers.any { g -> g.id == groupID } }
+            GithubRepoData.data.repos.filter { it.subscribers.any { g -> g.id == groupID } }
 
         if (repos.isEmpty()) {
             subject.sendMessage("本群还未订阅过任何仓库".toMessageWrapper())
