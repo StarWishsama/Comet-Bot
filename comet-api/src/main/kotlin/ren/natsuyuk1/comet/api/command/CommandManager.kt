@@ -127,7 +127,7 @@ object CommandManager {
 
                 when (property.executeConsumeType) {
                     CommandConsumeType.COOLDOWN -> {
-                        if (user.triggerCommandTime.plus(property.executeConsumePoint.seconds) >= executeTime) {
+                        if (user.userLevel != UserLevel.OWNER && user.triggerCommandTime.plus(property.executeConsumePoint.seconds) >= executeTime) {
                             return@runCatching CommandStatus.ValidateFailed()
                         }
                     }
@@ -136,7 +136,8 @@ object CommandManager {
                         if (user.coin < property.executeConsumePoint) {
                             return@runCatching CommandStatus.ValidateFailed()
                         } else {
-                            user.coin = user.coin - property.executeConsumePoint
+                            if (user.userLevel != UserLevel.OWNER)
+                                user.coin = user.coin - property.executeConsumePoint
                         }
                     }
                 }
