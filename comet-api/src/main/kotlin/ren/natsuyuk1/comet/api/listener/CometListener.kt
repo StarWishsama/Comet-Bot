@@ -53,7 +53,6 @@ fun CometListener.register(comet: Comet) {
     } else {
         methodEvent.forEach { (clazz, method) ->
             if (clazz.isSubclassOf(CometEvent::class)) {
-                @Suppress("UNCHECKED_CAST")
                 registerListener(clazz) { subEvent ->
                     if (subEvent is CometEvent) {
                         if (subEvent.comet != comet) {
