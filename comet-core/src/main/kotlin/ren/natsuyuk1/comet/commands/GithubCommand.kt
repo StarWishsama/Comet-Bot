@@ -284,7 +284,7 @@ class GithubCommand(
                 return
             }
 
-            GithubCommandService.fetchSubscribeRepos(subject, groupID!!)
+            GithubCommandService.fetchSubscribeRepos(subject, groupID ?: subject.id)
         }
     }
 }
