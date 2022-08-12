@@ -6,6 +6,7 @@ import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.api.group.GroupSettingManager
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometPersistDataFile
+import ren.natsuyuk1.comet.migrator.GitHubRepoMigrator
 import ren.natsuyuk1.comet.migrator.UserDataMigrator
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import kotlin.coroutines.CoroutineContext
@@ -32,6 +33,7 @@ object CometCoreService {
         startAutoSaveService()
         try {
             UserDataMigrator.migrate()
+            GitHubRepoMigrator.migrate()
         } catch (e: Exception) {
             logger.warn(e) { "在迁移用户数据时出现异常" }
         }
