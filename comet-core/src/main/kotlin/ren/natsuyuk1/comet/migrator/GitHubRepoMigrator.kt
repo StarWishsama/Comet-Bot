@@ -1,7 +1,7 @@
 package ren.natsuyuk1.comet.migrator
 
 import mu.KotlinLogging
-import ren.natsuyuk1.comet.consts.json
+import net.mamoe.yamlkt.Yaml
 import ren.natsuyuk1.comet.migrator.olddata.OldGitHubRepo
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
@@ -15,7 +15,7 @@ object GitHubRepoMigrator : IMigrator {
             return
         }
 
-        val githubRepo = File(oldFilePath, "repos.json")
+        val githubRepo = File(oldFilePath, "repos.yml")
 
         fun OldGitHubRepo.GithubRepo.migrateToSubscriber(): MutableList<GithubRepoData.Data.GithubRepo.GithubRepoSubscriber> {
             val result = mutableListOf<GithubRepoData.Data.GithubRepo.GithubRepoSubscriber>()
@@ -32,7 +32,7 @@ object GitHubRepoMigrator : IMigrator {
         }
 
         if (githubRepo.exists()) {
-            val oldRepos = json.decodeFromString(OldGitHubRepo.serializer(), githubRepo.readTextBuffered())
+            val oldRepos = Yaml.Default.decodeFromString(OldGitHubRepo.serializer(), githubRepo.readTextBuffered())
             val pendingRemove = mutableListOf<OldGitHubRepo.GithubRepo>()
 
             oldRepos.repos.forEach { repo ->
