@@ -24,7 +24,6 @@ data class OldCometUser(
     var level: OldUserLevel = OldUserLevel.USER,
     var triggerCommandTime: Long = -1,
     var genshinGachaPool: Int = 0,
-    private val permissions: MutableSet<OldCometPermission> = mutableSetOf(),
 )
 
 object UUIDSerializer : KSerializer<UUID> {
