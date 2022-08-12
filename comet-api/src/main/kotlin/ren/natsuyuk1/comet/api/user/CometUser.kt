@@ -19,6 +19,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.EmptySizedIterable
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
@@ -112,14 +113,26 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
          *
          * @param qq QQ 号
          */
-        fun findByQQ(qq: Long) = transaction { find { UserTable.qq eq qq } }
+        fun findByQQ(qq: Long) = transaction {
+            if (qq == 0L) {
+                return@transaction EmptySizedIterable<CometUser>()
+            }
+
+            find { UserTable.qq eq qq }
+        }
 
         /**
          * 通过 Telegram 账号 ID 搜索对应用户
          *
          * @param telegramID Telegram 账号 ID
          */
-        fun findByTelegramID(telegramID: Long) = transaction { find { UserTable.telegramID eq telegramID } }
+        fun findByTelegramID(telegramID: Long) = transaction {
+            if (telegramID == 0L) {
+                return@transaction EmptySizedIterable<CometUser>()
+            }
+
+            find { UserTable.telegramID eq telegramID }
+        }
 
         /**
          * Create a user to database

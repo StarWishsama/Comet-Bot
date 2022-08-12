@@ -51,9 +51,8 @@ object GithubRepoData : PersistDataFile<GithubRepoData.Data>(
             for (groupId in this.repoTarget) {
                 result.add(
                     Data.GithubRepo.GithubRepoSubscriber(
-                        groupId,
-                        subscribeBranch = this.branchFilter
-                    )
+                        groupId
+                    ).also { it.subscribeBranch.addAll(this.branchFilter) }
                 )
             }
 

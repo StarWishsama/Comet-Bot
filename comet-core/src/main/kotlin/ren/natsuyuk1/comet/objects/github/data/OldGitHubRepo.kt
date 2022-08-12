@@ -13,17 +13,5 @@ data class OldGitHubRepo(
         val repoSecret: String,
         val repoTarget: MutableSet<Long>,
         val branchFilter: MutableSet<String> = mutableSetOf(),
-    ) {
-        fun getFullName(): String {
-            return "${repoAuthor}/${repoName}"
-        }
-
-        override fun toString(): String {
-            return getFullName()
-        }
-    }
-
-    fun isEmpty(): Boolean {
-        return repos.isEmpty()
-    }
+    )
 }
