@@ -2,10 +2,9 @@ package ren.natsuyuk1.comet.objects.github.data
 
 import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
-import ren.natsuyuk1.comet.consts.json
+import ren.natsuyuk1.comet.api.event.logger
+import ren.natsuyuk1.comet.migrator.GitHubRepoMigrator
 import ren.natsuyuk1.comet.utils.file.configDirectory
-import ren.natsuyuk1.comet.utils.file.readTextBuffered
-import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import java.io.File
 
 object GithubRepoData : PersistDataFile<GithubRepoData.Data>(
@@ -37,40 +36,10 @@ object GithubRepoData : PersistDataFile<GithubRepoData.Data>(
     override suspend fun init() {
         super.init()
 
-        val oldFile = resolveDirectory("/old_comet")
-
-        if (!oldFile.exists() || !oldFile.isDirectory) {
-            return
-        }
-
-        val githubRepo = File(oldFile, "repos.json")
-
-        fun OldGitHubRepo.GithubRepo.migrateToSubscriber(): MutableList<Data.GithubRepo.GithubRepoSubscriber> {
-            val result = mutableListOf<Data.GithubRepo.GithubRepoSubscriber>()
-
-            for (groupId in this.repoTarget) {
-                result.add(
-                    Data.GithubRepo.GithubRepoSubscriber(
-                        groupId
-                    ).also { it.subscribeBranch.addAll(this.branchFilter) }
-                )
-            }
-
-            return result
-        }
-
-        if (githubRepo.exists()) {
-            val oldRepos = json.decodeFromString(OldGitHubRepo.serializer(), githubRepo.readTextBuffered())
-            oldRepos.repos.forEach { repo ->
-                GithubRepoData.data.repos.add(
-                    Data.GithubRepo(
-                        repo.repoName,
-                        repo.repoAuthor,
-                        repo.repoSecret,
-                        repo.migrateToSubscriber()
-                    )
-                )
-            }
+        try {
+            GitHubRepoMigrator.migrate()
+        } catch (e: Exception) {
+            logger.warn(e) { "在迁移 GitHub 仓库数据时出现问题" }
         }
     }
 

@@ -1,4 +1,4 @@
-package ren.natsuyuk1.comet.objects.github.data
+package ren.natsuyuk1.comet.migrator.olddata
 
 import kotlinx.serialization.Serializable
 

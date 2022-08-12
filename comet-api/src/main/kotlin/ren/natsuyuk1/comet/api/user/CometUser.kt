@@ -53,7 +53,6 @@ object UserTable : UUIDTable("user_data") {
     val userLevel = enumeration<UserLevel>("user_level").default(UserLevel.USER)
     val r6sAccount = varchar("r6s_account", 15).default("")
     val triggerCommandTime = timestamp("trigger_command_time").default(Clock.System.now())
-    val genshinGachaPool: Column<Int> = integer("genshin_gacha_pool").default(0)
 }
 
 /**
@@ -74,7 +73,6 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
     var userLevel by UserTable.userLevel
     var r6sAccount by UserTable.r6sAccount
     var triggerCommandTime by UserTable.triggerCommandTime
-    var genshinGachaPool by UserTable.genshinGachaPool
 
     companion object : EntityClass<UUID, CometUser>(UserTable) {
         /**
