@@ -23,7 +23,8 @@ val GITHUB = CommandProperty(
     "/github sub [仓库名] 订阅仓库\n" +
         "/github unsub [仓库名] 取消订阅仓库\n" +
         "/github info [仓库名/URL] 查询仓库信息\n" +
-        "/github setting [仓库名] 修改仓库订阅事件"
+        "/github setting [仓库名] 修改仓库订阅事件\n" +
+        "/github list 查询已订阅的仓库"
 )
 
 class GithubCommand(
@@ -39,7 +40,8 @@ class GithubCommand(
             Subscribe(subject, sender, user),
             UnSubscribe(subject, sender, user),
             Info(comet, subject, sender, user),
-            Setting(message, subject, sender, user)
+            Setting(message, subject, sender, user),
+            List(subject, sender, user)
         )
     }
 
@@ -251,6 +253,28 @@ class GithubCommand(
                     }
                 }
             }
+        }
+    }
+
+    class List(
+        override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
+        override val user: CometUser
+    ) : CometSubCommand(subject, sender, user, LIST) {
+        companion object {
+            val LIST = SubCommandProperty("list", listOf("ls", "列表"), GITHUB)
+        }
+
+        private val repoName by argument(help = "GitHub 仓库名称")
+        private val groupID by option("-g", "--group", help = "群号").long()
+
+        override suspend fun run() {
+            if (subject !is Group && groupID == null) {
+                subject.sendMessage("请提供欲订阅 GitHub 仓库动态的群号!".toMessageWrapper())
+                return
+            }
+
+            GithubCommandService.fetchSubscribeRepos(subject, repoName, groupID!!)
         }
     }
 }
