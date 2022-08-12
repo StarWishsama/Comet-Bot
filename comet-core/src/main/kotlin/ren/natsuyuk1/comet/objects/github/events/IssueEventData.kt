@@ -134,5 +134,5 @@ data class IssueEventData(
         return action == "opened" || action == "closed"
     }
 
-    override fun type(): String = "issue"
+    override fun type(): String = "issues"
 }
