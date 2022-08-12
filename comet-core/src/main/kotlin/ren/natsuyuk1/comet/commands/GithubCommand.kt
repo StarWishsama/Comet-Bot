@@ -181,12 +181,24 @@ class GithubCommand(
                 val repo = GithubRepoData.find(repoName) ?: return
 
                 if (branch != null) {
-                    val result = repo.subscribers.find { it.id == groupID }?.subscribeBranch?.add(branch!!)
+                    val target = repo.subscribers.find { it.id == groupID }
 
-                    if (result == true) {
+                    val result = if (target == null) {
+                        GithubRepoData.Data.GithubRepo.GithubRepoSubscriber(
+                            groupID ?: subject.id
+                        ).also {
+                            it.subscribeBranch.add(branch!!)
+                            repo.subscribers.add(it)
+                        }
+                        true
+                    } else {
+                        target.subscribeBranch.add(branch!!)
+                    }
+
+                    if (result) {
                         subject.sendMessage("成功订阅分支 $branch".toMessageWrapper())
                     } else {
-                        subject.sendMessage("在取消订阅分支时发生了异常".toMessageWrapper())
+                        subject.sendMessage("在订阅分支时发生了异常".toMessageWrapper())
                     }
                 }
 
@@ -196,7 +208,7 @@ class GithubCommand(
                     if (result == true) {
                         subject.sendMessage("成功订阅事件 $branch".toMessageWrapper())
                     } else {
-                        subject.sendMessage("在取消订阅事件时发生了异常".toMessageWrapper())
+                        subject.sendMessage("在订阅事件时发生了异常".toMessageWrapper())
                     }
                 }
             }
