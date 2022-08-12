@@ -137,14 +137,25 @@ class GithubCommand(
             subcommands(Add(subject, sender, user), Remove(subject, sender, user))
         }
 
+        private val repoName by argument(help = "GitHub 仓库名称")
+        private val groupID by option("-g", "--group", help = "群号").long()
+
         companion object {
             val SETTING = SubCommandProperty("setting", listOf("st", "设置"), GITHUB)
         }
 
         override suspend fun run() {
-            if (message.parseToString().toArgs().size == 2) {
-                subject.sendMessage(GITHUB.helpText.toMessageWrapper())
+            if (subject !is Group && groupID == null) {
+                subject.sendMessage("请提供欲订阅 GitHub 仓库动态的群号!".toMessageWrapper())
+                return
             }
+
+            if (!GithubRepoData.exists(repoName, groupID ?: subject.id)) {
+                subject.sendMessage("找不到你要查询的仓库, 可能是没有订阅过?".toMessageWrapper())
+                return
+            }
+
+            GithubCommandService.fetchRepoSetting(subject, repoName, groupID ?: subject.id)
         }
 
         class Add(

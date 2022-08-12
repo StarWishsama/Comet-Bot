@@ -193,4 +193,28 @@ object GithubCommandService {
             )
         }
     }
+
+    fun fetchRepoSetting(subject: PlatformCommandSender, repoName: String, groupID: Long) {
+        if (!repoRegex.matches(repoName)) {
+            subject.sendMessage("请输入有效的 GitHub 仓库名称, 例如 StarWishsama/Comet-Bot".toMessageWrapper())
+        } else {
+            val repo =
+                GithubRepoData.data.repos.find { it.getName() == repoName && it.subscribers.any { g -> g.id == groupID } }
+
+            if (repo == null) {
+                subject.sendMessage("找不到你想要查询设置的 GitHub 仓库".toMessageWrapper())
+            } else {
+                val subSetting = repo.subscribers.find { it.id == groupID } ?: kotlin.run {
+                    subject.sendMessage("该群聊未订阅此 GitHub 仓库".toMessageWrapper())
+                    return
+                }
+
+                subject.sendMessage(buildMessageWrapper {
+                    appendText("当前仓库 ${repo.getName()}", true)
+                    appendText("订阅分支 >> ${subSetting.subscribeBranch}", true)
+                    appendText("订阅事件 >> ${subSetting.subscribeEvent}", true)
+                })
+            }
+        }
+    }
 }
