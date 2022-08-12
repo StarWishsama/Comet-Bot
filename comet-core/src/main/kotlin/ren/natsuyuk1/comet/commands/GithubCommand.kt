@@ -171,7 +171,7 @@ class GithubCommand(
                     return
                 }
 
-                if (GithubRepoData.exists(repoName, groupID ?: subject.id)) {
+                if (!GithubRepoData.exists(repoName, groupID ?: subject.id)) {
                     subject.sendMessage("找不到你要查询的仓库, 可能是没有订阅过?".toMessageWrapper())
                     return
                 }
