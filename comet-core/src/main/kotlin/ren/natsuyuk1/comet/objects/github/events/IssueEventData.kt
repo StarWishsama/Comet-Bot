@@ -55,7 +55,7 @@ data class IssueEventData(
         val body: String?,
         val user: UserObject,
         @SerialName("state_reason")
-        val stateReason: IssueStateReason,
+        val stateReason: IssueStateReason? = null,
     ) {
         @Serializable
         data class UserObject(
@@ -112,7 +112,10 @@ data class IssueEventData(
 
             "closed" -> {
                 wrapper.appendText("\uD83D\uDC1B ${repository.fullName} 议题 #${issue.number} 关闭\n")
-                wrapper.appendText("by ${issue.user.login}\n关闭理由为 ${issue.stateReason.display}\n")
+                wrapper.appendText("by ${issue.user.login}\n")
+                if (issue.stateReason != null) {
+                    wrapper.appendText("关闭理由为 ${issue.stateReason.display}")
+                }
             }
         }
 
