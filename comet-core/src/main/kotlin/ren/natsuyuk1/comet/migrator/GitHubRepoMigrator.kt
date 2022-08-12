@@ -32,6 +32,8 @@ object GitHubRepoMigrator : IMigrator {
         }
 
         if (githubRepo.exists()) {
+            logger.info { "正在导入 GitHub 仓库订阅信息." }
+
             val oldRepos = Yaml.Default.decodeFromString(OldGitHubRepo.serializer(), githubRepo.readTextBuffered())
             val pendingRemove = mutableListOf<OldGitHubRepo.GithubRepo>()
 

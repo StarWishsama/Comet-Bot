@@ -31,6 +31,8 @@ object UserDataMigrator : IMigrator {
         }
 
         try {
+            logger.info { "正在导入用户数据." }
+
             userCache.putAll(json.decodeFromString(userFile.readTextBuffered()))
             val pendingRemove = mutableListOf<Long>()
 
