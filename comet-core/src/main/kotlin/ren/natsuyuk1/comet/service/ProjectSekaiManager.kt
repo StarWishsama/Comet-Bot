@@ -30,10 +30,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.profile.PJSKM
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestPredictionInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
-import ren.natsuyuk1.comet.utils.file.cacheDirectory
-import ren.natsuyuk1.comet.utils.file.readTextBuffered
-import ren.natsuyuk1.comet.utils.file.resolveResourceDirectory
-import ren.natsuyuk1.comet.utils.file.touch
+import ren.natsuyuk1.comet.utils.file.*
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 import ren.natsuyuk1.comet.utils.skiko.FontUtil
@@ -151,7 +148,31 @@ object ProjectSekaiManager {
         /**
          * Load Sekai Music Difficulties Info
          */
-        loadSpecificDatabase("musicDifficulties.json", PJSKMusicDifficultyInfo.serializer(), musicDiffDatabase)
+
+        val musicDiffFile = File(pjskFolder, "musicDifficulties.json")
+
+        suspend fun loadMusicDiff() {
+            try {
+                musicDiffDatabase.addAll(
+                    json.decodeFromString(
+                        ListSerializer(PJSKMusicDifficultyInfo.serializer()),
+                        musicDiffFile.readTextBuffered()
+                    )
+                )
+            } catch (e: SerializationException) {
+                logger.warn(e) { "解析音乐数据时出现问题, 路径 ${musicDiffFile.absPath}" }
+            }
+        }
+
+        if (musicDiffFile.exists()) {
+            loadMusicDiff()
+        } else {
+            musicDiffFile.touch()
+            scope.launch {
+                cometClient.client.downloadFile("https://musics.pjsekai.moe/musicDifficulties.json", musicDiffFile)
+                loadMusicDiff()
+            }
+        }
 
         /**
          * Load Sekai Music Info
@@ -237,7 +258,9 @@ object ProjectSekaiManager {
         val diffInfo =
             musicDiffDatabase.find { it.musicId == songId && it.musicDifficulty == difficulty } ?: return null
 
-        return diffInfo.playLevel + diffInfo.playLevelAdjust
+        println(musicDiffDatabase)
+
+        return diffInfo.playLevel + (diffInfo.playLevelAdjust ?: 0.0)
     }
 
     fun getLatestRankSeason(): Int? = rankSeasonInfo.lastOrNull()?.id
