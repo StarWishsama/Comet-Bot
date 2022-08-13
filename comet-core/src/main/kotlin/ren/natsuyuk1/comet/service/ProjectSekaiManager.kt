@@ -258,9 +258,7 @@ object ProjectSekaiManager {
         val diffInfo =
             musicDiffDatabase.find { it.musicId == songId && it.musicDifficulty == difficulty } ?: return null
 
-        println(musicDiffDatabase)
-
-        return diffInfo.playLevel + (diffInfo.playLevelAdjust ?: 0.0)
+        return diffInfo.playLevel + diffInfo.playLevelAdjust
     }
 
     fun getLatestRankSeason(): Int? = rankSeasonInfo.lastOrNull()?.id
