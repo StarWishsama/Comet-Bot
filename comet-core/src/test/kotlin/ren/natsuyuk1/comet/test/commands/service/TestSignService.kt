@@ -10,12 +10,17 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.database.DatabaseManager
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserPermissionTable
 import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.commands.service.SignInService
+import ren.natsuyuk1.comet.commands.service.isSigned
 import ren.natsuyuk1.comet.test.initTestDatabase
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -47,6 +52,31 @@ class TestSignService {
         }
 
         assertEquals(1, SignInService.getSignInPosition(testUser))
+    }
+
+    @Test
+    fun testIsSigned() {
+        val testCheckInTime = Clock.System.now()
+
+        val user = CometUser.getUserOrCreate(114514L, LoginPlatform.MIRAI)?.also {
+            transaction {
+                it.checkInDate = testCheckInTime.minus(1.days).toLocalDateTime(TimeZone.currentSystemDefault())
+            }
+        } ?: return
+
+        assertFalse { user.isSigned() }
+
+        transaction {
+            user.checkInDate = testCheckInTime.plus(1.days).toLocalDateTime(TimeZone.currentSystemDefault())
+        }
+
+        assertTrue { user.isSigned() }
+
+        transaction {
+            user.checkInDate = testCheckInTime.toLocalDateTime(TimeZone.currentSystemDefault())
+        }
+
+        assertTrue { user.isSigned() }
     }
 
     @AfterAll

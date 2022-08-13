@@ -26,8 +26,11 @@ import java.math.RoundingMode
 import java.security.SecureRandom
 
 fun CometUser.isSigned(): Boolean {
-    val currentTime = Clock.System.now()
-    return (currentTime - checkInDate.toInstant(TimeZone.currentSystemDefault())).inWholeDays < 1
+    val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val checkInRefreshTime =
+        LocalDateTime(LocalDate(currentTime.year, currentTime.month, currentTime.dayOfMonth), LocalTime(0, 0, 0))
+
+    return checkInDate > checkInRefreshTime
 }
 
 object SignInService {

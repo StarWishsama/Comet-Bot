@@ -180,6 +180,8 @@ object ProjectSekaiManager {
                         file.readTextBuffered()
                     )
                 )
+
+                logger.info { "已加载 Project Sekai $fileName 数据" }
             } catch (e: SerializationException) {
                 logger.warn(e) { "解析 $fileName 数据时出现问题" }
             }
