@@ -37,4 +37,5 @@ dependencies {
     compileOnly("com.zaxxer:HikariCP:_")
     compileOnly("org.jsoup:jsoup:_")
     compileOnly("org.jetbrains.skiko:skiko:_")
+    compileOnly("com.aayushatharva.brotli4j:brotli4j:1.7.1")
 }

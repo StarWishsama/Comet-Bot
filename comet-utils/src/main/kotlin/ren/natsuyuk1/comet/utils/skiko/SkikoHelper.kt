@@ -15,6 +15,9 @@ import org.jetbrains.skiko.hostId
 import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
+import ren.natsuyuk1.comet.utils.systeminfo.OsArch
+import ren.natsuyuk1.comet.utils.systeminfo.OsType
+import ren.natsuyuk1.comet.utils.systeminfo.RuntimeUtil
 import java.io.File
 import java.nio.file.Path
 import java.util.zip.ZipEntry
@@ -61,34 +64,28 @@ object SkikoHelper {
 
         skikoLibFolder.mkdirs()
 
-        val osName = System.getProperty("os.name")
-        val hostOs = when {
-            osName == "Mac OS X" -> "macos"
-            osName.startsWith("Win") -> "windows"
-            osName.startsWith("Linux") -> "linux"
-            else -> {
-                logger.error { "检测到不受支持的系统 $osName, 图片生成功能将被禁用." }
-                return
-            }
+
+        val skikoOsName = when (RuntimeUtil.getOsType()) {
+            OsType.MACOS -> "macos"
+            OsType.WINDOWS -> "windows"
+            OsType.LINUX -> "linux"
+            else -> return
         }
 
-        val hostArch = when (val osArch = System.getProperty("os.arch")) {
-            "x86_64", "amd64" -> "x64"
-            "aarch64" -> "arm64"
-            else -> {
-                logger.error { "检测到不受支持的系统架构 $osArch, 图片生成功能将被禁用." }
-                return
-            }
+        val skikoArchName = when (RuntimeUtil.getOsArch()) {
+            OsArch.X86_64 -> "x64"
+            OsArch.ARM64 -> "arm64"
+            else -> return
         }
 
         if (skikoLibFolder.listFiles()?.isEmpty() == true) {
             logger.info { "开始下载 Skiko $SKIKO_VERSION 依赖库." }
             val downloadURL =
-                "https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/skiko/skiko-awt-runtime-${hostOs}-${hostArch}/$SKIKO_VERSION/skiko-awt-runtime-${hostOs}-${hostArch}-$SKIKO_VERSION.jar"
+                "https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/skiko/skiko-awt-runtime-${skikoOsName}-${skikoArchName}/$SKIKO_VERSION/skiko-awt-runtime-${skikoOsName}-${skikoArchName}-$SKIKO_VERSION.jar"
 
             kotlin.runCatching {
                 val tmpDownloadFile =
-                    skikoLibFolder.resolve("skiko-awt-runtime-${hostOs}-${hostArch}-$SKIKO_VERSION.jar")
+                    skikoLibFolder.resolve("skiko-awt-runtime-${skikoOsName}-${skikoArchName}-$SKIKO_VERSION.jar")
                 client.downloadFile(downloadURL, tmpDownloadFile)
                 val zip = runInterruptible {
                     ZipFile(tmpDownloadFile)
@@ -107,7 +104,7 @@ object SkikoHelper {
                     return
                 }, skikoLib.toPath())
 
-                if (hostOs == "windows") {
+                if (skikoOsName == "windows") {
                     val extraEntry = zip.getEntry("icudtl.dat") ?: kotlin.run {
                         logger.warn { "下载的 Skiko 文件缺失, 请自行下载." }
                         return

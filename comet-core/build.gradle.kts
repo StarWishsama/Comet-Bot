@@ -20,23 +20,6 @@ repositories {
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
-val osName = System.getProperty("os.name")
-
-val hostOs = when {
-    osName == "Mac OS X" -> "macos"
-    osName.startsWith("Win") -> "windows"
-    osName.startsWith("Linux") -> "linux"
-    else -> error("Unsupported OS: $osName")
-}
-
-val osArch = System.getProperty("os.arch")
-
-var hostArch = when (osArch) {
-    "x86_64", "amd64" -> "x64"
-    "aarch64" -> "arm64"
-    else -> error("Unsupported arch: $osArch")
-}
-
 dependencies {
     implementation(project(":comet-api"))
     implementation(project(":comet-utils"))
@@ -52,10 +35,13 @@ dependencies {
 
     implementation("io.ktor:ktor-server-core:_")
     implementation("io.ktor:ktor-server-netty:_")
+    implementation("io.ktor:ktor-client-websockets:_")
 
     implementation("org.jsoup:jsoup:_")
 
     implementation("moe.sdl.yabapi:yabapi-core-jvm:_")
 
     implementation("org.jetbrains.skiko:skiko:_")
+
+    implementation("com.aayushatharva.brotli4j:brotli4j:1.7.1")
 }

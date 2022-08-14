@@ -17,6 +17,30 @@ object RuntimeUtil {
         return "${osMX.name} ${osMX.version} (${osMX.arch})"
     }
 
+    fun getOsType(): OsType {
+        val osName = getOperatingSystemBean().name
+
+        return when {
+            osName == "Mac OS X" -> OsType.MACOS
+            osName.startsWith("Win") -> OsType.WINDOWS
+            osName.startsWith("Linux") -> OsType.LINUX
+            else -> {
+                logger.error { "检测到不受支持的系统 $osName, 部分功能将被禁用." }
+                OsType.UNSUPPORTED
+            }
+        }
+    }
+
+    fun getOsArch(): OsArch =
+        when (val osArch = getOperatingSystemBean().arch) {
+            "x86_64", "amd64" -> OsArch.X86_64
+            "aarch64" -> OsArch.ARM64
+            else -> {
+                logger.error { "检测到不受支持的系统架构 $osArch, 部分功能将被禁用." }
+                OsArch.UNSUPPORTED
+            }
+        }
+
     fun getOsName(): String {
         val osMX = getOperatingSystemBean()
         return osMX.name
