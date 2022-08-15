@@ -15,5 +15,5 @@ interface IComet {
      *
      * @return [Group]，可能为空
      */
-    fun getGroup(id: Long): Group?
+    suspend fun getGroup(id: Long): Group?
 }

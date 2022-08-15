@@ -1,24 +1,24 @@
 package ren.natsuyuk1.comet.telegram
 
-import com.github.kotlintelegrambot.Bot
-import com.github.kotlintelegrambot.bot
-import com.github.kotlintelegrambot.dispatch
-import com.github.kotlintelegrambot.dispatcher.message
-import com.github.kotlintelegrambot.extensions.filters.Filter
+import dev.inmo.tgbotapi.bot.TelegramBot
+import dev.inmo.tgbotapi.bot.ktor.telegramBot
+import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
+import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
+import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onContentMessage
+import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.flushAccumulatedUpdates
+import dev.inmo.tgbotapi.types.chat.GroupChat
+import dev.inmo.tgbotapi.types.toChatId
 import kotlinx.coroutines.launch
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
-import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.listener.registerListeners
 import ren.natsuyuk1.comet.service.subscribeGithubEvent
 import ren.natsuyuk1.comet.telegram.contact.toCometGroup
 import ren.natsuyuk1.comet.telegram.event.toCometEvent
-import ren.natsuyuk1.comet.telegram.util.chatID
 import ren.natsuyuk1.comet.telegram.util.format
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
-import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
 
 private val logger = mu.KotlinLogging.logger("Comet-Telegram")
 
@@ -28,32 +28,23 @@ class TelegramComet(
      */
     config: CometConfig
 ) : Comet(config, logger, ModuleScope("telegram ${config.id}")) {
-    lateinit var bot: Bot
+    lateinit var bot: TelegramBot
     override val id: Long
         get() = config.id
 
     override fun login() {
-        bot = bot {
-            token = config.password
-            dispatch {
-                message(Filter.Text) {
-                    if (this.message.date.toInstant() >= initTime) {
-                        logger.trace { this.message.format() }
-                        scope.launch { toCometEvent(this@TelegramComet)?.broadcast() }
-                    }
-                }
+        bot = telegramBot(config.password)
 
-                // When bot no access to message
-                message(Filter.Command) {
-                    if (this.message.date.toInstant() >= initTime) {
-                        logger.trace { this.message.format() }
-                        scope.launch { toCometEvent(this@TelegramComet, true)?.broadcast() }
-                    }
+        scope.launch {
+            bot.flushAccumulatedUpdates()
+
+            bot.buildBehaviourWithLongPolling {
+                onContentMessage {
+                    logger.trace { it.format() }
+                    scope.launch { it.toCometEvent(this@TelegramComet, false) }
                 }
-            }
+            }.join()
         }
-
-        bot.startPolling()
 
         logger.info { "成功登录 Telegram Bot ${config.id}" }
     }
@@ -65,17 +56,19 @@ class TelegramComet(
     }
 
     override fun close() {
-        bot.stopPolling()
+        bot.close()
     }
 
     /**
      * Telegram Bot 并不能获取到某个群
      */
-    override fun getGroup(id: Long): Group? {
-        val resp = bot.getChat(id.chatID())
+    override suspend fun getGroup(id: Long): Group? {
+        val chat = bot.getChat(id.toChatId())
 
-        if (resp.isError) return null
-
-        return resp.getOrNull()?.toCometGroup(this)
+        return if (chat is GroupChat) {
+            chat.toCometGroup(this)
+        } else {
+            null
+        }
     }
 }

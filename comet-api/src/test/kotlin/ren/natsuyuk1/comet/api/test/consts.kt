@@ -19,7 +19,7 @@ val fakeComet = object : Comet(CometConfig(0, "", LoginPlatform.TEST), logger, M
 
     override fun close() {}
 
-    override fun getGroup(id: Long): Group? = null
+    override suspend fun getGroup(id: Long): Group? = null
 }
 
 val fakeSender = object : PlatformCommandSender() {

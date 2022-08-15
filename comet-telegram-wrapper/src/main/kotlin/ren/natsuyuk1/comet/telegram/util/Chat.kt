@@ -1,11 +1,7 @@
 package ren.natsuyuk1.comet.telegram.util
 
-import com.github.kotlintelegrambot.entities.Chat
-import com.github.kotlintelegrambot.entities.User
+import dev.inmo.tgbotapi.types.chat.User
 import ren.natsuyuk1.comet.utils.string.blankIfNull
 
-fun Chat.getDisplayName() = username ?: (this.firstName.blankIfNull() + " " + this.lastName.blankIfNull()).trim()
-
-fun Chat.usernameOrDisplay() = this.username ?: getDisplayName()
-
-fun User.getDisplayName() = username ?: (this.firstName.blankIfNull() + " " + this.lastName.blankIfNull()).trim()
+fun User.getDisplayName() =
+    username?.usernameWithoutAt ?: (this.firstName.blankIfNull() + " " + this.lastName.blankIfNull()).trim()

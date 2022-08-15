@@ -83,5 +83,5 @@ class MiraiComet(
         miraiBot.close()
     }
 
-    override fun getGroup(id: Long): Group? = cl.runWith { miraiBot.getGroup(id)?.toCometGroup(this) }
+    override suspend fun getGroup(id: Long): Group? = cl.runWith { miraiBot.getGroup(id)?.toCometGroup(this) }
 }

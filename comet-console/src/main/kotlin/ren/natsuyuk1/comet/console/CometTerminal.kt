@@ -58,7 +58,7 @@ private val dummyComet = object : Comet(CometConfig(0, "", LoginPlatform.TEST), 
 
     override fun close() {}
 
-    override fun getGroup(id: Long): Group? = null
+    override suspend fun getGroup(id: Long): Group? = null
 }
 
 object CometTerminal {

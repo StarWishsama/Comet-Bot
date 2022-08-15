@@ -1,16 +1,23 @@
 package ren.natsuyuk1.comet.telegram.contact
 
-import com.github.kotlintelegrambot.entities.ChatId
-import com.github.kotlintelegrambot.entities.ChatPermissions
-import com.github.kotlintelegrambot.entities.User
+import dev.inmo.tgbotapi.extensions.api.chat.members.banChatMember
+import dev.inmo.tgbotapi.extensions.api.chat.members.getChatMember
+import dev.inmo.tgbotapi.extensions.api.chat.members.promoteChatMember
+import dev.inmo.tgbotapi.extensions.api.chat.members.restrictChatMember
+import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.TelegramDate
+import dev.inmo.tgbotapi.types.chat.ChatPermissions
+import dev.inmo.tgbotapi.types.chat.User
+import dev.inmo.tgbotapi.types.chat.member.BannedChatMember
+import dev.inmo.tgbotapi.types.toChatId
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.impl.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.telegram.TelegramComet
-import ren.natsuyuk1.comet.telegram.util.chatID
 import ren.natsuyuk1.comet.telegram.util.getDisplayName
 import ren.natsuyuk1.comet.telegram.util.send
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
@@ -41,19 +48,19 @@ class TelegramGroupMemberImpl(
     override val remark: String
         get() = name
     override val id: Long
-        get() = user.id
+        get() = user.id.chatId
     override val joinTimestamp: Int
         get() = 0
     override val lastActiveTimestamp: Int
         get() = 0
     override val remainMuteTime: Int
-        get() = run<Int> {
-            val resp = comet.bot.getChatMember(groupChatID.chatID(), user.id)
+        get() = runBlocking<Int> {
+            val resp = comet.bot.getChatMember(groupChatID.toChatId(), user)
 
-            if (resp.isError) {
-                return@run -1
+            if (resp is BannedChatMember) {
+                (System.currentTimeMillis() - (resp.untilDate?.asDate?.unixMillisLong ?: return@runBlocking -1)).toInt()
             } else {
-                Clock.System.now().epochSeconds.toInt() - (resp.getOrNull()?.forceReply ?: return@run -1)
+                -1
             }
         }
     override val groupID: Long
@@ -62,22 +69,31 @@ class TelegramGroupMemberImpl(
     // When seconds more than 366 days or less than 30 seconds from the current time, they are considered to be restricted forever
     override suspend fun mute(seconds: Int) {
         val triggerTime = Clock.System.now()
-        comet.bot.restrictChatMember(ChatId.fromId(groupID), id, MUTE, (triggerTime + seconds.seconds).epochSeconds)
+        comet.bot.restrictChatMember(
+            groupID.toChatId(),
+            id.toChatId(),
+            TelegramDate((triggerTime + seconds.seconds).epochSeconds),
+            MUTE
+        )
     }
 
     override suspend fun unmute() {
-        comet.bot.restrictChatMember(ChatId.fromId(groupID), id, UNMUTE)
+        comet.bot.restrictChatMember(groupID.toChatId(), id.toChatId(), permissions = UNMUTE)
     }
 
     override suspend fun kick(reason: String, block: Boolean) {
-        comet.bot.banChatMember(groupChatID.chatID(), id)
+        comet.bot.banChatMember(groupChatID.toChatId(), id.toChatId())
     }
 
     override suspend fun operateAdminPermission(operation: Boolean) {
-        if (operation) comet.bot.promoteChatMember(groupChatID.chatID(), id)
+        if (operation) comet.bot.promoteChatMember(
+            chatId = groupChatID.toChatId(),
+            userId = id.toChatId(),
+            canManageChat = true
+        )
         else comet.bot.promoteChatMember(
-            groupChatID.chatID(),
-            id,
+            chatId = groupChatID.toChatId(),
+            userId = id.toChatId(),
             isAnonymous = false,
             canChangeInfo = false,
             canPostMessages = false,
@@ -86,7 +102,8 @@ class TelegramGroupMemberImpl(
             canInviteUsers = false,
             canRestrictMembers = false,
             canPinMessages = false,
-            canPromoteMembers = false
+            canPromoteMembers = false,
+            canManageChat = null
         )
     }
 
@@ -100,10 +117,10 @@ class TelegramGroupMemberImpl(
             ).also { it.broadcast() }
 
             if (!event.isCancelled)
-                message.send(comet, groupChatID.chatID())
+                message.send(comet, groupChatID.toChatId())
         }
     }
 }
 
-fun User.toCometGroupMember(comet: TelegramComet, groupChatID: Long): GroupMember =
-    TelegramGroupMemberImpl(this, groupChatID, comet)
+fun User.toCometGroupMember(comet: TelegramComet, groupChatID: ChatId): GroupMember =
+    TelegramGroupMemberImpl(this, groupChatID.chatId, comet)

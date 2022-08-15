@@ -1,13 +1,19 @@
 package ren.natsuyuk1.comet.telegram.util
 
-import com.github.kotlintelegrambot.entities.ChatId
-import com.github.kotlintelegrambot.entities.Message
-import com.github.kotlintelegrambot.entities.TelegramFile
-import ren.natsuyuk1.comet.consts.cometClient
+import dev.inmo.tgbotapi.extensions.api.files.downloadFile
+import dev.inmo.tgbotapi.extensions.api.send.media.sendAudio
+import dev.inmo.tgbotapi.extensions.api.send.media.sendPhoto
+import dev.inmo.tgbotapi.extensions.api.send.sendMessage
+import dev.inmo.tgbotapi.requests.abstracts.FileId
+import dev.inmo.tgbotapi.requests.abstracts.InputFile
+import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.message.content.MessageContent
+import dev.inmo.tgbotapi.types.message.content.PhotoContent
+import dev.inmo.tgbotapi.types.message.content.TextContent
 import ren.natsuyuk1.comet.telegram.TelegramComet
+import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.cacheDirectory
 import ren.natsuyuk1.comet.utils.file.touch
-import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.message.*
 import java.io.File
 
@@ -15,7 +21,7 @@ private val logger = mu.KotlinLogging.logger {}
 
 private val commandAtRegex by lazy { """(@\w*)""".toRegex() }
 
-fun MessageWrapper.send(comet: TelegramComet, target: ChatId) {
+suspend fun MessageWrapper.send(comet: TelegramComet, target: ChatId) {
     val textBuffer = StringBuffer()
 
     getMessageContent().forEach {
@@ -27,63 +33,64 @@ fun MessageWrapper.send(comet: TelegramComet, target: ChatId) {
     }
 
     if (find<Image>() != null) {
-        find<Image>()?.toTelegramFile()?.let { comet.bot.sendPhoto(target, it, caption = textBuffer.toString()) }
+        find<Image>()?.toInputFile()?.let { comet.bot.sendPhoto(target, it, text = textBuffer.toString()) }
     } else if (find<Voice>() != null) {
-        find<Voice>()?.toTelegramFile()?.let { comet.bot.sendAudio(target, it) }
+        find<Voice>()?.toInputFile()?.let { comet.bot.sendAudio(target, it) }
     } else {
         comet.bot.sendMessage(target, textBuffer.toString())
     }
 }
 
-suspend fun Message.toMessageWrapper(comet: TelegramComet, isCommand: Boolean): MessageWrapper {
-    return when {
-        photo != null -> {
+suspend fun MessageContent.toMessageWrapper(comet: TelegramComet, isCommand: Boolean): MessageWrapper {
+    return when (val content = this) {
+        is PhotoContent -> {
             buildMessageWrapper {
-                val photoIDs = mutableSetOf<String>()
+                val photoIDs = mutableSetOf<FileId>()
 
-                photo?.forEach { photoIDs.add(it.fileId) }
+                content.mediaCollection.forEach { photoIDs.add(it.fileId) }
 
                 photoIDs.forEach {
-                    val tempFile = File(cacheDirectory, it)
+                    val tempFile = File(cacheDirectory, it.fileId)
                     tempFile.touch()
                     tempFile.deleteOnExit()
 
-                    val (file, e) = comet.bot.getFile(it)
-
-                    if (e != null || file == null || !file.isSuccessful) {
-                        logger.warn(e) { "在转换 Telegram 图片为 MessageWrapper 时出现问题" }
-                        return@forEach
-                    }
-
                     kotlin.runCatching {
-                        cometClient.client.downloadFile(
-                            "https://api.telegram.org/file/bot${comet.config.password}/${file.body()?.result?.fileId}",
-                            tempFile
-                        )
+                        comet.bot.downloadFile(it)
+                    }.onSuccess { resp ->
+                        try {
+                            tempFile.writeBytes(resp)
+                            appendElement(Image(filePath = tempFile.absPath))
+                            appendText(content.text ?: "")
+                        } catch (e: Exception) {
+                            logger.warn(e) { "在转换 Telegram 图片为 Message Wrapper 时出现问题" }
+                        }
                     }.onFailure { t ->
-                        logger.warn(t) { "在转换 Telegram 图片为 MessageWrapper 时出现问题" }
-                    }.onSuccess {
-                        appendElement(Image(filePath = tempFile.canonicalPath))
-                        this@toMessageWrapper.caption?.let { it1 -> appendText(it1) }
+                        logger.warn(t) { "在转换 Telegram 图片为 Message Wrapper 时出现问题" }
+                        return@forEach
                     }
                 }
             }
         }
-        else -> buildMessageWrapper {
-            if (isCommand)
-                this@toMessageWrapper.text?.replace(commandAtRegex, "")?.let { appendText(it) }
-            else
-                this@toMessageWrapper.text?.let { appendText(it) }
+
+        is TextContent -> {
+            buildMessageWrapper {
+                if (isCommand)
+                    appendText(content.text.replace(commandAtRegex, ""))
+                else
+                    appendText(content.text)
+            }
         }
+
+        else -> MessageWrapper().setUsable(false)
     }
 }
 
-fun Image.toTelegramFile(): TelegramFile? {
+fun Image.toInputFile(): InputFile? {
     return when {
-        url.isNotBlank() -> TelegramFile.ByUrl(url)
-        filePath.isNotBlank() -> TelegramFile.ByFile(File(filePath))
+        url.isNotBlank() -> InputFile.fromUrl(url)
+        filePath.isNotBlank() -> InputFile.fromFile(File(filePath))
         else -> null
     }
 }
 
-fun Voice.toTelegramFile(): TelegramFile? = if (filePath.isNotBlank()) TelegramFile.ByFile(File(filePath)) else null
+fun Voice.toInputFile(): InputFile? = if (filePath.isNotBlank()) InputFile.fromFile(File(filePath)) else null
