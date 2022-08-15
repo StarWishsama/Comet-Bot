@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.network.thirdparty.jikipedia
 
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
@@ -9,7 +10,7 @@ private val logger = mu.KotlinLogging.logger {}
 
 object JikiPediaAPI {
     suspend fun search(comet: Comet, keyword: String): JikiPediaSearchResult {
-        return cometClient.client.post<JikiPediaSearchResult>("https://api.jikipedia.com/go/search_entities") {
+        return cometClient.client.post("https://api.jikipedia.com/go/search_entities") {
             headers {
                 append("Origin", "https://jikipedia.com")
                 append("Referer", "https://jikipedia.com")
@@ -24,7 +25,7 @@ object JikiPediaAPI {
                 append("Accept", "application/json, text/plain, */*")
             }
 
-            body = JikiPediaSearchRequest(keyword)
-        }.also { logger.debug { it } }
+            setBody(JikiPediaSearchRequest(keyword))
+        }.also { logger.debug { it } }.body()
     }
 }

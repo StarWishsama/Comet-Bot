@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.network.thirdparty.bangumi
 
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
@@ -28,10 +29,10 @@ object BangumiOnlineApi {
 
     suspend fun fetchBangumiSchedule(): BangumiOnlineScheduleData =
         cometClient.client.post("$API/api/schedule") {
-            body = FormDataContent(
+            setBody(FormDataContent(
                 Parameters.build {
                     append("tz", TimeZone.currentSystemDefault().id)
                 }
-            )
-        }
+            ))
+        }.body()
 }

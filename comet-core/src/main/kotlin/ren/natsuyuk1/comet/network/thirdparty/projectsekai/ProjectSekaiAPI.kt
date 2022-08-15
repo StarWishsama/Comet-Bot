@@ -11,7 +11,6 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import kotlinx.serialization.decodeFromString
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.CometClient
@@ -48,11 +47,11 @@ object ProjectSekaiAPI {
     suspend fun CometClient.getUserEventInfo(eventID: Int, userID: Long): SekaiProfileEventInfo {
         logger.debug { "Fetching project sekai event $eventID rank for user $userID" }
 
-        val resp = client.get<HttpStatement>("$PROFILE_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
+        val resp = client.get("$PROFILE_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
             url {
                 parameters.append("targetUserId", userID.toString())
             }
-        }.execute().receive<InputStream>()
+        }.body<InputStream>()
 
         return resp.bufferedReader()
             .use { json.decodeFromString(it.readText().also { logger.debug { "Raw content: $it" } }) }
@@ -61,11 +60,11 @@ object ProjectSekaiAPI {
     suspend fun CometClient.getSpecificRankInfo(eventID: Int, rankPosition: Int): SekaiProfileEventInfo {
         logger.debug { "Fetching project sekai event $eventID rank position at $rankPosition" }
 
-        val resp = client.get<HttpStatement>("$PROFILE_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
+        val resp = client.get("$PROFILE_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
             url {
                 parameters.append("targetRank", rankPosition.toString())
             }
-        }.execute().receive<InputStream>()
+        }.body<InputStream>()
 
         return resp.bufferedReader()
             .use { json.decodeFromString(it.readText().also { logger.debug { "Raw content: $it" } }) }
@@ -82,19 +81,19 @@ object ProjectSekaiAPI {
                     append("$" + "skip", skip.toString())
                 }
             }
-        }
+        }.body()
     }
 
     suspend fun CometClient.getRankPredictionInfo(): SekaiBestPredictionInfo {
         logger.debug { "Fetching project sekai rank prediction info" }
 
-        return client.get(THREE3KIT_URL)
+        return client.get(THREE3KIT_URL).body()
     }
 
     suspend fun CometClient.getUserInfo(id: Long): ProjectSekaiUserInfo {
         logger.debug { "Fetching project sekai user info for $id" }
 
-        val resp = client.get<HttpStatement>("$PROFILE_URL/api/user/$id/profile").execute().receive<InputStream>()
+        val resp = client.get("$PROFILE_URL/api/user/$id/profile").body<InputStream>()
 
         return resp.bufferedReader()
             .use { json.decodeFromString(it.readText().also { logger.debug { "Raw content: $it" } }) }
@@ -104,11 +103,11 @@ object ProjectSekaiAPI {
         logger.debug { "Fetching project sekai rank season #$rankSeasonId info for $userId" }
 
         val resp =
-            client.get<HttpStatement>("$PROFILE_URL/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
+            client.get("$PROFILE_URL/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
                 url {
                     parameters.append("targetUserId", userId.toString())
                 }
-            }.execute().receive<InputStream>()
+            }.body<InputStream>()
 
         return resp.bufferedReader()
             .use { json.decodeFromString(it.readText().also { logger.debug { "Raw content: $it" } }) }

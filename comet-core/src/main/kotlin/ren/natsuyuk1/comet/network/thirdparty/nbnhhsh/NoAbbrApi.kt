@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.network.thirdparty.nbnhhsh
 
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import ren.natsuyuk1.comet.consts.cometClient
@@ -11,7 +12,7 @@ object NoAbbrApi {
 
     suspend fun search(keyword: String): List<NoAbbrSearchResult> =
         cometClient.client.post(apiRoute) {
-            body = NoAbbrSearchRequest(keyword)
+            setBody(NoAbbrSearchRequest(keyword))
             contentType(ContentType.parse("application/json"))
-        }
+        }.body()
 }

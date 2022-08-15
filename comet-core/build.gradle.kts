@@ -35,6 +35,7 @@ dependencies {
 
     implementation("io.ktor:ktor-server-core:_")
     implementation("io.ktor:ktor-server-netty:_")
+    implementation("io.ktor:ktor-server-call-logging:_")
     implementation("io.ktor:ktor-client-websockets:_")
 
     implementation("org.jsoup:jsoup:_")

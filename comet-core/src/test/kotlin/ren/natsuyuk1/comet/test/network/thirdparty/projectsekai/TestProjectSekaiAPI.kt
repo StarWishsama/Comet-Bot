@@ -9,7 +9,7 @@
 
 package ren.natsuyuk1.comet.test.network.thirdparty.projectsekai
 
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -120,7 +120,7 @@ class TestProjectSekaiAPI {
         runBlocking {
             try {
                 client.getRankPredictionInfo().toMessageWrapper().print()
-            } catch (ignored: ServerResponseException) {
+            } catch (_: ServerResponseException) {
             }
         }
     }

@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.network.thirdparty.github
 
 import cn.hutool.core.collection.ConcurrentHashSet
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import org.jsoup.Jsoup
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
@@ -16,7 +17,7 @@ object GitHubApi {
 
     suspend fun getUserInfo(username: String): Result<UserInfo?> =
         runCatching<UserInfo?> {
-            cometClient.client.get("${apiRoute}/users/${username}")
+            cometClient.client.get("${apiRoute}/users/${username}").body()
         }.onSuccess {
             userCache.add(username)
         }
@@ -26,7 +27,7 @@ object GitHubApi {
 
     suspend fun getRepoInfo(owner: String, name: String): Result<RepoInfo> =
         runCatching<RepoInfo> {
-            cometClient.client.get("$apiRoute/repos/$owner/$name")
+            cometClient.client.get("$apiRoute/repos/$owner/$name").body()
         }.onSuccess {
             repoCache.add("$owner/$name")
         }
@@ -60,6 +61,6 @@ object GitHubApi {
                 parameter("path", filePath)
                 parameter("page", page)
                 parameter("per_page", perPage)
-            }
+            }.body()
         }
 }

@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.commands.service
 
-import io.ktor.client.features.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.launch
 import moe.sdl.yabapi.data.search.results.UserResult
@@ -145,7 +146,7 @@ object BiliBiliService {
         if (s.matches(pureNumberRegex)) return s
         if (shortLinkRegex.matches(s)) {
             try {
-                cometClient.client.config { followRedirects = false }.get<String>(s)
+                cometClient.client.config { followRedirects = false }.get(s).body()
             } catch (e: RedirectResponseException) {
                 s = e.response.headers["Location"] ?: run {
                     return null

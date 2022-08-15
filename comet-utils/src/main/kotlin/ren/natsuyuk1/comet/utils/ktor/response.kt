@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.utils.ktor
 
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +13,7 @@ import java.io.InputStream
 private val logger = mu.KotlinLogging.logger("CometClient")
 
 suspend fun HttpClient.downloadFile(url: String, file: File) {
-    val resp: InputStream = get(url)
+    val resp: InputStream = get(url).body()
 
     withContext(Dispatchers.IO) {
         resp.use { input ->

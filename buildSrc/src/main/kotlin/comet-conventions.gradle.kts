@@ -51,7 +51,8 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:_")
     implementation("io.ktor:ktor-client-logging:_")
     implementation("io.ktor:ktor-client-encoding:_")
-    implementation("io.ktor:ktor-client-serialization:_")
+    implementation("io.ktor:ktor-client-content-negotiation:_")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:_")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:_")
     implementation("net.mamoe.yamlkt:yamlkt:_")

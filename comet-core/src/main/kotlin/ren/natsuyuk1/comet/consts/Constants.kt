@@ -11,10 +11,10 @@ package ren.natsuyuk1.comet.consts
 
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.features.*
-import io.ktor.client.features.compression.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.compression.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.network.CometClient
@@ -38,8 +38,8 @@ val defaultClient = HttpClient(CIO) {
         identity()
     }
 
-    install(JsonFeature) {
-        serializer = KotlinxSerializer(json)
+    install(ContentNegotiation) {
+        json(json)
     }
 }
 

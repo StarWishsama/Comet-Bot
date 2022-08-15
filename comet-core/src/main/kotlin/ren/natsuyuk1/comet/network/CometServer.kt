@@ -1,9 +1,9 @@
 package ren.natsuyuk1.comet.network
 
-import io.ktor.application.*
-import io.ktor.features.*
+import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.callloging.*
 import ren.natsuyuk1.comet.network.server.githubWebHookModule
 import ren.natsuyuk1.comet.objects.config.CometServerConfig
 

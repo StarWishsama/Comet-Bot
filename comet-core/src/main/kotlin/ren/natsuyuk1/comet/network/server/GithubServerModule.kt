@@ -1,11 +1,11 @@
 package ren.natsuyuk1.comet.network.server
 
 import cn.hutool.core.net.URLDecoder
-import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.event.pusher.github.GithubEvent
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData

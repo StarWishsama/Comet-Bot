@@ -2,7 +2,6 @@ package ren.natsuyuk1.comet.mirai.util
 
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.AudioSupported
 import net.mamoe.mirai.contact.Contact
@@ -36,7 +35,7 @@ suspend fun WrapperElement.toMessageContent(subject: Contact?): MessageContent {
 
             try {
                 if (url.isNotEmpty()) {
-                    cometClient.client.get<HttpStatement>(url).execute().receive<InputStream>().use {
+                    cometClient.client.get(url).body<InputStream>().use {
                         it.uploadAsImage(subject)
                     }
                 } else if (filePath.isNotEmpty()) {
@@ -138,7 +137,7 @@ fun MessageChain.toMessageWrapper(localImage: Boolean = false): MessageWrapper {
                 runBlocking {
                     val fileName = message.filename
                     val downloadedAudio =
-                        cometClient.client.get<HttpStatement>(message.urlForDownload).execute().receive<InputStream>()
+                        cometClient.client.get(message.urlForDownload).body<InputStream>()
 
                     downloadedAudio.use {
                         val location = File(messageWrapperDirectory, fileName)

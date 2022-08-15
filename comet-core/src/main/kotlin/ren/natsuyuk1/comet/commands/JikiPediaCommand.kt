@@ -1,6 +1,6 @@
 package ren.natsuyuk1.comet.commands
 
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.http.*
 import moe.sdl.yac.parameters.arguments.argument
 import mu.KotlinLogging
