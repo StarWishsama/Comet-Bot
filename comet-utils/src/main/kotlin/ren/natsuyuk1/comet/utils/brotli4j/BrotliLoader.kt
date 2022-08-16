@@ -19,8 +19,6 @@ import ren.natsuyuk1.comet.utils.systeminfo.OsArch
 import ren.natsuyuk1.comet.utils.systeminfo.OsType
 import ren.natsuyuk1.comet.utils.systeminfo.RuntimeUtil
 import java.io.File
-import java.nio.file.Path
-import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import kotlin.io.path.outputStream
 
@@ -133,26 +131,24 @@ object BrotliLoader {
                     ZipFile(downloadFile)
                 }
 
-                suspend fun copyEntryTo(entry: ZipEntry, output: Path) {
-                    withContext(Dispatchers.IO) {
-                        zip.getInputStream(entry).use { input ->
-                            output.outputStream().use(input::copyTo)
-                        }
-                    }
-                }
-
                 val dll = zip.getEntry("lib/$packageName/$libraryName")
 
                 if (dll == null) {
                     logger.warn { "Brotli 库下载时出现问题, 请手动下载. /lib/$packageName/${libraryName}" }
+                    downloadFile.delete()
                     return
                 }
 
-                copyEntryTo(dll, libraryLocation.toPath())
+                withContext(Dispatchers.IO) {
+                    zip.getInputStream(dll).use { input ->
+                        libraryLocation.toPath().outputStream().use(input::copyTo)
+                    }
+                }
 
                 zip.close()
             }.onFailure {
                 logger.warn(it) { "Brotli 库下载时出现问题, 请手动下载." }
+                downloadFile.delete()
                 return
             }
         }

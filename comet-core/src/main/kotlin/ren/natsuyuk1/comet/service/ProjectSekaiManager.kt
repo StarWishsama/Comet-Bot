@@ -1,7 +1,9 @@
 package ren.natsuyuk1.comet.service
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
@@ -37,6 +39,7 @@ import ren.natsuyuk1.comet.utils.skiko.FontUtil
 import java.awt.Color
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -165,7 +168,19 @@ object ProjectSekaiManager {
         }
 
         if (musicDiffFile.exists()) {
-            loadMusicDiff()
+            scope.launch {
+                val tmpFile = File(pjskFolder, "musicDifficulties.tmp").also { it.deleteOnExit() }
+                cometClient.client.downloadFile("https://musics.pjsekai.moe/musicDifficulties.json", tmpFile)
+
+                if (tmpFile.length() > musicDiffFile.length()) {
+                    withContext(Dispatchers.IO) {
+                        Files.copy(tmpFile.toPath(), musicDiffFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                        tmpFile.delete()
+                    }
+                }
+
+                loadMusicDiff()
+            }
         } else {
             musicDiffFile.touch()
             scope.launch {

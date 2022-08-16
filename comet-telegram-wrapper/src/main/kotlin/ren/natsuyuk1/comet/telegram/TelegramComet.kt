@@ -4,14 +4,17 @@ import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
+import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.CommonMessageFilter
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onContentMessage
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.flushAccumulatedUpdates
 import dev.inmo.tgbotapi.types.chat.GroupChat
+import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.toChatId
 import kotlinx.coroutines.launch
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.listener.registerListeners
 import ren.natsuyuk1.comet.service.subscribeGithubEvent
@@ -38,10 +41,14 @@ class TelegramComet(
         scope.launch {
             bot.flushAccumulatedUpdates()
 
-            bot.buildBehaviourWithLongPolling {
-                onContentMessage {
+            logger.debug { "Refreshed accumulated updates" }
+
+            bot.buildBehaviourWithLongPolling(scope) {
+                onContentMessage(CommonMessageFilter {
+                    it.chat is PrivateChat || it.chat is GroupChat
+                }) {
                     logger.trace { it.format() }
-                    scope.launch { it.toCometEvent(this@TelegramComet, false) }
+                    scope.launch { it.toCometEvent(this@TelegramComet, false)?.broadcast() }
                 }
             }.join()
         }
@@ -59,9 +66,6 @@ class TelegramComet(
         bot.close()
     }
 
-    /**
-     * Telegram Bot 并不能获取到某个群
-     */
     override suspend fun getGroup(id: Long): Group? {
         val chat = bot.getChat(id.toChatId())
 

@@ -1,6 +1,5 @@
 package ren.natsuyuk1.comet.telegram.contact
 
-import dev.inmo.tgbotapi.types.chat.PrivateChat
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
@@ -21,14 +20,14 @@ abstract class TelegramUser(
 }
 
 class TelegramUserImpl(
-    private val chat: PrivateChat,
+    private val from: dev.inmo.tgbotapi.types.chat.User,
     override val comet: TelegramComet,
-) : TelegramUser(chat.id.chatId, (chat as dev.inmo.tgbotapi.types.chat.User).getDisplayName()) {
-    override var card: String = (chat as dev.inmo.tgbotapi.types.chat.User).getDisplayName()
+) : TelegramUser(from.id.chatId, from.getDisplayName()) {
+    override var card: String = from.getDisplayName()
 
-    override val id: Long = chat.id.chatId
+    override val id: Long = from.id.chatId
 
-    override val remark: String = (chat as dev.inmo.tgbotapi.types.chat.User).getDisplayName()
+    override val remark: String = from.getDisplayName()
 
     override fun sendMessage(message: MessageWrapper) {
         comet.scope.launch {
@@ -40,9 +39,9 @@ class TelegramUserImpl(
             ).also { it.broadcast() }
 
             if (!event.isCancelled)
-                message.send(comet, chat.id)
+                message.send(comet, from.id)
         }
     }
 }
 
-fun PrivateChat.toCometUser(comet: TelegramComet): TelegramUser = TelegramUserImpl(this, comet)
+fun dev.inmo.tgbotapi.types.chat.User.toCometUser(comet: TelegramComet): TelegramUser = TelegramUserImpl(this, comet)

@@ -7,6 +7,7 @@ import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
 import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.utils.RiskFeature
+import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.event.impl.message.GroupMessageEvent
 import ren.natsuyuk1.comet.api.event.impl.message.MessageEvent
 import ren.natsuyuk1.comet.api.event.impl.message.PrivateMessageEvent
@@ -17,18 +18,24 @@ import ren.natsuyuk1.comet.telegram.contact.toCometUser
 import ren.natsuyuk1.comet.telegram.util.getDisplayName
 import ren.natsuyuk1.comet.telegram.util.toMessageWrapper
 
+private val logger = KotlinLogging.logger {}
+
 suspend fun CommonMessage<MessageContent>.toCometEvent(
     comet: TelegramComet,
     isCommand: Boolean = false
 ): MessageEvent? {
-    if (chat !is FromUser) {
+    if (this !is FromUser) {
+        logger.debug { "Incoming chat isn't `FromUser`, is ${this::class.simpleName}" }
         return null
     }
 
     return when (chat) {
         is GroupChat -> this.toCometGroupEvent(comet, isCommand)
         is PrivateChat -> this.toCometPrivateEvent(comet, isCommand)
-        else -> null
+        else -> {
+            logger.debug { "Incoming chat group chat or private chat`, is ${chat::class.simpleName}" }
+            null
+        }
     }
 }
 
@@ -55,11 +62,9 @@ suspend fun CommonMessage<MessageContent>.toCometPrivateEvent(
     comet: TelegramComet,
     isCommand: Boolean
 ): PrivateMessageEvent {
-    val privateChat = chat as PrivateChat
-
     return PrivateMessageEvent(
         comet = comet,
-        subject = privateChat.toCometUser(comet),
+        subject = from!!.toCometUser(comet),
         sender = from!!.toCometUser(comet),
         senderName = from!!.getDisplayName(),
         message = content.toMessageWrapper(comet, isCommand),

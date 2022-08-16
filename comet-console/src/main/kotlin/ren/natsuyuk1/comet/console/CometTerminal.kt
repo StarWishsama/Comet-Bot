@@ -161,12 +161,17 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
             accounts.forEach {
                 logger.info { "正在自动登录账号 ${it[AccountDataTable.id]} (${it[AccountDataTable.platform]})" }
+
                 scope.launch {
-                    login(
-                        it[AccountDataTable.id].value,
-                        it[AccountDataTable.password],
-                        it[AccountDataTable.platform]
-                    )
+                    try {
+                        login(
+                            it[AccountDataTable.id].value,
+                            it[AccountDataTable.password],
+                            it[AccountDataTable.platform]
+                        )
+                    } catch (e: Throwable) {
+                        logger.warn(e) { "登录 ${it[AccountDataTable.id]} (${it[AccountDataTable.platform]}) 失败" }
+                    }
                 }
             }
         }
