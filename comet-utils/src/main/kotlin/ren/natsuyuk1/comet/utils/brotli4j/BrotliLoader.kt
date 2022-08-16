@@ -149,6 +149,7 @@ object BrotliLoader {
                 }
 
                 zip.close()
+                downloadFile.delete()
             }.onFailure {
                 logger.warn(it) { "Brotli 库下载时出现问题, 请手动下载." }
                 downloadFile.delete()
