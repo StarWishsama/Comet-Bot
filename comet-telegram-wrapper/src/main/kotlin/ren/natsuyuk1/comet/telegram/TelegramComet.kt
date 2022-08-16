@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.telegram
 
 import dev.inmo.tgbotapi.bot.TelegramBot
+import dev.inmo.tgbotapi.bot.exceptions.CommonRequestException
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
@@ -67,11 +68,15 @@ class TelegramComet(
     }
 
     override suspend fun getGroup(id: Long): Group? {
-        val chat = bot.getChat(id.toChatId())
+        return try {
+            val chat = bot.getChat(id.toChatId())
 
-        return if (chat is GroupChat) {
-            chat.toCometGroup(this)
-        } else {
+            if (chat is GroupChat) {
+                chat.toCometGroup(this)
+            } else {
+                null
+            }
+        } catch (e: CommonRequestException) {
             null
         }
     }
