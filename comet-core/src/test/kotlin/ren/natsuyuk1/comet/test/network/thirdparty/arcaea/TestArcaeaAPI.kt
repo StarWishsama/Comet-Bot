@@ -27,7 +27,7 @@ class TestArcaeaAPI {
         if (isCI()) return
 
         runBlocking {
-            ArcaeaClient.queryUserInfo(userID).await()?.print()
+            ArcaeaClient.queryUserInfo(userID)?.getMessageWrapper()?.print()
         }
     }
 }

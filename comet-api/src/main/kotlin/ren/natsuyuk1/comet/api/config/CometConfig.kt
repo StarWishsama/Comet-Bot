@@ -39,7 +39,10 @@ object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
         var useragent: String = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.41",
 
         @Comment("命令前缀")
-        val commandPrefix: List<String> = mutableListOf("/", "!")
+        val commandPrefix: List<String> = mutableListOf("/", "!"),
+
+        @Comment("命令执行冷却, 单位秒")
+        val commandCoolDown: Int = 3
     )
 }
 

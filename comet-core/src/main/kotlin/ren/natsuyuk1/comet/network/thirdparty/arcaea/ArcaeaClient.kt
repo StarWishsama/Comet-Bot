@@ -3,8 +3,6 @@ package ren.natsuyuk1.comet.network.thirdparty.arcaea
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
@@ -31,9 +29,9 @@ object ArcaeaClient {
     private const val arcaeaAPIHost = "arc.estertion.win"
     private const val arcaeaAPIPort = 616
 
-    suspend fun queryUserInfo(userID: String): Deferred<ArcaeaUserInfo?> = scope.async {
+    suspend fun queryUserInfo(userID: String): ArcaeaUserInfo? {
         if (!BrotliDecompressor.isUsable()) {
-            return@async null
+            return null
         }
 
         val client = HttpClient {
@@ -62,6 +60,9 @@ object ArcaeaClient {
                             val incomingJson = String(BrotliDecompressor.decompress(msg.readBytes()))
                             val command: Command = json.decodeFromString(incomingJson)
 
+                            logger.debug { "Received command: $command" }
+                            logger.debug { "Received json: $incomingJson" }
+
                             when (command.command) {
                                 ArcaeaCommand.USER_INFO -> {
                                     resp = json.decodeFromString(incomingJson)
@@ -84,6 +85,6 @@ object ArcaeaClient {
             }
         }
 
-        return@async resp
+        return resp
     }
 }
