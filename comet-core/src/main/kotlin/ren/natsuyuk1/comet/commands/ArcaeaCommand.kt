@@ -40,7 +40,7 @@ class ArcaeaCommand(
 
     override suspend fun run() {
         if (message.parseToString().toArgs().size == 1) {
-            subject.sendMessage(PROJECTSEKAI.helpText.toMessageWrapper())
+            subject.sendMessage(ARCAEA.helpText.toMessageWrapper())
         }
     }
 
