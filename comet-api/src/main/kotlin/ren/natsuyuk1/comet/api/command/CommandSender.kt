@@ -11,6 +11,10 @@ package ren.natsuyuk1.comet.api.command
 
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.user.Contact
+import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.api.user.GroupMember
+import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 /**
@@ -70,3 +74,69 @@ object ConsoleCommandSender : CommandSender {
         println(message.parseToString())
     }
 }
+
+
+// region === cast ===
+
+/**
+ * Try casting [PlatformCommandSender] to [Contact] or return `null`
+ *
+ * @see [Contact]
+ */
+fun PlatformCommandSender.asContact() = this as? Contact
+
+/**
+ * Try casting [PlatformCommandSender] to [User] or return `null`
+ *
+ * @see [User]
+ */
+fun PlatformCommandSender.asUser() = this as? User
+
+/**
+ * Try casting [PlatformCommandSender] to [Group] or return `null`
+ *
+ * @see [Group]
+ */
+fun PlatformCommandSender.asGroup() = this as? Group
+
+
+/**
+ * Try casting [PlatformCommandSender] to [GroupMember] or return `null`
+ *
+ * @see [GroupMember]
+ */
+fun PlatformCommandSender.asMember() = this as? GroupMember
+
+// endregion
+
+// region === check ===
+
+/**
+ * Check [PlatformCommandSender] is [Contact] or not
+ *
+ * @see [Contact]
+ */
+fun PlatformCommandSender.isContact() = this is Contact
+
+/**
+ * Check [PlatformCommandSender] is [User] or not
+ *
+ * @see [User]
+ */
+fun PlatformCommandSender.isUser() = this is User
+
+/**
+ * Check [PlatformCommandSender] is [Group] or not
+ *
+ * @see [Group]
+ */
+fun PlatformCommandSender.isGroup() = this is GroupMember
+
+/**
+ * Check [PlatformCommandSender] is [GroupMember] or not
+ *
+ * @see [GroupMember]
+ */
+fun PlatformCommandSender.isMember() = this is GroupMember
+
+// endregion
