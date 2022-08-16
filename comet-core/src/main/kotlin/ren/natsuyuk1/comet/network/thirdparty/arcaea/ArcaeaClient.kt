@@ -4,7 +4,6 @@ import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.consts.json
@@ -12,17 +11,10 @@ import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaCommand
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.Command
 import ren.natsuyuk1.comet.utils.brotli4j.BrotliDecompressor
-import ren.natsuyuk1.comet.utils.brotli4j.BrotliLoader
 
 private val logger = KotlinLogging.logger {}
 
 object ArcaeaClient {
-    init {
-        runBlocking {
-            BrotliLoader.loadBrotli()
-        }
-    }
-
     private const val arcaeaAPIHost = "arc.estertion.win"
     private const val arcaeaAPIPort = 616
 
