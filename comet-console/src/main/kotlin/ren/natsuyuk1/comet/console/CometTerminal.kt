@@ -39,6 +39,7 @@ import ren.natsuyuk1.comet.consts.defaultCommands
 import ren.natsuyuk1.comet.network.CometServer
 import ren.natsuyuk1.comet.objects.config.CometServerConfig
 import ren.natsuyuk1.comet.service.CometCoreService
+import ren.natsuyuk1.comet.utils.brotli4j.BrotliLoader
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
@@ -158,6 +159,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         CometServer.init(CometServerConfig)
 
         SkikoHelper.findSkikoLibrary()
+        BrotliLoader.loadBrotli()
     }
 
     private fun autoLogin() {

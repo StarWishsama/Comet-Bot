@@ -80,7 +80,9 @@ object BrotliLoader {
             return
         }
 
-        val libraryLocation = File(libraryPath.split(";")[0], libraryName)
+        val libActualPath = if (libraryPath.split(";").size == 1) libraryPath.split(":") else libraryPath.split(";")
+
+        val libraryLocation = File(libActualPath[0], libraryName)
 
         if (!libraryLocation.exists()) {
             val osType = RuntimeUtil.getOsType()
@@ -141,11 +143,13 @@ object BrotliLoader {
 
                 withContext(Dispatchers.IO) {
                     zip.getInputStream(dll).use { input ->
+                        libraryLocation.touch()
                         libraryLocation.toPath().outputStream().use(input::copyTo)
                     }
                 }
 
                 zip.close()
+                downloadFile.delete()
             }.onFailure {
                 logger.warn(it) { "Brotli 库下载时出现问题, 请手动下载." }
                 downloadFile.delete()

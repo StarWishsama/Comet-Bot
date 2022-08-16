@@ -9,6 +9,7 @@ import ren.natsuyuk1.comet.api.event.EventManagerConfig
 import ren.natsuyuk1.comet.api.user.UserPermissionTable
 import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.commands.*
+import ren.natsuyuk1.comet.objects.arcaea.ArcaeaUserDataTable
 import ren.natsuyuk1.comet.objects.config.CometServerConfig
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.objects.nowcmd.NowCmdConfigTable
@@ -30,7 +31,8 @@ val cometTables =
         UserPermissionTable,
         ProjectSekaiDataTable,
         ProjectSekaiUserDataTable,
-        NowCmdConfigTable
+        NowCmdConfigTable,
+        ArcaeaUserDataTable,
     )
 
 val defaultCommands: List<AbstractCommandNode<*>> =
@@ -93,5 +95,11 @@ val defaultCommands: List<AbstractCommandNode<*>> =
             NOW,
         ) { comet, sender, subject, wrapper, user ->
             NowCommand(comet, sender, subject, wrapper, user)
+        },
+        CommandNode(
+            ARCAEA,
+            listOf(ArcaeaCommand.Bind.BIND, ArcaeaCommand.Info.INFO)
+        ) { comet, sender, subject, wrapper, user ->
+            ArcaeaCommand(comet, sender, subject, wrapper, user)
         },
     )

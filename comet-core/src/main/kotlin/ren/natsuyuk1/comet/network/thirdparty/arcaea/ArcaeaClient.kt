@@ -3,10 +3,7 @@ package ren.natsuyuk1.comet.network.thirdparty.arcaea
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.consts.json
@@ -14,26 +11,16 @@ import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaCommand
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.Command
 import ren.natsuyuk1.comet.utils.brotli4j.BrotliDecompressor
-import ren.natsuyuk1.comet.utils.brotli4j.BrotliLoader
-import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 
 private val logger = KotlinLogging.logger {}
 
 object ArcaeaClient {
-    private val scope = ModuleScope("comet_arcaea_client")
-
-    init {
-        runBlocking {
-            BrotliLoader.loadBrotli()
-        }
-    }
-
     private const val arcaeaAPIHost = "arc.estertion.win"
     private const val arcaeaAPIPort = 616
 
-    suspend fun queryUserInfo(userID: String): Deferred<ArcaeaUserInfo?> = scope.async {
+    suspend fun queryUserInfo(userID: String): ArcaeaUserInfo? {
         if (!BrotliDecompressor.isUsable()) {
-            return@async null
+            return null
         }
 
         val client = HttpClient {
@@ -62,6 +49,9 @@ object ArcaeaClient {
                             val incomingJson = String(BrotliDecompressor.decompress(msg.readBytes()))
                             val command: Command = json.decodeFromString(incomingJson)
 
+                            logger.debug { "Received command: $command" }
+                            logger.debug { "Received json: $incomingJson" }
+
                             when (command.command) {
                                 ArcaeaCommand.USER_INFO -> {
                                     resp = json.decodeFromString(incomingJson)
@@ -84,6 +74,6 @@ object ArcaeaClient {
             }
         }
 
-        return@async resp
+        return resp
     }
 }

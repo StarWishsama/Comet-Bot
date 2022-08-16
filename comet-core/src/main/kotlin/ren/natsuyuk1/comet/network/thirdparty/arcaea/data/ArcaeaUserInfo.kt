@@ -3,6 +3,9 @@ package ren.natsuyuk1.comet.network.thirdparty.arcaea.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonArray
+import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
+import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 
 @Serializable
 data class ArcaeaUserInfo(
@@ -18,7 +21,7 @@ data class ArcaeaUserInfo(
         @SerialName("name")
         val name: String,
         @SerialName("recent_score")
-        val recentPlayScore: List<ArcaeaPlayResult>,
+        val recentPlayScore: List<ArcaeaPlayResult>?,
         @SerialName("character")
         val character: Int,
         @SerialName("join_date")
@@ -26,7 +29,7 @@ data class ArcaeaUserInfo(
         @SerialName("rating")
         val rating: Int,
         @SerialName("user_code")
-        val userCode: Long,
+        val userCode: String,
         @SerialName("rating_records")
         val ratingRecord: JsonArray
     ) {
@@ -50,4 +53,25 @@ data class ArcaeaUserInfo(
             val rating: Double
         )
     }
+
+    fun getMessageWrapper(): MessageWrapper = buildMessageWrapper {
+        appendText("${data.name} | ${data.userCode}", true)
+        appendText("当前 ptt >> ${getActualPtt()}", true)
+
+        if (!data.recentPlayScore.isNullOrEmpty()) {
+            appendLine()
+            val lastPlay = data.recentPlayScore.first()
+            appendText("最近游玩 >> ${lastPlay.songName} | ${lastPlay.clearType.formatType()}")
+        }
+    }
+
+    private fun Int.formatType(): String =
+        when (this) {
+            0 -> "CLEAR"
+            1 -> "FR"
+            2 -> "PM"
+            else -> "UNKNOWN"
+        }
+
+    fun getActualPtt(): String = (data.rating / 100.0).fixDisplay()
 }
