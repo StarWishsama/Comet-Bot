@@ -80,7 +80,9 @@ object BrotliLoader {
             return
         }
 
-        val libraryLocation = File(libraryPath.split(";")[0], libraryName)
+        val libActualPath = if (libraryPath.split(";").size == 1) libraryPath.split(":") else libraryPath.split(";")
+
+        val libraryLocation = File(libActualPath[0], libraryName)
 
         if (!libraryLocation.exists()) {
             val osType = RuntimeUtil.getOsType()

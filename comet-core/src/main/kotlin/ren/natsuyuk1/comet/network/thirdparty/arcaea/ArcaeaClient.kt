@@ -13,13 +13,10 @@ import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.Command
 import ren.natsuyuk1.comet.utils.brotli4j.BrotliDecompressor
 import ren.natsuyuk1.comet.utils.brotli4j.BrotliLoader
-import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 
 private val logger = KotlinLogging.logger {}
 
 object ArcaeaClient {
-    private val scope = ModuleScope("comet_arcaea_client")
-
     init {
         runBlocking {
             BrotliLoader.loadBrotli()
