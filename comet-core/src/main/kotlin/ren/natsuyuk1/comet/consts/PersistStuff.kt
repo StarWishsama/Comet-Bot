@@ -12,6 +12,7 @@ import ren.natsuyuk1.comet.commands.*
 import ren.natsuyuk1.comet.objects.arcaea.ArcaeaUserDataTable
 import ren.natsuyuk1.comet.objects.config.CometServerConfig
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
+import ren.natsuyuk1.comet.objects.nowcmd.NowCmdConfigTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserDataTable
 
@@ -30,6 +31,7 @@ val cometTables =
         UserPermissionTable,
         ProjectSekaiDataTable,
         ProjectSekaiUserDataTable,
+        NowCmdConfigTable,
         ArcaeaUserDataTable,
     )
 
@@ -88,6 +90,11 @@ val defaultCommands: List<AbstractCommandNode<*>> =
             listOf(BangumiCommand.Schedule.SCHEDULE, BangumiCommand.Search.SEARCH)
         ) { comet, sender, subject, wrapper, user ->
             BangumiCommand(comet, sender, subject, wrapper, user)
+        },
+        CommandNode(
+            NOW,
+        ) { comet, sender, subject, wrapper, user ->
+            NowCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
             ARCAEA,
