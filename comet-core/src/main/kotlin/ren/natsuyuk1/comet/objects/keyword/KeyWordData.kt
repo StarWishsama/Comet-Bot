@@ -11,6 +11,7 @@ object KeyWordData : PersistDataFile<KeyWordData.Data>(
     File(configDirectory, "keywords.json"),
     Data()
 ) {
+    @Serializable
     data class Data(
         val keywords: MutableList<GroupInstance> = mutableListOf()
     )
