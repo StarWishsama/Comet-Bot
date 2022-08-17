@@ -53,7 +53,7 @@ data class PullRequestEventData(
         @SerialName("html_url")
         val url: String,
         val title: String,
-        val body: String,
+        val body: String = "没有描述",
         @SerialName("created_at")
         val createdTime: String,
     ) {
