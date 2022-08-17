@@ -36,14 +36,18 @@ object ArcaeaService {
                 return
             }
 
-            comet.scope.launch {
-                newSuspendedTransaction {
-                    val userInfo = ArcaeaClient.queryUserInfo(data.userID)
-                    if (userInfo == null) {
-                        subject.sendMessage("❌ 查询用户数据失败".toMessageWrapper())
-                    } else {
-                        subject.sendMessage(userInfo.getMessageWrapper())
-                    }
+            querySpecificUserInfo(comet, subject, data.userID)
+        }
+    }
+
+    fun querySpecificUserInfo(comet: Comet, subject: PlatformCommandSender, id: String) {
+        comet.scope.launch {
+            newSuspendedTransaction {
+                val userInfo = ArcaeaClient.queryUserInfo(id)
+                if (userInfo == null) {
+                    subject.sendMessage("❌ 查询用户数据失败".toMessageWrapper())
+                } else {
+                    subject.sendMessage(userInfo.getMessageWrapper())
                 }
             }
         }

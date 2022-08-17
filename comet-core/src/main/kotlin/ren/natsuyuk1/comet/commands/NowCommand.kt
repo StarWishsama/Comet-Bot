@@ -110,7 +110,7 @@ class NowCommand(
     override suspend fun run() = withContext(Dispatchers.IO) c@{
         if (search != null) {
             val possible = similarity(search!!, TimeZone.getAvailableIDs(), searchNum ?: 5).joinToString()
-            TimeZone.getAvailableIDs().map { TimeZone.getTimeZone(it) }.map { it.getDisplayName() }
+            TimeZone.getAvailableIDs().map { TimeZone.getTimeZone(it) }.map { it.displayName }
             subject.sendMessage("搜索结果: $possible".toMessageWrapper())
             return@c
         }

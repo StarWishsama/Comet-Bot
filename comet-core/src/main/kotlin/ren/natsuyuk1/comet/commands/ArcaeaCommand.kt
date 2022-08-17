@@ -80,6 +80,11 @@ class ArcaeaCommand(
         override val user: CometUser
     ) : CometSubCommand(subject, sender, user, INFO) {
 
+        private val userID by option(
+            "-i", "--id",
+            help = "要查询的 Arcaea 账号 ID"
+        )
+
         companion object {
             val INFO = SubCommandProperty(
                 "info",
@@ -90,7 +95,15 @@ class ArcaeaCommand(
 
         override suspend fun run() {
             subject.sendMessage("🔍 正在获取 Arcaea 信息, 请坐和放宽...".toMessageWrapper())
-            ArcaeaService.queryUserInfo(comet, subject, user)
+            if (userID == null) {
+                ArcaeaService.queryUserInfo(comet, subject, user)
+            } else {
+                if (userID!!.length > 9) {
+                    subject.sendMessage("请正确填写 Arcaea 账号 ID! 例如 /arc info -i 123456789".toMessageWrapper())
+                    return
+                }
+                ArcaeaService.querySpecificUserInfo(comet, subject, userID!!)
+            }
         }
     }
 }
