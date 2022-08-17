@@ -62,7 +62,7 @@ abstract class CometCommand(
     override val sender: CommandSender,
     open val subject: CommandSender,
     message: MessageWrapper,
-    user: CometUser,
+    open val user: CometUser,
     /**
      * 该命令的配置 [CommandProperty]
      */

@@ -115,8 +115,9 @@ fun MessageChain.toMessageWrapper(localImage: Boolean = false): MessageWrapper {
             is net.mamoe.mirai.message.data.Image -> {
                 runBlocking {
                     if (localImage) {
-                        messageWrapperDirectory.touch()
                         val location = File(messageWrapperDirectory, message.imageId)
+                        location.touch()
+
                         cometClient.client.downloadFile(
                             message.queryUrl(),
                             location

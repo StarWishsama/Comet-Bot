@@ -10,6 +10,8 @@
 package ren.natsuyuk1.comet.api.command
 
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
+import ren.natsuyuk1.comet.api.event.impl.message.MessageEvent
+import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
 
 /**
@@ -25,7 +27,8 @@ open class CommandProperty(
     val permission: String = "comet.command.${name}",
     open val permissionLevel: UserLevel = UserLevel.USER,
     val executeConsumePoint: Int = CometGlobalConfig.data.commandCoolDown,
-    val executeConsumeType: CommandConsumeType = CommandConsumeType.COOLDOWN
+    val executeConsumeType: CommandConsumeType = CommandConsumeType.COOLDOWN,
+    val extraPermissionChecker: (CometUser, MessageEvent) -> Boolean = { _, _ -> true }
 )
 
 data class SubCommandProperty(

@@ -109,10 +109,10 @@ object CommandManager {
             return@launch
         }
 
-        // TODO: 模糊搜索命令系统
-        val cmd = getCommand(args[0].replaceAllToBlank(CometGlobalConfig.data.commandPrefix), sender) ?: return@launch
+        val command =
+            getCommand(args[0].replaceAllToBlank(CometGlobalConfig.data.commandPrefix), sender) ?: return@launch
 
-        val property = cmd.property
+        val property = command.property
         var user: CometUser = CometUser.dummyUser
 
         runCatching {
@@ -148,10 +148,10 @@ object CommandManager {
             }
 
             val cmdStatus = if (sender is PlatformCommandSender) {
-                (cmd as CommandNode).handler(comet, sender, subject as PlatformCommandSender, wrapper, user)
+                (command as CommandNode).handler(comet, sender, subject as PlatformCommandSender, wrapper, user)
                     .main(args.drop(1))
             } else {
-                (cmd as ConsoleCommandNode).handler(
+                (command as ConsoleCommandNode).handler(
                     comet,
                     sender as ConsoleCommandSender,
                     subject as ConsoleCommandSender,
@@ -176,7 +176,7 @@ object CommandManager {
         }.onSuccess {
             if (it.isPassed()) {
                 logger.info {
-                    "命令 ${cmd.property.name} 执行状态 ${it.name}, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}"
+                    "命令 ${command.property.name} 执行状态 ${it.name}, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}"
                 }
             }
         }.onFailure {
@@ -194,7 +194,7 @@ object CommandManager {
                 subject.sendMessage(buildMessageWrapper { appendText("这条命令突然坏掉了 (っ °Д °;)っ") })
             }
 
-            logger.warn(it) { "在尝试执行命令 ${cmd.property.name} 时出现异常" }
+            logger.warn(it) { "在尝试执行命令 ${command.property.name} 时出现异常" }
         }
     }
 
