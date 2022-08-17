@@ -3,6 +3,7 @@ package ren.natsuyuk1.comet.telegram
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.bot.exceptions.CommonRequestException
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
+import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.CommonMessageFilter
@@ -12,6 +13,7 @@ import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.toChatId
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
@@ -54,7 +56,7 @@ class TelegramComet(
             }.join()
         }
 
-        logger.info { "成功登录 Telegram Bot ${config.id}" }
+        logger.info { "成功登录 Telegram Bot (${runBlocking { bot.getMe().username.username }})" }
     }
 
     override fun afterLogin() {

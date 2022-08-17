@@ -2,12 +2,13 @@ package ren.natsuyuk1.comet.telegram.event
 
 import dev.inmo.tgbotapi.abstracts.FromUser
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
+import dev.inmo.tgbotapi.extensions.utils.extensions.raw.entities
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
-import dev.inmo.tgbotapi.extensions.utils.extensions.raw.text
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
 import dev.inmo.tgbotapi.types.message.content.MessageContent
+import dev.inmo.tgbotapi.types.message.textsources.BotCommandTextSource
 import dev.inmo.tgbotapi.utils.RiskFeature
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.event.impl.message.GroupMessageEvent
@@ -31,7 +32,8 @@ suspend fun CommonMessage<MessageContent>.toCometEvent(
         return null
     }
 
-    val isCommand = this.text?.contains(comet.bot.getMe().username.username) == true
+    val botName = comet.bot.getMe().username.username
+    val isCommand = this.entities?.find { it is BotCommandTextSource && it.source.contains(botName) } != null
 
     return when (chat) {
         is GroupChat -> this.toCometGroupEvent(comet, isCommand)
