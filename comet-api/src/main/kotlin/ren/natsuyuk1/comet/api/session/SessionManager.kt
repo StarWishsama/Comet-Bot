@@ -76,10 +76,12 @@ object SessionManager {
      * @param subject 可能触发的联系人 [Contact]
      * @param message 触发时发送的消息
      */
-    fun handleSession(subject: Contact, message: MessageWrapper): Boolean {
+    fun handleSession(subject: Contact, sender: Contact, message: MessageWrapper): Boolean {
         val user: CometUser? = if (subject !is Group) {
             CometUser.getUserOrCreate(subject.id, subject.platform)
-        } else null
+        } else {
+            CometUser.getUserOrCreate(sender.id, sender.platform)
+        }
 
         val targetSession = sessions.filter {
             it.contact.id == subject.id || it.cometUser?.id == user?.id

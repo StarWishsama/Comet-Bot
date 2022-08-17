@@ -24,6 +24,7 @@ import ren.natsuyuk1.comet.api.database.AccountDataTable
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.event.EventManager
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.session.SessionManager
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.config.branch
@@ -157,6 +158,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         TaskManager.init(coroutineContext)
         CometCoreService.init(coroutineContext)
         CometServer.init(CometServerConfig)
+        SessionManager.init(coroutineContext)
 
         SkikoHelper.findSkikoLibrary()
         BrotliLoader.loadBrotli()

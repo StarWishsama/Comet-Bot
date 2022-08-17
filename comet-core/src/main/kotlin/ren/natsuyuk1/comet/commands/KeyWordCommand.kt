@@ -62,8 +62,8 @@ class KeyWordCommand(
                 if (KeyWordData.exists(subject.id, subject.platform, add!!)) {
                     subject.sendMessage("这个关键词已经添加过了, 如果需要修改请先删除.".toMessageWrapper())
                 } else {
-                    subject.sendMessage("接下来, 请发送该关键词应回复的内容".toMessageWrapper())
                     KeyWordAddSession(sender, subject, user, add!!, regex).register()
+                    subject.sendMessage("接下来, 请发送该关键词应回复的内容".toMessageWrapper())
                 }
             }
 
