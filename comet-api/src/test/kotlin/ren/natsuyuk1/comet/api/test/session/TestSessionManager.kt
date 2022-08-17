@@ -9,17 +9,16 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
-import ren.natsuyuk1.comet.api.database.AccountDataTable
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.session.Session
 import ren.natsuyuk1.comet.api.session.SessionManager
+import ren.natsuyuk1.comet.api.session.expire
 import ren.natsuyuk1.comet.api.session.register
 import ren.natsuyuk1.comet.api.test.fakeComet
 import ren.natsuyuk1.comet.api.test.fakeSender
-import ren.natsuyuk1.comet.api.user.CometUser
-import ren.natsuyuk1.comet.api.user.User
-import ren.natsuyuk1.comet.api.user.UserTable
+import ren.natsuyuk1.comet.api.user.*
+import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import kotlin.test.assertTrue
 
@@ -47,13 +46,71 @@ class TestSessionManager {
         }
     }
 
-    @Test
-    fun testSessionRegister() {
-        val instance = transaction {
-            CometUser.create(616, LoginPlatform.TEST)
+    private class TestGroup : Group(2434L, "NIJISANJI") {
+        override val owner: GroupMember = TestGroupMember()
+
+        override val members: List<GroupMember>
+            get() = error("Unable to use this on test group")
+
+        override fun updateGroupName(groupName: String) = error("Unable to use this on test group")
+
+        override fun getBotMuteRemaining(): Int = error("Unable to use this on test group")
+
+        override fun getBotPermission(): GroupPermission = error("Unable to use this on test group")
+
+        override val avatarUrl: String
+            get() = error("Unable to use this on test group")
+
+        override fun getMember(id: Long): GroupMember = error("Unable to use this on test group")
+
+        override suspend fun quit(): Boolean = error("Unable to use this on test group")
+
+        override fun contains(id: Long): Boolean = error("Unable to use this on test group")
+
+        override val comet: Comet = fakeComet
+        override var card: String = "NIJISANJI"
+        override val platform: LoginPlatform = LoginPlatform.TEST
+
+        override fun sendMessage(message: MessageWrapper) {
+            logger.debug { "Group Received message: $message" }
+        }
+    }
+
+    private class TestGroupMember : GroupMember() {
+        override val id: Long = 24341
+        override val joinTimestamp: Int = 0
+        override val lastActiveTimestamp: Int = 0
+        override val remainMuteTime: Int = 0
+
+        override suspend fun mute(seconds: Int) = error("Unable to use this on test group member")
+
+        override suspend fun unmute() = error("Unable to use this on test group member")
+
+        override suspend fun kick(reason: String, block: Boolean) = error("Unable to use this on test group member")
+
+        override suspend fun operateAdminPermission(operation: Boolean) =
+            error("Unable to use this on test group member")
+
+        override fun sendMessage(message: MessageWrapper) {
+            logger.debug { "GroupMember received message: $message" }
         }
 
+        override val remark: String
+            get() = TODO("Not yet implemented")
+        override val comet: Comet = fakeComet
+        override val name: String = "Mito"
+        override var card: String = "Mito"
+        override val platform: LoginPlatform = LoginPlatform.TEST
+
+    }
+
+    @Test
+    fun testSessionRegister() {
         val fakeUser = TestUser()
+
+        val instance = transaction {
+            CometUser.create(fakeUser.id, LoginPlatform.TEST)
+        }
 
         TestSession(fakeSender, instance).register()
 
@@ -62,12 +119,27 @@ class TestSessionManager {
         assertTrue("User Session isn't be handle properly!") {
             SessionManager.handleSession(fakeUser, fakeUser, MessageWrapper().appendText("Test"))
         }
+
+        val fakeGroup = TestGroup()
+        val fakeGroupSender = TestGroupMember()
+
+        val instance2 = transaction {
+            CometUser.create(fakeGroupSender.id, LoginPlatform.TEST)
+        }
+
+        TestSession(fakeGroupSender, instance2).register()
+
+        assertTrue("Session List must have one session!") { SessionManager.getSessionCount() == 1 }
+
+        assertTrue("User Session isn't be handle properly!") {
+            SessionManager.handleSession(fakeGroup, fakeGroupSender, MessageWrapper().appendText("Test"))
+        }
     }
 
     @AfterAll
     fun cleanup() {
         transaction {
-            AccountDataTable.deleteAll()
+            UserTable.deleteAll()
         }
     }
 }
@@ -75,5 +147,6 @@ class TestSessionManager {
 internal class TestSession(contact: PlatformCommandSender, user: CometUser) : Session(contact, user) {
     override fun handle(message: MessageWrapper) {
         logger.debug { "Triggered test session!" }
+        expire()
     }
 }

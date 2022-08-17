@@ -77,20 +77,17 @@ object SessionManager {
      * @param message 触发时发送的消息
      */
     fun handleSession(subject: Contact, sender: Contact, message: MessageWrapper): Boolean {
-        val user: CometUser? = if (subject is Group) {
-            null
-        } else {
-            CometUser.getUser(sender.id, sender.platform)
-        }
+        val user: CometUser? = CometUser.getUser(sender.id, sender.platform)
+
         logger.debug { "Handling sessions, incoming subject: $subject, sender: $sender, message: $message" }
         logger.debug { "Current unhandled sessions: $sessions" }
 
         val targetSession = sessions.filter { session ->
             if (subject is Group) {
-                return@filter session.cometUser == null
+                return@filter session.cometUser == null || session.cometUser.id == user?.id
             } else {
                 if (session.cometUser != null) {
-                    return@filter (user!!.id == session.cometUser.id)
+                    return@filter session.cometUser.id == user!!.id
                 } else {
                     return@filter false
                 }
