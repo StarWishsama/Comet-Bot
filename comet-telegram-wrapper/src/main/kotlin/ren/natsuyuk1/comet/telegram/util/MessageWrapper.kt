@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.telegram.util
 
+import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.files.downloadFile
 import dev.inmo.tgbotapi.extensions.api.send.media.sendAudio
 import dev.inmo.tgbotapi.extensions.api.send.media.sendPhoto
@@ -18,8 +19,6 @@ import ren.natsuyuk1.comet.utils.message.*
 import java.io.File
 
 private val logger = mu.KotlinLogging.logger {}
-
-private val commandAtRegex by lazy { """(@\w*)""".toRegex() }
 
 suspend fun MessageWrapper.send(comet: TelegramComet, target: ChatId) {
     val textBuffer = StringBuffer()
@@ -75,7 +74,7 @@ suspend fun MessageContent.toMessageWrapper(comet: TelegramComet, isCommand: Boo
         is TextContent -> {
             buildMessageWrapper {
                 if (isCommand)
-                    appendText(content.text.replace(commandAtRegex, ""))
+                    appendText(content.text.replace(comet.bot.getMe().username.username, ""))
                 else
                     appendText(content.text)
             }
