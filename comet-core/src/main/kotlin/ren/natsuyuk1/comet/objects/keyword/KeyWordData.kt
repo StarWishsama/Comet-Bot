@@ -7,11 +7,16 @@ import ren.natsuyuk1.comet.utils.file.configDirectory
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import java.io.File
 
-object KeyWordData : PersistDataFile<MutableList<KeyWordData.Data>>(
+object KeyWordData : PersistDataFile<KeyWordData.Data>(
     File(configDirectory, "keywords.json"),
-    mutableListOf()
+    Data()
 ) {
     data class Data(
+        val keywords: MutableList<GroupInstance> = mutableListOf()
+    )
+
+    @Serializable
+    data class GroupInstance(
         val id: Long,
         val platform: LoginPlatform,
         val words: MutableList<KeyWord>
@@ -24,20 +29,20 @@ object KeyWordData : PersistDataFile<MutableList<KeyWordData.Data>>(
         )
     }
 
-    fun addKeyWord(id: Long, platform: LoginPlatform, keyword: Data.KeyWord) {
-        if (!data.any { it.id == id && it.platform == platform }) {
-            data.add(Data(id, platform, mutableListOf(keyword)))
+    fun addKeyWord(id: Long, platform: LoginPlatform, keyword: GroupInstance.KeyWord) {
+        if (!data.keywords.any { it.id == id && it.platform == platform }) {
+            data.keywords.add(GroupInstance(id, platform, mutableListOf(keyword)))
         } else {
-            data.find { it.id == id && it.platform == platform }?.words?.add(keyword)
+            data.keywords.find { it.id == id && it.platform == platform }?.words?.add(keyword)
         }
     }
 
     fun removeKeyWord(id: Long, platform: LoginPlatform, keyword: String) {
-        data.find { it.id == id && it.platform == platform }?.words?.removeIf { it.pattern == keyword }
+        data.keywords.find { it.id == id && it.platform == platform }?.words?.removeIf { it.pattern == keyword }
     }
 
-    fun find(id: Long, platform: LoginPlatform) = data.find { it.id == id && it.platform == platform }
+    fun find(id: Long, platform: LoginPlatform) = data.keywords.find { it.id == id && it.platform == platform }
 
     fun exists(id: Long, platform: LoginPlatform, keyword: String) =
-        data.any { it.id == id && it.platform == platform && it.words.any { w -> w.pattern == keyword } }
+        data.keywords.any { it.id == id && it.platform == platform && it.words.any { w -> w.pattern == keyword } }
 }
