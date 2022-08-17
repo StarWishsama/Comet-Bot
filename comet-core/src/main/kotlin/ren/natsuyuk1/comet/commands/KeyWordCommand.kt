@@ -43,7 +43,7 @@ class KeyWordCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     message: MessageWrapper,
-    override val user: CometUser
+    val user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, KEYWORD) {
     private val add by option("--add", "-a", help = "新增关键词")
     private val remove by option("--remove", "-rm", help = "删除关键词")
