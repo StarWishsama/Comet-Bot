@@ -104,4 +104,9 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         ) { comet, sender, subject, wrapper, user ->
             ArcaeaCommand(comet, sender, subject, wrapper, user)
         },
+        CommandNode(
+            KEYWORD
+        ) { comet, sender, subject, wrapper, user ->
+            KeyWordCommand(comet, sender, subject, wrapper, user)
+        }
     )
