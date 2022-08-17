@@ -32,7 +32,7 @@ class KeyWordAddSession(
     private val regex: Boolean,
 ) : Session(contact, user) {
     override fun handle(message: MessageWrapper) {
-        KeyWordData.addKeyWord(subject.id, subject.platform, KeyWordData.Data.KeyWord(keyword, message, regex))
+        KeyWordData.addKeyWord(subject.id, subject.platform, KeyWordData.GroupInstance.KeyWord(keyword, message, regex))
         subject.sendMessage("成功添加该关键字 ($keyword)".toMessageWrapper())
         expire()
     }
