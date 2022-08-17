@@ -12,6 +12,7 @@ package ren.natsuyuk1.comet.api.command
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import moe.sdl.yac.core.CliktError
 import moe.sdl.yac.core.CommandResult
 import moe.sdl.yac.core.parseToArgs
@@ -32,9 +33,13 @@ import ren.natsuyuk1.comet.utils.string.StringUtil.replaceAllToBlank
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 private val logger = mu.KotlinLogging.logger {}
+
+fun CometUser.hasCoolDown(triggerTime: Instant, coolDown: Duration = CometGlobalConfig.data.commandCoolDown.seconds) =
+    userLevel != UserLevel.OWNER && triggerCommandTime.plus(coolDown) >= triggerTime
 
 object CommandManager {
     private val commands: MutableMap<String, AbstractCommandNode<*>> = ConcurrentHashMap()
@@ -127,7 +132,7 @@ object CommandManager {
 
                 when (property.executeConsumeType) {
                     CommandConsumeType.COOLDOWN -> {
-                        if (user.userLevel != UserLevel.OWNER && user.triggerCommandTime.plus(property.executeConsumePoint.seconds) >= executeTime) {
+                        if (user.hasCoolDown(executeTime, property.executeConsumePoint.seconds)) {
                             return@runCatching CommandStatus.ValidateFailed()
                         }
                     }
