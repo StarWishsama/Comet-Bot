@@ -31,7 +31,7 @@ suspend fun CommonMessage<MessageContent>.toCometEvent(
         return null
     }
 
-    val isCommand = this.text?.startsWith(comet.bot.getMe().username.username) == true
+    val isCommand = this.text?.contains(comet.bot.getMe().username.username) == true
 
     return when (chat) {
         is GroupChat -> this.toCometGroupEvent(comet, isCommand)
