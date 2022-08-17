@@ -47,7 +47,7 @@ class KeyWordCommand(
 ) : CometCommand(comet, sender, subject, message, user, KEYWORD) {
     private val add by option("--add", "-a", help = "新增关键词")
     private val remove by option("--remove", "-rm", help = "删除关键词")
-    private val list by option("--list", "-l", help = "查看本群已有的关键词")
+    private val list by option("--list", "-l", help = "查看本群已有的关键词").flag(default = true)
     private val regex by option("--regex", "-r", help = "是否为正则表达式").flag()
 
     override suspend fun run() {
@@ -76,7 +76,7 @@ class KeyWordCommand(
                 }
             }
 
-            list != null -> {
+            list -> {
                 val keywords = KeyWordData.find(subject.id, subject.platform)
 
                 if (keywords == null) {

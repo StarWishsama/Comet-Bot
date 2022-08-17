@@ -16,7 +16,7 @@ object KeywordListener : CometListener {
     fun processKeyword(event: GroupMessageEvent) {
         val triggerTime = Clock.System.now()
         val sender = event.sender
-        val user = CometUser.getUserOrCreate(sender.id, sender.platform) ?: return
+        val user = CometUser.getUser(sender.id, sender.platform) ?: return
 
         if (user.hasCoolDown(triggerTime)) return
 

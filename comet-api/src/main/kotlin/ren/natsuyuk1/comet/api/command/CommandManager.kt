@@ -123,7 +123,6 @@ object CommandManager {
         runCatching {
             if (sender is PlatformCommandSender) {
                 user = CometUser.getUserOrCreate(sender.id, sender.platform)
-                    ?: return@runCatching CommandStatus.Success()
 
                 if (!user.hasPermission(property.permission)) {
                     subject.sendMessage(buildMessageWrapper { appendText("你没有权限执行这条命令!") })

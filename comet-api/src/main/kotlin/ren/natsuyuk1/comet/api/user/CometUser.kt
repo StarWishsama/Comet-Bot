@@ -19,8 +19,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.EmptySizedIterable
-import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -38,10 +37,10 @@ private val logger = KotlinLogging.logger {}
  * 用户数据表
  *
  */
-object UserTable : UUIDTable("user_data") {
+object UserTable : UUIDTable("comet_user_data") {
 
-    val qq = long("qq").default(0)
-    val telegramID = long("telegramID").default(0)
+    val platformID = long("platform_id")
+    val platform = enumeration<LoginPlatform>("platform")
     val checkInDate =
         datetime("check_in_date").default(
             Clock.System.now().minus(1.days).toLocalDateTime(TimeZone.currentSystemDefault())
@@ -51,7 +50,6 @@ object UserTable : UUIDTable("user_data") {
     val exp = long("exp").default(0L)
     val checkInTime = integer("check_in_time").default(0)
     val userLevel = enumeration<UserLevel>("user_level").default(UserLevel.USER)
-    val r6sAccount = varchar("r6s_account", 15).default("")
     val triggerCommandTime = timestamp("trigger_command_time").default(Clock.System.now())
 }
 
@@ -62,8 +60,8 @@ object UserTable : UUIDTable("user_data") {
  */
 class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
 
-    var qq by UserTable.qq
-    var telegramID by UserTable.telegramID
+    var platformID by UserTable.platformID
+    var platform by UserTable.platform
     var checkInDate by UserTable.checkInDate
     var coin by UserTable.coin
     var level by UserTable.level
@@ -71,7 +69,6 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
     var checkInTime by UserTable.checkInTime
     val permissions = SQLDatabaseSet(id, UserPermissionTable)
     var userLevel by UserTable.userLevel
-    var r6sAccount by UserTable.r6sAccount
     var triggerCommandTime by UserTable.triggerCommandTime
 
     companion object : EntityClass<UUID, CometUser>(UserTable) {
@@ -82,81 +79,38 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
             override val id: Column<EntityID<UUID>> = uuid("fake_uuid").entityId()
         }))
 
+        fun getUser(id: Long, platform: LoginPlatform) = transaction {
+            find {
+                UserTable.platform eq platform and (UserTable.platformID eq id)
+            }.firstOrNull()
+        }
+
         /**
          * 获取一个 [CometUser] 实例，在不存在时手动创建
          *
          * @return 获取或创建的 [CometUser]
          */
-        fun getUserOrCreate(id: Long, platform: LoginPlatform): CometUser? = transaction {
-            val findByQQ = findByQQ(id)
-            return@transaction if (findByQQ.empty()) {
-                val findByTelegram = findByTelegramID(id)
-
-                if (!findByTelegram.empty()) {
-                    findByTelegram.first()
-                } else {
-                    when (platform) {
-                        LoginPlatform.MIRAI -> create(qid = id)
-                        LoginPlatform.TELEGRAM -> create(tgID = id)
-                        else -> null
-                    }
-                }
-            } else {
-                findByQQ.first()
-            }
-        }
-
-        /**
-         * 通过 QQ 号搜索对应用户
-         *
-         * @param qq QQ 号
-         */
-        fun findByQQ(qq: Long) = transaction {
-            if (qq == 0L) {
-                return@transaction EmptySizedIterable<CometUser>()
-            }
-
-            find { UserTable.qq eq qq }
-        }
-
-        /**
-         * 通过 Telegram 账号 ID 搜索对应用户
-         *
-         * @param telegramID Telegram 账号 ID
-         */
-        fun findByTelegramID(telegramID: Long) = transaction {
-            if (telegramID == 0L) {
-                return@transaction EmptySizedIterable<CometUser>()
-            }
-
-            find { UserTable.telegramID eq telegramID }
+        fun getUserOrCreate(id: Long, platform: LoginPlatform): CometUser = transaction {
+            return@transaction getUser(id, platform) ?: create(id, platform)
         }
 
         /**
          * Create a user to database
          *
-         * When register a new user, you **must** provide qid or tgID.
+         * When register a new user, you **must** provide id and platform.
          *
-         * @param qid qq ID
-         * @param tgID telegram ID
+         * @param id Platform ID
+         * @param platform Platform
          *
-         * @return user id in database
+         * @return user instance
          */
-        fun create(qid: Long = 0, tgID: Long = 0): CometUser {
-            logger.info { "Creating comet user for ${if (qid != 0L) "qq $qid" else "telegram $tgID"}" }
+        fun create(id: Long, platform: LoginPlatform): CometUser {
+            logger.info { "Creating comet user for $id in ${platform.name}" }
             return transaction {
-                val uuid = UserTable.insertAndGetId {
-                    if (qid != 0L) {
-                        it[qq] = qid
-                    }
-
-                    if (tgID != 0L) {
-                        it[telegramID] = tgID
-                    }
+                new {
+                    platformID = id
+                    this.platform = platform
                 }
-
-
-                CometUser.find { UserTable.id eq uuid.value }.first()
             }
         }
     }
@@ -167,7 +121,7 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
  *
  * 用户所拥有的权限列表
  */
-object UserPermissionTable : SetTable<UUID, String>("user_permission") {
+object UserPermissionTable : SetTable<UUID, String>("comet_user_permission") {
     override val id: Column<EntityID<UUID>> = reference("user", UserTable.id).index()
     override val value: Column<String> = varchar("permission_node", 255)
 }

@@ -34,7 +34,7 @@ class Promote(
         .default(LoginPlatform.MIRAI)
 
     override suspend fun run() {
-        val user = CometUser.getUserOrCreate(id, platformName)
+        val user = CometUser.getUser(id, platformName)
 
         if (user == null) {
             sender.sendMessage(buildMessageWrapper { appendText("找不到此用户") })

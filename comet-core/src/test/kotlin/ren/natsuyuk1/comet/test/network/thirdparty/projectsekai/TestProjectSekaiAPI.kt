@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.database.DatabaseManager
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getEventList
@@ -72,7 +73,7 @@ class TestProjectSekaiAPI {
         }
 
         runBlocking {
-            val user = CometUser.create(id)
+            val user = CometUser.create(id, LoginPlatform.TEST)
 
             ProjectSekaiUserData.createData(user.id.value, this@TestProjectSekaiAPI.id)
 
