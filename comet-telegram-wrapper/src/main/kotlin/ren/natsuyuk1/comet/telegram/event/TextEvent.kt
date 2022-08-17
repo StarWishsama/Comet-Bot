@@ -1,7 +1,9 @@
 package ren.natsuyuk1.comet.telegram.event
 
 import dev.inmo.tgbotapi.abstracts.FromUser
+import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
+import dev.inmo.tgbotapi.extensions.utils.extensions.raw.text
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
@@ -20,14 +22,16 @@ import ren.natsuyuk1.comet.telegram.util.toMessageWrapper
 
 private val logger = KotlinLogging.logger {}
 
+@OptIn(RiskFeature::class)
 suspend fun CommonMessage<MessageContent>.toCometEvent(
-    comet: TelegramComet,
-    isCommand: Boolean = false
+    comet: TelegramComet
 ): MessageEvent? {
     if (this !is FromUser) {
         logger.debug { "Incoming chat isn't `FromUser`, is ${this::class.simpleName}" }
         return null
     }
+
+    val isCommand = this.text?.startsWith(comet.bot.getMe().username.username) == true
 
     return when (chat) {
         is GroupChat -> this.toCometGroupEvent(comet, isCommand)
