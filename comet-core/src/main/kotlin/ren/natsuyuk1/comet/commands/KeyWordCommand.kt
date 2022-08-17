@@ -95,6 +95,23 @@ class KeyWordCommand(
                     }.trim())
                 })
             }
+
+            else -> {
+                subject.sendMessage(
+                    """
+                用法: keyword [选项]
+
+                /keyword 关键词回复
+
+                选项:
+                 -a, --add 文本      新增关键词
+                 -rm, --remove 文本  删除关键词
+                 -l, --list 文本     查看本群已有的关键词
+                 -r, --regex       是否为正则表达式
+                 -h, --help        显示帮助信息并退出
+                """.trimIndent().toMessageWrapper()
+                )
+            }
         }
     }
 }
