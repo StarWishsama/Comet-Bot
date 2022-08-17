@@ -50,7 +50,7 @@ class TestSessionManager {
     @Test
     fun testSessionRegister() {
         val instance = transaction {
-            CometUser.create(616)
+            CometUser.create(616, LoginPlatform.TEST)
         }
 
         val fakeUser = TestUser()

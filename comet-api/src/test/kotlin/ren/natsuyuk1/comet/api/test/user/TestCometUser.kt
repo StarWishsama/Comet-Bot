@@ -7,10 +7,12 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.database.DatabaseManager
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.test.database.initTestDatabase
+import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserPermissionTable
 import ren.natsuyuk1.comet.api.user.UserTable
-import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TestCometUser {
@@ -23,10 +25,10 @@ class TestCometUser {
     @Test
     fun testUserCreate(): Unit = runBlocking {
         newSuspendedTransaction {
-            UserTable.deleteWhere { UserTable.qq eq 114514L }
-            CometUser.create(114514L)
-            assertEquals(1, CometUser.findByQQ(114514L).count())
-            UserTable.deleteWhere { UserTable.qq eq 114514L }
+            UserTable.deleteWhere { UserTable.platformID eq 114514L }
+            CometUser.create(114514L, LoginPlatform.TEST)
+            assertTrue(CometUser.getUser(114514L, LoginPlatform.TEST) != null)
+            UserTable.deleteWhere { UserTable.platformID eq 114514L }
         }
     }
 }

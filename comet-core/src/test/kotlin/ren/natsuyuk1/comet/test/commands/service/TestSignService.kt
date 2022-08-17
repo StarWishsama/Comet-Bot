@@ -35,17 +35,17 @@ class TestSignService {
     fun testSignInPosition() {
         val testCheckInTime = Clock.System.now()
 
-        val testUser = CometUser.create(114514L).also {
+        val testUser = CometUser.create(114514L, LoginPlatform.TEST).also {
             transaction {
                 it.checkInDate = testCheckInTime.plus(1.minutes).toLocalDateTime(TimeZone.currentSystemDefault())
             }
         }
-        CometUser.create(114515L).also {
+        CometUser.create(114515L, LoginPlatform.TEST).also {
             transaction {
                 it.checkInDate = testCheckInTime.toLocalDateTime(TimeZone.currentSystemDefault())
             }
         }
-        CometUser.create(114516L).also {
+        CometUser.create(114516L, LoginPlatform.TEST).also {
             transaction {
                 it.checkInDate = testCheckInTime.plus(2.minutes).toLocalDateTime(TimeZone.currentSystemDefault())
             }
@@ -58,11 +58,11 @@ class TestSignService {
     fun testIsSigned() {
         val testCheckInTime = Clock.System.now()
 
-        val user = CometUser.getUserOrCreate(114514L, LoginPlatform.MIRAI)?.also {
+        val user = CometUser.getUserOrCreate(114514L, LoginPlatform.MIRAI).also {
             transaction {
                 it.checkInDate = testCheckInTime.minus(1.days).toLocalDateTime(TimeZone.currentSystemDefault())
             }
-        } ?: return
+        }
 
         assertFalse { user.isSigned() }
 
