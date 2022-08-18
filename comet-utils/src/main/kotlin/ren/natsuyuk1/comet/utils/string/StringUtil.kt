@@ -144,7 +144,7 @@ object StringUtil {
 
     fun Instant.format(formatter: DateTimeFormatter = yyMMddPattern): String = formatter.format(toJavaInstant())
 
-    fun String.containsEtc(strict: Boolean = true, string: List<String>): Boolean {
+    fun String.containsEtc(strict: Boolean = true, vararg string: String): Boolean {
         var counter = 0
 
         string.forEach {

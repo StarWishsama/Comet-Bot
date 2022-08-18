@@ -16,8 +16,6 @@ import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
-import java.io.OutputStream
-import java.io.PrintStream
 
 object Console {
     private val terminal: Terminal = TerminalBuilder.terminal()
@@ -40,22 +38,11 @@ object Console {
     fun readln(prompt: String = "> "): String = reader?.readLine(prompt) ?: error("Reader not prepared")
 
     fun println(any: Any?) {
-        reader?.printAbove(any.toString()) ?: kotlin.io.println(any)
+        reader?.printAbove(any.toString())
     }
 
     @Suppress("NOTHING_TO_INLINE")
     inline fun println(string: String?) = println(any = string)
-
-    internal fun redirectToJLine() {
-        System.setErr(JLineRedirector)
-        System.setOut(JLineRedirector)
-    }
-
-    internal fun redirectToNull() {
-        val out = PrintStream(OutputStream.nullOutputStream())
-        System.setOut(out)
-        System.setErr(out)
-    }
 
     private fun LineReader.initHistory() {
         setVariable(

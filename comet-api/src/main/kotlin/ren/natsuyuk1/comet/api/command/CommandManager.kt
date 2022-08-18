@@ -110,7 +110,11 @@ object CommandManager {
         }
 
         // 检查消息是否含命令前缀
-        if (sender !is ConsoleCommandSender && !args[0].containsEtc(false, CometGlobalConfig.data.commandPrefix)) {
+        if (sender !is ConsoleCommandSender && !args[0].containsEtc(
+                false,
+                *CometGlobalConfig.data.commandPrefix.toTypedArray()
+            )
+        ) {
             return@launch
         }
 

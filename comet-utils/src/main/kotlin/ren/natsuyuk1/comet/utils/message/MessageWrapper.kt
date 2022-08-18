@@ -74,8 +74,6 @@ open class MessageWrapper {
             it.appendElements(getMessageContent().filter { mw -> mw::class.simpleName == type.name })
         }
 
-    private fun isPictureReachLimit(): Boolean = messageContent.count { it is Image } > 9
-
     override fun toString(): String = "MessageWrapper {content=${messageContent}, usable=${usable}}"
 
     fun parseToString(): String = buildString {

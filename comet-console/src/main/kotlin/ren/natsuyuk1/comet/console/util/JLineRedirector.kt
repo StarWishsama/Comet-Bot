@@ -9,15 +9,22 @@
 
 package ren.natsuyuk1.comet.console.util
 
+import mu.KotlinLogging
 import java.io.PrintStream
 import java.util.*
 
+private val logger = KotlinLogging.logger {}
+
 object JLineRedirector : PrintStream(nullOutputStream()) {
     @Suppress("NOTHING_TO_INLINE")
-    private inline fun println0() = Console.println("")
+    private inline fun println0() {
+        Console.println("")
+    }
 
     @Suppress("NOTHING_TO_INLINE")
-    private inline fun println0(x: Any?) = Console.println(x)
+    private inline fun println0(x: Any?) {
+        Console.println(x)
+    }
 
     override fun println(x: Any?) = println0(x)
 

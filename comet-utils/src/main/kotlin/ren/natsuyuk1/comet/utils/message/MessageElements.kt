@@ -11,8 +11,9 @@ package ren.natsuyuk1.comet.utils.message
 
 import kotlinx.serialization.Serializable
 
-interface WrapperElement {
-    fun parseToString(): String
+@Serializable
+sealed class WrapperElement {
+    abstract fun parseToString(): String
 }
 
 /**
@@ -22,7 +23,8 @@ interface WrapperElement {
  *
  * @param text 文本
  */
-data class Text(val text: String) : WrapperElement {
+@Serializable
+data class Text(val text: String) : WrapperElement() {
     override fun parseToString(): String = text
 }
 
@@ -41,7 +43,7 @@ data class Image(
     val url: String = "",
     val filePath: String = "",
     val base64: String = ""
-) : WrapperElement {
+) : WrapperElement() {
 
     init {
         if (url.isEmpty() && filePath.isEmpty() && base64.isEmpty()) {
@@ -64,7 +66,7 @@ data class AtElement(
     val target: Long,
     // For Telegram
     val userName: String = ""
-) : WrapperElement {
+) : WrapperElement() {
     override fun parseToString(): String = "@${target}"
 }
 
@@ -76,7 +78,7 @@ data class AtElement(
  * @param content XML 消息
  */
 @Serializable
-data class XmlElement(val content: String) : WrapperElement {
+data class XmlElement(val content: String) : WrapperElement() {
     override fun parseToString(): String = "[XML 消息]"
 
 }
@@ -87,10 +89,11 @@ data class XmlElement(val content: String) : WrapperElement {
  * 语音消息
  */
 @Serializable
-data class Voice(val filePath: String) : WrapperElement {
+data class Voice(val filePath: String) : WrapperElement() {
     override fun parseToString(): String = "[语音消息]"
 }
 
-data class Nudge(val target: Long) : WrapperElement {
+@Serializable
+data class Nudge(val target: Long) : WrapperElement() {
     override fun parseToString(): String = "[戳一戳]"
 }

@@ -120,7 +120,6 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
     private suspend fun setupConsole() = scope.launch {
         Console.initReader()
-        Console.redirectToJLine()
 
         while (isActive) {
             try {
@@ -150,7 +149,6 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
             runBlocking { cometPersistDataFile.forEach { it.save() } }
             closeAll()
             println("\n正在退出 Comet Terminal...")
-            Console.redirectToNull()
         }
     }
 
