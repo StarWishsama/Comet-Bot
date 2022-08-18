@@ -26,3 +26,7 @@ dependencies {
 
     implementation("dev.inmo:tgbotapi:_")
 }
+
+tasks.shadowJar {
+    destinationDirectory.set(File("$rootDir/modules"))
+}

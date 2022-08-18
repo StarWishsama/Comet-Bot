@@ -29,4 +29,12 @@ subprojects {
         mavenCentral()
     }
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+    apply(plugin = "comet-conventions")
+}
+
+task("buildComet") {
+    println("Now building comet $version...")
+    dependsOn(project("comet-console").tasks.findByName("shadowJar"))
+    dependsOn(project("comet-mirai-wrapper").tasks.findByName("shadowJar"))
+    dependsOn(project("comet-telegram-wrapper").tasks.findByName("shadowJar"))
 }

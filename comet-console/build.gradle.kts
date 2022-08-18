@@ -40,3 +40,7 @@ tasks.jar {
         attributes["Author"] = "StarWishsama"
     }
 }
+
+tasks.shadowJar {
+    destinationDirectory.set(File("$rootDir/comet"))
+}

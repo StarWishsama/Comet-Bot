@@ -28,3 +28,7 @@ dependencies {
     implementation("net.mamoe:mirai-core-api:_")
     implementation("net.mamoe:mirai-core-utils:_")
 }
+
+tasks.shadowJar {
+    destinationDirectory.set(File("$rootDir/modules"))
+}
