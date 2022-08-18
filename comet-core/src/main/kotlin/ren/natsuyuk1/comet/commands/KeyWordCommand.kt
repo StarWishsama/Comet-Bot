@@ -68,7 +68,7 @@ class KeyWordCommand(
             }
 
             remove != null -> {
-                if (KeyWordData.exists(subject.id, subject.platform, remove!!)) {
+                if (!KeyWordData.exists(subject.id, subject.platform, remove!!)) {
                     subject.sendMessage("该群聊还未添加过此关键词.".toMessageWrapper())
                 } else {
                     KeyWordData.removeKeyWord(subject.id, subject.platform, remove!!)
