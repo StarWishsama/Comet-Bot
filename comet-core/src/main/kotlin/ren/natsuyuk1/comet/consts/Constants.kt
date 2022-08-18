@@ -19,6 +19,7 @@ import kotlinx.serialization.json.Json
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.utils.time.Timer
+import kotlin.time.Duration.Companion.seconds
 
 val json = Json {
     prettyPrint = true
@@ -40,6 +41,10 @@ val defaultClient = HttpClient(CIO) {
 
     install(ContentNegotiation) {
         json(json)
+    }
+
+    install(HttpTimeout) {
+        requestTimeoutMillis = 10.seconds.inWholeMilliseconds
     }
 }
 
