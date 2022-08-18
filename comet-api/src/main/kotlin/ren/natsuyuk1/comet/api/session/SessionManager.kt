@@ -84,12 +84,12 @@ object SessionManager {
 
         val targetSession = sessions.filter { session ->
             if (subject is Group) {
-                return@filter session.cometUser == null || session.cometUser.id == user?.id
+                return@filter session.cometUser == null || session.cometUser.id == user?.id || sender.id == session.contact.id
             } else {
                 if (session.cometUser != null) {
                     return@filter session.cometUser.id == user!!.id
                 } else {
-                    return@filter false
+                    return@filter sender.id == session.contact.id
                 }
             }
         }

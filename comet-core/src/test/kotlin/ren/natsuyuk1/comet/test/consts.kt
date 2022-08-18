@@ -2,10 +2,12 @@ package ren.natsuyuk1.comet.test
 
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.Comet
-import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.api.user.GroupMember
+import ren.natsuyuk1.comet.api.user.User
+import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
@@ -24,22 +26,67 @@ val fakeComet = object : Comet(CometConfig(0, "", LoginPlatform.TEST), logger, M
 
 }
 
-fun generateFakeSender(id: Long): PlatformCommandSender = object : PlatformCommandSender() {
+fun generateFakeSender(id: Long): User = object : User() {
     override val comet: Comet
         get() = fakeComet
     override val id: Long
         get() = id
+    override val remark: String
+        get() = name
     override val name: String
-        get() = "test"
+        get() = "testuser"
     override var card: String
-        get() = "test"
+        get() = "testuser"
         set(_) {}
     override val platform: LoginPlatform
         get() = LoginPlatform.TEST
 
     override fun sendMessage(message: MessageWrapper) {
-        logger.info { "Message sent to user ${id}: ${message.parseToString()}" }
+        logger.debug { "Message sent to user ${id}: ${message.parseToString()}" }
     }
+}
+
+fun generateFakeGroup(id: Long): Group = object : Group(id, "TestGroup") {
+    override val owner: GroupMember
+        get() = error("dummy cannot invoke this")
+    override val members: List<GroupMember>
+        get() = error("dummy cannot invoke this")
+
+    override fun updateGroupName(groupName: String) {
+        error("dummy cannot invoke this")
+    }
+
+    override fun getBotMuteRemaining(): Int {
+        error("dummy cannot invoke this")
+    }
+
+    override fun getBotPermission(): GroupPermission {
+        error("dummy cannot invoke this")
+    }
+
+    override val avatarUrl: String
+        get() = error("dummy cannot invoke this")
+
+    override fun getMember(id: Long): GroupMember? {
+        error("dummy cannot invoke this")
+    }
+
+    override suspend fun quit(): Boolean {
+        error("dummy cannot invoke this")
+    }
+
+    override fun contains(id: Long): Boolean {
+        error("dummy cannot invoke this")
+    }
+
+    override val comet: Comet = fakeComet
+    override var card: String = name
+    override val platform: LoginPlatform = LoginPlatform.TEST
+
+    override fun sendMessage(message: MessageWrapper) {
+        logger.debug { "Message sent to group ${id}: ${message.parseToString()}" }
+    }
+
 }
 
 fun Any.print() = println(this)
