@@ -135,8 +135,10 @@ object CommandManager {
 
                 when (property.executeConsumeType) {
                     CommandConsumeType.COOLDOWN -> {
-                        if (user.hasCoolDown(executeTime, property.executeConsumePoint.seconds)) {
-                            return@runCatching CommandStatus.ValidateFailed()
+                        if (user.platform.needRestrict || property.executeConsumePoint == CometGlobalConfig.data.commandCoolDown) {
+                            if (user.hasCoolDown(executeTime, property.executeConsumePoint.seconds)) {
+                                return@runCatching CommandStatus.ValidateFailed()
+                            }
                         }
                     }
 
