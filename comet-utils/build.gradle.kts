@@ -1,3 +1,5 @@
+import java.util.*
+
 plugins {
     `comet-conventions`
     kotlin("plugin.serialization")
@@ -8,14 +10,27 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
+fun tokenize(command: String): Array<String?> {
+    val st = StringTokenizer(command)
+    val cmdArray = arrayOfNulls<String>(st.countTokens())
+
+    var i = 0
+    while (st.hasMoreTokens()) {
+        cmdArray[i] = st.nextToken()
+        i++
+    }
+
+    return cmdArray
+}
+
 val commitHash by lazy {
     val commitHashCommand = "git rev-parse --short HEAD"
-    Runtime.getRuntime().exec(commitHashCommand).inputStream.bufferedReader().readLine() ?: "Unknown Commit"
+    Runtime.getRuntime().exec(tokenize(commitHashCommand)).inputStream.bufferedReader().readLine() ?: "Unknown Commit"
 }
 
 val branch by lazy {
     val branchCommand = "git rev-parse --abbrev-ref HEAD"
-    Runtime.getRuntime().exec(branchCommand).inputStream.bufferedReader().readLine() ?: "Unknown Branch"
+    Runtime.getRuntime().exec(tokenize(branchCommand)).inputStream.bufferedReader().readLine() ?: "Unknown Branch"
 }
 
 buildConfig {
