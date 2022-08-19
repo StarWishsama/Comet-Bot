@@ -2,14 +2,13 @@ package ren.natsuyuk1.comet.network.thirdparty.jikipedia
 
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.consts.cometClient
 
 private val logger = mu.KotlinLogging.logger {}
 
 object JikiPediaAPI {
-    suspend fun search(comet: Comet, keyword: String): JikiPediaSearchResult {
+    suspend fun search(keyword: String): JikiPediaSearchResult {
         return cometClient.client.post("https://api.jikipedia.com/go/search_entities") {
             headers {
                 append("Origin", "https://jikipedia.com")
