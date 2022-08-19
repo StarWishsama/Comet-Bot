@@ -27,7 +27,6 @@ val fakeSender = object : PlatformCommandSender() {
         get() = fakeComet
     override val id: Long = 0
     override val name: String = "Dummy"
-    override var card: String = "Dummy"
     override val platform: LoginPlatform = LoginPlatform.TEST
 
     override fun sendMessage(message: MessageWrapper) {

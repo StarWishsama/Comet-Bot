@@ -34,10 +34,8 @@ class TestSessionManager {
 
     private class TestUser : User() {
         override val id: Long = 616
-        override val remark: String = "TestUser"
         override val comet: Comet = fakeComet
         override val name: String = "TestUser"
-        override var card: String = "TestUser"
         override val platform: LoginPlatform
             get() = LoginPlatform.TEST
 
@@ -68,7 +66,6 @@ class TestSessionManager {
         override fun contains(id: Long): Boolean = error("Unable to use this on test group")
 
         override val comet: Comet = fakeComet
-        override var card: String = "NIJISANJI"
         override val platform: LoginPlatform = LoginPlatform.TEST
 
         override fun sendMessage(message: MessageWrapper) {
@@ -77,6 +74,8 @@ class TestSessionManager {
     }
 
     private class TestGroupMember : GroupMember() {
+        override val group: Group
+            get() = TestGroup()
         override val id: Long = 24341
         override val joinTimestamp: Int = 0
         override val lastActiveTimestamp: Int = 0
@@ -95,8 +94,6 @@ class TestSessionManager {
             logger.debug { "GroupMember received message: $message" }
         }
 
-        override val remark: String
-            get() = TODO("Not yet implemented")
         override val comet: Comet = fakeComet
         override val name: String = "Mito"
         override var card: String = "Mito"

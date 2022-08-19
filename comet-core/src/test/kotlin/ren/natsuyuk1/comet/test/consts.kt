@@ -31,13 +31,8 @@ fun generateFakeSender(id: Long): User = object : User() {
         get() = fakeComet
     override val id: Long
         get() = id
-    override val remark: String
-        get() = name
     override val name: String
         get() = "testuser"
-    override var card: String
-        get() = "testuser"
-        set(_) {}
     override val platform: LoginPlatform
         get() = LoginPlatform.TEST
 
@@ -80,7 +75,6 @@ fun generateFakeGroup(id: Long): Group = object : Group(id, "TestGroup") {
     }
 
     override val comet: Comet = fakeComet
-    override var card: String = name
     override val platform: LoginPlatform = LoginPlatform.TEST
 
     override fun sendMessage(message: MessageWrapper) {
