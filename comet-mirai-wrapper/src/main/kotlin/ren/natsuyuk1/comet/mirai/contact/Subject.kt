@@ -5,7 +5,7 @@ import kotlinx.datetime.Clock
 import net.mamoe.mirai.contact.getMember
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.event.broadcast
-import ren.natsuyuk1.comet.api.event.impl.comet.MessagePreSendEvent
+import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
@@ -29,9 +29,11 @@ internal class MiraiGroupImpl(
     group.id,
     group.name
 ) {
-    override val owner: GroupMember = group.owner.toGroupMember(comet)
+    override val owner: GroupMember
+        get() = group.owner.toGroupMember(comet)
 
-    override val members: List<GroupMember> = group.members.toGroupMemberList(comet)
+    override val members: List<GroupMember>
+        get() = group.members.toGroupMemberList(comet)
 
     override fun updateGroupName(groupName: String) {
         group.name = groupName
@@ -50,9 +52,6 @@ internal class MiraiGroupImpl(
     override suspend fun quit(): Boolean = group.quit()
 
     override fun contains(id: Long): Boolean = group.contains(id)
-
-    // Group doesn't have card
-    override var card: String = ""
 
     override fun sendMessage(message: MessageWrapper) {
         comet.scope.launch {
@@ -82,9 +81,7 @@ fun net.mamoe.mirai.contact.User.toCometUser(miraiComet: MiraiComet): User {
     class MiraiUserImpl(
         override val comet: Comet = miraiComet,
         override val name: String = miraiUser.nick,
-        override var card: String = "",
         override val id: Long = miraiUser.id,
-        override val remark: String = miraiUser.remark
     ) : MiraiUser() {
         override fun sendMessage(message: MessageWrapper) {
             comet.scope.launch {

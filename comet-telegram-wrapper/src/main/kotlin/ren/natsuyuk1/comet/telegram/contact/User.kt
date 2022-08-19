@@ -3,7 +3,7 @@ package ren.natsuyuk1.comet.telegram.contact
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
-import ren.natsuyuk1.comet.api.event.impl.comet.MessagePreSendEvent
+import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.telegram.TelegramComet
@@ -23,11 +23,8 @@ class TelegramUserImpl(
     private val from: dev.inmo.tgbotapi.types.chat.User,
     override val comet: TelegramComet,
 ) : TelegramUser(from.id.chatId, from.getDisplayName()) {
-    override var card: String = from.getDisplayName()
-
-    override val id: Long = from.id.chatId
-
-    override val remark: String = from.getDisplayName()
+    override val id: Long
+        get() = from.id.chatId
 
     override fun sendMessage(message: MessageWrapper) {
         comet.scope.launch {

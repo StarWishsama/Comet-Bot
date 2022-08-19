@@ -2,7 +2,7 @@ package ren.natsuyuk1.comet.listener
 
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.command.hasCoolDown
-import ren.natsuyuk1.comet.api.event.impl.message.GroupMessageEvent
+import ren.natsuyuk1.comet.api.event.events.message.GroupMessageEvent
 import ren.natsuyuk1.comet.api.listener.CometListener
 import ren.natsuyuk1.comet.api.listener.EventHandler
 import ren.natsuyuk1.comet.api.user.CometUser

@@ -9,7 +9,6 @@
 
 package ren.natsuyuk1.comet.api.user
 
-import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
@@ -19,7 +18,6 @@ import kotlin.time.DurationUnit
 /**
  * [Contact] 联系人, 是所有可聊天对象的父类
  */
-@Serializable
 abstract class Contact : PlatformCommandSender() {
     /**
      * 可以是用户或群聊
@@ -31,20 +29,13 @@ abstract class Contact : PlatformCommandSender() {
  * [User] 用户
  *
  */
-@Serializable
 abstract class User : Contact() {
     abstract override val id: Long
-
-    /**
-     * 备注信息
-     *
-     * 当该用户与机器人存在好友关系时才有备注，否则为空
-     */
-    abstract val remark: String
 }
 
-@Serializable
 abstract class GroupMember : User() {
+    abstract val group: Group
+
     abstract override val id: Long
 
     abstract val joinTimestamp: Int
@@ -53,10 +44,12 @@ abstract class GroupMember : User() {
 
     abstract val remainMuteTime: Int
 
+    abstract val card: String
+
     val isMuted: Boolean get() = remainMuteTime != 0
 
     /**
-     * 禁言此群员1
+     * 禁言此群员
      */
     abstract suspend fun mute(seconds: Int)
 
@@ -96,7 +89,8 @@ abstract class GroupMember : User() {
     abstract override fun sendMessage(message: MessageWrapper)
 }
 
-@Serializable
+fun GroupMember.nameOrCard(): String = card.ifEmpty { name }
+
 abstract class AnonymousMember : GroupMember() {
     /**
      * 该匿名群成员 ID
@@ -107,7 +101,6 @@ abstract class AnonymousMember : GroupMember() {
 /**
  * [Group] 群组
  */
-@Serializable
 abstract class Group(
     override val id: Long,
 

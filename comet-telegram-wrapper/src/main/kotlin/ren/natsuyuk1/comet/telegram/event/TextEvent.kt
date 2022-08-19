@@ -11,9 +11,9 @@ import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.types.message.textsources.BotCommandTextSource
 import dev.inmo.tgbotapi.utils.RiskFeature
 import mu.KotlinLogging
-import ren.natsuyuk1.comet.api.event.impl.message.GroupMessageEvent
-import ren.natsuyuk1.comet.api.event.impl.message.MessageEvent
-import ren.natsuyuk1.comet.api.event.impl.message.PrivateMessageEvent
+import ren.natsuyuk1.comet.api.event.events.message.GroupMessageEvent
+import ren.natsuyuk1.comet.api.event.events.message.MessageEvent
+import ren.natsuyuk1.comet.api.event.events.message.PrivateMessageEvent
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.telegram.contact.toCometGroup
 import ren.natsuyuk1.comet.telegram.contact.toCometGroupMember

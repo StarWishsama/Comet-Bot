@@ -1,9 +1,9 @@
-package ren.natsuyuk1.comet.api.event.impl.comet
+package ren.natsuyuk1.comet.api.event.events.comet
 
 import ren.natsuyuk1.comet.api.Comet
-import ren.natsuyuk1.comet.api.command.CommandSender
 import ren.natsuyuk1.comet.api.event.CancelableEvent
 import ren.natsuyuk1.comet.api.event.CometEvent
+import ren.natsuyuk1.comet.api.user.Contact
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 /**
@@ -16,7 +16,7 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
  */
 class MessagePreSendEvent(
     override val comet: Comet,
-    val target: CommandSender,
+    val target: Contact,
     val message: MessageWrapper,
     val timestamp: Long
 ) : CometEvent(comet), CancelableEvent

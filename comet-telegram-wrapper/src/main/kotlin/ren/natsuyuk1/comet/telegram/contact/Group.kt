@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
-import ren.natsuyuk1.comet.api.event.impl.comet.MessagePreSendEvent
+import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
@@ -45,7 +45,8 @@ internal class TelegramGroupImpl(
         }
 
     // Telegram couldn't get all members
-    override val members: List<GroupMember> = emptyList()
+    override val members: List<GroupMember>
+        get() = emptyList()
 
     override fun updateGroupName(groupName: String) {
         comet.scope.launch {
@@ -80,7 +81,8 @@ internal class TelegramGroupImpl(
      *
      * FIXME
      */
-    override val avatarUrl: String = ""
+    override val avatarUrl: String
+        get() = ""
 
     override fun getMember(id: Long): GroupMember? {
         return runBlocking {
@@ -114,12 +116,6 @@ internal class TelegramGroupImpl(
             }
         }
     }
-
-    override var card: String
-        get() = ""
-        set(_) {
-            error("You cannot set card in telegram!")
-        }
 
     override fun sendMessage(message: MessageWrapper) {
         comet.scope.launch {

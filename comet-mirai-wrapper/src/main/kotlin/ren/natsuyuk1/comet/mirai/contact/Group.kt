@@ -6,10 +6,10 @@ import net.mamoe.mirai.contact.AnonymousMember
 import net.mamoe.mirai.contact.ContactList
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.NormalMember
-import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.event.broadcast
-import ren.natsuyuk1.comet.api.event.impl.comet.MessagePreSendEvent
+import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.mirai.MiraiComet
 import ren.natsuyuk1.comet.mirai.util.toMessageChain
@@ -29,8 +29,11 @@ internal abstract class MiraiGroupMember : GroupMember() {
 
 internal class MiraiGroupMemberImpl(
     private val contact: NormalMember,
-    override val comet: Comet
+    override val comet: MiraiComet
 ) : MiraiGroupMember() {
+    override val group: Group
+        get() = contact.group.toCometGroup(comet)
+
     override val id: Long
         get() = contact.id
 
@@ -71,9 +74,6 @@ internal class MiraiGroupMemberImpl(
         }
     }
 
-    override val remark: String
-        get() = contact.remark
-
     override val name: String
         get() = contact.nick
 
@@ -90,10 +90,14 @@ internal class MiraiAnonymousMemberImpl(
     private val contact: AnonymousMember,
     override val comet: MiraiComet,
 ) : ren.natsuyuk1.comet.api.user.AnonymousMember() {
+    override val group: Group
+        get() = contact.group.toCometGroup(comet)
+
     override val platform: LoginPlatform
         get() = LoginPlatform.MIRAI
 
-    override val anonymousId: String = contact.anonymousId
+    override val anonymousId: String
+        get() = contact.anonymousId
 
     override val id: Long
         get() = contact.id
@@ -134,8 +138,6 @@ internal class MiraiAnonymousMemberImpl(
         error("Cannot send message to AnonymousMember")
     }
 
-    override val remark: String
-        get() = contact.remark
     override val name: String
         get() = contact.nick
 
@@ -148,7 +150,6 @@ internal class MiraiAnonymousMemberImpl(
 
 fun AnonymousMember.toGroupMember(comet: MiraiComet): GroupMember = MiraiAnonymousMemberImpl(this, comet)
 
-// FIXME: Unsafe convert (?)
 fun ContactList<NormalMember>.toGroupMemberList(comet: MiraiComet): List<GroupMember> {
     val converted = mutableListOf<GroupMember>()
     for (normalMember in this) {

@@ -1,8 +1,9 @@
-package ren.natsuyuk1.comet.api.event.impl.message
+package ren.natsuyuk1.comet.api.event.events.message
 
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.event.CometEvent
 import ren.natsuyuk1.comet.api.user.Contact
+import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 sealed interface IMessageEvent {
@@ -10,7 +11,7 @@ sealed interface IMessageEvent {
 
     val subject: Contact
 
-    val sender: Contact
+    val sender: User
 
     val senderName: String
 

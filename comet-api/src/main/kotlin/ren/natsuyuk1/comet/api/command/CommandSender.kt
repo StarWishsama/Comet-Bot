@@ -50,19 +50,12 @@ abstract class PlatformCommandSender : CommandSender {
     abstract val name: String
 
     /**
-     * 群名片, 仅在 [PlatformCommandSender] 为来自 QQ 群的用户时存在
-     */
-    abstract var card: String
-
-    /**
      * 平台名称
      */
     abstract val platform: LoginPlatform
 
     abstract override fun sendMessage(message: MessageWrapper)
 }
-
-fun PlatformCommandSender.nameOrCard(): String = card.ifEmpty { name }
 
 /**
  * [ConsoleCommandSender]

@@ -4,7 +4,7 @@ import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.event.CometEvent
 import ren.natsuyuk1.comet.api.event.Event
-import ren.natsuyuk1.comet.api.event.impl.message.MessageEvent
+import ren.natsuyuk1.comet.api.event.events.message.MessageEvent
 import ren.natsuyuk1.comet.api.event.registerListener
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction

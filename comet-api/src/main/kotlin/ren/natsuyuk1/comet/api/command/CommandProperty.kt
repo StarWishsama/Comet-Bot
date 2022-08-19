@@ -10,7 +10,7 @@
 package ren.natsuyuk1.comet.api.command
 
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
-import ren.natsuyuk1.comet.api.event.impl.message.MessageEvent
+import ren.natsuyuk1.comet.api.event.events.message.MessageEvent
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
 
