@@ -24,15 +24,11 @@ import java.io.InputStream
 private val logger = mu.KotlinLogging.logger("MessageWrapperConverter")
 
 @OptIn(MiraiExperimentalApi::class)
-suspend fun WrapperElement.toMessageContent(subject: Contact?): MessageContent {
+suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent {
     when (this) {
         is Text -> return PlainText(this.text)
 
         is Image -> {
-            if (subject == null) {
-                return PlainText("[图片]")
-            }
-
             try {
                 if (url.isNotEmpty()) {
                     cometClient.client.get(url).body<InputStream>().use {
@@ -88,7 +84,7 @@ suspend fun WrapperElement.toMessageContent(subject: Contact?): MessageContent {
  *
  * @param subject Mirai 的 [Contact], 为空时一些需要 [Contact] 的元素会转为文字
  */
-fun MessageWrapper.toMessageChain(subject: Contact? = null): MessageChain {
+fun MessageWrapper.toMessageChain(subject: Contact): MessageChain {
     return MessageChainBuilder().apply {
         getMessageContent().forEach { elem ->
             kotlin.runCatching {
