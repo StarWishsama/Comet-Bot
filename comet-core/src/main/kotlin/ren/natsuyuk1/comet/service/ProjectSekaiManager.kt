@@ -223,6 +223,23 @@ object ProjectSekaiManager {
             }
         }
 
+        suspend fun load() {
+            if (file.exists()) {
+                loadDatabase()
+            } else {
+                scope.launch {
+                    file.touch()
+                    cometClient.client.downloadFile(url, file)
+                    loadDatabase()
+                }
+            }
+        }
+
+        if (RateLimitService.isRateLimit(RateLimitAPI.GITHUB)) {
+            load()
+            return
+        }
+
         GitHubApi.getSpecificFileCommits("Sekai-World", "sekai-master-db-diff", fileName)
             .onSuccess {
                 val current = Clock.System.now()
@@ -238,15 +255,7 @@ object ProjectSekaiManager {
                     loadDatabase()
                 }
             }.onFailure {
-                if (file.exists()) {
-                    loadDatabase()
-                } else {
-                    scope.launch {
-                        file.touch()
-                        cometClient.client.downloadFile(url, file)
-                        loadDatabase()
-                    }
-                }
+                load()
             }
     }
 
