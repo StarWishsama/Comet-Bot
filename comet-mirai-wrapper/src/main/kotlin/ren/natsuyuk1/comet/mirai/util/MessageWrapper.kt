@@ -58,8 +58,6 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent {
         is XmlElement -> return SimpleServiceMessage(serviceId = 60, content = content)
 
         is Voice -> {
-            requireNotNull(subject) { "subject cannot be null!" }
-
             if (subject !is AudioSupported) {
                 throw UnsupportedOperationException(
                     "Sending voice message to unsupported subject: must be friend or group"
@@ -148,6 +146,9 @@ fun MessageChain.toMessageWrapper(localImage: Boolean = false): MessageWrapper {
                         writeToFile(it, location)
                     }
                 }
+            }
+            is Face -> {
+                wrapper.appendText(message.content)
             }
             else -> {
                 continue
