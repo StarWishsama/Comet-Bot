@@ -78,6 +78,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
     override suspend fun run() {
         scope.launch {
             setupShutdownHook()
+            setupConsole()
 
             logger.info { "正在运行 Comet Terminal ${version}-${branch}-${hash}" }
 
@@ -91,7 +92,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
             startService()
 
-            setupConsole()
+            handleConsoleCommand()
         }.join()
     }
 
@@ -118,10 +119,12 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         EventManager.init(coroutineContext)
     }
 
-    private suspend fun setupConsole() = scope.launch {
+    private fun setupConsole() {
         Console.initReader()
         Console.redirectToJLine()
+    }
 
+    private suspend fun handleConsoleCommand() = scope.launch {
         while (isActive) {
             try {
                 CommandManager.executeCommand(
