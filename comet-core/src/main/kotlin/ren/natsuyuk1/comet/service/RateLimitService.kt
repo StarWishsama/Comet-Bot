@@ -40,6 +40,6 @@ object RateLimitService {
     }
 
     fun isRateLimit(apiType: RateLimitAPI): Boolean {
-        return !RateLimitData.data.rateLimitData.containsKey(apiType) || RateLimitData.data.rateLimitData[apiType]!! < System.currentTimeMillis()
+        return RateLimitData.data.rateLimitData.containsKey(apiType) && RateLimitData.data.rateLimitData[apiType]!! > System.currentTimeMillis() // ktlint-disable max-line-length
     }
 }

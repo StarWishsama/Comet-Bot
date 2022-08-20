@@ -80,6 +80,7 @@ class TestSessionManager {
         override val joinTimestamp: Int = 0
         override val lastActiveTimestamp: Int = 0
         override val remainMuteTime: Int = 0
+        override val groupPermission: GroupPermission = GroupPermission.MEMBER
 
         override suspend fun mute(seconds: Int) = error("Unable to use this on test group member")
 
