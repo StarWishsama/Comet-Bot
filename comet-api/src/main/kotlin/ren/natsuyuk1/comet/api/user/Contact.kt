@@ -107,7 +107,7 @@ abstract class Group(
     /**
      * 群名称
      */
-    override var name: String,
+    override var name: String
 ) : Contact() {
     abstract val owner: GroupMember
 

@@ -21,29 +21,29 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
 
         appendText(
             "EXPERT | Clear ${
-                getSpecificMusicCount(
-                    MusicDifficulty.EXPERT,
-                    MusicPlayResult.CLEAR
-                )
+            getSpecificMusicCount(
+                MusicDifficulty.EXPERT,
+                MusicPlayResult.CLEAR
+            )
             } / FC ${
-                getSpecificMusicCount(
-                    MusicDifficulty.EXPERT,
-                    MusicPlayResult.FULL_COMBO
-                )
+            getSpecificMusicCount(
+                MusicDifficulty.EXPERT,
+                MusicPlayResult.FULL_COMBO
+            )
             } / AP ${getSpecificMusicCount(MusicDifficulty.EXPERT, MusicPlayResult.ALL_PERFECT)}"
         )
         appendLine()
         appendText(
             "MASTER | Clear ${
-                getSpecificMusicCount(
-                    MusicDifficulty.MASTER,
-                    MusicPlayResult.CLEAR
-                )
+            getSpecificMusicCount(
+                MusicDifficulty.MASTER,
+                MusicPlayResult.CLEAR
+            )
             } / FC ${
-                getSpecificMusicCount(
-                    MusicDifficulty.MASTER,
-                    MusicPlayResult.FULL_COMBO
-                )
+            getSpecificMusicCount(
+                MusicDifficulty.MASTER,
+                MusicPlayResult.FULL_COMBO
+            )
             } / AP ${getSpecificMusicCount(MusicDifficulty.MASTER, MusicPlayResult.ALL_PERFECT)}"
         )
     }
@@ -57,8 +57,8 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
 data class ProjectSekaiUserInfo(
     val user: UserGameData,
     val userProfile: UserProfile,
-    //val userDecks
-    //val userCards
+    // val userDecks
+    // val userCards
     val userMusics: List<UserMusic>,
     val userMusicResults: List<MusicResult>
 ) {
@@ -105,7 +105,7 @@ data class ProjectSekaiUserInfo(
         @SerialName("fullPerfectFlg")
         val isAllPerfect: Boolean,
         val mvpCount: Int,
-        val superStarCount: Int,
+        val superStarCount: Int
     )
 
     @Serializable
@@ -156,7 +156,7 @@ data class ProjectSekaiUserInfo(
                 // easy, normal, hard, expert, master
                 val musicDifficulty: MusicDifficulty,
                 // clear, full_combo, all_perfect
-                val playResult: MusicPlayResult,
+                val playResult: MusicPlayResult
             )
         }
     }
@@ -182,7 +182,7 @@ enum class MusicDifficulty {
     EXPERT,
 
     @SerialName("master")
-    MASTER,
+    MASTER
 }
 
 /**

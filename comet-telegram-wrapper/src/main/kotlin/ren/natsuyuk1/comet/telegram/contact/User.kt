@@ -13,7 +13,7 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 abstract class TelegramUser(
     override val id: Long,
-    override var name: String,
+    override var name: String
 ) : User() {
     override val platform: LoginPlatform
         get() = LoginPlatform.TELEGRAM
@@ -21,7 +21,7 @@ abstract class TelegramUser(
 
 class TelegramUserImpl(
     private val from: dev.inmo.tgbotapi.types.chat.User,
-    override val comet: TelegramComet,
+    override val comet: TelegramComet
 ) : TelegramUser(from.id.chatId, from.getDisplayName()) {
     override val id: Long
         get() = from.id.chatId
@@ -35,8 +35,9 @@ class TelegramUserImpl(
                 Clock.System.now().epochSeconds
             ).also { it.broadcast() }
 
-            if (!event.isCancelled)
+            if (!event.isCancelled) {
                 message.send(comet, from.id)
+            }
         }
     }
 }

@@ -55,9 +55,9 @@ data class JikiPediaSearchResult(
     data class JikiSearchEntry(
         val topics: JsonElement,
         val category: JikiSearchCategory,
-        val definitions: List<JikiDefinition>,
-        //val albums: List<JikiAlbum>,
-        //val tags: List<JikiTag>,
+        val definitions: List<JikiDefinition>
+        // val albums: List<JikiAlbum>,
+        // val tags: List<JikiTag>,
     )
 
     @kotlinx.serialization.Serializable
@@ -95,7 +95,7 @@ data class JikiPediaSearchResult(
         @SerialName("dislike_count")
         val dislike: Int,
         @SerialName("view_count")
-        val view: Int,
+        val view: Int
     ) {
         @kotlinx.serialization.Serializable
         data class JikiTerm(
@@ -120,6 +120,6 @@ data class JikiPediaSearchResult(
         BANNER,
 
         @SerialName("user")
-        USER,
+        USER
     }
 }

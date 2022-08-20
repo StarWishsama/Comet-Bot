@@ -83,7 +83,9 @@ object SignInService {
             append("\n")
 
             if (user.checkInTime >= 2) {
-                append("连续签到 ${user.checkInTime} 天 ${if (coinResult.awardPoint > 0) ", 额外获得 ${coinResult.awardPoint} 点硬币\n" else "\n"}")
+                append(
+                    "连续签到 ${user.checkInTime} 天 ${if (coinResult.awardPoint > 0) ", 额外获得 ${coinResult.awardPoint} 点硬币\n" else "\n"}"
+                )
             }
 
             if (coinResult.chancePoint > 0) {
@@ -156,7 +158,7 @@ object SignInService {
     private data class SignInResult(
         val basePoint: Double,
         val awardPoint: Double,
-        val chancePoint: Double,
+        val chancePoint: Double
     ) {
         fun getAllPoint(): Double = basePoint + awardPoint + chancePoint
     }

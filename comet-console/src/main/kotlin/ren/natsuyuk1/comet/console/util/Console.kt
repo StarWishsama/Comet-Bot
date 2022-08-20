@@ -26,8 +26,9 @@ object Console {
     private var reader: LineReader? = null
 
     internal fun initReader() {
-        if (reader != null)
+        if (reader != null) {
             return
+        }
 
         reader = LineReaderBuilder.builder()
             .appName("CometTerminal")

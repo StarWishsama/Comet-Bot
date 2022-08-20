@@ -76,8 +76,9 @@ object ErrorHelper {
                 sb.append("\n")
                 sb.append("包名 $packageName ▶\n")
             }
-            sb.append("  ▶ 在类 " + className + ", 方法 " + elem.methodName + ". (" + elem.fileName + ", 行 " + elem.lineNumber + ")" + "\n")
-
+            sb.append(
+                "  ▶ 在类 " + className + ", 方法 " + elem.methodName + ". (" + elem.fileName + ", 行 " + elem.lineNumber + ")" + "\n"
+            )
         }
         sb.append("========================= 栈轨迹 =========================\n")
 

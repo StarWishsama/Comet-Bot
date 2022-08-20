@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-
 @Serializable
 sealed class Parser {
     @Required

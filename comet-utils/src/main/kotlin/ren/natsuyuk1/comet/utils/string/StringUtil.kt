@@ -91,16 +91,21 @@ object StringUtil {
     fun Duration.toFriendly(maxUnit: TimeUnit = TimeUnit.DAYS, msMode: Boolean = true): String {
         toComponents { days, hours, minutes, seconds, ns ->
             return buildString {
-                if (days != 0L && maxUnit >= TimeUnit.DAYS)
+                if (days != 0L && maxUnit >= TimeUnit.DAYS) {
                     append("${days}天")
-                if (hours != 0 && maxUnit >= TimeUnit.HOURS)
+                }
+                if (hours != 0 && maxUnit >= TimeUnit.HOURS) {
                     append("${hours}时")
-                if (minutes != 0 && maxUnit >= TimeUnit.MINUTES)
+                }
+                if (minutes != 0 && maxUnit >= TimeUnit.MINUTES) {
                     append("${minutes}分")
-                if (seconds != 0 && maxUnit >= TimeUnit.SECONDS)
+                }
+                if (seconds != 0 && maxUnit >= TimeUnit.SECONDS) {
                     append("${seconds}秒")
-                if (maxUnit >= TimeUnit.MILLISECONDS && msMode)
+                }
+                if (maxUnit >= TimeUnit.MILLISECONDS && msMode) {
                     append("${ns / 1_000_000}毫秒")
+                }
             }
         }
     }

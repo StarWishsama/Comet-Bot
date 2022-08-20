@@ -6,7 +6,7 @@ import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 @Serializable
 data class NoAbbrSearchResult(
     val name: String,
-    val trans: List<String>,
+    val trans: List<String>
 ) {
     fun toMessageWrapper() = buildMessageWrapper {
         appendText("🔍 能不能好好说话？", true)

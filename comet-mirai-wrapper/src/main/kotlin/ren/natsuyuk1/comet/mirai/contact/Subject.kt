@@ -17,7 +17,7 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 abstract class MiraiGroup(
     override val id: Long,
-    override var name: String,
+    override var name: String
 ) : Group(id, name) {
     override val platform: LoginPlatform = LoginPlatform.MIRAI
 }
@@ -62,8 +62,9 @@ internal class MiraiGroupImpl(
                 Clock.System.now().epochSeconds
             ).also { it.broadcast() }
 
-            if (!event.isCancelled)
+            if (!event.isCancelled) {
                 group.sendMessage(message.toMessageChain(group))
+            }
         }
     }
 }
@@ -75,13 +76,12 @@ abstract class MiraiUser : User() {
 }
 
 fun net.mamoe.mirai.contact.User.toCometUser(miraiComet: MiraiComet): User {
-
     val miraiUser = this@toCometUser
 
     class MiraiUserImpl(
         override val comet: Comet = miraiComet,
         override val name: String = miraiUser.nick,
-        override val id: Long = miraiUser.id,
+        override val id: Long = miraiUser.id
     ) : MiraiUser() {
         override fun sendMessage(message: MessageWrapper) {
             comet.scope.launch {
@@ -92,11 +92,11 @@ fun net.mamoe.mirai.contact.User.toCometUser(miraiComet: MiraiComet): User {
                     Clock.System.now().epochSeconds
                 ).also { it.broadcast() }
 
-                if (!event.isCancelled)
+                if (!event.isCancelled) {
                     miraiUser.sendMessage(message.toMessageChain(miraiUser))
+                }
             }
         }
-
     }
 
     return MiraiUserImpl()

@@ -20,7 +20,7 @@ object GitHubApi {
 
     suspend fun getUserInfo(username: String): Result<UserInfo?> =
         runCatching<UserInfo?> {
-            cometClient.client.get("${apiRoute}/users/${username}").body()
+            cometClient.client.get("$apiRoute/users/$username").body()
         }.onSuccess {
             userCache.add(username)
         }

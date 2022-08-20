@@ -26,7 +26,7 @@ object KeyWordData : PersistDataFile<KeyWordData.Data>(
         data class KeyWord(
             val pattern: String,
             val reply: MessageWrapper,
-            val isRegex: Boolean = false,
+            val isRegex: Boolean = false
         )
     }
 

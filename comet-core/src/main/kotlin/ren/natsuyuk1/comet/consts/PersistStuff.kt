@@ -24,7 +24,7 @@ val cometPersistDataFile: List<PersistDataFile<*>> =
         GithubRepoData,
         EventManagerConfig,
         CometServerConfig,
-        KeyWordData,
+        KeyWordData
     )
 
 val cometTables =
@@ -34,7 +34,7 @@ val cometTables =
         ProjectSekaiDataTable,
         ProjectSekaiUserDataTable,
         NowCmdConfigTable,
-        ArcaeaUserDataTable,
+        ArcaeaUserDataTable
     )
 
 val defaultCommands: List<AbstractCommandNode<*>> =
@@ -94,7 +94,7 @@ val defaultCommands: List<AbstractCommandNode<*>> =
             BangumiCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
-            NOW,
+            NOW
         ) { comet, sender, subject, wrapper, user ->
             NowCommand(comet, sender, subject, wrapper, user)
         },

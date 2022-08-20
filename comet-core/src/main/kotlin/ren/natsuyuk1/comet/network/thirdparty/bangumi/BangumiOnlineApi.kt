@@ -29,10 +29,12 @@ object BangumiOnlineApi {
 
     suspend fun fetchBangumiSchedule(): BangumiOnlineScheduleData =
         cometClient.client.post("$API/api/schedule") {
-            setBody(FormDataContent(
-                Parameters.build {
-                    append("tz", TimeZone.currentSystemDefault().id)
-                }
-            ))
+            setBody(
+                FormDataContent(
+                    Parameters.build {
+                        append("tz", TimeZone.currentSystemDefault().id)
+                    }
+                )
+            )
         }.body()
 }

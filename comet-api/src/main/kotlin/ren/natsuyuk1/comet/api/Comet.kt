@@ -69,13 +69,14 @@ fun Comet.attachMessageProcessor() {
         if (it.comet == this) {
             val sessionProcessed = SessionManager.handleSession(it.subject, it.sender, it.message)
 
-            if (!sessionProcessed)
+            if (!sessionProcessed) {
                 CommandManager.executeCommand(
                     comet = this,
                     sender = it.sender,
                     subject = it.subject,
                     wrapper = it.message
                 )
+            }
         }
     }
 }

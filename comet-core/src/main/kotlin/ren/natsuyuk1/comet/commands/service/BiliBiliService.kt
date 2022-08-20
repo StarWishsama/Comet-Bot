@@ -194,9 +194,13 @@ object BiliBiliService {
 
     suspend fun processDynamicSearch(subject: PlatformCommandSender, dynamicID: String) {
         val dynamic =
-            if (dynamicID.isNumeric()) dynamicID.toLongOrNull() else dynamicPattern.find(dynamicID)?.groupValues?.getOrNull(
-                1
-            )?.toLongOrNull()
+            if (dynamicID.isNumeric()) {
+                dynamicID.toLongOrNull()
+            } else {
+                dynamicPattern.find(dynamicID)?.groupValues?.getOrNull(
+                    1
+                )?.toLongOrNull()
+            }
 
         if (dynamic == null) {
             subject.sendMessage("请输入有效的动态 ID 或链接!".toMessageWrapper())

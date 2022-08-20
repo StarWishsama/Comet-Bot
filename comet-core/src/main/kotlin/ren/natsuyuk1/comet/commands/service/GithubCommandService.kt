@@ -26,7 +26,7 @@ object GithubCommandService {
         user: CometUser,
         val owner: String,
         val name: String,
-        private val groupID: Long,
+        private val groupID: Long
     ) : Session(contact, user) {
         override fun handle(message: MessageWrapper) {
             val raw = message.parseToString()
@@ -81,9 +81,11 @@ object GithubCommandService {
                     delay(1.seconds)
 
                     sender.sendMessage(
-                        ("你正在订阅仓库 $owner/$name, 是否需要添加仓库机密 (Secret)?\n" +
-                            "添加机密可以保证传输仓库信息更加安全, 但千万别忘记了你设置的机密!\n" +
-                            "如果无需添加, 请回复「完成订阅」, 反之直接发送你欲设置的机密.").toMessageWrapper()
+                        (
+                            "你正在订阅仓库 $owner/$name, 是否需要添加仓库机密 (Secret)?\n" +
+                                "添加机密可以保证传输仓库信息更加安全, 但千万别忘记了你设置的机密!\n" +
+                                "如果无需添加, 请回复「完成订阅」, 反之直接发送你欲设置的机密."
+                            ).toMessageWrapper()
                     )
 
                     GitHubSubscribeSession(subject, sender, user, owner, name, groupID).registerTimeout(1.minutes)
@@ -92,7 +94,9 @@ object GithubCommandService {
                     if (CometServerConfig.data.serverName.isBlank()) {
                         subject.sendMessage("订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置添加 Comet 管理提供的链接!".toMessageWrapper())
                     } else {
-                        subject.sendMessage("订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置添加以下链接!\n>> ${CometServerConfig.data.serverName}/github".toMessageWrapper())
+                        subject.sendMessage(
+                            "订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置添加以下链接!\n>> ${CometServerConfig.data.serverName}/github".toMessageWrapper()
+                        )
                     }
                 }
             } else {
@@ -155,7 +159,6 @@ object GithubCommandService {
             name = groupVar[4]
         }
 
-
         if (owner == null || name == null) {
             subject.sendMessage("请输入有效的仓库名/链接!".toMessageWrapper())
             return
@@ -209,11 +212,13 @@ object GithubCommandService {
                     return
                 }
 
-                subject.sendMessage(buildMessageWrapper {
-                    appendText("当前仓库 ${repo.getName()}", true)
-                    appendText("订阅分支 >> ${subSetting.subscribeBranch}", true)
-                    appendText("订阅事件 >> ${subSetting.subscribeEvent}", true)
-                })
+                subject.sendMessage(
+                    buildMessageWrapper {
+                        appendText("当前仓库 ${repo.getName()}", true)
+                        appendText("订阅分支 >> ${subSetting.subscribeBranch}", true)
+                        appendText("订阅事件 >> ${subSetting.subscribeEvent}", true)
+                    }
+                )
             }
         }
     }

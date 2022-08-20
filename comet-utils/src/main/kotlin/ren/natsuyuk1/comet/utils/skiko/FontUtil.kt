@@ -38,9 +38,11 @@ object FontUtil {
         fontFolder.listFiles()?.let { list ->
             list.forEach { f ->
                 try {
-                    fontProvider.registerTypeface(Typeface.makeFromFile(f.absPath).also {
-                        logger.debug { "Init typeface ${it.familyName}" }
-                    })
+                    fontProvider.registerTypeface(
+                        Typeface.makeFromFile(f.absPath).also {
+                            logger.debug { "Init typeface ${it.familyName}" }
+                        }
+                    )
                     counter++
                 } catch (e: Exception) {
                     logger.warn { "无效的字体文件 ${f.absPath}" }

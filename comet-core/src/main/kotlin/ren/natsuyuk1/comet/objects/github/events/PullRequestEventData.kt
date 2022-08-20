@@ -45,7 +45,7 @@ data class PullRequestEventData(
         @SerialName("owner")
         val owner: JsonElement,
         @SerialName("html_url")
-        val repoUrl: String,
+        val repoUrl: String
     )
 
     @Serializable
@@ -55,7 +55,7 @@ data class PullRequestEventData(
         val title: String,
         val body: String = "没有描述",
         @SerialName("created_at")
-        val createdTime: String,
+        val createdTime: String
     ) {
         fun convertCreatedTime(): String {
             val localTime =

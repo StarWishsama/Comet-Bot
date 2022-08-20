@@ -146,8 +146,9 @@ object CommandManager {
                         if (user.coin < property.executeConsumePoint) {
                             return@runCatching CommandStatus.ValidateFailed()
                         } else {
-                            if (user.userLevel != UserLevel.OWNER)
+                            if (user.userLevel != UserLevel.OWNER) {
                                 user.coin = user.coin - property.executeConsumePoint
+                            }
                         }
                     }
                 }
@@ -174,15 +175,15 @@ object CommandManager {
                 is CommandResult.Error -> {
                     subject.sendMessage(buildMessageWrapper { cmdStatus.userMessage?.let { appendText(it) } })
 
-                    if (cmdStatus.cause !is CliktError)
+                    if (cmdStatus.cause !is CliktError) {
                         logger.warn(cmdStatus.cause) { "在执行命令时发生了意外" }
+                    }
                     return@runCatching CommandStatus.Error()
                 }
                 is CommandResult.Success -> {
                     return@runCatching CommandStatus.Success()
                 }
             }
-
         }.onSuccess {
             if (it.isPassed()) {
                 logger.info {
@@ -191,15 +192,17 @@ object CommandManager {
             }
         }.onFailure {
             if (user.userLevel == UserLevel.OWNER) {
-                subject.sendMessage(buildMessageWrapper {
-                    appendText(
-                        "在尝试执行命令时发生异常, 报错信息如下, 详细请查看后台\n${
+                subject.sendMessage(
+                    buildMessageWrapper {
+                        appendText(
+                            "在尝试执行命令时发生异常, 报错信息如下, 详细请查看后台\n${
                             it.message?.limit(
                                 25
                             ) ?: "无"
-                        }"
-                    )
-                })
+                            }"
+                        )
+                    }
+                )
             } else {
                 subject.sendMessage(buildMessageWrapper { appendText("这条命令突然坏掉了 (っ °Д °;)っ") })
             }
@@ -216,8 +219,9 @@ object CommandManager {
      */
     fun getCommand(name: String, sender: CommandSender): AbstractCommandNode<*>? =
         commands.filter {
-            ((sender is ConsoleCommandSender && it.value is ConsoleCommandNode)
-                || (sender is PlatformCommandSender && it.value is CommandNode)
+            (
+                (sender is ConsoleCommandSender && it.value is ConsoleCommandNode) ||
+                    (sender is PlatformCommandSender && it.value is CommandNode)
                 ) && (it.value.property.name == name || it.value.property.alias.contains(name))
         }.values.firstOrNull()
 

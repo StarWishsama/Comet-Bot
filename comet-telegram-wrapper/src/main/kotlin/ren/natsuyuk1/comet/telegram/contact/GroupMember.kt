@@ -40,7 +40,7 @@ private val UNMUTE = ChatPermissions(canSendMessages = true, canSendMediaMessage
 class TelegramGroupMemberImpl(
     private val user: User,
     private val groupChatID: Long,
-    override val comet: TelegramComet,
+    override val comet: TelegramComet
 ) : TelegramGroupMember() {
     @OptIn(PreviewFeature::class)
     override val group: Group
@@ -95,25 +95,28 @@ class TelegramGroupMemberImpl(
     }
 
     override suspend fun operateAdminPermission(operation: Boolean) {
-        if (operation) comet.bot.promoteChatMember(
-            chatId = groupChatID.toChatId(),
-            userId = id.toChatId(),
-            canManageChat = true
-        )
-        else comet.bot.promoteChatMember(
-            chatId = groupChatID.toChatId(),
-            userId = id.toChatId(),
-            isAnonymous = false,
-            canChangeInfo = false,
-            canPostMessages = false,
-            canEditMessages = false,
-            canDeleteMessages = false,
-            canInviteUsers = false,
-            canRestrictMembers = false,
-            canPinMessages = false,
-            canPromoteMembers = false,
-            canManageChat = null
-        )
+        if (operation) {
+            comet.bot.promoteChatMember(
+                chatId = groupChatID.toChatId(),
+                userId = id.toChatId(),
+                canManageChat = true
+            )
+        } else {
+            comet.bot.promoteChatMember(
+                chatId = groupChatID.toChatId(),
+                userId = id.toChatId(),
+                isAnonymous = false,
+                canChangeInfo = false,
+                canPostMessages = false,
+                canEditMessages = false,
+                canDeleteMessages = false,
+                canInviteUsers = false,
+                canRestrictMembers = false,
+                canPinMessages = false,
+                canPromoteMembers = false,
+                canManageChat = null
+            )
+        }
     }
 
     override fun sendMessage(message: MessageWrapper) {
@@ -125,8 +128,9 @@ class TelegramGroupMemberImpl(
                 Clock.System.now().epochSeconds
             ).also { it.broadcast() }
 
-            if (!event.isCancelled)
+            if (!event.isCancelled) {
                 message.send(comet, groupChatID.toChatId())
+            }
         }
     }
 }

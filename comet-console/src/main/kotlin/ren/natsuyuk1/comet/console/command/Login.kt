@@ -19,7 +19,7 @@ internal val LOGIN = CommandProperty(
     listOf(),
     "登录机器人账号",
     "/login [id] --password [密码] --platform (登录平台 默认为 QQ)\n" +
-            "注意: Telegram 平台下, 你的 ID 为 token 中的数字."
+        "注意: Telegram 平台下, 你的 ID 为 token 中的数字."
 )
 
 internal class Login(
@@ -33,7 +33,8 @@ internal class Login(
     private val password by argument(name = "账户密码/Token", help = "登录账户的密码/Token")
 
     private val platform by option(
-        "-p", "--platform",
+        "-p",
+        "--platform",
         help = "登录 Comet 机器人的平台 (例如 QQ, Telegram)"
     ).enum<LoginPlatform>(true).default(LoginPlatform.MIRAI)
 

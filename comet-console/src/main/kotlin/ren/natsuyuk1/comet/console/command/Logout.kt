@@ -30,7 +30,8 @@ internal class Logout(
     private val id by argument(name = "账户 ID", help = "登录账户的 ID").long()
 
     private val platform by option(
-        "-p", "--platform",
+        "-p",
+        "--platform",
         help = "登录 Comet 机器人的平台 (例如 MIRAI, Telegram)"
     ).enum<LoginPlatform>(true).default(LoginPlatform.MIRAI)
 
@@ -48,4 +49,3 @@ internal class Logout(
         }
     }
 }
-

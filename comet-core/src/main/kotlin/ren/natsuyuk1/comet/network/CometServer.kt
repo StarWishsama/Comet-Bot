@@ -13,16 +13,19 @@ object CometServer {
     private lateinit var server: ApplicationEngine
 
     fun init(config: CometServerConfig) {
-        server = embeddedServer(Netty, environment = applicationEngineEnvironment {
-            module {
-                install(CallLogging)
-                githubWebHookModule()
-            }
+        server = embeddedServer(
+            Netty,
+            environment = applicationEngineEnvironment {
+                module {
+                    install(CallLogging)
+                    githubWebHookModule()
+                }
 
-            connector {
-                port = config.data.port
+                connector {
+                    port = config.data.port
+                }
             }
-        })
+        )
 
         server.start(false)
         logger.info { "Comet 服务器成功启动! 运行在端口 ${config.data.port}" }

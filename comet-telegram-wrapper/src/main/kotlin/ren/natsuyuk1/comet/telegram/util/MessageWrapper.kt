@@ -73,10 +73,11 @@ suspend fun MessageContent.toMessageWrapper(comet: TelegramComet, isCommand: Boo
 
         is TextContent -> {
             buildMessageWrapper {
-                if (isCommand)
+                if (isCommand) {
                     appendText(content.text.replace(comet.bot.getMe().username.username, ""))
-                else
+                } else {
                     appendText(content.text)
+                }
             }
         }
 

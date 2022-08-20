@@ -66,7 +66,6 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
         // Refresh user pjsk score and rank
         userData.updateInfo(profile.score, profile.rank)
 
-
         if (ahead != 0) {
             val aheadEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, ahead) }
             val aheadScore = aheadEventStatus.getScore()
@@ -129,4 +128,3 @@ private fun Int.getSurroundingRank(): Pair<Int, Int> {
 
     return Pair(rankPosition.last(), 1000001)
 }
-

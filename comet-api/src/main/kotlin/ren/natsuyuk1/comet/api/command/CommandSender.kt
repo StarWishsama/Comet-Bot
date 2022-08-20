@@ -68,7 +68,6 @@ object ConsoleCommandSender : CommandSender {
     }
 }
 
-
 // region === cast ===
 
 /**
@@ -91,7 +90,6 @@ fun PlatformCommandSender.asUser() = this as? User
  * @see [Group]
  */
 fun PlatformCommandSender.asGroup() = this as? Group
-
 
 /**
  * Try casting [PlatformCommandSender] to [GroupMember] or return `null`

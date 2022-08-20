@@ -12,6 +12,6 @@ data class OldGitHubRepo(
         val repoName: String,
         val repoSecret: String,
         val repoTarget: MutableSet<Long>,
-        val branchFilter: MutableSet<String> = mutableSetOf(),
+        val branchFilter: MutableSet<String> = mutableSetOf()
     )
 }

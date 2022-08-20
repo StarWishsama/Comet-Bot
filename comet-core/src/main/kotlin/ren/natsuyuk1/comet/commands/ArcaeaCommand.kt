@@ -34,7 +34,7 @@ class ArcaeaCommand(
     init {
         subcommands(
             Bind(subject, sender, user),
-            Info(comet, subject, sender, user),
+            Info(comet, subject, sender, user)
         )
     }
 
@@ -59,7 +59,8 @@ class ArcaeaCommand(
         }
 
         private val userID by option(
-            "-i", "--id",
+            "-i",
+            "--id",
             help = "要绑定的 Arcaea 账号 ID"
         )
 
@@ -81,7 +82,8 @@ class ArcaeaCommand(
     ) : CometSubCommand(subject, sender, user, INFO) {
 
         private val userID by option(
-            "-i", "--id",
+            "-i",
+            "--id",
             help = "要查询的 Arcaea 账号 ID"
         )
 
@@ -107,4 +109,3 @@ class ArcaeaCommand(
         }
     }
 }
-

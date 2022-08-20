@@ -124,7 +124,6 @@ class NowCommand(
             timezone()
         }
 
-
         if (save) {
             newSuspendedTransaction {
                 val config = Config(formatter, timezones.await())
@@ -149,8 +148,10 @@ class NowCommand(
             }
         }
 
-        subject.sendMessage(buildMessageWrapper {
-            appendText(message.await(), true)
-        })
+        subject.sendMessage(
+            buildMessageWrapper {
+                appendText(message.await(), true)
+            }
+        )
     }
 }

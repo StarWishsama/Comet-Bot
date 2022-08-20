@@ -9,7 +9,7 @@ import java.util.*
 fun newFormatterOrNull(pattern: String): DateTimeFormatter? =
     try {
         DateTimeFormatter.ofPattern(pattern)
-    }  catch (e: IllegalArgumentException) {
+    } catch (e: IllegalArgumentException) {
         null
     }
 

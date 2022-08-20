@@ -61,7 +61,9 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent {
             requireNotNull(subject) { "subject cannot be null!" }
 
             if (subject !is AudioSupported) {
-                throw UnsupportedOperationException("Sending voice message to unsupported subject: must be friend or group")
+                throw UnsupportedOperationException(
+                    "Sending voice message to unsupported subject: must be friend or group"
+                )
             }
 
             if (filePath.isNotEmpty() && File(filePath).exists()) {
@@ -73,7 +75,9 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent {
             throw RuntimeException("Unable to convert Voice to MessageChain, Raw content: $this")
         }
 
-        else -> throw UnsupportedOperationException("Unsupported message wrapper ${this::class.simpleName} in mirai side")
+        else -> throw UnsupportedOperationException(
+            "Unsupported message wrapper ${this::class.simpleName} in mirai side"
+        )
     }
 }
 
@@ -92,10 +96,11 @@ fun MessageWrapper.toMessageChain(subject: Contact): MessageChain {
                     add(elem.toMessageContent(subject))
                 }
             }.onFailure {
-                if (it !is UnsupportedOperationException)
+                if (it !is UnsupportedOperationException) {
                     logger.warn(it) { "A error occurred when converting message wrapper" }
-                else
+                } else {
                     logger.debug { "Unsupported message element: ${elem::class.simpleName}" }
+                }
             }
         }
     }.build()

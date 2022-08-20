@@ -18,7 +18,7 @@ object GithubRepoData : PersistDataFile<GithubRepoData.Data>(
             val repoName: String,
             val owner: String,
             val secret: String,
-            val subscribers: MutableList<GithubRepoSubscriber>,
+            val subscribers: MutableList<GithubRepoSubscriber>
         ) {
             fun getName(): String = "$owner/$repoName"
 

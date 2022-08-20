@@ -29,7 +29,7 @@ class KeyWordAddSession(
     val subject: PlatformCommandSender,
     user: CometUser,
     val keyword: String,
-    private val regex: Boolean,
+    private val regex: Boolean
 ) : Session(contact, user) {
     override fun handle(message: MessageWrapper) {
         KeyWordData.addKeyWord(subject.id, subject.platform, KeyWordData.GroupInstance.KeyWord(keyword, message, regex))
@@ -55,7 +55,6 @@ class KeyWordCommand(
             subject.sendMessage("该命令只能在群聊中使用!".toMessageWrapper())
             return
         }
-
 
         when {
             add != null -> {
@@ -84,16 +83,20 @@ class KeyWordCommand(
                     return
                 }
 
-                subject.sendMessage(buildMessageWrapper {
-                    appendText("已添加的关键词 >>", true)
+                subject.sendMessage(
+                    buildMessageWrapper {
+                        appendText("已添加的关键词 >>", true)
 
-                    appendText(buildString {
-                        keywords.words.forEach {
-                            append("${it.pattern} => ${it.reply.parseToString().limit(20)}")
-                            appendLine()
-                        }
-                    }.trim())
-                })
+                        appendText(
+                            buildString {
+                                keywords.words.forEach {
+                                    append("${it.pattern} => ${it.reply.parseToString().limit(20)}")
+                                    appendLine()
+                                }
+                            }.trim()
+                        )
+                    }
+                )
             }
 
             else -> {
@@ -109,7 +112,7 @@ class KeyWordCommand(
                  -l, --list 文本     查看本群已有的关键词
                  -r, --regex       是否为正则表达式
                  -h, --help        显示帮助信息并退出
-                """.trimIndent().toMessageWrapper()
+                    """.trimIndent().toMessageWrapper()
                 )
             }
         }

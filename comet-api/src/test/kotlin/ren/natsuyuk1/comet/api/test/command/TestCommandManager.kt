@@ -38,7 +38,8 @@ class TestCommandManager {
                 fakeComet,
                 fakeSender,
                 fakeSender,
-                buildMessageWrapper { appendText("/help") }).join()
+                buildMessageWrapper { appendText("/help") }
+            ).join()
         }
     }
 }

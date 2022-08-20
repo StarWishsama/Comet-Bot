@@ -47,11 +47,11 @@ object GroupSettingManager {
 }
 
 class GroupSetting(val id: Long) : PersistDataFile<GroupSetting.Data>(
-    File(resolveDirectory("./group-setting"), "${id}.yml"),
+    File(resolveDirectory("./group-setting"), "$id.yml"),
     Data()
 ) {
     data class Data(
         var autoAcceptJoinRequest: Boolean = false,
-        var allowRepeatMessage: Boolean = false,
+        var allowRepeatMessage: Boolean = false
     )
 }

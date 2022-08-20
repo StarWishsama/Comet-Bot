@@ -82,7 +82,9 @@ fun RepostCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
     buildMessageWrapper {
         val originDynamic = runBlocking { DynamicApi.getDynamic(item?.originFeedId!!.toLong()).getOrNull() }
 
-        appendText("${description.userProfile?.info?.uname} 分享了 ${originDynamic?.description?.userProfile?.info?.uname} 的动态\n")
+        appendText(
+            "${description.userProfile?.info?.uname} 分享了 ${originDynamic?.description?.userProfile?.info?.uname} 的动态\n"
+        )
         appendText("⏰ ${description.getReadableSentTime()}\n\n")
 
         appendText("${item?.content}\n\n")

@@ -15,7 +15,6 @@ import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 
-
 val PROMOTE = CommandProperty(
     "promote",
     listOf(),

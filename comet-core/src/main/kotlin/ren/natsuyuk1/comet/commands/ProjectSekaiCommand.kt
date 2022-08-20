@@ -46,7 +46,7 @@ class ProjectSekaiCommand(
             Event(subject, sender, user),
             Prediction(subject, sender, user),
             Info(subject, sender, user),
-            Best30(subject, sender, user),
+            Best30(subject, sender, user)
         )
     }
 
@@ -71,7 +71,8 @@ class ProjectSekaiCommand(
         }
 
         private val userID by option(
-            "-i", "--id",
+            "-i",
+            "--id",
             help = "要绑定的世界计划账号 ID"
         ).long().default(-1)
 
@@ -139,7 +140,6 @@ class ProjectSekaiCommand(
             )
         }
 
-
         override suspend fun run() {
             subject.sendMessage(ProjectSekaiService.fetchPrediction())
         }
@@ -158,7 +158,6 @@ class ProjectSekaiCommand(
                 PROJECTSEKAI
             )
         }
-
 
         override suspend fun run() {
             subject.sendMessage(ProjectSekaiService.b30(user))

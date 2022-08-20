@@ -55,7 +55,7 @@ data class IssueEventData(
         val body: String?,
         val user: UserObject,
         @SerialName("state_reason")
-        val stateReason: IssueStateReason? = null,
+        val stateReason: IssueStateReason? = null
     ) {
         @Serializable
         data class UserObject(
@@ -95,7 +95,7 @@ data class IssueEventData(
         @SerialName("updated_at")
         val updateTime: String,
         @SerialName("pushed_at")
-        val pushTime: String,
+        val pushTime: String
     )
 
     override fun toMessageWrapper(): MessageWrapper {

@@ -98,7 +98,6 @@ class TestSessionManager {
         override val name: String = "Mito"
         override var card: String = "Mito"
         override val platform: LoginPlatform = LoginPlatform.TEST
-
     }
 
     @Test

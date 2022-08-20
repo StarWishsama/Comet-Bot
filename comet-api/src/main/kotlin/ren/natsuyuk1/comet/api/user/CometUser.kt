@@ -75,9 +75,14 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
         /**
          * 获取一个不可操作的用户
          */
-        val dummyUser = CometUser(EntityID(UUID.randomUUID(), object : IdTable<UUID>("fake_table") {
-            override val id: Column<EntityID<UUID>> = uuid("fake_uuid").entityId()
-        }))
+        val dummyUser = CometUser(
+            EntityID(
+                UUID.randomUUID(),
+                object : IdTable<UUID>("fake_table") {
+                    override val id: Column<EntityID<UUID>> = uuid("fake_uuid").entityId()
+                }
+            )
+        )
 
         fun getUser(id: Long, platform: LoginPlatform) = transaction {
             find {

@@ -31,6 +31,6 @@ class TestProjectSekaiService {
 
         val fetched = ProjectSekaiManager.getSongAdjustedLevel(musicId, MusicDifficulty.MASTER)
 
-        assertTrue("Wrong music diff (${fetched}), it should be $diff") { diff == fetched }
+        assertTrue("Wrong music diff ($fetched), it should be $diff") { diff == fetched }
     }
 }

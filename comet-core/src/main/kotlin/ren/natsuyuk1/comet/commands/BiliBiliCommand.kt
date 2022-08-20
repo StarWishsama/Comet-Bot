@@ -98,7 +98,6 @@ class BiliBiliCommand(
                 BiliBiliService.processVideoSearch(subject, video)
             }
         }
-
     }
 
     class Dynamic(

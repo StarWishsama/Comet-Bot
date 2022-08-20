@@ -41,11 +41,13 @@ object SkikoHelper {
         }
 
         install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-                isLenient = true
-                ignoreUnknownKeys = true
-            })
+            json(
+                Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                }
+            )
         }
     }
     private const val SKIKO_LIBRARY_PATH_PROPERTY = "skiko.library.path"
@@ -65,7 +67,6 @@ object SkikoHelper {
 
         skikoLibFolder.mkdirs()
 
-
         val skikoOsName = when (RuntimeUtil.getOsType()) {
             OsType.MACOS -> "macos"
             OsType.WINDOWS -> "windows"
@@ -82,11 +83,11 @@ object SkikoHelper {
         if (skikoLibFolder.listFiles()?.isEmpty() == true) {
             logger.info { "开始下载 Skiko $SKIKO_VERSION 依赖库." }
             val downloadURL =
-                "https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/skiko/skiko-awt-runtime-${skikoOsName}-${skikoArchName}/$SKIKO_VERSION/skiko-awt-runtime-${skikoOsName}-${skikoArchName}-$SKIKO_VERSION.jar"
+                "https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/skiko/skiko-awt-runtime-$skikoOsName-$skikoArchName/$SKIKO_VERSION/skiko-awt-runtime-$skikoOsName-$skikoArchName-$SKIKO_VERSION.jar"
 
             kotlin.runCatching {
                 val tmpDownloadFile =
-                    skikoLibFolder.resolve("skiko-awt-runtime-${skikoOsName}-${skikoArchName}-$SKIKO_VERSION.jar")
+                    skikoLibFolder.resolve("skiko-awt-runtime-$skikoOsName-$skikoArchName-$SKIKO_VERSION.jar")
                 client.downloadFile(downloadURL, tmpDownloadFile)
                 val zip = runInterruptible {
                     ZipFile(tmpDownloadFile)
@@ -100,10 +101,13 @@ object SkikoHelper {
                     }
                 }
 
-                copyEntryTo(zip.getEntry(skikoLib.name) ?: kotlin.run {
-                    logger.warn { "下载的 Skiko 文件缺失, 请自行下载." }
-                    return
-                }, skikoLib.toPath())
+                copyEntryTo(
+                    zip.getEntry(skikoLib.name) ?: kotlin.run {
+                        logger.warn { "下载的 Skiko 文件缺失, 请自行下载." }
+                        return
+                    },
+                    skikoLib.toPath()
+                )
 
                 if (skikoOsName == "windows") {
                     val extraEntry = zip.getEntry("icudtl.dat") ?: kotlin.run {

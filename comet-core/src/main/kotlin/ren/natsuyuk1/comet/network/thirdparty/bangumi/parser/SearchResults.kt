@@ -68,7 +68,7 @@ class SubjectSearchResults(override val htmlPage: String) : Parser() {
             info = info,
             rank = rank,
             score = score,
-            voteCount = voteCount,
+            voteCount = voteCount
         )
     }
 

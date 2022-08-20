@@ -30,7 +30,7 @@ object NowCmdConfigTable : Table("now_cmd_config") {
         platform: LoginPlatform,
         isGroup: Boolean,
         id: Long,
-        config: Config,
+        config: Config
     ): Unit = withContext(Dispatchers.IO) {
         if (!hasConfig(platform, isGroup, id)) {
             insert {
@@ -52,7 +52,7 @@ object NowCmdConfigTable : Table("now_cmd_config") {
     suspend fun hasConfig(
         platform: LoginPlatform,
         isGroup: Boolean,
-        id: Long,
+        id: Long
     ): Boolean = withContext(Dispatchers.IO) {
         select {
             (platformType eq platform) and
@@ -64,7 +64,7 @@ object NowCmdConfigTable : Table("now_cmd_config") {
     suspend fun getConfig(
         platform: LoginPlatform,
         isGroup: Boolean,
-        id: Long,
+        id: Long
     ): Config? = withContext(Dispatchers.IO) {
         select {
             (platformType eq platform) and
@@ -80,7 +80,7 @@ object NowCmdConfigTable : Table("now_cmd_config") {
 class Config(
     val formatter: String? = null,
 
-    val timezones: List<Pair<@Serializable(TimeZoneSerializer::class) TimeZone, String?>>? = null,
+    val timezones: List<Pair<@Serializable(TimeZoneSerializer::class) TimeZone, String?>>? = null
 )
 
 object TimeZoneSerializer : KSerializer<TimeZone> {

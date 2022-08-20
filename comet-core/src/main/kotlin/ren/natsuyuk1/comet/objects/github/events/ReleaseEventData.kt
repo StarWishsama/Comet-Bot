@@ -27,7 +27,7 @@ data class ReleaseEventData(
     val action: String,
     val release: ReleaseInfo,
     val repository: IssueEventData.RepoInfo,
-    val sender: IssueEventData.SenderInfo,
+    val sender: IssueEventData.SenderInfo
 ) : GithubEventData {
 
     @Serializable

@@ -23,7 +23,6 @@ val fakeComet = object : Comet(CometConfig(0, "", LoginPlatform.TEST), logger, M
     override fun close() {}
 
     override suspend fun getGroup(id: Long): Group? = null
-
 }
 
 fun generateFakeSender(id: Long): User = object : User() {
@@ -37,7 +36,7 @@ fun generateFakeSender(id: Long): User = object : User() {
         get() = LoginPlatform.TEST
 
     override fun sendMessage(message: MessageWrapper) {
-        logger.debug { "Message sent to user ${id}: ${message.parseToString()}" }
+        logger.debug { "Message sent to user $id: ${message.parseToString()}" }
     }
 }
 
@@ -78,9 +77,8 @@ fun generateFakeGroup(id: Long): Group = object : Group(id, "TestGroup") {
     override val platform: LoginPlatform = LoginPlatform.TEST
 
     override fun sendMessage(message: MessageWrapper) {
-        logger.debug { "Message sent to group ${id}: ${message.parseToString()}" }
+        logger.debug { "Message sent to group $id: ${message.parseToString()}" }
     }
-
 }
 
 fun Any.print() = println(this)

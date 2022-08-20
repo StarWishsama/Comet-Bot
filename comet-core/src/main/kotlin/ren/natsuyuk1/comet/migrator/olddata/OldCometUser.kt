@@ -23,7 +23,7 @@ data class OldCometUser(
     var r6sAccount: String = "",
     var level: OldUserLevel = OldUserLevel.USER,
     var triggerCommandTime: Long = -1,
-    var genshinGachaPool: Int = 0,
+    var genshinGachaPool: Int = 0
 )
 
 object UUIDSerializer : KSerializer<UUID> {

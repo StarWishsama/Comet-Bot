@@ -78,7 +78,7 @@ object GithubWebHookHandler {
                     logger.debug("推送 WebHook 消息失败, 不支持的事件类型")
 
                     call.respondText(
-                        "Comet 已收到事件, 但所请求的事件类型不支持 (${eventType})",
+                        "Comet 已收到事件, 但所请求的事件类型不支持 ($eventType)",
                         status = HttpStatusCode.InternalServerError
                     )
 

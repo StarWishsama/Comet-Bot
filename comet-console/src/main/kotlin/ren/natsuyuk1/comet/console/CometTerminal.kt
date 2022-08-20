@@ -80,7 +80,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
             setupShutdownHook()
             setupConsole()
 
-            logger.info { "正在运行 Comet Terminal ${version}-${branch}-${hash}" }
+            logger.info { "正在运行 Comet Terminal $version-$branch-$hash" }
 
             CometTerminal.init(scope.coroutineContext)
 

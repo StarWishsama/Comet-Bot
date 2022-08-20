@@ -6,7 +6,7 @@ import ren.natsuyuk1.comet.utils.file.dataDirectory
 import java.io.File
 
 enum class RateLimitAPI {
-    GITHUB,
+    GITHUB
 }
 
 object RateLimitData : PersistDataFile<RateLimitData.Data>(

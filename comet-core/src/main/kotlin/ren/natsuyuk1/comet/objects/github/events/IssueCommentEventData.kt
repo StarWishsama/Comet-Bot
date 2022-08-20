@@ -25,7 +25,7 @@ data class IssueCommentEventData(
     val action: String,
     val issue: IssueEventData.IssueObject,
     val comment: CommentObject,
-    val repository: IssueEventData.RepoInfo,
+    val repository: IssueEventData.RepoInfo
 ) : GithubEventData {
     @Serializable
     data class CommentObject(
@@ -37,7 +37,7 @@ data class IssueCommentEventData(
         val createdTime: String,
         @SerialName("updated_at")
         val updatedTime: String,
-        val body: String,
+        val body: String
     ) {
         fun convertCreatedTime(): String {
             val localTime =
@@ -54,7 +54,6 @@ data class IssueCommentEventData(
             appendText("新回复 | ${comment.user.login} | ${comment.convertCreatedTime()}\n\n")
             appendText("${comment.body.limit(80).trim()}\n\n")
             appendText("查看全部 > ${comment.url}\n")
-
         }
     }
 

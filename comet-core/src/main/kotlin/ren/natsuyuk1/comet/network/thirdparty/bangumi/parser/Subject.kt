@@ -173,7 +173,7 @@ class Subject(override val htmlPage: String) : Parser(), Unique {
                 FollowStatus(
                     num = num ?: return@map null,
                     link = MAIN_DOMAIN + path,
-                    type = type ?: return@map null,
+                    type = type ?: return@map null
                 )
             }.filterNotNull().toList()
     }

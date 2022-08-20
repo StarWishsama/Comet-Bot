@@ -20,7 +20,6 @@ import ren.natsuyuk1.comet.mirai.util.runWithSuspend
 import ren.natsuyuk1.comet.service.subscribeGithubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 
-
 private val logger = logger("Comet-Mirai")
 
 class MiraiComet(
@@ -31,7 +30,7 @@ class MiraiComet(
 
     private val cl: ClassLoader,
 
-    private val miraiConfig: MiraiConfig,
+    private val miraiConfig: MiraiConfig
 ) : Comet(config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
     lateinit var miraiBot: Bot
 

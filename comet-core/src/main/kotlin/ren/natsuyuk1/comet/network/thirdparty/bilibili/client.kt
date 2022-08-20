@@ -14,12 +14,14 @@ val client = BiliClient()
 
 fun initYabapi() {
     Yabapi.apply {
-        defaultJson.lazySet(Json {
-            prettyPrint = true
-            isLenient = true
-            coerceInputValues = true
-            ignoreUnknownKeys = true
-        })
+        defaultJson.lazySet(
+            Json {
+                prettyPrint = true
+                isLenient = true
+                coerceInputValues = true
+                ignoreUnknownKeys = true
+            }
+        )
     }
 
     if (!isInitializedYabapi) {

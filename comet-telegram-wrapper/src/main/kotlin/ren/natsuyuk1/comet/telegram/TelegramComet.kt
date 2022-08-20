@@ -47,9 +47,11 @@ class TelegramComet(
             logger.debug { "Refreshed accumulated updates" }
 
             bot.buildBehaviourWithLongPolling(scope) {
-                onContentMessage(CommonMessageFilter {
-                    it.chat is PrivateChat || it.chat is GroupChat
-                }) {
+                onContentMessage(
+                    CommonMessageFilter {
+                        it.chat is PrivateChat || it.chat is GroupChat
+                    }
+                ) {
                     logger.trace { it.format() }
                     scope.launch { it.toCometEvent(this@TelegramComet)?.broadcast() }
                 }

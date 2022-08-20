@@ -101,7 +101,6 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
     var name by ProjectSekaiDataTable.name
 }
 
-
 /**
  * 储存与 Project Sekai: Colorful Stage 有关的数据
  *

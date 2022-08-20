@@ -69,8 +69,9 @@ internal class MiraiGroupMemberImpl(
                 Clock.System.now().epochSeconds
             ).also { it.broadcast() }
 
-            if (!event.isCancelled)
+            if (!event.isCancelled) {
                 contact.sendMessage(message.toMessageChain(contact))
+            }
         }
     }
 
@@ -88,7 +89,7 @@ fun NormalMember.toGroupMember(comet: MiraiComet): GroupMember = MiraiGroupMembe
 
 internal class MiraiAnonymousMemberImpl(
     private val contact: AnonymousMember,
-    override val comet: MiraiComet,
+    override val comet: MiraiComet
 ) : ren.natsuyuk1.comet.api.user.AnonymousMember() {
     override val group: Group
         get() = contact.group.toCometGroup(comet)

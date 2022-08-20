@@ -59,7 +59,7 @@ object EventManager {
      * @return [Flow]
      */
     fun getEventFlow(
-        priority: EventPriority = EventPriority.NORMAL,
+        priority: EventPriority = EventPriority.NORMAL
     ): Flow<Event> {
         return registeredChannelListener.first { it.priority == priority }.channel.receiveAsFlow()
     }
@@ -191,7 +191,7 @@ object EventManager {
 suspend inline fun <reified T : Event> nextEvent(
     timeoutMs: Long = 1000,
     priority: EventPriority = EventPriority.NORMAL,
-    noinline filter: (T) -> Boolean = { true },
+    noinline filter: (T) -> Boolean = { true }
 ) = withTimeout(timeoutMs) {
     EventManager.getEventFlow(priority).firstOrNull { if (it is T) filter(it) else false }
 }
@@ -307,7 +307,9 @@ suspend inline fun <T : Event> T.broadcast() {
 }
 
 object EventManagerConfig : PersistDataFile<EventManagerConfig.Data>(
-    File(configDirectory, "eventManagerConfig.yaml"), Data(), Yaml,
+    File(configDirectory, "eventManagerConfig.yaml"),
+    Data(),
+    Yaml
 ) {
 
     @kotlinx.serialization.Serializable

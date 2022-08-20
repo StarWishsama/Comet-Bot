@@ -52,5 +52,4 @@ sealed interface SearchType {
             override val name: String = "人物"
         }
     }
-
 }

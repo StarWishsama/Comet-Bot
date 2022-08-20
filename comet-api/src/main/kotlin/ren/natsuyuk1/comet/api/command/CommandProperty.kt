@@ -24,7 +24,7 @@ open class CommandProperty(
     open val alias: List<String> = listOf(),
     val description: String,
     val helpText: String,
-    val permission: String = "comet.command.${name}",
+    val permission: String = "comet.command.$name",
     open val permissionLevel: UserLevel = UserLevel.USER,
     val executeConsumePoint: Int = CometGlobalConfig.data.commandCoolDown,
     val executeConsumeType: CommandConsumeType = CommandConsumeType.COOLDOWN,

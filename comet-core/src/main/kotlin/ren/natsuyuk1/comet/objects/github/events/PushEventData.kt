@@ -55,7 +55,7 @@ data class PushEventData(
         @SerialName("html_url")
         val repoUrl: String,
         @SerialName("pushed_at")
-        val pushTime: Long,
+        val pushTime: Long
     )
 
     @Serializable
@@ -112,7 +112,6 @@ data class PushEventData(
             )
             appendText(buildCommitList(), true)
             appendText("查看差异 > $compare")
-
         }
     }
 

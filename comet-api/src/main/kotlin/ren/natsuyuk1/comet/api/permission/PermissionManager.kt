@@ -57,8 +57,8 @@ fun CometUser.hasPermission(node: String): Boolean {
     return transaction {
         val target = PermissionManager.getPermission(node) ?: return@transaction true
 
-        return@transaction userLevel >= target.level
-            || permissions.contains(target.nodeName)
-            || PermissionManager.checkWildCardPermission(this@hasPermission, target)
+        return@transaction userLevel >= target.level ||
+            permissions.contains(target.nodeName) ||
+            PermissionManager.checkWildCardPermission(this@hasPermission, target)
     }
 }

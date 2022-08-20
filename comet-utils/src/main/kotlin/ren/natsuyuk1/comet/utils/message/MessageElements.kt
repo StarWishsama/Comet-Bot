@@ -67,7 +67,7 @@ data class AtElement(
     // For Telegram
     val userName: String = ""
 ) : WrapperElement() {
-    override fun parseToString(): String = "@${target}"
+    override fun parseToString(): String = "@$target"
 }
 
 /**
@@ -80,7 +80,6 @@ data class AtElement(
 @Serializable
 data class XmlElement(val content: String) : WrapperElement() {
     override fun parseToString(): String = "[XML 消息]"
-
 }
 
 /**

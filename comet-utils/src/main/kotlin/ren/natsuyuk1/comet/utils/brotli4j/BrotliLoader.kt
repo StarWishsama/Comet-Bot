@@ -61,11 +61,13 @@ object BrotliLoader {
         }
 
         install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-                isLenient = true
-                ignoreUnknownKeys = true
-            })
+            json(
+                Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                }
+            )
         }
     }
 
@@ -136,7 +138,7 @@ object BrotliLoader {
                 val dll = zip.getEntry("lib/$packageName/$libraryName")
 
                 if (dll == null) {
-                    logger.warn { "Brotli 库下载时出现问题, 请手动下载. /lib/$packageName/${libraryName}" }
+                    logger.warn { "Brotli 库下载时出现问题, 请手动下载. /lib/$packageName/$libraryName" }
                     downloadFile.delete()
                     return
                 }

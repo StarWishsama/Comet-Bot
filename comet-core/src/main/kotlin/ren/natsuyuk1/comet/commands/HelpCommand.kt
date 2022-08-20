@@ -44,8 +44,9 @@ class HelpCommand(
     ).int().default(1)
 
     private val pageSize by option(
-        "--page-size", "-s",
-        help = "帮助菜单一页展示的命令个数",
+        "--page-size",
+        "-s",
+        help = "帮助菜单一页展示的命令个数"
     ).int().convert {
         it.coerceIn(1..20)
     }.default(10)
@@ -73,7 +74,9 @@ class HelpCommand(
                     appendText(" >> ")
                     if (prop.description.isNotBlank()) {
                         appendText(prop.description)
-                    } else appendText("无简介")
+                    } else {
+                        appendText("无简介")
+                    }
                     appendLine()
                 }
             }

@@ -14,8 +14,11 @@ fun Collection<Int>.weightRandom(): Int {
     var r = ps.size - 1
     while (l < r) {
         val mid = (l + r) ushr 1 // safe from overflows
-        if (ps[mid] < random) l = mid + 1
-        else r = mid
+        if (ps[mid] < random) {
+            l = mid + 1
+        } else {
+            r = mid
+        }
     }
     return l
 }

@@ -136,6 +136,4 @@ open class PersistDataFile<T : Any>(
                 }
             }
         }
-
-
 }

@@ -44,7 +44,9 @@ class JikiPediaCommand(
         } catch (e: Exception) {
             if (e is ClientRequestException) {
                 when (e.response.status) {
-                    HttpStatusCode.Unauthorized -> subject.sendMessage("\uD83D\uDEA7 已到达小鸡百科搜索上限, 等一会再试吧~".toMessageWrapper())
+                    HttpStatusCode.Unauthorized -> subject.sendMessage(
+                        "\uD83D\uDEA7 已到达小鸡百科搜索上限, 等一会再试吧~".toMessageWrapper()
+                    )
                     else -> subject.sendMessage("❓ 搜索内容遁入了黑洞之中, 等一会再试试吧".toMessageWrapper())
                 }
             } else {

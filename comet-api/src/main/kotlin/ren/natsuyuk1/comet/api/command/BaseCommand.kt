@@ -40,13 +40,13 @@ abstract class BaseCommand(
     invokeWithoutSubcommand = option.invokeWithoutSubCommand,
     printHelpOnEmptyArgs = option.printHelpOnEmptyArgs,
     allowMultipleSubcommands = option.allowMultipleSubcommands,
-    treatUnknownOptionsAsArgs = option.treatUnknownOptionsAsArgs,
+    treatUnknownOptionsAsArgs = option.treatUnknownOptionsAsArgs
 ) {
     class CliktOption(
         val invokeWithoutSubCommand: Boolean = false,
         val printHelpOnEmptyArgs: Boolean = false,
         val allowMultipleSubcommands: Boolean = false,
-        val treatUnknownOptionsAsArgs: Boolean = false,
+        val treatUnknownOptionsAsArgs: Boolean = false
     )
 
     init {
@@ -73,12 +73,13 @@ abstract class CometCommand(
         val aliasesMap = mutableMapOf<String, List<String>>()
 
         registeredSubcommands().forEach { cmd ->
-            if (cmd is CometSubCommand)
+            if (cmd is CometSubCommand) {
                 cmd.property.apply {
                     alias.forEach {
                         aliasesMap[it] = listOf(name)
                     }
                 }
+            }
         }
 
         return aliasesMap

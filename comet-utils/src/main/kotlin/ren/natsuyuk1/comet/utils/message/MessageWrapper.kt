@@ -74,7 +74,7 @@ open class MessageWrapper {
             it.appendElements(getMessageContent().filter { mw -> mw::class.simpleName == type.name })
         }
 
-    override fun toString(): String = "MessageWrapper {content=${messageContent}, usable=${usable}}"
+    override fun toString(): String = "MessageWrapper {content=$messageContent, usable=$usable}"
 
     fun parseToString(): String = buildString {
         messageContent.forEach {

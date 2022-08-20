@@ -62,7 +62,7 @@ object DatabaseConfig : PersistDataFile<DatabaseConfig.Data>(
         val maxPoolSize: Int = type.defaultMaxPoolSize,
         @Comment("数据库隔离等级, 通常不需要改动")
         @SerialName("isolationLevel")
-        internal val _isolationLevel: String = type.defaultIsolationLevel,
+        internal val _isolationLevel: String = type.defaultIsolationLevel
     ) {
         val isolationLevel: Int
             get() = when (_isolationLevel) {
@@ -71,7 +71,9 @@ object DatabaseConfig : PersistDataFile<DatabaseConfig.Data>(
                 "READ_COMMITTED" -> TRANSACTION_READ_COMMITTED
                 "REPEATABLE_READ" -> TRANSACTION_REPEATABLE_READ
                 "SERIALIZABLE" -> TRANSACTION_SERIALIZABLE
-                else -> error("No such field '$_isolationLevel', '${type.defaultIsolationLevel}' is default value for $type")
+                else -> error(
+                    "No such field '$_isolationLevel', '${type.defaultIsolationLevel}' is default value for $type"
+                )
             }
     }
 }

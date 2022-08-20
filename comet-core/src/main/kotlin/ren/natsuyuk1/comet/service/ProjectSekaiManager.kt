@@ -147,7 +147,6 @@ object ProjectSekaiManager {
     }
 
     private suspend fun loadPJSKDatabase() {
-
         /**
          * Load Sekai Music Difficulties Info
          */
@@ -293,10 +292,13 @@ object ProjectSekaiManager {
         surface.canvas.apply {
             clear(Color.WHITE.rgb)
 
-            ParagraphBuilder(ParagraphStyle().apply {
-                alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
-            }, FontUtil.fonts).apply {
+            ParagraphBuilder(
+                ParagraphStyle().apply {
+                    alignment = Alignment.LEFT
+                    textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
+                },
+                FontUtil.fonts
+            ).apply {
                 addText("${user.userGameData.name} - ${user.userGameData.userID} - BEST 30\n")
 
                 popStyle().pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 18f))
@@ -308,15 +310,15 @@ object ProjectSekaiManager {
 
                     addText(
                         "${getSongName(mr.musicId)} [${mr.musicDifficulty.name.uppercase()} ${
-                            getSongLevel(
-                                mr.musicId,
-                                mr.musicDifficulty
-                            )
+                        getSongLevel(
+                            mr.musicId,
+                            mr.musicDifficulty
+                        )
                         }] $status (${
-                            getSongAdjustedLevel(
-                                mr.musicId,
-                                mr.musicDifficulty
-                            )?.fixDisplay(1)
+                        getSongAdjustedLevel(
+                            mr.musicId,
+                            mr.musicDifficulty
+                        )?.fixDisplay(1)
                         })\n"
                     )
                 }

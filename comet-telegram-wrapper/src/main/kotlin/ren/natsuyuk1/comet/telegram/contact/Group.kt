@@ -23,7 +23,7 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 internal abstract class TelegramGroup(
     override val id: Long,
-    override var name: String,
+    override var name: String
 ) : Group(id, name) {
     override val platform: LoginPlatform
         get() = LoginPlatform.TELEGRAM
@@ -31,10 +31,10 @@ internal abstract class TelegramGroup(
 
 internal class TelegramGroupImpl(
     private val chat: GroupChat,
-    override val comet: TelegramComet,
+    override val comet: TelegramComet
 ) : TelegramGroup(
     chat.id.chatId,
-    chat.title,
+    chat.title
 ) {
     override val owner: GroupMember
         get() = runBlocking {
@@ -126,8 +126,9 @@ internal class TelegramGroupImpl(
                 Clock.System.now().epochSeconds
             ).also { it.broadcast() }
 
-            if (!event.isCancelled)
+            if (!event.isCancelled) {
                 message.send(comet, chat.id)
+            }
         }
     }
 }
