@@ -9,11 +9,8 @@
 
 package ren.natsuyuk1.comet.console.util
 
-import mu.KotlinLogging
 import java.io.PrintStream
 import java.util.*
-
-private val logger = KotlinLogging.logger {}
 
 object JLineRedirector : PrintStream(nullOutputStream()) {
     @Suppress("NOTHING_TO_INLINE")

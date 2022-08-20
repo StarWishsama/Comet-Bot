@@ -16,6 +16,8 @@ import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
+import java.io.OutputStream
+import java.io.PrintStream
 
 object Console {
     private val terminal: Terminal = TerminalBuilder.terminal()
@@ -43,6 +45,16 @@ object Console {
 
     @Suppress("NOTHING_TO_INLINE")
     inline fun println(string: String?) = println(any = string)
+
+    internal fun redirectToJLine() {
+        System.setOut(JLineRedirector)
+    }
+
+    internal fun redirectToNull() {
+        val out = PrintStream(OutputStream.nullOutputStream())
+        System.setOut(out)
+        System.setErr(out)
+    }
 
     private fun LineReader.initHistory() {
         setVariable(
