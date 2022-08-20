@@ -2,15 +2,13 @@ package ren.natsuyuk1.comet.mirai.contact
 
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import net.mamoe.mirai.contact.AnonymousMember
-import net.mamoe.mirai.contact.ContactList
-import net.mamoe.mirai.contact.Member
-import net.mamoe.mirai.contact.NormalMember
+import net.mamoe.mirai.contact.*
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
+import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.mirai.MiraiComet
 import ren.natsuyuk1.comet.mirai.util.toMessageChain
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
@@ -45,6 +43,9 @@ internal class MiraiGroupMemberImpl(
 
     override val remainMuteTime: Int
         get() = contact.muteTimeRemaining
+
+    override val groupPermission: GroupPermission
+        get() = contact.permission.toGroupPermission()
 
     override suspend fun mute(seconds: Int) {
         contact.mute(seconds)
@@ -85,6 +86,8 @@ internal class MiraiGroupMemberImpl(
         }
 }
 
+fun MemberPermission.toGroupPermission(): GroupPermission = GroupPermission.values()[ordinal]
+
 fun NormalMember.toGroupMember(comet: MiraiComet): GroupMember = MiraiGroupMemberImpl(this, comet)
 
 internal class MiraiAnonymousMemberImpl(
@@ -120,6 +123,9 @@ internal class MiraiAnonymousMemberImpl(
      */
     override val remainMuteTime: Int
         get() = -1
+
+    override val groupPermission: GroupPermission
+        get() = GroupPermission.MEMBER
 
     override suspend fun mute(seconds: Int) {
         contact.mute(seconds)

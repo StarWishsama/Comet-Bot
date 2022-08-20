@@ -46,6 +46,8 @@ abstract class GroupMember : User() {
 
     abstract val card: String
 
+    abstract val groupPermission: GroupPermission
+
     val isMuted: Boolean get() = remainMuteTime != 0
 
     /**
@@ -90,6 +92,12 @@ abstract class GroupMember : User() {
 }
 
 fun GroupMember.nameOrCard(): String = card.ifEmpty { name }
+
+fun GroupMember.isOperator() = groupPermission >= GroupPermission.ADMIN
+
+fun GroupMember.isAdmin() = groupPermission == GroupPermission.ADMIN
+
+fun GroupMember.isOwner() = groupPermission == GroupPermission.OWNER
 
 abstract class AnonymousMember : GroupMember() {
     /**

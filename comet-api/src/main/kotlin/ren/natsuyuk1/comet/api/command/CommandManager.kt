@@ -128,14 +128,14 @@ object CommandManager {
             if (sender is PlatformCommandSender) {
                 user = CometUser.getUserOrCreate(sender.id, sender.platform)
 
-                if (!user.hasPermission(property.permission)) {
+                if (!user.hasPermission(property.permission) && !property.extraPermissionChecker(user, sender)) {
                     subject.sendMessage(buildMessageWrapper { appendText("你没有权限执行这条命令!") })
                     return@runCatching CommandStatus.NoPermission()
                 }
 
                 when (property.executeConsumeType) {
                     CommandConsumeType.COOLDOWN -> {
-                        if (user.platform.needRestrict || property.executeConsumePoint == CometGlobalConfig.data.commandCoolDown) {
+                        if (user.platform.needRestrict || property.executeConsumePoint == CometGlobalConfig.data.commandCoolDown) { // ktlint-disable max-line-length
                             if (user.hasCoolDown(executeTime, property.executeConsumePoint.seconds)) {
                                 return@runCatching CommandStatus.ValidateFailed()
                             }
@@ -187,7 +187,7 @@ object CommandManager {
         }.onSuccess {
             if (it.isPassed()) {
                 logger.info {
-                    "命令 ${command.property.name} 执行状态 ${it.name}, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}"
+                    "命令 ${command.property.name} 执行状态 ${it.name}, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}" // ktlint-disable max-line-length
                 }
             }
         }.onFailure {

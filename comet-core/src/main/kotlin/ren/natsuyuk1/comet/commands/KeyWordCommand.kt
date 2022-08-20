@@ -7,10 +7,15 @@ import ren.natsuyuk1.comet.api.command.CometCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.command.asGroup
+import ren.natsuyuk1.comet.api.event.events.group.GroupEvent
+import ren.natsuyuk1.comet.api.event.events.message.GroupMessageEvent
 import ren.natsuyuk1.comet.api.session.Session
 import ren.natsuyuk1.comet.api.session.expire
 import ren.natsuyuk1.comet.api.session.register
 import ren.natsuyuk1.comet.api.user.CometUser
+import ren.natsuyuk1.comet.api.user.GroupMember
+import ren.natsuyuk1.comet.api.user.UserLevel
+import ren.natsuyuk1.comet.api.user.isOperator
 import ren.natsuyuk1.comet.objects.keyword.KeyWordData
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
@@ -21,7 +26,15 @@ val KEYWORD = CommandProperty(
     "keyword",
     listOf("kw", "关键词"),
     "关键词回复",
-    "/keyword 关键词回复"
+    "/keyword 关键词回复",
+    permissionLevel = UserLevel.ADMIN,
+    extraPermissionChecker = { _, sender ->
+        if (sender is GroupMember) {
+            return@CommandProperty sender.isOperator()
+        } else {
+            return@CommandProperty false
+        }
+    }
 )
 
 class KeyWordAddSession(

@@ -10,7 +10,9 @@ import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.TelegramDate
 import dev.inmo.tgbotapi.types.chat.ChatPermissions
 import dev.inmo.tgbotapi.types.chat.User
+import dev.inmo.tgbotapi.types.chat.member.AdministratorChatMember
 import dev.inmo.tgbotapi.types.chat.member.BannedChatMember
+import dev.inmo.tgbotapi.types.chat.member.OwnerChatMember
 import dev.inmo.tgbotapi.types.toChatId
 import dev.inmo.tgbotapi.utils.PreviewFeature
 import kotlinx.coroutines.launch
@@ -21,6 +23,7 @@ import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
+import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.telegram.util.getDisplayName
 import ren.natsuyuk1.comet.telegram.util.send
@@ -55,6 +58,21 @@ class TelegramGroupMemberImpl(
         get() = name
         set(_) {
             error("Card doesn't exist in telegram platform")
+        }
+    override val groupPermission: GroupPermission
+        get() = runBlocking {
+            when (val resp = comet.bot.getChatMember(groupChatID.toChatId(), user)) {
+                is AdministratorChatMember -> {
+                    if (resp is OwnerChatMember) {
+                        return@runBlocking GroupPermission.OWNER
+                    } else {
+                        return@runBlocking GroupPermission.ADMIN
+                    }
+                }
+                else -> {
+                    GroupPermission.MEMBER
+                }
+            }
         }
     override val id: Long
         get() = user.id.chatId
