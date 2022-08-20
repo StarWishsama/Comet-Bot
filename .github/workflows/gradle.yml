@@ -27,5 +27,5 @@ jobs:
         run: ./gradlew buildComet check
       - uses: actions/upload-artifact@v2
         with:
-          name: Nameless-Bot.jar
+          name: Comet-Bot-full
           path: comet
