@@ -10,7 +10,7 @@
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
@@ -19,8 +19,10 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
+import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
+import ren.natsuyuk1.comet.utils.string.StringUtil.toFriendly
 
 private val rankPosition = listOf(100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000)
 
@@ -29,6 +31,7 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
         return "你还没打这期活动捏".toMessageWrapper()
     }
 
+    val now = Clock.System.now()
     val profile = this@toMessageWrapper.rankings.first()
     val (ahead, behind) = profile.rank.getSurroundingRank()
 
@@ -36,6 +39,16 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
         appendText("${profile.name} - ${profile.userId}", true)
         appendLine()
         appendText("当前活动 ${ProjectSekaiData.getCurrentEventInfo()?.name}", true)
+        if (ProjectSekaiData.getCurrentEventInfo()?.endTime != null) {
+            appendText(
+                "离活动结束还有 ${
+                    (ProjectSekaiData.getCurrentEventInfo()?.endTime!!.toInstant() - now).toFriendly(
+                        msMode = false
+                    )
+                }",
+                true
+            )
+        }
         if (profile.userCheerfulCarnival.cheerfulCarnivalTeamId != null) {
             val teamName =
                 ProjectSekaiManager.getCarnivalTeamI18nName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
@@ -87,15 +100,6 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
         }
 
         appendLine()
-
-        if (ahead in 100..100000) {
-            val aheadPredictScore = ProjectSekaiManager.predictionCache.data[ahead.toString()]?.jsonPrimitive?.content
-            appendText("$ahead 档预测分数为 $aheadPredictScore", true)
-        }
-        if (behind in 100..100000) {
-            val behindPredictScore = ProjectSekaiManager.predictionCache.data[behind.toString()]?.jsonPrimitive?.content
-            appendText("$behind 档预测分数为 $behindPredictScore", true)
-        }
 
         appendText("数据来自 Project Sekai Profile | 33Kit")
     }

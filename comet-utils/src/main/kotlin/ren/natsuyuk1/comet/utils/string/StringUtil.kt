@@ -84,10 +84,6 @@ object StringUtil {
             return ImageIO.read(bis)
         }
     }
-
-    /**
-     * 来自 Mirai 的 asHumanReadable
-     */
     fun Duration.toFriendly(maxUnit: TimeUnit = TimeUnit.DAYS, msMode: Boolean = true): String {
         toComponents { days, hours, minutes, seconds, ns ->
             return buildString {
