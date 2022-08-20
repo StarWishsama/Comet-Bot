@@ -4,6 +4,7 @@
 
 本项目处于开发阶段, 且所有配置文件模板并不稳定, 并伴随可能的破坏性更改, 请谨慎使用
 
+Telegram Bot 实例: [@CometIsNotBot](https://t.me/CometIsNotBot)
 Demo/交流群：725656262
 
 **一切开发旨在学习，请勿用于非法用途**
