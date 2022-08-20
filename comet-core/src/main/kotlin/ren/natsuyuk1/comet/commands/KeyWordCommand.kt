@@ -7,8 +7,6 @@ import ren.natsuyuk1.comet.api.command.CometCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.command.asGroup
-import ren.natsuyuk1.comet.api.event.events.group.GroupEvent
-import ren.natsuyuk1.comet.api.event.events.message.GroupMessageEvent
 import ren.natsuyuk1.comet.api.session.Session
 import ren.natsuyuk1.comet.api.session.expire
 import ren.natsuyuk1.comet.api.session.register
