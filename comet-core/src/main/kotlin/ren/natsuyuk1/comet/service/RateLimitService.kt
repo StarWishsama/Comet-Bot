@@ -1,10 +1,12 @@
 package ren.natsuyuk1.comet.service
 
 import io.ktor.http.*
+import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.utils.file.dataDirectory
 import java.io.File
 
+@Serializable
 enum class RateLimitAPI {
     GITHUB
 }
@@ -13,6 +15,7 @@ object RateLimitData : PersistDataFile<RateLimitData.Data>(
     File(dataDirectory, "rate_limit.json"),
     Data()
 ) {
+    @Serializable
     data class Data(
         val rateLimitData: MutableMap<RateLimitAPI, Long> = mutableMapOf()
     )
