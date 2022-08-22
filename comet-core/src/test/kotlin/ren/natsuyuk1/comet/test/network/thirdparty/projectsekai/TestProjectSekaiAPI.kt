@@ -139,6 +139,8 @@ class TestProjectSekaiAPI {
 
     @Test
     fun testB30() {
+        if (isCI()) return
+
         runBlocking {
             val b30 = client.getUserInfo(id).getBest30Songs()
             Json.encodeToString(b30).print()
