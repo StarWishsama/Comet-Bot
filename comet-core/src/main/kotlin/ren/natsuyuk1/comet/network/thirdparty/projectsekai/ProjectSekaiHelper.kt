@@ -39,10 +39,10 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
         appendText("${profile.name} - ${profile.userId}", true)
         appendLine()
         appendText("当前活动 ${ProjectSekaiData.getCurrentEventInfo()?.name}", true)
-        if (ProjectSekaiData.getCurrentEventInfo()?.endTime != null) {
+        if (ProjectSekaiData.getCurrentEventInfo()?.aggregateTime != null) {
             appendText(
                 "离活动结束还有 ${
-                    (ProjectSekaiData.getCurrentEventInfo()?.endTime!!.toInstant(true) - now).toFriendly(
+                    (ProjectSekaiData.getCurrentEventInfo()?.aggregateTime!!.toInstant(true) - now).toFriendly(
                         msMode = false
                     )
                 }",
