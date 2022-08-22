@@ -81,6 +81,51 @@ fun generateFakeGroup(id: Long): Group = object : Group(id, "TestGroup") {
     }
 }
 
+fun generateFakeGroupMember(id: Long, group: Group) = object : GroupMember() {
+    override val group: Group
+        get() = group
+    override val id: Long
+        get() = id
+    override val joinTimestamp: Int
+        get() = error("dummy")
+    override val lastActiveTimestamp: Int
+        get() = error("dummy")
+    override val remainMuteTime: Int
+        get() = error("dummy")
+    override val card: String
+        get() = "Test"
+    override val groupPermission: GroupPermission
+        get() = error("dummy")
+
+    override suspend fun mute(seconds: Int) {
+        error("dummy")
+    }
+
+    override suspend fun unmute() {
+        error("dummy")
+    }
+
+    override suspend fun kick(reason: String, block: Boolean) {
+        error("dummy")
+    }
+
+    override suspend fun operateAdminPermission(operation: Boolean) {
+        error("dummy")
+    }
+
+    override fun sendMessage(message: MessageWrapper) {
+        logger.debug { "FakeGroupMember($id) received: $message" }
+    }
+
+    override val comet: Comet
+        get() = fakeComet
+    override val name: String
+        get() = "Test"
+    override val platform: LoginPlatform
+        get() = LoginPlatform.TEST
+
+}
+
 fun Any.print() = println(this)
 
 fun isCI() = System.getenv("CI") != null

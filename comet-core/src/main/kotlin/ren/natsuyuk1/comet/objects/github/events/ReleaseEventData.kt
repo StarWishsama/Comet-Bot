@@ -23,7 +23,7 @@ import java.util.*
 
 @Serializable
 data class ReleaseEventData(
-    // created, prereleased
+    // created, prereleased, deleted, published
     val action: String,
     val release: ReleaseInfo,
     val repository: IssueEventData.RepoInfo,

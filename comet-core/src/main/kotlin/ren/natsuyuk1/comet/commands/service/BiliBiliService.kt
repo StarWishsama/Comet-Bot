@@ -12,7 +12,6 @@ import ren.natsuyuk1.comet.api.session.Session
 import ren.natsuyuk1.comet.api.session.expire
 import ren.natsuyuk1.comet.api.session.registerTimeout
 import ren.natsuyuk1.comet.api.user.CometUser
-import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.bilibili.DynamicApi
 import ren.natsuyuk1.comet.network.thirdparty.bilibili.SearchApi
@@ -78,7 +77,7 @@ object BiliBiliService {
         }
     }
 
-    suspend fun processUserSearch(subject: PlatformCommandSender, id: Int = 0, keyword: String = "") = scope.launch {
+    suspend fun processUserSearch(subject: PlatformCommandSender, sender: PlatformCommandSender, id: Int = 0, keyword: String = "") = scope.launch {
         if (id != 0) {
             queryUser(subject, id)
         } else {
@@ -90,8 +89,7 @@ object BiliBiliService {
                 if (searchResult.size == 1) {
                     queryUser(subject, (searchResult as PendingSearchResult).first().mid!!)
                 } else {
-                    val user: CometUser? =
-                        if (subject is User) CometUser.getUser(subject.id, subject.platform) else null
+                    val user: CometUser? = CometUser.getUser(sender.id, subject.platform)
                     BiliBiliUserQuerySession(
                         subject,
                         user,

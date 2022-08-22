@@ -66,9 +66,9 @@ class BiliBiliCommand(
 
         override suspend fun run() {
             if (uid != null) {
-                BiliBiliService.processUserSearch(subject, id = uid!!)
+                BiliBiliService.processUserSearch(subject, sender, id = uid!!)
             } else if (name != null) {
-                BiliBiliService.processUserSearch(subject, keyword = name!!)
+                BiliBiliService.processUserSearch(subject, sender, keyword = name!!)
             } else {
                 subject.sendMessage("请提供欲查询用户的名称或 ID!".toMessageWrapper())
             }
