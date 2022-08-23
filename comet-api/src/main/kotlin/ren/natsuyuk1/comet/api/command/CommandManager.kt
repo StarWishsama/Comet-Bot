@@ -33,6 +33,7 @@ import ren.natsuyuk1.comet.utils.string.StringUtil.replaceAllToBlank
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.reflect.jvm.jvmName
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -118,8 +119,14 @@ object CommandManager {
             return@launch
         }
 
+        val possibleCommand = args[0].replaceAllToBlank(CometGlobalConfig.data.commandPrefix)
+
+        if (!hasCommand(possibleCommand)) {
+            return@launch
+        }
+
         val command =
-            getCommand(args[0].replaceAllToBlank(CometGlobalConfig.data.commandPrefix), sender) ?: return@launch
+            getCommand(possibleCommand, sender) ?: return@launch
 
         val property = command.property
         var user: CometUser = CometUser.dummyUser
@@ -195,11 +202,11 @@ object CommandManager {
                 subject.sendMessage(
                     buildMessageWrapper {
                         appendText(
-                            "在尝试执行命令时发生异常, 报错信息如下, 详细请查看后台\n${
-                            it.message?.limit(
-                                25
-                            ) ?: "无"
-                            }"
+                            "在尝试执行命令时发生异常, 报错信息如下, 详细请查看后台\n" +
+                                (if (it.cause != null) it.cause!!::class.jvmName else "") + ":" +
+                                (it.message?.limit(
+                                    25
+                                ) ?: "无")
                         )
                     }
                 )

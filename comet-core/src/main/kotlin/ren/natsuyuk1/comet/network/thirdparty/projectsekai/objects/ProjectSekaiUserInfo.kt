@@ -198,6 +198,6 @@ enum class MusicPlayResult {
     @SerialName("full_combo")
     FULL_COMBO,
 
-    @SerialName("all_perfect")
+    @SerialName("full_perfect")
     ALL_PERFECT
 }
