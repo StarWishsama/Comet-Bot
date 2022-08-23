@@ -42,5 +42,6 @@ tasks.jar {
 }
 
 tasks.shadowJar {
+    archiveFileName.set("${project.name}.jar")
     destinationDirectory.set(File("$rootDir/comet"))
 }
