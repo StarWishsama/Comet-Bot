@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk-debian:17-jre-latest
+FROM azul/zulu-openjdk-debian:17-latest
 MAINTAINER StarWishsama
 WORKDIR /comet
 RUN set -eux; \
