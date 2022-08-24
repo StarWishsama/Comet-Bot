@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.service
 
+import cn.hutool.crypto.SecureUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -171,7 +172,7 @@ object ProjectSekaiManager {
                 val tmpFile = File(pjskFolder, "musicDifficulties.tmp").also { it.deleteOnExit() }
                 cometClient.client.downloadFile("https://musics.pjsekai.moe/musicDifficulties.json", tmpFile)
 
-                if (tmpFile.length() > musicDiffFile.length()) {
+                if (SecureUtil.md5(tmpFile) != SecureUtil.md5(musicDiffFile)) {
                     withContext(Dispatchers.IO) {
                         Files.copy(tmpFile.toPath(), musicDiffFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
                         tmpFile.delete()
