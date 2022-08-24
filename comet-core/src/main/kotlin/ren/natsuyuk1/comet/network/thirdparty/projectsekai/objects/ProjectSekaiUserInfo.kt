@@ -66,7 +66,10 @@ data class ProjectSekaiUserInfo(
         it.musicDifficulty >= MusicDifficulty.EXPERT && (it.isAllPerfect || it.isFullCombo)
     }.sortedBy {
         ProjectSekaiManager.getSongAdjustedLevel(it.musicId, it.musicDifficulty)
-    }.asReversed().take(30)
+    }.asReversed()
+     .distinctBy {
+         it.musicId
+     }.take(30)
 
     fun generateBest30(): MessageWrapper {
         if (ProjectSekaiManager.musicDiffDatabase.isEmpty() || ProjectSekaiManager.musicDatabase.isEmpty()) {

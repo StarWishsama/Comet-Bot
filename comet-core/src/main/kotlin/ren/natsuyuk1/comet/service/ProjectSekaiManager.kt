@@ -339,6 +339,8 @@ object ProjectSekaiManager {
             }
         }
 
+        runBlocking { tmpFile.touch() }
+
         image.encodeToData(EncodedImageFormat.PNG)?.bytes?.let {
             Files.write(tmpFile.toPath(), it)
         }
