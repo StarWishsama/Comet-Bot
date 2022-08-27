@@ -20,6 +20,10 @@ repositories {
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor(0, "minutes")
+}
+
 dependencies {
     implementation(project(":comet-api"))
     implementation(project(":comet-utils"))
@@ -45,4 +49,6 @@ dependencies {
     implementation("org.jetbrains.skiko:skiko:_")
 
     implementation("com.aayushatharva.brotli4j:brotli4j:1.7.1")
+
+    implementation("ren.natsuyuk1.setsuna:Setsuna:_")
 }
