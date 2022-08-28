@@ -70,7 +70,7 @@ object GithubWebHookHandler {
             try {
                 val event = GitHubService.processEvent(payload, eventType)
 
-                if (event != null) {
+                if (event != null && event.isSendableEvent()) {
                     GithubRepoData.find(event.repoName())?.let {
                         GithubEvent(it, event).broadcast()
                     }
