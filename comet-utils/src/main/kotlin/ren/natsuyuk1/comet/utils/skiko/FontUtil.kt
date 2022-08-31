@@ -1,10 +1,7 @@
 package ren.natsuyuk1.comet.utils.skiko
 
 import mu.KotlinLogging
-import org.jetbrains.skia.FontMgr
-import org.jetbrains.skia.FontStyle
-import org.jetbrains.skia.Typeface
-import org.jetbrains.skia.makeFromFile
+import org.jetbrains.skia.*
 import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skia.paragraph.TypefaceFontProvider
@@ -52,6 +49,8 @@ object FontUtil {
 
         logger.info { "已加载 $counter 个字体." }
     }
+
+    fun defaultFont(size: Float) = Font(fonts.findTypefaces(arrayOf("Source Han Sans SC"), FontStyle.NORMAL.withWeight(500)).firstOrNull(), size)
 
     fun defaultFontStyle(c: Color, size: Float) = TextStyle().apply {
         color = c.rgb

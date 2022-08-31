@@ -5,27 +5,31 @@ import ren.natsuyuk1.setsuna.api.fetchTweet
 import ren.natsuyuk1.setsuna.api.fetchUser
 import ren.natsuyuk1.setsuna.api.fetchUserByUsername
 import ren.natsuyuk1.setsuna.api.getUserTimeline
+import ren.natsuyuk1.setsuna.api.options.Expansions
+import ren.natsuyuk1.setsuna.api.options.defaultTwitterOption
+import ren.natsuyuk1.setsuna.api.options.defaultUserOption
 import ren.natsuyuk1.setsuna.objects.tweet.Tweet
 import ren.natsuyuk1.setsuna.objects.user.TwitterUser
+import ren.natsuyuk1.setsuna.response.TweetFetchResponse
 
 private val logger = KotlinLogging.logger {}
 
 object TwitterAPI {
-    suspend fun fetchTweet(id: String): Tweet? = kotlin.runCatching {
-        val resp = client.fetchTweet(id)
+    suspend fun fetchTweet(id: String): TweetFetchResponse? = kotlin.runCatching {
+        val resp = client.fetchTweet(id, defaultTwitterOption + Expansions.Media())
 
         return if (resp.errors != null) {
             logger.warn { "获取推文 ($id) 失败, ${resp.errors}" }
             null
         } else {
-            resp.tweet
+            resp
         }
     }.onFailure {
         logger.warn(it) { "获取推文 ($id) 失败" }
     }.getOrNull()
 
     suspend fun fetchTimeline(userID: String): List<Tweet>? = kotlin.runCatching {
-        val resp = client.getUserTimeline(userID)
+        val resp = client.getUserTimeline(userID, defaultUserOption + Expansions.Media())
 
         return if (resp.errors != null) {
             logger.warn { "获取用户 ($userID) 的时间线失败, ${resp.errors}" }
