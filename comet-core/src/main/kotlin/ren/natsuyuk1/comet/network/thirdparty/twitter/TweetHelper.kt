@@ -13,7 +13,7 @@ suspend fun TweetFetchResponse.toMessageWrapper(): MessageWrapper =
     buildMessageWrapper {
         val tweet = this@toMessageWrapper.tweet!!
         val author = tweet.authorID?.let { TwitterAPI.fetchUser(it) }
-        appendText("${author?.name} 发布了一条推文", true)
+        appendText("${author?.name} | @${author?.username}", true)
         appendText(tweet.text.removeShortLink().limit(100), true)
         appendLine()
         if (tweet.referencedTweets != null) {
