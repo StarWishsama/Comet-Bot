@@ -25,12 +25,12 @@ private val logger = mu.KotlinLogging.logger("MessageWrapperConverter")
 
 @OptIn(MiraiExperimentalApi::class)
 suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent {
-    when (this) {
+    return when (this) {
         is Text -> return PlainText(this.text)
 
         is Image -> {
             try {
-                if (url.isNotEmpty()) {
+                if (url.isNotBlank()) {
                     cometClient.client.get(url).body<InputStream>().use {
                         it.uploadAsImage(subject)
                     }
@@ -49,8 +49,6 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent {
                 logger.warn { "A error occurred when converting Image, raw content: ${toString()}" }
                 return PlainText("[图片]")
             }
-
-            return PlainText("[图片]")
         }
 
         is AtElement -> return At(target)
