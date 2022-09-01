@@ -70,9 +70,11 @@ object GithubWebHookHandler {
             try {
                 val event = GitHubService.processEvent(payload, eventType)
 
-                if (event != null && event.isSendableEvent()) {
-                    GithubRepoData.find(event.repoName())?.let {
-                        GithubEvent(it, event).broadcast()
+                if (event != null) {
+                    if (event.isSendableEvent()) {
+                        GithubRepoData.find(event.repoName())?.let {
+                            GithubEvent(it, event).broadcast()
+                        }
                     }
                 } else {
                     logger.debug("推送 WebHook 消息失败, 不支持的事件类型")
