@@ -29,7 +29,8 @@ class TestWrapperParse {
         if (isCI()) return
 
         runBlocking {
-            TwitterAPI.fetchTweet("1563362417597648897")?.toMessageWrapper()?.print()
+            val resp = TwitterAPI.fetchTweet("1563362417597648897")
+            resp?.tweet?.toMessageWrapper(resp.includes)?.print()
         }
     }
 }
