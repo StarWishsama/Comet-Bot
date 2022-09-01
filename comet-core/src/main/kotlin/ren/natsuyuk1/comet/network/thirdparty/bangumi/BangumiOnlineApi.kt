@@ -12,7 +12,7 @@ import ren.natsuyuk1.comet.network.thirdparty.bangumi.data.BangumiOnlineSchedule
 import kotlin.time.Duration.Companion.days
 
 object BangumiOnlineApi {
-    private const val API = "https://bangumi.online/"
+    private const val API = "https://bangumi.online"
     private var cache: BangumiOnlineScheduleData
 
     init {
@@ -28,7 +28,7 @@ object BangumiOnlineApi {
     fun getCache(): BangumiOnlineScheduleData = cache
 
     suspend fun fetchBangumiSchedule(): BangumiOnlineScheduleData =
-        cometClient.client.post("$API/api/schedule") {
+        cometClient.client.post("$API/api/serve/schedule") {
             setBody(
                 FormDataContent(
                     Parameters.build {
