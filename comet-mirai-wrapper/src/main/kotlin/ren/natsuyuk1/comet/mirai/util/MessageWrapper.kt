@@ -24,7 +24,7 @@ import java.io.InputStream
 private val logger = mu.KotlinLogging.logger("MessageWrapperConverter")
 
 @OptIn(MiraiExperimentalApi::class)
-suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent {
+suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent? {
     return when (this) {
         is Text -> return PlainText(this.text)
 
@@ -71,9 +71,10 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent {
             throw RuntimeException("Unable to convert Voice to MessageChain, Raw content: $this")
         }
 
-        else -> throw UnsupportedOperationException(
-            "Unsupported message wrapper ${this::class.simpleName} in mirai side"
-        )
+        else -> {
+            logger.debug { "Unsupported message wrapper ${this::class.simpleName} in mirai side" }
+            null
+        }
     }
 }
 
@@ -89,7 +90,7 @@ fun MessageWrapper.toMessageChain(subject: Contact): MessageChain {
         getMessageContent().forEach { elem ->
             kotlin.runCatching {
                 runBlocking {
-                    add(elem.toMessageContent(subject))
+                    elem.toMessageContent(subject)?.let { add(it) }
                 }
             }.onFailure {
                 if (it !is UnsupportedOperationException) {
