@@ -3,6 +3,7 @@ package ren.natsuyuk1.comet.commands
 import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.arguments.default
+import moe.sdl.yac.parameters.options.flag
 import moe.sdl.yac.parameters.options.option
 import moe.sdl.yac.parameters.types.long
 import ren.natsuyuk1.comet.api.Comet
@@ -13,7 +14,6 @@ import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.commands.service.GithubCommandService
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.util.toMessageWrapper
-import ren.natsuyuk1.comet.utils.message.EmptyMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 val GITHUB = CommandProperty(
@@ -128,63 +128,36 @@ class GithubCommand(
         }
     }
 
-    open class Setting(
+    class Setting(
         val message: MessageWrapper,
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser,
-        override val property: SubCommandProperty = SETTING,
-    ) : CometSubCommand(subject, sender, user, property) {
-        init {
-            subcommands(Add(subject, sender, user), Remove(subject, sender, user))
-        }
+        override val user: CometUser
+    ) : CometSubCommand(subject, sender, user, SETTING) {
 
-        val groupID by option("-g", "--group", help = "群号").long()
-        val repoName by argument(help = "GitHub 仓库名称")
+        private val add by option("-a", "--add").flag(default = false)
+        private val remove by option("-r", "--remove").flag(default = false)
+        private val groupID by option("-g", "--group", help = "群号").long()
+        private val repoName by argument(help = "GitHub 仓库名称")
+        private val branch by option("-b", "--branch", help = "分支名")
+        private val eventName by option("-e", "--event", help = "事件名称")
 
         companion object {
             val SETTING = SubCommandProperty("setting", listOf("st", "设置"), GITHUB)
         }
 
         override suspend fun run() {
-            if (currentContext.invokedSubcommand == null) {
-                if (subject !is Group && groupID == null) {
-                    subject.sendMessage("请提供欲订阅 GitHub 仓库动态的群号!".toMessageWrapper())
-                    return
-                }
-
-                if (!GithubRepoData.exists(repoName, groupID ?: subject.id)) {
-                    subject.sendMessage("找不到你要查询的仓库, 可能是没有订阅过?".toMessageWrapper())
-                    return
-                }
-
-                GithubCommandService.fetchRepoSetting(subject, repoName, groupID ?: subject.id)
-            }
-        }
-
-        class Add(
-            override val subject: PlatformCommandSender,
-            override val sender: PlatformCommandSender,
-            override val user: CometUser
-        ): Setting(EmptyMessageWrapper, subject, sender, user, ADD) {
-            companion object {
-                val ADD = SubCommandProperty("add", listOf("新增", "添加"), SETTING, UserLevel.ADMIN)
+            if (subject !is Group && groupID == null) {
+                subject.sendMessage("请提供欲订阅 GitHub 仓库动态的群号!".toMessageWrapper())
+                return
             }
 
-            private val branch by option("-b", "--branch", help = "分支名")
-            private val eventName by option("-e", "--event", help = "事件名称")
+            if (!GithubRepoData.exists(repoName, groupID ?: subject.id)) {
+                subject.sendMessage("找不到你要查询的仓库, 可能是没有订阅过?".toMessageWrapper())
+                return
+            }
 
-            override suspend fun run() {
-                if (repoName.isBlank()) {
-                    subject.sendMessage("请输入 GitHub 仓库名称或链接!".toMessageWrapper())
-                    return
-                }
-
-                if (subject !is Group && groupID == null) {
-                    subject.sendMessage("请提供欲订阅 GitHub 仓库动态的群号!".toMessageWrapper())
-                    return
-                }
-
+            if (add) {
                 if (!GithubRepoData.exists(repoName, groupID ?: subject.id)) {
                     subject.sendMessage("找不到你要查询的仓库, 可能是没有订阅过?".toMessageWrapper())
                     return
@@ -210,44 +183,22 @@ class GithubCommand(
                     if (result) {
                         subject.sendMessage("成功订阅分支 $branch".toMessageWrapper())
                     } else {
-                        subject.sendMessage("在订阅分支时发生了异常".toMessageWrapper())
+                        subject.sendMessage("已经订阅过分支 $branch 了".toMessageWrapper())
+                    }
+                } else if (eventName != null) {
+                    when (repo.subscribers.find { it.id == groupID }?.subscribeEvent?.add(eventName!!)) {
+                        true -> {
+                            subject.sendMessage("成功订阅事件 $eventName".toMessageWrapper())
+                        }
+                        false -> {
+                            subject.sendMessage("已经订阅过事件 $eventName 了".toMessageWrapper())
+                        }
+                        else -> {
+                            subject.sendMessage("在订阅事件时发生了异常".toMessageWrapper())
+                        }
                     }
                 }
-
-                if (eventName != null) {
-                    val result = repo.subscribers.find { it.id == groupID }?.subscribeEvent?.add(eventName!!)
-
-                    if (result == true) {
-                        subject.sendMessage("成功订阅事件 $branch".toMessageWrapper())
-                    } else {
-                        subject.sendMessage("在订阅事件时发生了异常".toMessageWrapper())
-                    }
-                }
-            }
-        }
-
-        class Remove(
-            override val subject: PlatformCommandSender,
-            override val sender: PlatformCommandSender,
-            override val user: CometUser
-        ) : Setting(EmptyMessageWrapper, subject, sender, user, REMOVE) {
-            companion object {
-                val REMOVE = SubCommandProperty("remove", listOf("rm", "删除"), SETTING, UserLevel.ADMIN)
-            }
-
-            private val branch by option("-b", "--branch", help = "分支名")
-            private val eventName by option("-e", "--event", help = "事件名称")
-
-            override suspend fun run() {
-                if (repoName.isBlank()) {
-                    subject.sendMessage("请输入 GitHub 仓库名称或链接!".toMessageWrapper())
-                }
-
-                if (subject !is Group && groupID == null) {
-                    subject.sendMessage("请提供欲订阅 GitHub 仓库动态的群号!".toMessageWrapper())
-                    return
-                }
-
+            } else if (remove) {
                 if (GithubRepoData.exists(repoName, groupID ?: subject.id)) {
                     subject.sendMessage("找不到你要查询的仓库, 可能是没有订阅过?".toMessageWrapper())
                     return
@@ -263,9 +214,7 @@ class GithubCommand(
                     } else {
                         subject.sendMessage("在取消订阅分支时发生了异常".toMessageWrapper())
                     }
-                }
-
-                if (eventName != null) {
+                } else if (eventName != null) {
                     val result = repo.subscribers.find { it.id == groupID }?.subscribeEvent?.remove(eventName)
 
                     if (result == true) {
@@ -274,6 +223,8 @@ class GithubCommand(
                         subject.sendMessage("在取消订阅事件时发生了异常".toMessageWrapper())
                     }
                 }
+            } else {
+                GithubCommandService.fetchRepoSetting(subject, repoName, groupID ?: subject.id)
             }
         }
     }
