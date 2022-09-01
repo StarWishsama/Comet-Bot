@@ -26,7 +26,7 @@ object GithubRepoData : PersistDataFile<GithubRepoData.Data>(
             data class GithubRepoSubscriber(
                 val id: Long,
                 val subscribeBranch: MutableSet<String> = mutableSetOf("master", "main"),
-                val subscribeEvent: MutableSet<String> = mutableSetOf("push", "release", "issues", "issue_comment")
+                val subscribeEvent: MutableSet<String> = mutableSetOf("push", "release", "issues", "issue_comment", "pull_request")
             )
         }
     }
