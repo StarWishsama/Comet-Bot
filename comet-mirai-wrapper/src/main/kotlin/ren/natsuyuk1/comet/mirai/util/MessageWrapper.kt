@@ -103,7 +103,7 @@ fun MessageWrapper.toMessageChain(subject: Contact): MessageChain {
     }.build()
 }
 
-fun MessageChain.toMessageWrapper(localImage: Boolean = false): MessageWrapper {
+fun MessageChain.toMessageWrapper(): MessageWrapper {
     val wrapper = MessageWrapper()
     for (message in this) {
         when (message) {
