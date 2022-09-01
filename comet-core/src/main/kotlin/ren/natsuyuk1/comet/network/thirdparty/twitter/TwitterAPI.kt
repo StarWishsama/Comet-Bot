@@ -6,6 +6,7 @@ import ren.natsuyuk1.setsuna.api.fetchUser
 import ren.natsuyuk1.setsuna.api.fetchUserByUsername
 import ren.natsuyuk1.setsuna.api.getUserTimeline
 import ren.natsuyuk1.setsuna.api.options.Expansions
+import ren.natsuyuk1.setsuna.api.options.defaultTweetOption
 import ren.natsuyuk1.setsuna.api.options.defaultTwitterOption
 import ren.natsuyuk1.setsuna.api.options.defaultUserOption
 import ren.natsuyuk1.setsuna.objects.user.TwitterUser
@@ -29,7 +30,7 @@ object TwitterAPI {
     }.getOrNull()
 
     suspend fun fetchTimeline(userID: String): UserTimelineResponse? = kotlin.runCatching {
-        val resp = client.getUserTimeline(userID, defaultUserOption + Expansions.Media())
+        val resp = client.getUserTimeline(userID, defaultUserOption + defaultTweetOption + Expansions.Media())
 
         return if (resp.errors != null) {
             logger.warn { "获取用户 ($userID) 的时间线失败, ${resp.errors}" }

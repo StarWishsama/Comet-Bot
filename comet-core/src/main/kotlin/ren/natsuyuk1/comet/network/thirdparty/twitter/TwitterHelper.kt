@@ -17,7 +17,6 @@ suspend fun Tweet.toMessageWrapper(includes: TwitterExpansions? = null): Message
         val author = tweet.authorID?.let { TwitterAPI.fetchUser(it) }
         appendText("${author?.name} | @${author?.username}", true)
         appendText(tweet.text.removeShortLink().limit(100), true)
-        appendLine()
         if (tweet.referencedTweets != null) {
             val rtInfo = tweet.referencedTweets?.firstOrNull()
             if (rtInfo != null) {
@@ -26,6 +25,8 @@ suspend fun Tweet.toMessageWrapper(includes: TwitterExpansions? = null): Message
                 val rtAuthor = rtTweet?.authorID?.let { TwitterAPI.fetchUser(it) }
 
                 if (rtTweet != null && rtAuthor != null) {
+                    appendLine()
+
                     when (rtInfo.type) {
                         ReferencedTweetType.RETWEETED -> appendText("\uD83D\uDD01 转发了 ${rtAuthor.name.limit(15)} 的推文", true)
                         ReferencedTweetType.REPLY_TO -> appendText("\uD83D\uDCAC 回复了 ${rtAuthor.name.limit(15)} 的推文", true)
@@ -60,6 +61,7 @@ suspend fun Tweet.toMessageWrapper(includes: TwitterExpansions? = null): Message
         }
 
         if (tweet.publicMetrics != null) {
+            appendLine()
             val metrics = tweet.publicMetrics!!
             appendText("💬 ${metrics.reply.getBetterNumber()} \uD83D\uDD01 ${metrics.retweet.getBetterNumber()} 👍 ${metrics.like.getBetterNumber()}")
         }
