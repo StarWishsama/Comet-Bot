@@ -11,7 +11,6 @@ import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.BiliBiliService
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
 
 val BILIBILI = CommandProperty(
     "bilibili",
@@ -42,7 +41,7 @@ class BiliBiliCommand(
     }
 
     override suspend fun run() {
-        if (message.parseToString().toArgs().size == 1) {
+        if (currentContext.invokedSubcommand == null) {
             subject.sendMessage(BILIBILI.helpText.toMessageWrapper())
         }
     }

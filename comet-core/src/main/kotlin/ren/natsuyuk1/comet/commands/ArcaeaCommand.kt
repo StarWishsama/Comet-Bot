@@ -8,7 +8,6 @@ import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.ArcaeaService
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
 
 val ARCAEA by lazy {
     CommandProperty(
@@ -39,7 +38,7 @@ class ArcaeaCommand(
     }
 
     override suspend fun run() {
-        if (message.parseToString().toArgs().size == 1) {
+        if (currentContext.invokedSubcommand == null) {
             subject.sendMessage(ARCAEA.helpText.toMessageWrapper())
         }
     }

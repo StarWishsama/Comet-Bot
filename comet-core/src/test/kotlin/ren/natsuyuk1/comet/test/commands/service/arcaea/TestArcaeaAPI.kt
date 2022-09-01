@@ -1,4 +1,4 @@
-package ren.natsuyuk1.comet.test.network.thirdparty.arcaea
+package ren.natsuyuk1.comet.test.commands.service.arcaea
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll

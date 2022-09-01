@@ -12,6 +12,7 @@ import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.network.thirdparty.twitter.client
 import ren.natsuyuk1.comet.network.thirdparty.twitter.initSetsuna
 import ren.natsuyuk1.comet.objects.config.TwitterConfig
+import ren.natsuyuk1.comet.test.isCI
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.skiko.FontUtil
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
@@ -34,6 +35,8 @@ import kotlin.coroutines.EmptyCoroutineContext
 class TestTweetDraw {
     @BeforeAll
     fun init() {
+        if (isCI()) return
+
         runBlocking {
             SkikoHelper.findSkikoLibrary()
             TwitterConfig.init()
@@ -43,6 +46,8 @@ class TestTweetDraw {
 
     @Test
     fun test() {
+        if (isCI()) return
+
         runBlocking {
             client.fetchTweet("1559791386152448000", defaultTwitterOption + Expansions.Media())
         }.drawTweet()

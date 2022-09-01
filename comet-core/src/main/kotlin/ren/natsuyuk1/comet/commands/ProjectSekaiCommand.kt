@@ -11,9 +11,9 @@ import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.ProjectSekaiService
+import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
 
 val PROJECTSEKAI by lazy {
     CommandProperty(
@@ -51,7 +51,9 @@ class ProjectSekaiCommand(
     }
 
     override suspend fun run() {
-        if (message.parseToString().toArgs().size == 1) {
+        if (ProjectSekaiUserData.isBound(user.id.value)) {
+            subject.sendMessage(ProjectSekaiService.queryUserEventInfo(user, 0))
+        } else if (currentContext.invokedSubcommand == null) {
             subject.sendMessage(PROJECTSEKAI.helpText.toMessageWrapper())
         }
     }
