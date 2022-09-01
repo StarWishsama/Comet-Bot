@@ -15,12 +15,15 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.service.HitokotoManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
+import ren.natsuyuk1.comet.utils.message.AtElement
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import java.lang.Double.min
 import java.math.RoundingMode
 import java.security.SecureRandom
@@ -52,6 +55,12 @@ object SignInService {
             user.exp += expResult.getAllPoint().toLong()
             user.coin += coinResult.getAllPoint()
             user.level += earnLevel
+        }
+
+        val at = when (sender.platform) {
+            LoginPlatform.MIRAI -> AtElement(sender.id)
+            LoginPlatform.TELEGRAM -> AtElement(userName = sender.name)
+            else -> AtElement(sender.id)
         }
 
         val checkInResult = buildString {
@@ -97,7 +106,10 @@ object SignInService {
             append("今日一言 > ${HitokotoManager.getHitokoto()}\n")
         }
 
-        return checkInResult.toMessageWrapper()
+        return buildMessageWrapper {
+            appendElement(at)
+            appendText(checkInResult)
+        }
     }
 
     /**

@@ -71,7 +71,7 @@ fun File.asImage(): Image = Image(filePath = absPath)
  */
 @Serializable
 data class AtElement(
-    val target: Long,
+    val target: Long = 0,
     // For Telegram
     val userName: String = ""
 ) : WrapperElement() {
