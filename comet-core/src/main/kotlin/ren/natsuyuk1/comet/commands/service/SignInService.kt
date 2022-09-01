@@ -93,12 +93,12 @@ object SignInService {
 
             if (user.checkInTime >= 2) {
                 append(
-                    "连续签到 ${user.checkInTime} 天 ${if (coinResult.awardPoint > 0) ", 额外获得 ${coinResult.awardPoint} 点硬币\n" else "\n"}"
+                    "连续签到 ${user.checkInTime} 天 ${if (coinResult.awardPoint > 0) ", 额外获得 ${coinResult.awardPoint.fixDisplay()} 点硬币\n" else "\n"}"
                 )
             }
 
             if (coinResult.chancePoint > 0) {
-                append("随机事件: 额外获得了 ${coinResult.chancePoint} 点硬币 (*^_^*)\n")
+                append("随机事件: 额外获得了 ${coinResult.chancePoint.fixDisplay()} 点硬币 (*^_^*)\n")
             }
 
             append("目前硬币 > ${user.coin.fixDisplay()}\n")
@@ -108,6 +108,7 @@ object SignInService {
 
         return buildMessageWrapper {
             appendElement(at)
+            appendLine()
             appendText(checkInResult)
         }
     }
