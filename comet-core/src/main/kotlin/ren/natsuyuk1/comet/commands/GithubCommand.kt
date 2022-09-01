@@ -152,7 +152,9 @@ class GithubCommand(
                 return
             }
 
-            if (!GithubRepoData.exists(repoName, groupID ?: subject.id)) {
+            val actualGroupID = groupID ?: subject.id
+
+            if (!GithubRepoData.exists(repoName, actualGroupID)) {
                 subject.sendMessage("找不到你要查询的仓库, 可能是没有订阅过?".toMessageWrapper())
                 return
             }
@@ -161,11 +163,11 @@ class GithubCommand(
                 val repo = GithubRepoData.find(repoName) ?: return
 
                 if (branch != null) {
-                    val target = repo.subscribers.find { it.id == groupID }
+                    val target = repo.subscribers.find { it.id == actualGroupID }
 
                     val result = if (target == null) {
                         GithubRepoData.Data.GithubRepo.GithubRepoSubscriber(
-                            groupID ?: subject.id
+                            actualGroupID
                         ).also {
                             it.subscribeBranch.add(branch!!)
                             repo.subscribers.add(it)
@@ -181,7 +183,7 @@ class GithubCommand(
                         subject.sendMessage("已经订阅过分支 $branch 了".toMessageWrapper())
                     }
                 } else if (eventName != null) {
-                    when (repo.subscribers.find { it.id == groupID }?.subscribeEvent?.add(eventName!!)) {
+                    when (repo.subscribers.find { it.id == actualGroupID }?.subscribeEvent?.add(eventName!!)) {
                         true -> {
                             subject.sendMessage("成功订阅事件 $eventName".toMessageWrapper())
                         }
@@ -197,24 +199,32 @@ class GithubCommand(
                 val repo = GithubRepoData.find(repoName) ?: return
 
                 if (branch != null) {
-                    val result = repo.subscribers.find { it.id == groupID }?.subscribeBranch?.remove(branch)
-
-                    if (result == true) {
-                        subject.sendMessage("已取消订阅分支 $branch".toMessageWrapper())
-                    } else {
-                        subject.sendMessage("在取消订阅分支时发生了异常".toMessageWrapper())
+                    when (repo.subscribers.find { it.id == actualGroupID }?.subscribeBranch?.remove(branch)) {
+                        true -> {
+                            subject.sendMessage("已取消订阅分支 $branch".toMessageWrapper())
+                        }
+                        false -> {
+                            subject.sendMessage("未订阅过分支 $branch".toMessageWrapper())
+                        }
+                        else -> {
+                            subject.sendMessage("在取消订阅分支时发生了异常".toMessageWrapper())
+                        }
                     }
                 } else if (eventName != null) {
-                    val result = repo.subscribers.find { it.id == groupID }?.subscribeEvent?.remove(eventName)
-
-                    if (result == true) {
-                        subject.sendMessage("已取消订阅事件 $branch".toMessageWrapper())
-                    } else {
-                        subject.sendMessage("在取消订阅事件时发生了异常".toMessageWrapper())
+                    when (repo.subscribers.find { it.id == actualGroupID }?.subscribeEvent?.remove(eventName)) {
+                        true -> {
+                            subject.sendMessage("已取消订阅事件 $eventName".toMessageWrapper())
+                        }
+                        false -> {
+                            subject.sendMessage("未订阅过事件 $eventName".toMessageWrapper())
+                        }
+                        else -> {
+                            subject.sendMessage("在取消订阅事件时发生了异常".toMessageWrapper())
+                        }
                     }
                 }
             } else {
-                GithubCommandService.fetchRepoSetting(subject, repoName, groupID ?: subject.id)
+                GithubCommandService.fetchRepoSetting(subject, repoName, actualGroupID)
             }
         }
     }
