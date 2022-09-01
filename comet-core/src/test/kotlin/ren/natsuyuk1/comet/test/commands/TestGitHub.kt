@@ -39,7 +39,6 @@ class TestGitHub {
             )
         )
         runBlocking {
-            GithubRepoData
             GithubCommand(
                 fakeComet,
                 generateFakeSender(1),
