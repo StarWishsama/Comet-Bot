@@ -231,5 +231,5 @@ object CommandLocalization : Localization {
 
     override fun helpTagRequired(): String = "必须"
 
-    override fun helpOptionMessage(): String = "显示帮助信息并退出"
+    override fun helpOptionMessage(): String = "显示帮助信息"
 }

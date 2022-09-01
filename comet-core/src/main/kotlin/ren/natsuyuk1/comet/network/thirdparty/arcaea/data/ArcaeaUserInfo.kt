@@ -67,10 +67,10 @@ data class ArcaeaUserInfo(
 
     private fun Int.formatType(): String =
         when (this) {
-            0 -> "CLEAR"
+            0, 5 -> "TC"
             1 -> "FR"
             2 -> "PM"
-            else -> "UNKNOWN"
+            else -> "UNKNOWN ($this)"
         }
 
     fun getActualPtt(): String = (data.rating / 100.0).fixDisplay()

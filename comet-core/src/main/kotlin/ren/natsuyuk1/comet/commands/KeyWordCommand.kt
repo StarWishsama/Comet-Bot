@@ -122,7 +122,7 @@ class KeyWordCommand(
                  -rm, --remove 文本  删除关键词
                  -l, --list 文本     查看本群已有的关键词
                  -r, --regex       是否为正则表达式
-                 -h, --help        显示帮助信息并退出
+                 -h, --help        显示帮助信息
                     """.trimIndent().toMessageWrapper()
                 )
             }
