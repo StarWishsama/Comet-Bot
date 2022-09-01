@@ -11,6 +11,9 @@ import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.types.message.content.PhotoContent
 import dev.inmo.tgbotapi.types.message.content.TextContent
+import dev.inmo.tgbotapi.types.message.textsources.TextSource
+import dev.inmo.tgbotapi.types.message.textsources.mention
+import dev.inmo.tgbotapi.types.message.textsources.regular
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.cacheDirectory
@@ -21,22 +24,26 @@ import java.io.File
 private val logger = mu.KotlinLogging.logger {}
 
 suspend fun MessageWrapper.send(comet: TelegramComet, target: ChatId) {
-    val textBuffer = StringBuffer()
+    val textSourceList = mutableListOf<TextSource>()
 
     getMessageContent().forEach {
-        if (it is Text) {
-            textBuffer.append(it.parseToString())
-        } else if (it is AtElement) {
-            textBuffer.append("@${it.userName}")
+        when (it) {
+            is Text -> {
+                textSourceList.add(regular(it.parseToString()))
+            }
+            is AtElement -> {
+                textSourceList.add(mention(it.userName))
+            }
+            else -> {}
         }
     }
 
     if (find<Image>() != null) {
-        find<Image>()?.toInputFile()?.let { comet.bot.sendPhoto(target, it, text = textBuffer.toString()) }
+        find<Image>()?.toInputFile()?.let { comet.bot.sendPhoto(target, it, entities = textSourceList) }
     } else if (find<Voice>() != null) {
         find<Voice>()?.toInputFile()?.let { comet.bot.sendAudio(target, it) }
     } else {
-        comet.bot.sendMessage(target, textBuffer.toString())
+        comet.bot.sendMessage(target, textSourceList)
     }
 }
 
