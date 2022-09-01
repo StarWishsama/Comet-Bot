@@ -6,6 +6,8 @@ import moe.sdl.yac.parameters.options.option
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
 import ren.natsuyuk1.comet.api.user.CometUser
+import ren.natsuyuk1.comet.api.user.UserLevel
+import ren.natsuyuk1.comet.api.user.isOperator
 import ren.natsuyuk1.comet.network.thirdparty.twitter.TwitterAPI
 import ren.natsuyuk1.comet.network.thirdparty.twitter.toMessageWrapper
 import ren.natsuyuk1.comet.util.toMessageWrapper
@@ -18,7 +20,9 @@ val TWITTER = CommandProperty(
     """
     /twit user 查询用户
     /twit tweet 查询推文    
-    """.trimIndent()
+    """.trimIndent(),
+    permissionLevel = UserLevel.ADMIN,
+    extraPermissionChecker = { _, sender -> sender.asMember()?.isOperator() == true }
 )
 
 class TwitterCommand(

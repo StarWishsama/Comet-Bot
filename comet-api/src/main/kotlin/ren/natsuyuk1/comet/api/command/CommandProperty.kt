@@ -10,9 +10,7 @@
 package ren.natsuyuk1.comet.api.command
 
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
-import ren.natsuyuk1.comet.api.event.events.message.MessageEvent
 import ren.natsuyuk1.comet.api.user.CometUser
-import ren.natsuyuk1.comet.api.user.Contact
 import ren.natsuyuk1.comet.api.user.UserLevel
 
 /**
@@ -36,5 +34,5 @@ data class SubCommandProperty(
     override val name: String,
     override val alias: List<String>,
     val parentCommandProperty: CommandProperty,
-    override val permissionLevel: UserLevel = UserLevel.USER
+    override val permissionLevel: UserLevel = parentCommandProperty.permissionLevel
 ) : CommandProperty(name, alias, "", "", "${parentCommandProperty.permission}.$name", permissionLevel)
