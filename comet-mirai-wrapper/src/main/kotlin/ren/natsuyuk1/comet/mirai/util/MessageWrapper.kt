@@ -14,7 +14,6 @@ import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.utils.file.messageWrapperDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.file.writeToFile
-import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.message.*
 import ren.natsuyuk1.comet.utils.message.Image
 import java.io.File
@@ -112,18 +111,7 @@ fun MessageChain.toMessageWrapper(): MessageWrapper {
             }
             is net.mamoe.mirai.message.data.Image -> {
                 runBlocking {
-                    if (localImage) {
-                        val location = File(messageWrapperDirectory, message.imageId)
-                        location.touch()
-
-                        cometClient.client.downloadFile(
-                            message.queryUrl(),
-                            location
-                        )
-                        wrapper.appendElement(Image(filePath = location.canonicalPath))
-                    } else {
-                        wrapper.appendElement(Image(url = message.queryUrl()))
-                    }
+                    wrapper.appendElement(Image(url = message.queryUrl()))
                 }
             }
             is At -> {
