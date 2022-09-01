@@ -49,7 +49,7 @@ suspend fun Tweet.toMessageWrapper(includes: TwitterExpansions? = null): Message
         }
 
         if (includes?.media?.isEmpty() == false) {
-            includes?.media?.take(2)?.forEach {
+            includes.media?.take(2)?.forEach {
                 appendElement(Image(url = it.url!!))
             }
 

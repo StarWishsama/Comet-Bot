@@ -85,7 +85,7 @@ class TwitterCommand(
                     resp.tweet?.toMessageWrapper(resp.includes)?.let { subject.sendMessage(it) }
                 }
             } else if (username != null) {
-                val user = TwitterAPI.fetchUser(username!!)
+                val user = TwitterAPI.fetchUserByUsername(username!!)
 
                 if (user == null) {
                     subject.sendMessage("找不到对应的用户捏, 检查下用户名格式吧".toMessageWrapper())
