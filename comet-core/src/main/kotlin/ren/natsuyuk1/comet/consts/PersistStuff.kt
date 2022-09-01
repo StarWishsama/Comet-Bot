@@ -108,5 +108,11 @@ val defaultCommands: List<AbstractCommandNode<*>> =
             KEYWORD
         ) { comet, sender, subject, wrapper, user ->
             KeyWordCommand(comet, sender, subject, wrapper, user)
-        }
+        },
+        CommandNode(
+            TWITTER,
+            listOf(TwitterCommand.Tweet.TWEET, TwitterCommand.User.USER)
+        ) { comet, sender, subject, wrapper, user ->
+            TwitterCommand(comet, sender, subject, wrapper, user)
+        },
     )

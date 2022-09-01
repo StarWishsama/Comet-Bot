@@ -49,7 +49,7 @@ class NowCommand(
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
     user: CometUser
-) : CometCommand(comet, sender, subject, message, user, INFO) {
+) : CometCommand(comet, sender, subject, message, user, NOW) {
     companion object {
         // ************************************** $1 * $2 * $3 *******
         private val aliasRegex = Regex("""^(.+?)(==>(.+?))?${'$'}""")

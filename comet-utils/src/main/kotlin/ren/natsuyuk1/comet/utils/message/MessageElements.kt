@@ -10,6 +10,8 @@
 package ren.natsuyuk1.comet.utils.message
 
 import kotlinx.serialization.Serializable
+import ren.natsuyuk1.comet.utils.file.absPath
+import java.io.File
 
 @Serializable
 sealed class WrapperElement {
@@ -53,6 +55,12 @@ data class Image(
 
     override fun parseToString(): String = "[图片]"
 }
+
+fun String.asURLImage(): Image = Image(url = this)
+
+fun String.asBase64Image(): Image = Image(base64 = this)
+
+fun File.asImage(): Image = Image(filePath = absPath)
 
 /**
  * [AtElement]

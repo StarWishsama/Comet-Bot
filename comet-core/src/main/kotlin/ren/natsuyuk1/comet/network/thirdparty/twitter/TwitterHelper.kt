@@ -3,15 +3,18 @@ package ren.natsuyuk1.comet.network.thirdparty.twitter
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.message.Image
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.utils.message.asURLImage
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
+import ren.natsuyuk1.setsuna.objects.TwitterExpansions
 import ren.natsuyuk1.setsuna.objects.tweet.ReferencedTweetType
-import ren.natsuyuk1.setsuna.response.TweetFetchResponse
+import ren.natsuyuk1.setsuna.objects.tweet.Tweet
+import ren.natsuyuk1.setsuna.objects.user.TwitterUser
 import ren.natsuyuk1.setsuna.util.removeShortLink
 
-suspend fun TweetFetchResponse.toMessageWrapper(): MessageWrapper =
+suspend fun Tweet.toMessageWrapper(includes: TwitterExpansions? = null): MessageWrapper =
     buildMessageWrapper {
-        val tweet = this@toMessageWrapper.tweet!!
+        val tweet = this@toMessageWrapper
         val author = tweet.authorID?.let { TwitterAPI.fetchUser(it) }
         appendText("${author?.name} | @${author?.username}", true)
         appendText(tweet.text.removeShortLink().limit(100), true)
@@ -58,3 +61,25 @@ suspend fun TweetFetchResponse.toMessageWrapper(): MessageWrapper =
             appendText("💬 ${metrics.reply.getBetterNumber()} \uD83D\uDD01 ${metrics.retweet.getBetterNumber()} 👍 ${metrics.like.getBetterNumber()}")
         }
     }
+
+fun TwitterUser.toMessageWrapper() = buildMessageWrapper {
+    appendElement(profileImageURL!!.asURLImage())
+    appendText("$name (@$username)", true)
+
+    if (bio != null) {
+        appendLine()
+        appendText(bio!!.limit(50))
+        appendLine()
+    }
+
+    if (location != null) {
+        appendText("📍 $location")
+        if (url != null) {
+            appendText(" 🔗 $url")
+        }
+
+        appendLine()
+    }
+
+    appendText("${publicMetrics?.following} 正在关注 | ${publicMetrics?.followers} 关注者", true)
+}
