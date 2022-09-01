@@ -150,24 +150,16 @@ object SignInService {
         )
 
         // 连续签到的奖励硬币
-        val awardPoint = if (coinBase < 0) {
-            0.0
-        } else {
-            String.format("%.1f", awardProp * coinBase).toDouble()
-        }
+        val awardPoint = awardProp * coinBase
 
-        val awardExp = if (coinBase < 0) {
-            0.0
-        } else {
-            String.format("%.1f", awardProp * coinBase).toDouble()
-        }
+        val awardExp = awardProp * expBase
 
         val chancePoint = getRandomEventCoin()
 
         return Pair(SignInResult(coinBase, awardPoint, chancePoint), SignInResult(expBase, awardExp, 0.0))
     }
 
-    private data class SignInResult(
+    internal data class SignInResult(
         val basePoint: Double,
         val awardPoint: Double,
         val chancePoint: Double
@@ -175,7 +167,7 @@ object SignInService {
         fun getAllPoint(): Double = basePoint + awardPoint + chancePoint
     }
 
-    fun getSignInPosition(user: CometUser): Int {
+    internal fun getSignInPosition(user: CometUser): Int {
         val checkTime = Clock.System.now()
         val checkLDT = checkTime.toLocalDateTime(TimeZone.currentSystemDefault())
 
@@ -230,7 +222,7 @@ object SignInService {
         }
     }
 
-    private fun getTargetExp(currentLevel: Int): Int =
+    private fun getTargetExpDifference(currentLevel: Int): Int =
         when (currentLevel) {
             in 0..15 -> {
                 2 * currentLevel + 7
@@ -245,23 +237,16 @@ object SignInService {
             }
         }
 
-    private fun levelUp(currentLevel: Int, earnExp: Long): Int {
-        val targetExp = getTargetExp(currentLevel)
+    internal fun levelUp(currentLevel: Int, earnExp: Long): Int {
+        var cacheExp = earnExp
+        var earnLevel = 0
 
-        return if (earnExp > targetExp) {
-            var earnLevel = 1
-
-            while (true) {
-                if (earnExp > getTargetExp(currentLevel + earnLevel)) {
-                    earnLevel++
-                } else {
-                    break
-                }
-            }
-
-            earnLevel
-        } else {
-            0
+        while (cacheExp > getTargetExpDifference(currentLevel + earnLevel)) {
+            val target = getTargetExpDifference(currentLevel + earnLevel)
+            cacheExp -= target
+            earnLevel++
         }
+
+        return earnLevel
     }
 }

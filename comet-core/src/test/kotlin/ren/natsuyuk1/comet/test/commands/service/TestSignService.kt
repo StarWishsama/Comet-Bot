@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.test.commands.service
 
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -17,6 +18,7 @@ import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.commands.service.SignInService
 import ren.natsuyuk1.comet.commands.service.isSigned
 import ren.natsuyuk1.comet.test.initTestDatabase
+import ren.natsuyuk1.comet.test.print
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -52,6 +54,10 @@ class TestSignService {
         }
 
         assertEquals(1, SignInService.getSignInPosition(testUser))
+
+        transaction {
+            UserTable.deleteAll()
+        }
     }
 
     @Test
@@ -77,6 +83,28 @@ class TestSignService {
         }
 
         assertTrue { user.isSigned() }
+
+        transaction {
+            UserTable.deleteAll()
+        }
+    }
+
+    @Test
+    fun testLevelUp() {
+        val user = CometUser.create(1, LoginPlatform.TEST)
+        runBlocking {
+            transaction {
+                user.exp = 1000
+            }
+
+            val upLevel = SignInService.levelUp(user.level, user.exp).also { it.print() }
+
+            transaction {
+                user.level += upLevel
+            }
+        }
+
+        assertEquals(26, user.level)
     }
 
     @AfterAll
