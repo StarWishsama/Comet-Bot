@@ -158,11 +158,6 @@ class GithubCommand(
             }
 
             if (add) {
-                if (!GithubRepoData.exists(repoName, groupID ?: subject.id)) {
-                    subject.sendMessage("找不到你要查询的仓库, 可能是没有订阅过?".toMessageWrapper())
-                    return
-                }
-
                 val repo = GithubRepoData.find(repoName) ?: return
 
                 if (branch != null) {
@@ -199,11 +194,6 @@ class GithubCommand(
                     }
                 }
             } else if (remove) {
-                if (GithubRepoData.exists(repoName, groupID ?: subject.id)) {
-                    subject.sendMessage("找不到你要查询的仓库, 可能是没有订阅过?".toMessageWrapper())
-                    return
-                }
-
                 val repo = GithubRepoData.find(repoName) ?: return
 
                 if (branch != null) {
