@@ -1,7 +1,6 @@
 package ren.natsuyuk1.comet.network.thirdparty.twitter
 
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
-import ren.natsuyuk1.comet.utils.message.Image
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.asURLImage
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
@@ -39,7 +38,9 @@ suspend fun Tweet.toMessageWrapper(includes: TwitterExpansions? = null): Message
 
                     if (rt.includes?.media?.isEmpty() == false) {
                         rt.includes?.media?.take(2)?.forEach {
-                            appendElement(Image(url = it.url!!))
+                            it.url?.let { url ->
+                                appendElement(url.asURLImage())
+                            }
                         }
 
                         appendLine()
@@ -50,7 +51,9 @@ suspend fun Tweet.toMessageWrapper(includes: TwitterExpansions? = null): Message
 
         if (includes?.media?.isEmpty() == false) {
             includes.media?.take(2)?.forEach {
-                appendElement(Image(url = it.url!!))
+                it.url?.let { url ->
+                    appendElement(url.asURLImage())
+                }
             }
 
             appendLine()
