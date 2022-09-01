@@ -13,8 +13,8 @@ import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.commands.service.GithubCommandService
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.util.toMessageWrapper
+import ren.natsuyuk1.comet.utils.message.EmptyMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.string.StringUtil.toArgs
 
 val GITHUB = CommandProperty(
     "github",
@@ -128,25 +128,26 @@ class GithubCommand(
         }
     }
 
-    class Setting(
+    open class Setting(
         val message: MessageWrapper,
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
-    ) : CometSubCommand(subject, sender, user, SETTING) {
+        override val user: CometUser,
+        override val property: SubCommandProperty = SETTING,
+    ) : CometSubCommand(subject, sender, user, property) {
         init {
             subcommands(Add(subject, sender, user), Remove(subject, sender, user))
         }
 
-        private val groupID by option("-g", "--group", help = "群号").long()
-        private val repoName by argument(help = "GitHub 仓库名称")
+        val groupID by option("-g", "--group", help = "群号").long()
+        val repoName by argument(help = "GitHub 仓库名称")
 
         companion object {
             val SETTING = SubCommandProperty("setting", listOf("st", "设置"), GITHUB)
         }
 
         override suspend fun run() {
-            if (message.parseToString().toArgs().size == 2) {
+            if (currentContext.invokedSubcommand == null) {
                 if (subject !is Group && groupID == null) {
                     subject.sendMessage("请提供欲订阅 GitHub 仓库动态的群号!".toMessageWrapper())
                     return
@@ -165,13 +166,11 @@ class GithubCommand(
             override val subject: PlatformCommandSender,
             override val sender: PlatformCommandSender,
             override val user: CometUser
-        ) : CometSubCommand(subject, sender, user, ADD) {
+        ): Setting(EmptyMessageWrapper, subject, sender, user, ADD) {
             companion object {
                 val ADD = SubCommandProperty("add", listOf("新增", "添加"), SETTING, UserLevel.ADMIN)
             }
 
-            private val repoName by argument(help = "GitHub 仓库名称").default("")
-            private val groupID by option("-g", "--group", help = "群号").long()
             private val branch by option("-b", "--branch", help = "分支名")
             private val eventName by option("-e", "--event", help = "事件名称")
 
@@ -231,13 +230,11 @@ class GithubCommand(
             override val subject: PlatformCommandSender,
             override val sender: PlatformCommandSender,
             override val user: CometUser
-        ) : CometSubCommand(subject, sender, user, REMOVE) {
+        ) : Setting(EmptyMessageWrapper, subject, sender, user, REMOVE) {
             companion object {
                 val REMOVE = SubCommandProperty("remove", listOf("rm", "删除"), SETTING, UserLevel.ADMIN)
             }
 
-            private val repoName by argument(help = "GitHub 仓库名称").default("")
-            private val groupID by option("-g", "--group", help = "群号").long()
             private val branch by option("-b", "--branch", help = "分支名")
             private val eventName by option("-e", "--event", help = "事件名称")
 
