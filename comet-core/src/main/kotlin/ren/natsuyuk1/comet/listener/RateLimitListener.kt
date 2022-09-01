@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.listener
 
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consume
@@ -16,6 +17,7 @@ import kotlin.time.Duration.Companion.minutes
 @OptIn(ExperimentalCoroutinesApi::class)
 object RateLimitListener : CometListener {
     private val messageCache = Channel<MessagePreSendEvent>(CometGlobalConfig.data.globalRateLimitMessageSize)
+    private val currentMessageSize by atomic(0)
     override val name: String
         get() = "全局限速"
 
@@ -39,7 +41,7 @@ object RateLimitListener : CometListener {
 
     @EventHandler
     fun processMessage(event: MessagePreSendEvent) {
-        if (event.target.platform == LoginPlatform.MIRAI) {
+        if (event.target.platform == LoginPlatform.MIRAI && currentMessageSize >= CometGlobalConfig.data.globalRateLimitMessageSize) {
             event.cancel()
             event.comet.scope.launch {
                 messageCache.send(event)
