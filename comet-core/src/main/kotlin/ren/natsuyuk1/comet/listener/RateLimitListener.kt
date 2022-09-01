@@ -40,6 +40,7 @@ object RateLimitListener : CometListener {
     @EventHandler
     fun processMessage(event: MessagePreSendEvent) {
         if (event.target.platform == LoginPlatform.MIRAI) {
+            event.cancel()
             event.comet.scope.launch {
                 messageCache.send(event)
             }
