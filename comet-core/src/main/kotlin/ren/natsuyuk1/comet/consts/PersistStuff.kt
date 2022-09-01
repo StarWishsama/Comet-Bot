@@ -80,8 +80,6 @@ val defaultCommands: List<AbstractCommandNode<*>> =
                 GithubCommand.UnSubscribe.UNSUBSCRIBE,
                 GithubCommand.Info.INFO,
                 GithubCommand.Setting.SETTING,
-                GithubCommand.Setting.Add.ADD,
-                GithubCommand.Setting.Remove.REMOVE
             )
         ) { comet, sender, subject, wrapper, user ->
             GithubCommand(comet, sender, subject, wrapper, user)
