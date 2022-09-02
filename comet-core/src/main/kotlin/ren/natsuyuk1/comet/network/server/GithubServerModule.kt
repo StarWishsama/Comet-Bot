@@ -92,11 +92,11 @@ object GithubWebHookHandler {
             }
 
             when {
-                secretStatus == SecretStatus.NO_SECRET -> {
-                    call.respondText("Comet 已收到事件, 推荐使用密钥加密以保证服务器安全")
-                }
                 hasError -> {
                     call.respondText("Comet 发生内部错误", status = HttpStatusCode.InternalServerError)
+                }
+                secretStatus == SecretStatus.NO_SECRET -> {
+                    call.respondText("Comet 已收到事件, 推荐使用密钥加密以保证服务器安全")
                 }
                 else -> {
                     call.respondText("Comet 已收到事件")
