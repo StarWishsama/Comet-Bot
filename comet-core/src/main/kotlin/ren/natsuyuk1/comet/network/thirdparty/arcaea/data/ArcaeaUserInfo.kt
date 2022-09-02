@@ -3,6 +3,7 @@ package ren.natsuyuk1.comet.network.thirdparty.arcaea.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonArray
+import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaClient
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
@@ -36,7 +37,7 @@ data class ArcaeaUserInfo(
         @Serializable
         data class ArcaeaPlayResult(
             @SerialName("song_id")
-            val songName: String,
+            val songID: String,
             val difficulty: Int,
             val score: Int,
             @SerialName("shiny_perfect_count")
@@ -61,15 +62,26 @@ data class ArcaeaUserInfo(
         if (!data.recentPlayScore.isNullOrEmpty()) {
             appendLine()
             val lastPlay = data.recentPlayScore.first()
-            appendText("最近游玩 >> ${lastPlay.songName} | ${lastPlay.clearType.formatType()}")
+            appendText("最近游玩 >> ${ArcaeaClient.getSongNameByID(lastPlay.songID)} (${lastPlay.difficulty.formatDifficulty()}) | ${lastPlay.clearType.formatType()}")
         }
     }
 
     private fun Int.formatType(): String =
         when (this) {
-            5 -> "TC"
+            // 5 为伞对立完成后结果
+            1, 5 -> "TC"
             2 -> "FR"
+            3 -> "PM"
             else -> "UNKNOWN ($this)"
+        }
+
+    private fun Int.formatDifficulty(): String =
+        when (this) {
+            1 -> "PST"
+            2 -> "PRS"
+            3 -> "FTR"
+            4 -> "BYD"
+            else -> "Unknown ($this)"
         }
 
     fun getActualPtt(): String = (data.rating / 100.0).fixDisplay()

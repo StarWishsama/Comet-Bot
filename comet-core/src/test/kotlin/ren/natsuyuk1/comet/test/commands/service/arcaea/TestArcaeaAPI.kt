@@ -27,6 +27,7 @@ class TestArcaeaAPI {
         if (isCI()) return
 
         runBlocking {
+            ArcaeaClient.fetchConstants()
             ArcaeaClient.queryUserInfo(userID)?.getMessageWrapper()?.print()
         }
     }
