@@ -67,9 +67,8 @@ data class ArcaeaUserInfo(
 
     private fun Int.formatType(): String =
         when (this) {
-            0, 5 -> "TC"
-            1 -> "FR"
-            2 -> "PM"
+            5 -> "TC"
+            2 -> "FR"
             else -> "UNKNOWN ($this)"
         }
 
