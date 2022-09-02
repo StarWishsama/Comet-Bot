@@ -110,6 +110,7 @@ object ArcaeaClient {
                             when (command.command) {
                                 ArcaeaCommand.USER_INFO -> {
                                     resp = json.decodeFromString(incomingJson)
+                                    logger.debug { "Receive user info ${resp?.data?.userID} >> $resp" }
                                     send("bye")
                                     client.close()
                                 }

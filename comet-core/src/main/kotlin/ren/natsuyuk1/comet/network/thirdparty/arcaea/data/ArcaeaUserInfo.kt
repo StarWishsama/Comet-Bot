@@ -3,6 +3,8 @@ package ren.natsuyuk1.comet.network.thirdparty.arcaea.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaClient
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
@@ -63,6 +65,12 @@ data class ArcaeaUserInfo(
             appendLine()
             val lastPlay = data.recentPlayScore.first()
             appendText("最近游玩 >> ${ArcaeaClient.getSongNameByID(lastPlay.songID)} (${lastPlay.difficulty.formatDifficulty()}) | ${lastPlay.clearType.formatType()}")
+        }
+
+        if (!data.ratingRecord.isEmpty()) {
+            appendLine()
+            val lastPtt = data.ratingRecord[data.ratingRecord.size - 2].jsonObject.entries.first().value.jsonPrimitive.content.toDouble()
+            appendText("距上次查询 ptt 已变化 >> ${((data.rating - lastPtt) / 100.0).fixDisplay()}")
         }
     }
 
