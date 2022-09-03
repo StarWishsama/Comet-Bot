@@ -5,7 +5,6 @@ import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -23,12 +22,6 @@ object ArcaeaClient {
     private const val arcaeaAPIPort = 616
 
     private val songInfo = mutableMapOf<String, String>()
-
-    init {
-        runBlocking {
-            fetchConstants()
-        }
-    }
 
     suspend fun fetchConstants() {
         val cmd = "constants"
@@ -127,13 +120,18 @@ object ArcaeaClient {
                                     resp = json.decodeFromString(incomingJson)
                                     logger.debug { "Receive user info ${resp?.data?.userID} >> $resp" }
                                     client.close()
+                                    break
                                 }
 
                                 else -> { /* ignore */ }
                             }
                         }
 
-                        is Frame.Close -> client.close()
+                        is Frame.Close -> {
+                            client.close()
+                            break
+                        }
+
                         else -> { /* ignore */ }
                     }
                 }

@@ -8,6 +8,7 @@ import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometPersistDataFile
 import ren.natsuyuk1.comet.migrator.GitHubRepoMigrator
 import ren.natsuyuk1.comet.migrator.UserDataMigrator
+import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaClient
 import ren.natsuyuk1.comet.network.thirdparty.twitter.initSetsuna
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import kotlin.coroutines.CoroutineContext
@@ -29,6 +30,9 @@ object CometCoreService {
 
     private suspend fun initCoreService() {
         ProjectSekaiManager.init(scope.coroutineContext)
+        scope.launch {
+            ArcaeaClient.fetchConstants()
+        }
         GroupSettingManager.init(scope.coroutineContext)
         TaskManager.registerTask(1.hours) { HitokotoManager.fetch() }
         startAutoSaveService()
