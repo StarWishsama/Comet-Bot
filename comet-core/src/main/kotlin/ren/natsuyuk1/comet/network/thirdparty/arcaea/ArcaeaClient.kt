@@ -4,6 +4,7 @@ import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.isActive
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -55,7 +56,6 @@ object ArcaeaClient {
                                     }
                                 }
 
-                                println(songInfo.size)
                                 client.close()
                                 break
                             }
@@ -69,6 +69,10 @@ object ArcaeaClient {
                         break
                     }
                 }
+            }
+
+            if (client.isActive) {
+                client.close()
             }
         }
     }

@@ -76,6 +76,7 @@ data class ArcaeaUserInfo(
 
     private fun Int.formatType(): String =
         when (this) {
+            0 -> "FAILED"
             // 5 为伞对立完成后结果
             1, 5 -> "TC"
             2 -> "FR"
