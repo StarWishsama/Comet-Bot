@@ -140,20 +140,20 @@ object CommandManager {
                     return@runCatching CommandStatus.NoPermission()
                 }
 
-                when (property.executeConsumeType) {
-                    CommandConsumeType.COOLDOWN -> {
-                        if (user.platform.needRestrict || property.executeConsumePoint == CometGlobalConfig.data.commandCoolDown) { // ktlint-disable max-line-length
-                            if (user.hasCoolDown(executeTime, property.executeConsumePoint.seconds)) {
-                                return@runCatching CommandStatus.ValidateFailed()
+                if (user.userLevel != UserLevel.OWNER) {
+                    when (property.executeConsumeType) {
+                        CommandConsumeType.COOLDOWN -> {
+                            if (user.platform.needRestrict || property.executeConsumePoint == CometGlobalConfig.data.commandCoolDown) { // ktlint-disable max-line-length
+                                if (user.hasCoolDown(executeTime, property.executeConsumePoint.seconds)) {
+                                    return@runCatching CommandStatus.ValidateFailed()
+                                }
                             }
                         }
-                    }
 
-                    CommandConsumeType.COIN -> {
-                        if (user.coin < property.executeConsumePoint) {
-                            return@runCatching CommandStatus.ValidateFailed()
-                        } else {
-                            if (user.userLevel != UserLevel.OWNER) {
+                        CommandConsumeType.COIN -> {
+                            if (user.coin < property.executeConsumePoint) {
+                                return@runCatching CommandStatus.ValidateFailed()
+                            } else {
                                 user.coin = user.coin - property.executeConsumePoint
                             }
                         }
