@@ -19,6 +19,7 @@ class TestArcaeaAPI {
 
         runBlocking {
             BrotliLoader.loadBrotli()
+            ArcaeaClient.fetchConstants()
         }
     }
 
@@ -27,7 +28,6 @@ class TestArcaeaAPI {
         if (isCI()) return
 
         runBlocking {
-            ArcaeaClient.fetchConstants()
             ArcaeaClient.queryUserInfo(userID)?.getMessageWrapper()?.print()
         }
     }

@@ -36,6 +36,8 @@ object ArcaeaClient {
             return
         }
 
+        if (songInfo.isNotEmpty()) return
+
         val client = HttpClient {
             install(WebSockets)
         }
@@ -101,7 +103,7 @@ object ArcaeaClient {
             send(userID)
 
             try {
-                while (true) {
+                while (client.isActive) {
                     when (val msg = incoming.receive()) {
                         is Frame.Text -> {
                             val text = msg.readText()
@@ -124,7 +126,6 @@ object ArcaeaClient {
                                 ArcaeaCommand.USER_INFO -> {
                                     resp = json.decodeFromString(incomingJson)
                                     logger.debug { "Receive user info ${resp?.data?.userID} >> $resp" }
-                                    send("bye")
                                     client.close()
                                 }
 

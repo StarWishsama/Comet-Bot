@@ -21,5 +21,8 @@ enum class ArcaeaCommand {
     SONG_TITLE,
 
     @SerialName("songartist")
-    SONG_ARTIST
+    SONG_ARTIST,
+
+    @SerialName("lookup_result")
+    LOOKUP_RESULT
 }

@@ -77,10 +77,13 @@ data class ArcaeaUserInfo(
     private fun Int.formatType(): String =
         when (this) {
             0 -> "FAILED"
-            // 5 为伞对立完成后结果
-            1, 5 -> "TC"
+            1 -> "TC"
             2 -> "FR"
             3 -> "PM"
+            // 4 简单型角色
+            4 -> "TC"
+            // 5 困难型角色
+            5 -> "TC"
             else -> "UNKNOWN ($this)"
         }
 
