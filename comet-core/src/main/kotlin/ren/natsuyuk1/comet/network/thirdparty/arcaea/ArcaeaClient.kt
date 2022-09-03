@@ -5,6 +5,7 @@ import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -22,6 +23,12 @@ object ArcaeaClient {
     private const val arcaeaAPIPort = 616
 
     private val songInfo = mutableMapOf<String, String>()
+
+    init {
+        runBlocking {
+            fetchConstants()
+        }
+    }
 
     suspend fun fetchConstants() {
         val cmd = "constants"
@@ -54,6 +61,8 @@ object ArcaeaClient {
                                     songInfoData.jsonObject["data"]?.jsonObject?.forEach { id, songName ->
                                         songInfo[id] = songName.jsonObject["en"]?.jsonPrimitive?.content!!
                                     }
+
+                                    logger.info { "已更新歌曲信息 (${songInfo.size} 个)" }
                                 }
 
                                 client.close()
