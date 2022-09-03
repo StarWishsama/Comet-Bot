@@ -3,7 +3,7 @@ package ren.natsuyuk1.comet.network.thirdparty.arcaea.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaClient
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
@@ -69,7 +69,7 @@ data class ArcaeaUserInfo(
 
         if (!data.ratingRecord.isEmpty()) {
             appendLine()
-            val lastPtt = data.ratingRecord[data.ratingRecord.size - 2].jsonObject.entries.first().value.jsonPrimitive.content.toDouble()
+            val lastPtt = data.ratingRecord[data.ratingRecord.size - 2].jsonArray.last().jsonPrimitive.content.toDouble()
             appendText("距上次查询 ptt 已变化 >> ${((data.rating - lastPtt) / 100.0).fixDisplay()}")
         }
     }
