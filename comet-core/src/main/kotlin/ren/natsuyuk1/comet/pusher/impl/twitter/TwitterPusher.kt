@@ -7,8 +7,4 @@ class TwitterPusher: CometPusher("twitter", CometPusherConfig(300)) {
     override suspend fun retrieve() {
         TODO("Not yet implemented")
     }
-
-    override suspend fun push() {
-        TODO("Not yet implemented")
-    }
 }
