@@ -4,11 +4,11 @@ import mu.KotlinLogging
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
+import ren.natsuyuk1.comet.api.cometInstances
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.database.AccountData
 import ren.natsuyuk1.comet.api.database.AccountDataTable
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
-import ren.natsuyuk1.comet.console.CometTerminal
 import ren.natsuyuk1.comet.console.CometTerminalCommand
 import ren.natsuyuk1.comet.console.wrapper.WrapperLoader
 
@@ -29,7 +29,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
             val miraiComet =
                 miraiService.createInstance(createCometConfig(id, password, platform), WrapperLoader.wrapperClassLoader)
 
-            CometTerminal.instance.push(miraiComet)
+            cometInstances.push(miraiComet)
             miraiComet.init(CometTerminalCommand.scope.coroutineContext)
 
             try {
@@ -37,7 +37,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
                 miraiComet.afterLogin()
             } catch (e: RuntimeException) {
                 logger.warn(e) { "Mirai $id 登录失败, 请尝试重新登录" }
-                CometTerminal.instance.removeIf { it.id == id }
+                cometInstances.removeIf { it.id == id }
             }
         }
 
@@ -51,7 +51,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
                     WrapperLoader.wrapperClassLoader
                 )
 
-            CometTerminal.instance.push(telegramComet)
+            cometInstances.push(telegramComet)
             telegramComet.init(CometTerminalCommand.scope.coroutineContext)
 
             try {
@@ -59,7 +59,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
                 telegramComet.afterLogin()
             } catch (e: Exception) {
                 logger.warn(e) { "Telegram $id 登录失败, 请尝试重新登录" }
-                CometTerminal.instance.removeIf { it.id == id }
+                cometInstances.removeIf { it.id == id }
             }
         }
 
@@ -79,8 +79,8 @@ internal fun logout(id: Long, platform: LoginPlatform) {
             }
         }
 
-        CometTerminal.instance.find { it.id == id }?.close()
-        CometTerminal.instance.removeIf { it.id == id }
+        cometInstances.find { it.id == id }?.close()
+        cometInstances.removeIf { it.id == id }
 
         logger.info { "注销账号成功" }
     }

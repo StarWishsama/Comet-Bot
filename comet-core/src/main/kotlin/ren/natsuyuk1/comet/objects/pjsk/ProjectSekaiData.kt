@@ -10,6 +10,7 @@
 package ren.natsuyuk1.comet.objects.pjsk
 
 import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.UUIDEntity
@@ -20,10 +21,11 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import ren.natsuyuk1.comet.api.event.logger
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getEventList
 import java.util.*
+
+private val logger = KotlinLogging.logger {}
 
 object ProjectSekaiDataTable : IdTable<Int>("pjsk_data") {
     override val id: Column<EntityID<Int>> = integer("id").entityId()

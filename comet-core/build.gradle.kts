@@ -51,4 +51,6 @@ dependencies {
     implementation("com.aayushatharva.brotli4j:brotli4j:1.7.1")
 
     implementation("ren.natsuyuk1.setsuna:Setsuna:_")
+
+    implementation("com.rometools:rome:_")
 }

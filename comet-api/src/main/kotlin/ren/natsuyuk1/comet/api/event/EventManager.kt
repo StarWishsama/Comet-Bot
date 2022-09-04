@@ -28,7 +28,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.KClass
 
-val logger = mu.KotlinLogging.logger {}
+private val logger = mu.KotlinLogging.logger {}
 
 /**
  * Must call `init()` before any registration and `broadcastEvent(event)`

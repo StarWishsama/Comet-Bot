@@ -1,6 +1,9 @@
 package ren.natsuyuk1.comet.api
 
 import ren.natsuyuk1.comet.api.user.Group
+import java.util.concurrent.ConcurrentLinkedDeque
+
+val cometInstances = ConcurrentLinkedDeque<Comet>()
 
 /**
  * [IComet]

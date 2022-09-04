@@ -17,6 +17,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.jline.reader.EndOfFileException
 import org.jline.reader.UserInterruptException
 import ren.natsuyuk1.comet.api.Comet
+import ren.natsuyuk1.comet.api.cometInstances
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
 import ren.natsuyuk1.comet.api.config.CometConfig
@@ -45,7 +46,6 @@ import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
 import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
-import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
 
@@ -65,8 +65,6 @@ private val dummyComet = object : Comet(CometConfig(0, "", LoginPlatform.TEST), 
 
 object CometTerminal {
     private var scope = ModuleScope("CometTerminal")
-
-    val instance = ConcurrentLinkedDeque<Comet>()
 
     fun init(parentContext: CoroutineContext) {
         scope = ModuleScope("CometTerminal", parentContext)
@@ -144,7 +142,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
     private fun setupShutdownHook() {
         addShutdownHook {
             CometServer.stop()
-            CometTerminal.instance.forEach {
+            cometInstances.forEach {
                 try {
                     it.close()
                 } catch (_: Exception) {
