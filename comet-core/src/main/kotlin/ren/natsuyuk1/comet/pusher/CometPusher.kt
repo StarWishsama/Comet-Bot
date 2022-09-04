@@ -1,19 +1,29 @@
 package ren.natsuyuk1.comet.pusher
 
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
 import ren.natsuyuk1.comet.api.cometInstances
+import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.file.writeTextBuffered
 import java.io.File
+import kotlin.time.toDuration
 
 private val logger = KotlinLogging.logger {}
 
 abstract class CometPusher(val name: String, private val defaultConfig: CometPusherConfig) {
+    private var job: Job? = null
     private val configPath = File(resolveDirectory("./config/pusher/"), "$name.yml")
+    private var nightTime: Pair<Int, Int>
+
     protected val pendingPushContext = mutableListOf<CometPushContext>()
 
     var config: CometPusherConfig
@@ -28,14 +38,36 @@ abstract class CometPusher(val name: String, private val defaultConfig: CometPus
                 config = defaultConfig
                 configPath.writeTextBuffered(Yaml.Default.encodeToString(config))
             }
+
+            val duration = config.nightModeDuration.split("-")
+
+            if (duration.size != 2 || duration.any { it.toIntOrNull() == null || it.toInt() !in 0..23 }) {
+                logger.warn("推送器 $name 夜间模式间隔有误! 已重置为默认值.")
+                config.nightModeDuration = "0-6"
+            }
+
+            nightTime = Pair(duration[0].toInt(), duration[1].toInt())
         }
     }
 
-    open fun init() {}
+    open fun init() {
+        job = TaskManager.registerTaskWithCustomDelay({
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            val (start, end) = nightTime
+            if (now.hour in start..end) {
+                delay(config.nightPushInterval.toDuration(config.pushIntervalUnit))
+            } else {
+                delay(config.pushInterval.toDuration(config.pushIntervalUnit))
+            }
+        }) {
+            retrieve()
+            push()
+        }
+    }
 
     abstract suspend fun retrieve()
 
-    suspend fun push() {
+    private suspend fun push() {
         pendingPushContext.forEach {
             val context = it.normalize()
 
@@ -61,5 +93,6 @@ abstract class CometPusher(val name: String, private val defaultConfig: CometPus
     open suspend fun stop() {
         configPath.touch()
         configPath.writeTextBuffered(Yaml.Default.encodeToString(config))
+        job?.cancel()
     }
 }

@@ -9,6 +9,7 @@ import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaClient
 import ren.natsuyuk1.comet.objects.arcaea.ArcaeaUserData
 import ren.natsuyuk1.comet.util.toMessageWrapper
+import ren.natsuyuk1.comet.utils.brotli4j.BrotliDecompressor
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 object ArcaeaService {
@@ -42,6 +43,10 @@ object ArcaeaService {
 
     fun querySpecificUserInfo(comet: Comet, subject: PlatformCommandSender, id: String) {
         comet.scope.launch {
+            if (!BrotliDecompressor.isUsable()) {
+                subject.sendMessage("❌ 无法查询 Arcaea 数据, 缺少关键依赖.".toMessageWrapper())
+            }
+
             newSuspendedTransaction {
                 val userInfo = ArcaeaClient.queryUserInfo(id)
                 if (userInfo == null) {

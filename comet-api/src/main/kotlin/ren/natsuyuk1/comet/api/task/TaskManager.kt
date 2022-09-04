@@ -44,12 +44,15 @@ interface ITaskManager {
         delay: Duration,
         task: suspend () -> Unit
     ): Job
+
+    fun registerTaskWithCustomDelay(
+        delay: suspend () -> Unit,
+        task: suspend () -> Unit
+    ): Job
 }
 
 object TaskManager : ITaskManager {
     private var scope = ModuleScope("TaskManager")
-
-    // private val cronJobMap: MutableMap<String, Job> = ConcurrentHashMap()
 
     /**
      * Init task manager scope for structured concurrency
@@ -103,4 +106,16 @@ object TaskManager : ITaskManager {
             task()
         }
     }
+
+    override fun registerTaskWithCustomDelay(
+        delay: suspend () -> Unit,
+        task: suspend () -> Unit
+    ): Job =
+        scope.launch {
+        while (isActive) {
+            delay()
+            task()
+        }
+    }
+
 }

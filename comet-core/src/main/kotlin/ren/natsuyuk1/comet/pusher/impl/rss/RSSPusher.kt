@@ -32,6 +32,8 @@ object RSSPusher: CometPusher("rss", CometPusherConfig(60)) {
     private val subscriber = mutableMapOf<String, List<CometPushTarget>>()
 
     override fun init() {
+        super.init()
+
         runBlocking {
             if (!subPath.exists()) {
                 subPath.touch()

@@ -10,6 +10,7 @@ import ren.natsuyuk1.comet.migrator.GitHubRepoMigrator
 import ren.natsuyuk1.comet.migrator.UserDataMigrator
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaClient
 import ren.natsuyuk1.comet.network.thirdparty.twitter.initSetsuna
+import ren.natsuyuk1.comet.pusher.DEFAULT_PUSHERS
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.hours
@@ -29,19 +30,25 @@ object CometCoreService {
     }
 
     private suspend fun initCoreService() {
-        ProjectSekaiManager.init(scope.coroutineContext)
-        scope.launch {
-            ArcaeaClient.fetchConstants()
-        }
-        GroupSettingManager.init(scope.coroutineContext)
-        TaskManager.registerTask(1.hours) { HitokotoManager.fetch() }
-        startAutoSaveService()
-        initSetsuna(scope.coroutineContext)
         try {
             UserDataMigrator.migrate()
             GitHubRepoMigrator.migrate()
         } catch (e: Exception) {
             logger.warn(e) { "在迁移用户数据时出现异常" }
+        }
+
+        startAutoSaveService()
+        GroupSettingManager.init(scope.coroutineContext)
+
+        initSetsuna(scope.coroutineContext)
+
+        scope.launch {
+            ArcaeaClient.fetchConstants()
+            ProjectSekaiManager.init(scope.coroutineContext)
+        }
+        TaskManager.registerTask(1.hours) { HitokotoManager.fetch() }
+        DEFAULT_PUSHERS.forEach {
+            it.init()
         }
     }
 
