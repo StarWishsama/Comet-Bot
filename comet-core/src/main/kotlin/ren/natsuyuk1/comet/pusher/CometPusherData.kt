@@ -36,6 +36,10 @@ class CometPusherData(id: EntityID<Int>): IntEntity(id) {
             find { CometPusherDataTable.pusherName eq pusherName }.firstOrNull()?.pushContext?.containsKey(id)
 
         fun deleteOutdatedContext(pusherName: String) {
+            if (CometPusherDataTable.columns.size <= 50) {
+                return
+            }
+
             val queryTime = Clock.System.now()
             val pendingRemoveEntry = mutableSetOf<String>()
 

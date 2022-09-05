@@ -7,9 +7,9 @@ import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
-import ren.natsuyuk1.comet.api.user.isOperator
 import ren.natsuyuk1.comet.network.thirdparty.twitter.TwitterAPI
 import ren.natsuyuk1.comet.network.thirdparty.twitter.toMessageWrapper
+import ren.natsuyuk1.comet.util.groupAdminChecker
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
@@ -22,7 +22,7 @@ val TWITTER = CommandProperty(
     /twit tweet 查询推文    
     """.trimIndent(),
     permissionLevel = UserLevel.ADMIN,
-    extraPermissionChecker = { _, sender -> sender.asMember()?.isOperator() == true }
+    extraPermissionChecker = groupAdminChecker
 )
 
 class TwitterCommand(

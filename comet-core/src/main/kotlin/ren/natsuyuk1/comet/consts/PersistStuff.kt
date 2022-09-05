@@ -115,4 +115,10 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         ) { comet, sender, subject, wrapper, user ->
             TwitterCommand(comet, sender, subject, wrapper, user)
         },
+        CommandNode(
+            RSS,
+            listOf(RSSCommand.Subscribe.SUBSCRIBE, RSSCommand.UnSubscribe.UNSUBSCRIBE, RSSCommand.List.LIST)
+        ) { comet, sender, subject, wrapper, user ->
+            RSSCommand(comet, sender, subject, wrapper, user)
+        },
     )

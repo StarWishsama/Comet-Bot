@@ -29,7 +29,7 @@ private val logger = KotlinLogging.logger {}
 
 object RSSPusher: CometPusher("rss", CometPusherConfig(60)) {
     private val subPath = File(resolveDirectory("./config/pusher/"), "${name}_sub.json")
-    private val subscriber = mutableMapOf<String, List<CometPushTarget>>()
+    val subscriber = mutableMapOf<String, MutableList<CometPushTarget>>()
 
     override fun init() {
         super.init()
@@ -50,14 +50,14 @@ object RSSPusher: CometPusher("rss", CometPusherConfig(60)) {
                 val feedID = SecureUtil.md5(feed.description)
 
                 val isPushed = transaction {
-                    CometPusherData.isDuplicated(this@RSSPusher.name, feedID)
+                    CometPusherData.isDuplicated(name, feedID)
                 }
 
                 if (isPushed != true) {
                     val context = RSSPusherContext(feedID, target, feed)
                     pendingPushContext.add(context)
                     transaction {
-                        CometPusherData.insertPushContext(this@RSSPusher.name, context)
+                        CometPusherData.insertPushContext(name, context)
                     }
                 }
             } catch (e: IOException) {
