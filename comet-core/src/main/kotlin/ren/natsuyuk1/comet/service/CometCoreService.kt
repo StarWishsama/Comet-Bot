@@ -9,6 +9,7 @@ import ren.natsuyuk1.comet.consts.cometPersistDataFile
 import ren.natsuyuk1.comet.migrator.GitHubRepoMigrator
 import ren.natsuyuk1.comet.migrator.UserDataMigrator
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaClient
+import ren.natsuyuk1.comet.network.thirdparty.bilibili.initYabapi
 import ren.natsuyuk1.comet.network.thirdparty.twitter.initSetsuna
 import ren.natsuyuk1.comet.pusher.DEFAULT_PUSHERS
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
@@ -41,6 +42,7 @@ object CometCoreService {
         GroupSettingManager.init(scope.coroutineContext)
 
         initSetsuna(scope.coroutineContext)
+        initYabapi()
 
         scope.launch {
             ArcaeaClient.fetchConstants()

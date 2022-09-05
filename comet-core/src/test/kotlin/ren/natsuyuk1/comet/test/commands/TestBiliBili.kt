@@ -28,7 +28,9 @@ class TestBiliBili {
 
         DatabaseManager.loadDatabase()
         DatabaseManager.loadTables(UserTable)
-        initYabapi()
+        runBlocking {
+            initYabapi()
+        }
     }
 
     @Test

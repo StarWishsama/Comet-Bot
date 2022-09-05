@@ -12,14 +12,9 @@ package ren.natsuyuk1.comet.network
 import io.ktor.client.*
 import kotlinx.coroutines.CoroutineName
 import ren.natsuyuk1.comet.consts.defaultClient
-import ren.natsuyuk1.comet.network.thirdparty.bilibili.initYabapi
 import kotlin.coroutines.CoroutineContext
 
 class CometClient(
     var client: HttpClient = defaultClient,
     val context: CoroutineContext = CoroutineName("comet-client")
-) {
-    init {
-        initYabapi()
-    }
-}
+)
