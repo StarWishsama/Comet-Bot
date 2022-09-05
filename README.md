@@ -5,6 +5,7 @@
 本项目处于开发阶段, 且所有配置文件模板并不稳定, 并伴随可能的破坏性更改, 请谨慎使用
 
 Telegram Bot 实例: [@CometIsNotBot](https://t.me/CometIsNotBot)
+
 Demo/交流群：725656262
 
 **一切开发旨在学习，请勿用于非法用途**
@@ -12,6 +13,7 @@ Demo/交流群：725656262
 [![Issues](https://img.shields.io/github/issues/StarWishsama/Comet-Bot.svg?style=popout)](https://github.com/StarWishsama/Comet-Bot/issues)
 ![Stars](https://img.shields.io/github/stars/starwishsama/Comet-Bot)
 [![Release](https://img.shields.io/github/v/release/StarWishSama/Comet-Bot?include_prereleases)](https://github.com/StarWishsama/Comet-Bot/releases)
+[Wiki](https://github.com/StarWishsama/Comet-Bot/wiki)
 
 ## 🎉 它能干什么?
 
@@ -37,10 +39,12 @@ Demo/交流群：725656262
 
 ## 💽 如何使用
 
+### 直接使用
 1. 在[此处](https://github.com/StarWishsama/Comet-Bot/releases)下载最新版本
-2. 使用 ```java -jar Comet本体路径``` 启动 Bot
-3. 输入 /login 登录指定平台账号 (QQ, Telegram)
-4. 提示登录成功后, 在机器人加入的群内发送 /help 就可开始了解 Comet 的各项功能了
+2. 将组件放置在 Comet jar 同目录下的 `/modules` 文件夹 (需要你自己创建)
+3. 使用 ```java -jar Comet本体路径``` 启动 Bot
+4. 输入 /login 登录指定平台账号 (QQ, Telegram)
+5. 提示登录成功后, 在机器人加入的群内发送 /help 就可开始了解 Comet 的各项功能了
 
 ## 📜 协议
 
