@@ -17,6 +17,8 @@ import ren.natsuyuk1.comet.objects.keyword.KeyWordData
 import ren.natsuyuk1.comet.objects.nowcmd.NowCmdConfigTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserDataTable
+import ren.natsuyuk1.comet.pusher.CometPusherContextTable
+import ren.natsuyuk1.comet.pusher.CometPusherDataTable
 
 val cometPersistDataFile: List<PersistDataFile<*>> =
     listOf(
@@ -36,7 +38,9 @@ val cometTables =
         ProjectSekaiDataTable,
         ProjectSekaiUserDataTable,
         NowCmdConfigTable,
-        ArcaeaUserDataTable
+        ArcaeaUserDataTable,
+        CometPusherDataTable,
+        CometPusherContextTable,
     )
 
 val defaultCommands: List<AbstractCommandNode<*>> =
