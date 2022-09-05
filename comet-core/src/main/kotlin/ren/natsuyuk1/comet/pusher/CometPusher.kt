@@ -8,6 +8,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
+import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.cometInstances
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
@@ -62,6 +63,11 @@ abstract class CometPusher(val name: String, private val defaultConfig: CometPus
         }) {
             retrieve()
             push()
+        }
+
+        transaction {
+            CometPusherData.init(name)
+            CometPusherData.deleteOutdatedContext(name)
         }
     }
 

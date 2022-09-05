@@ -1,5 +1,7 @@
 package ren.natsuyuk1.comet.pusher
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import ren.natsuyuk1.comet.consts.json
@@ -7,7 +9,8 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 abstract class CometPushContext(
     val id: String,
-    val target: List<CometPushTarget>
+    val target: List<CometPushTarget>,
+    val createTime: Instant = Clock.System.now()
 ){
     abstract fun normalize(): MessageWrapper
 
@@ -15,4 +18,4 @@ abstract class CometPushContext(
 }
 
 @Serializable
-class MinCometPushContext(val id: String, val target: List<CometPushTarget>)
+class MinCometPushContext(val id: String, val target: List<CometPushTarget>, val createTime: Instant = Clock.System.now())

@@ -50,14 +50,14 @@ object RSSPusher: CometPusher("rss", CometPusherConfig(60)) {
                 val feedID = SecureUtil.md5(feed.description)
 
                 val isPushed = transaction {
-                    CometPusherData.isDuplicated(this@RSSPusher, feedID)
+                    CometPusherData.isDuplicated(this@RSSPusher.name, feedID)
                 }
 
                 if (isPushed != true) {
-                    val context = RSSPusherContext(SecureUtil.md5(feed.description), target, feed)
+                    val context = RSSPusherContext(feedID, target, feed)
                     pendingPushContext.add(context)
                     transaction {
-                        CometPusherData.insertPushContext(this@RSSPusher, context)
+                        CometPusherData.insertPushContext(this@RSSPusher.name, context)
                     }
                 }
             } catch (e: IOException) {
