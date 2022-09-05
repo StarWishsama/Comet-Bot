@@ -28,7 +28,7 @@ object DynamicApi {
             return@runCatching cache
         }
 
-        val feedResp = client.getFeedContent(id.toULong())
+        val feedResp = biliClient.getFeedContent(id.toULong())
 
         if (feedResp.code != GeneralCode.SUCCESS || feedResp.data == null || feedResp.data?.card == null) {
             throw ApiException("获取动态失败, 状态码 ${feedResp.code.name}")
@@ -48,7 +48,7 @@ object DynamicApi {
     @Throws(ApiException::class)
     suspend fun getUserDynamicTimeline(mid: Int): List<FeedCardNode>? {
         try {
-            val resp = client.getFeedByUid(0, mid)
+            val resp = biliClient.getFeedByUid(0, mid)
 
             if (resp.code != GeneralCode.SUCCESS || resp.data == null || resp.data?.cards == null) {
                 logger.warn { "解析动态时出现异常" }

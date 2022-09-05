@@ -21,6 +21,6 @@ object SearchApi {
         keyword: String,
         searchType: SearchOption = SearchOption(SearchType.USER)
     ): SearchNormalData? {
-        return client.searchByType(keyword, searchType).data
+        return biliClient.searchByType(keyword, searchType).data
     }
 }

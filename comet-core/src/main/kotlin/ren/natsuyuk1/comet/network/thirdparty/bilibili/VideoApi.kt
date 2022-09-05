@@ -18,13 +18,13 @@ private val logger = KotlinLogging.logger {}
 
 object VideoApi {
     suspend fun getVideoInfo(av: Int): Result<VideoInfo?> {
-        return kotlin.runCatching { client.getVideoInfo(av).data }.onFailure {
+        return kotlin.runCatching { biliClient.getVideoInfo(av).data }.onFailure {
             logger.warn("在获取哔哩哔哩视频信息时遇到了问题", it)
         }
     }
 
     suspend fun getVideoInfo(bv: String): Result<VideoInfo?> {
-        return kotlin.runCatching { client.getVideoInfo(bv).data }.onFailure {
+        return kotlin.runCatching { biliClient.getVideoInfo(bv).data }.onFailure {
             logger.warn("在获取哔哩哔哩视频信息时遇到了问题", it)
         }
     }

@@ -17,11 +17,11 @@ import moe.sdl.yabapi.data.info.UserSpace
 
 object UserApi {
     suspend fun getUserCard(id: Int): UserCardGetData? {
-        return client.getUserCard(id, false).data
+        return biliClient.getUserCard(id, false).data
     }
 
     suspend fun getUserSpace(id: Int): UserSpace? {
-        return client.getUserSpace(id).data
+        return biliClient.getUserSpace(id).data
     }
 
     suspend fun getUserNameByMid(mid: Int): String {

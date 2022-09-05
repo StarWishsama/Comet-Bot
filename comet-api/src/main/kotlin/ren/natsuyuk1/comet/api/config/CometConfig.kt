@@ -49,6 +49,9 @@ object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
 
         @Comment("全局限速时间内最高可发送消息数")
         val globalRateLimitMessageSize: Int = 60,
+
+        @Comment("哔哩哔哩 Cookie, 用于用户搜索等需要 Cookie 的 API")
+        val biliCookie: String = "",
     )
 }
 

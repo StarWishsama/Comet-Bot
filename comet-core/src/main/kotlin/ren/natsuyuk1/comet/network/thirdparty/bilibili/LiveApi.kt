@@ -18,6 +18,6 @@ object LiveApi {
             throw IllegalArgumentException("直播间 ID 不能小于 1")
         }
 
-        client.getRoomInfoByRoomId(roomId).data
+        biliClient.getRoomInfoByRoomId(roomId).data
     }
 }
