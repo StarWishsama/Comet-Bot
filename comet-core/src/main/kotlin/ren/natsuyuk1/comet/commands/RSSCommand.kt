@@ -35,7 +35,7 @@ class RSSCommand(
 ): CometCommand(comet, sender, subject, message, user, RSS) {
 
     init {
-        subcommands(Subscribe(sender, subject, user), UnSubscribe(sender, subject, user))
+        subcommands(Subscribe(sender, subject, user), UnSubscribe(sender, subject, user), List(sender, subject, user))
     }
 
     override suspend fun run() {
