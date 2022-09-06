@@ -5,4 +5,4 @@ WORKDIR /comet
 # Comet Server Port
 EXPOSE 1145
 
-ENTRYPOINT ["java", "-jar", "./comet-console.jar"]
+ENTRYPOINT ["java", "-jar", "comet-console.jar"]
