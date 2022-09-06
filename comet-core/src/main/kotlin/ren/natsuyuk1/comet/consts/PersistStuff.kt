@@ -18,7 +18,6 @@ import ren.natsuyuk1.comet.objects.nowcmd.NowCmdConfigTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserDataTable
 import ren.natsuyuk1.comet.pusher.CometPusherContextTable
-import ren.natsuyuk1.comet.pusher.CometPusherDataTable
 
 val cometPersistDataFile: List<PersistDataFile<*>> =
     listOf(
@@ -39,7 +38,6 @@ val cometTables =
         ProjectSekaiUserDataTable,
         NowCmdConfigTable,
         ArcaeaUserDataTable,
-        CometPusherDataTable,
         CometPusherContextTable,
     )
 

@@ -1,74 +1,54 @@
 package ren.natsuyuk1.comet.pusher
 
 import kotlinx.datetime.Clock
-import kotlinx.serialization.decodeFromString
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.exposed.dao.Entity
+import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
-import ren.natsuyuk1.comet.consts.json
-import ren.natsuyuk1.comet.utils.sql.MapTable
-import ren.natsuyuk1.comet.utils.sql.SQLDatabaseMap
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.kotlin.datetime.datetime
+import kotlin.time.Duration.Companion.days
 
-object CometPusherDataTable: IdTable<Int>("comet_pusher_data") {
-    override val id: Column<EntityID<Int>> = integer("pusher_id").autoIncrement().entityId()
-    val pusherName = text("pusher_name")
+object CometPusherContextTable: IdTable<String>("comet_pusher_context") {
+    override val id: Column<EntityID<String>> = text("push_context_id").entityId()
+    val pusherName: Column<String> = text("push_name")
+    val context: Column<String> = text("push_context")
+    val date = datetime("push_date").default(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
 
-    override val primaryKey = PrimaryKey(id)
+    override val primaryKey: Table.PrimaryKey = PrimaryKey(id)
 }
 
-class CometPusherData(id: EntityID<Int>): IntEntity(id) {
-    var pusherName by CometPusherDataTable.pusherName
-    val pushContext = SQLDatabaseMap(id, CometPusherContextTable)
+class CometPusherContext(id: EntityID<String>): Entity<String>(id) {
+    var pusherName by CometPusherContextTable.pusherName
+    var context by CometPusherContextTable.context
+    val date by CometPusherContextTable.date
 
-    companion object : IntEntityClass<CometPusherData>(CometPusherDataTable) {
-        fun init(pusherName: String) {
-            if (find { CometPusherDataTable.pusherName eq pusherName }.empty()) {
-                new {
-                    this.pusherName = pusherName
-                }
+    companion object : EntityClass<String, CometPusherContext>(CometPusherContextTable) {
+        fun insertPushContext(pusherName: String, context: CometPushContext) {
+            new(context.id) {
+                this.pusherName = pusherName
+                this.context = context.toJson()
             }
         }
 
-        fun insertPushContext(pusherName: String, context: CometPushContext) {
-            find { CometPusherDataTable.pusherName eq pusherName }.firstOrNull()?.pushContext?.put(context.id, context.toJson())
-        }
-
-        fun isDuplicated(pusherName: String, id: String): Boolean? =
-            find { CometPusherDataTable.pusherName eq pusherName }.firstOrNull()?.pushContext?.containsKey(id)
+        fun isDuplicated(pusherName: String, id: String): Boolean =
+            !find { CometPusherContextTable.pusherName eq pusherName and (CometPusherContextTable.id eq id) }.empty()
 
         fun deleteOutdatedContext(pusherName: String) {
-            if (CometPusherDataTable.columns.size <= 50) {
+            if (CometPusherContextTable.columns.size <= 50) {
                 return
             }
 
-            val queryTime = Clock.System.now()
-            val pendingRemoveEntry = mutableSetOf<String>()
+            val queryTime = Clock.System.now().minus(1.days).toLocalDateTime(TimeZone.currentSystemDefault())
 
-            find {
-                CometPusherDataTable.pusherName eq pusherName
-            }.firstOrNull()?.pushContext?.apply {
-                forEach { (k, v) ->
-                    val context: MinCometPushContext = json.decodeFromString(v)
-                    if ((queryTime - context.createTime).inWholeDays > 1) {
-                        pendingRemoveEntry.add(k)
-                    }
-                }
-
-                pendingRemoveEntry.forEach {
-                    this.remove(it)
-                }
+            CometPusherContextTable.deleteWhere {
+                CometPusherContextTable.pusherName eq pusherName and (CometPusherContextTable.date less queryTime)
             }
         }
     }
-}
-
-object CometPusherContextTable: MapTable<Int, String, String>("comet_pusher_context") {
-    override val id: Column<EntityID<Int>> = reference("pusher_id", CometPusherDataTable)
-    override val key: Column<String> = text("push_context_id")
-    override val value: Column<String> = text("push_context")
-
-    override val primaryKey: Table.PrimaryKey = PrimaryKey(id, key)
 }

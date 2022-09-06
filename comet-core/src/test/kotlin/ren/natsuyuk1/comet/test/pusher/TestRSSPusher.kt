@@ -11,7 +11,6 @@ import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.pusher.CometPushTarget
 import ren.natsuyuk1.comet.pusher.CometPushTargetType
 import ren.natsuyuk1.comet.pusher.CometPusherContextTable
-import ren.natsuyuk1.comet.pusher.CometPusherDataTable
 import ren.natsuyuk1.comet.pusher.impl.rss.RSSPusher
 import ren.natsuyuk1.comet.test.fakeGroups
 import ren.natsuyuk1.comet.test.generateFakeGroup
@@ -23,7 +22,7 @@ class TestRSSPusher {
     @BeforeAll
     fun init() {
         initTestDatabase()
-        DatabaseManager.loadTables(CometPusherDataTable, CometPusherContextTable)
+        DatabaseManager.loadTables(CometPusherContextTable)
         RSSPusher.init()
         RSSPusher.subscriber["https://rsshub.app/36kr/newsflashes"] = mutableListOf(CometPushTarget(1, CometPushTargetType.GROUP, LoginPlatform.TEST))
     }
@@ -45,7 +44,6 @@ class TestRSSPusher {
         }
 
         transaction {
-            CometPusherDataTable.deleteAll()
             CometPusherContextTable.deleteAll()
         }
     }

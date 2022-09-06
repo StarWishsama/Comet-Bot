@@ -16,7 +16,7 @@ import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.pusher.CometPushTarget
 import ren.natsuyuk1.comet.pusher.CometPusher
 import ren.natsuyuk1.comet.pusher.CometPusherConfig
-import ren.natsuyuk1.comet.pusher.CometPusherData
+import ren.natsuyuk1.comet.pusher.CometPusherContext
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import ren.natsuyuk1.comet.utils.file.touch
@@ -50,15 +50,15 @@ object RSSPusher: CometPusher("RSS", CometPusherConfig(60)) {
                 val feedID = SecureUtil.md5(feed.description)
 
                 val isPushed = transaction {
-                    CometPusherData.isDuplicated(name, feedID)
+                    CometPusherContext.isDuplicated(name, feedID)
                 }
 
-                if (isPushed != true) {
+                if (!isPushed) {
                     val context = RSSPusherContext(feedID, target, feed.entries.first())
                     pendingPushContext.add(context)
                     try {
                         transaction {
-                            CometPusherData.insertPushContext(name, context)
+                            CometPusherContext.insertPushContext(name, context)
                         }
                     } catch (e: Exception) {
                         logger.warn(e) { "Error" }

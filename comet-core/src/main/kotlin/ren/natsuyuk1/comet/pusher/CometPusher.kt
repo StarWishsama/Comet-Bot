@@ -66,8 +66,7 @@ abstract class CometPusher(val name: String, private val defaultConfig: CometPus
         }
 
         transaction {
-            CometPusherData.init(name)
-            CometPusherData.deleteOutdatedContext(name)
+            CometPusherContext.deleteOutdatedContext(name)
         }
     }
 
