@@ -10,7 +10,7 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 private val logger = mu.KotlinLogging.logger {}
 
-val fakeComet = object : Comet(CometConfig(0, "", LoginPlatform.TEST), logger, ModuleScope("TestInstance")) {
+val fakeComet = object : Comet(LoginPlatform.TEST, CometConfig(0, "", LoginPlatform.TEST), logger, ModuleScope("TestInstance")) {
     override val id: Long = 0
 
     override fun login() {}
