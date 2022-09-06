@@ -4,7 +4,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
-import ren.natsuyuk1.comet.consts.json
+import kotlinx.serialization.json.Json
 import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 abstract class CometPushContext(
@@ -14,7 +14,7 @@ abstract class CometPushContext(
 ){
     abstract fun normalize(): MessageWrapper
 
-    internal fun toJson(): String = json.encodeToString(MinCometPushContext(id, target))
+    internal fun toJson(): String = Json.encodeToString(MinCometPushContext(id, target))
 }
 
 @Serializable

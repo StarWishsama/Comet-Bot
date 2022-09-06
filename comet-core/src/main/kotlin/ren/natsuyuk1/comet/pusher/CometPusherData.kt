@@ -5,14 +5,18 @@ import kotlinx.serialization.decodeFromString
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.Table
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.utils.sql.MapTable
 import ren.natsuyuk1.comet.utils.sql.SQLDatabaseMap
 
-object CometPusherDataTable: IntIdTable("comet_pusher_data") {
+object CometPusherDataTable: IdTable<Int>("comet_pusher_data") {
+    override val id: Column<EntityID<Int>> = integer("pusher_id").autoIncrement().entityId()
     val pusherName = text("pusher_name")
+
+    override val primaryKey = PrimaryKey(id)
 }
 
 class CometPusherData(id: EntityID<Int>): IntEntity(id) {
@@ -62,7 +66,9 @@ class CometPusherData(id: EntityID<Int>): IntEntity(id) {
 }
 
 object CometPusherContextTable: MapTable<Int, String, String>("comet_pusher_context") {
-    override val id: Column<EntityID<Int>> = reference("id", CometPusherDataTable)
+    override val id: Column<EntityID<Int>> = reference("pusher_id", CometPusherDataTable)
     override val key: Column<String> = text("push_context_id")
     override val value: Column<String> = text("push_context")
+
+    override val primaryKey: Table.PrimaryKey = PrimaryKey(id, key)
 }

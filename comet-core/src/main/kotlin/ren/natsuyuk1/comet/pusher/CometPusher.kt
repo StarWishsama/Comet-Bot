@@ -71,19 +71,22 @@ abstract class CometPusher(val name: String, private val defaultConfig: CometPus
         }
     }
 
-    abstract suspend fun retrieve()
+    internal abstract suspend fun retrieve()
 
-    private suspend fun push() {
+    internal suspend fun push() {
+        var counter = 0
+
         pendingPushContext.forEach {
             val context = it.normalize()
 
             it.target.forEach { pt ->
-                cometInstances.filter { instance -> instance::class.simpleName?.contains(pt.platform.name.lowercase()) == true }.forEach { comet ->
+                cometInstances.filter { instance -> pt.platform == instance.platform }.forEach { comet ->
                     try {
                         when (pt.type) {
                             CometPushTargetType.USER -> {}
                             CometPushTargetType.GROUP -> {
                                 comet.getGroup(pt.id)?.sendMessage(context)
+                                counter++
                             }
                         }
                     } catch (e: Exception) {
@@ -94,6 +97,8 @@ abstract class CometPusher(val name: String, private val defaultConfig: CometPus
         }
 
         pendingPushContext.clear()
+
+        logger.debug { "推送器 \"$name\" 已推送 $counter 条推送内容." }
     }
 
     open suspend fun stop() {

@@ -2,6 +2,7 @@ package ren.natsuyuk1.comet.test
 
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.Comet
+import ren.natsuyuk1.comet.api.cometInstances
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
@@ -13,16 +14,20 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 private val logger = KotlinLogging.logger {}
 
-val fakeComet = object : Comet(CometConfig(0, "", LoginPlatform.TEST), logger, ModuleScope("fake-comet-core")) {
-    override val id: Long = 0
+val fakeGroups = mutableSetOf<Group>()
 
-    override fun login() {}
+val fakeComet by lazy {
+    object : Comet(LoginPlatform.TEST, CometConfig(0, "", LoginPlatform.TEST), logger, ModuleScope("fake-comet-core")) {
+        override val id: Long = 0
 
-    override fun afterLogin() {}
+        override fun login() {}
 
-    override fun close() {}
+        override fun afterLogin() {}
 
-    override suspend fun getGroup(id: Long): Group? = null
+        override fun close() {}
+
+        override suspend fun getGroup(id: Long): Group? = fakeGroups.find { it.id == id }
+    }.also { cometInstances.add(it) }
 }
 
 fun generateFakeSender(id: Long): User = object : User() {

@@ -17,6 +17,7 @@ import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.database.AccountData
 import ren.natsuyuk1.comet.api.event.events.message.MessageEvent
 import ren.natsuyuk1.comet.api.event.registerListener
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.session.SessionManager
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import kotlin.coroutines.CoroutineContext
@@ -30,6 +31,10 @@ import kotlin.coroutines.CoroutineContext
  *
  */
 abstract class Comet(
+    /**
+     * Comet 实例的平台
+     */
+    val platform: LoginPlatform,
     /**
      * 一个 Comet 实例的 [CometConfig]
      */

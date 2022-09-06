@@ -27,7 +27,7 @@ import java.io.InputStream
 
 private val logger = KotlinLogging.logger {}
 
-object RSSPusher: CometPusher("rss", CometPusherConfig(60)) {
+object RSSPusher: CometPusher("RSS", CometPusherConfig(60)) {
     private val subPath = File(resolveDirectory("./config/pusher/"), "${name}_sub.json")
     val subscriber = mutableMapOf<String, MutableList<CometPushTarget>>()
 
@@ -54,16 +54,22 @@ object RSSPusher: CometPusher("rss", CometPusherConfig(60)) {
                 }
 
                 if (isPushed != true) {
-                    val context = RSSPusherContext(feedID, target, feed)
+                    val context = RSSPusherContext(feedID, target, feed.entries.first())
                     pendingPushContext.add(context)
-                    transaction {
-                        CometPusherData.insertPushContext(name, context)
+                    try {
+                        transaction {
+                            CometPusherData.insertPushContext(name, context)
+                        }
+                    } catch (e: Exception) {
+                        logger.warn(e) { "Error" }
                     }
                 }
             } catch (e: IOException) {
                 logger.warn(e) { "在推送 RSS 源 ($rssURL) 时出现问题" }
             }
         }
+
+        logger.debug { "已获取 ${pendingPushContext.size} 个待推送 RSS 内容." }
     }
 
     override suspend fun stop() {

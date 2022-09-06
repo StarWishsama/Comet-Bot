@@ -7,6 +7,7 @@ import net.mamoe.mirai.utils.BotConfiguration
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.listener.registerListeners
 import ren.natsuyuk1.comet.mirai.config.MiraiConfig
@@ -31,7 +32,7 @@ class MiraiComet(
     private val cl: ClassLoader,
 
     private val miraiConfig: MiraiConfig
-) : Comet(config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
+) : Comet(LoginPlatform.MIRAI, config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
     lateinit var miraiBot: Bot
 
     override val id: Long

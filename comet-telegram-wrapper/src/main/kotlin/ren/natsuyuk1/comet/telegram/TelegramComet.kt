@@ -21,6 +21,7 @@ import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.event.broadcast
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.listener.registerListeners
 import ren.natsuyuk1.comet.service.subscribeGithubEvent
@@ -36,7 +37,7 @@ class TelegramComet(
      * 一个 Comet 实例的 [CometConfig]
      */
     config: CometConfig
-) : Comet(config, logger, ModuleScope("telegram ${config.id}")) {
+) : Comet(LoginPlatform.TELEGRAM, config, logger, ModuleScope("telegram ${config.id}")) {
     lateinit var bot: TelegramBot
     override val id: Long
         get() = config.id
