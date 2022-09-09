@@ -46,9 +46,13 @@ suspend fun MessageWrapper.send(comet: TelegramComet, target: ChatId): MessageRe
         comet.bot.sendMessage(target, textSourceList)
     }
 
+    if (resp == null) {
+        error("Unable to send message")
+    }
+
     return MessageReceipt(comet, MessageSource(
         comet.id,
-        resp!!.chat.id.chatId,
+        resp.chat.id.chatId,
         resp.date.unixMillisLong,
         resp.messageId
     ))
