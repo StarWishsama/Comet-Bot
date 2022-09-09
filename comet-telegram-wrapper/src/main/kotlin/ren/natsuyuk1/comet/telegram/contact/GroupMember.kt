@@ -8,6 +8,7 @@ import dev.inmo.tgbotapi.extensions.api.chat.members.restrictChatMember
 import dev.inmo.tgbotapi.extensions.utils.asGroupChat
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.TelegramDate
+import dev.inmo.tgbotapi.types.chat.ChannelChat
 import dev.inmo.tgbotapi.types.chat.ChatPermissions
 import dev.inmo.tgbotapi.types.chat.User
 import dev.inmo.tgbotapi.types.chat.member.AdministratorChatMember
@@ -22,6 +23,7 @@ import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.user.AnonymousMember
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
@@ -153,5 +155,60 @@ class TelegramGroupMemberImpl(
     }
 }
 
-fun User.toCometGroupMember(comet: TelegramComet, groupChatID: ChatId): GroupMember =
+fun User.toCometAnonymousMember(comet: TelegramComet, groupChatID: ChatId): GroupMember =
     TelegramGroupMemberImpl(this, groupChatID.chatId, comet)
+
+internal class TelegramAnonymousMemberImpl(
+    private val channelChat: ChannelChat,
+    override val comet: TelegramComet,
+    private val groupChatID: ChatId,
+): AnonymousMember() {
+    override val anonymousId: String
+        get() = channelChat.id.chatId.toString()
+    @OptIn(PreviewFeature::class)
+    override val group: Group
+        get() = runBlocking {
+            comet.bot.getChat(groupChatID).asGroupChat()?.toCometGroup(comet)
+                ?: error("Unable to retrieve group")
+        }
+    override val id: Long
+        get() = channelChat.id.chatId
+    override val joinTimestamp: Int
+        get() = 0
+    override val lastActiveTimestamp: Int
+        get() = 0
+    override val remainMuteTime: Int
+        get() = TODO("Not yet implemented")
+    override val card: String
+        get() = channelChat.getDisplayName()
+    override val groupPermission: GroupPermission
+        get() = GroupPermission.MEMBER
+
+    override suspend fun mute(seconds: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun unmute() {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun kick(reason: String, block: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun operateAdminPermission(operation: Boolean) {
+        TODO("Not yet implemented")
+    }
+    override val name: String
+        get() = card
+    override val platform: LoginPlatform
+        get() = LoginPlatform.TELEGRAM
+
+    override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
+        error("Anonymous Member cannot send message")
+    }
+}
+
+fun ChannelChat.toCometAnonymousMember(comet: TelegramComet, groupChatID: ChatId): AnonymousMember =
+    TelegramAnonymousMemberImpl(this, comet, groupChatID)
+

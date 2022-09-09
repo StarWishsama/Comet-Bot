@@ -41,7 +41,7 @@ internal class TelegramGroupImpl(
         get() = runBlocking {
             val resp = comet.bot.getChatAdministrators(chat.id)
 
-            resp.find { it is OwnerChatMember }?.user?.toCometGroupMember(comet, chat.id)
+            resp.find { it is OwnerChatMember }?.user?.toCometAnonymousMember(comet, chat.id)
                 ?: error("Unable to retrieve group owner")
         }
 
@@ -90,7 +90,7 @@ internal class TelegramGroupImpl(
             try {
                 val resp = comet.bot.getChatMember(this@TelegramGroupImpl.chat, id.toChatId())
 
-                return@runBlocking resp.user.toCometGroupMember(comet, this@TelegramGroupImpl.chat.id)
+                return@runBlocking resp.user.toCometAnonymousMember(comet, this@TelegramGroupImpl.chat.id)
             } catch (e: Exception) {
                 return@runBlocking null
             }
