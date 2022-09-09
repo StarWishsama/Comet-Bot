@@ -28,7 +28,7 @@ private val logger = KotlinLogging.logger {}
 suspend fun CommonMessage<MessageContent>.toCometEvent(
     comet: TelegramComet
 ): MessageEvent? {
-    if (this !is FromUser || this !is WithSenderChatMessage) {
+    if (this !is FromUser && this !is WithSenderChatMessage) {
         logger.debug { "Incoming message doesn't have user or sender, is ${this::class.simpleName}" }
         return null
     }
