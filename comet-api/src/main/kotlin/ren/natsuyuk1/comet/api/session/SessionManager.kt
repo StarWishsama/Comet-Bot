@@ -2,12 +2,12 @@ package ren.natsuyuk1.comet.api.session
 
 import kotlinx.coroutines.Job
 import mu.KotlinLogging
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.Contact
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.coroutines.CoroutineContext
@@ -76,7 +76,7 @@ object SessionManager {
      * @param subject 可能触发的联系人 [Contact]
      * @param message 触发时发送的消息
      */
-    fun handleSession(subject: Contact, sender: Contact, message: MessageWrapper): Boolean {
+    suspend fun handleSession(subject: Contact, sender: Contact, message: MessageWrapper): Boolean {
         val user: CometUser? = CometUser.getUser(sender.id, sender.platform)
 
         logger.debug { "Handling sessions, incoming subject: ${subject.id}, sender: ${sender.id}, message: $message" }

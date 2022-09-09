@@ -3,8 +3,8 @@ package ren.natsuyuk1.comet.api.event.events.comet
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.event.CancelableEvent
 import ren.natsuyuk1.comet.api.event.CometEvent
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.Contact
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 /**
  * 一个消息将要被发出的事件.

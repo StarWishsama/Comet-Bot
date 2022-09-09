@@ -2,12 +2,12 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ren.natsuyuk1.comet.api.message.Image
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.file.absPath
-import ren.natsuyuk1.comet.utils.message.Image
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 
 fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
     buildMessageWrapper {

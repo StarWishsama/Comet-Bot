@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.listener
 
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.command.hasCoolDown
 import ren.natsuyuk1.comet.api.event.events.message.GroupMessageEvent
@@ -31,7 +32,9 @@ object KeywordListener : CometListener {
             }
 
             if (validate) {
-                event.subject.sendMessage(kw.reply)
+                event.comet.scope.launch {
+                    event.subject.sendMessage(kw.reply)
+                }
             }
         }
     }

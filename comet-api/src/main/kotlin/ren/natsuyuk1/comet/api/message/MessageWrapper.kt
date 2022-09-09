@@ -7,7 +7,7 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
-package ren.natsuyuk1.comet.utils.message
+package ren.natsuyuk1.comet.api.message
 
 import java.util.*
 

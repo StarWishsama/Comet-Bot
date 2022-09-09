@@ -1,10 +1,10 @@
 package ren.natsuyuk1.comet.pusher.impl.rss
 
 import com.rometools.rome.feed.synd.SyndEntry
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.pusher.CometPushContext
 import ren.natsuyuk1.comet.pusher.CometPushTarget
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 
 class RSSPusherContext(
     id: String,

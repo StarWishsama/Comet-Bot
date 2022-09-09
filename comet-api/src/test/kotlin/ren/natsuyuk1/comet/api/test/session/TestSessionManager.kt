@@ -10,6 +10,7 @@ import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.database.DatabaseManager
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.session.Session
 import ren.natsuyuk1.comet.api.session.SessionManager
@@ -19,7 +20,6 @@ import ren.natsuyuk1.comet.api.test.fakeComet
 import ren.natsuyuk1.comet.api.test.fakeSender
 import ren.natsuyuk1.comet.api.user.*
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import kotlin.test.assertTrue
 
 private val logger = KotlinLogging.logger {}
@@ -39,7 +39,7 @@ class TestSessionManager {
         override val platform: LoginPlatform
             get() = LoginPlatform.TEST
 
-        override fun sendMessage(message: MessageWrapper) {
+        override suspend fun sendMessage(message: MessageWrapper) {
             logger.debug { "Received message: $message" }
         }
     }
@@ -68,7 +68,7 @@ class TestSessionManager {
         override val comet: Comet = fakeComet
         override val platform: LoginPlatform = LoginPlatform.TEST
 
-        override fun sendMessage(message: MessageWrapper) {
+        override suspend fun sendMessage(message: MessageWrapper) {
             logger.debug { "Group Received message: $message" }
         }
     }
@@ -91,7 +91,7 @@ class TestSessionManager {
         override suspend fun operateAdminPermission(operation: Boolean) =
             error("Unable to use this on test group member")
 
-        override fun sendMessage(message: MessageWrapper) {
+        override suspend fun sendMessage(message: MessageWrapper) {
             logger.debug { "GroupMember received message: $message" }
         }
 
@@ -142,7 +142,7 @@ class TestSessionManager {
 }
 
 internal class TestSession(contact: PlatformCommandSender, user: CometUser) : Session(contact, user) {
-    override fun handle(message: MessageWrapper) {
+    override suspend fun handle(message: MessageWrapper) {
         logger.debug { "Triggered test session!" }
         expire()
     }

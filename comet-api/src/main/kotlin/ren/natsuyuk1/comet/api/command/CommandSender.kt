@@ -10,12 +10,13 @@
 package ren.natsuyuk1.comet.api.command
 
 import ren.natsuyuk1.comet.api.Comet
+import ren.natsuyuk1.comet.api.message.MessageReceipt
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Contact
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.User
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 /**
  * [CommandSender]
@@ -23,7 +24,7 @@ import ren.natsuyuk1.comet.utils.message.MessageWrapper
  *
  */
 interface CommandSender {
-    fun sendMessage(message: MessageWrapper)
+    suspend fun sendMessage(message: MessageWrapper): MessageReceipt?
 }
 
 /**
@@ -54,7 +55,7 @@ abstract class PlatformCommandSender : CommandSender {
      */
     abstract val platform: LoginPlatform
 
-    abstract override fun sendMessage(message: MessageWrapper)
+    abstract override suspend fun sendMessage(message: MessageWrapper): MessageReceipt?
 }
 
 /**
@@ -63,8 +64,9 @@ abstract class PlatformCommandSender : CommandSender {
  * 代表来自终端的命令发送者
  */
 object ConsoleCommandSender : CommandSender {
-    override fun sendMessage(message: MessageWrapper) {
+    override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
         println(message.parseToString())
+        return null
     }
 }
 

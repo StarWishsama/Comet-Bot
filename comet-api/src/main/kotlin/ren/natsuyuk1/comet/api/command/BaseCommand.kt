@@ -13,8 +13,8 @@ import moe.sdl.yac.core.CliktCommand
 import moe.sdl.yac.core.context
 import moe.sdl.yac.output.Localization
 import ren.natsuyuk1.comet.api.Comet
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 /**
  * [BaseCommand]

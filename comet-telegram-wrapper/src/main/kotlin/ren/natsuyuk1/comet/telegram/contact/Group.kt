@@ -13,13 +13,14 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
+import ren.natsuyuk1.comet.api.message.MessageReceipt
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.telegram.util.send
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 internal abstract class TelegramGroup(
     override val id: Long,
@@ -117,18 +118,18 @@ internal class TelegramGroupImpl(
         }
     }
 
-    override fun sendMessage(message: MessageWrapper) {
-        comet.scope.launch {
-            val event = MessagePreSendEvent(
-                comet,
-                this@TelegramGroupImpl,
-                message,
-                Clock.System.now().epochSeconds
-            ).also { it.broadcast() }
+    override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
+        val event = MessagePreSendEvent(
+            comet,
+            this@TelegramGroupImpl,
+            message,
+            Clock.System.now().epochSeconds
+        ).also { it.broadcast() }
 
-            if (!event.isCancelled) {
-                message.send(comet, chat.id)
-            }
+        return if (!event.isCancelled) {
+            message.send(comet, chat.id)
+        } else {
+            null
         }
     }
 }

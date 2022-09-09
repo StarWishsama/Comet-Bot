@@ -4,10 +4,10 @@ import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.options.option
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.ArcaeaService
 import ren.natsuyuk1.comet.util.toMessageWrapper
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 val ARCAEA by lazy {
     CommandProperty(

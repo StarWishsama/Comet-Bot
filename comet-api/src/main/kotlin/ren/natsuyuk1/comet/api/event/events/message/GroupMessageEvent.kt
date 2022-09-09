@@ -1,9 +1,9 @@
 package ren.natsuyuk1.comet.api.event.events.message
 
 import ren.natsuyuk1.comet.api.Comet
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 /**
  * 群消息事件.

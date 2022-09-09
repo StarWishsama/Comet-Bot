@@ -11,8 +11,8 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest
 
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.isNumeric
 
 @kotlinx.serialization.Serializable

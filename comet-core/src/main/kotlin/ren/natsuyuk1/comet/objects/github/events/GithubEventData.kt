@@ -10,7 +10,7 @@
 
 package ren.natsuyuk1.comet.objects.github.events
 
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 
 interface GithubEventData {
     fun toMessageWrapper(): MessageWrapper

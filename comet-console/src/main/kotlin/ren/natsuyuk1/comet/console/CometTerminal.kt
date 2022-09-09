@@ -24,6 +24,8 @@ import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.database.AccountDataTable
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.event.EventManager
+import ren.natsuyuk1.comet.api.message.MessageSource
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.session.SessionManager
 import ren.natsuyuk1.comet.api.task.TaskManager
@@ -44,7 +46,6 @@ import ren.natsuyuk1.comet.service.CometCoreService
 import ren.natsuyuk1.comet.utils.brotli4j.BrotliLoader
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
@@ -61,6 +62,8 @@ private val dummyComet = object : Comet(LoginPlatform.TEST, CometConfig(0, "", L
     override fun close() {}
 
     override suspend fun getGroup(id: Long): Group? = null
+
+    override suspend fun deleteMessage(source: MessageSource): Boolean = false
 }
 
 object CometTerminal {

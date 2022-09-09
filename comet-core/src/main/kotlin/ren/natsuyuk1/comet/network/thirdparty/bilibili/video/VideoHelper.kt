@@ -1,11 +1,11 @@
 package ren.natsuyuk1.comet.network.thirdparty.bilibili.video
 
 import moe.sdl.yabapi.data.video.VideoInfo
+import ren.natsuyuk1.comet.api.message.Image
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.bilibili.util.buildImagePreview
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
-import ren.natsuyuk1.comet.utils.message.Image
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 
 fun VideoInfo.toMessageWrapper(): MessageWrapper =

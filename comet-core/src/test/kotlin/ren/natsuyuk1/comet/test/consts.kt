@@ -4,13 +4,13 @@ import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.cometInstances
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 private val logger = KotlinLogging.logger {}
 
@@ -40,7 +40,7 @@ fun generateFakeSender(id: Long): User = object : User() {
     override val platform: LoginPlatform
         get() = LoginPlatform.TEST
 
-    override fun sendMessage(message: MessageWrapper) {
+    override suspend fun sendMessage(message: MessageWrapper) {
         logger.debug { "Message sent to user $id: ${message.parseToString()}" }
     }
 }
@@ -81,7 +81,7 @@ fun generateFakeGroup(id: Long): Group = object : Group(id, "TestGroup") {
     override val comet: Comet = fakeComet
     override val platform: LoginPlatform = LoginPlatform.TEST
 
-    override fun sendMessage(message: MessageWrapper) {
+    override suspend fun sendMessage(message: MessageWrapper) {
         logger.debug { "Message sent to group $id: ${message.parseToString()}" }
     }
 }
@@ -118,7 +118,7 @@ fun generateFakeGroupMember(id: Long, group: Group) = object : GroupMember() {
         error("dummy")
     }
 
-    override fun sendMessage(message: MessageWrapper) {
+    override suspend fun sendMessage(message: MessageWrapper) {
         logger.debug { "FakeGroupMember($id) received: $message" }
     }
 

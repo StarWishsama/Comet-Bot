@@ -1,8 +1,8 @@
 package ren.natsuyuk1.comet.api.session
 
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 abstract class Session(
     /**
@@ -14,5 +14,5 @@ abstract class Session(
      */
     val cometUser: CometUser?
 ) {
-    abstract fun handle(message: MessageWrapper)
+    abstract suspend fun handle(message: MessageWrapper)
 }

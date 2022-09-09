@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.console.command
 
+import kotlinx.coroutines.runBlocking
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.options.default
 import moe.sdl.yac.parameters.options.option
@@ -9,11 +10,11 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.command.BaseCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 
 val PROMOTE = CommandProperty(
     "promote",
@@ -49,7 +50,9 @@ class Promote(
                 user.userLevel = UserLevel.values()[targetLevel]
             }
 
-            sender.sendMessage(buildMessageWrapper { appendText("成功设置 $id 的用户等级为 ${user.userLevel}") })
+            runBlocking {
+                sender.sendMessage(buildMessageWrapper { appendText("成功设置 $id 的用户等级为 ${user.userLevel}") })
+            }
         }
     }
 }

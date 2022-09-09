@@ -14,16 +14,16 @@ import dev.inmo.tgbotapi.types.message.content.TextContent
 import dev.inmo.tgbotapi.types.message.textsources.TextSource
 import dev.inmo.tgbotapi.types.message.textsources.mention
 import dev.inmo.tgbotapi.types.message.textsources.regular
+import ren.natsuyuk1.comet.api.message.*
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.cacheDirectory
 import ren.natsuyuk1.comet.utils.file.touch
-import ren.natsuyuk1.comet.utils.message.*
 import java.io.File
 
 private val logger = mu.KotlinLogging.logger {}
 
-suspend fun MessageWrapper.send(comet: TelegramComet, target: ChatId) {
+suspend fun MessageWrapper.send(comet: TelegramComet, target: ChatId): MessageReceipt {
     val textSourceList = mutableListOf<TextSource>()
 
     getMessageContent().forEach {
@@ -38,13 +38,20 @@ suspend fun MessageWrapper.send(comet: TelegramComet, target: ChatId) {
         }
     }
 
-    if (find<Image>() != null) {
+    val resp = if (find<Image>() != null) {
         find<Image>()?.toInputFile()?.let { comet.bot.sendPhoto(target, it, entities = textSourceList) }
     } else if (find<Voice>() != null) {
         find<Voice>()?.toInputFile()?.let { comet.bot.sendAudio(target, it) }
     } else {
         comet.bot.sendMessage(target, textSourceList)
     }
+
+    return MessageReceipt(comet, MessageSource(
+        comet.id,
+        resp!!.chat.id.chatId,
+        resp.date.unixMillisLong,
+        resp.messageId
+    ))
 }
 
 suspend fun MessageContent.toMessageWrapper(comet: TelegramComet, isCommand: Boolean): MessageWrapper {

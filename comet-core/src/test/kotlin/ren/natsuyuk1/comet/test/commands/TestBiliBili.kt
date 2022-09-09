@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.database.DatabaseManager
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.session.SessionManager
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserTable
@@ -16,7 +17,6 @@ import ren.natsuyuk1.comet.network.thirdparty.bilibili.initYabapi
 import ren.natsuyuk1.comet.test.generateFakeGroup
 import ren.natsuyuk1.comet.test.generateFakeGroupMember
 import ren.natsuyuk1.comet.test.isCI
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 

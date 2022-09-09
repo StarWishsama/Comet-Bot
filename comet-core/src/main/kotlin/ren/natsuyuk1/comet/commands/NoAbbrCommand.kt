@@ -5,9 +5,9 @@ import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.CometCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.NoAbbrService.processAbbrSearch
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 val NOABBR = CommandProperty(
     "nbnhhsh",

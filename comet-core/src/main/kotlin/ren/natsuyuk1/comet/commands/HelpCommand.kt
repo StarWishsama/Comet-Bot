@@ -18,9 +18,9 @@ import moe.sdl.yac.parameters.options.option
 import moe.sdl.yac.parameters.types.int
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 
 val HELP by lazy {
     CommandProperty(

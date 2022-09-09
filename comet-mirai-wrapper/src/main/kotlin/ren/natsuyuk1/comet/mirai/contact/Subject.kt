@@ -1,11 +1,12 @@
 package ren.natsuyuk1.comet.mirai.contact
 
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import net.mamoe.mirai.contact.getMember
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
+import ren.natsuyuk1.comet.api.message.MessageReceipt
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
@@ -13,7 +14,7 @@ import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.mirai.MiraiComet
 import ren.natsuyuk1.comet.mirai.util.toMessageChain
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.mirai.util.toMessageSource
 
 abstract class MiraiGroup(
     override val id: Long,
@@ -53,18 +54,19 @@ internal class MiraiGroupImpl(
 
     override fun contains(id: Long): Boolean = group.contains(id)
 
-    override fun sendMessage(message: MessageWrapper) {
-        comet.scope.launch {
-            val event = MessagePreSendEvent(
-                comet,
-                this@MiraiGroupImpl,
-                message,
-                Clock.System.now().epochSeconds
-            ).also { it.broadcast() }
+    override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
+        val event = MessagePreSendEvent(
+            comet,
+            this@MiraiGroupImpl,
+            message,
+            Clock.System.now().epochSeconds
+        ).also { it.broadcast() }
 
-            if (!event.isCancelled) {
-                group.sendMessage(message.toMessageChain(group))
-            }
+        return if (!event.isCancelled) {
+            val receipt = group.sendMessage(message.toMessageChain(group))
+            MessageReceipt(comet, receipt.source.toMessageSource())
+        } else {
+            null
         }
     }
 }
@@ -83,18 +85,19 @@ fun net.mamoe.mirai.contact.User.toCometUser(miraiComet: MiraiComet): User {
         override val name: String = miraiUser.nick,
         override val id: Long = miraiUser.id
     ) : MiraiUser() {
-        override fun sendMessage(message: MessageWrapper) {
-            comet.scope.launch {
-                val event = MessagePreSendEvent(
-                    comet,
-                    this@MiraiUserImpl,
-                    message,
-                    Clock.System.now().epochSeconds
-                ).also { it.broadcast() }
+        override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
+            val event = MessagePreSendEvent(
+                comet,
+                this@MiraiUserImpl,
+                message,
+                Clock.System.now().epochSeconds
+            ).also { it.broadcast() }
 
-                if (!event.isCancelled) {
-                    miraiUser.sendMessage(message.toMessageChain(miraiUser))
-                }
+            return if (!event.isCancelled) {
+                val receipt = miraiUser.sendMessage(message.toMessageChain(miraiUser))
+                return MessageReceipt(comet, receipt.source.toMessageSource())
+            } else {
+                null
             }
         }
     }

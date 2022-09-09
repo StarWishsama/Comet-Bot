@@ -5,6 +5,7 @@ import dev.inmo.tgbotapi.bot.exceptions.CommonRequestException
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
+import dev.inmo.tgbotapi.extensions.api.deleteMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onContentMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onUnhandledCommand
@@ -21,6 +22,7 @@ import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.event.broadcast
+import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.listener.registerListeners
@@ -92,6 +94,15 @@ class TelegramComet(
             }
         } catch (e: CommonRequestException) {
             null
+        }
+    }
+
+    override suspend fun deleteMessage(source: MessageSource): Boolean {
+        return try {
+            bot.deleteMessage(source.from.toChatId(), source.messageID)
+        } catch (e: CommonRequestException) {
+            logger.warn { "撤回消息失败, source: $source" }
+            return false
         }
     }
 }

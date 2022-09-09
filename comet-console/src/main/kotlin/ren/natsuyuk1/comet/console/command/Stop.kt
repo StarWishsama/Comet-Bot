@@ -3,8 +3,8 @@ package ren.natsuyuk1.comet.console.command
 import ren.natsuyuk1.comet.api.command.BaseCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import kotlin.system.exitProcess
 
 val STOP = CommandProperty(

@@ -4,10 +4,13 @@ import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import moe.sdl.yabapi.data.search.results.UserResult
 import moe.sdl.yabapi.data.video.VideoInfo
 import moe.sdl.yabapi.util.encoding.bv
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.session.Session
 import ren.natsuyuk1.comet.api.session.expire
 import ren.natsuyuk1.comet.api.session.registerTimeout
@@ -23,8 +26,6 @@ import ren.natsuyuk1.comet.network.thirdparty.bilibili.video.toMessageWrapper
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.isNumeric
 import kotlin.time.Duration.Companion.seconds
 
@@ -53,10 +54,12 @@ object BiliBiliService {
                 appendText("请在 15 秒内回复指定 UP 主编号")
             }
 
-            contact.sendMessage(request)
+            runBlocking {
+                contact.sendMessage(request)
+            }
         }
 
-        override fun handle(message: MessageWrapper) {
+        override suspend fun handle(message: MessageWrapper) {
             val index = message.parseToString().toIntOrNull()
 
             if (index == null) {

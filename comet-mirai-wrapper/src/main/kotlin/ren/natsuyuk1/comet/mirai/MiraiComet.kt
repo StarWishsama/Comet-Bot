@@ -3,6 +3,10 @@ package ren.natsuyuk1.comet.mirai
 import mu.KotlinLogging.logger
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
+import net.mamoe.mirai.contact.PermissionDeniedException
+import net.mamoe.mirai.message.data.MessageSource.Key.recall
+import net.mamoe.mirai.message.data.MessageSourceKind
+import net.mamoe.mirai.message.data.buildMessageSource
 import net.mamoe.mirai.utils.BotConfiguration
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
@@ -84,4 +88,26 @@ class MiraiComet(
     }
 
     override suspend fun getGroup(id: Long): Group? = cl.runWith { miraiBot.getGroup(id)?.toCometGroup(this) }
+    override suspend fun deleteMessage(source: ren.natsuyuk1.comet.api.message.MessageSource): Boolean {
+        return runCatching<Boolean> {
+            source as MiraiMessageSource
+
+            miraiBot.buildMessageSource(
+                MessageSourceKind.values()[source.kind.ordinal]
+            ) {
+                fromId = source.from
+                targetId = source.target
+                ids = source.ids
+                internalIds = source.internalIds
+                time = source.time.toInt()
+            }.recall()
+
+            true
+        }.onFailure {
+            if (it !is PermissionDeniedException) {
+                logger.warn(it) { "撤回消息 $source 失败" }
+            }
+            return false
+        }.getOrDefault(false)
+    }
 }

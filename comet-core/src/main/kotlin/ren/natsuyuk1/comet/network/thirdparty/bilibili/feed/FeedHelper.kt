@@ -5,12 +5,12 @@ import moe.sdl.yabapi.data.feed.FeedCardNode
 import moe.sdl.yabapi.data.feed.FeedDescription
 import moe.sdl.yabapi.data.feed.cards.*
 import moe.sdl.yabapi.util.encoding.bv
+import ren.natsuyuk1.comet.api.message.Image
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.bilibili.DynamicApi
 import ren.natsuyuk1.comet.network.thirdparty.bilibili.util.buildImagePreview
 import ren.natsuyuk1.comet.utils.math.NumberUtil.toLocalDateTime
-import ren.natsuyuk1.comet.utils.message.Image
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import ren.natsuyuk1.comet.utils.time.yyMMddWithTimePattern
 

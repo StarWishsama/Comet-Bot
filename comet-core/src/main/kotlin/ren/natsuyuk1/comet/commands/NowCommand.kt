@@ -18,16 +18,17 @@ import ren.natsuyuk1.comet.api.command.CometCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.command.isGroup
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.objects.nowcmd.Config
 import ren.natsuyuk1.comet.objects.nowcmd.NowCmdConfigTable
 import ren.natsuyuk1.comet.util.newFormatterOrNull
 import ren.natsuyuk1.comet.util.newTimeZoneOrNull
 import ren.natsuyuk1.comet.util.toMessageWrapper
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.time.Duration.Companion.minutes
 
 val NOW = CommandProperty(
     "now",
@@ -152,6 +153,6 @@ class NowCommand(
             buildMessageWrapper {
                 appendText(message.await(), true)
             }
-        )
+        )?.delayDelete(1.minutes)
     }
 }

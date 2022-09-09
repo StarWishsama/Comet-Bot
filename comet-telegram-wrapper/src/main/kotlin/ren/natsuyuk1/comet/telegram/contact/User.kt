@@ -1,15 +1,15 @@
 package ren.natsuyuk1.comet.telegram.contact
 
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
+import ren.natsuyuk1.comet.api.message.MessageReceipt
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.telegram.util.getDisplayName
 import ren.natsuyuk1.comet.telegram.util.send
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 abstract class TelegramUser(
     override val id: Long,
@@ -26,19 +26,17 @@ class TelegramUserImpl(
     override val id: Long
         get() = from.id.chatId
 
-    override fun sendMessage(message: MessageWrapper) {
-        comet.scope.launch {
-            val event = MessagePreSendEvent(
-                comet,
-                this@TelegramUserImpl,
-                message,
-                Clock.System.now().epochSeconds
-            ).also { it.broadcast() }
+    override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
+        val event = MessagePreSendEvent(
+            comet,
+            this@TelegramUserImpl,
+            message,
+            Clock.System.now().epochSeconds
+        ).also { it.broadcast() }
 
-            if (!event.isCancelled) {
-                message.send(comet, from.id)
-            }
-        }
+        return if (!event.isCancelled) {
+            message.send(comet, from.id)
+        } else null
     }
 }
 

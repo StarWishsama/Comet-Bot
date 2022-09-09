@@ -3,9 +3,9 @@ package ren.natsuyuk1.comet.network.thirdparty.bangumi.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.datetime.toChinese
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.time.hourMinutePattern
 import java.time.DayOfWeek
 import java.time.LocalDate

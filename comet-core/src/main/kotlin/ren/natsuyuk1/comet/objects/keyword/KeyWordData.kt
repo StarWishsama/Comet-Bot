@@ -2,9 +2,9 @@ package ren.natsuyuk1.comet.objects.keyword
 
 import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.utils.file.configDirectory
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import java.io.File
 
 object KeyWordData : PersistDataFile<KeyWordData.Data>(

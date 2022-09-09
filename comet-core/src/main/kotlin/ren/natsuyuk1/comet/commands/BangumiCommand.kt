@@ -5,13 +5,13 @@ import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.arguments.default
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.network.thirdparty.bangumi.BangumiOnlineApi
 import ren.natsuyuk1.comet.network.thirdparty.bangumi.bgmCrawler
 import ren.natsuyuk1.comet.network.thirdparty.bangumi.data.common.SearchType
 import ren.natsuyuk1.comet.network.thirdparty.bangumi.parser.toMessageWrapper
 import ren.natsuyuk1.comet.util.toMessageWrapper
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import ren.natsuyuk1.comet.utils.string.parseDayOfWeek
 
 val BANGUMI = CommandProperty(

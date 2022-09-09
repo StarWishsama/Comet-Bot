@@ -2,6 +2,9 @@ package ren.natsuyuk1.comet.commands.service
 
 import kotlinx.coroutines.delay
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
+import ren.natsuyuk1.comet.api.message.Image
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.session.Session
 import ren.natsuyuk1.comet.api.session.expire
 import ren.natsuyuk1.comet.api.session.registerTimeout
@@ -11,9 +14,6 @@ import ren.natsuyuk1.comet.network.thirdparty.github.GitHubApi
 import ren.natsuyuk1.comet.objects.config.CometServerConfig
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.util.toMessageWrapper
-import ren.natsuyuk1.comet.utils.message.Image
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -28,7 +28,7 @@ object GithubCommandService {
         val name: String,
         private val groupID: Long
     ) : Session(contact, user) {
-        override fun handle(message: MessageWrapper) {
+        override suspend fun handle(message: MessageWrapper) {
             val raw = message.parseToString()
             val secret = if (raw == "完成订阅") {
                 ""
@@ -107,7 +107,7 @@ object GithubCommandService {
         }
     }
 
-    fun processUnsubscribe(
+    suspend fun processUnsubscribe(
         subject: PlatformCommandSender,
         groupID: Long,
         repoName: String
@@ -178,7 +178,7 @@ object GithubCommandService {
         }
     }
 
-    fun fetchSubscribeRepos(subject: PlatformCommandSender, groupID: Long) {
+    suspend fun fetchSubscribeRepos(subject: PlatformCommandSender, groupID: Long) {
         val repos =
             GithubRepoData.data.repos.filter { it.subscribers.any { g -> g.id == groupID } }
 
@@ -197,7 +197,7 @@ object GithubCommandService {
         }
     }
 
-    fun fetchRepoSetting(subject: PlatformCommandSender, repoName: String, groupID: Long) {
+    suspend fun fetchRepoSetting(subject: PlatformCommandSender, repoName: String, groupID: Long) {
         if (!repoRegex.matches(repoName)) {
             subject.sendMessage("请输入有效的 GitHub 仓库名称, 例如 StarWishsama/Comet-Bot".toMessageWrapper())
         } else {

@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.database.DatabaseManager
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.test.database.initTestDatabase
 import ren.natsuyuk1.comet.api.test.fakeComet
 import ren.natsuyuk1.comet.api.test.fakeSender
 import ren.natsuyuk1.comet.api.user.UserPermissionTable
 import ren.natsuyuk1.comet.api.user.UserTable
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TestCommandManager {

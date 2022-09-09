@@ -5,13 +5,13 @@ import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.options.option
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.network.thirdparty.twitter.TwitterAPI
 import ren.natsuyuk1.comet.network.thirdparty.twitter.toMessageWrapper
 import ren.natsuyuk1.comet.util.groupAdminChecker
 import ren.natsuyuk1.comet.util.toMessageWrapper
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 val TWITTER = CommandProperty(
     "twitter",

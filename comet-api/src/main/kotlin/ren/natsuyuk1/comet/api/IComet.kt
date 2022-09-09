@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.api
 
+import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.user.Group
 import java.util.concurrent.ConcurrentLinkedDeque
 
@@ -19,4 +20,6 @@ interface IComet {
      * @return [Group]，可能为空
      */
     suspend fun getGroup(id: Long): Group?
+
+    suspend fun deleteMessage(source: MessageSource): Boolean
 }

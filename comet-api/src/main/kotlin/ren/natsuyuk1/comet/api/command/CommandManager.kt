@@ -19,13 +19,13 @@ import moe.sdl.yac.core.parseToArgs
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.permission.PermissionManager
 import ren.natsuyuk1.comet.api.permission.hasPermission
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.containsEtc
 import ren.natsuyuk1.comet.utils.string.StringUtil.getLastingTimeAsString
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit

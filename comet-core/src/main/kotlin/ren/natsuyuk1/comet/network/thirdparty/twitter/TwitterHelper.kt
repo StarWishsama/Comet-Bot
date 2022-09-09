@@ -1,9 +1,9 @@
 package ren.natsuyuk1.comet.network.thirdparty.twitter
 
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.asURLImage
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.asURLImage
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import ren.natsuyuk1.setsuna.objects.TwitterExpansions
 import ren.natsuyuk1.setsuna.objects.tweet.ReferencedTweetType

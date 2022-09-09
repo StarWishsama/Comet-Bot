@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.database.DatabaseManager
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.session.SessionManager
 import ren.natsuyuk1.comet.api.session.register
 import ren.natsuyuk1.comet.api.user.CometUser
@@ -14,7 +15,6 @@ import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.commands.KeyWordAddSession
 import ren.natsuyuk1.comet.test.generateFakeGroup
 import ren.natsuyuk1.comet.test.generateFakeSender
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

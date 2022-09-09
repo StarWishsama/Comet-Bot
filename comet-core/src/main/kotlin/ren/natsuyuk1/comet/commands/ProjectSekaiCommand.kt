@@ -9,11 +9,11 @@ import moe.sdl.yac.parameters.types.int
 import moe.sdl.yac.parameters.types.long
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.ProjectSekaiService
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.util.toMessageWrapper
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 val PROJECTSEKAI by lazy {
     CommandProperty(

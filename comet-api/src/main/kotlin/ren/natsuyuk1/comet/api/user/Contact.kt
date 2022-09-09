@@ -11,7 +11,6 @@ package ren.natsuyuk1.comet.api.user
 
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -87,8 +86,6 @@ abstract class GroupMember : User() {
      * @param operation 是否给予
      */
     abstract suspend fun operateAdminPermission(operation: Boolean)
-
-    abstract override fun sendMessage(message: MessageWrapper)
 }
 
 fun GroupMember.nameOrCard(): String = card.ifEmpty { name }

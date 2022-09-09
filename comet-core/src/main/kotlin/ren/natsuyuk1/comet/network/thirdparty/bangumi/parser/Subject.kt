@@ -2,13 +2,13 @@ package ren.natsuyuk1.comet.network.thirdparty.bangumi.parser
 
 import kotlinx.serialization.Serializable
 import org.jsoup.nodes.Element
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.bangumi.const.MAIN_DOMAIN
 import ren.natsuyuk1.comet.network.thirdparty.bangumi.data.resp.*
 import ren.natsuyuk1.comet.network.thirdparty.bangumi.util.*
 import ren.natsuyuk1.comet.utils.jsoup.byClass
 import ren.natsuyuk1.comet.utils.jsoup.byId
 import ren.natsuyuk1.comet.utils.jsoup.byTag
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 
 @Serializable

@@ -5,7 +5,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 
 abstract class CometPushContext(
     val id: String,

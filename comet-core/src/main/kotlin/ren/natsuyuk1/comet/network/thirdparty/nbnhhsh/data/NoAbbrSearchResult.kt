@@ -1,7 +1,7 @@
 package ren.natsuyuk1.comet.network.thirdparty.nbnhhsh.data
 
 import kotlinx.serialization.Serializable
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 
 @Serializable
 data class NoAbbrSearchResult(

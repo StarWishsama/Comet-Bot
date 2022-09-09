@@ -7,6 +7,8 @@ import ren.natsuyuk1.comet.api.command.CometCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.command.asGroup
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.session.Session
 import ren.natsuyuk1.comet.api.session.expire
 import ren.natsuyuk1.comet.api.session.register
@@ -15,8 +17,6 @@ import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.objects.keyword.KeyWordData
 import ren.natsuyuk1.comet.util.groupAdminChecker
 import ren.natsuyuk1.comet.util.toMessageWrapper
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 
 val KEYWORD = CommandProperty(
@@ -35,7 +35,7 @@ class KeyWordAddSession(
     val keyword: String,
     private val regex: Boolean
 ) : Session(contact, user) {
-    override fun handle(message: MessageWrapper) {
+    override suspend fun handle(message: MessageWrapper) {
         KeyWordData.addKeyWord(subject.id, subject.platform, KeyWordData.GroupInstance.KeyWord(keyword, message, regex))
         subject.sendMessage("成功添加该关键字 ($keyword)".toMessageWrapper())
         expire()

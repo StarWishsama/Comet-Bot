@@ -3,10 +3,10 @@ package ren.natsuyuk1.comet.api.test
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
 
 private val logger = mu.KotlinLogging.logger {}
 
@@ -29,7 +29,7 @@ val fakeSender = object : PlatformCommandSender() {
     override val name: String = "Dummy"
     override val platform: LoginPlatform = LoginPlatform.TEST
 
-    override fun sendMessage(message: MessageWrapper) {
+    override suspend fun sendMessage(message: MessageWrapper) {
         logger.info { message.parseToString() }
     }
 }

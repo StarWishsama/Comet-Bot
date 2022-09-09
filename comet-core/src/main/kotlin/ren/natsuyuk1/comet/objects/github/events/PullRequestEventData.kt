@@ -13,8 +13,8 @@ package ren.natsuyuk1.comet.objects.github.events
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
-import ren.natsuyuk1.comet.utils.message.MessageWrapper
-import ren.natsuyuk1.comet.utils.message.buildMessageWrapper
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import ren.natsuyuk1.comet.utils.time.hmsPattern
 import java.time.LocalDateTime

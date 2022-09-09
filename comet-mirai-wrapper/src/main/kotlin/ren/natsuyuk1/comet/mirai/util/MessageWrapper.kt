@@ -7,15 +7,17 @@ import net.mamoe.mirai.contact.AudioSupported
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
+import net.mamoe.mirai.message.data.MessageSource
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.MiraiExperimentalApi
+import ren.natsuyuk1.comet.api.message.*
+import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.consts.cometClient
+import ren.natsuyuk1.comet.mirai.MiraiMessageSource
 import ren.natsuyuk1.comet.utils.file.messageWrapperDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.file.writeToFile
-import ren.natsuyuk1.comet.utils.message.*
-import ren.natsuyuk1.comet.utils.message.Image
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
@@ -145,3 +147,14 @@ fun MessageChain.toMessageWrapper(): MessageWrapper {
 
     return wrapper
 }
+
+internal fun MessageSource.toMessageSource(): MiraiMessageSource =
+    MiraiMessageSource(
+        MiraiMessageSource.MiraiMessageSourceKind.values()[kind.ordinal],
+        botId,
+        ids,
+        internalIds,
+        time,
+        fromId,
+        targetId
+    )
