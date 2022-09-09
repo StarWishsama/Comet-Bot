@@ -73,14 +73,14 @@ internal fun logout(id: Long, platform: LoginPlatform) {
     if (!AccountData.hasAccount(id, platform)) {
         logger.info { "注销账号失败: 找不到对应账号" }
     } else {
+        cometInstances.find { it.id == id && it.platform == platform }?.close()
+        cometInstances.removeIf { it.id == id && it.platform == platform }
+
         transaction {
             AccountDataTable.deleteWhere {
                 AccountDataTable.id eq id and (AccountDataTable.platform eq platform)
             }
         }
-
-        cometInstances.find { it.id == id }?.close()
-        cometInstances.removeIf { it.id == id }
 
         logger.info { "注销账号成功" }
     }

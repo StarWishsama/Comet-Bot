@@ -6,6 +6,7 @@ import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 
@@ -24,8 +25,7 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
     companion object : EntityClass<Long, AccountData>(AccountDataTable) {
         fun hasAccount(id: Long, platform: LoginPlatform): Boolean = transaction {
             !find {
-                AccountDataTable.id eq id
-                AccountDataTable.platform eq platform
+                AccountDataTable.id eq id and (AccountDataTable.platform eq platform)
             }.empty()
         }
 
