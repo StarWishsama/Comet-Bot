@@ -5,7 +5,6 @@ import ren.natsuyuk1.comet.api.listener.register
 
 val DEFAULT_LISTENERS = listOf(
     KeywordListener,
-    RateLimitListener
 )
 
 fun Comet.registerListeners() =
