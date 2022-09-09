@@ -1,4 +1,4 @@
-package ren.natsuyuk1.utils.test.message
+package ren.natsuyuk1.comet.api.test.message
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
