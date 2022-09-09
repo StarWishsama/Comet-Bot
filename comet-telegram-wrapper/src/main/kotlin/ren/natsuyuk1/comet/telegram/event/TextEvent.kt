@@ -7,6 +7,7 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.extensions.utils.fromChannelGroupContentMessageOrNull
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.PrivateChat
+import dev.inmo.tgbotapi.types.message.abstracts.AnonymousGroupContentMessage
 import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
 import dev.inmo.tgbotapi.types.message.abstracts.WithSenderChatMessage
 import dev.inmo.tgbotapi.types.message.content.MessageContent
@@ -56,27 +57,40 @@ suspend fun CommonMessage<MessageContent>.toCometGroupEvent(
 
     val channelGroupMsg = fromChannelGroupContentMessageOrNull()
 
-    if (channelGroupMsg == null) {
-        return GroupMessageEvent(
-            comet = comet,
-            subject = groupChat.toCometGroup(comet),
-            sender = from!!.toCometAnonymousMember(comet, groupChat.id),
-            senderName = from!!.getDisplayName(),
-            message = content.toMessageWrapper(comet, isCommand),
-            time = date.unixMillisLong,
-            messageID = messageId
-        )
-    } else {
-        channelGroupMsg.channel
-        return GroupMessageEvent(
-            comet = comet,
-            subject = groupChat.toCometGroup(comet),
-            sender = channelGroupMsg.channel.toCometAnonymousMember(comet, groupChat.id),
-            senderName = channelGroupMsg.channel.getDisplayName(),
-            message = content.toMessageWrapper(comet, isCommand),
-            time = date.unixMillisLong,
-            messageID = messageId
-        )
+    return when {
+        channelGroupMsg != null -> {
+            GroupMessageEvent(
+                comet = comet,
+                subject = groupChat.toCometGroup(comet),
+                sender = channelGroupMsg.channel.toCometAnonymousMember(comet, groupChat.id),
+                senderName = channelGroupMsg.channel.getDisplayName(),
+                message = content.toMessageWrapper(comet, isCommand),
+                time = date.unixMillisLong,
+                messageID = messageId
+            )
+        }
+        this is AnonymousGroupContentMessage -> {
+            GroupMessageEvent(
+                comet = comet,
+                subject = groupChat.toCometGroup(comet),
+                sender = senderChat.toCometAnonymousMember(comet),
+                senderName = senderChat.title,
+                message = content.toMessageWrapper(comet, isCommand),
+                time = date.unixMillisLong,
+                messageID = messageId
+            )
+        }
+        else -> {
+            GroupMessageEvent(
+                comet = comet,
+                subject = groupChat.toCometGroup(comet),
+                sender = from!!.toCometAnonymousMember(comet, groupChat.id),
+                senderName = from!!.getDisplayName(),
+                message = content.toMessageWrapper(comet, isCommand),
+                time = date.unixMillisLong,
+                messageID = messageId
+            )
+        }
     }
 }
 
