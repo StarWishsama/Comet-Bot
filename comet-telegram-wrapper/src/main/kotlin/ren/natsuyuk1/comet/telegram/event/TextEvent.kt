@@ -7,6 +7,7 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
+import dev.inmo.tgbotapi.types.message.abstracts.WithSenderChatMessage
 import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.types.message.textsources.BotCommandTextSource
 import dev.inmo.tgbotapi.utils.RiskFeature
@@ -27,8 +28,8 @@ private val logger = KotlinLogging.logger {}
 suspend fun CommonMessage<MessageContent>.toCometEvent(
     comet: TelegramComet
 ): MessageEvent? {
-    if (this !is FromUser) {
-        logger.debug { "Incoming chat isn't `FromUser`, is ${this::class.simpleName}" }
+    if (this !is FromUser || this !is WithSenderChatMessage) {
+        logger.debug { "Incoming message doesn't have user or sender, is ${this::class.simpleName}" }
         return null
     }
 
