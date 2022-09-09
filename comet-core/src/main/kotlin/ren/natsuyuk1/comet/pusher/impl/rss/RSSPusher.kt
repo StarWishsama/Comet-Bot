@@ -38,7 +38,11 @@ object RSSPusher: CometPusher("RSS", CometPusherConfig(60)) {
             if (!subPath.exists()) {
                 subPath.touch()
             } else {
-                subscriber.putAll(json.decodeFromString(subPath.readTextBuffered()))
+                subPath.readTextBuffered().let {
+                    if (it.isNotEmpty()) {
+                        subscriber.putAll(json.decodeFromString(it))
+                    }
+                }
             }
         }
     }
