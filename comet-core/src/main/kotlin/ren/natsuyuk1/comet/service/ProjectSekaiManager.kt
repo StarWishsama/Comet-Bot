@@ -1,10 +1,7 @@
 package ren.natsuyuk1.comet.service
 
-import cn.hutool.crypto.SecureUtil
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
@@ -40,10 +37,8 @@ import ren.natsuyuk1.comet.utils.skiko.FontUtil
 import java.awt.Color
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.StandardCopyOption
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
 
 private val logger = KotlinLogging.logger {}
 
@@ -68,15 +63,13 @@ object ProjectSekaiManager {
 
         loadPJSKDatabase()
 
-        scope.launch { refreshCache() }
-
         if (!pjskFolder.exists()) {
             pjskFolder.mkdir()
         }
 
         fetchI18NFile()
 
-        TaskManager.registerTask(20.minutes, ::refreshCache)
+        TaskManager.registerTaskDelayed(1.hours, ::refreshCache)
     }
 
     private fun refreshCache() {
@@ -169,16 +162,6 @@ object ProjectSekaiManager {
 
         if (musicDiffFile.exists()) {
             scope.launch {
-                val tmpFile = File(pjskFolder, "musicDifficulties.tmp").also { it.deleteOnExit() }
-                cometClient.client.downloadFile("https://musics.pjsekai.moe/musicDifficulties.json", tmpFile)
-
-                if (SecureUtil.md5(tmpFile) != SecureUtil.md5(musicDiffFile)) {
-                    withContext(Dispatchers.IO) {
-                        Files.copy(tmpFile.toPath(), musicDiffFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-                        tmpFile.delete()
-                    }
-                }
-
                 loadMusicDiff()
             }
         } else {

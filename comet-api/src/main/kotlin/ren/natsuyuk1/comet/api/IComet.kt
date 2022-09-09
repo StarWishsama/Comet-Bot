@@ -21,5 +21,12 @@ interface IComet {
      */
     suspend fun getGroup(id: Long): Group?
 
+    /**
+     * 撤回 / 删除一个已发送的信息
+     *
+     * @param source [MessageSource] 消息来源
+     *
+     * @return 是否成功撤回 / 删除此消息
+     */
     suspend fun deleteMessage(source: MessageSource): Boolean
 }
