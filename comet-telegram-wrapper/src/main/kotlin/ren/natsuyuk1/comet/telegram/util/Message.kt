@@ -9,13 +9,13 @@ fun CommonMessage<MessageContent>.format(): String {
     val msg = this@format
 
     val prefix: String = when (chat) {
-        is GroupChat -> "[${(chat as GroupChat).title} (${chat.id.chatId}]"
+        is GroupChat -> "[${(chat as GroupChat).title} (${chat.id.chatId})]"
         else -> ""
     }
 
     val sender = buildString {
         if (msg is FromUser) {
-            append("${msg.from.getDisplayName()}(${msg.chat.id})")
+            append("${msg.from.getDisplayName()}(${msg.from.id})")
         }
     }
 
