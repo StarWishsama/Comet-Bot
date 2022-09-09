@@ -27,7 +27,7 @@ class TestProjectSekaiService {
 
         // てらてら
         val musicId = 257
-        val diff = 30 + 0.2789866632577603
+        val diff = 30.145577713496646
 
         val fetched = ProjectSekaiManager.getSongAdjustedLevel(musicId, MusicDifficulty.MASTER)
 

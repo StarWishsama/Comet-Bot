@@ -3,6 +3,8 @@ package ren.natsuyuk1.comet.api.test
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.message.MessageReceipt
+import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
@@ -20,6 +22,8 @@ val fakeComet = object : Comet(LoginPlatform.TEST, CometConfig(0, "", LoginPlatf
     override fun close() {}
 
     override suspend fun getGroup(id: Long): Group? = null
+
+    override suspend fun deleteMessage(source: MessageSource): Boolean = true
 }
 
 val fakeSender = object : PlatformCommandSender() {
@@ -29,7 +33,8 @@ val fakeSender = object : PlatformCommandSender() {
     override val name: String = "Dummy"
     override val platform: LoginPlatform = LoginPlatform.TEST
 
-    override suspend fun sendMessage(message: MessageWrapper) {
+    override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
         logger.info { message.parseToString() }
+        return null
     }
 }

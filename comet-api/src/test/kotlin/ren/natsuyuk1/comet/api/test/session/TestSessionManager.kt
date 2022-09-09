@@ -10,6 +10,7 @@ import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.database.DatabaseManager
+import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.session.Session
@@ -39,8 +40,9 @@ class TestSessionManager {
         override val platform: LoginPlatform
             get() = LoginPlatform.TEST
 
-        override suspend fun sendMessage(message: MessageWrapper) {
+        override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
             logger.debug { "Received message: $message" }
+            return null
         }
     }
 
@@ -68,8 +70,10 @@ class TestSessionManager {
         override val comet: Comet = fakeComet
         override val platform: LoginPlatform = LoginPlatform.TEST
 
-        override suspend fun sendMessage(message: MessageWrapper) {
+        override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
             logger.debug { "Group Received message: $message" }
+
+            return null
         }
     }
 
@@ -91,8 +95,10 @@ class TestSessionManager {
         override suspend fun operateAdminPermission(operation: Boolean) =
             error("Unable to use this on test group member")
 
-        override suspend fun sendMessage(message: MessageWrapper) {
+        override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
             logger.debug { "GroupMember received message: $message" }
+
+            return null
         }
 
         override val comet: Comet = fakeComet
