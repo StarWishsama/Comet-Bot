@@ -45,12 +45,12 @@ buildConfig {
 
 dependencies {
     compileOnly(KotlinX.serialization.json)
-    compileOnly("org.jetbrains.exposed:exposed-core:_")
-    compileOnly("org.jetbrains.exposed:exposed-dao:_")
-    compileOnly("org.jetbrains.exposed:exposed-jdbc:_")
-    compileOnly("org.jetbrains.exposed:exposed-kotlin-datetime:_")
-    compileOnly("com.zaxxer:HikariCP:_")
-    compileOnly("org.jsoup:jsoup:_")
-    compileOnly("org.jetbrains.skiko:skiko:_")
-    compileOnly("com.aayushatharva.brotli4j:brotli4j:1.7.1")
+    compileOnly(JetBrains.exposed.core)
+    compileOnly(JetBrains.exposed.dao)
+    compileOnly(JetBrains.exposed.jdbc)
+    compileOnly(libs.exposed.kotlin.datetime)
+    compileOnly(libs.hikaricp)
+    compileOnly(libs.jsoup)
+    compileOnly(libs.skiko)
+    compileOnly(libs.brotli4j)
 }

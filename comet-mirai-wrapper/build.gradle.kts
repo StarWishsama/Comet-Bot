@@ -24,9 +24,9 @@ dependencies {
     compileOnly(project(":comet-core"))
     compileOnly(project(":comet-utils"))
 
-    implementation("net.mamoe:mirai-core:_")
-    implementation("net.mamoe:mirai-core-api:_")
-    implementation("net.mamoe:mirai-core-utils:_")
+    implementation(libs.mirai.core)
+    implementation(libs.mirai.core.api)
+    implementation(libs.mirai.core.utils)
 }
 
 tasks.shadowJar {

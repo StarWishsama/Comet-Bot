@@ -20,16 +20,16 @@ repositories {
 
 dependencies {
     implementation(KotlinX.serialization.json)
-    implementation("net.mamoe.yamlkt:yamlkt:_")
+    implementation(libs.yamlkt)
 
-    api("org.jetbrains.exposed:exposed-core:_")
-    api("org.jetbrains.exposed:exposed-dao:_")
-    api("org.jetbrains.exposed:exposed-jdbc:_")
-    api("org.jetbrains.exposed:exposed-kotlin-datetime:_")
-    implementation("com.zaxxer:HikariCP:_")
+    api(JetBrains.exposed.core)
+    api(JetBrains.exposed.dao)
+    api(JetBrains.exposed.jdbc)
+    api(libs.exposed.kotlin.datetime)
+    implementation(libs.hikaricp)
 
-    implementation("org.xerial:sqlite-jdbc:_")
-    implementation("org.postgresql:postgresql:_")
+    implementation(libs.sqlite.jdbc)
+    implementation(libs.postgresql)
 
     implementation(project(":comet-utils"))
 }

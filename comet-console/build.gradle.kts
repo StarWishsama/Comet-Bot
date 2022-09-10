@@ -21,17 +21,14 @@ repositories {
 }
 
 dependencies {
-    implementation(KotlinX.serialization.json)
-
-    implementation("moe.sdl.yac:core:_")
-
-    implementation("org.jline:jline:_")
+    implementation(libs.moe.sdl.yac.core)
+    implementation(libs.jline)
 
     api(project(":comet-api"))
     api(project(":comet-core"))
     api(project(":comet-utils"))
 
-    compileOnly("org.jetbrains.skiko:skiko:_")
+    compileOnly(libs.skiko)
 }
 
 tasks.jar {

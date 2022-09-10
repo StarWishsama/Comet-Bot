@@ -31,26 +31,26 @@ dependencies {
     implementation(KotlinX.serialization.json)
     implementation(KotlinX.datetime)
 
-    api("org.jetbrains.exposed:exposed-core:_")
-    api("org.jetbrains.exposed:exposed-dao:_")
-    api("org.jetbrains.exposed:exposed-jdbc:_")
-    api("org.jetbrains.exposed:exposed-kotlin-datetime:_")
-    implementation("com.zaxxer:HikariCP:_")
+    api(JetBrains.exposed.core)
+    api(JetBrains.exposed.dao)
+    api(JetBrains.exposed.jdbc)
+    api(libs.exposed.kotlin.datetime)
+    implementation(libs.hikaricp)
 
-    implementation("io.ktor:ktor-server-core:_")
-    implementation("io.ktor:ktor-server-netty:_")
-    implementation("io.ktor:ktor-server-call-logging:_")
-    implementation("io.ktor:ktor-client-websockets:_")
+    implementation(Ktor.server.core)
+    implementation(Ktor.server.netty)
+    implementation(Ktor.server.callLogging)
+    implementation(libs.ktor.client.websockets)
 
-    implementation("org.jsoup:jsoup:_")
+    implementation(libs.jsoup)
 
-    implementation("moe.sdl.yabapi:yabapi-core-jvm:_")
+    implementation(libs.yabapi.core.jvm)
 
-    implementation("org.jetbrains.skiko:skiko:_")
+    implementation(libs.skiko)
 
-    implementation("com.aayushatharva.brotli4j:brotli4j:1.7.1")
+    implementation(libs.brotli4j)
 
-    implementation("ren.natsuyuk1.setsuna:Setsuna:_")
+    implementation(libs.setsuna)
 
-    implementation("com.rometools:rome:_")
+    implementation(libs.rome)
 }

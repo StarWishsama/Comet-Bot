@@ -24,9 +24,12 @@ dependencies {
     compileOnly(project(":comet-core"))
     compileOnly(project(":comet-utils"))
 
-    implementation("dev.inmo:tgbotapi:_")
+    implementation(libs.tgbotapi) {
+        exclude("io.ktor")
+    }
 }
 
 tasks.shadowJar {
     destinationDirectory.set(File("$rootDir/comet/modules"))
+    minimize()
 }
