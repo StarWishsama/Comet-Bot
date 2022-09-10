@@ -101,6 +101,11 @@ val defaultCommands: List<AbstractCommandNode<*>> =
             NowCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
+            RAND
+        ) { comet, sender, subject, wrapper, user ->
+            RandCommand(comet, sender, subject, wrapper, user)
+        },
+        CommandNode(
             ARCAEA,
             listOf(ArcaeaCommand.Bind.BIND, ArcaeaCommand.Info.INFO)
         ) { comet, sender, subject, wrapper, user ->
