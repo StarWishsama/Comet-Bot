@@ -62,3 +62,6 @@ device.json
 
 ## Comet Modules ##
 /comet
+.comet_history
+/modules
+/config
