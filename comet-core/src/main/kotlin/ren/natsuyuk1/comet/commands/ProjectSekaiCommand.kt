@@ -51,10 +51,12 @@ class ProjectSekaiCommand(
     }
 
     override suspend fun run() {
-        if (ProjectSekaiUserData.isBound(user.id.value)) {
-            subject.sendMessage(ProjectSekaiService.queryUserEventInfo(user, 0))
-        } else if (currentContext.invokedSubcommand == null) {
-            subject.sendMessage(PROJECTSEKAI.helpText.toMessageWrapper())
+        if (currentContext.invokedSubcommand == null) {
+            if (ProjectSekaiUserData.isBound(user.id.value)) {
+                subject.sendMessage(ProjectSekaiService.queryUserEventInfo(user, 0))
+            } else {
+                subject.sendMessage(PROJECTSEKAI.helpText.toMessageWrapper())
+            }
         }
     }
 
