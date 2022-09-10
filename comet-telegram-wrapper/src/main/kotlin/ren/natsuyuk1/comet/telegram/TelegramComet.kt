@@ -7,11 +7,9 @@ import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
 import dev.inmo.tgbotapi.extensions.api.deleteMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
-import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onContentMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onUnhandledCommand
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.flushAccumulatedUpdates
 import dev.inmo.tgbotapi.types.chat.GroupChat
-import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
 import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.types.toChatId
@@ -54,19 +52,21 @@ class TelegramComet(
             logger.debug { "Refreshed accumulated updates" }
 
             bot.buildBehaviourWithLongPolling(scope) {
-                onContentMessage(
+                onUnhandledCommand {
+                    logger.trace { "onUnhandledCommand > " + (it as CommonMessage<MessageContent>).format() }
+                    scope.launch { (it as CommonMessage<MessageContent>).toCometEvent(this@TelegramComet)?.broadcast() }
+                }
+
+                /**onContentMessage(
                     {
                         it.chat is PrivateChat || it.chat is GroupChat
                     }
                 ) {
-                    logger.trace { it.format() }
-                    scope.launch { it.toCometEvent(this@TelegramComet)?.broadcast() }
-                }
-
-                onUnhandledCommand {
-                    logger.trace { (it as CommonMessage<MessageContent>).format() }
-                    scope.launch { (it as CommonMessage<MessageContent>).toCometEvent(this@TelegramComet)?.broadcast() }
-                }
+                    logger.trace { "onContentMessage > " + it.format() }
+                    scope.launch {
+                        it.toCometEvent(this@TelegramComet)?.broadcast()
+                    }
+                }*/
             }.join()
         }
 

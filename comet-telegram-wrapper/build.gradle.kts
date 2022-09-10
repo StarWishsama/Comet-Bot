@@ -31,5 +31,4 @@ dependencies {
 
 tasks.shadowJar {
     destinationDirectory.set(File("$rootDir/comet/modules"))
-    minimize()
 }
