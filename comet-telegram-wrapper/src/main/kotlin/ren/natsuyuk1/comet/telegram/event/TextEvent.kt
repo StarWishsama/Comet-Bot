@@ -42,7 +42,7 @@ suspend fun CommonMessage<MessageContent>.toCometEvent(
         is GroupChat -> this.toCometGroupEvent(comet, isCommand)
         is PrivateChat -> this.toCometPrivateEvent(comet, isCommand)
         else -> {
-            logger.debug { "Incoming chat group chat or private chat`, is ${chat::class.simpleName}" }
+            logger.debug { "Incoming chat isn't group chat or private chat`, is ${chat::class.simpleName}" }
             null
         }
     }
