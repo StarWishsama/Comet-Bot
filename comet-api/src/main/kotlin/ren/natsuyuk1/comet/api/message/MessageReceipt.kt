@@ -17,7 +17,7 @@ class MessageReceipt(
         comet.deleteMessage(source)
     }
 
-    fun delayDelete(delay: Duration) = comet.scope?.launch {
+    fun delayDelete(delay: Duration) = comet.scope.launch {
         delay(delay)
         delete()
     }

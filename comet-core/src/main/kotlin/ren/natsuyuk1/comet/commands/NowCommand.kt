@@ -21,6 +21,8 @@ import ren.natsuyuk1.comet.api.command.isGroup
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
+import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.objects.nowcmd.Config
 import ren.natsuyuk1.comet.objects.nowcmd.NowCmdConfigTable
 import ren.natsuyuk1.comet.util.newFormatterOrNull
@@ -136,7 +138,7 @@ class NowCommand(
             return@c
         }
 
-        val message = async {
+        val timeMessage = async {
             val tz = timezones.await().map { (tz, alias) ->
                 val name = alias ?: tz.id
                 val zone = now.atZone(tz.toZoneId()).format(dateFormatter.await())
@@ -151,8 +153,12 @@ class NowCommand(
 
         subject.sendMessage(
             buildMessageWrapper {
-                appendText(message.await(), true)
+                appendText(timeMessage.await(), true)
             }
         )?.delayDelete(1.minutes)
+
+        if (subject is Group && subject.getBotPermission() != GroupPermission.MEMBER) {
+            message.receipt?.delayDelete(1.minutes)
+        }
     }
 }
