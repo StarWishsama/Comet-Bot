@@ -91,7 +91,7 @@ class TelegramComet(
         return try {
             bot.deleteMessage(source.target.toChatId(), source.messageID)
         } catch (e: CommonRequestException) {
-            logger.warn { "撤回消息失败, source: $source" }
+            logger.warn(e) { "撤回消息失败, source: $source" }
             return false
         }
     }
