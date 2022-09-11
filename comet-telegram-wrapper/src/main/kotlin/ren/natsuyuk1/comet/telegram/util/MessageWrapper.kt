@@ -23,7 +23,7 @@ import java.io.File
 
 private val logger = mu.KotlinLogging.logger {}
 
-suspend fun MessageWrapper.send(comet: TelegramComet, target: ChatId): MessageReceipt {
+suspend fun MessageWrapper.send(comet: TelegramComet, type: MessageSource.MessageSourceType, target: ChatId): MessageReceipt {
     val textSourceList = mutableListOf<TextSource>()
 
     getMessageContent().forEach {
@@ -51,6 +51,7 @@ suspend fun MessageWrapper.send(comet: TelegramComet, target: ChatId): MessageRe
     }
 
     return MessageReceipt(comet, MessageSource(
+        type,
         comet.id,
         resp.chat.id.chatId,
         resp.date.unixMillisLong,
@@ -58,8 +59,8 @@ suspend fun MessageWrapper.send(comet: TelegramComet, target: ChatId): MessageRe
     ))
 }
 
-suspend fun MessageContent.toMessageWrapper(from: Long, to: Long, time: Long, msgID: Long, comet: TelegramComet, containBotAt: Boolean): MessageWrapper {
-    val receipt = MessageReceipt(comet, MessageSource(from, to, time, msgID))
+suspend fun MessageContent.toMessageWrapper(type: MessageSource.MessageSourceType, from: Long, to: Long, time: Long, msgID: Long, comet: TelegramComet, containBotAt: Boolean): MessageWrapper {
+    val receipt = MessageReceipt(comet, MessageSource(type, from, to, time, msgID))
 
     return when (val content = this) {
         is PhotoContent -> {

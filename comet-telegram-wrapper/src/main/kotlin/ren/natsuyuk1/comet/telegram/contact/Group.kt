@@ -14,6 +14,7 @@ import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.message.MessageReceipt
+import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
@@ -65,9 +66,7 @@ internal class TelegramGroupImpl(
 
     override fun getBotPermission(): GroupPermission {
         return runBlocking {
-            val cm = comet.bot.getChatMember(chat.id, comet.id.toChatId())
-
-            when (cm) {
+            when (comet.bot.getChatMember(chat.id, comet.id.toChatId())) {
                 is OwnerChatMember -> GroupPermission.OWNER
                 is AdministratorChatMember -> GroupPermission.ADMIN
                 else -> GroupPermission.MEMBER
@@ -127,7 +126,7 @@ internal class TelegramGroupImpl(
         ).also { it.broadcast() }
 
         return if (!event.isCancelled) {
-            message.send(comet, chat.id)
+            message.send(comet, MessageSource.MessageSourceType.GROUP, chat.id)
         } else {
             null
         }

@@ -93,7 +93,7 @@ class MiraiComet(
             source as MiraiMessageSource
 
             miraiBot.buildMessageSource(
-                MessageSourceKind.values()[source.kind.ordinal]
+                MessageSourceKind.values()[source.type.ordinal]
             ) {
                 fromId = source.from
                 targetId = source.target

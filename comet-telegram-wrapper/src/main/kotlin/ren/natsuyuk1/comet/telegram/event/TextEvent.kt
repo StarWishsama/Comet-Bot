@@ -17,6 +17,7 @@ import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.event.events.message.GroupMessageEvent
 import ren.natsuyuk1.comet.api.event.events.message.MessageEvent
 import ren.natsuyuk1.comet.api.event.events.message.PrivateMessageEvent
+import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.telegram.contact.toCometAnonymousMember
 import ren.natsuyuk1.comet.telegram.contact.toCometGroup
@@ -66,7 +67,7 @@ suspend fun CommonMessage<MessageContent>.toCometGroupEvent(
                 subject = groupChat.toCometGroup(comet),
                 sender = channelSender,
                 senderName = channelGroupMsg.channel.getDisplayName(),
-                message = content.toMessageWrapper(channelSender.id, groupChat.id.chatId, date.unixMillisLong, messageId, comet, isCommand),
+                message = content.toMessageWrapper(MessageSource.MessageSourceType.GROUP, channelSender.id, groupChat.id.chatId, date.unixMillisLong, messageId, comet, isCommand),
                 time = date.unixMillisLong,
                 messageID = messageId
             )
@@ -78,7 +79,7 @@ suspend fun CommonMessage<MessageContent>.toCometGroupEvent(
                 subject = groupChat.toCometGroup(comet),
                 sender = anonymousSender,
                 senderName = senderChat.title,
-                message = content.toMessageWrapper(anonymousSender.id, groupChat.id.chatId, date.unixMillisLong, messageId, comet, isCommand),
+                message = content.toMessageWrapper(MessageSource.MessageSourceType.GROUP, anonymousSender.id, groupChat.id.chatId, date.unixMillisLong, messageId, comet, isCommand),
                 time = date.unixMillisLong,
                 messageID = messageId
             )
@@ -91,7 +92,7 @@ suspend fun CommonMessage<MessageContent>.toCometGroupEvent(
                 subject = groupChat.toCometGroup(comet),
                 sender = sender,
                 senderName = from!!.getDisplayName(),
-                message = content.toMessageWrapper(sender.id, groupChat.id.chatId, date.unixMillisLong, messageId, comet, isCommand),
+                message = content.toMessageWrapper(MessageSource.MessageSourceType.GROUP, sender.id, groupChat.id.chatId, date.unixMillisLong, messageId, comet, isCommand),
                 time = date.unixMillisLong,
                 messageID = messageId
             )
@@ -111,7 +112,7 @@ suspend fun CommonMessage<MessageContent>.toCometPrivateEvent(
         subject = sender,
         sender = sender,
         senderName = from!!.getDisplayName(),
-        message = content.toMessageWrapper(sender.id, comet.id, date.unixMillisLong, messageId, comet, isCommand),
+        message = content.toMessageWrapper(MessageSource.MessageSourceType.BOT, sender.id, comet.id, date.unixMillisLong, messageId, comet, isCommand),
         time = date.unixMillisLong,
         messageID = messageId
     )

@@ -4,6 +4,7 @@ import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.message.MessageReceipt
+import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.User
@@ -35,7 +36,7 @@ class TelegramUserImpl(
         ).also { it.broadcast() }
 
         return if (!event.isCancelled) {
-            message.send(comet, from.id)
+            message.send(comet, MessageSource.MessageSourceType.BOT, from.id)
         } else null
     }
 }

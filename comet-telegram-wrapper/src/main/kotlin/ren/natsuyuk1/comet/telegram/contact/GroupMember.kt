@@ -22,6 +22,7 @@ import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.message.MessageReceipt
+import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.AnonymousMember
@@ -149,7 +150,7 @@ class TelegramGroupMemberImpl(
         ).also { it.broadcast() }
 
         return if (!event.isCancelled) {
-            message.send(comet, groupChatID.toChatId())
+            message.send(comet, MessageSource.MessageSourceType.GROUP, groupChatID.toChatId())
         } else {
             null
         }
