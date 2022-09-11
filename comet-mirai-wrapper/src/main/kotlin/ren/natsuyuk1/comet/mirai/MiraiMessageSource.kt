@@ -23,3 +23,5 @@ class MiraiMessageSource(
         STRANGER
     }
 }
+
+

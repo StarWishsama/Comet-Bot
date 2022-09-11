@@ -20,6 +20,7 @@ import ren.natsuyuk1.comet.api.event.events.message.PrivateMessageEvent
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.telegram.contact.toCometAnonymousMember
 import ren.natsuyuk1.comet.telegram.contact.toCometGroup
+import ren.natsuyuk1.comet.telegram.contact.toCometGroupMember
 import ren.natsuyuk1.comet.telegram.contact.toCometUser
 import ren.natsuyuk1.comet.telegram.util.getDisplayName
 import ren.natsuyuk1.comet.telegram.util.toMessageWrapper
@@ -59,34 +60,38 @@ suspend fun CommonMessage<MessageContent>.toCometGroupEvent(
 
     return when {
         channelGroupMsg != null -> {
+            val channelSender = channelGroupMsg.channel.toCometAnonymousMember(comet, groupChat.id)
             GroupMessageEvent(
                 comet = comet,
                 subject = groupChat.toCometGroup(comet),
-                sender = channelGroupMsg.channel.toCometAnonymousMember(comet, groupChat.id),
+                sender = channelSender,
                 senderName = channelGroupMsg.channel.getDisplayName(),
-                message = content.toMessageWrapper(comet, isCommand),
+                message = content.toMessageWrapper(channelSender.id, groupChat.id.chatId, date.unixMillisLong, messageId, comet, isCommand),
                 time = date.unixMillisLong,
                 messageID = messageId
             )
         }
         this is AnonymousGroupContentMessage -> {
+            val anonymousSender = senderChat.toCometAnonymousMember(comet)
             GroupMessageEvent(
                 comet = comet,
                 subject = groupChat.toCometGroup(comet),
-                sender = senderChat.toCometAnonymousMember(comet),
+                sender = anonymousSender,
                 senderName = senderChat.title,
-                message = content.toMessageWrapper(comet, isCommand),
+                message = content.toMessageWrapper(anonymousSender.id, groupChat.id.chatId, date.unixMillisLong, messageId, comet, isCommand),
                 time = date.unixMillisLong,
                 messageID = messageId
             )
         }
         else -> {
+            val sender = from!!.toCometGroupMember(comet, groupChat.id)
+
             GroupMessageEvent(
                 comet = comet,
                 subject = groupChat.toCometGroup(comet),
-                sender = from!!.toCometAnonymousMember(comet, groupChat.id),
+                sender = sender,
                 senderName = from!!.getDisplayName(),
-                message = content.toMessageWrapper(comet, isCommand),
+                message = content.toMessageWrapper(sender.id, groupChat.id.chatId, date.unixMillisLong, messageId, comet, isCommand),
                 time = date.unixMillisLong,
                 messageID = messageId
             )
@@ -99,12 +104,14 @@ suspend fun CommonMessage<MessageContent>.toCometPrivateEvent(
     comet: TelegramComet,
     isCommand: Boolean
 ): PrivateMessageEvent {
+    val sender = from!!.toCometUser(comet)
+
     return PrivateMessageEvent(
         comet = comet,
-        subject = from!!.toCometUser(comet),
-        sender = from!!.toCometUser(comet),
+        subject = sender,
+        sender = sender,
         senderName = from!!.getDisplayName(),
-        message = content.toMessageWrapper(comet, isCommand),
+        message = content.toMessageWrapper(sender.id, comet.id, date.unixMillisLong, messageId, comet, isCommand),
         time = date.unixMillisLong,
         messageID = messageId
     )

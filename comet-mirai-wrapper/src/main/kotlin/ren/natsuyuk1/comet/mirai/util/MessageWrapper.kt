@@ -14,6 +14,7 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import ren.natsuyuk1.comet.api.message.*
 import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.consts.cometClient
+import ren.natsuyuk1.comet.mirai.MiraiComet
 import ren.natsuyuk1.comet.mirai.MiraiMessageSource
 import ren.natsuyuk1.comet.utils.file.messageWrapperDirectory
 import ren.natsuyuk1.comet.utils.file.touch
@@ -104,8 +105,9 @@ fun MessageWrapper.toMessageChain(subject: Contact): MessageChain {
     }.build()
 }
 
-fun MessageChain.toMessageWrapper(): MessageWrapper {
-    val wrapper = MessageWrapper()
+fun MessageChain.toMessageWrapper(comet: MiraiComet): MessageWrapper {
+    val wrapper = MessageWrapper(MessageReceipt(comet, source.toMessageSource()))
+
     for (message in this) {
         when (message) {
             is PlainText -> {

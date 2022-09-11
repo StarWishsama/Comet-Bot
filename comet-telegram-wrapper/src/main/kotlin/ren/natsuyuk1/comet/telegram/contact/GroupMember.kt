@@ -156,7 +156,7 @@ class TelegramGroupMemberImpl(
     }
 }
 
-fun User.toCometAnonymousMember(comet: TelegramComet, groupChatID: ChatId): GroupMember =
+fun User.toCometGroupMember(comet: TelegramComet, groupChatID: ChatId): GroupMember =
     TelegramGroupMemberImpl(this, groupChatID.chatId, comet)
 
 internal class TelegramChannelMemberImpl(

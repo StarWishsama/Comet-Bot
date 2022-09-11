@@ -9,10 +9,11 @@
 
 package ren.natsuyuk1.comet.api.message
 
+import kotlinx.serialization.Transient
 import java.util.*
 
-inline fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapper {
-    return MessageWrapper().apply(builder)
+inline fun buildMessageWrapper(receipt: MessageReceipt? = null, builder: MessageWrapper.() -> Unit): MessageWrapper {
+    return MessageWrapper(receipt).apply(builder)
 }
 
 /**
@@ -21,13 +22,16 @@ inline fun buildMessageWrapper(builder: MessageWrapper.() -> Unit): MessageWrapp
 object EmptyMessageWrapper : MessageWrapper()
 
 @kotlinx.serialization.Serializable
-open class MessageWrapper {
+open class MessageWrapper(
+    @Transient
+    val receipt: MessageReceipt? = null
+) {
     private val messageContent = mutableSetOf<WrapperElement>()
 
-    @kotlinx.serialization.Transient
+    @Transient
     private lateinit var lastInsertElement: WrapperElement
 
-    @kotlinx.serialization.Transient
+    @Transient
     private var usable: Boolean = isEmpty()
 
     fun appendText(text: String, newline: Boolean = false): MessageWrapper =

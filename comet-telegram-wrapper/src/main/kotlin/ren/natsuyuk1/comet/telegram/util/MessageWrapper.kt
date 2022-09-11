@@ -58,10 +58,12 @@ suspend fun MessageWrapper.send(comet: TelegramComet, target: ChatId): MessageRe
     ))
 }
 
-suspend fun MessageContent.toMessageWrapper(comet: TelegramComet, isCommand: Boolean): MessageWrapper {
+suspend fun MessageContent.toMessageWrapper(from: Long, to: Long, time: Long, msgID: Long, comet: TelegramComet, containBotAt: Boolean): MessageWrapper {
+    val receipt = MessageReceipt(comet, MessageSource(from, to, time, msgID))
+
     return when (val content = this) {
         is PhotoContent -> {
-            buildMessageWrapper {
+            buildMessageWrapper(receipt) {
                 val photoIDs = mutableSetOf<FileId>()
 
                 content.mediaCollection.forEach { photoIDs.add(it.fileId) }
@@ -90,8 +92,8 @@ suspend fun MessageContent.toMessageWrapper(comet: TelegramComet, isCommand: Boo
         }
 
         is TextContent -> {
-            buildMessageWrapper {
-                if (isCommand) {
+            buildMessageWrapper(receipt) {
+                if (containBotAt) {
                     appendText(content.text.replace(comet.bot.getMe().username.username, ""))
                 } else {
                     appendText(content.text)

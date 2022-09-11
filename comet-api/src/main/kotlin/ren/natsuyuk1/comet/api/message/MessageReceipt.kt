@@ -9,15 +9,15 @@ class MessageReceipt(
     /**
      * 参与此消息的 [Comet] 实例
      */
-    val comet: Comet?,
+    val comet: Comet,
 
     val source: MessageSource
 ) {
     suspend fun delete() {
-        comet!!.deleteMessage(source)
+        comet.deleteMessage(source)
     }
 
-    fun delayDelete(delay: Duration) = comet!!.scope.launch {
+    fun delayDelete(delay: Duration) = comet.scope?.launch {
         delay(delay)
         delete()
     }
