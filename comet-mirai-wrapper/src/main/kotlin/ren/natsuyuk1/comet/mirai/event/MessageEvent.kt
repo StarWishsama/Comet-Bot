@@ -16,7 +16,7 @@ fun GroupMessageEvent.toCometEvent(comet: MiraiComet): ren.natsuyuk1.comet.api.e
         subject = this.subject.toCometGroup(comet),
         sender = this.sender.toGroupMember(comet),
         senderName = this.senderName,
-        message = this.message.toMessageWrapper(),
+        message = this.message.toMessageWrapper(comet),
         time = this.time.toLong(),
         messageID = source.ids.first().toLong()
     )
@@ -28,7 +28,7 @@ fun FriendMessageEvent.toCometEvent(comet: MiraiComet): PrivateMessageEvent {
         this.subject.toCometUser(comet),
         this.sender.toCometUser(comet),
         this.senderName,
-        this.message.toMessageWrapper(),
+        this.message.toMessageWrapper(comet),
         this.time.toLong(),
         messageID = source.ids.first().toLong()
     )
@@ -40,7 +40,7 @@ fun GroupTempMessageEvent.toCometEvent(comet: MiraiComet): PrivateMessageEvent {
         this.subject.toCometUser(comet),
         this.sender.toCometUser(comet),
         this.senderName,
-        this.message.toMessageWrapper(),
+        this.message.toMessageWrapper(comet),
         this.time.toLong(),
         messageID = source.ids.first().toLong()
     )
