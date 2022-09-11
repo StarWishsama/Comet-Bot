@@ -41,6 +41,7 @@ object CometCoreService {
         startAutoSaveService()
         GroupSettingManager.init(scope.coroutineContext)
 
+        /* init external API */
         initSetsuna(scope.coroutineContext)
         initYabapi()
 
