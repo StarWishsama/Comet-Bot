@@ -8,6 +8,7 @@ import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaClient
 import ren.natsuyuk1.comet.test.isCI
 import ren.natsuyuk1.comet.test.print
 import ren.natsuyuk1.comet.utils.brotli4j.BrotliLoader
+import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TestArcaeaAPI {
@@ -29,6 +30,15 @@ class TestArcaeaAPI {
 
         runBlocking {
             ArcaeaClient.queryUserInfo(userID)?.getMessageWrapper()?.print()
+        }
+    }
+
+    @Test
+    fun testB30() {
+        if (isCI()) return
+
+        runBlocking {
+            ArcaeaClient.queryUserB30(userID, UUID.randomUUID()).print()
         }
     }
 }

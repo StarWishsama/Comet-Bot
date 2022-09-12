@@ -11,17 +11,25 @@ import kotlinx.serialization.json.jsonPrimitive
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaCommand
+import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaSongInfo
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.Command
 import ren.natsuyuk1.comet.utils.brotli4j.BrotliDecompressor
+import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import ren.natsuyuk1.comet.utils.string.StringUtil.toFriendly
+import ren.natsuyuk1.comet.utils.time.Timer
+import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
 object ArcaeaClient {
+    private val scope = ModuleScope("arcaea_client")
     private const val arcaeaAPIHost = "arc.estertion.win"
     private const val arcaeaAPIPort = 616
 
     private val songInfo = mutableMapOf<String, String>()
+
+    private val queryingUser = mutableSetOf<UUID>()
 
     suspend fun fetchConstants() {
         val cmd = "constants"
@@ -141,6 +149,76 @@ object ArcaeaClient {
         }
 
         return resp
+    }
+
+    fun isUserQuerying(uuid: UUID) = queryingUser.contains(uuid)
+
+    suspend fun queryUserB30(userID: String, uuid: UUID): List<ArcaeaSongInfo> {
+        if (!BrotliDecompressor.isUsable()) {
+            return emptyList()
+        }
+
+        queryingUser.add(uuid)
+
+        val result = mutableListOf<ArcaeaSongInfo>()
+
+        val client = HttpClient {
+            install(WebSockets)
+        }
+
+        val timer = Timer()
+
+        client.wss(host = arcaeaAPIHost, port = arcaeaAPIPort) {
+            send(userID)
+
+            try {
+                while (client.isActive) {
+                    when (val msg = incoming.receive()) {
+                        is Frame.Text -> {
+                            val text = msg.readText()
+
+                            if (text == "bye") {
+                                logger.debug { "Query end, good bye!" }
+                                client.close()
+                            } else {
+                                logger.debug { "Arcaea client received: $text" }
+                            }
+                        }
+
+                        is Frame.Binary -> {
+                            val incomingJson = String(BrotliDecompressor.decompress(msg.readBytes()))
+                            val command: Command = json.decodeFromString(incomingJson)
+
+                            logger.debug { "Received command: $command" }
+                            logger.debug { "Received json: $incomingJson" }
+
+                            when (command.command) {
+                                ArcaeaCommand.SCORES -> {
+                                    val playResult: ArcaeaSongInfo = json.decodeFromString(incomingJson)
+                                    logger.debug { "Receive scores $userID >> $playResult" }
+                                    result.add(playResult)
+                                }
+
+                                else -> { /* ignore */ }
+                            }
+                        }
+
+                        is Frame.Close -> {
+                            client.close()
+                            break
+                        }
+
+                        else -> { /* ignore */ }
+                    }
+                }
+            } catch (e: ClosedReceiveChannelException) {
+                logger.debug { "Arcaea client closed by accident" }
+            }
+        }
+
+        logger.debug { "Accumulated ${result.size} play results, costs ${timer.measureDuration().toFriendly()}" }
+
+        return result.sortedByDescending { it.songResult.first().rating }.take(30).also { queryingUser.remove(uuid) }
     }
 
     fun getSongNameByID(id: String): String = songInfo[id] ?: id

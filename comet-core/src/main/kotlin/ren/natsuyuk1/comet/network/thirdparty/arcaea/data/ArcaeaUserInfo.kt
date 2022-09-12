@@ -24,7 +24,7 @@ data class ArcaeaUserInfo(
         @SerialName("name")
         val name: String,
         @SerialName("recent_score")
-        val recentPlayScore: List<ArcaeaPlayResult>?,
+        val recentPlayScore: List<ArcaeaSongInfo.ArcaeaSongResult>?,
         @SerialName("character")
         val character: Int,
         @SerialName("join_date")
@@ -35,29 +35,7 @@ data class ArcaeaUserInfo(
         val userCode: String,
         @SerialName("rating_records")
         val ratingRecord: JsonArray
-    ) {
-        @Serializable
-        data class ArcaeaPlayResult(
-            @SerialName("song_id")
-            val songID: String,
-            val difficulty: Int,
-            val score: Int,
-            @SerialName("shiny_perfect_count")
-            val shinyPure: Int,
-            @SerialName("perfect_count")
-            val pure: Int,
-            @SerialName("near_count")
-            val far: Int,
-            @SerialName("miss_count")
-            val miss: Int,
-            @SerialName("clear_type")
-            val clearType: Int,
-            @SerialName("rating")
-            val rating: Double,
-            @SerialName("constant")
-            val constant: String,
-        )
-    }
+    )
 
     fun getMessageWrapper(): MessageWrapper = buildMessageWrapper {
         appendText("${data.name} | ${data.userCode}", true)
@@ -78,39 +56,6 @@ data class ArcaeaUserInfo(
             appendText("距上次游玩 ptt 已变化 ${((data.rating - lastPtt) / 100.0).fixDisplay()}")
         }
     }
-
-    private fun Int.formatType(): String =
-        when (this) {
-            // 4 简单型角色, 5 困难型角色
-            0 -> "FAILED"
-            1 -> "Clear"
-            4 -> "Easy Clear"
-            5 -> "Hard Clear"
-            2 -> "Full Recall"
-            3 -> "Pure Memory"
-            else -> "UNKNOWN ($this)"
-        }
-
-    private fun Int.formatDifficulty(): String =
-        when (this) {
-            1 -> "PST"
-            2 -> "PRS"
-            3 -> "FTR"
-            4 -> "BYD"
-            else -> "Unknown ($this)"
-        }
-
-    private fun Int.formatScore(): String =
-        when {
-            this in 8600000..8899999 -> "C"
-            this in 8900000..9199999 -> "B"
-            this in 9200000..9499999 -> "A"
-            this in 9500000..9799999 -> "AA"
-            this in 9800000..9899999 -> "EX"
-            this >= 9900000 -> "EX+"
-            this in 0..8599999 -> "D"
-            else -> "UNKNOWN"
-        }
 
 
     fun getActualPtt(): String = (data.rating / 100.0).fixDisplay()

@@ -7,6 +7,7 @@ import ren.natsuyuk1.comet.api.command.*
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.ArcaeaService
+import ren.natsuyuk1.comet.objects.arcaea.ArcaeaUserData
 import ren.natsuyuk1.comet.util.toMessageWrapper
 
 val ARCAEA by lazy {
@@ -39,7 +40,11 @@ class ArcaeaCommand(
 
     override suspend fun run() {
         if (currentContext.invokedSubcommand == null) {
-            subject.sendMessage(ARCAEA.helpText.toMessageWrapper())
+            if (ArcaeaUserData.isBound(user.id.value)) {
+                ArcaeaService.queryUserInfo(comet, subject, user)
+            } else {
+                subject.sendMessage(ARCAEA.helpText.toMessageWrapper())
+            }
         }
     }
 
@@ -95,16 +100,38 @@ class ArcaeaCommand(
         }
 
         override suspend fun run() {
-            subject.sendMessage("🔍 正在获取 Arcaea 信息, 请坐和放宽...".toMessageWrapper())
             if (userID == null) {
+                subject.sendMessage("🔍 正在获取 Arcaea 信息, 请坐和放宽...".toMessageWrapper())
                 ArcaeaService.queryUserInfo(comet, subject, user)
             } else {
                 if (userID!!.length > 9) {
                     subject.sendMessage("请正确填写 Arcaea 账号 ID! 例如 /arc info -i 123456789".toMessageWrapper())
                     return
                 }
+
+                subject.sendMessage("🔍 正在获取 Arcaea 信息, 请坐和放宽...".toMessageWrapper())
                 ArcaeaService.querySpecificUserInfo(comet, subject, userID!!)
             }
+        }
+    }
+
+    class Best30(
+        val comet: Comet,
+        override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
+        override val user: CometUser
+    ) : CometSubCommand(subject, sender, user, BEST30) {
+
+        companion object {
+            val BEST30 = SubCommandProperty(
+                "best30",
+                listOf("b30"),
+                ARCAEA
+            )
+        }
+
+        override suspend fun run() {
+           TODO()
         }
     }
 }
