@@ -43,7 +43,7 @@ internal class MiraiGroupImpl(
     override fun getBotMuteRemaining(): Int = group.botMuteRemaining
 
     override fun getBotPermission(): GroupPermission {
-        return GroupPermission.valueOf(group.botPermission.name)
+        return GroupPermission.values()[group.botPermission.ordinal]
     }
 
     override val avatarUrl: String = group.avatarUrl
