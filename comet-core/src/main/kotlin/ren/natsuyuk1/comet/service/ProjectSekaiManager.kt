@@ -317,7 +317,7 @@ object ProjectSekaiManager {
 
         val image = surface.makeImageSnapshot()
 
-        val tmpFile = File(cacheDirectory, "${System.currentTimeMillis()}.png").apply {
+        val tmpFile = File(cacheDirectory, "${System.currentTimeMillis()}-pjsk.png").apply {
             TaskManager.registerTaskDelayed(1.hours) {
                 delete()
             }

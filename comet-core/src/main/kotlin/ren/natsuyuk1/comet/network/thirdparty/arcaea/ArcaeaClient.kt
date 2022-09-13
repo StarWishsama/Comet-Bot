@@ -10,6 +10,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.consts.json
+import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaHelper.songInfo
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaCommand
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaSongInfo
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaUserInfo
@@ -26,8 +27,6 @@ object ArcaeaClient {
     private val scope = ModuleScope("arcaea_client")
     private const val arcaeaAPIHost = "arc.estertion.win"
     private const val arcaeaAPIPort = 616
-
-    private val songInfo = mutableMapOf<String, String>()
 
     private val queryingUser = mutableSetOf<UUID>()
 
@@ -153,14 +152,17 @@ object ArcaeaClient {
 
     fun isUserQuerying(uuid: UUID) = queryingUser.contains(uuid)
 
-    suspend fun queryUserB30(userID: String, uuid: UUID): List<ArcaeaSongInfo> {
+    fun getQueryUserCount() = queryingUser.size
+
+    suspend fun queryUserB30(userID: String, uuid: UUID): Pair<ArcaeaUserInfo?, List<ArcaeaSongInfo>> {
         if (!BrotliDecompressor.isUsable()) {
-            return emptyList()
+            return Pair(null, emptyList())
         }
 
         queryingUser.add(uuid)
 
-        val result = mutableListOf<ArcaeaSongInfo>()
+        val songResults = mutableListOf<ArcaeaSongInfo>()
+        var userInfo: ArcaeaUserInfo? = null
 
         val client = HttpClient {
             install(WebSockets)
@@ -193,10 +195,15 @@ object ArcaeaClient {
                             logger.debug { "Received json: $incomingJson" }
 
                             when (command.command) {
+                                ArcaeaCommand.USER_INFO -> {
+                                    userInfo = json.decodeFromString(incomingJson)
+                                    logger.debug { "Receive user info $userID >> $userID" }
+                                }
+
                                 ArcaeaCommand.SCORES -> {
                                     val playResult: ArcaeaSongInfo = json.decodeFromString(incomingJson)
                                     logger.debug { "Receive scores $userID >> $playResult" }
-                                    result.add(playResult)
+                                    songResults.add(playResult)
                                 }
 
                                 else -> { /* ignore */ }
@@ -216,10 +223,12 @@ object ArcaeaClient {
             }
         }
 
-        logger.debug { "Accumulated ${result.size} play results, costs ${timer.measureDuration().toFriendly()}" }
+        if (userInfo == null) {
+            return Pair(null, emptyList())
+        }
 
-        return result.sortedByDescending { it.songResult.first().rating }.take(30).also { queryingUser.remove(uuid) }
+        logger.debug { "Accumulated ${songResults.size} play results, costs ${timer.measureDuration().toFriendly()}" }
+
+        return Pair(userInfo!!, songResults.sortedByDescending { it.songResult.first().rating }.take(30).also { queryingUser.remove(uuid) })
     }
-
-    fun getSongNameByID(id: String): String = songInfo[id] ?: id
 }

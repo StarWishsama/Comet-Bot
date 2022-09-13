@@ -34,7 +34,8 @@ class ArcaeaCommand(
     init {
         subcommands(
             Bind(subject, sender, user),
-            Info(comet, subject, sender, user)
+            Info(comet, subject, sender, user),
+            Best30(comet, subject, sender, user)
         )
     }
 
@@ -131,7 +132,7 @@ class ArcaeaCommand(
         }
 
         override suspend fun run() {
-           TODO()
+           ArcaeaService.queryB30(comet, subject, user)
         }
     }
 }

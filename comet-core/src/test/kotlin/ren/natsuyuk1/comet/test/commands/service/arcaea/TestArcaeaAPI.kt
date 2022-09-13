@@ -5,9 +5,11 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaClient
+import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaHelper
 import ren.natsuyuk1.comet.test.isCI
 import ren.natsuyuk1.comet.test.print
 import ren.natsuyuk1.comet.utils.brotli4j.BrotliLoader
+import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -20,6 +22,7 @@ class TestArcaeaAPI {
 
         runBlocking {
             BrotliLoader.loadBrotli()
+            SkikoHelper.findSkikoLibrary()
             ArcaeaClient.fetchConstants()
         }
     }
@@ -38,7 +41,10 @@ class TestArcaeaAPI {
         if (isCI()) return
 
         runBlocking {
-            ArcaeaClient.queryUserB30(userID, UUID.randomUUID()).print()
+            val (info, result) = ArcaeaClient.queryUserB30(userID, UUID.randomUUID())
+            if (info != null) {
+                ArcaeaHelper.drawB30(info, result).print()
+            }
         }
     }
 }

@@ -7,7 +7,10 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
-import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaClient
+import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaHelper
+import ren.natsuyuk1.comet.network.thirdparty.arcaea.formatDifficulty
+import ren.natsuyuk1.comet.network.thirdparty.arcaea.formatScore
+import ren.natsuyuk1.comet.network.thirdparty.arcaea.formatType
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 
 @Serializable
@@ -45,7 +48,7 @@ data class ArcaeaUserInfo(
             appendLine()
             val lastPlay = data.recentPlayScore.first()
             appendText("最近游玩 >>", true)
-            appendText("${ArcaeaClient.getSongNameByID(lastPlay.songID)} (${lastPlay.difficulty.formatDifficulty()})", true)
+            appendText("${ArcaeaHelper.getSongNameByID(lastPlay.songID)} (${lastPlay.difficulty.formatDifficulty()})", true)
             appendText("${lastPlay.score} [${lastPlay.score.formatScore()} | ${lastPlay.constant}] | ${lastPlay.clearType.formatType()}")
             appendLine()
         }

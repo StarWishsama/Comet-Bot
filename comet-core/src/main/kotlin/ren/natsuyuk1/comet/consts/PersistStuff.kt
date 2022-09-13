@@ -107,7 +107,7 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         },
         CommandNode(
             ARCAEA,
-            listOf(ArcaeaCommand.Bind.BIND, ArcaeaCommand.Info.INFO)
+            listOf(ArcaeaCommand.Bind.BIND, ArcaeaCommand.Info.INFO, ArcaeaCommand.Best30.BEST30)
         ) { comet, sender, subject, wrapper, user ->
             ArcaeaCommand(comet, sender, subject, wrapper, user)
         },

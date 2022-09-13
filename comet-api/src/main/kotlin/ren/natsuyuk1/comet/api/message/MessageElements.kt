@@ -10,6 +10,8 @@
 package ren.natsuyuk1.comet.api.message
 
 import kotlinx.serialization.Serializable
+import ren.natsuyuk1.comet.api.command.PlatformCommandSender
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.utils.file.absPath
 import java.io.File
 
@@ -77,6 +79,13 @@ data class AtElement(
 ) : WrapperElement() {
     override fun parseToString(): String = "@$target"
 }
+
+fun PlatformCommandSender.at(): AtElement =
+    when (platform) {
+        LoginPlatform.MIRAI -> AtElement(id)
+        LoginPlatform.TELEGRAM -> AtElement(userName = name)
+        else -> AtElement()
+    }
 
 /**
  * [XmlElement]

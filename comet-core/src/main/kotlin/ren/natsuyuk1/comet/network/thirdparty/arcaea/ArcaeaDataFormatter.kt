@@ -1,4 +1,4 @@
-package ren.natsuyuk1.comet.network.thirdparty.arcaea.data
+package ren.natsuyuk1.comet.network.thirdparty.arcaea
 
 internal fun Int.formatType(): String =
     when (this) {
@@ -9,7 +9,7 @@ internal fun Int.formatType(): String =
         5 -> "Hard Clear"
         2 -> "Full Recall"
         3 -> "Pure Memory"
-        else -> "UNKNOWN ($this)"
+        else -> "不存在捏 ($this)"
     }
 
 internal fun Int.formatDifficulty(): String =
@@ -18,7 +18,7 @@ internal fun Int.formatDifficulty(): String =
         2 -> "PRS"
         3 -> "FTR"
         4 -> "BYD"
-        else -> "Unknown ($this)"
+        else -> "不存在捏 ($this)"
     }
 
 internal fun Int.formatScore(): String =
@@ -30,5 +30,5 @@ internal fun Int.formatScore(): String =
         this in 9800000..9899999 -> "EX"
         this >= 9900000 -> "EX+"
         this in 0..8599999 -> "D"
-        else -> "UNKNOWN"
+        else -> "不存在捏"
     }
