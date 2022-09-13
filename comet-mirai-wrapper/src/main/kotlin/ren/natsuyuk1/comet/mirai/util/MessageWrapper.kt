@@ -158,5 +158,6 @@ internal fun MessageSource.toMessageSource(): MiraiMessageSource =
         internalIds,
         time,
         fromId,
-        targetId
+        targetId,
+        originalMessage.serializeToMiraiCode()
     )

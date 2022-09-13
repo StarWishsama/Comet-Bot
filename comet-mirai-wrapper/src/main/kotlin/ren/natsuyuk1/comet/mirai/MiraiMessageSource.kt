@@ -15,6 +15,7 @@ class MiraiMessageSource(
     time: Int,
     from: Long,
     target: Long,
+    val originMessage: String,
 ): MessageSource(type, from, target, time.toLong(), (ids.firstOrNull() ?: -1).toLong())
 
 

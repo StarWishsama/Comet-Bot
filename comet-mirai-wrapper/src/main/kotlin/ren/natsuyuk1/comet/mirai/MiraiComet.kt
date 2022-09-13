@@ -4,6 +4,7 @@ import mu.KotlinLogging.logger
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.contact.PermissionDeniedException
+import net.mamoe.mirai.message.code.MiraiCode
 import net.mamoe.mirai.message.data.MessageSource.Key.recall
 import net.mamoe.mirai.message.data.MessageSourceKind
 import net.mamoe.mirai.message.data.buildMessageSource
@@ -100,6 +101,10 @@ class MiraiComet(
                 ids = source.ids
                 internalIds = source.internalIds
                 time = source.time.toInt()
+
+                MiraiCode.deserializeMiraiCode(source.originMessage).forEach {
+                    messages(it)
+                }
             }.recall()
 
             true
