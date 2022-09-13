@@ -35,7 +35,7 @@ object ArcaeaHelper {
 
             val overallRating = b30.sumOf { it.songResult.first().rating }
 
-            addText("总 Rating >> $overallRating\n")
+            addText("总 Rating >> ${overallRating.fixDisplay()}\n")
 
             popStyle().pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 15f))
 
@@ -44,7 +44,7 @@ object ArcaeaHelper {
             b30.forEach { sr ->
                 val mr = sr.songResult.first()
 
-                addText("${getSongNameByID(mr.songID)} [${mr.difficulty.formatDifficulty()} ${mr.constant}]" +
+                addText("${getSongNameByID(mr.songID)} [${mr.difficulty.formatDifficulty()} ${mr.constant}] " +
                     "${mr.score} ${mr.score.formatScore()} ${mr.clearType.formatType()} | Rating ${mr.rating.fixDisplay()}\n")
             }
 
