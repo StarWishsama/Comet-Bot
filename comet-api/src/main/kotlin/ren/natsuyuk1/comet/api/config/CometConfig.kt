@@ -52,6 +52,9 @@ object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
 
         @Comment("哔哩哔哩 Cookie, 用于用户搜索等需要 Cookie 的 API")
         val biliCookie: String = "",
+
+        @Comment("Apex Legends API Token, 用于搜索 Apex 玩家信息")
+        val apexLegendToken: String = "",
     )
 }
 
