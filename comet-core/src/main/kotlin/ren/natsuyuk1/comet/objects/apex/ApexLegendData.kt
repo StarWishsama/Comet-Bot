@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
-object ApexLegendDataTable : IdTable<UUID>("arcaea_user_data") {
+object ApexLegendDataTable : IdTable<UUID>("apex_user_data") {
     override val id: Column<EntityID<UUID>> = ApexLegendDataTable.uuid("user").entityId()
     override val primaryKey = PrimaryKey(id)
 
