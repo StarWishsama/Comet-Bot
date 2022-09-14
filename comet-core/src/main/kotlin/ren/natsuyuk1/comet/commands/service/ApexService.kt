@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.commands.service
 
+import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.consts.cometClient
@@ -11,7 +12,13 @@ import ren.natsuyuk1.comet.objects.apex.ApexLegendData
 import ren.natsuyuk1.comet.util.toMessageWrapper
 
 object ApexService {
+    private fun isUsable() = CometGlobalConfig.data.apexLegendToken.isNotEmpty()
+
     suspend fun bindAccount(user: CometUser, username: String): MessageWrapper {
+        if (!isUsable()) {
+            return "Comet 未注册 Apex Legends API, 无法查询".toMessageWrapper()
+        }
+
         if (ApexLegendData.isBound(user.id.value)) {
             return "你已经绑定过账号了捏".toMessageWrapper()
         } else {
@@ -27,6 +34,10 @@ object ApexService {
     }
 
     suspend fun queryUserInfo(user: CometUser, username: String = ""): MessageWrapper {
+        if (!isUsable()) {
+            return "Comet 未注册 Apex Legends API, 无法查询".toMessageWrapper()
+        }
+
         if (username.isBlank()) {
             if (ApexLegendData.isBound(user.id.value)) {
                 val data = ApexLegendData.getUserApexData(user.id.value) ?: return "你还没有绑定过账号".toMessageWrapper()
