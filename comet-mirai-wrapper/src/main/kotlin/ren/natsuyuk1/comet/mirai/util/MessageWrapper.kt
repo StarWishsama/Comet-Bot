@@ -152,12 +152,9 @@ fun MessageChain.toMessageWrapper(comet: MiraiComet): MessageWrapper {
 
 internal fun MessageSource.toMessageSource(): MiraiMessageSource =
     MiraiMessageSource(
+        this,
         ren.natsuyuk1.comet.api.message.MessageSource.MessageSourceType.values()[kind.ordinal],
-        botId,
-        ids,
-        internalIds,
         time,
         fromId,
-        targetId,
-        originalMessage.serializeToMiraiCode()
+        targetId
     )

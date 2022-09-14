@@ -8,14 +8,11 @@ import ren.natsuyuk1.comet.api.message.MessageSource
  * **Mirai 侧独占** 消息元素.
  */
 class MiraiMessageSource(
+    val miraiSource: net.mamoe.mirai.message.data.MessageSource,
     type: MessageSourceType,
-    val botID: Long,
-    val ids: IntArray,
-    val internalIds: IntArray,
     time: Int,
     from: Long,
     target: Long,
-    val originMessage: String,
-): MessageSource(type, from, target, time.toLong(), (ids.firstOrNull() ?: -1).toLong())
+): MessageSource(type, from, target, time.toLong(), (miraiSource.ids.firstOrNull() ?: -1).toLong())
 
 
