@@ -3,15 +3,19 @@ package ren.natsuyuk1.comet.mirai
 import mu.KotlinLogging.logger
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
+import net.mamoe.mirai.LowLevelApi
+import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.contact.PermissionDeniedException
 import net.mamoe.mirai.message.code.MiraiCode
 import net.mamoe.mirai.message.data.MessageSource.Key.recall
 import net.mamoe.mirai.message.data.MessageSourceKind
 import net.mamoe.mirai.message.data.buildMessageSource
 import net.mamoe.mirai.utils.BotConfiguration
+import net.mamoe.mirai.utils.MiraiExperimentalApi
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.listener.registerListeners
@@ -89,23 +93,31 @@ class MiraiComet(
     }
 
     override suspend fun getGroup(id: Long): Group? = cl.runWith { miraiBot.getGroup(id)?.toCometGroup(this) }
-    override suspend fun deleteMessage(source: ren.natsuyuk1.comet.api.message.MessageSource): Boolean {
+    @OptIn(LowLevelApi::class, MiraiExperimentalApi::class)
+    override suspend fun deleteMessage(source: MessageSource): Boolean {
         return runCatching<Boolean> {
             source as MiraiMessageSource
 
-            miraiBot.buildMessageSource(
-                MessageSourceKind.values()[source.type.ordinal]
-            ) {
-                fromId = source.from
-                targetId = source.target
-                ids = source.ids
-                internalIds = source.internalIds
-                time = source.time.toInt()
+            when (source.type) {
+                MessageSource.MessageSourceType.GROUP -> Mirai.recallGroupMessageRaw(this.miraiBot, source.target, source.ids, source.internalIds)
+                MessageSource.MessageSourceType.FRIEND -> Mirai.recallFriendMessageRaw(this.miraiBot, source.target, source.ids, source.internalIds, source.time.toInt())
+                else -> {
+                    miraiBot.buildMessageSource(
+                        MessageSourceKind.values()[source.type.ordinal]
+                    ) {
+                        fromId = source.from
+                        targetId = source.target
+                        ids = source.ids
+                        internalIds = source.internalIds
+                        time = source.time.toInt()
 
-                MiraiCode.deserializeMiraiCode(source.originMessage).forEach {
-                    messages(it)
+                        // unsafe
+                        MiraiCode.deserializeMiraiCode(source.originMessage).forEach {
+                            messages(it)
+                        }
+                    }.recall()
                 }
-            }.recall()
+            }
 
             true
         }.onFailure {
