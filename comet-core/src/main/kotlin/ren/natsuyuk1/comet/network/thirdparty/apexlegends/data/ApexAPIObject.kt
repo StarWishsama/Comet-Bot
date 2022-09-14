@@ -2,12 +2,14 @@ package ren.natsuyuk1.comet.network.thirdparty.apexlegends.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.asURLImage
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 
 @Serializable
 data class ApexPlayerInfo(
+    val error: JsonElement? = null,
     val global: ApexPlayerGlobalInfo
 ) {
     @Serializable
@@ -59,3 +61,10 @@ fun ApexPlayerInfo.toMessageWrapper(): MessageWrapper = buildMessageWrapper {
         appendElement(global.rank.rankImg.asURLImage())
     }
 }
+
+@Serializable
+data class ApexIDInfo(
+    val error: JsonElement? = null,
+    val name: String,
+    val uid: String
+)

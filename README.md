@@ -33,6 +33,8 @@ Demo/交流群：725656262
 - Arcaea
   - 查询自己的 ptt 及近期游玩信息
   - 查询 Best 30 曲目
+- Apex Legends
+  -  查询玩家信息
 
 ## ☑ To-Do 列表
 

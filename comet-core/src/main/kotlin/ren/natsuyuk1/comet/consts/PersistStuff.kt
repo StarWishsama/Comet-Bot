@@ -9,6 +9,7 @@ import ren.natsuyuk1.comet.api.event.EventManagerConfig
 import ren.natsuyuk1.comet.api.user.UserPermissionTable
 import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.commands.*
+import ren.natsuyuk1.comet.objects.apex.ApexLegendDataTable
 import ren.natsuyuk1.comet.objects.arcaea.ArcaeaUserDataTable
 import ren.natsuyuk1.comet.objects.config.CometServerConfig
 import ren.natsuyuk1.comet.objects.config.TwitterConfig
@@ -39,6 +40,7 @@ val cometTables =
         NowCmdConfigTable,
         ArcaeaUserDataTable,
         CometPusherContextTable,
+        ApexLegendDataTable,
     )
 
 val defaultCommands: List<AbstractCommandNode<*>> =
@@ -127,5 +129,11 @@ val defaultCommands: List<AbstractCommandNode<*>> =
             listOf(RSSCommand.Subscribe.SUBSCRIBE, RSSCommand.UnSubscribe.UNSUBSCRIBE, RSSCommand.List.LIST)
         ) { comet, sender, subject, wrapper, user ->
             RSSCommand(comet, sender, subject, wrapper, user)
+        },
+        CommandNode(
+            APEX,
+            listOf(ApexCommand.Bind.BIND, ApexCommand.Info.INFO)
+        ) { comet, sender, subject, wrapper, user ->
+            ApexCommand(comet, sender, subject, wrapper, user)
         },
     )
