@@ -13,7 +13,7 @@ object ApexLegendDataTable : IdTable<UUID>("arcaea_user_data") {
     override val id: Column<EntityID<UUID>> = ApexLegendDataTable.uuid("user").entityId()
     override val primaryKey = PrimaryKey(id)
 
-    val userID = ren.natsuyuk1.comet.objects.arcaea.ArcaeaUserDataTable.varchar("user_id", 9)
+    val userID = varchar("user_id", 9)
 }
 
 class ApexLegendData(id: EntityID<UUID>) : UUIDEntity(id) {
