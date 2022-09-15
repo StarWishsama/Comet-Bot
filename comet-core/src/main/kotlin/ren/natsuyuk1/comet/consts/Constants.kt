@@ -14,6 +14,7 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.cookies.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
@@ -46,6 +47,8 @@ val defaultClient = HttpClient(CIO) {
     install(HttpTimeout) {
         requestTimeoutMillis = 10.seconds.inWholeMilliseconds
     }
+
+    install(HttpCookies)
 }
 
 val cometClient: CometClient = CometClient()

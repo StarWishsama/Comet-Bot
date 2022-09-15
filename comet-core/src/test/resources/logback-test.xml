@@ -11,7 +11,7 @@
         <appender-ref ref="STDOUT"/>
     </root>
     <!--Sub-loggers, the name is NOT same as package path-->
-    <logger name="Exposed" level="TRACE"/>
-    <logger name="ktor" level="TRACE"/>
+    <logger name="Exposed" level="DEBUG"/>
+    <logger name="ktor" level="DEBUG"/>
     <logger name="com.zaxxer.hikari" level="DEBUG"/>
 </configuration>
