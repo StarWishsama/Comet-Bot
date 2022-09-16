@@ -62,7 +62,7 @@ object ArcaeaService {
         }
     }
 
-    fun queryB30(comet: Comet, subject: PlatformCommandSender, user: CometUser) = comet.scope.launch {
+    fun queryB30(comet: Comet, subject: PlatformCommandSender, sender: PlatformCommandSender, user: CometUser) = comet.scope.launch {
         if (!ArcaeaUserData.isBound(user.id.value)) {
             subject.sendMessage("❓ 你还没有绑定过 Arcaea 账号, 记得先绑定哦~".toMessageWrapper())
             return@launch
@@ -92,7 +92,7 @@ object ArcaeaService {
         val b30Image = ArcaeaHelper.drawB38(userInfo, b30)
 
         subject.sendMessage(buildMessageWrapper {
-            appendElement(subject.at())
+            appendElement(sender.at())
             appendElement(b30Image.asImage())
         })
     }
