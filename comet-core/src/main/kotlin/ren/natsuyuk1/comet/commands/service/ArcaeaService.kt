@@ -80,7 +80,7 @@ object ArcaeaService {
 
         subject.sendMessage("🔍 正在查询中, 通常会在三分钟内完成...".toMessageWrapper())
 
-        val (userInfo, b30) = ArcaeaClient.queryUserB30(data.userID, user.id.value)
+        val (userInfo, b30) = ArcaeaClient.queryUserB38(data.userID, user.id.value)
 
         if (userInfo == null) {
             subject.sendMessage(buildMessageWrapper {

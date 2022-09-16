@@ -41,7 +41,7 @@ class TestArcaeaAPI {
         if (isCI()) return
 
         runBlocking {
-            val (info, result) = ArcaeaClient.queryUserB30(userID, UUID.randomUUID())
+            val (info, result) = ArcaeaClient.queryUserB38(userID, UUID.randomUUID())
             if (info != null) {
                 ArcaeaHelper.drawB38(info, result).print()
             }

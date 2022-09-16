@@ -154,7 +154,7 @@ object ArcaeaClient {
 
     fun getQueryUserCount() = queryingUser.size
 
-    suspend fun queryUserB30(userID: String, uuid: UUID): Pair<ArcaeaUserInfo?, List<ArcaeaSongInfo>> {
+    suspend fun queryUserB38(userID: String, uuid: UUID): Pair<ArcaeaUserInfo?, List<ArcaeaSongInfo>> {
         if (!BrotliDecompressor.isUsable()) {
             return Pair(null, emptyList())
         }
@@ -229,6 +229,6 @@ object ArcaeaClient {
 
         logger.debug { "Accumulated ${songResults.size} play results, costs ${timer.measureDuration().toFriendly()}" }
 
-        return Pair(userInfo!!, songResults.sortedByDescending { it.songResult.first().rating }.take(30).also { queryingUser.remove(uuid) })
+        return Pair(userInfo!!, songResults.sortedByDescending { it.songResult.first().rating }.take(38).also { queryingUser.remove(uuid) })
     }
 }

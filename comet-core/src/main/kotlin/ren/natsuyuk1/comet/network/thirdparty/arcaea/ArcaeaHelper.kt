@@ -23,10 +23,7 @@ object ArcaeaHelper {
 
     internal fun getSongNameByID(id: String): String = songInfo[id] ?: id
 
-    /**
-     * TODO: best 38
-     */
-    internal fun drawB38(user: ArcaeaUserInfo, b30: List<ArcaeaSongInfo>): File {
+    internal fun drawB38(user: ArcaeaUserInfo, b38: List<ArcaeaSongInfo>): File {
         val paragraph = ParagraphBuilder(
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
@@ -36,7 +33,7 @@ object ArcaeaHelper {
         ).apply {
             addText("${user.data.name} - ${user.data.userID} - BEST 30\n")
 
-            val overallRating = b30.sumOf { it.songResult.first().rating } / b30.size.toDouble()
+            val overallRating = b38.sumOf { it.songResult.first().rating } / b38.size.toDouble()
 
             addText("平均 Rating >> ${overallRating.fixDisplay()}\n")
 
@@ -44,11 +41,22 @@ object ArcaeaHelper {
 
             addText("\n")
 
-            b30.forEach { sr ->
+            b38.take(30).forEach { sr ->
                 val mr = sr.songResult.first()
 
                 addText("${getSongNameByID(mr.songID)} [${mr.difficulty.formatDifficulty()} ${mr.constant}] " +
                     "${mr.score} ${mr.score.formatScore()} ${mr.clearType.formatType()} | Rating ${mr.rating.fixDisplay()}\n")
+            }
+
+            if (b38.size > 30) {
+                addText("\n")
+                addText("Overflow")
+
+                b38.drop(30).forEach { sr ->
+                    val mr = sr.songResult.first()
+                    addText("${getSongNameByID(mr.songID)} [${mr.difficulty.formatDifficulty()} ${mr.constant}] " +
+                        "${mr.score} ${mr.score.formatScore()} ${mr.clearType.formatType()} | Rating ${mr.rating.fixDisplay()}\n")
+                }
             }
 
             addText("\n")
