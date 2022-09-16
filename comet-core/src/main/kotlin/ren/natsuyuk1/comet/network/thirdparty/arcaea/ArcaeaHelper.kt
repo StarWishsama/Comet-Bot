@@ -47,7 +47,7 @@ object ArcaeaHelper {
 
             if (b38.size > 30) {
                 addText("\n")
-                addText("Overflow")
+                addText("Overflow\n")
 
                 b38.drop(30).forEach { sr ->
                     addText("${sr.encodeToString()}\n")
