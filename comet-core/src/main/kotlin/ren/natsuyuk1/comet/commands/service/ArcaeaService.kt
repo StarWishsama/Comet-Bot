@@ -78,6 +78,11 @@ object ArcaeaService {
             return@launch
         }
 
+        if (ArcaeaClient.isUserQuerying(user.id.value)) {
+            subject.sendMessage("🏃再稍等一下, 结果马上出来~".toMessageWrapper())
+            return@launch
+        }
+
         subject.sendMessage("🔍 正在查询中, 通常会在三分钟内完成...".toMessageWrapper())
 
         val (userInfo, b30) = ArcaeaClient.queryUserB38(data.userID, user.id.value)
