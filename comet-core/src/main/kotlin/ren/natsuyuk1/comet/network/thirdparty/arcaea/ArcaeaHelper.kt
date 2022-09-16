@@ -42,10 +42,7 @@ object ArcaeaHelper {
             addText("\n")
 
             b38.take(30).forEach { sr ->
-                val mr = sr.songResult.first()
-
-                addText("${getSongNameByID(mr.songID)} [${mr.difficulty.formatDifficulty()} ${mr.constant}] " +
-                    "${mr.score} ${mr.score.formatScore()} ${mr.clearType.formatType()} | Rating ${mr.rating.fixDisplay()}\n")
+                addText("${sr.encodeToString()}\n")
             }
 
             if (b38.size > 30) {
@@ -53,9 +50,7 @@ object ArcaeaHelper {
                 addText("Overflow")
 
                 b38.drop(30).forEach { sr ->
-                    val mr = sr.songResult.first()
-                    addText("${getSongNameByID(mr.songID)} [${mr.difficulty.formatDifficulty()} ${mr.constant}] " +
-                        "${mr.score} ${mr.score.formatScore()} ${mr.clearType.formatType()} | Rating ${mr.rating.fixDisplay()}\n")
+                    addText("${sr.encodeToString()}\n")
                 }
             }
 
@@ -90,4 +85,10 @@ object ArcaeaHelper {
 
         return tmpFile
     }
+}
+
+private fun ArcaeaSongInfo.encodeToString(): String {
+    val mr = songResult.first()
+    return ("${ArcaeaHelper.getSongNameByID(mr.songID)} [${mr.difficulty.formatDifficulty()} ${mr.constant}] " +
+        "${mr.score} ${mr.score.formatScore()} ${mr.clearType.formatType()} | Rating ${mr.rating.fixDisplay()}")
 }
