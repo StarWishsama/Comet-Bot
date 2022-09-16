@@ -7,6 +7,7 @@ import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.asImage
+import ren.natsuyuk1.comet.api.message.at
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaClient
@@ -88,9 +89,10 @@ object ArcaeaService {
             return@launch
         }
 
-        val b30Image = ArcaeaHelper.drawB30(userInfo, b30)
+        val b30Image = ArcaeaHelper.drawB38(userInfo, b30)
 
         subject.sendMessage(buildMessageWrapper {
+            appendElement(subject.at())
             appendElement(b30Image.asImage())
         })
     }

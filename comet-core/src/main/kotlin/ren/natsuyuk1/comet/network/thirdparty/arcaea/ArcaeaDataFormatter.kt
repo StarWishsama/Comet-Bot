@@ -3,7 +3,7 @@ package ren.natsuyuk1.comet.network.thirdparty.arcaea
 internal fun Int.formatType(): String =
     when (this) {
         // 4 简单型角色, 5 困难型角色
-        0 -> "FAILED"
+        0 -> "Failed"
         1 -> "Clear"
         4 -> "Easy Clear"
         5 -> "Hard Clear"
@@ -14,10 +14,10 @@ internal fun Int.formatType(): String =
 
 internal fun Int.formatDifficulty(): String =
     when (this) {
-        1 -> "PST"
-        2 -> "PRS"
-        3 -> "FTR"
-        4 -> "BYD"
+        0 -> "PST"
+        1 -> "PRS"
+        2 -> "FTR"
+        3 -> "BYD"
         else -> "不存在捏 ($this)"
     }
 

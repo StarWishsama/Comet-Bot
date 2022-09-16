@@ -23,7 +23,10 @@ object ArcaeaHelper {
 
     internal fun getSongNameByID(id: String): String = songInfo[id] ?: id
 
-    internal fun drawB30(user: ArcaeaUserInfo, b30: List<ArcaeaSongInfo>): File {
+    /**
+     * TODO: best 38
+     */
+    internal fun drawB38(user: ArcaeaUserInfo, b30: List<ArcaeaSongInfo>): File {
         val paragraph = ParagraphBuilder(
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
@@ -33,9 +36,9 @@ object ArcaeaHelper {
         ).apply {
             addText("${user.data.name} - ${user.data.userID} - BEST 30\n")
 
-            val overallRating = b30.sumOf { it.songResult.first().rating }
+            val overallRating = b30.sumOf { it.songResult.first().rating } / b30.size.toDouble()
 
-            addText("总 Rating >> ${overallRating.fixDisplay()}\n")
+            addText("平均 Rating >> ${overallRating.fixDisplay()}\n")
 
             popStyle().pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 15f))
 

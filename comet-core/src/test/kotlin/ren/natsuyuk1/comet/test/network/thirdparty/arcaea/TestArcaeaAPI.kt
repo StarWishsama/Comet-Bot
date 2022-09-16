@@ -1,4 +1,4 @@
-package ren.natsuyuk1.comet.test.commands.service.arcaea
+package ren.natsuyuk1.comet.test.network.thirdparty.arcaea
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll
@@ -43,7 +43,7 @@ class TestArcaeaAPI {
         runBlocking {
             val (info, result) = ArcaeaClient.queryUserB30(userID, UUID.randomUUID())
             if (info != null) {
-                ArcaeaHelper.drawB30(info, result).print()
+                ArcaeaHelper.drawB38(info, result).print()
             }
         }
     }
