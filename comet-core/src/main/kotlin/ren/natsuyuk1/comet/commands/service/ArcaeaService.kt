@@ -94,11 +94,11 @@ object ArcaeaService {
             return@launch
         }
 
-        val b30Image = ArcaeaHelper.drawB38(userInfo, b30)
+        val b38Image = ArcaeaHelper.drawB38(userInfo, b30)
 
         subject.sendMessage(buildMessageWrapper {
             appendElement(sender.at())
-            appendElement(b30Image.asImage())
+            appendElement(b38Image.asImage())
         })
     }
 }
