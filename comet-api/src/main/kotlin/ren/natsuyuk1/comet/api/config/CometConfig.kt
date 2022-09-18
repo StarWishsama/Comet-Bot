@@ -55,6 +55,9 @@ object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
 
         @Comment("Apex Legends API Token, 用于搜索 Apex 玩家信息")
         val apexLegendToken: String = "",
+
+        @Comment("SauceNao API Token, 用于 SauceNao 平台的以图搜图")
+        val sauceNaoToken: String = "",
     )
 }
 
