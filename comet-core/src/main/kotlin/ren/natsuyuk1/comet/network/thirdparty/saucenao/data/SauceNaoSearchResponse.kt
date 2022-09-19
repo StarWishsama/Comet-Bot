@@ -56,6 +56,14 @@ data class SauceNaoSearchResponse(
             val characters: String? = null,
             val title: String? = null,
             val source: String? = null,
+            @SerialName("pixiv_id")
+            val pixivID: String? = null,
+            @SerialName("da_id")
+            val deviantartID: String? = null,
+            @SerialName("as_project")
+            val artStationID: String? = null,
+            @SerialName("danbooru_id")
+            val danbooruID: String? = null,
         )
     }
 }
@@ -69,7 +77,7 @@ fun SauceNaoSearchResponse.toMessageWrapper(): MessageWrapper = buildMessageWrap
         return@buildMessageWrapper
     }
 
-    if (!results.any { it.header.similarity < 60 }) {
+    if (!results.any { it.header.similarity >= 60 }) {
         appendText("找不到该图片的以图识图结果, 相似度过低.")
         return@buildMessageWrapper
     }
@@ -79,12 +87,36 @@ fun SauceNaoSearchResponse.toMessageWrapper(): MessageWrapper = buildMessageWrap
         return@buildMessageWrapper
     }
 
-    val highestProbResult = results.first()
+    val highestProbResult = results.first().data
 
     appendText("✔ 已找到可能的图片来源", true)
+    appendLine()
 
-    // 画作网站独占 (Pixiv, skeb, deviantart)
-    if (!highestProbResult.data.externalURLs.isNullOrEmpty()) {
-        appendText("原作地址 🔗 ${highestProbResult.data.externalURLs.first()}", true)
+    // Check website ID
+    when {
+        // Pixiv
+        highestProbResult.pixivID != null -> {
+            appendText("🏷 来自 Pixiv 的画作 (${highestProbResult.pixivID})", true)
+            appendText("🔗 https://www.pixiv.net/artworks/${highestProbResult.pixivID}")
+        }
+        highestProbResult.deviantartID != null -> {
+            appendText("🏷 来自 Deviantart 的画作", true)
+            appendText("🔗 https://deviantart.com/view/${highestProbResult.deviantartID}")
+        }
+        highestProbResult.artStationID != null -> {
+            appendText("🏷 来自 ArtStation 的画作", true)
+            appendText("🔗 https://www.artstation.com/artwork/${highestProbResult.artStationID}")
+        }
+        highestProbResult.danbooruID != null -> {
+            appendText("🏷 来自 Danbooru 的画作", true)
+            appendText("🔗 https://danbooru.donmai.us/post/show/${highestProbResult.danbooruID}")
+
+        }
+        !highestProbResult.externalURLs.isNullOrEmpty() -> {
+            appendText("可能的原作地址 🔗 ${highestProbResult.externalURLs.first()}")
+        }
+        else -> {
+            appendText("找到了结果, 但是 SauceNao 什么信息都没有提供🤨")
+        }
     }
 }
