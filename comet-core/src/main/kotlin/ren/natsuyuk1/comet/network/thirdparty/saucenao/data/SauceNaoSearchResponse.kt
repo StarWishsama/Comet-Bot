@@ -82,5 +82,9 @@ fun SauceNaoSearchResponse.toMessageWrapper(): MessageWrapper = buildMessageWrap
     val highestProbResult = results.first()
 
     appendText("✔ 已找到可能的图片来源", true)
-    appendText(highestProbResult.data.externalURLs?.first()!!)
+
+    // 画作网站独占 (Pixiv, skeb, deviantart)
+    if (!highestProbResult.data.externalURLs.isNullOrEmpty()) {
+        appendText("原作地址 🔗 ${highestProbResult.data.externalURLs.first()}", true)
+    }
 }

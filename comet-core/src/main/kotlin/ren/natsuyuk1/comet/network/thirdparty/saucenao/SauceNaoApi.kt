@@ -22,6 +22,8 @@ object SauceNaoApi {
             parameter("db", "999")
             parameter("output_type", "2")
             parameter("url", img.url)
+            // 2 = hide expected and suspected explicit
+            parameter("hide", 2)
             parameter("api_key", CometGlobalConfig.data.sauceNaoToken)
         }.bodyAsText().apply {
             logger.debug { "Incoming saucenao response: $this" }

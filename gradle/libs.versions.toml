@@ -7,8 +7,6 @@ org-jetbrains-kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.
 [versions]
 
 kotlin = "1.7.10"
-##  ⬆ = "1.7.20-Beta"
-##  ⬆ = "1.7.20-RC"
 
 jetbrains-exposed = "0.39.2"
 
@@ -47,11 +45,6 @@ kotlin-serialization = { group = "org.jetbrains.kotlin", name = "kotlin-serializ
 kotlin-scripting-compiler-embeddable = { group = "org.jetbrains.kotlin", name = "kotlin-scripting-compiler-embeddable", version.ref = "kotlin" }
 
 skiko = "org.jetbrains.skiko:skiko:0.7.27"
-##                             ⬆ :0.7.28"
-##                             ⬆ :0.7.29"
-##                             ⬆ :0.7.30"
-##                             ⬆ :0.7.31"
-##                             ⬆ :0.7.32"
 
 jline = "org.jline:jline:3.21.0"
 
@@ -60,10 +53,8 @@ ktor-client-websockets = { group = "io.ktor", name = "ktor-client-websockets", v
 jsoup = "org.jsoup:jsoup:1.15.3"
 
 yabapi-core-jvm = "moe.sdl.yabapi:yabapi-core-jvm:0.11.0-ktor2-SNAPSHOT"
-##                                            ⬆ :0.11.0-SNAPSHOT"
 
 brotli4j = "com.aayushatharva.brotli4j:brotli4j:1.7.1"
-##                                          ⬆ :1.8.0"
 
 setsuna = "ren.natsuyuk1.setsuna:Setsuna:0.1.0-SNAPSHOT"
 
@@ -75,6 +66,4 @@ mirai-core-api = "net.mamoe:mirai-core-api:2.13.0-M1"
 
 mirai-core-utils = "net.mamoe:mirai-core-utils:2.13.0-M1"
 
-tgbotapi = "dev.inmo:tgbotapi:3.1.1"
-##                        ⬆ :3.2.0"
-##                        ⬆ :3.2.1"
+tgbotapi = "dev.inmo:tgbotapi:3.2.6"
