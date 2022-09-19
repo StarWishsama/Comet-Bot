@@ -110,8 +110,8 @@ suspend fun MessageContent.toMessageWrapper(type: MessageSource.MessageSourceTyp
 
 fun Image.toInputFile(): InputFile? {
     return when {
-        url.isNotBlank() -> InputFile.fromUrl(url)
-        filePath.isNotBlank() -> InputFile.fromFile(File(filePath))
+        url?.isNotBlank() == true -> InputFile.fromUrl(url!!)
+        filePath?.isNotBlank() == true -> InputFile.fromFile(File(filePath!!))
         else -> null
     }
 }

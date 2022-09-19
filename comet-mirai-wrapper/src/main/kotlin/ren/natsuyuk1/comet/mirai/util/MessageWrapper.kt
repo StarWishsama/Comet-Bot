@@ -32,18 +32,18 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent? {
 
         is Image -> {
             try {
-                if (url.isNotBlank()) {
-                    cometClient.client.get(url).body<InputStream>().use {
+                if (url?.isNotBlank() == true) {
+                    cometClient.client.get(url!!).body<InputStream>().use {
                         it.uploadAsImage(subject)
                     }
-                } else if (filePath.isNotEmpty()) {
-                    if (filePath.isNotEmpty() && File(filePath).exists()) {
-                        return runBlocking { File(filePath).uploadAsImage(subject) }
+                } else if (filePath?.isNotBlank() == true) {
+                    if (File(filePath!!).exists()) {
+                        return runBlocking { File(filePath!!).uploadAsImage(subject) }
                     } else {
                         throw FileNotFoundException(filePath)
                     }
-                } else if (base64.isNotEmpty()) {
-                    return base64.toByteArray().toExternalResource().uploadAsImage(subject)
+                } else if (base64?.isNotEmpty() == true) {
+                    return base64!!.toByteArray().toExternalResource().uploadAsImage(subject)
                 } else {
                     throw IllegalArgumentException("Image have no argument to access image")
                 }

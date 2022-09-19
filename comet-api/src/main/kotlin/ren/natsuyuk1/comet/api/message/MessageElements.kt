@@ -44,13 +44,13 @@ data class Text(val text: String) : WrapperElement() {
  */
 @Serializable
 data class Image(
-    val url: String = "",
-    val filePath: String = "",
-    val base64: String = ""
+    val url: String? = null,
+    val filePath: String? = null,
+    val base64: String? = null,
 ) : WrapperElement() {
 
     init {
-        if (url.isEmpty() && filePath.isEmpty() && base64.isEmpty()) {
+        if (url == null && filePath  == null && base64 == null) {
             throw IllegalArgumentException("url/filePath/base64 can't be null or empty!")
         }
     }
