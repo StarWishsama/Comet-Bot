@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.skia.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
+import ren.natsuyuk1.comet.test.isCI
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import java.io.File
 import java.nio.file.Files
@@ -13,6 +14,8 @@ import kotlin.test.Test
 class TestImageDraw {
     @BeforeAll
     fun init() {
+        if (isCI()) return
+
         runBlocking {
             SkikoHelper.findSkikoLibrary()
         }
@@ -20,6 +23,8 @@ class TestImageDraw {
 
     @Test
     fun test() {
+        if (isCI()) return
+
         val surface = Surface.makeRasterN32Premul(650, 650)
         val canvas = surface.canvas
 
