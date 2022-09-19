@@ -16,7 +16,7 @@ object SauceNaoApi {
     private const val API_ROUTE = "https://saucenao.com/search.php"
 
     suspend fun searchByImage(img: Image): SauceNaoSearchResponse {
-        require(img.url.isNotBlank()) { "Image for saucenao search must not be empty!" }
+        require(img.url?.isNotBlank() == true) { "Image for saucenao search must not be empty!" }
 
         return cometClient.client.get(API_ROUTE) {
             parameter("db", "999")
