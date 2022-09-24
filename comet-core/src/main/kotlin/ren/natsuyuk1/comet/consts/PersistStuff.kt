@@ -12,6 +12,7 @@ import ren.natsuyuk1.comet.commands.*
 import ren.natsuyuk1.comet.objects.apex.ApexLegendDataTable
 import ren.natsuyuk1.comet.objects.arcaea.ArcaeaUserDataTable
 import ren.natsuyuk1.comet.objects.command.now.NowCmdConfigTable
+import ren.natsuyuk1.comet.objects.command.picturesearch.PictureSearchConfigTable
 import ren.natsuyuk1.comet.objects.config.CometServerConfig
 import ren.natsuyuk1.comet.objects.config.TwitterConfig
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
@@ -41,6 +42,7 @@ val cometTables =
         ArcaeaUserDataTable,
         CometPusherContextTable,
         ApexLegendDataTable,
+        PictureSearchConfigTable,
     )
 
 val defaultCommands: List<AbstractCommandNode<*>> =
