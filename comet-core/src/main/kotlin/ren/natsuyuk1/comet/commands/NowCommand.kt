@@ -23,8 +23,8 @@ import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
-import ren.natsuyuk1.comet.objects.nowcmd.Config
-import ren.natsuyuk1.comet.objects.nowcmd.NowCmdConfigTable
+import ren.natsuyuk1.comet.objects.command.now.Config
+import ren.natsuyuk1.comet.objects.command.now.NowCmdConfigTable
 import ren.natsuyuk1.comet.util.newFormatterOrNull
 import ren.natsuyuk1.comet.util.newTimeZoneOrNull
 import ren.natsuyuk1.comet.util.toMessageWrapper

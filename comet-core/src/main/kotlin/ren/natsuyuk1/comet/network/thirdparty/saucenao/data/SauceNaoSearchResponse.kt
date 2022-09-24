@@ -92,31 +92,33 @@ fun SauceNaoSearchResponse.toMessageWrapper(): MessageWrapper = buildMessageWrap
     appendText("✔ 已找到可能的图片来源", true)
     appendLine()
 
-    // Check website ID
-    when {
-        // Pixiv
-        highestProbResult.pixivID != null -> {
-            appendText("🏷 来自 Pixiv 的画作 (${highestProbResult.pixivID})", true)
-            appendText("🔗 https://www.pixiv.net/artworks/${highestProbResult.pixivID}")
-        }
-        highestProbResult.deviantartID != null -> {
-            appendText("🏷 来自 Deviantart 的画作", true)
-            appendText("🔗 https://deviantart.com/view/${highestProbResult.deviantartID}")
-        }
-        highestProbResult.artStationID != null -> {
-            appendText("🏷 来自 ArtStation 的画作", true)
-            appendText("🔗 https://www.artstation.com/artwork/${highestProbResult.artStationID}")
-        }
-        highestProbResult.danbooruID != null -> {
-            appendText("🏷 来自 Danbooru 的画作", true)
-            appendText("🔗 https://danbooru.donmai.us/post/show/${highestProbResult.danbooruID}")
+    highestProbResult.apply {
+        // Check website ID
+        when {
+            // Pixiv
+            highestProbResult.pixivID != null -> {
+                appendText("🏷 来自 Pixiv 的作品 (${highestProbResult.pixivID})", true)
+                appendText("🔗 https://www.pixiv.net/artworks/${highestProbResult.pixivID}")
+            }
+            highestProbResult.deviantartID != null -> {
+                appendText("🏷 来自 Deviantart 的作品", true)
+                appendText("🔗 https://deviantart.com/view/${highestProbResult.deviantartID}")
+            }
+            highestProbResult.artStationID != null -> {
+                appendText("🏷 来自 ArtStation 的作品", true)
+                appendText("🔗 https://www.artstation.com/artwork/${highestProbResult.artStationID}")
+            }
+            highestProbResult.danbooruID != null -> {
+                appendText("🏷 来自 Danbooru 的作品", true)
+                appendText("🔗 https://danbooru.donmai.us/post/show/${highestProbResult.danbooruID}")
 
-        }
-        !highestProbResult.externalURLs.isNullOrEmpty() -> {
-            appendText("可能的原作地址 🔗 ${highestProbResult.externalURLs.first()}")
-        }
-        else -> {
-            appendText("找到了结果, 但是 SauceNao 什么信息都没有提供🤨")
+            }
+            !highestProbResult.externalURLs.isNullOrEmpty() -> {
+                appendText("可能的原作地址 🔗 ${highestProbResult.externalURLs.first()}")
+            }
+            else -> {
+                appendText("找到了结果, 但是并不能解析 SauceNao 的这个结果捏🤨")
+            }
         }
     }
 }

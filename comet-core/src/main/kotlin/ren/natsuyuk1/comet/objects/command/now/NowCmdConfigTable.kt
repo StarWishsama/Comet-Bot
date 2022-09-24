@@ -1,4 +1,4 @@
-package ren.natsuyuk1.comet.objects.nowcmd
+package ren.natsuyuk1.comet.objects.command.now
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -35,16 +35,16 @@ object NowCmdConfigTable : Table("now_cmd_config") {
         if (!hasConfig(platform, isGroup, id)) {
             insert {
                 it[platformType] = platform
-                it[NTable.isGroup] = isGroup
-                it[NTable.id] = id
-                it[NTable.config] = Json.encodeToString(config)
+                it[NowCmdConfigTable.isGroup] = isGroup
+                it[NowCmdConfigTable.id] = id
+                it[NowCmdConfigTable.config] = Json.encodeToString(config)
             }
         } else {
-            update( { NTable.id eq id and (NTable.isGroup eq isGroup) and (NTable.platformType eq platform) } ) {
+            update( { NowCmdConfigTable.id eq id and (NowCmdConfigTable.isGroup eq isGroup) and (platformType eq platform) } ) {
                 it[platformType] = platform
-                it[NTable.isGroup] = isGroup
-                it[NTable.id] = id
-                it[NTable.config] = Json.encodeToString(config)
+                it[NowCmdConfigTable.isGroup] = isGroup
+                it[NowCmdConfigTable.id] = id
+                it[NowCmdConfigTable.config] = Json.encodeToString(config)
             }
         }
     }
@@ -56,8 +56,8 @@ object NowCmdConfigTable : Table("now_cmd_config") {
     ): Boolean = withContext(Dispatchers.IO) {
         select {
             (platformType eq platform) and
-                (NTable.isGroup eq isGroup) and
-                (NTable.id eq id)
+                (NowCmdConfigTable.isGroup eq isGroup) and
+                (NowCmdConfigTable.id eq id)
         }.firstOrNull() != null
     }
 
@@ -68,8 +68,8 @@ object NowCmdConfigTable : Table("now_cmd_config") {
     ): Config? = withContext(Dispatchers.IO) {
         select {
             (platformType eq platform) and
-                (NTable.isGroup eq isGroup) and
-                (NTable.id eq id)
+                (NowCmdConfigTable.isGroup eq isGroup) and
+                (NowCmdConfigTable.id eq id)
         }.map {
             Json.decodeFromString<Config>(it[config])
         }.firstOrNull()
