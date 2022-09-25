@@ -121,7 +121,7 @@ abstract class Group(
     abstract fun updateGroupName(groupName: String)
 
     /**
-     * 仅在 Mirai 环境下可用, Telegram 实现会返回 -1
+     * 仅在 Mirai 环境下可用, Telegram 实现会抛出错误
      */
     abstract fun getBotMuteRemaining(): Int
 

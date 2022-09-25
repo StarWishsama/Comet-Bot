@@ -64,7 +64,7 @@ object ArcaeaClient {
                                         songInfo[id] = songName.jsonObject["en"]?.jsonPrimitive?.content!!
                                     }
 
-                                    logger.info { "已更新歌曲信息 (${songInfo.size} 个)" }
+                                    logger.info { "已更新 Arcaea 歌曲信息 (${songInfo.size} 个)" }
                                 }
 
                                 client.close()
