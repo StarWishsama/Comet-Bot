@@ -32,7 +32,9 @@ class PictureSearchCommand(
     }
 
     override suspend fun run() {
-        PictureSearchService.handleSearch(subject, user)
+        if (currentContext.invokedSubcommand == null) {
+            PictureSearchService.handleSearch(subject, user)
+        }
     }
 
     class Source(
