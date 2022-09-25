@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.commands.service
 
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.api.message.MessageWrapper
@@ -17,11 +18,17 @@ import kotlin.time.Duration.Companion.seconds
 
 object PictureSearchService {
     suspend fun handleSearch(subject: PlatformCommandSender, user: CometUser) {
-        if (PictureSearchConfigTable.getPlatform(user.id.value) == null) {
-            PictureSearchConfigTable.setPlatform(user.id.value, PictureSearchSource.SAUCENAO)
-        }
+        newSuspendedTransaction {
+            if (PictureSearchConfigTable.getPlatform(user.id.value) == null) {
+                PictureSearchConfigTable.setPlatform(user.id.value, PictureSearchSource.SAUCENAO)
+            }
 
-        PictureSearchQuerySession(subject, user, PictureSearchConfigTable.getPlatform(user.id.value)!!).registerTimeout(20.seconds)
+            PictureSearchQuerySession(
+                subject,
+                user,
+                PictureSearchConfigTable.getPlatform(user.id.value)!!
+            ).registerTimeout(20.seconds)
+        }
     }
 
     suspend fun searchImage(image: Image, source: PictureSearchSource): MessageWrapper =

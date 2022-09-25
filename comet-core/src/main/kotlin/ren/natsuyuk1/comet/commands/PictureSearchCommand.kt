@@ -3,6 +3,7 @@ package ren.natsuyuk1.comet.commands
 import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.types.enum
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
 import ren.natsuyuk1.comet.api.message.MessageWrapper
@@ -53,8 +54,10 @@ class PictureSearchCommand(
         val api by argument("API").enum<PictureSearchSource>(ignoreCase = true)
 
         override suspend fun run() {
-            PictureSearchConfigTable.setPlatform(user.id.value, api)
-            subject.sendMessage("成功设置以图搜图引擎 ${api.name}".toMessageWrapper())
+            newSuspendedTransaction {
+                PictureSearchConfigTable.setPlatform(user.id.value, api)
+                subject.sendMessage("成功设置以图搜图引擎 ${api.name}".toMessageWrapper())
+            }
         }
     }
 }
