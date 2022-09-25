@@ -12,7 +12,6 @@ import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.flushAccumulatedUpd
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.toChatId
-import dev.inmo.tgbotapi.utils.PreviewFeature
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import ren.natsuyuk1.comet.api.Comet
@@ -41,7 +40,6 @@ class TelegramComet(
     override val id: Long
         get() = config.id
 
-    @OptIn(PreviewFeature::class)
     override fun login() {
         bot = telegramBot(config.password)
 

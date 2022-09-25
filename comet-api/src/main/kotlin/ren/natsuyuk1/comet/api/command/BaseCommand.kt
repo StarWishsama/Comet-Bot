@@ -43,7 +43,7 @@ abstract class BaseCommand(
     treatUnknownOptionsAsArgs = option.treatUnknownOptionsAsArgs
 ) {
     class CliktOption(
-        val invokeWithoutSubCommand: Boolean = false,
+        val invokeWithoutSubCommand: Boolean = true,
         val printHelpOnEmptyArgs: Boolean = false,
         val allowMultipleSubcommands: Boolean = false,
         val treatUnknownOptionsAsArgs: Boolean = false
