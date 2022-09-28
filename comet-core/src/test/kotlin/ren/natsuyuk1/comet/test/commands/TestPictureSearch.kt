@@ -19,6 +19,7 @@ import ren.natsuyuk1.comet.objects.command.picturesearch.PictureSearchConfigTabl
 import ren.natsuyuk1.comet.test.fakeComet
 import ren.natsuyuk1.comet.test.generateFakeSender
 import ren.natsuyuk1.comet.test.initTestDatabase
+import ren.natsuyuk1.comet.test.isCI
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -26,6 +27,8 @@ import kotlin.test.assertTrue
 class TestPictureSearch {
     @BeforeAll
     fun init() {
+        if (isCI()) return
+
         runBlocking {
             CometGlobalConfig.init()
         }
@@ -36,6 +39,8 @@ class TestPictureSearch {
 
     @Test
     fun test() {
+        if (isCI()) return
+
         val fakeSender = generateFakeSender(1)
         val testMsg = buildMessageWrapper {
             appendText("/ps")
@@ -65,6 +70,8 @@ class TestPictureSearch {
 
     @AfterAll
     fun cleanup() {
+        if (isCI()) return
+
         transaction {
             UserTable.deleteAll()
         }
