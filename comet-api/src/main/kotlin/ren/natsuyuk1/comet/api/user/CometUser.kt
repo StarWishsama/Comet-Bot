@@ -116,7 +116,15 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
          * @return user instance
          */
         fun create(id: Long, platform: LoginPlatform): CometUser {
+            val u = getUser(id, platform)
+
+            if (u != null) {
+                logger.info { "Found exist user with UUID ${u.id.value}, skipping create" }
+                return u
+            }
+
             logger.info { "Creating comet user for $id in ${platform.name}" }
+
             return transaction {
                 new {
                     platformID = id
