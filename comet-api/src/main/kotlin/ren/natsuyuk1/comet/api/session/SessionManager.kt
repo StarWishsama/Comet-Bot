@@ -80,22 +80,22 @@ object SessionManager {
     fun handleSession(subject: Contact, sender: Contact, message: MessageWrapper): Boolean {
         val user: CometUser? = CometUser.getUser(sender.id, sender.platform)
 
-        logger.debug { "Handling sessions, incoming subject: ${subject.id}, sender: ${sender.id}, message: $message" }
-        logger.debug { "Current unhandled sessions: $sessions" }
+        logger.debug { "Processing incoming subject: ${subject.id}, sender: ${sender.id}, message: $message" }
+        logger.debug { "Pending session(s): $sessions" }
 
         val targetSession = sessions.filter { session ->
             if (subject is Group) {
                 return@filter session.cometUser == null || (user != null && session.cometUser.id == user.id)
             } else {
-                if (session.cometUser != null) {
-                    return@filter session.cometUser.id == user?.id
+                if (session.cometUser != null && user != null) {
+                    return@filter session.cometUser.id == user.id
                 } else {
                     return@filter sender.id == session.contact.id
                 }
             }
         }
 
-        logger.debug { "Possible target sessions: $targetSession" }
+        logger.debug { "Matched session(s): $targetSession" }
 
         targetSession.forEach { runBlocking { it.handle(message) } }
 

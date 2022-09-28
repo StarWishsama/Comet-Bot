@@ -22,13 +22,13 @@ object PictureSearchService {
             if (PictureSearchConfigTable.getPlatform(user.id.value) == null) {
                 PictureSearchConfigTable.setPlatform(user.id.value, PictureSearchSource.SAUCENAO)
             }
-
-            PictureSearchQuerySession(
-                subject,
-                user,
-                PictureSearchConfigTable.getPlatform(user.id.value)!!
-            ).registerTimeout(20.seconds)
         }
+
+        PictureSearchQuerySession(
+            subject,
+            user,
+            newSuspendedTransaction { PictureSearchConfigTable.getPlatform(user.id.value) }!!
+        ).registerTimeout(30.seconds)
     }
 
     suspend fun searchImage(image: Image, source: PictureSearchSource): MessageWrapper =

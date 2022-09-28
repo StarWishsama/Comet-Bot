@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
+import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 
 @Serializable
 data class SauceNaoSearchResponse(
@@ -87,35 +88,41 @@ fun SauceNaoSearchResponse.toMessageWrapper(): MessageWrapper = buildMessageWrap
         return@buildMessageWrapper
     }
 
-    val highestProbResult = results.first().data
+    val highestProbResult = results.first()
 
     appendText("✔ 已找到可能的图片来源", true)
     appendLine()
+    appendText("🤖 相似度 ${highestProbResult.header.similarity.fixDisplay()}%")
 
     highestProbResult.apply {
         // Check website ID
         when {
             // Pixiv
-            highestProbResult.pixivID != null -> {
-                appendText("🏷 来自 Pixiv 的作品 (${highestProbResult.pixivID})", true)
-                appendText("🔗 https://www.pixiv.net/artworks/${highestProbResult.pixivID}")
+            highestProbResult.data.pixivID != null -> {
+                appendText("🏷 来自 Pixiv 的作品 (${highestProbResult.data.pixivID})", true)
+                appendText("🔗 https://www.pixiv.net/artworks/${highestProbResult.data.pixivID}")
             }
-            highestProbResult.deviantartID != null -> {
+
+            highestProbResult.data.deviantartID != null -> {
                 appendText("🏷 来自 Deviantart 的作品", true)
-                appendText("🔗 https://deviantart.com/view/${highestProbResult.deviantartID}")
+                appendText("🔗 https://deviantart.com/view/${highestProbResult.data.deviantartID}")
             }
-            highestProbResult.artStationID != null -> {
+
+            highestProbResult.data.artStationID != null -> {
                 appendText("🏷 来自 ArtStation 的作品", true)
-                appendText("🔗 https://www.artstation.com/artwork/${highestProbResult.artStationID}")
+                appendText("🔗 https://www.artstation.com/artwork/${highestProbResult.data.artStationID}")
             }
-            highestProbResult.danbooruID != null -> {
+
+            highestProbResult.data.danbooruID != null -> {
                 appendText("🏷 来自 Danbooru 的作品", true)
-                appendText("🔗 https://danbooru.donmai.us/post/show/${highestProbResult.danbooruID}")
+                appendText("🔗 https://danbooru.donmai.us/post/show/${highestProbResult.data.danbooruID}")
 
             }
-            !highestProbResult.externalURLs.isNullOrEmpty() -> {
-                appendText("可能的原作地址 🔗 ${highestProbResult.externalURLs.first()}")
+
+            !highestProbResult.data.externalURLs.isNullOrEmpty() -> {
+                appendText("可能的原作地址 🔗 ${highestProbResult.data.externalURLs.first()}")
             }
+
             else -> {
                 appendText("找到了结果, 但是并不能解析 SauceNao 的这个结果捏🤨")
             }

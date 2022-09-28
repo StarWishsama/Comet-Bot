@@ -72,6 +72,7 @@ abstract class Comet(
 fun Comet.attachMessageProcessor() {
     registerListener<MessageEvent> {
         if (it.comet == this) {
+            // Find session first
             val sessionProcessed = SessionManager.handleSession(it.subject, it.sender, it.message)
 
             if (!sessionProcessed) {

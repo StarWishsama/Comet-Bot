@@ -86,7 +86,13 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
 
         fun getUser(id: Long, platform: LoginPlatform) = transaction {
             find {
-                UserTable.platform eq platform and (UserTable.platformID eq id)
+                UserTable.platformID eq id and (UserTable.platform eq platform)
+            }.firstOrNull()
+        }
+
+        fun getUser(uuid: UUID) = transaction {
+            find {
+                UserTable.id eq uuid
             }.firstOrNull()
         }
 
