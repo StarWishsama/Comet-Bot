@@ -59,9 +59,8 @@ class MiraiComet(
             heartbeatPeriodMillis = miraiConfig.heartbeatPeriodMillis
         }
 
-        miraiBot = BotFactory.newBot(qq = this.config.id, password = this.config.password, configuration = config)
-
         cl.runWithScope(scope) {
+            miraiBot = BotFactory.newBot(qq = this.config.id, password = this.config.password, configuration = config)
             miraiBot.login()
 
             miraiBot.eventChannel.subscribeAlways<net.mamoe.mirai.event.Event> {
