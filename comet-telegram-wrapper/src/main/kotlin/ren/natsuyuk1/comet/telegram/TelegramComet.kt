@@ -37,6 +37,7 @@ class TelegramComet(
      */
     config: CometConfig
 ) : Comet(LoginPlatform.TELEGRAM, config, logger, ModuleScope("telegram ${config.id}")) {
+    private val startTime = DateTime.now()
     lateinit var bot: TelegramBot
     override val id: Long
         get() = config.id
@@ -51,7 +52,7 @@ class TelegramComet(
 
             bot.buildBehaviourWithLongPolling(scope) {
                 onContentMessage( { it.chat is PrivateChat || it.chat is GroupChat } ) {
-                    if (it.date < DateTime.now()) {
+                    if (it.date < startTime) {
                         return@onContentMessage
                     }
 
