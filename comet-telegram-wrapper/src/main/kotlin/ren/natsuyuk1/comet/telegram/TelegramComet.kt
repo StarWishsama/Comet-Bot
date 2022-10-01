@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.telegram
 
+import com.soywiz.klock.DateTime
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.bot.exceptions.CommonRequestException
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
@@ -50,6 +51,10 @@ class TelegramComet(
 
             bot.buildBehaviourWithLongPolling(scope) {
                 onContentMessage( { it.chat is PrivateChat || it.chat is GroupChat } ) {
+                    if (it.date < DateTime.now()) {
+                        return@onContentMessage
+                    }
+
                     logger.trace { "onContentMessage > " + it.format() }
                     scope.launch {
                         it.toCometEvent(this@TelegramComet)?.broadcast()

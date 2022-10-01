@@ -63,11 +63,16 @@ class MiraiComet(
             miraiBot = BotFactory.newBot(qq = this.config.id, password = this.config.password, configuration = config)
             miraiBot.login()
 
-            miraiBot.eventChannel.subscribeAlways<net.mamoe.mirai.event.Event> {
-                cl.runWithSuspend {
-                    it.redirectToComet(this@MiraiComet)
+            miraiBot.eventChannel
+                .parentScope(scope)
+                .exceptionHandler {
+                    logger.warn(it) { "Mirai Bot (${miraiBot.id}) occurred a exception" }
                 }
-            }
+                .subscribeAlways<net.mamoe.mirai.event.Event> {
+                    cl.runWithSuspend {
+                        it.redirectToComet(this@MiraiComet)
+                    }
+                }
 
             miraiBot.join()
         }
