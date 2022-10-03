@@ -43,11 +43,6 @@ class MiraiComet(
         get() = miraiConfig.id
 
     override fun login() {
-        if (::miraiBot.isInitialized && miraiBot.isOnline) {
-            logger.warn { "Mirai Bot (${miraiBot.id}) 正常在线无需重新登录!" }
-            return
-        }
-
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
                 LoggerRedirector(logger("mirai (${it.id})"))
