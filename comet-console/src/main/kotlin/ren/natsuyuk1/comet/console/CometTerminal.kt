@@ -52,7 +52,12 @@ import kotlin.system.exitProcess
 
 private val logger = mu.KotlinLogging.logger {}
 
-private val dummyComet = object : Comet(LoginPlatform.TEST, CometConfig(0, "", LoginPlatform.TEST), logger, ModuleScope("dummy-comet")) {
+private val dummyComet = object : Comet(
+    LoginPlatform.TEST,
+    CometConfig(0, "", LoginPlatform.TEST),
+    logger,
+    ModuleScope("dummy-comet")
+) {
     override val id: Long = 0
 
     override fun login() {}

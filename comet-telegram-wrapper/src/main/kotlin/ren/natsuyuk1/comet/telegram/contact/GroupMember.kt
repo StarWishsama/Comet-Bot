@@ -164,7 +164,7 @@ internal class TelegramChannelMemberImpl(
     private val channelChat: ChannelChat,
     override val comet: TelegramComet,
     private val groupChatID: ChatId,
-): AnonymousMember() {
+) : AnonymousMember() {
     override val anonymousId: String
         get() = channelChat.id.chatId.toString()
     @OptIn(PreviewFeature::class)
@@ -217,7 +217,7 @@ fun ChannelChat.toCometAnonymousMember(comet: TelegramComet, groupChatID: ChatId
 internal class TelegramGroupAsMemberImpl(
     private val groupChat: GroupChat,
     override val comet: TelegramComet,
-): AnonymousMember() {
+) : AnonymousMember() {
     override val anonymousId: String
         get() = groupChat.id.chatId.toString()
     override val group: Group
@@ -262,4 +262,3 @@ internal class TelegramGroupAsMemberImpl(
 
 fun GroupChat.toCometAnonymousMember(comet: TelegramComet): AnonymousMember =
     TelegramGroupAsMemberImpl(this, comet)
-

@@ -116,7 +116,6 @@ fun SauceNaoSearchResponse.toMessageWrapper(): MessageWrapper = buildMessageWrap
             highestProbResult.data.danbooruID != null -> {
                 appendText("🏷 来自 Danbooru 的作品", true)
                 appendText("🔗 https://danbooru.donmai.us/post/show/${highestProbResult.data.danbooruID}")
-
             }
 
             !highestProbResult.data.externalURLs.isNullOrEmpty() -> {

@@ -32,7 +32,7 @@ class RSSCommand(
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
     val user: CometUser
-): CometCommand(comet, sender, subject, message, user, RSS) {
+) : CometCommand(comet, sender, subject, message, user, RSS) {
 
     init {
         subcommands(Subscribe(sender, subject, user), UnSubscribe(sender, subject, user), List(sender, subject, user))
@@ -69,7 +69,9 @@ class RSSCommand(
             }
 
             if (RSSPusher.subscriber.containsKey(url)) {
-                if (RSSPusher.subscriber[url]?.find { it.id == subject.id && it.platform == subject.platform } != null) {
+                if (RSSPusher.subscriber[url]
+                    ?.find { it.id == subject.id && it.platform == subject.platform } != null
+                ) {
                     subject.sendMessage("你已经订阅过这个 RSS 源了!".toMessageWrapper())
                 } else {
                     RSSPusher.subscriber[url]?.add(
@@ -114,7 +116,9 @@ class RSSCommand(
             }
 
             if (RSSPusher.subscriber.containsKey(url)) {
-                if (RSSPusher.subscriber[url]?.find { it.id == subject.id && it.platform == subject.platform } == null) {
+                if (RSSPusher.subscriber[url]
+                    ?.find { it.id == subject.id && it.platform == subject.platform } == null
+                ) {
                     subject.sendMessage("本群还未订阅过这个 RSS 源!".toMessageWrapper())
                 } else {
                     RSSPusher.subscriber[url]?.removeIf { it.id == subject.id && it.platform == subject.platform }
@@ -151,12 +155,14 @@ class RSSCommand(
             if (subRSS.isEmpty()) {
                 subject.sendMessage("本群还未订阅过任何 RSS 源!".toMessageWrapper())
             } else {
-                subject.sendMessage(buildMessageWrapper {
-                    appendText("本群已订阅的 RSS 源 >>", true)
-                    subRSS.forEach { k ->
-                        appendText("| ${k.replace(URL_PREFIX_REGEX, "")}", true)
+                subject.sendMessage(
+                    buildMessageWrapper {
+                        appendText("本群已订阅的 RSS 源 >>", true)
+                        subRSS.forEach { k ->
+                            appendText("| ${k.replace(URL_PREFIX_REGEX, "")}", true)
+                        }
                     }
-                })
+                )
             }
         }
     }

@@ -11,11 +11,15 @@ abstract class CometPushContext(
     val id: String,
     val target: List<CometPushTarget>,
     val createTime: Instant = Clock.System.now()
-){
+) {
     abstract fun normalize(): MessageWrapper
 
     internal fun toJson(): String = Json.encodeToString(MinCometPushContext(id, target))
 }
 
 @Serializable
-class MinCometPushContext(val id: String, val target: List<CometPushTarget>, val createTime: Instant = Clock.System.now())
+class MinCometPushContext(
+    val id: String,
+    val target: List<CometPushTarget>,
+    val createTime: Instant = Clock.System.now()
+)

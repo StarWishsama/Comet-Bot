@@ -31,7 +31,7 @@ class TwitterCommand(
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
     user: CometUser
-): CometCommand(comet, sender, subject, message, user, TWITTER) {
+) : CometCommand(comet, sender, subject, message, user, TWITTER) {
     init {
         subcommands(
             User(sender, subject, user),
@@ -49,7 +49,7 @@ class TwitterCommand(
         override val sender: PlatformCommandSender,
         override val subject: PlatformCommandSender,
         user: CometUser
-    ): CometSubCommand(sender, subject, user, USER) {
+    ) : CometSubCommand(sender, subject, user, USER) {
         companion object {
             val USER = SubCommandProperty("user", listOf("用户", "yh"), TWITTER)
         }
@@ -72,7 +72,7 @@ class TwitterCommand(
         override val sender: PlatformCommandSender,
         override val subject: PlatformCommandSender,
         user: CometUser
-    ): CometSubCommand(sender, subject, user, TWEET) {
+    ) : CometSubCommand(sender, subject, user, TWEET) {
         companion object {
             val TWEET = SubCommandProperty("tweet", listOf("推文", "tw"), TWITTER)
         }

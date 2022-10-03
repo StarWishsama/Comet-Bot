@@ -40,4 +40,3 @@ object PictureSearchConfigTable : Table("picture_search_config") {
         }.firstOrNull()
     }
 }
-

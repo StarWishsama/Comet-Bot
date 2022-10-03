@@ -82,7 +82,10 @@ class TestTweetDraw {
             FontUtil.fonts
         ).apply {
             val sentTime = tweet!!.createdTime!!.toJavaInstant()
-            addText(hourMinutePattern.format(sentTime) + " | " + yyMMddPattern.format(sentTime) + " | Rendered by Comet")
+            addText(
+                hourMinutePattern.format(sentTime) + " | " +
+                    yyMMddPattern.format(sentTime) + " | Rendered by Comet"
+            )
         }.build().layout(widthWithoutPadding)
 
         val tweetImage = includes?.media?.first()
@@ -115,19 +118,15 @@ class TestTweetDraw {
 
         println(textHeight)
 
-        val height = (defaultAvatarSize +
-            textHeight +
-            tweetPicture.height +
-            padding.height +
-            defaultPadding
-        ).toInt()
+        val height = (
+            defaultAvatarSize +
+                textHeight +
+                tweetPicture.height +
+                padding.height +
+                defaultPadding
+            ).toInt()
 
         println("Actual height $height")
-
-        runBlocking {
-           // ren.natsuyuk1.comet.test.network.client.client.downloadFile(user.profileImageURL!!.replace("_normal", ""), avatarPath)
-           // ren.natsuyuk1.comet.test.network.client.client.downloadFile(tweetImage!!.url!!, tweetPicturePath)
-        }
 
         val surface = Surface.makeRasterN32Premul(defaultWidth.toInt(), height)
 
@@ -146,7 +145,8 @@ class TestTweetDraw {
                 tarFaceRect.left + tarFaceRect.width / 2,
                 tarFaceRect.top + tarFaceRect.width / 2,
                 tarFaceRect.width / 2,
-                Paint().apply { color = Color.BLACK.rgb })
+                Paint().apply { color = Color.BLACK.rgb }
+            )
 
             val image = Image.makeFromEncoded(avatarPath.readBytes())
 
@@ -166,11 +166,23 @@ class TestTweetDraw {
                 addText("@${user.username}")
             }.build().layout(defaultWidth - defaultAvatarSize)
 
-            userInfo.paint(this, defaultAvatarSize + defaultMargin * 2 + defaultTextSpace, (defaultMargin + defaultTextSpace) / 2)
+            userInfo.paint(
+                this,
+                defaultAvatarSize + defaultMargin * 2 + defaultTextSpace,
+                (defaultMargin + defaultTextSpace) / 2
+            )
 
-            tweetContent.paint(this, tarFaceRect.left + defaultMargin, defaultAvatarSize + defaultMargin + defaultTextSpace)
+            tweetContent.paint(
+                this,
+                tarFaceRect.left + defaultMargin,
+                defaultAvatarSize + defaultMargin + defaultTextSpace
+            )
 
-            resizeTweetImage(tarFaceRect.left + defaultMargin, defaultAvatarSize + defaultMargin + tweetContent.height + defaultTextSpace, tweetPicture)
+            resizeTweetImage(
+                tarFaceRect.left + defaultMargin,
+                defaultAvatarSize + defaultMargin + tweetContent.height + defaultTextSpace,
+                tweetPicture
+            )
 
             padding.paint(this, tarFaceRect.left + defaultMargin, (height - defaultPadding - padding.height))
         }
@@ -191,7 +203,14 @@ class TestTweetDraw {
 fun Canvas.drawImageRRect(image: Image, rRect: RRect, paint: Paint? = null) {
     save()
     clipRRect(rRect, true)
-    drawImageRect(image, Rect(0f, 0f, image.width.toFloat(), image.height.toFloat()), rRect, FilterMipmap(FilterMode.LINEAR, MipmapMode.NEAREST), paint, true)
+    drawImageRect(
+        image,
+        Rect(0f, 0f, image.width.toFloat(), image.height.toFloat()),
+        rRect,
+        FilterMipmap(FilterMode.LINEAR, MipmapMode.NEAREST),
+        paint,
+        true
+    )
     restore()
 }
 
@@ -209,12 +228,15 @@ fun Canvas.resizeTweetImage(x: Float, y: Float, vararg image: Image): Rect {
 
             tarImageRect
         }
+
         2 -> {
             TODO()
         }
+
         3 -> {
             TODO()
         }
+
         4 -> {
             TODO()
         }

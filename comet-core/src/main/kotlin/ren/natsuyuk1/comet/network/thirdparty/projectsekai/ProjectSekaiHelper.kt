@@ -42,9 +42,9 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
         if (ProjectSekaiData.getCurrentEventInfo()?.aggregateTime != null) {
             appendText(
                 "离活动结束还有 ${
-                    (ProjectSekaiData.getCurrentEventInfo()?.aggregateTime!!.toInstant(true) - now).toFriendly(
-                        msMode = false
-                    )
+                (ProjectSekaiData.getCurrentEventInfo()?.aggregateTime!!.toInstant(true) - now).toFriendly(
+                    msMode = false
+                )
                 }",
                 true
             )

@@ -204,9 +204,11 @@ object CommandManager {
                         appendText(
                             "在尝试执行命令时发生异常, 报错信息如下, 详细请查看后台\n" +
                                 it::class.jvmName + ":" +
-                                (it.message?.limit(
-                                    25
-                                ) ?: "无")
+                                (
+                                    it.message?.limit(
+                                        25
+                                    ) ?: "无"
+                                    )
                         )
                     }
                 )
