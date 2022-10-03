@@ -95,7 +95,7 @@ open class PersistDataFile<T : Any>(
     override suspend fun load(): T {
         return withContext(scope.coroutineContext) {
             if (!file.exists()) {
-                logger.debug { " ${file.absolutePath} does not exist, creating new default config..." }
+                logger.debug { " ${file.absolutePath} 不存在, 正在创建默认配置..." }
                 save(data)
             }
             mutex.withLock {
@@ -127,7 +127,7 @@ open class PersistDataFile<T : Any>(
                     for (e in wk.pollEvents()) {
                         val changeContext = e.context() as Path
                         if (changeContext == file.toPath()) {
-                            logger.info { "Detected ${this@PersistDataFile.clazz.simpleName} data file has been changed, reloading..." }
+                            logger.info { "检测到文件 ${this@PersistDataFile.clazz.simpleName} 已被修改, 正在尝试重载..." }
                             load()
                         }
                     }
