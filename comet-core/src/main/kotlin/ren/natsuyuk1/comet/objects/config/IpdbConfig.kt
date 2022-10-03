@@ -22,8 +22,8 @@ object IpdbConfig : PersistDataFile<IpdbConfig.Data>(
     @Serializable
     data class Data(
         @Comment("是否开启 IP 服务") val enable: Boolean = true,
-        @Comment("IPDB v4 路径") @SerialName("pathV4") private val _pathV4: String? = null,
-        @Comment("IPDB v6 路径") @SerialName("pathV6") private val _pathV6: String? = null,
+        @Comment("IPDB v4 路径") @SerialName("pathV4") private val _pathV4: String? = "./resources/v4.ipdb",
+        @Comment("IPDB v6 路径") @SerialName("pathV6") private val _pathV6: String? = "./resources/v6.ipdb",
     ) {
         private fun checkFile(path: String?): File? {
             val file = File(path ?: return null)
@@ -45,7 +45,7 @@ object IpdbConfig : PersistDataFile<IpdbConfig.Data>(
         @Transient
         val pathV6 = checkFile(_pathV6)
 
-        private fun db(path: File?) = ConcRef() {
+        private fun db(path: File?) = ConcRef {
             val file = path ?: return@ConcRef null
             logger.info { "Loading IPDB from $path" }
             Reader(file)
