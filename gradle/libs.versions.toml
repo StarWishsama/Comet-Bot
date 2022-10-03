@@ -60,10 +60,10 @@ setsuna = "ren.natsuyuk1.setsuna:Setsuna:0.1.0-SNAPSHOT"
 
 rome = "com.rometools:rome:1.18.0"
 
-mirai-core = "net.mamoe:mirai-core:2.13.0-M1"
+mirai-core = "net.mamoe:mirai-core:2.13.0-RC"
 
-mirai-core-api = "net.mamoe:mirai-core-api:2.13.0-M1"
+mirai-core-api = "net.mamoe:mirai-core-api:2.13.0-RC"
 
-mirai-core-utils = "net.mamoe:mirai-core-utils:2.13.0-M1"
+mirai-core-utils = "net.mamoe:mirai-core-utils:2.13.0-RC"
 
 tgbotapi = "dev.inmo:tgbotapi:3.2.6"
