@@ -52,24 +52,15 @@ import kotlin.system.exitProcess
 
 private val logger = mu.KotlinLogging.logger {}
 
-private val dummyComet = object : Comet(
-    LoginPlatform.TEST,
-    CometConfig(0, "", LoginPlatform.TEST),
-    logger,
-    ModuleScope("dummy-comet")
-) {
-    override val id: Long = 0
-
-    override fun login() {}
-
-    override fun afterLogin() {}
-
-    override fun close() {}
-
-    override suspend fun getGroup(id: Long): Group? = null
-
-    override suspend fun deleteMessage(source: MessageSource): Boolean = false
-}
+private val dummyComet =
+    object : Comet(LoginPlatform.TEST, CometConfig(0, "", LoginPlatform.TEST), logger, ModuleScope("dummy-comet")) {
+        override val id: Long = 0
+        override fun login() {}
+        override fun afterLogin() {}
+        override fun close() {}
+        override suspend fun getGroup(id: Long): Group? = null
+        override suspend fun deleteMessage(source: MessageSource): Boolean = false
+    }
 
 object CometTerminal {
     private var scope = ModuleScope("CometTerminal")
@@ -104,8 +95,9 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
     private fun setupConfig(): Job = scope.launch {
         logger.info { "加载配置文件..." }
+        val loadScope = ModuleScope("ConfigLoaderCoroutine", scope.coroutineContext, Dispatchers.IO)
         cometPersistDataFile.map {
-            launch {
+            loadScope.launch {
                 it.init()
                 it.save()
             }
