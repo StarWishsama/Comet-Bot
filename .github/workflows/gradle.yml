@@ -24,7 +24,7 @@ jobs:
       - name: 给予 gradlew 权限
         run: chmod +x gradlew
       - name: Gradle shadowjar 打包
-        run: ./gradlew buildComet check
+        run: ./gradlew buildComet test
       - uses: actions/upload-artifact@v2
         with:
           name: Comet-Bot-full
