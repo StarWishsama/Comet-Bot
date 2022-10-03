@@ -24,7 +24,6 @@ import java.net.UnknownHostException
 
 private val logger = KotlinLogging.logger {}
 
-
 val IP by lazy {
     CommandProperty(
         "ip",
@@ -76,7 +75,6 @@ class IPCommand(
             IPAddressGenerator().from(dnsQueried)
         }
 
-
         val db = try {
             when {
                 addr.isIPv4 -> IpdbConfig.data.dbV4.get()
@@ -122,7 +120,6 @@ class IPCommand(
     }
 }
 
-
 private inline val FullInfo.isIDC: Boolean
     get() = idc == "IDC"
 
@@ -139,9 +136,11 @@ private val String.sp
 private val FullInfo.countryNoDep: String
     get() = if (regionName != countryName) countryName else ""
 
+/* ktlint-disable max-line-length */
 private fun FullInfo.toReadable(): String =
     when {
         isAnyCast -> "任播网络${if (isIDC) " IDC" else ""} 所有者域名: $ownerDomain | ISP 域名：$ispDomain"
-        isIDC -> "IDC${ispDomain.sp}${ownerDomain.sp} | ${euDesc.sp}${countryName}${countryNoDep}${cityName}${districtName}"
+        isIDC -> "IDC${ispDomain.sp}${ownerDomain.sp} | ${euDesc.sp}${countryName}${countryNoDep}${cityName}$districtName"
         else -> "${euDesc.sp}${countryName}${regionName}${cityName}${districtName}${ispDomain.sp}${ownerDomain.sp}"
     }
+/* ktlint-enable max-line-length */

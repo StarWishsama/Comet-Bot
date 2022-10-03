@@ -149,7 +149,11 @@ class RSSCommand(
             }
 
             val subRSS = RSSPusher.subscriber
-                .filter { sub -> sub.value.find { it.id == subject.id && it.platform == subject.platform } != null }
+                .filter { sub ->
+                    sub.value.find {
+                        it.id == subject.id && it.platform == subject.platform
+                    } != null
+                }
                 .map { it.key }
 
             if (subRSS.isEmpty()) {

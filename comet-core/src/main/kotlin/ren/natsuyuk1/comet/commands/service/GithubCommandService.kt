@@ -65,7 +65,12 @@ object GithubCommandService {
 
             val repos = GithubRepoData.data.repos
 
-            if (repos.any { it.getName() == repoName && it.subscribers.any { sub -> sub.id == groupID } }) {
+            val hasSubscribed = repos.any {
+                val nameEq = it.getName() == repoName
+                val groupEq = it.subscribers.any { sub -> sub.id == groupID }
+                nameEq && groupEq
+            }
+            if (hasSubscribed) {
                 subject.sendMessage("你已经订阅过这个仓库了!".toMessageWrapper())
                 return
             }
@@ -95,7 +100,10 @@ object GithubCommandService {
                         subject.sendMessage("订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置添加 Comet 管理提供的链接!".toMessageWrapper())
                     } else {
                         subject.sendMessage(
-                            "订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置添加以下链接!\n>> ${CometServerConfig.data.serverName}/github".toMessageWrapper()
+                            """
+                            订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置添加以下链接!
+                            >> ${CometServerConfig.data.serverName}/github
+                            """.trimIndent().toMessageWrapper()
                         )
                     }
                 }
@@ -202,7 +210,11 @@ object GithubCommandService {
             subject.sendMessage("请输入有效的 GitHub 仓库名称, 例如 StarWishsama/Comet-Bot".toMessageWrapper())
         } else {
             val repo =
-                GithubRepoData.data.repos.find { it.getName() == repoName && it.subscribers.any { g -> g.id == groupID } }
+                GithubRepoData.data.repos.find {
+                    val nameEq = it.getName() == repoName
+                    val subEq = it.subscribers.any { g -> g.id == groupID }
+                    nameEq && subEq
+                }
 
             if (repo == null) {
                 subject.sendMessage("找不到你想要查询设置的 GitHub 仓库".toMessageWrapper())
