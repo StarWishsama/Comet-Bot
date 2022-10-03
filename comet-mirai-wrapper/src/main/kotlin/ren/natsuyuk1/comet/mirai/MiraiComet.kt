@@ -66,7 +66,7 @@ class MiraiComet(
             miraiBot.eventChannel
                 .parentScope(scope)
                 .exceptionHandler {
-                    logger.warn(it) { "Mirai Bot (${miraiBot.id}) occurred a exception" }
+                    logger.warn(it) { "Mirai Bot (${miraiBot.id}) 发生异常" }
                 }
                 .subscribeAlways<net.mamoe.mirai.event.Event> {
                     cl.runWithSuspend {
@@ -77,7 +77,11 @@ class MiraiComet(
             miraiBot.join()
         }
 
-        logger.info { "Mirai ${miraiBot.id} 登录成功" }
+        if (miraiBot.isOnline) {
+            logger.info { "Mirai ${miraiBot.id} 登录成功" }
+        } else {
+            logger.warn { "Mirai ${miraiBot.id} 并未正常登录" }
+        }
     }
 
     override fun afterLogin() {

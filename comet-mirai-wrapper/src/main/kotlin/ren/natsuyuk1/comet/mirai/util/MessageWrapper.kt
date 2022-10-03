@@ -48,7 +48,7 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent? {
                     throw IllegalArgumentException("Image have no argument to access image")
                 }
             } catch (e: Exception) {
-                logger.warn { "A error occurred when converting Image, raw content: ${toString()}" }
+                logger.warn { "转换图片失败, 原始内容: ${toString()}" }
                 return PlainText("[图片]")
             }
         }
@@ -96,9 +96,9 @@ fun MessageWrapper.toMessageChain(subject: Contact): MessageChain {
                 }
             }.onFailure {
                 if (it !is UnsupportedOperationException) {
-                    logger.warn(it) { "A error occurred when converting message wrapper" }
+                    logger.warn(it) { "在转换 Mirai 消息时出现问题" }
                 } else {
-                    logger.debug { "Unsupported message element: ${elem::class.simpleName}" }
+                    logger.debug { "在转换 Mirai 消息时出现问题, 不受支持的消息元素: ${elem::class.simpleName}" }
                 }
             }
         }

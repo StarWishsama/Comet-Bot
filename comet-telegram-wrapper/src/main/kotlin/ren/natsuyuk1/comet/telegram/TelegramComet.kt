@@ -48,7 +48,7 @@ class TelegramComet(
         scope.launch {
             bot.flushAccumulatedUpdates()
 
-            logger.debug { "Refreshed accumulated updates" }
+            logger.debug { "已刷新 Telegram Bot 离线时暂存的消息" }
 
             bot.buildBehaviourWithLongPolling(scope) {
                 onContentMessage({ it.chat is PrivateChat || it.chat is GroupChat }) {
@@ -56,7 +56,7 @@ class TelegramComet(
                         return@onContentMessage
                     }
 
-                    logger.trace { "onContentMessage > " + it.format() }
+                    logger.trace { it.format() }
                     scope.launch {
                         it.toCometEvent(this@TelegramComet)?.broadcast()
                     }
@@ -95,7 +95,7 @@ class TelegramComet(
         return try {
             bot.deleteMessage(source.target.toChatId(), source.messageID)
         } catch (e: CommonRequestException) {
-            logger.warn(e) { "撤回消息失败, source: $source" }
+            logger.warn(e) { "撤回消息失败, 原始消息来源: $source" }
             return false
         }
     }
