@@ -1,12 +1,17 @@
 import org.gradle.api.Project
+import org.gradle.internal.os.OperatingSystem
+import shadow.org.apache.commons.io.FileUtils
 import java.io.File
 import java.nio.file.Files
 
 fun Project.installGitHooks() {
-    if (!File("./.git").exists()) return
-    val target = File(rootProject.rootDir, ".git/hooks")
-    val source = File(rootProject.rootDir, ".git-hooks")
+    val target = File(project.rootProject.rootDir, ".git/hooks")
+    val source = File(project.rootProject.rootDir, ".git-hooks")
     if (target.canonicalFile == source) return
     target.deleteRecursively()
-    Files.createSymbolicLink(target.toPath(), source.toPath())
+    if (OperatingSystem.current().isWindows) {
+        FileUtils.copyDirectory(source, target)
+    } else {
+        Files.createSymbolicLink(target.toPath(), source.toPath())
+    }
 }

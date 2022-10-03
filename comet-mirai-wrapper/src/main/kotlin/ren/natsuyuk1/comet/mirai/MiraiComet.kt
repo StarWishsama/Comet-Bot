@@ -1,7 +1,5 @@
 package ren.natsuyuk1.comet.mirai
 
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging.logger
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
@@ -21,6 +19,7 @@ import ren.natsuyuk1.comet.mirai.contact.toCometGroup
 import ren.natsuyuk1.comet.mirai.event.redirectToComet
 import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
 import ren.natsuyuk1.comet.mirai.util.runWith
+import ren.natsuyuk1.comet.mirai.util.runWithScope
 import ren.natsuyuk1.comet.mirai.util.runWithSuspend
 import ren.natsuyuk1.comet.service.subscribeGithubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
@@ -60,32 +59,35 @@ class MiraiComet(
             heartbeatPeriodMillis = miraiConfig.heartbeatPeriodMillis
         }
 
-        cl.runWith {
-            miraiBot = BotFactory.newBot(qq = this.config.id, password = this.config.password, configuration = config)
-            runBlocking {
-                miraiBot.login()
-            }
+        cl.runWithScope(scope) {
+            if (!::miraiBot.isInitialized) {
+                miraiBot = BotFactory.newBot(
+                    qq = this.config.id,
+                    password = this.config.password,
+                    configuration = config
+                )
 
-            miraiBot.eventChannel
-                .parentScope(scope)
-                .exceptionHandler {
-                    logger.warn(it) { "Mirai Bot (${miraiBot.id}) 发生异常" }
-                }
-                .subscribeAlways<net.mamoe.mirai.event.Event> {
-                    cl.runWithSuspend {
-                        it.redirectToComet(this@MiraiComet)
+                miraiBot.eventChannel
+                    .parentScope(scope)
+                    .exceptionHandler {
+                        logger.warn(it) { "Mirai Bot (${miraiBot.id}) 发生异常" }
                     }
-                }
-
-            scope.launch {
-                miraiBot.join()
+                    .subscribeAlways<net.mamoe.mirai.event.Event> {
+                        cl.runWithSuspend {
+                            it.redirectToComet(this@MiraiComet)
+                        }
+                    }
             }
-        }
 
-        if (miraiBot.isOnline) {
-            logger.info { "Mirai ${miraiBot.id} 登录成功" }
-        } else {
-            logger.warn { "Mirai ${miraiBot.id} 并未正常登录" }
+            miraiBot.login()
+
+            if (miraiBot.isOnline) {
+                logger.info { "Mirai ${miraiBot.id} 登录成功" }
+            } else {
+                logger.warn { "Mirai ${miraiBot.id} 并未正常登录" }
+            }
+
+            miraiBot.join()
         }
     }
 
