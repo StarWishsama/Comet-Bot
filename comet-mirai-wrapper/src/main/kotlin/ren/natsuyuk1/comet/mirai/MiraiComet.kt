@@ -1,5 +1,7 @@
 package ren.natsuyuk1.comet.mirai
 
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging.logger
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
@@ -19,7 +21,6 @@ import ren.natsuyuk1.comet.mirai.contact.toCometGroup
 import ren.natsuyuk1.comet.mirai.event.redirectToComet
 import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
 import ren.natsuyuk1.comet.mirai.util.runWith
-import ren.natsuyuk1.comet.mirai.util.runWithScope
 import ren.natsuyuk1.comet.mirai.util.runWithSuspend
 import ren.natsuyuk1.comet.service.subscribeGithubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
@@ -59,9 +60,11 @@ class MiraiComet(
             heartbeatPeriodMillis = miraiConfig.heartbeatPeriodMillis
         }
 
-        cl.runWithScope(scope) {
+        cl.runWith {
             miraiBot = BotFactory.newBot(qq = this.config.id, password = this.config.password, configuration = config)
-            miraiBot.login()
+            runBlocking {
+                miraiBot.login()
+            }
 
             miraiBot.eventChannel
                 .parentScope(scope)
@@ -74,7 +77,9 @@ class MiraiComet(
                     }
                 }
 
-            miraiBot.join()
+            scope.launch {
+                miraiBot.join()
+            }
         }
 
         if (miraiBot.isOnline) {
