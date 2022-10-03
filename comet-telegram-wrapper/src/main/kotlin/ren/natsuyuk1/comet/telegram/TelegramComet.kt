@@ -13,6 +13,9 @@ import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.flushAccumulatedUpd
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.toChatId
+import io.ktor.client.*
+import io.ktor.client.engine.*
+import io.ktor.client.engine.cio.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import ren.natsuyuk1.comet.api.Comet
@@ -43,7 +46,15 @@ class TelegramComet(
         get() = config.id
 
     override fun login() {
-        bot = telegramBot(config.password)
+        bot = telegramBot(config.password) {
+            this.client = HttpClient(CIO) {
+                engine {
+                    val proxyStr = System.getenv("COMET_PROXY")
+                    if (proxyStr.isNullOrBlank()) return@engine
+                    proxy = ProxyBuilder.http(proxyStr)
+                }
+            }
+        }
 
         scope.launch {
             bot.flushAccumulatedUpdates()
