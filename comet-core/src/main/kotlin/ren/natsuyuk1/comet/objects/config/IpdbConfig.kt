@@ -10,7 +10,9 @@ import mu.KotlinLogging
 import net.mamoe.yamlkt.Comment
 import net.mamoe.yamlkt.Yaml
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
+import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.configDirectory
+import ren.natsuyuk1.comet.utils.file.resolveResourceDirectory
 import java.io.File
 import java.lang.ref.SoftReference
 
@@ -22,8 +24,8 @@ object IpdbConfig : PersistDataFile<IpdbConfig.Data>(
     @Serializable
     data class Data(
         @Comment("是否开启 IP 服务") val enable: Boolean = true,
-        @Comment("IPDB v4 路径") @SerialName("pathV4") private val _pathV4: String? = "./resources/v4.ipdb",
-        @Comment("IPDB v6 路径") @SerialName("pathV6") private val _pathV6: String? = "./resources/v6.ipdb",
+        @Comment("IPDB v4 路径") @SerialName("pathV4") private val _pathV4: String? = resolveResourceDirectory("./resources/v4.ipdb").absPath,
+        @Comment("IPDB v6 路径") @SerialName("pathV6") private val _pathV6: String? = resolveResourceDirectory("./resources/v6.ipdb").absPath,
     ) {
         private fun checkFile(path: String?): File? {
             val file = File(path ?: return null)
