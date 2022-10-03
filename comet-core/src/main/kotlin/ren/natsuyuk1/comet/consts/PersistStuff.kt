@@ -14,6 +14,7 @@ import ren.natsuyuk1.comet.objects.arcaea.ArcaeaUserDataTable
 import ren.natsuyuk1.comet.objects.command.now.NowCmdConfigTable
 import ren.natsuyuk1.comet.objects.command.picturesearch.PictureSearchConfigTable
 import ren.natsuyuk1.comet.objects.config.CometServerConfig
+import ren.natsuyuk1.comet.objects.config.IpdbConfig
 import ren.natsuyuk1.comet.objects.config.TwitterConfig
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.objects.keyword.KeyWordData
@@ -30,6 +31,7 @@ val cometPersistDataFile: List<PersistDataFile<*>> =
         CometServerConfig,
         KeyWordData,
         TwitterConfig,
+        IpdbConfig,
     )
 
 val cometTables =
@@ -143,5 +145,10 @@ val defaultCommands: List<AbstractCommandNode<*>> =
             listOf(PictureSearchCommand.Source.SOURCE)
         ) { comet, sender, subject, wrapper, user ->
             PictureSearchCommand(comet, sender, subject, wrapper, user)
+        },
+        CommandNode(
+            IP,
+        ) { comet, sender, subject, wrapper, user ->
+            IPCommand(comet, sender, subject, wrapper, user)
         },
     )

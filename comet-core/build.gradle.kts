@@ -46,6 +46,8 @@ dependencies {
 
     implementation(libs.yabapi.core.jvm)
 
+    implementation("moe.sdl.ipdb:ipdb-core:0.1.1")
+
     implementation(libs.skiko)
 
     implementation(libs.brotli4j)
