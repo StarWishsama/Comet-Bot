@@ -24,7 +24,8 @@ class TestRSSPusher {
         initTestDatabase()
         DatabaseManager.loadTables(CometPusherContextTable)
         RSSPusher.init()
-        RSSPusher.subscriber["https://rsshub.app/36kr/newsflashes"] = mutableListOf(CometPushTarget(1, CometPushTargetType.GROUP, LoginPlatform.TEST))
+        RSSPusher.subscriber["https://rsshub.app/36kr/newsflashes"] =
+            mutableListOf(CometPushTarget(id = 1, CometPushTargetType.GROUP, LoginPlatform.TEST))
     }
 
     @Test

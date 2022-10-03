@@ -113,27 +113,26 @@ open class PersistDataFile<T : Any>(
         }
     }
 
-    override suspend fun monitorFileChange(): Unit =
-        withContext(Dispatchers.IO) {
-            val watchService = FileSystems.getDefault().newWatchService()
-            file.parentFile.toPath().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY)
+    override suspend fun monitorFileChange(): Unit = withContext(Dispatchers.IO) {
+        val watchService = FileSystems.getDefault().newWatchService()
+        file.parentFile.toPath().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY)
 
-            scope.launch {
-                while (scope.isActive) {
-                    val wk = withContext(Dispatchers.IO) {
-                        watchService.take()
-                    }
-
-                    for (e in wk.pollEvents()) {
-                        val changeContext = e.context() as Path
-                        if (changeContext == file.toPath()) {
-                            logger.info { "检测到文件 ${this@PersistDataFile.clazz.simpleName} 已被修改, 正在尝试重载..." }
-                            load()
-                        }
-                    }
-
-                    if (!wk.reset()) break
+        scope.launch {
+            while (scope.isActive) {
+                val wk = withContext(Dispatchers.IO) {
+                    watchService.take()
                 }
+
+                for (e in wk.pollEvents()) {
+                    val changeContext = e.context() as Path
+                    if (changeContext == file.toPath()) {
+                        logger.info { "检测到文件 ${this@PersistDataFile.clazz.simpleName} 已被修改, 正在尝试重载..." }
+                        load()
+                    }
+                }
+
+                if (!wk.reset()) break
             }
         }
+    }
 }

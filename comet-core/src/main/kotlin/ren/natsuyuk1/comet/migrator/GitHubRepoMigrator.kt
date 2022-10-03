@@ -17,8 +17,10 @@ object GitHubRepoMigrator : IMigrator {
 
         val githubRepo = File(oldFilePath, "repos.yml")
 
-        fun OldGitHubRepo.GithubRepo.migrateToSubscriber(): MutableList<GithubRepoData.Data.GithubRepo.GithubRepoSubscriber> {
-            val result = mutableListOf<GithubRepoData.Data.GithubRepo.GithubRepoSubscriber>()
+        fun OldGitHubRepo.GithubRepo.migrateToSubscriber():
+            MutableList<GithubRepoData.Data.GithubRepo.GithubRepoSubscriber> {
+            val result =
+                mutableListOf<GithubRepoData.Data.GithubRepo.GithubRepoSubscriber>()
 
             for (groupId in this.repoTarget) {
                 result.add(

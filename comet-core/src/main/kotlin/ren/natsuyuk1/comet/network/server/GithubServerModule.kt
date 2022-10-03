@@ -40,7 +40,14 @@ object GithubWebHookHandler {
     suspend fun handle(call: ApplicationCall) {
         try {
             logger.debug { "有新连接 ${call.request.httpMethod} - ${call.request.uri}" }
-            logger.debug { "Request Headers ${buildString { call.request.headers.forEach { k, v -> append("$k=$v") } }}}" }
+            logger.debug {
+                val headers = call.request.headers
+                    .entries()
+                    .joinToString(";") { (k, v) ->
+                        "$k=$v"
+                    }
+                "Request Headers: $headers"
+            }
 
             // Get information from header to identity whether the request is from GitHub.
             if (!isGitHubRequest(call.request)) {
@@ -95,9 +102,11 @@ object GithubWebHookHandler {
                 hasError -> {
                     call.respondText("Comet 发生内部错误", status = HttpStatusCode.InternalServerError)
                 }
+
                 secretStatus == SecretStatus.NO_SECRET -> {
                     call.respondText("Comet 已收到事件, 推荐使用密钥加密以保证服务器安全")
                 }
+
                 else -> {
                     call.respondText("Comet 已收到事件")
                 }

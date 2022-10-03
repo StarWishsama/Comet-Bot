@@ -15,8 +15,11 @@ fun VideoInfo.toMessageWrapper(): MessageWrapper =
                 append("$title\n")
                 append("| ${owner?.name}\n")
                 append("| ${description.limit(80)}\n")
+                val like = stat?.like?.getBetterNumber()
+                val coin = stat?.coin?.getBetterNumber()
+                val collect = stat?.collect?.getBetterNumber()
                 append(
-                    "| \uD83D\uDC4D ${stat?.like?.getBetterNumber()} \uD83D\uDCB0 ${stat?.coin?.getBetterNumber()} ⭐ ${stat?.collect?.getBetterNumber()}\n"
+                    "| \uD83D\uDC4D $like \uD83D\uDCB0 $coin ⭐ $collect\n"
                 )
                 append(if (stat?.highestRank?.let { it > 0 } == true) "| 本站最高日排行第${stat?.highestRank}名\n" else "\n")
             }

@@ -24,7 +24,13 @@ import ren.natsuyuk1.comet.api.user.CometUser
 abstract class AbstractCommandNode<CSender : CommandSender>(
     val property: CommandProperty,
     val subCommandProperty: List<SubCommandProperty> = listOf(),
-    val handler: (comet: Comet, sender: CSender, subject: CSender, wrapper: MessageWrapper, user: CometUser) -> BaseCommand
+    val handler: (
+        comet: Comet,
+        sender: CSender,
+        subject: CSender,
+        wrapper: MessageWrapper,
+        user: CometUser
+    ) -> BaseCommand
 )
 
 /**

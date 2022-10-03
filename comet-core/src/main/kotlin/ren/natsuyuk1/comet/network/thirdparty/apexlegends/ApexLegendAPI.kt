@@ -31,7 +31,10 @@ object ApexLegendAPI {
         logger.debug { "Received body $it" }
     }.serializeTo(json)
 
-    suspend fun CometClient.fetchUserInfoByName(playerName: String, platform: String): ApexPlayerInfo = client.get("$API_ROUTE/bridge") {
+    suspend fun CometClient.fetchUserInfoByName(
+        playerName: String,
+        platform: String,
+    ): ApexPlayerInfo = client.get("$API_ROUTE/bridge") {
         parameter("auth", CometGlobalConfig.data.apexLegendToken)
         parameter("player", playerName)
         parameter("platform", platform)
