@@ -40,7 +40,7 @@ object NowCmdConfigTable : Table("now_cmd_config") {
                 it[NowCmdConfigTable.config] = Json.encodeToString(config)
             }
         } else {
-            update( { NowCmdConfigTable.id eq id and (NowCmdConfigTable.isGroup eq isGroup) and (platformType eq platform) } ) {
+            update({ NowCmdConfigTable.id eq id and (NowCmdConfigTable.isGroup eq isGroup) and (platformType eq platform) }) {
                 it[platformType] = platform
                 it[NowCmdConfigTable.isGroup] = isGroup
                 it[NowCmdConfigTable.id] = id

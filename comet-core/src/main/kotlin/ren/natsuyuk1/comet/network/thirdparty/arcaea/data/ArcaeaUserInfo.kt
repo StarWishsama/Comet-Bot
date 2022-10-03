@@ -60,6 +60,5 @@ data class ArcaeaUserInfo(
         }
     }
 
-
     fun getActualPtt(): String = (data.rating / 100.0).fixDisplay()
 }

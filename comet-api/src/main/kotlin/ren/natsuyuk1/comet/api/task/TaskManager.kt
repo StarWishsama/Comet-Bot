@@ -112,10 +112,9 @@ object TaskManager : ITaskManager {
         task: suspend () -> Unit
     ): Job =
         scope.launch {
-        while (isActive) {
-            delay()
-            task()
+            while (isActive) {
+                delay()
+                task()
+            }
         }
-    }
-
 }

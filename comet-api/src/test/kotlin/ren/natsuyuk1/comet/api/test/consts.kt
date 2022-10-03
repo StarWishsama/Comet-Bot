@@ -12,7 +12,12 @@ import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 
 private val logger = mu.KotlinLogging.logger {}
 
-val fakeComet = object : Comet(LoginPlatform.TEST, CometConfig(0, "", LoginPlatform.TEST), logger, ModuleScope("TestInstance")) {
+val fakeComet = object : Comet(
+    platform = LoginPlatform.TEST,
+    config = CometConfig(0, "", LoginPlatform.TEST),
+    logger = logger,
+    scope = ModuleScope("TestInstance")
+) {
     override val id: Long = 0
 
     override fun login() {}

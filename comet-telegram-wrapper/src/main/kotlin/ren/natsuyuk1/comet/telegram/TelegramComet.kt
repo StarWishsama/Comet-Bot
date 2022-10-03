@@ -51,7 +51,7 @@ class TelegramComet(
             logger.debug { "Refreshed accumulated updates" }
 
             bot.buildBehaviourWithLongPolling(scope) {
-                onContentMessage( { it.chat is PrivateChat || it.chat is GroupChat } ) {
+                onContentMessage({ it.chat is PrivateChat || it.chat is GroupChat }) {
                     if (it.date < startTime) {
                         return@onContentMessage
                     }

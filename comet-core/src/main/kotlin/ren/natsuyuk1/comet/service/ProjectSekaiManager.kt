@@ -289,15 +289,15 @@ object ProjectSekaiManager {
 
                 addText(
                     "${getSongName(mr.musicId)} [${mr.musicDifficulty.name.uppercase()} ${
-                        getSongLevel(
-                            mr.musicId,
-                            mr.musicDifficulty
-                        )
+                    getSongLevel(
+                        mr.musicId,
+                        mr.musicDifficulty
+                    )
                     }] $status (${
-                        getSongAdjustedLevel(
-                            mr.musicId,
-                            mr.musicDifficulty
-                        )?.fixDisplay(1)
+                    getSongAdjustedLevel(
+                        mr.musicId,
+                        mr.musicDifficulty
+                    )?.fixDisplay(1)
                     })\n"
                 )
             }

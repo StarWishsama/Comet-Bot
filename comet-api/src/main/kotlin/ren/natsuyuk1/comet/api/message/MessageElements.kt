@@ -50,7 +50,7 @@ data class Image(
 ) : WrapperElement() {
 
     init {
-        if (url == null && filePath  == null && base64 == null) {
+        if (url == null && filePath == null && base64 == null) {
             throw IllegalArgumentException("url/filePath/base64 can't be null or empty!")
         }
     }

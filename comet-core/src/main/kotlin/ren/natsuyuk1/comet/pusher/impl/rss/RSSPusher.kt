@@ -27,7 +27,7 @@ import java.io.InputStream
 
 private val logger = KotlinLogging.logger {}
 
-object RSSPusher: CometPusher("RSS", CometPusherConfig(60)) {
+object RSSPusher : CometPusher("RSS", CometPusherConfig(60)) {
     private val subPath = File(resolveDirectory("./config/pusher/"), "${name}_sub.json")
     val subscriber = mutableMapOf<String, MutableList<CometPushTarget>>()
 

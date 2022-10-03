@@ -17,7 +17,7 @@ class TestEventManager {
         assertFalse { MessagePreSendEvent::class.isSubclassOf(MessageEvent::class) }
     }
 
-    class TestEvent: AbstractEvent(), CancelableEvent
+    class TestEvent : AbstractEvent(), CancelableEvent
 
     @Test
     fun testEventHandle() {

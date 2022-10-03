@@ -31,7 +31,7 @@ class RandCommand(
         x..y 在 x 到 y 之中随机，包含 y
         
         x..<y 在 x 到 y 之中随机，不包含 y
-        """.trimIndent()
+    """.trimIndent()
     private val exprRegex = Regex("""^(?<x>[+-]?\d+)(?<operator>..<?)(?<y>[+-]?\d+)$""")
     private val expression by argument("EXPR", exprHelp).convert {
         it.trim()

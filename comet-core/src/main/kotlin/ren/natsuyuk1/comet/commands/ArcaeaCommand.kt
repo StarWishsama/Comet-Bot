@@ -132,7 +132,7 @@ class ArcaeaCommand(
         }
 
         override suspend fun run() {
-           ArcaeaService.queryB38(comet, subject, sender, user)
+            ArcaeaService.queryB38(comet, subject, sender, user)
         }
     }
 }

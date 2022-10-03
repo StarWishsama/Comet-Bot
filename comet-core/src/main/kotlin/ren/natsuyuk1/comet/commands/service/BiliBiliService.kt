@@ -80,7 +80,12 @@ object BiliBiliService {
         }
     }
 
-    suspend fun processUserSearch(subject: PlatformCommandSender, sender: PlatformCommandSender, id: Int = 0, keyword: String = "") = scope.launch {
+    suspend fun processUserSearch(
+        subject: PlatformCommandSender,
+        sender: PlatformCommandSender,
+        id: Int = 0,
+        keyword: String = ""
+    ) = scope.launch {
         if (id != 0) {
             queryUser(subject, id)
         } else {
