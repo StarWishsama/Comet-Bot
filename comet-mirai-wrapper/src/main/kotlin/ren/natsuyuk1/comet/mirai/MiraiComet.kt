@@ -5,7 +5,6 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.contact.PermissionDeniedException
 import net.mamoe.mirai.message.data.MessageSource.Key.recall
-import net.mamoe.mirai.supervisorJob
 import net.mamoe.mirai.utils.BotConfiguration
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
@@ -88,9 +87,7 @@ class MiraiComet(
                 logger.warn { "Mirai ${miraiBot.id} 并未正常登录" }
             }
 
-            if (!miraiBot.supervisorJob.isActive) {
-                miraiBot.join()
-            }
+            miraiBot.join()
         }
     }
 
