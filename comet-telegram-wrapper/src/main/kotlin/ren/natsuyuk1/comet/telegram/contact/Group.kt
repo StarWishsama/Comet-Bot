@@ -4,10 +4,15 @@ import dev.inmo.tgbotapi.extensions.api.chat.get.getChatAdministrators
 import dev.inmo.tgbotapi.extensions.api.chat.leaveChat
 import dev.inmo.tgbotapi.extensions.api.chat.members.getChatMember
 import dev.inmo.tgbotapi.extensions.api.chat.modify.setChatTitle
+import dev.inmo.tgbotapi.extensions.api.get.getFileAdditionalInfo
+import dev.inmo.tgbotapi.extensions.utils.asExtendedGroupChat
+import dev.inmo.tgbotapi.requests.abstracts.toInputFile
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.member.AdministratorChatMember
 import dev.inmo.tgbotapi.types.chat.member.OwnerChatMember
+import dev.inmo.tgbotapi.types.files.fullUrl
 import dev.inmo.tgbotapi.types.toChatId
+import dev.inmo.tgbotapi.utils.PreviewFeature
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
@@ -79,10 +84,20 @@ internal class TelegramGroupImpl(
      *
      * 获取后请尽快使用
      *
-     * FIXME
      */
+    @OptIn(PreviewFeature::class)
     override val avatarUrl: String
-        get() = ""
+        get() {
+            chat.asExtendedGroupChat()?.chatPhoto?.bigFileId?.let {
+                val avatarInfo = runBlocking {
+                    comet.bot.getFileAdditionalInfo(it.toInputFile())
+                }
+
+                return avatarInfo.fullUrl(comet.urlsKeeper)
+            }
+
+            throw IllegalArgumentException("指定的群聊必须是 ExtendedGroupChat!")
+        }
 
     override fun getMember(id: Long): GroupMember? {
         return runBlocking {
@@ -126,7 +141,7 @@ internal class TelegramGroupImpl(
         ).also { it.broadcast() }
 
         return if (!event.isCancelled) {
-            message.send(comet, MessageSource.MessageSourceType.GROUP, chat.id)
+            comet.send(message, MessageSource.MessageSourceType.GROUP, chat.id)
         } else {
             null
         }

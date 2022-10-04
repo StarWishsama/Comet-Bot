@@ -150,7 +150,7 @@ class TelegramGroupMemberImpl(
         ).also { it.broadcast() }
 
         return if (!event.isCancelled) {
-            message.send(comet, MessageSource.MessageSourceType.GROUP, groupChatID.toChatId())
+            comet.send(message, MessageSource.MessageSourceType.GROUP, groupChatID.toChatId())
         } else {
             null
         }

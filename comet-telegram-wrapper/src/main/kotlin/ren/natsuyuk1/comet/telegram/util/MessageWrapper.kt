@@ -24,31 +24,33 @@ import java.io.File
 
 private val logger = mu.KotlinLogging.logger {}
 
-suspend fun MessageWrapper.send(
-    comet: TelegramComet,
+suspend fun TelegramComet.send(
+    message: MessageWrapper,
     type: MessageSource.MessageSourceType,
     target: ChatId,
 ): MessageReceipt {
     val textSourceList = mutableListOf<TextSource>()
 
-    getMessageContent().forEach {
+    message.getMessageContent().forEach {
         when (it) {
             is Text -> {
                 textSourceList.add(regular(it.parseToString()))
             }
+
             is AtElement -> {
                 textSourceList.add(mention(it.userName))
             }
+
             else -> {}
         }
     }
 
-    val resp = if (find<Image>() != null) {
-        find<Image>()?.toInputFile()?.let { comet.bot.sendPhoto(target, it, entities = textSourceList) }
-    } else if (find<Voice>() != null) {
-        find<Voice>()?.toInputFile()?.let { comet.bot.sendAudio(target, it) }
+    val resp = if (message.find<Image>() != null) {
+        message.find<Image>()?.toInputFile()?.let { bot.sendPhoto(target, it, entities = textSourceList) }
+    } else if (message.find<Voice>() != null) {
+        message.find<Voice>()?.toInputFile()?.let { bot.sendAudio(target, it) }
     } else {
-        comet.bot.sendMessage(target, textSourceList)
+        bot.sendMessage(target, textSourceList)
     }
 
     if (resp == null) {
@@ -56,10 +58,10 @@ suspend fun MessageWrapper.send(
     }
 
     return MessageReceipt(
-        comet,
+        this,
         MessageSource(
             type,
-            comet.id,
+            id,
             resp.chat.id.chatId,
             resp.date.unixMillisLong,
             resp.messageId

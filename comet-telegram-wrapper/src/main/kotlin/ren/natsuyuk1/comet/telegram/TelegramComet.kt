@@ -13,6 +13,7 @@ import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.flushAccumulatedUpd
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.toChatId
+import dev.inmo.tgbotapi.utils.TelegramAPIUrlsKeeper
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import ren.natsuyuk1.comet.api.Comet
@@ -39,6 +40,8 @@ class TelegramComet(
 ) : Comet(LoginPlatform.TELEGRAM, config, logger, ModuleScope("telegram ${config.id}")) {
     private val startTime = DateTime.now()
     lateinit var bot: TelegramBot
+    lateinit var urlsKeeper: TelegramAPIUrlsKeeper
+
     override val id: Long
         get() = config.id
 
@@ -63,6 +66,8 @@ class TelegramComet(
                 }
             }.join()
         }
+
+        urlsKeeper = TelegramAPIUrlsKeeper(token = config.password)
 
         logger.info { "成功登录 Telegram Bot (${runBlocking { bot.getMe().username.username }})" }
     }
