@@ -45,7 +45,7 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent? {
                 } else if (base64?.isNotEmpty() == true) {
                     return base64!!.toByteArray().toExternalResource().uploadAsImage(subject)
                 } else {
-                    throw IllegalArgumentException("Image have no argument to access image")
+                    throw IllegalArgumentException("图片消息元素必须存在一个参数!")
                 }
             } catch (e: Exception) {
                 logger.warn { "转换图片失败, 原始内容: ${toString()}" }
@@ -60,7 +60,7 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent? {
         is Voice -> {
             if (subject !is AudioSupported) {
                 throw UnsupportedOperationException(
-                    "Sending voice message to unsupported subject: must be friend or group"
+                    "发送语音消息失败: 发送对象必须是好友或群聊!"
                 )
             }
 
@@ -68,13 +68,13 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent? {
                 return runBlocking {
                     subject.uploadAudio(File(filePath).toExternalResource())
                 }
+            } else {
+                throw FileNotFoundException("转换语音失败, 对应的语音文件不存在: $filePath")
             }
-
-            throw RuntimeException("Unable to convert Voice to MessageChain, Raw content: $this")
         }
 
         else -> {
-            logger.debug { "Unsupported message wrapper ${this::class.simpleName} in mirai side" }
+            logger.debug { "Mirai Wrapper 不支持该消息元素: ${this::class.simpleName}" }
             null
         }
     }

@@ -83,7 +83,7 @@ open class PersistDataFile<T : Any>(
      */
     override suspend fun save(saveData: T) = mutex.withLock {
         withContext(scope.coroutineContext) {
-            logger.debug { "Saving data $saveData" }
+            logger.debug { "正在保存数据 $saveData" }
             file.touch()
             file.writeTextBuffered(format.encodeToString(serializer, saveData))
         }
@@ -106,8 +106,8 @@ open class PersistDataFile<T : Any>(
                     )
                 updateData { t }
                 t.also {
-                    logger.debug { "Loaded data: ${it::class.simpleName}" }
-                    logger.trace { "Data content $it" }
+                    logger.debug { "已加载文件: ${it::class.simpleName}" }
+                    logger.trace { "文件内容 $it" }
                 }
             }
         }
