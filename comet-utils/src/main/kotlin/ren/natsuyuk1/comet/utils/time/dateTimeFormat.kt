@@ -15,6 +15,10 @@ val yyMMddWithTimePattern: DateTimeFormatter by lazy {
     DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").withZone(ZoneId.systemDefault())
 }
 
+val yyMMddWithTimeZonePattern: DateTimeFormatter by lazy {
+    DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss Z").withZone(ZoneId.systemDefault())
+}
+
 val yyMMddPattern: DateTimeFormatter by lazy {
     DateTimeFormatter.ofPattern("yyyy/MM/dd").withZone(ZoneId.systemDefault())
 }
