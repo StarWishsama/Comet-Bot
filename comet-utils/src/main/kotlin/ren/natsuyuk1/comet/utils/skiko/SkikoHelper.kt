@@ -30,8 +30,9 @@ private val logger = KotlinLogging.logger {}
 object SkikoHelper {
     private val client = HttpClient(CIO) {
         install(UserAgent) {
-            agent =
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.41"
+            /* ktlint-disable max-line-length */
+            agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.41"
+            /* ktlint-enable max-line-length */
         }
 
         install(ContentEncoding) {
@@ -82,8 +83,9 @@ object SkikoHelper {
 
         if (skikoLibFolder.listFiles()?.isEmpty() == true) {
             logger.info { "开始下载 Skiko $SKIKO_VERSION 依赖库." }
-            val downloadURL =
-                "https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/skiko/skiko-awt-runtime-$skikoOsName-$skikoArchName/$SKIKO_VERSION/skiko-awt-runtime-$skikoOsName-$skikoArchName-$SKIKO_VERSION.jar"
+            /* ktlint-disable max-line-length */
+            val downloadURL = "https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/skiko/skiko-awt-runtime-$skikoOsName-$skikoArchName/$SKIKO_VERSION/skiko-awt-runtime-$skikoOsName-$skikoArchName-$SKIKO_VERSION.jar"
+            /* ktlint-enable max-line-length */
 
             kotlin.runCatching {
                 val tmpDownloadFile =

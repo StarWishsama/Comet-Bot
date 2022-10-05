@@ -50,8 +50,9 @@ object BrotliDecompressor {
 object BrotliLoader {
     private val client = HttpClient(CIO) {
         install(UserAgent) {
-            agent =
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.41"
+            /* ktlint-disable max-line-length */
+            agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.41"
+            /* ktlint-enable max-line-length */
         }
 
         install(ContentEncoding) {
@@ -82,7 +83,9 @@ object BrotliLoader {
             return
         }
 
-        val libActualPath = if (libraryPath.split(";").size == 1) libraryPath.split(":") else libraryPath.split(";")
+        val libActualPath = if (libraryPath.split(";").size == 1) {
+            libraryPath.split(":")
+        } else libraryPath.split(";")
 
         val libraryLocation = File(libActualPath[0], libraryName)
 
@@ -123,8 +126,9 @@ object BrotliLoader {
                 }
             }
 
-            val downloadURL =
-                "https://repo1.maven.org/maven2/com/aayushatharva/brotli4j/native-$packageName/1.7.1/native-$packageName-1.7.1.jar"
+            /* ktlint-disable max-line-length */
+            val downloadURL = "https://repo1.maven.org/maven2/com/aayushatharva/brotli4j/native-$packageName/1.7.1/native-$packageName-1.7.1.jar"
+            /* ktlint-enable max-line-length */
             val downloadFile = File(brotliLibFolder, "native-$packageName-1.7.1.jar")
 
             kotlin.runCatching {

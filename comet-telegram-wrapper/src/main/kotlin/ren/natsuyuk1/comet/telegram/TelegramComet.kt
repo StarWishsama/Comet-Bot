@@ -13,6 +13,7 @@ import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.flushAccumulatedUpd
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.toChatId
+import dev.inmo.tgbotapi.utils.TelegramAPIUrlsKeeper
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
@@ -42,6 +43,8 @@ class TelegramComet(
 ) : Comet(LoginPlatform.TELEGRAM, config, logger, ModuleScope("telegram ${config.id}")) {
     private val startTime = DateTime.now()
     lateinit var bot: TelegramBot
+    lateinit var urlsKeeper: TelegramAPIUrlsKeeper
+
     override val id: Long
         get() = config.id
 
@@ -59,7 +62,7 @@ class TelegramComet(
         scope.launch {
             bot.flushAccumulatedUpdates()
 
-            logger.debug { "Refreshed accumulated updates" }
+            logger.debug { "已刷新 Telegram Bot 离线时暂存的消息" }
 
             bot.buildBehaviourWithLongPolling(scope) {
                 onContentMessage({ it.chat is PrivateChat || it.chat is GroupChat }) {
@@ -67,13 +70,15 @@ class TelegramComet(
                         return@onContentMessage
                     }
 
-                    logger.trace { "onContentMessage > " + it.format() }
+                    logger.trace { it.format() }
                     scope.launch {
                         it.toCometEvent(this@TelegramComet)?.broadcast()
                     }
                 }
             }.join()
         }
+
+        urlsKeeper = TelegramAPIUrlsKeeper(token = config.password)
 
         logger.info { "成功登录 Telegram Bot (${runBlocking { bot.getMe().username.username }})" }
     }
@@ -106,7 +111,7 @@ class TelegramComet(
         return try {
             bot.deleteMessage(source.target.toChatId(), source.messageID)
         } catch (e: CommonRequestException) {
-            logger.warn(e) { "撤回消息失败, source: $source" }
+            logger.warn(e) { "撤回消息失败, 原始消息来源: $source" }
             return false
         }
     }

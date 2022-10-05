@@ -89,6 +89,8 @@ object ArcaeaHelper {
 
 private fun ArcaeaSongInfo.encodeToString(): String {
     val mr = songResult.first()
-    return ("${ArcaeaHelper.getSongNameByID(mr.songID)} [${mr.difficulty.formatDifficulty()} ${mr.constant}] " +
-        "${mr.score} ${mr.score.formatScore()} ${mr.clearType.formatType()} | Rating ${mr.rating.fixDisplay()}")
+    return (
+        "${ArcaeaHelper.getSongNameByID(mr.songID)} [${mr.difficulty.formatDifficulty()} ${mr.constant}] " +
+            "${mr.score} ${mr.score.formatScore()} ${mr.clearType.formatType()} | Rating ${mr.rating.fixDisplay()}"
+        )
 }

@@ -28,9 +28,12 @@ suspend fun Tweet.toMessageWrapper(includes: TwitterExpansions? = null): Message
                     appendLine()
 
                     when (rtInfo.type) {
-                        ReferencedTweetType.RETWEETED -> appendText("\uD83D\uDD01 转发了 ${rtAuthor.name.limit(15)} 的推文", true)
-                        ReferencedTweetType.REPLY_TO -> appendText("\uD83D\uDCAC 回复了 ${rtAuthor.name.limit(15)} 的推文", true)
-                        ReferencedTweetType.QUOTED -> appendText("\uD83D\uDCAC 引用了 ${rtAuthor.name.limit(15)} 的推文", true)
+                        ReferencedTweetType.RETWEETED ->
+                            appendText("\uD83D\uDD01 转发了 ${rtAuthor.name.limit(15)} 的推文", true)
+                        ReferencedTweetType.REPLY_TO ->
+                            appendText("\uD83D\uDCAC 回复了 ${rtAuthor.name.limit(15)} 的推文", true)
+                        ReferencedTweetType.QUOTED ->
+                            appendText("\uD83D\uDCAC 引用了 ${rtAuthor.name.limit(15)} 的推文", true)
                         else -> {}
                     }
 
@@ -63,7 +66,10 @@ suspend fun Tweet.toMessageWrapper(includes: TwitterExpansions? = null): Message
         if (tweet.publicMetrics != null) {
             appendLine()
             val metrics = tweet.publicMetrics!!
-            appendText("💬 ${metrics.reply.getBetterNumber()} \uD83D\uDD01 ${metrics.retweet.getBetterNumber()} 👍 ${metrics.like.getBetterNumber()}")
+            val reply = metrics.reply.getBetterNumber()
+            val retweet = metrics.retweet.getBetterNumber()
+            val like = metrics.like.getBetterNumber()
+            appendText("💬 $reply \uD83D\uDD01 $retweet 👍 $like")
         }
     }
 

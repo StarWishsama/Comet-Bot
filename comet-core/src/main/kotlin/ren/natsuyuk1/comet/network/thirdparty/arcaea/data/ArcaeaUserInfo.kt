@@ -48,18 +48,25 @@ data class ArcaeaUserInfo(
             appendLine()
             val lastPlay = data.recentPlayScore.first()
             appendText("最近游玩 >>", true)
-            appendText("${ArcaeaHelper.getSongNameByID(lastPlay.songID)} (${lastPlay.difficulty.formatDifficulty()})", true)
-            appendText("${lastPlay.score} [${lastPlay.score.formatScore()} | ${lastPlay.constant}] | ${lastPlay.clearType.formatType()}")
+            val difficulty = lastPlay.difficulty.formatDifficulty()
+            val lastPlayedSong = ArcaeaHelper.getSongNameByID(lastPlay.songID)
+            appendText("$lastPlayedSong ($difficulty)", true)
+            val score = lastPlay.score
+            val scoreLevel = score.formatScore()
+            val clearType = lastPlay.clearType.formatType()
+            appendText("$score [$scoreLevel | ${lastPlay.constant}] | $clearType")
             appendLine()
         }
 
         if (!data.ratingRecord.isEmpty()) {
             appendLine()
-            val lastPtt = data.ratingRecord[data.ratingRecord.size - 2].jsonArray.last().jsonPrimitive.content.toDouble()
+            val lastPtt = data.ratingRecord[data.ratingRecord.size - 2]
+                .jsonArray.last()
+                .jsonPrimitive.content
+                .toDouble()
             appendText("距上次游玩 ptt 已变化 ${((data.rating - lastPtt) / 100.0).fixDisplay()}")
         }
     }
-
 
     fun getActualPtt(): String = (data.rating / 100.0).fixDisplay()
 }

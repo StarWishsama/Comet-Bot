@@ -7,8 +7,12 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+
 plugins {
     kotlin("plugin.serialization") apply false
+    id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
+    id("org.jlleitschuh.gradle.ktlint-idea") version "10.3.0"
 }
 
 repositories {
@@ -24,12 +28,25 @@ allprojects {
     version = "0.7.0-SNAPSHOT"
 }
 
+installGitHooks()
+
 subprojects {
     repositories {
         mavenCentral()
     }
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
     apply(plugin = "comet-conventions")
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
+    configure<KtlintExtension> {
+        disabledRules.set(setOf("no-wildcard-imports", "import-ordering"))
+        filter {
+            // exclude("**/generated/**")
+            fun exclude(path: String) = exclude {
+                projectDir.toURI().relativize(it.file.toURI()).normalize().path.contains(path)
+            }
+            setOf("/generated/", "/build/", "resources").forEach { exclude(it) }
+        }
+    }
 }
 
 task("buildComet") {

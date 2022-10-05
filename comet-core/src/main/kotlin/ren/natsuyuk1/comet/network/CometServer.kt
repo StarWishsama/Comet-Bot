@@ -28,7 +28,7 @@ object CometServer {
         )
 
         server.start(false)
-        logger.info { "Comet 服务器成功启动! 运行在端口 ${config.data.port}" }
+        logger.info { "Comet 服务成功启动! 运行于端口 ${config.data.port}" }
     }
 
     fun stop() {

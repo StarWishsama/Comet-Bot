@@ -4,27 +4,41 @@
 name: Comet Builder
 
 on:
+  workflow_dispatch:
   push:
     branches: [ dev, stable, work ]
+    paths:
+      - '**.kt'
+      - '**.kts'
+      - '.github/workflows/*.yml'
   pull_request:
-    branches: [ dev, stable, work ]
+    branches:
+      - '*'
+    paths:
+      - '**.kt'
+      - '**.kts'
+      - '.github/workflows/*.yml'
 
 jobs:
+
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: 设置 JDK 17 编译环境
+
+      - name: 设置 JDK 17
         uses: actions/setup-java@v2
         with:
-          distribution: 'zulu'
-          java-version: 17
-          java-package: jdk
-          architecture: x64
-      - name: 给予 gradlew 权限
-        run: chmod +x gradlew
-      - name: Gradle shadowjar 打包
-        run: ./gradlew buildComet check
+          java-version: '17'
+          distribution: 'adopt'
+
+      - uses: burrunan/gradle-cache-action@v1
+        name: 检查格式、测试并打包
+        with:
+          job-id: checker
+          arguments: ktlintCheck test buildComet
+          gradle-version: wrapper
+
       - uses: actions/upload-artifact@v2
         with:
           name: Comet-Bot-full

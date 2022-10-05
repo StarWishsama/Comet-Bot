@@ -60,24 +60,35 @@ class MiraiComet(
         }
 
         cl.runWithScope(scope) {
-            miraiBot = BotFactory.newBot(qq = this.config.id, password = this.config.password, configuration = config)
+            if (!::miraiBot.isInitialized) {
+                miraiBot = BotFactory.newBot(
+                    qq = this.config.id,
+                    password = this.config.password,
+                    configuration = config
+                )
+
+                miraiBot.eventChannel
+                    .parentScope(scope)
+                    .exceptionHandler {
+                        logger.warn(it) { "Mirai Bot (${miraiBot.id}) 发生异常" }
+                    }
+                    .subscribeAlways<net.mamoe.mirai.event.Event> {
+                        cl.runWithSuspend {
+                            it.redirectToComet(this@MiraiComet)
+                        }
+                    }
+            }
+
             miraiBot.login()
 
-            miraiBot.eventChannel
-                .parentScope(scope)
-                .exceptionHandler {
-                    logger.warn(it) { "Mirai Bot (${miraiBot.id}) occurred a exception" }
-                }
-                .subscribeAlways<net.mamoe.mirai.event.Event> {
-                    cl.runWithSuspend {
-                        it.redirectToComet(this@MiraiComet)
-                    }
-                }
+            if (miraiBot.isOnline) {
+                logger.info { "Mirai ${miraiBot.id} 登录成功" }
+            } else {
+                logger.warn { "Mirai ${miraiBot.id} 并未正常登录" }
+            }
 
             miraiBot.join()
         }
-
-        logger.info { "Mirai ${miraiBot.id} 登录成功" }
     }
 
     override fun afterLogin() {

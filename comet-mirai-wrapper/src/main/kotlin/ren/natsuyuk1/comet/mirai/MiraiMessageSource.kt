@@ -13,6 +13,4 @@ class MiraiMessageSource(
     time: Int,
     from: Long,
     target: Long,
-): MessageSource(type, from, target, time.toLong(), (miraiSource.ids.firstOrNull() ?: -1).toLong())
-
-
+) : MessageSource(type, from, target, time.toLong(), (miraiSource.ids.firstOrNull() ?: -1).toLong())

@@ -11,7 +11,7 @@ class RSSPusherContext(
     id: String,
     target: List<CometPushTarget>,
     val content: SyndEntry,
-): CometPushContext(id, target) {
+) : CometPushContext(id, target) {
     override fun normalize(): MessageWrapper =
         buildMessageWrapper {
             appendText(content.title, true)

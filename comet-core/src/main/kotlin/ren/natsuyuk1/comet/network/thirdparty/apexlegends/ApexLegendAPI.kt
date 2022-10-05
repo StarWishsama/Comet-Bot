@@ -16,7 +16,10 @@ private val logger = KotlinLogging.logger {}
 object ApexLegendAPI {
     private const val API_ROUTE = "https://api.mozambiquehe.re"
 
-    suspend fun CometClient.fetchUserInfo(uid: String, platform: String): ApexPlayerInfo = client.get("$API_ROUTE/bridge") {
+    suspend fun CometClient.fetchUserInfo(
+        uid: String,
+        platform: String,
+    ): ApexPlayerInfo = client.get("$API_ROUTE/bridge") {
         parameter("auth", CometGlobalConfig.data.apexLegendToken)
         parameter("uid", uid)
         parameter("platform", platform)
@@ -28,7 +31,10 @@ object ApexLegendAPI {
         logger.debug { "Received body $it" }
     }.serializeTo(json)
 
-    suspend fun CometClient.fetchUserInfoByName(playerName: String, platform: String): ApexPlayerInfo = client.get("$API_ROUTE/bridge") {
+    suspend fun CometClient.fetchUserInfoByName(
+        playerName: String,
+        platform: String,
+    ): ApexPlayerInfo = client.get("$API_ROUTE/bridge") {
         parameter("auth", CometGlobalConfig.data.apexLegendToken)
         parameter("player", playerName)
         parameter("platform", platform)
@@ -40,7 +46,10 @@ object ApexLegendAPI {
         logger.debug { "Received body $it" }
     }.serializeTo(json)
 
-    suspend fun CometClient.fetchUserID(playerName: String, platform: String): ApexIDInfo = client.get("$API_ROUTE/nametouid") {
+    suspend fun CometClient.fetchUserID(
+        playerName: String,
+        platform: String,
+    ): ApexIDInfo = client.get("$API_ROUTE/nametouid") {
         parameter("auth", CometGlobalConfig.data.apexLegendToken)
         parameter("player", playerName)
         parameter("platform", platform)

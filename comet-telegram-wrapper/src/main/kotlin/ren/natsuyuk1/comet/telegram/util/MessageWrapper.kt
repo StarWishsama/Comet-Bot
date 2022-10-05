@@ -24,43 +24,60 @@ import java.io.File
 
 private val logger = mu.KotlinLogging.logger {}
 
-suspend fun MessageWrapper.send(comet: TelegramComet, type: MessageSource.MessageSourceType, target: ChatId): MessageReceipt {
+suspend fun TelegramComet.send(
+    message: MessageWrapper,
+    type: MessageSource.MessageSourceType,
+    target: ChatId,
+): MessageReceipt {
     val textSourceList = mutableListOf<TextSource>()
 
-    getMessageContent().forEach {
+    message.getMessageContent().forEach {
         when (it) {
             is Text -> {
                 textSourceList.add(regular(it.parseToString()))
             }
+
             is AtElement -> {
                 textSourceList.add(mention(it.userName))
             }
+
             else -> {}
         }
     }
 
-    val resp = if (find<Image>() != null) {
-        find<Image>()?.toInputFile()?.let { comet.bot.sendPhoto(target, it, entities = textSourceList) }
-    } else if (find<Voice>() != null) {
-        find<Voice>()?.toInputFile()?.let { comet.bot.sendAudio(target, it) }
+    val resp = if (message.find<Image>() != null) {
+        message.find<Image>()?.toInputFile()?.let { bot.sendPhoto(target, it, entities = textSourceList) }
+    } else if (message.find<Voice>() != null) {
+        message.find<Voice>()?.toInputFile()?.let { bot.sendAudio(target, it) }
     } else {
-        comet.bot.sendMessage(target, textSourceList)
+        bot.sendMessage(target, textSourceList)
     }
 
     if (resp == null) {
         error("Unable to send message")
     }
 
-    return MessageReceipt(comet, MessageSource(
-        type,
-        comet.id,
-        resp.chat.id.chatId,
-        resp.date.unixMillisLong,
-        resp.messageId
-    ))
+    return MessageReceipt(
+        this,
+        MessageSource(
+            type,
+            id,
+            resp.chat.id.chatId,
+            resp.date.unixMillisLong,
+            resp.messageId
+        )
+    )
 }
 
-suspend fun MessageContent.toMessageWrapper(type: MessageSource.MessageSourceType, from: Long, to: Long, time: Long, msgID: Long, comet: TelegramComet, containBotAt: Boolean): MessageWrapper {
+suspend fun MessageContent.toMessageWrapper(
+    type: MessageSource.MessageSourceType,
+    from: Long,
+    to: Long,
+    time: Long,
+    msgID: Long,
+    comet: TelegramComet,
+    containBotAt: Boolean
+): MessageWrapper {
     val receipt = MessageReceipt(comet, MessageSource(type, from, to, time, msgID))
 
     return when (val content = this) {
@@ -81,7 +98,8 @@ suspend fun MessageContent.toMessageWrapper(type: MessageSource.MessageSourceTyp
                         try {
                             tempFile.writeBytes(localPath)
                             // Provide a temp url for pic search (expire after 1h)
-                            appendElement(Image(filePath = tempFile.absPath, url = "https://api.telegram.org/file/bot${comet.config.password}/${urlPath.filePath}"))
+                            val url = "https://api.telegram.org/file/bot${comet.config.password}/${urlPath.filePath}"
+                            appendElement(Image(filePath = tempFile.absPath, url = url))
                             content.text?.let { t -> appendText(t) }
                         } catch (e: Exception) {
                             logger.warn(e) { "在转换 Telegram 图片为 Message Wrapper 时出现问题" }

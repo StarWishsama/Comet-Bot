@@ -42,7 +42,7 @@ class PictureSearchCommand(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
         override val user: CometUser
-    ): CometSubCommand(subject, sender, user, SOURCE) {
+    ) : CometSubCommand(subject, sender, user, SOURCE) {
         companion object {
             val SOURCE = SubCommandProperty(
                 "source",

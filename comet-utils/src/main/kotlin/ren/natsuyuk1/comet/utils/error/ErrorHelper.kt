@@ -57,8 +57,8 @@ object ErrorHelper {
         sb.append(exception.toString() + "\n")
         sb.append("\n")
         var lastPackage = ""
-        for (elem in exception.stackTrace) {
-            val key = elem.className
+        for (ele in exception.stackTrace) {
+            val key = ele.className
             val nameSet = key.split("[.]".toRegex()).toTypedArray()
             val className = nameSet[nameSet.size - 1]
             val packageSet = arrayOfNulls<String>(nameSet.size - 2)
@@ -76,9 +76,7 @@ object ErrorHelper {
                 sb.append("\n")
                 sb.append("包名 $packageName ▶\n")
             }
-            sb.append(
-                "  ▶ 在类 " + className + ", 方法 " + elem.methodName + ". (" + elem.fileName + ", 行 " + elem.lineNumber + ")" + "\n"
-            )
+            sb.appendLine("  ▶ 在类 $className, 方法 ${ele.methodName}. (${ele.fileName}, 行 ${ele.lineNumber})")
         }
         sb.append("========================= 栈轨迹 =========================\n")
 

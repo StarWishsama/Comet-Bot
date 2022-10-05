@@ -39,8 +39,8 @@ class TestImageDraw {
             drawImageRect(Image.makeFromEncoded(testImage.readBytes()), src)
 
             val dst = Rect(20f, 20f, 256f, 256f)
-            //drawImageRect(Image.makeFromEncoded(testImage.readBytes()), testRect, dst)
-            //drawImage(Image.makeFromEncoded(testImage.readBytes()), 10f, 10f)
+            // drawImageRect(Image.makeFromEncoded(testImage.readBytes()), testRect, dst)
+            // drawImage(Image.makeFromEncoded(testImage.readBytes()), 10f, 10f)
         }
 
         val image = surface.makeImageSnapshot()

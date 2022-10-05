@@ -50,8 +50,15 @@ object FontUtil {
         logger.info { "已加载 $counter 个字体." }
     }
 
-    fun defaultFont(size: Float) = Font(fonts.findTypefaces(arrayOf("Source Han Sans SC"), FontStyle.NORMAL.withWeight(500)).firstOrNull(), size).apply {
-        edging = FontEdging.SUBPIXEL_ANTI_ALIAS
+    fun defaultFont(size: Float): Font {
+        val typeface =
+            fonts.findTypefaces(
+                familyNames = arrayOf("Source Han Sans SC"),
+                style = FontStyle.NORMAL.withWeight(500)
+            ).firstOrNull()
+        return Font(typeface, size).apply {
+            edging = FontEdging.SUBPIXEL_ANTI_ALIAS
+        }
     }
 
     fun defaultFontStyle(c: Color, size: Float) = TextStyle().apply {

@@ -36,7 +36,7 @@ class TelegramUserImpl(
         ).also { it.broadcast() }
 
         return if (!event.isCancelled) {
-            message.send(comet, MessageSource.MessageSourceType.BOT, from.id)
+            comet.send(message, MessageSource.MessageSourceType.BOT, from.id)
         } else null
     }
 }

@@ -60,5 +60,7 @@ interface PersistFile<T : Any> {
 }
 
 internal fun KClass<*>.requireSerializable() {
-    require(hasAnnotation<Serializable>() || hasAnnotation<Contextual>()) { "Class $qualifiedName is not @Serializable or @Contextual" }
+    require(hasAnnotation<Serializable>() || hasAnnotation<Contextual>()) {
+        "Class $qualifiedName is not @Serializable or @Contextual"
+    }
 }

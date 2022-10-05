@@ -27,7 +27,7 @@ import java.io.InputStream
 
 private val logger = KotlinLogging.logger {}
 
-object RSSPusher: CometPusher("RSS", CometPusherConfig(60)) {
+object RSSPusher : CometPusher("RSS", CometPusherConfig(60)) {
     private val subPath = File(resolveDirectory("./config/pusher/"), "${name}_sub.json")
     val subscriber = mutableMapOf<String, MutableList<CometPushTarget>>()
 
@@ -50,7 +50,10 @@ object RSSPusher: CometPusher("RSS", CometPusherConfig(60)) {
     override suspend fun retrieve() {
         subscriber.forEach { (rssURL, target) ->
             try {
-                val feed: SyndFeed = SyndFeedInput().build(XmlReader(cometClient.client.get(rssURL).body<InputStream>()))
+                val body = cometClient.client
+                    .get(rssURL)
+                    .body<InputStream>()
+                val feed: SyndFeed = SyndFeedInput().build(XmlReader(body))
                 val feedID = SecureUtil.md5(feed.description)
 
                 val isPushed = transaction {

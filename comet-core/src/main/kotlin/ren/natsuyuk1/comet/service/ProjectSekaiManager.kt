@@ -112,10 +112,12 @@ object ProjectSekaiManager {
 
                 if (teams.readTextBuffered().isEmpty() || commitTime > now) {
                     scope.launch {
+                        /* ktlint-disable max-line-length */
                         cometClient.client.downloadFile(
                             "https://raw.githubusercontent.com/Sekai-World/sekai-i18n/main/zh-TW/cheerful_carnival_teams.json",
                             teams
                         )
+                        /* ktlint-enable max-line-length */
                         carnivalTeamI18NCache = json.parseToJsonElement(teams.readTextBuffered()).jsonObject
                     }
                 } else {
@@ -289,15 +291,15 @@ object ProjectSekaiManager {
 
                 addText(
                     "${getSongName(mr.musicId)} [${mr.musicDifficulty.name.uppercase()} ${
-                        getSongLevel(
-                            mr.musicId,
-                            mr.musicDifficulty
-                        )
+                    getSongLevel(
+                        mr.musicId,
+                        mr.musicDifficulty
+                    )
                     }] $status (${
-                        getSongAdjustedLevel(
-                            mr.musicId,
-                            mr.musicDifficulty
-                        )?.fixDisplay(1)
+                    getSongAdjustedLevel(
+                        mr.musicId,
+                        mr.musicDifficulty
+                    )?.fixDisplay(1)
                     })\n"
                 )
             }

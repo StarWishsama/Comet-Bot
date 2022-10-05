@@ -26,7 +26,8 @@
             <totalSizeCap>1GB</totalSizeCap>
         </rollingPolicy>
         <encoder class="ren.natsuyuk1.comet.utils.logging.PatternLayoutNoLambda">
-            <pattern>%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1le) [%t] %green([%lo{60}]) >>> %highlight(%m) %n%rEx{full}
+            <pattern>%style{%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1le) [%t] %green([%lo{60}]) >>> %highlight(%m)
+                %n%rEx{full}}{Normal}
             </pattern>
         </encoder>
     </appender>

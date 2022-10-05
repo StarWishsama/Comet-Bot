@@ -71,7 +71,8 @@ object ArcaeaClient {
                                 break
                             }
 
-                            else -> { /* ignore */ }
+                            else -> { /* ignore */
+                            }
                         }
                     }
 
@@ -130,7 +131,8 @@ object ArcaeaClient {
                                     break
                                 }
 
-                                else -> { /* ignore */ }
+                                else -> { /* ignore */
+                                }
                             }
                         }
 
@@ -139,7 +141,8 @@ object ArcaeaClient {
                             break
                         }
 
-                        else -> { /* ignore */ }
+                        else -> { /* ignore */
+                        }
                     }
                 }
             } catch (e: ClosedReceiveChannelException) {
@@ -206,7 +209,8 @@ object ArcaeaClient {
                                     songResults.add(playResult)
                                 }
 
-                                else -> { /* ignore */ }
+                                else -> { /* ignore */
+                                }
                             }
                         }
 
@@ -215,7 +219,8 @@ object ArcaeaClient {
                             break
                         }
 
-                        else -> { /* ignore */ }
+                        else -> { /* ignore */
+                        }
                     }
                 }
             } catch (e: ClosedReceiveChannelException) {
@@ -229,6 +234,10 @@ object ArcaeaClient {
 
         logger.debug { "Accumulated ${songResults.size} play results, costs ${timer.measureDuration().toFriendly()}" }
 
-        return Pair(userInfo!!, songResults.sortedByDescending { it.songResult.first().rating }.take(38).also { queryingUser.remove(uuid) })
+        val result = songResults
+            .sortedByDescending { it.songResult.first().rating }
+            .take(38)
+            .also { queryingUser.remove(uuid) }
+        return userInfo!! to result
     }
 }

@@ -14,7 +14,7 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import kotlin.time.Duration.Companion.days
 
-object CometPusherContextTable: IdTable<String>("comet_pusher_context") {
+object CometPusherContextTable : IdTable<String>("comet_pusher_context") {
     override val id: Column<EntityID<String>> = text("push_context_id").entityId()
     val pusherName: Column<String> = text("push_name")
     val context: Column<String> = text("push_context")
@@ -23,7 +23,7 @@ object CometPusherContextTable: IdTable<String>("comet_pusher_context") {
     override val primaryKey: Table.PrimaryKey = PrimaryKey(id)
 }
 
-class CometPusherContext(id: EntityID<String>): Entity<String>(id) {
+class CometPusherContext(id: EntityID<String>) : Entity<String>(id) {
     var pusherName by CometPusherContextTable.pusherName
     var context by CometPusherContextTable.context
     val date by CometPusherContextTable.date

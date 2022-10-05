@@ -135,7 +135,6 @@ fun generateFakeGroupMember(id: Long, group: Group) = object : GroupMember() {
         get() = "Test"
     override val platform: LoginPlatform
         get() = LoginPlatform.TEST
-
 }
 
 fun Any.print() = println(this)
