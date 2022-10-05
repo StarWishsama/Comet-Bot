@@ -13,10 +13,12 @@ object JikiPediaAPI {
             headers {
                 append("Origin", "https://jikipedia.com")
                 append("Referer", "https://jikipedia.com")
+                /* ktlint-disable max-line-length */
                 append(
                     "xid",
                     "pZBzqk4B5uHQDyU2satS+FKft78gvi+PruIpjhHJdfudi4PAcYs/TdhfQQeYZxvF8WR0KZM4FHUxK3dPm7rLfC3hexA1MFvsSw3R/eVPw48="
                 )
+                /* ktlint-enable max-line-length */
                 append("User-Agent", CometGlobalConfig.data.useragent)
                 append("Client", "web")
                 append("Client-Version", "2.7.3a")

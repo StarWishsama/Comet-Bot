@@ -16,8 +16,6 @@ import org.jetbrains.exposed.sql.*
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import java.util.*
 
-private typealias NTable = NowCmdConfigTable
-
 object NowCmdConfigTable : Table("now_cmd_config") {
     private val platformType = enumerationByName<LoginPlatform>("type", 20)
     private val isGroup = bool("is_group")
@@ -40,7 +38,13 @@ object NowCmdConfigTable : Table("now_cmd_config") {
                 it[NowCmdConfigTable.config] = Json.encodeToString(config)
             }
         } else {
-            update({ NowCmdConfigTable.id eq id and (NowCmdConfigTable.isGroup eq isGroup) and (platformType eq platform) }) {
+            update(
+                {
+                    NowCmdConfigTable.id eq id and
+                        (NowCmdConfigTable.isGroup eq isGroup) and
+                        (platformType eq platform)
+                }
+            ) {
                 it[platformType] = platform
                 it[NowCmdConfigTable.isGroup] = isGroup
                 it[NowCmdConfigTable.id] = id

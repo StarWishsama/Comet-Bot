@@ -83,8 +83,10 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
             val aheadEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, ahead) }
             val aheadScore = aheadEventStatus.getScore()
 
+            val aheadScoreStr = aheadScore.getBetterNumber()
+            val delta = (aheadScore - profile.score).getBetterNumber()
             appendText(
-                "上一档排名 $ahead 的分数为 ${aheadScore.getBetterNumber()}, 相差 ${(aheadScore - profile.score).getBetterNumber()}",
+                "上一档排名 $ahead 的分数为 $aheadScoreStr, 相差 $delta",
                 true
             )
         }
@@ -93,8 +95,10 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
             val behindEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, behind) }
             val behindScore = behindEventStatus.getScore()
 
+            val targetScore = behindScore.getBetterNumber()
+            val deltaScore = (profile.score - behindScore).getBetterNumber()
             appendText(
-                "下一档排名 $behind 的分数为 ${behindScore.getBetterNumber()}, 相差 ${(profile.score - behindScore).getBetterNumber()}",
+                "下一档排名 $behind 的分数为 $targetScore, 相差 $deltaScore",
                 true
             )
         }
