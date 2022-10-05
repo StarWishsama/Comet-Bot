@@ -49,7 +49,7 @@ class TelegramComet(
         bot = telegramBot(config.password) {
             this.client = HttpClient(CIO) {
                 engine {
-                    val proxyStr = System.getenv("COMET_PROXY")
+                    val proxyStr = System.getProperty("comet.proxy") ?: System.getenv("COMET_PROXY")
                     if (proxyStr.isNullOrBlank()) return@engine
                     proxy = ProxyBuilder.http(proxyStr)
                 }
@@ -62,7 +62,7 @@ class TelegramComet(
             logger.debug { "Refreshed accumulated updates" }
 
             bot.buildBehaviourWithLongPolling(scope) {
-                onContentMessage( { it.chat is PrivateChat || it.chat is GroupChat } ) {
+                onContentMessage({ it.chat is PrivateChat || it.chat is GroupChat }) {
                     if (it.date < startTime) {
                         return@onContentMessage
                     }
