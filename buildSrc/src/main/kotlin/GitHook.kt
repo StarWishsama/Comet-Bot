@@ -1,6 +1,5 @@
 import org.gradle.api.Project
 import org.gradle.internal.os.OperatingSystem
-import shadow.org.apache.commons.io.FileUtils
 import java.io.File
 import java.nio.file.Files
 
@@ -10,7 +9,7 @@ fun Project.installGitHooks() {
     if (target.canonicalFile == source) return
     target.deleteRecursively()
     if (OperatingSystem.current().isWindows) {
-        FileUtils.copyDirectory(source, target)
+        source.copyRecursively(target)
     } else {
         Files.createSymbolicLink(target.toPath(), source.toPath())
     }
