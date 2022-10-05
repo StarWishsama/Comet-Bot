@@ -112,10 +112,12 @@ object ProjectSekaiManager {
 
                 if (teams.readTextBuffered().isEmpty() || commitTime > now) {
                     scope.launch {
+                        /* ktlint-disable max-line-length */
                         cometClient.client.downloadFile(
                             "https://raw.githubusercontent.com/Sekai-World/sekai-i18n/main/zh-TW/cheerful_carnival_teams.json",
                             teams
                         )
+                        /* ktlint-enable max-line-length */
                         carnivalTeamI18NCache = json.parseToJsonElement(teams.readTextBuffered()).jsonObject
                     }
                 } else {
