@@ -5,9 +5,11 @@ import inet.ipaddr.IPAddressNetwork.IPAddressGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import moe.sdl.ipdb.Reader
 import moe.sdl.ipdb.parser.builtins.FullInfo
 import moe.sdl.yac.core.PrintMessage
 import moe.sdl.yac.parameters.arguments.argument
+import moe.sdl.yac.parameters.arguments.optional
 import moe.sdl.yac.parameters.options.flag
 import moe.sdl.yac.parameters.options.option
 import mu.KotlinLogging
@@ -19,9 +21,12 @@ import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.objects.config.IpdbConfig
 import ren.natsuyuk1.comet.util.sendMessage
+import ren.natsuyuk1.comet.utils.time.yyMMddWithTimeZonePattern
 import java.net.IDN
 import java.net.InetAddress
 import java.net.UnknownHostException
+import java.time.Instant
+import java.time.ZoneId
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.time.DurationUnit
@@ -31,10 +36,7 @@ private val logger = KotlinLogging.logger {}
 
 val IP by lazy {
     CommandProperty(
-        "ip",
-        emptyList(),
-        "查询 IP 或域名归属",
-        "/ip <IP>"
+        "ip", emptyList(), "查询 IP 或域名归属", "/ip <IP>"
     )
 }
 
@@ -53,13 +55,30 @@ class IPCommand(
     private val message: MessageWrapper,
     user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, IP) {
-    val link by argument("LINK", "IP 或域名")
-    val language by option("-l", "--language", help = "要显示的语言")
-    val position by option("-p", "--position", help = "是否显示经纬度").flag()
-    val verbose by option("-v", "--verbose", help = "是否显示详细信息").flag()
+    private val link by argument("LINK", "IP 或域名").optional()
+    private val language by option("-l", "--language", help = "要显示的语言")
+    private val position by option("-p", "--position", help = "是否显示经纬度").flag()
+    private val verbose by option("-v", "--verbose", help = "是否显示详细信息").flag()
+    private val metadata by option("-m", "--metadata", help = "输出元数据").flag()
 
     override suspend fun run() {
         if (!IpdbConfig.data.enable) return
+
+        if (metadata) {
+            val dbs = listOfNotNull(IpdbConfig.data.dbV4.get(), IpdbConfig.data.dbV6.get())
+            if (dbs.isEmpty()) {
+                subject.sendMessage("当前机器人未配置 IPDB")
+                return
+            }
+            subject.sendMessage("\n" + dbs.toMetadataString())?.delayDelete(delDuration)
+            message.receipt?.delayDelete(delDuration)
+            return
+        }
+
+        if (link == null) {
+            subject.sendMessage("错误: 缺少参数 \"LINK\"")
+            return
+        }
 
         val host = HostName(link)
         val addr = if (host.isAddress) {
@@ -110,9 +129,7 @@ class IPCommand(
             return
         }
 
-        val lang =
-            language ?: if (db.metadata.languages.containsKey("CN"))
-                "CN" else db.metadata.languages.keys.first()
+        val lang = language ?: if (db.metadata.languages.containsKey("CN")) "CN" else db.metadata.languages.keys.first()
 
         val info = try {
             db.findThenParse(FullInfo, addr, lang)
@@ -136,7 +153,7 @@ class IPCommand(
                     }
                 }
             } else {
-                appendLine(info.toReadable())
+                appendLine(info.toMetadataString())
                 if (position && info.longitude.isNotBlank() && info.latitude.isNotBlank()) {
                     appendLine("经纬度: ${info.latitude}, ${info.longitude}")
                 }
@@ -165,10 +182,28 @@ private val FullInfo.regionNoDep: String
     get() = if (regionName != countryName) regionName else ""
 
 /* ktlint-disable max-line-length */
-private fun FullInfo.toReadable(): String =
-    when {
-        isAnyCast -> "任播网络${if (isIDC) " IDC" else ""} 所有者域名: $ownerDomain | ISP 域名：$ispDomain"
-        isIDC -> "IDC${ispDomain.sp}${ownerDomain.sp} | ${euDesc.sp}${countryName}${regionNoDep}${cityName}$districtName"
-        else -> "${euDesc.sp}${countryName}${regionNoDep}${cityName}${districtName}${ispDomain.sp}${ownerDomain.sp}"
+private fun FullInfo.toMetadataString(): String = when {
+    isAnyCast -> "任播网络${if (isIDC) " IDC" else ""} 所有者域名: $ownerDomain | ISP 域名：$ispDomain"
+    isIDC -> "IDC${ispDomain.sp}${ownerDomain.sp} | ${euDesc.sp}${countryName}${regionNoDep}${cityName}$districtName"
+    else -> "${euDesc.sp}${countryName}${regionNoDep}${cityName}${districtName}${ispDomain.sp}${ownerDomain.sp}"
+} /* ktlint-enable max-line-length */
+
+fun List<Reader>.toMetadataString(): String = buildString {
+    this@toMetadataString.map {
+        it.ipVersion to it.metadata
+    }.forEach { (ver, meta) ->
+        append(" - ")
+        append(ver?.name ?: "未知")
+        append(" IPDB")
+        appendLine(": ")
+        val format = Instant
+            .ofEpochSecond(meta.build)
+            .atZone(ZoneId.of("UTC"))
+            .format(yyMMddWithTimeZonePattern)
+        appendLine("   构建时间: $format")
+        append("   支持的语言: ")
+        appendLine(meta.languages.keys.joinToString(", "))
+        append("   支持的字段: ")
+        appendLine(meta.fields.joinToString(", "))
     }
-/* ktlint-enable max-line-length */
+}
