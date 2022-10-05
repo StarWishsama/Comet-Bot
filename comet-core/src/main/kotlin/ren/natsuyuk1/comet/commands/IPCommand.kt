@@ -8,6 +8,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import moe.sdl.ipdb.parser.builtins.FullInfo
 import moe.sdl.yac.core.PrintMessage
 import moe.sdl.yac.parameters.arguments.argument
+import moe.sdl.yac.parameters.options.flag
 import moe.sdl.yac.parameters.options.option
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.Comet
@@ -21,6 +22,10 @@ import ren.natsuyuk1.comet.util.sendMessage
 import java.net.IDN
 import java.net.InetAddress
 import java.net.UnknownHostException
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.jvmErasure
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 private val logger = KotlinLogging.logger {}
 
@@ -33,15 +38,25 @@ val IP by lazy {
     )
 }
 
+private val infoFields by lazy {
+    FullInfo::class.memberProperties.filter {
+        it.returnType.jvmErasure == String::class
+    }
+}
+
+private val delDuration = 60.toDuration(DurationUnit.SECONDS)
+
 class IPCommand(
     comet: Comet,
     sender: PlatformCommandSender,
     subject: PlatformCommandSender,
-    message: MessageWrapper,
+    private val message: MessageWrapper,
     user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, IP) {
     val link by argument("LINK", "IP 或域名")
-    val language by option("-l", "--language")
+    val language by option("-l", "--language", help = "要显示的语言")
+    val position by option("-p", "--position", help = "是否显示经纬度").flag()
+    val verbose by option("-v", "--verbose", help = "是否显示详细信息").flag()
 
     override suspend fun run() {
         if (!IpdbConfig.data.enable) return
@@ -108,15 +123,28 @@ class IPCommand(
         }
         if (info == null) {
             subject.sendMessage("数据库中不存在该 IP 记录: $addr")
-        } else {
-            val str = buildString {
-                appendLine("结果为:")
-                appendLine(info.toReadable())
-                if (info.longitude.isNotBlank() && info.latitude.isNotBlank())
-                    appendLine("经纬度: ${info.latitude}, ${info.longitude}")
-            }
-            subject.sendMessage(str)
+            return
         }
+
+        val str = buildString {
+            appendLine("结果为:")
+            if (verbose) {
+                infoFields.forEach {
+                    val value = it.getter(info) as? String
+                    if (!value.isNullOrBlank()) {
+                        appendLine("${it.name}: $value")
+                    }
+                }
+            } else {
+                appendLine(info.toReadable())
+                if (position && info.longitude.isNotBlank() && info.latitude.isNotBlank()) {
+                    appendLine("经纬度: ${info.latitude}, ${info.longitude}")
+                }
+            }
+        }
+
+        message.receipt?.delayDelete(delDuration)
+        subject.sendMessage(str)?.delayDelete(delDuration)
     }
 }
 
@@ -133,14 +161,14 @@ private inline val FullInfo.euDesc: String
 private val String.sp
     get() = if (!isNullOrBlank()) " $this" else ""
 
-private val FullInfo.countryNoDep: String
-    get() = if (regionName != countryName) countryName else ""
+private val FullInfo.regionNoDep: String
+    get() = if (regionName != countryName) regionName else ""
 
 /* ktlint-disable max-line-length */
 private fun FullInfo.toReadable(): String =
     when {
         isAnyCast -> "任播网络${if (isIDC) " IDC" else ""} 所有者域名: $ownerDomain | ISP 域名：$ispDomain"
-        isIDC -> "IDC${ispDomain.sp}${ownerDomain.sp} | ${euDesc.sp}${countryName}${countryNoDep}${cityName}$districtName"
-        else -> "${euDesc.sp}${countryName}${regionName}${cityName}${districtName}${ispDomain.sp}${ownerDomain.sp}"
+        isIDC -> "IDC${ispDomain.sp}${ownerDomain.sp} | ${euDesc.sp}${countryName}${regionNoDep}${cityName}$districtName"
+        else -> "${euDesc.sp}${countryName}${regionNoDep}${cityName}${districtName}${ispDomain.sp}${ownerDomain.sp}"
     }
 /* ktlint-enable max-line-length */
