@@ -44,7 +44,7 @@ dependencies {
 
     implementation(libs.jsoup)
 
-    implementation(libs.yabapi.core.jvm)
+    implementation("moe.sdl.yabapi:yabapi-core-jvm:0.11.0")
 
     implementation("moe.sdl.ipdb:ipdb-core:0.1.1")
 

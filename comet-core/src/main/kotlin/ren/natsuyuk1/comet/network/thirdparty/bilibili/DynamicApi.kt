@@ -46,7 +46,7 @@ object DynamicApi {
 
     @Suppress("BlockingMethodInNonBlockingContext")
     @Throws(ApiException::class)
-    suspend fun getUserDynamicTimeline(mid: Int): List<FeedCardNode>? {
+    suspend fun getUserDynamicTimeline(mid: Long): List<FeedCardNode>? {
         try {
             val resp = biliClient.getFeedByUid(0, mid)
 

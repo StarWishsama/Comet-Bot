@@ -4,7 +4,7 @@ import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.arguments.default
 import moe.sdl.yac.parameters.options.option
-import moe.sdl.yac.parameters.types.int
+import moe.sdl.yac.parameters.types.long
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
 import ren.natsuyuk1.comet.api.message.MessageWrapper
@@ -61,7 +61,7 @@ class BiliBiliCommand(
         }
 
         private val name by option("-n", "--name", help = "欲查询用户的名称")
-        private val uid by option("-i", "--id", help = "欲查询用户的 UID").int()
+        private val uid by option("-i", "--id", help = "欲查询用户的 UID").long()
 
         override suspend fun run() {
             if (uid != null) {

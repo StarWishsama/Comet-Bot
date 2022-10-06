@@ -16,15 +16,15 @@ import moe.sdl.yabapi.data.info.UserCardGetData
 import moe.sdl.yabapi.data.info.UserSpace
 
 object UserApi {
-    suspend fun getUserCard(id: Int): UserCardGetData? {
+    suspend fun getUserCard(id: Long): UserCardGetData? {
         return biliClient.getUserCard(id, false).data
     }
 
-    suspend fun getUserSpace(id: Int): UserSpace? {
+    suspend fun getUserSpace(id: Long): UserSpace? {
         return biliClient.getUserSpace(id).data
     }
 
-    suspend fun getUserNameByMid(mid: Int): String {
+    suspend fun getUserNameByMid(mid: Long): String {
         return getUserCard(mid)?.card?.name!!
     }
 }

@@ -83,10 +83,10 @@ object BiliBiliService {
     suspend fun processUserSearch(
         subject: PlatformCommandSender,
         sender: PlatformCommandSender,
-        id: Int = 0,
+        id: Long = 0,
         keyword: String = ""
     ) = scope.launch {
-        if (id != 0) {
+        if (id != 0L) {
             queryUser(subject, id)
         } else {
             val searchResult = SearchApi.searchUser(keyword)?.data
@@ -108,7 +108,7 @@ object BiliBiliService {
         }
     }
 
-    suspend fun queryUser(subject: PlatformCommandSender, id: Int = 0) = scope.launch {
+    suspend fun queryUser(subject: PlatformCommandSender, id: Long = 0) = scope.launch {
         val space = UserApi.getUserSpace(id)
         val card = UserApi.getUserCard(id)
 
