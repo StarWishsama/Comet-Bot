@@ -10,6 +10,7 @@
 package ren.natsuyuk1.comet.consts
 
 import io.ktor.client.*
+import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.compression.*
@@ -20,6 +21,8 @@ import kotlinx.serialization.json.Json
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.utils.time.Timer
+import java.security.cert.X509Certificate
+import javax.net.ssl.X509TrustManager
 import kotlin.time.Duration.Companion.seconds
 
 val json = Json {
@@ -29,6 +32,20 @@ val json = Json {
 }
 
 val defaultClient = HttpClient(CIO) {
+    engine {
+        val proxyStr = System.getProperty("comet.proxy") ?: System.getenv("COMET_PROXY")
+        if (proxyStr.isNullOrBlank()) return@engine
+        proxy = ProxyBuilder.http(proxyStr)
+
+        https {
+            trustManager = object : X509TrustManager {
+                override fun checkClientTrusted(p0: Array<out X509Certificate>?, p1: String?) {}
+                override fun checkServerTrusted(p0: Array<out X509Certificate>?, p1: String?) {}
+                override fun getAcceptedIssuers(): Array<X509Certificate>? = null
+            }
+        }
+    }
+
     install(UserAgent) {
         agent =
             CometGlobalConfig.data.useragent

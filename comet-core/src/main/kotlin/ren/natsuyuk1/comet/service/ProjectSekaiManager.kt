@@ -5,7 +5,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
@@ -157,7 +156,7 @@ object ProjectSekaiManager {
                         musicDiffFile.readTextBuffered()
                     )
                 )
-            } catch (e: SerializationException) {
+            } catch (e: Exception) {
                 logger.warn(e) { "解析音乐数据时出现问题, 路径 ${musicDiffFile.absPath}" }
             }
         }
@@ -203,7 +202,7 @@ object ProjectSekaiManager {
                 )
 
                 logger.info { "已加载 Project Sekai $fileName 数据" }
-            } catch (e: SerializationException) {
+            } catch (e: Exception) {
                 logger.warn(e) { "解析 $fileName 数据时出现问题" }
             }
         }
