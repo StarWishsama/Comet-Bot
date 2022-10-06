@@ -31,6 +31,7 @@ suspend fun TelegramComet.send(
 ): MessageReceipt {
     val textSourceList = mutableListOf<TextSource>()
 
+    // 纯文本
     message.getMessageContent().forEach {
         when (it) {
             is Text -> {
@@ -45,16 +46,27 @@ suspend fun TelegramComet.send(
         }
     }
 
-    val resp = if (message.find<Image>() != null) {
-        message.find<Image>()?.toInputFile()?.let { bot.sendPhoto(target, it, entities = textSourceList) }
-    } else if (message.find<Voice>() != null) {
-        message.find<Voice>()?.toInputFile()?.let { bot.sendAudio(target, it) }
+    val image = message.find<Image>()
+    val voice = message.find<Voice>()
+
+    val resp = if (image != null) {
+        (image.toInputFile() ?: error("无法发送该图片 $image")).let {
+            bot.sendPhoto(
+                target,
+                it,
+                entities = textSourceList
+            )
+        }
+    } else if (voice != null) {
+        (voice.toInputFile() ?: error("无法发送该语音 $voice")).let {
+            bot.sendAudio(
+                target,
+                it,
+                entities = textSourceList
+            )
+        }
     } else {
         bot.sendMessage(target, textSourceList)
-    }
-
-    if (resp == null) {
-        error("Unable to send message")
     }
 
     return MessageReceipt(

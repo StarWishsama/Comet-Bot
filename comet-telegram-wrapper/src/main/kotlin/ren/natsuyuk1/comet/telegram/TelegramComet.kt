@@ -49,7 +49,8 @@ class TelegramComet(
         get() = config.id
 
     override fun login() {
-        bot = telegramBot(config.password) {
+        urlsKeeper = TelegramAPIUrlsKeeper(token = config.password)
+        bot = telegramBot(urlsKeeper) {
             this.client = HttpClient(CIO) {
                 engine {
                     val proxyStr = System.getProperty("comet.proxy") ?: System.getenv("COMET_PROXY")
@@ -78,8 +79,6 @@ class TelegramComet(
             }.join()
         }
 
-        urlsKeeper = TelegramAPIUrlsKeeper(token = config.password)
-
         logger.info { "成功登录 Telegram Bot (${runBlocking { bot.getMe().username.username }})" }
     }
 
@@ -103,6 +102,7 @@ class TelegramComet(
                 null
             }
         } catch (e: CommonRequestException) {
+            logger.warn(e) { "获取群聊 ($id) 信息失败" }
             null
         }
     }
