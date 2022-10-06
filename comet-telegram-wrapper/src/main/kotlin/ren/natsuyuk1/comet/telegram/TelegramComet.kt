@@ -100,6 +100,11 @@ class TelegramComet(
 
     override suspend fun getGroup(id: Long): Group? {
         return try {
+            // Telegram group id always negative
+            if (id > 0) {
+                return null
+            }
+
             val chat = bot.getChat(id.toChatId())
 
             if (chat is GroupChat) {
