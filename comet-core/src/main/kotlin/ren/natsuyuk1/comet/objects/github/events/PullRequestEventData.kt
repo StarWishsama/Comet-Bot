@@ -53,7 +53,7 @@ data class PullRequestEventData(
         @SerialName("html_url")
         val url: String,
         val title: String,
-        val body: String? = "没有描述",
+        val body: String? = null,
         @SerialName("created_at")
         val createdTime: String
     ) {
@@ -71,7 +71,7 @@ data class PullRequestEventData(
             appendText("\uD83D\uDD27 新提交更改 ${repository.fullName}\n")
             appendText("by ${sender.login} | ${pullRequestInfo.convertCreatedTime()}\n\n")
             appendText("${pullRequestInfo.title}\n")
-            appendText("${pullRequestInfo.body!!.limit(100).trim()}\n\n")
+            appendText("${(pullRequestInfo.body ?: "没有描述").limit(100).trim()}\n\n")
             appendText("查看全部 > ${pullRequestInfo.url}")
         }
 
