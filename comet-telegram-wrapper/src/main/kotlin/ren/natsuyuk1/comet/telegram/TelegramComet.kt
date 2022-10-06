@@ -17,6 +17,7 @@ import dev.inmo.tgbotapi.utils.TelegramAPIUrlsKeeper
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import ren.natsuyuk1.comet.api.Comet
@@ -32,6 +33,7 @@ import ren.natsuyuk1.comet.telegram.contact.toCometGroup
 import ren.natsuyuk1.comet.telegram.event.toCometEvent
 import ren.natsuyuk1.comet.telegram.util.format
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import kotlin.time.Duration.Companion.seconds
 
 private val logger = mu.KotlinLogging.logger("Comet-Telegram")
 
@@ -56,6 +58,10 @@ class TelegramComet(
                     val proxyStr = System.getProperty("comet.proxy") ?: System.getenv("COMET_PROXY")
                     if (proxyStr.isNullOrBlank()) return@engine
                     proxy = ProxyBuilder.http(proxyStr)
+                }
+
+                install(HttpTimeout) {
+                    requestTimeoutMillis = 30.seconds.inWholeMilliseconds
                 }
             }
         }

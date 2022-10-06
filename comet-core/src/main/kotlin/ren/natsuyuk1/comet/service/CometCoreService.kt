@@ -13,6 +13,7 @@ import ren.natsuyuk1.comet.network.thirdparty.bilibili.initYabapi
 import ren.natsuyuk1.comet.network.thirdparty.twitter.initSetsuna
 import ren.natsuyuk1.comet.pusher.DEFAULT_PUSHERS
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import java.security.cert.CertificateException
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -46,9 +47,14 @@ object CometCoreService {
         initYabapi()
 
         scope.launch {
-            ArcaeaClient.fetchConstants()
+            try {
+                ArcaeaClient.fetchConstants()
+            } catch (e: CertificateException) {
+                logger.warn(e) { "无法加载 Arcaea 数据: 目标主机证书有误" }
+            }
             ProjectSekaiManager.init(scope.coroutineContext)
         }
+
         TaskManager.registerTask(1.hours) { HitokotoManager.fetch() }
         DEFAULT_PUSHERS.forEach {
             it.init()
