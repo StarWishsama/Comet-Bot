@@ -50,6 +50,12 @@ subprojects {
 }
 
 task("buildComet") {
+    val output = File("$rootDir/comet/modules")
+
+    if (output.isDirectory && !output.listFiles().isNullOrEmpty()) {
+        output.deleteRecursively()
+    }
+
     println("Now building comet $version...")
     dependsOn(project("comet-console").tasks.findByName("shadowJar"))
     dependsOn(project("comet-mirai-wrapper").tasks.findByName("shadowJar"))
