@@ -13,7 +13,7 @@ package ren.natsuyuk1.comet.network.thirdparty.bilibili
 import moe.sdl.yabapi.api.getRoomInfoByRoomId
 
 object LiveApi {
-    suspend fun getLiveInfo(roomId: Int) = runCatching {
+    suspend fun getLiveInfo(roomId: Long) = runCatching {
         if (roomId < 1L) {
             throw IllegalArgumentException("直播间 ID 不能小于 1")
         }

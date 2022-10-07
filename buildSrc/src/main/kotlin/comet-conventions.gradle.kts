@@ -31,30 +31,30 @@ dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    implementation("io.github.microutils:kotlin-logging-jvm:_")
-    implementation("ch.qos.logback:logback-classic:_")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
+    implementation("ch.qos.logback:logback-classic:1.4.0")
 
     // Kotlinx
-    implementation("org.jetbrains.kotlinx:atomicfu:_")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
+    implementation("org.jetbrains.kotlinx:atomicfu:0.18.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
     testImplementation(kotlin("test"))
 
-    implementation("moe.sdl.yac:core:_")
+    implementation("moe.sdl.yac:core:1.0.0")
 
-    implementation("cn.hutool:hutool-http:_")
-    implementation("cn.hutool:hutool-crypto:_")
-    implementation("cn.hutool:hutool-cron:_")
+    implementation("cn.hutool:hutool-http:5.8.6")
+    implementation("cn.hutool:hutool-crypto:5.8.6")
+    implementation("cn.hutool:hutool-cron:5.8.6")
 
-    implementation("io.ktor:ktor-client-core:_")
-    implementation("io.ktor:ktor-client-cio:_")
-    implementation("io.ktor:ktor-client-logging:_")
-    implementation("io.ktor:ktor-client-encoding:_")
-    implementation("io.ktor:ktor-client-content-negotiation:_")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:_")
+    implementation("io.ktor:ktor-client-core:2.1.2")
+    implementation("io.ktor:ktor-client-cio:2.1.2")
+    implementation("io.ktor:ktor-client-logging:2.1.2")
+    implementation("io.ktor:ktor-client-encoding:2.1.2")
+    implementation("io.ktor:ktor-client-content-negotiation:2.1.2")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.2")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:_")
-    implementation("net.mamoe.yamlkt:yamlkt:_")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+    implementation("net.mamoe.yamlkt:yamlkt:0.12.0")
 }
 
 sourceSets {

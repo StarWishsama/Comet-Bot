@@ -12,6 +12,7 @@ package ren.natsuyuk1.comet.utils.sql
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
@@ -82,8 +83,8 @@ class SQLDatabaseSet<TID : Comparable<TID>, V>(
     override fun removeAll(elements: Collection<V>): Boolean {
         needToUpdate()
         val previous = elements.intersect(values.toSet()).isNotEmpty()
-        elements.forEach {
-            setTable.deleteWhere { setTable.value eq it }
+        elements.forEach { ele ->
+            setTable.deleteWhere { setTable.value eq ele }
         }
         return previous
     }
