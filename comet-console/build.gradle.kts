@@ -42,4 +42,26 @@ tasks.jar {
 tasks.shadowJar {
     archiveFileName.set("${project.name}.jar")
     destinationDirectory.set(File("$rootDir/comet"))
+
+    exclude("checkstyle.xml")
+    exclude("**/*.html")
+    exclude("CronUtilsI18N*.properties")
+    exclude("DebugProbesKt.bin")
+    exclude("org/sqlite/native/FreeBSD/**/*")
+    exclude("org/sqlite/native/Linux-Android/**/*")
+    exclude("org/sqlite/native/Linux-Musl/**/*")
+    listOf("arm", "armv6", "armv7", "ppc64", "x86").forEach {
+        exclude("org/sqlite/native/Linux/$it/**/*")
+        exclude("org/sqlite/native/Windows/$it/**/*")
+    }
+    listOf("freebsd32", "freebsd64", "linux32", "windows32").forEach {
+        exclude("META-INF/native/$it/**/*")
+    }
+    listOf("aix", "freebsd", "openbsd", "sunos").forEach {
+        exclude("com/sun/jna/$it*/**/*")
+    }
+    listOf("arm", "armel", "loongarch64", "mips64el", "ppc", "ppc64le", "riscv64", "s390x", "x86").forEach {
+        exclude("com/sun/jna/linux-$it/**/*")
+        exclude("com/sun/jna/win32-$it/**/*")
+    }
 }
