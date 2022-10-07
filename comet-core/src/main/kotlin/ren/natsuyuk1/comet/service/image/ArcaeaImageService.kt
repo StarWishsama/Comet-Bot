@@ -23,7 +23,7 @@ import java.nio.file.Files
 import kotlin.time.Duration.Companion.hours
 
 object ArcaeaImageService {
-    fun drawB38(user: ArcaeaUserInfo, b38: List<ArcaeaSongInfo>): File {
+    fun drawB38(user: ArcaeaUserInfo, b38: List<ArcaeaSongInfo>): Pair<List<ArcaeaSongInfo>, File> {
         val paragraph = ParagraphBuilder(
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
@@ -83,7 +83,7 @@ object ArcaeaImageService {
             Files.write(tmpFile.toPath(), it)
         }
 
-        return tmpFile
+        return Pair(b38, tmpFile)
     }
 
     private fun ArcaeaSongInfo.encodeToString(): String {
