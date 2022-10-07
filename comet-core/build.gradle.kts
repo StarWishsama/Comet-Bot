@@ -37,14 +37,14 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.40.1")
     implementation("com.zaxxer:HikariCP:5.0.1")
 
-    implementation("io.ktor:ktor-server-core:2.1.2")
-    implementation("io.ktor:ktor-server-netty:2.1.2")
-    implementation("io.ktor:ktor-server-call-logging-jvm:2.1.2")
-    implementation("io.ktor:ktor-client-websocket:2.1.2")
+    api("io.ktor:ktor-server-core:2.1.2")
+    api("io.ktor:ktor-server-netty:2.1.2")
+    api("io.ktor:ktor-server-call-logging-jvm:2.1.2")
+    api("io.ktor:ktor-client-websockets-jvm:2.1.2")
 
     implementation("org.jsoup:jsoup:1.15.3")
 
-    implementation("moe.sdl.yabapi:yabapi-core-jvm:0.11.0-ktor2-SNAPSHOT")
+    implementation("moe.sdl.yabapi:yabapi-core-jvm:0.11.0")
 
     implementation("moe.sdl.ipdb:ipdb-core:0.1.1")
 

@@ -52,7 +52,7 @@ fun LiveRoomData.parseLiveTime(): LocalDateTime {
 
 @Serializable
 data class SimpleLiveRoomData(
-    val roomId: Int,
+    val roomId: Long,
     val roomTitle: String?,
     val liveTime: String?,
     val liveStatus: LiveStatus,

@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.console.util
 
 import mu.KotlinLogging
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -78,7 +79,8 @@ internal fun logout(id: Long, platform: LoginPlatform) {
 
         transaction {
             AccountDataTable.deleteWhere {
-                AccountDataTable.id eq id and (AccountDataTable.platform eq platform)
+                AccountDataTable.id eq id and
+                    (AccountDataTable.platform eq platform)
             }
         }
 

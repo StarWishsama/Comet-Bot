@@ -14,17 +14,17 @@ import ren.natsuyuk1.comet.objects.pusher.SubscribeStatus
 import ren.natsuyuk1.comet.utils.sql.SQLDatabaseSet
 import ren.natsuyuk1.comet.utils.sql.SetTable
 
-object BiliBiliDataTable : IdTable<Int>() {
-    override val id = integer("uid").entityId()
+object BiliBiliDataTable : IdTable<Long>() {
+    override val id = long("uid").entityId()
     val username = varchar("username", 30)
 }
 
-class BiliBiliData(id: EntityID<Int>) : Entity<Int>(id) {
+class BiliBiliData(id: EntityID<Long>) : Entity<Long>(id) {
     val username by BiliBiliDataTable.username
     val subscribers = SQLDatabaseSet(id, BiliBiliSubscriberTable)
 
-    companion object : EntityClass<Int, BiliBiliData>(BiliBiliDataTable) {
-        suspend fun subscribe(uid: Int, target: Long): SubscribeStatus =
+    companion object : EntityClass<Long, BiliBiliData>(BiliBiliDataTable) {
+        suspend fun subscribe(uid: Long, target: Long): SubscribeStatus =
             newSuspendedTransaction {
                 if (UserApi.getUserCard(uid) == null) {
                     return@newSuspendedTransaction SubscribeStatus.NOT_FOUND
@@ -67,7 +67,7 @@ class BiliBiliData(id: EntityID<Int>) : Entity<Int>(id) {
                 SubscribeStatus.SUCCESS
             }
 
-        fun unsubscribe(uid: Int, target: Long): SubscribeStatus =
+        fun unsubscribe(uid: Long, target: Long): SubscribeStatus =
             transaction {
                 val data = findById(uid) ?: return@transaction SubscribeStatus.NOT_FOUND
 
@@ -96,7 +96,7 @@ class BiliBiliData(id: EntityID<Int>) : Entity<Int>(id) {
     }
 }
 
-object BiliBiliSubscriberTable : SetTable<Int, Long>("bilibili_subscribers") {
-    override val id: Column<EntityID<Int>> = reference("uid", BiliBiliDataTable)
+object BiliBiliSubscriberTable : SetTable<Long, Long>("bilibili_subscribers") {
+    override val id: Column<EntityID<Long>> = reference("uid", BiliBiliDataTable)
     override val value: Column<Long> = long("push_target")
 }

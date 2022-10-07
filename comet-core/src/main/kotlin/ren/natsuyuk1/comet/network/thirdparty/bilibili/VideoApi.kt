@@ -17,7 +17,7 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger {}
 
 object VideoApi {
-    suspend fun getVideoInfo(av: Int): Result<VideoInfo?> {
+    suspend fun getVideoInfo(av: Long): Result<VideoInfo?> {
         return kotlin.runCatching { biliClient.getVideoInfo(av).data }.onFailure {
             logger.warn("在获取哔哩哔哩视频信息时遇到了问题", it)
         }
