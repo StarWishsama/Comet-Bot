@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaClient
-import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaHelper
+import ren.natsuyuk1.comet.service.image.ArcaeaImageService
 import ren.natsuyuk1.comet.test.isCI
 import ren.natsuyuk1.comet.test.print
 import ren.natsuyuk1.comet.utils.brotli4j.BrotliLoader
@@ -43,7 +43,7 @@ class TestArcaeaAPI {
         runBlocking {
             val (info, result) = ArcaeaClient.queryUserB38(userID, UUID.randomUUID())
             if (info != null) {
-                ArcaeaHelper.drawB38(info, result).print()
+                ArcaeaImageService.drawB38(info, result).print()
             }
         }
     }
