@@ -35,7 +35,7 @@ jobs:
       - uses: burrunan/gradle-cache-action@v1
         name: 检查格式、测试并打包
         with:
-          job-id: checker
+          job-id: checker-1
           arguments: ktlintCheck test buildComet
           gradle-version: wrapper
 

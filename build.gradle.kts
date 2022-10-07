@@ -10,7 +10,7 @@
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 plugins {
-    kotlin("plugin.serialization") apply false
+    kotlin("plugin.serialization") version "1.7.10" apply false
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
     id("org.jlleitschuh.gradle.ktlint-idea") version "10.3.0"
 }
@@ -50,6 +50,12 @@ subprojects {
 }
 
 task("buildComet") {
+    val output = File("$rootDir/comet/modules")
+
+    if (output.isDirectory && !output.listFiles().isNullOrEmpty()) {
+        output.deleteRecursively()
+    }
+
     println("Now building comet $version...")
     dependsOn(project("comet-console").tasks.findByName("shadowJar"))
     dependsOn(project("comet-mirai-wrapper").tasks.findByName("shadowJar"))
