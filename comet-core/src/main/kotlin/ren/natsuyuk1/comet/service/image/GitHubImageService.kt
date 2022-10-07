@@ -8,6 +8,7 @@ object GitHubImageService {
     fun drawEventInfo(event: GithubEventData): File {
         return when (event) {
             is PullRequestEventData -> {
+                TODO()
             }
 
             else -> error("不支持转换的事件, 请使用文本转换.")
@@ -15,5 +16,6 @@ object GitHubImageService {
     }
 
     private fun PullRequestEventData.drawPullRequestEvent(): File {
+        TODO()
     }
 }
