@@ -28,31 +28,31 @@ dependencies {
     implementation(project(":comet-api"))
     implementation(project(":comet-utils"))
 
-    implementation(KotlinX.serialization.json)
-    implementation(KotlinX.datetime)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+    implementation(("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"))
 
-    api(JetBrains.exposed.core)
-    api(JetBrains.exposed.dao)
-    api(JetBrains.exposed.jdbc)
-    api(libs.exposed.kotlin.datetime)
-    implementation(libs.hikaricp)
+    implementation("org.jetbrains.exposed:exposed-core:0.40.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.40.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.40.1")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.40.1")
+    implementation("com.zaxxer:HikariCP:5.0.1")
 
-    implementation(Ktor.server.core)
-    implementation(Ktor.server.netty)
-    implementation(Ktor.server.callLogging)
-    implementation(libs.ktor.client.websockets)
+    implementation("io.ktor:ktor-server-core:2.1.2")
+    implementation("io.ktor:ktor-server-netty:2.1.2")
+    implementation("io.ktor:ktor-server-call-logging-jvm:2.1.2")
+    implementation("io.ktor:ktor-client-websocket:2.1.2")
 
-    implementation(libs.jsoup)
+    implementation("org.jsoup:jsoup:1.15.3")
 
-    implementation(libs.yabapi.core.jvm)
+    implementation("moe.sdl.yabapi:yabapi-core-jvm:0.11.0-ktor2-SNAPSHOT")
 
     implementation("moe.sdl.ipdb:ipdb-core:0.1.1")
 
-    implementation(libs.skiko)
+    implementation("org.jetbrains.skiko:skiko:0.7.27")
 
-    implementation(libs.brotli4j)
+    implementation("com.aayushatharva.brotli4j:brotli4j:1.7.1")
 
-    implementation(libs.setsuna)
+    implementation("ren.natsuyuk1.setsuna:Setsuna:0.1.0-SNAPSHOT")
 
-    implementation(libs.rome)
+    implementation("com.rometools:rome:1.18.0")
 }
