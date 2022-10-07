@@ -52,5 +52,5 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("org.jsoup:jsoup:1.15.3")
     implementation("org.jetbrains.skiko:skiko:0.7.27")
-    implementation("com.aayushatharva.brotli4j:brotli4j:1.7.1")
+    implementation("com.aayushatharva.brotli4j:brotli4j:1.8.0")
 }

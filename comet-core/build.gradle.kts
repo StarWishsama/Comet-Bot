@@ -50,7 +50,7 @@ dependencies {
 
     implementation("org.jetbrains.skiko:skiko:0.7.27")
 
-    implementation("com.aayushatharva.brotli4j:brotli4j:1.7.1")
+    implementation("com.aayushatharva.brotli4j:brotli4j:1.8.0")
 
     implementation("ren.natsuyuk1.setsuna:Setsuna:0.1.0-SNAPSHOT")
 

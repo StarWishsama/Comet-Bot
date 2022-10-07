@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
+import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
@@ -19,6 +20,7 @@ import ren.natsuyuk1.comet.utils.systeminfo.OsArch
 import ren.natsuyuk1.comet.utils.systeminfo.OsType
 import ren.natsuyuk1.comet.utils.systeminfo.RuntimeUtil
 import java.io.File
+import java.io.IOException
 import java.util.zip.ZipFile
 import kotlin.io.path.outputStream
 
@@ -89,7 +91,9 @@ object BrotliLoader {
 
         val libraryLocation = File(libActualPath[0], libraryName)
 
-        if (!libraryLocation.exists()) {
+        val isOldVersion = !libraryLocation.nameWithoutExtension.contains("1.8.0")
+
+        if (!libraryLocation.exists() || isOldVersion) {
             val osType = RuntimeUtil.getOsType()
             val osArch = RuntimeUtil.getOsArch()
 
@@ -126,10 +130,19 @@ object BrotliLoader {
                 }
             }
 
+            if (isOldVersion) {
+                try {
+                    libraryLocation.delete()
+                } catch (e: IOException) {
+                    logger.warn(e) { "无法删除旧 Brotli 库, 请手动删除 (${libraryLocation.absPath})." }
+                }
+            }
+
             /* ktlint-disable max-line-length */
-            val downloadURL = "https://repo1.maven.org/maven2/com/aayushatharva/brotli4j/native-$packageName/1.7.1/native-$packageName-1.7.1.jar"
+            val downloadURL =
+                "https://repo1.maven.org/maven2/com/aayushatharva/brotli4j/native-$packageName/1.8.0/native-$packageName-1.8.0.jar"
             /* ktlint-enable max-line-length */
-            val downloadFile = File(brotliLibFolder, "native-$packageName-1.7.1.jar")
+            val downloadFile = File(brotliLibFolder, "native-$packageName-1.8.0.jar")
 
             kotlin.runCatching {
                 downloadFile.touch()
