@@ -10,18 +10,12 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import mu.KotlinLogging
-import org.jetbrains.skia.EncodedImageFormat
-import org.jetbrains.skia.Surface
-import org.jetbrains.skia.paragraph.Alignment
-import org.jetbrains.skia.paragraph.ParagraphBuilder
-import org.jetbrains.skia.paragraph.ParagraphStyle
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.github.GitHubApi
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.official.PJSKMusicInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.official.PJSKRankSeasonInfo
@@ -29,13 +23,12 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.profile.PJSKM
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestPredictionInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
-import ren.natsuyuk1.comet.utils.file.*
+import ren.natsuyuk1.comet.utils.file.absPath
+import ren.natsuyuk1.comet.utils.file.readTextBuffered
+import ren.natsuyuk1.comet.utils.file.resolveResourceDirectory
+import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
-import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
-import ren.natsuyuk1.comet.utils.skiko.FontUtil
-import java.awt.Color
 import java.io.File
-import java.nio.file.Files
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.hours
 
@@ -270,70 +263,4 @@ object ProjectSekaiManager {
     }
 
     fun getLatestRankSeason(): Int? = rankSeasonInfo.lastOrNull()?.id
-
-    fun drawB30(user: ProjectSekaiUserInfo.UserGameData, b30: List<ProjectSekaiUserInfo.MusicResult>): File {
-        val b30Text = ParagraphBuilder(
-            ParagraphStyle().apply {
-                alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
-            },
-            FontUtil.fonts
-        ).apply {
-            addText("${user.userGameData.name} - ${user.userGameData.userID} - BEST 30\n")
-
-            popStyle().pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 18f))
-
-            addText("\n")
-
-            b30.forEach { mr ->
-                val status = if (mr.isAllPerfect) "AP" else "FC"
-
-                addText(
-                    "${getSongName(mr.musicId)} [${mr.musicDifficulty.name.uppercase()} ${
-                    getSongLevel(
-                        mr.musicId,
-                        mr.musicDifficulty
-                    )
-                    }] $status (${
-                    getSongAdjustedLevel(
-                        mr.musicId,
-                        mr.musicDifficulty
-                    )?.fixDisplay(1)
-                    })\n"
-                )
-            }
-
-            addText("\n")
-
-            popStyle().pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 13f))
-
-            addText("由 Comet 生成 | 数据来源于 profile.pjsekai.moe")
-        }.build().layout(650f)
-
-        val surface = Surface.makeRasterN32Premul(650, (20 + b30Text.height).toInt())
-
-        surface.canvas.apply {
-            clear(Color.WHITE.rgb)
-
-            b30Text.paint(this, 10f, 10f)
-        }
-
-        val image = surface.makeImageSnapshot()
-
-        val tmpFile = File(cacheDirectory, "${System.currentTimeMillis()}-pjsk.png").apply {
-            TaskManager.registerTaskDelayed(1.hours) {
-                delete()
-            }
-
-            deleteOnExit()
-        }
-
-        runBlocking { tmpFile.touch() }
-
-        image.encodeToData(EncodedImageFormat.PNG)?.bytes?.let {
-            Files.write(tmpFile.toPath(), it)
-        }
-
-        return tmpFile
-    }
 }

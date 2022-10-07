@@ -6,6 +6,7 @@ import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
+import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.file.absPath
 
@@ -76,7 +77,7 @@ data class ProjectSekaiUserInfo(
             return "Project Sekai 歌曲数据还没有加载好噢".toMessageWrapper()
         }
 
-        val result = ProjectSekaiManager.drawB30(user, getBest30Songs())
+        val result = ProjectSekaiImageService.drawB30(user, getBest30Songs())
 
         return buildMessageWrapper {
             appendElement(Image(filePath = result.absPath))
