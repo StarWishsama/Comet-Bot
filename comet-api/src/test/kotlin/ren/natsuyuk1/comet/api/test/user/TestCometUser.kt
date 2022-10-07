@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.api.test.user
 
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.junit.jupiter.api.BeforeAll
@@ -25,10 +26,10 @@ class TestCometUser {
     @Test
     fun testUserCreate(): Unit = runBlocking {
         newSuspendedTransaction {
-            UserTable.deleteWhere { UserTable.platformID eq 114514L }
+            UserTable.deleteWhere { platformID eq 114514L }
             CometUser.create(114514L, LoginPlatform.TEST)
             assertTrue(CometUser.getUser(114514L, LoginPlatform.TEST) != null)
-            UserTable.deleteWhere { UserTable.platformID eq 114514L }
+            UserTable.deleteWhere { platformID eq 114514L }
         }
     }
 }

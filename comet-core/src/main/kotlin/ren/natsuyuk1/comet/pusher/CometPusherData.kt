@@ -8,6 +8,8 @@ import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
@@ -47,7 +49,8 @@ class CometPusherContext(id: EntityID<String>) : Entity<String>(id) {
             val queryTime = Clock.System.now().minus(1.days).toLocalDateTime(TimeZone.currentSystemDefault())
 
             CometPusherContextTable.deleteWhere {
-                CometPusherContextTable.pusherName eq pusherName and (CometPusherContextTable.date less queryTime)
+                CometPusherContextTable.pusherName eq pusherName and
+                    (CometPusherContextTable.date less queryTime)
             }
         }
     }
