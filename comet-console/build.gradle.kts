@@ -21,14 +21,14 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.moe.sdl.yac.core)
-    implementation(libs.jline)
+    implementation("moe.sdl.yac:core:1.0.0")
+    implementation("org.jline:jline:3.21.0")
 
     api(project(":comet-api"))
     api(project(":comet-core"))
     api(project(":comet-utils"))
 
-    compileOnly(libs.skiko)
+    compileOnly("org.jetbrains.skiko:skiko:0.7.27")
 }
 
 tasks.jar {

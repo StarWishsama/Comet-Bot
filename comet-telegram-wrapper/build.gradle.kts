@@ -24,7 +24,7 @@ dependencies {
     compileOnly(project(":comet-core"))
     compileOnly(project(":comet-utils"))
 
-    implementation(libs.tgbotapi) {
+    implementation("dev.inmo:tgbotapi:3.2.6") {
         exclude("io.ktor")
     }
 }
