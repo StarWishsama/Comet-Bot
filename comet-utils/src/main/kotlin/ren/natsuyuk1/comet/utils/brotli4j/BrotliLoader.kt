@@ -2,18 +2,12 @@ package ren.natsuyuk1.comet.utils.brotli4j
 
 import com.aayushatharva.brotli4j.Brotli4jLoader
 import com.aayushatharva.brotli4j.decoder.BrotliInputStream
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.compression.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import ren.natsuyuk1.comet.utils.file.touch
+import ren.natsuyuk1.comet.utils.ktor.defaultClient
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.systeminfo.OsArch
 import ren.natsuyuk1.comet.utils.systeminfo.OsType
@@ -48,30 +42,6 @@ object BrotliDecompressor {
 }
 
 object BrotliLoader {
-    private val client = HttpClient(CIO) {
-        install(UserAgent) {
-            /* ktlint-disable max-line-length */
-            agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.41"
-            /* ktlint-enable max-line-length */
-        }
-
-        install(ContentEncoding) {
-            gzip()
-            deflate()
-            identity()
-        }
-
-        install(ContentNegotiation) {
-            json(
-                Json {
-                    prettyPrint = true
-                    isLenient = true
-                    ignoreUnknownKeys = true
-                }
-            )
-        }
-    }
-
     private val brotliLibFolder = File(resolveDirectory("/modules"), "/brotli")
 
     suspend fun loadBrotli() {
@@ -134,7 +104,7 @@ object BrotliLoader {
 
             kotlin.runCatching {
                 downloadFile.touch()
-                client.downloadFile(downloadURL, downloadFile)
+                defaultClient.downloadFile(downloadURL, downloadFile)
             }.onSuccess {
                 val zip = withContext(Dispatchers.IO) {
                     ZipFile(downloadFile)

@@ -1,20 +1,15 @@
 package ren.natsuyuk1.comet.utils.skiko
 
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
-import io.ktor.client.plugins.compression.*
-import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
-import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import org.jetbrains.skiko.Library
 import org.jetbrains.skiko.hostId
 import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
+import ren.natsuyuk1.comet.utils.ktor.defaultClient
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.systeminfo.OsArch
 import ren.natsuyuk1.comet.utils.systeminfo.OsType
@@ -28,29 +23,6 @@ import kotlin.io.path.outputStream
 private val logger = KotlinLogging.logger {}
 
 object SkikoHelper {
-    private val client = HttpClient(CIO) {
-        install(UserAgent) {
-            /* ktlint-disable max-line-length */
-            agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.41"
-            /* ktlint-enable max-line-length */
-        }
-
-        install(ContentEncoding) {
-            gzip()
-            deflate()
-            identity()
-        }
-
-        install(ContentNegotiation) {
-            json(
-                Json {
-                    prettyPrint = true
-                    isLenient = true
-                    ignoreUnknownKeys = true
-                }
-            )
-        }
-    }
     private const val SKIKO_LIBRARY_PATH_PROPERTY = "skiko.library.path"
     private const val SKIKO_VERSION = "0.7.27"
     private var isLoaded = false
@@ -90,7 +62,7 @@ object SkikoHelper {
             kotlin.runCatching {
                 val tmpDownloadFile =
                     skikoLibFolder.resolve("skiko-awt-runtime-$skikoOsName-$skikoArchName-$SKIKO_VERSION.jar")
-                client.downloadFile(downloadURL, tmpDownloadFile)
+                defaultClient.downloadFile(downloadURL, tmpDownloadFile)
                 val zip = runInterruptible {
                     ZipFile(tmpDownloadFile)
                 }
