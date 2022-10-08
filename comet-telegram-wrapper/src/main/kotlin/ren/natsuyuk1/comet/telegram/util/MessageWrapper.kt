@@ -2,7 +2,6 @@ package ren.natsuyuk1.comet.telegram.util
 
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.files.downloadFile
-import dev.inmo.tgbotapi.extensions.api.get.getFileAdditionalInfo
 import dev.inmo.tgbotapi.extensions.api.send.media.sendAudio
 import dev.inmo.tgbotapi.extensions.api.send.media.sendPhoto
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
@@ -105,13 +104,11 @@ suspend fun MessageContent.toMessageWrapper(
                     tempFile.deleteOnExit()
 
                     kotlin.runCatching {
-                        Pair(comet.bot.downloadFile(it), comet.bot.getFileAdditionalInfo(it))
-                    }.onSuccess { (localPath, urlPath) ->
+                        comet.bot.downloadFile(it)
+                    }.onSuccess { localPath ->
                         try {
                             tempFile.writeBytes(localPath)
-                            // Provide a temp url for pic search (expire after 1h)
-                            val url = "https://api.telegram.org/file/bot${comet.config.password}/${urlPath.filePath}"
-                            appendElement(Image(filePath = tempFile.absPath, url = url))
+                            appendElement(Image(filePath = tempFile.absPath))
                             content.text?.let { t -> appendText(t) }
                         } catch (e: Exception) {
                             logger.warn(e) { "在转换 Telegram 图片为 Message Wrapper 时出现问题" }

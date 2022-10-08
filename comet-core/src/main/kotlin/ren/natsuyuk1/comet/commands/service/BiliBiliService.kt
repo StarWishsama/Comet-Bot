@@ -94,14 +94,17 @@ object BiliBiliService {
             if (searchResult == null || searchResult.firstOrNull() !is UserResult) {
                 subject.sendMessage("找不到你想要搜索的用户, 可能不存在哦".toMessageWrapper())
             } else {
+                @Suppress("UNCHECKED_CAST")
+                searchResult as PendingSearchResult
+
                 if (searchResult.size == 1) {
-                    queryUser(subject, (searchResult as PendingSearchResult).first().mid!!)
+                    queryUser(subject, searchResult.first().mid!!)
                 } else {
                     val user: CometUser? = CometUser.getUser(sender.id, subject.platform)
                     BiliBiliUserQuerySession(
                         subject,
                         user,
-                        searchResult as PendingSearchResult
+                        searchResult
                     ).registerTimeout(15.seconds)
                 }
             }
