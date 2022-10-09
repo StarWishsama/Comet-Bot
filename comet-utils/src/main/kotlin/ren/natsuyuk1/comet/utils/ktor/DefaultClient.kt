@@ -9,6 +9,10 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
 internal val defaultClient = HttpClient(CIO) {
+    engine {
+        requestTimeout = 0
+    }
+
     install(UserAgent) {
         /* ktlint-disable max-line-length */
         agent =

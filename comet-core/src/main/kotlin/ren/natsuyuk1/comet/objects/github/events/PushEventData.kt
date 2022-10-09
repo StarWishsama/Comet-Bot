@@ -86,7 +86,9 @@ data class PushEventData(
         )
     }
 
-    private fun buildCommitList(): String {
+    fun getPushTimeAsString() = getLocalTime(repoInfo.pushTime)
+
+    internal fun buildCommitList(): String {
         val reversed = commitInfo.reversed()
 
         return buildString {
