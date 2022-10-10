@@ -29,7 +29,7 @@ object GitHubImageService {
     private val githubLogo = resourceFile.resolve("github_logo.png")
     private const val GITHUB_CONTENT_PADDING = 10f
     private const val GITHUB_CONTENT_MARGIN = 10f
-    private const val GITHUB_DEFAULT_WIDTH = 450
+    private const val GITHUB_DEFAULT_WIDTH = 600
 
     fun drawEventInfo(event: GithubEventData): File {
         return when (event) {
@@ -50,7 +50,9 @@ object GitHubImageService {
             TaskManager.registerTaskDelayed(1.hours) {
                 delete()
             }
-        }.also { it.touch() }
+
+            touch()
+        }
     }
 
     private fun checkResource() {
@@ -62,7 +64,7 @@ object GitHubImageService {
         ParagraphBuilder(
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 23f)
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 21f)
             },
             FontUtil.fonts
         ).apply {
@@ -74,11 +76,11 @@ object GitHubImageService {
         ParagraphBuilder(
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 15f)
             },
             FontUtil.fonts
         ).apply {
-            addText("Rendered by Comet")
+            addText("☄ Rendered by Comet")
         }.build().layout(width)
 
     private fun PullRequestEventData.draw(): File {
@@ -95,11 +97,11 @@ object GitHubImageService {
         val pullRequestBody = ParagraphBuilder(
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 18f)
             },
             FontUtil.fonts
         ).apply {
-            addText("📜 ${pullRequestInfo.title}\n")
+            addText("📜 ${pullRequestInfo.title}\n\n")
 
             popStyle()
             pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 16f))
@@ -109,9 +111,11 @@ object GitHubImageService {
 
         val padding = drawPadding(GITHUB_DEFAULT_WIDTH - GITHUB_CONTENT_MARGIN * 2)
 
+        val height = (pullRequestBody.height + padding.height * 2.5 + image.height).toInt()
+
         val surface = Surface.makeRasterN32Premul(
             GITHUB_DEFAULT_WIDTH,
-            (pullRequestBody.height + padding.height * 3 + image.height).toInt()
+            height
         )
 
         surface.canvas.apply {
@@ -119,9 +123,13 @@ object GitHubImageService {
             // Draw github logo
             drawImage(image, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN)
 
-            repoInfo.paint(this, GITHUB_CONTENT_PADDING + image.width, GITHUB_CONTENT_MARGIN)
+            repoInfo.paint(this, GITHUB_CONTENT_PADDING * 2 + image.width, GITHUB_CONTENT_MARGIN)
             pullRequestBody.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + image.height)
-            padding.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 3 + image.height)
+            padding.paint(
+                this,
+                GITHUB_CONTENT_PADDING,
+                GITHUB_CONTENT_MARGIN * 2 + image.height + pullRequestBody.height
+            )
         }
 
         val tempFile = runBlocking { generateTempImageFile(this@draw) }
@@ -151,7 +159,7 @@ object GitHubImageService {
         val pushBody = ParagraphBuilder(
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 16f)
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 18f)
             },
             FontUtil.fonts
         ).apply {
@@ -160,9 +168,11 @@ object GitHubImageService {
 
         val padding = drawPadding(GITHUB_DEFAULT_WIDTH - GITHUB_CONTENT_MARGIN * 2)
 
+        val height = (pushBody.height + padding.height * 2.5 + image.height).toInt()
+
         val surface = Surface.makeRasterN32Premul(
             GITHUB_DEFAULT_WIDTH,
-            (pushBody.height + padding.height * 2 + image.height).toInt()
+            height
         )
 
         surface.canvas.apply {
@@ -170,9 +180,9 @@ object GitHubImageService {
             // Draw github logo
             drawImage(image, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN)
 
-            repoInfo.paint(this, GITHUB_CONTENT_PADDING + image.width, GITHUB_CONTENT_MARGIN)
+            repoInfo.paint(this, GITHUB_CONTENT_PADDING * 2 + image.width, GITHUB_CONTENT_MARGIN)
             pushBody.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + image.height)
-            padding.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 3 + image.height)
+            padding.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + image.height + pushBody.height)
         }
 
         val tempFile = runBlocking { generateTempImageFile(this@draw) }
