@@ -6,7 +6,7 @@ import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.event.registerListener
 import ren.natsuyuk1.comet.api.message.Image
-import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.event.pusher.github.GithubEvent
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
@@ -85,7 +85,12 @@ fun Comet.subscribeGithubEvent() = run {
         event.broadcastTargets.forEach {
             val image = GitHubImageService.drawEventInfo(event.eventData)
             if (image != null) {
-                getGroup(it.id)?.sendMessage(MessageWrapper().appendElement(Image(filePath = image.absPath)))
+                getGroup(it.id)?.sendMessage(
+                    buildMessageWrapper {
+                        appendElement(Image(filePath = image.absPath))
+                        appendText("🔗 ${event.eventData.url()}")
+                    }
+                )
             } else {
                 getGroup(it.id)?.sendMessage(event.eventData.toMessageWrapper())
             }

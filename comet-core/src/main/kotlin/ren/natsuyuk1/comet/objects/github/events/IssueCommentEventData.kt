@@ -64,4 +64,6 @@ data class IssueCommentEventData(
     override fun isSendableEvent(): Boolean = true
 
     override fun type(): String = "issue_comment"
+
+    override fun url(): String = comment.url
 }

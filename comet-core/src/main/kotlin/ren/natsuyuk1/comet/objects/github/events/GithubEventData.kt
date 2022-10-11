@@ -21,5 +21,7 @@ interface GithubEventData {
 
     fun type(): String
 
+    fun url(): String
+
     fun isSendableEvent(): Boolean
 }

@@ -51,11 +51,10 @@ data class PingEventData(
         return repositoryInfo.repoFullName
     }
 
-    override fun branchName(): String {
-        return ""
-    }
+    override fun branchName(): String = ""
 
     override fun type(): String = "ping"
+    override fun url(): String = ""
 
     override fun isSendableEvent(): Boolean = true
 }

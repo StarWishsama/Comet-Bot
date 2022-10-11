@@ -135,4 +135,6 @@ data class IssueEventData(
     }
 
     override fun type(): String = "issues"
+
+    override fun url(): String = issue.url
 }

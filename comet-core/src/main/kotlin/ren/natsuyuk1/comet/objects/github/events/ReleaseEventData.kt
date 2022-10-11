@@ -71,6 +71,7 @@ data class ReleaseEventData(
     }
 
     override fun type(): String = "release"
+    override fun url(): String = release.url
 
     override fun isSendableEvent(): Boolean = action == "released" || action == "prereleased"
 }

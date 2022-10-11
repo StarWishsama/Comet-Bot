@@ -17,11 +17,8 @@ import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.service.refsPattern
 import ren.natsuyuk1.comet.utils.time.hmsPattern
-import ren.natsuyuk1.comet.utils.time.yyMMddWithTimePattern
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Serializable
@@ -72,13 +69,7 @@ data class PushEventData(
         val timestamp: String,
         val url: String,
         val committer: PusherInfo
-    ) {
-        fun convertTimestamp(): String {
-            val localTime =
-                LocalDateTime.parse(timestamp, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.systemDefault())
-            return yyMMddWithTimePattern.format(localTime)
-        }
-    }
+    )
 
     private fun getLocalTime(time: Long): String {
         return TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT) + " " + hmsPattern.format(
@@ -126,6 +117,7 @@ data class PushEventData(
     }
 
     override fun type(): String = "push"
+    override fun url(): String = compare
 
     override fun isSendableEvent(): Boolean = true
 }

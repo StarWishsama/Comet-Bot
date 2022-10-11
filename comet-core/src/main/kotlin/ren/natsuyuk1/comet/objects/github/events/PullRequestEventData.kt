@@ -82,4 +82,6 @@ data class PullRequestEventData(
     override fun type(): String = "pull_request"
 
     override fun isSendableEvent(): Boolean = action == "opened"
+
+    override fun url(): String = pullRequestInfo.url
 }
