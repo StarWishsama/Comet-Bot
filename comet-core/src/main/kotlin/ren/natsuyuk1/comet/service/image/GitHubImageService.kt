@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.service.image
 
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.EncodedImageFormat
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.Surface
@@ -45,14 +46,30 @@ object GitHubImageService {
         }
     }
 
-    private suspend fun generateTempImageFile(event: GithubEventData): File {
-        return File(cacheDirectory, "${System.currentTimeMillis()}-${event.type()}.png").apply {
+    private fun Canvas.applyDefaultCanvas(logo: Image, header: Paragraph, body: Paragraph, padding: Paragraph) {
+        clear(Color.WHITE.rgb)
+        // Draw github logo
+        drawImage(logo, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN)
+
+        header.paint(this, GITHUB_CONTENT_PADDING * 2.5f + logo.width, GITHUB_CONTENT_MARGIN)
+        body.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + logo.height)
+        padding.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + logo.height + logo.height)
+    }
+
+    private suspend fun Surface.generateTempImageFile(event: GithubEventData): File {
+        val tmp = File(cacheDirectory, "${System.currentTimeMillis()}-${event.type()}.png").apply {
             TaskManager.registerTaskDelayed(1.hours) {
                 delete()
             }
 
             touch()
         }
+
+        makeImageSnapshot().encodeToData(EncodedImageFormat.PNG)?.bytes?.let {
+            Files.write(tmp.toPath(), it)
+        }
+
+        return tmp
     }
 
     private fun checkResource() {
@@ -134,27 +151,9 @@ object GitHubImageService {
             height
         )
 
-        surface.canvas.apply {
-            clear(Color.WHITE.rgb)
-            // Draw github logo
-            drawImage(image, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN)
+        surface.canvas.applyDefaultCanvas(image, repoInfo, pullRequestBody, padding)
 
-            repoInfo.paint(this, GITHUB_CONTENT_PADDING * 2.5f + image.width, GITHUB_CONTENT_MARGIN)
-            pullRequestBody.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + image.height)
-            padding.paint(
-                this,
-                GITHUB_CONTENT_PADDING,
-                GITHUB_CONTENT_MARGIN * 2 + image.height + pullRequestBody.height
-            )
-        }
-
-        val tempFile = runBlocking { generateTempImageFile(this@draw) }
-
-        surface.makeImageSnapshot().encodeToData(EncodedImageFormat.PNG)?.bytes?.let {
-            Files.write(tempFile.toPath(), it)
-        }
-
-        return tempFile
+        return runBlocking { surface.generateTempImageFile(this@draw) }
     }
 
     private fun PushEventData.draw(): File {
@@ -183,22 +182,8 @@ object GitHubImageService {
             height
         )
 
-        surface.canvas.apply {
-            clear(Color.WHITE.rgb)
-            // Draw github logo
-            drawImage(image, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN)
+        surface.canvas.applyDefaultCanvas(image, repoInfo, pushBody, padding)
 
-            repoInfo.paint(this, GITHUB_CONTENT_PADDING * 2.5f + image.width, GITHUB_CONTENT_MARGIN)
-            pushBody.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + image.height)
-            padding.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + image.height + pushBody.height)
-        }
-
-        val tempFile = runBlocking { generateTempImageFile(this@draw) }
-
-        surface.makeImageSnapshot().encodeToData(EncodedImageFormat.PNG)?.bytes?.let {
-            Files.write(tempFile.toPath(), it)
-        }
-
-        return tempFile
+        return runBlocking { surface.generateTempImageFile(this@draw) }
     }
 }
