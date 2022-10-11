@@ -18,6 +18,7 @@ import ren.natsuyuk1.comet.utils.file.cacheDirectory
 import ren.natsuyuk1.comet.utils.file.resolveResourceDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.skiko.FontUtil
+import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import java.awt.Color
 import java.io.File
@@ -32,7 +33,10 @@ object GitHubImageService {
     private const val GITHUB_CONTENT_MARGIN = 10f
     private const val GITHUB_DEFAULT_WIDTH = 600
 
-    fun drawEventInfo(event: GithubEventData): File {
+    fun drawEventInfo(event: GithubEventData): File? {
+        if (!SkikoHelper.isSkikoLoaded())
+            return null
+
         return when (event) {
             is PullRequestEventData -> {
                 event.draw()
@@ -42,7 +46,7 @@ object GitHubImageService {
                 event.draw()
             }
 
-            else -> error("不支持转换的事件, 请使用文本转换.")
+            else -> null
         }
     }
 

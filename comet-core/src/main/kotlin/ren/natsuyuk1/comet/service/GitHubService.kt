@@ -5,11 +5,15 @@ import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.event.registerListener
+import ren.natsuyuk1.comet.api.message.Image
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.event.pusher.github.GithubEvent
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.objects.github.data.SecretStatus
 import ren.natsuyuk1.comet.objects.github.events.*
+import ren.natsuyuk1.comet.service.image.GitHubImageService
+import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.string.toHMAC
 
 private val logger = KotlinLogging.logger {}
@@ -79,7 +83,12 @@ fun Comet.subscribeGithubEvent() = run {
         logger.debug { "Processing GithubEvent: $event" }
 
         event.broadcastTargets.forEach {
-            getGroup(it.id)?.sendMessage(event.eventData.toMessageWrapper())
+            val image = GitHubImageService.drawEventInfo(event.eventData)
+            if (image != null) {
+                getGroup(it.id)?.sendMessage(MessageWrapper().appendElement(Image(filePath = image.absPath)))
+            } else {
+                getGroup(it.id)?.sendMessage(event.eventData.toMessageWrapper())
+            }
         }
     }
 }
