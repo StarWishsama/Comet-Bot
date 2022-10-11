@@ -35,7 +35,7 @@ data class PushEventData(
     val commitInfo: List<CommitInfo>,
     @SerialName("head_commit")
     val headCommitInfo: CommitInfo?
-) : GithubEventData {
+) : GitHubEventData {
     @Serializable
     data class RepoInfo(
         val id: Long,

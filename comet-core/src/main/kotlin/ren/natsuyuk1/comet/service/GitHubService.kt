@@ -21,14 +21,16 @@ private val logger = KotlinLogging.logger {}
 val refsPattern = "refs/\\w*/".toRegex()
 
 object GitHubService {
-    fun processEvent(raw: String, type: String): GithubEventData? {
+    fun processEvent(raw: String, type: String): GitHubEventData? {
         return when (type) {
             "ping" -> {
                 json.decodeFromString<PingEventData>(raw)
             }
+
             "issues" -> {
                 json.decodeFromString<IssueEventData>(raw)
             }
+
             "push" -> {
                 json.decodeFromString<PushEventData>(raw)
             }
@@ -49,7 +51,7 @@ object GitHubService {
     }
 
     fun checkSecret(secret: String?, requestBody: String, eventType: String): SecretStatus {
-        val parse: GithubEventData =
+        val parse: GitHubEventData =
             processEvent(
                 URLDecoder.decode(requestBody.replace("payload=", ""), Charsets.UTF_8),
                 eventType
@@ -78,22 +80,30 @@ object GitHubService {
     }
 }
 
+/**
+ * 快速为一个 [Comet] 实例
+ */
 fun Comet.subscribeGithubEvent() = run {
     registerListener<GithubEvent> { event ->
         logger.debug { "Processing GithubEvent: $event" }
 
         event.broadcastTargets.forEach {
+            val target = getGroup(it.id) ?: return@forEach
             val image = GitHubImageService.drawEventInfo(event.eventData)
+
             if (image != null) {
-                getGroup(it.id)?.sendMessage(
+                target.sendMessage(
                     buildMessageWrapper {
                         appendElement(Image(filePath = image.absPath))
+                        appendLine()
                         appendText("🔗 ${event.eventData.url()}")
                     }
                 )
             } else {
-                getGroup(it.id)?.sendMessage(event.eventData.toMessageWrapper())
+                target.sendMessage(event.eventData.toMessageWrapper())
             }
+
+            logger.debug { "已推送事件 ${event.eventData.type()} 至群 ${it.id}" }
         }
     }
 }

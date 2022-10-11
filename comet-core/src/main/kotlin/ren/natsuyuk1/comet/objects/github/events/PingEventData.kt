@@ -30,7 +30,7 @@ data class PingEventData(
     val hookInfo: HookInfo,
     @SerialName("repository")
     val repositoryInfo: RepoInfo
-) : GithubEventData {
+) : GitHubEventData {
     @Serializable
     data class HookInfo(
         val type: String,

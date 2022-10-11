@@ -26,7 +26,7 @@ data class IssueCommentEventData(
     val issue: IssueEventData.IssueObject,
     val comment: CommentObject,
     val repository: IssueEventData.RepoInfo
-) : GithubEventData {
+) : GitHubEventData {
     @Serializable
     data class CommentObject(
         @SerialName("html_url")

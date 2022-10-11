@@ -3,11 +3,11 @@ package ren.natsuyuk1.comet.event.pusher.github
 import ren.natsuyuk1.comet.event.BroadcastTarget
 import ren.natsuyuk1.comet.event.CometBroadcastEvent
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
-import ren.natsuyuk1.comet.objects.github.events.GithubEventData
+import ren.natsuyuk1.comet.objects.github.events.GitHubEventData
 
 class GithubEvent(
     private val repo: GithubRepoData.Data.GithubRepo,
-    val eventData: GithubEventData
+    val eventData: GitHubEventData
 ) : CometBroadcastEvent() {
     init {
         val eventType = eventData.type()

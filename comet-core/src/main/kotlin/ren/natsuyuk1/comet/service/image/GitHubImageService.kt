@@ -10,7 +10,7 @@ import org.jetbrains.skia.paragraph.Paragraph
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import ren.natsuyuk1.comet.api.task.TaskManager
-import ren.natsuyuk1.comet.objects.github.events.GithubEventData
+import ren.natsuyuk1.comet.objects.github.events.GitHubEventData
 import ren.natsuyuk1.comet.objects.github.events.PullRequestEventData
 import ren.natsuyuk1.comet.objects.github.events.PushEventData
 import ren.natsuyuk1.comet.service.refsPattern
@@ -33,7 +33,7 @@ object GitHubImageService {
     private const val GITHUB_CONTENT_MARGIN = 10f
     private const val GITHUB_DEFAULT_WIDTH = 600
 
-    fun drawEventInfo(event: GithubEventData): File? {
+    fun drawEventInfo(event: GitHubEventData): File? {
         if (!SkikoHelper.isSkikoLoaded())
             return null
 
@@ -60,7 +60,7 @@ object GitHubImageService {
         padding.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + logo.height + logo.height)
     }
 
-    private suspend fun Surface.generateTempImageFile(event: GithubEventData): File {
+    private suspend fun Surface.generateTempImageFile(event: GitHubEventData): File {
         val tmp = File(cacheDirectory, "${System.currentTimeMillis()}-${event.type()}.png").apply {
             TaskManager.registerTaskDelayed(1.hours) {
                 delete()

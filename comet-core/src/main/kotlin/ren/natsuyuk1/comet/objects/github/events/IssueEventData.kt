@@ -39,7 +39,7 @@ data class IssueEventData(
     val issue: IssueObject,
     val repository: RepoInfo,
     val sender: SenderInfo
-) : GithubEventData {
+) : GitHubEventData {
 
     @Serializable
     data class IssueObject(

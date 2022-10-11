@@ -30,7 +30,7 @@ data class PullRequestEventData(
     @SerialName("repository")
     val repository: RepoInfo,
     val sender: IssueEventData.SenderInfo
-) : GithubEventData {
+) : GitHubEventData {
     @Serializable
     data class RepoInfo(
         val id: Long,
