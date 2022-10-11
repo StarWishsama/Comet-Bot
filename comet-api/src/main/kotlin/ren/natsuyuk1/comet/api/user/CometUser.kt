@@ -10,8 +10,6 @@
 package ren.natsuyuk1.comet.api.user
 
 import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import mu.KotlinLogging
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
@@ -20,7 +18,6 @@ import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
@@ -42,9 +39,7 @@ object UserTable : UUIDTable("comet_user_data") {
     val platformID = long("platform_id")
     val platform = enumeration<LoginPlatform>("platform")
     val checkInDate =
-        datetime("check_in_date").default(
-            Clock.System.now().minus(1.days).toLocalDateTime(TimeZone.currentSystemDefault())
-        )
+        timestamp("check_in_date").default(Clock.System.now().minus(1.days))
     val coin = double("coin").default(0.0)
     val level = integer("level").default(0)
     val exp = long("exp").default(0L)

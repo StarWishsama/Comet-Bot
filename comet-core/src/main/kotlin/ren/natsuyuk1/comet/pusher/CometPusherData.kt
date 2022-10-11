@@ -13,14 +13,14 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.kotlin.datetime.datetime
+import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import kotlin.time.Duration.Companion.days
 
 object CometPusherContextTable : IdTable<String>("comet_pusher_context") {
     override val id: Column<EntityID<String>> = text("push_context_id").entityId()
     val pusherName: Column<String> = text("push_name")
     val context: Column<String> = text("push_context")
-    val date = datetime("push_date").default(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
+    val date = timestamp("push_date").default(Clock.System.now())
 
     override val primaryKey: Table.PrimaryKey = PrimaryKey(id)
 }
@@ -50,7 +50,7 @@ class CometPusherContext(id: EntityID<String>) : Entity<String>(id) {
 
             CometPusherContextTable.deleteWhere {
                 CometPusherContextTable.pusherName eq pusherName and
-                    (CometPusherContextTable.date less queryTime)
+                    (date less queryTime)
             }
         }
     }

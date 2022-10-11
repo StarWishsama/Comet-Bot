@@ -25,7 +25,7 @@ object ProjectSekaiService {
 
     init {
         runBlocking {
-            ProjectSekaiData.updateData()
+            ProjectSekaiData.updateEventInfo()
             currentEventId = ProjectSekaiData.getCurrentEventInfo()?.currentEventID
         }
     }

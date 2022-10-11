@@ -1,15 +1,13 @@
 package ren.natsuyuk1.comet.objects.arcaea
 
 import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.kotlin.datetime.datetime
+import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
@@ -17,8 +15,7 @@ object ArcaeaUserDataTable : IdTable<UUID>("arcaea_user_data") {
     override val id: Column<EntityID<UUID>> = ArcaeaUserDataTable.uuid("user").entityId()
     override val primaryKey = PrimaryKey(id)
     val best38 = text("best38").default("")
-    val best38Time = datetime("best38_time")
-        .default(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
+    val best38Time = timestamp("best38_time").default(Clock.System.now())
 
     val userID = varchar("user_id", 9)
 }

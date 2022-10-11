@@ -56,7 +56,7 @@ class TestProjectSekaiAPI {
         DatabaseManager.loadTables(ProjectSekaiDataTable, ProjectSekaiUserDataTable)
         runBlocking {
             ProjectSekaiManager.init(EmptyCoroutineContext)
-            ProjectSekaiData.updateData()
+            ProjectSekaiData.updateEventInfo()
         }
     }
 
