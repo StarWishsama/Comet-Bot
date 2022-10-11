@@ -16,13 +16,13 @@ import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.isNumeric
 
 @kotlinx.serialization.Serializable
-data class SekaiBestPredictionInfo(
+data class PJSKEventPredictionInfo(
     val status: String,
     val data: JsonObject,
     val message: String
 )
 
-fun SekaiBestPredictionInfo.toMessageWrapper(): MessageWrapper =
+fun PJSKEventPredictionInfo.toMessageWrapper(): MessageWrapper =
     buildMessageWrapper {
         val eventName = data["eventName"]?.jsonPrimitive?.content
 

@@ -4,7 +4,6 @@ import kotlinx.coroutines.runBlocking
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.consts.cometClient
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankSeasonInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserEventInfo
@@ -75,8 +74,10 @@ object ProjectSekaiService {
         }
     }
 
-    suspend fun fetchPrediction(): MessageWrapper {
-        return cometClient.getRankPredictionInfo().toMessageWrapper()
+    fun fetchPrediction(): MessageWrapper {
+        val pred = ProjectSekaiData.getCurrentPredictionInfo()
+            ?: return "活动预测线信息暂未获取, 稍等片刻哦~".toMessageWrapper()
+        return pred.toMessageWrapper()
     }
 
     suspend fun queryUserInfo(user: CometUser): MessageWrapper {
@@ -104,8 +105,6 @@ object ProjectSekaiService {
         val userData = ProjectSekaiUserData.getUserPJSKData(user.id.value)
             ?: return "你还没有绑定过世界计划账号, 使用 /pjsk bind -i [你的ID] 绑定".toMessageWrapper()
 
-        val userId = userData.userID
-
-        return cometClient.getUserInfo(userId).generateBest30()
+        return cometClient.getUserInfo(userData.userID).generateBest30()
     }
 }

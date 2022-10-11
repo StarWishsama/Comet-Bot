@@ -1,7 +1,6 @@
 package ren.natsuyuk1.comet.service
 
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
@@ -14,13 +13,11 @@ import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.github.GitHubApi
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.official.PJSKMusicInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.official.PJSKRankSeasonInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.profile.PJSKMusicDifficultyInfo
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestPredictionInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.file.absPath
@@ -30,14 +27,11 @@ import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import java.io.File
 import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 private val logger = KotlinLogging.logger {}
 
 object ProjectSekaiManager {
-    lateinit var predictionCache: SekaiBestPredictionInfo
-        private set
-
     private var scope = ModuleScope("projectsekai_helper")
 
     private val pjskFolder = resolveResourceDirectory("./projectsekai")
@@ -61,11 +55,11 @@ object ProjectSekaiManager {
 
         fetchI18NFile()
 
-        TaskManager.registerTaskDelayed(1.hours, ::refreshCache)
+        TaskManager.registerTaskDelayed(30.minutes, ::refreshCache)
     }
 
-    private fun refreshCache() {
-        predictionCache = runBlocking { cometClient.getRankPredictionInfo() }
+    private suspend fun refreshCache() {
+        ProjectSekaiData.updatePredictionData()
     }
 
     fun getCurrentEventStatus(): SekaiEventStatus {

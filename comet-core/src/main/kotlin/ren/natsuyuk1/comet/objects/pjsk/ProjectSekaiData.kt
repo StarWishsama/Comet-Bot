@@ -11,6 +11,7 @@ package ren.natsuyuk1.comet.objects.pjsk
 
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import mu.KotlinLogging
 import org.jetbrains.exposed.dao.Entity
@@ -28,6 +29,7 @@ import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getEventList
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.PJSKEventPredictionInfo
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
@@ -66,34 +68,33 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
         }
 
         suspend fun updateEventInfo() {
+            transaction {
+                if (ProjectSekaiDataTable.columns.isEmpty()) {
+                    runBlocking { initData() }
+                }
+            }
+
             val timestamp = System.currentTimeMillis()
 
             kotlin.runCatching {
                 cometClient.getEventList(1).data.first()
             }.onSuccess { currentEvent ->
                 transaction {
-                    val data = ProjectSekaiData.all()
+                    val info = ProjectSekaiData[0]
 
-                    if (data.empty()) {
-                        runBlocking { initData() }
-                        return@transaction
-                    } else {
-                        val info = data.first()
+                    if (info.endTime < timestamp) {
+                        info.apply {
+                            currentEventID = currentEvent.id
+                            startTime = currentEvent.startAt
+                            aggregateTime = currentEvent.aggregateAt
+                            endTime = currentEvent.closedAt
+                            name = currentEvent.name
+                        }
 
-                        if (info.endTime < timestamp) {
-                            info.apply {
-                                currentEventID = currentEvent.id
-                                startTime = currentEvent.startAt
-                                aggregateTime = currentEvent.aggregateAt
-                                endTime = currentEvent.closedAt
-                                name = currentEvent.name
-                            }
-
-                            transaction {
-                                ProjectSekaiUserDataTable.update {
-                                    it[lastQueryPosition] = 0
-                                    it[lastQueryScore] = 0
-                                }
+                        transaction {
+                            ProjectSekaiUserDataTable.update {
+                                it[lastQueryPosition] = 0
+                                it[lastQueryScore] = 0
                             }
                         }
                     }
@@ -110,9 +111,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
                 }
             }
 
-            val pjskData = transaction {
-                ProjectSekaiData.all().first()
-            }
+            val pjskData = transaction { ProjectSekaiData[0] }
 
             val timestamp = Clock.System.now()
 
@@ -133,6 +132,13 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
         }
 
         fun getCurrentEventInfo(): ProjectSekaiData? = transaction { ProjectSekaiData.all().firstOrNull() }
+
+        fun getCurrentPredictionInfo(): PJSKEventPredictionInfo? =
+            transaction {
+                getCurrentEventInfo()?.eventPredictionData?.let {
+                    json.decodeFromString(it)
+                }
+            }
     }
 
     var currentEventID by ProjectSekaiDataTable.currentEventID

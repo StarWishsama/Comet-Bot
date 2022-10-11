@@ -18,7 +18,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiE
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiRankSeasonInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.SekaiBestPredictionInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.PJSKEventPredictionInfo
 import java.io.InputStream
 
 private val logger = mu.KotlinLogging.logger {}
@@ -84,7 +84,7 @@ object ProjectSekaiAPI {
         }.body()
     }
 
-    suspend fun CometClient.getRankPredictionInfo(): SekaiBestPredictionInfo {
+    suspend fun CometClient.getRankPredictionInfo(): PJSKEventPredictionInfo {
         logger.debug { "Fetching project sekai rank prediction info" }
 
         return client.get(THREE3KIT_URL).body()
