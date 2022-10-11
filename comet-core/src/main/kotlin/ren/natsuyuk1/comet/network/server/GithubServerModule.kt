@@ -94,7 +94,7 @@ object GithubWebHookHandler {
                     return
                 }
             } catch (e: IOException) {
-                ErrorHelper.createErrorReportFile("推送 WebHook 消息失败", "Github Webhook", e, payload)
+                ErrorHelper.createErrorReportFile("推送 WebHook 消息失败", "GitHub WebHook", e, payload)
                 hasError = true
             }
 
@@ -104,7 +104,7 @@ object GithubWebHookHandler {
                 }
 
                 secretStatus == SecretStatus.NO_SECRET -> {
-                    call.respondText("Comet 已收到事件, 推荐使用密钥加密以保证服务器安全")
+                    call.respondText("Comet 已收到事件, 推荐使用密钥加密以保证安全")
                 }
 
                 else -> {

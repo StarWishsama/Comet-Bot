@@ -1,6 +1,8 @@
 package ren.natsuyuk1.comet.migrator
 
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
@@ -56,7 +58,7 @@ object UserDataMigrator : IMigrator {
                                 oldTime.minute,
                                 oldTime.second,
                                 oldTime.nano
-                            )
+                            ).toInstant(TimeZone.currentSystemDefault())
                             it[userLevel] = user.level.toUserLevel()
                         }
                     } else {

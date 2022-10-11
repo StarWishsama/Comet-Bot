@@ -1,6 +1,6 @@
 package ren.natsuyuk1.comet.commands
 
-import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toJavaInstant
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.CometCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
@@ -32,7 +32,7 @@ class InfoCommand(
                 appendElement(AtElement(sender.id, sender.name))
                 appendLine()
                 appendText("等级 ${user.level} | 硬币 ${user.coin.getBetterNumber()}", true)
-                appendText("上次签到于 ${yyMMddWithTimePattern.format(user.checkInDate.toJavaLocalDateTime())}")
+                appendText("上次签到于 ${yyMMddWithTimePattern.format(user.checkInDate.toJavaInstant())}")
             }
         )
     }

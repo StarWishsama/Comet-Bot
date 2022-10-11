@@ -2,8 +2,6 @@ package ren.natsuyuk1.comet.test.commands.service
 
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterAll
@@ -39,17 +37,17 @@ class TestSignService {
 
         val testUser = CometUser.create(114514L, LoginPlatform.TEST).also {
             transaction {
-                it.checkInDate = testCheckInTime.plus(1.minutes).toLocalDateTime(TimeZone.currentSystemDefault())
+                it.checkInDate = testCheckInTime.plus(1.minutes)
             }
         }
         CometUser.create(114515L, LoginPlatform.TEST).also {
             transaction {
-                it.checkInDate = testCheckInTime.toLocalDateTime(TimeZone.currentSystemDefault())
+                it.checkInDate = testCheckInTime
             }
         }
         CometUser.create(114516L, LoginPlatform.TEST).also {
             transaction {
-                it.checkInDate = testCheckInTime.plus(2.minutes).toLocalDateTime(TimeZone.currentSystemDefault())
+                it.checkInDate = testCheckInTime.plus(2.minutes)
             }
         }
 
@@ -66,20 +64,20 @@ class TestSignService {
 
         val user = CometUser.getUserOrCreate(114514L, LoginPlatform.MIRAI).also {
             transaction {
-                it.checkInDate = testCheckInTime.minus(1.days).toLocalDateTime(TimeZone.currentSystemDefault())
+                it.checkInDate = testCheckInTime.minus(1.days)
             }
         }
 
         assertFalse { user.isSigned() }
 
         transaction {
-            user.checkInDate = testCheckInTime.plus(1.days).toLocalDateTime(TimeZone.currentSystemDefault())
+            user.checkInDate = testCheckInTime.plus(1.days)
         }
 
         assertTrue { user.isSigned() }
 
         transaction {
-            user.checkInDate = testCheckInTime.toLocalDateTime(TimeZone.currentSystemDefault())
+            user.checkInDate = testCheckInTime
         }
 
         assertTrue { user.isSigned() }

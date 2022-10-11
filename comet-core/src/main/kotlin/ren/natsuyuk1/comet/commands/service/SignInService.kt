@@ -31,7 +31,10 @@ import java.security.SecureRandom
 fun CometUser.isSigned(): Boolean {
     val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     val checkInRefreshTime =
-        LocalDateTime(LocalDate(currentTime.year, currentTime.month, currentTime.dayOfMonth), LocalTime(0, 0, 0))
+        LocalDateTime(
+            LocalDate(currentTime.year, currentTime.month, currentTime.dayOfMonth),
+            LocalTime(0, 0, 0)
+        ).toInstant(TimeZone.currentSystemDefault())
 
     return checkInDate > checkInRefreshTime
 }
@@ -122,7 +125,7 @@ object SignInService {
     private fun calculate(user: CometUser): Pair<SignInResult, SignInResult> {
         // 计算签到时间
         val currentTime = Clock.System.now()
-        val lastSignInTime = user.checkInDate.toInstant(TimeZone.currentSystemDefault())
+        val lastSignInTime = user.checkInDate
         val checkDuration = currentTime - lastSignInTime
 
         if (checkDuration.inWholeDays <= 1) {
@@ -136,7 +139,7 @@ object SignInService {
         }
 
         transaction {
-            user.checkInDate = currentTime.toLocalDateTime(TimeZone.currentSystemDefault())
+            user.checkInDate = currentTime
         }
 
         // 使用随机数工具生成基础硬币
@@ -181,7 +184,7 @@ object SignInService {
             0,
             0,
             0
-        )
+        ).toInstant(TimeZone.currentSystemDefault())
         val after = LocalDateTime(
             checkLDT.year,
             checkLDT.monthNumber,
@@ -190,7 +193,7 @@ object SignInService {
             59,
             59,
             0
-        )
+        ).toInstant(TimeZone.currentSystemDefault())
 
         return transaction {
             val sortedByDate = UserTable.select {
