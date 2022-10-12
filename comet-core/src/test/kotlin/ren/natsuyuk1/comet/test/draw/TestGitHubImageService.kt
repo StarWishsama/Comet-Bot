@@ -23,6 +23,8 @@ class TestGitHubImageService {
 
     @Test
     fun test() {
+      if (isCI()) return
+      
         val payload = """{
   "ref": "refs/heads/dev",
   "before": "624891b46da95a3c69d93349e643a6a5cc20a39a",
