@@ -69,10 +69,7 @@ class MiraiComet(
             loginSolver = if (Desktop.isDesktopSupported()) {
                 SwingSolver
             } else {
-                StandardCharImageLoginSolver(
-                    input = { lineReader.readLine() },
-                    loggerSupplier = { miraiBot.logger }
-                )
+                StandardCharImageLoginSolver(input = { lineReader.readLine() })
             }
         }
 
