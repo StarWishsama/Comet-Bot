@@ -125,21 +125,19 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
     private suspend fun handleConsoleCommand() = scope.launch {
         while (isActive) {
-            if (loginStatus.value) {
-                continue
-            }
-
-            try {
-                CommandManager.executeCommand(
-                    dummyComet,
-                    ConsoleCommandSender,
-                    ConsoleCommandSender,
-                    buildMessageWrapper { appendText(Console.readln()) }
-                ).join()
-            } catch (e: UserInterruptException) { // Ctrl + C
-                println("请使用 Ctrl + D 退出 Comet 终端")
-            } catch (e: EndOfFileException) { // Ctrl + D
-                exitProcess(0)
+            if (!loginStatus.value) {
+                try {
+                    CommandManager.executeCommand(
+                        dummyComet,
+                        ConsoleCommandSender,
+                        ConsoleCommandSender,
+                        buildMessageWrapper { appendText(Console.readln()) }
+                    ).join()
+                } catch (e: UserInterruptException) { // Ctrl + C
+                    println("请使用 Ctrl + D 退出 Comet 终端")
+                } catch (e: EndOfFileException) { // Ctrl + D
+                    exitProcess(0)
+                }
             }
         }
     }.join()
