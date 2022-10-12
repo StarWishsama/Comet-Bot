@@ -7,7 +7,11 @@ import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.wrapper.CometWrapper
 
 class TelegramWrapper : CometWrapper {
-    override suspend fun createInstance(config: CometConfig, classLoader: ClassLoader): Comet {
+    override suspend fun createInstance(
+        config: CometConfig,
+        classLoader: ClassLoader,
+        input: org.jline.reader.LineReader
+    ): Comet {
         AccountData.registerAccount(config.id, config.password, platform())
 
         return TelegramComet(config)

@@ -12,7 +12,7 @@ package ren.natsuyuk1.comet.console.util
 import java.io.PrintStream
 import java.util.*
 
-object JLineRedirector : PrintStream(nullOutputStream()) {
+object JLineOutputRedirector : PrintStream(nullOutputStream()) {
     @Suppress("NOTHING_TO_INLINE")
     private inline fun println0() {
         Console.println("")

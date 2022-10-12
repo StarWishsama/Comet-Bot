@@ -23,6 +23,7 @@ dependencies {
     compileOnly(project(":comet-api"))
     compileOnly(project(":comet-core"))
     compileOnly(project(":comet-utils"))
+    compileOnly("org.jline:jline:3.21.0")
 
     implementation("dev.inmo:tgbotapi:3.2.6") {
         exclude("io.ktor")

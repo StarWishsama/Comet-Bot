@@ -27,9 +27,15 @@ dependencies {
     api("org.jetbrains.exposed:exposed-dao:0.40.1")
     api("org.jetbrains.exposed:exposed-jdbc:0.40.1")
     api("org.jetbrains.exposed:exposed-kotlin-datetime:0.40.1")
-    implementation("com.zaxxer:HikariCP:5.0.1")
-    implementation("org.xerial:sqlite-jdbc:3.39.3.0")
-    implementation("org.postgresql:postgresql:42.5.0")
+    compileOnly("com.zaxxer:HikariCP:5.0.1")
+    testCompileOnly("com.zaxxer:HikariCP:5.0.1")
+    compileOnly("org.xerial:sqlite-jdbc:3.39.3.0")
+    testCompileOnly("org.xerial:sqlite-jdbc:3.39.3.0")
+    compileOnly("org.postgresql:postgresql:42.5.0")
+    testCompileOnly("org.postgresql:postgresql:42.5.0")
+
+    compileOnly("org.jline:jline:3.21.0")
+    testCompileOnly("org.jline:jline:3.21.0")
 
     implementation(project(":comet-utils"))
 }

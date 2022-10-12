@@ -6,6 +6,10 @@ import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.contact.PermissionDeniedException
 import net.mamoe.mirai.message.data.MessageSource.Key.recall
 import net.mamoe.mirai.utils.BotConfiguration
+import net.mamoe.mirai.utils.MiraiExperimentalApi
+import net.mamoe.mirai.utils.StandardCharImageLoginSolver
+import net.mamoe.mirai.utils.SwingSolver
+import org.jline.reader.LineReader
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
@@ -23,6 +27,7 @@ import ren.natsuyuk1.comet.mirai.util.runWithScope
 import ren.natsuyuk1.comet.mirai.util.runWithSuspend
 import ren.natsuyuk1.comet.service.subscribeGithubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import java.awt.Desktop
 
 private val logger = logger("Comet-Mirai")
 
@@ -34,13 +39,16 @@ class MiraiComet(
 
     private val cl: ClassLoader,
 
-    private val miraiConfig: MiraiConfig
+    private val miraiConfig: MiraiConfig,
+
+    private val lineReader: LineReader
 ) : Comet(LoginPlatform.MIRAI, config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
     lateinit var miraiBot: Bot
 
     override val id: Long
         get() = miraiConfig.id
 
+    @OptIn(MiraiExperimentalApi::class)
     override fun login() {
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
@@ -57,6 +65,15 @@ class MiraiComet(
             heartbeatStrategy = miraiConfig.heartbeatStrategy
 
             heartbeatPeriodMillis = miraiConfig.heartbeatPeriodMillis
+
+            loginSolver = if (Desktop.isDesktopSupported()) {
+                SwingSolver
+            } else {
+                StandardCharImageLoginSolver(
+                    input = { lineReader.readLine() },
+                    loggerSupplier = { miraiBot.logger }
+                )
+            }
         }
 
         cl.runWithScope(scope) {

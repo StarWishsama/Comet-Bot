@@ -48,7 +48,7 @@ object Console {
     inline fun println(string: String?) = println(any = string)
 
     internal fun redirectToJLine() {
-        System.setOut(JLineRedirector)
+        System.setOut(JLineOutputRedirector)
     }
 
     internal fun redirectToNull() {
