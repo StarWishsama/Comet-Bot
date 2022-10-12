@@ -69,7 +69,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
 
         suspend fun updateEventInfo() {
             transaction {
-                if (ProjectSekaiDataTable.columns.isEmpty()) {
+                if (ProjectSekaiData.all().empty()) {
                     runBlocking { initData() }
                 }
             }
@@ -106,7 +106,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
 
         suspend fun updatePredictionData() {
             transaction {
-                if (ProjectSekaiDataTable.columns.isEmpty()) {
+                if (ProjectSekaiData.all().empty()) {
                     runBlocking { initData() }
                 }
             }

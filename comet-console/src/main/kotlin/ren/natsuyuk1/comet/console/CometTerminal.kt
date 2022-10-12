@@ -131,7 +131,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
                     dummyComet,
                     ConsoleCommandSender,
                     ConsoleCommandSender,
-                    buildMessageWrapper { appendText(ConsoleInputReceiver.input) }
+                    buildMessageWrapper { appendText(ConsoleInputReceiver.readln()) }
                 ).join()
             } catch (e: UserInterruptException) { // Ctrl + C
                 println("请使用 Ctrl + D 退出 Comet 终端")
