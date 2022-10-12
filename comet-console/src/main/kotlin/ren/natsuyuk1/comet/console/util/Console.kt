@@ -23,7 +23,7 @@ object Console {
     private val terminal: Terminal = TerminalBuilder.terminal()
     private const val HISTORY_FILE = ".comet_history"
 
-    private var reader: LineReader? = null
+    internal var reader: LineReader? = null
 
     internal fun initReader() {
         if (reader != null) {

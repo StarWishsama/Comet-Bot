@@ -28,7 +28,11 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
                 ?: error("未安装 Mirai Wrapper, 请下载 Mirai Wrapper 并放置在 ./modules 下")
 
             val miraiComet =
-                miraiService.createInstance(createCometConfig(id, password, platform), WrapperLoader.wrapperClassLoader)
+                miraiService.createInstance(
+                    createCometConfig(id, password, platform),
+                    WrapperLoader.wrapperClassLoader,
+                    Console.reader ?: error("终端未正确加载")
+                )
 
             cometInstances.push(miraiComet)
             miraiComet.init(CometTerminalCommand.scope.coroutineContext)
@@ -49,7 +53,8 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
             val telegramComet =
                 telegramService.createInstance(
                     createCometConfig(id, password, platform),
-                    WrapperLoader.wrapperClassLoader
+                    WrapperLoader.wrapperClassLoader,
+                    Console.reader ?: error("终端未正确加载")
                 )
 
             cometInstances.push(telegramComet)
