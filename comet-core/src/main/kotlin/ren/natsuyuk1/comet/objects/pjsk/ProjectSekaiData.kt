@@ -80,7 +80,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
                 cometClient.getEventList(1).data.first()
             }.onSuccess { currentEvent ->
                 transaction {
-                    val info = ProjectSekaiData[0]
+                    val info = ProjectSekaiData.all().first()
 
                     if (info.endTime < timestamp) {
                         info.apply {
@@ -111,7 +111,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
                 }
             }
 
-            val pjskData = transaction { ProjectSekaiData[0] }
+            val pjskData = transaction { ProjectSekaiData.all().first() }
 
             val timestamp = Clock.System.now()
 
