@@ -2,9 +2,6 @@ package ren.natsuyuk1.comet.commands.service
 
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -88,7 +85,7 @@ object ArcaeaService {
             return@launch
         }
 
-        if ((executedTime - data.best38Time.toInstant(TimeZone.currentSystemDefault())).inWholeMinutes < 15) {
+        if ((executedTime - data.best38Time).inWholeMinutes < 15) {
             val userInfo = ArcaeaClient.queryUserInfo(data.userID)
             val best38 = json.decodeFromString<List<ArcaeaSongInfo>>(data.best38)
 
@@ -134,8 +131,10 @@ object ArcaeaService {
 
         val (b38, b38Image) = ArcaeaImageService.drawB38(userInfo, b30)
 
-        data.best38 = json.encodeToString(b38)
-        data.best38Time = executedTime.toLocalDateTime(TimeZone.currentSystemDefault())
+        transaction {
+            data.best38 = json.encodeToString(b38)
+            data.best38Time = executedTime
+        }
 
         subject.sendMessage(
             buildMessageWrapper {
