@@ -8,12 +8,13 @@ import ren.natsuyuk1.comet.api.wrapper.CometWrapper
 import ren.natsuyuk1.comet.mirai.config.MiraiConfig
 import ren.natsuyuk1.comet.mirai.config.MiraiConfigManager
 import ren.natsuyuk1.comet.mirai.util.runWith
+import ren.natsuyuk1.comet.utils.input.IConsoleInputReceiver
 
 class MiraiWrapper : CometWrapper {
     override suspend fun createInstance(
         config: CometConfig,
         classLoader: ClassLoader,
-        input: org.jline.reader.LineReader
+        receiver: IConsoleInputReceiver
     ): Comet {
         MiraiConfigManager.init()
 
@@ -24,7 +25,7 @@ class MiraiWrapper : CometWrapper {
             AccountData.registerAccount(config.id, config.password, platform())
         }
 
-        return classLoader.runWith { MiraiComet(config, classLoader, miraiConfig, input) }
+        return classLoader.runWith { MiraiComet(config, classLoader, miraiConfig, receiver) }
     }
 
     override fun platform(): LoginPlatform = LoginPlatform.MIRAI

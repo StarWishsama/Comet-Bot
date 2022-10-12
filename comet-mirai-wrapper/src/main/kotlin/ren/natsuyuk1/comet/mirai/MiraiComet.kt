@@ -5,11 +5,8 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.contact.PermissionDeniedException
 import net.mamoe.mirai.message.data.MessageSource.Key.recall
-import net.mamoe.mirai.utils.BotConfiguration
-import net.mamoe.mirai.utils.MiraiExperimentalApi
-import net.mamoe.mirai.utils.StandardCharImageLoginSolver
-import net.mamoe.mirai.utils.SwingSolver
-import org.jline.reader.LineReader
+import net.mamoe.mirai.network.NoStandardInputForCaptchaException
+import net.mamoe.mirai.utils.*
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
@@ -27,6 +24,7 @@ import ren.natsuyuk1.comet.mirai.util.runWithScope
 import ren.natsuyuk1.comet.mirai.util.runWithSuspend
 import ren.natsuyuk1.comet.service.subscribeGithubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import ren.natsuyuk1.comet.utils.input.IConsoleInputReceiver
 import java.awt.Desktop
 
 private val logger = logger("Comet-Mirai")
@@ -41,14 +39,14 @@ class MiraiComet(
 
     private val miraiConfig: MiraiConfig,
 
-    private val lineReader: LineReader
+    private val receiver: IConsoleInputReceiver
 ) : Comet(LoginPlatform.MIRAI, config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
     lateinit var miraiBot: Bot
 
     override val id: Long
         get() = miraiConfig.id
 
-    @OptIn(MiraiExperimentalApi::class)
+    @OptIn(MiraiExperimentalApi::class, MiraiInternalApi::class)
     override fun login() {
         val config = BotConfiguration.Default.apply {
             botLoggerSupplier = { it ->
@@ -69,7 +67,13 @@ class MiraiComet(
             loginSolver = if (Desktop.isDesktopSupported()) {
                 SwingSolver
             } else {
-                StandardCharImageLoginSolver(input = { lineReader.readLine() })
+                StandardCharImageLoginSolver(input = {
+                    try {
+                        receiver.readln()
+                    } catch (e: Exception) {
+                        throw NoStandardInputForCaptchaException(e)
+                    }
+                })
             }
         }
 

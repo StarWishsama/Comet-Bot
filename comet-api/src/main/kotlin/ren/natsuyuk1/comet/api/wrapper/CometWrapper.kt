@@ -1,9 +1,9 @@
 package ren.natsuyuk1.comet.api.wrapper
 
-import org.jline.reader.LineReader
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.utils.input.IConsoleInputReceiver
 
 /**
  * 代表一个 [CometWrapper]
@@ -20,7 +20,7 @@ interface CometWrapper {
      *
      * @return Comet 实例
      */
-    suspend fun createInstance(config: CometConfig, classLoader: ClassLoader, input: LineReader): Comet
+    suspend fun createInstance(config: CometConfig, classLoader: ClassLoader, receiver: IConsoleInputReceiver): Comet
 
     /**
      * 此 [CometWrapper] 对应的登录平台

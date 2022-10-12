@@ -31,8 +31,5 @@ dependencies {
     implementation("org.xerial:sqlite-jdbc:3.39.3.0")
     implementation("org.postgresql:postgresql:42.5.0")
 
-    compileOnly("org.jline:jline:3.21.0")
-    testCompileOnly("org.jline:jline:3.21.0")
-
     implementation(project(":comet-utils"))
 }
