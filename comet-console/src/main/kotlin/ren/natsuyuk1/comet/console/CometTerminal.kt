@@ -36,6 +36,7 @@ import ren.natsuyuk1.comet.config.version
 import ren.natsuyuk1.comet.console.command.registerTerminalCommands
 import ren.natsuyuk1.comet.console.util.Console
 import ren.natsuyuk1.comet.console.util.login
+import ren.natsuyuk1.comet.console.util.loginStatus
 import ren.natsuyuk1.comet.console.wrapper.WrapperLoader
 import ren.natsuyuk1.comet.consts.cometPersistDataFile
 import ren.natsuyuk1.comet.consts.cometTables
@@ -124,6 +125,10 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
     private suspend fun handleConsoleCommand() = scope.launch {
         while (isActive) {
+            if (loginStatus.value) {
+                continue
+            }
+
             try {
                 CommandManager.executeCommand(
                     dummyComet,

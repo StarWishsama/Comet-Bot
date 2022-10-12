@@ -1,5 +1,7 @@
 package ren.natsuyuk1.comet.console.util
 
+import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.update
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
@@ -15,61 +17,68 @@ import ren.natsuyuk1.comet.console.wrapper.WrapperLoader
 
 private val logger = KotlinLogging.logger {}
 
+val loginStatus = atomic(false)
+
 fun createCometConfig(id: Long, password: String, platform: LoginPlatform): CometConfig {
     return CometConfig(id, password, platform)
 }
 
 internal suspend fun login(id: Long, password: String, platform: LoginPlatform) {
+    loginStatus.update { true }
     logger.info { "正在尝试登录账号 $id 于 ${platform.name} 平台" }
 
-    when (platform) {
-        LoginPlatform.MIRAI -> {
-            val miraiService = WrapperLoader.getService(platform)
-                ?: error("未安装 Mirai Wrapper, 请下载 Mirai Wrapper 并放置在 ./modules 下")
+    try {
+        when (platform) {
+            LoginPlatform.MIRAI -> {
+                val miraiService = WrapperLoader.getService(platform)
+                    ?: error("未安装 Mirai Wrapper, 请下载 Mirai Wrapper 并放置在 ./modules 下")
 
-            val miraiComet =
-                miraiService.createInstance(
-                    createCometConfig(id, password, platform),
-                    WrapperLoader.wrapperClassLoader,
-                    Console.newLineReader("mirai-comet")
-                )
+                val miraiComet =
+                    miraiService.createInstance(
+                        createCometConfig(id, password, platform),
+                        WrapperLoader.wrapperClassLoader,
+                        Console.newLineReader("mirai-comet")
+                    )
 
-            cometInstances.push(miraiComet)
-            miraiComet.init(CometTerminalCommand.scope.coroutineContext)
+                cometInstances.push(miraiComet)
+                miraiComet.init(CometTerminalCommand.scope.coroutineContext)
 
-            try {
-                miraiComet.login()
-                miraiComet.afterLogin()
-            } catch (e: RuntimeException) {
-                logger.warn(e) { "Mirai $id 登录失败, 请尝试重新登录" }
-                cometInstances.removeIf { it.id == id }
+                try {
+                    miraiComet.login()
+                    miraiComet.afterLogin()
+                } catch (e: RuntimeException) {
+                    logger.warn(e) { "Mirai $id 登录失败, 请尝试重新登录" }
+                    cometInstances.removeIf { it.id == id }
+                }
             }
-        }
 
-        LoginPlatform.TELEGRAM -> {
-            val telegramService = WrapperLoader.getService(platform)
-                ?: error("未安装 Telegram Wrapper, 请下载 Telegram Wrapper 并放置在 ./modules 下")
+            LoginPlatform.TELEGRAM -> {
+                val telegramService = WrapperLoader.getService(platform)
+                    ?: error("未安装 Telegram Wrapper, 请下载 Telegram Wrapper 并放置在 ./modules 下")
 
-            val telegramComet =
-                telegramService.createInstance(
-                    createCometConfig(id, password, platform),
-                    WrapperLoader.wrapperClassLoader,
-                    Console.newLineReader("telegram-comet")
-                )
+                val telegramComet =
+                    telegramService.createInstance(
+                        createCometConfig(id, password, platform),
+                        WrapperLoader.wrapperClassLoader,
+                        Console.newLineReader("telegram-comet")
+                    )
 
-            cometInstances.push(telegramComet)
-            telegramComet.init(CometTerminalCommand.scope.coroutineContext)
+                cometInstances.push(telegramComet)
+                telegramComet.init(CometTerminalCommand.scope.coroutineContext)
 
-            try {
-                telegramComet.login()
-                telegramComet.afterLogin()
-            } catch (e: Exception) {
-                logger.warn(e) { "Telegram $id 登录失败, 请尝试重新登录" }
-                cometInstances.removeIf { it.id == id }
+                try {
+                    telegramComet.login()
+                    telegramComet.afterLogin()
+                } catch (e: Exception) {
+                    logger.warn(e) { "Telegram $id 登录失败, 请尝试重新登录" }
+                    cometInstances.removeIf { it.id == id }
+                }
             }
-        }
 
-        else -> {}
+            else -> {}
+        }
+    } finally {
+        loginStatus.update { false }
     }
 }
 
