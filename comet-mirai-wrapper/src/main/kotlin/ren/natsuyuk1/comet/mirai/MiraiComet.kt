@@ -7,6 +7,7 @@ import net.mamoe.mirai.contact.PermissionDeniedException
 import net.mamoe.mirai.message.data.MessageSource.Key.recall
 import net.mamoe.mirai.network.NoStandardInputForCaptchaException
 import net.mamoe.mirai.utils.*
+import org.jline.reader.LineReader
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
@@ -24,7 +25,6 @@ import ren.natsuyuk1.comet.mirai.util.runWithScope
 import ren.natsuyuk1.comet.mirai.util.runWithSuspend
 import ren.natsuyuk1.comet.service.subscribeGithubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
-import ren.natsuyuk1.comet.utils.input.IConsoleInputReceiver
 import java.awt.Desktop
 
 private val logger = logger("Comet-Mirai")
@@ -39,7 +39,7 @@ class MiraiComet(
 
     private val miraiConfig: MiraiConfig,
 
-    private val receiver: IConsoleInputReceiver
+    private val reader: LineReader
 ) : Comet(LoginPlatform.MIRAI, config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
     lateinit var miraiBot: Bot
 
@@ -69,7 +69,7 @@ class MiraiComet(
             } else {
                 StandardCharImageLoginSolver(input = {
                     try {
-                        receiver.readln()
+                        reader.readLine()
                     } catch (e: Exception) {
                         throw NoStandardInputForCaptchaException(e)
                     }

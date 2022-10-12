@@ -31,7 +31,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
                 miraiService.createInstance(
                     createCometConfig(id, password, platform),
                     WrapperLoader.wrapperClassLoader,
-                    ConsoleInputReceiver
+                    Console.newLineReader("mirai-comet")
                 )
 
             cometInstances.push(miraiComet)
@@ -54,7 +54,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
                 telegramService.createInstance(
                     createCometConfig(id, password, platform),
                     WrapperLoader.wrapperClassLoader,
-                    ConsoleInputReceiver
+                    Console.newLineReader("telegram-comet")
                 )
 
             cometInstances.push(telegramComet)

@@ -35,7 +35,6 @@ import ren.natsuyuk1.comet.config.hash
 import ren.natsuyuk1.comet.config.version
 import ren.natsuyuk1.comet.console.command.registerTerminalCommands
 import ren.natsuyuk1.comet.console.util.Console
-import ren.natsuyuk1.comet.console.util.ConsoleInputReceiver
 import ren.natsuyuk1.comet.console.util.login
 import ren.natsuyuk1.comet.console.wrapper.WrapperLoader
 import ren.natsuyuk1.comet.consts.cometPersistDataFile
@@ -121,7 +120,6 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
     private fun setupConsole() {
         Console.initReader()
         Console.redirectToJLine()
-        ConsoleInputReceiver.init(scope.coroutineContext)
     }
 
     private suspend fun handleConsoleCommand() = scope.launch {
@@ -131,7 +129,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
                     dummyComet,
                     ConsoleCommandSender,
                     ConsoleCommandSender,
-                    buildMessageWrapper { appendText(ConsoleInputReceiver.readln()) }
+                    buildMessageWrapper { appendText(Console.readln()) }
                 ).join()
             } catch (e: UserInterruptException) { // Ctrl + C
                 println("请使用 Ctrl + D 退出 Comet 终端")

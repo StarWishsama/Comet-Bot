@@ -38,6 +38,12 @@ object Console {
             }
     }
 
+    fun newLineReader(name: String): LineReader =
+        LineReaderBuilder.builder()
+            .appName(name)
+            .terminal(terminal)
+            .build()
+
     fun readln(prompt: String = "> "): String = reader?.readLine(prompt) ?: error("Reader not prepared")
 
     fun println(any: Any?) {
