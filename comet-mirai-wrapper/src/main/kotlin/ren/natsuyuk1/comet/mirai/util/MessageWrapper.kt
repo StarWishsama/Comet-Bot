@@ -2,7 +2,6 @@ package ren.natsuyuk1.comet.mirai.util
 
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.AudioSupported
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.*
@@ -38,12 +37,14 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent? {
                     }
                 } else if (filePath?.isNotBlank() == true) {
                     if (File(filePath!!).exists()) {
-                        return runBlocking { File(filePath!!).uploadAsImage(subject) }
+                        return File(filePath!!).uploadAsImage(subject)
                     } else {
                         throw FileNotFoundException(filePath)
                     }
                 } else if (base64?.isNotEmpty() == true) {
-                    return base64!!.toByteArray().toExternalResource().uploadAsImage(subject)
+                    return base64!!.toByteArray().toExternalResource().use {
+                        it.uploadAsImage(subject)
+                    }
                 } else {
                     throw IllegalArgumentException("图片消息元素必须存在一个参数!")
                 }
@@ -65,9 +66,7 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent? {
             }
 
             if (filePath.isNotEmpty() && File(filePath).exists()) {
-                return runBlocking {
-                    subject.uploadAudio(File(filePath).toExternalResource())
-                }
+                return subject.uploadAudio(File(filePath).toExternalResource())
             } else {
                 throw FileNotFoundException("转换语音失败, 对应的语音文件不存在: $filePath")
             }
@@ -87,13 +86,11 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent? {
  *
  * @param subject Mirai 的 [Contact], 为空时一些需要 [Contact] 的元素会转为文字
  */
-fun MessageWrapper.toMessageChain(subject: Contact): MessageChain {
+suspend fun MessageWrapper.toMessageChain(subject: Contact): MessageChain {
     return MessageChainBuilder().apply {
         getMessageContent().forEach { elem ->
             kotlin.runCatching {
-                runBlocking {
-                    elem.toMessageContent(subject)?.let { add(it) }
-                }
+                elem.toMessageContent(subject)?.let { add(it) }
             }.onFailure {
                 if (it !is UnsupportedOperationException) {
                     logger.warn(it) { "在转换 Mirai 消息时出现问题" }
@@ -105,7 +102,7 @@ fun MessageWrapper.toMessageChain(subject: Contact): MessageChain {
     }.build()
 }
 
-fun MessageChain.toMessageWrapper(comet: MiraiComet): MessageWrapper {
+suspend fun MessageChain.toMessageWrapper(comet: MiraiComet): MessageWrapper {
     val wrapper = MessageWrapper(MessageReceipt(comet, source.toMessageSource()))
 
     for (message in this) {
@@ -113,10 +110,9 @@ fun MessageChain.toMessageWrapper(comet: MiraiComet): MessageWrapper {
             is PlainText -> {
                 wrapper.appendText(message.content)
             }
+
             is net.mamoe.mirai.message.data.Image -> {
-                runBlocking {
-                    wrapper.appendElement(Image(url = message.queryUrl()))
-                }
+                wrapper.appendElement(Image(url = message.queryUrl()))
             }
             is At -> {
                 wrapper.appendElement(AtElement(message.target))
@@ -125,17 +121,15 @@ fun MessageChain.toMessageWrapper(comet: MiraiComet): MessageWrapper {
                 wrapper.appendElement(XmlElement(message.content))
             }
             is OnlineAudio -> {
-                runBlocking {
-                    val fileName = message.filename
-                    val downloadedAudio =
-                        cometClient.client.get(message.urlForDownload).body<InputStream>()
+                val fileName = message.filename
+                val downloadedAudio =
+                    cometClient.client.get(message.urlForDownload).body<InputStream>()
 
-                    downloadedAudio.use {
-                        val location = File(messageWrapperDirectory, fileName)
-                        location.touch()
+                downloadedAudio.use {
+                    val location = File(messageWrapperDirectory, fileName)
+                    location.touch()
 
-                        writeToFile(it, location)
-                    }
+                    writeToFile(it, location)
                 }
             }
             is Face -> {
