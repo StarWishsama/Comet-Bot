@@ -37,6 +37,11 @@ interface PersistFile<T : Any> {
     val format: StringFormat
 
     /**
+     * Determined the data is readonly or not
+     */
+    val readOnly: Boolean
+
+    /**
      * Initialize file persist
      * Must be called at program start
      */

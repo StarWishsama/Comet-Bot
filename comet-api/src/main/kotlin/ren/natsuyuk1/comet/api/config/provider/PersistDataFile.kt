@@ -41,7 +41,8 @@ open class PersistDataFile<T : Any>(
         coerceInputValues = true
     },
     final override val scope: CoroutineScope =
-        ModuleScope("DataFilePersist", dispatcher = Dispatchers.IO)
+        ModuleScope("DataFilePersist", dispatcher = Dispatchers.IO),
+    final override val readOnly: Boolean = false,
 ) : PersistFile<T> {
     private val clazz = defaultValue::class
 
@@ -82,6 +83,8 @@ open class PersistDataFile<T : Any>(
      * @param saveData saved data
      */
     override suspend fun save(saveData: T) = mutex.withLock {
+        if (readOnly) return@withLock
+
         withContext(scope.coroutineContext) {
             logger.debug { "正在保存数据 $saveData" }
             file.touch()
@@ -114,6 +117,8 @@ open class PersistDataFile<T : Any>(
     }
 
     override suspend fun monitorFileChange(): Unit = withContext(Dispatchers.IO) {
+        if (readOnly) return@withContext
+
         val watchService = FileSystems.getDefault().newWatchService()
         file.parentFile.toPath().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY)
 

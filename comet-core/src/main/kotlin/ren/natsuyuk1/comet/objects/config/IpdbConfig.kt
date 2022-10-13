@@ -17,7 +17,8 @@ import java.lang.ref.SoftReference
 private val logger = KotlinLogging.logger {}
 
 object IpdbConfig : PersistDataFile<IpdbConfig.Data>(
-    File(configDirectory, "ipdb.yml"), Data(), Yaml()
+    File(configDirectory, "ipdb.yml"), Data(), Yaml(),
+    readOnly = true
 ) {
     @Serializable
     data class Data(
@@ -45,7 +46,7 @@ object IpdbConfig : PersistDataFile<IpdbConfig.Data>(
         @Transient
         val pathV6 = checkFile(_pathV6)
 
-        private fun db(path: File?) = ConcRef() {
+        private fun db(path: File?) = ConcRef {
             val file = path ?: return@ConcRef null
             logger.info { "Loading IPDB from $path" }
             Reader(file)

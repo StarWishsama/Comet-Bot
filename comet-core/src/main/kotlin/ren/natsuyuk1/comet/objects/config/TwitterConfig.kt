@@ -9,7 +9,8 @@ import java.io.File
 object TwitterConfig : PersistDataFile<TwitterConfig.Data>(
     File(configDirectory, "twitter.yml"),
     Data(),
-    Yaml()
+    Yaml(),
+    readOnly = true
 ) {
     @kotlinx.serialization.Serializable
     data class Data(
