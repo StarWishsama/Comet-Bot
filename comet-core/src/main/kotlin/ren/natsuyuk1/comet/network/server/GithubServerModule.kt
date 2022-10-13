@@ -64,6 +64,7 @@ object GithubWebHookHandler {
             logger.debug { "GitHub WebHook 收到新事件, secretStatus = $secretStatus" }
 
             if (!checkSecretStatus(call, secretStatus, signature)) {
+                call.respond(HttpStatusCode.Forbidden, "Validate Failed")
                 logger.debug("Secret 校验失败")
                 return
             }
@@ -127,6 +128,7 @@ object GithubWebHookHandler {
         }
 
         if (signature == null && secretStatus == SecretStatus.NO_SECRET) {
+            call.respondText(status = HttpStatusCode.NotFound, text = "Not Found")
             return true
         }
 
