@@ -55,6 +55,7 @@ object Console {
 
     internal fun redirectToJLine() {
         System.setOut(JLineOutputRedirector)
+        System.setErr(JLineOutputRedirector)
     }
 
     internal fun redirectToNull() {
