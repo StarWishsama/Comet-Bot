@@ -4,6 +4,7 @@ import mu.KotlinLogging.logger
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.contact.PermissionDeniedException
+import net.mamoe.mirai.internal.network.Packet
 import net.mamoe.mirai.message.data.MessageSource.Key.recall
 import net.mamoe.mirai.network.NoStandardInputForCaptchaException
 import net.mamoe.mirai.utils.*
@@ -78,34 +79,42 @@ class MiraiComet(
         }
 
         cl.runWithScope(scope) {
-            if (!::miraiBot.isInitialized) {
-                miraiBot = BotFactory.newBot(
-                    qq = this.config.id,
-                    password = this.config.password,
-                    configuration = config
-                )
+            try {
+                if (!::miraiBot.isInitialized) {
+                    miraiBot = BotFactory.newBot(
+                        qq = this.config.id,
+                        password = this.config.password,
+                        configuration = config
+                    )
 
-                miraiBot.eventChannel
-                    .parentScope(scope)
-                    .exceptionHandler {
-                        logger.warn(it) { "Mirai Bot (${miraiBot.id}) 发生异常" }
-                    }
-                    .subscribeAlways<net.mamoe.mirai.event.Event> {
-                        cl.runWithSuspend {
-                            it.redirectToComet(this@MiraiComet)
+                    miraiBot.eventChannel
+                        .parentScope(scope)
+                        .exceptionHandler {
+                            logger.warn(it) { "Mirai Bot (${miraiBot.id}) 发生异常" }
                         }
-                    }
+                        .subscribeAlways<net.mamoe.mirai.event.Event> {
+                            if (it is Packet.NoEventLog || it is Packet.NoLog) {
+                                return@subscribeAlways
+                            }
+
+                            cl.runWithSuspend {
+                                it.redirectToComet(this@MiraiComet)
+                            }
+                        }
+                }
+
+                miraiBot.login()
+
+                if (miraiBot.isOnline) {
+                    logger.info { "Mirai ${miraiBot.id} 登录成功" }
+                } else {
+                    logger.warn { "Mirai ${miraiBot.id} 并未正常登录" }
+                }
+
+                miraiBot.join()
+            } catch (e: Exception) {
+                logger.warn(e) { "Mirai 发生异常" }
             }
-
-            miraiBot.login()
-
-            if (miraiBot.isOnline) {
-                logger.info { "Mirai ${miraiBot.id} 登录成功" }
-            } else {
-                logger.warn { "Mirai ${miraiBot.id} 并未正常登录" }
-            }
-
-            miraiBot.join()
         }
     }
 
