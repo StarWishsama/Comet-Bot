@@ -128,6 +128,10 @@ object CommandManager {
         val command =
             getCommand(possibleCommand, sender) ?: return@launch
 
+        logger.info {
+            "$sender 正在执行命令 ${command.property.name}" // ktlint-disable max-line-length
+        }
+
         val property = command.property
         var user: CometUser = CometUser.dummyUser
 
