@@ -88,6 +88,8 @@ comet-mirai-wrapper 使用 [AGPL v3](https://github.com/StarWishsama/Comet-Bot/b
 [<img src=".github/jetbrains.png" width="200"/>](https://www.jetbrains.com/?from=comet-bot)
 
 - [Sorapointa](https://github.com/Sorapointa/Sorapointa) 提供的高质量基础架构设计
+- [Setsuna](https://github.com/StarWishsama/Setsuna) 提供 Twitter API 库
+- [Mirai](https://github.com/mamoe/mirai) 提供 高效率 QQ 机器人支持库 于 comet-mirai-wrapper
 - [sekai.best](https://sekai.best) 查询 Project Sekai 游戏信息
 - [Project Sekai Profile](https://profile.pjsekai.moe) 提供 Project Sekai 游戏信息
 - [33Kit](https://3-3.dev/) 提供 Project Sekai 活动积分预测
