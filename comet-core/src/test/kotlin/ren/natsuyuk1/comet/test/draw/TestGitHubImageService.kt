@@ -10,6 +10,7 @@ import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import kotlin.test.Test
 
+/* ktlint-disable */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TestGitHubImageService {
     @BeforeAll
@@ -23,8 +24,8 @@ class TestGitHubImageService {
 
     @Test
     fun test() {
-      if (isCI()) return
-      
+        if (isCI()) return
+
         val payload = """{
   "ref": "refs/heads/dev",
   "before": "624891b46da95a3c69d93349e643a6a5cc20a39a",
