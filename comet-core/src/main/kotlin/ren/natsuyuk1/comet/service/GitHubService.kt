@@ -91,7 +91,9 @@ fun Comet.subscribeGithubEvent() = run {
             val target = getGroup(it.id) ?: return@forEach
             val image = GitHubImageService.drawEventInfo(event.eventData)
 
-            if (image != null) {
+            if (image == null) {
+                target.sendMessage(event.eventData.toMessageWrapper())
+            } else {
                 target.sendMessage(
                     buildMessageWrapper {
                         appendElement(Image(filePath = image.absPath))
@@ -99,8 +101,6 @@ fun Comet.subscribeGithubEvent() = run {
                         appendText("🔗 ${event.eventData.url()}")
                     }
                 )
-            } else {
-                target.sendMessage(event.eventData.toMessageWrapper())
             }
 
             logger.debug { "已推送事件 ${event.eventData.type()} 至群 ${it.id}" }

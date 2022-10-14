@@ -23,7 +23,6 @@ import ren.natsuyuk1.comet.mirai.event.redirectToComet
 import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
 import ren.natsuyuk1.comet.mirai.util.runWith
 import ren.natsuyuk1.comet.mirai.util.runWithScope
-import ren.natsuyuk1.comet.mirai.util.runWithSuspend
 import ren.natsuyuk1.comet.service.subscribeGithubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import java.awt.Desktop
@@ -97,9 +96,7 @@ class MiraiComet(
                                 return@subscribeAlways
                             }
 
-                            cl.runWithSuspend {
-                                it.redirectToComet(this@MiraiComet)
-                            }
+                            it.redirectToComet(this@MiraiComet)
                         }
                 }
 
