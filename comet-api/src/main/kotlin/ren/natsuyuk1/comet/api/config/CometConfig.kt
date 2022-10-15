@@ -20,7 +20,8 @@ import java.io.File
 object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
     File(configDirectory, "config.yml"),
     Data(),
-    Yaml
+    Yaml,
+    readOnly = true
 ) {
     @Serializable
     data class Data(

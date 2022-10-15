@@ -19,7 +19,6 @@ import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
@@ -85,7 +84,12 @@ class TelegramComet(
             }.join()
         }
 
-        logger.info { "成功登录 Telegram Bot (${runBlocking { bot.getMe().username.username }})" }
+        scope.launch {
+            val username = bot.getMe().username.username
+            logger.info { "成功登录 Telegram Bot ($username)" }
+
+            bot.getMe().username.username
+        }
     }
 
     override fun afterLogin() {

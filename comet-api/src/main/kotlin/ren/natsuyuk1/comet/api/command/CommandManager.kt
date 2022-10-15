@@ -48,6 +48,7 @@ object CommandManager {
     private var commandScope = ModuleScope("CommandManager")
 
     fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
+        logger.info { "已加载命令管理器" }
         commandScope = ModuleScope("CommandManager", parentContext)
     }
 

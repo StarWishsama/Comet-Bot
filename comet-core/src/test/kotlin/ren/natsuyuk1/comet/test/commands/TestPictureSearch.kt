@@ -63,7 +63,7 @@ class TestPictureSearch {
             ).main("")
         }
 
-        val result = SessionManager.handleSession(fakeSender, fakeSender, fakeImage)
+        val result = runBlocking { SessionManager.handleSession(fakeSender, fakeSender, fakeImage) }
 
         assertTrue(result, "Picture search request wasn't be handled!")
     }

@@ -60,8 +60,6 @@ interface PersistFile<T : Any> {
      *
      */
     suspend fun save(saveData: T = data!!)
-
-    suspend fun monitorFileChange()
 }
 
 internal fun KClass<*>.requireSerializable() {

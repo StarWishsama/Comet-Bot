@@ -4,7 +4,6 @@ import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import moe.sdl.yabapi.data.search.results.UserResult
 import moe.sdl.yabapi.data.video.VideoInfo
 import moe.sdl.yabapi.util.encoding.bv
@@ -39,26 +38,6 @@ object BiliBiliService {
         cometUser: CometUser?,
         private val pendingSearchResult: PendingSearchResult
     ) : Session(contact, cometUser) {
-        init {
-            val request = buildMessageWrapper {
-                appendText("请选择你欲搜索的 UP 主 >", true)
-
-                appendLine()
-
-                pendingSearchResult.take(5).forEachIndexed { index, userResult ->
-                    appendText("${index + 1} >> ${userResult.uname} (${userResult.mid})", true)
-                }
-
-                appendLine()
-
-                appendText("请在 15 秒内回复指定 UP 主编号")
-            }
-
-            runBlocking {
-                contact.sendMessage(request)
-            }
-        }
-
         override suspend fun handle(message: MessageWrapper) {
             val index = message.parseToString().toIntOrNull()
 
@@ -106,6 +85,22 @@ object BiliBiliService {
                         user,
                         searchResult
                     ).registerTimeout(15.seconds)
+
+                    val request = buildMessageWrapper {
+                        appendText("请选择你欲搜索的 UP 主 >", true)
+
+                        appendLine()
+
+                        searchResult.take(5).forEachIndexed { index, userResult ->
+                            appendText("${index + 1} >> ${userResult.uname} (${userResult.mid})", true)
+                        }
+
+                        appendLine()
+
+                        appendText("请在 15 秒内回复指定 UP 主编号")
+                    }
+
+                    subject.sendMessage(request)
                 }
             }
         }

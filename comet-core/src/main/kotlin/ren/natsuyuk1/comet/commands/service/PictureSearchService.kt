@@ -1,6 +1,5 @@
 package ren.natsuyuk1.comet.commands.service
 
-import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.message.Image
@@ -29,6 +28,8 @@ object PictureSearchService {
             user,
             newSuspendedTransaction { PictureSearchConfigTable.getPlatform(user.id.value) }!!
         ).registerTimeout(30.seconds)
+
+        subject.sendMessage("⏳ 接下来, 请发送你要搜索的图片".toMessageWrapper())
     }
 
     suspend fun searchImage(image: Image, source: PictureSearchSource): MessageWrapper =
@@ -45,14 +46,6 @@ class PictureSearchQuerySession(
     cometUser: CometUser?,
     val source: PictureSearchSource
 ) : Session(contact, cometUser) {
-    init {
-        val request = "⏳ 接下来, 请发送你要搜索的图片".toMessageWrapper()
-
-        runBlocking {
-            contact.sendMessage(request)
-        }
-    }
-
     override suspend fun handle(message: MessageWrapper) {
         val image = message.find<Image>()
 

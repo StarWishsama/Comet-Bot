@@ -1,7 +1,7 @@
 package ren.natsuyuk1.comet.api.session
 
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.task.TaskManager
@@ -97,7 +97,7 @@ object SessionManager {
 
         logger.debug { "Matched session(s): $targetSession" }
 
-        targetSession.forEach { runBlocking { it.handle(message) } }
+        targetSession.forEach { scope.launch { it.handle(message) } }
 
         return targetSession.isNotEmpty()
     }

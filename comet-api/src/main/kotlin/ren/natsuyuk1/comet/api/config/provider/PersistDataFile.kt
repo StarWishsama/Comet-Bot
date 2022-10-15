@@ -23,9 +23,6 @@ import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.file.writeTextBuffered
 import java.io.File
-import java.nio.file.FileSystems
-import java.nio.file.Path
-import java.nio.file.StandardWatchEventKinds
 import kotlin.reflect.full.createType
 
 private val logger = mu.KotlinLogging.logger { }
@@ -69,12 +66,12 @@ open class PersistDataFile<T : Any>(
 
     override suspend fun init(): Unit =
         withContext(scope.coroutineContext) {
-            load().also { monitorFileChange() }
+            load()
         }
 
     suspend fun initAndLoad(): T =
         withContext(scope.coroutineContext) {
-            load().also { monitorFileChange() }
+            load()
         }
 
     /**
@@ -112,31 +109,6 @@ open class PersistDataFile<T : Any>(
                     logger.debug { "已加载文件: ${it::class.simpleName}" }
                     logger.trace { "文件内容 $it" }
                 }
-            }
-        }
-    }
-
-    override suspend fun monitorFileChange(): Unit = withContext(Dispatchers.IO) {
-        if (readOnly) return@withContext
-
-        val watchService = FileSystems.getDefault().newWatchService()
-        file.parentFile.toPath().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY)
-
-        scope.launch {
-            while (scope.isActive) {
-                val wk = withContext(Dispatchers.IO) {
-                    watchService.take()
-                }
-
-                for (e in wk.pollEvents()) {
-                    val changeContext = e.context() as Path
-                    if (changeContext == file.toPath()) {
-                        logger.info { "检测到文件 ${this@PersistDataFile.clazz.simpleName} 已被修改, 正在尝试重载..." }
-                        load()
-                    }
-                }
-
-                if (!wk.reset()) break
             }
         }
     }

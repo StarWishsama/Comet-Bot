@@ -52,11 +52,13 @@ class TestBiliBili {
 
         assertTrue("BiliBili Session isn't be registered properly!") { SessionManager.getSessionCount() == 1 }
 
-        val handleResult = SessionManager.handleSession(group, dummy2, buildMessageWrapper { appendText("1") })
+        val handleResult =
+            runBlocking { SessionManager.handleSession(group, dummy2, buildMessageWrapper { appendText("1") }) }
 
         assertFalse("BiliBili session be processed wrongly! 2 ($handleResult)") { handleResult }
 
-        val handleResult2 = SessionManager.handleSession(group, dummy1, buildMessageWrapper { appendText("1") })
+        val handleResult2 =
+            runBlocking { SessionManager.handleSession(group, dummy1, buildMessageWrapper { appendText("1") }) }
 
         assertTrue("BiliBili session be processed wrongly! 1 ($handleResult)") { handleResult2 }
     }

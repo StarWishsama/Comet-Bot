@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.test.commands
 
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterAll
@@ -38,7 +39,13 @@ class TestKeyWord {
         assertTrue("KeyWordAddSession isn't be registered!") { SessionManager.getSessionCount() == 1 }
 
         val handleResult =
-            SessionManager.handleSession(group, sender, buildMessageWrapper { appendText("TestMessageWrapper") })
+            runBlocking {
+                SessionManager.handleSession(
+                    group,
+                    sender,
+                    buildMessageWrapper { appendText("TestMessageWrapper") }
+                )
+            }
 
         assertTrue("KeyWordAddSession isn't be handled!") { handleResult }
     }
