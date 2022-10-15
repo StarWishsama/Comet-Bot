@@ -80,7 +80,14 @@ open class PersistDataFile<T : Any>(
      * @param saveData saved data
      */
     override suspend fun save(saveData: T) = mutex.withLock {
-        if (readOnly) return@withLock
+        if (readOnly) {
+            if (!file.exists()) {
+                logger.debug { "正在初始化数据 $saveData" }
+                file.touch()
+                file.writeTextBuffered(format.encodeToString(serializer, saveData))
+            }
+            return@withLock
+        }
 
         withContext(scope.coroutineContext) {
             logger.debug { "正在保存数据 $saveData" }
