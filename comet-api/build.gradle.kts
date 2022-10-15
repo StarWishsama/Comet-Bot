@@ -35,3 +35,10 @@ dependencies {
 
     implementation(project(":comet-utils"))
 }
+
+tasks.withType(AbstractTestTask::class.java).configureEach {
+    testLogging {
+        showExceptions = true
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+}
