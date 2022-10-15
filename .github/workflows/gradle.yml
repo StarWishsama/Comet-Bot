@@ -36,7 +36,7 @@ jobs:
         name: 检查格式、测试并打包
         with:
           job-id: checker-1
-          arguments: ktlintCheck test buildComet
+          arguments: ktlintCheck test buildComet --stacktrace
           gradle-version: wrapper
 
       - uses: actions/upload-artifact@v2
