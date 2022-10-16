@@ -12,6 +12,7 @@ import ren.natsuyuk1.comet.objects.config.PushTemplate
 import ren.natsuyuk1.comet.objects.config.PushTemplateConfig
 import ren.natsuyuk1.comet.pusher.toCometPushTarget
 import ren.natsuyuk1.comet.util.toMessageWrapper
+import java.util.*
 
 enum class PushTemplateSubscribeStage {
     TEMPLATE, URL
@@ -36,15 +37,23 @@ class PushTemplateNewSession(
 
             PushTemplateSubscribeStage.URL -> {
                 url = message.parseToString()
+                val token = UUID.randomUUID()
                 PushTemplateConfig.data.add(
                     PushTemplate(
                         templateName,
                         template,
                         mutableListOf(requestGroup.toCometPushTarget()),
-                        url
+                        url,
+                        token
                     )
                 )
-                contact.sendMessage("成功新建推送模板 $templateName! 已自动订阅你发起新建请求的群聊.".toMessageWrapper())
+                contact.sendMessage(
+                    buildMessageWrapper {
+                        appendTextln("成功新建推送模板 $templateName! 已自动订阅你发起新建请求的群聊.")
+                        appendTextln("你的推送 Token 是 $token")
+                        appendText("该 Token 之后无法再获取, 请记好你的 Token.")
+                    }
+                )
                 expire()
             }
         }

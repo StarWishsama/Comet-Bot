@@ -1,11 +1,14 @@
 package ren.natsuyuk1.comet.commands
 
 import moe.sdl.yac.core.subcommands
+import moe.sdl.yac.parameters.arguments.argument
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
+import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.UserLevel
+import ren.natsuyuk1.comet.commands.service.PushTemplateService
 import ren.natsuyuk1.comet.util.groupAdminChecker
 import ren.natsuyuk1.comet.util.toMessageWrapper
 
@@ -32,7 +35,13 @@ class PushTemplateCommand(
     user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, PUSH_TEMPLATE) {
     init {
-        subcommands()
+        subcommands(
+            New(subject, sender, user),
+            Remove(subject, sender, user),
+            Subscribe(subject, sender, user),
+            UnSubscribe(subject, sender, user),
+            List(subject, sender, user)
+        )
     }
 
     override suspend fun run() {
@@ -50,8 +59,14 @@ class PushTemplateCommand(
             val NEW = SubCommandProperty("new", listOf("新建"), PUSH_TEMPLATE)
         }
 
+        private val templateName by argument("模板名")
+
         override suspend fun run() {
-            TODO("Not yet implemented")
+            if (subject is Group) {
+                subject.sendMessage(PushTemplateService.new(subject, sender, user, templateName))
+            } else {
+                subject.sendMessage("请在群聊中使用该命令".toMessageWrapper())
+            }
         }
     }
 
@@ -64,8 +79,10 @@ class PushTemplateCommand(
             val REMOVE = SubCommandProperty("remove", listOf("rm", "删除"), PUSH_TEMPLATE)
         }
 
+        private val templateName by argument("模板名")
+
         override suspend fun run() {
-            TODO("Not yet implemented")
+            subject.sendMessage(PushTemplateService.remove(templateName))
         }
     }
 
@@ -78,8 +95,14 @@ class PushTemplateCommand(
             val SUBSCRIBE = SubCommandProperty("subscribe", listOf("sub", "订阅"), PUSH_TEMPLATE)
         }
 
+        private val templateName by argument("模板名")
+
         override suspend fun run() {
-            TODO("Not yet implemented")
+            if (subject is Group) {
+                subject.sendMessage(PushTemplateService.subscribe(templateName, subject))
+            } else {
+                subject.sendMessage("请在群聊中使用该命令".toMessageWrapper())
+            }
         }
     }
 
@@ -92,8 +115,14 @@ class PushTemplateCommand(
             val UNSUBSCRIBE = SubCommandProperty("unsubscribe", listOf("unsub", "退订"), PUSH_TEMPLATE)
         }
 
+        private val templateName by argument("模板名")
+
         override suspend fun run() {
-            TODO("Not yet implemented")
+            if (subject is Group) {
+                subject.sendMessage(PushTemplateService.unsubscribe(templateName, subject))
+            } else {
+                subject.sendMessage("请在群聊中使用该命令".toMessageWrapper())
+            }
         }
     }
 
@@ -107,7 +136,11 @@ class PushTemplateCommand(
         }
 
         override suspend fun run() {
-            TODO("Not yet implemented")
+            if (subject is Group) {
+                subject.sendMessage(PushTemplateService.list(subject))
+            } else {
+                subject.sendMessage("请在群聊中使用该命令".toMessageWrapper())
+            }
         }
     }
 }
