@@ -2,11 +2,9 @@ package ren.natsuyuk1.comet.utils.json
 
 import com.jayway.jsonpath.DocumentContext
 import com.mitchellbosecke.pebble.PebbleEngine
-import mu.KotlinLogging
 import java.io.StringWriter
 
 private val TEMPLATE_ENGINE: PebbleEngine = PebbleEngine.Builder().build()
-private val logger = KotlinLogging.logger {}
 
 class JsonPathMap(private val compiledPath: DocumentContext) : MutableMap<String?, Any?> {
     override fun isEmpty(): Boolean {
@@ -14,7 +12,7 @@ class JsonPathMap(private val compiledPath: DocumentContext) : MutableMap<String
     }
 
     override fun containsKey(key: String?): Boolean {
-        return compiledPath.read(key as String, Any::class.java) == null
+        return compiledPath.read(key, Any::class.java) == null
     }
 
     override fun containsValue(value: Any?): Boolean {
@@ -22,7 +20,7 @@ class JsonPathMap(private val compiledPath: DocumentContext) : MutableMap<String
     }
 
     override operator fun get(key: String?): Any? {
-        return compiledPath.read(key as String)
+        return compiledPath.read(key)
     }
 
     override fun put(key: String?, value: Any?): Any? {
@@ -51,37 +49,10 @@ class JsonPathMap(private val compiledPath: DocumentContext) : MutableMap<String
     }
 }
 
-fun JsonPathMap.parsePath(template: String): String {
+fun JsonPathMap.formatByTemplate(template: String): String {
     val writer = StringWriter()
     val compiledTemplate = TEMPLATE_ENGINE.getLiteralTemplate(template)
     compiledTemplate.evaluate(writer, this)
 
     return writer.toString()
-    /**val mr = JSON_PATH_REGEX.find(template) ?: return template
-
-     if (mr.groupValues.isEmpty()) {
-     return template
-     }
-
-     val nodes = mr.groupValues.drop(0).map { "$$it" }
-
-     println(nodes)
-
-     val pendingText = nodes.map {
-     logger.debug { "Parsing path $it" }
-     try {
-     JsonPath.read<Any>(this, it)
-     } catch (e: InvalidPathException) {
-     logger.debug(e) { "invalid path $it" }
-     "转换失败"
-     }
-     }
-
-     var result = template
-
-     nodes.forEachIndexed { i, s ->
-     result = result.replace(s, pendingText[i].toString())
-     }
-
-     return result*/
 }
