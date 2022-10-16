@@ -12,6 +12,7 @@ import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.objects.github.data.SecretStatus
 import ren.natsuyuk1.comet.service.GitHubService
 import ren.natsuyuk1.comet.utils.error.ErrorHelper
+import ren.natsuyuk1.comet.utils.ktor.asReadable
 import java.io.IOException
 
 private val logger = mu.KotlinLogging.logger {}
@@ -38,17 +39,12 @@ object GithubWebHookHandler {
     private const val eventTypeHeader = "X-GitHub-Event"
 
     suspend fun handle(call: ApplicationCall) {
-        try {
-            logger.debug { "有新连接 ${call.request.httpMethod} - ${call.request.uri}" }
-            logger.debug {
-                val headers = call.request.headers
-                    .entries()
-                    .joinToString(";") { (k, v) ->
-                        "$k=$v"
-                    }
-                "Request Headers: $headers"
-            }
+        logger.debug { "有新连接 ${call.request.httpMethod} - ${call.request.uri}" }
+        logger.debug {
+            "Request Headers: ${call.request.headers.asReadable()}"
+        }
 
+        try {
             // Get information from header to identity whether the request is from GitHub.
             if (!isGitHubRequest(call.request)) {
                 logger.debug { "Github Webhook 传入无效请求" }

@@ -1,10 +1,10 @@
 package ren.natsuyuk1.comet.utils.error
 
 import mu.KotlinLogging
+import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.file.writeTextBuffered
-import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -21,7 +21,7 @@ object ErrorHelper {
         message: String
     ) {
         val fileName = "$type-${standardDateTimeFormatter.format(LocalDateTime.now())}.txt"
-        val location = File(errorReportsFolder, fileName)
+        val location = errorReportsFolder.resolve(fileName)
 
         location.touch()
 
@@ -35,8 +35,8 @@ object ErrorHelper {
             """.trimIndent()
 
         location.writeTextBuffered(report)
-        logger.warn("$reason, 错误报告已生成! 保存在 ${location.path}")
-        logger.warn("如果你无法确定原因, 可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")
+        logger.warn("$reason, 错误报告已生成! 保存在 ${location.absPath}")
+        logger.warn("如果你无法确定错误的原因, 可以将其反馈到 https://github.com/StarWishsama/Comet-Bot/issues")
         logger.warn("以下是错误堆栈: ", t)
     }
 
