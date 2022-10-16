@@ -66,7 +66,7 @@ abstract class CometCommand(
     /**
      * 该命令的配置 [CommandProperty]
      */
-    property: CommandProperty,
+    val property: CommandProperty,
     option: CliktOption = CliktOption()
 ) : BaseCommand(sender, message, user, property, option) {
     override fun aliases(): Map<String, List<String>> {

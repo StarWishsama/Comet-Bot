@@ -44,7 +44,7 @@ class ApexCommand(
             if (ApexLegendData.isBound(user.id.value)) {
                 subject.sendMessage(ApexService.queryUserInfo(user))
             } else {
-                subject.sendMessage(APEX.helpText.toMessageWrapper())
+                subject.sendMessage(property.helpText.toMessageWrapper())
             }
         }
     }

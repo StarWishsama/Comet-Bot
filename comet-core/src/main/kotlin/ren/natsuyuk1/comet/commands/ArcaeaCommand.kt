@@ -44,7 +44,7 @@ class ArcaeaCommand(
             if (ArcaeaUserData.isBound(user.id.value)) {
                 ArcaeaService.queryUserInfo(comet, subject, user)
             } else {
-                subject.sendMessage(ARCAEA.helpText.toMessageWrapper())
+                subject.sendMessage(property.helpText.toMessageWrapper())
             }
         }
     }

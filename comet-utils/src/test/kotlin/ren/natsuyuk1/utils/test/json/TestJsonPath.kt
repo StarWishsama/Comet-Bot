@@ -11,11 +11,11 @@ import kotlin.test.assertEquals
 class TestJsonPath {
     @Test
     fun test() {
-        val testJson = """{"test":2,"test2":3, "test3":[114,514,1919]}"""
+        val testJson = """{"test":2,"test2":3, "test3":[114,514,1919], "test4": {"ksm": "arisa"}}"""
         val jsonMap = JsonPathMap(JsonPath.parse(testJson))
 
-        val r = jsonMap.formatByTemplate("测试 {{ test3[1] }}")
+        val r = jsonMap.formatByTemplate("测试 {{ test3[1] }} {{ test4.ksm }}")
 
-        assertEquals("测试 514", r)
+        assertEquals("测试 514 arisa", r)
     }
 }

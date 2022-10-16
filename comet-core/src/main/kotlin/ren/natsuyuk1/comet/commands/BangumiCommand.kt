@@ -40,7 +40,7 @@ class BangumiCommand(
 
     override suspend fun run() {
         if (currentContext.invokedSubcommand == null) {
-            subject.sendMessage(BANGUMI.helpText.toMessageWrapper())
+            subject.sendMessage(property.helpText.toMessageWrapper())
         }
     }
 

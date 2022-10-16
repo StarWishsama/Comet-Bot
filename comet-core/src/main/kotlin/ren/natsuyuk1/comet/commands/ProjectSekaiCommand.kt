@@ -55,7 +55,7 @@ class ProjectSekaiCommand(
             if (ProjectSekaiUserData.isBound(user.id.value)) {
                 subject.sendMessage(ProjectSekaiService.queryUserEventInfo(user, 0))
             } else {
-                subject.sendMessage(PROJECTSEKAI.helpText.toMessageWrapper())
+                subject.sendMessage(property.helpText.toMessageWrapper())
             }
         }
     }

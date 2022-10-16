@@ -40,7 +40,7 @@ class RSSCommand(
 
     override suspend fun run() {
         if (currentContext.invokedSubcommand == null) {
-            subject.sendMessage(RSS.helpText.toMessageWrapper())
+            subject.sendMessage(property.helpText.toMessageWrapper())
         }
     }
 

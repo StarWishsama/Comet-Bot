@@ -41,7 +41,7 @@ class TwitterCommand(
 
     override suspend fun run() {
         if (currentContext.invokedSubcommand == null) {
-            subject.sendMessage(TWITTER.helpText.toMessageWrapper())
+            subject.sendMessage(property.helpText.toMessageWrapper())
         }
     }
 

@@ -48,7 +48,7 @@ class GithubCommand(
     override suspend fun run() {
         val subcommand = currentContext.invokedSubcommand
         if (subcommand == null) {
-            subject.sendMessage(GITHUB.helpText.toMessageWrapper())
+            subject.sendMessage(property.helpText.toMessageWrapper())
         }
     }
 

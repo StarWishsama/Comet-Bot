@@ -42,7 +42,7 @@ class BiliBiliCommand(
 
     override suspend fun run() {
         if (currentContext.invokedSubcommand == null) {
-            subject.sendMessage(BILIBILI.helpText.toMessageWrapper())
+            subject.sendMessage(property.helpText.toMessageWrapper())
         }
     }
 
@@ -92,7 +92,7 @@ class BiliBiliCommand(
 
         override suspend fun run() {
             if (video.isBlank()) {
-                subject.sendMessage(BILIBILI.helpText.toMessageWrapper())
+                subject.sendMessage(property.helpText.toMessageWrapper())
             } else {
                 BiliBiliService.processVideoSearch(subject, video)
             }
