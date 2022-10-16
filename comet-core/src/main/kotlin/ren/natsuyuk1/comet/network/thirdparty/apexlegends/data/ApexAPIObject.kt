@@ -53,11 +53,11 @@ data class ApexPlayerInfo(
 }
 
 fun ApexPlayerInfo.toMessageWrapper(): MessageWrapper = buildMessageWrapper {
-    appendText("${global.name} | ${global.level}", true)
+    appendTextln("${global.name} | ${global.level}")
     appendLine()
 
     if (global.rank.rankName != "Unranked") {
-        appendText("本赛季段位 >> ${global.rank.rankName} ${global.rank.rankDiv}", true)
+        appendTextln("本赛季段位 >> ${global.rank.rankName} ${global.rank.rankDiv}")
         appendElement(global.rank.rankImg.asURLImage())
     }
 }

@@ -12,13 +12,13 @@ import ren.natsuyuk1.comet.utils.file.absPath
 
 fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
     buildMessageWrapper {
-        appendText("${user.userGameData.name} | ${user.userGameData.level} 级", true)
+        appendTextln("${user.userGameData.name} | ${user.userGameData.level} 级")
         appendLine()
         if (userProfile.bio.isNotBlank()) {
-            appendText(userProfile.bio, true)
+            appendTextln(userProfile.bio)
             appendLine()
         }
-        appendText("歌曲游玩情况 >>", true)
+        appendTextln("歌曲游玩情况 >>")
 
         appendText(
             "EXPERT | Clear ${

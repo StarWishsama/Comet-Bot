@@ -103,16 +103,16 @@ data class IssueEventData(
 
         when (action) {
             "opened" -> {
-                wrapper.appendText("\uD83D\uDC1B ${repository.fullName} 有新议题 #${issue.number}\n")
+                wrapper.appendTextln("\uD83D\uDC1B ${repository.fullName} 有新议题 #${issue.number}")
                 wrapper.appendText("by ${issue.user.login} | ${issue.convertCreatedTime()}\n\n")
-                wrapper.appendText(issue.title, true)
+                wrapper.appendTextln(issue.title)
                 wrapper.appendText("${issue.body?.limit(50)?.trim() ?: "没有描述"}\n\n")
-                wrapper.appendText("查看全部 >: ${issue.url}\n")
+                wrapper.appendText("查看全部 > ${issue.url}")
             }
 
             "closed" -> {
-                wrapper.appendText("\uD83D\uDC1B ${repository.fullName} 议题 #${issue.number} 关闭\n")
-                wrapper.appendText("by ${issue.user.login}\n")
+                wrapper.appendTextln("\uD83D\uDC1B ${repository.fullName} 议题 #${issue.number} 关闭")
+                wrapper.appendTextln("by ${issue.user.login}")
                 if (issue.stateReason != null) {
                     wrapper.appendText("关闭理由为 ${issue.stateReason.display}")
                 }

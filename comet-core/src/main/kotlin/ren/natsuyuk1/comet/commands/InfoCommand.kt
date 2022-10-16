@@ -31,7 +31,7 @@ class InfoCommand(
             buildMessageWrapper {
                 appendElement(AtElement(sender.id, sender.name))
                 appendLine()
-                appendText("等级 ${user.level} | 硬币 ${user.coin.getBetterNumber()}", true)
+                appendTextln("等级 ${user.level} | 硬币 ${user.coin.getBetterNumber()}")
                 appendText("上次签到于 ${yyMMddWithTimePattern.format(user.checkInDate.toJavaInstant())}")
             }
         )

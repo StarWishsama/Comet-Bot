@@ -15,6 +15,7 @@ import ren.natsuyuk1.comet.objects.command.now.NowCmdConfigTable
 import ren.natsuyuk1.comet.objects.command.picturesearch.PictureSearchConfigTable
 import ren.natsuyuk1.comet.objects.config.CometServerConfig
 import ren.natsuyuk1.comet.objects.config.IpdbConfig
+import ren.natsuyuk1.comet.objects.config.PushTemplateConfig
 import ren.natsuyuk1.comet.objects.config.TwitterConfig
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.objects.keyword.KeyWordData
@@ -32,6 +33,7 @@ val cometPersistDataFile: List<PersistDataFile<*>> =
         KeyWordData,
         TwitterConfig,
         IpdbConfig,
+        PushTemplateConfig
     )
 
 val cometTables =

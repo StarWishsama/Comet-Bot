@@ -36,17 +36,17 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
     val (ahead, behind) = profile.rank.getSurroundingRank()
 
     return buildMessageWrapper {
-        appendText("${profile.name} - ${profile.userId}", true)
+        appendTextln("${profile.name} - ${profile.userId}")
         appendLine()
-        appendText("当前活动 ${ProjectSekaiData.getCurrentEventInfo()?.name}", true)
+        appendTextln("当前活动 ${ProjectSekaiData.getCurrentEventInfo()?.name}")
         if (ProjectSekaiData.getCurrentEventInfo()?.aggregateTime != null) {
-            appendText(
+            appendTextln(
                 "离活动结束还有 ${
-                (ProjectSekaiData.getCurrentEventInfo()?.aggregateTime!!.toInstant(true) - now).toFriendly(
-                    msMode = false
-                )
-                }",
-                true
+                (ProjectSekaiData.getCurrentEventInfo()?.aggregateTime!!.toInstant(true) - now)
+                    .toFriendly(
+                        msMode = false
+                    )
+                }"
             )
         }
         if (profile.userCheerfulCarnival.cheerfulCarnivalTeamId != null) {
@@ -54,11 +54,11 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
                 ProjectSekaiManager.getCarnivalTeamI18nName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
 
             if (teamName != null) {
-                appendText("当前队伍为 $teamName", true)
+                appendTextln("当前队伍为 $teamName")
             }
         }
         appendLine()
-        appendText("分数 ${profile.score} | 排名 ${profile.rank}", true)
+        appendTextln("分数 ${profile.score} | 排名 ${profile.rank}")
         appendLine()
 
         if (userData.lastQueryScore != 0L && userData.lastQueryPosition != 0) {
@@ -85,10 +85,7 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
 
             val aheadScoreStr = aheadScore.getBetterNumber()
             val delta = (aheadScore - profile.score).getBetterNumber()
-            appendText(
-                "上一档排名 $ahead 的分数为 $aheadScoreStr, 相差 $delta",
-                true
-            )
+            appendTextln("上一档排名 $ahead 的分数为 $aheadScoreStr, 相差 $delta")
         }
 
         if (behind in 100..1000001) {
@@ -97,10 +94,7 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
 
             val targetScore = behindScore.getBetterNumber()
             val deltaScore = (profile.score - behindScore).getBetterNumber()
-            appendText(
-                "下一档排名 $behind 的分数为 $targetScore, 相差 $deltaScore",
-                true
-            )
+            appendTextln("下一档排名 $behind 的分数为 $targetScore, 相差 $deltaScore")
         }
 
         appendLine()

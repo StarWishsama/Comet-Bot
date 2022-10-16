@@ -10,7 +10,7 @@ data class NoAbbrSearchResult(
     val inputting: List<String>? = null,
 ) {
     fun toMessageWrapper() = buildMessageWrapper {
-        appendText("🔍 能不能好好说话？", true)
+        appendTextln("🔍 能不能好好说话？")
         if (trans.isNullOrEmpty()) {
             appendText("找不到 $name 的缩写释义捏")
         } else {

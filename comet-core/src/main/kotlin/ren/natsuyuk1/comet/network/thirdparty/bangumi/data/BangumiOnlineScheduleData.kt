@@ -27,7 +27,7 @@ data class BangumiOnlineScheduleData(
         val bangumis = data[day.value - 1].entries
 
         return buildMessageWrapper {
-            appendText("${day.toChinese()} 新番列表 >>", true)
+            appendTextln("${day.toChinese()} 新番列表 >>")
 
             bangumis.forEach { (k, v) ->
                 appendText("${k.toLong().convertToTime()} => ")

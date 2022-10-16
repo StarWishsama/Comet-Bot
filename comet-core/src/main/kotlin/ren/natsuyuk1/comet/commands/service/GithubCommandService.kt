@@ -28,7 +28,7 @@ object GithubCommandService {
         val name: String,
         private val groupID: Long
     ) : Session(contact, user) {
-        override suspend fun handle(message: MessageWrapper) {
+        override suspend fun process(message: MessageWrapper) {
             val raw = message.parseToString()
             val secret = if (raw == "完成订阅") {
                 ""
@@ -226,9 +226,9 @@ object GithubCommandService {
 
                 subject.sendMessage(
                     buildMessageWrapper {
-                        appendText("当前仓库 ${repo.getName()}", true)
-                        appendText("订阅分支 >> ${subSetting.subscribeBranch}", true)
-                        appendText("订阅事件 >> ${subSetting.subscribeEvent}", true)
+                        appendTextln("当前仓库 ${repo.getName()}")
+                        appendTextln("订阅分支 >> ${subSetting.subscribeBranch}")
+                        appendText("订阅事件 >> ${subSetting.subscribeEvent}")
                     }
                 )
             }

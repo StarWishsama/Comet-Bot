@@ -14,11 +14,11 @@ class RSSPusherContext(
 ) : CometPushContext(id, target) {
     override fun normalize(): MessageWrapper =
         buildMessageWrapper {
-            appendText(content.title, true)
-            appendText(content.description.value.simplifyHTML(), true)
+            appendTextln(content.title)
+            appendTextln(content.description.value.simplifyHTML())
 
             if (content.publishedDate != null) {
-                appendText("发布于 ${yyMMddWithTimePattern.format(content.publishedDate.toInstant())}", true)
+                appendTextln("发布于 ${yyMMddWithTimePattern.format(content.publishedDate.toInstant())}")
             }
 
             appendLine()

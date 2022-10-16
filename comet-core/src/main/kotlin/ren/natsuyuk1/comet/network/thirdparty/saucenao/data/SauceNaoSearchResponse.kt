@@ -90,31 +90,31 @@ fun SauceNaoSearchResponse.toMessageWrapper(): MessageWrapper = buildMessageWrap
 
     val highestProbResult = results.first()
 
-    appendText("✔ 已找到可能的图片来源", true)
+    appendTextln("✔ 已找到可能的图片来源")
     appendLine()
-    appendText("🤖 相似度 ${highestProbResult.header.similarity.fixDisplay()}%")
+    appendTextln("🤖 相似度 ${highestProbResult.header.similarity.fixDisplay()}%")
 
     highestProbResult.apply {
         // Check website ID
         when {
             // Pixiv
             highestProbResult.data.pixivID != null -> {
-                appendText("🏷 来自 Pixiv 的作品 (${highestProbResult.data.pixivID})", true)
+                appendTextln("🏷 来自 Pixiv 的作品 (${highestProbResult.data.pixivID})")
                 appendText("🔗 https://www.pixiv.net/artworks/${highestProbResult.data.pixivID}")
             }
 
             highestProbResult.data.deviantartID != null -> {
-                appendText("🏷 来自 Deviantart 的作品", true)
+                appendTextln("🏷 来自 Deviantart 的作品")
                 appendText("🔗 https://deviantart.com/view/${highestProbResult.data.deviantartID}")
             }
 
             highestProbResult.data.artStationID != null -> {
-                appendText("🏷 来自 ArtStation 的作品", true)
+                appendTextln("🏷 来自 ArtStation 的作品")
                 appendText("🔗 https://www.artstation.com/artwork/${highestProbResult.data.artStationID}")
             }
 
             highestProbResult.data.danbooruID != null -> {
-                appendText("🏷 来自 Danbooru 的作品", true)
+                appendTextln("🏷 来自 Danbooru 的作品")
                 appendText("🔗 https://danbooru.donmai.us/post/show/${highestProbResult.data.danbooruID}")
             }
 

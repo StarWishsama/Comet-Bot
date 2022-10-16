@@ -161,9 +161,9 @@ class RSSCommand(
             } else {
                 subject.sendMessage(
                     buildMessageWrapper {
-                        appendText("本群已订阅的 RSS 源 >>", true)
+                        appendTextln("本群已订阅的 RSS 源 >>")
                         subRSS.forEach { k ->
-                            appendText("| ${k.replace(URL_PREFIX_REGEX, "")}", true)
+                            appendTextln("| ${k.replace(URL_PREFIX_REGEX, "")}")
                         }
                     }
                 )

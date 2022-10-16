@@ -34,11 +34,12 @@ open class MessageWrapper(
     @Transient
     private var usable: Boolean = isEmpty()
 
-    fun appendText(text: String, newline: Boolean = false): MessageWrapper =
+    fun appendText(text: String): MessageWrapper =
         apply {
             appendElement(Text(text))
-            if (newline) appendLine()
         }
+
+    fun appendTextln(text: String): MessageWrapper = appendText(text).appendLine()
 
     fun appendLine(): MessageWrapper = apply { appendElement(Text("\n")) }
 

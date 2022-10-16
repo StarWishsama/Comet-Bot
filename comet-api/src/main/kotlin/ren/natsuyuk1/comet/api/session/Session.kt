@@ -14,5 +14,5 @@ abstract class Session(
      */
     val cometUser: CometUser?
 ) {
-    abstract suspend fun handle(message: MessageWrapper)
+    abstract suspend fun process(message: MessageWrapper)
 }

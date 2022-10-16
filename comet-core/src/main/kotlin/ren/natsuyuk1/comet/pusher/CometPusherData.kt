@@ -1,8 +1,6 @@
 package ren.natsuyuk1.comet.pusher
 
 import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -46,7 +44,7 @@ class CometPusherContext(id: EntityID<String>) : Entity<String>(id) {
                 return
             }
 
-            val queryTime = Clock.System.now().minus(1.days).toLocalDateTime(TimeZone.currentSystemDefault())
+            val queryTime = Clock.System.now().minus(1.days)
 
             CometPusherContextTable.deleteWhere {
                 CometPusherContextTable.pusherName eq pusherName and

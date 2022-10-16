@@ -181,8 +181,8 @@ class Subject(override val htmlPage: String) : Parser(), Unique {
 
 fun Subject.toMessageWrapper(url: String) =
     buildMessageWrapper {
-        title?.let { appendText(it, true) }
-        if (title != translatedTitle) appendText("📖 中译 $translatedTitle", true)
+        title?.let { appendTextln(it) }
+        if (title != translatedTitle) appendTextln("📖 中译 $translatedTitle")
         appendText("🌟 评分 $score")
         rank?.let { appendText(" | 🪜 排名 #$it") }
         appendLine()

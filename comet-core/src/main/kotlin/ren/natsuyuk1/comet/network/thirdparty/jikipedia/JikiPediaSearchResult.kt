@@ -38,11 +38,11 @@ data class JikiPediaSearchResult(
                 } else {
                     val dn = definition.definitions.first()
 
-                    appendText(dn.term.title, true)
-                    appendText("${dn.createTime.format()} | 阅读 ${dn.view.getBetterNumber()}", true)
+                    appendTextln(dn.term.title)
+                    appendTextln("${dn.createTime.format()} | 阅读 ${dn.view.getBetterNumber()}")
 
                     if (dn.plainText.length > 100) {
-                        appendText(dn.plainText.limit(100), true)
+                        appendTextln(dn.plainText.limit(100))
                         appendText("🔍 查看全部 https://jikipedia.com/definition/${dn.id}")
                     } else {
                         appendText(dn.plainText)

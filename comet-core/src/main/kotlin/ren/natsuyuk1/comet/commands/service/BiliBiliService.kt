@@ -38,7 +38,7 @@ object BiliBiliService {
         cometUser: CometUser?,
         private val pendingSearchResult: PendingSearchResult
     ) : Session(contact, cometUser) {
-        override suspend fun handle(message: MessageWrapper) {
+        override suspend fun process(message: MessageWrapper) {
             val index = message.parseToString().toIntOrNull()
 
             if (index == null) {
@@ -87,12 +87,12 @@ object BiliBiliService {
                     ).registerTimeout(15.seconds)
 
                     val request = buildMessageWrapper {
-                        appendText("请选择你欲搜索的 UP 主 >", true)
+                        appendTextln("请选择你欲搜索的 UP 主 >")
 
                         appendLine()
 
                         searchResult.take(5).forEachIndexed { index, userResult ->
-                            appendText("${index + 1} >> ${userResult.uname} (${userResult.mid})", true)
+                            appendTextln("${index + 1} >> ${userResult.uname} (${userResult.mid})")
                         }
 
                         appendLine()
@@ -132,9 +132,9 @@ object BiliBiliService {
                 appendLine()
                 appendLine()
 
-                appendText("签名 >> ${space.bio}", true)
+                appendTextln("签名 >> ${space.bio}")
                 appendLine()
-                appendText("粉丝 ${card.follower?.getBetterNumber()} | 获赞 ${card.like?.getBetterNumber()}", true)
+                appendTextln("粉丝 ${card.follower?.getBetterNumber()} | 获赞 ${card.like?.getBetterNumber()}")
                 appendLine()
                 appendText("\uD83D\uDD17 https://space.bilibili.com/${space.mid}")
             }

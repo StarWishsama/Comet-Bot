@@ -46,7 +46,7 @@ class PictureSearchQuerySession(
     cometUser: CometUser?,
     val source: PictureSearchSource
 ) : Session(contact, cometUser) {
-    override suspend fun handle(message: MessageWrapper) {
+    override suspend fun process(message: MessageWrapper) {
         val image = message.find<Image>()
 
         if (image == null) {

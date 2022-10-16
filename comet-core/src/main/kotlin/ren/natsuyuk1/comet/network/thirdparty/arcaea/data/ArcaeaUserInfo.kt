@@ -41,16 +41,16 @@ data class ArcaeaUserInfo(
     )
 
     fun getMessageWrapper(): MessageWrapper = buildMessageWrapper {
-        appendText("${data.name} | ${data.userCode}", true)
-        appendText("当前 ptt >> ${getActualPtt()}", true)
+        appendTextln("${data.name} | ${data.userCode}")
+        appendTextln("当前 ptt >> ${getActualPtt()}")
 
         if (!data.recentPlayScore.isNullOrEmpty()) {
             appendLine()
             val lastPlay = data.recentPlayScore.first()
-            appendText("最近游玩 >>", true)
+            appendTextln("最近游玩 >>")
             val difficulty = lastPlay.difficulty.formatDifficulty()
             val lastPlayedSong = ArcaeaHelper.getSongNameByID(lastPlay.songID)
-            appendText("$lastPlayedSong ($difficulty)", true)
+            appendTextln("$lastPlayedSong ($difficulty)")
             val score = lastPlay.score
             val scoreLevel = score.formatScore()
             val clearType = lastPlay.clearType.formatType()

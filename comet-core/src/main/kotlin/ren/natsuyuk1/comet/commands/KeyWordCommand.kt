@@ -35,7 +35,7 @@ class KeyWordAddSession(
     val keyword: String,
     private val regex: Boolean
 ) : Session(contact, user) {
-    override suspend fun handle(message: MessageWrapper) {
+    override suspend fun process(message: MessageWrapper) {
         KeyWordData.addKeyWord(subject.id, subject.platform, KeyWordData.GroupInstance.KeyWord(keyword, message, regex))
         subject.sendMessage("成功添加该关键字 ($keyword)".toMessageWrapper())
         expire()
@@ -89,7 +89,7 @@ class KeyWordCommand(
 
                 subject.sendMessage(
                     buildMessageWrapper {
-                        appendText("已添加的关键词 >>", true)
+                        appendTextln("已添加的关键词 >>")
 
                         appendText(
                             buildString {

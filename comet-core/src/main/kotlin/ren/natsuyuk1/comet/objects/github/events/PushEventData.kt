@@ -103,7 +103,7 @@ data class PushEventData(
             appendText(
                 "by ${headCommitInfo.committer.name} | ${getLocalTime(repoInfo.pushTime)}\n\n"
             )
-            appendText(buildCommitList(), true)
+            appendTextln(buildCommitList())
             appendText("查看差异 > $compare")
         }
     }

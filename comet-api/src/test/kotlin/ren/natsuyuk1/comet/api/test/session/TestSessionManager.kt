@@ -153,7 +153,7 @@ class TestSessionManager {
 }
 
 internal class TestSession(contact: PlatformCommandSender, user: CometUser) : Session(contact, user) {
-    override suspend fun handle(message: MessageWrapper) {
+    override suspend fun process(message: MessageWrapper) {
         logger.debug { "Triggered test session!" }
         expire()
     }

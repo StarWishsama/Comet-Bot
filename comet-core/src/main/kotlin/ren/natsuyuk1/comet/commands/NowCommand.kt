@@ -153,7 +153,7 @@ class NowCommand(
 
         subject.sendMessage(
             buildMessageWrapper {
-                appendText(timeMessage.await(), true)
+                appendTextln(timeMessage.await())
             }
         )?.delayDelete(1.minutes)
 

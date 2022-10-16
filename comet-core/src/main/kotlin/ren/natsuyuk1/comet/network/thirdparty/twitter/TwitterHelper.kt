@@ -15,8 +15,8 @@ suspend fun Tweet.toMessageWrapper(includes: TwitterExpansions? = null): Message
     buildMessageWrapper {
         val tweet = this@toMessageWrapper
         val author = tweet.authorID?.let { TwitterAPI.fetchUser(it) }
-        appendText("${author?.name} | @${author?.username}", true)
-        appendText(tweet.text.removeShortLink().limit(100), true)
+        appendTextln("${author?.name} | @${author?.username}")
+        appendTextln(tweet.text.removeShortLink().limit(100))
         if (tweet.referencedTweets != null) {
             val rtInfo = tweet.referencedTweets?.firstOrNull()
             if (rtInfo != null) {
@@ -29,15 +29,15 @@ suspend fun Tweet.toMessageWrapper(includes: TwitterExpansions? = null): Message
 
                     when (rtInfo.type) {
                         ReferencedTweetType.RETWEETED ->
-                            appendText("\uD83D\uDD01 转发了 ${rtAuthor.name.limit(15)} 的推文", true)
+                            appendTextln("\uD83D\uDD01 转发了 ${rtAuthor.name.limit(15)} 的推文")
                         ReferencedTweetType.REPLY_TO ->
-                            appendText("\uD83D\uDCAC 回复了 ${rtAuthor.name.limit(15)} 的推文", true)
+                            appendTextln("\uD83D\uDCAC 回复了 ${rtAuthor.name.limit(15)} 的推文")
                         ReferencedTweetType.QUOTED ->
-                            appendText("\uD83D\uDCAC 引用了 ${rtAuthor.name.limit(15)} 的推文", true)
+                            appendTextln("\uD83D\uDCAC 引用了 ${rtAuthor.name.limit(15)} 的推文")
                         else -> {}
                     }
 
-                    appendText(rtTweet.text.removeShortLink().limit(50), true)
+                    appendTextln(rtTweet.text.removeShortLink().limit(50))
                     appendLine()
 
                     if (rt.includes?.media?.isEmpty() == false) {
@@ -75,7 +75,7 @@ suspend fun Tweet.toMessageWrapper(includes: TwitterExpansions? = null): Message
 
 fun TwitterUser.toMessageWrapper() = buildMessageWrapper {
     appendElement(profileImageURL!!.asURLImage())
-    appendText("$name (@$username)", true)
+    appendTextln("$name (@$username)")
 
     if (bio != null) {
         appendLine()
@@ -92,5 +92,5 @@ fun TwitterUser.toMessageWrapper() = buildMessageWrapper {
         appendLine()
     }
 
-    appendText("${publicMetrics?.following} 正在关注 | ${publicMetrics?.followers} 关注者", true)
+    appendTextln("${publicMetrics?.following} 正在关注 | ${publicMetrics?.followers} 关注者")
 }

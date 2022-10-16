@@ -97,7 +97,7 @@ object SessionManager {
 
         logger.debug { "Matched session(s): $targetSession" }
 
-        targetSession.forEach { scope.launch { it.handle(message) } }
+        targetSession.forEach { scope.launch { it.process(message) } }
 
         return targetSession.isNotEmpty()
     }
