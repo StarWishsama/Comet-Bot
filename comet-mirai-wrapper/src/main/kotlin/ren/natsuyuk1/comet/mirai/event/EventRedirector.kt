@@ -2,10 +2,7 @@ package ren.natsuyuk1.comet.mirai.event
 
 import mu.KotlinLogging
 import net.mamoe.mirai.event.Event
-import net.mamoe.mirai.event.events.FriendMessageEvent
-import net.mamoe.mirai.event.events.GroupMessageEvent
-import net.mamoe.mirai.event.events.GroupTempMessageEvent
-import net.mamoe.mirai.event.events.MemberJoinEvent
+import net.mamoe.mirai.event.events.*
 import ren.natsuyuk1.comet.api.event.EventManager
 import ren.natsuyuk1.comet.mirai.MiraiComet
 
@@ -28,6 +25,18 @@ suspend fun Event.redirectToComet(comet: MiraiComet) {
         }
 
         is MemberJoinEvent -> {
+            EventManager.broadcastEvent(this.toCometEvent(comet))
+        }
+
+        is NewFriendRequestEvent -> {
+            EventManager.broadcastEvent(this.toCometEvent(comet))
+        }
+
+        is FriendAddEvent -> {
+            EventManager.broadcastEvent(this.toCometEvent(comet))
+        }
+
+        is FriendDeleteEvent -> {
             EventManager.broadcastEvent(this.toCometEvent(comet))
         }
     }
