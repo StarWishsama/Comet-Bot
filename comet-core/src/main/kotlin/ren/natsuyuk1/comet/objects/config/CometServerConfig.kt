@@ -15,7 +15,7 @@ object CometServerConfig : PersistDataFile<CometServerConfig.Data>(
     @kotlinx.serialization.Serializable
     data class Data(
         @Comment("服务器开关")
-        val switch: Boolean = true,
+        val switch: Boolean = false,
         @Comment("服务器端口")
         val port: Int = 1145,
         @Comment("服务器对外展示的域名, 在订阅时展示, 如 https://example.com")

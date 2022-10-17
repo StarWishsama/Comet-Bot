@@ -42,7 +42,6 @@ import ren.natsuyuk1.comet.consts.cometPersistDataFile
 import ren.natsuyuk1.comet.consts.cometTables
 import ren.natsuyuk1.comet.consts.defaultCommands
 import ren.natsuyuk1.comet.network.CometServer
-import ren.natsuyuk1.comet.objects.config.CometServerConfig
 import ren.natsuyuk1.comet.service.CometCoreService
 import ren.natsuyuk1.comet.utils.brotli4j.BrotliLoader
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
@@ -162,7 +161,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
     private fun startService() = scope.launch {
         TaskManager.init(coroutineContext)
         CometCoreService.init(coroutineContext)
-        CometServer.init(CometServerConfig)
+        CometServer.init()
         SessionManager.init(coroutineContext)
 
         SkikoHelper.findSkikoLibrary()
