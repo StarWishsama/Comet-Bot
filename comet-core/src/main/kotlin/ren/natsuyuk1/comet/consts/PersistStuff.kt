@@ -153,4 +153,16 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         ) { comet, sender, subject, wrapper, user ->
             IPCommand(comet, sender, subject, wrapper, user)
         },
+        CommandNode(
+            PUSH_TEMPLATE,
+            listOf(
+                PushTemplateCommand.New.NEW,
+                PushTemplateCommand.List.LIST,
+                PushTemplateCommand.Subscribe.SUBSCRIBE,
+                PushTemplateCommand.UnSubscribe.UNSUBSCRIBE,
+                PushTemplateCommand.Remove.REMOVE
+            )
+        ) { comet, sender, subject, wrapper, user ->
+            PushTemplateCommand(comet, sender, subject, wrapper, user)
+        },
     )
