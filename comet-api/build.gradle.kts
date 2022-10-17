@@ -22,7 +22,7 @@ repositories {
 dependencies {
     compileOnly("org.jline:jline:3.21.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
     implementation("net.mamoe.yamlkt:yamlkt:0.12.0")
 
     api("org.jetbrains.exposed:exposed-core:0.40.1")
