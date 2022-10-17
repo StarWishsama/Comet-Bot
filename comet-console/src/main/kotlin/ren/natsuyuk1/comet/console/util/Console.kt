@@ -55,13 +55,11 @@ object Console {
 
     internal fun redirectToJLine() {
         System.setOut(JLineOutputRedirector)
-        System.setErr(JLineOutputRedirector)
     }
 
     internal fun redirectToNull() {
         val out = PrintStream(OutputStream.nullOutputStream())
         System.setOut(out)
-        System.setErr(out)
     }
 
     private fun LineReader.initHistory() {
