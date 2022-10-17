@@ -13,6 +13,7 @@ object PushTemplateConfig : PersistDataFile<PushTemplateConfig.Data>(
     Data(),
     json
 ) {
+    @Serializable
     data class Data(
         val templates: MutableSet<PushTemplate> = mutableSetOf()
     )
