@@ -15,6 +15,7 @@ import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.commands.service.subscribePushTemplateEvent
 import ren.natsuyuk1.comet.listener.registerListeners
 import ren.natsuyuk1.comet.mirai.config.MiraiConfig
 import ren.natsuyuk1.comet.mirai.config.toMiraiProtocol
@@ -23,7 +24,7 @@ import ren.natsuyuk1.comet.mirai.event.redirectToComet
 import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
 import ren.natsuyuk1.comet.mirai.util.runWith
 import ren.natsuyuk1.comet.mirai.util.runWithScope
-import ren.natsuyuk1.comet.service.subscribeGithubEvent
+import ren.natsuyuk1.comet.service.subscribeGitHubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import java.awt.Desktop
 
@@ -118,7 +119,8 @@ class MiraiComet(
     override fun afterLogin() {
         attachMessageProcessor()
         registerListeners()
-        subscribeGithubEvent()
+        subscribeGitHubEvent()
+        subscribePushTemplateEvent()
     }
 
     override fun close() {

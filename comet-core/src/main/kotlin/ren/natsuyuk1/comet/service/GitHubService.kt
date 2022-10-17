@@ -8,7 +8,7 @@ import ren.natsuyuk1.comet.api.event.registerListener
 import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.consts.json
-import ren.natsuyuk1.comet.event.pusher.github.GithubEvent
+import ren.natsuyuk1.comet.event.pusher.github.GitHubEvent
 import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
 import ren.natsuyuk1.comet.objects.github.data.SecretStatus
 import ren.natsuyuk1.comet.objects.github.events.*
@@ -81,11 +81,11 @@ object GitHubService {
 }
 
 /**
- * 快速为一个 [Comet] 实例
+ * 快速为一个 [Comet] 实例监听 GitHub 事件
  */
-fun Comet.subscribeGithubEvent() = run {
-    registerListener<GithubEvent> { event ->
-        logger.debug { "Processing GithubEvent: $event" }
+fun Comet.subscribeGitHubEvent() = run {
+    registerListener<GitHubEvent> { event ->
+        logger.debug { "Processing GitHubEvent: $event" }
 
         event.broadcastTargets.forEach {
             val target = getGroup(it.id) ?: return@forEach

@@ -1,17 +1,24 @@
 package ren.natsuyuk1.comet.network.server
 
+import com.jayway.jsonpath.JsonPath
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import ren.natsuyuk1.comet.api.event.broadcast
+import ren.natsuyuk1.comet.event.pusher.pushtemplate.PushTemplateReceiveEvent
+import ren.natsuyuk1.comet.network.server.response.CometResponse
+import ren.natsuyuk1.comet.network.server.response.respond
 import ren.natsuyuk1.comet.objects.config.PushTemplate
 import ren.natsuyuk1.comet.objects.config.PushTemplateConfig
+import ren.natsuyuk1.comet.utils.json.JsonPathMap
 import ren.natsuyuk1.comet.utils.ktor.asReadable
+import java.util.*
 
 private val logger = mu.KotlinLogging.logger {}
 
-fun Application.pushModule() {
+fun Application.pushTemplateModule() {
     routing {
         handlePush()
     }
@@ -31,13 +38,29 @@ object PushHandler {
         }
 
         try {
-            val ptc = call.validateRequest() ?: return
+            val ptc = call.validateRequest()
+
+            if (ptc == null) {
+                CometResponse(HttpStatusCode.Forbidden.value, "未通过验证").respond(call)
+                return
+            }
+
             val body = call.receiveText()
 
-            // TODO PushTemplateEvent
+            try {
+                val jp = JsonPath.parse(body)
+                PushTemplateReceiveEvent(
+                    JsonPathMap(jp),
+                    ptc
+                ).broadcast()
+
+                CometResponse(HttpStatusCode.OK.value, "Comet 已收到推送内容并推送").respond(call)
+            } catch (e: Exception) {
+                logger.warn(e) { "无法解析远端传入的 json, 原内容 $body" }
+            }
         } catch (e: Exception) {
             logger.warn(e) { "处理 WebHook 消息时发生错误" }
-            call.respondText("Comet 发生内部错误", status = HttpStatusCode.InternalServerError)
+            CometResponse(HttpStatusCode.InternalServerError.value, "Comet 发生内部错误").respond(call)
         }
     }
 
@@ -60,7 +83,9 @@ object PushHandler {
             return null
         }
 
-        val ptc = PushTemplateConfig.data.find { it.token.toString() == token.replace("Bearer ", "") }
+        val uuidToken = UUID.fromString(token.replace("Bearer ", ""))
+
+        val ptc = PushTemplateConfig.data.find { it.token == uuidToken }
         return if (ptc == null) {
             respond(HttpStatusCode.NotFound)
             null

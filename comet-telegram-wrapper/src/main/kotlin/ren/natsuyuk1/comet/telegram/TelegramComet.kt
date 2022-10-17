@@ -26,8 +26,9 @@ import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.commands.service.subscribePushTemplateEvent
 import ren.natsuyuk1.comet.listener.registerListeners
-import ren.natsuyuk1.comet.service.subscribeGithubEvent
+import ren.natsuyuk1.comet.service.subscribeGitHubEvent
 import ren.natsuyuk1.comet.telegram.contact.toCometGroup
 import ren.natsuyuk1.comet.telegram.event.toCometEvent
 import ren.natsuyuk1.comet.telegram.util.format
@@ -95,7 +96,8 @@ class TelegramComet(
     override fun afterLogin() {
         attachMessageProcessor()
         registerListeners()
-        subscribeGithubEvent()
+        subscribeGitHubEvent()
+        subscribePushTemplateEvent()
     }
 
     override fun close() {

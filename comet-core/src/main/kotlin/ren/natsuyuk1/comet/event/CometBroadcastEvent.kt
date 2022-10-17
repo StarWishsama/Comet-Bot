@@ -19,7 +19,7 @@ abstract class CometBroadcastEvent : AbstractEvent() {
 
 data class BroadcastTarget(
     val type: BroadcastType,
-    val id: Long
+    val id: Long,
 ) {
     enum class BroadcastType {
         PRIVATE, GROUP

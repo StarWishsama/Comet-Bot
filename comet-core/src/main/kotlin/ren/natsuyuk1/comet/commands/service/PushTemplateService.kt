@@ -1,6 +1,8 @@
 package ren.natsuyuk1.comet.commands.service
 
+import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
+import ren.natsuyuk1.comet.api.event.registerListener
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.session.Session
@@ -8,6 +10,7 @@ import ren.natsuyuk1.comet.api.session.expire
 import ren.natsuyuk1.comet.api.session.register
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.event.pusher.pushtemplate.PushTemplateReceiveEvent
 import ren.natsuyuk1.comet.objects.config.PushTemplate
 import ren.natsuyuk1.comet.objects.config.PushTemplateConfig
 import ren.natsuyuk1.comet.pusher.toCometPushTarget
@@ -115,6 +118,23 @@ object PushTemplateService {
                     appendText(content)
                 }
             }
+        }
+    }
+}
+
+/**
+ * 快速为一个 [Comet] 实例监听推送模板事件
+ */
+fun Comet.subscribePushTemplateEvent() = run {
+    registerListener<PushTemplateReceiveEvent> { event ->
+        logger.debug { "Processing PushTemplateReceiveEvent: $event" }
+
+        event.broadcastTargets.forEach {
+            val target = getGroup(it.id) ?: return@forEach
+
+            target.sendMessage(event.content)
+
+            logger.debug { "已推送来自 ${event.pushTemplate.url} 的事件至群 ${it.id}" }
         }
     }
 }

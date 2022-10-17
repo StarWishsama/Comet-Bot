@@ -5,6 +5,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
 import ren.natsuyuk1.comet.network.server.githubWebHookModule
+import ren.natsuyuk1.comet.network.server.pushTemplateModule
 import ren.natsuyuk1.comet.objects.config.CometServerConfig
 
 private val logger = mu.KotlinLogging.logger("CometServer")
@@ -19,6 +20,7 @@ object CometServer {
                 module {
                     install(CallLogging)
                     githubWebHookModule()
+                    pushTemplateModule()
                 }
 
                 connector {
