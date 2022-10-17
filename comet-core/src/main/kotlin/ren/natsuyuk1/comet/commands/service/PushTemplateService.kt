@@ -41,7 +41,7 @@ class PushTemplateNewSession(
             PushTemplateSubscribeStage.URL -> {
                 url = message.parseToString()
                 val token = UUID.randomUUID()
-                PushTemplateConfig.data.add(
+                PushTemplateConfig.data.templates.add(
                     PushTemplate(
                         templateName,
                         template,
@@ -65,7 +65,7 @@ class PushTemplateNewSession(
 
 object PushTemplateService {
     fun new(group: Group, sender: PlatformCommandSender, user: CometUser, templateName: String): MessageWrapper {
-        if (PushTemplateConfig.data.any { it.templateName == templateName }) {
+        if (PushTemplateConfig.data.templates.any { it.templateName == templateName }) {
             return "已存在相同的推送模板 $templateName".toMessageWrapper()
         }
 
@@ -74,7 +74,7 @@ object PushTemplateService {
     }
 
     fun remove(templateName: String): MessageWrapper {
-        return if (PushTemplateConfig.data.removeIf { it.templateName == templateName }) {
+        return if (PushTemplateConfig.data.templates.removeIf { it.templateName == templateName }) {
             "成功删除模板 $templateName".toMessageWrapper()
         } else {
             "找不到推送模板 $templateName".toMessageWrapper()
@@ -82,7 +82,7 @@ object PushTemplateService {
     }
 
     fun subscribe(templateName: String, group: Group): MessageWrapper {
-        val pt = PushTemplateConfig.data.find { it.templateName == templateName }
+        val pt = PushTemplateConfig.data.templates.find { it.templateName == templateName }
 
         return if (pt == null) {
             "找不到模板 $templateName".toMessageWrapper()
@@ -93,7 +93,7 @@ object PushTemplateService {
     }
 
     fun unsubscribe(templateName: String, group: Group): MessageWrapper {
-        val pt = PushTemplateConfig.data.find { it.templateName == templateName }
+        val pt = PushTemplateConfig.data.templates.find { it.templateName == templateName }
 
         return if (pt == null) {
             "找不到模板 $templateName".toMessageWrapper()
@@ -104,7 +104,7 @@ object PushTemplateService {
     }
 
     fun list(group: Group): MessageWrapper {
-        val pts = PushTemplateConfig.data.filter { pt ->
+        val pts = PushTemplateConfig.data.templates.filter { pt ->
             pt.subscribers.any { it.id == group.id && it.platform == group.platform }
         }
 

@@ -8,11 +8,15 @@ import ren.natsuyuk1.comet.utils.file.configDirectory
 import ren.natsuyuk1.comet.utils.json.serializers.UUIDSerializer
 import java.util.*
 
-object PushTemplateConfig : PersistDataFile<MutableSet<PushTemplate>>(
+object PushTemplateConfig : PersistDataFile<PushTemplateConfig.Data>(
     configDirectory.resolve("push_templates.json"),
-    mutableSetOf(),
+    Data(),
     json
-)
+) {
+    data class Data(
+        val templates: MutableSet<PushTemplate> = mutableSetOf()
+    )
+}
 
 @Serializable
 data class PushTemplate(
