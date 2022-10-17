@@ -28,7 +28,7 @@ dependencies {
     api(project(":comet-core"))
     api(project(":comet-utils"))
 
-    compileOnly("org.jetbrains.skiko:skiko:0.7.27")
+    compileOnly("org.jetbrains.skiko:skiko:0.7.36")
     testRuntimeOnly("org.jetbrains.skiko:skiko:0.7.27")
 }
 
