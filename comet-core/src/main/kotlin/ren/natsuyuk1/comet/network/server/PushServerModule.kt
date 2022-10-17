@@ -80,7 +80,7 @@ object PushHandler {
 
         val uuidToken = UUID.fromString(token.replace("Bearer ", ""))
 
-        val ptc = PushTemplateConfig.data.find { it.token == uuidToken }
+        val ptc = PushTemplateConfig.data.templates.find { it.token == uuidToken }
         return if (ptc == null) {
             CometResponse(HttpStatusCode.NotFound.value, "不存在对应目标").respond(this)
             null
