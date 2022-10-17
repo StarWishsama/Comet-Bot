@@ -38,12 +38,7 @@ object PushHandler {
         }
 
         try {
-            val ptc = call.validateRequest()
-
-            if (ptc == null) {
-                CometResponse(HttpStatusCode.Forbidden.value, "未通过验证").respond(call)
-                return
-            }
+            val ptc = call.validateRequest() ?: return
 
             val body = call.receiveText()
 
@@ -74,12 +69,12 @@ object PushHandler {
         val json = request.headers["Content-Type"] == ContentType.Application.Json.toString()
 
         if (!json) {
-            respond(HttpStatusCode.NotAcceptable)
+            CometResponse(HttpStatusCode.NotAcceptable.value, "不是合法的请求类型").respond(this)
             return null
         }
 
         if (token == null) {
-            respond(HttpStatusCode.Unauthorized)
+            CometResponse(HttpStatusCode.Unauthorized.value, "无权限").respond(this)
             return null
         }
 
@@ -87,7 +82,7 @@ object PushHandler {
 
         val ptc = PushTemplateConfig.data.find { it.token == uuidToken }
         return if (ptc == null) {
-            respond(HttpStatusCode.NotFound)
+            CometResponse(HttpStatusCode.NotFound.value, "不存在对应目标").respond(this)
             null
         } else {
             ptc
