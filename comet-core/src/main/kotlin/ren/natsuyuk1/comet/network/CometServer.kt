@@ -13,7 +13,11 @@ private val logger = mu.KotlinLogging.logger("CometServer")
 object CometServer {
     private lateinit var server: ApplicationEngine
 
-    fun init(config: CometServerConfig) {
+    fun init() {
+        if (!CometServerConfig.data.switch) {
+            return
+        }
+
         server = embeddedServer(
             Netty,
             environment = applicationEngineEnvironment {
@@ -24,13 +28,13 @@ object CometServer {
                 }
 
                 connector {
-                    port = config.data.port
+                    port = CometServerConfig.data.port
                 }
             }
         )
 
         server.start(false)
-        logger.info { "Comet 服务成功启动! 运行于端口 ${config.data.port}" }
+        logger.info { "Comet 服务成功启动! 运行于端口 ${CometServerConfig.data.port}" }
     }
 
     fun stop() {
