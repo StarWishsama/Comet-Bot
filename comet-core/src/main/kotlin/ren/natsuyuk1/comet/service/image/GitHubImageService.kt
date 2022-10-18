@@ -34,7 +34,7 @@ object GitHubImageService {
     private const val GITHUB_DEFAULT_WIDTH = 600
 
     fun drawEventInfo(event: GitHubEventData): File? {
-        if (!SkikoHelper.isSkikoLoaded())
+        if (!SkikoHelper.isSkikoLoaded() || githubLogo.exists())
             return null
 
         return when (event) {
