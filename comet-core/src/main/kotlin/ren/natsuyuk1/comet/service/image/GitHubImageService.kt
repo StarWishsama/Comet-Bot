@@ -1,6 +1,5 @@
 package ren.natsuyuk1.comet.service.image
 
-import kotlinx.coroutines.runBlocking
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.EncodedImageFormat
 import org.jetbrains.skia.Image
@@ -33,8 +32,8 @@ object GitHubImageService {
     private const val GITHUB_CONTENT_MARGIN = 10f
     private const val GITHUB_DEFAULT_WIDTH = 600
 
-    fun drawEventInfo(event: GitHubEventData): File? {
-        if (!SkikoHelper.isSkikoLoaded() || githubLogo.exists())
+    suspend fun drawEventInfo(event: GitHubEventData): File? {
+        if (!SkikoHelper.isSkikoLoaded())
             return null
 
         return when (event) {
@@ -126,7 +125,7 @@ object GitHubImageService {
             customBuilder(this)
         }.build().layout(width)
 
-    private fun PullRequestEventData.draw(): File {
+    private suspend fun PullRequestEventData.draw(): File {
         checkResource()
 
         val image = Image.makeFromEncoded(githubLogo.readBytes())
@@ -157,10 +156,10 @@ object GitHubImageService {
 
         surface.canvas.applyDefaultCanvas(image, repoInfo, pullRequestBody, padding)
 
-        return runBlocking { surface.generateTempImageFile(this@draw) }
+        return surface.generateTempImageFile(this@draw)
     }
 
-    private fun PushEventData.draw(): File {
+    private suspend fun PushEventData.draw(): File {
         checkResource()
 
         if (headCommitInfo == null || commitInfo.isEmpty()) {
@@ -188,6 +187,6 @@ object GitHubImageService {
 
         surface.canvas.applyDefaultCanvas(image, repoInfo, pushBody, padding)
 
-        return runBlocking { surface.generateTempImageFile(this@draw) }
+        return surface.generateTempImageFile(this@draw)
     }
 }

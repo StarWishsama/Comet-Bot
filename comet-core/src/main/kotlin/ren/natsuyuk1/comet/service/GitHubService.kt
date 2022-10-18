@@ -1,6 +1,8 @@
 package ren.natsuyuk1.comet.service
 
 import cn.hutool.core.net.URLDecoder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.Comet
@@ -15,6 +17,7 @@ import ren.natsuyuk1.comet.objects.github.events.*
 import ren.natsuyuk1.comet.service.image.GitHubImageService
 import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.string.toHMAC
+import java.io.FileNotFoundException
 
 private val logger = KotlinLogging.logger {}
 
@@ -83,27 +86,32 @@ object GitHubService {
 /**
  * 快速为一个 [Comet] 实例监听 GitHub 事件
  */
-fun Comet.subscribeGitHubEvent() = run {
+fun Comet.subscribeGitHubEvent() =
     registerListener<GitHubEvent> { event ->
         logger.debug { "Processing GitHubEvent: $event" }
 
         event.broadcastTargets.forEach {
             val target = getGroup(it.id) ?: return@forEach
-            val image = GitHubImageService.drawEventInfo(event.eventData)
+            try {
+                val image = withContext(Dispatchers.IO) {
+                    GitHubImageService.drawEventInfo(event.eventData)
+                }
 
-            if (image == null) {
+                if (image == null) {
+                    target.sendMessage(event.eventData.toMessageWrapper())
+                } else {
+                    target.sendMessage(
+                        buildMessageWrapper {
+                            appendElement(Image(filePath = image.absPath))
+                            appendLine()
+                            appendText("🔗 ${event.eventData.url()}")
+                        }
+                    )
+                }
+            } catch (e: FileNotFoundException) {
                 target.sendMessage(event.eventData.toMessageWrapper())
-            } else {
-                target.sendMessage(
-                    buildMessageWrapper {
-                        appendElement(Image(filePath = image.absPath))
-                        appendLine()
-                        appendText("🔗 ${event.eventData.url()}")
-                    }
-                )
             }
 
             logger.debug { "已推送事件 ${event.eventData.type()} 至群 ${it.id}" }
         }
     }
-}
