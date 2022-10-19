@@ -12,7 +12,7 @@ import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.network.thirdparty.github.GitHubApi
 import ren.natsuyuk1.comet.objects.config.CometServerConfig
-import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
+import ren.natsuyuk1.comet.objects.github.data.GitHubRepoData
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -36,12 +36,12 @@ object GithubCommandService {
                 raw
             }
 
-            GithubRepoData.data.repos.add(
-                GithubRepoData.Data.GithubRepo(
+            GitHubRepoData.data.repos.add(
+                GitHubRepoData.Data.GithubRepo(
                     name,
                     owner,
                     secret,
-                    mutableListOf(GithubRepoData.Data.GithubRepo.GithubRepoSubscriber(groupID))
+                    mutableListOf(GitHubRepoData.Data.GithubRepo.GithubRepoSubscriber(groupID))
                 )
             )
 
@@ -63,7 +63,7 @@ object GithubCommandService {
             val owner = slice[0]
             val name = slice[1]
 
-            val repos = GithubRepoData.data.repos
+            val repos = GitHubRepoData.data.repos
 
             val hasSubscribed = repos.any {
                 val nameEq = it.getName() == repoName
@@ -76,7 +76,7 @@ object GithubCommandService {
             }
 
             if (GitHubApi.isRepoExist(owner, name)) {
-                val repo = GithubRepoData.data.repos.find { it.getName() == "$owner/$name" }
+                val repo = GitHubRepoData.data.repos.find { it.getName() == "$owner/$name" }
 
                 if (repo == null) {
                     if (subject is Group) {
@@ -95,7 +95,7 @@ object GithubCommandService {
 
                     GitHubSubscribeSession(subject, sender, user, owner, name, groupID).registerTimeout(1.minutes)
                 } else {
-                    repo.subscribers.add(GithubRepoData.Data.GithubRepo.GithubRepoSubscriber(groupID))
+                    repo.subscribers.add(GitHubRepoData.Data.GithubRepo.GithubRepoSubscriber(groupID))
                     if (CometServerConfig.data.serverName.isBlank()) {
                         subject.sendMessage("订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置添加 Comet 管理提供的链接!".toMessageWrapper())
                     } else {
@@ -125,7 +125,7 @@ object GithubCommandService {
             val owner = slice[0]
             val name = slice[1]
 
-            val repos = GithubRepoData.data.repos
+            val repos = GitHubRepoData.data.repos
             val repo = repos.find { it.getName() == "$owner/$name" }
 
             if (repo != null) {
@@ -188,7 +188,7 @@ object GithubCommandService {
 
     suspend fun fetchSubscribeRepos(subject: PlatformCommandSender, groupID: Long) {
         val repos =
-            GithubRepoData.data.repos.filter { it.subscribers.any { g -> g.id == groupID } }
+            GitHubRepoData.data.repos.filter { it.subscribers.any { g -> g.id == groupID } }
 
         if (repos.isEmpty()) {
             subject.sendMessage("本群还未订阅过任何仓库".toMessageWrapper())
@@ -210,7 +210,7 @@ object GithubCommandService {
             subject.sendMessage("请输入有效的 GitHub 仓库名称, 例如 StarWishsama/Comet-Bot".toMessageWrapper())
         } else {
             val repo =
-                GithubRepoData.data.repos.find {
+                GitHubRepoData.data.repos.find {
                     val nameEq = it.getName() == repoName
                     val subEq = it.subscribers.any { g -> g.id == groupID }
                     nameEq && subEq

@@ -5,7 +5,7 @@ import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.utils.file.configDirectory
 import java.io.File
 
-object GithubRepoData : PersistDataFile<GithubRepoData.Data>(
+object GitHubRepoData : PersistDataFile<GitHubRepoData.Data>(
     File(configDirectory, "github_repos.json"),
     Data()
 ) {

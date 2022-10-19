@@ -3,7 +3,7 @@ package ren.natsuyuk1.comet.migrator
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
 import ren.natsuyuk1.comet.migrator.olddata.OldGitHubRepo
-import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
+import ren.natsuyuk1.comet.objects.github.data.GitHubRepoData
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import java.io.File
 
@@ -18,13 +18,13 @@ object GitHubRepoMigrator : IMigrator {
         val githubRepo = File(oldFilePath, "repos.yml")
 
         fun OldGitHubRepo.GithubRepo.migrateToSubscriber():
-            MutableList<GithubRepoData.Data.GithubRepo.GithubRepoSubscriber> {
+            MutableList<GitHubRepoData.Data.GithubRepo.GithubRepoSubscriber> {
             val result =
-                mutableListOf<GithubRepoData.Data.GithubRepo.GithubRepoSubscriber>()
+                mutableListOf<GitHubRepoData.Data.GithubRepo.GithubRepoSubscriber>()
 
             for (groupId in this.repoTarget) {
                 result.add(
-                    GithubRepoData.Data.GithubRepo.GithubRepoSubscriber(
+                    GitHubRepoData.Data.GithubRepo.GithubRepoSubscriber(
                         groupId
                     ).also { it.subscribeBranch.addAll(this.branchFilter) }
                 )
@@ -40,15 +40,15 @@ object GitHubRepoMigrator : IMigrator {
             val pendingRemove = mutableListOf<OldGitHubRepo.GithubRepo>()
 
             oldRepos.repos.forEach { repo ->
-                val exists = GithubRepoData.data.repos.find {
+                val exists = GitHubRepoData.data.repos.find {
                     it.getName() == "${repo.repoAuthor}/${repo.repoName}" && it.subscribers.any { g ->
                         repo.repoTarget.contains(g.id)
                     }
                 } != null
 
                 if (!exists) {
-                    GithubRepoData.data.repos.add(
-                        GithubRepoData.Data.GithubRepo(
+                    GitHubRepoData.data.repos.add(
+                        GitHubRepoData.Data.GithubRepo(
                             repo.repoName,
                             repo.repoAuthor,
                             repo.repoSecret,

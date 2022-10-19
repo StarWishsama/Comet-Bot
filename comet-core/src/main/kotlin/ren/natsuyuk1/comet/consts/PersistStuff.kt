@@ -17,7 +17,7 @@ import ren.natsuyuk1.comet.objects.config.CometServerConfig
 import ren.natsuyuk1.comet.objects.config.IpdbConfig
 import ren.natsuyuk1.comet.objects.config.PushTemplateConfig
 import ren.natsuyuk1.comet.objects.config.TwitterConfig
-import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
+import ren.natsuyuk1.comet.objects.github.data.GitHubRepoData
 import ren.natsuyuk1.comet.objects.keyword.KeyWordData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserDataTable
@@ -27,7 +27,7 @@ val cometPersistDataFile: List<PersistDataFile<*>> =
     listOf(
         CometGlobalConfig,
         DatabaseConfig,
-        GithubRepoData,
+        GitHubRepoData,
         EventManagerConfig,
         CometServerConfig,
         KeyWordData,

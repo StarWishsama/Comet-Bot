@@ -11,7 +11,7 @@ import ren.natsuyuk1.comet.event.pusher.github.GitHubEvent
 import ren.natsuyuk1.comet.network.server.response.CometResponse
 import ren.natsuyuk1.comet.network.server.response.respond
 import ren.natsuyuk1.comet.network.server.response.toJson
-import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
+import ren.natsuyuk1.comet.objects.github.data.GitHubRepoData
 import ren.natsuyuk1.comet.objects.github.data.SecretStatus
 import ren.natsuyuk1.comet.service.GitHubService
 import ren.natsuyuk1.comet.utils.error.ErrorHelper
@@ -87,7 +87,7 @@ object GithubWebHookHandler {
 
                 if (event != null) {
                     if (event.isSendableEvent()) {
-                        GithubRepoData.find(event.repoName())?.let {
+                        GitHubRepoData.find(event.repoName())?.let {
                             GitHubEvent(it, event).broadcast()
                         }
                     }

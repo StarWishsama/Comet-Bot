@@ -13,7 +13,7 @@ import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.commands.GithubCommand
-import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
+import ren.natsuyuk1.comet.objects.github.data.GitHubRepoData
 import ren.natsuyuk1.comet.test.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -23,15 +23,15 @@ class TestGitHub {
         runBlocking {
             initTestDatabase()
             DatabaseManager.loadTables(UserTable)
-            GithubRepoData.init()
+            GitHubRepoData.init()
         }
     }
 
     @Test
     fun testSetting() {
         val fakeUser = CometUser.create(1L, LoginPlatform.TEST)
-        GithubRepoData.data.repos.add(
-            GithubRepoData.Data.GithubRepo(
+        GitHubRepoData.data.repos.add(
+            GitHubRepoData.Data.GithubRepo(
                 "Comet-Bot",
                 "StarWishsama",
                 "",

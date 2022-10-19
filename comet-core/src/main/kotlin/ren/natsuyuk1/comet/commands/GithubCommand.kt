@@ -13,7 +13,7 @@ import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.commands.service.GithubCommandService
-import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
+import ren.natsuyuk1.comet.objects.github.data.GitHubRepoData
 import ren.natsuyuk1.comet.util.toMessageWrapper
 
 val GITHUB = CommandProperty(
@@ -154,19 +154,19 @@ class GithubCommand(
 
             val actualGroupID = groupID ?: subject.id
 
-            if (!GithubRepoData.exists(repoName, actualGroupID)) {
+            if (!GitHubRepoData.exists(repoName, actualGroupID)) {
                 subject.sendMessage("找不到你要查询的仓库, 可能是没有订阅过?".toMessageWrapper())
                 return
             }
 
             if (add) {
-                val repo = GithubRepoData.find(repoName) ?: return
+                val repo = GitHubRepoData.find(repoName) ?: return
 
                 if (branch != null) {
                     val target = repo.subscribers.find { it.id == actualGroupID }
 
                     val result = if (target == null) {
-                        GithubRepoData.Data.GithubRepo.GithubRepoSubscriber(
+                        GitHubRepoData.Data.GithubRepo.GithubRepoSubscriber(
                             actualGroupID
                         ).also {
                             it.subscribeBranch.add(branch!!)
@@ -196,7 +196,7 @@ class GithubCommand(
                     }
                 }
             } else if (remove) {
-                val repo = GithubRepoData.find(repoName) ?: return
+                val repo = GitHubRepoData.find(repoName) ?: return
 
                 if (branch != null) {
                     when (repo.subscribers.find { it.id == actualGroupID }?.subscribeBranch?.remove(branch)) {

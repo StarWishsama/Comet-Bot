@@ -11,7 +11,7 @@ import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.event.pusher.github.GitHubEvent
-import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
+import ren.natsuyuk1.comet.objects.github.data.GitHubRepoData
 import ren.natsuyuk1.comet.objects.github.data.SecretStatus
 import ren.natsuyuk1.comet.objects.github.events.*
 import ren.natsuyuk1.comet.service.image.GitHubImageService
@@ -61,7 +61,7 @@ object GitHubService {
             ) ?: return SecretStatus.FAILED
 
         val targetRepo =
-            GithubRepoData.data.repos.find { it.getName() == parse.repoName() } ?: return SecretStatus.NOT_FOUND
+            GitHubRepoData.data.repos.find { it.getName() == parse.repoName() } ?: return SecretStatus.NOT_FOUND
 
         if (targetRepo.secret.isEmpty() && secret == null) {
             return SecretStatus.NO_SECRET
@@ -89,6 +89,7 @@ object GitHubService {
 fun Comet.subscribeGitHubEvent() =
     registerListener<GitHubEvent> { event ->
         logger.debug { "Processing GitHubEvent: $event" }
+        logger.debug { "Broadcast Targets: ${event.broadcastTargets}" }
 
         event.broadcastTargets.forEach {
             val target = getGroup(it.id) ?: return@forEach

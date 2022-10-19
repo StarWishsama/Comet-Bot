@@ -242,7 +242,9 @@ class TestGitHubImageService {
   }
 }"""
         val event = GitHubService.processEvent(payload, "push") ?: error("GitHub event parse failed")
-        val output = GitHubImageService.drawEventInfo(event)
+        val output = runBlocking {
+            GitHubImageService.drawEventInfo(event)
+        }
         println(output?.absPath)
         require(output != null && output.exists())
     }

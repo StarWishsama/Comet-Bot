@@ -2,26 +2,31 @@ package ren.natsuyuk1.comet.event.pusher.github
 
 import ren.natsuyuk1.comet.event.BroadcastTarget
 import ren.natsuyuk1.comet.event.CometBroadcastEvent
-import ren.natsuyuk1.comet.objects.github.data.GithubRepoData
+import ren.natsuyuk1.comet.objects.github.data.GitHubRepoData
 import ren.natsuyuk1.comet.objects.github.events.GitHubEventData
 
 class GitHubEvent(
-    private val repo: GithubRepoData.Data.GithubRepo,
+    private val repo: GitHubRepoData.Data.GithubRepo,
     val eventData: GitHubEventData
 ) : CometBroadcastEvent() {
     init {
         val eventType = eventData.type()
+        val branchName = eventData.branchName()
 
-        repo.subscribers.forEach {
-            if (it.subscribeEvent.contains(eventType)) {
-                if (eventData.branchName().isEmpty() || (
-                    it.subscribeBranch.isEmpty() || it.subscribeBranch.any { br ->
-                        eventData.branchName().matches(Regex(br))
-                    }
+        repo.subscribers.forEach { sub ->
+            if (
+                sub.subscribeEvent.contains(eventType) && (
+                    sub.subscribeBranch.isEmpty() ||
+                        branchName.isBlank() ||
+                        sub.subscribeBranch.contains(branchName)
                     )
-                ) {
-                    broadcastTargets.add(BroadcastTarget(BroadcastTarget.BroadcastType.GROUP, it.id))
-                }
+            ) {
+                broadcastTargets.add(
+                    BroadcastTarget(
+                        BroadcastTarget.BroadcastType.GROUP,
+                        sub.id
+                    )
+                )
             }
         }
     }
