@@ -15,7 +15,7 @@ val APEX by lazy {
     CommandProperty(
         "apex",
         listOf(),
-        "查询 Arcaea 相关信息",
+        "查询 Apex Legends 相关信息",
         """
         /apex bind [Origin 账号名] - 绑定账号
         /apex info 查询绑定账号用户信息
