@@ -16,7 +16,6 @@ import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaSongInfo
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.Command
 import ren.natsuyuk1.comet.utils.brotli4j.BrotliDecompressor
-import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.string.StringUtil.toFriendly
 import ren.natsuyuk1.comet.utils.time.Timer
 import java.util.*
@@ -24,23 +23,24 @@ import java.util.*
 private val logger = KotlinLogging.logger {}
 
 object ArcaeaClient {
-    private val scope = ModuleScope("arcaea_client")
     private const val arcaeaAPIHost = "arc.estertion.win"
     private const val arcaeaAPIPort = 616
 
     private val queryingUser = mutableSetOf<UUID>()
 
-    suspend fun fetchConstants() {
+    suspend fun fetchConstants(): MutableMap<String, String> {
         val cmd = "constants"
         if (!BrotliDecompressor.isUsable()) {
-            return
+            return mutableMapOf()
         }
 
-        if (songInfo.isNotEmpty()) return
+        if (songInfo.isNotEmpty()) return mutableMapOf()
 
         val client = HttpClient {
             install(WebSockets)
         }
+
+        val result = mutableMapOf<String, String>()
 
         client.wss(host = arcaeaAPIHost, port = arcaeaAPIPort) {
             send(cmd)
@@ -57,15 +57,13 @@ object ArcaeaClient {
 
                         when (command.command) {
                             ArcaeaCommand.SONG_TITLE -> {
-                                if (songInfo.isEmpty()) {
-                                    val songInfoData = json.parseToJsonElement(incomingJson)
+                                val songInfoData = json.parseToJsonElement(incomingJson)
 
-                                    songInfoData.jsonObject["data"]?.jsonObject?.forEach { id, songName ->
-                                        songInfo[id] = songName.jsonObject["en"]?.jsonPrimitive?.content!!
-                                    }
-
-                                    logger.info { "已更新 Arcaea 歌曲信息 (${songInfo.size} 个)" }
+                                songInfoData.jsonObject["data"]?.jsonObject?.forEach { id, songName ->
+                                    result[id] = songName.jsonObject["en"]?.jsonPrimitive?.content!!
                                 }
+
+                                logger.info { "已更新 Arcaea 歌曲信息 (${songInfo.size} 个)" }
 
                                 client.close()
                                 break
@@ -87,6 +85,8 @@ object ArcaeaClient {
                 client.close()
             }
         }
+
+        return result
     }
 
     suspend fun queryUserInfo(userID: String): ArcaeaUserInfo? {

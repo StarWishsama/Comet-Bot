@@ -257,4 +257,8 @@ object ProjectSekaiManager {
     }
 
     fun getLatestRankSeason(): Int? = rankSeasonInfo.lastOrNull()?.id
+
+    suspend fun reload() {
+        loadPJSKDatabase()
+    }
 }
