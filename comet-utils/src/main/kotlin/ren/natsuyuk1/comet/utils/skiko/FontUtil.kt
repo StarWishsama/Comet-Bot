@@ -16,6 +16,8 @@ private val logger = KotlinLogging.logger {}
 object FontUtil {
     private val fontMgr = FontMgr.default
     private val fontProvider = TypefaceFontProvider()
+    private val defaultFont = arrayOf("HarmonyOS Sans", "Source Han Sans SC", "Pingfang SC", "Twemoji Mozilla")
+
     val fonts = FontCollection().setDynamicFontManager(fontProvider).setDefaultFontManager(fontMgr)
 
     private val fontFolder = resolveResourceDirectory("/fonts")
@@ -50,10 +52,10 @@ object FontUtil {
         logger.info { "已加载 $counter 个字体." }
     }
 
-    fun defaultFont(size: Float): Font {
+    fun defaultFont(size: Float, fontFamily: Array<String> = defaultFont): Font {
         val typeface =
             fonts.findTypefaces(
-                familyNames = arrayOf("Source Han Sans SC"),
+                familyNames = fontFamily,
                 style = FontStyle.NORMAL.withWeight(500)
             ).firstOrNull()
         return Font(typeface, size).apply {
@@ -61,10 +63,10 @@ object FontUtil {
         }
     }
 
-    fun defaultFontStyle(c: Color, size: Float) = TextStyle().apply {
+    fun defaultFontStyle(c: Color, size: Float, fontFamily: Array<String> = defaultFont) = TextStyle().apply {
         color = c.rgb
         fontSize = size
         fontStyle = FontStyle.NORMAL.withWeight(500)
-        fontFamilies = arrayOf("Source Han Sans SC")
+        fontFamilies = fontFamily
     }
 }
