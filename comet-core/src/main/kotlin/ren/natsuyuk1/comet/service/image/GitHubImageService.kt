@@ -56,7 +56,7 @@ object GitHubImageService {
 
         header.paint(this, GITHUB_CONTENT_PADDING * 2.5f + logo.width, GITHUB_CONTENT_MARGIN)
         body.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + logo.height)
-        padding.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + logo.height + body.height)
+        padding.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 3 + logo.height + body.height)
     }
 
     private suspend fun Surface.generateTempImageFile(event: GitHubEventData): File {
