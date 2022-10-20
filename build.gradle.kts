@@ -10,7 +10,7 @@
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 plugins {
-    kotlin("plugin.serialization") version "1.7.10" apply false
+    kotlin("plugin.serialization") version "1.7.20" apply false
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
     id("org.jlleitschuh.gradle.ktlint-idea") version "10.3.0"
 }
