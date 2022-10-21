@@ -50,7 +50,7 @@ object GitHubImageService {
     }
 
     private fun Canvas.applyDefaultCanvas(logo: Image, header: Paragraph, body: Paragraph, padding: Paragraph) {
-        clear(Color.WHITE.rgb)
+        clear(Color(249, 249, 251).rgb)
         // Draw github logo
         drawImage(logo, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN)
 
@@ -147,7 +147,7 @@ object GitHubImageService {
 
         val padding = drawPadding(GITHUB_DEFAULT_WIDTH - GITHUB_CONTENT_MARGIN * 2)
 
-        val height = (pullRequestBody.height + padding.height * 2.5 + image.height).toInt()
+        val height = (pullRequestBody.height + padding.height * 3 + image.height).toInt()
 
         val surface = Surface.makeRasterN32Premul(
             GITHUB_DEFAULT_WIDTH,
@@ -178,7 +178,7 @@ object GitHubImageService {
 
         val padding = drawPadding(GITHUB_DEFAULT_WIDTH - GITHUB_CONTENT_MARGIN * 2)
 
-        val height = (pushBody.height + padding.height * 2.5 + image.height).toInt()
+        val height = (pushBody.height + padding.height * 3 + image.height).toInt()
 
         val surface = Surface.makeRasterN32Premul(
             GITHUB_DEFAULT_WIDTH,
