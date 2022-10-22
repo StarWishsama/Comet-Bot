@@ -13,7 +13,7 @@ Demo/交流群：725656262
 [![Issues](https://img.shields.io/github/issues/StarWishsama/Comet-Bot.svg?style=popout)](https://github.com/StarWishsama/Comet-Bot/issues)
 ![Stars](https://img.shields.io/github/stars/starwishsama/Comet-Bot)
 [![Release](https://img.shields.io/github/v/release/StarWishSama/Comet-Bot?include_prereleases)](https://github.com/StarWishsama/Comet-Bot/releases)
-[Wiki](https://github.com/StarWishsama/Comet-Bot/wiki)
+[![Wiki](https://img.shields.io/badge/Wiki-%23000000.svg?style=for-the-badge)](https://github.com/StarWishsama/Comet-Bot/wiki)
 
 ## 🎉 它能干什么?
 
