@@ -28,7 +28,7 @@ dependencies {
 
     implementation("net.mamoe:mirai-core:2.13.0-RC2")
     implementation("net.mamoe:mirai-core-api:2.13.0-RC2")
-    implementation("net.mamoe:mirai-core-utils:2.13.0-RC2")
+    implementation("net.mamoe:mirai-core-utils:2.13.0-dev-91998884")
 }
 
 tasks.shadowJar {
