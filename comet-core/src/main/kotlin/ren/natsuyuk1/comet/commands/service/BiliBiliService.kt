@@ -3,6 +3,7 @@ package ren.natsuyuk1.comet.commands.service
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.coroutines.launch
 import moe.sdl.yabapi.data.search.results.UserResult
 import moe.sdl.yabapi.data.video.VideoInfo
@@ -15,6 +16,7 @@ import ren.natsuyuk1.comet.api.session.expire
 import ren.natsuyuk1.comet.api.session.registerTimeout
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.consts.cometClient
+import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.bilibili.DynamicApi
 import ren.natsuyuk1.comet.network.thirdparty.bilibili.SearchApi
 import ren.natsuyuk1.comet.network.thirdparty.bilibili.UserApi
@@ -24,6 +26,7 @@ import ren.natsuyuk1.comet.network.thirdparty.bilibili.user.asReadable
 import ren.natsuyuk1.comet.network.thirdparty.bilibili.video.toMessageWrapper
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import ren.natsuyuk1.comet.utils.json.serializeTo
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.string.StringUtil.isNumeric
 import kotlin.time.Duration.Companion.seconds
@@ -150,7 +153,7 @@ object BiliBiliService {
         if (s.matches(pureNumberRegex)) return s
         if (shortLinkRegex.matches(s)) {
             try {
-                cometClient.client.config { followRedirects = false }.get(s).body()
+                cometClient.client.config { followRedirects = false }.get(s).bodyAsText().serializeTo(json)
             } catch (e: RedirectResponseException) {
                 s = e.response.headers["Location"] ?: run {
                     return null

@@ -1,14 +1,16 @@
 package ren.natsuyuk1.comet.network.thirdparty.bangumi
 
-import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
+import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.bangumi.data.BangumiOnlineScheduleData
+import ren.natsuyuk1.comet.utils.json.serializeTo
 import kotlin.time.Duration.Companion.days
 
 object BangumiOnlineApi {
@@ -36,5 +38,5 @@ object BangumiOnlineApi {
                     }
                 )
             )
-        }.body()
+        }.bodyAsText().serializeTo(json)
 }

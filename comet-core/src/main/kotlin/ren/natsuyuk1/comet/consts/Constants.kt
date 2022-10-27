@@ -14,9 +14,7 @@ import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.compression.*
-import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.cookies.*
-import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.network.CometClient
@@ -33,8 +31,10 @@ val json = Json {
 
 val defaultClient = HttpClient(CIO) {
     engine {
+        requestTimeout = 0
         val proxyStr = System.getProperty("comet.proxy") ?: System.getenv("COMET_PROXY")
         if (proxyStr.isNullOrBlank()) return@engine
+
         proxy = ProxyBuilder.http(proxyStr)
 
         https {
@@ -55,10 +55,6 @@ val defaultClient = HttpClient(CIO) {
         gzip()
         deflate()
         identity()
-    }
-
-    install(ContentNegotiation) {
-        json(json)
     }
 
     install(HttpTimeout) {

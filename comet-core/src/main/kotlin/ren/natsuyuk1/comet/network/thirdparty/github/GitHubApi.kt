@@ -1,17 +1,19 @@
 package ren.natsuyuk1.comet.network.thirdparty.github
 
 import cn.hutool.core.collection.ConcurrentHashSet
-import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.jsoup.Jsoup
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.consts.cometClient
+import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.github.data.GitHubFileCommitInfo
 import ren.natsuyuk1.comet.network.thirdparty.github.data.RepoInfo
 import ren.natsuyuk1.comet.network.thirdparty.github.data.UserInfo
 import ren.natsuyuk1.comet.service.RateLimitAPI
 import ren.natsuyuk1.comet.service.RateLimitService
+import ren.natsuyuk1.comet.utils.json.serializeTo
 
 object GitHubApi {
     private const val apiRoute = "https://api.github.com"
@@ -20,7 +22,7 @@ object GitHubApi {
 
     suspend fun getUserInfo(username: String): Result<UserInfo?> =
         runCatching<UserInfo?> {
-            cometClient.client.get("$apiRoute/users/$username").body()
+            cometClient.client.get("$apiRoute/users/$username").bodyAsText().serializeTo(json)
         }.onSuccess {
             userCache.add(username)
         }
@@ -30,7 +32,7 @@ object GitHubApi {
 
     suspend fun getRepoInfo(owner: String, name: String): Result<RepoInfo> =
         runCatching<RepoInfo> {
-            cometClient.client.get("$apiRoute/repos/$owner/$name").body()
+            cometClient.client.get("$apiRoute/repos/$owner/$name").bodyAsText().serializeTo(json)
         }.onSuccess {
             repoCache.add("$owner/$name")
         }
@@ -75,7 +77,7 @@ object GitHubApi {
             if (resp.status != HttpStatusCode.OK) {
                 emptyList()
             } else {
-                resp.body()
+                resp.bodyAsText().serializeTo(json)
             }
         }
 }

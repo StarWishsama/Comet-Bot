@@ -11,6 +11,7 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.serialization.decodeFromString
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.CometClient
@@ -19,6 +20,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiR
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.PJSKEventPredictionInfo
+import ren.natsuyuk1.comet.utils.json.serializeTo
 import java.io.InputStream
 
 private val logger = mu.KotlinLogging.logger {}
@@ -81,13 +83,13 @@ object ProjectSekaiAPI {
                     append("$" + "skip", skip.toString())
                 }
             }
-        }.body()
+        }.bodyAsText().serializeTo(json)
     }
 
     suspend fun CometClient.getRankPredictionInfo(): PJSKEventPredictionInfo {
         logger.debug { "Fetching project sekai rank prediction info" }
 
-        return client.get(THREE3KIT_URL).body()
+        return client.get(THREE3KIT_URL).bodyAsText().serializeTo(json)
     }
 
     suspend fun CometClient.getUserInfo(id: Long): ProjectSekaiUserInfo {

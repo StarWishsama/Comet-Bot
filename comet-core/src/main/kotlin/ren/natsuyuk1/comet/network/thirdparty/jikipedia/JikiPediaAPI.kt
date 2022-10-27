@@ -1,9 +1,11 @@
 package ren.natsuyuk1.comet.network.thirdparty.jikipedia
 
-import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.consts.cometClient
+import ren.natsuyuk1.comet.consts.json
+import ren.natsuyuk1.comet.utils.json.serializeTo
 
 private val logger = mu.KotlinLogging.logger {}
 
@@ -27,6 +29,6 @@ object JikiPediaAPI {
             }
 
             setBody(JikiPediaSearchRequest(keyword))
-        }.also { logger.debug { it } }.body()
+        }.also { logger.debug { it } }.bodyAsText().serializeTo(json)
     }
 }
