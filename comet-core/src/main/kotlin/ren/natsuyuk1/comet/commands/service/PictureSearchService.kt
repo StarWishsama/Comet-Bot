@@ -9,6 +9,8 @@ import ren.natsuyuk1.comet.api.session.expire
 import ren.natsuyuk1.comet.api.session.registerTimeout
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.PictureSearchSource
+import ren.natsuyuk1.comet.network.thirdparty.ascii2d.Ascii2dApi
+import ren.natsuyuk1.comet.network.thirdparty.ascii2d.toMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.saucenao.SauceNaoApi
 import ren.natsuyuk1.comet.network.thirdparty.saucenao.data.toMessageWrapper
 import ren.natsuyuk1.comet.objects.command.picturesearch.PictureSearchConfigTable
@@ -37,7 +39,11 @@ object PictureSearchService {
             PictureSearchSource.SAUCENAO -> {
                 SauceNaoApi.searchByImage(image).toMessageWrapper()
             }
-            PictureSearchSource.ASCII2D -> "暂未支持 ascii2d".toMessageWrapper()
+
+            PictureSearchSource.ASCII2D -> {
+                require(image.url?.isNotBlank() == true) { "Image for ascii2d search must not be empty!" }
+                Ascii2dApi.searchImage(image.url!!).toMessageWrapper()
+            }
         }
 }
 
