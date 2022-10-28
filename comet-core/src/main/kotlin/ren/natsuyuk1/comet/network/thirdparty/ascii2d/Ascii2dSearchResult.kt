@@ -10,7 +10,7 @@ data class Ascii2dSearchResult(
 )
 
 fun Ascii2dSearchResult.toMessageWrapper(): MessageWrapper =
-    if (isError) {
+    if (!isError) {
         buildMessageWrapper {
             appendTextln("✔ 已找到可能的图片来源")
             appendTextln("\uD83C\uDFF7 来自 $author 的作品")
