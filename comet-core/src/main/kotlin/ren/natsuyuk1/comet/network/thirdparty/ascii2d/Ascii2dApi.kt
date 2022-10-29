@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.network.thirdparty.ascii2d
 
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import mu.KotlinLogging
@@ -16,7 +17,11 @@ object Ascii2dApi {
         val reqURL = API_ROUTE.replace("[url]", url)
         logger.debug { "Request url: $reqURL" }
         return try {
-            val req = cometClient.client.get(reqURL)
+            val req = cometClient.client.config {
+                install(UserAgent) {
+                    agent = "curl/7.74.0"
+                }
+            }.get(reqURL)
             val doc = Jsoup.parse(req.bodyAsText())
             val elements = doc.body().getElementsByClass("container")
             val infoBox = elements.select(".info-box")
