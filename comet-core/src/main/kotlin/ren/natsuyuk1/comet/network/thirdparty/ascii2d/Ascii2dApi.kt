@@ -9,10 +9,12 @@ import ren.natsuyuk1.comet.consts.cometClient
 private val logger = KotlinLogging.logger {}
 
 object Ascii2dApi {
-    private const val API_ROUTE = "https://ascii2d.net/search/url/[url]?type=color"
+    private const val API_ROUTE = "https://ascii2d.net/search/url/[url]"
 
     suspend fun searchImage(url: String): Ascii2dSearchResult {
+        logger.debug { "Trying search image by ascii2d, url: $url" }
         val reqURL = API_ROUTE.replace("[url]", url)
+        logger.debug { "Request url: $reqURL" }
         return try {
             val req = cometClient.client.get(reqURL)
             val doc = Jsoup.parse(req.bodyAsText())

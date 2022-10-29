@@ -16,7 +16,7 @@ class TestAscii2d {
         runBlocking {
             val r =
                 /* ktlint-disable */
-                Ascii2dApi.searchImage("https://i.pximg.net/img-master/img/2021/11/04/19/52/24/93914980_p0_master1200.jpg")
+                Ascii2dApi.searchImage("http://gchat.qpic.cn/gchatpic_new/2426600292/725656262-2843171224-BAF76ADF456D053234D17FAEBFFE9EBA/0?term=2&is_origin=0")
             /* ktlint-enable */
             println(r.toMessageWrapper())
             assertTrue(r.errorMessage.isBlank())
