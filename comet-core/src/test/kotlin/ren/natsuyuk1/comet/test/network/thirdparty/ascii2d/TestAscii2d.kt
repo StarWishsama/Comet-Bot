@@ -3,9 +3,10 @@ package ren.natsuyuk1.comet.test.network.thirdparty.ascii2d
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.network.thirdparty.ascii2d.Ascii2dApi
+import ren.natsuyuk1.comet.network.thirdparty.ascii2d.toMessageWrapper
 import ren.natsuyuk1.comet.test.isCI
 import kotlin.test.Test
-import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TestAscii2d {
@@ -15,9 +16,10 @@ class TestAscii2d {
         runBlocking {
             val r =
                 /* ktlint-disable */
-                Ascii2dApi.searchImage("https://i.pximg.net/img-master/img/2022/10/16/16/46/17/101984525_p0_master1200.jpg")
+                Ascii2dApi.searchImage("https://i.pximg.net/img-master/img/2021/11/04/19/52/24/93914980_p0_master1200.jpg")
             /* ktlint-enable */
-            assertFalse(r.isError)
+            println(r.toMessageWrapper())
+            assertTrue(r.errorMessage.isBlank())
         }
     }
 }
