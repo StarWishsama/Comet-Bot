@@ -3,6 +3,7 @@ package ren.natsuyuk1.comet.network.thirdparty.nbnhhsh
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.serialization.encodeToString
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.nbnhhsh.data.NoAbbrSearchRequest
@@ -14,7 +15,7 @@ object NoAbbrApi {
 
     suspend fun search(keyword: String): List<NoAbbrSearchResult> =
         cometClient.client.post(apiRoute) {
-            setBody(NoAbbrSearchRequest(keyword))
+            setBody(json.encodeToString(NoAbbrSearchRequest(keyword)))
             contentType(ContentType.parse("application/json"))
         }.bodyAsText().serializeTo(json)
 }

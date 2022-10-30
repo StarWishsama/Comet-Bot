@@ -2,6 +2,7 @@ package ren.natsuyuk1.comet.network.thirdparty.jikipedia
 
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import kotlinx.serialization.encodeToString
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
@@ -28,7 +29,7 @@ object JikiPediaAPI {
                 append("Accept", "application/json, text/plain, */*")
             }
 
-            setBody(JikiPediaSearchRequest(keyword))
+            setBody(json.encodeToString(JikiPediaSearchRequest(keyword)))
         }.also { logger.debug { it } }.bodyAsText().serializeTo(json)
     }
 }
