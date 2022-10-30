@@ -85,6 +85,8 @@ class TwitterCommand(
                 val resp = TwitterAPI.fetchTweet(id!!)
                 if (resp == null) {
                     subject.sendMessage("找不到对应 ID ($id) 的推文".toMessageWrapper())
+                } else if (resp.errors != null) {
+                    subject.sendMessage("搜索推文失败".toMessageWrapper())
                 } else {
                     resp.tweet?.toMessageWrapper(resp.includes)?.let { subject.sendMessage(it) }
                 }
@@ -100,6 +102,8 @@ class TwitterCommand(
 
                 if (resp == null) {
                     subject.sendMessage("找不到对应 ID ($id) 的推文".toMessageWrapper())
+                } else if (resp.errors != null) {
+                    subject.sendMessage("搜索推文失败".toMessageWrapper())
                 } else {
                     resp.tweets?.firstOrNull()?.toMessageWrapper(resp.includes)?.let { subject.sendMessage(it) }
                 }

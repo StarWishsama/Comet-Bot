@@ -9,7 +9,7 @@ import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.config.branch
 import ren.natsuyuk1.comet.config.hash
 import ren.natsuyuk1.comet.config.version
-import ren.natsuyuk1.comet.consts.timer
+import ren.natsuyuk1.comet.consts.cometRunningTimer
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.toFriendly
 
@@ -34,7 +34,7 @@ class VersionCommand(
         subject.sendMessage(
             """
             ☄ Comet Bot - $version [$branch-$hash]   
-            已运行了 ${timer.measureDuration().toFriendly()}
+            已运行了 ${cometRunningTimer.measureDuration().toFriendly()}
             Made with ❤
             """.trimIndent().toMessageWrapper()
         )
