@@ -26,9 +26,9 @@ dependencies {
 
     compileOnly("org.jline:jline:3.21.0")
 
-    implementation("net.mamoe:mirai-core:2.14.0-dev-440122d4")
-    implementation("net.mamoe:mirai-core-api:2.14.0-dev-440122d4")
-    implementation("net.mamoe:mirai-core-utils:2.14.0-dev-440122d4")
+    implementation("net.mamoe:mirai-core:2.13.0-RC2")
+    implementation("net.mamoe:mirai-core-api:2.13.0-RC2")
+    implementation("net.mamoe:mirai-core-utils:2.13.0-RC2")
 }
 
 tasks.shadowJar {
