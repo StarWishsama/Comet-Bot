@@ -26,7 +26,7 @@ dependencies {
 
     compileOnly("org.jline:jline:3.21.0")
 
-    implementation("dev.inmo:tgbotapi:3.2.7") {
+    implementation("dev.inmo:tgbotapi:3.3.0") {
         exclude("io.ktor")
     }
 }
