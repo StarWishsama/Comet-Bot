@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    implementation("moe.sdl.yac:core:1.0.0")
+    implementation("moe.sdl.yac:core:1.0.1")
     implementation("org.jline:jline:3.21.0")
 
     api(project(":comet-api"))
