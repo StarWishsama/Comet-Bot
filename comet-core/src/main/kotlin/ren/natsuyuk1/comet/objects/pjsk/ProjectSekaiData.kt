@@ -68,11 +68,15 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
         }
 
         suspend fun updateEventInfo() {
+            var init = false
             transaction {
                 if (ProjectSekaiData.all().empty()) {
                     runBlocking { initData() }
+                    init = true
                 }
             }
+
+            if (init) return
 
             val timestamp = System.currentTimeMillis()
 
@@ -105,17 +109,21 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
         }
 
         suspend fun updatePredictionData() {
+            var init = false
             transaction {
                 if (ProjectSekaiData.all().empty()) {
                     runBlocking { initData() }
+                    init = true
                 }
             }
+
+            if (init) return
 
             val pjskData = transaction { ProjectSekaiData.all().first() }
 
             val timestamp = Clock.System.now()
 
-            if ((timestamp - pjskData.eventPredictionUpdateTime).inWholeMinutes > 15) {
+            if ((timestamp - pjskData.eventPredictionUpdateTime).inWholeHours >= 1) {
                 kotlin.runCatching {
                     cometClient.getRankPredictionInfo()
                 }.onSuccess { pred ->

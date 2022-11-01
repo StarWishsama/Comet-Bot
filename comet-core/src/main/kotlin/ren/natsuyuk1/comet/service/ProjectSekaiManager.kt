@@ -27,7 +27,8 @@ import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import java.io.File
 import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 private val logger = KotlinLogging.logger {}
 
@@ -55,11 +56,16 @@ object ProjectSekaiManager {
 
         fetchI18NFile()
 
-        TaskManager.registerTaskDelayed(30.minutes, ::refreshCache)
+        TaskManager.registerTaskDelayed(1.toDuration(DurationUnit.HOURS), ::refreshCache)
+        TaskManager.registerTaskDelayed(3.toDuration(DurationUnit.DAYS), ::refreshEvent)
     }
 
     private suspend fun refreshCache() {
         ProjectSekaiData.updatePredictionData()
+    }
+
+    private suspend fun refreshEvent() {
+        ProjectSekaiData.updateEventInfo()
     }
 
     fun getCurrentEventStatus(): SekaiEventStatus {
