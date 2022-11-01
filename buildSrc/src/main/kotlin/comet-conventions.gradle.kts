@@ -52,6 +52,7 @@ dependencies {
     implementation("io.ktor:ktor-client-encoding:2.1.2")
     implementation("io.ktor:ktor-client-content-negotiation:2.1.2")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.2")
+    implementation("io.ktor:ktor-network:2.1.2")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
     implementation("net.mamoe.yamlkt:yamlkt:0.12.0")
