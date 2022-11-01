@@ -13,6 +13,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
+import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.string.StringUtil.isNumeric
 
 @kotlinx.serialization.Serializable
@@ -29,6 +30,6 @@ fun PJSKEventPredictionInfo.toMessageWrapper(): MessageWrapper =
         appendText("活动 $eventName PT预测\n")
 
         data.forEach { k, v ->
-            if (k.isNumeric()) appendText("$k => ${v.jsonPrimitive.content}\n")
+            if (k.isNumeric()) appendText("$k => ${v.jsonPrimitive.content.toLong().getBetterNumber()}\n")
         }
     }
