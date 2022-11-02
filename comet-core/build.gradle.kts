@@ -37,7 +37,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.40.1")
     implementation("com.zaxxer:HikariCP:5.0.1")
 
-    api("io.ktor:ktor-server-core:2.1.2")
+    api("io.ktor:ktor-server-core:2.1.3")
     api("io.ktor:ktor-server-netty:2.1.2")
     api("io.ktor:ktor-server-call-logging-jvm:2.1.2")
     api("io.ktor:ktor-client-websockets-jvm:2.1.2")
