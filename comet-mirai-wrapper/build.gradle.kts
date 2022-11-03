@@ -16,7 +16,7 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven("https://repo.mirai.mamoe.net/snapshots")
+    // maven("https://repo.mirai.mamoe.net/snapshots")
 }
 
 dependencies {
@@ -26,9 +26,9 @@ dependencies {
 
     compileOnly("org.jline:jline:3.21.0")
 
-    implementation("net.mamoe:mirai-core:2.13.0-RC2")
-    implementation("net.mamoe:mirai-core-api:2.13.0-RC2")
-    implementation("net.mamoe:mirai-core-utils:2.13.0-RC2")
+    implementation("net.mamoe:mirai-core:2.13.0")
+    implementation("net.mamoe:mirai-core-api:2.13.0")
+    implementation("net.mamoe:mirai-core-utils:2.13.0")
 }
 
 tasks.shadowJar {
