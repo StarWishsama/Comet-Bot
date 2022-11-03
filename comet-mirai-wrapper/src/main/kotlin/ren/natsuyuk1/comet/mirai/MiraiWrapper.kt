@@ -22,8 +22,9 @@ class MiraiWrapper : CometWrapper {
 
         if (miraiConfig == null) {
             miraiConfig = MiraiConfig(config.id).also { it.init() }
-            AccountData.registerAccount(config.id, config.password, platform())
         }
+
+        AccountData.registerAccount(config.id, config.password, platform())
 
         return classLoader.runWith { MiraiComet(config, classLoader, miraiConfig, reader) }
     }
