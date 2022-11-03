@@ -165,4 +165,9 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         ) { comet, sender, subject, wrapper, user ->
             PushTemplateCommand(comet, sender, subject, wrapper, user)
         },
+        CommandNode(
+            MUTE
+        ) { comet, sender, subject, wrapper, user ->
+            MuteCommand(comet, sender, subject, wrapper, user)
+        },
     )
