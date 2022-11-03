@@ -187,14 +187,19 @@ object ProjectSekaiManager {
 
         suspend fun loadDatabase() {
             try {
-                database.addAll(
-                    json.decodeFromString(
-                        ListSerializer(serializer),
-                        file.readTextBuffered()
+                val content = file.readTextBuffered()
+                if (content.isBlank()) {
+                    logger.warn { "加载 Project Sekai $fileName 失败, 文件为空" }
+                } else {
+                    database.addAll(
+                        json.decodeFromString(
+                            ListSerializer(serializer),
+                            content
+                        )
                     )
-                )
 
-                logger.info { "已加载 Project Sekai $fileName 数据" }
+                    logger.info { "已加载 Project Sekai $fileName 数据" }
+                }
             } catch (e: Exception) {
                 logger.warn(e) { "解析 $fileName 数据时出现问题" }
             }
