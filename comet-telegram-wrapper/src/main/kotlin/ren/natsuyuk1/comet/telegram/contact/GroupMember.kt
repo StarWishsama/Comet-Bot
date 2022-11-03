@@ -9,7 +9,6 @@ import dev.inmo.tgbotapi.extensions.utils.asGroupChat
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.TelegramDate
 import dev.inmo.tgbotapi.types.chat.ChannelChat
-import dev.inmo.tgbotapi.types.chat.ChatPermissions
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.User
 import dev.inmo.tgbotapi.types.chat.member.AdministratorChatMember
@@ -30,6 +29,8 @@ import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.telegram.TelegramComet
+import ren.natsuyuk1.comet.telegram.util.MUTE
+import ren.natsuyuk1.comet.telegram.util.UNMUTE
 import ren.natsuyuk1.comet.telegram.util.getDisplayName
 import ren.natsuyuk1.comet.telegram.util.send
 import kotlin.time.Duration.Companion.seconds
@@ -39,10 +40,6 @@ abstract class TelegramGroupMember : GroupMember() {
 
     override val platform: LoginPlatform = LoginPlatform.TELEGRAM
 }
-
-private val MUTE = ChatPermissions(canSendMessages = false, canSendMediaMessages = false, canSendOtherMessages = false)
-
-private val UNMUTE = ChatPermissions(canSendMessages = true, canSendMediaMessages = true, canSendOtherMessages = true)
 
 class TelegramGroupMemberImpl(
     private val user: User,
@@ -180,22 +177,28 @@ internal class TelegramChannelMemberImpl(
     override val lastActiveTimestamp: Int
         get() = 0
     override val remainMuteTime: Int
-        get() = TODO("Not yet implemented")
+        get() = 0
     override val card: String
         get() = channelChat.getDisplayName()
     override val groupPermission: GroupPermission
         get() = GroupPermission.MEMBER
 
     override suspend fun mute(seconds: Int) {
-        TODO("Not yet implemented")
+        val triggerTime = Clock.System.now()
+        comet.bot.restrictChatMember(
+            groupChatID,
+            id.toChatId(),
+            TelegramDate((triggerTime + seconds.seconds).epochSeconds),
+            MUTE
+        )
     }
 
     override suspend fun unmute() {
-        TODO("Not yet implemented")
+        comet.bot.restrictChatMember(groupChatID, id.toChatId(), permissions = UNMUTE)
     }
 
     override suspend fun kick(reason: String, block: Boolean) {
-        TODO("Not yet implemented")
+        comet.bot.banChatMember(groupChatID, id.toChatId())
     }
 
     override suspend fun operateAdminPermission(operation: Boolean) {
@@ -236,11 +239,17 @@ internal class TelegramGroupAsMemberImpl(
         get() = GroupPermission.MEMBER
 
     override suspend fun mute(seconds: Int) {
-        TODO("Not yet implemented")
+        val triggerTime = Clock.System.now()
+        comet.bot.restrictChatMember(
+            groupChat.id,
+            id.toChatId(),
+            TelegramDate((triggerTime + seconds.seconds).epochSeconds),
+            MUTE
+        )
     }
 
     override suspend fun unmute() {
-        TODO("Not yet implemented")
+        comet.bot.restrictChatMember(groupChat.id, id.toChatId(), permissions = UNMUTE)
     }
 
     override suspend fun kick(reason: String, block: Boolean) {
