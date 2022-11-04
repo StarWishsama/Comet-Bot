@@ -8,6 +8,7 @@ import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.command.asGroup
 import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.Text
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.session.Session
 import ren.natsuyuk1.comet.api.session.expire
@@ -46,7 +47,7 @@ class KeyWordCommand(
     comet: Comet,
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
-    message: MessageWrapper,
+    val message: MessageWrapper,
     val user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, KEYWORD) {
     private val add by option("--add", "-a", help = "新增关键词")
@@ -62,6 +63,11 @@ class KeyWordCommand(
 
         when {
             add != null -> {
+                if (message.getMessageContent().any { it !is Text }) {
+                    subject.sendMessage("关键词只可以是文字!".toMessageWrapper())
+                    return
+                }
+
                 if (KeyWordData.exists(subject.id, subject.platform, add!!)) {
                     subject.sendMessage("这个关键词已经添加过了, 如果需要修改请先删除.".toMessageWrapper())
                 } else {
