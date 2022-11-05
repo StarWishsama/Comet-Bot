@@ -146,6 +146,7 @@ class IPCommand(
         val str = buildString {
             appendLine("结果为:")
             if (verbose) {
+                if (!host.isAddress) appendLine("ip: $addr")
                 infoFields.forEach {
                     val value = it.getter(info) as? String
                     if (!value.isNullOrBlank()) {
@@ -153,6 +154,7 @@ class IPCommand(
                     }
                 }
             } else {
+                if (!host.isAddress) appendLine("$addr ")
                 appendLine(info.toMetadataString())
                 if (position && info.longitude.isNotBlank() && info.latitude.isNotBlank()) {
                     appendLine("经纬度: ${info.latitude}, ${info.longitude}")
