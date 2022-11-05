@@ -95,6 +95,16 @@ open class MessageWrapper(
         return messageContent.isEmpty()
     }
 
+    fun trim(): MessageWrapper {
+        val last = messageContent.last()
+        if (last is Text && last.text.endsWith("\n")) {
+            messageContent.remove(last)
+            messageContent.add(Text(last.text.removeSuffix("\n")))
+        }
+
+        return this
+    }
+
     inline fun <reified T : WrapperElement> find(): T? =
         getMessageContent().asSequence().filterIsInstance<T?>().firstOrNull()
 }

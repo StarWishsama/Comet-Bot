@@ -44,7 +44,7 @@ class MuteCommand(
 ) : CometCommand(comet, sender, subject, message, user, MUTE) {
     private val id by argument("禁言用户 ID")
 
-    private val time by option("time", "t")
+    private val time by option("--time", "-t")
 
     override suspend fun run() {
         if (subject !is Group) {

@@ -42,16 +42,10 @@ object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
         /* ktlint-enable max-line-length */
 
         @Comment("命令前缀")
-        val commandPrefix: List<String> = mutableListOf("/", "!"),
+        val commandPrefix: List<String> = mutableListOf("/", "!", "."),
 
         @Comment("命令执行冷却, 单位秒")
         val commandCoolDown: Int = 3,
-
-        @Comment("全局限速间隔, 单位分钟")
-        val globalRateLimitInterval: Int = 1,
-
-        @Comment("全局限速时间内最高可发送消息数")
-        val globalRateLimitMessageSize: Int = 60,
 
         @Comment("哔哩哔哩 Cookie, 用于用户搜索等需要 Cookie 的 API")
         val biliCookie: String = "",
