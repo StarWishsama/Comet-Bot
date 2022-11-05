@@ -17,6 +17,8 @@ import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.CometCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
+import ren.natsuyuk1.comet.api.command.isGroup
+import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.objects.config.IpdbConfig
@@ -50,8 +52,8 @@ private val delDuration = 60.toDuration(DurationUnit.SECONDS)
 
 class IPCommand(
     comet: Comet,
-    sender: PlatformCommandSender,
-    subject: PlatformCommandSender,
+    override val sender: PlatformCommandSender,
+    override val subject: PlatformCommandSender,
     private val message: MessageWrapper,
     user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, IP) {
@@ -146,6 +148,7 @@ class IPCommand(
         val str = buildString {
             appendLine("结果为:")
             if (verbose) {
+                if (!host.isAddress) appendLine("ip: $addr")
                 infoFields.forEach {
                     val value = it.getter(info) as? String
                     if (!value.isNullOrBlank()) {
@@ -153,6 +156,7 @@ class IPCommand(
                     }
                 }
             } else {
+                if (!host.isAddress) appendLine("$addr ")
                 appendLine(info.toMetadataString())
                 if (position && info.longitude.isNotBlank() && info.latitude.isNotBlank()) {
                     appendLine("经纬度: ${info.latitude}, ${info.longitude}")
@@ -160,8 +164,12 @@ class IPCommand(
             }
         }
 
-        message.receipt?.delayDelete(delDuration)
-        subject.sendMessage(str)?.delayDelete(delDuration)
+        fun MessageReceipt?.del() {
+            if (subject.isGroup()) this?.delayDelete(delDuration)
+        }
+
+        message.receipt.del()
+        subject.sendMessage(str).del()
     }
 }
 
