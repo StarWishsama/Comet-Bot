@@ -50,6 +50,7 @@ subprojects {
 }
 
 task("buildComet") {
+    group = "build"
     val output = File("$rootDir/comet/modules")
 
     if (output.isDirectory && !output.listFiles().isNullOrEmpty()) {
