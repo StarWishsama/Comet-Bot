@@ -16,7 +16,7 @@ suspend fun query(host: String, port: Int, serverType: MinecraftServerType): Que
     }
 }
 
-private suspend fun javaQuery(host: String, port: Int): QueryInfo {
+private fun javaQuery(host: String, port: Int): QueryInfo {
     try {
         val timer = Timer()
         val socket = Socket(host, port)
@@ -56,22 +56,12 @@ private suspend fun javaQuery(host: String, port: Int): QueryInfo {
         dataInputStream.readVarInt()
         /*返回的数据包id*/
         var id = dataInputStream.readVarInt()
-        if (id == -1) {
-            throw IOException("数据流过早结束")
-        }
+        id.checkVarInt()
 
-        /*需要返回的状态*/
-        if (id != 0x00) {
-            throw IOException("无效的数据包 ID")
-        }
         /*json字符串长度*/
         val length = dataInputStream.readVarInt()
-        if (length == -1) {
-            throw IOException("数据流过早结束")
-        }
-        if (length == 0) {
-            throw IOException("无效的 json 字符串长度")
-        }
+        length.checkVarInt()
+
         val jsonString = ByteArray(length)
         /* 读取json字符串 */
         dataInputStream.readFully(jsonString)
@@ -85,12 +75,7 @@ private suspend fun javaQuery(host: String, port: Int): QueryInfo {
         dataOutputStream.writeLong(now)
         dataInputStream.readVarInt()
         id = dataInputStream.readVarInt()
-        if (id == -1) {
-            throw IOException("数据流过早结束")
-        }
-        if (id != 0x01) {
-            throw IOException("无效的数据包 ID")
-        }
+        id.checkVarInt()
 
         dataOutputStream.close()
         outputStream.close()

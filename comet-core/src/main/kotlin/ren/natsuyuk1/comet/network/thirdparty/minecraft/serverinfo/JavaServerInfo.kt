@@ -3,6 +3,8 @@ package ren.natsuyuk1.comet.network.thirdparty.minecraft.serverinfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
+import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 
 @Serializable
 data class JavaServerInfo(
@@ -44,4 +46,8 @@ data class JavaServerInfo(
             val version: String
         )
     }
+
+    fun toMessageWrapper(ping: Long): MessageWrapper =
+        buildMessageWrapper {
+        }
 }
