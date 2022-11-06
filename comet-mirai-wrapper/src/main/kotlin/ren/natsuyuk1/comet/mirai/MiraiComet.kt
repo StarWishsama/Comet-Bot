@@ -125,7 +125,7 @@ class MiraiComet(
     }
 
     override fun close() {
-        miraiBot.close()
+        if (::miraiBot.isInitialized) miraiBot.close()
     }
 
     override suspend fun getGroup(id: Long): Group? = cl.runWith { miraiBot.getGroup(id)?.toCometGroup(this) }

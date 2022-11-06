@@ -47,6 +47,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
                     miraiComet.afterLogin()
                 } catch (e: RuntimeException) {
                     logger.warn(e) { "Mirai $id 登录失败, 请尝试重新登录" }
+                    miraiComet.close()
                     cometInstances.remove(miraiComet)
                 }
             }
@@ -67,6 +68,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
                     telegramComet.afterLogin()
                 } catch (e: Exception) {
                     logger.warn(e) { "Telegram $id 登录失败, 请尝试重新登录" }
+                    telegramComet.close()
                     cometInstances.remove(telegramComet)
                 }
             }
