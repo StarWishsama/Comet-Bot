@@ -25,16 +25,15 @@ fun createCometConfig(id: Long, password: String, platform: LoginPlatform): Come
 
 internal suspend fun login(id: Long, password: String, platform: LoginPlatform) {
     loginStatus.update { true }
+    val service = WrapperLoader.getService(platform)
+        ?: error("未安装 ${platform.name} Wrapper, 请下载 ${platform.name} Wrapper 并放置在 ./modules 下")
     logger.info { "正在尝试登录账号 $id 于 ${platform.name} 平台" }
 
     try {
         when (platform) {
             LoginPlatform.MIRAI -> {
-                val miraiService = WrapperLoader.getService(platform)
-                    ?: error("未安装 Mirai Wrapper, 请下载 Mirai Wrapper 并放置在 ./modules 下")
-
                 val miraiComet =
-                    miraiService.createInstance(
+                    service.createInstance(
                         createCometConfig(id, password, platform),
                         WrapperLoader.wrapperClassLoader,
                         Console.newLineReader("mirai-comet")
@@ -53,11 +52,8 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform) 
             }
 
             LoginPlatform.TELEGRAM -> {
-                val telegramService = WrapperLoader.getService(platform)
-                    ?: error("未安装 Telegram Wrapper, 请下载 Telegram Wrapper 并放置在 ./modules 下")
-
                 val telegramComet =
-                    telegramService.createInstance(
+                    service.createInstance(
                         createCometConfig(id, password, platform),
                         WrapperLoader.wrapperClassLoader,
                         Console.newLineReader("telegram-comet")

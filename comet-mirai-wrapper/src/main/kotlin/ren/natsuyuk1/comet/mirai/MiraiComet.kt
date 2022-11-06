@@ -24,6 +24,7 @@ import ren.natsuyuk1.comet.mirai.event.redirectToComet
 import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
 import ren.natsuyuk1.comet.mirai.util.runWith
 import ren.natsuyuk1.comet.mirai.util.runWithScope
+import ren.natsuyuk1.comet.mirai.util.runWithSuspend
 import ren.natsuyuk1.comet.service.subscribeGitHubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import java.awt.Desktop
@@ -129,18 +130,20 @@ class MiraiComet(
 
     override suspend fun getGroup(id: Long): Group? = cl.runWith { miraiBot.getGroup(id)?.toCometGroup(this) }
 
-    override suspend fun deleteMessage(source: MessageSource): Boolean {
-        return runCatching<Boolean> {
-            source as MiraiMessageSource
+    override suspend fun deleteMessage(source: MessageSource): Boolean =
+        cl.runWithSuspend {
+            return@runWithSuspend runCatching<Boolean> {
+                source as MiraiMessageSource
 
-            source.miraiSource.recall()
+                source.miraiSource.recall()
 
-            true
-        }.onFailure {
-            if (it !is PermissionDeniedException) {
-                logger.warn(it) { "撤回消息 $source 失败" }
-            }
-            return false
-        }.getOrDefault(false)
-    }
+                true
+            }.onFailure {
+                if (it !is PermissionDeniedException) {
+                    logger.warn(it) { "撤回消息 $source 失败" }
+                }
+
+                return@runWithSuspend false
+            }.getOrDefault(false)
+        }
 }
