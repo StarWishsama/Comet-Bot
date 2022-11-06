@@ -1,134 +1,190 @@
 package ren.natsuyuk1.comet.network.thirdparty.minecraft
 
-import ren.natsuyuk1.comet.utils.time.Timer
-import java.io.*
-import java.net.Socket
-import java.util.concurrent.TimeUnit
+import io.ktor.network.selector.*
+import io.ktor.network.sockets.*
+import io.ktor.utils.io.*
+import io.ktor.utils.io.core.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import mu.KotlinLogging
+import java.io.IOException
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.net.InetAddress
+import java.nio.charset.Charset
+import kotlin.io.use
+
+private val logger = KotlinLogging.logger {}
+private const val VERSION_NUMBER = 760 // Represent Minecraft 1.19.2
+private const val SEGMENT_BITS = 0x7F
+private const val CONTINUE_BIT = 0x80
 
 enum class MinecraftServerType {
     JAVA, BEDROCK
 }
 
-suspend fun query(host: String, port: Int, serverType: MinecraftServerType): QueryInfo {
+suspend fun query(host: String, port: Int, serverType: MinecraftServerType): QueryInfo? {
     return when (serverType) {
         MinecraftServerType.JAVA -> javaQuery(host, port)
         MinecraftServerType.BEDROCK -> bedrockQuery(host, port)
     }
 }
 
-private fun javaQuery(host: String, port: Int): QueryInfo {
+suspend fun javaQuery(host: String, port: Int): QueryInfo? {
+    val manager = SelectorManager(Dispatchers.IO)
+
     try {
-        val timer = Timer()
-        val socket = Socket(host, port)
+        val socket = aSocket(manager).tcp().connect(host, port)
 
-        socket.soTimeout = TimeUnit.SECONDS.toMillis(5).toInt()
+        val receiveChannel = socket.openReadChannel()
+        val sendChannel = socket.openWriteChannel(autoFlush = true)
 
-        val outputStream = socket.getOutputStream()
-        val dataOutputStream = DataOutputStream(outputStream)
-        val inputStream = socket.getInputStream()
-        val inputStreamReader = InputStreamReader(inputStream)
-        val b = ByteArrayOutputStream()
-        val handshake = DataOutputStream(b)
-        /*握手数据包id*/
-        handshake.writeByte(0x00)
-        /*协议版本*/
-        handshake.writeVarInt(578)
-        /*主机地址长度*/
-        handshake.writeVarInt(host.length)
-        /*主机地址*/
-        handshake.writeBytes(host)
-        /*端口*/
-        handshake.writeShort(25565)
-        /*状态(握手是1)*/
-        handshake.writeVarInt(1)
+        val handshakePacket = BytePacketBuilder().apply {
+            writeByte(0x00) // handshake packet id
+            writeVarInt(VERSION_NUMBER) // version number
+            writeVarInt(host.length) // host length
+            writeFully(host.toByteArray()) // host
+            writeUShort(port.toUShort()) // port
+            writeVarInt(1) // status, 1 for handshake
+        }
 
-        /*发送的握手数据包大小*/
-        dataOutputStream.writeVarInt(b.size())
-        /*发送握手数据包*/
-        dataOutputStream.write(b.toByteArray())
+        sendChannel.writeVarInt(handshakePacket.size) // prepend size
+        sendChannel.writePacket(handshakePacket.build())
 
-        /*大小为1*/
-        dataOutputStream.writeByte(0x01)
-        /*ping的数据包id*/
-        dataOutputStream.writeByte(0x00)
-        val dataInputStream = DataInputStream(inputStream)
-        /*返回的数据包大小*/
-        dataInputStream.readVarInt()
-        /*返回的数据包id*/
-        var id = dataInputStream.readVarInt()
-        id.checkVarInt()
+        sendChannel.writeByte(0x01) // size == 1
+        sendChannel.writeByte(0x00) // packet id for ping
 
-        /*json字符串长度*/
-        val length = dataInputStream.readVarInt()
-        length.checkVarInt()
+        val requestTime = System.currentTimeMillis()
 
-        val jsonString = ByteArray(length)
-        /* 读取json字符串 */
-        dataInputStream.readFully(jsonString)
-        val json = String(jsonString, Charsets.UTF_8)
+        receiveChannel.readVarInt() // packet size
+        val id = receiveChannel.readVarInt()
+
+        if (id == -1) {
+            throw IOException("请求流过早关闭.")
+        }
+
+        if (id != 0x00) {
+            throw IOException("无效的包 ID")
+        }
+
+        val respLength = receiveChannel.readVarInt()
+
+        if (respLength == -1) {
+            throw IOException("请求流过早关闭.")
+        }
+
+        if (respLength == 0) {
+            throw IllegalStateException("回报的响应字符串大小有误.")
+        }
+
+        val resp = ByteArray(respLength)
+        receiveChannel.readFully(resp)
+
         val now = System.currentTimeMillis()
-        /* 数据包大小 */
-        dataOutputStream.writeByte(0x09)
-        /* ping 0x01 */
-        dataOutputStream.writeByte(0x01)
-        /*时间*/
-        dataOutputStream.writeLong(now)
-        dataInputStream.readVarInt()
-        id = dataInputStream.readVarInt()
-        id.checkVarInt()
 
-        dataOutputStream.close()
-        outputStream.close()
-        inputStreamReader.close()
-        inputStream.close()
-        socket.close()
+        sendChannel.writeByte(0x09)
+        sendChannel.writeByte(0x01)
+        sendChannel.writeLong(now)
 
-        return QueryInfo(json, MinecraftServerType.JAVA, timer.measureDuration().inWholeMilliseconds)
+        receiveChannel.readVarInt() // drop
+        receiveChannel.readVarInt() // drop
+
+        val pingTime = receiveChannel.readLong()
+
+        withContext(Dispatchers.IO) {
+            socket.close()
+            manager.close()
+        }
+
+        return QueryInfo(resp.toString(Charset.defaultCharset()), MinecraftServerType.JAVA, pingTime - requestTime)
     } catch (e: Exception) {
-        throw e
+        logger.warn(e) { "查询 Java 版服务器失败, host=$host, port=$port" }
+        return null
     }
 }
 
-private fun bedrockQuery(host: String, port: Int): QueryInfo {
-    TODO()
-}
-
-private fun Int.checkVarInt() {
-    if (this == -1) {
-        throw IllegalStateException("数据流过早关闭")
-    }
-
-    if (this != 0x01) {
-        throw IllegalArgumentException("无效的数据包 ID")
-    }
-}
-
-@Throws(IOException::class)
-private fun DataOutputStream.writeVarInt(paramInt: Int) {
-    var int = paramInt
+suspend fun ByteWriteChannel.writeVarInt(value: Int) {
+    var temp = value
     while (true) {
-        if (int and -0x80 == 0) {
-            writeByte(int)
+        if (temp and SEGMENT_BITS.inv() == 0) {
+            writeByte(temp.toByte())
             return
         }
-        writeByte(int and 0x7F or 0x80)
-        int = int ushr 7
+        writeByte((temp and SEGMENT_BITS or CONTINUE_BIT).toByte())
+
+        // Note: >>> means that the sign bit is shifted with the rest of the number rather than being left alone
+        temp = temp ushr 7
     }
 }
 
-@Throws(IOException::class)
-private fun DataInputStream.readVarInt(): Int {
-    var i = 0
-    var j = 0
+fun BytePacketBuilder.writeVarInt(value: Int) {
+    var temp = value
     while (true) {
-        val k = readByte().toInt()
-        i = i or (k and 0x7F shl j++ * 7)
-        if (j > 5) {
-            throw RuntimeException("VarInt too big")
+        if (temp and SEGMENT_BITS.inv() == 0) {
+            writeByte(temp.toByte())
+            return
         }
-        if (k and 0x80 != 128) {
-            break
-        }
+        writeByte((temp and SEGMENT_BITS or CONTINUE_BIT).toByte())
+
+        // Note: >>> means that the sign bit is shifted with the rest of the number rather than being left alone
+        temp = temp ushr 7
     }
-    return i
+}
+
+suspend fun ByteReadChannel.readVarInt(): Int {
+    var value = 0
+    var position = 0
+    var currentByte: Byte
+    while (true) {
+        currentByte = readByte()
+        value = value or (currentByte.toInt() and SEGMENT_BITS shl position)
+        if (currentByte.toInt() and CONTINUE_BIT == 0) break
+        position += 7
+        if (position >= 32) throw RuntimeException("VarInt is too big")
+    }
+    return value
+}
+
+private fun bedrockQuery(address: String, port: Int = 19132): QueryInfo? {
+    val socket = DatagramSocket()
+
+    socket.use {
+        socket.soTimeout = 1500
+        val start = System.currentTimeMillis()
+        socket.connect(InetAddress.getByName(address), port)
+        val receivePacket = DatagramPacket(ByteArray(1024), 1024)
+
+        // 数据包
+        val bytes: ByteArray = convertToBedrockByte("0100000000240D12D300FFFF00FEFEFEFEFDFDFDFD12345678")
+            ?: return null
+        socket.send(DatagramPacket(bytes, 0, bytes.size))
+
+        socket.receive(receivePacket)
+
+        val result = String(receivePacket.data, Charsets.UTF_8)
+
+        return QueryInfo(result, MinecraftServerType.BEDROCK, System.currentTimeMillis() - start)
+    }
+}
+
+private fun convertToBedrockByte(hexString: String): ByteArray? {
+    if (hexString.isEmpty()) {
+        return null
+    }
+
+    val lowerHex = hexString.lowercase()
+
+    val byteArray = ByteArray(lowerHex.length shr 1)
+
+    var index = 0
+
+    for (i in lowerHex.indices) {
+        if (index > lowerHex.length - 1) return byteArray
+        val highDit = lowerHex[index].digitToInt(16) and 0xFF
+        val lowDit = lowerHex[index + 1].digitToInt(16) and 0xFF
+        byteArray[i] = (highDit shl 4 or lowDit).toByte()
+        index += 2
+    }
+
+    return byteArray
 }
