@@ -8,11 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import java.io.IOException
-import java.net.DatagramPacket
-import java.net.DatagramSocket
-import java.net.InetAddress
+import java.nio.ByteBuffer
 import java.nio.charset.Charset
-import kotlin.io.use
 
 private val logger = KotlinLogging.logger {}
 private const val VERSION_NUMBER = 760 // Represent Minecraft 1.19.2
@@ -145,33 +142,31 @@ suspend fun ByteReadChannel.readVarInt(): Int {
     return value
 }
 
-private fun bedrockQuery(address: String, port: Int = 19132): QueryInfo? {
-    val socket = DatagramSocket()
+private suspend fun bedrockQuery(address: String, port: Int = 19132): QueryInfo {
+    val manager = SelectorManager(Dispatchers.IO)
+    val start = System.currentTimeMillis()
+    val socket = aSocket(manager).udp().connect(InetSocketAddress(address, port))
+    val writer = socket.openWriteChannel(true)
+    val reader = socket.openReadChannel()
 
-    socket.use {
-        socket.soTimeout = 1500
-        val start = System.currentTimeMillis()
-        socket.connect(InetAddress.getByName(address), port)
-        val receivePacket = DatagramPacket(ByteArray(1024), 1024)
+    val bytes: ByteArray = convertToBedrockByte("0100000000240D12D300FFFF00FEFEFEFEFDFDFDFD12345678")
+    writer.writeFully(bytes)
 
-        // 数据包
-        val bytes: ByteArray = convertToBedrockByte("0100000000240D12D300FFFF00FEFEFEFEFDFDFDFD12345678")
-            ?: return null
-        socket.send(DatagramPacket(bytes, 0, bytes.size))
+    val byteBuffer = ByteBuffer.allocate(1024)
 
-        socket.receive(receivePacket)
+    reader.readFully(byteBuffer)
 
-        val result = String(receivePacket.data, Charsets.UTF_8)
+    val result = Charsets.UTF_8.decode(byteBuffer).toString()
 
-        return QueryInfo(result, MinecraftServerType.BEDROCK, System.currentTimeMillis() - start)
+    withContext(Dispatchers.IO) {
+        socket.close()
+        manager.close()
     }
+
+    return QueryInfo(result, MinecraftServerType.BEDROCK, System.currentTimeMillis() - start)
 }
 
-private fun convertToBedrockByte(hexString: String): ByteArray? {
-    if (hexString.isEmpty()) {
-        return null
-    }
-
+private fun convertToBedrockByte(hexString: String): ByteArray {
     val lowerHex = hexString.lowercase()
 
     val byteArray = ByteArray(lowerHex.length shr 1)

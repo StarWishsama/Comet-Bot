@@ -14,7 +14,7 @@ data class NoAbbrSearchResult(
         if (trans.isNullOrEmpty()) {
             appendText("找不到 $name 的缩写释义捏")
         } else {
-            appendText("$name: ${trans.take(5).format()}")
+            appendText("$name: ${trans.format()}")
         }
     }
 }
