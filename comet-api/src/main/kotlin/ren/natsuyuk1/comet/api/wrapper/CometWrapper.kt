@@ -15,12 +15,18 @@ interface CometWrapper {
      * 创建一个 [Comet] 实例
      *
      * @param config [Comet] 的配置文件 [CometConfig]
+     * @param protocol 在 QQ 平台登录 [Comet] 时使用的协议
      * @param classLoader 加载此 Wrapper 的 [ClassLoader]
      * @param reader [LineReader]
      *
      * @return Comet 实例
      */
-    suspend fun createInstance(config: CometConfig, classLoader: ClassLoader, reader: LineReader): Comet
+    suspend fun createInstance(
+        config: CometConfig,
+        protocol: String,
+        classLoader: ClassLoader,
+        reader: LineReader
+    ): Comet
 
     /**
      * 此 [CometWrapper] 对应的登录平台

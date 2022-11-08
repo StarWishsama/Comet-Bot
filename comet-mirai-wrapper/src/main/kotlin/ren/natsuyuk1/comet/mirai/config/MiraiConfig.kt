@@ -58,7 +58,7 @@ fun MiraiLoginProtocol.toMiraiProtocol(): BotConfiguration.MiraiProtocol =
 data class MiraiConfig(
     val id: Long,
     @Comment("Mirai 登录协议")
-    val protocol: MiraiLoginProtocol = MiraiLoginProtocol.ANDROID_PHONE,
+    var protocol: MiraiLoginProtocol = MiraiLoginProtocol.ANDROID_PHONE,
     @Comment("Mirai 心跳策略, 一般情况下无需改动")
     val heartbeatStrategy: BotConfiguration.HeartbeatStrategy = BotConfiguration.HeartbeatStrategy.STAT_HB,
     @Comment("Mirai 心跳周期, 单位为毫秒")

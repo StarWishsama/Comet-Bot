@@ -18,8 +18,10 @@ internal val LOGIN = CommandProperty(
     "login",
     listOf(),
     "登录机器人账号",
-    "/login [id] --password [密码] --platform (登录平台 默认为 QQ)\n" +
-        "注意: Telegram 平台下, 你的 ID 为 token 中的数字."
+    "/login [ID] [密码]\n" +
+        "-p/--platform (登录平台 默认为 QQ)\n" +
+        "-P/--protocol 登录协议, 仅在使用 QQ 登录时可用\n" +
+        "注意: Telegram 平台下, 你的 ID 为 token 中的**数字**."
 )
 
 internal class Login(
@@ -38,6 +40,12 @@ internal class Login(
         help = "登录 Comet 机器人的平台 (例如 QQ, Telegram)"
     ).enum<LoginPlatform>(true).default(LoginPlatform.MIRAI)
 
+    private val protocol by option(
+        "-P",
+        "--protocol",
+        help = "登录 Comet QQ 侧时使用的协议"
+    ).default("ANDROID_PAD")
+
     override suspend fun run() {
         if (password.isBlank()) {
             sender.sendMessage(buildMessageWrapper { appendText("请输入密码, 例子: login 123456 -p qq -pwd password") })
@@ -48,13 +56,13 @@ internal class Login(
             LoginPlatform.MIRAI -> {
                 sender.sendMessage(buildMessageWrapper { appendText("正在尝试登录账号 $id 于 QQ 平台") })
 
-                login(id, password, LoginPlatform.MIRAI)
+                login(id, password, LoginPlatform.MIRAI, protocol)
             }
 
             LoginPlatform.TELEGRAM -> {
                 sender.sendMessage(buildMessageWrapper { appendText("正在尝试登录账号于 Telegram 平台") })
 
-                login(id, password, LoginPlatform.TELEGRAM)
+                login(id, password, LoginPlatform.TELEGRAM, protocol)
             }
 
             else -> {}

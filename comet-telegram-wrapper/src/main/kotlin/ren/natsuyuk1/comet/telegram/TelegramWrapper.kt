@@ -10,6 +10,7 @@ import ren.natsuyuk1.comet.api.wrapper.CometWrapper
 class TelegramWrapper : CometWrapper {
     override suspend fun createInstance(
         config: CometConfig,
+        protocol: String,
         classLoader: ClassLoader,
         reader: LineReader
     ): Comet {
