@@ -4,6 +4,7 @@ import org.jline.reader.LineReader
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.MiraiLoginProtocol
 
 /**
  * 代表一个 [CometWrapper]
@@ -23,7 +24,7 @@ interface CometWrapper {
      */
     suspend fun createInstance(
         config: CometConfig,
-        protocol: String,
+        protocol: MiraiLoginProtocol?,
         classLoader: ClassLoader,
         reader: LineReader
     ): Comet

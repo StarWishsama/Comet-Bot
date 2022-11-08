@@ -11,6 +11,7 @@ import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.MiraiLoginProtocol
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.console.util.login
 
@@ -44,7 +45,7 @@ internal class Login(
         "-P",
         "--protocol",
         help = "登录 Comet QQ 侧时使用的协议"
-    ).default("ANDROID_PAD")
+    ).enum<MiraiLoginProtocol>(true).default(MiraiLoginProtocol.ANDROID_PAD)
 
     override suspend fun run() {
         if (password.isBlank()) {

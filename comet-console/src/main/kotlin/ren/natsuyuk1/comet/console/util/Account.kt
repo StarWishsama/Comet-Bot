@@ -12,6 +12,7 @@ import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.database.AccountData
 import ren.natsuyuk1.comet.api.database.AccountDataTable
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.MiraiLoginProtocol
 import ren.natsuyuk1.comet.console.CometTerminalCommand
 import ren.natsuyuk1.comet.console.wrapper.WrapperLoader
 
@@ -23,7 +24,7 @@ fun createCometConfig(id: Long, password: String, platform: LoginPlatform): Come
     return CometConfig(id, password, platform)
 }
 
-internal suspend fun login(id: Long, password: String, platform: LoginPlatform, protocol: String) {
+internal suspend fun login(id: Long, password: String, platform: LoginPlatform, protocol: MiraiLoginProtocol?) {
     loginStatus.update { true }
     val service = WrapperLoader.getService(platform)
         ?: error("未安装 ${platform.name} Wrapper, 请下载 ${platform.name} Wrapper 并放置在 ./modules 下")
@@ -32,6 +33,10 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform, 
     try {
         when (platform) {
             LoginPlatform.MIRAI -> {
+                if (protocol == null) {
+                    logger.warn { "未指定 Mirai 登录协议, 将默认设置为 ANDROID_PHONE (安卓手机协议)." }
+                }
+
                 val miraiComet =
                     service.createInstance(
                         createCometConfig(id, password, platform),

@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.mirai
 
+import mu.KotlinLogging
 import org.jline.reader.LineReader
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.config.CometConfig
@@ -11,22 +12,18 @@ import ren.natsuyuk1.comet.mirai.config.MiraiConfig
 import ren.natsuyuk1.comet.mirai.config.MiraiConfigManager
 import ren.natsuyuk1.comet.mirai.util.runWith
 
+private val logger = KotlinLogging.logger {}
+
 class MiraiWrapper : CometWrapper {
     override suspend fun createInstance(
         config: CometConfig,
-        protocol: String,
+        protocol: MiraiLoginProtocol?,
         classLoader: ClassLoader,
         reader: LineReader
     ): Comet {
         MiraiConfigManager.init()
 
-        val loginProtocol: MiraiLoginProtocol
-
-        try {
-            loginProtocol = MiraiLoginProtocol.valueOf(protocol)
-        } catch (e: IllegalArgumentException) {
-            throw IllegalArgumentException("输入的 Mirai 协议名称有误, 请重新输入!")
-        }
+        var loginProtocol = protocol
 
         var miraiConfig = MiraiConfigManager.findMiraiConfigByID(config.id)
 
@@ -34,9 +31,12 @@ class MiraiWrapper : CometWrapper {
             miraiConfig = MiraiConfig(config.id).also { it.init() }
         }
 
-        miraiConfig.protocol = loginProtocol
+        if (protocol == null) {
+            logger.warn { "检测到旧版本数据库, 将使用当前 Mirai 配置文件设置的协议 (${miraiConfig.protocol}) 登录." }
+            loginProtocol = miraiConfig.protocol
+        }
 
-        AccountData.registerAccount(config.id, config.password, platform())
+        AccountData.registerAccount(config.id, config.password, platform(), loginProtocol)
 
         return classLoader.runWith { MiraiComet(config, classLoader, miraiConfig, reader) }
     }

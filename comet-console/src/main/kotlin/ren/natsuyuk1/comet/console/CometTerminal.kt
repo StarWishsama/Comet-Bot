@@ -180,7 +180,8 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
                         login(
                             it[AccountDataTable.id].value,
                             it[AccountDataTable.password],
-                            it[AccountDataTable.platform]
+                            it[AccountDataTable.platform],
+                            it[AccountDataTable.protocol]
                         )
                     } catch (e: Throwable) {
                         logger.warn(e) { "登录 ${it[AccountDataTable.id]} (${it[AccountDataTable.platform]}) 失败" }
