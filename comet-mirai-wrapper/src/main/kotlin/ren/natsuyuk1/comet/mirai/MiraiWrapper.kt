@@ -34,9 +34,12 @@ class MiraiWrapper : CometWrapper {
         if (protocol == null) {
             logger.warn { "检测到旧版本数据库, 将使用当前 Mirai 配置文件设置的协议 (${miraiConfig.protocol}) 登录." }
             loginProtocol = miraiConfig.protocol
+            AccountData.getAccountData(config.id, platform())?.protocol = loginProtocol
         }
 
-        AccountData.registerAccount(config.id, config.password, platform(), loginProtocol)
+        if (!AccountData.hasAccount(config.id, platform())) {
+            AccountData.registerAccount(config.id, config.password, platform(), loginProtocol)
+        }
 
         return classLoader.runWith { MiraiComet(config, classLoader, miraiConfig, reader) }
     }

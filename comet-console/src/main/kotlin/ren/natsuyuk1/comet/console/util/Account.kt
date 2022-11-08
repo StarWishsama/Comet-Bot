@@ -34,7 +34,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform, 
         when (platform) {
             LoginPlatform.MIRAI -> {
                 if (protocol == null) {
-                    logger.warn { "未指定 Mirai 登录协议, 将默认设置为 ANDROID_PHONE (安卓手机协议)." }
+                    logger.warn { "未指定 Mirai 登录协议, 将默认设置为 ANDROID_PAD (安卓手机协议). 如先前已有配置将会跟随先前配置." }
                 }
 
                 val miraiComet =

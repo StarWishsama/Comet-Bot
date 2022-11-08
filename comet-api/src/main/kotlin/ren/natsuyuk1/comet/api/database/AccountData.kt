@@ -55,9 +55,11 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
             }
         }
 
-        fun getAccountData(id: Long): AccountData? =
+        fun getAccountData(id: Long, platform: LoginPlatform): AccountData? =
             transaction {
-                findById(id)
+                find {
+                    AccountDataTable.id eq id and (AccountDataTable.platform eq platform)
+                }.firstOrNull()
             }
     }
 }

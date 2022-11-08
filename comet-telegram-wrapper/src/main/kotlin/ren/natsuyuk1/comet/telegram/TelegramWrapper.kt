@@ -15,7 +15,9 @@ class TelegramWrapper : CometWrapper {
         classLoader: ClassLoader,
         reader: LineReader
     ): Comet {
-        AccountData.registerAccount(config.id, config.password, platform(), null)
+        if (!AccountData.hasAccount(config.id, platform())) {
+            AccountData.registerAccount(config.id, config.password, platform(), null)
+        }
 
         return TelegramComet(config)
     }
