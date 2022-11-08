@@ -22,30 +22,30 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
 
         appendText(
             "EXPERT | Clear ${
-            getSpecificMusicCount(
+            getSpecificLevelMusicCount(
                 MusicDifficulty.EXPERT,
                 MusicPlayResult.CLEAR
             )
             } / FC ${
-            getSpecificMusicCount(
+            getSpecificLevelMusicCount(
                 MusicDifficulty.EXPERT,
                 MusicPlayResult.FULL_COMBO
             )
-            } / AP ${getSpecificMusicCount(MusicDifficulty.EXPERT, MusicPlayResult.ALL_PERFECT)}"
+            } / AP ${getSpecificLevelMusicCount(MusicDifficulty.EXPERT, MusicPlayResult.ALL_PERFECT)}"
         )
         appendLine()
         appendText(
             "MASTER | Clear ${
-            getSpecificMusicCount(
+            getSpecificLevelMusicCount(
                 MusicDifficulty.MASTER,
                 MusicPlayResult.CLEAR
             )
             } / FC ${
-            getSpecificMusicCount(
+            getSpecificLevelMusicCount(
                 MusicDifficulty.MASTER,
                 MusicPlayResult.FULL_COMBO
             )
-            } / AP ${getSpecificMusicCount(MusicDifficulty.MASTER, MusicPlayResult.ALL_PERFECT)}"
+            } / AP ${getSpecificLevelMusicCount(MusicDifficulty.MASTER, MusicPlayResult.ALL_PERFECT)}"
         )
     }
 
@@ -84,12 +84,14 @@ data class ProjectSekaiUserInfo(
         }
     }
 
-    fun getSpecificMusicCount(difficulty: MusicDifficulty, playResult: MusicPlayResult): Int {
+    fun getSpecificLevelMusicCount(difficulty: MusicDifficulty, playResult: MusicPlayResult): Int {
         var counter = 0
 
         userMusics.forEach {
             counter += it.musicStatus.count { ms ->
-                ms.userMusicResult.any { umr -> umr.musicDifficulty == difficulty && umr.playResult == playResult }
+                ms.userMusicResult.any { umr ->
+                    umr.musicDifficulty == difficulty && umr.playResult >= playResult
+                }
             }
         }
 
