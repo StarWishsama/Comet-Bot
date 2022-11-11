@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.mirai
 
 import mu.KotlinLogging
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.jline.reader.LineReader
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.config.CometConfig
@@ -34,7 +35,9 @@ class MiraiWrapper : CometWrapper {
         if (protocol == null) {
             logger.warn { "检测到旧版本数据库, 将使用当前 Mirai 配置文件设置的协议 (${miraiConfig.protocol}) 登录." }
             loginProtocol = miraiConfig.protocol
-            AccountData.getAccountData(config.id, platform())?.protocol = loginProtocol
+            transaction {
+                AccountData.getAccountData(config.id, platform())?.protocol = loginProtocol
+            }
         }
 
         if (!AccountData.hasAccount(config.id, platform())) {
