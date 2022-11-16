@@ -12,6 +12,7 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.serialization.decodeFromString
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.CometClient
@@ -57,11 +58,17 @@ object ProjectSekaiAPI {
         logger.debug { "Fetching project sekai event $eventID rank for user $userID" }
 
         val resp = try {
-            client.get("$PROFILE_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
+            val req = client.get("$PROFILE_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
                 url {
                     parameters.append("targetUserId", userID.toString())
                 }
-            }.body()
+            }
+
+            if (req.status != HttpStatusCode.OK) {
+                error("PJSK Profile API return code isn't OK (${req.status})")
+            }
+
+            req.body()
         } catch (e: IOException) {
             client.get("$UNIBOT_API_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
                 url {
@@ -78,11 +85,17 @@ object ProjectSekaiAPI {
         logger.debug { "Fetching project sekai event $eventID rank position at $rankPosition" }
 
         val resp: InputStream = try {
-            client.get("$PROFILE_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
+            val req = client.get("$PROFILE_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
                 url {
                     parameters.append("targetRank", rankPosition.toString())
                 }
-            }.body()
+            }
+
+            if (req.status != HttpStatusCode.OK) {
+                error("PJSK Profile API return code isn't OK (${req.status})")
+            }
+
+            req.body()
         } catch (e: Exception) {
             client.get("$UNIBOT_API_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
                 url {
@@ -119,7 +132,13 @@ object ProjectSekaiAPI {
         logger.debug { "Fetching project sekai user info for $id" }
 
         val resp: InputStream = try {
-            client.get("$PROFILE_URL/api/user/$id/profile").body()
+            val req = client.get("$PROFILE_URL/api/user/$id/profile")
+
+            if (req.status != HttpStatusCode.OK) {
+                error("PJSK Profile API return code isn't OK (${req.status})")
+            }
+
+            req.body()
         } catch (e: Exception) {
             client.get("$UNIBOT_API_URL/api/user/$id/profile").body()
         }
@@ -133,11 +152,17 @@ object ProjectSekaiAPI {
 
         val resp: InputStream =
             try {
-                client.get("$PROFILE_URL/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
+                val req = client.get("$PROFILE_URL/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
                     url {
                         parameters.append("targetUserId", userId.toString())
                     }
-                }.body()
+                }
+
+                if (req.status != HttpStatusCode.OK) {
+                    error("PJSK Profile API return code isn't OK (${req.status})")
+                }
+
+                req.body()
             } catch (e: Exception) {
                 client.get("$UNIBOT_API_URL/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
                     url {

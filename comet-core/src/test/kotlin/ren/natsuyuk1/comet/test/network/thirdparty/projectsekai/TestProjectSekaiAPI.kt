@@ -60,8 +60,8 @@ class TestProjectSekaiAPI {
         }
     }
 
-    // Represent to event named 迷い子の手を引く、そのさきは
-    private val eventID = 61
+    // Represent to event named `Echo my melody`
+    private val eventID = 76
 
     // Welcome to add me as friend :D
     private val id = 210043933010767872L
