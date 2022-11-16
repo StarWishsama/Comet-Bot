@@ -22,7 +22,6 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiU
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.PJSKEventPredictionInfo
 import ren.natsuyuk1.comet.utils.json.serializeTo
-import java.io.IOException
 import java.io.InputStream
 
 private val logger = mu.KotlinLogging.logger {}
@@ -69,7 +68,7 @@ object ProjectSekaiAPI {
             }
 
             req.body()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             client.get("$UNIBOT_API_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
                 url {
                     parameters.append("targetUserId", userID.toString())
