@@ -92,6 +92,7 @@ comet-mirai-wrapper 使用 [AGPL v3](https://github.com/StarWishsama/Comet-Bot/b
 - [Mirai](https://github.com/mamoe/mirai) 提供 高效率 QQ 机器人支持库 于 comet-mirai-wrapper
 - [sekai.best](https://sekai.best) 查询 Project Sekai 游戏信息
 - [Project Sekai Profile](https://profile.pjsekai.moe) 提供 Project Sekai 游戏信息
+- [Unibot API](https://docs.unipjsk.com/API/) 提供 Project Sekai 游戏信息
 - [33Kit](https://3-3.dev/) 提供 Project Sekai 活动积分预测
 - [PRTS Wiki](http://prts.wiki/) 提供的明日方舟干员数据以及立绘
 - [ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData) 提供明日方舟游戏数据资源
