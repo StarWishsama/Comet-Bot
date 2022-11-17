@@ -25,7 +25,31 @@ import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
 import ren.natsuyuk1.comet.utils.string.StringUtil.toFriendly
 
 private val rankPosition =
-    listOf(1, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000)
+    listOf(
+        1,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100,
+        200,
+        500,
+        1000,
+        2000,
+        5000,
+        10000,
+        20000,
+        50000,
+        100000,
+        200000,
+        500000,
+        1000000
+    )
 
 fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, eventId: Int): MessageWrapper {
     if (rankings.isEmpty()) {

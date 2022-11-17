@@ -16,7 +16,6 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
@@ -40,6 +39,7 @@ import ren.natsuyuk1.comet.test.isCI
 import ren.natsuyuk1.comet.test.network.client
 import ren.natsuyuk1.comet.test.print
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.test.Test
 import kotlin.test.assertTrue
 
 private val logger = mu.KotlinLogging.logger {}
@@ -100,7 +100,9 @@ class TestProjectSekaiAPI {
             return
         }
 
-        runBlocking { client.getSpecificRankInfo(eventID, 10000) }
+        val resp = runBlocking { client.getSpecificRankInfo(eventID, 100) }
+
+        println(resp.toMessageWrapper(null, eventID))
     }
 
     @Test
