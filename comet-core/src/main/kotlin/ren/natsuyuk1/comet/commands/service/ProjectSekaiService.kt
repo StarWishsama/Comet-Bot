@@ -41,18 +41,19 @@ object ProjectSekaiService {
 
     suspend fun queryUserEventInfo(user: CometUser, position: Int): MessageWrapper {
         val userData = ProjectSekaiUserData.getUserPJSKData(user.id.value)
-            ?: return "你还没有绑定过世界计划账号, 使用 /pjsk bind -i [你的ID] 绑定".toMessageWrapper()
-
-        val userId = userData.userID
 
         if (currentEventId == null) {
             return "获取当前活动信息失败, 请稍后再试".toMessageWrapper()
         }
 
+        if (position == 0 && userData == null) {
+            return "你还没有绑定过世界计划账号, 使用 /pjsk bind -i [你的ID] 绑定".toMessageWrapper()
+        }
+
         return when (pjskHelper.getCurrentEventStatus()) {
             SekaiEventStatus.ONGOING -> {
-                if (position == 0) {
-                    val currentInfo = cometClient.getUserEventInfo(currentEventId!!, userId)
+                if (position == 0 && userData != null) {
+                    val currentInfo = cometClient.getUserEventInfo(currentEventId!!, userData.userID)
                     currentInfo.toMessageWrapper(userData, currentEventId!!)
                 } else {
                     cometClient.getSpecificRankInfo(currentEventId!!, position)

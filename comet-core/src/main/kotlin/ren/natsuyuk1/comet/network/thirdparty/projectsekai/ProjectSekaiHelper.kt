@@ -26,7 +26,7 @@ import ren.natsuyuk1.comet.utils.string.StringUtil.toFriendly
 
 private val rankPosition = listOf(100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000)
 
-fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, eventId: Int): MessageWrapper {
+fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, eventId: Int): MessageWrapper {
     if (rankings.isEmpty()) {
         return "你还没打这期活动捏".toMessageWrapper()
     }
@@ -61,23 +61,25 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData, event
         appendTextln("分数 ${profile.score} | 排名 ${profile.rank}")
         appendLine()
 
-        if (userData.lastQueryScore != 0L && userData.lastQueryPosition != 0) {
-            val scoreDiff = getDifference(userData.lastQueryScore, profile.score)
-            val rankDiff = getDifference(userData.lastQueryPosition.toLong(), profile.rank.toLong())
+        if (userData != null) {
+            if (userData.lastQueryScore != 0L && userData.lastQueryPosition != 0) {
+                val scoreDiff = getDifference(userData.lastQueryScore, profile.score)
+                val rankDiff = getDifference(userData.lastQueryPosition.toLong(), profile.rank.toLong())
 
-            if (scoreDiff != 0L) {
-                appendText("↑ 上升 $scoreDiff 分")
+                if (scoreDiff != 0L) {
+                    appendText("↑ 上升 $scoreDiff 分")
+                }
+
+                if (rankDiff != 0L) {
+                    appendText((if (profile.rank < userData.lastQueryPosition) " ↑ 上升" else " ↓ 下降") + " $rankDiff 名")
+                }
+
+                appendLine()
             }
 
-            if (rankDiff != 0L) {
-                appendText((if (profile.rank < userData.lastQueryPosition) " ↑ 上升" else " ↓ 下降") + " $rankDiff 名")
-            }
-
-            appendLine()
+            // Refresh user pjsk score and rank
+            userData.updateInfo(profile.score, profile.rank)
         }
-
-        // Refresh user pjsk score and rank
-        userData.updateInfo(profile.score, profile.rank)
 
         if (ahead != 0) {
             val aheadEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, ahead) }
