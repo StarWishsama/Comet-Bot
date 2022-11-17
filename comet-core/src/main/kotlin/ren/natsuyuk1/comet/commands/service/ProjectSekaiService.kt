@@ -57,7 +57,7 @@ object ProjectSekaiService {
                     currentInfo.toMessageWrapper(userData, currentEventId!!)
                 } else {
                     cometClient.getSpecificRankInfo(currentEventId!!, position)
-                        .toMessageWrapper(userData, currentEventId!!)
+                        .toMessageWrapper(null, currentEventId!!)
                 }
             }
 
