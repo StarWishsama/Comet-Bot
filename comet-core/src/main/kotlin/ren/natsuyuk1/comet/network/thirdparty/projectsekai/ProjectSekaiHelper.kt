@@ -126,7 +126,7 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, even
 
         appendLine()
 
-        appendText("数据来自 Project Sekai Profile | 33Kit")
+        appendText("数据来自 PJSK Profile | Unibot API | 33Kit")
     }
 }
 
