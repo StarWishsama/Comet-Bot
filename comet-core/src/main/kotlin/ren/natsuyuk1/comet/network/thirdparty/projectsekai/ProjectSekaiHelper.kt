@@ -24,7 +24,8 @@ import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
 import ren.natsuyuk1.comet.utils.string.StringUtil.toFriendly
 
-private val rankPosition = listOf(100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000)
+private val rankPosition =
+    listOf(1, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000)
 
 fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, eventId: Int): MessageWrapper {
     if (rankings.isEmpty()) {
@@ -90,7 +91,7 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, even
             appendTextln("上一档排名 $ahead 的分数为 $aheadScoreStr, 相差 $delta")
         }
 
-        if (behind in 100..1000001) {
+        if (behind in 101..1000001) {
             val behindEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, behind) }
             val behindScore = behindEventStatus.getScore()
 
