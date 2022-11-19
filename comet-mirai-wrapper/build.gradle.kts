@@ -26,10 +26,11 @@ dependencies {
 
     compileOnly("org.jline:jline:3.21.0")
 
-    // lock version due to https://github.com/mamoe/mirai/issues/2324
-    implementation("net.mamoe:mirai-core:2.13.0-RC2")
-    implementation("net.mamoe:mirai-core-api:2.13.0-RC2")
-    implementation("net.mamoe:mirai-core-utils:2.13.0-RC2")
+    // use fixed version for resolving deps relocate issue
+    // see https://github.com/mamoe/mirai/pull/2331
+    implementation("net.mamoe:mirai-core:2.14.0-dev-shadow-1")
+    implementation("net.mamoe:mirai-core-api:2.14.0-dev-shadow-1")
+    implementation("net.mamoe:mirai-core-utils:2.14.0-dev-shadow-1")
 }
 
 tasks.shadowJar {
