@@ -30,7 +30,7 @@ dependencies {
     api("org.jetbrains.exposed:exposed-jdbc:0.40.1")
     api("org.jetbrains.exposed:exposed-kotlin-datetime:0.40.1")
     implementation("com.zaxxer:HikariCP:5.0.1")
-    implementation("org.xerial:sqlite-jdbc:3.39.3.0")
+    implementation("org.xerial:sqlite-jdbc:3.39.4.1")
     implementation("org.postgresql:postgresql:42.5.0")
 
     implementation(project(":comet-utils"))
