@@ -23,4 +23,6 @@ class TelegramWrapper : CometWrapper {
     }
 
     override fun platform(): LoginPlatform = LoginPlatform.TELEGRAM
+
+    override fun libInfo(): String = "TGBotAPI $tgbotAPI"
 }

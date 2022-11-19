@@ -13,8 +13,8 @@ import ren.natsuyuk1.comet.api.database.AccountData
 import ren.natsuyuk1.comet.api.database.AccountDataTable
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.platform.MiraiLoginProtocol
+import ren.natsuyuk1.comet.api.wrapper.WrapperLoader
 import ren.natsuyuk1.comet.console.CometTerminalCommand
-import ren.natsuyuk1.comet.console.wrapper.WrapperLoader
 
 private val logger = KotlinLogging.logger {}
 

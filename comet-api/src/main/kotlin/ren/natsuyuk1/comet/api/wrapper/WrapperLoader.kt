@@ -1,8 +1,7 @@
-package ren.natsuyuk1.comet.console.wrapper
+package ren.natsuyuk1.comet.api.wrapper
 
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
-import ren.natsuyuk1.comet.api.wrapper.CometWrapper
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import java.io.File
 import java.net.URL
@@ -47,5 +46,18 @@ object WrapperLoader {
         }
 
         return serviceLoader.find { it.platform() == platform }
+    }
+
+    fun getServicesInfo(): String {
+        if (!::serviceLoader.isInitialized) {
+            return "暂无服务已加载"
+        }
+
+        return buildString {
+            serviceLoader.forEach {
+                append(it.libInfo())
+                appendLine()
+            }
+        }.trim()
     }
 }

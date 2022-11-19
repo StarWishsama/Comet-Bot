@@ -33,4 +33,9 @@ interface CometWrapper {
      * 此 [CometWrapper] 对应的登录平台
      */
     fun platform(): LoginPlatform
+
+    /**
+     * 此 [CometWrapper] 对应登录平台的库相关信息
+     */
+    fun libInfo(): String
 }

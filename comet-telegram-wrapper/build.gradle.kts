@@ -19,6 +19,8 @@ repositories {
     maven("https://jitpack.io")
 }
 
+val tgbotAPI = "3.3.1"
+
 dependencies {
     compileOnly(project(":comet-api"))
     compileOnly(project(":comet-core"))
@@ -26,9 +28,15 @@ dependencies {
 
     compileOnly("org.jline:jline:3.21.0")
 
-    implementation("dev.inmo:tgbotapi:3.3.1") {
+    implementation("dev.inmo:tgbotapi:$tgbotAPI") {
         exclude("io.ktor")
     }
+}
+
+buildConfig {
+    packageName("ren.natsuyuk1.comet.telegram")
+    useKotlinOutput { topLevelConstants = true }
+    string("tgbotAPI", tgbotAPI)
 }
 
 tasks.shadowJar {

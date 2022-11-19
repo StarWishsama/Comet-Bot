@@ -16,8 +16,10 @@ plugins {
 
 repositories {
     mavenCentral()
-    // maven("https://repo.mirai.mamoe.net/snapshots")
+    maven("https://repo.mirai.mamoe.net/snapshots")
 }
+
+val miraiVersion = "2.14.0-dev-shadow-1-dev-68def96d"
 
 dependencies {
     compileOnly(project(":comet-api"))
@@ -28,9 +30,15 @@ dependencies {
 
     // use fixed version for resolving deps relocate issue
     // see https://github.com/mamoe/mirai/pull/2331
-    implementation("net.mamoe:mirai-core:2.14.0-dev-shadow-1")
-    implementation("net.mamoe:mirai-core-api:2.14.0-dev-shadow-1")
-    implementation("net.mamoe:mirai-core-utils:2.14.0-dev-shadow-1")
+    implementation("net.mamoe:mirai-core:$miraiVersion")
+    implementation("net.mamoe:mirai-core-api:$miraiVersion")
+    implementation("net.mamoe:mirai-core-utils:$miraiVersion")
+}
+
+buildConfig {
+    packageName("ren.natsuyuk1.comet.mirai")
+    useKotlinOutput { topLevelConstants = true }
+    string("miraiVersion", miraiVersion)
 }
 
 tasks.shadowJar {

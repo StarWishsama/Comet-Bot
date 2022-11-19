@@ -30,6 +30,7 @@ import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.session.SessionManager
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.api.wrapper.WrapperLoader
 import ren.natsuyuk1.comet.config.branch
 import ren.natsuyuk1.comet.config.hash
 import ren.natsuyuk1.comet.config.version
@@ -37,7 +38,6 @@ import ren.natsuyuk1.comet.console.command.registerTerminalCommands
 import ren.natsuyuk1.comet.console.util.Console
 import ren.natsuyuk1.comet.console.util.login
 import ren.natsuyuk1.comet.console.util.loginStatus
-import ren.natsuyuk1.comet.console.wrapper.WrapperLoader
 import ren.natsuyuk1.comet.consts.cometPersistDataFile
 import ren.natsuyuk1.comet.consts.cometTables
 import ren.natsuyuk1.comet.consts.defaultCommands

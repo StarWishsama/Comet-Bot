@@ -48,4 +48,6 @@ class MiraiWrapper : CometWrapper {
     }
 
     override fun platform(): LoginPlatform = LoginPlatform.MIRAI
+
+    override fun libInfo(): String = "Mirai $miraiVersion"
 }
