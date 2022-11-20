@@ -51,7 +51,7 @@ object ProjectSekaiService {
         }
 
         return when (pjskHelper.getCurrentEventStatus()) {
-            SekaiEventStatus.ONGOING -> {
+            SekaiEventStatus.ONGOING, SekaiEventStatus.END -> {
                 if (position == 0 && userData != null) {
                     val currentInfo = cometClient.getUserEventInfo(currentEventId!!, userData.userID)
                     currentInfo.toMessageWrapper(userData, currentEventId!!)
