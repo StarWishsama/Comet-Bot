@@ -4,6 +4,7 @@ import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.arguments.default
 import moe.sdl.yac.parameters.options.default
+import moe.sdl.yac.parameters.options.flag
 import moe.sdl.yac.parameters.options.option
 import moe.sdl.yac.parameters.types.int
 import moe.sdl.yac.parameters.types.long
@@ -11,7 +12,9 @@ import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
+import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.commands.service.ProjectSekaiService
+import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.util.toMessageWrapper
 
@@ -50,8 +53,21 @@ class ProjectSekaiCommand(
         )
     }
 
+    private val refreshCache by option("--refresh", "-r").flag()
+
     override suspend fun run() {
         if (currentContext.invokedSubcommand == null) {
+            if (refreshCache) {
+                if (user.userLevel >= UserLevel.ADMIN) {
+                    ProjectSekaiData.updateEventInfo()
+                    subject.sendMessage("成功刷新活动信息".toMessageWrapper())
+                } else {
+                    subject.sendMessage("你没有权限".toMessageWrapper())
+                }
+
+                return
+            }
+
             if (ProjectSekaiUserData.isBound(user.id.value)) {
                 subject.sendMessage(ProjectSekaiService.queryUserEventInfo(user, 0))
             } else {
