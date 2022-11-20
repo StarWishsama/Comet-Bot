@@ -56,7 +56,7 @@ object ProjectSekaiManager {
 
         fetchI18NFile()
 
-        TaskManager.registerTaskDelayed(1.toDuration(DurationUnit.HOURS), ::refreshCache)
+        TaskManager.registerTaskDelayed(3.toDuration(DurationUnit.HOURS), ::refreshCache)
         TaskManager.registerTaskDelayed(1.toDuration(DurationUnit.DAYS), ::refreshEvent)
     }
 
