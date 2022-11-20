@@ -15,6 +15,7 @@ import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
@@ -59,21 +60,24 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, even
     val now = Clock.System.now()
     val profile = this@toMessageWrapper.rankings.first()
     val (ahead, behind) = profile.rank.getSurroundingRank()
+    val eventInfo = ProjectSekaiData.getCurrentEventInfo() ?: return "查询失败, 活动信息未加载".toMessageWrapper()
+    val eventStatus = ProjectSekaiManager.getCurrentEventStatus()
 
     return buildMessageWrapper {
         appendTextln("${profile.name} - ${profile.userId}")
         appendLine()
-        appendTextln("当前活动 ${ProjectSekaiData.getCurrentEventInfo()?.name}")
-        if (ProjectSekaiData.getCurrentEventInfo()?.aggregateTime != null) {
+        appendTextln("当前活动 ${eventInfo.name}")
+        if (eventStatus == SekaiEventStatus.ONGOING) {
             appendTextln(
                 "离活动结束还有 ${
-                (ProjectSekaiData.getCurrentEventInfo()?.aggregateTime!!.toInstant(true) - now)
+                (eventInfo.aggregateTime.toInstant(true) - now)
                     .toFriendly(
                         msMode = false
                     )
                 }"
             )
         }
+
         if (profile.userCheerfulCarnival.cheerfulCarnivalTeamId != null) {
             val teamName =
                 ProjectSekaiManager.getCarnivalTeamI18nName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
@@ -86,21 +90,19 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, even
         appendTextln("分数 ${profile.score} | 排名 ${profile.rank}")
         appendLine()
 
-        if (userData != null) {
-            if (userData.lastQueryScore != 0L && userData.lastQueryPosition != 0) {
-                val scoreDiff = getDifference(userData.lastQueryScore, profile.score)
-                val rankDiff = getDifference(userData.lastQueryPosition.toLong(), profile.rank.toLong())
+        if (userData != null && userData.lastQueryScore != 0L && userData.lastQueryPosition != 0) {
+            val scoreDiff = getDifference(userData.lastQueryScore, profile.score)
+            val rankDiff = getDifference(userData.lastQueryPosition.toLong(), profile.rank.toLong())
 
-                if (scoreDiff != 0L) {
-                    appendText("↑ 上升 $scoreDiff 分")
-                }
-
-                if (rankDiff != 0L) {
-                    appendText((if (profile.rank < userData.lastQueryPosition) " ↑ 上升" else " ↓ 下降") + " $rankDiff 名")
-                }
-
-                appendLine()
+            if (scoreDiff != 0L) {
+                appendText("↑ 上升 $scoreDiff 分")
             }
+
+            if (rankDiff != 0L) {
+                appendText((if (profile.rank < userData.lastQueryPosition) " ↑ 上升" else " ↓ 下降") + " $rankDiff 名")
+            }
+
+            appendLine()
 
             // Refresh user pjsk score and rank
             userData.updateInfo(profile.score, profile.rank)

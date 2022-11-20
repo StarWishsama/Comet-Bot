@@ -65,10 +65,6 @@ object ProjectSekaiService {
                 "活动数据统计中, 首先别急, 其次不要急".toMessageWrapper()
             }
 
-            SekaiEventStatus.END -> {
-                "当期活动已结束, 请等待下期活动".toMessageWrapper()
-            }
-
             else -> {
                 "获取当前活动信息失败, 请稍后再试".toMessageWrapper()
             }
