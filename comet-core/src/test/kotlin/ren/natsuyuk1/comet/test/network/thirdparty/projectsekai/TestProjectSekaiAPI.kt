@@ -61,7 +61,7 @@ class TestProjectSekaiAPI {
     }
 
     // Represent to event named `Echo my melody`
-    private val eventID = 76
+    private val eventID = 77
 
     // Welcome to add me as friend :D
     private val id = 210043933010767872L
@@ -92,6 +92,17 @@ class TestProjectSekaiAPI {
                 UserTable.deleteAll()
             }
         }
+    }
+
+    @Test
+    fun testEventRankingWithoutDatabaseFetch() {
+        if (isCI()) {
+            return
+        }
+
+        val resp = runBlocking { client.getUserEventInfo(eventID, id) }
+
+        println(resp.toMessageWrapper(null, eventID))
     }
 
     @Test

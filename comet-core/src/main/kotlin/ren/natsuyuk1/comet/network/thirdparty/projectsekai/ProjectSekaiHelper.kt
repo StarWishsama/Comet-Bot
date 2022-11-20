@@ -24,19 +24,10 @@ import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
 import ren.natsuyuk1.comet.utils.string.StringUtil.toFriendly
+import kotlin.math.absoluteValue
 
 private val rankPosition =
     listOf(
-        1,
-        10,
-        20,
-        30,
-        40,
-        50,
-        60,
-        70,
-        80,
-        90,
         100,
         200,
         500,
@@ -90,19 +81,24 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, even
         appendTextln("分数 ${profile.score} | 排名 ${profile.rank}")
         appendLine()
 
-        if (userData != null && userData.lastQueryScore != 0L && userData.lastQueryPosition != 0) {
-            val scoreDiff = getDifference(userData.lastQueryScore, profile.score)
-            val rankDiff = getDifference(userData.lastQueryPosition.toLong(), profile.rank.toLong())
+        if (userData != null) {
+            if (userData.lastQueryScore != 0L && userData.lastQueryPosition != 0) {
+                val scoreDiff = userData.lastQueryScore - profile.score
+                val rankDiff = userData.lastQueryPosition - profile.rank
 
-            if (scoreDiff != 0L) {
-                appendText("↑ 上升 $scoreDiff 分")
+                if (scoreDiff != 0L) {
+                    appendText("${if (scoreDiff > 0) "↑ 上升" else "↓ 下降"} ${scoreDiff.absoluteValue} 分")
+                }
+
+                if (rankDiff != 0) {
+                    appendText(
+                        (if (profile.rank < userData.lastQueryPosition) " ↑ 上升" else " ↓ 下降") +
+                            " ${rankDiff.absoluteValue} 名"
+                    )
+                }
+
+                appendLine()
             }
-
-            if (rankDiff != 0L) {
-                appendText((if (profile.rank < userData.lastQueryPosition) " ↑ 上升" else " ↓ 下降") + " $rankDiff 名")
-            }
-
-            appendLine()
 
             // Refresh user pjsk score and rank
             userData.updateInfo(profile.score, profile.rank)
@@ -117,7 +113,7 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, even
             appendTextln("上一档排名 $ahead 的分数为 $aheadScoreStr, 相差 $delta")
         }
 
-        if (behind in 101..1000001) {
+        if (behind in 200..1000000) {
             val behindEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, behind) }
             val behindScore = behindEventStatus.getScore()
 
@@ -132,15 +128,8 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, even
     }
 }
 
-private fun getDifference(before: Long, now: Long): Long =
-    if (before > now) {
-        before - now
-    } else {
-        now - before
-    }
-
 private fun Int.getSurroundingRank(): Pair<Int, Int> {
-    if (this < rankPosition.first()) {
+    if (this <= rankPosition.first()) {
         return Pair(0, rankPosition.first())
     }
 
