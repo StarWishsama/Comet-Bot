@@ -133,15 +133,24 @@ private fun Int.getSurroundingRank(): Pair<Int, Int> {
         return Pair(0, rankPosition.first())
     }
 
+    var before: Int
+    var after: Int
+
     for (i in rankPosition.indices) {
         if (i == rankPosition.size - 1) {
             break
         }
 
-        val before = rankPosition[i]
-        val after = rankPosition[i + 1]
+        before = rankPosition[i]
+        after = rankPosition[i + 1]
 
-        if (this in (before + 1)..after) {
+        if (this in before + 1..after) {
+            if (before == this && i != 0) {
+                before = rankPosition[i - 1]
+            } else if (after == this && i != rankPosition.size - 1) {
+                after = rankPosition[i + 1]
+            }
+
             return Pair(before, after)
         }
     }
