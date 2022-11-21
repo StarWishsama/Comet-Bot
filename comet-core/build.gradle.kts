@@ -32,7 +32,7 @@ dependencies {
     implementation(("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"))
 
     implementation("org.jetbrains.exposed:exposed-core:0.40.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.40.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.41.1")
     implementation("org.jetbrains.exposed:exposed-jdbc:0.40.1")
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.40.1")
     implementation("com.zaxxer:HikariCP:5.0.1")
