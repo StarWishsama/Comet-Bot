@@ -2,6 +2,7 @@ package ren.natsuyuk1.comet.telegram.event
 
 import dev.inmo.tgbotapi.abstracts.FromUser
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
+import dev.inmo.tgbotapi.extensions.utils.chatIdOrThrow
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.entities
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.extensions.utils.fromChannelGroupContentMessageOrNull
@@ -61,7 +62,7 @@ suspend fun CommonMessage<MessageContent>.toCometGroupEvent(
 
     return when {
         channelGroupMsg != null -> {
-            val channelSender = channelGroupMsg.channel.toCometAnonymousMember(comet, groupChat.id)
+            val channelSender = channelGroupMsg.channel.toCometAnonymousMember(comet, groupChat.id.chatIdOrThrow())
             GroupMessageEvent(
                 comet = comet,
                 subject = groupChat.toCometGroup(comet),
@@ -101,7 +102,7 @@ suspend fun CommonMessage<MessageContent>.toCometGroupEvent(
             )
         }
         else -> {
-            val sender = from!!.toCometGroupMember(comet, groupChat.id)
+            val sender = from!!.toCometGroupMember(comet, groupChat.id.chatIdOrThrow())
 
             GroupMessageEvent(
                 comet = comet,

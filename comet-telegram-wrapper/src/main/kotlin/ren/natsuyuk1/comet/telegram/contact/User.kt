@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.telegram.contact
 
+import dev.inmo.tgbotapi.extensions.utils.chatIdOrThrow
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
@@ -36,7 +37,7 @@ class TelegramUserImpl(
         ).also { it.broadcast() }
 
         return if (!event.isCancelled) {
-            comet.send(message, MessageSource.MessageSourceType.BOT, from.id)
+            comet.send(message, MessageSource.MessageSourceType.BOT, from.id.chatIdOrThrow())
         } else null
     }
 }

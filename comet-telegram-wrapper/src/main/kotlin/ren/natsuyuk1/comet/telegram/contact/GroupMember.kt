@@ -6,6 +6,7 @@ import dev.inmo.tgbotapi.extensions.api.chat.members.getChatMember
 import dev.inmo.tgbotapi.extensions.api.chat.members.promoteChatMember
 import dev.inmo.tgbotapi.extensions.api.chat.members.restrictChatMember
 import dev.inmo.tgbotapi.extensions.utils.asGroupChat
+import dev.inmo.tgbotapi.extensions.utils.chatIdOrThrow
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.TelegramDate
 import dev.inmo.tgbotapi.types.chat.ChannelChat
@@ -147,7 +148,7 @@ class TelegramGroupMemberImpl(
         ).also { it.broadcast() }
 
         return if (!event.isCancelled) {
-            comet.send(message, MessageSource.MessageSourceType.GROUP, groupChatID.toChatId())
+            comet.send(message, MessageSource.MessageSourceType.GROUP, groupChatID.toChatId().chatIdOrThrow())
         } else {
             null
         }

@@ -6,6 +6,7 @@ import dev.inmo.tgbotapi.extensions.api.chat.members.getChatMember
 import dev.inmo.tgbotapi.extensions.api.chat.modify.setChatTitle
 import dev.inmo.tgbotapi.extensions.api.get.getFileAdditionalInfo
 import dev.inmo.tgbotapi.extensions.utils.asExtendedGroupChat
+import dev.inmo.tgbotapi.extensions.utils.chatIdOrThrow
 import dev.inmo.tgbotapi.requests.abstracts.toInputFile
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.member.AdministratorChatMember
@@ -47,7 +48,7 @@ internal class TelegramGroupImpl(
         get() = runBlocking {
             val resp = comet.bot.getChatAdministrators(chat.id)
 
-            resp.find { it is OwnerChatMember }?.user?.toCometGroupMember(comet, chat.id)
+            resp.find { it is OwnerChatMember }?.user?.toCometGroupMember(comet, chat.id.chatIdOrThrow())
                 ?: error("Unable to retrieve group owner")
         }
 
@@ -104,7 +105,7 @@ internal class TelegramGroupImpl(
             try {
                 val resp = comet.bot.getChatMember(this@TelegramGroupImpl.chat, id.toChatId())
 
-                return@runBlocking resp.user.toCometGroupMember(comet, this@TelegramGroupImpl.chat.id)
+                return@runBlocking resp.user.toCometGroupMember(comet, this@TelegramGroupImpl.chat.id.chatIdOrThrow())
             } catch (e: Exception) {
                 return@runBlocking null
             }
@@ -141,7 +142,7 @@ internal class TelegramGroupImpl(
         ).also { it.broadcast() }
 
         return if (!event.isCancelled) {
-            comet.send(message, MessageSource.MessageSourceType.GROUP, chat.id)
+            comet.send(message, MessageSource.MessageSourceType.GROUP, chat.id.chatIdOrThrow())
         } else {
             null
         }
