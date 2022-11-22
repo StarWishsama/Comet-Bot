@@ -39,7 +39,7 @@ dependencies {
 
     api("io.ktor:ktor-server-core:2.1.3")
     api("io.ktor:ktor-server-netty:2.1.3")
-    api("io.ktor:ktor-server-call-logging-jvm:2.1.2")
+    api("io.ktor:ktor-server-call-logging-jvm:2.1.3")
     api("io.ktor:ktor-client-websockets-jvm:2.1.3")
 
     implementation("org.jsoup:jsoup:1.15.3")
