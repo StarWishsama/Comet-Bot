@@ -87,7 +87,7 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, even
                 val rankDiff = userData.lastQueryPosition - profile.rank
 
                 if (scoreDiff != 0L) {
-                    appendText("$scoreDiff 分")
+                    appendText("+ $scoreDiff 分")
                 }
 
                 if (rankDiff != 0) {
@@ -103,6 +103,8 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, even
             // Refresh user pjsk score and rank
             userData.updateInfo(profile.score, profile.rank)
         }
+
+        appendLine()
 
         if (ahead != 0) {
             val aheadEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, ahead) }
