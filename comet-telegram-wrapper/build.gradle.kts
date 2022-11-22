@@ -19,7 +19,7 @@ repositories {
     maven("https://jitpack.io")
 }
 
-val tgbotAPI = "3.3.1"
+val tgbotAPI = "4.1.2"
 
 dependencies {
     compileOnly(project(":comet-api"))
