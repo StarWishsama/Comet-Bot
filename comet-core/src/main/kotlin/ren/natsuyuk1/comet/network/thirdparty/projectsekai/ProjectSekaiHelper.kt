@@ -83,11 +83,11 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, even
 
         if (userData != null) {
             if (userData.lastQueryScore != 0L && userData.lastQueryPosition != 0) {
-                val scoreDiff = userData.lastQueryScore - profile.score
+                val scoreDiff = profile.score - userData.lastQueryScore
                 val rankDiff = userData.lastQueryPosition - profile.rank
 
                 if (scoreDiff != 0L) {
-                    appendText("${if (scoreDiff > 0) "↑ 上升" else "↓ 下降"} ${scoreDiff.absoluteValue} 分")
+                    appendText("$scoreDiff 分")
                 }
 
                 if (rankDiff != 0) {
