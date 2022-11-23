@@ -134,7 +134,7 @@ object ProjectSekaiImageService {
         ).apply {
             addTextln(profile.name)
             addText("ID: ${profile.userId}")
-        }.build()
+        }.build().layout(650f)
 
         val eventInfoText = ParagraphBuilder(
             ParagraphStyle().apply {
@@ -215,10 +215,13 @@ object ProjectSekaiImageService {
             addTextln()
 
             addText("数据来自 PJSK Profile | Unibot API | 33Kit")
-        }.build()
+        }.build().layout(650f)
 
         val surface =
-            Surface.makeRasterN32Premul(WIDTH, (AVATAR_SIZE + DEFAULT_PADDING * 3 + eventInfoText.height).toInt())
+            Surface.makeRasterN32Premul(
+                WIDTH,
+                (AVATAR_SIZE + DEFAULT_PADDING * 3 + eventInfoText.height + userInfoText.height).toInt()
+            )
 
         surface.canvas.apply {
             clear(Color.WHITE.rgb)
