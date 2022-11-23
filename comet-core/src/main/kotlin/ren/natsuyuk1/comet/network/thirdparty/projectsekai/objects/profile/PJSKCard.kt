@@ -11,6 +11,6 @@ import kotlinx.serialization.Serializable
 data class PJSKCard(
     val id: Int,
     val characterId: Int,
-    @SerialName("assetbundlename")
+    @SerialName("assetbundleName")
     val assetBundleName: String,
 )
