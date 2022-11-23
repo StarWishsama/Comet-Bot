@@ -3,6 +3,8 @@ package ren.natsuyuk1.comet.service.image
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import org.jetbrains.skia.EncodedImageFormat
+import org.jetbrains.skia.Image
+import org.jetbrains.skia.Rect
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.paragraph.Alignment
 import org.jetbrains.skia.paragraph.ParagraphBuilder
@@ -107,7 +109,7 @@ object ProjectSekaiImageService {
         return tmpFile
     }
 
-    fun SekaiProfileEventInfo.drawEventInfo(userData: ProjectSekaiUserData?, eventId: Int): MessageWrapper {
+    suspend fun SekaiProfileEventInfo.drawEventInfo(userData: ProjectSekaiUserData?, eventId: Int): MessageWrapper {
         if (rankings.isEmpty()) {
             return "你还没打这期活动捏".toMessageWrapper()
         }
@@ -117,6 +119,11 @@ object ProjectSekaiImageService {
         val (ahead, behind) = profile.rank.getSurroundingRank()
         val eventInfo = ProjectSekaiData.getCurrentEventInfo() ?: return "查询失败, 活动信息未加载".toMessageWrapper()
         val eventStatus = ProjectSekaiManager.getCurrentEventStatus()
+
+        val avatarPath = ProjectSekaiManager.getAssetBundleName(profile.userCard.cardId.toInt())
+            ?.let { ProjectSekaiManager.resolveCardImage(it) }
+
+        val avatar = avatarPath?.readBytes()?.let { Image.makeFromEncoded(it) }
 
         val userInfoText = ParagraphBuilder(
             ParagraphStyle().apply {
@@ -215,6 +222,18 @@ object ProjectSekaiImageService {
 
         surface.canvas.apply {
             clear(Color.WHITE.rgb)
+
+            if (avatar != null) {
+                drawImageRect(
+                    avatar,
+                    Rect(
+                        20f,
+                        20f,
+                        100f,
+                        100f
+                    )
+                ) // 80 x 80
+            }
 
             userInfoText.paint(
                 this,

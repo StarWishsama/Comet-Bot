@@ -302,6 +302,34 @@ object ProjectSekaiManager {
 
     fun getLatestRankSeason(): Int? = rankSeasonInfo.lastOrNull()?.id
 
+    fun getAssetBundleName(id: Int): String? = cards.find { it.id == id }?.assetBundleName
+
+    suspend fun downloadCardImage(assetBundleName: String) {
+        /* ktlint-disable max-line-length */
+        val url =
+            "https://assets.pjsek.ai/file/pjsekai-assets/startapp/character/member_cutout/$assetBundleName/normal/thumbnail_xl.png"
+        /* ktlint-enable max-line-length */
+        val card = File(File(pjskFolder, "cards"), "$assetBundleName.png")
+
+        card.touch()
+
+        if (card.exists()) {
+            return
+        }
+
+        cometClient.client.downloadFile(url, card)
+    }
+
+    suspend fun resolveCardImage(assetBundleName: String): File {
+        val target = File(File(pjskFolder, "cards"), "$assetBundleName.png")
+
+        if (!target.exists()) {
+            downloadCardImage(assetBundleName)
+        }
+
+        return target
+    }
+
     suspend fun reload() {
         loadPJSKDatabase()
     }
