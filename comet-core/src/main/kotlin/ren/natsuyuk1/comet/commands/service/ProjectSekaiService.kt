@@ -12,6 +12,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.toM
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.toMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
+import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService.drawEventInfo
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData as pjskData
@@ -44,12 +45,20 @@ object ProjectSekaiService {
 
         return when (pjskHelper.getCurrentEventStatus()) {
             SekaiEventStatus.ONGOING, SekaiEventStatus.END -> {
+
                 if (position == 0 && userData != null) {
-                    val currentInfo = cometClient.getUserEventInfo(currentEventId!!, userData.userID)
-                    currentInfo.toMessageWrapper(userData, currentEventId!!)
+                    val cur = cometClient.getUserEventInfo(currentEventId!!, userData.userID)
+                    if (SkikoHelper.isSkikoLoaded()) cur.drawEventInfo(
+                        userData,
+                        currentEventId!!
+                    ) else cur.toMessageWrapper(userData, currentEventId!!)
                 } else {
-                    cometClient.getSpecificRankInfo(currentEventId!!, position)
-                        .toMessageWrapper(null, currentEventId!!)
+                    val cur = cometClient.getSpecificRankInfo(currentEventId!!, position)
+
+                    if (SkikoHelper.isSkikoLoaded()) cur.drawEventInfo(
+                        null,
+                        currentEventId!!
+                    ) else cur.toMessageWrapper(null, currentEventId!!)
                 }
             }
 

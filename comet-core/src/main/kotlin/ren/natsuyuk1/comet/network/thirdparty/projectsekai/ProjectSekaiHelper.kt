@@ -43,7 +43,7 @@ private val rankPosition =
         1000000
     )
 
-fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, eventId: Int): MessageWrapper {
+internal fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, eventId: Int): MessageWrapper {
     if (rankings.isEmpty()) {
         return "你还没打这期活动捏".toMessageWrapper()
     }
@@ -75,9 +75,10 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, even
 
             if (teamName != null) {
                 appendTextln("当前队伍为 $teamName")
+                appendLine()
             }
         }
-        appendLine()
+
         appendTextln("分数 ${profile.score} | 排名 ${profile.rank}")
         appendLine()
 
@@ -130,7 +131,7 @@ fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, even
     }
 }
 
-private fun Int.getSurroundingRank(): Pair<Int, Int> {
+internal fun Int.getSurroundingRank(): Pair<Int, Int> {
     if (this <= rankPosition.first()) {
         return Pair(0, rankPosition.first())
     }
