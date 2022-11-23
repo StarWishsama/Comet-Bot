@@ -149,8 +149,8 @@ private fun Int.getSurroundingRank(): Pair<Int, Int> {
         if (this in before + 1..after) {
             if (before == this && i != 0) {
                 before = rankPosition[i - 1]
-            } else if (after == this && i != rankPosition.size - 1) {
-                after = rankPosition[i + 1]
+            } else if (after == this && i + 1 != rankPosition.size - 1) {
+                after = rankPosition[i + 2]
             }
 
             return Pair(before, after)
