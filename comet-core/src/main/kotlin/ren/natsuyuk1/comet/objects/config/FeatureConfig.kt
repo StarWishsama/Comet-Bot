@@ -8,7 +8,7 @@ import ren.natsuyuk1.comet.utils.file.configDirectory
 import java.io.File
 
 object FeatureConfig : PersistDataFile<FeatureConfig.Data>(
-    File(configDirectory, "ipdb.yml"),
+    File(configDirectory, "feature.yml"),
     Data(),
     Yaml,
     readOnly = true
