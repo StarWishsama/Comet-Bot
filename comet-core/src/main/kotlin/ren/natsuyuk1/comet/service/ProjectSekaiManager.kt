@@ -17,6 +17,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficul
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.official.PJSKMusicInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.official.PJSKRankSeasonInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.profile.PJSKCard
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.profile.PJSKMusicDifficultyInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
@@ -44,6 +45,8 @@ object ProjectSekaiManager {
     val musicDatabase = mutableListOf<PJSKMusicInfo>()
 
     private val rankSeasonInfo = mutableListOf<PJSKRankSeasonInfo>()
+
+    private val cards = mutableListOf<PJSKCard>()
 
     suspend fun init(parentContext: CoroutineContext) {
         scope = ModuleScope("projectsekai_helper", parentContext)
@@ -163,6 +166,36 @@ object ProjectSekaiManager {
             scope.launch {
                 cometClient.client.downloadFile("https://musics.pjsekai.moe/musicDifficulties.json", musicDiffFile)
                 loadMusicDiff()
+            }
+        }
+
+        val cardsFile = pjskFolder.resolve("cards.json")
+
+        suspend fun loadCards() {
+            try {
+                cards.addAll(
+                    json.decodeFromString(
+                        ListSerializer(PJSKCard.serializer()),
+                        cardsFile.readTextBuffered()
+                    )
+                )
+            } catch (e: Exception) {
+                logger.warn(e) { "解析卡面数据时出现问题, 路径 ${cardsFile.absPath}" }
+            }
+        }
+
+        if (cardsFile.exists()) {
+            scope.launch {
+                loadCards()
+            }
+        } else {
+            cardsFile.touch()
+            scope.launch {
+                cometClient.client.downloadFile(
+                    "https://gitlab.com/pjsekai/database/jp/-/raw/main/cards.json",
+                    cardsFile
+                )
+                loadCards()
             }
         }
 

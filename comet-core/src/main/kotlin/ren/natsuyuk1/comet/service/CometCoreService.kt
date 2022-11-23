@@ -11,6 +11,7 @@ import ren.natsuyuk1.comet.migrator.UserDataMigrator
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaHelper
 import ren.natsuyuk1.comet.network.thirdparty.bilibili.initYabapi
 import ren.natsuyuk1.comet.network.thirdparty.twitter.initSetsuna
+import ren.natsuyuk1.comet.objects.config.FeatureConfig
 import ren.natsuyuk1.comet.pusher.DEFAULT_PUSHERS
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import java.security.GeneralSecurityException
@@ -48,11 +49,16 @@ object CometCoreService {
 
         scope.launch {
             try {
-                ArcaeaHelper.load()
+                if (FeatureConfig.data.arcaea) {
+                    ArcaeaHelper.load()
+                }
             } catch (e: GeneralSecurityException) {
                 logger.warn(e) { "无法加载 Arcaea 数据: 目标主机证书有误" }
             }
-            ProjectSekaiManager.init(scope.coroutineContext)
+
+            if (FeatureConfig.data.arcaea) {
+                ProjectSekaiManager.init(scope.coroutineContext)
+            }
         }
 
         TaskManager.registerTask(1.hours) { HitokotoManager.fetch() }

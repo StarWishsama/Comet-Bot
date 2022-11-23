@@ -14,6 +14,7 @@ import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.commands.service.ProjectSekaiService
+import ren.natsuyuk1.comet.objects.config.FeatureConfig
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.util.toMessageWrapper
@@ -56,6 +57,11 @@ class ProjectSekaiCommand(
     private val refreshCache by option("--refresh", "-r").flag()
 
     override suspend fun run() {
+        if (!FeatureConfig.data.projectSekai) {
+            subject.sendMessage("抱歉, Project Sekai 功能未被启用.".toMessageWrapper())
+            return
+        }
+
         if (currentContext.invokedSubcommand == null) {
             if (refreshCache) {
                 if (user.userLevel >= UserLevel.ADMIN) {
@@ -97,6 +103,11 @@ class ProjectSekaiCommand(
         ).long().default(-1)
 
         override suspend fun run() {
+            if (!FeatureConfig.data.projectSekai) {
+                subject.sendMessage("抱歉, Project Sekai 功能未被启用.".toMessageWrapper())
+                return
+            }
+
             if (userID == -1L || userID.toString().length != 18) {
                 subject.sendMessage("请正确填写你的世界计划账号 ID! 例如 /pjsk bind -i 210043933010767872".toMessageWrapper())
                 return
@@ -121,6 +132,11 @@ class ProjectSekaiCommand(
         }
 
         override suspend fun run() {
+            if (!FeatureConfig.data.projectSekai) {
+                subject.sendMessage("抱歉, Project Sekai 功能未被启用.".toMessageWrapper())
+                return
+            }
+
             subject.sendMessage(ProjectSekaiService.queryUserInfo(user))
         }
     }
@@ -142,6 +158,11 @@ class ProjectSekaiCommand(
         private val position by argument("排名位置", "欲查询的指定排名").int().default(0)
 
         override suspend fun run() {
+            if (!FeatureConfig.data.projectSekai) {
+                subject.sendMessage("抱歉, Project Sekai 功能未被启用.".toMessageWrapper())
+                return
+            }
+
             subject.sendMessage(ProjectSekaiService.queryUserEventInfo(user, position))
         }
     }
@@ -180,6 +201,11 @@ class ProjectSekaiCommand(
         }
 
         override suspend fun run() {
+            if (!FeatureConfig.data.projectSekai) {
+                subject.sendMessage("抱歉, Project Sekai 功能未被启用.".toMessageWrapper())
+                return
+            }
+
             subject.sendMessage(ProjectSekaiService.b30(user))
         }
     }

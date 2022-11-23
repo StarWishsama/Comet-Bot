@@ -8,6 +8,7 @@ import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.ArcaeaService
 import ren.natsuyuk1.comet.objects.arcaea.ArcaeaUserData
+import ren.natsuyuk1.comet.objects.config.FeatureConfig
 import ren.natsuyuk1.comet.util.toMessageWrapper
 
 val ARCAEA by lazy {
@@ -40,6 +41,11 @@ class ArcaeaCommand(
     }
 
     override suspend fun run() {
+        if (!FeatureConfig.data.arcaea) {
+            subject.sendMessage("抱歉, Arcaea 功能未被启用.".toMessageWrapper())
+            return
+        }
+
         if (currentContext.invokedSubcommand == null) {
             if (ArcaeaUserData.isBound(user.id.value)) {
                 ArcaeaService.queryUserInfo(comet, subject, user)
@@ -70,6 +76,11 @@ class ArcaeaCommand(
         )
 
         override suspend fun run() {
+            if (!FeatureConfig.data.arcaea) {
+                subject.sendMessage("抱歉, Arcaea 功能未被启用.".toMessageWrapper())
+                return
+            }
+
             if (userID == null || userID!!.length > 9) {
                 subject.sendMessage("请正确填写你的 Arcaea 账号 ID! 例如 /arc bind -i 123456789".toMessageWrapper())
                 return
@@ -101,6 +112,11 @@ class ArcaeaCommand(
         }
 
         override suspend fun run() {
+            if (!FeatureConfig.data.arcaea) {
+                subject.sendMessage("抱歉, Arcaea 功能未被启用.".toMessageWrapper())
+                return
+            }
+
             if (userID == null) {
                 subject.sendMessage("🔍 正在获取 Arcaea 信息, 请坐和放宽...".toMessageWrapper())
                 ArcaeaService.queryUserInfo(comet, subject, user)
@@ -132,6 +148,11 @@ class ArcaeaCommand(
         }
 
         override suspend fun run() {
+            if (!FeatureConfig.data.arcaea) {
+                subject.sendMessage("抱歉, Arcaea 功能未被启用.".toMessageWrapper())
+                return
+            }
+
             ArcaeaService.queryB38(comet, subject, sender, user)
         }
     }
