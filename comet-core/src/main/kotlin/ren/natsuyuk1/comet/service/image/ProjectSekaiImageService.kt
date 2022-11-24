@@ -214,7 +214,7 @@ object ProjectSekaiImageService {
 
             addTextln()
 
-            addText("数据来自 PJSK Profile | Unibot API | 33Kit")
+            addText("数据来自 PJSK Profile | Unibot API")
         }.build().layout(650f)
 
         val surface =
