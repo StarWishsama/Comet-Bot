@@ -9,6 +9,7 @@ import okio.sink
 import okio.source
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.consts.cometClient
+import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.resolveResourceDirectory
 import ren.natsuyuk1.comet.utils.file.touch
@@ -19,10 +20,11 @@ import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TestProjectSekaiAvatar {
+    private val assetBundleName = "res018_no021"
+
     @Test
-    fun testAvatarDownload() {
+    fun testAvatarDownloadAltar() {
         runBlocking {
-            val assetBundleName = "res018_no021"
             /* ktlint-disable max-line-length */
             val url =
                 "https://assets.pjsek.ai/file/pjsekai-assets/startapp/character/member_cutout/$assetBundleName/normal/thumbnail_xl.png"
@@ -43,6 +45,15 @@ class TestProjectSekaiAvatar {
                 println(file.absPath)
                 assertTrue(file.length() != 0L)
             }
+        }
+    }
+
+    @Test
+    fun testAvatarDownload() {
+        runBlocking {
+            val file = ProjectSekaiManager.resolveCardImage(assetBundleName)
+            println(file.absPath)
+            assertTrue(file.length() != 0L)
         }
     }
 }

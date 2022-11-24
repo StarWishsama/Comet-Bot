@@ -52,4 +52,6 @@ dependencies {
     implementation("com.rometools:rome:1.18.0")
 
     implementation("org.jetbrains.skiko:skiko:0.7.40")
+    implementation("com.aayushatharva.brotli4j:brotli4j:1.8.0")
+    implementation("com.squareup.okio:okio:3.2.0")
 }

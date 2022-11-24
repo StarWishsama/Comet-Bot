@@ -312,7 +312,7 @@ object ProjectSekaiManager {
         val card = File(File(pjskFolder, "cards"), "$assetBundleName.png")
         card.touch()
 
-        if (card.exists() || card.length() != 0L) {
+        if (card.exists() && card.length() != 0L) {
             return
         }
 
