@@ -2,10 +2,7 @@ package ren.natsuyuk1.comet.service.image
 
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
-import org.jetbrains.skia.EncodedImageFormat
-import org.jetbrains.skia.Image
-import org.jetbrains.skia.Rect
-import org.jetbrains.skia.Surface
+import org.jetbrains.skia.*
 import org.jetbrains.skia.paragraph.Alignment
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
@@ -41,7 +38,7 @@ import kotlin.time.Duration.Companion.hours
 object ProjectSekaiImageService {
     private const val WIDTH = 650
     private const val DEFAULT_PADDING = 20
-    private const val AVATAR_SIZE = 80
+    private const val AVATAR_SIZE = 100
 
     fun drawB30(user: ProjectSekaiUserInfo.UserGameData, b30: List<ProjectSekaiUserInfo.MusicResult>): File {
         val b30Text = ParagraphBuilder(
@@ -236,9 +233,12 @@ object ProjectSekaiImageService {
                     Rect(
                         20f,
                         20f,
-                        100f,
-                        100f
-                    )
+                        20f + AVATAR_SIZE,
+                        20f + AVATAR_SIZE
+                    ),
+                    Paint().apply {
+                        isAntiAlias = true
+                    }
                 ) // 80 x 80
             }
 
