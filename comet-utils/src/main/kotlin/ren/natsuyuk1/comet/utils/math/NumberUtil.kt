@@ -21,7 +21,7 @@ object NumberUtil {
     private val DECIMAL_FORMAT = DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.ROOT))
 
     /**
-     * 获取更优雅的数字并转为字符串, 如 13200 -> 1.32w
+     * 获取更优雅的数字并转为字符串, 如 13200 -> 13.2k
      *
      * 扩展函数形式, 支持所有数字, 但可能会产生 [NumberFormatException]
      */

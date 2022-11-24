@@ -36,7 +36,7 @@ import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.hours
 
 object ProjectSekaiImageService {
-    private const val WIDTH = 650
+    private const val WIDTH = 550
     private const val DEFAULT_PADDING = 20
     private const val AVATAR_SIZE = 100
 
@@ -77,7 +77,7 @@ object ProjectSekaiImageService {
             changeStyle(FontUtil.defaultFontStyle(Color.BLACK, 13f))
 
             addText("由 Comet 生成 | 数据来源于 profile.pjsekai.moe")
-        }.build().layout(650f)
+        }.build().layout(WIDTH.toFloat())
 
         val surface = Surface.makeRasterN32Premul(WIDTH, (DEFAULT_PADDING + b30Text.height).toInt())
 
@@ -117,10 +117,14 @@ object ProjectSekaiImageService {
         val eventInfo = ProjectSekaiData.getCurrentEventInfo() ?: return "查询失败, 活动信息未加载".toMessageWrapper()
         val eventStatus = ProjectSekaiManager.getCurrentEventStatus()
 
-        val avatarPath = ProjectSekaiManager.getAssetBundleName(profile.userCard.cardId.toInt())
-            ?.let { ProjectSekaiManager.resolveCardImage(it) }
+        val avatarBundleName = ProjectSekaiManager.getAssetBundleName(profile.userCard.cardId.toInt())
 
+        var avatarPath: File? = null
         var avatar: Image? = null
+
+        if (avatarBundleName != null) {
+            avatarPath = ProjectSekaiManager.resolveCardImage(avatarBundleName)
+        }
 
         if (avatarPath?.exists() == true && avatarPath.length() != 0L) {
             avatar = Image.makeFromEncoded(avatarPath.readBytes())
@@ -135,7 +139,7 @@ object ProjectSekaiImageService {
         ).apply {
             addTextln(profile.name)
             addText("ID: ${profile.userId}")
-        }.build().layout(650f)
+        }.build().layout(WIDTH.toFloat())
 
         val eventInfoText = ParagraphBuilder(
             ParagraphStyle().apply {
@@ -216,7 +220,7 @@ object ProjectSekaiImageService {
             addTextln()
 
             addText("数据来自 PJSK Profile | Unibot API")
-        }.build().layout(650f)
+        }.build().layout(WIDTH.toFloat())
 
         val surface =
             Surface.makeRasterN32Premul(
