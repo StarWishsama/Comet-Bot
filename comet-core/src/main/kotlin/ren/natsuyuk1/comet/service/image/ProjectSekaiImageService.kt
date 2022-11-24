@@ -123,7 +123,11 @@ object ProjectSekaiImageService {
         val avatarPath = ProjectSekaiManager.getAssetBundleName(profile.userCard.cardId.toInt())
             ?.let { ProjectSekaiManager.resolveCardImage(it) }
 
-        val avatar = avatarPath?.readBytes()?.let { Image.makeFromEncoded(it) }
+        var avatar: Image? = null
+
+        if (avatarPath?.exists() == true && avatarPath.length() != 0L) {
+            avatar = Image.makeFromEncoded(avatarPath.readBytes())
+        }
 
         val userInfoText = ParagraphBuilder(
             ParagraphStyle().apply {
@@ -240,7 +244,7 @@ object ProjectSekaiImageService {
 
             userInfoText.paint(
                 this,
-                DEFAULT_PADDING / 2f + AVATAR_SIZE,
+                DEFAULT_PADDING * 2f + AVATAR_SIZE,
                 DEFAULT_PADDING.toFloat()
             )
 
