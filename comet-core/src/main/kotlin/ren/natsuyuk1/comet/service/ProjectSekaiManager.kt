@@ -310,10 +310,9 @@ object ProjectSekaiManager {
             "https://assets.pjsek.ai/file/pjsekai-assets/startapp/character/member_cutout/$assetBundleName/normal/thumbnail_xl.png"
         /* ktlint-enable max-line-length */
         val card = File(File(pjskFolder, "cards"), "$assetBundleName.png")
-
         card.touch()
 
-        if (card.exists()) {
+        if (card.exists() || card.length() != 0L) {
             return
         }
 
@@ -323,8 +322,10 @@ object ProjectSekaiManager {
     suspend fun resolveCardImage(assetBundleName: String): File {
         val target = File(File(pjskFolder, "cards"), "$assetBundleName.png")
 
-        if (!target.exists()) {
+        if (!target.exists() || target.length() == 0L) {
             downloadCardImage(assetBundleName)
+
+            logger.debug { "Downloaded pjsk card image ($assetBundleName)" }
         }
 
         return target

@@ -28,8 +28,7 @@ dependencies {
     implementation(project(":comet-api"))
     implementation(project(":comet-utils"))
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-    implementation(("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"))
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
     implementation("org.jetbrains.exposed:exposed-core:0.41.1")
     implementation("org.jetbrains.exposed:exposed-dao:0.41.1")
@@ -37,10 +36,10 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.41.1")
     implementation("com.zaxxer:HikariCP:5.0.1")
 
-    api("io.ktor:ktor-server-core:2.1.3")
-    api("io.ktor:ktor-server-netty:2.1.3")
-    api("io.ktor:ktor-server-call-logging-jvm:2.1.3")
-    api("io.ktor:ktor-client-websockets-jvm:2.1.3")
+    implementation("io.ktor:ktor-server-core:2.1.3")
+    implementation("io.ktor:ktor-server-netty:2.1.3")
+    implementation("io.ktor:ktor-server-call-logging-jvm:2.1.3")
+    implementation("io.ktor:ktor-client-websockets-jvm:2.1.3")
 
     implementation("org.jsoup:jsoup:1.15.3")
 
@@ -48,11 +47,9 @@ dependencies {
 
     implementation("moe.sdl.ipdb:ipdb-core:0.1.1")
 
-    implementation("org.jetbrains.skiko:skiko:0.7.27")
-
-    implementation("com.aayushatharva.brotli4j:brotli4j:1.8.0")
-
     implementation("ren.natsuyuk1.setsuna:Setsuna:0.1.0-SNAPSHOT")
 
     implementation("com.rometools:rome:1.18.0")
+
+    compileOnly("org.jetbrains.skiko:skiko:0.7.40")
 }

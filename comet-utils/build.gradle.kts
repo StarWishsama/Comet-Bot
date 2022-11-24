@@ -8,6 +8,10 @@ plugins {
 repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven {
+        url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        name = "Compose for Desktop DEV"
+    }
 }
 
 fun tokenize(command: String): Array<String?> {
@@ -44,15 +48,16 @@ buildConfig {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-    implementation("org.jetbrains.exposed:exposed-core:0.41.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.41.1")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.41.1")
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.41.1")
-    implementation("com.zaxxer:HikariCP:5.0.1")
-    implementation("org.jsoup:jsoup:1.15.3")
-    implementation("org.jetbrains.skiko:skiko:0.7.27")
-    implementation("com.aayushatharva.brotli4j:brotli4j:1.8.0")
+    compileOnly("org.jetbrains.exposed:exposed-core:0.41.1")
+    compileOnly("org.jetbrains.exposed:exposed-dao:0.41.1")
+    compileOnly("org.jetbrains.exposed:exposed-jdbc:0.41.1")
+    compileOnly("org.jetbrains.exposed:exposed-kotlin-datetime:0.41.1")
+    compileOnly("com.zaxxer:HikariCP:5.0.1")
+    api("org.jsoup:jsoup:1.15.3")
+    compileOnly("org.jetbrains.skiko:skiko:0.7.40")
+    api("com.aayushatharva.brotli4j:brotli4j:1.8.0")
     api("com.jayway.jsonpath:json-path:2.7.0")
-    implementation("io.pebbletemplates:pebble:3.1.6")
+    api("io.pebbletemplates:pebble:3.1.6")
+    api("com.squareup.okio:okio:3.2.0")
+    api("moe.sdl.yac:core:1.0.1")
 }

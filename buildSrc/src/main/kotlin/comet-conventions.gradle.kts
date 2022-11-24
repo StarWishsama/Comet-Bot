@@ -40,8 +40,6 @@ dependencies {
 
     testImplementation(kotlin("test"))
 
-    implementation("moe.sdl.yac:core:1.0.0")
-
     implementation("cn.hutool:hutool-http:5.8.6")
     implementation("cn.hutool:hutool-crypto:5.8.6")
     implementation("cn.hutool:hutool-cron:5.8.6")
@@ -54,7 +52,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.2")
     implementation("io.ktor:ktor-network:2.1.2")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
     implementation("net.mamoe.yamlkt:yamlkt:0.12.0")
 }
 
