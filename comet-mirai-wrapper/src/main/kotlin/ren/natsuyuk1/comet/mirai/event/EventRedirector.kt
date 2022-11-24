@@ -39,5 +39,13 @@ suspend fun Event.redirectToComet(comet: MiraiComet) {
         is FriendDeleteEvent -> {
             EventManager.broadcastEvent(this.toCometEvent(comet))
         }
+
+        is BotLeaveEvent -> {
+            EventManager.broadcastEvent(this.toCometEvent(comet))
+        }
+
+        is MemberLeaveEvent -> {
+            EventManager.broadcastEvent(this.toCometEvent(comet))
+        }
     }
 }
