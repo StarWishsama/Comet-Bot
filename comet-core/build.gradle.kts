@@ -25,8 +25,8 @@ configurations.all {
 }
 
 dependencies {
-    implementation(project(":comet-api"))
-    implementation(project(":comet-utils"))
+    api(project(":comet-api"))
+    api(project(":comet-utils"))
 
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
