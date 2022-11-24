@@ -175,7 +175,7 @@ object ProjectSekaiImageService {
                     val rankDiff = userData.lastQueryPosition - profile.rank
 
                     if (scoreDiff != 0L) {
-                        addText("+ $scoreDiff 分 | ")
+                        addText("↑ $scoreDiff 分 ")
                     }
 
                     if (rankDiff != 0) {
@@ -220,7 +220,7 @@ object ProjectSekaiImageService {
         val surface =
             Surface.makeRasterN32Premul(
                 WIDTH,
-                (AVATAR_SIZE + DEFAULT_PADDING * 3 + eventInfoText.height + userInfoText.height).toInt()
+                (AVATAR_SIZE + DEFAULT_PADDING * 3 + eventInfoText.height).toInt()
             )
 
         surface.canvas.apply {
@@ -246,7 +246,7 @@ object ProjectSekaiImageService {
 
             eventInfoText.paint(
                 this,
-                (DEFAULT_PADDING / 2).toFloat(),
+                DEFAULT_PADDING.toFloat(),
                 (AVATAR_SIZE + DEFAULT_PADDING * 2).toFloat()
             )
         }
