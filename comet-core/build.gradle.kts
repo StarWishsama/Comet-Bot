@@ -51,5 +51,5 @@ dependencies {
 
     implementation("com.rometools:rome:1.18.0")
 
-    compileOnly("org.jetbrains.skiko:skiko:0.7.40")
+    implementation("org.jetbrains.skiko:skiko:0.7.40")
 }

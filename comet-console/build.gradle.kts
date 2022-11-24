@@ -27,8 +27,8 @@ dependencies {
     implementation(project(":comet-core"))
     implementation(project(":comet-utils"))
 
-    implementation("org.jetbrains.skiko:skiko:0.7.40")
-    testImplementation("org.jetbrains.skiko:skiko:0.7.40")
+    compileOnly("org.jetbrains.skiko:skiko:0.7.40")
+    testCompileOnly("org.jetbrains.skiko:skiko:0.7.40")
 }
 
 tasks.jar {
