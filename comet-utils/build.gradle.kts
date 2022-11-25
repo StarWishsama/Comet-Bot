@@ -57,7 +57,7 @@ dependencies {
     compileOnly("org.jetbrains.skiko:skiko:0.7.40")
     compileOnly("com.aayushatharva.brotli4j:brotli4j:1.8.0")
     api("com.jayway.jsonpath:json-path:2.7.0")
-    api("io.pebbletemplates:pebble:3.1.6")
+    api("io.pebbletemplates:pebble:3.2.0")
     compileOnly("com.squareup.okio:okio:3.2.0")
     implementation("moe.sdl.yac:core:1.0.1")
 }
