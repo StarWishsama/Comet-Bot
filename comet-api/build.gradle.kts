@@ -27,7 +27,7 @@ dependencies {
     api("org.jetbrains.exposed:exposed-jdbc:0.41.1")
     api("org.jetbrains.exposed:exposed-kotlin-datetime:0.41.1")
     api("com.zaxxer:HikariCP:5.0.1")
-    api("org.xerial:sqlite-jdbc:3.39.4.1")
+    api("org.xerial:sqlite-jdbc:3.40.0.0")
     api("org.postgresql:postgresql:42.5.1")
     api("moe.sdl.yac:core:1.0.1")
 
