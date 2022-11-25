@@ -309,18 +309,18 @@ object ProjectSekaiManager {
         val url =
             "https://assets.pjsek.ai/file/pjsekai-assets/startapp/character/member_cutout/$assetBundleName/normal/thumbnail_xl.png"
         /* ktlint-enable max-line-length */
-        val card = File(File(pjskFolder, "cards"), "$assetBundleName.png")
-        card.touch()
+        val cardFile = pjskFolder.resolveSibling("cards/$assetBundleName.png")
+        cardFile.touch()
 
-        if (card.exists() && card.length() != 0L) {
+        if (cardFile.exists() && cardFile.length() != 0L) {
             return
         }
 
-        cometClient.client.downloadFile(url, card)
+        cometClient.client.downloadFile(url, cardFile)
     }
 
     suspend fun resolveCardImage(assetBundleName: String): File {
-        val target = File(File(pjskFolder, "cards"), "$assetBundleName.png")
+        val target = pjskFolder.resolveSibling("cards/$assetBundleName.png")
 
         if (!target.exists() || target.length() == 0L) {
             downloadCardImage(assetBundleName)

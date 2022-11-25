@@ -11,6 +11,9 @@ package ren.natsuyuk1.comet.utils.file
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okio.buffer
+import okio.sink
+import okio.source
 import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
@@ -63,9 +66,9 @@ suspend fun File.readTextBuffered() = withContext(Dispatchers.IO) {
  */
 suspend fun writeToFile(input: InputStream, target: File): Unit =
     withContext(Dispatchers.IO) {
-        input.use {
-            target.outputStream().use { output ->
-                input.copyTo(output)
+        input.source().buffer().use { i ->
+            target.sink().buffer().use { o ->
+                o.writeAll(i)
             }
         }
     }
