@@ -19,9 +19,6 @@ import kotlinx.serialization.json.Json
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.utils.time.Timer
-import java.security.cert.X509Certificate
-import javax.net.ssl.X509TrustManager
-import kotlin.time.Duration.Companion.seconds
 
 val json = Json {
     prettyPrint = true
@@ -36,14 +33,6 @@ val defaultClient = HttpClient(CIO) {
         if (proxyStr.isNullOrBlank()) return@engine
 
         proxy = ProxyBuilder.http(proxyStr)
-
-        https {
-            trustManager = object : X509TrustManager {
-                override fun checkClientTrusted(p0: Array<out X509Certificate>?, p1: String?) {}
-                override fun checkServerTrusted(p0: Array<out X509Certificate>?, p1: String?) {}
-                override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
-            }
-        }
     }
 
     install(UserAgent) {
@@ -55,10 +44,6 @@ val defaultClient = HttpClient(CIO) {
         gzip()
         deflate()
         identity()
-    }
-
-    install(HttpTimeout) {
-        requestTimeoutMillis = 30.seconds.inWholeMilliseconds
     }
 
     install(HttpCookies)

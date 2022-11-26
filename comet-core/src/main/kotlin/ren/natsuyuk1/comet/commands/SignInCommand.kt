@@ -34,8 +34,7 @@ class SignInCommand(
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
     private val user: CometUser
-) :
-    CometCommand(comet, sender, subject, message, user, SIGNIN) {
+) : CometCommand(comet, sender, subject, message, user, SIGNIN) {
 
     override suspend fun run() {
         subject.sendMessage(SignInService.processSignIn(user, sender))

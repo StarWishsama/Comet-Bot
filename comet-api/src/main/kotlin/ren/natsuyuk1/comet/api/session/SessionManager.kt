@@ -3,6 +3,8 @@ package ren.natsuyuk1.comet.api.session
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
+import ren.natsuyuk1.comet.api.command.PlatformCommandSender
+import ren.natsuyuk1.comet.api.command.simpleEquals
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.api.user.CometUser
@@ -71,6 +73,12 @@ object SessionManager {
         autoExpireJobs.remove(session)
     }
 
+    fun getSession(requester: PlatformCommandSender, user: CometUser? = null): Session? =
+        sessions.find {
+            (user != null && it.cometUser?.id?.value == user.id.value) ||
+                requester.simpleEquals(it.contact)
+        }
+
     /**
      * 处理会话
      *
@@ -83,23 +91,30 @@ object SessionManager {
         logger.debug { "Processing incoming subject: ${subject.id}, sender: ${sender.id}, message: $message" }
         logger.debug { "Pending session(s): $sessions" }
 
-        val targetSession = sessions.filter { session ->
-            if (subject is Group) {
-                return@filter session.cometUser == null || (user != null && session.cometUser.id == user.id)
-            } else {
-                if (session.cometUser != null && user != null) {
-                    return@filter session.cometUser.id == user.id
+        val pendingSessions =
+            sessions.filter { session ->
+                val validate = if (subject is Group) {
+                    session.cometUser == null || (user != null && session.cometUser.id == user.id)
                 } else {
-                    return@filter sender.id == session.contact.id
+                    if (session.cometUser != null && user != null) {
+                        session.cometUser.id == user.id
+                    } else {
+                        sender.id == session.contact.id
+                    }
                 }
+
+                return session.interrupt && validate
+            }
+
+        logger.debug { "Matched session(s): $pendingSessions" }
+
+        scope.launch {
+            pendingSessions.forEach {
+                it.process(message)
             }
         }
 
-        logger.debug { "Matched session(s): $targetSession" }
-
-        targetSession.forEach { scope.launch { it.process(message) } }
-
-        return targetSession.isNotEmpty()
+        return pendingSessions.isNotEmpty()
     }
 
     fun getSessionCount() = sessions.size

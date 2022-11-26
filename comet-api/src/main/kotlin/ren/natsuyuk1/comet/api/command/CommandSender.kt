@@ -133,3 +133,12 @@ fun PlatformCommandSender.isGroup() = this is GroupMember
 fun PlatformCommandSender.isMember() = this is GroupMember
 
 // endregion
+
+// region === equal ===
+fun PlatformCommandSender.simpleEquals(other: PlatformCommandSender?): Boolean {
+    if (other == null) {
+        return false
+    }
+
+    return id == other.id && platform == other.platform
+}
