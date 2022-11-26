@@ -232,18 +232,25 @@ object ProjectSekaiImageService {
             clear(Color.WHITE.rgb)
 
             if (avatar != null) {
+                val rrect = RRect.makeXYWH(
+                    20f,
+                    20f,
+                    AVATAR_SIZE.toFloat(),
+                    AVATAR_SIZE.toFloat(),
+                    10f // 圆形弧度
+                )
+
+                save()
+                clipRRect(rrect, true)
                 drawImageRect(
                     avatar,
-                    Rect(
-                        20f,
-                        20f,
-                        20f + AVATAR_SIZE,
-                        20f + AVATAR_SIZE
-                    ),
-                    Paint().apply {
-                        isAntiAlias = true
-                    }
+                    Rect(0f, 0f, avatar.width.toFloat(), avatar.height.toFloat()),
+                    rrect,
+                    FilterMipmap(FilterMode.LINEAR, MipmapMode.NEAREST),
+                    null,
+                    true
                 ) // 80 x 80
+                restore()
             }
 
             userInfoText.paint(
@@ -266,7 +273,7 @@ object ProjectSekaiImageService {
                 delete()
             }
 
-            deleteOnExit()
+            // deleteOnExit()
         }
 
         runBlocking { tmpFile.touch() }

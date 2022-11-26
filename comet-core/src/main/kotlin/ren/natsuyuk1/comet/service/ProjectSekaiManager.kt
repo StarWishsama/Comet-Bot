@@ -137,6 +137,21 @@ object ProjectSekaiManager {
         }
     }
 
+    suspend fun loadCards() {
+        val cardsFile = pjskFolder.resolve("cards.json")
+
+        try {
+            cards.addAll(
+                json.decodeFromString(
+                    ListSerializer(PJSKCard.serializer()),
+                    cardsFile.readTextBuffered()
+                )
+            )
+        } catch (e: Exception) {
+            logger.warn(e) { "解析卡面数据时出现问题, 路径 ${cardsFile.absPath}" }
+        }
+    }
+
     private suspend fun loadPJSKDatabase() {
         /**
          * Load Sekai Music Difficulties Info
@@ -170,19 +185,6 @@ object ProjectSekaiManager {
         }
 
         val cardsFile = pjskFolder.resolve("cards.json")
-
-        suspend fun loadCards() {
-            try {
-                cards.addAll(
-                    json.decodeFromString(
-                        ListSerializer(PJSKCard.serializer()),
-                        cardsFile.readTextBuffered()
-                    )
-                )
-            } catch (e: Exception) {
-                logger.warn(e) { "解析卡面数据时出现问题, 路径 ${cardsFile.absPath}" }
-            }
-        }
 
         if (cardsFile.exists()) {
             scope.launch {

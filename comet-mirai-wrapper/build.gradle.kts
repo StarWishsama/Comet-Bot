@@ -19,7 +19,7 @@ repositories {
     maven("https://repo.mirai.mamoe.net/snapshots")
 }
 
-val miraiVersion = "2.14.0-dev-shadow-1-dev-68def96d"
+val miraiVersion = "2.14.0-dev-shadow-10-dev-cb7de061"
 
 dependencies {
     compileOnly(project(":comet-api"))
