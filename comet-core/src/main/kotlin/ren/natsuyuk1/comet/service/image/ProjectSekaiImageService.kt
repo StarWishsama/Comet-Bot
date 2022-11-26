@@ -273,7 +273,7 @@ object ProjectSekaiImageService {
                 delete()
             }
 
-            // deleteOnExit()
+            deleteOnExit()
         }
 
         runBlocking { tmpFile.touch() }
