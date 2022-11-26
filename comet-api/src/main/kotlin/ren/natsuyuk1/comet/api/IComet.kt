@@ -2,6 +2,7 @@ package ren.natsuyuk1.comet.api
 
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.api.user.User
 import java.util.concurrent.ConcurrentLinkedDeque
 
 val cometInstances = ConcurrentLinkedDeque<Comet>()
@@ -29,4 +30,14 @@ interface IComet {
      * @return 是否成功撤回 / 删除此消息
      */
     suspend fun deleteMessage(source: MessageSource): Boolean
+
+    /**
+     * 获取机器人的一个好友 (QQ 独占)
+     */
+    suspend fun getFriend(id: Long): User?
+
+    /**
+     * 获取机器人的一个临时会话 (QQ 独占)
+     */
+    suspend fun getStranger(id: Long): User?
 }

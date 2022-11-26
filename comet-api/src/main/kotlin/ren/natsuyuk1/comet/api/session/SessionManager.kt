@@ -75,9 +75,11 @@ object SessionManager {
 
     fun getSession(requester: PlatformCommandSender, user: CometUser? = null): Session? =
         sessions.find {
-            (user != null && it.cometUser?.id?.value == user.id.value) ||
-                requester.simpleEquals(it.contact)
+            (user?.uuidEquals(it.cometUser) == true) || requester.simpleEquals(it.contact)
         }
+
+    fun getSession(filter: (Session) -> Boolean): Session? =
+        sessions.find(filter)
 
     /**
      * 处理会话

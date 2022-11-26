@@ -4,6 +4,8 @@ import net.mamoe.mirai.event.events.FriendMessageEvent
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.GroupTempMessageEvent
 import ren.natsuyuk1.comet.api.event.events.message.PrivateMessageEvent
+import ren.natsuyuk1.comet.api.user.Friend
+import ren.natsuyuk1.comet.api.user.Stranger
 import ren.natsuyuk1.comet.mirai.MiraiComet
 import ren.natsuyuk1.comet.mirai.contact.toCometGroup
 import ren.natsuyuk1.comet.mirai.contact.toCometUser
@@ -25,10 +27,12 @@ suspend fun GroupMessageEvent.toCometEvent(comet: MiraiComet): ren.natsuyuk1.com
 /* ktlint-enable */
 
 suspend fun FriendMessageEvent.toCometEvent(comet: MiraiComet): PrivateMessageEvent {
+    val subject = this.subject.toCometUser(comet) as Friend
+
     return PrivateMessageEvent(
         comet,
-        this.subject.toCometUser(comet),
-        this.sender.toCometUser(comet),
+        subject,
+        subject,
         this.senderName,
         this.message.toMessageWrapper(comet),
         this.time.toLong(),
@@ -37,10 +41,12 @@ suspend fun FriendMessageEvent.toCometEvent(comet: MiraiComet): PrivateMessageEv
 }
 
 suspend fun GroupTempMessageEvent.toCometEvent(comet: MiraiComet): PrivateMessageEvent {
+    val subject = this.subject.toCometUser(comet) as Stranger
+
     return PrivateMessageEvent(
         comet,
-        this.subject.toCometUser(comet),
-        this.sender.toCometUser(comet),
+        subject,
+        subject,
         this.senderName,
         this.message.toMessageWrapper(comet),
         this.time.toLong(),

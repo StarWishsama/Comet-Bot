@@ -7,12 +7,16 @@ import dev.inmo.tgbotapi.bot.ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
 import dev.inmo.tgbotapi.extensions.api.deleteMessage
+import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onContentMessage
+import dev.inmo.tgbotapi.extensions.utils.asPrivateChat
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.flushAccumulatedUpdates
+import dev.inmo.tgbotapi.extensions.utils.userOrNull
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.toChatId
+import dev.inmo.tgbotapi.utils.PreviewFeature
 import dev.inmo.tgbotapi.utils.TelegramAPIUrlsKeeper
 import io.ktor.client.*
 import io.ktor.client.engine.*
@@ -26,10 +30,12 @@ import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.commands.service.subscribePushTemplateEvent
 import ren.natsuyuk1.comet.listener.registerListeners
 import ren.natsuyuk1.comet.service.subscribeGitHubEvent
 import ren.natsuyuk1.comet.telegram.contact.toCometGroup
+import ren.natsuyuk1.comet.telegram.contact.toCometUser
 import ren.natsuyuk1.comet.telegram.event.toCometEvent
 import ren.natsuyuk1.comet.telegram.util.format
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
@@ -132,4 +138,28 @@ class TelegramComet(
             return false
         }
     }
+
+    /**
+     * 受 Telegram 设计限制, 我们只能通过发送消息尝试
+     */
+    @OptIn(PreviewFeature::class)
+    override suspend fun getFriend(id: Long): User? {
+        return try {
+            val chat = bot.getChat(id.toChatId()).asPrivateChat()
+            val resp = chat?.let { bot.send(it, "Test") }
+
+            if (chat != null && resp != null) {
+                bot.deleteMessage(chat.id, resp.messageId)
+            }
+
+            return chat?.userOrNull()?.toCometUser(this)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Telegram 不存在此设计
+     */
+    override suspend fun getStranger(id: Long): User? = null
 }

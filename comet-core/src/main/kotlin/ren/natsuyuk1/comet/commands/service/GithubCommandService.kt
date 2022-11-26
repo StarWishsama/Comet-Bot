@@ -1,15 +1,15 @@
 package ren.natsuyuk1.comet.commands.service
 
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
-import ren.natsuyuk1.comet.api.session.Session
-import ren.natsuyuk1.comet.api.session.expire
-import ren.natsuyuk1.comet.api.session.registerTimeout
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.session.*
 import ren.natsuyuk1.comet.api.user.CometUser
-import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.network.thirdparty.github.GitHubApi
 import ren.natsuyuk1.comet.objects.config.CometServerConfig
 import ren.natsuyuk1.comet.objects.github.data.GitHubRepoData
@@ -22,11 +22,10 @@ object GithubCommandService {
 
     class GitHubSubscribeSession(
         contact: PlatformCommandSender,
-        val sender: PlatformCommandSender,
         user: CometUser,
         val owner: String,
         val name: String,
-        private val groupID: Long
+        val groupID: Long
     ) : Session(contact, user) {
         override suspend fun process(message: MessageWrapper) {
             val raw = message.parseToString()
@@ -45,7 +44,7 @@ object GithubCommandService {
                 )
             )
 
-            sender.sendMessage("订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置 Comet 回调链接!".toMessageWrapper())
+            contact.sendMessage("订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置 Comet 回调链接!".toMessageWrapper())
 
             expire()
         }
@@ -79,21 +78,42 @@ object GithubCommandService {
                 val repo = GitHubRepoData.data.repos.find { it.getName() == "$owner/$name" }
 
                 if (repo == null) {
-                    if (subject is Group) {
-                        subject.sendMessage("请在私聊中继续完成订阅".toMessageWrapper())
+                    if (subject.platform == LoginPlatform.MIRAI) {
+                        delay(1.seconds)
                     }
 
-                    delay(1.seconds)
+                    val githubSession = GitHubSubscribeSession(sender, user, owner, name, groupID)
 
-                    sender.sendMessage(
-                        (
-                            "你正在订阅仓库 $owner/$name, 是否需要添加仓库机密 (Secret)?\n" +
-                                "添加机密可以保证传输仓库信息更加安全, 但千万别忘记了你设置的机密!\n" +
-                                "如果无需添加, 请回复「完成订阅」, 反之直接发送你欲设置的机密."
-                            ).toMessageWrapper()
-                    )
+                    val notice = (
+                        "你正在订阅仓库 $owner/$name, 是否需要添加仓库机密 (Secret)?\n" +
+                            "添加机密可以保证传输仓库信息更加安全, 但千万别忘记了你设置的机密!\n" +
+                            "如果无需添加, 请回复「完成订阅」, 反之直接发送你欲设置的机密."
+                        ).toMessageWrapper()
 
-                    GitHubSubscribeSession(subject, sender, user, owner, name, groupID).registerTimeout(1.minutes)
+                    if ((sender as? GroupMember)?.isFriend() == true ||
+                        (sender as? GroupMember)?.isStranger() == true
+                    ) {
+                        sender.sendMessage(notice)
+                        githubSession.registerTimeout(1.minutes)
+                    } else {
+                        subject.sendMessage("请私聊机器人使用 /start 命令继续你的订阅操作".toMessageWrapper())
+
+                        object : VerifySession(subject, user, passTo = githubSession) {
+                            override fun verify(sender: PlatformCommandSender, message: MessageWrapper) {
+                                runBlocking {
+                                    sender.sendMessage(
+                                        (
+                                            "你正在订阅仓库 $owner/$name, 是否需要添加仓库机密 (Secret)?\n" +
+                                                "添加机密可以保证传输仓库信息更加安全, 但千万别忘记了你设置的机密!\n" +
+                                                "如果无需添加, 请回复「完成订阅」, 反之直接发送你欲设置的机密."
+                                            ).toMessageWrapper()
+                                    )
+                                }
+
+                                passSession(1.minutes)
+                            }
+                        }.register()
+                    }
                 } else {
                     repo.subscribers.add(GitHubRepoData.Data.GithubRepo.GithubRepoSubscriber(groupID))
                     if (CometServerConfig.data.serverName.isBlank()) {

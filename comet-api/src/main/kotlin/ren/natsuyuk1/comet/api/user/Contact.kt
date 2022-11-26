@@ -32,6 +32,16 @@ abstract class User : Contact() {
     abstract override val id: Long
 }
 
+/**
+ * 好友, 仅在 QQ 平台使用，用于识别
+ */
+abstract class Friend : User()
+
+/**
+ * 陌生人, 仅在 QQ 平台使用，用于识别
+ */
+abstract class Stranger : User()
+
 abstract class GroupMember : User() {
     abstract val group: Group
 
@@ -86,6 +96,10 @@ abstract class GroupMember : User() {
      * @param operation 是否给予
      */
     abstract suspend fun operateAdminPermission(operation: Boolean)
+
+    suspend fun isFriend() = comet.getFriend(id) != null
+
+    suspend fun isStranger() = comet.getStranger(id) != null
 }
 
 fun GroupMember.nameOrCard(): String = card.ifEmpty { name }
@@ -95,6 +109,10 @@ fun GroupMember.isOperator() = groupPermission >= GroupPermission.ADMIN
 fun GroupMember.isAdmin() = groupPermission == GroupPermission.ADMIN
 
 fun GroupMember.isOwner() = groupPermission == GroupPermission.OWNER
+
+suspend fun GroupMember.asFriend() = comet.getFriend(id)
+
+suspend fun GroupMember.asStranger() = comet.getStranger(id)
 
 abstract class AnonymousMember : GroupMember() {
     /**

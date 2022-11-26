@@ -66,6 +66,8 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
     var userLevel by UserTable.userLevel
     var triggerCommandTime by UserTable.triggerCommandTime
 
+    fun uuidEquals(other: CometUser?) = other != null && id.value == other.id.value
+
     companion object : EntityClass<UUID, CometUser>(UserTable) {
         /**
          * 获取一个不可操作的用户

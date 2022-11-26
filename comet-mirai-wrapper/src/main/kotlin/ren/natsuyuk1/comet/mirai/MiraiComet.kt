@@ -15,11 +15,13 @@ import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.commands.service.subscribePushTemplateEvent
 import ren.natsuyuk1.comet.listener.registerListeners
 import ren.natsuyuk1.comet.mirai.config.MiraiConfig
 import ren.natsuyuk1.comet.mirai.config.toMiraiProtocol
 import ren.natsuyuk1.comet.mirai.contact.toCometGroup
+import ren.natsuyuk1.comet.mirai.contact.toCometUser
 import ren.natsuyuk1.comet.mirai.event.redirectToComet
 import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
 import ren.natsuyuk1.comet.mirai.util.runWith
@@ -145,5 +147,15 @@ class MiraiComet(
 
                 return@runWithSuspend false
             }.getOrDefault(false)
+        }
+
+    override suspend fun getFriend(id: Long): User? =
+        cl.runWithSuspend {
+            miraiBot.getFriend(id)?.toCometUser(this)
+        }
+
+    override suspend fun getStranger(id: Long): User? =
+        cl.runWithSuspend {
+            miraiBot.getStranger(id)?.toCometUser(this)
         }
 }
