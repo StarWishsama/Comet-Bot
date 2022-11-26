@@ -12,6 +12,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUs
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService.drawEventInfo
 import ren.natsuyuk1.comet.test.initTestDatabase
+import ren.natsuyuk1.comet.test.isCI
 import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import kotlin.test.Test
@@ -30,6 +31,8 @@ class TestProjectSekaiAvatar {
 
     @Test
     fun testAvatarDownload() {
+        if (isCI()) return
+
         runBlocking {
             val file = ProjectSekaiManager.resolveCardImage(assetBundleName)
             println(file.absPath)
@@ -39,6 +42,8 @@ class TestProjectSekaiAvatar {
 
     @Test
     fun testAvatarDraw() {
+        if (isCI()) return
+
         initTestDatabase()
 
         runBlocking {
