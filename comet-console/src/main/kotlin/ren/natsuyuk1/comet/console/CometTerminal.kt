@@ -30,6 +30,7 @@ import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.session.SessionManager
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.api.wrapper.WrapperLoader
 import ren.natsuyuk1.comet.config.branch
 import ren.natsuyuk1.comet.config.hash
@@ -60,6 +61,8 @@ private val dummyComet =
         override fun close() {}
         override suspend fun getGroup(id: Long): Group? = null
         override suspend fun deleteMessage(source: MessageSource): Boolean = false
+        override suspend fun getFriend(id: Long): User? = null
+        override suspend fun getStranger(id: Long): User? = null
     }
 
 object CometTerminal {

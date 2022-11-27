@@ -21,8 +21,9 @@ object Ascii2dApi {
                 install(UserAgent) {
                     agent = "curl/7.74.0"
                 }
-            }.get(reqURL)
-            val doc = Jsoup.parse(req.bodyAsText())
+            }.get(reqURL).bodyAsText()
+            logger.debug { "Raw response: $req" }
+            val doc = Jsoup.parse(req)
             val elements = doc.body().getElementsByClass("container")
             val infoBox = elements.select(".info-box")
 
