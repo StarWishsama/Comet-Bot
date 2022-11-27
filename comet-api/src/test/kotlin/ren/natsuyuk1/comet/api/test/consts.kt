@@ -8,6 +8,7 @@ import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
+import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 
 private val logger = mu.KotlinLogging.logger {}
@@ -28,7 +29,15 @@ val fakeComet = object : Comet(
 
     override suspend fun getGroup(id: Long): Group? = null
 
-    override suspend fun deleteMessage(source: MessageSource): Boolean = true
+    override suspend fun deleteMessage(source: MessageSource): Boolean = false
+
+    override suspend fun getFriend(id: Long): User? {
+        return null
+    }
+
+    override suspend fun getStranger(id: Long): User? {
+        return null
+    }
 }
 
 val fakeSender = object : PlatformCommandSender() {

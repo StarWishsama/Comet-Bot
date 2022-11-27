@@ -30,7 +30,15 @@ val fakeComet by lazy {
 
         override suspend fun getGroup(id: Long): Group? = fakeGroups.find { it.id == id }
 
-        override suspend fun deleteMessage(source: MessageSource) = true
+        override suspend fun deleteMessage(source: MessageSource) = false
+
+        override suspend fun getFriend(id: Long): User? {
+            return null
+        }
+
+        override suspend fun getStranger(id: Long): User? {
+            return null
+        }
     }.also { cometInstances.add(it) }
 }
 
