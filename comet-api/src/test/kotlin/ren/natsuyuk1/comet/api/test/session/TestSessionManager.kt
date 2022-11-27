@@ -121,9 +121,7 @@ class TestSessionManager {
         assertTrue("Session List must have one session!") { SessionManager.getSessionCount() == 1 }
 
         assertTrue("User Session isn't be handle properly!") {
-            runBlocking {
-                SessionManager.handleSession(fakeUser, fakeUser, MessageWrapper().appendText("Test"))
-            }
+            SessionManager.handleSession(fakeUser, fakeUser, MessageWrapper().appendText("Test"))
         }
 
         val fakeGroup = TestGroup()

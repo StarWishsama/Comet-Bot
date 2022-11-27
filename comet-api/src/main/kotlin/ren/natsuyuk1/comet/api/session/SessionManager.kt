@@ -93,7 +93,7 @@ object SessionManager {
         logger.debug { "Processing incoming subject: ${subject.id}, sender: ${sender.id}, message: $message" }
         logger.debug { "Pending session(s): $sessions" }
 
-        val pendingSessions =
+        val matched =
             sessions.filter { session ->
                 val validate = if (subject is Group) {
                     session.cometUser == null || (user != null && session.cometUser.id == user.id)
@@ -105,18 +105,18 @@ object SessionManager {
                     }
                 }
 
-                return session.interrupt && validate
+                return@filter session.interrupt && validate
             }
 
-        logger.debug { "Matched session(s): $pendingSessions" }
+        logger.debug { "Matched session(s): $matched" }
 
         scope.launch {
-            pendingSessions.forEach {
+            matched.forEach {
                 it.process(message)
             }
         }
 
-        return pendingSessions.isNotEmpty()
+        return matched.isNotEmpty()
     }
 
     fun getSessionCount() = sessions.size
