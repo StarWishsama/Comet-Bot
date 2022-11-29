@@ -61,14 +61,14 @@ object RSSPusher : CometPusher("RSS", CometPusherConfig(60)) {
                 }
 
                 if (!isPushed) {
-                    val context = RSSPusherContext(feedID, target, feed.entries.first())
+                    val context = RSSPushContext(feedID, target, feed.entries.first())
                     pendingPushContext.add(context)
                     try {
                         transaction {
                             CometPusherContext.insertPushContext(name, context)
                         }
                     } catch (e: Exception) {
-                        logger.warn(e) { "Error" }
+                        logger.warn(e) { "在写入推送数据至数据库时发生意外" }
                     }
                 }
             } catch (e: IOException) {

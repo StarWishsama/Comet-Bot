@@ -7,7 +7,7 @@ import ren.natsuyuk1.comet.pusher.CometPushContext
 import ren.natsuyuk1.comet.pusher.CometPushTarget
 import ren.natsuyuk1.comet.utils.time.yyMMddWithTimePattern
 
-class RSSPusherContext(
+class RSSPushContext(
     id: String,
     target: List<CometPushTarget>,
     val content: SyndEntry,
