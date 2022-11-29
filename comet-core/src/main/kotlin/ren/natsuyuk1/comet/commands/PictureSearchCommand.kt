@@ -63,6 +63,5 @@ class PictureSearchCommand(
 }
 
 enum class PictureSearchSource {
-    SAUCENAO,
-    ASCII2D,
+    SAUCENAO
 }
