@@ -9,10 +9,12 @@
 
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 
-import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.selects.select
 import kotlinx.serialization.decodeFromString
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.CometClient
@@ -21,8 +23,8 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiR
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.PJSKEventPredictionInfo
+import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.json.serializeTo
-import java.io.InputStream
 
 private val logger = mu.KotlinLogging.logger {}
 
@@ -53,58 +55,60 @@ object ProjectSekaiAPI {
      */
     private const val THREE3KIT_URL = "https://33.dsml.hk/pred"
 
-    suspend fun CometClient.getUserEventInfo(eventID: Int, userID: Long): SekaiProfileEventInfo {
-        logger.debug { "Fetching project sekai event $eventID rank for user $userID" }
+    private val scope = ModuleScope("project_sekai_api")
 
-        val resp = try {
-            val req = client.get("$PROFILE_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
-                url {
-                    parameters.append("targetUserId", userID.toString())
-                }
+    private suspend fun CometClient.profileRequest(
+        param: String,
+        builder: URLBuilder.(URLBuilder) -> Unit = {}
+    ): HttpResponse {
+        val profileReq = scope.async {
+            val req = client.get("$PROFILE_URL$param") {
+                url(builder)
             }
 
             if (req.status != HttpStatusCode.OK) {
-                error("PJSK Profile API return code isn't OK (${req.status})")
+                cancel("PJSK Profile API return code isn't OK (${req.status})")
             }
 
-            req.body()
-        } catch (e: Exception) {
-            client.get("$UNIBOT_API_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
-                url {
-                    parameters.append("targetUserId", userID.toString())
-                }
-            }.body<InputStream>()
+            req
         }
 
-        return resp.bufferedReader()
-            .use { json.decodeFromString(it.readText().also { logger.debug { "Raw content: $it" } }) }
+        val unibotReq = scope.async {
+            val req = client.get("$UNIBOT_API_URL$param") {
+                url(builder)
+            }
+
+            if (req.status != HttpStatusCode.OK) {
+                cancel("PJSK Profile API return code isn't OK (${req.status})")
+            }
+
+            req
+        }
+
+        return select {
+            profileReq.onAwait { it }
+            unibotReq.onAwait { it }
+        }
+    }
+
+    suspend fun CometClient.getUserEventInfo(eventID: Int, userID: Long): SekaiProfileEventInfo {
+        logger.debug { "Fetching project sekai event $eventID rank for user $userID" }
+
+        val resp = profileRequest("/api/user/%7Buser_id%7D/event/$eventID/ranking") {
+            parameters.append("targetUserId", userID.toString())
+        }
+
+        return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
     }
 
     suspend fun CometClient.getSpecificRankInfo(eventID: Int, rankPosition: Int): SekaiProfileEventInfo {
         logger.debug { "Fetching project sekai event $eventID rank position at $rankPosition" }
 
-        val resp: InputStream = try {
-            val req = client.get("$PROFILE_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
-                url {
-                    parameters.append("targetRank", rankPosition.toString())
-                }
-            }
-
-            if (req.status != HttpStatusCode.OK) {
-                error("PJSK Profile API return code isn't OK (${req.status})")
-            }
-
-            req.body()
-        } catch (e: Exception) {
-            client.get("$UNIBOT_API_URL/api/user/%7Buser_id%7D/event/$eventID/ranking") {
-                url {
-                    parameters.append("targetRank", rankPosition.toString())
-                }
-            }.body()
+        val resp = profileRequest("/api/user/%7Buser_id%7D/event/$eventID/ranking") {
+            parameters.append("targetRank", rankPosition.toString())
         }
 
-        return resp.bufferedReader()
-            .use { json.decodeFromString(it.readText().also { logger.debug { "Raw content: $it" } }) }
+        return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
     }
 
     suspend fun CometClient.getEventList(limit: Int = 12, startAt: Int = -1, skip: Int = 0): ProjectSekaiEventList {
@@ -130,47 +134,18 @@ object ProjectSekaiAPI {
     suspend fun CometClient.getUserInfo(id: Long): ProjectSekaiUserInfo {
         logger.debug { "Fetching project sekai user info for $id" }
 
-        val resp: InputStream = try {
-            val req = client.get("$PROFILE_URL/api/user/$id/profile")
+        val resp = profileRequest("/api/user/$id/profile")
 
-            if (req.status != HttpStatusCode.OK) {
-                error("PJSK Profile API return code isn't OK (${req.status})")
-            }
-
-            req.body()
-        } catch (e: Exception) {
-            client.get("$UNIBOT_API_URL/api/user/$id/profile").body()
-        }
-
-        return resp.bufferedReader()
-            .use { json.decodeFromString(it.readText().also { logger.debug { "Raw content: $it" } }) }
+        return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
     }
 
     suspend fun CometClient.getRankSeasonInfo(userId: Long, rankSeasonId: Int): ProjectSekaiRankSeasonInfo {
         logger.debug { "Fetching project sekai rank season #$rankSeasonId info for $userId" }
 
-        val resp: InputStream =
-            try {
-                val req = client.get("$PROFILE_URL/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
-                    url {
-                        parameters.append("targetUserId", userId.toString())
-                    }
-                }
+        val resp = profileRequest("/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
+            parameters.append("targetUserId", userId.toString())
+        }
 
-                if (req.status != HttpStatusCode.OK) {
-                    error("PJSK Profile API return code isn't OK (${req.status})")
-                }
-
-                req.body()
-            } catch (e: Exception) {
-                client.get("$UNIBOT_API_URL/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
-                    url {
-                        parameters.append("targetUserId", userId.toString())
-                    }
-                }.body()
-            }
-
-        return resp.bufferedReader()
-            .use { json.decodeFromString(it.readText().also { logger.debug { "Raw content: $it" } }) }
+        return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
     }
 }

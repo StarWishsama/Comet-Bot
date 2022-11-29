@@ -3,7 +3,6 @@ package ren.natsuyuk1.comet.service
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
-import ren.natsuyuk1.comet.api.group.GroupSettingManager
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometPersistDataFile
 import ren.natsuyuk1.comet.migrator.GitHubRepoMigrator
@@ -12,6 +11,7 @@ import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaHelper
 import ren.natsuyuk1.comet.network.thirdparty.bilibili.initYabapi
 import ren.natsuyuk1.comet.network.thirdparty.twitter.initSetsuna
 import ren.natsuyuk1.comet.objects.config.FeatureConfig
+import ren.natsuyuk1.comet.objects.group.GroupSettingManager
 import ren.natsuyuk1.comet.pusher.DEFAULT_PUSHERS
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import java.security.GeneralSecurityException

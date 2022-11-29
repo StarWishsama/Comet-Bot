@@ -1,10 +1,10 @@
 package ren.natsuyuk1.comet.listener
 
 import ren.natsuyuk1.comet.api.event.events.group.GroupLeaveEvent
-import ren.natsuyuk1.comet.api.group.GroupSettingManager
 import ren.natsuyuk1.comet.api.listener.CometListener
 import ren.natsuyuk1.comet.api.listener.EventHandler
 import ren.natsuyuk1.comet.objects.github.data.GitHubRepoData
+import ren.natsuyuk1.comet.objects.group.GroupSettingManager
 
 object GroupLeaveListener : CometListener {
     override val name: String
