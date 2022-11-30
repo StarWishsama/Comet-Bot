@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.21")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.22")
     implementation("com.github.gmazzo:gradle-buildconfig-plugin:3.1.0")
     implementation("gradle.plugin.com.github.johnrengelman:shadow:7.1.2")
 }
