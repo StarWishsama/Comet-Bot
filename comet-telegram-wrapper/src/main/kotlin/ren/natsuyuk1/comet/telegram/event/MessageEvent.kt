@@ -2,6 +2,8 @@ package ren.natsuyuk1.comet.telegram.event
 
 import dev.inmo.tgbotapi.abstracts.FromUser
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
+import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
+import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onContentMessage
 import dev.inmo.tgbotapi.extensions.utils.chatIdOrThrow
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.entities
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
@@ -14,7 +16,9 @@ import dev.inmo.tgbotapi.types.message.abstracts.WithSenderChatMessage
 import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.types.message.textsources.BotCommandTextSource
 import dev.inmo.tgbotapi.utils.RiskFeature
+import kotlinx.coroutines.launch
 import mu.KotlinLogging
+import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.events.message.GroupMessageEvent
 import ren.natsuyuk1.comet.api.event.events.message.MessageEvent
 import ren.natsuyuk1.comet.api.event.events.message.PrivateMessageEvent
@@ -24,10 +28,24 @@ import ren.natsuyuk1.comet.telegram.contact.toCometAnonymousMember
 import ren.natsuyuk1.comet.telegram.contact.toCometGroup
 import ren.natsuyuk1.comet.telegram.contact.toCometGroupMember
 import ren.natsuyuk1.comet.telegram.contact.toCometUser
+import ren.natsuyuk1.comet.telegram.util.format
 import ren.natsuyuk1.comet.telegram.util.getDisplayName
 import ren.natsuyuk1.comet.telegram.util.toMessageWrapper
 
 private val logger = KotlinLogging.logger {}
+
+suspend fun BehaviourContext.listenMessageEvent(comet: TelegramComet) {
+    onContentMessage({ it.chat is PrivateChat || it.chat is GroupChat }) {
+        if (it.date < comet.startTime) {
+            return@onContentMessage
+        }
+
+        logger.trace { it.format() }
+        scope.launch {
+            it.toCometEvent(comet)?.broadcast()
+        }
+    }
+}
 
 @OptIn(RiskFeature::class)
 suspend fun CommonMessage<MessageContent>.toCometEvent(

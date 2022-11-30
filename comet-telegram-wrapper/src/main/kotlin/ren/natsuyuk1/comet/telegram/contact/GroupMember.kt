@@ -8,6 +8,7 @@ import dev.inmo.tgbotapi.extensions.api.chat.members.restrictChatMember
 import dev.inmo.tgbotapi.extensions.utils.asGroupChat
 import dev.inmo.tgbotapi.extensions.utils.chatIdOrThrow
 import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.TelegramDate
 import dev.inmo.tgbotapi.types.chat.ChannelChat
 import dev.inmo.tgbotapi.types.chat.GroupChat
@@ -155,7 +156,7 @@ class TelegramGroupMemberImpl(
     }
 }
 
-fun User.toCometGroupMember(comet: TelegramComet, groupChatID: ChatId): GroupMember =
+fun User.toCometGroupMember(comet: TelegramComet, groupChatID: IdChatIdentifier): GroupMember =
     TelegramGroupMemberImpl(this, groupChatID.chatId, comet)
 
 internal class TelegramChannelMemberImpl(

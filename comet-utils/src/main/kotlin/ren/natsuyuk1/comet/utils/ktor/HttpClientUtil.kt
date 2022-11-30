@@ -2,6 +2,8 @@ package ren.natsuyuk1.comet.utils.ktor
 
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.engine.*
+import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.utils.io.core.*
 import okio.buffer
@@ -12,6 +14,13 @@ import java.io.File
 import java.io.InputStream
 
 private val logger = mu.KotlinLogging.logger("CometClient")
+
+fun CIOEngineConfig.initProxy() {
+    val proxyStr = System.getProperty("comet.proxy") ?: System.getenv("COMET_PROXY")
+    if (proxyStr.isNullOrBlank()) return
+
+    proxy = ProxyBuilder.http(proxyStr)
+}
 
 suspend fun HttpClient.downloadFile(url: String, file: File) {
     val req = get(url)

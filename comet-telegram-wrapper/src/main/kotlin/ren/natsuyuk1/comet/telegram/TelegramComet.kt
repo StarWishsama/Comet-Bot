@@ -9,12 +9,10 @@ import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
 import dev.inmo.tgbotapi.extensions.api.deleteMessage
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
-import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onContentMessage
 import dev.inmo.tgbotapi.extensions.utils.asPrivateChat
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.flushAccumulatedUpdates
 import dev.inmo.tgbotapi.extensions.utils.userOrNull
 import dev.inmo.tgbotapi.types.chat.GroupChat
-import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.toChatId
 import dev.inmo.tgbotapi.utils.PreviewFeature
 import dev.inmo.tgbotapi.utils.TelegramAPIUrlsKeeper
@@ -26,7 +24,6 @@ import kotlinx.coroutines.launch
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
-import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
@@ -36,9 +33,10 @@ import ren.natsuyuk1.comet.listener.registerListeners
 import ren.natsuyuk1.comet.service.subscribeGitHubEvent
 import ren.natsuyuk1.comet.telegram.contact.toCometGroup
 import ren.natsuyuk1.comet.telegram.contact.toCometUser
-import ren.natsuyuk1.comet.telegram.event.toCometEvent
-import ren.natsuyuk1.comet.telegram.util.format
+import ren.natsuyuk1.comet.telegram.event.listenGroupEvent
+import ren.natsuyuk1.comet.telegram.event.listenMessageEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import ren.natsuyuk1.comet.utils.ktor.initProxy
 import kotlin.time.Duration.Companion.seconds
 
 private val logger = mu.KotlinLogging.logger("Comet-Telegram")
@@ -49,7 +47,7 @@ class TelegramComet(
      */
     config: CometConfig
 ) : Comet(LoginPlatform.TELEGRAM, config, logger, ModuleScope("telegram ${config.id}")) {
-    private val startTime = DateTime.now()
+    internal val startTime = DateTime.now()
     lateinit var bot: TelegramBot
     lateinit var urlsKeeper: TelegramAPIUrlsKeeper
 
@@ -61,9 +59,7 @@ class TelegramComet(
         bot = telegramBot(urlsKeeper) {
             this.client = HttpClient(CIO) {
                 engine {
-                    val proxyStr = System.getProperty("comet.proxy") ?: System.getenv("COMET_PROXY")
-                    if (proxyStr.isNullOrBlank()) return@engine
-                    proxy = ProxyBuilder.http(proxyStr)
+                    initProxy()
                 }
 
                 install(HttpTimeout) {
@@ -78,16 +74,9 @@ class TelegramComet(
             logger.debug { "已刷新 Telegram Bot 离线时暂存的消息" }
 
             bot.buildBehaviourWithLongPolling(scope) {
-                onContentMessage({ it.chat is PrivateChat || it.chat is GroupChat }) {
-                    if (it.date < startTime) {
-                        return@onContentMessage
-                    }
+                listenMessageEvent(this@TelegramComet)
 
-                    logger.trace { it.format() }
-                    scope.launch {
-                        it.toCometEvent(this@TelegramComet)?.broadcast()
-                    }
-                }
+                listenGroupEvent(this@TelegramComet)
             }.join()
         }
 
