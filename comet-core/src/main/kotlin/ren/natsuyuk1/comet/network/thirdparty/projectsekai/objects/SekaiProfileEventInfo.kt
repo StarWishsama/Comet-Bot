@@ -16,7 +16,11 @@ import kotlinx.serialization.Serializable
 data class SekaiProfileEventInfo(
     val rankings: List<EventInfo>
 ) {
-    fun getScore(): Long = rankings.first().score
+    fun getScore(): Long = if (rankings.isEmpty()) {
+        -1
+    } else {
+        rankings.first().score
+    }
 
     @Serializable
     data class EventInfo(
