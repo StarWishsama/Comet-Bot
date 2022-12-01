@@ -20,7 +20,7 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData as pjskUserData
 import ren.natsuyuk1.comet.service.ProjectSekaiManager as pjskHelper
 
 object ProjectSekaiService {
-    private var currentEventId: Int? = pjskData.getCurrentEventInfo()?.currentEventID
+    private val currentEventId = pjskData.getCurrentEventInfo()?.currentEventID
 
     fun bindAccount(user: CometUser, userID: Long): MessageWrapper {
         return if (pjskUserData.isBound(user.id.value)) {
@@ -47,18 +47,18 @@ object ProjectSekaiService {
             SekaiEventStatus.ONGOING, SekaiEventStatus.END -> {
 
                 if (position == 0 && userData != null) {
-                    val cur = cometClient.getUserEventInfo(currentEventId!!, userData.userID)
+                    val cur = cometClient.getUserEventInfo(currentEventId, userData.userID)
                     if (SkikoHelper.isSkikoLoaded()) cur.drawEventInfo(
                         userData,
-                        currentEventId!!
-                    ) else cur.toMessageWrapper(userData, currentEventId!!)
+                        currentEventId
+                    ) else cur.toMessageWrapper(userData, currentEventId)
                 } else {
-                    val cur = cometClient.getSpecificRankInfo(currentEventId!!, position)
+                    val cur = cometClient.getSpecificRankInfo(currentEventId, position)
 
                     if (SkikoHelper.isSkikoLoaded()) cur.drawEventInfo(
                         null,
-                        currentEventId!!
-                    ) else cur.toMessageWrapper(null, currentEventId!!)
+                        currentEventId
+                    ) else cur.toMessageWrapper(null, currentEventId)
                 }
             }
 
