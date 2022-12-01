@@ -200,7 +200,7 @@ object ProjectSekaiImageService {
             addTextln()
 
             if (ahead != 0) {
-                val aheadEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, ahead) }
+                val aheadEventStatus = cometClient.getSpecificRankInfo(eventId, ahead)
                 val aheadScore = aheadEventStatus.getScore()
 
                 if (aheadScore != -1L) {
@@ -213,7 +213,7 @@ object ProjectSekaiImageService {
             }
 
             if (behind in 200..1000000) {
-                val behindEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, behind) }
+                val behindEventStatus = cometClient.getSpecificRankInfo(eventId, behind)
                 val behindScore = behindEventStatus.getScore()
 
                 if (behindScore != -1L) {
@@ -284,7 +284,7 @@ object ProjectSekaiImageService {
             deleteOnExit()
         }
 
-        runBlocking { tmpFile.touch() }
+        tmpFile.touch()
 
         image.encodeToData(EncodedImageFormat.PNG)?.bytes?.let {
             Files.write(tmpFile.toPath(), it)
