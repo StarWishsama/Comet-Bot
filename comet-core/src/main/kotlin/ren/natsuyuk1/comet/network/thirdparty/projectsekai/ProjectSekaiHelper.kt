@@ -120,18 +120,26 @@ internal fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserDa
             val aheadEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, ahead) }
             val aheadScore = aheadEventStatus.getScore()
 
-            val aheadScoreStr = aheadScore.getBetterNumber()
-            val delta = (aheadScore - profile.score).getBetterNumber()
-            appendTextln("上一档排名 $ahead 的分数为 $aheadScoreStr, 相差 $delta")
+            if (aheadScore != -1L) {
+                val aheadScoreStr = aheadScore.getBetterNumber()
+                val delta = (aheadScore - profile.score).getBetterNumber()
+                appendTextln("上一档排名 $ahead 的分数为 $aheadScoreStr, 相差 $delta")
+            } else {
+                appendTextln("上一档排名 $ahead 暂无数据")
+            }
         }
 
         if (behind in 200..1000000) {
             val behindEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, behind) }
             val behindScore = behindEventStatus.getScore()
 
-            val targetScore = behindScore.getBetterNumber()
-            val deltaScore = (profile.score - behindScore).getBetterNumber()
-            appendTextln("下一档排名 $behind 的分数为 $targetScore, 相差 $deltaScore")
+            if (behindScore != -1L) {
+                val targetScore = behindScore.getBetterNumber()
+                val deltaScore = (profile.score - behindScore).getBetterNumber()
+                appendTextln("下一档排名 $behind 的分数为 $targetScore, 相差 $deltaScore")
+            } else {
+                appendTextln("下一档排名 $behind 暂无数据")
+            }
         }
 
         appendLine()
