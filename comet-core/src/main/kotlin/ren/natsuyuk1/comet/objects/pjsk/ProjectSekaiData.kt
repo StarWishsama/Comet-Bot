@@ -9,7 +9,6 @@
 
 package ren.natsuyuk1.comet.objects.pjsk
 
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -23,6 +22,7 @@ import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import ren.natsuyuk1.comet.consts.cometClient
@@ -69,9 +69,9 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
 
         suspend fun updateEventInfo() {
             var init = false
-            transaction {
+            newSuspendedTransaction {
                 if (ProjectSekaiData.all().empty()) {
-                    runBlocking { initData() }
+                    initData()
                     init = true
                 }
             }
@@ -96,10 +96,12 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
                         }
 
                         transaction {
-                            ProjectSekaiUserDataTable.update {
+                            val updateCount = ProjectSekaiUserDataTable.update {
                                 it[lastQueryPosition] = 0
                                 it[lastQueryScore] = 0
                             }
+
+                            logger.debug { "Event has updated, operated $updateCount row(s), user data total ${ProjectSekaiUserDataTable.fields.size}" }
                         }
                     }
                 }
@@ -110,9 +112,9 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
 
         suspend fun updatePredictionData() {
             var init = false
-            transaction {
+            newSuspendedTransaction {
                 if (ProjectSekaiData.all().empty()) {
-                    runBlocking { initData() }
+                    initData()
                     init = true
                 }
             }

@@ -39,8 +39,12 @@ class HelpCommand(
     user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, HELP) {
 
-    private val pageNum by argument(
-        name = "帮助菜单的页数"
+    private val cmdName by argument("命令名称").default("")
+
+    private val pageNum by option(
+        "--page-num",
+        "-n",
+        help = "帮助菜单的页数"
     ).int().default(1)
 
     private val pageSize by option(
@@ -54,32 +58,50 @@ class HelpCommand(
     override suspend fun run() {
         val cmds = CommandManager.getCommands()
 
-        // Take out the page items from command list.
-        val pageItems = cmds.entries.chunked(pageSize)
-        // Throw exception when the page number exceed.
-        if (pageNum !in 1..pageItems.size) {
-            throw UsageError("页数超过上限 ${pageItems.size}")
-        }
+        if (cmdName.isNotBlank()) {
+            val cmd = CommandManager.getCommand(cmdName, sender)
 
-        // Build the message and send to the sender
-        subject.sendMessage(
-            buildMessageWrapper {
-                appendTextln("Comet 帮助菜单 $pageNum / ${pageItems.size}")
-                val entries = pageItems[pageNum - 1]
-                val maxLen = entries.map { it.key }.maxOf { it.length }
-                entries.filter { it.value !is ConsoleCommandNode }.forEach {
-                    val prop = it.value.property
-
-                    appendText(prop.name.padEnd(maxLen, ' '))
-                    appendText(" >> ")
-                    if (prop.description.isNotBlank()) {
-                        appendText(prop.description)
-                    } else {
-                        appendText("无简介")
+            if (cmd == null) {
+                throw UsageError("找不到名称为 $cmdName 的命令")
+            } else {
+                subject.sendMessage(
+                    buildMessageWrapper {
+                        appendTextln("命令 $cmdName")
+                        appendLine()
+                        appendTextln(cmd.property.description)
+                        appendLine()
+                        appendText(cmd.property.helpText)
                     }
-                    appendLine()
-                }
+                )
             }
-        )
+        } else {
+            // Take out the page items from command list.
+            val pageItems = cmds.entries.chunked(pageSize)
+            // Throw exception when the page number exceed.
+            if (pageNum !in 1..pageItems.size) {
+                throw UsageError("页数超过上限 ${pageItems.size}")
+            }
+
+            // Build the message and send to the sender
+            subject.sendMessage(
+                buildMessageWrapper {
+                    appendTextln("Comet 帮助菜单 $pageNum / ${pageItems.size}")
+                    val entries = pageItems[pageNum - 1]
+                    val maxLen = entries.map { it.key }.maxOf { it.length }
+                    entries.filter { it.value !is ConsoleCommandNode }.forEach {
+                        val prop = it.value.property
+
+                        appendText(prop.name.padEnd(maxLen, ' '))
+                        appendText(" >> ")
+                        if (prop.description.isNotBlank()) {
+                            appendText(prop.description)
+                        } else {
+                            appendText("无简介")
+                        }
+                        appendLine()
+                    }
+                }
+            )
+        }
     }
 }

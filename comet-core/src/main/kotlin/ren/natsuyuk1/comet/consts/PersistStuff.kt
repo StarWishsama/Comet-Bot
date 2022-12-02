@@ -168,4 +168,9 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         ) { comet, sender, subject, wrapper, user ->
             MuteCommand(comet, sender, subject, wrapper, user)
         },
+        CommandNode(
+            DEBUG
+        ) { comet, sender, subject, wrapper, user ->
+            DebugCommand(comet, sender, subject, wrapper, user)
+        },
     )

@@ -129,6 +129,10 @@ object CommandManager {
         val command =
             getCommand(possibleCommand, sender) ?: return@launch
 
+        if (comet.maintainenceMode && command.property.name != "debug") {
+            return@launch
+        }
+
         logger.info {
             "$sender 正在执行命令 ${command.property.name}" // ktlint-disable max-line-length
         }
@@ -139,11 +143,6 @@ object CommandManager {
         runCatching {
             if (sender is PlatformCommandSender) {
                 user = CometUser.getUserOrCreate(sender.id, sender.platform)
-
-                if (!user.hasPermission(property.permission) && !property.extraPermissionChecker(user, sender)) {
-                    subject.sendMessage(buildMessageWrapper { appendText("你没有权限执行这条命令!") })
-                    return@runCatching CommandStatus.NoPermission()
-                }
 
                 if (user.userLevel != UserLevel.OWNER) {
                     when (property.executeConsumeType) {
@@ -163,6 +162,11 @@ object CommandManager {
                             }
                         }
                     }
+                }
+
+                if (!user.hasPermission(property.permission) && !property.extraPermissionChecker(user, sender)) {
+                    subject.sendMessage(buildMessageWrapper { appendText("你没有权限执行这条命令!") })
+                    return@runCatching CommandStatus.NoPermission()
                 }
 
                 transaction {
@@ -211,7 +215,7 @@ object CommandManager {
                                 it::class.jvmName + ":" +
                                 (
                                     it.message?.limit(
-                                        25
+                                        30
                                     ) ?: "无"
                                     )
                         )

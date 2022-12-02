@@ -53,6 +53,8 @@ abstract class Comet(
 
     abstract val id: Long
 
+    var maintainenceMode: Boolean = false
+
     fun init(parentContext: CoroutineContext) {
         scope = ModuleScope(scope.name(), parentContext)
 

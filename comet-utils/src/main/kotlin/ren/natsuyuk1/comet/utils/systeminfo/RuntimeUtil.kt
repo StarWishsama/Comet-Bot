@@ -75,7 +75,7 @@ object RuntimeUtil {
             append(
                 String.format(
                     "| %-4s %-4s %-4s",
-                    "已使用",
+                    "已用",
                     (heap.used / byteToMB).formatDigests(),
                     (nonHeap.used / byteToMB).formatDigests()
                 )
