@@ -101,7 +101,9 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
                                 it[lastQueryScore] = 0
                             }
 
+                            /* ktlint-disable max-line-length */
                             logger.debug { "Event has updated, operated $updateCount row(s), user data total ${ProjectSekaiUserDataTable.fields.size}" }
+                            /* ktlint-enable max-line-length */
                         }
                     }
                 }
