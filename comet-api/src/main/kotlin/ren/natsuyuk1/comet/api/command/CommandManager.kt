@@ -26,11 +26,12 @@ import ren.natsuyuk1.comet.api.permission.hasPermission
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import ren.natsuyuk1.comet.utils.datetime.getLastingTimeAsString
 import ren.natsuyuk1.comet.utils.string.StringUtil.containsEtc
-import ren.natsuyuk1.comet.utils.string.StringUtil.getLastingTimeAsString
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import ren.natsuyuk1.comet.utils.string.StringUtil.replaceAllToBlank
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.jvm.jvmName
@@ -203,7 +204,11 @@ object CommandManager {
         }.onSuccess {
             if (it.isPassed()) {
                 logger.info {
-                    "命令 ${command.property.name} 执行状态 ${it.name}, 耗时 ${executeTime.getLastingTimeAsString(msMode = true)}" // ktlint-disable max-line-length
+                    "命令 ${command.property.name} 执行状态 ${it.name}, 耗时 ${
+                    executeTime.getLastingTimeAsString(
+                        TimeUnit.MILLISECONDS
+                    )
+                    }" // ktlint-disable max-line-length
                 }
             }
         }.onFailure {

@@ -45,25 +45,32 @@ object ProjectSekaiService {
 
         return when (pjskHelper.getCurrentEventStatus()) {
             SekaiEventStatus.ONGOING, SekaiEventStatus.END -> {
-
                 if (position == 0 && userData != null) {
                     val cur = cometClient.getUserEventInfo(currentEventId, userData.userID)
-                    if (SkikoHelper.isSkikoLoaded()) cur.drawEventInfo(
-                        userData,
-                        currentEventId
-                    ) else cur.toMessageWrapper(userData, currentEventId)
+                    if (SkikoHelper.isSkikoLoaded()) {
+                        cur.drawEventInfo(
+                            userData,
+                            currentEventId
+                        )
+                    } else {
+                        cur.toMessageWrapper(userData, currentEventId)
+                    }
                 } else {
                     val cur = cometClient.getSpecificRankInfo(currentEventId, position)
 
-                    if (SkikoHelper.isSkikoLoaded()) cur.drawEventInfo(
-                        null,
-                        currentEventId
-                    ) else cur.toMessageWrapper(null, currentEventId)
+                    if (SkikoHelper.isSkikoLoaded()) {
+                        cur.drawEventInfo(
+                            null,
+                            currentEventId
+                        )
+                    } else {
+                        cur.toMessageWrapper(null, currentEventId)
+                    }
                 }
             }
 
             SekaiEventStatus.COUNTING -> {
-                "活动数据统计中, 首先别急, 其次不要急".toMessageWrapper()
+                "活动数据统计中, 请耐心等待~".toMessageWrapper()
             }
 
             else -> {
@@ -74,7 +81,12 @@ object ProjectSekaiService {
 
     fun fetchPrediction(): MessageWrapper {
         val pred = pjskData.getCurrentPredictionInfo()
-            ?: return "活动预测线信息暂未获取, 稍等片刻哦~".toMessageWrapper()
+        val predUpdateTime = pjskData.getPredictionInfoTime()
+
+        if (pred == null || predUpdateTime == null) {
+            return "活动预测线信息暂未获取, 稍等片刻哦~".toMessageWrapper()
+        }
+
         return pred.toMessageWrapper()
     }
 

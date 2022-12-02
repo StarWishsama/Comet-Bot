@@ -4,8 +4,8 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.json.JsonElement
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
+import ren.natsuyuk1.comet.utils.datetime.format
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
-import ren.natsuyuk1.comet.utils.string.StringUtil.format
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 
 @kotlinx.serialization.Serializable

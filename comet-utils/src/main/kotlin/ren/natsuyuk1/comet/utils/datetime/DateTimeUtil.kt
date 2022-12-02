@@ -9,7 +9,64 @@
 
 package ren.natsuyuk1.comet.utils.datetime
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toJavaInstant
+import ren.natsuyuk1.comet.utils.time.yyMMddPattern
 import java.time.DayOfWeek
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.toKotlinDuration
+
+fun Duration.toFriendly(maxUnit: TimeUnit = TimeUnit.DAYS): String {
+    toComponents { days, hours, minutes, seconds, ns ->
+        return buildString {
+            if (days != 0L && maxUnit >= TimeUnit.DAYS) {
+                append("${days}天")
+            }
+            if (hours != 0 && maxUnit >= TimeUnit.HOURS) {
+                append("${hours}时")
+            }
+            if (minutes != 0 && maxUnit >= TimeUnit.MINUTES) {
+                append("${minutes}分")
+            }
+            if (seconds != 0 && maxUnit >= TimeUnit.SECONDS) {
+                append("${seconds}秒")
+            }
+            if (maxUnit >= TimeUnit.MILLISECONDS) {
+                append("${ns / 1_000_000}毫秒")
+            }
+        }
+    }
+}
+
+/**
+ * 获取该 [LocalDateTime] 距今的时间
+ */
+fun LocalDateTime.getLastingTime(): Duration {
+    val current = LocalDateTime.now()
+
+    return java.time.Duration.between(this, current).toKotlinDuration()
+}
+
+/**
+ * 获取该 [LocalDateTime] 距今的时间并转换为友好的字符串
+ *
+ * @param msMode 是否精准到毫秒
+ */
+fun LocalDateTime.getLastingTimeAsString(unit: TimeUnit = TimeUnit.SECONDS): String {
+    val duration = getLastingTime()
+    return duration.toFriendly(maxUnit = unit)
+}
+
+fun Instant.getLastingTimeAsString(unit: TimeUnit = TimeUnit.SECONDS): String {
+    val duration = Clock.System.now() - this
+    return duration.toFriendly(maxUnit = unit)
+}
+
+fun Instant.format(formatter: DateTimeFormatter = yyMMddPattern): String = formatter.format(toJavaInstant())
 
 fun DayOfWeek.toChinese(): String =
     when (this) {

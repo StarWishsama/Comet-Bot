@@ -18,7 +18,7 @@ import ren.natsuyuk1.comet.config.hash
 import ren.natsuyuk1.comet.config.version
 import ren.natsuyuk1.comet.consts.coreUpTimer
 import ren.natsuyuk1.comet.util.toMessageWrapper
-import ren.natsuyuk1.comet.utils.string.StringUtil.toFriendly
+import ren.natsuyuk1.comet.utils.datetime.toFriendly
 import ren.natsuyuk1.comet.utils.systeminfo.RuntimeUtil
 
 val DEBUG = CommandProperty(

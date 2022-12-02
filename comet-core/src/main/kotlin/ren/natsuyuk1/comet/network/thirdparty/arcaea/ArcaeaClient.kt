@@ -16,7 +16,7 @@ import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaSongInfo
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.Command
 import ren.natsuyuk1.comet.utils.brotli4j.BrotliDecompressor
-import ren.natsuyuk1.comet.utils.string.StringUtil.toFriendly
+import ren.natsuyuk1.comet.utils.datetime.toFriendly
 import ren.natsuyuk1.comet.utils.time.Timer
 import java.util.*
 

@@ -20,6 +20,7 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
+import ren.natsuyuk1.comet.utils.datetime.toFriendly
 import ren.natsuyuk1.comet.utils.file.cacheDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
@@ -28,10 +29,10 @@ import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
 import ren.natsuyuk1.comet.utils.skiko.FontUtil
 import ren.natsuyuk1.comet.utils.skiko.addTextln
 import ren.natsuyuk1.comet.utils.skiko.changeStyle
-import ren.natsuyuk1.comet.utils.string.StringUtil.toFriendly
 import java.awt.Color
 import java.io.File
 import java.nio.file.Files
+import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.hours
 
@@ -154,9 +155,7 @@ object ProjectSekaiImageService {
                 addTextln(
                     "离活动结束还有 ${
                     (eventInfo.aggregateTime.toInstant(true) - now)
-                        .toFriendly(
-                            msMode = false
-                        )
+                        .toFriendly(TimeUnit.SECONDS)
                     }"
                 )
             }

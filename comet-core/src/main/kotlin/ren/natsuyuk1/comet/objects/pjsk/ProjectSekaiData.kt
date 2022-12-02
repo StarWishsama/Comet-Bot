@@ -10,6 +10,7 @@
 package ren.natsuyuk1.comet.objects.pjsk
 
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import mu.KotlinLogging
@@ -150,6 +151,11 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
                 getCurrentEventInfo()?.eventPredictionData?.let {
                     json.decodeFromString(it)
                 }
+            }
+
+        fun getPredictionInfoTime(): Instant? =
+            transaction {
+                getCurrentEventInfo()?.eventPredictionUpdateTime
             }
     }
 

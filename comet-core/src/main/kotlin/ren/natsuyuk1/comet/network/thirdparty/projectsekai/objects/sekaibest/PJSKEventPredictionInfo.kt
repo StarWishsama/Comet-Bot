@@ -9,12 +9,15 @@
 
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest
 
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
+import ren.natsuyuk1.comet.utils.datetime.format
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.string.StringUtil.isNumeric
+import ren.natsuyuk1.comet.utils.time.yyMMddWithTimePattern
 
 @kotlinx.serialization.Serializable
 data class PJSKEventPredictionInfo(
@@ -23,13 +26,15 @@ data class PJSKEventPredictionInfo(
     val message: String
 )
 
-fun PJSKEventPredictionInfo.toMessageWrapper(): MessageWrapper =
+fun PJSKEventPredictionInfo.toMessageWrapper(updateTime: Instant? = null): MessageWrapper =
     buildMessageWrapper {
         val eventName = data["eventName"]?.jsonPrimitive?.content
 
         appendText("活动 $eventName PT预测\n")
 
         data.forEach { k, v ->
-            if (k.isNumeric()) appendText("$k => ${v.jsonPrimitive.content.toLong().getBetterNumber()}\n")
+            if (k.isNumeric()) appendTextln("$k => ${v.jsonPrimitive.content.toLong().getBetterNumber()}")
         }
+
+        appendText("上次更新于 ${updateTime?.format(yyMMddWithTimePattern)}")
     }

@@ -21,9 +21,10 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
+import ren.natsuyuk1.comet.utils.datetime.toFriendly
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
-import ren.natsuyuk1.comet.utils.string.StringUtil.toFriendly
+import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 
 private val rankPosition =
@@ -71,9 +72,7 @@ internal fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserDa
             appendTextln(
                 "离活动结束还有 ${
                 (eventInfo.aggregateTime.toInstant(true) - now)
-                    .toFriendly(
-                        msMode = false
-                    )
+                    .toFriendly(TimeUnit.SECONDS)
                 }"
             )
         }
