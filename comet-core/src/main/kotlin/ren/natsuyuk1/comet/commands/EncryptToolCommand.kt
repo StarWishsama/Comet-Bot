@@ -71,9 +71,9 @@ class EncryptToolCommand(
             }
 
             if (raw) {
-                subject.sendMessage(HexUtil.encodeHexStr(aes.encrypt(content)).toMessageWrapper(""))
+                subject.sendMessage(HexUtil.encodeHexStr(aes.encrypt(content)).toMessageWrapper("结果 (hex) > "))
             } else {
-                subject.sendMessage(aes.encryptBase64(content).toMessageWrapper(""))
+                subject.sendMessage(aes.encryptBase64(content).toMessageWrapper("结果 (base64) > "))
             }
         }
     }
