@@ -4,7 +4,6 @@ import org.jline.reader.LineReader
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
-import ren.natsuyuk1.comet.api.platform.MiraiLoginProtocol
 
 /**
  * 代表一个 [CometWrapper]
@@ -16,7 +15,6 @@ interface CometWrapper {
      * 创建一个 [Comet] 实例
      *
      * @param config [Comet] 的配置文件 [CometConfig]
-     * @param protocol 在 QQ 平台登录 [Comet] 时使用的协议
      * @param classLoader 加载此 Wrapper 的 [ClassLoader]
      * @param reader [LineReader]
      *
@@ -24,7 +22,6 @@ interface CometWrapper {
      */
     suspend fun createInstance(
         config: CometConfig,
-        protocol: MiraiLoginProtocol?,
         classLoader: ClassLoader,
         reader: LineReader
     ): Comet

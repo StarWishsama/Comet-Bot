@@ -20,10 +20,6 @@ private val logger = KotlinLogging.logger {}
 
 val loginStatus = atomic(false)
 
-fun createCometConfig(id: Long, password: String, platform: LoginPlatform): CometConfig {
-    return CometConfig(id, password, platform)
-}
-
 internal suspend fun login(id: Long, password: String, platform: LoginPlatform, protocol: MiraiLoginProtocol?) {
     loginStatus.update { true }
     val service = WrapperLoader.getService(platform)
@@ -39,8 +35,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform, 
 
                 val miraiComet =
                     service.createInstance(
-                        createCometConfig(id, password, platform),
-                        protocol,
+                        CometConfig(id, password, platform, protocol),
                         WrapperLoader.wrapperClassLoader,
                         Console.newLineReader("mirai-comet")
                     )
@@ -61,8 +56,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform, 
             LoginPlatform.TELEGRAM -> {
                 val telegramComet =
                     service.createInstance(
-                        createCometConfig(id, password, platform),
-                        protocol,
+                        CometConfig(id, password, platform, protocol),
                         WrapperLoader.wrapperClassLoader,
                         Console.newLineReader("telegram-comet")
                     )

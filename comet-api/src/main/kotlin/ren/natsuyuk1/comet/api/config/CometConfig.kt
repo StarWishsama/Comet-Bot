@@ -14,6 +14,7 @@ import net.mamoe.yamlkt.Comment
 import net.mamoe.yamlkt.Yaml
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.MiraiLoginProtocol
 import ren.natsuyuk1.comet.utils.file.configDirectory
 import java.io.File
 
@@ -59,4 +60,9 @@ object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
     )
 }
 
-data class CometConfig(val id: Long, val password: String, val platform: LoginPlatform)
+data class CometConfig(
+    val id: Long,
+    val password: String,
+    val platform: LoginPlatform,
+    val protocol: MiraiLoginProtocol? = null
+)
