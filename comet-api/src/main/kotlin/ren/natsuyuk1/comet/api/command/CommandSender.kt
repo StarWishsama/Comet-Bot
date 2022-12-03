@@ -56,6 +56,8 @@ abstract class PlatformCommandSender : CommandSender {
     abstract val platform: LoginPlatform
 
     abstract override suspend fun sendMessage(message: MessageWrapper): MessageReceipt?
+
+    override fun toString(): String = "$name($id) [$platform]"
 }
 
 /**
@@ -68,6 +70,8 @@ object ConsoleCommandSender : CommandSender {
         println(message.parseToString())
         return null
     }
+
+    override fun toString(): String = "Console"
 }
 
 // region === cast ===
