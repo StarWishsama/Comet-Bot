@@ -13,6 +13,7 @@ enum class RateLimitAPI {
 
 object RateLimitData : PersistDataFile<RateLimitData.Data>(
     File(dataDirectory, "rate_limit.json"),
+    Data.serializer(),
     Data()
 ) {
     @Serializable

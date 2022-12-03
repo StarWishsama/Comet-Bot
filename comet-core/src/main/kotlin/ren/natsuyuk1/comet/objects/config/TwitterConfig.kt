@@ -8,6 +8,7 @@ import java.io.File
 
 object TwitterConfig : PersistDataFile<TwitterConfig.Data>(
     File(configDirectory, "twitter.yml"),
+    Data.serializer(),
     Data(),
     Yaml(),
     readOnly = true

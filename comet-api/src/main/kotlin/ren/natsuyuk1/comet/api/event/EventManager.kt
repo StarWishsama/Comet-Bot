@@ -308,6 +308,7 @@ suspend inline fun <T : Event> T.broadcast() {
 
 object EventManagerConfig : PersistDataFile<EventManagerConfig.Data>(
     File(configDirectory, "eventManagerConfig.yaml"),
+    Data.serializer(),
     Data(),
     Yaml
 ) {

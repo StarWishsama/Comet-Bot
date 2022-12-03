@@ -7,6 +7,7 @@ import java.io.File
 
 object GitHubRepoData : PersistDataFile<GitHubRepoData.Data>(
     File(configDirectory, "github_repos.json"),
+    Data.serializer(),
     Data()
 ) {
     @Serializable

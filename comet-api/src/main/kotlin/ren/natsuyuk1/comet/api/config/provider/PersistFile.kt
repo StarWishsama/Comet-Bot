@@ -10,12 +10,8 @@
 package ren.natsuyuk1.comet.api.config.provider
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.StringFormat
 import java.io.File
-import kotlin.reflect.KClass
-import kotlin.reflect.full.hasAnnotation
 
 interface PersistFile<T : Any> {
 
@@ -60,10 +56,4 @@ interface PersistFile<T : Any> {
      *
      */
     suspend fun save(saveData: T = data!!)
-}
-
-internal fun KClass<*>.requireSerializable() {
-    require(hasAnnotation<Serializable>() || hasAnnotation<Contextual>()) {
-        "Class $qualifiedName is not @Serializable or @Contextual"
-    }
 }

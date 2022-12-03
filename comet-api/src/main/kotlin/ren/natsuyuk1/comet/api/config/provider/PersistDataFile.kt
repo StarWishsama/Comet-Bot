@@ -9,27 +9,26 @@
 
 package ren.natsuyuk1.comet.api.config.provider
 
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.update
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.file.writeTextBuffered
 import java.io.File
-import kotlin.reflect.full.createType
 
 private val logger = mu.KotlinLogging.logger { }
 
 open class PersistDataFile<T : Any>(
     final override val file: File,
-    defaultValue: T,
+    private val serializer: KSerializer<T>,
+    default: T,
     override val format: StringFormat = Json {
         isLenient = true
         prettyPrint = true
@@ -41,28 +40,11 @@ open class PersistDataFile<T : Any>(
         ModuleScope("DataFilePersist", dispatcher = Dispatchers.IO),
     final override val readOnly: Boolean = false,
 ) : PersistFile<T> {
-    private val clazz = defaultValue::class
-
-    /**
-     * The serializer of data
-     */
-    private val serializer: KSerializer<Any?> = serializer(clazz.createType())
+    private val clazz = default::class
 
     private val mutex = Mutex()
 
-    @Suppress("PropertyName")
-    val _data = atomic(defaultValue)
-
-    final override val data: T by _data
-
-    init {
-        clazz.requireSerializable()
-    }
-
-    /**
-     * Modify current [PersistDataFile] data
-     */
-    inline fun updateData(update: (T) -> T) = _data.update(update)
+    final override var data: T = default
 
     override suspend fun init(): Unit =
         withContext(scope.coroutineContext) {
@@ -107,11 +89,8 @@ open class PersistDataFile<T : Any>(
             }
             mutex.withLock {
                 val json = file.readTextBuffered()
-                val t = (
-                    format.decodeFromString(serializer, json) as? T
-                        ?: error("Failed to cast Any? to ${clazz.simpleName}")
-                    )
-                updateData { t }
+                val t = format.decodeFromString(serializer, json)
+                data = t
                 t.also {
                     logger.debug { "已加载文件: ${it::class.simpleName}" }
                     logger.trace { "文件内容 $it" }

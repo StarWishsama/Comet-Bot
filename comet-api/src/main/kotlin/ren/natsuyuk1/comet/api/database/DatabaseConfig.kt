@@ -45,6 +45,7 @@ enum class DatabaseType {
 
 object DatabaseConfig : PersistDataFile<DatabaseConfig.Data>(
     File(configDirectory, "database.yml"),
+    Data.serializer(),
     Data(),
     Yaml(),
     readOnly = true

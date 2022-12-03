@@ -9,6 +9,7 @@ import java.io.File
 
 object KeyWordData : PersistDataFile<KeyWordData.Data>(
     File(configDirectory, "keywords.json"),
+    Data.serializer(),
     Data()
 ) {
     @Serializable

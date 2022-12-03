@@ -19,6 +19,7 @@ import java.io.File
 
 object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
     File(configDirectory, "config.yml"),
+    Data.serializer(),
     Data(),
     Yaml,
     readOnly = true

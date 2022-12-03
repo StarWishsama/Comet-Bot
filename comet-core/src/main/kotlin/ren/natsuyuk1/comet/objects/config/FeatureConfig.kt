@@ -9,6 +9,7 @@ import java.io.File
 
 object FeatureConfig : PersistDataFile<FeatureConfig.Data>(
     File(configDirectory, "feature.yml"),
+    Data.serializer(),
     Data(),
     Yaml,
     readOnly = true

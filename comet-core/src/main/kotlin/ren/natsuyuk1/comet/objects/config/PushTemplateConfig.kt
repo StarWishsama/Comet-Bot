@@ -10,6 +10,7 @@ import java.util.*
 
 object PushTemplateConfig : PersistDataFile<PushTemplateConfig.Data>(
     configDirectory.resolve("push_templates.json"),
+    Data.serializer(),
     Data(),
     json
 ) {

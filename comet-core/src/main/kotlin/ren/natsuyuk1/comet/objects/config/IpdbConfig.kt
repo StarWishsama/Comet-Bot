@@ -17,7 +17,7 @@ import java.lang.ref.SoftReference
 private val logger = KotlinLogging.logger {}
 
 object IpdbConfig : PersistDataFile<IpdbConfig.Data>(
-    File(configDirectory, "ipdb.yml"), Data(), Yaml(),
+    File(configDirectory, "ipdb.yml"), Data.serializer(), Data(), Yaml(),
     readOnly = true
 ) {
     @Serializable
