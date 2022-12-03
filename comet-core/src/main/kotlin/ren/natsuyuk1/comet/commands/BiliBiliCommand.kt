@@ -16,7 +16,7 @@ val BILIBILI = CommandProperty(
     "bilibili",
     listOf("bili", "哔哩哔哩"),
     "查询哔哩哔哩用户/视频/动态等相关信息",
-    """
+    helpText = """
     /bili user 查询用户信息
     /bili video 查询视频信息
     /bili dynamic 查询用户动态
@@ -27,8 +27,8 @@ val BILIBILI = CommandProperty(
 
 class BiliBiliCommand(
     comet: Comet,
-    override val sender: PlatformCommandSender,
-    override val subject: PlatformCommandSender,
+    sender: PlatformCommandSender,
+    subject: PlatformCommandSender,
     val message: MessageWrapper,
     val user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, BILIBILI) {

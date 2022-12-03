@@ -59,7 +59,7 @@ abstract class BaseCommand(
 
 abstract class CometCommand(
     val comet: Comet,
-    override val sender: CommandSender,
+    sender: CommandSender,
     open val subject: CommandSender,
     message: MessageWrapper,
     user: CometUser,
@@ -90,7 +90,7 @@ abstract class CometSubCommand(
     open val subject: CommandSender,
     open val sender: CommandSender,
     open val user: CometUser,
-    open val property: SubCommandProperty
+    val property: SubCommandProperty
 ) : CliktCommand(name = property.name)
 
 object CommandLocalization : Localization {

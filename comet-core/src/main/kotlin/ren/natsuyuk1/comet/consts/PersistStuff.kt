@@ -173,4 +173,12 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         ) { comet, sender, subject, wrapper, user ->
             DebugCommand(comet, sender, subject, wrapper, user)
         },
+        CommandNode(
+            ENCRYPT_TOOL,
+            listOf(
+                EncryptToolCommand.AESCommand.AES
+            )
+        ) { comet, sender, subject, wrapper, user ->
+            EncryptToolCommand(comet, sender, subject, wrapper, user)
+        }
     )
