@@ -44,8 +44,8 @@ class EncryptToolCommand(
     }
 
     class AESCommand(
-        override val subject: PlatformCommandSender,
-        override val sender: PlatformCommandSender,
+        subject: PlatformCommandSender,
+        sender: PlatformCommandSender,
         user: CometUser,
     ) : CometSubCommand(subject, sender, user, AES) {
         companion object {
@@ -62,11 +62,6 @@ class EncryptToolCommand(
         private val content by argument("加密内容")
 
         override suspend fun run() {
-            if (sender.platform.needRestrict) {
-                subject.sendMessage("不支持的平台".toMessageWrapper())
-                return
-            }
-
             if (mode == null) {
                 subject.sendMessage("请提供 AES 模式!".toMessageWrapper())
                 return
