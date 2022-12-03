@@ -12,9 +12,6 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.selects.select
 import kotlinx.serialization.decodeFromString
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.CometClient
@@ -61,33 +58,18 @@ object ProjectSekaiAPI {
         param: String,
         builder: URLBuilder.(URLBuilder) -> Unit = {}
     ): HttpResponse {
-        val profileReq = scope.async {
-            val req = client.get("$PROFILE_URL$param") {
+        val profileReq = client.get("$PROFILE_URL$param") {
+            url(builder)
+        }
+
+        return if (profileReq.status != HttpStatusCode.OK) {
+            val unibotReq = client.get("$UNIBOT_API_URL$param") {
                 url(builder)
             }
 
-            if (req.status != HttpStatusCode.OK) {
-                cancel("PJSK Profile API return code isn't OK (${req.status})")
-            }
-
-            req
-        }
-
-        val unibotReq = scope.async {
-            val req = client.get("$UNIBOT_API_URL$param") {
-                url(builder)
-            }
-
-            if (req.status != HttpStatusCode.OK) {
-                cancel("PJSK Profile API return code isn't OK (${req.status})")
-            }
-
-            req
-        }
-
-        return select {
-            profileReq.onAwait { it }
-            unibotReq.onAwait { it }
+            unibotReq
+        } else {
+            profileReq
         }
     }
 
@@ -98,6 +80,10 @@ object ProjectSekaiAPI {
             parameters.append("targetUserId", userID.toString())
         }
 
+        if (resp.status != HttpStatusCode.OK) {
+            error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")
+        }
+
         return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
     }
 
@@ -106,6 +92,10 @@ object ProjectSekaiAPI {
 
         val resp = profileRequest("/api/user/%7Buser_id%7D/event/$eventID/ranking") {
             parameters.append("targetRank", rankPosition.toString())
+        }
+
+        if (resp.status != HttpStatusCode.OK) {
+            error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")
         }
 
         return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
@@ -136,6 +126,10 @@ object ProjectSekaiAPI {
 
         val resp = profileRequest("/api/user/$id/profile")
 
+        if (resp.status != HttpStatusCode.OK) {
+            error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")
+        }
+
         return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
     }
 
@@ -144,6 +138,10 @@ object ProjectSekaiAPI {
 
         val resp = profileRequest("/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
             parameters.append("targetUserId", userId.toString())
+        }
+
+        if (resp.status != HttpStatusCode.OK) {
+            error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")
         }
 
         return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
