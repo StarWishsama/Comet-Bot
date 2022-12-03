@@ -27,16 +27,19 @@ import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 import java.lang.Double.min
 import java.math.RoundingMode
 import java.security.SecureRandom
+import java.time.ZoneId
 
 fun CometUser.isSigned(): Boolean {
-    val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-    val checkInRefreshTime =
-        LocalDateTime(
-            LocalDate(currentTime.year, currentTime.month, currentTime.dayOfMonth),
-            LocalTime(0, 0, 0)
-        ).toInstant(TimeZone.currentSystemDefault())
+    val checkTime = Clock.System.now()
+        .toJavaInstant()
+        .atZone(ZoneId.systemDefault())
+        .withHour(0)
+        .withMinute(0)
+        .withSecond(0)
+        .toInstant()
+        .toKotlinInstant()
 
-    return checkInDate > checkInRefreshTime
+    return checkInDate > checkTime
 }
 
 object SignInService {
