@@ -77,14 +77,14 @@ class EncryptToolCommand(
 
             val result = if (decrypt) aes.decrypt(content) else aes.encrypt(content)
 
-            subject.sendMessage(checkRawMode(result, raw).toMessageWrapper("结果 > "))
+            subject.sendMessage(checkRawMode(result, raw).toMessageWrapper(""))
         }
     }
 }
 
 private fun checkRawMode(result: ByteArray, raw: Boolean): String =
     if (raw) {
-        HexUtil.encodeHexStr(result)
+        "结果 [HEX] " + HexUtil.encodeHexStr(result)
     } else {
-        Base64.encode(result)
+        "结果 [Base64] " + Base64.encode(result)
     }

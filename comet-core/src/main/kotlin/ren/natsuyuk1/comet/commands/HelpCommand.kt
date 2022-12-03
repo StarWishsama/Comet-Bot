@@ -76,7 +76,7 @@ class HelpCommand(
             }
         } else {
             // Take out the page items from command list.
-            val pageItems = cmds.entries.chunked(pageSize)
+            val pageItems = cmds.entries.sortedBy { it.key }.chunked(pageSize)
             // Throw exception when the page number exceed.
             if (pageNum !in 1..pageItems.size) {
                 throw UsageError("页数超过上限 ${pageItems.size}")
