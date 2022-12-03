@@ -30,6 +30,7 @@ dependencies {
     api("org.xerial:sqlite-jdbc:3.40.0.0")
     api("org.postgresql:postgresql:42.5.1")
     api("moe.sdl.yac:core:1.0.1")
+    api("com.cronutils:cron-utils:9.2.0")
 
     implementation(project(":comet-utils"))
 }

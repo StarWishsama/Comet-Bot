@@ -37,7 +37,7 @@ class DebugCommand(
     user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, DEBUG) {
     private val logLevel by option("--loglevel", "-ll")
-    private val memory by option("--memory", "-m").flag()
+    private val memory by option("--memory").flag()
     private val info by option("--info", "-i").flag()
     private val maintain by option("--maintain", "-m").flag()
 
