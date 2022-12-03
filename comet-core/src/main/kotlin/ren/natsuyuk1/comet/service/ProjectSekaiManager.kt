@@ -59,8 +59,8 @@ object ProjectSekaiManager {
 
         fetchI18NFile()
 
+        TaskManager.registerTask("pjsk_event", "0 8 * * *", ::refreshEvent)
         TaskManager.registerTaskDelayed(3.toDuration(DurationUnit.HOURS), ::refreshCache)
-        TaskManager.registerTaskDelayed(1.toDuration(DurationUnit.DAYS), ::refreshEvent)
     }
 
     private suspend fun refreshCache() {
