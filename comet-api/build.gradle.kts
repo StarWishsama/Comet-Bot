@@ -21,6 +21,7 @@ repositories {
 
 dependencies {
     compileOnly("org.jline:jline:3.21.0")
+    testCompileOnly("org.jline:jline:3.21.0")
 
     api("org.jetbrains.exposed:exposed-core:0.41.1")
     api("org.jetbrains.exposed:exposed-dao:0.41.1")
