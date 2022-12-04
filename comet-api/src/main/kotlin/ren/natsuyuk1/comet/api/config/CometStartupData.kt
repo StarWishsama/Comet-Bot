@@ -18,7 +18,7 @@ import ren.natsuyuk1.comet.api.platform.MiraiLoginProtocol
 import ren.natsuyuk1.comet.utils.file.configDirectory
 import java.io.File
 
-object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
+object CometConfig : PersistDataFile<CometConfig.Data>(
     File(configDirectory, "config.yml"),
     Data.serializer(),
     Data(),
@@ -33,14 +33,14 @@ object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
          * 自动保存数据的周期, 单位为分钟
          */
         @Comment("自动保存数据的周期, 单位为分钟")
-        var dataSaveDuration: Long = 60,
+        val dataSaveDuration: Long = 60,
 
         /**
          * 进行网络请求时的 User-Agent, 进行部分特殊请求时不使用该 User-Agent
          */
         @Comment("进行网络请求时的 User-Agent, 进行部分特殊请求时不使用该 User-Agent")
         /* ktlint-disable max-line-length */
-        var useragent: String = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.41",
+        val useragent: String = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.41",
         /* ktlint-enable max-line-length */
 
         @Comment("命令前缀")
@@ -60,7 +60,7 @@ object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
     )
 }
 
-data class CometConfig(
+data class CometStartupData(
     val id: Long,
     val password: String,
     val platform: LoginPlatform,

@@ -20,7 +20,7 @@ import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.cometInstances
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
-import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.config.CometStartupData
 import ren.natsuyuk1.comet.api.database.AccountDataTable
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.event.EventManager
@@ -54,7 +54,8 @@ import kotlin.system.exitProcess
 private val logger = mu.KotlinLogging.logger {}
 
 private val dummyComet =
-    object : Comet(LoginPlatform.TEST, CometConfig(0, "", LoginPlatform.TEST), logger, ModuleScope("dummy-comet")) {
+    object :
+        Comet(LoginPlatform.TEST, CometStartupData(0, "", LoginPlatform.TEST), logger, ModuleScope("dummy-comet")) {
         override val id: Long = 0
         override fun login() {}
         override fun afterLogin() {}

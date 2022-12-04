@@ -2,7 +2,7 @@ package ren.natsuyuk1.comet.service
 
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
-import ren.natsuyuk1.comet.api.config.CometGlobalConfig
+import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometPersistDataFile
 import ren.natsuyuk1.comet.migrator.GitHubRepoMigrator
@@ -68,7 +68,7 @@ object CometCoreService {
     }
 
     private fun startAutoSaveService() {
-        TaskManager.registerTaskDelayed(CometGlobalConfig.data.dataSaveDuration.minutes) {
+        TaskManager.registerTaskDelayed(CometConfig.data.dataSaveDuration.minutes) {
             GroupSettingManager.save()
 
             cometPersistDataFile.forEach {

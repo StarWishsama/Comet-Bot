@@ -4,7 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import ren.natsuyuk1.comet.api.config.CometGlobalConfig
+import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.apexlegends.ApexLegendAPI.fetchUserID
 import ren.natsuyuk1.comet.test.isCI
@@ -17,7 +17,7 @@ class TestApexLegends {
         if (isCI()) return
 
         runBlocking {
-            CometGlobalConfig.init()
+            CometConfig.init()
         }
     }
 

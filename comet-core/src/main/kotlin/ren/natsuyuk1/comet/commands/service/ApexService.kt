@@ -1,6 +1,6 @@
 package ren.natsuyuk1.comet.commands.service
 
-import ren.natsuyuk1.comet.api.config.CometGlobalConfig
+import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.consts.cometClient
@@ -12,7 +12,7 @@ import ren.natsuyuk1.comet.objects.apex.ApexLegendData
 import ren.natsuyuk1.comet.util.toMessageWrapper
 
 object ApexService {
-    private fun isUsable() = CometGlobalConfig.data.apexLegendToken.isNotEmpty()
+    private fun isUsable() = CometConfig.data.apexLegendToken.isNotEmpty()
 
     suspend fun bindAccount(user: CometUser, username: String): MessageWrapper {
         if (!isUsable()) {

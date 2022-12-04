@@ -5,7 +5,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.jsoup.Jsoup
-import ren.natsuyuk1.comet.api.config.CometGlobalConfig
+import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.github.data.GitHubFileCommitInfo
@@ -47,7 +47,7 @@ object GitHubApi {
 
         val conn = Jsoup.connect("https://github.com/$owner/$name")
 
-        conn.header("user-agent", CometGlobalConfig.data.useragent)
+        conn.header("user-agent", CometConfig.data.useragent)
         conn.timeout(5_000)
 
         val doc = conn.get()

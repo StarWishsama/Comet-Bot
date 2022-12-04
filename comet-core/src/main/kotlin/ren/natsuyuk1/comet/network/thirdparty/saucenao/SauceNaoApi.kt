@@ -3,7 +3,7 @@ package ren.natsuyuk1.comet.network.thirdparty.saucenao
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import mu.KotlinLogging
-import ren.natsuyuk1.comet.api.config.CometGlobalConfig
+import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
@@ -24,7 +24,7 @@ object SauceNaoApi {
             parameter("url", img.url)
             // 2 = hide expected and suspected explicit
             parameter("hide", 2)
-            parameter("api_key", CometGlobalConfig.data.sauceNaoToken)
+            parameter("api_key", CometConfig.data.sauceNaoToken)
         }.bodyAsText().apply {
             logger.debug { "Incoming saucenao response: $this" }
         }.serializeTo(json)

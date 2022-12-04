@@ -3,7 +3,7 @@ package ren.natsuyuk1.comet.test.network.thirdparty.saucenao
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
-import ren.natsuyuk1.comet.api.config.CometGlobalConfig
+import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.network.thirdparty.saucenao.SauceNaoApi
 import ren.natsuyuk1.comet.network.thirdparty.saucenao.data.toMessageWrapper
@@ -18,7 +18,7 @@ class TestSauceNaoAPI {
         if (isCI()) return
 
         runBlocking {
-            CometGlobalConfig.init()
+            CometConfig.init()
         }
     }
 

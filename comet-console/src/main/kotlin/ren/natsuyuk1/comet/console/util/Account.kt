@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.cometInstances
-import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.config.CometStartupData
 import ren.natsuyuk1.comet.api.database.AccountData
 import ren.natsuyuk1.comet.api.database.AccountDataTable
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
@@ -35,7 +35,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform, 
 
                 val miraiComet =
                     service.createInstance(
-                        CometConfig(id, password, platform, protocol),
+                        CometStartupData(id, password, platform, protocol),
                         WrapperLoader.wrapperClassLoader,
                         Console.newLineReader("mirai-comet")
                     )
@@ -56,7 +56,7 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform, 
             LoginPlatform.TELEGRAM -> {
                 val telegramComet =
                     service.createInstance(
-                        CometConfig(id, password, platform, protocol),
+                        CometStartupData(id, password, platform, protocol),
                         WrapperLoader.wrapperClassLoader,
                         Console.newLineReader("telegram-comet")
                     )

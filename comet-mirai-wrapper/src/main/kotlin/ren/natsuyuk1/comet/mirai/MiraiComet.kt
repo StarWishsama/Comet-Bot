@@ -11,7 +11,7 @@ import net.mamoe.mirai.utils.*
 import org.jline.reader.LineReader
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
-import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.config.CometStartupData
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
@@ -35,9 +35,9 @@ private val logger = logger("Comet-Mirai")
 
 class MiraiComet(
     /**
-     * 一个 Comet 实例的 [CometConfig]
+     * 一个 Comet 实例的 [CometStartupData]
      */
-    config: CometConfig,
+    config: CometStartupData,
 
     private val cl: ClassLoader,
 
