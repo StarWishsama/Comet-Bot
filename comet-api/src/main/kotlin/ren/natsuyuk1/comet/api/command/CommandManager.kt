@@ -18,7 +18,7 @@ import moe.sdl.yac.core.CommandResult
 import moe.sdl.yac.core.parseToArgs
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.Comet
-import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.permission.PermissionManager
@@ -40,7 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 
 private val logger = mu.KotlinLogging.logger {}
 
-fun CometUser.hasCoolDown(triggerTime: Instant, coolDown: Duration = CometConfig.data.commandCoolDown.seconds) =
+fun CometUser.hasCoolDown(triggerTime: Instant, coolDown: Duration = CometGlobalConfig.data.commandCoolDown.seconds) =
     userLevel != UserLevel.OWNER && triggerCommandTime.plus(coolDown) >= triggerTime
 
 object CommandManager {
@@ -115,13 +115,13 @@ object CommandManager {
         // 检查消息是否含命令前缀
         if (sender !is ConsoleCommandSender && !args[0].containsEtc(
                 false,
-                *CometConfig.data.commandPrefix.toTypedArray()
+                *CometGlobalConfig.data.commandPrefix.toTypedArray()
             )
         ) {
             return@launch
         }
 
-        val possibleCommand = args[0].replaceAllToBlank(CometConfig.data.commandPrefix)
+        val possibleCommand = args[0].replaceAllToBlank(CometGlobalConfig.data.commandPrefix)
 
         if (!hasCommand(possibleCommand)) {
             return@launch
@@ -148,7 +148,7 @@ object CommandManager {
                 if (user.userLevel != UserLevel.OWNER) {
                     when (property.executeConsumeType) {
                         CommandConsumeType.COOLDOWN -> {
-                            if (user.platform.needRestrict || property.executeConsumePoint == CometConfig.data.commandCoolDown) { // ktlint-disable max-line-length
+                            if (user.platform.needRestrict || property.executeConsumePoint == CometGlobalConfig.data.commandCoolDown) { // ktlint-disable max-line-length
                                 if (user.hasCoolDown(executeTime, property.executeConsumePoint.seconds)) {
                                     return@runCatching CommandStatus.ValidateFailed()
                                 }

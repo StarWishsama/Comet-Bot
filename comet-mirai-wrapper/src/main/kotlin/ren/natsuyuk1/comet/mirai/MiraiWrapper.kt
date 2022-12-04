@@ -2,9 +2,8 @@ package ren.natsuyuk1.comet.mirai
 
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jline.reader.LineReader
 import ren.natsuyuk1.comet.api.Comet
-import ren.natsuyuk1.comet.api.config.CometStartupData
+import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.database.AccountData
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.wrapper.CometWrapper
@@ -15,11 +14,7 @@ import ren.natsuyuk1.comet.mirai.util.runWith
 private val logger = KotlinLogging.logger {}
 
 class MiraiWrapper : CometWrapper {
-    override suspend fun createInstance(
-        config: CometStartupData,
-        classLoader: ClassLoader,
-        reader: LineReader
-    ): Comet {
+    override suspend fun createInstance(config: CometConfig): Comet {
         MiraiConfigManager.init()
 
         var loginProtocol = config.protocol
@@ -42,7 +37,7 @@ class MiraiWrapper : CometWrapper {
             AccountData.registerAccount(config.id, config.password, platform(), loginProtocol)
         }
 
-        return classLoader.runWith { MiraiComet(config, classLoader, miraiConfig, reader) }
+        return config.classLoader.runWith { MiraiComet(config, miraiConfig) }
     }
 
     override fun platform(): LoginPlatform = LoginPlatform.MIRAI

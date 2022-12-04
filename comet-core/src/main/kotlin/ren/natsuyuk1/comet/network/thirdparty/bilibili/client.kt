@@ -10,7 +10,7 @@ import moe.sdl.yabapi.enums.LogLevel
 import moe.sdl.yabapi.storage.FileCookieStorage
 import moe.sdl.yabapi.util.string.cookieFromHeader
 import mu.KotlinLogging
-import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.utils.file.configDirectory
 
 private var isInitializedYabapi = false
@@ -45,11 +45,11 @@ suspend fun initYabapi() {
         biliClient = BiliClient(
             getDefaultHttpClient(
                 FileCookieStorage(configDirectory.resolve("bili_token")).apply {
-                    if (CometConfig.data.biliCookie.isEmpty()) {
+                    if (CometGlobalConfig.data.biliCookie.isEmpty()) {
                         return@apply
                     }
 
-                    cookieFromHeader(CometConfig.data.biliCookie).forEach {
+                    cookieFromHeader(CometGlobalConfig.data.biliCookie).forEach {
                         addCookie("https://.bilibili.com", it)
                     }
                 }

@@ -12,13 +12,14 @@ package ren.natsuyuk1.comet.api.config
 import kotlinx.serialization.Serializable
 import net.mamoe.yamlkt.Comment
 import net.mamoe.yamlkt.Yaml
+import org.jline.reader.LineReader
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.platform.MiraiLoginProtocol
 import ren.natsuyuk1.comet.utils.file.configDirectory
 import java.io.File
 
-object CometConfig : PersistDataFile<CometConfig.Data>(
+object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
     File(configDirectory, "config.yml"),
     Data.serializer(),
     Data(),
@@ -60,9 +61,11 @@ object CometConfig : PersistDataFile<CometConfig.Data>(
     )
 }
 
-data class CometStartupData(
+data class CometConfig(
     val id: Long,
     val password: String,
     val platform: LoginPlatform,
-    val protocol: MiraiLoginProtocol? = null
+    val protocol: MiraiLoginProtocol? = null,
+    val classLoader: ClassLoader,
+    val reader: LineReader
 )

@@ -2,7 +2,7 @@ package ren.natsuyuk1.comet.consts
 
 import ren.natsuyuk1.comet.api.command.AbstractCommandNode
 import ren.natsuyuk1.comet.api.command.CommandNode
-import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.api.database.DatabaseConfig
 import ren.natsuyuk1.comet.api.event.EventManagerConfig
@@ -22,7 +22,7 @@ import ren.natsuyuk1.comet.pusher.CometPusherContextTable
 
 val cometPersistDataFile: List<PersistDataFile<*>> =
     listOf(
-        CometConfig,
+        CometGlobalConfig,
         DatabaseConfig,
         GitHubRepoData,
         EventManagerConfig,

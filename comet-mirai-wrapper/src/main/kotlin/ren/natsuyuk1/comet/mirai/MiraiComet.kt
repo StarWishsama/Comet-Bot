@@ -8,10 +8,9 @@ import net.mamoe.mirai.internal.network.Packet
 import net.mamoe.mirai.message.data.MessageSource.Key.recall
 import net.mamoe.mirai.network.NoStandardInputForCaptchaException
 import net.mamoe.mirai.utils.*
-import org.jline.reader.LineReader
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
-import ren.natsuyuk1.comet.api.config.CometStartupData
+import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
@@ -35,17 +34,13 @@ private val logger = logger("Comet-Mirai")
 
 class MiraiComet(
     /**
-     * 一个 Comet 实例的 [CometStartupData]
+     * 一个 Comet 实例的 [CometConfig]
      */
-    config: CometStartupData,
-
-    private val cl: ClassLoader,
-
+    config: CometConfig,
     private val miraiConfig: MiraiConfig,
-
-    private val reader: LineReader
 ) : Comet(LoginPlatform.MIRAI, config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
     lateinit var miraiBot: Bot
+    private val cl = config.classLoader
 
     override val id: Long
         get() = miraiConfig.id
@@ -73,7 +68,7 @@ class MiraiComet(
             } else {
                 StandardCharImageLoginSolver(input = {
                     try {
-                        reader.readLine()
+                        config.reader.readLine()
                     } catch (e: Exception) {
                         throw NoStandardInputForCaptchaException(e)
                     }

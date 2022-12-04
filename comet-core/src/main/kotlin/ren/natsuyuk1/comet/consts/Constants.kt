@@ -15,7 +15,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.cookies.*
 import kotlinx.serialization.json.Json
-import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.utils.ktor.initProxy
 import ren.natsuyuk1.comet.utils.time.Timer
@@ -34,7 +34,7 @@ val defaultClient = HttpClient(CIO) {
 
     install(UserAgent) {
         agent =
-            CometConfig.data.useragent
+            CometGlobalConfig.data.useragent
     }
 
     install(ContentEncoding) {

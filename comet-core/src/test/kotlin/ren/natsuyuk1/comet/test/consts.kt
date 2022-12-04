@@ -3,7 +3,7 @@ package ren.natsuyuk1.comet.test
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.cometInstances
-import ren.natsuyuk1.comet.api.config.CometStartupData
+import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.message.MessageWrapper
@@ -20,7 +20,7 @@ val fakeGroups = mutableSetOf<Group>()
 
 val fakeComet by lazy {
     object :
-        Comet(LoginPlatform.TEST, CometStartupData(0, "", LoginPlatform.TEST), logger, ModuleScope("fake-comet-core")) {
+        Comet(LoginPlatform.TEST, CometConfig(0, "", LoginPlatform.TEST), logger, ModuleScope("fake-comet-core")) {
         override val id: Long = 0
 
         override fun login() {}

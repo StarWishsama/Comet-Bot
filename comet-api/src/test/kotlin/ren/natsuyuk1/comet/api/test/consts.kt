@@ -2,7 +2,7 @@ package ren.natsuyuk1.comet.api.test
 
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
-import ren.natsuyuk1.comet.api.config.CometStartupData
+import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.message.MessageWrapper
@@ -15,7 +15,7 @@ private val logger = mu.KotlinLogging.logger {}
 
 val fakeComet = object : Comet(
     platform = LoginPlatform.TEST,
-    config = CometStartupData(0, "", LoginPlatform.TEST),
+    config = CometConfig(0, "", LoginPlatform.TEST),
     logger = logger,
     scope = ModuleScope("TestInstance")
 ) {

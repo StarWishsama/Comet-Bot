@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
-import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
@@ -30,7 +30,7 @@ class TestPictureSearch {
         if (isCI()) return
 
         runBlocking {
-            CometConfig.init()
+            CometGlobalConfig.init()
         }
 
         initTestDatabase()

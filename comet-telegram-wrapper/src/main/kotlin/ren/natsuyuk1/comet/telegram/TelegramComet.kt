@@ -23,7 +23,7 @@ import io.ktor.client.plugins.*
 import kotlinx.coroutines.launch
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
-import ren.natsuyuk1.comet.api.config.CometStartupData
+import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
@@ -43,9 +43,9 @@ private val logger = mu.KotlinLogging.logger("Comet-Telegram")
 
 class TelegramComet(
     /**
-     * 一个 Comet 实例的 [CometStartupData]
+     * 一个 Comet 实例的 [CometConfig]
      */
-    config: CometStartupData
+    config: CometConfig
 ) : Comet(LoginPlatform.TELEGRAM, config, logger, ModuleScope("telegram ${config.id}")) {
     internal val startTime = DateTime.now()
     lateinit var bot: TelegramBot

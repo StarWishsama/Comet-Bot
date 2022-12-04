@@ -4,7 +4,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import mu.KotlinLogging
-import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.network.thirdparty.apexlegends.data.ApexIDInfo
@@ -20,7 +20,7 @@ object ApexLegendAPI {
         uid: String,
         platform: String,
     ): ApexPlayerInfo = client.get("$API_ROUTE/bridge") {
-        parameter("auth", CometConfig.data.apexLegendToken)
+        parameter("auth", CometGlobalConfig.data.apexLegendToken)
         parameter("uid", uid)
         parameter("platform", platform)
 
@@ -35,7 +35,7 @@ object ApexLegendAPI {
         playerName: String,
         platform: String,
     ): ApexPlayerInfo = client.get("$API_ROUTE/bridge") {
-        parameter("auth", CometConfig.data.apexLegendToken)
+        parameter("auth", CometGlobalConfig.data.apexLegendToken)
         parameter("player", playerName)
         parameter("platform", platform)
 
@@ -50,7 +50,7 @@ object ApexLegendAPI {
         playerName: String,
         platform: String,
     ): ApexIDInfo = client.get("$API_ROUTE/nametouid") {
-        parameter("auth", CometConfig.data.apexLegendToken)
+        parameter("auth", CometGlobalConfig.data.apexLegendToken)
         parameter("player", playerName)
         parameter("platform", platform)
 

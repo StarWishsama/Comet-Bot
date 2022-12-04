@@ -13,7 +13,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import mu.KLogger
 import ren.natsuyuk1.comet.api.command.CommandManager
-import ren.natsuyuk1.comet.api.config.CometStartupData
+import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.event.events.message.MessageEvent
 import ren.natsuyuk1.comet.api.event.registerListener
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
@@ -35,9 +35,9 @@ abstract class Comet(
      */
     val platform: LoginPlatform,
     /**
-     * 一个 Comet 实例的 [CometStartupData]
+     * 一个 Comet 实例的 [CometConfig]
      */
-    val config: CometStartupData,
+    val config: CometConfig,
 
     /**
      * 一个 Comet 实例的 [KLogger]
