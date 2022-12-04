@@ -66,6 +66,6 @@ data class CometConfig(
     val password: String,
     val platform: LoginPlatform,
     val protocol: MiraiLoginProtocol? = null,
-    val classLoader: ClassLoader,
-    val reader: LineReader
+    val classLoader: ClassLoader = Thread.currentThread().contextClassLoader,
+    val reader: LineReader? = null,
 )

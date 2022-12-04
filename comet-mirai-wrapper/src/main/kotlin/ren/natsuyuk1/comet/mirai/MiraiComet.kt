@@ -68,7 +68,7 @@ class MiraiComet(
             } else {
                 StandardCharImageLoginSolver(input = {
                     try {
-                        config.reader.readLine()
+                        config.reader!!.readLine()
                     } catch (e: Exception) {
                         throw NoStandardInputForCaptchaException(e)
                     }
