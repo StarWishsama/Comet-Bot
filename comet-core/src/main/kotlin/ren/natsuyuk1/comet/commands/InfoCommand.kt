@@ -46,7 +46,7 @@ class InfoCommand(
             )
         } else {
             val leaderboard = transaction {
-                CometUser.all().orderBy(UserTable.coin to SortOrder.DESC).take(10)
+                CometUser.all().orderBy(UserTable.coin to SortOrder.DESC).limit(10)
             }
 
             subject.sendMessage(
