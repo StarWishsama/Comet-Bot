@@ -35,9 +35,14 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform, 
 
                 val miraiComet =
                     service.createInstance(
-                        CometConfig(id, password, platform, protocol),
-                        WrapperLoader.wrapperClassLoader,
-                        Console.newLineReader("mirai-comet")
+                        CometConfig(
+                            id,
+                            password,
+                            platform,
+                            protocol,
+                            WrapperLoader.wrapperClassLoader,
+                            Console.newLineReader("mirai-comet")
+                        ),
                     )
 
                 cometInstances.push(miraiComet)
@@ -56,9 +61,14 @@ internal suspend fun login(id: Long, password: String, platform: LoginPlatform, 
             LoginPlatform.TELEGRAM -> {
                 val telegramComet =
                     service.createInstance(
-                        CometConfig(id, password, platform, protocol),
-                        WrapperLoader.wrapperClassLoader,
-                        Console.newLineReader("telegram-comet")
+                        CometConfig(
+                            id,
+                            password,
+                            platform,
+                            protocol,
+                            WrapperLoader.wrapperClassLoader,
+                            Console.newLineReader("telegram-comet")
+                        )
                     )
 
                 cometInstances.push(telegramComet)

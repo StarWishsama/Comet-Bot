@@ -3,6 +3,7 @@ package ren.natsuyuk1.comet.commands
 import kotlinx.datetime.toJavaInstant
 import moe.sdl.yac.parameters.options.flag
 import moe.sdl.yac.parameters.options.option
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.CometCommand
@@ -12,6 +13,7 @@ import ren.natsuyuk1.comet.api.message.AtElement
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
+import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.time.yyMMddWithTimePattern
 
@@ -44,7 +46,7 @@ class InfoCommand(
             )
         } else {
             val leaderboard = transaction {
-                CometUser.all().sortedByDescending { it.coin }.take(10)
+                CometUser.all().orderBy(UserTable.coin to SortOrder.DESC).take(10)
             }
 
             subject.sendMessage(
