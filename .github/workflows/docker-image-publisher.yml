@@ -34,4 +34,4 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/qianjunakasumi/senjuko-conch:dev
+            ghcr.io/StarWishsama/Comet-Bot:dev
