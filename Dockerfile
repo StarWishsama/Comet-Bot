@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk-alpine:17-latest
+FROM azul/zulu-openjdk-alpine:17-latest as builder
 WORKDIR /usr/src/comet
 COPY . .
 RUN apt update && apt install -y git && ./gradlew buildComet
