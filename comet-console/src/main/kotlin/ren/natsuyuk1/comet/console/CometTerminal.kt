@@ -227,5 +227,8 @@ suspend fun main(args: Array<String>) {
     }
 }
 
-private fun terminalAvaliable(): Boolean =
-    (System.getProperty("comet.no-terminal") ?: System.getenv("COMET_NO_TERMINAL")).isNullOrBlank()
+private fun terminalAvaliable(): Boolean {
+    return if (System.getProperty("comet.no-terminal") != null) {
+        false
+    } else System.getenv("COMET_NO_TERMINAL").isEmpty()
+}
