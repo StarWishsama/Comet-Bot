@@ -6,6 +6,7 @@ import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.api.database.DatabaseConfig
 import ren.natsuyuk1.comet.api.event.EventManagerConfig
+import ren.natsuyuk1.comet.api.task.CronTasks
 import ren.natsuyuk1.comet.api.user.UserPermissionTable
 import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.commands.*
@@ -45,6 +46,7 @@ val cometTables =
         CometPusherContextTable,
         ApexLegendDataTable,
         PictureSearchConfigTable,
+        CronTasks
     )
 
 val defaultCommands: List<AbstractCommandNode<*>> =
