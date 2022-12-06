@@ -67,7 +67,7 @@ class MiraiComet(
                 SwingSolver
             } else if (if (System.getProperty("comet.no-terminal") != null) {
                 false
-            } else System.getenv("COMET_NO_TERMINAL").isEmpty()
+            } else System.getenv("COMET_NO_TERMINAL").isNullOrBlank()
             ) {
                 StandardCharImageLoginSolver(input = {
                     try {
