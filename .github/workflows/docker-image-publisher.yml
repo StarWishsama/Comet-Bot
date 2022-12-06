@@ -35,3 +35,4 @@ jobs:
           push: true
           tags: |
             ghcr.io/starwishsama/comet-bot:dev
+            ghcr.io/starwishsama/comet-bot:latest
