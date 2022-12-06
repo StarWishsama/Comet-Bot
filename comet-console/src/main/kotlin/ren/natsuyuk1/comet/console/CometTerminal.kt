@@ -120,7 +120,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
     private fun setupCommands() = scope.launch {
         logger.info { "注册命令..." }
-        registerTerminalCommands()
+        if (terminalAvaliable()) registerTerminalCommands()
         CommandManager.registerCommands(defaultCommands)
         EventManager.init(coroutineContext)
     }
@@ -151,6 +151,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
     private fun setupShutdownHook() {
         addShutdownHook {
+            println("\n正在退出 Comet Terminal...")
             CometServer.stop()
             cometInstances.forEach {
                 try {
@@ -162,7 +163,6 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
             runBlocking { cometPersistDataFile.forEach { it.save() } }
             closeAll()
             Console.redirectToNull()
-            println("\n正在退出 Comet Terminal...")
         }
     }
 
