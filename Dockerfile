@@ -6,6 +6,5 @@ RUN apt update && apt install -y git && ./gradlew buildComet
 FROM azul/zulu-openjdk:17-latest
 COPY --from=builder /usr/src/comet/comet /usr/local/comet
 ENV TZ=Asia/Shanghai
-ENV COMET_NO_CONSOLE=TRUE
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-CMD ["java", "-XX:+OptimizeStringConcat", "-XX:+UseStringDeduplication", "-Dcomet.no-terminal", "-jar", "/usr/local/comet/comet-console.jar"]
+CMD ["java", "-XX:+OptimizeStringConcat", "-XX:+UseStringDeduplication", "-Dcomet.no-terminal", "-Dfile.encoding=UTF-8", "-jar", "/usr/local/comet/comet-console.jar"]
