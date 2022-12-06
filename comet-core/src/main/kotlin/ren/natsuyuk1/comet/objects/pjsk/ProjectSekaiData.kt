@@ -68,7 +68,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
             }
         }
 
-        suspend fun updateEventInfo() {
+        suspend fun updateEventInfo(force: Boolean = false) {
             var init = false
             newSuspendedTransaction {
                 if (ProjectSekaiData.all().empty()) {
@@ -87,7 +87,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
                 transaction {
                     val info = ProjectSekaiData.all().first()
 
-                    if (info.endTime < timestamp) {
+                    if (info.endTime < timestamp || force) {
                         info.apply {
                             currentEventID = currentEvent.id
                             startTime = currentEvent.startAt
