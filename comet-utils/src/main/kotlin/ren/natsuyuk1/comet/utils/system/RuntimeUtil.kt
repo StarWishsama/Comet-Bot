@@ -1,4 +1,4 @@
-package ren.natsuyuk1.comet.utils.systeminfo
+package ren.natsuyuk1.comet.utils.system
 
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.utils.math.NumberUtil.formatDigests

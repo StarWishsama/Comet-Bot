@@ -93,7 +93,9 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
             startService()
 
-            handleConsoleCommand()
+            if (!terminalAvaliable()) {
+                handleConsoleCommand()
+            }
         }.join()
     }
 
@@ -220,3 +222,6 @@ suspend fun main(args: Array<String>) {
         }
     }
 }
+
+private fun terminalAvaliable(): Boolean =
+    (System.getProperty("comet.no-terminal") ?: System.getenv("COMET_NO_TERMINAL")).isBlank()

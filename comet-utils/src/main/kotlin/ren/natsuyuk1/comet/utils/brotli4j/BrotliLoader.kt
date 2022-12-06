@@ -9,9 +9,9 @@ import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.defaultClient
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
-import ren.natsuyuk1.comet.utils.systeminfo.OsArch
-import ren.natsuyuk1.comet.utils.systeminfo.OsType
-import ren.natsuyuk1.comet.utils.systeminfo.RuntimeUtil
+import ren.natsuyuk1.comet.utils.system.OsArch
+import ren.natsuyuk1.comet.utils.system.OsType
+import ren.natsuyuk1.comet.utils.system.RuntimeUtil
 import java.io.File
 import java.util.zip.ZipFile
 import kotlin.io.path.outputStream

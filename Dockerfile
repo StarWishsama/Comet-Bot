@@ -5,4 +5,4 @@ RUN apt update && apt install -y git && ./gradlew buildComet
 
 FROM azul/zulu-openjdk:17-latest
 COPY --from=builder /usr/src/comet/comet /usr/local/comet
-CMD ["java", "-XX:+OptimizeStringConcat", "-XX:+UseStringDeduplication", "-jar", "/usr/local/comet/comet-console.jar"]
+CMD ["java", "-XX:+OptimizeStringConcat", "-XX:+UseStringDeduplication", "-Dcomet.no-terminal", "-jar", "/usr/local/comet/comet-console.jar"]

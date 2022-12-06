@@ -1,4 +1,4 @@
-package ren.natsuyuk1.comet.utils.systeminfo
+package ren.natsuyuk1.comet.utils.system
 
 enum class OsType {
     WINDOWS,
