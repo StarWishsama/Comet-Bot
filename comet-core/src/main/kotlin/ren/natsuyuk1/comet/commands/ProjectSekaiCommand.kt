@@ -65,7 +65,7 @@ class ProjectSekaiCommand(
         if (currentContext.invokedSubcommand == null) {
             if (refreshCache) {
                 if (user.userLevel >= UserLevel.ADMIN) {
-                    ProjectSekaiData.updateEventInfo()
+                    ProjectSekaiData.updateEventInfo(true)
                     subject.sendMessage("成功刷新活动信息".toMessageWrapper())
                 } else {
                     subject.sendMessage("你没有权限".toMessageWrapper())
