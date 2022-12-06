@@ -97,6 +97,8 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
                 handleConsoleCommand()
             } else {
                 logger.warn { "检测到不支持标准输入的环境, Comet 暂时不支持在这样的环境下完成操作, 请在支持的环境下完成这些操作后再复制相关文件." }
+                while (true) {
+                }
             }
         }.join()
     }
