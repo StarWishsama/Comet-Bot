@@ -40,7 +40,7 @@ jobs:
           context: .
           push: true
           tags: |
+            noraincity/comet-bot:dev
             ghcr.io/starwishsama/comet-bot:dev
+            noraincity/comet-bot:latest
             ghcr.io/starwishsama/comet-bot:latest
-            starwishsama/comet-bot:dev
-            starwishsama/comet-bot:latest
