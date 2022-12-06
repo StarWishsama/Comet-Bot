@@ -65,7 +65,10 @@ class MiraiComet(
 
             loginSolver = if (Desktop.isDesktopSupported()) {
                 SwingSolver
-            } else if ((System.getProperty("comet.no-terminal") ?: System.getenv("COMET_NO_TERMINAL")).isBlank()) {
+            } else if (if (System.getProperty("comet.no-terminal") != null) {
+                false
+            } else System.getenv("COMET_NO_TERMINAL").isEmpty()
+            ) {
                 StandardCharImageLoginSolver(input = {
                     try {
                         config.reader!!.readLine()
