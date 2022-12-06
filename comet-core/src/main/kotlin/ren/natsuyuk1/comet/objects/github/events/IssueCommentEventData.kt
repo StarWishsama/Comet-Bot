@@ -13,6 +13,7 @@ package ren.natsuyuk1.comet.objects.github.events
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import ren.natsuyuk1.comet.utils.time.hmsPattern
 import java.time.LocalDateTime
@@ -21,8 +22,20 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Serializable
+enum class IssueCommentStatus {
+    @SerialName("created")
+    CREATED,
+
+    @SerialName("edited")
+    EDITED,
+
+    @SerialName("deleted")
+    DELETED,
+}
+
+@Serializable
 data class IssueCommentEventData(
-    val action: String,
+    val action: IssueCommentStatus,
     val issue: IssueEventData.IssueObject,
     val comment: CommentObject,
     val repository: IssueEventData.RepoInfo
@@ -49,11 +62,33 @@ data class IssueCommentEventData(
     }
 
     override fun toMessageWrapper(): MessageWrapper {
-        return MessageWrapper().apply {
-            appendText("\uD83D\uDCAC ${repository.fullName} 议题 #${issue.number}\n")
-            appendText("新回复 | ${comment.user.login} | ${comment.convertCreatedTime()}\n\n")
-            appendText("${comment.body.limit(80).trim()}\n\n")
-            appendText("查看全部 > ${comment.url}\n")
+        return when (action) {
+            IssueCommentStatus.CREATED -> {
+                buildMessageWrapper {
+                    appendText("\uD83D\uDCAC ${repository.fullName} 议题 #${issue.number}\n")
+                    appendText("新回复 | ${comment.user.login} | ${comment.convertCreatedTime()}\n\n")
+                    appendText("${comment.body.limit(80).trim()}\n\n")
+                    appendText("查看全部 > ${comment.url}\n")
+                }
+            }
+
+            IssueCommentStatus.EDITED -> {
+                buildMessageWrapper {
+                    appendText("\uD83D\uDCAC ${repository.fullName} 议题 #${issue.number}\n")
+                    appendText("已编辑回复 | ${comment.user.login} | ${comment.convertCreatedTime()}\n\n")
+                    appendText("${comment.body.limit(80).trim()}\n\n")
+                    appendText("查看全部 > ${comment.url}\n")
+                }
+            }
+
+            IssueCommentStatus.DELETED -> {
+                buildMessageWrapper {
+                    appendText("\uD83D\uDCAC ${repository.fullName} 议题 #${issue.number}\n")
+                    appendText("回复已删除 | ${comment.user.login} | ${comment.convertCreatedTime()}\n\n")
+                    appendText("${comment.body.limit(80).trim()}\n\n")
+                    appendText("原回复链接 > ${comment.url}\n")
+                }
+            }
         }
     }
 
