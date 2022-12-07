@@ -30,9 +30,6 @@ jobs:
           java-package: jdk
           architecture: x64
 
-      - name: Gradle Wrapper 验证
-        uses: gradle/wrapper-validation-action@v1
-
       - uses: burrunan/gradle-cache-action@v1
         name: 检查格式、测试并打包
         with:
