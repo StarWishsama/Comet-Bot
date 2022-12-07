@@ -14,6 +14,7 @@ Demo/交流群：725656262
 ![Stars](https://img.shields.io/github/stars/starwishsama/Comet-Bot)
 [![Release](https://img.shields.io/github/v/release/StarWishSama/Comet-Bot?include_prereleases)](https://github.com/StarWishsama/Comet-Bot/releases)
 [![Wiki](https://img.shields.io/badge/Wiki-%23000000.svg?style=plastic)](https://github.com/StarWishsama/Comet-Bot/wiki)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FStarWishsama%2FComet-Bot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FStarWishsama%2FComet-Bot?ref=badge_shield)
 
 ## 🎉 它能干什么?
 
@@ -78,6 +79,9 @@ comet-mirai-wrapper 使用 [AGPL v3](https://github.com/StarWishsama/Comet-Bot/b
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FStarWishsama%2FComet-Bot.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FStarWishsama%2FComet-Bot?ref=badge_large)
 
 ## 🔈 鸣谢
 
