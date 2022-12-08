@@ -26,8 +26,8 @@ import kotlin.io.path.pathString
 val globalDirectory by lazy {
     File(
         if (getEnv("comet.workdir").isNullOrBlank()) {
-            getEnv("comet.workdir")
-        } else System.getProperty("user.dir")
+            System.getProperty("user.dir")
+        } else getEnv("comet.workdir")
     )
 }
 
