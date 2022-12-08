@@ -39,6 +39,7 @@ import ren.natsuyuk1.comet.console.command.registerTerminalCommands
 import ren.natsuyuk1.comet.console.util.Console
 import ren.natsuyuk1.comet.console.util.login
 import ren.natsuyuk1.comet.console.util.loginStatus
+import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.cometPersistDataFile
 import ren.natsuyuk1.comet.consts.cometTables
 import ren.natsuyuk1.comet.consts.defaultCommands
@@ -88,6 +89,10 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
             logger.info { "Comet 工作目录: ${File("./").absPath}" }
 
             CometTerminal.init(scope.coroutineContext)
+
+            if (cometClient.client.engineConfig.proxy != null) {
+                logger.info { "检测到系统代理设置, 已自动为 Comet 设置" }
+            }
 
             setupConfig()
             setupDatabase()
