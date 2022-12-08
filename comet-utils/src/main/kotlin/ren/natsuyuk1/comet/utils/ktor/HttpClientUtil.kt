@@ -19,6 +19,8 @@ fun HttpClientEngineConfig.initProxy() {
     val proxyStr = getEnv("comet.proxy")
     if (proxyStr.isNullOrBlank()) return
 
+    logger.info { "检测到系统代理设置, 已自动为 Comet 设置" }
+
     proxy = ProxyBuilder.http(proxyStr)
 }
 
