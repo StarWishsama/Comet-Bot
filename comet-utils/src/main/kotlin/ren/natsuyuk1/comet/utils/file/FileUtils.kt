@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.sink
 import okio.source
+import ren.natsuyuk1.comet.utils.system.getEnv
 import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
@@ -23,7 +24,11 @@ import kotlin.io.path.absolute
 import kotlin.io.path.pathString
 
 val globalDirectory by lazy {
-    File(System.getProperty("user.dir"))
+    File(
+        if (getEnv("comet.workdir").isNullOrBlank()) {
+            getEnv("comet.workdir")
+        } else System.getProperty("user.dir")
+    )
 }
 
 fun resolveDirectory(path: String) = File(globalDirectory, path)
