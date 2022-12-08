@@ -46,9 +46,11 @@ import ren.natsuyuk1.comet.network.CometServer
 import ren.natsuyuk1.comet.service.CometCoreService
 import ren.natsuyuk1.comet.utils.brotli4j.BrotliLoader
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import ren.natsuyuk1.comet.utils.system.getEnv
+import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
 
@@ -83,6 +85,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
             setupConsole()
 
             logger.info { "正在运行 Comet Terminal $version-$branch-$hash" }
+            logger.info { "Comet 工作目录: ${File("./").absPath}" }
 
             CometTerminal.init(scope.coroutineContext)
 
