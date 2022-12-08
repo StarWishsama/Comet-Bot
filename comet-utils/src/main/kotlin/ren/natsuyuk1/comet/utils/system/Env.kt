@@ -5,6 +5,4 @@ fun getEnv(propName: String): String? {
     return getEnv(propName, env)
 }
 
-fun getEnv(propName: String, env: String): String? =
-    System.getProperty(propName).also { println("prop($propName): $it") } ?: System.getenv(env)
-        .also { println("env($env): $it") }
+fun getEnv(propName: String, env: String): String? = System.getProperty(propName) ?: System.getenv(env)
