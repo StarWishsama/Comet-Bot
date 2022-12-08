@@ -28,6 +28,7 @@ import ren.natsuyuk1.comet.mirai.util.runWithScope
 import ren.natsuyuk1.comet.mirai.util.runWithSuspend
 import ren.natsuyuk1.comet.service.subscribeGitHubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import ren.natsuyuk1.comet.utils.system.getEnv
 import java.awt.Desktop
 
 private val logger = logger("Comet-Mirai")
@@ -65,10 +66,7 @@ class MiraiComet(
 
             loginSolver = if (Desktop.isDesktopSupported()) {
                 SwingSolver
-            } else if (if (System.getProperty("comet.no-terminal") != null) {
-                false
-            } else System.getenv("COMET_NO_TERMINAL").isNullOrBlank()
-            ) {
+            } else if (getEnv("comet.no-terminal").isNullOrBlank()) {
                 StandardCharImageLoginSolver(input = {
                     try {
                         config.reader!!.readLine()

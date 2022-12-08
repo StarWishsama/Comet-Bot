@@ -9,13 +9,14 @@ import okio.buffer
 import okio.sink
 import okio.source
 import ren.natsuyuk1.comet.utils.file.absPath
+import ren.natsuyuk1.comet.utils.system.getEnv
 import java.io.File
 import java.io.InputStream
 
 private val logger = mu.KotlinLogging.logger("CometClient")
 
 fun HttpClientEngineConfig.initProxy() {
-    val proxyStr = System.getProperty("comet.proxy") ?: System.getenv("COMET_PROXY")
+    val proxyStr = getEnv("comet.proxy")
     if (proxyStr.isNullOrBlank()) return
 
     proxy = ProxyBuilder.http(proxyStr)

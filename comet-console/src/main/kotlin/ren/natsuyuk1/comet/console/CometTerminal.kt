@@ -48,6 +48,7 @@ import ren.natsuyuk1.comet.utils.brotli4j.BrotliLoader
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.jvm.addShutdownHook
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
+import ren.natsuyuk1.comet.utils.system.getEnv
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
 
@@ -227,8 +228,4 @@ suspend fun main(args: Array<String>) {
     }
 }
 
-private fun terminalAvaliable(): Boolean {
-    return if (System.getProperty("comet.no-terminal") != null) {
-        false
-    } else System.getenv("COMET_NO_TERMINAL").isNullOrBlank()
-}
+private fun terminalAvaliable(): Boolean = getEnv("comet.no-terminal").isNullOrBlank()

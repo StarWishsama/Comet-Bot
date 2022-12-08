@@ -17,13 +17,16 @@ import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.configDirectory
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
+import ren.natsuyuk1.comet.utils.system.getEnv
 import java.io.File
 import java.sql.Connection.*
+
+private val databaseDir = getEnv("comet.sqlite-dir") ?: resolveDirectory("sqlite.db").absPath
 
 enum class DatabaseType {
     SQLITE {
         override val defaultConnectionString: String by lazy {
-            "jdbc:sqlite:${resolveDirectory("sqlite.db").absPath}"
+            "jdbc:sqlite:$databaseDir"
         }
 
         override val defaultMaxPoolSize: Int = 1
