@@ -3,9 +3,11 @@ package ren.natsuyuk1.comet.api
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.User
+import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import java.util.concurrent.ConcurrentLinkedDeque
 
 val cometInstances = ConcurrentLinkedDeque<Comet>()
+val cometScope = ModuleScope("comet_global_scope")
 
 /**
  * [IComet]

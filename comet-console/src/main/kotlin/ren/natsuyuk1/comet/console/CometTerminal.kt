@@ -21,8 +21,11 @@ import ren.natsuyuk1.comet.api.cometInstances
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.console.Console
+import ren.natsuyuk1.comet.api.database.AccountData
 import ren.natsuyuk1.comet.api.database.AccountDataTable
 import ren.natsuyuk1.comet.api.database.DatabaseManager
+import ren.natsuyuk1.comet.api.database.loginStatus
 import ren.natsuyuk1.comet.api.event.EventManager
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
@@ -36,9 +39,6 @@ import ren.natsuyuk1.comet.config.branch
 import ren.natsuyuk1.comet.config.hash
 import ren.natsuyuk1.comet.config.version
 import ren.natsuyuk1.comet.console.command.registerTerminalCommands
-import ren.natsuyuk1.comet.console.util.Console
-import ren.natsuyuk1.comet.console.util.login
-import ren.natsuyuk1.comet.console.util.loginStatus
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.cometPersistDataFile
 import ren.natsuyuk1.comet.consts.cometTables
@@ -196,7 +196,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
 
                 scope.launch {
                     try {
-                        login(
+                        AccountData.login(
                             it[AccountDataTable.id].value,
                             it[AccountDataTable.password],
                             it[AccountDataTable.platform],

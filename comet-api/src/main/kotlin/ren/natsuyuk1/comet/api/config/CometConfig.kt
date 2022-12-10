@@ -17,7 +17,9 @@ import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.platform.MiraiLoginProtocol
 import ren.natsuyuk1.comet.utils.file.configDirectory
+import ren.natsuyuk1.comet.utils.json.serializers.UUIDSerializer
 import java.io.File
+import java.util.*
 
 object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
     File(configDirectory, "config.yml"),
@@ -28,6 +30,9 @@ object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
 ) {
     @Serializable
     data class Data(
+        @Serializable(with = UUIDSerializer::class)
+        @Comment("Comet WebAPI 访问 Token")
+        val accessToken: UUID = UUID.randomUUID(),
         @Comment("Comet 消息前缀")
         val prefix: String = "Comet > ",
         /**

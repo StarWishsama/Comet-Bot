@@ -8,6 +8,7 @@ import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.user.Friend
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.User
@@ -103,4 +104,35 @@ fun net.mamoe.mirai.contact.User.toCometUser(miraiComet: MiraiComet): User {
     }
 
     return MiraiUserImpl()
+}
+
+fun net.mamoe.mirai.contact.Friend.toCometFriend(miraiComet: MiraiComet): Friend {
+    val miraiUser = this@toCometFriend
+
+    return object : Friend() {
+        override val id: Long
+            get() = miraiUser.id
+        override val comet: Comet
+            get() = miraiComet
+        override val name: String
+            get() = miraiUser.nick
+        override val platform: LoginPlatform
+            get() = LoginPlatform.MIRAI
+
+        override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
+            val event = MessagePreSendEvent(
+                comet,
+                this,
+                message,
+                Clock.System.now().epochSeconds
+            ).also { it.broadcast() }
+
+            return if (!event.isCancelled) {
+                val receipt = miraiUser.sendMessage(message.toMessageChain(miraiUser))
+                return MessageReceipt(comet, receipt.source.toMessageSource())
+            } else {
+                null
+            }
+        }
+    }
 }

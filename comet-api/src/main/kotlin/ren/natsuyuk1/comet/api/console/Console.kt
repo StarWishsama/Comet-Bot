@@ -7,7 +7,7 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
-package ren.natsuyuk1.comet.console.util
+package ren.natsuyuk1.comet.api.console
 
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
@@ -25,7 +25,7 @@ object Console {
 
     private var reader: LineReader? = null
 
-    internal fun initReader() {
+    fun initReader() {
         if (reader != null) {
             return
         }
@@ -53,11 +53,11 @@ object Console {
     @Suppress("NOTHING_TO_INLINE")
     inline fun println(string: String?) = println(any = string)
 
-    internal fun redirectToJLine() {
+    fun redirectToJLine() {
         System.setOut(JLineOutputRedirector)
     }
 
-    internal fun redirectToNull() {
+    fun redirectToNull() {
         val out = PrintStream(OutputStream.nullOutputStream())
         System.setOut(out)
     }

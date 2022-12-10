@@ -14,7 +14,7 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <withJansi>true</withJansi>
         <encoder class="ren.natsuyuk1.comet.utils.logging.PatternLayoutNoLambda">
-            <pattern>%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1le) [%t] %green([%lo{40}]) >>> %highlight(%m) %n%rEx{full}
+            <pattern>%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1le) [%t] %green([%lo{25}]) >>> %highlight(%m) %n%rEx{full}
             </pattern>
         </encoder>
     </appender>
@@ -26,8 +26,7 @@
             <totalSizeCap>1GB</totalSizeCap>
         </rollingPolicy>
         <encoder class="ren.natsuyuk1.comet.utils.logging.PatternLayoutNoLambda">
-            <pattern>%style{%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1le) [%t] %green([%lo{60}]) >>> %highlight(%m)
-                %n%rEx{full}}{Normal}
+            <pattern>%d{MM-dd'T'HH:mm:ss} - (%.-1le) [%t] ([%lo{60}]) >>> (%m) %n%rEx{full}
             </pattern>
         </encoder>
     </appender>

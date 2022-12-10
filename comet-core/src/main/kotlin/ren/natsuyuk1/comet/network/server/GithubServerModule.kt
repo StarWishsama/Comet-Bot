@@ -53,7 +53,7 @@ object GithubWebHookHandler {
                 logger.debug { "Github Webhook 传入无效请求" }
                 call.respond(
                     HttpStatusCode.Forbidden,
-                    CometResponse(HttpStatusCode.Forbidden.value, "Unsupport Request")
+                    CometResponse(HttpStatusCode.Forbidden, "Unsupport Request")
                         .toJson()
                 )
                 return
@@ -69,7 +69,7 @@ object GithubWebHookHandler {
             if (!checkSecretStatus(call, secretStatus, signature)) {
                 call.respond(
                     HttpStatusCode.Forbidden,
-                    CometResponse(HttpStatusCode.Forbidden.value, "Validate secret failed")
+                    CometResponse(HttpStatusCode.Forbidden, "Validate secret failed")
                         .toJson()
                 )
                 logger.debug("Secret 校验失败")
@@ -96,7 +96,7 @@ object GithubWebHookHandler {
 
                     call.respondText(
                         CometResponse(
-                            HttpStatusCode.NotAcceptable.value,
+                            HttpStatusCode.NotAcceptable,
                             "Comet 已收到事件, 但所请求的事件类型不支持 ($eventType)"
                         )
                             .toJson(),
@@ -112,23 +112,23 @@ object GithubWebHookHandler {
 
             when {
                 hasError -> {
-                    CometResponse(HttpStatusCode.InternalServerError.value, "Comet 发生内部错误")
+                    CometResponse(HttpStatusCode.InternalServerError, "Comet 发生内部错误")
                         .respond(call)
                 }
 
                 secretStatus == SecretStatus.NO_SECRET -> {
-                    CometResponse(HttpStatusCode.OK.value, "Comet 成功接收事件, 推荐使用密钥加密以保证安全")
+                    CometResponse(HttpStatusCode.OK, "Comet 成功接收事件, 推荐使用密钥加密以保证安全")
                         .respond(call)
                 }
 
                 else -> {
-                    CometResponse(HttpStatusCode.OK.value, "Comet 成功接收事件")
+                    CometResponse(HttpStatusCode.OK, "Comet 成功接收事件")
                         .respond(call)
                 }
             }
         } catch (e: Exception) {
             logger.warn(e) { "推送 WebHook 消息失败" }
-            CometResponse(HttpStatusCode.InternalServerError.value, "Comet 发生内部错误")
+            CometResponse(HttpStatusCode.InternalServerError, "Comet 发生内部错误")
                 .respond(call)
         }
     }
@@ -143,19 +143,19 @@ object GithubWebHookHandler {
         }
 
         if (signature == null && secretStatus == SecretStatus.NO_SECRET) {
-            CometResponse(HttpStatusCode.NotFound.value, "找不到指定的推送对象").respond(call)
+            CometResponse(HttpStatusCode.NotFound, "找不到指定的推送对象").respond(call)
             return true
         }
 
         if (secretStatus == SecretStatus.FAILED) {
             logger.debug("获取 Secret 失败")
-            CometResponse(HttpStatusCode.NotFound.value, "找不到指定的推送对象").respond(call)
+            CometResponse(HttpStatusCode.NotFound, "找不到指定的推送对象").respond(call)
             return false
         }
 
         if (secretStatus == SecretStatus.UNAUTHORIZED) {
             logger.debug { "收到新事件, 未通过安全验证. 请求的签名为: ${signature?.firstOrNull() ?: "无"}" }
-            CometResponse(HttpStatusCode.Forbidden.value, "未通过安全验证").respond(call)
+            CometResponse(HttpStatusCode.Forbidden, "未通过安全验证").respond(call)
             return false
         }
 

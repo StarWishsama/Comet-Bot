@@ -24,6 +24,8 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "minutes")
 }
 
+val ktor = "2.2.1"
+
 dependencies {
     api(project(":comet-api"))
     api(project(":comet-utils"))
@@ -36,10 +38,11 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.41.1")
     implementation("com.zaxxer:HikariCP:5.0.1")
 
-    implementation("io.ktor:ktor-server-core:2.2.1")
-    implementation("io.ktor:ktor-server-netty:2.2.1")
-    implementation("io.ktor:ktor-server-call-logging-jvm:2.2.1")
-    implementation("io.ktor:ktor-client-websockets-jvm:2.2.1")
+    implementation("io.ktor:ktor-server-core:$ktor")
+    implementation("io.ktor:ktor-server-netty:$ktor")
+    implementation("io.ktor:ktor-server-rate-limit:$ktor")
+    implementation("io.ktor:ktor-server-call-logging-jvm:$ktor")
+    implementation("io.ktor:ktor-client-websockets-jvm:$ktor")
 
     implementation("org.jsoup:jsoup:1.15.3")
 

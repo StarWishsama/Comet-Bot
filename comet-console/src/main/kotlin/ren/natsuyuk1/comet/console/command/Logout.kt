@@ -8,10 +8,10 @@ import moe.sdl.yac.parameters.types.long
 import ren.natsuyuk1.comet.api.command.BaseCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
+import ren.natsuyuk1.comet.api.database.AccountData
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
-import ren.natsuyuk1.comet.console.util.logout
 
 internal val LOGOUT = CommandProperty(
     "logout",
@@ -38,11 +38,11 @@ internal class Logout(
     override suspend fun run() {
         when (platform) {
             LoginPlatform.MIRAI -> {
-                logout(id, LoginPlatform.MIRAI)
+                AccountData.logout(id, LoginPlatform.MIRAI)
             }
 
             LoginPlatform.TELEGRAM -> {
-                logout(id, LoginPlatform.TELEGRAM)
+                AccountData.logout(id, LoginPlatform.TELEGRAM)
             }
 
             else -> {}

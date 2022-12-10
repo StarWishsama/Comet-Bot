@@ -7,7 +7,7 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
-package ren.natsuyuk1.comet.console.util
+package ren.natsuyuk1.comet.api.console
 
 import java.io.PrintStream
 import java.util.*

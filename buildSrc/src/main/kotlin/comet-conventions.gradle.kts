@@ -23,6 +23,8 @@ repositories {
     maven("https://jitpack.io")
 }
 
+val ktor = "2.2.1"
+
 dependencies {
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -44,13 +46,13 @@ dependencies {
     implementation("cn.hutool:hutool-crypto:5.8.6")
     implementation("cn.hutool:hutool-cron:5.8.6")
 
-    implementation("io.ktor:ktor-client-core:2.1.3")
-    implementation("io.ktor:ktor-client-cio:2.1.3")
-    implementation("io.ktor:ktor-client-logging:2.1.3")
-    implementation("io.ktor:ktor-client-encoding:2.1.3")
-    implementation("io.ktor:ktor-client-content-negotiation:2.1.3")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.3")
-    implementation("io.ktor:ktor-network:2.1.3")
+    implementation("io.ktor:ktor-client-core:$ktor")
+    implementation("io.ktor:ktor-client-cio:$ktor")
+    implementation("io.ktor:ktor-client-logging:$ktor")
+    implementation("io.ktor:ktor-client-encoding:$ktor")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
+    implementation("io.ktor:ktor-network:$ktor")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
     implementation("net.mamoe.yamlkt:yamlkt:0.12.0")
