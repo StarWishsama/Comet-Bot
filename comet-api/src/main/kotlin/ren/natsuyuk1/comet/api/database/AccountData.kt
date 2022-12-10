@@ -18,6 +18,8 @@ import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.console.Console
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.platform.MiraiLoginProtocol
+import ren.natsuyuk1.comet.api.status.AccountOperationResult
+import ren.natsuyuk1.comet.api.status.AccountOperationStatus
 import ren.natsuyuk1.comet.api.wrapper.WrapperLoader
 
 private val logger = KotlinLogging.logger {}
@@ -73,14 +75,25 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
                 }.firstOrNull()
             }
 
-        suspend fun login(id: Long, password: String, platform: LoginPlatform, protocol: MiraiLoginProtocol?) {
+        suspend fun login(
+            id: Long,
+            password: String,
+            platform: LoginPlatform,
+            protocol: MiraiLoginProtocol? = null
+        ): AccountOperationResult {
             loginStatus.update { true }
             val service = WrapperLoader.getService(platform)
-                ?: error("未安装 ${platform.name} Wrapper, 请下载 ${platform.name} Wrapper 并放置在 ./modules 下")
+                ?: return AccountOperationResult(
+                    AccountOperationStatus.NO_WRAPPER,
+                    "未安装 ${platform.name} Wrapper, 请下载 ${platform.name} Wrapper 并放置在 ./modules 下"
+                ).also {
+                    logger.warn { it.message }
+                }
+
             logger.info { "正在尝试登录账号 $id 于 ${platform.name} 平台" }
 
             try {
-                when (platform) {
+                return when (platform) {
                     LoginPlatform.MIRAI -> {
                         if (protocol == null) {
                             logger.warn { "未指定 Mirai 登录协议, 将默认设置为 ANDROID_PAD (安卓手机协议). 如先前已有配置将会跟随先前配置." }
@@ -101,13 +114,22 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
                         cometInstances.push(miraiComet)
                         miraiComet.init(cometScope.coroutineContext)
 
-                        try {
+                        return try {
                             miraiComet.login()
                             miraiComet.afterLogin()
+                            AccountOperationResult(AccountOperationStatus.OK, "Mirai $id 登录成功")
                         } catch (e: RuntimeException) {
                             logger.warn(e) { "Mirai $id 登录失败, 请尝试重新登录" }
                             miraiComet.close()
                             cometInstances.remove(miraiComet)
+                            AccountOperationResult(
+                                AccountOperationStatus.LOGIN_FAILED,
+                                """
+                                Mirai $id 登录失败, 请尝试重新登录
+                                Mirai 渠道无法正常通过 Web API 登录,
+                                请在本地登录后复制相关文件登录.    
+                                """.trimIndent()
+                            )
                         }
                     }
 
@@ -130,37 +152,64 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
                         try {
                             telegramComet.login()
                             telegramComet.afterLogin()
+                            AccountOperationResult(AccountOperationStatus.OK, "Telegram $id 登录成功")
                         } catch (e: Exception) {
                             logger.warn(e) { "Telegram $id 登录失败, 请尝试重新登录" }
                             telegramComet.close()
                             cometInstances.remove(telegramComet)
+                            AccountOperationResult(
+                                AccountOperationStatus.LOGIN_FAILED,
+                                "Telegram $id 登录失败, 请尝试重新登录"
+                            )
                         }
                     }
 
-                    else -> {}
+                    else -> {
+                        AccountOperationResult(AccountOperationStatus.NO_WRAPPER, "不支持的 Wrapper 类型")
+                    }
                 }
             } finally {
                 loginStatus.update { false }
             }
         }
 
-        fun logout(id: Long, platform: LoginPlatform): String {
+        fun logout(id: Long, platform: LoginPlatform): AccountOperationResult {
             logger.info { "正在尝试注销账号 $id 于 ${platform.name} 平台" }
 
             return if (!hasAccount(id, platform)) {
-                "注销账号失败: 找不到对应账号".also { logger.info { it } }
+                AccountOperationResult(AccountOperationStatus.NOT_FOUND, "注销账号失败: 找不到对应账号")
+                    .also {
+                        logger.info { it.message }
+                    }
             } else {
-                cometInstances.find { it.id == id && it.platform == platform }?.close()
-                cometInstances.removeIf { it.id == id && it.platform == platform }
-
-                transaction {
+                val result = transaction {
                     AccountDataTable.deleteWhere {
                         AccountDataTable.id eq id and
                             (AccountDataTable.platform eq platform)
                     }
                 }
 
-                "注销账号成功".also { logger.info { it } }
+                if (result != 0) {
+                    try {
+                        cometInstances.find { it.id == id && it.platform == platform }?.close()
+                        cometInstances.removeIf { it.id == id && it.platform == platform }
+
+                        AccountOperationResult(AccountOperationStatus.OK, "注销账号成功")
+                            .also {
+                                logger.info { it.message }
+                            }
+                    } catch (e: Exception) {
+                        AccountOperationResult(AccountOperationStatus.INTERNAL_ERROR, "发生异常")
+                            .also {
+                                logger.info { it.message }
+                            }
+                    }
+                } else {
+                    AccountOperationResult(AccountOperationStatus.NOT_FOUND, "注销账号失败: 找不到对应账号")
+                        .also {
+                            logger.info { it.message }
+                        }
+                }
             }
         }
     }

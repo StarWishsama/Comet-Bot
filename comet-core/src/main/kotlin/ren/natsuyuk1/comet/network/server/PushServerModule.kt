@@ -3,6 +3,7 @@ package ren.natsuyuk1.comet.network.server
 import com.jayway.jsonpath.JsonPath
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.ratelimit.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -25,8 +26,10 @@ fun Application.pushTemplateModule() {
 }
 
 internal fun Routing.handlePush() {
-    post(path = "/push") {
-        PushHandler.handle(call)
+    rateLimit(RateLimitName("comet_pusher_limiter")) {
+        post(path = "/push") {
+            PushHandler.handle(call)
+        }
     }
 }
 
@@ -49,13 +52,13 @@ object PushHandler {
                     ptc
                 ).broadcast()
 
-                CometResponse(HttpStatusCode.OK.value, "Comet 已收到推送内容并推送").respond(call)
+                CometResponse(HttpStatusCode.OK, "Comet 已收到推送内容并推送").respond(call)
             } catch (e: Exception) {
                 logger.warn(e) { "无法解析远端传入的 json, 原内容 $body" }
             }
         } catch (e: Exception) {
             logger.warn(e) { "处理 WebHook 消息时发生错误" }
-            CometResponse(HttpStatusCode.InternalServerError.value, "Comet 发生内部错误").respond(call)
+            CometResponse(HttpStatusCode.InternalServerError, "Comet 发生内部错误").respond(call)
         }
     }
 
@@ -69,12 +72,12 @@ object PushHandler {
         val json = request.headers["Content-Type"] == ContentType.Application.Json.toString()
 
         if (!json) {
-            CometResponse(HttpStatusCode.NotAcceptable.value, "不是合法的请求类型").respond(this)
+            CometResponse(HttpStatusCode.NotAcceptable, "不是合法的请求类型").respond(this)
             return null
         }
 
         if (token == null) {
-            CometResponse(HttpStatusCode.Unauthorized.value, "无权限").respond(this)
+            CometResponse(HttpStatusCode.Unauthorized, "无权限").respond(this)
             return null
         }
 
@@ -82,7 +85,7 @@ object PushHandler {
 
         val ptc = PushTemplateConfig.data.templates.find { it.token == uuidToken }
         return if (ptc == null) {
-            CometResponse(HttpStatusCode.NotFound.value, "不存在对应目标").respond(this)
+            CometResponse(HttpStatusCode.NotFound, "不存在对应目标").respond(this)
             null
         } else {
             ptc

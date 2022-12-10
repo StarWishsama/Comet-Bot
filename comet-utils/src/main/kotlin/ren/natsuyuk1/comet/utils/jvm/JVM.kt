@@ -9,6 +9,8 @@
 
 package ren.natsuyuk1.comet.utils.jvm
 
+inline fun <reified T : Enum<T>> String.asEnumOrNull() = enumValues<T>().firstOrNull { it.name.equals(this, true) }
+
 fun addShutdownHook(block: () -> Unit) {
     Runtime.getRuntime().addShutdownHook(
         Thread { block() }
