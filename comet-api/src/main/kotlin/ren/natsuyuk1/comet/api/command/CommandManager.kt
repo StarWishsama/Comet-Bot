@@ -165,7 +165,7 @@ object CommandManager {
                     }
                 }
 
-                if (!user.hasPermission(property.permission) && !property.extraPermissionChecker(user, sender)) {
+                if (!user.hasPermission(property.permission) || !property.extraPermissionChecker(user, sender)) {
                     subject.sendMessage(buildMessageWrapper { appendText("你没有权限执行这条命令!") })
                     return@runCatching CommandStatus.NoPermission()
                 }

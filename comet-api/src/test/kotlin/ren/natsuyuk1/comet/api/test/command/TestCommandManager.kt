@@ -29,6 +29,15 @@ class TestCommandManager {
                 user
             )
         }
+        CommandManager.registerCommand(PERMISSION) { comet, sender, subject, wrapper, user ->
+            TestPermissionCommand(
+                comet,
+                sender,
+                subject,
+                wrapper,
+                user
+            )
+        }
     }
 
     @Test
@@ -39,6 +48,18 @@ class TestCommandManager {
                 fakeSender,
                 fakeSender,
                 buildMessageWrapper { appendText("/help") }
+            ).join()
+        }
+    }
+
+    @Test
+    fun testPermission() {
+        runBlocking {
+            CommandManager.executeCommand(
+                fakeComet,
+                fakeSender,
+                fakeSender,
+                buildMessageWrapper { appendText("/perm") }
             ).join()
         }
     }
