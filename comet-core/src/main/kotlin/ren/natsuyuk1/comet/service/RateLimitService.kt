@@ -8,7 +8,8 @@ import java.io.File
 
 @Serializable
 enum class RateLimitAPI {
-    GITHUB
+    GITHUB,
+    GITLAB
 }
 
 object RateLimitData : PersistDataFile<RateLimitData.Data>(
@@ -31,6 +32,19 @@ object RateLimitService {
                     return
                 } else {
                     val nextReset = headers["x-ratelimit-reset"] ?: return
+                    if (nextReset.toLongOrNull() == null) {
+                        return
+                    }
+                    RateLimitData.data.rateLimitData[apiType] = nextReset.toLong()
+                }
+            }
+
+            RateLimitAPI.GITLAB -> {
+                val remaining = headers["ratelimit-remaining"] ?: return
+                if (remaining.toIntOrNull() != null && remaining.toInt() > 1) {
+                    return
+                } else {
+                    val nextReset = headers["ratelimit-reset"] ?: return
                     if (nextReset.toLongOrNull() == null) {
                         return
                     }

@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusicDifficulty
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
 import ren.natsuyuk1.comet.util.toMessageWrapper
@@ -73,7 +75,7 @@ data class ProjectSekaiUserInfo(
         }.take(30)
 
     fun generateBest30(): MessageWrapper {
-        if (ProjectSekaiManager.musicDiffDatabase.isEmpty() || ProjectSekaiManager.musicDatabase.isEmpty()) {
+        if (ProjectSekaiMusicDifficulty.musicDiffDatabase.isEmpty() || ProjectSekaiMusic.musicDatabase.isEmpty()) {
             return "Project Sekai 歌曲数据还没有加载好噢".toMessageWrapper()
         }
 

@@ -19,6 +19,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventSta
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiI18N
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.datetime.toFriendly
@@ -79,7 +80,7 @@ internal fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserDa
 
         if (profile.userCheerfulCarnival.cheerfulCarnivalTeamId != null) {
             val teamName =
-                ProjectSekaiManager.getCarnivalTeamI18nName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
+                ProjectSekaiI18N.getCarnivalTeamName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
 
             if (teamName != null) {
                 appendTextln("当前队伍为 $teamName")

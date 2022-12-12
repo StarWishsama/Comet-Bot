@@ -11,6 +11,7 @@ package ren.natsuyuk1.comet.utils.file
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
 import okio.buffer
 import okio.sink
 import okio.source
@@ -119,3 +120,5 @@ fun jar(clazz: Class<*>): JarFile? {
     }
     return null
 }
+
+fun File.lastModifiedTime(): Instant = Instant.fromEpochMilliseconds(lastModified())

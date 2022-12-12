@@ -18,6 +18,8 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventSta
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiCard
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiI18N
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.datetime.toFriendly
@@ -118,7 +120,7 @@ object ProjectSekaiImageService {
         val eventInfo = ProjectSekaiData.getCurrentEventInfo() ?: return "查询失败, 活动信息未加载".toMessageWrapper()
         val eventStatus = ProjectSekaiManager.getCurrentEventStatus()
 
-        val avatarBundleName = ProjectSekaiManager.getAssetBundleName(profile.userCard.cardId.toInt())
+        val avatarBundleName = ProjectSekaiCard.getAssetBundleName(profile.userCard.cardId.toInt())
 
         var avatarPath: File? = null
         var avatar: Image? = null
@@ -162,7 +164,7 @@ object ProjectSekaiImageService {
 
             if (profile.userCheerfulCarnival.cheerfulCarnivalTeamId != null) {
                 val teamName =
-                    ProjectSekaiManager.getCarnivalTeamI18nName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
+                    ProjectSekaiI18N.getCarnivalTeamName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
 
                 if (teamName != null) {
                     addTextln("当前队伍为 $teamName")

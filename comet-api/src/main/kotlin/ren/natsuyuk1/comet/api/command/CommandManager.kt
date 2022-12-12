@@ -197,6 +197,7 @@ object CommandManager {
                     }
                     return@runCatching CommandStatus.Error()
                 }
+
                 is CommandResult.Success -> {
                     return@runCatching CommandStatus.Success()
                 }

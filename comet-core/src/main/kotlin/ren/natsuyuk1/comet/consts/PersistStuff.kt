@@ -19,7 +19,9 @@ import ren.natsuyuk1.comet.objects.github.data.GitHubRepoData
 import ren.natsuyuk1.comet.objects.keyword.KeyWordData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserDataTable
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiLocalFileTable
 import ren.natsuyuk1.comet.pusher.CometPusherContextTable
+import ren.natsuyuk1.comet.service.RateLimitData
 
 val cometPersistDataFile: List<PersistDataFile<*>> =
     listOf(
@@ -32,7 +34,8 @@ val cometPersistDataFile: List<PersistDataFile<*>> =
         TwitterConfig,
         IpdbConfig,
         PushTemplateConfig,
-        FeatureConfig
+        FeatureConfig,
+        RateLimitData,
     )
 
 val cometTables =
@@ -46,7 +49,8 @@ val cometTables =
         CometPusherContextTable,
         ApexLegendDataTable,
         PictureSearchConfigTable,
-        CronTasks
+        CronTasks,
+        ProjectSekaiLocalFileTable,
     )
 
 val defaultCommands: List<AbstractCommandNode<*>> =
