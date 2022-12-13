@@ -56,7 +56,7 @@ object CometCoreService {
                 logger.warn(e) { "无法加载 Arcaea 数据: 目标主机证书有误" }
             }
 
-            if (FeatureConfig.data.arcaea) {
+            if (FeatureConfig.data.projectSekai) {
                 ProjectSekaiManager.init(scope.coroutineContext)
             }
         }
