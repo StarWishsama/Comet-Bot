@@ -63,6 +63,12 @@ object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
 
         @Comment("SauceNao API Token, 用于 SauceNao 平台的以图搜图")
         val sauceNaoToken: String = "",
+
+        @Comment("Skiko 绘图工具, 启用后为 Comet 部分命令提供图片结果")
+        val skiko: Boolean = true,
+
+        @Comment("Brotli 加解密库, 启用后为 Arcaea 查询功能提供支持")
+        val brotli: Boolean = true,
     )
 }
 

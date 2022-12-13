@@ -21,6 +21,7 @@ import ren.natsuyuk1.comet.api.cometInstances
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.api.console.Console
 import ren.natsuyuk1.comet.api.database.AccountData
 import ren.natsuyuk1.comet.api.database.AccountDataTable
@@ -183,8 +184,13 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         CometServer.init()
         SessionManager.init(coroutineContext)
 
-        SkikoHelper.findSkikoLibrary()
-        BrotliLoader.loadBrotli()
+        if (CometGlobalConfig.data.skiko) {
+            SkikoHelper.loadSkiko()
+        }
+
+        if (CometGlobalConfig.data.brotli) {
+            BrotliLoader.loadBrotli()
+        }
     }
 
     private fun autoLogin() {

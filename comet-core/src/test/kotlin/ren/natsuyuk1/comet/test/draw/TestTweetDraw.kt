@@ -38,7 +38,7 @@ class TestTweetDraw {
         if (isCI()) return
 
         runBlocking {
-            SkikoHelper.findSkikoLibrary()
+            SkikoHelper.loadSkiko()
             TwitterConfig.init()
             initSetsuna(EmptyCoroutineContext)
         }

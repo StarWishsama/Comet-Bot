@@ -48,7 +48,7 @@ class TestProjectSekaiAvatar {
         initTestDatabase()
 
         runBlocking {
-            SkikoHelper.findSkikoLibrary()
+            SkikoHelper.loadSkiko()
             ProjectSekaiCard.load()
 
             val info = cometClient.getUserEventInfo(eventID, id)

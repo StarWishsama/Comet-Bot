@@ -33,7 +33,7 @@ object SkikoHelper {
 
     private val skikoLib = skikoLibFolder.resolve(System.mapLibraryName("skiko-$hostId"))
 
-    suspend fun findSkikoLibrary() {
+    suspend fun loadSkiko() {
         if (skikoLibraryPath != null) {
             return
         }

@@ -18,7 +18,7 @@ class TestGitHubImageService {
         if (isCI()) return
 
         runBlocking {
-            SkikoHelper.findSkikoLibrary()
+            SkikoHelper.loadSkiko()
         }
     }
 

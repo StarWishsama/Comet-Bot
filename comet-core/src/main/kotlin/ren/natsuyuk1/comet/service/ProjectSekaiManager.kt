@@ -117,7 +117,7 @@ object ProjectSekaiManager {
 
     fun getLatestRankSeason(): Int? = rankSeasonInfo.lastOrNull()?.id
 
-    suspend fun downloadCardImage(assetBundleName: String) {
+    private suspend fun downloadCardImage(assetBundleName: String) {
         /* ktlint-disable max-line-length */
         val url =
             "https://assets.pjsek.ai/file/pjsekai-assets/startapp/character/member_cutout/$assetBundleName/normal/thumbnail_xl.png"

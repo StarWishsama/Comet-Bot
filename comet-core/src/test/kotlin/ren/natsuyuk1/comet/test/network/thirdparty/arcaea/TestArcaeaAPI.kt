@@ -22,7 +22,7 @@ class TestArcaeaAPI {
 
         runBlocking {
             BrotliLoader.loadBrotli()
-            SkikoHelper.findSkikoLibrary()
+            SkikoHelper.loadSkiko()
             ArcaeaClient.fetchConstants()
         }
     }
