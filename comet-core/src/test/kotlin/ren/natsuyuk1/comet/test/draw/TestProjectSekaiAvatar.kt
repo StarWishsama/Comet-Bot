@@ -9,6 +9,7 @@ import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserEventInfo
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiCard
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService.drawEventInfo
 import ren.natsuyuk1.comet.test.initTestDatabase
@@ -48,7 +49,7 @@ class TestProjectSekaiAvatar {
 
         runBlocking {
             SkikoHelper.findSkikoLibrary()
-            ProjectSekaiManager.loadCards()
+            ProjectSekaiCard.load()
 
             val info = cometClient.getUserEventInfo(eventID, id)
 
