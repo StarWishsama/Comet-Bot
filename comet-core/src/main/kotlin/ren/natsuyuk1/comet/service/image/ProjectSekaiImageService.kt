@@ -109,7 +109,10 @@ object ProjectSekaiImageService {
         return tmpFile
     }
 
-    suspend fun SekaiProfileEventInfo.drawEventInfo(userData: ProjectSekaiUserData?, eventId: Int): MessageWrapper {
+    suspend fun SekaiProfileEventInfo.drawEventInfo(
+        eventId: Int,
+        userData: ProjectSekaiUserData? = null
+    ): MessageWrapper {
         if (rankings.isEmpty()) {
             return "你还没打这期活动捏".toMessageWrapper()
         }
@@ -122,15 +125,15 @@ object ProjectSekaiImageService {
 
         val avatarBundleName = ProjectSekaiCard.getAssetBundleName(profile.userCard.cardId.toInt())
 
-        var avatarPath: File? = null
+        var avatarFile: File? = null
         var avatar: Image? = null
 
         if (avatarBundleName != null) {
-            avatarPath = ProjectSekaiManager.resolveCardImage(avatarBundleName)
+            avatarFile = ProjectSekaiManager.resolveCardImage(avatarBundleName)
         }
 
-        if (avatarPath?.exists() == true && avatarPath.length() != 0L) {
-            avatar = Image.makeFromEncoded(avatarPath.readBytes())
+        if (avatarFile?.exists() == true && avatarFile.length() != 0L) {
+            avatar = Image.makeFromEncoded(avatarFile.readBytes())
         }
 
         val userInfoText = ParagraphBuilder(

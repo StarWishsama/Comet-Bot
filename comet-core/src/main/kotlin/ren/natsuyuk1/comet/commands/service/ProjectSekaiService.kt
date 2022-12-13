@@ -48,10 +48,7 @@ object ProjectSekaiService {
                 if (position == 0 && userData != null) {
                     val cur = cometClient.getUserEventInfo(currentEventId, userData.userID)
                     if (SkikoHelper.isSkikoLoaded()) {
-                        cur.drawEventInfo(
-                            userData,
-                            currentEventId
-                        )
+                        cur.drawEventInfo(currentEventId, userData)
                     } else {
                         cur.toMessageWrapper(userData, currentEventId)
                     }
@@ -59,10 +56,7 @@ object ProjectSekaiService {
                     val cur = cometClient.getSpecificRankInfo(currentEventId, position)
 
                     if (SkikoHelper.isSkikoLoaded()) {
-                        cur.drawEventInfo(
-                            null,
-                            currentEventId
-                        )
+                        cur.drawEventInfo(currentEventId)
                     } else {
                         cur.toMessageWrapper(null, currentEventId)
                     }

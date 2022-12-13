@@ -54,7 +54,7 @@ class TestProjectSekaiAvatar {
             val info = cometClient.getUserEventInfo(eventID, id)
 
             val res = newSuspendedTransaction {
-                info.drawEventInfo(null, eventID)
+                info.drawEventInfo(eventID)
             }
 
             println(res.find<Image>())
