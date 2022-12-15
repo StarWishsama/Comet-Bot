@@ -21,6 +21,7 @@ import ren.natsuyuk1.comet.utils.file.writeToFile
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
+import java.util.*
 
 private val logger = mu.KotlinLogging.logger("MessageWrapperConverter")
 
@@ -31,18 +32,22 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent? {
 
         is Image -> {
             try {
-                if (url?.isNotBlank() == true) {
+                if (!url.isNullOrBlank()) {
                     cometClient.client.get(url!!).body<InputStream>().use {
                         it.uploadAsImage(subject)
                     }
-                } else if (filePath?.isNotBlank() == true) {
+                } else if (!filePath.isNullOrBlank()) {
                     if (File(filePath!!).exists()) {
                         return File(filePath!!).uploadAsImage(subject)
                     } else {
                         throw FileNotFoundException(filePath)
                     }
-                } else if (base64?.isNotEmpty() == true) {
-                    return base64!!.toByteArray().toExternalResource().use {
+                } else if (!base64.isNullOrBlank()) {
+                    return Base64.getMimeDecoder().decode(base64).toExternalResource().use {
+                        it.uploadAsImage(subject)
+                    }
+                } else if (stream != null) {
+                    return stream!!.use {
                         it.uploadAsImage(subject)
                     }
                 } else {

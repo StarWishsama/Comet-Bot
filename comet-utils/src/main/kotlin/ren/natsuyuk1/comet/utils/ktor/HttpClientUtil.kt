@@ -12,7 +12,6 @@ import ren.natsuyuk1.comet.utils.system.getEnv
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
-import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
@@ -44,7 +43,7 @@ suspend fun HttpClient.downloadFile(url: String, file: File) {
             }
         }
 
-        logger.debug { "Downloaded file ${file.name} from $url, costs ${duration.toString(DurationUnit.MICROSECONDS)}" }
+        logger.debug { "Downloaded file ${file.name} from $url, costs $duration" }
     } catch (e: IOException) {
         logger.warn(e) {}
     }

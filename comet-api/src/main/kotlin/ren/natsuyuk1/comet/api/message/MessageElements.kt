@@ -10,10 +10,12 @@
 package ren.natsuyuk1.comet.api.message
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.utils.file.absPath
 import java.io.File
+import java.io.InputStream
 
 @Serializable
 sealed class WrapperElement {
@@ -47,10 +49,12 @@ data class Image(
     val url: String? = null,
     val filePath: String? = null,
     val base64: String? = null,
+    @Transient
+    val stream: InputStream? = null,
 ) : WrapperElement() {
 
     init {
-        if (url == null && filePath == null && base64 == null) {
+        if (url == null && filePath == null && base64 == null && stream == null) {
             throw IllegalArgumentException("url/filePath/base64 can't be null or empty!")
         }
     }
@@ -58,11 +62,13 @@ data class Image(
     override fun parseToString(): String = "[图片]"
 }
 
-fun String.asURLImage(): Image = Image(url = this)
+fun String.asURLImage() = Image(url = this)
 
-fun String.asBase64Image(): Image = Image(base64 = this)
+fun String.asBase64Image() = Image(base64 = this)
 
-fun File.asImage(): Image = Image(filePath = absPath)
+fun File.asImage() = Image(filePath = absPath)
+
+fun InputStream.asImage() = Image(stream = this)
 
 /**
  * [AtElement]

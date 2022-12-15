@@ -1,6 +1,5 @@
 package ren.natsuyuk1.comet.service.image
 
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import org.jetbrains.skia.*
 import org.jetbrains.skia.paragraph.Alignment
@@ -9,23 +8,23 @@ import org.jetbrains.skia.paragraph.ParagraphStyle
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.asImage
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
-import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.getSurroundingRank
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.official.PJSKMusicInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiCard
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiCharts
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiI18N
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.datetime.toFriendly
-import ren.natsuyuk1.comet.utils.file.cacheDirectory
-import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
@@ -34,17 +33,15 @@ import ren.natsuyuk1.comet.utils.skiko.addTextln
 import ren.natsuyuk1.comet.utils.skiko.changeStyle
 import java.awt.Color
 import java.io.File
-import java.nio.file.Files
 import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
-import kotlin.time.Duration.Companion.hours
 
 object ProjectSekaiImageService {
     private const val WIDTH = 550
     private const val DEFAULT_PADDING = 20
     private const val AVATAR_SIZE = 100
 
-    fun drawB30(user: ProjectSekaiUserInfo.UserGameData, b30: List<ProjectSekaiUserInfo.MusicResult>): File {
+    fun drawB30(user: ProjectSekaiUserInfo.UserGameData, b30: List<ProjectSekaiUserInfo.MusicResult>): MessageWrapper {
         val b30Text = ParagraphBuilder(
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
@@ -92,22 +89,14 @@ object ProjectSekaiImageService {
         }
 
         val image = surface.makeImageSnapshot()
-
-        val tmpFile = File(cacheDirectory, "${System.currentTimeMillis()}-pjsk-b30.png").apply {
-            TaskManager.registerTaskDelayed(1.hours) {
-                delete()
+        val data = image.encodeToData(EncodedImageFormat.PNG)
+            ?: return buildMessageWrapper {
+                appendText("生成图片失败!")
             }
 
-            deleteOnExit()
+        return buildMessageWrapper {
+            appendElement(data.bytes.inputStream().asImage())
         }
-
-        runBlocking { tmpFile.touch() }
-
-        image.encodeToData(EncodedImageFormat.PNG)?.bytes?.let {
-            Files.write(tmpFile.toPath(), it)
-        }
-
-        return tmpFile
     }
 
     suspend fun SekaiProfileEventInfo.drawEventInfo(
@@ -280,23 +269,74 @@ object ProjectSekaiImageService {
         }
 
         val image = surface.makeImageSnapshot()
-
-        val tmpFile = File(cacheDirectory, "${System.currentTimeMillis()}-pjsk-event-info.png").apply {
-            TaskManager.registerTaskDelayed(1.hours) {
-                delete()
+        val data = image.encodeToData(EncodedImageFormat.PNG)
+            ?: return buildMessageWrapper {
+                appendText("生成图片失败!")
             }
 
-            deleteOnExit()
+        return buildMessageWrapper {
+            appendElement(data.bytes.inputStream().asImage())
+        }
+    }
+
+    suspend fun drawCharts(songInfo: PJSKMusicInfo, difficulty: MusicDifficulty): MessageWrapper {
+        val chartFiles = ProjectSekaiCharts.getCharts(songInfo, difficulty)
+
+        val bg = Image.makeFromEncoded(chartFiles[0].readBytes())
+        val bar = Image.makeFromEncoded(chartFiles[1].readBytes())
+        val chart = Image.makeFromEncoded(chartFiles[2].readBytes())
+
+        val text = ParagraphBuilder(
+            ParagraphStyle().apply {
+                alignment = Alignment.LEFT
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 70f)
+            },
+            FontUtil.fonts
+        ).apply {
+            addTextln(
+                "${songInfo.title} - ${songInfo.lyricist}   ${difficulty.name} [Lv.${
+                ProjectSekaiManager.getSongLevel(
+                    songInfo.id,
+                    difficulty
+                )
+                }]"
+            )
+            popStyle()
+            pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 45f))
+            addText("谱面数据来自 プロセカ譜面保管所 || Render by Comet")
+        }.build().layout((bg.width + DEFAULT_PADDING).toFloat())
+
+        val surface = Surface.makeRasterN32Premul(
+            bg.width + DEFAULT_PADDING,
+            bg.height + DEFAULT_PADDING * 3 + text.height.toInt()
+        )
+
+        surface.canvas.apply {
+            clear(Color.WHITE.rgb)
+            drawRect(
+                Rect(10f, 10f, 10f + bg.width, 10f + bg.height),
+                Paint().apply {
+                    color = Color.GRAY.rgb
+                }
+            )
+            drawImage(bg, 10f, 10f)
+            save()
+            drawImage(bar, 10f, 10f)
+            restore()
+            save()
+            drawImage(chart, 10f, 10f)
+            restore()
+
+            text.paint(this, 30f, 30f + bg.height)
         }
 
-        tmpFile.touch()
-
-        image.encodeToData(EncodedImageFormat.PNG)?.bytes?.let {
-            Files.write(tmpFile.toPath(), it)
-        }
+        val data = surface.makeImageSnapshot().encodeToData(EncodedImageFormat.PNG)
+            ?: return buildMessageWrapper {
+                appendText("图片生成失败!")
+            }
 
         return buildMessageWrapper {
-            appendElement(tmpFile.asImage())
+            appendElement(data.bytes.inputStream().asImage())
         }
     }
 }

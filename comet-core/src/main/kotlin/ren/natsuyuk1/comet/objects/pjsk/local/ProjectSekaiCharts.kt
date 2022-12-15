@@ -12,9 +12,9 @@ object ProjectSekaiCharts {
     private val folder = pjskFolder.resolve("charts/")
 
     private fun getSdvxID(music: PJSKMusicInfo) =
-        ProjectSekaiMusic.musicDatabase.values.sortedBy { it.publishedAt }.indexOf(music)
+        ProjectSekaiMusic.musicDatabase.values.sortedBy { it.publishedAt }.indexOf(music) + 1
 
-    suspend fun downloadChart(music: PJSKMusicInfo) {
+    private suspend fun downloadChart(music: PJSKMusicInfo) {
         val chartFolder = folder.resolve("${music.id}/")
 
         if (chartFolder.exists() && !chartFolder.listFiles().isNullOrEmpty()) {
@@ -23,7 +23,7 @@ object ProjectSekaiCharts {
 
         val sdvxID = getSdvxID(music)
 
-        chartFolder.touch()
+        chartFolder.mkdir()
 
         val bg = chartFolder.resolve("${music.id}bg.png").also { it.touch() }
         cometClient.client.downloadFile("https://sdvx.in/prsk/bg/${sdvxID}bg.png", bg)

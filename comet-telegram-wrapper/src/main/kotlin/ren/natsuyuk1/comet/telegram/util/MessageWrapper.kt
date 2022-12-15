@@ -7,6 +7,7 @@ import dev.inmo.tgbotapi.extensions.api.send.media.sendPhoto
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.requests.abstracts.FileId
 import dev.inmo.tgbotapi.requests.abstracts.InputFile
+import dev.inmo.tgbotapi.requests.abstracts.asMultipartFile
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.types.message.content.PhotoContent
@@ -14,12 +15,14 @@ import dev.inmo.tgbotapi.types.message.content.TextContent
 import dev.inmo.tgbotapi.types.message.textsources.TextSource
 import dev.inmo.tgbotapi.types.message.textsources.mention
 import dev.inmo.tgbotapi.types.message.textsources.regular
+import io.ktor.utils.io.streams.*
 import ren.natsuyuk1.comet.api.message.*
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.cacheDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import java.io.File
+import java.util.*
 
 private val logger = mu.KotlinLogging.logger {}
 
@@ -139,6 +142,16 @@ fun Image.toInputFile(): InputFile? {
     return when {
         url?.isNotBlank() == true -> InputFile.fromUrl(url!!)
         filePath?.isNotBlank() == true -> InputFile.fromFile(File(filePath!!))
+        !base64.isNullOrBlank() ->
+            Base64
+                .getMimeDecoder()
+                .decode(base64!!)
+                .asMultipartFile(System.currentTimeMillis().toString() + ".png")
+
+        stream != null -> stream!!.asInput().use {
+            InputFile.fromInput(System.currentTimeMillis().toString() + ".png") { it }
+        }
+
         else -> null
     }
 }
