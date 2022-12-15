@@ -279,8 +279,8 @@ object ProjectSekaiImageService {
         }
     }
 
-    suspend fun drawCharts(songInfo: PJSKMusicInfo, difficulty: MusicDifficulty): MessageWrapper {
-        val chartFiles = ProjectSekaiCharts.getCharts(songInfo, difficulty)
+    suspend fun drawCharts(musicInfo: PJSKMusicInfo, difficulty: MusicDifficulty): MessageWrapper {
+        val chartFiles = ProjectSekaiCharts.getCharts(musicInfo, difficulty)
 
         val bg = Image.makeFromEncoded(chartFiles[0].readBytes())
         val bar = Image.makeFromEncoded(chartFiles[1].readBytes())
@@ -294,22 +294,26 @@ object ProjectSekaiImageService {
             FontUtil.fonts
         ).apply {
             addTextln(
-                "${songInfo.title} - ${songInfo.lyricist}   ${difficulty.name} [Lv.${
-                ProjectSekaiManager.getSongLevel(
-                    songInfo.id,
-                    difficulty
-                )
-                }]"
+                "${musicInfo.title} - ${musicInfo.lyricist}"
             )
             popStyle()
-            pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 45f))
-            addText("谱面数据来自 プロセカ譜面保管所 || Render by Comet")
+            pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 38f))
+            addText(
+                "${difficulty.name} [Lv.${
+                ProjectSekaiManager.getSongLevel(
+                    musicInfo.id,
+                    difficulty
+                )
+                }] || 谱面数据来自 プロセカ譜面保管所 || Render by Comet"
+            )
         }.build().layout((bg.width + DEFAULT_PADDING).toFloat())
 
         val surface = Surface.makeRasterN32Premul(
             bg.width + DEFAULT_PADDING,
             bg.height + DEFAULT_PADDING * 3 + text.height.toInt()
         )
+
+        val cover = Image.makeFromEncoded(ProjectSekaiMusic.getMusicCover(musicInfo).readBytes())
 
         surface.canvas.apply {
             clear(Color.WHITE.rgb)
@@ -327,7 +331,27 @@ object ProjectSekaiImageService {
             drawImage(chart, 10f, 10f)
             restore()
 
-            text.paint(this, 30f, 30f + bg.height)
+            val rrect = RRect.makeXYWH(
+                30f,
+                40f + bg.height,
+                text.height,
+                text.height,
+                0f
+            )
+
+            save()
+            clipRRect(rrect, true)
+            drawImageRect(
+                cover,
+                Rect(0f, 0f, cover.width.toFloat(), cover.height.toFloat()),
+                rrect,
+                FilterMipmap(FilterMode.LINEAR, MipmapMode.NEAREST),
+                null,
+                true
+            )
+            restore()
+
+            text.paint(this, 60f + rrect.width, 27f + bg.height)
         }
 
         val data = surface.makeImageSnapshot().encodeToData(EncodedImageFormat.PNG)

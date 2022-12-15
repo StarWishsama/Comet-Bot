@@ -34,9 +34,9 @@ suspend fun HttpClient.downloadFile(url: String, file: File) {
 
             val resp = req.body<InputStream>()
 
-            resp.source().buffer().use { i ->
-                logger.debug { "Received source size = ${i.buffer.size}" }
+            logger.debug { "Received source size = ${resp.available()}" }
 
+            resp.source().buffer().use { i ->
                 file.sink().buffer().use { o ->
                     o.writeAll(i)
                 }

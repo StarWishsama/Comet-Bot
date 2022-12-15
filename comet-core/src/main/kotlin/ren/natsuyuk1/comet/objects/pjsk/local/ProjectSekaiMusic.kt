@@ -10,6 +10,7 @@ import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.string.ldSimilarity
+import java.io.File
 import java.math.BigDecimal
 import java.text.Normalizer
 import kotlin.time.Duration.Companion.days
@@ -21,6 +22,8 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
     1.days
 ) {
     private const val url = "https://musics.pjsekai.moe/musics.json"
+    private val musicCoverFolder = pjskFolder.resolve("covers/")
+
     internal val musicDatabase = mutableMapOf<Int, PJSKMusicInfo>()
 
     override suspend fun load() {
@@ -71,5 +74,32 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
         } else {
             Pair(entry.key, entry.value)
         }
+    }
+
+    suspend fun getMusicCover(music: PJSKMusicInfo): File {
+        if (!musicCoverFolder.exists()) {
+            musicCoverFolder.mkdir()
+        }
+
+        val cover = musicCoverFolder.resolve(music.assetBundleName + ".png")
+
+        if (!cover.exists()) {
+            downloadMusicCover(music)
+        }
+
+        return cover
+    }
+
+    private suspend fun downloadMusicCover(music: PJSKMusicInfo) {
+        if (!musicCoverFolder.exists()) {
+            musicCoverFolder.mkdir()
+        }
+
+        val cover = musicCoverFolder.resolve(music.assetBundleName + ".png")
+        cover.touch()
+
+        val url =
+            "https://assets.pjsek.ai/file/pjsekai-assets/startapp/music/jacket/${music.assetBundleName}/${music.assetBundleName}.png" // ktlint-disable max-line-length
+        cometClient.client.downloadFile(url, cover)
     }
 }
