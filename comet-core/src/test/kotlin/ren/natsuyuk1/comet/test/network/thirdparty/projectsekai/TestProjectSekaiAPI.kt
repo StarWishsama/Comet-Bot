@@ -56,12 +56,12 @@ class TestProjectSekaiAPI {
         DatabaseManager.loadTables(ProjectSekaiDataTable, ProjectSekaiUserDataTable)
         runBlocking {
             ProjectSekaiManager.init(EmptyCoroutineContext)
-            ProjectSekaiData.updateEventInfo()
+            ProjectSekaiData.updateEventInfo(true)
         }
     }
 
-    // Represent to event named `Echo my melody`
-    private val eventID = 77
+    // Represent to event named `Find a way out`
+    private val eventID = 79
 
     // Welcome to add me as friend :D
     private val id = 210043933010767872L

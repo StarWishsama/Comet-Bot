@@ -146,6 +146,8 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
 
         fun getCurrentEventInfo(): ProjectSekaiData? = transaction { ProjectSekaiData.all().firstOrNull() }
 
+        fun getEventId(): Int? = transaction { ProjectSekaiData.all().firstOrNull()?.currentEventID }
+
         fun getCurrentPredictionInfo(): PJSKEventPredictionInfo? =
             transaction {
                 getCurrentEventInfo()?.eventPredictionData?.let {

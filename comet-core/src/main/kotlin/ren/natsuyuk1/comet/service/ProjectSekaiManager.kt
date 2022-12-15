@@ -32,6 +32,8 @@ object ProjectSekaiManager {
         }
 
         loadPJSKDatabase()
+        refreshEvent()
+        refreshCache()
 
         TaskManager.registerTask("pjsk_event", "0 14 * * *", ::refreshEvent)
         TaskManager.registerTaskDelayed(3.toDuration(DurationUnit.HOURS), ::refreshCache)

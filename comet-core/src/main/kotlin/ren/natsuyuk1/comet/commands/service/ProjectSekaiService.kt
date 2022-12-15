@@ -20,8 +20,6 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData as pjskUserData
 import ren.natsuyuk1.comet.service.ProjectSekaiManager as pjskHelper
 
 object ProjectSekaiService {
-    private val currentEventId = pjskData.getCurrentEventInfo()?.currentEventID
-
     fun bindAccount(user: CometUser, userID: Long): MessageWrapper {
         return if (pjskUserData.isBound(user.id.value)) {
             pjskUserData.updateID(user.id.value, userID)
@@ -34,10 +32,7 @@ object ProjectSekaiService {
 
     suspend fun queryUserEventInfo(user: CometUser, position: Int): MessageWrapper {
         val userData = pjskUserData.getUserPJSKData(user.id.value)
-
-        if (currentEventId == null) {
-            return "获取当前活动信息失败, 请稍后再试".toMessageWrapper()
-        }
+        val currentEventId = pjskData.getEventId() ?: return "获取当前活动信息失败, 请稍后再试".toMessageWrapper()
 
         if (position == 0 && userData == null) {
             return "你还没有绑定过世界计划账号, 使用 /pjsk bind -i [你的ID] 绑定".toMessageWrapper()

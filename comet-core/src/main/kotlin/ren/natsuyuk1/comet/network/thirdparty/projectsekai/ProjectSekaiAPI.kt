@@ -20,7 +20,6 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiR
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.PJSKEventPredictionInfo
-import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.json.serializeTo
 
 private val logger = mu.KotlinLogging.logger {}
@@ -51,8 +50,6 @@ object ProjectSekaiAPI {
      * https://3-3.dev/
      */
     private const val THREE3KIT_URL = "https://33.dsml.hk/pred"
-
-    private val scope = ModuleScope("project_sekai_api")
 
     private suspend fun CometClient.profileRequest(
         param: String,
