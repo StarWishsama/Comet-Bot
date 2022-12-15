@@ -20,6 +20,7 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiCard
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiI18N
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.datetime.toFriendly
@@ -61,7 +62,7 @@ object ProjectSekaiImageService {
                 val status = if (mr.isAllPerfect) "AP" else "FC"
 
                 addTextln(
-                    "${ProjectSekaiManager.getSongName(mr.musicId)} [${mr.musicDifficulty.name.uppercase()} ${
+                    "${ProjectSekaiMusic.getMusicInfo(mr.musicId)?.title} [${mr.musicDifficulty.name.uppercase()} ${
                     ProjectSekaiManager.getSongLevel(
                         mr.musicId,
                         mr.musicDifficulty

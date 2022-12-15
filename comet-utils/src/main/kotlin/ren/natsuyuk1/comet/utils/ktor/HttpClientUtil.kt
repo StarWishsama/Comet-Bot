@@ -8,10 +8,13 @@ import io.ktor.utils.io.core.*
 import okio.buffer
 import okio.sink
 import okio.source
-import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.system.getEnv
 import java.io.File
+import java.io.IOException
 import java.io.InputStream
+import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 
 private val logger = mu.KotlinLogging.logger("CometClient")
 
@@ -22,20 +25,27 @@ fun HttpClientEngineConfig.initProxy() {
     proxy = ProxyBuilder.http(proxyStr)
 }
 
+@OptIn(ExperimentalTime::class)
 suspend fun HttpClient.downloadFile(url: String, file: File) {
-    val req = get(url)
+    try {
+        val duration = measureTime {
+            val req = get(url)
 
-    logger.debug { "Headers = ${req.headers.entries()}" }
+            logger.debug { "Headers = ${req.headers.entries()}" }
 
-    val resp = req.body<InputStream>()
+            val resp = req.body<InputStream>()
 
-    resp.source().buffer().use { i ->
-        logger.debug { "Received source size = ${i.buffer.size}" }
+            resp.source().buffer().use { i ->
+                logger.debug { "Received source size = ${i.buffer.size}" }
 
-        file.sink().buffer().use { o ->
-            o.writeAll(i)
+                file.sink().buffer().use { o ->
+                    o.writeAll(i)
+                }
+            }
         }
-    }
 
-    logger.debug { "Downloaded file ${file.absPath} from $url" }
+        logger.debug { "Downloaded file ${file.name} from $url, costs ${duration.toString(DurationUnit.MICROSECONDS)}" }
+    } catch (e: IOException) {
+        logger.warn(e) {}
+    }
 }

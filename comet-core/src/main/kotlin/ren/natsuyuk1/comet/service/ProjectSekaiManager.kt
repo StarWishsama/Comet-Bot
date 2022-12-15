@@ -6,7 +6,6 @@ import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic.musicDatabase
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusicDifficulty.musicDiffDatabase
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiRank.rankSeasonInfo
 import ren.natsuyuk1.comet.objects.pjsk.local.pjskLocal
@@ -89,18 +88,6 @@ object ProjectSekaiManager {
                 }
             }
         }
-    }
-
-    fun getSongIdByName(name: String): Int? {
-        val songInfo = musicDatabase.find { it.title == name } ?: return null
-
-        return songInfo.id
-    }
-
-    fun getSongName(id: Int): String? {
-        val songInfo = musicDatabase.find { it.id == id } ?: return null
-
-        return songInfo.title
     }
 
     fun getSongLevel(songId: Int, difficulty: MusicDifficulty): Int? {

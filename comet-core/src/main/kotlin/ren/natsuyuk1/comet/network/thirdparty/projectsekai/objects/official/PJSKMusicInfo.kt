@@ -9,5 +9,6 @@ data class PJSKMusicInfo(
     val pronunciation: String,
     val lyricist: String,
     val composer: String,
-    val arranger: String
+    val arranger: String,
+    val publishedAt: Long,
 )
