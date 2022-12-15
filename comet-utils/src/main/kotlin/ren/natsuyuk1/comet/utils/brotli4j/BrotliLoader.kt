@@ -5,6 +5,7 @@ import com.aayushatharva.brotli4j.decoder.BrotliInputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
+import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.defaultClient
@@ -125,6 +126,8 @@ object BrotliLoader {
                     }
                 }
 
+                logger.info { "成功下载 Brotli 库." }
+
                 zip.close()
                 downloadFile.delete()
             }.onFailure {
@@ -132,6 +135,8 @@ object BrotliLoader {
                 downloadFile.delete()
                 return
             }
+        } else {
+            logger.info { "已找到 Brotli 库 ${libraryLocation.absPath}" }
         }
     }
 }
