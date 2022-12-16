@@ -179,11 +179,6 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
     }
 
     private fun startService() = scope.launch {
-        TaskManager.init(coroutineContext)
-        CometCoreService.init(coroutineContext)
-        CometServer.init()
-        SessionManager.init(coroutineContext)
-
         if (CometGlobalConfig.data.skiko) {
             SkikoHelper.loadSkiko()
         }
@@ -191,6 +186,11 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
         if (CometGlobalConfig.data.brotli) {
             BrotliLoader.loadBrotli()
         }
+
+        TaskManager.init(coroutineContext)
+        CometCoreService.init(coroutineContext)
+        CometServer.init()
+        SessionManager.init(coroutineContext)
     }
 
     private fun autoLogin() {
