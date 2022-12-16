@@ -18,7 +18,10 @@ class GitHubEvent(
                 sub.subscribeEvent.contains(eventType) && (
                     sub.subscribeBranch.isEmpty() ||
                         branchName.isBlank() ||
-                        sub.subscribeBranch.contains(branchName)
+                        (
+                            sub.subscribeBranch.contains(branchName) ||
+                                sub.subscribeBranch.contains("*")
+                            )
                     )
             ) {
                 broadcastTargets.add(
