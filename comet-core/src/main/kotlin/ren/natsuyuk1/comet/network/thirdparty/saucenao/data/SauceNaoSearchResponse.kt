@@ -3,6 +3,7 @@ package ren.natsuyuk1.comet.network.thirdparty.saucenao.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.asURLImage
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 
@@ -69,7 +70,7 @@ data class SauceNaoSearchResponse(
     }
 }
 
-fun SauceNaoSearchResponse.toMessageWrapper(): MessageWrapper = buildMessageWrapper {
+fun SauceNaoSearchResponse.toMessageWrapper(picMode: Boolean = true): MessageWrapper = buildMessageWrapper {
     if (header.status < 0) {
         appendText("无法识别你发出的图片.")
         return@buildMessageWrapper
@@ -124,7 +125,13 @@ fun SauceNaoSearchResponse.toMessageWrapper(): MessageWrapper = buildMessageWrap
 
             else -> {
                 appendText("找到了结果, 但是并不能解析 SauceNao 的这个结果捏🤨")
+                return@apply
             }
+        }
+
+        if (picMode) {
+            appendTextln("")
+            appendElement(highestProbResult.header.thumbnail.asURLImage())
         }
     }
 }
