@@ -14,9 +14,13 @@ import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.commands.service.ProjectSekaiService
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
 import ren.natsuyuk1.comet.objects.config.FeatureConfig
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiCharts
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
+import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
 import ren.natsuyuk1.comet.util.toMessageWrapper
 
 val PROJECTSEKAI by lazy {
@@ -32,6 +36,8 @@ val PROJECTSEKAI by lazy {
         /pjsk pred 查询当前活动结束预测分数    
         
         /pjsk info 查询账号信息
+        
+        /pjsk chart 查询歌曲谱面
         """.trimIndent()
     )
 }
@@ -50,7 +56,8 @@ class ProjectSekaiCommand(
             Event(subject, sender, user),
             Prediction(subject, sender, user),
             Info(subject, sender, user),
-            Best30(subject, sender, user)
+            Best30(subject, sender, user),
+            Chart(subject, sender, user),
         )
     }
 
@@ -207,6 +214,52 @@ class ProjectSekaiCommand(
             }
 
             subject.sendMessage(ProjectSekaiService.b30(user))
+        }
+    }
+
+    class Chart(
+        override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
+        override val user: CometUser
+    ) : CometSubCommand(subject, sender, user, CHART) {
+
+        companion object {
+            val CHART = SubCommandProperty(
+                "chart",
+                listOf("谱面", "谱面预览"),
+                PROJECTSEKAI
+            )
+        }
+
+        private val musicName by argument("歌曲名称")
+        private val difficulty by option("-d", "--diff", "--difficulty", help = "歌曲难度")
+
+        override suspend fun run() {
+            val diff = if (difficulty == null) {
+                MusicDifficulty.MASTER
+            } else {
+                when (difficulty!!.lowercase()) {
+                    "ma", "master", "大师" -> MusicDifficulty.MASTER
+                    "ex", "expert", "专家" -> MusicDifficulty.EXPERT
+                    else -> {
+                        subject.sendMessage("抱歉, 谱面预览只支持查看 EX 及以上等级的谱子.".toMessageWrapper())
+                        return
+                    }
+                }
+            }
+
+            val pair = ProjectSekaiMusic.fuzzyGetMusicInfo(musicName)
+
+            if (pair == null) {
+                subject.sendMessage("找不到你想要搜索的歌曲哦".toMessageWrapper())
+                return
+            } else {
+                ProjectSekaiCharts.getCharts(pair.first, diff)
+            }
+
+            subject.sendMessage(
+                ProjectSekaiImageService.drawCharts(pair.first, diff).appendText("\n搜索准确度: ${pair.second}")
+            )
         }
     }
 }

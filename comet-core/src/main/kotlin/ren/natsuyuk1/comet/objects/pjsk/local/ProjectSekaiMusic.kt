@@ -12,7 +12,6 @@ import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.string.ldSimilarity
 import java.io.File
 import java.math.BigDecimal
-import java.text.Normalizer
 import kotlin.time.Duration.Companion.days
 
 private val logger = KotlinLogging.logger {}
@@ -64,10 +63,10 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
     fun getMusicInfo(id: Int): PJSKMusicInfo? = musicDatabase[id]
 
     fun fuzzyGetMusicInfo(name: String): Pair<PJSKMusicInfo, BigDecimal>? {
-        val normalizeName = Normalizer.normalize(name, Normalizer.Form.NFC)
+        // val normalizeName = Normalizer.normalize(name, Normalizer.Form.NFC)
         val entry = musicDatabase.values.filter {
-            ldSimilarity(it.title, normalizeName) > BigDecimal.valueOf(0.75)
-        }.associateWith { ldSimilarity(it.title, normalizeName) }.entries.firstOrNull()
+            ldSimilarity(it.title, name) > BigDecimal.valueOf(0.5)
+        }.associateWith { ldSimilarity(it.title, name) }.entries.firstOrNull()
 
         return if (entry == null) {
             null
