@@ -67,12 +67,6 @@ object GithubWebHookHandler {
             logger.debug { "GitHub WebHook 收到新事件, secretStatus = $secretStatus" }
 
             if (!checkSecretStatus(call, secretStatus, signature)) {
-                call.respond(
-                    HttpStatusCode.Forbidden,
-                    CometResponse(HttpStatusCode.Forbidden, "Validate secret failed")
-                        .toJson()
-                )
-                logger.debug("Secret 校验失败")
                 return
             }
 
@@ -142,7 +136,7 @@ object GithubWebHookHandler {
             return true
         }
 
-        if (signature == null && secretStatus == SecretStatus.NO_SECRET) {
+        if (secretStatus == SecretStatus.NO_SECRET && signature == null) {
             CometResponse(HttpStatusCode.NotFound, "找不到指定的推送对象").respond(call)
             return true
         }
