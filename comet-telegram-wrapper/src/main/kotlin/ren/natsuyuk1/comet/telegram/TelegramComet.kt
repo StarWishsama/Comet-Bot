@@ -70,21 +70,15 @@ class TelegramComet(
 
         scope.launch {
             bot.flushAccumulatedUpdates()
-
-            logger.debug { "已刷新 Telegram Bot 离线时暂存的消息" }
-
-            bot.buildBehaviourWithLongPolling(scope) {
-                listenMessageEvent(this@TelegramComet)
-
-                listenGroupEvent(this@TelegramComet)
-            }.join()
-        }
-
-        scope.launch {
             val username = bot.getMe().username.username
             logger.info { "成功登录 Telegram Bot ($username)" }
 
-            bot.getMe().username.username
+            logger.debug { "已刷新 Telegram Bot 离线时暂存的消息" }
+
+            bot.buildBehaviourWithLongPolling {
+                listenMessageEvent(this@TelegramComet)
+                listenGroupEvent(this@TelegramComet)
+            }.join()
         }
     }
 
