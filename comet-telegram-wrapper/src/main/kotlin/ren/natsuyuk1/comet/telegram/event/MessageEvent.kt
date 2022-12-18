@@ -1,7 +1,6 @@
 package ren.natsuyuk1.comet.telegram.event
 
 import dev.inmo.tgbotapi.abstracts.FromUser
-import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onContentMessage
 import dev.inmo.tgbotapi.extensions.utils.chatIdOrThrow
@@ -56,8 +55,7 @@ suspend fun CommonMessage<MessageContent>.toCometEvent(
         return null
     }
 
-    val botName = comet.bot.getMe().username.username
-    val isCommand = this.entities?.find { it is BotCommandTextSource && it.source.contains(botName) } != null
+    val isCommand = this.entities?.find { it is BotCommandTextSource && it.source.contains(comet.username) } != null
 
     return when (chat) {
         is GroupChat -> this.toCometGroupEvent(comet, isCommand)

@@ -48,6 +48,7 @@ class TelegramComet(
     config: CometConfig
 ) : Comet(LoginPlatform.TELEGRAM, config, logger, ModuleScope("telegram ${config.id}")) {
     internal val startTime = DateTime.now()
+    internal lateinit var username: String
     lateinit var bot: TelegramBot
     lateinit var urlsKeeper: TelegramAPIUrlsKeeper
 
@@ -70,7 +71,7 @@ class TelegramComet(
 
         scope.launch {
             bot.flushAccumulatedUpdates()
-            val username = bot.getMe().username.username
+            username = bot.getMe().username.username
             logger.info { "成功登录 Telegram Bot ($username)" }
 
             logger.debug { "已刷新 Telegram Bot 离线时暂存的消息" }
