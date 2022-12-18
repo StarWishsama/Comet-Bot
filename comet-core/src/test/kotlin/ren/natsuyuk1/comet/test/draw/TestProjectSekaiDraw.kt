@@ -78,7 +78,7 @@ class TestProjectSekaiDraw {
             ProjectSekaiMusicDifficulty.load()
 
             // Represent to project sekai music named `Iなんです`
-            val music = ProjectSekaiMusic.getMusicInfo(304)
+            val music = ProjectSekaiMusic.getMusicInfo(139)
             assertNotNull(music)
             val test = cacheDirectory.resolve("test.png")
             test.touch()
