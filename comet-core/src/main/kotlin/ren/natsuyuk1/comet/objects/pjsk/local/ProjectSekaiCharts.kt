@@ -38,7 +38,7 @@ object ProjectSekaiCharts {
     suspend fun getCharts(music: PJSKMusicInfo, difficulty: MusicDifficulty): Array<File> {
         val chartFolder = folder.resolve("${music.id}/")
 
-        if (!chartFolder.isDirectory || chartFolder.listFiles().isNullOrEmpty()) {
+        if (!chartFolder.isDirectory || chartFolder.listFiles()?.size != 4) {
             downloadChart(music)
         }
 
