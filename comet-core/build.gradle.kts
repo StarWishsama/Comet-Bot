@@ -48,7 +48,7 @@ dependencies {
 
     implementation("moe.sdl.yabapi:yabapi-core-jvm:0.11.1")
 
-    implementation("moe.sdl.ipdb:ipdb-core:0.1.1")
+    implementation("moe.sdl.ipdb:ipdb-core:0.2.0")
 
     implementation("ren.natsuyuk1.setsuna:Setsuna:0.1.0-SNAPSHOT")
 
