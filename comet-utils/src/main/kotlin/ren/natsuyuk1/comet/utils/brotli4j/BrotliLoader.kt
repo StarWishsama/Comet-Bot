@@ -121,7 +121,7 @@ object BrotliLoader {
 
                 withContext(Dispatchers.IO) {
                     zip.getInputStream(dll).use { input ->
-                        libraryLocation.touch()
+                        libraryLocation.mkdir()
                         libraryLocation.toPath().outputStream().use(input::copyTo)
                     }
                 }
