@@ -15,7 +15,6 @@ import ren.natsuyuk1.comet.utils.system.OsType
 import ren.natsuyuk1.comet.utils.system.RuntimeUtil
 import java.io.File
 import java.util.zip.ZipFile
-import kotlin.io.path.outputStream
 
 private val logger = KotlinLogging.logger {}
 
@@ -47,20 +46,9 @@ object BrotliLoader {
 
     suspend fun loadBrotli() {
         val libraryName = System.mapLibraryName("brotli")
-        val libraryPath = System.getProperty("java.library.path")
+        val libraryFile = File(brotliLibFolder, libraryName)
 
-        if (libraryPath == null) {
-            logger.warn { "无法获取系统的 `java.library.path`, 请检查系统环境变量是否有误!" }
-            return
-        }
-
-        val libActualPath = if (libraryPath.split(";").size == 1) {
-            libraryPath.split(":")
-        } else libraryPath.split(";")
-
-        val libraryLocation = File(libActualPath[0], libraryName)
-
-        if (!libraryLocation.exists()) {
+        if (!libraryFile.exists()) {
             val osType = RuntimeUtil.getOsType()
             val osArch = RuntimeUtil.getOsArch()
 
@@ -121,8 +109,8 @@ object BrotliLoader {
 
                 withContext(Dispatchers.IO) {
                     zip.getInputStream(dll).use { input ->
-                        libraryLocation.mkdir()
-                        libraryLocation.toPath().outputStream().use(input::copyTo)
+                        libraryFile.touch()
+                        libraryFile.outputStream().use(input::copyTo)
                     }
                 }
 
@@ -130,13 +118,13 @@ object BrotliLoader {
 
                 zip.close()
                 downloadFile.delete()
+
+                System.load(libraryFile.absPath)
             }.onFailure {
                 logger.warn(it) { "Brotli 库下载时出现问题, 请手动下载." }
                 downloadFile.delete()
                 return
             }
-        } else {
-            logger.info { "已找到 Brotli 库 ${libraryLocation.absPath}" }
         }
     }
 }
