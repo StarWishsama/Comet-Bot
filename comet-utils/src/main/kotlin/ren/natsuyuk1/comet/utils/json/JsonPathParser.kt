@@ -1,7 +1,7 @@
 package ren.natsuyuk1.comet.utils.json
 
 import com.jayway.jsonpath.DocumentContext
-import com.mitchellbosecke.pebble.PebbleEngine
+import io.pebbletemplates.pebble.PebbleEngine
 import java.io.StringWriter
 
 private val TEMPLATE_ENGINE: PebbleEngine = PebbleEngine.Builder().build()
