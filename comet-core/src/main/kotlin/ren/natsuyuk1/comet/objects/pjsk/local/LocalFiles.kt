@@ -6,4 +6,5 @@ internal val pjskLocal = mutableListOf(
     ProjectSekaiI18N,
     ProjectSekaiMusicDifficulty,
     ProjectSekaiRank,
+    ProjectSekaiMusicAlias,
 )

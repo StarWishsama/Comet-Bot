@@ -4,9 +4,12 @@ import ren.natsuyuk1.comet.utils.file.resolveResourceDirectory
 
 internal val pjskFolder = resolveResourceDirectory("./projectsekai")
 
-fun getSekaiBestResourceURL(fileName: String) =
-    "https://raw.githubusercontent.com/Sekai-World/sekai-master-db-diff/main/$fileName"
+fun getSekaiBestResourceURL(path: String) =
+    "https://raw.githubusercontent.com/Sekai-World/sekai-master-db-diff/main/$path"
 
-fun getSekaiResourceURL(fileName: String) = "https://gitlab.com/pjsekai/database/jp/-/raw/main/$fileName"
+fun getSekaiResourceURL(path: String) = "https://gitlab.com/pjsekai/database/jp/-/raw/main/$path"
 
-fun getSekaiMusicResourceURL(fileName: String) = "https://musics.pjsekai.moe/$fileName"
+fun getSekaiMusicResourceURL(path: String) = "https://musics.pjsekai.moe/$path"
+
+fun getCometDatabaseURL(path: String) =
+    "https://raw.githubusercontent.com/StarWishsama/comet-resource-database/main/projectsekai/$path"
