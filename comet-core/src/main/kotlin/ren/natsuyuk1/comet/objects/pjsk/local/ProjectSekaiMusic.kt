@@ -63,14 +63,23 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
     fun getMusicInfo(id: Int): PJSKMusicInfo? = musicDatabase[id]
 
     fun fuzzyGetMusicInfo(name: String): Pair<PJSKMusicInfo, BigDecimal>? {
+        val cache = mutableMapOf<Int, BigDecimal>()
+
         val entry = musicDatabase.values.filter {
             val alias = ProjectSekaiMusicAlias.getAlias(it.id) ?: emptyArray()
-            ldSimilarity(it.title, name)
+            val sim = ldSimilarity(it.title, name)
                 .max(
                     alias.maxOfOrNull { a -> ldSimilarity(a, name) }
                         ?: BigDecimal.ZERO
-                ) > BigDecimal.valueOf(0.4)
-        }.associateWith { ldSimilarity(it.title, name) }.entries.firstOrNull()
+                )
+            val result = sim > BigDecimal.valueOf(0.4)
+
+            if (result) {
+                cache[it.id] = sim
+            }
+
+            result
+        }.associateWith { cache[it.id] ?: BigDecimal.ZERO }.entries.firstOrNull()
 
         return if (entry == null) {
             null
