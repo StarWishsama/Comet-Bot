@@ -43,11 +43,10 @@ object BrotliDecompressor {
 
 object BrotliLoader {
     private val brotliLibFolder = File(resolveDirectory("/modules"), "/brotli")
+    private val libraryName = System.mapLibraryName("brotli")
+    private val libraryFile = File(brotliLibFolder, libraryName)
 
     suspend fun loadBrotli() {
-        val libraryName = System.mapLibraryName("brotli")
-        val libraryFile = File(brotliLibFolder, libraryName)
-
         if (!libraryFile.exists()) {
             val osType = RuntimeUtil.getOsType()
             val osArch = RuntimeUtil.getOsArch()
@@ -118,13 +117,17 @@ object BrotliLoader {
 
                 zip.close()
                 downloadFile.delete()
-
-                System.load(libraryFile.absPath)
             }.onFailure {
                 logger.warn(it) { "Brotli 库下载时出现问题, 请手动下载." }
                 downloadFile.delete()
                 return
             }
         }
+
+        load()
+    }
+
+    private fun load() {
+        System.setProperty("brotli4j.library.path", libraryFile.absPath)
     }
 }

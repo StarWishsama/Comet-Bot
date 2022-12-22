@@ -9,7 +9,6 @@ import ren.natsuyuk1.comet.service.image.ArcaeaImageService
 import ren.natsuyuk1.comet.test.isCI
 import ren.natsuyuk1.comet.test.print
 import ren.natsuyuk1.comet.utils.brotli4j.BrotliLoader
-import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -22,7 +21,6 @@ class TestArcaeaAPI {
 
         runBlocking {
             BrotliLoader.loadBrotli()
-            SkikoHelper.loadSkiko()
             ArcaeaClient.fetchConstants()
         }
     }
