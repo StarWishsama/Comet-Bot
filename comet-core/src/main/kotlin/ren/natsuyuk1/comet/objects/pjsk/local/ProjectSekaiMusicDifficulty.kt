@@ -36,7 +36,10 @@ object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
         file.touch()
 
         if (file.length() == 0L || checkOutdated()) {
-            cometClient.client.downloadFile("https://musics.pjsekai.moe/musicDifficulties.json", file)
+            cometClient.client.downloadFile(
+                "https://gitlab.com/pjsekai/database/musics/-/raw/main/musicDifficulties.json",
+                file
+            )
             return true
         }
 
