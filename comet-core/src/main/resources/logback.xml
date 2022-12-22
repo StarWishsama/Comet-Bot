@@ -26,7 +26,7 @@
             <totalSizeCap>1GB</totalSizeCap>
         </rollingPolicy>
         <encoder class="ren.natsuyuk1.comet.utils.logging.PatternLayoutNoLambda">
-            <pattern>%d{MM-dd'T'HH:mm:ss} - (%.-1le) [%t] ([%lo{60}]) >>> (%m) %n%rEx{full}
+            <pattern>%d{MM-dd'T'HH:mm:ss} - %.-1le [%t] [%lo{60}] >>> %m %n%rEx{full}
             </pattern>
         </encoder>
     </appender>
