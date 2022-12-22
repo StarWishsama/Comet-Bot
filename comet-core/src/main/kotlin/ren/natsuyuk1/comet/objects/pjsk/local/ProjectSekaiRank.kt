@@ -20,7 +20,7 @@ import kotlin.time.Duration.Companion.days
 private val logger = KotlinLogging.logger {}
 
 object ProjectSekaiRank : ProjectSekaiLocalFile(
-    pjskFolder.resolve("musicDifficulties.json"),
+    pjskFolder.resolve("rankMatchSeasons.json"),
     30.days
 ) {
     internal val rankSeasonInfo = mutableListOf<PJSKRankSeasonInfo>()
