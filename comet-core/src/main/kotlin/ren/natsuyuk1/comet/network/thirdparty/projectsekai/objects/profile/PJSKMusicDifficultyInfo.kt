@@ -14,6 +14,6 @@ data class PJSKMusicDifficultyInfo(
     val musicId: Int,
     val musicDifficulty: MusicDifficulty,
     val playLevel: Int,
-    val noteCount: Int,
+    val totalNoteCount: Int,
     val playLevelAdjust: Double = 0.0
 )
