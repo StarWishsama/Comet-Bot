@@ -33,6 +33,7 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserDataTable
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiLocalFileTable
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.test.initTestDatabase
 import ren.natsuyuk1.comet.test.isCI
@@ -53,7 +54,7 @@ class TestProjectSekaiAPI {
         }
 
         initTestDatabase()
-        DatabaseManager.loadTables(ProjectSekaiDataTable, ProjectSekaiUserDataTable)
+        DatabaseManager.loadTables(ProjectSekaiDataTable, ProjectSekaiUserDataTable, ProjectSekaiLocalFileTable)
         runBlocking {
             ProjectSekaiManager.init(EmptyCoroutineContext)
             ProjectSekaiData.updateEventInfo(true)
