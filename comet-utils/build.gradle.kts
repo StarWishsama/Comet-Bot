@@ -51,7 +51,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.0.1")
     compileOnly("org.jsoup:jsoup:1.15.3")
     compileOnly("org.jetbrains.skiko:skiko:0.7.40")
-    compileOnly("com.aayushatharva.brotli4j:brotli4j:1.8.0")
+    compileOnly("com.aayushatharva.brotli4j:brotli4j:1.9.0")
     api("com.jayway.jsonpath:json-path:2.7.0")
     api("io.pebbletemplates:pebble:3.2.0")
     compileOnly("com.squareup.okio:okio:3.2.0")
