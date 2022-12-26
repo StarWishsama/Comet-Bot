@@ -42,11 +42,13 @@ object BrotliDecompressor {
 }
 
 object BrotliLoader {
-    private val brotliLibFolder = File(resolveDirectory("/modules"), "/brotli")
-    private val libraryName = System.mapLibraryName("brotli")
-    private val libraryFile = File(brotliLibFolder, libraryName)
+    private const val BROTLI_VERSION = "1.9.0"
 
     suspend fun loadBrotli() {
+        val brotliLibFolder = File(resolveDirectory("/modules"), "/brotli")
+        val libraryName = System.mapLibraryName("brotli")
+        val libraryFile = File(brotliLibFolder, libraryName)
+
         if (!libraryFile.exists()) {
             val osType = RuntimeUtil.getOsType()
             val osArch = RuntimeUtil.getOsArch()
@@ -86,9 +88,9 @@ object BrotliLoader {
 
             /* ktlint-disable max-line-length */
             val downloadURL =
-                "https://repo1.maven.org/maven2/com/aayushatharva/brotli4j/native-$packageName/1.8.0/native-$packageName-1.8.0.jar"
+                "https://repo1.maven.org/maven2/com/aayushatharva/brotli4j/native-$packageName/$BROTLI_VERSION/native-$packageName-$BROTLI_VERSION.jar"
             /* ktlint-enable max-line-length */
-            val downloadFile = File(brotliLibFolder, "native-$packageName-1.8.0.jar")
+            val downloadFile = File(brotliLibFolder, "native-$packageName-$BROTLI_VERSION.jar")
 
             kotlin.runCatching {
                 downloadFile.touch()
@@ -101,7 +103,7 @@ object BrotliLoader {
                 val dll = zip.getEntry("lib/$packageName/$libraryName")
 
                 if (dll == null) {
-                    logger.warn { "Brotli 库下载时出现问题, 请手动下载. /lib/$packageName/$libraryName" }
+                    logger.warn { "Brotli 库下载时出现问题, 请手动下载." }
                     downloadFile.delete()
                     return
                 }
@@ -124,10 +126,6 @@ object BrotliLoader {
             }
         }
 
-        load()
-    }
-
-    private fun load() {
         System.setProperty("brotli4j.library.path", libraryFile.absPath)
     }
 }
