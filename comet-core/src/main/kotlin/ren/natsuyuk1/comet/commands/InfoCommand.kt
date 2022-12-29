@@ -35,16 +35,7 @@ class InfoCommand(
     private val leaderboard by option("-L", "--leaderboard").flag(default = false)
 
     override suspend fun run() {
-        if (!leaderboard) {
-            subject.sendMessage(
-                buildMessageWrapper {
-                    appendElement(AtElement(sender.id, sender.name))
-                    appendLine()
-                    appendTextln("等级 ${user.level} | 硬币 ${user.coin.getBetterNumber()}")
-                    appendText("上次签到于 ${yyMMddWithTimePattern.format(user.checkInDate.toJavaInstant())}")
-                }
-            )
-        } else {
+        if (leaderboard) {
             val leaderboard = transaction {
                 CometUser.all().orderBy(UserTable.coin to SortOrder.DESC).limit(10)
             }
@@ -53,13 +44,26 @@ class InfoCommand(
                 buildMessageWrapper {
                     appendTextln("Comet 积分排行榜")
 
-                    leaderboard.forEachIndexed { i, user ->
-                        appendTextln("${i + 1} | ${user.platformID} >> ${user.coin}")
+                    transaction {
+                        leaderboard.forEachIndexed { i, user ->
+                            appendTextln("${i + 1} | ${user.platformID} >> ${user.coin}")
+                        }
                     }
 
                     trim()
                 }
             )
+
+            return
         }
+
+        subject.sendMessage(
+            buildMessageWrapper {
+                appendElement(AtElement(sender.id, sender.name))
+                appendLine()
+                appendTextln("等级 ${user.level} | 硬币 ${user.coin.getBetterNumber()}")
+                appendText("上次签到于 ${yyMMddWithTimePattern.format(user.checkInDate.toJavaInstant())}")
+            }
+        )
     }
 }

@@ -75,7 +75,7 @@ class MiraiComet(
                     }
                 })
             } else {
-                LoginSolver.Default
+                null
             }
         }
 
