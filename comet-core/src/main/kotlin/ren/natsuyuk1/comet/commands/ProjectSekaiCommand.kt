@@ -257,6 +257,8 @@ class ProjectSekaiCommand(
                 ProjectSekaiCharts.getCharts(pair.first, diff)
             }
 
+            subject.sendMessage("请稍后, 获取谱面中...".toMessageWrapper())
+
             subject.sendMessage(
                 ProjectSekaiImageService.drawCharts(pair.first, diff).appendText("\n搜索准确度: ${pair.second}")
             )

@@ -320,7 +320,7 @@ object ProjectSekaiImageService {
             drawRect(
                 Rect(10f, 10f, 10f + bg.width, 10f + bg.height),
                 Paint().apply {
-                    color = Color.GRAY.rgb
+                    color = Color(220, 220, 220).rgb // #DCDCDC
                 }
             )
             drawImage(bg, 10f, 10f)
