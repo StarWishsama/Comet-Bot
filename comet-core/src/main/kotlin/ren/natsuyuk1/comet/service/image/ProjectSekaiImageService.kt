@@ -304,9 +304,20 @@ object ProjectSekaiImageService {
                     musicInfo.id,
                     difficulty
                 )
-                }] || 谱面数据来自 プロセカ譜面保管所 || Render by Comet"
+                }]"
             )
         }.build().layout((bg.width + DEFAULT_PADDING).toFloat())
+
+        val rightText = ParagraphBuilder(
+            ParagraphStyle().apply {
+                alignment = Alignment.RIGHT
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 35f)
+            },
+            FontUtil.fonts
+        ).apply {
+            addTextln("谱面数据来自 プロセカ譜面保管所")
+            addTextln("Render by Comet")
+        }.build().layout(bg.width - 250f)
 
         val surface = Surface.makeRasterN32Premul(
             bg.width + DEFAULT_PADDING,
@@ -352,6 +363,7 @@ object ProjectSekaiImageService {
             restore()
 
             text.paint(this, 60f + rrect.width, 27f + bg.height)
+            rightText.paint(this, 60f + rrect.width, 30f + bg.height)
         }
 
         val data = surface.makeImageSnapshot().encodeToData(EncodedImageFormat.PNG)
