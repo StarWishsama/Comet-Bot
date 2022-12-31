@@ -34,7 +34,7 @@ object ProjectSekaiManager {
         refreshEvent()
         refreshCache()
 
-        TaskManager.registerTask("pjsk_event", "0 14 * * *", ::refreshEvent)
+        TaskManager.registerTask("pjsk_event", "0 0 14 * * ?", ::refreshEvent)
         TaskManager.registerTaskDelayed(3.toDuration(DurationUnit.HOURS), ::refreshCache)
     }
 
@@ -77,7 +77,7 @@ object ProjectSekaiManager {
             }
         }
 
-        TaskManager.registerTask("pjsk_data_updater", "0 1 * * *") {
+        TaskManager.registerTask("pjsk_data_updater", "0 0 1 * * ?") {
             pjskLocal.forEach {
                 try {
                     if (it.update()) {
