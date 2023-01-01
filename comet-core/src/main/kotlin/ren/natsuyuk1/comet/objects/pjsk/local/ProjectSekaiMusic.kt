@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.objects.pjsk.local
 
+import io.ktor.http.*
 import kotlinx.serialization.builtins.ListSerializer
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.consts.cometClient
@@ -51,12 +52,11 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
         file.touch()
 
         if (file.length() == 0L || isOutdated()) {
-            cometClient.client.downloadFile(url, file)
-            updateLastUpdateTime()
-
-            logger.info { "成功更新音乐数据" }
-
-            return true
+            if (cometClient.client.downloadFile(url, file)) {
+                updateLastUpdateTime()
+                logger.info { "成功更新音乐数据" }
+                return true
+            }
         }
 
         return false
@@ -90,7 +90,7 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
 
         val cover = musicCoverFolder.resolve(music.assetBundleName + ".png")
 
-        if (!cover.exists()) {
+        if (!cover.exists() || cover.length() == 0L) {
             downloadMusicCover(music)
         }
 
@@ -107,6 +107,9 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
 
         val url =
             "https://assets.pjsek.ai/file/pjsekai-assets/startapp/music/jacket/${music.assetBundleName}/${music.assetBundleName}.png" // ktlint-disable max-line-length
-        cometClient.client.downloadFile(url, cover)
+
+        cometClient.client.downloadFile(url, cover) {
+            it.contentType()?.match(ContentType.Image.PNG) == true
+        }
     }
 }

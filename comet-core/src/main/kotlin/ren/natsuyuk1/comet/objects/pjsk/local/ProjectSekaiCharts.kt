@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.objects.pjsk.local
 
+import io.ktor.http.*
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.official.PJSKMusicInfo
@@ -30,13 +31,21 @@ object ProjectSekaiCharts {
         chartFolder.mkdir()
 
         val bg = chartFolder.resolve("${music.id}bg.png").also { it.touch() }
-        cometClient.client.downloadFile("https://sdvx.in/prsk/bg/${sdvxID}bg.png", bg)
+        cometClient.client.downloadFile("https://sdvx.in/prsk/bg/${sdvxID}bg.png", bg) {
+            it.contentType()?.match(ContentType.Image.PNG) == true
+        }
         val bar = chartFolder.resolve("${music.id}bar.png").also { it.touch() }
-        cometClient.client.downloadFile("https://sdvx.in/prsk/bg/${sdvxID}bar.png", bar)
+        cometClient.client.downloadFile("https://sdvx.in/prsk/bg/${sdvxID}bar.png", bar) {
+            it.contentType()?.match(ContentType.Image.PNG) == true
+        }
         val chartMaster = chartFolder.resolve("${music.id}ma.png").also { it.touch() }
-        cometClient.client.downloadFile("https://sdvx.in/prsk/obj/data${sdvxID}mst.png", chartMaster)
+        cometClient.client.downloadFile("https://sdvx.in/prsk/obj/data${sdvxID}mst.png", chartMaster) {
+            it.contentType()?.match(ContentType.Image.PNG) == true
+        }
         val chartExpert = chartFolder.resolve("${music.id}ex.png").also { it.touch() }
-        cometClient.client.downloadFile("https://sdvx.in/prsk/obj/data${sdvxID}exp.png", chartExpert)
+        cometClient.client.downloadFile("https://sdvx.in/prsk/obj/data${sdvxID}exp.png", chartExpert) {
+            it.contentType()?.match(ContentType.Image.PNG) == true
+        }
     }
 
     fun getCharts(music: PJSKMusicInfo, difficulty: MusicDifficulty): Array<File> {

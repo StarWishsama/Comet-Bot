@@ -50,11 +50,10 @@ object ProjectSekaiRank : ProjectSekaiLocalFile(
 
                 if (!file.exists() || lastUpdate > current) {
                     file.touch()
-                    cometClient.client.downloadFile(getSekaiBestResourceURL(file.name), file)
-
-                    logger.info { "成功更新排位数据" }
-
-                    return true
+                    if (cometClient.client.downloadFile(getSekaiBestResourceURL(file.name), file)) {
+                        logger.info { "成功更新排位数据" }
+                        return true
+                    }
                 }
             }
 

@@ -333,7 +333,9 @@ object ProjectSekaiImageService {
             bg.height + DEFAULT_PADDING * 3 + text.height.toInt()
         )
 
-        val cover = Image.makeFromEncoded(ProjectSekaiMusic.getMusicCover(musicInfo).readBytes())
+        val cover = ProjectSekaiMusic.getMusicCover(musicInfo)?.readBytes()?.let {
+            Image.makeFromEncoded(it)
+        }
 
         surface.canvas.apply {
             clear(Color.WHITE.rgb)
@@ -359,17 +361,19 @@ object ProjectSekaiImageService {
                 0f
             )
 
-            save()
-            clipRRect(rrect, true)
-            drawImageRect(
-                cover,
-                Rect(0f, 0f, cover.width.toFloat(), cover.height.toFloat()),
-                rrect,
-                FilterMipmap(FilterMode.LINEAR, MipmapMode.NEAREST),
-                null,
-                true
-            )
-            restore()
+            if (cover != null) {
+                save()
+                clipRRect(rrect, true)
+                drawImageRect(
+                    cover,
+                    Rect(0f, 0f, cover.width.toFloat(), cover.height.toFloat()),
+                    rrect,
+                    FilterMipmap(FilterMode.LINEAR, MipmapMode.NEAREST),
+                    null,
+                    true
+                )
+                restore()
+            }
 
             text.paint(this, 60f + rrect.width, 27f + bg.height)
             rightText.paint(this, 60f + rrect.width, 30f + bg.height)

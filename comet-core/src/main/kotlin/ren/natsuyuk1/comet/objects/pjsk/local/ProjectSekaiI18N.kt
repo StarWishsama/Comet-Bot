@@ -40,14 +40,15 @@ object ProjectSekaiI18N : ProjectSekaiLocalFile(
                 file.touch()
 
                 if (file.length() == 0L || commitTime > lastModified) {
-                    cometClient.client.downloadFile(
-                        getCometDatabaseURL("cheerful_carnival_teams.json"),
-                        file
-                    )
+                    if (cometClient.client.downloadFile(
+                            getCometDatabaseURL("cheerful_carnival_teams.json"),
+                            file
+                        )
+                    ) {
+                        logger.info { "成功更新本地化数据" }
 
-                    logger.info { "成功更新本地化数据" }
-
-                    return true
+                        return true
+                    }
                 }
             }.onFailure {
                 logger.warn(it) { "加载 Project Sekai 本地化文件失败!" }

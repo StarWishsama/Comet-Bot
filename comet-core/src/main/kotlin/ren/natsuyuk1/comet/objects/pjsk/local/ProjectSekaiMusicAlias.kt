@@ -51,14 +51,14 @@ object ProjectSekaiMusicAlias : ProjectSekaiLocalFile(
                 file.touch()
 
                 if (file.length() == 0L || commitTime > lastModified) {
-                    cometClient.client.downloadFile(
-                        getCometDatabaseURL("music_title.json"),
-                        file
-                    )
-
-                    logger.info { "成功更新歌曲别名数据" }
-
-                    return true
+                    if (cometClient.client.downloadFile(
+                            getCometDatabaseURL(file.name),
+                            file
+                        )
+                    ) {
+                        logger.info { "成功更新歌曲别名数据" }
+                        return true
+                    }
                 }
             }.onFailure {
                 logger.warn(it) { "加载 Project Sekai 歌曲别名失败!" }

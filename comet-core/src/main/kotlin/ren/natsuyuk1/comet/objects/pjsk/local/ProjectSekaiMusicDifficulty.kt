@@ -36,15 +36,17 @@ object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
         file.touch()
 
         if (file.length() == 0L || isOutdated()) {
-            cometClient.client.downloadFile(
-                "https://gitlab.com/pjsekai/database/musics/-/raw/main/musicDifficulties.json",
-                file
-            )
 
-            updateLastUpdateTime()
-            logger.info { "成功更新音乐等级偏差值数据" }
+            if (cometClient.client.downloadFile(
+                    "https://gitlab.com/pjsekai/database/musics/-/raw/main/musicDifficulties.json",
+                    file
+                )
+            ) {
+                updateLastUpdateTime()
+                logger.info { "成功更新音乐等级偏差值数据" }
 
-            return true
+                return true
+            }
         }
 
         return false
