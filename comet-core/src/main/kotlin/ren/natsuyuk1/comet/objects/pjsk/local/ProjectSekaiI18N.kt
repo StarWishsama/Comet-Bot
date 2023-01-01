@@ -8,6 +8,7 @@ import mu.KotlinLogging
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.github.GitHubApi
+import ren.natsuyuk1.comet.util.pjsk.getCometDatabaseURL
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.utils.file.lastModifiedTime
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
@@ -27,7 +28,11 @@ object ProjectSekaiI18N : ProjectSekaiLocalFile(
     }
 
     override suspend fun update(): Boolean {
-        GitHubApi.getSpecificFileCommits("Sekai-World", "sekai-i18n", "zh-TW/cheerful_carnival_teams.json")
+        GitHubApi.getSpecificFileCommits(
+            "StarWishsama",
+            "comet-resource-database",
+            "projectsekai/cheerful_carnival_teams.json"
+        )
             .onSuccess {
                 val commitTime = Instant.parse(it.first().commit.committer.date)
                 val lastModified = file.lastModifiedTime()
@@ -35,9 +40,8 @@ object ProjectSekaiI18N : ProjectSekaiLocalFile(
                 file.touch()
 
                 if (file.length() == 0L || commitTime > lastModified) {
-                    /* ktlint-disable max-line-length */
                     cometClient.client.downloadFile(
-                        "https://raw.githubusercontent.com/Sekai-World/sekai-i18n/main/zh-TW/cheerful_carnival_teams.json",
+                        getCometDatabaseURL("cheer_carnival_teams.json"),
                         file
                     )
 

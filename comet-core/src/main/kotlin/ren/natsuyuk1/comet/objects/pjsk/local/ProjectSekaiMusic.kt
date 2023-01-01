@@ -10,8 +10,10 @@ import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.string.ldSimilarity
+import ren.natsuyuk1.comet.utils.string.normalize
 import java.io.File
 import java.math.BigDecimal
+import java.text.Normalizer
 import kotlin.time.Duration.Companion.days
 
 private val logger = KotlinLogging.logger {}
@@ -65,29 +67,20 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
     fun getMusicInfo(id: Int): PJSKMusicInfo? = musicDatabase[id]
 
     fun fuzzyGetMusicInfo(name: String): Pair<PJSKMusicInfo, BigDecimal>? {
-        val cache = mutableMapOf<Int, BigDecimal>()
+        val name = name.normalize(Normalizer.Form.NFKC)
 
-        val entry = musicDatabase.values.filter {
+        return musicDatabase.values.associateWith {
             val alias = ProjectSekaiMusicAlias.getAlias(it.id) ?: emptyArray()
-            val sim = ldSimilarity(it.title, name)
+            val sim = ldSimilarity(it.title.normalize(Normalizer.Form.NFKC), name)
                 .max(
-                    alias.maxOfOrNull { a -> ldSimilarity(a, name) }
+                    alias.maxOfOrNull { a -> ldSimilarity(a.normalize(Normalizer.Form.NFKC), name) }
                         ?: BigDecimal.ZERO
                 )
-            val result = sim > BigDecimal.valueOf(0.4)
 
-            if (result) {
-                cache[it.id] = sim
-            }
-
-            result
-        }.associateWith { cache[it.id] ?: BigDecimal.ZERO }.entries.firstOrNull()
-
-        return if (entry == null) {
-            null
-        } else {
-            Pair(entry.key, entry.value)
-        }
+            sim
+        }.filterNot { it.value > BigDecimal.valueOf(0.4) }
+            .maxByOrNull { it.value }
+            ?.toPair()
     }
 
     suspend fun getMusicCover(music: PJSKMusicInfo): File {

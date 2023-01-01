@@ -13,6 +13,8 @@ import cn.hutool.core.codec.Base64Decoder
 import cn.hutool.crypto.SecureUtil
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
+import java.text.Normalizer
+import java.text.Normalizer.Form
 import javax.imageio.ImageIO
 
 enum class IDGuidelineType(val rule: Regex) {
@@ -156,3 +158,5 @@ fun String.toHMAC(key: String): String {
 }
 
 fun String?.blankIfNull() = if (this.isNullOrEmpty()) "" else this
+
+fun String.normalize(form: Form) = Normalizer.normalize(this, form)

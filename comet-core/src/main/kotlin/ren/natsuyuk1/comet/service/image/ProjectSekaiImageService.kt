@@ -41,6 +41,7 @@ object ProjectSekaiImageService {
     private const val WIDTH = 550
     private const val DEFAULT_PADDING = 20
     private const val AVATAR_SIZE = 100
+    private val BETTER_GRAY_RGB: Int by lazy { Color(220, 220, 220).rgb }
 
     fun drawB30(user: ProjectSekaiUserInfo.UserGameData, b30: List<ProjectSekaiUserInfo.MusicResult>): MessageWrapper {
         val b30Text = ParagraphBuilder(
@@ -341,7 +342,7 @@ object ProjectSekaiImageService {
             drawRect(
                 Rect(10f, 10f, 10f + bg.width, 10f + bg.height),
                 Paint().apply {
-                    color = Color(220, 220, 220).rgb // #DCDCDC
+                    color = BETTER_GRAY_RGB // #DCDCDC
                 }
             )
             drawImage(bg, 10f, 10f)
