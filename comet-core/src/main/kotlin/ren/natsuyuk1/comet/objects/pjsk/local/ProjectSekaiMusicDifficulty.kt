@@ -35,11 +35,14 @@ object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
     override suspend fun update(): Boolean {
         file.touch()
 
-        if (file.length() == 0L || checkOutdated()) {
+        if (file.length() == 0L || isOutdated()) {
             cometClient.client.downloadFile(
                 "https://gitlab.com/pjsekai/database/musics/-/raw/main/musicDifficulties.json",
                 file
             )
+
+            logger.info { "成功更新音乐等级偏差值数据" }
+
             return true
         }
 

@@ -34,16 +34,18 @@ object ProjectSekaiMusicAlias : ProjectSekaiLocalFile(
                 )
             }
         } catch (e: Exception) {
-            logger.warn(e) { "解析 歌曲数据时出现问题" }
+            logger.warn(e) { "解析歌曲别名数据时出现问题" }
         }
     }
 
     override suspend fun update(): Boolean {
         file.touch()
 
-        if (file.length() == 0L || checkOutdated()) {
+        if (file.length() == 0L || isOutdated()) {
             cometClient.client.downloadFile(url, file)
             updateLastUpdateTime()
+
+            logger.info { "成功更新歌曲别名数据" }
 
             return true
         }

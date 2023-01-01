@@ -22,9 +22,9 @@ abstract class ProjectSekaiLocalFile(
     /**
      * 更新当前 Project Sekai 游戏数据
      *
-     * @return 是否更新
+     * @return 是否已更新数据
      */
     abstract suspend fun update(): Boolean
 
-    fun checkOutdated(): Boolean = checkDuration == null || (Clock.System.now() - getLastUpdateTime() > checkDuration)
+    fun isOutdated(): Boolean = checkDuration == null || (Clock.System.now() - getLastUpdateTime() > checkDuration)
 }

@@ -18,7 +18,7 @@ object ProjectSekaiCharts {
             maximumIntegerDigits = 3
         }.format(ProjectSekaiMusic.musicDatabase.values.sortedBy { it.publishedAt }.indexOf(music) + 1)
 
-    private suspend fun downloadChart(music: PJSKMusicInfo) {
+    suspend fun downloadChart(music: PJSKMusicInfo) {
         val chartFolder = folder.resolve("${music.id}/")
 
         if (chartFolder.exists() && !chartFolder.listFiles().isNullOrEmpty()) {
@@ -39,11 +39,11 @@ object ProjectSekaiCharts {
         cometClient.client.downloadFile("https://sdvx.in/prsk/obj/data${sdvxID}exp.png", chartExpert)
     }
 
-    suspend fun getCharts(music: PJSKMusicInfo, difficulty: MusicDifficulty): Array<File> {
+    fun getCharts(music: PJSKMusicInfo, difficulty: MusicDifficulty): Array<File> {
         val chartFolder = folder.resolve("${music.id}/")
 
         if (!chartFolder.isDirectory || chartFolder.listFiles()?.size != 4) {
-            downloadChart(music)
+            return emptyArray()
         }
 
         val bg = chartFolder.resolve("${music.id}bg.png")

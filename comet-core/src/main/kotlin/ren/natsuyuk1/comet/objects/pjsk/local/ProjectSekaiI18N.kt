@@ -19,7 +19,7 @@ private val logger = KotlinLogging.logger {}
 
 object ProjectSekaiI18N : ProjectSekaiLocalFile(
     pjskFolder.resolve("cheerful_carnival_teams.json"),
-    5.days
+    3.days
 ) {
     private var carnivalTeamName: JsonObject? = null
     override suspend fun load() {
@@ -40,6 +40,8 @@ object ProjectSekaiI18N : ProjectSekaiLocalFile(
                         "https://raw.githubusercontent.com/Sekai-World/sekai-i18n/main/zh-TW/cheerful_carnival_teams.json",
                         file
                     )
+
+                    logger.info { "成功更新本地化数据" }
 
                     return true
                 }

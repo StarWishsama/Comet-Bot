@@ -5,6 +5,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.paragraph.Alignment
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
+import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.asImage
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
@@ -279,8 +280,17 @@ object ProjectSekaiImageService {
         }
     }
 
-    suspend fun drawCharts(musicInfo: PJSKMusicInfo, difficulty: MusicDifficulty): MessageWrapper {
+    suspend fun drawCharts(
+        musicInfo: PJSKMusicInfo,
+        difficulty: MusicDifficulty,
+        subject: PlatformCommandSender
+    ): MessageWrapper {
         val chartFiles = ProjectSekaiCharts.getCharts(musicInfo, difficulty)
+
+        if (chartFiles.isEmpty()) {
+            subject.sendMessage("正在下载该谱面数据, 稍等一会哦".toMessageWrapper())
+            ProjectSekaiCharts.downloadChart(musicInfo)
+        }
 
         val bg = Image.makeFromEncoded(chartFiles[0].readBytes())
         val bar = Image.makeFromEncoded(chartFiles[1].readBytes())
