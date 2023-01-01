@@ -78,7 +78,7 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
                 )
 
             sim
-        }.filterNot { it.value > BigDecimal.valueOf(0.4) }
+        }.filter { it.value > BigDecimal.valueOf(0.4) }
             .maxByOrNull { it.value }
             ?.toPair()
     }
