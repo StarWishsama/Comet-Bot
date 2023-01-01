@@ -41,7 +41,7 @@ object ProjectSekaiI18N : ProjectSekaiLocalFile(
 
                 if (file.length() == 0L || commitTime > lastModified) {
                     cometClient.client.downloadFile(
-                        getCometDatabaseURL("cheer_carnival_teams.json"),
+                        getCometDatabaseURL("cheerful_carnival_teams.json"),
                         file
                     )
 
