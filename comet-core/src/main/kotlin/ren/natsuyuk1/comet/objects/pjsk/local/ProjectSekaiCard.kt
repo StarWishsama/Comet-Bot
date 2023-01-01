@@ -38,12 +38,16 @@ object ProjectSekaiCard : ProjectSekaiLocalFile(
 
     override suspend fun update(): Boolean {
         if (!file.exists() || file.length() == 0L || isOutdated()) {
-            cometClient.client.downloadFile(url, file)
-            updateLastUpdateTime()
-
-            logger.info { "成功更新卡面数据" }
-
-            return true
+            if (cometClient.client.downloadFile(url, file) {
+                it.status.value in (200..304)
+            }
+            ) {
+                updateLastUpdateTime()
+                logger.info { "成功更新卡面数据" }
+                return true
+            } else {
+                logger.warn { "尝试更新卡面数据失败" }
+            }
         }
 
         return false

@@ -118,7 +118,9 @@ object ProjectSekaiManager {
             return
         }
 
-        cometClient.client.downloadFile(url, cardFile)
+        cometClient.client.downloadFile(url, cardFile) {
+            it.status.value in (200..304)
+        }
     }
 
     suspend fun resolveCardImage(assetBundleName: String): File {

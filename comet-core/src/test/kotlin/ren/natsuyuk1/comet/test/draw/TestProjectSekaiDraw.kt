@@ -56,6 +56,7 @@ class TestProjectSekaiDraw {
 
         runBlocking {
             SkikoHelper.loadSkiko()
+            ProjectSekaiCard.update()
             ProjectSekaiCard.load()
 
             val info = cometClient.getUserEventInfo(eventID, id)
@@ -74,7 +75,9 @@ class TestProjectSekaiDraw {
 
         runBlocking {
             SkikoHelper.loadSkiko()
+            ProjectSekaiMusic.update()
             ProjectSekaiMusic.load()
+            ProjectSekaiMusicDifficulty.update()
             ProjectSekaiMusicDifficulty.load()
 
             // Represent to project sekai music named `Iなんです`
