@@ -41,6 +41,7 @@ object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
                 file
             )
 
+            updateLastUpdateTime()
             logger.info { "成功更新音乐等级偏差值数据" }
 
             return true
