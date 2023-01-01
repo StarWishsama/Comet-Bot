@@ -284,10 +284,11 @@ object ProjectSekaiImageService {
         musicInfo: PJSKMusicInfo,
         difficulty: MusicDifficulty
     ): MessageWrapper {
-        val chartFiles = ProjectSekaiCharts.getCharts(musicInfo, difficulty)
+        var chartFiles = ProjectSekaiCharts.getCharts(musicInfo, difficulty)
 
         if (chartFiles.isEmpty()) {
             ProjectSekaiCharts.downloadChart(musicInfo)
+            chartFiles = ProjectSekaiCharts.getCharts(musicInfo, difficulty)
         }
 
         val bg = Image.makeFromEncoded(chartFiles[0].readBytes())
