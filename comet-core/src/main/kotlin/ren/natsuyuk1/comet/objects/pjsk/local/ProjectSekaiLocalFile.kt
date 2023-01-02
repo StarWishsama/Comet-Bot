@@ -26,5 +26,6 @@ abstract class ProjectSekaiLocalFile(
      */
     abstract suspend fun update(): Boolean
 
-    fun isOutdated(): Boolean = checkDuration == null || (Clock.System.now() - getLastUpdateTime() > checkDuration)
+    fun isOutdated(): Boolean =
+        checkDuration == null || (Clock.System.now() - getLastUpdateTime() > checkDuration)
 }

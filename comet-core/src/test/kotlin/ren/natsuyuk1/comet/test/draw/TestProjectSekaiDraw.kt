@@ -6,11 +6,13 @@ import io.ktor.utils.io.core.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.junit.jupiter.api.TestInstance
+import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiCard
+import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiLocalFileTable
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusicDifficulty
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
@@ -22,6 +24,8 @@ import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.cacheDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
+import java.io.File
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -31,8 +35,7 @@ class TestProjectSekaiDraw {
     // Represent to card named 何かが違う食卓
     private val assetBundleName = "res018_no021"
 
-    // Represent to event named `Echo my melody`
-    private val eventID = 77
+    private val eventID = 81
 
     // Welcome to add me as friend :D
     private val id = 210043933010767872L
@@ -42,7 +45,7 @@ class TestProjectSekaiDraw {
         if (isCI()) return
 
         runBlocking {
-            val file = ProjectSekaiManager.resolveCardImage(assetBundleName)
+            val file = ProjectSekaiManager.resolveCardImage(assetBundleName, "done")
             println(file.absPath)
             assertTrue(file.length() != 0L)
         }
@@ -55,9 +58,9 @@ class TestProjectSekaiDraw {
         initTestDatabase()
 
         runBlocking {
+            DatabaseManager.loadTables(ProjectSekaiLocalFileTable, ProjectSekaiDataTable)
             SkikoHelper.loadSkiko()
-            ProjectSekaiCard.update()
-            ProjectSekaiCard.load()
+            ProjectSekaiManager.init(EmptyCoroutineContext)
 
             val info = cometClient.getUserEventInfo(eventID, id)
 
@@ -65,7 +68,14 @@ class TestProjectSekaiDraw {
                 info.drawEventInfo(eventID)
             }
 
-            println(res.find<Image>())
+            val tfile = File.createTempFile("pjsk_userinfo_test_", ".png")
+            res.find<Image>()?.stream?.use {
+                tfile.outputStream().use { fos ->
+                    it.copyTo(fos)
+                }
+            }
+
+            println(tfile.absPath)
         }
     }
 

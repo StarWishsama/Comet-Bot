@@ -18,10 +18,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileE
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.official.PJSKMusicInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiCard
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiCharts
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiI18N
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
+import ren.natsuyuk1.comet.objects.pjsk.local.*
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.datetime.toFriendly
@@ -120,7 +117,7 @@ object ProjectSekaiImageService {
         var avatar: Image? = null
 
         if (avatarBundleName != null) {
-            avatarFile = ProjectSekaiManager.resolveCardImage(avatarBundleName)
+            avatarFile = ProjectSekaiManager.resolveCardImage(avatarBundleName, profile.userCard.specialTrainingStatus)
         }
 
         if (avatarFile?.exists() == true && avatarFile.length() != 0L) {
@@ -147,25 +144,48 @@ object ProjectSekaiImageService {
         ).apply {
             addTextln("当前活动 ${eventInfo.name}")
 
-            if (eventStatus == SekaiEventStatus.ONGOING) {
-                addTextln(
-                    "离活动结束还有 ${
-                    (eventInfo.aggregateTime.toInstant(true) - now)
-                        .toFriendly(TimeUnit.SECONDS)
-                    }"
-                )
-            }
+            when (eventStatus) {
+                SekaiEventStatus.ONGOING -> {
+                    addTextln(
+                        "离活动结束还有 ${
+                        (eventInfo.aggregateTime.toInstant(true) - now)
+                            .toFriendly(TimeUnit.SECONDS)
+                        }"
+                    )
+                }
 
+                SekaiEventStatus.END -> {
+                    addTextln("当前活动已结束")
+                }
+
+                else -> {}
+            }
+        }.build().layout(WIDTH.toFloat())
+
+        val eventTeamText = ParagraphBuilder(
+            ParagraphStyle().apply {
+                alignment = Alignment.LEFT
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 18f)
+            },
+            FontUtil.fonts
+        ).apply {
             if (profile.userCheerfulCarnival.cheerfulCarnivalTeamId != null) {
                 val teamName =
                     ProjectSekaiI18N.getCarnivalTeamName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
 
                 if (teamName != null) {
                     addTextln("当前队伍为 $teamName")
-                    addTextln()
                 }
             }
+        }.build().layout(WIDTH.toFloat())
 
+        val eventScoreText = ParagraphBuilder(
+            ParagraphStyle().apply {
+                alignment = Alignment.LEFT
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 18f)
+            },
+            FontUtil.fonts
+        ).apply {
             addTextln("分数 ${profile.score} | 排名 ${profile.rank}")
             addTextln()
 
@@ -228,7 +248,13 @@ object ProjectSekaiImageService {
         val surface =
             Surface.makeRasterN32Premul(
                 WIDTH,
-                (AVATAR_SIZE + DEFAULT_PADDING * 3 + eventInfoText.height).toInt()
+                (
+                    AVATAR_SIZE +
+                        DEFAULT_PADDING * 3 +
+                        eventInfoText.height +
+                        eventScoreText.height +
+                        eventTeamText.height
+                    ).toInt()
             )
 
         surface.canvas.apply {
@@ -266,6 +292,54 @@ object ProjectSekaiImageService {
                 this,
                 DEFAULT_PADDING.toFloat(),
                 (AVATAR_SIZE + DEFAULT_PADDING * 2).toFloat()
+            )
+
+            var extraY = 0f
+
+            if (eventInfo.eventType == "cheerful_carnival" &&
+                profile.userCheerfulCarnival.cheerfulCarnivalTeamId != null
+            ) {
+                val teamIcon =
+                    ProjectSekaiEvent.getEventTeamImage(profile.userCheerfulCarnival.cheerfulCarnivalTeamId % 2 + 1)
+                var extraX = 0f
+
+                if (teamIcon != null) {
+                    val teamIconImg = Image.makeFromEncoded(teamIcon.readBytes())
+                    val rect = Rect.makeXYWH(
+                        DEFAULT_PADDING.toFloat(),
+                        AVATAR_SIZE + DEFAULT_PADDING * 2 + eventInfoText.height,
+                        30f,
+                        30f
+                    )
+
+                    save()
+                    clipRect(rect, true)
+                    drawImageRect(
+                        teamIconImg,
+                        Rect(0f, 0f, teamIconImg.width.toFloat(), teamIconImg.height.toFloat()),
+                        rect,
+                        FilterMipmap(FilterMode.LINEAR, MipmapMode.NEAREST),
+                        null,
+                        true
+                    )
+                    restore()
+
+                    extraX = rect.width
+                }
+
+                eventTeamText.paint(
+                    this,
+                    DEFAULT_PADDING + extraX + 10f,
+                    AVATAR_SIZE + DEFAULT_PADDING * 2 + eventInfoText.height
+                )
+
+                extraY = eventTeamText.height
+            }
+
+            eventScoreText.paint(
+                this,
+                DEFAULT_PADDING.toFloat(),
+                AVATAR_SIZE + DEFAULT_PADDING * 2 + eventInfoText.height + extraY
             )
         }
 
@@ -333,7 +407,7 @@ object ProjectSekaiImageService {
             bg.height + DEFAULT_PADDING * 3 + text.height.toInt()
         )
 
-        val cover = ProjectSekaiMusic.getMusicCover(musicInfo)?.readBytes()?.let {
+        val cover = ProjectSekaiMusic.getMusicCover(musicInfo).readBytes().let {
             Image.makeFromEncoded(it)
         }
 

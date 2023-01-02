@@ -9,6 +9,8 @@
 
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects
 
+import kotlinx.serialization.SerialName
+
 @kotlinx.serialization.Serializable
 data class ProjectSekaiEventList(
     val total: Int,
@@ -21,6 +23,8 @@ data class ProjectSekaiEventList(
         val id: Int,
         // 已知的有 marathon (普通玩法), cheerful_carnival (选边玩法)
         val eventType: String,
+        @SerialName("assetbundleName")
+        val assetBundleName: String,
         val name: String,
         // 开始时间
         val startAt: Long,

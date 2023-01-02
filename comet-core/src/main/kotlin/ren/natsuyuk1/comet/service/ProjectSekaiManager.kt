@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.service
 
+import io.ktor.http.*
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
@@ -106,12 +107,13 @@ object ProjectSekaiManager {
 
     fun getLatestRankSeason(): Int? = rankSeasonInfo.lastOrNull()?.id
 
-    private suspend fun downloadCardImage(assetBundleName: String) {
+    private suspend fun downloadCardImage(assetBundleName: String, trainingStatus: String) {
+        val suffix = if (trainingStatus == "done") "after_training" else "normal"
         /* ktlint-disable max-line-length */
         val url =
-            "https://assets.pjsek.ai/file/pjsekai-assets/startapp/character/member_cutout/$assetBundleName/normal/thumbnail_xl.png"
+            "https://storage.sekai.best/sekai-assets/character/member_cutout/${assetBundleName}_rip/$suffix.png"
         /* ktlint-enable max-line-length */
-        val cardFile = pjskFolder.resolveSibling("cards/$assetBundleName.png")
+        val cardFile = pjskFolder.resolve("cards/${assetBundleName}_$suffix.png")
         cardFile.touch()
 
         if (cardFile.exists() && cardFile.length() != 0L) {
@@ -119,17 +121,18 @@ object ProjectSekaiManager {
         }
 
         cometClient.client.downloadFile(url, cardFile) {
-            it.status.value in (200..304)
+            it.contentType()?.match(ContentType.Image.PNG) == true
         }
     }
 
-    suspend fun resolveCardImage(assetBundleName: String): File {
-        val target = pjskFolder.resolveSibling("cards/$assetBundleName.png")
+    suspend fun resolveCardImage(assetBundleName: String, trainingStatus: String): File {
+        val suffix = if (trainingStatus == "done") "after_training" else "normal"
+        val target = pjskFolder.resolve("cards/${assetBundleName}_$suffix.png")
 
         if (!target.exists() || target.length() == 0L) {
-            downloadCardImage(assetBundleName)
+            downloadCardImage(assetBundleName, trainingStatus)
 
-            logger.debug { "Downloaded pjsk card image ($assetBundleName)" }
+            logger.debug { "Downloaded pjsk card image (${assetBundleName}_$suffix)" }
         }
 
         return target

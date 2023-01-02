@@ -31,6 +31,7 @@ import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getEventList
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.PJSKEventPredictionInfo
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiEvent
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
@@ -44,6 +45,7 @@ object ProjectSekaiDataTable : IdTable<Int>("pjsk_data") {
     val name = text("name")
     val eventPredictionData = text("event_prediction_data")
     val eventPredictionUpdateTime = timestamp("event_prediction_update_time")
+    val eventType = text("event_type").default("marathon")
 }
 
 class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
@@ -61,6 +63,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
                         name = eventInfo.name
                         eventPredictionData = json.encodeToString(pred)
                         eventPredictionUpdateTime = Clock.System.now()
+                        eventType = eventInfo.eventType
                     }
                 }
             }.onFailure {
@@ -69,42 +72,40 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
         }
 
         suspend fun updateEventInfo(force: Boolean = false) {
-            var init = false
-            newSuspendedTransaction {
-                if (ProjectSekaiData.all().empty()) {
-                    initData()
-                    init = true
-                }
-            }
+            val empty = transaction { ProjectSekaiData.all().empty() }
 
-            if (init) return
+            if (empty) {
+                initData()
+                return
+            }
 
             val timestamp = System.currentTimeMillis()
 
             kotlin.runCatching {
                 cometClient.getEventList(1).data.first()
             }.onSuccess { currentEvent ->
-                transaction {
+                newSuspendedTransaction {
                     val info = ProjectSekaiData.all().first()
 
                     if (info.endTime < timestamp || force) {
+                        if (currentEvent.eventType == "cheerful_carnival") {
+                            ProjectSekaiEvent.updateEventTeamImage(currentEvent.assetBundleName)
+                        }
+
                         info.apply {
                             currentEventID = currentEvent.id
                             startTime = currentEvent.startAt
                             aggregateTime = currentEvent.aggregateAt
                             endTime = currentEvent.closedAt
                             name = currentEvent.name
+                            eventType = currentEvent.eventType
                         }
 
                         transaction {
-                            val updateCount = ProjectSekaiUserDataTable.update {
+                            ProjectSekaiUserDataTable.update {
                                 it[lastQueryPosition] = 0
                                 it[lastQueryScore] = 0
                             }
-
-                            /* ktlint-disable max-line-length */
-                            logger.debug { "Event has updated, operated $updateCount row(s), user data total ${ProjectSekaiUserDataTable.fields.size}" }
-                            /* ktlint-enable max-line-length */
                         }
                     }
                 }
@@ -168,6 +169,7 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
     var name by ProjectSekaiDataTable.name
     var eventPredictionData by ProjectSekaiDataTable.eventPredictionData
     var eventPredictionUpdateTime by ProjectSekaiDataTable.eventPredictionUpdateTime
+    var eventType by ProjectSekaiDataTable.eventType
 }
 
 /**
