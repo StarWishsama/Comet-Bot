@@ -242,7 +242,8 @@ object ProjectSekaiImageService {
 
             addTextln()
 
-            addText("数据来自 PJSK Profile | Unibot API")
+            addTextln("数据来自 PJSK Profile | Unibot API")
+            addText("Render by Comet")
         }.build().layout(WIDTH.toFloat())
 
         val surface =
