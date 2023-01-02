@@ -300,8 +300,9 @@ object ProjectSekaiImageService {
             if (eventInfo.eventType == "cheerful_carnival" &&
                 profile.userCheerfulCarnival.cheerfulCarnivalTeamId != null
             ) {
+                val teamNum = if (profile.userCheerfulCarnival.cheerfulCarnivalTeamId % 2 == 0) 2 else 1
                 val teamIcon =
-                    ProjectSekaiEvent.getEventTeamImage(profile.userCheerfulCarnival.cheerfulCarnivalTeamId % 2 + 1)
+                    ProjectSekaiEvent.getEventTeamImage(teamNum)
                 var extraX = 0f
 
                 if (teamIcon != null) {
