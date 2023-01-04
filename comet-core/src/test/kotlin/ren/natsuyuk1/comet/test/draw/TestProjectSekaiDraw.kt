@@ -96,9 +96,9 @@ class TestProjectSekaiDraw {
             val test = cacheDirectory.resolve("test.png")
             test.touch()
 
-            val wrapper = ProjectSekaiImageService.drawCharts(music, MusicDifficulty.MASTER)
+            val image = ProjectSekaiImageService.drawCharts(music, MusicDifficulty.MASTER)
 
-            wrapper.find<Image>()?.stream?.use { istr ->
+            image?.stream?.use { istr ->
                 test.outputStream().use {
                     istr.copyTo(it)
                 }

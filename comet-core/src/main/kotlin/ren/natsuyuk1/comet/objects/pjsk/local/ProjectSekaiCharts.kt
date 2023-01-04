@@ -13,7 +13,7 @@ import java.io.File
 import java.text.NumberFormat
 
 object ProjectSekaiCharts {
-    private val folder = pjskFolder.resolve("charts/")
+    private val chartDir = pjskFolder.resolve("charts/")
 
     private fun getSdvxID(music: PJSKMusicInfo) =
         NumberFormat.getNumberInstance().apply {
@@ -24,39 +24,39 @@ object ProjectSekaiCharts {
     private val validator: (HttpResponse) -> Boolean = { it.contentType()?.match(ContentType.Image.PNG) == true }
 
     suspend fun downloadChart(music: PJSKMusicInfo) {
-        val chartFolder = folder.resolve("${music.id}/")
+        val musicChartDir = chartDir.resolve("${music.id}/")
 
-        if (chartFolder.exists() && !chartFolder.listFiles().isNullOrEmpty()) {
+        if (musicChartDir.exists() && !musicChartDir.listFiles().isNullOrEmpty()) {
             return
         }
 
         val sdvxID = getSdvxID(music)
 
-        chartFolder.mkdir()
+        musicChartDir.mkdirs()
 
-        val bg = chartFolder.resolve("${music.id}bg.png").also { it.touch() }
+        val bg = musicChartDir.resolve("${music.id}bg.png").also { it.touch() }
         cometClient.client.downloadFile("https://sdvx.in/prsk/bg/${sdvxID}bg.png", bg, validator)
-        val bar = chartFolder.resolve("${music.id}bar.png").also { it.touch() }
+        val bar = musicChartDir.resolve("${music.id}bar.png").also { it.touch() }
         cometClient.client.downloadFile("https://sdvx.in/prsk/bg/${sdvxID}bar.png", bar, validator)
-        val chartMaster = chartFolder.resolve("${music.id}ma.png").also { it.touch() }
+        val chartMaster = musicChartDir.resolve("${music.id}ma.png").also { it.touch() }
         cometClient.client.downloadFile("https://sdvx.in/prsk/obj/data${sdvxID}mst.png", chartMaster, validator)
-        val chartExpert = chartFolder.resolve("${music.id}ex.png").also { it.touch() }
+        val chartExpert = musicChartDir.resolve("${music.id}ex.png").also { it.touch() }
         cometClient.client.downloadFile("https://sdvx.in/prsk/obj/data${sdvxID}exp.png", chartExpert, validator)
     }
 
     fun getCharts(music: PJSKMusicInfo, difficulty: MusicDifficulty): Array<File> {
-        val chartFolder = folder.resolve("${music.id}/")
+        val musicChartDir = chartDir.resolve("${music.id}/")
 
-        if (!chartFolder.isDirectory || chartFolder.listFiles()?.size != 4) {
+        if (!musicChartDir.isDirectory || musicChartDir.listFiles()?.size != 4) {
             return emptyArray()
         }
 
-        val bg = chartFolder.resolve("${music.id}bg.png").also { assert(it.isType("image/png")) }
-        val bar = chartFolder.resolve("${music.id}bar.png").also { assert(it.isType("image/png")) }
+        val bg = musicChartDir.resolve("${music.id}bg.png").also { assert(it.isType("image/png")) }
+        val bar = musicChartDir.resolve("${music.id}bar.png").also { assert(it.isType("image/png")) }
         val chart = if (difficulty == MusicDifficulty.MASTER) {
-            chartFolder.resolve("${music.id}ma.png")
+            musicChartDir.resolve("${music.id}ma.png")
         } else {
-            chartFolder.resolve("${music.id}ex.png")
+            musicChartDir.resolve("${music.id}ex.png")
         }.also { assert(it.isType("image/png")) }
 
         return arrayOf(bg, bar, chart)
