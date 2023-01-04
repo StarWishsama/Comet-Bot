@@ -203,7 +203,7 @@ internal suspend fun PJSKMusicInfo.toMessageWrapper() =
         appendTextln("作曲 ${musicInfo.composer}")
         appendTextln("编曲 ${musicInfo.arranger}")
         appendTextln("时长 ${musicInfo.duration.fixDisplay(1)} 秒")
-        appendTextln("上线时间 ${musicInfo.publishedAt.toInstant(false).format(yyMMddWithTimeZonePattern)}")
+        appendTextln("上线时间 ${musicInfo.publishedAt.toInstant(true).format(yyMMddWithTimeZonePattern)}")
         appendLine()
 
         appendTextln("难度信息 >")
