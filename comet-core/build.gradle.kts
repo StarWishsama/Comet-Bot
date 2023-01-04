@@ -24,7 +24,7 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "minutes")
 }
 
-val ktor = "2.2.1"
+val ktor = "2.2.2"
 
 dependencies {
     api(project(":comet-api"))
