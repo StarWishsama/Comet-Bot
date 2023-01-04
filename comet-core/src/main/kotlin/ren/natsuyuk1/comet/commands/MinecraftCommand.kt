@@ -38,13 +38,14 @@ class MinecraftCommand(
     private val host by argument("服务器地址")
     private val port by argument("服务器端口")
         .int()
-        .default(
-            if (protocol == MinecraftServerType.JAVA) 25565
-            else 19132
-        )
+        .default(0)
 
     override suspend fun run() {
         var result: QueryInfo?
+        val actualPort = if (port == 0) {
+            if (protocol == MinecraftServerType.JAVA) 25565
+            else 19132
+        } else port
 
         try {
             val srvRecord = SRVLookup.lookup(host, "minecraft")
@@ -52,12 +53,12 @@ class MinecraftCommand(
             result = if (srvRecord != null) {
                 query(srvRecord.first, srvRecord.second, protocol)
             } else {
-                query(host, port, protocol)
+                query(host, actualPort, protocol)
             }
 
             result?.toMessageWrapper()?.let { subject.sendMessage(it) }
         } catch (e: Exception) {
-            result = query(host, port, protocol)
+            result = query(host, actualPort, protocol)
         }
 
         if (result == null) {
