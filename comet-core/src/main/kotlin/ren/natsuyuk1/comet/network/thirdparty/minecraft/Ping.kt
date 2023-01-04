@@ -95,7 +95,7 @@ suspend fun javaQuery(host: String, port: Int): QueryInfo? {
 
         return QueryInfo(resp.toString(Charset.defaultCharset()), MinecraftServerType.JAVA, pingTime - requestTime)
     } catch (e: Exception) {
-        logger.warn(e) { "查询 Java 版服务器失败, host=$host, port=$port" }
+        logger.debug(e) { "Unable to fetch minecraft server info (host=$host, port=$port)" }
         return null
     }
 }
@@ -142,28 +142,33 @@ suspend fun ByteReadChannel.readVarInt(): Int {
     return value
 }
 
-private suspend fun bedrockQuery(address: String, port: Int = 19132): QueryInfo {
-    val manager = SelectorManager(Dispatchers.IO)
-    val start = System.currentTimeMillis()
-    val socket = aSocket(manager).udp().connect(InetSocketAddress(address, port))
-    val writer = socket.openWriteChannel(true)
-    val reader = socket.openReadChannel()
+private suspend fun bedrockQuery(address: String, port: Int): QueryInfo? {
+    try {
+        val manager = SelectorManager(Dispatchers.IO)
+        val start = System.currentTimeMillis()
+        val socket = aSocket(manager).udp().connect(InetSocketAddress(address, port))
+        val writer = socket.openWriteChannel(true)
+        val reader = socket.openReadChannel()
 
-    val bytes: ByteArray = convertToBedrockByte("0100000000240D12D300FFFF00FEFEFEFEFDFDFDFD12345678")
-    writer.writeFully(bytes)
+        val bytes: ByteArray = convertToBedrockByte("0100000000240D12D300FFFF00FEFEFEFEFDFDFDFD12345678")
+        writer.writeFully(bytes)
 
-    val byteBuffer = ByteBuffer.allocate(1024)
+        val byteBuffer = ByteBuffer.allocate(1024)
 
-    reader.readFully(byteBuffer)
+        reader.readFully(byteBuffer)
 
-    val result = Charsets.UTF_8.decode(byteBuffer).toString()
+        val result = Charsets.UTF_8.decode(byteBuffer).toString()
 
-    withContext(Dispatchers.IO) {
-        socket.close()
-        manager.close()
+        withContext(Dispatchers.IO) {
+            socket.close()
+            manager.close()
+        }
+
+        return QueryInfo(result, MinecraftServerType.BEDROCK, System.currentTimeMillis() - start)
+    } catch (e: Exception) {
+        logger.debug(e) { "Unable to fetch minecraft server info (host=$address, port=$port)" }
+        return null
     }
-
-    return QueryInfo(result, MinecraftServerType.BEDROCK, System.currentTimeMillis() - start)
 }
 
 private fun convertToBedrockByte(hexString: String): ByteArray {

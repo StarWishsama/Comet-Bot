@@ -78,7 +78,7 @@ Java 版服务器
 > MOTD ${parseMOTD().replace(colorCodeRegex, "")}
 > 服务器版本 ${version.protocolName}
 > 延迟 ${ping}ms
-${if (modInfo?.modList != null && modInfo.modList.isNotEmpty()) "> MOD 列表 " + modInfo.modList else ""}
+${if (!modInfo?.modList.isNullOrEmpty()) "> MOD 列表 " + modInfo!!.modList else ""}
                 """.trimIndent()
             )
         }

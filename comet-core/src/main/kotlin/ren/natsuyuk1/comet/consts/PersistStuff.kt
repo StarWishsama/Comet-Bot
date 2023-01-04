@@ -68,7 +68,8 @@ val defaultCommands: List<AbstractCommandNode<*>> =
                 ProjectSekaiCommand.Event.EVENT,
                 ProjectSekaiCommand.Prediction.PREDICTION,
                 ProjectSekaiCommand.Info.INFO,
-                ProjectSekaiCommand.Chart.CHART
+                ProjectSekaiCommand.Chart.CHART,
+                ProjectSekaiCommand.Music.MUSIC,
             )
         ) { comet, sender, subject, wrapper, user ->
             ProjectSekaiCommand(comet, sender, subject, wrapper, user)
@@ -179,5 +180,10 @@ val defaultCommands: List<AbstractCommandNode<*>> =
             DEBUG
         ) { comet, sender, subject, wrapper, user ->
             DebugCommand(comet, sender, subject, wrapper, user)
+        },
+        CommandNode(
+            MINECRAFT
+        ) { comet, sender, subject, wrapper, user ->
+            MinecraftCommand(comet, sender, subject, wrapper, user)
         },
     )
