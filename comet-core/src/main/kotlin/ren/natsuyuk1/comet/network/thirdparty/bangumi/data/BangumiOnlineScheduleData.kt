@@ -34,14 +34,15 @@ data class BangumiOnlineScheduleData(
                 appendText(
                     buildString {
                         v.jsonArray.forEach bgmName@{ ele ->
-                            ele.jsonObject["title_zh"]?.jsonPrimitive?.contentOrNull.let {
+                            val title = ele.jsonObject["title"]
+                            title?.jsonObject?.get("zh")?.jsonPrimitive?.contentOrNull.let {
                                 if (it != null) {
                                     append("$it | ")
                                     return@bgmName
                                 }
                             }
 
-                            ele.jsonObject["title_ja"]?.jsonPrimitive?.contentOrNull?.let {
+                            title?.jsonObject?.get("jp")?.jsonPrimitive?.contentOrNull?.let {
                                 append("$it | ")
                             }
                         }
