@@ -20,6 +20,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.nio.file.Files
 import java.util.jar.JarFile
 import kotlin.io.path.absolute
 import kotlin.io.path.pathString
@@ -121,4 +122,32 @@ fun jar(clazz: Class<*>): JarFile? {
     return null
 }
 
+/**
+ * Get file last modified time
+ *
+ * @return last modified time
+ */
 fun File.lastModifiedTime(): Instant = Instant.fromEpochMilliseconds(lastModified())
+
+/**
+ * Identify a file is blank or not
+ *
+ * @return is file blank
+ */
+fun File.isBlank(): Boolean = !exists() || length() == 0L
+
+/**
+ * Check specific file type
+ *
+ * @param type file type to check
+ *
+ * The param of this method is the string form of the value of a
+ * Multipurpose Internet Mail Extension (MIME) content type as
+ * defined by <a href="http://www.ietf.org/rfc/rfc2045.txt"><i>RFC&nbsp;2045:
+ * Multipurpose Internet Mail Extensions (MIME) Part One: Format of Internet
+ * Message Bodies</i></a>. The string is guaranteed to be parsable according
+ * to the grammar in the RFC.
+ *
+ * @return is file type equals
+ */
+fun File.isType(type: String): Boolean = Files.probeContentType(toPath()) == type

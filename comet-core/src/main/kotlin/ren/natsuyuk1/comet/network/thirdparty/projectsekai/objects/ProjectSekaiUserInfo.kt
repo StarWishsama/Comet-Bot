@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects
 
+import kotlinx.atomicfu.atomic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.message.MessageWrapper
@@ -26,7 +27,7 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
                 MusicDifficulty.EXPERT,
                 MusicPlayResult.CLEAR
             )
-            } / FC ${
+            }/${ProjectSekaiMusic.musicDatabase.size} / FC ${
             getSpecificLevelMusicCount(
                 MusicDifficulty.EXPERT,
                 MusicPlayResult.FULL_COMBO
@@ -40,7 +41,7 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
                 MusicDifficulty.MASTER,
                 MusicPlayResult.CLEAR
             )
-            } / FC ${
+            }${ProjectSekaiMusic.musicDatabase.size} / FC ${
             getSpecificLevelMusicCount(
                 MusicDifficulty.MASTER,
                 MusicPlayResult.FULL_COMBO
@@ -81,17 +82,19 @@ data class ProjectSekaiUserInfo(
     }
 
     fun getSpecificLevelMusicCount(difficulty: MusicDifficulty, playResult: MusicPlayResult): Int {
-        var counter = 0
+        var counter = atomic(0)
 
         userMusics.forEach {
-            counter += it.musicStatus.count { ms ->
-                ms.userMusicResult.any { umr ->
-                    umr.musicDifficulty == difficulty && umr.playResult >= playResult
+            counter.getAndAdd(
+                it.musicStatus.count { ms ->
+                    ms.userMusicResult.any { umr ->
+                        umr.musicDifficulty == difficulty && umr.playResult >= playResult
+                    }
                 }
-            }
+            )
         }
 
-        return counter
+        return counter.value
     }
 
     @Serializable

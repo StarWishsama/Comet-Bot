@@ -3,6 +3,8 @@ package ren.natsuyuk1.comet.objects.pjsk.local
 import io.ktor.http.*
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
+import ren.natsuyuk1.comet.utils.file.isBlank
+import ren.natsuyuk1.comet.utils.file.isType
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import java.io.File
@@ -17,7 +19,7 @@ object ProjectSekaiEvent {
     fun getEventTeamImage(num: Int): File? {
         val target = eventImage.resolve("team_$num.png")
 
-        return if (!target.exists() || target.length() == 0L) {
+        return if (target.isBlank() || !target.isType("image/png")) {
             null
         } else {
             target

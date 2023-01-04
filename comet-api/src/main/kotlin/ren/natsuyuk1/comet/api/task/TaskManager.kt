@@ -25,6 +25,13 @@ interface ITaskManager {
     fun close()
 
     /**
+     * Simple run a suspend task
+     *
+     * @return task job
+     */
+    fun run(task: suspend () -> Unit): Job
+
+    /**
      * Register a simple delayed task
      *
      * @return task job
@@ -93,6 +100,13 @@ object TaskManager : ITaskManager {
     override fun close() {
         scope.cancel("Closing")
     }
+
+    /**
+     * Simple run a suspend task
+     *
+     * @return task job
+     */
+    override fun run(task: suspend () -> Unit): Job = scope.launch { task() }
 
     /**
      * Register a simple delayed task

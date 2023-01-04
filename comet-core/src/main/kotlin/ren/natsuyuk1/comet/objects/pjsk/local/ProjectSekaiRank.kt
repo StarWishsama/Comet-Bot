@@ -6,7 +6,7 @@ import mu.KotlinLogging
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.github.GitHubApi
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.official.PJSKRankSeasonInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.PJSKRankSeasonInfo
 import ren.natsuyuk1.comet.service.RateLimitAPI
 import ren.natsuyuk1.comet.service.RateLimitService
 import ren.natsuyuk1.comet.util.pjsk.getSekaiBestResourceURL

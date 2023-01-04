@@ -69,6 +69,13 @@ abstract class CometCommand(
     val property: CommandProperty,
     option: CliktOption = CliktOption()
 ) : BaseCommand(sender, message, user, property, option) {
+    init {
+        context {
+            localization = CommandLocalization
+            expandArgumentFiles = false
+        }
+    }
+
     override fun aliases(): Map<String, List<String>> {
         val aliasesMap = mutableMapOf<String, List<String>>()
 
@@ -91,7 +98,14 @@ abstract class CometSubCommand(
     open val sender: CommandSender,
     open val user: CometUser,
     val property: SubCommandProperty
-) : CliktCommand(name = property.name)
+) : CliktCommand(name = property.name) {
+    init {
+        context {
+            localization = CommandLocalization
+            expandArgumentFiles = false
+        }
+    }
+}
 
 object CommandLocalization : Localization {
     override fun usageError(message: String) = "错误: $message"
@@ -156,9 +170,10 @@ object CommandLocalization : Localization {
 
     override fun fileEndsWithSlash() = "文件以 \\ 结尾"
 
-    override fun extraArgumentOne(name: String) = "输入了多余的参数 $name"
+    override fun extraArgumentOne(name: String) = "输入了多余的参数 $name, 想输入带空格的关键词请使用 \" 号括起来"
 
-    override fun extraArgumentMany(name: String, count: Int) = "输入了多余的参数 $name"
+    override fun extraArgumentMany(name: String, count: Int) =
+        "输入了多余的参数 $name, 想输入带空格的关键词请使用 \" 号括起来"
 
     override fun invalidFlagValueInFile(name: String) = "Invalid flag value in file for option $name"
 

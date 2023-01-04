@@ -4,8 +4,9 @@ import kotlinx.serialization.builtins.ListSerializer
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.profile.PJSKMusicDifficultyInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.PJSKMusicDifficultyInfo
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
+import ren.natsuyuk1.comet.utils.file.isBlank
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
@@ -35,7 +36,7 @@ object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
     override suspend fun update(): Boolean {
         file.touch()
 
-        if (file.length() == 0L || isOutdated()) {
+        if (file.isBlank() || isOutdated()) {
 
             if (cometClient.client.downloadFile(
                     "https://gitlab.com/pjsekai/database/musics/-/raw/main/musicDifficulties.json",
@@ -51,4 +52,6 @@ object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
 
         return false
     }
+
+    fun getMusicDifficulty(musicId: Int) = musicDiffDatabase.filter { it.musicId == musicId }
 }

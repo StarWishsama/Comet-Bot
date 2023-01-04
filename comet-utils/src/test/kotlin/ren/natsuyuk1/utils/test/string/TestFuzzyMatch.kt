@@ -11,6 +11,5 @@ class TestFuzzyMatch {
     @Test
     fun testLevenshteinDistance() {
         assertEquals(ldSimilarity("dog", "doge"), BigDecimal.valueOf(0.75))
-        ldSimilarity("夜に駆ける", "夜駆").also { println(it) }
     }
 }

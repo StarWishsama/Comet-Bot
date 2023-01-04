@@ -1,7 +1,6 @@
-package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.profile
+package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects
 
 import kotlinx.serialization.Serializable
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
 
 /**
  * Project Sekai Profile Music Data

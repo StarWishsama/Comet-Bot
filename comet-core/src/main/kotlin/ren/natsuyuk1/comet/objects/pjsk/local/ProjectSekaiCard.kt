@@ -4,9 +4,10 @@ import kotlinx.serialization.builtins.ListSerializer
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.profile.PJSKCard
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.PJSKCard
 import ren.natsuyuk1.comet.util.pjsk.getSekaiResourceURL
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
+import ren.natsuyuk1.comet.utils.file.isBlank
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
@@ -37,7 +38,7 @@ object ProjectSekaiCard : ProjectSekaiLocalFile(
     }
 
     override suspend fun update(): Boolean {
-        if (!file.exists() || file.length() == 0L || isOutdated()) {
+        if (file.isBlank() || isOutdated()) {
             if (cometClient.client.downloadFile(url, file)) {
                 updateLastUpdateTime()
                 logger.info { "成功更新卡面数据" }

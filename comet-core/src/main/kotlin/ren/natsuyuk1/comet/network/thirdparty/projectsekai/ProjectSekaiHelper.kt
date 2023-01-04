@@ -12,19 +12,26 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.asImage
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.PJSKMusicInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiI18N
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusicDifficulty
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
+import ren.natsuyuk1.comet.utils.datetime.format
 import ren.natsuyuk1.comet.utils.datetime.toFriendly
+import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
+import ren.natsuyuk1.comet.utils.time.yyMMddWithTimeZonePattern
 import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 
@@ -177,3 +184,32 @@ internal fun Int.getSurroundingRank(): Pair<Int, Int> {
 
     return Pair(rankPosition.last(), 1000001)
 }
+
+internal suspend fun PJSKMusicInfo.toMessageWrapper() =
+    buildMessageWrapper {
+        val musicInfo = this@toMessageWrapper
+        val diff = ProjectSekaiMusicDifficulty.getMusicDifficulty(musicInfo.id)
+
+        if (diff.size != 5) {
+            appendText("音乐等级数据还没有准备好哦")
+            return@buildMessageWrapper
+        }
+
+        appendElement(ProjectSekaiMusic.getMusicCover(musicInfo).asImage())
+        appendLine()
+        appendTextln("${musicInfo.title}")
+        appendLine()
+        appendTextln("作词 ${musicInfo.lyricist}")
+        appendTextln("作曲 ${musicInfo.composer}")
+        appendTextln("编曲 ${musicInfo.arranger}")
+        appendTextln("时长 ${musicInfo.duration.fixDisplay(1)} 秒")
+        appendTextln("上线时间 ${musicInfo.publishedAt.toInstant(false).format(yyMMddWithTimeZonePattern)}")
+        appendLine()
+
+        appendTextln("难度信息 >")
+        diff.forEach {
+            appendTextln("${it.musicDifficulty}[${it.playLevel}] | ${it.totalNoteCount}")
+        }
+
+        trim()
+    }

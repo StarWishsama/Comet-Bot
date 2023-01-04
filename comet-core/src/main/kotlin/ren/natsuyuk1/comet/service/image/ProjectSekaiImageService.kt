@@ -11,11 +11,7 @@ import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.getSurroundingRank
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.official.PJSKMusicInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.*
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.local.*
@@ -359,7 +355,7 @@ object ProjectSekaiImageService {
     suspend fun drawCharts(
         musicInfo: PJSKMusicInfo,
         difficulty: MusicDifficulty
-    ): MessageWrapper {
+    ): ren.natsuyuk1.comet.api.message.Image? {
         var chartFiles = ProjectSekaiCharts.getCharts(musicInfo, difficulty)
 
         if (chartFiles.isEmpty()) {
@@ -456,12 +452,8 @@ object ProjectSekaiImageService {
         }
 
         val data = surface.makeImageSnapshot().encodeToData(EncodedImageFormat.PNG)
-            ?: return buildMessageWrapper {
-                appendText("图片生成失败!")
-            }
+            ?: return null
 
-        return buildMessageWrapper {
-            appendElement(data.bytes.inputStream().asImage())
-        }
+        return data.bytes.inputStream().asImage()
     }
 }

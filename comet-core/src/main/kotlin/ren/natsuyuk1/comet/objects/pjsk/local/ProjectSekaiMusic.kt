@@ -5,8 +5,10 @@ import kotlinx.serialization.builtins.ListSerializer
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.official.PJSKMusicInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.PJSKMusicInfo
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
+import ren.natsuyuk1.comet.utils.file.isBlank
+import ren.natsuyuk1.comet.utils.file.isType
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
@@ -90,7 +92,7 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
 
         val cover = musicCoverFolder.resolve(music.assetBundleName + ".png")
 
-        if (!cover.exists() || cover.length() == 0L) {
+        if (cover.isBlank() || !cover.isType("image/png")) {
             downloadMusicCover(music)
         }
 

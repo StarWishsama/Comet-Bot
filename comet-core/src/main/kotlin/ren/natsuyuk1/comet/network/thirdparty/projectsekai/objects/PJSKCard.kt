@@ -1,4 +1,4 @@
-package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.profile
+package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
