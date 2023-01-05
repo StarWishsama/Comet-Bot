@@ -41,6 +41,8 @@ suspend fun HttpClient.downloadFile(
     file: File,
     verifier: (HttpResponse) -> Boolean = { it.status.isSuccess() }
 ): Boolean {
+    logger.debug { "Trying download file from $url..." }
+
     var verified = false
 
     try {
@@ -66,6 +68,8 @@ suspend fun HttpClient.downloadFile(
 
         if (verified) {
             logger.debug { "Downloaded file ${file.name} from $url, costs $duration" }
+        } else {
+            logger.debug { "File ${file.name} not be downloaded because extra verify is failed." }
         }
     } catch (e: IOException) {
         logger.warn(e) {}

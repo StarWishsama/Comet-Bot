@@ -5,6 +5,7 @@ import io.ktor.client.request.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.message.Image
@@ -14,7 +15,6 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficul
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiLocalFileTable
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusicDifficulty
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService.drawEventInfo
@@ -40,6 +40,17 @@ class TestProjectSekaiDraw {
     // Welcome to add me as friend :D
     private val id = 210043933010767872L
 
+    @BeforeAll
+    fun init() {
+        initTestDatabase()
+        DatabaseManager.loadTables(ProjectSekaiLocalFileTable, ProjectSekaiDataTable)
+
+        runBlocking {
+            SkikoHelper.loadSkiko()
+            ProjectSekaiManager.init(EmptyCoroutineContext)
+        }
+    }
+
     @Test
     fun testAvatarDownload() {
         if (isCI()) return
@@ -55,13 +66,7 @@ class TestProjectSekaiDraw {
     fun testAvatarDraw() {
         if (isCI()) return
 
-        initTestDatabase()
-
         runBlocking {
-            DatabaseManager.loadTables(ProjectSekaiLocalFileTable, ProjectSekaiDataTable)
-            SkikoHelper.loadSkiko()
-            ProjectSekaiManager.init(EmptyCoroutineContext)
-
             val info = cometClient.getUserEventInfo(eventID, id)
 
             val res = newSuspendedTransaction {
@@ -84,14 +89,8 @@ class TestProjectSekaiDraw {
         if (isCI()) return
 
         runBlocking {
-            SkikoHelper.loadSkiko()
-            ProjectSekaiMusic.update()
-            ProjectSekaiMusic.load()
-            ProjectSekaiMusicDifficulty.update()
-            ProjectSekaiMusicDifficulty.load()
-
-            // Represent to project sekai music named `Iなんです`
-            val music = ProjectSekaiMusic.getMusicInfo(139)
+            // Represent to music named `気まぐれメルシィ`
+            val music = ProjectSekaiMusic.getMusicInfo(281)
             assertNotNull(music)
             val test = cacheDirectory.resolve("test.png")
             test.touch()
