@@ -106,5 +106,8 @@ open class MessageWrapper(
     }
 
     inline fun <reified T : WrapperElement> find(): T? =
-        getMessageContent().asSequence().filterIsInstance<T?>().firstOrNull()
+        getMessageContent().asSequence().filterIsInstance<T>().firstOrNull()
+
+    inline fun <reified T : WrapperElement> filterIsInstance(): List<T> =
+        getMessageContent().asSequence().filterIsInstance<T>().toList()
 }

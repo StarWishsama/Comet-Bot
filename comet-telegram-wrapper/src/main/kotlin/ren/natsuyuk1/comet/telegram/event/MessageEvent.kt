@@ -55,7 +55,7 @@ suspend fun CommonMessage<MessageContent>.toCometEvent(
         return null
     }
 
-    val isCommand = this.entities?.find { it is BotCommandTextSource && it.source.contains(comet.username) } != null
+    val isCommand = this.entities?.any { it is BotCommandTextSource && it.source.contains(comet.username) } == true
 
     return when (chat) {
         is GroupChat -> this.toCometGroupEvent(comet, isCommand)

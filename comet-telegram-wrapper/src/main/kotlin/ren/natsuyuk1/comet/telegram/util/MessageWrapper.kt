@@ -1,14 +1,16 @@
 package ren.natsuyuk1.comet.telegram.util
 
+import dev.inmo.tgbotapi.bot.exceptions.CommonRequestException
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.files.downloadFile
 import dev.inmo.tgbotapi.extensions.api.send.media.sendAudio
-import dev.inmo.tgbotapi.extensions.api.send.media.sendPhoto
+import dev.inmo.tgbotapi.extensions.api.send.media.sendVisualMediaGroup
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.requests.abstracts.FileId
 import dev.inmo.tgbotapi.requests.abstracts.InputFile
 import dev.inmo.tgbotapi.requests.abstracts.asMultipartFile
 import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.media.TelegramMediaPhoto
 import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.types.message.content.PhotoContent
 import dev.inmo.tgbotapi.types.message.content.TextContent
@@ -48,17 +50,30 @@ suspend fun TelegramComet.send(
         }
     }
 
-    val image = message.find<Image>()
+    val images = message.filterIsInstance<Image>()
     val voice = message.find<Voice>()
 
-    val resp = if (image != null) {
-        (image.toInputFile() ?: error("无法发送该图片 $image")).let {
-            bot.sendPhoto(
-                target,
-                it,
-                entities = textSourceList
-            )
+    val resp = if (images.isNotEmpty()) {
+        val photos = mutableListOf<TelegramMediaPhoto>()
+        images.forEachIndexed { i, img ->
+            val ifile = img.toInputFile()
+
+            if (ifile == null) {
+                logger.debug { "Unable to convert $img to telegram InputFile" }
+            } else {
+                val mediaPhoto = if (i == 0) TelegramMediaPhoto(
+                    ifile,
+                    entities = textSourceList
+                ) else TelegramMediaPhoto(ifile)
+
+                photos.add(mediaPhoto)
+            }
         }
+
+        bot.sendVisualMediaGroup(
+            target,
+            photos
+        )
     } else if (voice != null) {
         (voice.toInputFile() ?: error("无法发送该语音 $voice")).let {
             bot.sendAudio(
@@ -108,9 +123,9 @@ suspend fun MessageContent.toMessageWrapper(
 
                     kotlin.runCatching {
                         comet.bot.downloadFile(it)
-                    }.onSuccess { localPath ->
+                    }.onSuccess { stream ->
                         try {
-                            tempFile.writeBytes(localPath)
+                            tempFile.writeBytes(stream)
                             appendElement(Image(filePath = tempFile.absPath))
                             content.text?.let { t -> appendText(t) }
                         } catch (e: Exception) {
@@ -139,20 +154,25 @@ suspend fun MessageContent.toMessageWrapper(
 }
 
 fun Image.toInputFile(): InputFile? {
-    return when {
-        url?.isNotBlank() == true -> InputFile.fromUrl(url!!)
-        filePath?.isNotBlank() == true -> InputFile.fromFile(File(filePath!!))
-        !base64.isNullOrBlank() ->
-            Base64
-                .getMimeDecoder()
-                .decode(base64!!)
-                .asMultipartFile(System.currentTimeMillis().toString() + ".png")
+    return try {
+        when {
+            url?.isNotBlank() == true -> InputFile.fromUrl(url!!)
+            filePath?.isNotBlank() == true -> InputFile.fromFile(File(filePath!!))
+            !base64.isNullOrBlank() ->
+                Base64
+                    .getMimeDecoder()
+                    .decode(base64!!)
+                    .asMultipartFile(System.currentTimeMillis().toString() + ".png")
 
-        stream != null -> stream!!.asInput().use {
-            InputFile.fromInput(System.currentTimeMillis().toString() + ".png") { it }
+            stream != null -> stream!!.asInput().use {
+                InputFile.fromInput(System.currentTimeMillis().toString() + ".png") { it }
+            }
+
+            else -> null
         }
-
-        else -> null
+    } catch (e: CommonRequestException) {
+        logger.warn(e) { "Unable to convert $this to telegram Inputfile" }
+        null
     }
 }
 
