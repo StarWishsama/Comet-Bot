@@ -41,7 +41,7 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
                 MusicDifficulty.MASTER,
                 MusicPlayResult.CLEAR
             )
-            }${ProjectSekaiMusic.musicDatabase.size} / FC ${
+            }/${ProjectSekaiMusic.musicDatabase.size} / FC ${
             getSpecificLevelMusicCount(
                 MusicDifficulty.MASTER,
                 MusicPlayResult.FULL_COMBO
