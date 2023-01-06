@@ -1,9 +1,9 @@
 package ren.natsuyuk1.comet.telegram.util
 
-import dev.inmo.tgbotapi.bot.exceptions.CommonRequestException
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.files.downloadFile
 import dev.inmo.tgbotapi.extensions.api.send.media.sendAudio
+import dev.inmo.tgbotapi.extensions.api.send.media.sendPhoto
 import dev.inmo.tgbotapi.extensions.api.send.media.sendVisualMediaGroup
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.requests.abstracts.FileId
@@ -14,10 +14,10 @@ import dev.inmo.tgbotapi.types.media.TelegramMediaPhoto
 import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.types.message.content.PhotoContent
 import dev.inmo.tgbotapi.types.message.content.TextContent
+import dev.inmo.tgbotapi.types.message.content.VoiceContent
 import dev.inmo.tgbotapi.types.message.textsources.TextSource
 import dev.inmo.tgbotapi.types.message.textsources.mention
 import dev.inmo.tgbotapi.types.message.textsources.regular
-import io.ktor.utils.io.streams.*
 import ren.natsuyuk1.comet.api.message.*
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.utils.file.absPath
@@ -33,17 +33,17 @@ suspend fun TelegramComet.send(
     type: MessageSource.MessageSourceType,
     target: ChatId,
 ): MessageReceipt {
-    val textSourceList = mutableListOf<TextSource>()
+    val textSource = mutableListOf<TextSource>()
 
     // 纯文本
     message.getMessageContent().forEach {
         when (it) {
             is Text -> {
-                textSourceList.add(regular(it.parseToString()))
+                textSource.add(regular(it.parseToString()))
             }
 
             is AtElement -> {
-                textSourceList.add(mention(it.userName))
+                textSource.add(mention(it.userName))
             }
 
             else -> {}
@@ -54,36 +54,47 @@ suspend fun TelegramComet.send(
     val voice = message.find<Voice>()
 
     val resp = if (images.isNotEmpty()) {
-        val photos = mutableListOf<TelegramMediaPhoto>()
-        images.forEachIndexed { i, img ->
-            val ifile = img.toInputFile()
+        if (images.size == 1) {
+            val ifile = images.first().toInputFile() ?: error("Unable to convert ${images.first()} to inputfile")
 
-            if (ifile == null) {
-                logger.debug { "Unable to convert $img to telegram InputFile" }
-            } else {
-                val mediaPhoto = if (i == 0) TelegramMediaPhoto(
-                    ifile,
-                    entities = textSourceList
-                ) else TelegramMediaPhoto(ifile)
+            bot.sendPhoto(
+                target,
+                ifile,
+                entities = textSource
+            )
+        } else {
+            val photos = mutableListOf<TelegramMediaPhoto>()
 
-                photos.add(mediaPhoto)
+            images.forEachIndexed { i, img ->
+                val ifile = img.toInputFile()
+
+                if (ifile == null) {
+                    logger.debug { "Unable to convert $img to telegram InputFile" }
+                } else {
+                    val mediaPhoto = if (i == 0) TelegramMediaPhoto(
+                        ifile,
+                        entities = textSource
+                    ) else TelegramMediaPhoto(ifile)
+
+                    photos.add(mediaPhoto)
+                }
             }
-        }
 
-        bot.sendVisualMediaGroup(
-            target,
-            photos
-        )
+            bot.sendVisualMediaGroup(
+                target,
+                photos
+            )
+        }
     } else if (voice != null) {
         (voice.toInputFile() ?: error("无法发送该语音 $voice")).let {
             bot.sendAudio(
                 target,
                 it,
-                entities = textSourceList
+                entities = textSource
             )
         }
     } else {
-        bot.sendMessage(target, textSourceList)
+        bot.sendMessage(target, textSource)
     }
 
     return MessageReceipt(
@@ -139,6 +150,18 @@ suspend fun MessageContent.toMessageWrapper(
             }
         }
 
+        is VoiceContent -> {
+            buildMessageWrapper(receipt) {
+                val dest = File(cacheDirectory, content.media.fileId.fileId)
+                dest.touch()
+                dest.deleteOnExit()
+                comet.bot.downloadFile(content.media, dest)
+                appendElement(Voice(dest.absPath))
+
+                content.text?.let { t -> appendText(t) }
+            }
+        }
+
         is TextContent -> {
             buildMessageWrapper(receipt) {
                 if (containBotAt) {
@@ -164,13 +187,11 @@ fun Image.toInputFile(): InputFile? {
                     .decode(base64!!)
                     .asMultipartFile(System.currentTimeMillis().toString() + ".png")
 
-            stream != null -> stream!!.asInput().use {
-                InputFile.fromInput(System.currentTimeMillis().toString() + ".png") { it }
-            }
+            byteArray != null -> byteArray!!.asMultipartFile(System.currentTimeMillis().toString() + ".png")
 
             else -> null
         }
-    } catch (e: CommonRequestException) {
+    } catch (e: Exception) {
         logger.warn(e) { "Unable to convert $this to telegram Inputfile" }
         null
     }

@@ -46,8 +46,8 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent? {
                     return Base64.getMimeDecoder().decode(base64).toExternalResource().use {
                         it.uploadAsImage(subject)
                     }
-                } else if (stream != null) {
-                    return stream!!.use {
+                } else if (byteArray != null) {
+                    return byteArray!!.toExternalResource().use {
                         it.uploadAsImage(subject)
                     }
                 } else {
@@ -71,7 +71,9 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent? {
             }
 
             if (filePath.isNotEmpty() && File(filePath).exists()) {
-                return subject.uploadAudio(File(filePath).toExternalResource())
+                return File(filePath).toExternalResource().use {
+                    subject.uploadAudio(it)
+                }
             } else {
                 throw FileNotFoundException("转换语音失败, 对应的语音文件不存在: $filePath")
             }

@@ -15,7 +15,6 @@ import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.utils.file.absPath
 import java.io.File
-import java.io.InputStream
 
 @Serializable
 sealed class WrapperElement {
@@ -50,16 +49,40 @@ data class Image(
     val filePath: String? = null,
     val base64: String? = null,
     @Transient
-    val stream: InputStream? = null,
+    val byteArray: ByteArray? = null,
 ) : WrapperElement() {
 
     init {
-        if (url == null && filePath == null && base64 == null && stream == null) {
+        if (url == null && filePath == null && base64 == null && byteArray == null) {
             throw IllegalArgumentException("url/filePath/base64 can't be null or empty!")
         }
     }
 
     override fun parseToString(): String = "[图片]"
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Image
+
+        if (url != other.url) return false
+        if (filePath != other.filePath) return false
+        if (base64 != other.base64) return false
+        if (byteArray != null) {
+            if (other.byteArray == null) return false
+            if (!byteArray.contentEquals(other.byteArray)) return false
+        } else if (other.byteArray != null) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = url?.hashCode() ?: 0
+        result = 31 * result + (filePath?.hashCode() ?: 0)
+        result = 31 * result + (base64?.hashCode() ?: 0)
+        result = 31 * result + (byteArray?.contentHashCode() ?: 0)
+        return result
+    }
 }
 
 fun String.asURLImage() = Image(url = this)
@@ -68,7 +91,7 @@ fun String.asBase64Image() = Image(base64 = this)
 
 fun File.asImage() = Image(filePath = absPath)
 
-fun InputStream.asImage() = Image(stream = this)
+fun ByteArray.asImage() = Image(byteArray = this)
 
 /**
  * [AtElement]

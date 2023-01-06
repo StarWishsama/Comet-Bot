@@ -89,7 +89,7 @@ object ProjectSekaiImageService {
             }
 
         return buildMessageWrapper {
-            appendElement(data.bytes.inputStream().asImage())
+            appendElement(data.bytes.asImage())
         }
     }
 
@@ -348,7 +348,7 @@ object ProjectSekaiImageService {
             }
 
         return buildMessageWrapper {
-            appendElement(data.bytes.inputStream().asImage())
+            appendElement(data.bytes.asImage())
         }
     }
 
@@ -454,6 +454,6 @@ object ProjectSekaiImageService {
         val data = surface.makeImageSnapshot().encodeToData(EncodedImageFormat.PNG)
             ?: return null
 
-        return data.bytes.inputStream().asImage()
+        return data.bytes.asImage()
     }
 }
