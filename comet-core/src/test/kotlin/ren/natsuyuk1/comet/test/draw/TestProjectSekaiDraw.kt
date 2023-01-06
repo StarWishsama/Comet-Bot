@@ -74,11 +74,7 @@ class TestProjectSekaiDraw {
             }
 
             val tfile = File.createTempFile("pjsk_userinfo_test_", ".png")
-            res.find<Image>()?.stream?.use {
-                tfile.outputStream().use { fos ->
-                    it.copyTo(fos)
-                }
-            }
+            res.find<Image>()?.byteArray?.let { tfile.writeBytes(it) }
 
             println(tfile.absPath)
         }
@@ -97,10 +93,8 @@ class TestProjectSekaiDraw {
 
             val image = ProjectSekaiImageService.drawCharts(music, MusicDifficulty.MASTER)
 
-            image?.stream?.use { istr ->
-                test.outputStream().use {
-                    istr.copyTo(it)
-                }
+            image?.byteArray?.let {
+                test.writeBytes(it)
             }
 
             println(test.absPath)
