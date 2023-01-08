@@ -48,10 +48,9 @@ class TestSessionManager {
     }
 
     private class TestGroup : Group(2434L, "NIJISANJI") {
-        override val owner: GroupMember = TestGroupMember()
+        override suspend fun getOwner(): GroupMember = TestGroupMember()
 
-        override val members: List<GroupMember>
-            get() = error("Unable to use this on test group")
+        override suspend fun getMembers(): List<GroupMember> = error("Unable to use this on test group")
 
         override fun updateGroupName(groupName: String) = error("Unable to use this on test group")
 
@@ -59,14 +58,13 @@ class TestSessionManager {
 
         override suspend fun getBotPermission(): GroupPermission = error("Unable to use this on test group")
 
-        override val avatarUrl: String
-            get() = error("Unable to use this on test group")
+        override suspend fun avatarUrl(): String = error("Unable to use this on test group")
 
-        override fun getMember(id: Long): GroupMember = error("Unable to use this on test group")
+        override suspend fun getMember(id: Long): GroupMember = error("Unable to use this on test group")
 
         override suspend fun quit(): Boolean = error("Unable to use this on test group")
 
-        override fun contains(id: Long): Boolean = error("Unable to use this on test group")
+        override suspend fun contains(id: Long): Boolean = error("Unable to use this on test group")
 
         override val comet: Comet = fakeComet
         override val platform: LoginPlatform = LoginPlatform.TEST
@@ -85,7 +83,8 @@ class TestSessionManager {
         override val joinTimestamp: Int = 0
         override val lastActiveTimestamp: Int = 0
         override val remainMuteTime: Int = 0
-        override val groupPermission: GroupPermission = GroupPermission.MEMBER
+
+        override suspend fun getGroupPermission(): GroupPermission = GroupPermission.MEMBER
 
         override suspend fun mute(seconds: Int) = error("Unable to use this on test group member")
 

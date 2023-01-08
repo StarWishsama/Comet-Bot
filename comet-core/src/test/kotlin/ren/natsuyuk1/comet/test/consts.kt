@@ -60,10 +60,9 @@ fun generateFakeSender(id: Long): User = object : User() {
 }
 
 fun generateFakeGroup(id: Long): Group = object : Group(id, "TestGroup") {
-    override val owner: GroupMember
-        get() = error("dummy cannot invoke this")
-    override val members: List<GroupMember>
-        get() = error("dummy cannot invoke this")
+    override suspend fun getOwner(): GroupMember = error("dummy cannot invoke this")
+
+    override suspend fun getMembers(): List<GroupMember> = error("dummy cannot invoke this")
 
     override fun updateGroupName(groupName: String) {
         error("dummy cannot invoke this")
@@ -77,10 +76,9 @@ fun generateFakeGroup(id: Long): Group = object : Group(id, "TestGroup") {
         error("dummy cannot invoke this")
     }
 
-    override val avatarUrl: String
-        get() = error("dummy cannot invoke this")
+    override suspend fun avatarUrl(): String = error("dummy cannot invoke this")
 
-    override fun getMember(id: Long): GroupMember? {
+    override suspend fun getMember(id: Long): GroupMember? {
         error("dummy cannot invoke this")
     }
 
@@ -88,7 +86,7 @@ fun generateFakeGroup(id: Long): Group = object : Group(id, "TestGroup") {
         error("dummy cannot invoke this")
     }
 
-    override fun contains(id: Long): Boolean {
+    override suspend fun contains(id: Long): Boolean {
         error("dummy cannot invoke this")
     }
 
@@ -114,8 +112,8 @@ fun generateFakeGroupMember(id: Long, group: Group) = object : GroupMember() {
         get() = error("dummy")
     override val card: String
         get() = "Test"
-    override val groupPermission: GroupPermission
-        get() = error("dummy")
+
+    override suspend fun getGroupPermission(): GroupPermission = error("dummy")
 
     override suspend fun mute(seconds: Int) {
         error("dummy")
