@@ -13,6 +13,8 @@ import dev.inmo.tgbotapi.extensions.utils.asPrivateChat
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.flushAccumulatedUpdates
 import dev.inmo.tgbotapi.extensions.utils.userOrNull
 import dev.inmo.tgbotapi.types.chat.GroupChat
+import dev.inmo.tgbotapi.types.message.MarkdownV2ParseMode
+import dev.inmo.tgbotapi.types.message.defaultParseMode
 import dev.inmo.tgbotapi.types.toChatId
 import dev.inmo.tgbotapi.utils.PreviewFeature
 import dev.inmo.tgbotapi.utils.TelegramAPIUrlsKeeper
@@ -84,6 +86,8 @@ class TelegramComet(
     }
 
     override fun afterLogin() {
+        defaultParseMode = MarkdownV2ParseMode
+
         attachMessageProcessor()
         registerListeners()
         subscribeGitHubEvent()

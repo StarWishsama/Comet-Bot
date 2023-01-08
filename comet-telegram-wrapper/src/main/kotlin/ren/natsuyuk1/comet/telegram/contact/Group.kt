@@ -51,11 +51,11 @@ internal class TelegramGroupImpl(
     }
 
     // Telegram couldn't get all members
-    override suspend fun getMembers(): List<GroupMember> = error("You cannot get group members in telegram!")
+    override suspend fun getMembers(): List<GroupMember> = emptyList()
 
     override fun updateGroupName(groupName: String) {
         comet.scope.launch {
-            if (getBotPermission() == GroupPermission.ADMIN) {
+            if (getBotPermission() >= GroupPermission.ADMIN) {
                 comet.bot.setChatTitle(chat.id, groupName)
             } else {
                 throw IllegalAccessException("Bot doesn't permission to modify group name")

@@ -60,7 +60,7 @@ suspend fun TelegramComet.send(
             bot.sendPhoto(
                 target,
                 ifile,
-                entities = textSource
+                entities = textSource,
             )
         } else {
             val photos = mutableListOf<TelegramMediaPhoto>()

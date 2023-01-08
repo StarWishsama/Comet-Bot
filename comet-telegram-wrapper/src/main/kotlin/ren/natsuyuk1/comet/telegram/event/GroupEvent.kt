@@ -12,6 +12,7 @@ import ren.natsuyuk1.comet.api.event.events.group.GroupLeaveEvent
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.telegram.contact.toCometGroup
 import ren.natsuyuk1.comet.telegram.contact.toCometGroupMember
+import ren.natsuyuk1.comet.telegram.contact.toCometUser
 
 @OptIn(PreviewFeature::class)
 suspend fun BehaviourContext.listenGroupEvent(comet: TelegramComet) {
@@ -26,11 +27,11 @@ suspend fun BehaviourContext.listenGroupEvent(comet: TelegramComet) {
             }
 
             is LeftChatMemberEvent -> {
-                it.chat.asGroupChat()?.toCometGroup(comet)?.let { it1 ->
+                it.chat.asGroupChat()?.toCometGroup(comet)?.let { group ->
                     GroupLeaveEvent(
                         comet,
-                        it1,
-                        (it.chatEvent as LeftChatMemberEvent).user.toCometGroupMember(comet, it.chat.id)
+                        group,
+                        (it.chatEvent as LeftChatMemberEvent).user.toCometUser(comet)
                     ).broadcast()
                 }
             }
