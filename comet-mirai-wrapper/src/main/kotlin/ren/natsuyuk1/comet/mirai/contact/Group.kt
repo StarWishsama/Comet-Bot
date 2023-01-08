@@ -45,8 +45,7 @@ internal class MiraiGroupMemberImpl(
     override val remainMuteTime: Int
         get() = contact.muteTimeRemaining
 
-    override val groupPermission: GroupPermission
-        get() = contact.permission.toGroupPermission()
+    override suspend fun getGroupPermission(): GroupPermission = contact.permission.toGroupPermission()
 
     override suspend fun mute(seconds: Int) {
         contact.mute(seconds)
@@ -126,8 +125,7 @@ internal class MiraiAnonymousMemberImpl(
     override val remainMuteTime: Int
         get() = -1
 
-    override val groupPermission: GroupPermission
-        get() = GroupPermission.MEMBER
+    override suspend fun getGroupPermission(): GroupPermission = GroupPermission.MEMBER
 
     override suspend fun mute(seconds: Int) {
         contact.mute(seconds)

@@ -57,7 +57,7 @@ class TestSessionManager {
 
         override fun getBotMuteRemaining(): Int = error("Unable to use this on test group")
 
-        override fun getBotPermission(): GroupPermission = error("Unable to use this on test group")
+        override suspend fun getBotPermission(): GroupPermission = error("Unable to use this on test group")
 
         override val avatarUrl: String
             get() = error("Unable to use this on test group")

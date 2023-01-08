@@ -73,7 +73,7 @@ fun generateFakeGroup(id: Long): Group = object : Group(id, "TestGroup") {
         error("dummy cannot invoke this")
     }
 
-    override fun getBotPermission(): GroupPermission {
+    override suspend fun getBotPermission(): GroupPermission {
         error("dummy cannot invoke this")
     }
 

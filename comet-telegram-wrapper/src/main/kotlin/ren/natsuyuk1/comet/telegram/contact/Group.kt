@@ -15,7 +15,6 @@ import dev.inmo.tgbotapi.types.files.fullUrl
 import dev.inmo.tgbotapi.types.toChatId
 import dev.inmo.tgbotapi.utils.PreviewFeature
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
@@ -44,17 +43,15 @@ internal class TelegramGroupImpl(
     chat.id.chatId,
     chat.title
 ) {
-    override val owner: GroupMember
-        get() = runBlocking {
-            val resp = comet.bot.getChatAdministrators(chat.id)
+    override suspend fun getOwner(): GroupMember = run {
+        val resp = comet.bot.getChatAdministrators(chat.id)
 
-            resp.find { it is OwnerChatMember }?.user?.toCometGroupMember(comet, chat.id.chatIdOrThrow())
-                ?: error("Unable to retrieve group owner")
-        }
+        resp.find { it is OwnerChatMember }?.user?.toCometGroupMember(comet, chat.id.chatIdOrThrow())
+            ?: error("Unable to retrieve group owner")
+    }
 
     // Telegram couldn't get all members
-    override val members: List<GroupMember>
-        get() = emptyList()
+    override suspend fun getMembers(): List<GroupMember> = error("You cannot get group members in telegram!")
 
     override fun updateGroupName(groupName: String) {
         comet.scope.launch {
@@ -70,13 +67,11 @@ internal class TelegramGroupImpl(
         error("You cannot get bot mute remaining time in telegram!")
     }
 
-    override fun getBotPermission(): GroupPermission {
-        return runBlocking {
-            when (comet.bot.getChatMember(chat.id, comet.id.toChatId())) {
-                is OwnerChatMember -> GroupPermission.OWNER
-                is AdministratorChatMember -> GroupPermission.ADMIN
-                else -> GroupPermission.MEMBER
-            }
+    override suspend fun getBotPermission(): GroupPermission {
+        return when (comet.bot.getChatMember(chat.id, comet.id.toChatId())) {
+            is OwnerChatMember -> GroupPermission.OWNER
+            is AdministratorChatMember -> GroupPermission.ADMIN
+            else -> GroupPermission.MEMBER
         }
     }
 
@@ -87,49 +82,38 @@ internal class TelegramGroupImpl(
      *
      */
     @OptIn(PreviewFeature::class)
-    override val avatarUrl: String
-        get() {
-            chat.asExtendedGroupChat()?.chatPhoto?.bigFileId?.let {
-                val avatarInfo = runBlocking {
-                    comet.bot.getFileAdditionalInfo(it.toInputFile())
-                }
+    override suspend fun avatarUrl(): String =
+        chat.asExtendedGroupChat()?.chatPhoto?.bigFileId?.let {
+            val avatarInfo = comet.bot.getFileAdditionalInfo(it.toInputFile())
 
-                return avatarInfo.fullUrl(comet.urlsKeeper)
-            }
+            return avatarInfo.fullUrl(comet.urlsKeeper)
+        } ?: error("指定的群聊必须是 ExtendedGroupChat!")
 
-            throw IllegalArgumentException("指定的群聊必须是 ExtendedGroupChat!")
-        }
+    override suspend fun getMember(id: Long): GroupMember? {
+        return try {
+            val resp = comet.bot.getChatMember(this@TelegramGroupImpl.chat, id.toChatId())
 
-    override fun getMember(id: Long): GroupMember? {
-        return runBlocking {
-            try {
-                val resp = comet.bot.getChatMember(this@TelegramGroupImpl.chat, id.toChatId())
-
-                return@runBlocking resp.user.toCometGroupMember(comet, this@TelegramGroupImpl.chat.id.chatIdOrThrow())
-            } catch (e: Exception) {
-                return@runBlocking null
-            }
+            resp.user.toCometGroupMember(comet, this@TelegramGroupImpl.chat.id.chatIdOrThrow())
+        } catch (e: Exception) {
+            null
         }
     }
 
     override suspend fun quit(): Boolean {
-        return runBlocking {
-            try {
-                return@runBlocking comet.bot.leaveChat(id.toChatId())
-            } catch (e: Exception) {
-                return@runBlocking false
-            }
+        return try {
+            comet.bot.leaveChat(id.toChatId())
+        } catch (e: Exception) {
+            false
         }
     }
 
-    override fun contains(id: Long): Boolean {
-        return runBlocking {
-            try {
-                comet.bot.getChatMember(this@TelegramGroupImpl.id.toChatId(), id.toChatId())
-                return@runBlocking true
-            } catch (_: Exception) {
-                return@runBlocking false
-            }
+    override suspend fun contains(id: Long): Boolean {
+        return try {
+            comet.bot.getChatMember(this@TelegramGroupImpl.id.toChatId(), id.toChatId())
+
+            true
+        } catch (_: Exception) {
+            false
         }
     }
 

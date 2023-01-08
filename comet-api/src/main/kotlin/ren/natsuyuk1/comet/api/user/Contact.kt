@@ -55,7 +55,7 @@ abstract class GroupMember : User() {
 
     abstract val card: String
 
-    abstract val groupPermission: GroupPermission
+    abstract suspend fun getGroupPermission(): GroupPermission
 
     val isMuted: Boolean get() = remainMuteTime != 0
 
@@ -104,11 +104,11 @@ abstract class GroupMember : User() {
 
 fun GroupMember.nameOrCard(): String = card.ifEmpty { name }
 
-fun GroupMember.isOperator() = groupPermission >= GroupPermission.ADMIN
+suspend fun GroupMember.isOperator() = getGroupPermission() >= GroupPermission.ADMIN
 
-fun GroupMember.isAdmin() = groupPermission == GroupPermission.ADMIN
+suspend fun GroupMember.isAdmin() = getGroupPermission() == GroupPermission.ADMIN
 
-fun GroupMember.isOwner() = groupPermission == GroupPermission.OWNER
+suspend fun GroupMember.isOwner() = getGroupPermission() == GroupPermission.OWNER
 
 suspend fun GroupMember.asFriend() = comet.getFriend(id)
 
@@ -132,9 +132,9 @@ abstract class Group(
      */
     override var name: String
 ) : Contact() {
-    abstract val owner: GroupMember
+    abstract suspend fun getOwner(): GroupMember
 
-    abstract val members: List<GroupMember>
+    abstract suspend fun getMembers(): List<GroupMember>
 
     abstract fun updateGroupName(groupName: String)
 
@@ -143,15 +143,13 @@ abstract class Group(
      */
     abstract fun getBotMuteRemaining(): Int
 
-    abstract fun getBotPermission(): GroupPermission
+    abstract suspend fun getBotPermission(): GroupPermission
 
-    abstract val avatarUrl: String
+    abstract suspend fun avatarUrl(): String
 
-    abstract fun getMember(id: Long): GroupMember?
+    abstract suspend fun getMember(id: Long): GroupMember?
 
     abstract suspend fun quit(): Boolean
 
-    abstract operator fun contains(id: Long): Boolean
-
-    operator fun contains(member: GroupMember): Boolean = member in members
+    abstract suspend fun contains(id: Long): Boolean
 }

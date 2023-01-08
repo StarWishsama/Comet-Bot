@@ -31,11 +31,9 @@ internal class MiraiGroupImpl(
     group.id,
     group.name
 ) {
-    override val owner: GroupMember
-        get() = group.owner.toGroupMember(comet)
+    override suspend fun getOwner(): GroupMember = group.owner.toGroupMember(comet)
 
-    override val members: List<GroupMember>
-        get() = group.members.toGroupMemberList(comet)
+    override suspend fun getMembers(): List<GroupMember> = group.members.toGroupMemberList(comet)
 
     override fun updateGroupName(groupName: String) {
         group.name = groupName
@@ -43,17 +41,17 @@ internal class MiraiGroupImpl(
 
     override fun getBotMuteRemaining(): Int = group.botMuteRemaining
 
-    override fun getBotPermission(): GroupPermission {
+    override suspend fun getBotPermission(): GroupPermission {
         return GroupPermission.values()[group.botPermission.ordinal]
     }
 
-    override val avatarUrl: String = group.avatarUrl
+    override suspend fun avatarUrl(): String = group.avatarUrl
 
-    override fun getMember(id: Long): GroupMember? = group.getMember(id)?.toGroupMember(comet)
+    override suspend fun getMember(id: Long): GroupMember? = group.getMember(id)?.toGroupMember(comet)
 
     override suspend fun quit(): Boolean = group.quit()
 
-    override fun contains(id: Long): Boolean = group.contains(id)
+    override suspend fun contains(id: Long): Boolean = group.contains(id)
 
     override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
         val event = MessagePreSendEvent(

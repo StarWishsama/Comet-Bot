@@ -62,21 +62,22 @@ class TelegramGroupMemberImpl(
         set(_) {
             error("Card doesn't exist in telegram platform")
         }
-    override val groupPermission: GroupPermission
-        get() = runBlocking {
-            when (val resp = comet.bot.getChatMember(groupChatID.toChatId(), user)) {
-                is AdministratorChatMember -> {
-                    if (resp is OwnerChatMember) {
-                        return@runBlocking GroupPermission.OWNER
-                    } else {
-                        return@runBlocking GroupPermission.ADMIN
-                    }
-                }
-                else -> {
-                    GroupPermission.MEMBER
+
+    override suspend fun getGroupPermission(): GroupPermission =
+        when (val resp = comet.bot.getChatMember(groupChatID.toChatId(), user)) {
+            is AdministratorChatMember -> {
+                if (resp is OwnerChatMember) {
+                    GroupPermission.OWNER
+                } else {
+                    GroupPermission.ADMIN
                 }
             }
+
+            else -> {
+                GroupPermission.MEMBER
+            }
         }
+
     override val id: Long
         get() = user.id.chatId
     override val joinTimestamp: Int
@@ -166,6 +167,7 @@ internal class TelegramChannelMemberImpl(
 ) : AnonymousMember() {
     override val anonymousId: String
         get() = channelChat.id.chatId.toString()
+
     @OptIn(PreviewFeature::class)
     override val group: Group
         get() = runBlocking {
@@ -182,8 +184,8 @@ internal class TelegramChannelMemberImpl(
         get() = 0
     override val card: String
         get() = channelChat.getDisplayName()
-    override val groupPermission: GroupPermission
-        get() = GroupPermission.MEMBER
+
+    override suspend fun getGroupPermission(): GroupPermission = GroupPermission.MEMBER
 
     override suspend fun mute(seconds: Int) {
         val triggerTime = Clock.System.now()
@@ -206,6 +208,7 @@ internal class TelegramChannelMemberImpl(
     override suspend fun operateAdminPermission(operation: Boolean) {
         TODO("Not yet implemented")
     }
+
     override val name: String
         get() = card
     override val platform: LoginPlatform
@@ -237,8 +240,8 @@ internal class TelegramGroupAsMemberImpl(
         get() = TODO("Not yet implemented")
     override val card: String
         get() = groupChat.title
-    override val groupPermission: GroupPermission
-        get() = GroupPermission.MEMBER
+
+    override suspend fun getGroupPermission(): GroupPermission = GroupPermission.MEMBER
 
     override suspend fun mute(seconds: Int) {
         val triggerTime = Clock.System.now()
@@ -255,12 +258,13 @@ internal class TelegramGroupAsMemberImpl(
     }
 
     override suspend fun kick(reason: String, block: Boolean) {
-        TODO("Not yet implemented")
+        error("You can't kick 'Group' member")
     }
 
     override suspend fun operateAdminPermission(operation: Boolean) {
         TODO("Not yet implemented")
     }
+
     override val name: String
         get() = card
     override val platform: LoginPlatform

@@ -27,7 +27,7 @@ open class CommandProperty(
     open val permissionLevel: UserLevel = UserLevel.USER,
     val executeConsumePoint: Int = CometGlobalConfig.data.commandCoolDown,
     val executeConsumeType: CommandConsumeType = CommandConsumeType.COOLDOWN,
-    val extraPermissionChecker: (CometUser, PlatformCommandSender) -> Boolean = { _, _ -> true }
+    val extraPermissionChecker: suspend (CometUser, PlatformCommandSender) -> Boolean = { _, _ -> true }
 )
 
 data class SubCommandProperty(
