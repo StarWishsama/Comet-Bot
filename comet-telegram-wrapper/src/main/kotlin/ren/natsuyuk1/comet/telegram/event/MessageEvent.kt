@@ -74,6 +74,7 @@ suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
     return when (this) {
         is FromChannelGroupContentMessage<*> -> {
             val channelSender = channel.toCometAnonymousMember(comet, chat.id.toChatId())
+
             GroupMessageEvent(
                 comet = comet,
                 subject = chat.toCometGroup(comet),
@@ -95,6 +96,7 @@ suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
 
         is AnonymousGroupContentMessage<*> -> {
             val anonymousSender = senderChat.toCometAnonymousMember(comet)
+
             GroupMessageEvent(
                 comet = comet,
                 subject = chat.toCometGroup(comet),
@@ -113,15 +115,15 @@ suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
                 messageID = messageId
             )
         }
+
         else -> {
-            val member = chatMemberOrThrow() // Validated `WithUser`
-            val sender = member.toCometGroupMember(comet, chat.id.chatIdOrThrow())
+            val sender = from.toCometGroupMember(comet, chat.id.chatIdOrThrow())
 
             GroupMessageEvent(
                 comet = comet,
                 subject = chat.toCometGroup(comet),
                 sender = sender,
-                senderName = member.user.getDisplayName(),
+                senderName = from.getDisplayName(),
                 message = content.toMessageWrapper(
                     type = MessageSource.MessageSourceType.GROUP,
                     from = sender.id,

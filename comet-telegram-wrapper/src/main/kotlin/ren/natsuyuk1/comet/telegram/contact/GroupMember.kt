@@ -2,6 +2,7 @@ package ren.natsuyuk1.comet.telegram.contact
 
 import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
 import dev.inmo.tgbotapi.extensions.api.chat.members.banChatMember
+import dev.inmo.tgbotapi.extensions.api.chat.members.getChatMember
 import dev.inmo.tgbotapi.extensions.api.chat.members.promoteChatMember
 import dev.inmo.tgbotapi.extensions.api.chat.members.restrictChatMember
 import dev.inmo.tgbotapi.extensions.utils.asGroupChat
@@ -46,7 +47,10 @@ class TelegramGroupUserImpl(
     override val comet: TelegramComet
 ) : TelegramGroupMember() {
     override val group: Group
-        get() = error("Unable to retrieve group when group member is generated from 'User'")
+        get() = runBlocking {
+            comet.bot.getChat(groupChatID.toChatId()).asGroupChat()?.toCometGroup(comet)
+                ?: error("Unable to retrieve group")
+        }
 
     override val name: String
         get() = user.getDisplayName()
@@ -57,7 +61,19 @@ class TelegramGroupUserImpl(
         }
 
     override suspend fun getGroupPermission(): GroupPermission =
-        error("Unable to get permission when group member is generated from 'User'")
+        when (val member = comet.bot.getChatMember(groupChatID.toChatId(), user)) {
+            is AdministratorChatMember -> {
+                if (member is OwnerChatMember) {
+                    GroupPermission.OWNER
+                } else {
+                    GroupPermission.ADMIN
+                }
+            }
+
+            else -> {
+                GroupPermission.MEMBER
+            }
+        }
 
     override val id: Long
         get() = user.id.chatId
@@ -66,7 +82,15 @@ class TelegramGroupUserImpl(
     override val lastActiveTimestamp: Int
         get() = 0
     override val remainMuteTime: Int
-        get() = error("Unable to get remainMuteTime when group member is generated from 'User'")
+        get() = runBlocking {
+            val member = comet.bot.getChatMember(groupChatID.toChatId(), user)
+
+            if (member is BannedChatMember && member.untilDate != null) {
+                (System.currentTimeMillis() - (member.untilDate!!.asDate.unixMillisLong)).toInt()
+            } else {
+                -1
+            }
+        }
     override val groupID: Long
         get() = groupChatID
 
