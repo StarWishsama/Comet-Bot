@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.command.CommandManager
+import ren.natsuyuk1.comet.api.command.CommandNode
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
@@ -83,7 +84,9 @@ class TelegramComet(
 
             bot.buildBehaviourWithLongPolling {
                 setMyCommands(
-                    CommandManager.getCommands().map { BotCommand(it.key, it.value.property.description) }
+                    CommandManager.getCommands()
+                        .filter { it.value is CommandNode }
+                        .map { BotCommand(it.key, it.value.property.description) }
                 )
 
                 listenMessageEvent(this@TelegramComet)
