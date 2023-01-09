@@ -87,6 +87,7 @@ class TelegramComet(
                     CommandManager.getCommands()
                         .filter { it.value is CommandNode }
                         .map { BotCommand(it.key, it.value.property.description) }
+                        .sortedBy { it.command }
                 )
 
                 listenMessageEvent(this@TelegramComet)
