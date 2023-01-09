@@ -55,11 +55,11 @@ suspend fun CommonMessage<MessageContent>.toCometEvent(
         return null
     }
 
-    val isCommand = this.entities?.any { it is BotCommandTextSource && it.source.contains(comet.username) } == true
+    val containAt = this.entities?.any { it is BotCommandTextSource && it.source.contains(comet.username) } == true
 
     return when (chat) {
-        is GroupChat -> this.requireCommonGroupContentMessage().toCometGroupEvent(comet, isCommand)
-        is PrivateChat -> this.toCometPrivateEvent(comet, isCommand)
+        is GroupChat -> this.requireCommonGroupContentMessage().toCometGroupEvent(comet, containAt)
+        is PrivateChat -> this.toCometPrivateEvent(comet, containAt)
         else -> {
             logger.debug { "Incoming chat isn't group chat or private chat`, is ${chat::class.simpleName}" }
             null
@@ -67,21 +67,18 @@ suspend fun CommonMessage<MessageContent>.toCometEvent(
     }
 }
 
-@OptIn(PreviewFeature::class)
 suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
     comet: TelegramComet,
     isCommand: Boolean
 ): GroupMessageEvent {
-    return when {
-        fromChannelGroupContentMessageOrNull() != null -> {
-            val channelGroupMsg = fromChannelGroupContentMessageOrNull()!!
-
-            val channelSender = channelGroupMsg.channel.toCometAnonymousMember(comet, chat.id.toChatId())
+    return when (this) {
+        is FromChannelGroupContentMessage<*> -> {
+            val channelSender = channel.toCometAnonymousMember(comet, chat.id.toChatId())
             GroupMessageEvent(
                 comet = comet,
                 subject = chat.toCometGroup(comet),
                 sender = channelSender,
-                senderName = channelGroupMsg.channel.getDisplayName(),
+                senderName = channel.getDisplayName(),
                 message = content.toMessageWrapper(
                     type = MessageSource.MessageSourceType.GROUP,
                     from = channelSender.id,
@@ -96,14 +93,13 @@ suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
             )
         }
 
-        asAnonymousGroupContentMessage() != null -> {
-            val anonymousMsg = asAnonymousGroupContentMessage()!!
-            val anonymousSender = anonymousMsg.senderChat.toCometAnonymousMember(comet)
+        is AnonymousGroupContentMessage<*> -> {
+            val anonymousSender = senderChat.toCometAnonymousMember(comet)
             GroupMessageEvent(
                 comet = comet,
                 subject = chat.toCometGroup(comet),
                 sender = anonymousSender,
-                senderName = anonymousMsg.senderChat.title,
+                senderName = senderChat.title,
                 message = content.toMessageWrapper(
                     type = MessageSource.MessageSourceType.GROUP,
                     from = anonymousSender.id,
@@ -118,7 +114,7 @@ suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
             )
         }
         else -> {
-            val member = memberChatMemberOrNull()!!
+            val member = chatMemberOrThrow() // Validated `WithUser`
             val sender = member.toCometGroupMember(comet, chat.id.chatIdOrThrow())
 
             GroupMessageEvent(
@@ -145,15 +141,15 @@ suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
 @OptIn(RiskFeature::class)
 suspend fun CommonMessage<MessageContent>.toCometPrivateEvent(
     comet: TelegramComet,
-    isCommand: Boolean
+    containAt: Boolean
 ): PrivateMessageEvent {
-    val sender = from!!.toCometUser(comet)
+    val sender = from!!.toCometUser(comet) // Validated fromUser
 
     return PrivateMessageEvent(
         comet = comet,
         subject = sender,
         sender = sender,
-        senderName = from!!.getDisplayName(),
+        senderName = from!!.getDisplayName(), // Validated fromUser
         message = content.toMessageWrapper(
             type = MessageSource.MessageSourceType.BOT,
             from = sender.id,
@@ -161,7 +157,7 @@ suspend fun CommonMessage<MessageContent>.toCometPrivateEvent(
             time = date.unixMillisLong,
             msgID = messageId,
             comet = comet,
-            containBotAt = isCommand
+            containBotAt = containAt
         ),
         time = date.unixMillisLong,
         messageID = messageId
