@@ -14,7 +14,7 @@ import ren.natsuyuk1.comet.util.toMessageWrapper
 val RAND = CommandProperty(
     "random",
     listOf("rand", "随机"),
-    "",
+    "生成随机数",
     "/rand [表达式]"
 )
 
