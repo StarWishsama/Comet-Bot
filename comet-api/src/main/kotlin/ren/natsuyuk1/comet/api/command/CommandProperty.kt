@@ -28,12 +28,7 @@ open class CommandProperty(
     val executeConsumePoint: Int = CometGlobalConfig.data.commandCoolDown,
     val executeConsumeType: CommandConsumeType = CommandConsumeType.COOLDOWN,
     val extraPermissionChecker: suspend (CometUser, PlatformCommandSender) -> Boolean = { _, _ -> true }
-) {
-    init {
-        require(description.isNotBlank()) { "description can't be empty!" }
-        require(helpText.isNotBlank()) { "helpText can't be empty!" }
-    }
-}
+)
 
 data class SubCommandProperty(
     override val name: String,
