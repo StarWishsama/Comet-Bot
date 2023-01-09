@@ -114,28 +114,22 @@ object CommandManager {
 
         // 检查消息是否含命令前缀
         if (sender !is ConsoleCommandSender && !args[0].containsEtc(
-                false,
-                *CometGlobalConfig.data.commandPrefix.toTypedArray()
+                false, *CometGlobalConfig.data.commandPrefix.toTypedArray()
             )
         ) {
             return@launch
         }
 
-        val possibleCommand = args[0].replaceAllToBlank(CometGlobalConfig.data.commandPrefix)
+        val cmdName = args[0].replaceAllToBlank(CometGlobalConfig.data.commandPrefix)
 
-        if (!hasCommand(possibleCommand)) {
-            return@launch
-        }
-
-        val command =
-            getCommand(possibleCommand, sender) ?: return@launch
+        val command = getCommand(cmdName, sender) ?: return@launch
 
         if (comet.maintainenceMode && command.property.name != "debug") {
             return@launch
         }
 
         logger.info {
-            "$sender 正在执行命令 ${command.property.name}" // ktlint-disable max-line-length
+            "$sender 正在执行命令 ${command.property.name}"
         }
 
         val property = command.property
@@ -170,8 +164,10 @@ object CommandManager {
                     return@runCatching CommandStatus.NoPermission()
                 }
 
-                transaction {
-                    user.triggerCommandTime = executeTime
+                commandScope.launch {
+                    transaction {
+                        user.triggerCommandTime = executeTime
+                    }
                 }
             }
 
@@ -180,26 +176,23 @@ object CommandManager {
                     .main(args.drop(1))
             } else {
                 (command as ConsoleCommandNode).handler(
-                    comet,
-                    sender as ConsoleCommandSender,
-                    subject as ConsoleCommandSender,
-                    wrapper,
-                    user
+                    comet, sender as ConsoleCommandSender, subject as ConsoleCommandSender, wrapper, user
                 ).main(args.drop(1))
             }
 
-            when (cmdStatus) {
+            return@runCatching when (cmdStatus) {
+                is CommandResult.Success -> {
+                    CommandStatus.Success()
+                }
+
                 is CommandResult.Error -> {
                     subject.sendMessage(buildMessageWrapper { cmdStatus.userMessage?.let { appendText(it) } })
 
                     if (cmdStatus.cause !is CliktError) {
                         logger.warn(cmdStatus.cause) { "在执行命令时发生了意外" }
                     }
-                    return@runCatching CommandStatus.Error()
-                }
 
-                is CommandResult.Success -> {
-                    return@runCatching CommandStatus.Success()
+                    CommandStatus.Error()
                 }
             }
         }.onSuccess {
@@ -209,7 +202,7 @@ object CommandManager {
                     executeTime.getLastingTimeAsString(
                         TimeUnit.MILLISECONDS
                     )
-                    }" // ktlint-disable max-line-length
+                    }"
                 }
             }
         }.onFailure {
@@ -217,13 +210,11 @@ object CommandManager {
                 subject.sendMessage(
                     buildMessageWrapper {
                         appendText(
-                            "在尝试执行命令时发生异常, 报错信息如下, 详细请查看后台\n" +
-                                it::class.jvmName + ":" +
-                                (
-                                    it.message?.limit(
-                                        30
-                                    ) ?: "无"
-                                    )
+                            "在尝试执行命令时发生异常, 报错信息如下, 详细请查看后台\n" + it::class.jvmName + ":" + (
+                                it.message?.limit( // ktlint-disable max-line-length
+                                    30
+                                ) ?: "无"
+                                )
                         )
                     }
                 )
@@ -241,13 +232,23 @@ object CommandManager {
      * @param name 主命令名或命令别称
      * @return 命令节点, 不存在时为空
      */
-    fun getCommand(name: String, sender: CommandSender): AbstractCommandNode<*>? =
-        commands.filter {
-            (
-                (sender is ConsoleCommandSender && it.value is ConsoleCommandNode) ||
-                    (sender is PlatformCommandSender && it.value is CommandNode)
-                ) && (it.value.property.name == name || it.value.property.alias.contains(name))
-        }.values.firstOrNull()
+    fun getCommand(name: String, sender: CommandSender): AbstractCommandNode<*>? {
+        return when (sender) {
+            is ConsoleCommandSender -> {
+                if (commands[name] is ConsoleCommandNode) commands[name]
+                else commands.values.find {
+                    it is ConsoleCommandNode && it.property.alias.contains(name)
+                }
+            }
+
+            is PlatformCommandSender -> {
+                if (commands[name] is CommandNode) commands[name]
+                else commands.values.find {
+                    it is CommandNode && it.property.alias.contains(name)
+                }
+            }
+        }
+    }
 
     /**
      * 是否存在对应名称的命令
@@ -256,7 +257,7 @@ object CommandManager {
      * @return 命令是否存在
      */
     fun hasCommand(name: String): Boolean =
-        commands.filter { it.value.property.name == name || it.value.property.alias.contains(name) }.isNotEmpty()
+        commands[name] != null || commands.values.any { it.property.alias.contains(name) }
 
     fun getCommands(): Map<String, AbstractCommandNode<*>> = commands
 }

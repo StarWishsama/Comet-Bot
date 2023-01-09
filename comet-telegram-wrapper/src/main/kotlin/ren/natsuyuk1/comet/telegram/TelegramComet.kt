@@ -5,6 +5,7 @@ import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.bot.exceptions.CommonRequestException
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
+import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
 import dev.inmo.tgbotapi.extensions.api.deleteMessage
 import dev.inmo.tgbotapi.extensions.api.send.send
@@ -12,6 +13,7 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPoll
 import dev.inmo.tgbotapi.extensions.utils.asPrivateChat
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.flushAccumulatedUpdates
 import dev.inmo.tgbotapi.extensions.utils.userOrNull
+import dev.inmo.tgbotapi.types.BotCommand
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.message.MarkdownV2ParseMode
 import dev.inmo.tgbotapi.types.message.defaultParseMode
@@ -25,6 +27,7 @@ import io.ktor.client.plugins.*
 import kotlinx.coroutines.launch
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
+import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
@@ -79,6 +82,10 @@ class TelegramComet(
             logger.debug { "已刷新 Telegram Bot 离线时暂存的消息" }
 
             bot.buildBehaviourWithLongPolling {
+                setMyCommands(
+                    CommandManager.getCommands().map { BotCommand(it.key, it.value.property.description) }
+                )
+
                 listenMessageEvent(this@TelegramComet)
                 listenGroupEvent(this@TelegramComet)
             }.join()
@@ -86,7 +93,7 @@ class TelegramComet(
     }
 
     override fun afterLogin() {
-        defaultParseMode = MarkdownV2ParseMode
+        defaultParseMode = MarkdownV2ParseMode // TODO: add to config
 
         attachMessageProcessor()
         registerListeners()
@@ -147,7 +154,7 @@ class TelegramComet(
     }
 
     /**
-     * Telegram 不存在此设计
+     * Telegram 没有 "陌生人" 这一设计
      */
     override suspend fun getStranger(id: Long): User? = null
 }

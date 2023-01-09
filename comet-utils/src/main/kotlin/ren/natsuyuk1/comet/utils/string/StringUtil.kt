@@ -55,12 +55,12 @@ object StringUtil {
         return if (this.length <= size) this else substring(0, size) + "..."
     }
 
-    fun String.containsEtc(strict: Boolean = true, vararg string: String): Boolean {
+    fun String.containsEtc(allMatch: Boolean = true, vararg string: String): Boolean {
         var counter = 0
 
         string.forEach {
             if (this.contains(it)) {
-                if (!strict) {
+                if (!allMatch) {
                     return true
                 } else if (counter < string.size) {
                     counter++

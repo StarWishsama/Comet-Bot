@@ -21,9 +21,9 @@ import ren.natsuyuk1.comet.api.user.User
 /**
  * [CommandSender]
  *
- *
+ * 代表一个可发送消息的命令发送者
  */
-interface CommandSender {
+sealed interface CommandSender {
     suspend fun sendMessage(message: MessageWrapper): MessageReceipt?
 }
 
