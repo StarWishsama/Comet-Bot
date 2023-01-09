@@ -54,6 +54,6 @@ dependencies {
     compileOnly("com.aayushatharva.brotli4j:brotli4j:1.9.0")
     api("com.jayway.jsonpath:json-path:2.7.0")
     api("io.pebbletemplates:pebble:3.2.0")
-    compileOnly("com.squareup.okio:okio:3.2.0")
+    compileOnly("com.squareup.okio:okio:3.3.0")
     implementation("moe.sdl.yac:core:1.0.1")
 }

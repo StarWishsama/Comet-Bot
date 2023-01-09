@@ -56,7 +56,7 @@ dependencies {
 
     implementation("org.jetbrains.skiko:skiko:0.7.40")
     implementation("com.aayushatharva.brotli4j:brotli4j:1.9.0")
-    implementation("com.squareup.okio:okio:3.2.0")
+    implementation("com.squareup.okio:okio:3.3.0")
 
     testCompileOnly("org.jline:jline:3.21.0")
 }
