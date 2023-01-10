@@ -50,13 +50,7 @@ Demo/交流群：725656262
 详见 [Issues](https://github.com/StarWishsama/Comet-Bot/issues)
 
 ## 💽 如何使用
-
-### 直接使用
-1. 在[此处](https://github.com/StarWishsama/Comet-Bot/releases)下载最新版本
-2. 将组件放置在 Comet jar 同目录下的 `/modules` 文件夹 (需要你自己创建)
-3. 使用 ```java -jar Comet本体路径``` 启动 Bot
-4. 输入 /login 登录指定平台账号 (QQ, Telegram)
-5. 提示登录成功后, 在机器人加入的群内发送 /help 就可开始了解 Comet 的各项功能了
+查看 Wiki [开始使用 Comet](https://github.com/StarWishsama/Comet-Bot/wiki/%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8-Comet)
 
 ## 📜 协议
 
