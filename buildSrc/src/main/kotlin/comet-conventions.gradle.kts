@@ -26,13 +26,6 @@ repositories {
 val ktor = "2.2.1"
 
 dependencies {
-    constraints {
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    }
-
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
     implementation("ch.qos.logback:logback-classic:1.4.0")
 
@@ -41,10 +34,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
     testImplementation(kotlin("test"))
-
-    implementation("cn.hutool:hutool-http:5.8.6")
-    implementation("cn.hutool:hutool-crypto:5.8.6")
-    implementation("cn.hutool:hutool-cron:5.8.6")
 
     implementation("io.ktor:ktor-client-core:$ktor")
     implementation("io.ktor:ktor-client-cio:$ktor")

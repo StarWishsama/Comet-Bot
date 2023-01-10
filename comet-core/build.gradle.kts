@@ -11,52 +11,50 @@
 
 plugins {
     `comet-conventions`
-    kotlin("plugin.serialization")
-}
-
-repositories {
-    mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "minutes")
 }
 
-val ktor = "2.2.2"
+repositories {
+    google()
+    mavenCentral()
+    maven("https://jitpack.io")
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://repo.mirai.mamoe.net/snapshots")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+}
 
 dependencies {
-    api(project(":comet-api"))
-    api(project(":comet-utils"))
+    implementation(project(":comet-api"))
+    implementation(project(":comet-utils"))
 
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    implementation(libs.kotlinx.datetime)
 
-    implementation("org.jetbrains.exposed:exposed-core:0.41.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.41.1")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.41.1")
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.41.1")
-    implementation("com.zaxxer:HikariCP:5.0.1")
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.rate.limit)
+    implementation(libs.ktor.server.call.logging.jvm)
+    implementation(libs.ktor.client.websockets.jvm)
 
-    implementation("io.ktor:ktor-server-core:$ktor")
-    implementation("io.ktor:ktor-server-netty:$ktor")
-    implementation("io.ktor:ktor-server-rate-limit:$ktor")
-    implementation("io.ktor:ktor-server-call-logging-jvm:$ktor")
-    implementation("io.ktor:ktor-client-websockets-jvm:$ktor")
+    implementation(libs.jsoup)
 
-    implementation("org.jsoup:jsoup:1.15.3")
+    implementation(libs.yabapi.core.jvm)
+    implementation(libs.ipdb.core)
 
-    implementation("moe.sdl.yabapi:yabapi-core-jvm:0.11.1")
+    implementation(libs.setsuna)
 
-    implementation("moe.sdl.ipdb:ipdb-core:0.2.1")
+    implementation(libs.rome)
 
-    implementation("ren.natsuyuk1.setsuna:Setsuna:0.1.0-SNAPSHOT")
+    implementation(libs.skiko)
+    implementation(libs.brotli4j)
+    implementation(libs.okio)
 
-    implementation("com.rometools:rome:1.18.0")
+    testCompileOnly(libs.jline)
 
-    implementation("org.jetbrains.skiko:skiko:0.7.40")
-    implementation("com.aayushatharva.brotli4j:brotli4j:1.9.0")
-    implementation("com.squareup.okio:okio:3.3.0")
-
-    testCompileOnly("org.jline:jline:3.21.0")
+    implementation(libs.cron.utils)
+    implementation(libs.hutool.http)
+    implementation(libs.hutool.cron)
+    implementation(libs.hutool.crypto)
 }

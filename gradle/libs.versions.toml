@@ -1,0 +1,69 @@
+[versions]
+kotlin = "1.8.0"
+hutool = "5.8.6"
+mirai = "2.13.2"
+exposed = "0.41.1"
+ktor = "2.2.2"
+
+[libraries]
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+logback-classic = "ch.qos.logback:logback-classic:1.4.0"
+hutool-cron = { module = "cn.hutool:hutool-cron", version.ref = "hutool" }
+hutool-crypto = { module = "cn.hutool:hutool-crypto", version.ref = "hutool" }
+hutool-http = { module = "cn.hutool:hutool-http", version.ref = "hutool" }
+brotli4j = "com.aayushatharva.brotli4j:brotli4j:1.9.0"
+cron-utils = "com.cronutils:cron-utils:9.2.0"
+jsonpath = "com.jayway.jsonpath:json-path:2.7.0"
+ktlint = "com.pinterest:ktlint:0.43.2"
+rome = "com.rometools:rome:1.18.0"
+okio = "com.squareup.okio:okio:3.3.0"
+hikaricp = "com.zaxxer:HikariCP:5.0.1"
+tgbotapi = "dev.inmo:tgbotapi:5.0.0"
+kotlin-logging-jvm = "io.github.microutils:kotlin-logging-jvm:2.1.23"
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-websockets-jvm = { module = "io.ktor:ktor-client-websockets-jvm", version.ref = "ktor" }
+ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-server-call-logging-jvm = { module = "io.ktor:ktor-server-call-logging-jvm", version.ref = "ktor" }
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
+ktor-server-rate-limit = { module = "io.ktor:ktor-server-rate-limit", version.ref = "ktor" }
+pebble = "io.pebbletemplates:pebble:3.2.0"
+ipdb-core = "moe.sdl.ipdb:ipdb-core:0.2.1"
+yabapi-core-jvm = "moe.sdl.yabapi:yabapi-core-jvm:0.11.1"
+yac-core = "moe.sdl.yac:core:1.0.1"
+mirai-core = { module = "net.mamoe:mirai-core", version.ref = "mirai" }
+mirai-core-api = { module = "net.mamoe:mirai-core-api", version.ref = "mirai" }
+mirai-core-utils = { module = "net.mamoe:mirai-core-utils", version.ref = "mirai" }
+yamlkt = "net.mamoe.yamlkt:yamlkt:0.12.0"
+log4j-core = "org.apache.logging.log4j:log4j-core:2.17.1"
+jetbrains-annotations = "org.jetbrains:annotations:13.0"
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed" }
+kotlin-reflect = "org.jetbrains.kotlin:kotlin-reflect:1.8.0"
+kotlin-scripting-compiler-embeddable = "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.8.0"
+kotlin-serialization = "org.jetbrains.kotlin:kotlin-serialization:1.8.0"
+kotlin-stdlib = "org.jetbrains.kotlin:kotlin-stdlib:1.8.0"
+kotlin-stdlib-common = "org.jetbrains.kotlin:kotlin-stdlib-common:1.8.0"
+kotlin-test = "org.jetbrains.kotlin:kotlin-test:1.8.0"
+atomicfu = "org.jetbrains.kotlinx:atomicfu:0.18.3"
+kotlinx-coroutines-core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
+kotlinx-serialization-json = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
+skiko = "org.jetbrains.skiko:skiko:0.7.40"
+jline = "org.jline:jline:3.21.0"
+jsoup = "org.jsoup:jsoup:1.15.3"
+postgresql = "org.postgresql:postgresql:42.5.1"
+sqlite-jdbc = "org.xerial:sqlite-jdbc:3.40.0.0"
+setsuna = "ren.natsuyuk1.setsuna:Setsuna:0.1.0-SNAPSHOT"
+
+[plugins]
+kotlin-plugin-serialization = "org.jetbrains.kotlin.plugin.serialization:1.8.0"
+ktlint = "org.jlleitschuh.gradle.ktlint:11.0.0"
+ktlint-idea = "org.jlleitschuh.gradle.ktlint-idea:11.0.0"

@@ -11,34 +11,24 @@
 
 plugins {
     `comet-conventions`
-    kotlin("plugin.serialization")
 }
-
-repositories {
-    mavenCentral()
-    maven("https://repo.mirai.mamoe.net/snapshots")
-}
-
-val miraiVersion = "2.13.2"
 
 dependencies {
     compileOnly(project(":comet-api"))
     compileOnly(project(":comet-core"))
     compileOnly(project(":comet-utils"))
 
-    compileOnly("org.jline:jline:3.21.0")
+    compileOnly(libs.jline)
 
-    // use fixed version for resolving deps relocate issue
-    // see https://github.com/mamoe/mirai/pull/2331
-    implementation("net.mamoe:mirai-core:$miraiVersion")
-    implementation("net.mamoe:mirai-core-api:$miraiVersion")
-    implementation("net.mamoe:mirai-core-utils:$miraiVersion")
+    implementation(libs.mirai.core)
+    implementation(libs.mirai.core.api)
+    implementation(libs.mirai.core.utils)
 }
 
 buildConfig {
     packageName("ren.natsuyuk1.comet.mirai")
     useKotlinOutput { topLevelConstants = true }
-    string("miraiVersion", miraiVersion)
+    string("miraiVersion", libs.mirai.core.api.get().version ?: "Unknown")
 }
 
 tasks.shadowJar {

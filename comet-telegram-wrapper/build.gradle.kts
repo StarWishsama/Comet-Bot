@@ -11,24 +11,25 @@
 
 plugins {
     `comet-conventions`
-    kotlin("plugin.serialization")
 }
 
 repositories {
+    google()
     mavenCentral()
     maven("https://jitpack.io")
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://repo.mirai.mamoe.net/snapshots")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
-
-val tgbotAPI = "5.0.0"
 
 dependencies {
     compileOnly(project(":comet-api"))
     compileOnly(project(":comet-core"))
     compileOnly(project(":comet-utils"))
 
-    compileOnly("org.jline:jline:3.21.0")
+    compileOnly(libs.jline)
 
-    implementation("dev.inmo:tgbotapi:$tgbotAPI") {
+    implementation(libs.tgbotapi) {
         exclude("io.ktor")
     }
 }
@@ -36,7 +37,7 @@ dependencies {
 buildConfig {
     packageName("ren.natsuyuk1.comet.telegram")
     useKotlinOutput { topLevelConstants = true }
-    string("tgbotAPI", tgbotAPI)
+    string("tgbotAPI", libs.tgbotapi.get().version ?: "Unknown")
 }
 
 tasks.shadowJar {

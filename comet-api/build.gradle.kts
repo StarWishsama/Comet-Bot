@@ -11,27 +11,33 @@
 
 plugins {
     `comet-conventions`
-    kotlin("plugin.serialization")
 }
 
 repositories {
+    google()
     mavenCentral()
+    maven("https://jitpack.io")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://repo.mirai.mamoe.net/snapshots")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
-    compileOnly("org.jline:jline:3.21.0")
-    testCompileOnly("org.jline:jline:3.21.0")
+    compileOnly(libs.jline)
+    testCompileOnly(libs.jline)
 
-    api("org.jetbrains.exposed:exposed-core:0.41.1")
-    api("org.jetbrains.exposed:exposed-dao:0.41.1")
-    api("org.jetbrains.exposed:exposed-jdbc:0.41.1")
-    api("org.jetbrains.exposed:exposed-kotlin-datetime:0.41.1")
-    api("com.zaxxer:HikariCP:5.0.1")
-    api("org.xerial:sqlite-jdbc:3.40.0.0")
-    api("org.postgresql:postgresql:42.5.1")
-    api("moe.sdl.yac:core:1.0.1")
-    api("com.cronutils:cron-utils:9.2.0")
+    api(libs.exposed.core)
+    api(libs.exposed.dao)
+    api(libs.exposed.jdbc)
+    api(libs.exposed.kotlin.datetime)
+    implementation(libs.hikaricp)
+    implementation(libs.sqlite.jdbc)
+    implementation(libs.postgresql)
+    api(libs.yac.core)
+    implementation(libs.cron.utils)
+    implementation(libs.hutool.http)
+    implementation(libs.hutool.cron)
+    implementation(libs.hutool.crypto)
 
     implementation(project(":comet-utils"))
 }

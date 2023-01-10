@@ -11,12 +11,14 @@
 
 plugins {
     `comet-conventions`
-    kotlin("plugin.serialization")
 }
 
 repositories {
+    google()
     mavenCentral()
+    maven("https://jitpack.io")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://repo.mirai.mamoe.net/snapshots")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
@@ -27,8 +29,8 @@ dependencies {
     implementation(project(":comet-core"))
     implementation(project(":comet-utils"))
 
-    compileOnly("org.jetbrains.skiko:skiko:0.7.40")
-    testCompileOnly("org.jetbrains.skiko:skiko:0.7.40")
+    compileOnly(libs.skiko)
+    testCompileOnly(libs.skiko)
 }
 
 tasks.jar {
