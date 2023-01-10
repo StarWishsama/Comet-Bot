@@ -23,7 +23,7 @@ repositories {
     maven("https://jitpack.io")
 }
 
-val ktor = "2.2.1"
+val ktor = "2.2.2"
 
 dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
