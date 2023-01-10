@@ -3,7 +3,6 @@ package ren.natsuyuk1.comet.mirai
 import mu.KotlinLogging.logger
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
-import net.mamoe.mirai.contact.PermissionDeniedException
 import net.mamoe.mirai.internal.network.Packet
 import net.mamoe.mirai.message.data.MessageSource.Key.recall
 import net.mamoe.mirai.network.NoStandardInputForCaptchaException
@@ -83,23 +82,18 @@ class MiraiComet(
             try {
                 if (!::miraiBot.isInitialized) {
                     miraiBot = BotFactory.newBot(
-                        qq = this.config.id,
-                        password = this.config.password,
-                        configuration = config
+                        qq = this.config.id, password = this.config.password, configuration = config
                     )
 
-                    miraiBot.eventChannel
-                        .parentScope(scope)
-                        .exceptionHandler {
-                            logger.warn(it) { "Mirai Bot (${miraiBot.id}) 发生异常" }
+                    miraiBot.eventChannel.parentScope(scope).exceptionHandler {
+                        logger.warn(it) { "Mirai Bot (${miraiBot.id}) 发生异常" }
+                    }.subscribeAlways<net.mamoe.mirai.event.Event> {
+                        if (it is Packet.NoEventLog || it is Packet.NoLog) {
+                            return@subscribeAlways
                         }
-                        .subscribeAlways<net.mamoe.mirai.event.Event> {
-                            if (it is Packet.NoEventLog || it is Packet.NoLog) {
-                                return@subscribeAlways
-                            }
 
-                            it.redirectToComet(this@MiraiComet)
-                        }
+                        it.redirectToComet(this@MiraiComet)
+                    }
                 }
 
                 miraiBot.login()
@@ -130,30 +124,18 @@ class MiraiComet(
 
     override suspend fun getGroup(id: Long): Group? = cl.runWith { miraiBot.getGroup(id)?.toCometGroup(this) }
 
-    override suspend fun deleteMessage(source: MessageSource): Boolean =
-        cl.runWithSuspend {
-            return@runWithSuspend runCatching<Boolean> {
-                source as MiraiMessageSource
+    override suspend fun deleteMessage(source: MessageSource): Boolean = cl.runWithSuspend {
+        (source as? MiraiMessageSource ?: return@runWithSuspend false)
+            .miraiSource.recall()
 
-                source.miraiSource.recall()
+        return@runWithSuspend true
+    }
 
-                true
-            }.onFailure {
-                if (it !is PermissionDeniedException) {
-                    logger.warn(it) { "撤回消息 $source 失败" }
-                }
+    override suspend fun getFriend(id: Long): User? = cl.runWithSuspend {
+        miraiBot.getFriend(id)?.toCometUser(this)
+    }
 
-                return@runWithSuspend false
-            }.getOrDefault(false)
-        }
-
-    override suspend fun getFriend(id: Long): User? =
-        cl.runWithSuspend {
-            miraiBot.getFriend(id)?.toCometUser(this)
-        }
-
-    override suspend fun getStranger(id: Long): User? =
-        cl.runWithSuspend {
-            miraiBot.getStranger(id)?.toCometUser(this)
-        }
+    override suspend fun getStranger(id: Long): User? = cl.runWithSuspend {
+        miraiBot.getStranger(id)?.toCometUser(this)
+    }
 }

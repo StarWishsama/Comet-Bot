@@ -18,8 +18,10 @@ import dev.inmo.tgbotapi.types.message.content.VoiceContent
 import dev.inmo.tgbotapi.types.message.textsources.TextSource
 import dev.inmo.tgbotapi.types.message.textsources.mention
 import dev.inmo.tgbotapi.types.message.textsources.regular
+import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.message.*
 import ren.natsuyuk1.comet.telegram.TelegramComet
+import ren.natsuyuk1.comet.utils.datetime.getLastingTimeAsString
 import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.cacheDirectory
 import ren.natsuyuk1.comet.utils.file.touch
@@ -33,6 +35,8 @@ suspend fun TelegramComet.send(
     type: MessageSource.MessageSourceType,
     target: ChatId,
 ): MessageReceipt {
+    val executeTime = Clock.System.now()
+
     val textSource = mutableListOf<TextSource>()
 
     // 纯文本
@@ -106,7 +110,9 @@ suspend fun TelegramComet.send(
             resp.date.unixMillisLong,
             resp.messageId
         )
-    )
+    ).also {
+        logger.debug { "Used time ${executeTime.getLastingTimeAsString()}" }
+    }
 }
 
 suspend fun MessageContent.toMessageWrapper(

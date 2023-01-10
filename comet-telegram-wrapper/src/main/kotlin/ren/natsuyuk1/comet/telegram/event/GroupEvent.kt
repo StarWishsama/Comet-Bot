@@ -17,9 +17,9 @@ import ren.natsuyuk1.comet.telegram.contact.toCometUser
 @OptIn(PreviewFeature::class)
 suspend fun BehaviourContext.listenGroupEvent(comet: TelegramComet) {
     onGroupEvent {
-        when (it.chatEvent) {
+        when (val event = it.chatEvent) {
             is NewChatMembers -> {
-                (it.chatEvent as NewChatMembers).members.forEach { user ->
+                event.members.forEach { user ->
                     GroupJoinEvent.Normal(
                         user.toCometGroupMember(comet, it.chat.id)
                     ).broadcast()
@@ -31,7 +31,7 @@ suspend fun BehaviourContext.listenGroupEvent(comet: TelegramComet) {
                     GroupLeaveEvent(
                         comet,
                         group,
-                        (it.chatEvent as LeftChatMemberEvent).user.toCometUser(comet)
+                        event.user.toCometUser(comet)
                     ).broadcast()
                 }
             }

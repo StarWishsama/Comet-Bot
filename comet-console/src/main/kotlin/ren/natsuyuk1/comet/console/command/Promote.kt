@@ -16,14 +16,14 @@ import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
 
-val PROMOTE = CommandProperty(
+internal val PROMOTE = CommandProperty(
     "promote",
     listOf(),
     "提升用户权限等级",
     "promote [id] -p/--platform=[平台]"
 )
 
-class Promote(
+internal class Promote(
     override val sender: ConsoleCommandSender,
     message: MessageWrapper,
     user: CometUser

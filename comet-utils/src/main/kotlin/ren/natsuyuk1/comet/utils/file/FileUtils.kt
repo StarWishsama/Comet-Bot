@@ -25,7 +25,7 @@ import java.util.jar.JarFile
 import kotlin.io.path.absolute
 import kotlin.io.path.pathString
 
-val globalDirectory by lazy {
+val workDir by lazy {
     File(
         if (getEnv("comet.workdir").isNullOrBlank()) {
             System.getProperty("user.dir")
@@ -33,7 +33,7 @@ val globalDirectory by lazy {
     )
 }
 
-fun resolveDirectory(path: String) = File(globalDirectory, path)
+fun resolveDirectory(path: String) = File(workDir, path)
 fun resolveResourceDirectory(path: String) = File(resourceDirectory, path)
 
 val configDirectory by lazy { resolveDirectory("./config") }

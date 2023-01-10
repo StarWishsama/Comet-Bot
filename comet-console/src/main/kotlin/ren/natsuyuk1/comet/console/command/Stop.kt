@@ -7,14 +7,14 @@ import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import kotlin.system.exitProcess
 
-val STOP = CommandProperty(
+internal val STOP = CommandProperty(
     "stop",
     listOf(),
     "关闭 Comet Terminal",
     "/stop 关闭 Comet Terminal"
 )
 
-class Stop(
+internal class Stop(
     override val sender: ConsoleCommandSender,
     message: MessageWrapper,
     user: CometUser

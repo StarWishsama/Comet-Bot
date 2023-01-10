@@ -2,7 +2,6 @@ package ren.natsuyuk1.comet.telegram
 
 import com.soywiz.klock.DateTime
 import dev.inmo.tgbotapi.bot.TelegramBot
-import dev.inmo.tgbotapi.bot.exceptions.CommonRequestException
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
@@ -24,6 +23,7 @@ import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
@@ -77,10 +77,12 @@ class TelegramComet(
 
         scope.launch {
             bot.flushAccumulatedUpdates()
-            username = bot.getMe().username.username
-            logger.info { "成功登录 Telegram Bot ($username)" }
 
             logger.debug { "已刷新 Telegram Bot 离线时暂存的消息" }
+
+            username = bot.getMe().username.username
+
+            logger.info { "成功登录 Telegram Bot ($username)" }
 
             bot.buildBehaviourWithLongPolling {
                 setMyCommands(
@@ -110,51 +112,37 @@ class TelegramComet(
     }
 
     override suspend fun getGroup(id: Long): Group? {
-        return try {
-            // Telegram group id always negative
-            if (id > 0) {
-                return null
-            }
+        // Telegram group id always negative
+        if (id > 0) {
+            return null
+        }
 
-            val chat = bot.getChat(id.toChatId())
+        val chat = bot.getChat(id.toChatId())
 
-            if (chat is GroupChat) {
-                chat.toCometGroup(this)
-            } else {
-                null
-            }
-        } catch (e: CommonRequestException) {
-            logger.warn(e) { "获取群聊 ($id) 信息失败" }
+        return if (chat is GroupChat) {
+            chat.toCometGroup(this)
+        } else {
             null
         }
     }
 
-    override suspend fun deleteMessage(source: MessageSource): Boolean {
-        return try {
-            bot.deleteMessage(source.target.toChatId(), source.messageID)
-        } catch (e: CommonRequestException) {
-            logger.warn(e) { "撤回消息失败, 原始消息来源: $source" }
-            return false
-        }
-    }
+    override suspend fun deleteMessage(source: MessageSource): Boolean =
+        bot.deleteMessage(source.target.toChatId(), source.messageID)
 
     /**
      * 受 Telegram 设计限制, 我们只能通过发送消息尝试
      */
     @OptIn(PreviewFeature::class)
     override suspend fun getFriend(id: Long): User? {
-        return try {
-            val chat = bot.getChat(id.toChatId()).asPrivateChat()
-            val resp = chat?.let { bot.send(it, "Test") }
+        val chat = bot.getChat(id.toChatId()).asPrivateChat() ?: return null
 
-            if (chat != null && resp != null) {
-                bot.deleteMessage(chat.id, resp.messageId)
-            }
+        val resp = bot.send(chat, "Test")
 
-            return chat?.userOrNull()?.toCometUser(this)
-        } catch (e: Exception) {
-            null
-        }
+        delay(500)
+
+        bot.deleteMessage(chat.id, resp.messageId)
+
+        return chat.userOrNull()?.toCometUser(this)
     }
 
     /**

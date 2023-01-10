@@ -3,9 +3,10 @@ package ren.natsuyuk1.comet.telegram.event
 import dev.inmo.tgbotapi.abstracts.FromUser
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onContentMessage
-import dev.inmo.tgbotapi.extensions.utils.*
+import dev.inmo.tgbotapi.extensions.utils.asCommonGroupContentMessage
+import dev.inmo.tgbotapi.extensions.utils.asPrivateContentMessage
+import dev.inmo.tgbotapi.extensions.utils.chatIdOrThrow
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.entities
-import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.message.abstracts.*
@@ -33,7 +34,9 @@ import ren.natsuyuk1.comet.telegram.util.toMessageWrapper
 private val logger = KotlinLogging.logger {}
 
 suspend fun BehaviourContext.listenMessageEvent(comet: TelegramComet) {
-    onContentMessage({ it.chat is PrivateChat || it.chat is GroupChat }) {
+    onContentMessage(
+        { it.chat is PrivateChat || it.chat is GroupChat }
+    ) {
         if (it.date < comet.startTime) {
             return@onContentMessage
         }
@@ -46,24 +49,20 @@ suspend fun BehaviourContext.listenMessageEvent(comet: TelegramComet) {
     }
 }
 
-@OptIn(RiskFeature::class, PreviewFeature::class)
+@OptIn(PreviewFeature::class, RiskFeature::class)
 suspend fun CommonMessage<MessageContent>.toCometEvent(
     comet: TelegramComet
 ): MessageEvent? {
     if (this !is FromUser && this !is WithSenderChatMessage) {
-        logger.debug { "Incoming message doesn't have user or sender, is ${this::class.simpleName}" }
         return null
     }
 
-    val containAt = this.entities?.any { it is BotCommandTextSource && it.source.contains(comet.username) } == true
+    val containAt = entities?.any { it is BotCommandTextSource && it.source.contains(comet.username) } == true
 
     return when (chat) {
-        is GroupChat -> this.requireCommonGroupContentMessage().toCometGroupEvent(comet, containAt)
-        is PrivateChat -> this.toCometPrivateEvent(comet, containAt)
-        else -> {
-            logger.debug { "Incoming chat isn't group chat or private chat`, is ${chat::class.simpleName}" }
-            null
-        }
+        is GroupChat -> this.asCommonGroupContentMessage()?.toCometGroupEvent(comet, containAt)
+        is PrivateChat -> this.asPrivateContentMessage()?.toCometPrivateEvent(comet, containAt)
+        else -> null
     }
 }
 
@@ -140,18 +139,17 @@ suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
     }
 }
 
-@OptIn(RiskFeature::class)
-suspend fun CommonMessage<MessageContent>.toCometPrivateEvent(
+suspend fun PrivateContentMessage<MessageContent>.toCometPrivateEvent(
     comet: TelegramComet,
     containAt: Boolean
 ): PrivateMessageEvent {
-    val sender = from!!.toCometUser(comet) // Validated fromUser
+    val sender = from.toCometUser(comet)
 
     return PrivateMessageEvent(
         comet = comet,
         subject = sender,
         sender = sender,
-        senderName = from!!.getDisplayName(), // Validated fromUser
+        senderName = from.getDisplayName(),
         message = content.toMessageWrapper(
             type = MessageSource.MessageSourceType.BOT,
             from = sender.id,

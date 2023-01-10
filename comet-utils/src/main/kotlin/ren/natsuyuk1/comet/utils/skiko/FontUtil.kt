@@ -6,8 +6,6 @@ import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skia.paragraph.TypefaceFontProvider
 import ren.natsuyuk1.comet.utils.file.absPath
-import ren.natsuyuk1.comet.utils.file.copyResourceDirectory
-import ren.natsuyuk1.comet.utils.file.jar
 import ren.natsuyuk1.comet.utils.file.resolveResourceDirectory
 import java.awt.Color
 
@@ -22,14 +20,9 @@ object FontUtil {
 
     private val fontFolder = resolveResourceDirectory("/fonts")
 
-    suspend fun loadDefaultFont() {
+    fun loadDefaultFont() {
         if (!fontFolder.exists()) {
             fontFolder.mkdirs()
-
-            val source = jar(this::class.java)
-            if (source != null) {
-                copyResourceDirectory(source, "fonts", fontFolder)
-            }
         }
 
         var counter = 0

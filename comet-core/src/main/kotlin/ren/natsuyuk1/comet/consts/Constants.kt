@@ -48,4 +48,4 @@ val defaultClient = HttpClient(CIO) {
 
 val cometClient: CometClient = CometClient()
 
-val coreUpTimer = Timer()
+val coreUpTimer by lazy { Timer() }
