@@ -28,7 +28,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.4.5")
 
     // Kotlinx
-    implementation("org.jetbrains.kotlinx:atomicfu:0.18.3")
+    implementation("org.jetbrains.kotlinx:atomicfu:0.19.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
     testImplementation(kotlin("test"))
