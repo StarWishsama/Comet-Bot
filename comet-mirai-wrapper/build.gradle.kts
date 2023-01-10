@@ -23,6 +23,8 @@ dependencies {
     implementation(libs.mirai.core)
     implementation(libs.mirai.core.api)
     implementation(libs.mirai.core.utils)
+
+    implementation(libs.ktor.client.core)
 }
 
 buildConfig {

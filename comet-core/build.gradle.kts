@@ -36,7 +36,15 @@ dependencies {
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.rate.limit)
     implementation(libs.ktor.server.call.logging.jvm)
-    implementation(libs.ktor.client.websockets.jvm)
+
+    api(libs.ktor.client.websockets.jvm)
+    api(libs.ktor.client.cio)
+    api(libs.ktor.client.core)
+    api(libs.ktor.client.logging)
+    api(libs.ktor.client.encoding)
+    api(libs.ktor.client.content.negotiation)
+    api(libs.ktor.serialization.kotlinx.json)
+    api(libs.ktor.network)
 
     implementation(libs.jsoup)
 

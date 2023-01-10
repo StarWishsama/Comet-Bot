@@ -23,8 +23,6 @@ repositories {
     maven("https://jitpack.io")
 }
 
-val ktor = "2.2.1"
-
 dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
     implementation("ch.qos.logback:logback-classic:1.4.0")
@@ -34,17 +32,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
     testImplementation(kotlin("test"))
-
-    implementation("io.ktor:ktor-client-core:$ktor")
-    implementation("io.ktor:ktor-client-cio:$ktor")
-    implementation("io.ktor:ktor-client-logging:$ktor")
-    implementation("io.ktor:ktor-client-encoding:$ktor")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktor")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
-    implementation("io.ktor:ktor-network:$ktor")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-    implementation("net.mamoe.yamlkt:yamlkt:0.12.0")
 }
 
 sourceSets {

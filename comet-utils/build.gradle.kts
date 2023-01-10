@@ -64,4 +64,21 @@ dependencies {
     compileOnly(libs.hutool.http)
     compileOnly(libs.hutool.cron)
     compileOnly(libs.hutool.crypto)
+
+    compileOnly(libs.ktor.server.core)
+    compileOnly(libs.ktor.server.netty)
+    compileOnly(libs.ktor.server.rate.limit)
+    compileOnly(libs.ktor.server.call.logging.jvm)
+
+    compileOnly(libs.ktor.client.websockets.jvm)
+    compileOnly(libs.ktor.client.cio)
+    compileOnly(libs.ktor.client.core)
+    compileOnly(libs.ktor.client.logging)
+    compileOnly(libs.ktor.client.encoding)
+    compileOnly(libs.ktor.client.content.negotiation)
+    compileOnly(libs.ktor.serialization.kotlinx.json)
+    compileOnly(libs.ktor.network)
+
+    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+    api("net.mamoe.yamlkt:yamlkt:0.12.0")
 }

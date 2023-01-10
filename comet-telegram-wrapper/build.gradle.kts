@@ -29,9 +29,7 @@ dependencies {
 
     compileOnly(libs.jline)
 
-    implementation(libs.tgbotapi) {
-        exclude("io.ktor")
-    }
+    implementation(libs.tgbotapi)
 }
 
 buildConfig {

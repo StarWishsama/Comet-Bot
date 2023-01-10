@@ -39,6 +39,8 @@ dependencies {
     implementation(libs.hutool.cron)
     implementation(libs.hutool.crypto)
 
+    compileOnly(libs.ktor.client.core)
+
     implementation(project(":comet-utils"))
 }
 
