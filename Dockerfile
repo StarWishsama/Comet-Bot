@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk-alpine:17-latest as builder
+FROM azul/zulu-openjdk-alpine:19-latest as builder
 WORKDIR /usr/src/comet
 COPY . .
 RUN apk add --no-cache --update git && ./gradlew clean buildComet
