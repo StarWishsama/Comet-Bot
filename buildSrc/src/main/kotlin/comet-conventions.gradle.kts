@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
-    implementation("ch.qos.logback:logback-classic:1.4.0")
+    implementation("ch.qos.logback:logback-classic:1.4.5")
 
     // Kotlinx
     implementation("org.jetbrains.kotlinx:atomicfu:0.18.3")
