@@ -3,6 +3,7 @@ package ren.natsuyuk1.comet.mirai
 import mu.KotlinLogging.logger
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
+import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.internal.network.Packet
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.MessageSource.Key.recall
@@ -25,7 +26,12 @@ import ren.natsuyuk1.comet.mirai.config.toMiraiProtocol
 import ren.natsuyuk1.comet.mirai.contact.toCometGroup
 import ren.natsuyuk1.comet.mirai.contact.toCometUser
 import ren.natsuyuk1.comet.mirai.event.redirectToComet
-import ren.natsuyuk1.comet.mirai.util.*
+import ren.natsuyuk1.comet.mirai.util.toMessageSource
+import ren.natsuyuk1.comet.mirai.util.runWithSuspend
+import ren.natsuyuk1.comet.mirai.util.runWithScope
+import ren.natsuyuk1.comet.mirai.util.runWith
+import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
+import ren.natsuyuk1.comet.mirai.util.toMessageChain
 import ren.natsuyuk1.comet.service.subscribeGitHubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.system.getEnv
@@ -88,7 +94,7 @@ class MiraiComet(
 
                     miraiBot.eventChannel.parentScope(scope).exceptionHandler {
                         logger.warn(it) { "Mirai Bot (${miraiBot.id}) 发生异常" }
-                    }.subscribeAlways<net.mamoe.mirai.event.Event> {
+                    }.subscribeAlways<Event> {
                         if (it is Packet.NoEventLog || it is Packet.NoLog) {
                             return@subscribeAlways
                         }
