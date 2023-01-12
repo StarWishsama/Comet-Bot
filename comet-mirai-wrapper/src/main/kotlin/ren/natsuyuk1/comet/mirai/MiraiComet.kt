@@ -25,6 +25,7 @@ import ren.natsuyuk1.comet.mirai.config.toMiraiProtocol
 import ren.natsuyuk1.comet.mirai.contact.toCometGroup
 import ren.natsuyuk1.comet.mirai.contact.toCometUser
 import ren.natsuyuk1.comet.mirai.event.redirectToComet
+import ren.natsuyuk1.comet.mirai.util.*
 import ren.natsuyuk1.comet.service.subscribeGitHubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.system.getEnv
