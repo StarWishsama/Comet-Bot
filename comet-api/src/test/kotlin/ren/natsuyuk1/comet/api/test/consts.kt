@@ -38,6 +38,10 @@ val fakeComet = object : Comet(
     override suspend fun getStranger(id: Long): User? {
         return null
     }
+
+    override suspend fun reply(message: MessageWrapper, receipt: MessageReceipt): MessageReceipt? {
+        return null
+    }
 }
 
 val fakeSender = object : PlatformCommandSender() {

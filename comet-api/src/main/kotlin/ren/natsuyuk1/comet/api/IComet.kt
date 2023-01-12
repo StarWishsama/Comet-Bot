@@ -1,6 +1,8 @@
 package ren.natsuyuk1.comet.api
 
+import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageSource
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
@@ -15,6 +17,14 @@ internal val cometScope = ModuleScope("comet_global_scope")
  * 一个 [Comet] 扩展方法，包括常用的获取用户等。
  */
 interface IComet {
+    /**
+     * 使用一个已有 [MessageReceipt] 回复对应消息
+     *
+     * @param message 消息
+     * @param receipt 消息回执
+     */
+    suspend fun reply(message: MessageWrapper, receipt: MessageReceipt): MessageReceipt?
+
     /**
      * 获取一个群聊
      *

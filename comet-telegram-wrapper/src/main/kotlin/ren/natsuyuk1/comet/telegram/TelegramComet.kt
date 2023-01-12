@@ -30,7 +30,9 @@ import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.command.CommandNode
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageSource
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.User
@@ -41,6 +43,7 @@ import ren.natsuyuk1.comet.telegram.contact.toCometGroup
 import ren.natsuyuk1.comet.telegram.contact.toCometUser
 import ren.natsuyuk1.comet.telegram.event.listenGroupEvent
 import ren.natsuyuk1.comet.telegram.event.listenMessageEvent
+import ren.natsuyuk1.comet.telegram.util.send
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.ktor.initProxy
 import kotlin.time.Duration.Companion.seconds
@@ -111,6 +114,8 @@ class TelegramComet(
         bot.close()
     }
 
+    /** Start of IComet region */
+
     override suspend fun getGroup(id: Long): Group? {
         // Telegram group id always negative
         if (id > 0) {
@@ -149,4 +154,16 @@ class TelegramComet(
      * Telegram 没有 "陌生人" 这一设计
      */
     override suspend fun getStranger(id: Long): User? = null
+
+    override suspend fun reply(message: MessageWrapper, receipt: MessageReceipt): MessageReceipt? {
+        return when (receipt.source.type) {
+            MessageSource.MessageSourceType.GROUP,
+            MessageSource.MessageSourceType.FRIEND,
+            MessageSource.MessageSourceType.BOT -> {
+                send(message, receipt.source.type, receipt.source.from.toChatId(), receipt.source.messageID)
+            }
+
+            else -> null
+        }
+    }
 }

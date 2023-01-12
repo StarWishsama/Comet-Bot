@@ -10,6 +10,7 @@ import dev.inmo.tgbotapi.requests.abstracts.FileId
 import dev.inmo.tgbotapi.requests.abstracts.InputFile
 import dev.inmo.tgbotapi.requests.abstracts.asMultipartFile
 import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.MessageId
 import dev.inmo.tgbotapi.types.media.TelegramMediaPhoto
 import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.types.message.content.PhotoContent
@@ -34,6 +35,7 @@ suspend fun TelegramComet.send(
     message: MessageWrapper,
     type: MessageSource.MessageSourceType,
     target: ChatId,
+    replyMessageId: MessageId? = null,
 ): MessageReceipt {
     val executeTime = Clock.System.now()
 
@@ -65,6 +67,7 @@ suspend fun TelegramComet.send(
                 target,
                 ifile,
                 entities = textSource,
+                replyToMessageId = replyMessageId,
             )
         } else {
             val photos = mutableListOf<TelegramMediaPhoto>()
@@ -86,7 +89,8 @@ suspend fun TelegramComet.send(
 
             bot.sendVisualMediaGroup(
                 target,
-                photos
+                photos,
+                replyToMessageId = replyMessageId,
             )
         }
     } else if (voice != null) {
@@ -94,11 +98,12 @@ suspend fun TelegramComet.send(
             bot.sendAudio(
                 target,
                 it,
-                entities = textSource
+                entities = textSource,
+                replyToMessageId = replyMessageId,
             )
         }
     } else {
-        bot.sendMessage(target, textSource)
+        bot.sendMessage(target, textSource, replyToMessageId = replyMessageId)
     }
 
     return MessageReceipt(

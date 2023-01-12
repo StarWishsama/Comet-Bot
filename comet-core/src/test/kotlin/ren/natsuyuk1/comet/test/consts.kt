@@ -40,6 +40,10 @@ val fakeComet by lazy {
         override suspend fun getStranger(id: Long): User? {
             return null
         }
+
+        override suspend fun reply(message: MessageWrapper, receipt: MessageReceipt): MessageReceipt? {
+            return null
+        }
     }.also { cometInstances.add(it) }
 }
 

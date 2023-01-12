@@ -30,6 +30,7 @@ dependencies {
     compileOnly(libs.jline)
 
     implementation(libs.tgbotapi)
+    implementation(libs.ktor.client.core)
 }
 
 buildConfig {

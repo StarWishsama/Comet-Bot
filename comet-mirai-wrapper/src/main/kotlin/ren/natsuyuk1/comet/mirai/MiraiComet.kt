@@ -4,13 +4,17 @@ import mu.KotlinLogging.logger
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.internal.network.Packet
+import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.MessageSource.Key.recall
+import net.mamoe.mirai.message.data.OnlineMessageSource
 import net.mamoe.mirai.network.NoStandardInputForCaptchaException
 import net.mamoe.mirai.utils.*
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.attachMessageProcessor
 import ren.natsuyuk1.comet.api.config.CometConfig
+import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageSource
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.User
@@ -21,10 +25,6 @@ import ren.natsuyuk1.comet.mirai.config.toMiraiProtocol
 import ren.natsuyuk1.comet.mirai.contact.toCometGroup
 import ren.natsuyuk1.comet.mirai.contact.toCometUser
 import ren.natsuyuk1.comet.mirai.event.redirectToComet
-import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
-import ren.natsuyuk1.comet.mirai.util.runWith
-import ren.natsuyuk1.comet.mirai.util.runWithScope
-import ren.natsuyuk1.comet.mirai.util.runWithSuspend
 import ren.natsuyuk1.comet.service.subscribeGitHubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.system.getEnv
@@ -122,6 +122,8 @@ class MiraiComet(
         if (::miraiBot.isInitialized) miraiBot.close()
     }
 
+    /** Start of IComet region */
+
     override suspend fun getGroup(id: Long): Group? = cl.runWith { miraiBot.getGroup(id)?.toCometGroup(this) }
 
     override suspend fun deleteMessage(source: MessageSource): Boolean = cl.runWithSuspend {
@@ -137,5 +139,38 @@ class MiraiComet(
 
     override suspend fun getStranger(id: Long): User? = cl.runWithSuspend {
         miraiBot.getStranger(id)?.toCometUser(this)
+    }
+
+    override suspend fun reply(message: MessageWrapper, receipt: MessageReceipt): MessageReceipt? {
+        val source = receipt.source as? MiraiMessageSource ?: return null
+        val quoteReply = source.miraiSource.quote()
+
+        return when (source.type) {
+            MessageSource.MessageSourceType.GROUP -> {
+                miraiBot.getGroup(source.from)?.let {
+                    it.sendMessage(quoteReply.plus(message.toMessageChain(it)))
+                }?.source?.toMessageSource()?.let { MessageReceipt(this, it) }
+            }
+
+            MessageSource.MessageSourceType.FRIEND -> {
+                miraiBot.getFriend(source.from)?.let {
+                    it.sendMessage(quoteReply.plus(message.toMessageChain(it)))
+                }?.source?.toMessageSource()?.let { MessageReceipt(this, it) }
+            }
+
+            MessageSource.MessageSourceType.TEMP -> {
+                (source.miraiSource as? OnlineMessageSource)?.subject?.let {
+                    it.sendMessage(quoteReply.plus(message.toMessageChain(it)))
+                }?.source?.toMessageSource()?.let { MessageReceipt(this, it) }
+            }
+
+            MessageSource.MessageSourceType.STRANGER -> {
+                miraiBot.getStranger(source.from)?.let {
+                    it.sendMessage(quoteReply.plus(message.toMessageChain(it)))
+                }?.source?.toMessageSource()?.let { MessageReceipt(this, it) }
+            }
+
+            else -> null
+        }
     }
 }

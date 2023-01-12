@@ -28,7 +28,9 @@ import ren.natsuyuk1.comet.api.database.AccountDataTable
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.database.loginStatus
 import ren.natsuyuk1.comet.api.event.EventManager
+import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageSource
+import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.session.SessionManager
@@ -66,6 +68,7 @@ private val dummyComet =
         override suspend fun deleteMessage(source: MessageSource): Boolean = false
         override suspend fun getFriend(id: Long): User? = null
         override suspend fun getStranger(id: Long): User? = null
+        override suspend fun reply(message: MessageWrapper, receipt: MessageReceipt): MessageReceipt? = null
     }
 
 object CometTerminal {

@@ -22,7 +22,5 @@ class MessageReceipt(
         delete()
     }
 
-    fun reply(message: MessageWrapper): MessageReceipt {
-        TODO()
-    }
+    suspend fun reply(message: MessageWrapper): MessageReceipt? = comet.reply(message, this)
 }
