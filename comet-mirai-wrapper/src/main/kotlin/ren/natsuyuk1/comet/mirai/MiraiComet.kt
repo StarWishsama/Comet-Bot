@@ -46,7 +46,7 @@ class MiraiComet(
     config: CometConfig,
     private val miraiConfig: MiraiConfig,
 ) : Comet(LoginPlatform.MIRAI, config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
-    lateinit var miraiBot: Bot
+    private lateinit var miraiBot: Bot
     private val cl = config.classLoader
 
     override val id: Long
@@ -148,11 +148,11 @@ class MiraiComet(
         miraiBot.getStranger(id)?.toCometUser(this)
     }
 
-    override suspend fun reply(message: MessageWrapper, receipt: MessageReceipt): MessageReceipt? {
-        val source = receipt.source as? MiraiMessageSource ?: return null
+    override suspend fun reply(message: MessageWrapper, receipt: MessageReceipt): MessageReceipt? = cl.runWithSuspend {
+        val source = receipt.source as? MiraiMessageSource ?: return@runWithSuspend null
         val quoteReply = source.miraiSource.quote()
 
-        return when (source.type) {
+        return@runWithSuspend when (source.type) {
             MessageSource.MessageSourceType.GROUP -> {
                 miraiBot.getGroup(source.from)?.let {
                     it.sendMessage(quoteReply.plus(message.toMessageChain(it)))
