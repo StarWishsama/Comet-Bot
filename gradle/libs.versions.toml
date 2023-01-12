@@ -40,8 +40,6 @@ mirai-core = { module = "net.mamoe:mirai-core", version.ref = "mirai" }
 mirai-core-api = { module = "net.mamoe:mirai-core-api", version.ref = "mirai" }
 mirai-core-utils = { module = "net.mamoe:mirai-core-utils", version.ref = "mirai" }
 yamlkt = "net.mamoe.yamlkt:yamlkt:0.12.0"
-log4j-core = "org.apache.logging.log4j:log4j-core:2.19.0"
-jetbrains-annotations = "org.jetbrains:annotations:24.0.0"
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
 exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
