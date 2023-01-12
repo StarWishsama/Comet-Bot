@@ -51,7 +51,7 @@ fun levenshteinDistance(s1: String, s2: String, limit: Int = Int.MAX_VALUE): Dou
         // use formula to fill in the rest of the row
         for (j in s2.indices) {
             var cost = 1
-            if (s1.toCharArray()[i] === s2.toCharArray()[j]) {
+            if (s1.toCharArray()[i] == s2.toCharArray()[j]) {
                 cost = 0
             }
             v1[j + 1] = // Cost of insertion

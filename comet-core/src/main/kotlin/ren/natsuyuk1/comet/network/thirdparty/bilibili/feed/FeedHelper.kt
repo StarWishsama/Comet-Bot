@@ -51,6 +51,7 @@ fun BangumiCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
         appendText("详情 > $url")
     }
 
+@Suppress("UNUSED_PARAMETER")
 fun CollectionCard.toMessageWrapper(description: FeedDescription): MessageWrapper =
     buildMessageWrapper {
         appendText("暂不支持该类型动态")

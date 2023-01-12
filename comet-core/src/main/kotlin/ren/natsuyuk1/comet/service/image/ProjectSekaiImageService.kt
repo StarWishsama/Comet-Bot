@@ -405,8 +405,12 @@ object ProjectSekaiImageService {
             bg.height + DEFAULT_PADDING * 3 + text.height.toInt()
         )
 
-        val cover = ProjectSekaiMusic.getMusicCover(musicInfo).readBytes().let {
-            Image.makeFromEncoded(it)
+        val cover = try {
+            ProjectSekaiMusic.getMusicCover(musicInfo).readBytes().let {
+                Image.makeFromEncoded(it)
+            }
+        } catch (e: IllegalArgumentException) {
+            null
         }
 
         surface.canvas.apply {

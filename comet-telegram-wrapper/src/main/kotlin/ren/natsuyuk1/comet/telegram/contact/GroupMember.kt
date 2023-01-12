@@ -46,6 +46,7 @@ class TelegramGroupUserImpl(
     private val groupChatID: Long,
     override val comet: TelegramComet
 ) : TelegramGroupMember() {
+    @OptIn(PreviewFeature::class)
     override val group: Group
         get() = runBlocking {
             comet.bot.getChat(groupChatID.toChatId()).asGroupChat()?.toCometGroup(comet)

@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.objects.pjsk.local
 
 import kotlinx.datetime.Instant
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.builtins.ArraySerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
@@ -24,6 +25,7 @@ object ProjectSekaiMusicAlias : ProjectSekaiLocalFile(
 ) {
     private var musicAliasDatabase = mapOf<Int, Array<String>>()
 
+    @OptIn(ExperimentalSerializationApi::class)
     override suspend fun load() {
         try {
             val content = file.readTextBuffered()

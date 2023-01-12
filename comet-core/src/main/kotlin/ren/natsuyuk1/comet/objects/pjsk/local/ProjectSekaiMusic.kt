@@ -69,13 +69,13 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
     fun getMusicInfo(id: Int): PJSKMusicInfo? = musicDatabase[id]
 
     fun fuzzyGetMusicInfo(name: String): Pair<PJSKMusicInfo, BigDecimal>? {
-        val name = name.normalize(Normalizer.Form.NFKC)
+        val normalizeName = name.normalize(Normalizer.Form.NFKC)
 
         return musicDatabase.values.associateWith {
             val alias = ProjectSekaiMusicAlias.getAlias(it.id) ?: emptyArray()
-            val sim = ldSimilarity(it.title.normalize(Normalizer.Form.NFKC), name)
+            val sim = ldSimilarity(it.title.normalize(Normalizer.Form.NFKC), normalizeName)
                 .max(
-                    alias.maxOfOrNull { a -> ldSimilarity(a.normalize(Normalizer.Form.NFKC), name) }
+                    alias.maxOfOrNull { a -> ldSimilarity(a.normalize(Normalizer.Form.NFKC), normalizeName) }
                         ?: BigDecimal.ZERO
                 )
 
