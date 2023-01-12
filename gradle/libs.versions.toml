@@ -14,7 +14,7 @@ hutool-http = { module = "cn.hutool:hutool-http", version.ref = "hutool" }
 brotli4j = "com.aayushatharva.brotli4j:brotli4j:1.9.0"
 cron-utils = "com.cronutils:cron-utils:9.2.0"
 jsonpath = "com.jayway.jsonpath:json-path:2.7.0"
-ktlint = "com.pinterest:ktlint:0.43.2"
+ktlint = "com.pinterest:ktlint:0.48.1"
 rome = "com.rometools:rome:1.18.0"
 okio = "com.squareup.okio:okio:3.3.0"
 hikaricp = "com.zaxxer:HikariCP:5.0.1"
