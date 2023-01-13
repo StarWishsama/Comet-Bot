@@ -24,7 +24,7 @@ private val logger = KotlinLogging.logger {}
 
 object SkikoHelper {
     private const val SKIKO_LIBRARY_PATH_PROPERTY = "skiko.library.path"
-    private const val SKIKO_VERSION = "0.7.40"
+    private const val SKIKO_VERSION = "0.7.45"
     private var isLoaded = false
 
     private val skikoLibraryPath = System.getProperty(SKIKO_LIBRARY_PATH_PROPERTY)
