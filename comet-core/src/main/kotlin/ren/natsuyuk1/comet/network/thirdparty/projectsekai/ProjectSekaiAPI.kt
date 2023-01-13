@@ -55,18 +55,18 @@ object ProjectSekaiAPI {
         param: String,
         builder: URLBuilder.(URLBuilder) -> Unit = {}
     ): HttpResponse {
-        val profileReq = client.get("$PROFILE_URL$param") {
+        val unibotReq = client.get("$UNIBOT_API_URL$param") {
             url(builder)
         }
 
-        return if (profileReq.status != HttpStatusCode.OK) {
-            val unibotReq = client.get("$UNIBOT_API_URL$param") {
+        return if (unibotReq.status != HttpStatusCode.OK) {
+            val profileReq = client.get("$PROFILE_URL$param") {
                 url(builder)
             }
 
-            unibotReq
-        } else {
             profileReq
+        } else {
+            unibotReq
         }
     }
 
