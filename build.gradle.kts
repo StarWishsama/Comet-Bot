@@ -52,7 +52,7 @@ subprojects {
 
 task("buildComet") {
     group = "build"
-    val output = File("$rootDir/comet/modules")
+    val output = File("$rootDir/comet")
 
     if (output.isDirectory && !output.listFiles().isNullOrEmpty()) {
         output.deleteRecursively()
