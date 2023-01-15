@@ -68,7 +68,7 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
 
     fun getMusicInfo(id: Int): PJSKMusicInfo? = musicDatabase[id]
 
-    fun fuzzyGetMusicInfo(name: String): Pair<PJSKMusicInfo, BigDecimal>? {
+    fun fuzzyGetMusicInfo(name: String, minSimilarity: Double = 0.35): Pair<PJSKMusicInfo, BigDecimal>? {
         val normalizeName = name.normalize(Normalizer.Form.NFKC)
 
         return musicDatabase.values.associateWith {
@@ -80,7 +80,7 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
                 )
 
             sim
-        }.filter { it.value > BigDecimal.valueOf(0.4) }
+        }.filter { it.value > BigDecimal.valueOf(minSimilarity) }
             .maxByOrNull { it.value }
             ?.toPair()
     }

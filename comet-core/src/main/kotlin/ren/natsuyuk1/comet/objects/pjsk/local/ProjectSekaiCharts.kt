@@ -23,11 +23,11 @@ object ProjectSekaiCharts {
 
     private val validator: (HttpResponse) -> Boolean = { it.contentType()?.match(ContentType.Image.PNG) == true }
 
-    suspend fun downloadChart(music: PJSKMusicInfo) {
+    suspend fun downloadChart(music: PJSKMusicInfo): Boolean {
         val musicChartDir = chartDir.resolve("${music.id}/")
 
         if (musicChartDir.exists() && !musicChartDir.listFiles().isNullOrEmpty()) {
-            return
+            return true
         }
 
         val sdvxID = getSdvxID(music)
@@ -35,13 +35,23 @@ object ProjectSekaiCharts {
         musicChartDir.mkdirs()
 
         val bg = musicChartDir.resolve("${music.id}bg.png").also { it.touch() }
-        cometClient.client.downloadFile("https://sdvx.in/prsk/bg/${sdvxID}bg.png", bg, validator)
+        cometClient.client.downloadFile("https://sdvx.in/prsk/bg/${sdvxID}bg.png", bg, validator).apply {
+            if (!this) return this
+        }
         val bar = musicChartDir.resolve("${music.id}bar.png").also { it.touch() }
-        cometClient.client.downloadFile("https://sdvx.in/prsk/bg/${sdvxID}bar.png", bar, validator)
+        cometClient.client.downloadFile("https://sdvx.in/prsk/bg/${sdvxID}bar.png", bar, validator).apply {
+            if (!this) return this
+        }
         val chartMaster = musicChartDir.resolve("${music.id}ma.png").also { it.touch() }
-        cometClient.client.downloadFile("https://sdvx.in/prsk/obj/data${sdvxID}mst.png", chartMaster, validator)
+        cometClient.client.downloadFile("https://sdvx.in/prsk/obj/data${sdvxID}mst.png", chartMaster, validator).apply {
+            if (!this) return this
+        }
         val chartExpert = musicChartDir.resolve("${music.id}ex.png").also { it.touch() }
-        cometClient.client.downloadFile("https://sdvx.in/prsk/obj/data${sdvxID}exp.png", chartExpert, validator)
+        cometClient.client.downloadFile("https://sdvx.in/prsk/obj/data${sdvxID}exp.png", chartExpert, validator).apply {
+            if (!this) return this
+        }
+
+        return true
     }
 
     fun getCharts(music: PJSKMusicInfo, difficulty: MusicDifficulty): Array<File> {

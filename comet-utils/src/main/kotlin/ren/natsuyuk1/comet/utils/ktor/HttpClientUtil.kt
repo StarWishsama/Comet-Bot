@@ -19,6 +19,8 @@ import kotlin.time.measureTime
 
 private val logger = mu.KotlinLogging.logger("CometClient")
 
+private val downloadingFile = mutableListOf<String>()
+
 fun HttpClientEngineConfig.initProxy() {
     val proxyStr = getEnv("comet.proxy")
     if (proxyStr.isNullOrBlank()) return
@@ -33,7 +35,7 @@ fun HttpClientEngineConfig.initProxy() {
  * @param file 下载内容储存位置
  * @param verifier 用于验证该响应是否符合要求, 默认仅检查响应码是否为成功
  *
- * @return 响应是否符合要求
+ * @return 下载是否成功
  */
 @OptIn(ExperimentalTime::class)
 suspend fun HttpClient.downloadFile(
@@ -41,6 +43,10 @@ suspend fun HttpClient.downloadFile(
     file: File,
     verifier: (HttpResponse) -> Boolean = { it.status.isSuccess() }
 ): Boolean {
+    if (downloadingFile.contains(url)) {
+        return false
+    }
+
     logger.debug { "Trying download file from $url..." }
 
     var verified = false
@@ -48,6 +54,8 @@ suspend fun HttpClient.downloadFile(
     try {
         val duration = measureTime {
             val req = get(url)
+
+            downloadingFile.add(url)
 
             logger.debug { "Headers = ${req.headers.entries()}" }
 
@@ -73,6 +81,8 @@ suspend fun HttpClient.downloadFile(
         }
     } catch (e: IOException) {
         logger.warn(e) {}
+    } finally {
+        downloadingFile.remove(url)
     }
 
     return verified

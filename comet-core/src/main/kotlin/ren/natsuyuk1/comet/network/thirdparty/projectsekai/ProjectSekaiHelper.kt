@@ -208,7 +208,10 @@ internal suspend fun PJSKMusicInfo.toMessageWrapper() =
 
         appendTextln("难度信息 >")
         diff.forEach {
-            appendTextln("${it.musicDifficulty}[${it.playLevel}] | ${it.totalNoteCount}")
+            appendTextln(
+                "${it.musicDifficulty}[${it.playLevel}|" +
+                    "${(it.playLevel + it.playLevelAdjust).fixDisplay(1)}] | ${it.totalNoteCount}"
+            )
         }
 
         trim()

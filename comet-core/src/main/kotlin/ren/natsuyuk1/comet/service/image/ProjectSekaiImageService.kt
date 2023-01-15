@@ -355,17 +355,32 @@ object ProjectSekaiImageService {
     suspend fun drawCharts(
         musicInfo: PJSKMusicInfo,
         difficulty: MusicDifficulty
-    ): ren.natsuyuk1.comet.api.message.Image? {
+    ): Pair<ren.natsuyuk1.comet.api.message.Image?, String> {
         var chartFiles = ProjectSekaiCharts.getCharts(musicInfo, difficulty)
 
         if (chartFiles.isEmpty()) {
-            ProjectSekaiCharts.downloadChart(musicInfo)
-            chartFiles = ProjectSekaiCharts.getCharts(musicInfo, difficulty)
+            if (ProjectSekaiCharts.downloadChart(musicInfo)) {
+                chartFiles = ProjectSekaiCharts.getCharts(musicInfo, difficulty)
+            } else {
+                return Pair(null, "谱面下载失败, 可能暂未更新")
+            }
         }
 
-        val bg = Image.makeFromEncoded(chartFiles[0].readBytes())
-        val bar = Image.makeFromEncoded(chartFiles[1].readBytes())
-        val chart = Image.makeFromEncoded(chartFiles[2].readBytes())
+        val bg = try {
+            Image.makeFromEncoded(chartFiles[0].readBytes())
+        } catch (e: IllegalArgumentException) {
+            return Pair(null, "谱面背景未准备好")
+        }
+        val bar = try {
+            Image.makeFromEncoded(chartFiles[1].readBytes())
+        } catch (e: IllegalArgumentException) {
+            return Pair(null, "谱面序号表未准备好")
+        }
+        val chart = try {
+            Image.makeFromEncoded(chartFiles[2].readBytes())
+        } catch (e: IllegalArgumentException) {
+            return Pair(null, "谱面按键未准备好")
+        }
 
         val text = ParagraphBuilder(
             ParagraphStyle().apply {
@@ -410,7 +425,7 @@ object ProjectSekaiImageService {
                 Image.makeFromEncoded(it)
             }
         } catch (e: IllegalArgumentException) {
-            null
+            return Pair(null, "歌曲封面未准备好")
         }
 
         surface.canvas.apply {
@@ -456,8 +471,8 @@ object ProjectSekaiImageService {
         }
 
         val data = surface.makeImageSnapshot().encodeToData(EncodedImageFormat.PNG)
-            ?: return null
+            ?: return Pair(null, "生成谱面失败")
 
-        return data.bytes.asImage()
+        return Pair(data.bytes.asImage(), "")
     }
 }

@@ -83,13 +83,11 @@ object ProjectSekaiService {
         val userData = pjskUserData.getUserPJSKData(user.id.value)
             ?: return "你还没有绑定过世界计划账号, 使用 /pjsk bind -i [你的ID] 绑定".toMessageWrapper()
 
-        val userId = userData.userID
-
         val rankSeason = ProjectSekaiManager.getLatestRankSeason() ?: return "查询排位数据时出现异常".toMessageWrapper()
 
-        val rankInfo = cometClient.getRankSeasonInfo(userId, rankSeason)
+        val rankInfo = cometClient.getRankSeasonInfo(userData.userID, rankSeason)
 
-        return cometClient.getUserInfo(userId).toMessageWrapper().apply {
+        return cometClient.getUserInfo(userData.userID).toMessageWrapper().apply {
             appendLine()
             appendLine()
             appendText(rankInfo.getRankInfo())

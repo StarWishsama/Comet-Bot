@@ -4,7 +4,6 @@ import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.arguments.default
 import moe.sdl.yac.parameters.options.default
-import moe.sdl.yac.parameters.options.flag
 import moe.sdl.yac.parameters.options.option
 import moe.sdl.yac.parameters.types.int
 import moe.sdl.yac.parameters.types.long
@@ -13,12 +12,10 @@ import ren.natsuyuk1.comet.api.command.*
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
-import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.commands.service.ProjectSekaiService
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.config.FeatureConfig
-import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiCharts
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
@@ -49,18 +46,18 @@ class ProjectSekaiCommand(
 ) : CometCommand(comet, sender, subject, message, user, PROJECTSEKAI) {
 
     init {
-        subcommands(
-            Bind(subject, sender, user),
-            Event(subject, sender, user),
-            Prediction(subject, sender, user),
-            Info(subject, sender, user),
-            Best30(subject, sender, user),
-            Chart(subject, sender, user),
-            Music(subject, sender, user)
-        )
+        if (FeatureConfig.data.projectSekai) {
+            subcommands(
+                Bind(subject, sender, user),
+                Event(subject, sender, user),
+                Prediction(subject, sender, user),
+                Info(subject, sender, user),
+                Best30(subject, sender, user),
+                Chart(subject, sender, user),
+                Music(subject, sender, user)
+            )
+        }
     }
-
-    private val refreshCache by option("--refresh", "-r").flag()
 
     override suspend fun run() {
         if (!FeatureConfig.data.projectSekai) {
@@ -69,17 +66,6 @@ class ProjectSekaiCommand(
         }
 
         if (currentContext.invokedSubcommand == null) {
-            if (refreshCache) {
-                if (user.userLevel >= UserLevel.ADMIN) {
-                    ProjectSekaiData.updateEventInfo(true)
-                    subject.sendMessage("成功刷新活动信息".toMessageWrapper())
-                } else {
-                    subject.sendMessage("你没有权限".toMessageWrapper())
-                }
-
-                return
-            }
-
             if (ProjectSekaiUserData.isBound(user.id.value)) {
                 subject.sendMessage(ProjectSekaiService.queryUserEventInfo(user, 0))
             } else {
@@ -109,11 +95,6 @@ class ProjectSekaiCommand(
         ).long().default(-1)
 
         override suspend fun run() {
-            if (!FeatureConfig.data.projectSekai) {
-                subject.sendMessage("抱歉, Project Sekai 功能未被启用.".toMessageWrapper())
-                return
-            }
-
             if (userID == -1L || userID.toString().length != 18) {
                 subject.sendMessage("请正确填写你的世界计划账号 ID! 例如 /pjsk bind -i 210043933010767872".toMessageWrapper())
                 return
@@ -164,11 +145,6 @@ class ProjectSekaiCommand(
         private val position by argument("排名位置", "欲查询的指定排名").int().default(0)
 
         override suspend fun run() {
-            if (!FeatureConfig.data.projectSekai) {
-                subject.sendMessage("抱歉, Project Sekai 功能未被启用.".toMessageWrapper())
-                return
-            }
-
             subject.sendMessage(ProjectSekaiService.queryUserEventInfo(user, position))
         }
     }
@@ -207,11 +183,6 @@ class ProjectSekaiCommand(
         }
 
         override suspend fun run() {
-            if (!FeatureConfig.data.projectSekai) {
-                subject.sendMessage("抱歉, Project Sekai 功能未被启用.".toMessageWrapper())
-                return
-            }
-
             subject.sendMessage(ProjectSekaiService.b30(user))
         }
     }
@@ -258,10 +229,10 @@ class ProjectSekaiCommand(
 
             subject.sendMessage("请稍后, 获取谱面中...".toMessageWrapper())
 
-            val image = ProjectSekaiImageService.drawCharts(pair.first, diff)
+            val (image, msg) = ProjectSekaiImageService.drawCharts(pair.first, diff)
 
             if (image == null) {
-                subject.sendMessage("获取谱面失败, 可能是谱面站还没有更新".toMessageWrapper())
+                subject.sendMessage("获取谱面失败, $msg".toMessageWrapper())
             } else {
                 subject.sendMessage(
                     buildMessageWrapper {
