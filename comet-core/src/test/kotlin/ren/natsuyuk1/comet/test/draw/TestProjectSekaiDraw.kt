@@ -93,7 +93,7 @@ class TestProjectSekaiDraw {
 
             val image = ProjectSekaiImageService.drawCharts(music, MusicDifficulty.MASTER)
 
-            image?.byteArray?.let {
+            image?.first?.byteArray?.let {
                 test.writeBytes(it)
             }
 
