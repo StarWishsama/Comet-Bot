@@ -452,19 +452,18 @@ object ProjectSekaiImageService {
                 0f
             )
 
-            if (cover != null) {
-                save()
-                clipRRect(rrect, true)
-                drawImageRect(
-                    cover,
-                    Rect(0f, 0f, cover.width.toFloat(), cover.height.toFloat()),
-                    rrect,
-                    FilterMipmap(FilterMode.LINEAR, MipmapMode.NEAREST),
-                    null,
-                    true
-                )
-                restore()
-            }
+            // Draw music cover
+            save()
+            clipRRect(rrect, true)
+            drawImageRect(
+                cover,
+                Rect(0f, 0f, cover.width.toFloat(), cover.height.toFloat()),
+                rrect,
+                FilterMipmap(FilterMode.LINEAR, MipmapMode.NEAREST),
+                null,
+                true
+            )
+            restore()
 
             text.paint(this, 60f + rrect.width, 27f + bg.height)
             rightText.paint(this, 60f + rrect.width, 30f + bg.height)
