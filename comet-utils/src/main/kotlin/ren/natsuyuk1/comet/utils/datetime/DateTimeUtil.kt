@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.toKotlinDuration
 
-fun Duration.toFriendly(maxUnit: TimeUnit = TimeUnit.DAYS): String {
+fun Duration.toFriendly(maxUnit: TimeUnit = TimeUnit.SECONDS): String {
     toComponents { days, hours, minutes, seconds, ns ->
         return buildString {
             if (days != 0L && maxUnit <= TimeUnit.DAYS) {
