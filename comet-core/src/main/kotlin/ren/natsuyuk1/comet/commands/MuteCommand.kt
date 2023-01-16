@@ -7,15 +7,15 @@ import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.CometCommand
 import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
-import ren.natsuyuk1.comet.api.message.AtElement
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.UserLevel
+import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.util.groupAdminChecker
 import ren.natsuyuk1.comet.util.toMessageWrapper
+import ren.natsuyuk1.comet.util.yac.user
 import ren.natsuyuk1.comet.utils.math.TimeUtil
-import ren.natsuyuk1.comet.utils.string.StringUtil.isNumeric
 
 private val logger = KotlinLogging.logger {}
 
@@ -42,7 +42,7 @@ class MuteCommand(
     val message: MessageWrapper,
     val user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, MUTE) {
-    private val id by argument("禁言用户 ID")
+    private val id by argument("禁言用户").user(message)
 
     private val time by option("--time", "-t")
 
@@ -52,29 +52,24 @@ class MuteCommand(
             return
         }
 
-        val targetID = if (id.isNumeric()) {
-            id.toLongOrNull()
-        } else {
-            message.find<AtElement>()?.target
+        if (subject.getBotPermission() < GroupPermission.ADMIN) {
+            subject.sendMessage("Comet 没有权限禁言!".toMessageWrapper())
+            return
         }
 
-        if (targetID == null) {
+        if (id == 0L) {
             subject.sendMessage("输入的禁言对象有误, 检查一下吧".toMessageWrapper())
             return
         }
 
-        val target = subject.getMember(targetID)
+        val target = subject.getMember(id)
 
         if (target == null) {
             subject.sendMessage("找不到你要禁言的对象, 检查一下吧".toMessageWrapper())
             return
         }
 
-        val actualTime = if (time == null) {
-            60 // 默认一分钟
-        } else {
-            TimeUtil.parseTextTime(time!!)
-        }
+        val actualTime = time?.let { TimeUtil.parseTextTime(it) } ?: 60
 
         if (actualTime !in 1..2592000) {
             subject.sendMessage("请输入合理的禁言时间, 范围在 [1秒, 30天]".toMessageWrapper())

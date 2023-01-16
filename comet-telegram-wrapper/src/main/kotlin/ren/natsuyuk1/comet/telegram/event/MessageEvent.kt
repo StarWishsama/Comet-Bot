@@ -6,12 +6,10 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onConten
 import dev.inmo.tgbotapi.extensions.utils.asCommonGroupContentMessage
 import dev.inmo.tgbotapi.extensions.utils.asPrivateContentMessage
 import dev.inmo.tgbotapi.extensions.utils.chatIdOrThrow
-import dev.inmo.tgbotapi.extensions.utils.extensions.raw.entities
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.message.abstracts.*
 import dev.inmo.tgbotapi.types.message.content.MessageContent
-import dev.inmo.tgbotapi.types.message.textsources.BotCommandTextSource
 import dev.inmo.tgbotapi.types.toChatId
 import dev.inmo.tgbotapi.utils.PreviewFeature
 import dev.inmo.tgbotapi.utils.RiskFeature
@@ -57,18 +55,15 @@ suspend fun CommonMessage<MessageContent>.toCometEvent(
         return null
     }
 
-    val containAt = entities?.any { it is BotCommandTextSource && it.source.contains(comet.username) } == true
-
     return when (chat) {
-        is GroupChat -> this.asCommonGroupContentMessage()?.toCometGroupEvent(comet, containAt)
-        is PrivateChat -> this.asPrivateContentMessage()?.toCometPrivateEvent(comet, containAt)
+        is GroupChat -> this.asCommonGroupContentMessage()?.toCometGroupEvent(comet)
+        is PrivateChat -> this.asPrivateContentMessage()?.toCometPrivateEvent(comet)
         else -> null
     }
 }
 
 suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
-    comet: TelegramComet,
-    isCommand: Boolean
+    comet: TelegramComet
 ): GroupMessageEvent {
     return when (this) {
         is FromChannelGroupContentMessage<*> -> {
@@ -86,7 +81,6 @@ suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
                     time = date.unixMillisLong,
                     msgID = messageId,
                     comet = comet,
-                    containBotAt = isCommand
                 ),
                 time = date.unixMillisLong,
                 messageID = messageId
@@ -108,7 +102,6 @@ suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
                     time = date.unixMillisLong,
                     msgID = messageId,
                     comet = comet,
-                    containBotAt = isCommand
                 ),
                 time = date.unixMillisLong,
                 messageID = messageId
@@ -130,7 +123,6 @@ suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
                     time = date.unixMillisLong,
                     msgID = messageId,
                     comet = comet,
-                    containBotAt = isCommand
                 ),
                 time = date.unixMillisLong,
                 messageID = messageId
@@ -140,8 +132,7 @@ suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
 }
 
 suspend fun PrivateContentMessage<MessageContent>.toCometPrivateEvent(
-    comet: TelegramComet,
-    containAt: Boolean
+    comet: TelegramComet
 ): PrivateMessageEvent {
     val sender = from.toCometUser(comet)
 
@@ -157,7 +148,6 @@ suspend fun PrivateContentMessage<MessageContent>.toCometPrivateEvent(
             time = date.unixMillisLong,
             msgID = messageId,
             comet = comet,
-            containBotAt = containAt
         ),
         time = date.unixMillisLong,
         messageID = messageId

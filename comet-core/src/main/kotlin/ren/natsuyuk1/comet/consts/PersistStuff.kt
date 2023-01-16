@@ -186,4 +186,9 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         ) { comet, sender, subject, wrapper, user ->
             MinecraftCommand(comet, sender, subject, wrapper, user)
         },
+        CommandNode(
+            COIN
+        ) { comet, sender, subject, wrapper, user ->
+            CoinCommand(comet, sender, subject, wrapper, user)
+        },
     )

@@ -362,7 +362,7 @@ object ProjectSekaiImageService {
             if (ProjectSekaiCharts.downloadChart(musicInfo)) {
                 chartFiles = ProjectSekaiCharts.getCharts(musicInfo, difficulty)
             } else {
-                return Pair(null, "谱面下载失败, 可能暂未更新")
+                return Pair(null, "谱面下载中或下载失败, 可能暂未更新")
             }
         }
 

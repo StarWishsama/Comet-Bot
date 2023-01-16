@@ -1,6 +1,8 @@
 package ren.natsuyuk1.comet.telegram.util
 
+import dev.inmo.tgbotapi.abstracts.TextedWithTextSources
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
+import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
 import dev.inmo.tgbotapi.extensions.api.files.downloadFile
 import dev.inmo.tgbotapi.extensions.api.send.media.sendAudio
 import dev.inmo.tgbotapi.extensions.api.send.media.sendPhoto
@@ -16,9 +18,7 @@ import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.types.message.content.PhotoContent
 import dev.inmo.tgbotapi.types.message.content.TextContent
 import dev.inmo.tgbotapi.types.message.content.VoiceContent
-import dev.inmo.tgbotapi.types.message.textsources.TextSource
-import dev.inmo.tgbotapi.types.message.textsources.mention
-import dev.inmo.tgbotapi.types.message.textsources.regular
+import dev.inmo.tgbotapi.types.message.textsources.*
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.message.*
 import ren.natsuyuk1.comet.telegram.TelegramComet
@@ -127,16 +127,29 @@ suspend fun MessageContent.toMessageWrapper(
     time: Long,
     msgID: Long,
     comet: TelegramComet,
-    containBotAt: Boolean
 ): MessageWrapper {
-    val receipt = MessageReceipt(comet, MessageSource(type, from, to, time, msgID))
 
-    return when (val content = this) {
+    val receipt = MessageReceipt(comet, MessageSource(type, from, to, time, msgID))
+    val textSource = (this as? TextedWithTextSources)?.textSources?.map {
+        when (it) {
+            is MentionTextSource -> {
+                try {
+                    AtElement(comet.bot.getChat(it.username).id.chatId)
+                } catch (e: Exception) {
+                    AtElement(userName = it.source)
+                }
+            }
+            is BotCommandTextSource -> Text(it.asText.replace(comet.bot.getMe().username.username, ""))
+            else -> Text(it.asText)
+        }
+    }
+
+    return when (this) {
         is PhotoContent -> {
             buildMessageWrapper(receipt) {
                 val photoIDs = mutableSetOf<FileId>()
 
-                content.mediaCollection.forEach { photoIDs.add(it.fileId) }
+                mediaCollection.forEach { photoIDs.add(it.fileId) }
 
                 photoIDs.forEach {
                     val tempFile = File(cacheDirectory, it.fileId)
@@ -149,7 +162,7 @@ suspend fun MessageContent.toMessageWrapper(
                         try {
                             tempFile.writeBytes(stream)
                             appendElement(Image(filePath = tempFile.absPath))
-                            content.text?.let { t -> appendText(t) }
+                            textSource?.forEach { t -> appendElement(t) }
                         } catch (e: Exception) {
                             logger.warn(e) { "在转换 Telegram 图片为 Message Wrapper 时出现问题" }
                         }
@@ -163,23 +176,19 @@ suspend fun MessageContent.toMessageWrapper(
 
         is VoiceContent -> {
             buildMessageWrapper(receipt) {
-                val dest = File(cacheDirectory, content.media.fileId.fileId)
+                val dest = File(cacheDirectory, media.fileId.fileId)
                 dest.touch()
                 dest.deleteOnExit()
-                comet.bot.downloadFile(content.media, dest)
+                comet.bot.downloadFile(media, dest)
                 appendElement(Voice(dest.absPath))
 
-                content.text?.let { t -> appendText(t) }
+                textSource?.forEach { t -> appendElement(t) }
             }
         }
 
         is TextContent -> {
             buildMessageWrapper(receipt) {
-                if (containBotAt) {
-                    appendText(content.text.replace(comet.bot.getMe().username.username, ""))
-                } else {
-                    appendText(content.text)
-                }
+                textSource?.forEach { t -> appendElement(t) }
             }
         }
 
@@ -193,8 +202,7 @@ fun Image.toInputFile(): InputFile? {
             url?.isNotBlank() == true -> InputFile.fromUrl(url!!)
             filePath?.isNotBlank() == true -> InputFile.fromFile(File(filePath!!))
             !base64.isNullOrBlank() ->
-                Base64
-                    .getMimeDecoder()
+                Base64.getMimeDecoder()
                     .decode(base64!!)
                     .asMultipartFile(System.currentTimeMillis().toString() + ".png")
 
