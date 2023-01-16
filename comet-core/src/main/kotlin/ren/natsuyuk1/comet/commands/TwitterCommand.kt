@@ -57,7 +57,7 @@ class TwitterCommand(
         val username by argument("推特用户名")
 
         override suspend fun run() {
-            val user = TwitterAPI.fetchUser(username)
+            val user = TwitterAPI.fetchUserByUsername(username)
 
             if (user == null) {
                 subject.sendMessage("找不到对应的用户捏, 检查下用户名格式吧".toMessageWrapper())
