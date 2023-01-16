@@ -81,7 +81,15 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
             platform: LoginPlatform,
             protocol: MiraiLoginProtocol? = null
         ): AccountOperationResult {
-            loginStatus.update { true }
+            if (hasAccount(id, platform)) {
+                return AccountOperationResult(
+                    AccountOperationStatus.ALREADY_LOGON,
+                    "Comet 终端已登录过相同账号!"
+                ).also {
+                    logger.warn { it.message }
+                }
+            }
+
             val service = WrapperLoader.getService(platform)
                 ?: return AccountOperationResult(
                     AccountOperationStatus.NO_WRAPPER,
@@ -91,6 +99,8 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
                 }
 
             logger.info { "正在尝试登录账号 $id 于 ${platform.name} 平台" }
+
+            loginStatus.update { true }
 
             try {
                 return when (platform) {
