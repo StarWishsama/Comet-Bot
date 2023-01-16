@@ -15,12 +15,12 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
-import ren.natsuyuk1.comet.api.message.AtElement
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
+import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.UserTable
+import ren.natsuyuk1.comet.api.user.at
 import ren.natsuyuk1.comet.service.HitokotoManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
@@ -63,11 +63,9 @@ object SignInService {
             user.level += earnLevel
         }
 
-        val at = when (sender.platform) {
-            LoginPlatform.MIRAI -> AtElement(sender.id)
-            LoginPlatform.TELEGRAM -> AtElement(userName = sender.name)
-            else -> AtElement(sender.id)
-        }
+        val at = if (sender is GroupMember) {
+            sender.at()
+        } else null
 
         val checkInResult = buildString {
             append("${getCurrentInstantString()}好, ${sender.name}~\n")
@@ -114,7 +112,7 @@ object SignInService {
         }
 
         return buildMessageWrapper {
-            appendElement(at)
+            at?.let { appendElement(it) }
             appendLine()
             appendText(checkInResult)
         }

@@ -10,9 +10,10 @@ import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.asImage
-import ren.natsuyuk1.comet.api.message.at
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
+import ren.natsuyuk1.comet.api.user.GroupMember
+import ren.natsuyuk1.comet.api.user.at
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.ArcaeaClient
 import ren.natsuyuk1.comet.network.thirdparty.arcaea.data.ArcaeaSongInfo
@@ -98,7 +99,7 @@ object ArcaeaService {
 
             subject.sendMessage(
                 buildMessageWrapper {
-                    appendElement(sender.at())
+                    if (sender is GroupMember) appendElement(sender.at())
                     appendElement(b38Image.asImage())
                 }
             )
@@ -138,7 +139,7 @@ object ArcaeaService {
 
         subject.sendMessage(
             buildMessageWrapper {
-                appendElement(sender.at())
+                if (sender is GroupMember) appendElement(sender.at())
                 appendElement(b38Image.asImage())
             }
         )

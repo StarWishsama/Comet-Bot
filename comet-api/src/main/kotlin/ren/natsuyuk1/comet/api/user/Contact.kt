@@ -10,6 +10,8 @@
 package ren.natsuyuk1.comet.api.user
 
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
+import ren.natsuyuk1.comet.api.message.AtElement
+import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -101,6 +103,13 @@ abstract class GroupMember : User() {
 
     suspend fun isStranger() = comet.getStranger(id) != null
 }
+
+fun GroupMember.at(): AtElement =
+    if (platform == LoginPlatform.TELEGRAM) {
+        AtElement(userName = name)
+    } else {
+        AtElement(id)
+    }
 
 fun GroupMember.nameOrCard(): String = card.ifEmpty { name }
 
