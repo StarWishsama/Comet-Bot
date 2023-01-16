@@ -81,7 +81,7 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
             platform: LoginPlatform,
             protocol: MiraiLoginProtocol? = null
         ): AccountOperationResult {
-            if (hasAccount(id, platform)) {
+            if (cometInstances.any { it.id == id && it.platform == platform }) {
                 return AccountOperationResult(
                     AccountOperationStatus.ALREADY_LOGON,
                     "Comet 终端已登录过相同账号!"
