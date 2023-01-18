@@ -1,4 +1,4 @@
-import { defaultTheme } from "vuepress";
+const { defaultTheme } = require('vuepress')
 
 module.exports = {
     head: [['link', { rel: 'icon', href: 'favicon.svg' }]],
