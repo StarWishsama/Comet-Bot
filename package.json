@@ -5,10 +5,9 @@
   "repository": "https://github.com/StarWishsama/Comet-Bot",
   "author": "StarWishsama",
   "license": "MIT",
-  "dependencies": {
-    "vuepress": "^2.0.0-beta.60"
-  },
   "devDependencies": {
+    "@vuepress/plugin-docsearch": "2.0.0-beta.60",
+    "@vuepress/plugin-theme-data": "2.0.0-beta.60",
     "vuepress": "^2.0.0-beta.60"
   },
   "scripts": {
