@@ -9,8 +9,6 @@ import ren.natsuyuk1.comet.mirai.MiraiComet
 private val logger = KotlinLogging.logger {}
 
 suspend fun Event.redirectToComet(comet: MiraiComet) {
-    logger.debug { "正在尝试转换 Mirai 事件 $this" }
-
     when (this) {
         is GroupMessageEvent -> {
             EventManager.broadcastEvent(this.toCometEvent(comet))

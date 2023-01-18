@@ -90,7 +90,6 @@ object SessionManager {
     fun handleSession(subject: Contact, sender: Contact, message: MessageWrapper): Boolean {
         val user: CometUser? = CometUser.getUser(sender.id, sender.platform)
 
-        logger.debug { "Processing incoming subject: ${subject.id}, sender: ${sender.id}, message: $message" }
         logger.debug { "Pending session(s): $sessions" }
 
         val matched =

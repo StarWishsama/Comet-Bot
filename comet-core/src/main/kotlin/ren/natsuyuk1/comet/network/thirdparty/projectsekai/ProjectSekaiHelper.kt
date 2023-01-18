@@ -9,7 +9,6 @@
 
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.asImage
@@ -55,19 +54,19 @@ private val rankPosition =
         10000,
         20000,
         50000,
-        100000,
-        200000,
-        500000,
-        1000000
+        100000
     )
 
-internal fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserData?, eventId: Int): MessageWrapper {
+internal suspend fun SekaiProfileEventInfo.toMessageWrapper(
+    userData: ProjectSekaiUserData?,
+    eventId: Int
+): MessageWrapper {
     if (rankings.isEmpty()) {
         return "你还没打这期活动捏".toMessageWrapper()
     }
 
     val now = Clock.System.now()
-    val profile = this@toMessageWrapper.rankings.first()
+    val profile = rankings.first()
     val (ahead, behind) = profile.rank.getSurroundingRank()
     val eventInfo = ProjectSekaiData.getCurrentEventInfo() ?: return "查询失败, 活动信息未加载".toMessageWrapper()
     val eventStatus = ProjectSekaiManager.getCurrentEventStatus()
@@ -124,7 +123,7 @@ internal fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserDa
         appendLine()
 
         if (ahead != 0) {
-            val aheadEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, ahead) }
+            val aheadEventStatus = cometClient.getSpecificRankInfo(eventId, ahead)
             val aheadScore = aheadEventStatus.getScore()
 
             if (aheadScore != -1L) {
@@ -136,8 +135,8 @@ internal fun SekaiProfileEventInfo.toMessageWrapper(userData: ProjectSekaiUserDa
             }
         }
 
-        if (behind in 200..1000000) {
-            val behindEventStatus = runBlocking { cometClient.getSpecificRankInfo(eventId, behind) }
+        if (behind in 200..100000) {
+            val behindEventStatus = cometClient.getSpecificRankInfo(eventId, behind)
             val behindScore = behindEventStatus.getScore()
 
             if (behindScore != -1L) {
@@ -197,7 +196,7 @@ internal suspend fun PJSKMusicInfo.toMessageWrapper() =
 
         appendElement(ProjectSekaiMusic.getMusicCover(musicInfo).asImage())
         appendLine()
-        appendTextln("${musicInfo.title}")
+        appendTextln(musicInfo.title)
         appendLine()
         appendTextln("作词 ${musicInfo.lyricist}")
         appendTextln("作曲 ${musicInfo.composer}")

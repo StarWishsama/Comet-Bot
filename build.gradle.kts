@@ -39,6 +39,7 @@ subprojects {
     apply(plugin = "comet-conventions")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
     configure<KtlintExtension> {
+        coloredOutput.set(false)
         disabledRules.set(setOf("no-wildcard-imports", "import-ordering"))
         filter {
             // exclude("**/generated/**")
