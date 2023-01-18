@@ -1,6 +1,7 @@
 import { defaultTheme } from "vuepress";
 
 module.exports = {
+    head: [['link', { rel: 'icon', href: 'favicon.svg' }]],
     title: "彗星 Bot",
     description: "多功能跨 IM 平台机器人",
     base: "/",
