@@ -101,9 +101,9 @@ class TestProjectSekaiAPI {
             return
         }
 
-        val resp = runBlocking { client.getUserEventInfo(eventID, id) }
-
-        println(resp.toMessageWrapper(null, eventID))
+        runBlocking {
+            client.getUserEventInfo(eventID, id).toMessageWrapper(null, eventID).print()
+        }
     }
 
     @Test
@@ -112,9 +112,9 @@ class TestProjectSekaiAPI {
             return
         }
 
-        val resp = runBlocking { client.getSpecificRankInfo(eventID, 100) }
-
-        println(resp.toMessageWrapper(null, eventID))
+        runBlocking {
+            client.getSpecificRankInfo(eventID, 100).toMessageWrapper(null, eventID).print()
+        }
     }
 
     @Test

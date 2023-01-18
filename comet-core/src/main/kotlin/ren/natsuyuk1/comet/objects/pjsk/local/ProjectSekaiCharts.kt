@@ -6,6 +6,7 @@ import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.PJSKMusicInfo
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
+import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.file.isType
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
@@ -14,6 +15,7 @@ import java.text.NumberFormat
 
 object ProjectSekaiCharts {
     private val chartDir = pjskFolder.resolve("charts/")
+    private val scope = ModuleScope("pjsk_chart")
 
     private fun getSdvxID(music: PJSKMusicInfo) =
         NumberFormat.getNumberInstance().apply {

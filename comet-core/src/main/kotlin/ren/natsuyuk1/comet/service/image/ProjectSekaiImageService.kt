@@ -34,6 +34,7 @@ object ProjectSekaiImageService {
     private const val DEFAULT_PADDING = 20
     private const val AVATAR_SIZE = 100
     private val BETTER_GRAY_RGB: Int by lazy { Color(220, 220, 220).rgb }
+    private val QUALITY = 75
 
     fun drawB30(user: ProjectSekaiUserInfo.UserGameData, b30: List<ProjectSekaiUserInfo.MusicResult>): MessageWrapper {
         val b30Text = ParagraphBuilder(
@@ -83,7 +84,7 @@ object ProjectSekaiImageService {
         }
 
         val image = surface.makeImageSnapshot()
-        val data = image.encodeToData(EncodedImageFormat.PNG)
+        val data = image.encodeToData(EncodedImageFormat.JPEG, QUALITY)
             ?: return buildMessageWrapper {
                 appendText("生成图片失败!")
             }
@@ -342,7 +343,7 @@ object ProjectSekaiImageService {
         }
 
         val image = surface.makeImageSnapshot()
-        val data = image.encodeToData(EncodedImageFormat.PNG)
+        val data = image.encodeToData(EncodedImageFormat.JPEG, QUALITY)
             ?: return buildMessageWrapper {
                 appendText("生成图片失败!")
             }
@@ -469,7 +470,7 @@ object ProjectSekaiImageService {
             rightText.paint(this, 60f + rrect.width, 30f + bg.height)
         }
 
-        val data = surface.makeImageSnapshot().encodeToData(EncodedImageFormat.PNG)
+        val data = surface.makeImageSnapshot().encodeToData(EncodedImageFormat.JPEG, QUALITY)
             ?: return Pair(null, "生成谱面失败")
 
         return Pair(data.bytes.asImage(), "")
