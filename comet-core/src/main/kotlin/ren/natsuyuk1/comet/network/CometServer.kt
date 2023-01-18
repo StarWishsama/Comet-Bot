@@ -1,10 +1,13 @@
 package ren.natsuyuk1.comet.network
 
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.ratelimit.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import ren.natsuyuk1.comet.network.server.githubWebHookModule
 import ren.natsuyuk1.comet.network.server.pushTemplateModule
 import ren.natsuyuk1.comet.network.server.remoteConsoleModule
@@ -35,6 +38,14 @@ object CometServer {
 
                             requestKey { call ->
                                 call.request.headers["Authorization"]!!
+                            }
+                        }
+                    }
+
+                    routing {
+                        route("/") {
+                            handle {
+                                call.response.status(HttpStatusCode(418, "I'm a tea pot"))
                             }
                         }
                     }

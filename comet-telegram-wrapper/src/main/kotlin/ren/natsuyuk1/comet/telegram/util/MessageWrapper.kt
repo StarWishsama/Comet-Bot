@@ -28,6 +28,7 @@ import ren.natsuyuk1.comet.utils.file.cacheDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import java.io.File
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 private val logger = mu.KotlinLogging.logger {}
 
@@ -116,7 +117,7 @@ suspend fun TelegramComet.send(
             resp.messageId
         )
     ).also {
-        logger.debug { "Used time ${executeTime.getLastingTimeAsString()}" }
+        logger.debug { "Send message costs ${executeTime.getLastingTimeAsString(TimeUnit.MILLISECONDS)}" }
     }
 }
 
@@ -139,6 +140,7 @@ suspend fun MessageContent.toMessageWrapper(
                     AtElement(userName = it.source)
                 }
             }
+
             is BotCommandTextSource -> Text(it.asText.replace(comet.bot.getMe().username.username, ""))
             else -> Text(it.asText)
         }
@@ -199,14 +201,16 @@ suspend fun MessageContent.toMessageWrapper(
 fun Image.toInputFile(): InputFile? {
     return try {
         when {
-            url?.isNotBlank() == true -> InputFile.fromUrl(url!!)
-            filePath?.isNotBlank() == true -> InputFile.fromFile(File(filePath!!))
+            !url.isNullOrBlank() -> url?.let { InputFile.fromUrl(it) }
+            !filePath.isNullOrBlank() -> filePath?.let { InputFile.fromFile(File(it)) }
             !base64.isNullOrBlank() ->
-                Base64.getMimeDecoder()
-                    .decode(base64!!)
-                    .asMultipartFile(System.currentTimeMillis().toString() + ".png")
+                base64?.let {
+                    Base64.getMimeDecoder()
+                        .decode(it)
+                        .asMultipartFile(System.currentTimeMillis().toString() + ".png")
+                }
 
-            byteArray != null -> byteArray!!.asMultipartFile(System.currentTimeMillis().toString() + ".png")
+            byteArray != null -> byteArray?.let { it.asMultipartFile(System.currentTimeMillis().toString() + ".png") }
 
             else -> null
         }
