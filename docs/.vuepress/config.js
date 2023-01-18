@@ -1,11 +1,9 @@
-const { defaultTheme } = require('vuepress')
-
 module.exports = {
     head: [['link', { rel: 'icon', href: 'favicon.svg' }]],
     title: "彗星 Bot",
     description: "多功能跨 IM 平台机器人",
     base: "/",
-    theme: defaultTheme({
+    themeConfig: {
         repo: 'StarWishsama/Comet-Bot',
         docsDir: 'docs',
         docsBranch: 'main',
@@ -20,5 +18,5 @@ module.exports = {
             { text: "快速上手", link: "/getting-started/" },
             { text: "命令列表", link: "/commands/" },
         ],
-    }),
+    }
 };
