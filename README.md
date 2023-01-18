@@ -49,7 +49,7 @@ Demo/交流群：725656262
 详见 [Issues](https://github.com/StarWishsama/Comet-Bot/issues)
 
 ## 💽 如何使用
-查看 Wiki [开始使用 Comet](https://comet-wiki.natsuyuk1.ren)
+查看 Wiki [开始使用 Comet](https://comet-wiki.natsuyuk1.ren/getting-started/)
 
 ## 📜 协议
 
