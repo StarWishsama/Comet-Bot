@@ -5,15 +5,14 @@ module.exports = {
     base: "/",
     themeConfig: {
         repo: 'StarWishsama/Comet-Bot',
-        docsDir: 'docs',
-        docsBranch: 'main',
         repoLabel: 'GitHub',
+        docsDir: 'docs',
+        docsBranch: 'dev',
         editLinks: true,
         editLinkText: '在 GitHub 上编辑此页',
-        lastUpdatedText: '上次更新',
-        contributorsText: '贡献者',
+        lastUpdated: '上次更新',
         sidebar: 'auto',
-        navbar: [
+        nav: [
             { text: "首页", link: "/" },
             { text: "快速上手", link: "/getting-started/" },
             { text: "命令列表", link: "/commands/" },

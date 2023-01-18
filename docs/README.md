@@ -2,7 +2,8 @@
 home: true
 heroText: Comet Bot
 tagline: 多功能跨 IM 平台机器人
-actionText: 功能列表 →
+actionText: 快速上手 →
+actionText: /getting-started/
 actions:
 - text: 快速上手
   link: /getting-started/
