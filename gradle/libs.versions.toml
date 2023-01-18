@@ -18,7 +18,7 @@ ktlint = "com.pinterest:ktlint:0.48.1"
 rome = "com.rometools:rome:1.18.0"
 okio = "com.squareup.okio:okio:3.3.0"
 hikaricp = "com.zaxxer:HikariCP:5.0.1"
-tgbotapi = "dev.inmo:tgbotapi:5.0.0"
+tgbotapi = "dev.inmo:tgbotapi:5.0.1"
 kotlin-logging-jvm = "io.github.microutils:kotlin-logging-jvm:3.0.4"
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
