@@ -65,3 +65,8 @@ device.json
 .comet_history
 /modules
 /config
+
+## Doc related ##
+/node_modules
+/docs/.vuepress/.cache
+/docs/.vuepress/.temp
