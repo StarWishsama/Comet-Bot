@@ -21,6 +21,7 @@ import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.api.user.at
+import ren.natsuyuk1.comet.objects.config.FeatureConfig
 import ren.natsuyuk1.comet.service.HitokotoManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
@@ -30,14 +31,9 @@ import java.security.SecureRandom
 import java.time.ZoneId
 
 fun CometUser.isSigned(): Boolean {
-    val checkTime = Clock.System.now()
-        .toJavaInstant()
-        .atZone(ZoneId.systemDefault())
-        .withHour(0)
-        .withMinute(0)
-        .withSecond(0)
-        .toInstant()
-        .toKotlinInstant()
+    val checkTime =
+        Clock.System.now().toJavaInstant().atZone(ZoneId.systemDefault()).withHour(0).withMinute(0).withSecond(0)
+            .toInstant().toKotlinInstant()
 
     return checkInDate > checkTime
 }
@@ -68,7 +64,8 @@ object SignInService {
         } else null
 
         val checkInResult = buildString {
-            append("${getCurrentInstantString()}好, ${sender.name}~\n")
+            append("${getCurrentInstantString()}好, ${sender.name}~")
+            appendLine()
 
             val position = getSignInPosition(user)
 
@@ -78,11 +75,11 @@ object SignInService {
                 append("今日第${position + 1}位签到")
             }
 
-            append("\n")
+            appendLine()
 
             if (earnLevel > 0) {
                 append("升级! 现在等级为 ${user.level}")
-                append("\n")
+                appendLine()
             }
 
             if (coinResult.getAllPoint() == 0.0) {
@@ -93,22 +90,23 @@ object SignInService {
                 append("获得了 ${coinResult.basePoint.fixDisplay()} 点硬币")
             }
 
-            append("\n")
+            appendLine()
 
             if (user.checkInTime >= 2) {
                 append("连续签到 ${user.checkInTime} 天")
-                if (coinResult.awardPoint > 0)
-                    append(", 额外获得 ${coinResult.awardPoint.fixDisplay()} 点硬币")
+                if (coinResult.awardPoint > 0) append(", 额外获得 ${coinResult.awardPoint.fixDisplay()} 点硬币")
                 appendLine()
             }
 
             if (coinResult.chancePoint > 0) {
-                append("随机事件: 额外获得了 ${coinResult.chancePoint.fixDisplay()} 点硬币 (*^_^*)\n")
+                append("随机事件: 额外获得了 ${coinResult.chancePoint.fixDisplay()} 点硬币 (*^_^*)")
+                appendLine()
             }
 
-            append("目前硬币 > ${user.coin.fixDisplay()}\n")
+            append("目前硬币 > ${user.coin.fixDisplay()}")
+            appendLine()
 
-            append("今日一言 > ${HitokotoManager.getHitokoto()}\n")
+            append("今日一言 > ${HitokotoManager.getHitokoto()}")
         }
 
         return buildMessageWrapper {
@@ -126,7 +124,9 @@ object SignInService {
     private fun calculate(user: CometUser): Pair<SignInResult, SignInResult> {
         // 计算签到时间
         val currentTime = Clock.System.now()
-        val lastSignInTime = user.checkInDate
+        val lastSignInTime =
+            user.checkInDate.toJavaInstant().atZone(ZoneId.systemDefault()).withHour(0).withMinute(0).withSecond(0)
+                .toInstant().toKotlinInstant()
         val checkDuration = currentTime - lastSignInTime
 
         if (checkDuration.inWholeDays <= 1) {
@@ -144,21 +144,40 @@ object SignInService {
         }
 
         // 使用随机数工具生成基础硬币
-        val coinBase = NumberUtil.round(random.nextDouble(0.0, 3.0), 1, RoundingMode.HALF_DOWN).toDouble()
+        val coinBase = NumberUtil.round(
+            random.nextDouble(
+                FeatureConfig.data.signInSetting.minCoin, FeatureConfig.data.signInSetting.maxCoin
+            ),
+            1, RoundingMode.HALF_DOWN
+        ).toDouble()
 
-        val expBase = NumberUtil.round(random.nextDouble(0.0, 10.0), 1, RoundingMode.HALF_DOWN).toDouble()
+        val expBase = NumberUtil.round(
+            random.nextDouble(
+                FeatureConfig.data.signInSetting.minExp, FeatureConfig.data.signInSetting.maxExp
+            ),
+            1, RoundingMode.HALF_DOWN
+        ).toDouble()
 
-        // 只取小数点后一位，将最大奖励点数限制到 1.5 倍
+        // 最大奖励倍数
         val awardProp = min(
-            1.5,
-            NumberUtil.round((random.nextDouble(0.0, 0.2) * (user.checkInTime - 1)), 1, RoundingMode.HALF_DOWN)
-                .toDouble()
+            FeatureConfig.data.signInSetting.maxAccumulateBonus,
+            NumberUtil.round(
+                (
+                    random.nextDouble(
+                        0.0, FeatureConfig.data.signInSetting.accumulateBonus
+                    ) * (user.checkInTime - FeatureConfig.data.signInSetting.accumulateBonusStart + 1)
+                    ),
+                1,
+                RoundingMode.HALF_DOWN
+            ).toDouble()
         )
 
-        // 连续签到的奖励硬币
-        val awardPoint = awardProp * coinBase
+        val multiplier = if (coinBase <= 0) 1.0 else awardProp
 
-        val awardExp = awardProp * expBase
+        // 连续签到的奖励硬币
+        val awardPoint = multiplier * coinBase
+
+        val awardExp = multiplier * expBase
 
         val chancePoint = getRandomEventCoin()
 
@@ -178,22 +197,10 @@ object SignInService {
         val checkLDT = checkTime.toLocalDateTime(TimeZone.currentSystemDefault())
 
         val before = LocalDateTime(
-            checkLDT.year,
-            checkLDT.monthNumber,
-            checkLDT.dayOfMonth,
-            0,
-            0,
-            0,
-            0
+            checkLDT.year, checkLDT.monthNumber, checkLDT.dayOfMonth, 0, 0, 0, 0
         ).toInstant(TimeZone.currentSystemDefault())
         val after = LocalDateTime(
-            checkLDT.year,
-            checkLDT.monthNumber,
-            checkLDT.dayOfMonth,
-            23,
-            59,
-            59,
-            0
+            checkLDT.year, checkLDT.monthNumber, checkLDT.dayOfMonth, 23, 59, 59, 0
         ).toInstant(TimeZone.currentSystemDefault())
 
         return transaction {
@@ -209,7 +216,7 @@ object SignInService {
         val timeNow = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
         return when (timeNow.hour) {
-            in 6..8 -> "早上"
+            in 5..8 -> "早上"
             in 9..11 -> "上午"
             12 -> "中午"
             in 13..18 -> "下午"
@@ -221,27 +228,28 @@ object SignInService {
     private fun getRandomEventCoin(): Double {
         val randomEvent = random.nextDouble(0.0, 1.0)
 
-        return if (randomEvent in 0.499999..0.500001) {
-            random.nextDouble(50.0, 100.0)
+        return if (randomEvent <= FeatureConfig.data.signInSetting.randomBonusProbability) {
+            random.nextDouble(
+                FeatureConfig.data.signInSetting.randomBonusMin, FeatureConfig.data.signInSetting.randomBonusMax
+            )
         } else {
             0.0
         }
     }
 
-    private fun getTargetExpDifference(currentLevel: Int): Int =
-        when (currentLevel) {
-            in 0..15 -> {
-                2 * currentLevel + 7
-            }
-
-            in 16..30 -> {
-                5 * currentLevel - 38
-            }
-
-            else -> {
-                9 * currentLevel - 158
-            }
+    private fun getTargetExpDifference(currentLevel: Int): Int = when (currentLevel) {
+        in 0..15 -> {
+            2 * currentLevel + 7
         }
+
+        in 16..30 -> {
+            5 * currentLevel - 38
+        }
+
+        else -> {
+            9 * currentLevel - 158
+        }
+    }
 
     internal fun levelUp(currentLevel: Int, earnExp: Long): Int {
         var cacheExp = earnExp
