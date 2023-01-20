@@ -52,7 +52,7 @@ abstract class CometPusher(val name: String, private val defaultConfig: CometPus
     }
 
     open fun init() {
-        job = TaskManager.registerTaskWithCustomDelay({
+        job = TaskManager.registerTask({
             val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             val (start, end) = nightTime
             if (now.hour in start..end) {

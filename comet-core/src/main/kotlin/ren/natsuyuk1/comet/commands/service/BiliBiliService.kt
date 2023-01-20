@@ -42,7 +42,7 @@ object BiliBiliService {
         private val pendingSearchResult: PendingSearchResult
     ) : Session(contact, cometUser) {
         override suspend fun process(message: MessageWrapper) {
-            val index = message.parseToString().toIntOrNull()
+            val index = message.encodeToString().toIntOrNull()
 
             if (index == null) {
                 contact.sendMessage("请输入正确的编号!".toMessageWrapper())

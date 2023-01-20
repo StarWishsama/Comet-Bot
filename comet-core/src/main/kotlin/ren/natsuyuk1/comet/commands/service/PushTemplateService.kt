@@ -34,12 +34,12 @@ class PushTemplateNewSession(
     override suspend fun process(message: MessageWrapper) {
         when (stage) {
             PushTemplateSubscribeStage.TEMPLATE -> {
-                template = message.parseToString()
+                template = message.encodeToString()
                 contact.sendMessage("成功设置模板, 接下来请回复我推送服务器的地址".toMessageWrapper())
             }
 
             PushTemplateSubscribeStage.URL -> {
-                url = message.parseToString()
+                url = message.encodeToString()
                 val token = UUID.randomUUID()
                 PushTemplateConfig.data.templates.add(
                     PushTemplate(

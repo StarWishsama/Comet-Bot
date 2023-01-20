@@ -8,10 +8,7 @@ import ren.natsuyuk1.comet.api.event.events.message.MessageEvent
 import ren.natsuyuk1.comet.api.event.registerListener
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
-import kotlin.reflect.full.createType
-import kotlin.reflect.full.functions
-import kotlin.reflect.full.isSubclassOf
-import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -65,7 +62,11 @@ fun CometListener.register(comet: Comet) {
                         }
 
                         try {
-                            method.call(this@register, subEvent)
+                            if (method.isSuspend) {
+                                method.callSuspend(this@register, subEvent)
+                            } else {
+                                method.call(this@register, subEvent)
+                            }
                         } catch (e: Exception) {
                             logger.warn(e.cause) { "${this@register.name} 在运行时发生了异常" }
                         }

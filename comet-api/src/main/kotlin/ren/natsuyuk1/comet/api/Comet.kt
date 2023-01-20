@@ -71,17 +71,17 @@ abstract class Comet(
 fun Comet.attachMessageProcessor() {
     registerListener<MessageEvent> {
         if (it.comet == this) {
-            // Find session first
-            val sessionProcessed = SessionManager.handleSession(it.subject, it.sender, it.message)
-
-            if (!sessionProcessed) {
-                CommandManager.executeCommand(
-                    comet = this,
-                    sender = it.sender,
-                    subject = it.subject,
-                    wrapper = it.message
-                )
+            // Handle session
+            if (SessionManager.handleSession(it.subject, it.sender, it.message)) {
+                return@registerListener
             }
+
+            CommandManager.executeCommand(
+                comet = this,
+                sender = it.sender,
+                subject = it.subject,
+                wrapper = it.message
+            )
         }
     }
 }

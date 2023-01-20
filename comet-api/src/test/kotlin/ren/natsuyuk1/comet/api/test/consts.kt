@@ -52,7 +52,7 @@ val fakeSender = object : PlatformCommandSender() {
     override val platform: LoginPlatform = LoginPlatform.TEST
 
     override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
-        logger.info { message.parseToString() }
+        logger.info { message.encodeToString() }
         return null
     }
 }

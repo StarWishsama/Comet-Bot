@@ -9,8 +9,10 @@
 
 package ren.natsuyuk1.comet.api.permission
 
+import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.user.UserLevel
 
+@Serializable
 data class CometPermission(
     val nodeName: String,
     val level: UserLevel

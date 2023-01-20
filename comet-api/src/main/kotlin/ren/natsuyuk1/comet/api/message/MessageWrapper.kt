@@ -81,7 +81,7 @@ open class MessageWrapper(
 
     override fun toString(): String = "MessageWrapper {content=$messageContent, usable=$usable}"
 
-    fun parseToString(): String = buildString {
+    fun encodeToString(): String = buildString {
         messageContent.forEach {
             append(it.parseToString())
         }

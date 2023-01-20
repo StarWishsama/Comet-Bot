@@ -56,7 +56,7 @@ interface ITaskManager {
         task: suspend () -> Unit
     ): Job
 
-    fun registerTaskWithCustomDelay(
+    fun registerTask(
         delay: suspend () -> Unit,
         task: suspend () -> Unit
     ): Job
@@ -148,7 +148,7 @@ object TaskManager : ITaskManager {
         }
     }
 
-    override fun registerTaskWithCustomDelay(
+    override fun registerTask(
         delay: suspend () -> Unit,
         task: suspend () -> Unit
     ): Job =

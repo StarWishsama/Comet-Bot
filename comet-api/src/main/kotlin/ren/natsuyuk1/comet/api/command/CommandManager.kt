@@ -100,7 +100,8 @@ object CommandManager {
         comet: Comet,
         sender: CommandSender,
         subject: CommandSender,
-        wrapper: MessageWrapper
+        wrapper: MessageWrapper,
+        tempPermission: Pair<UserLevel, String>? = null
     ): Job = commandScope.launch {
         val executeTime = Clock.System.now()
 
@@ -108,7 +109,7 @@ object CommandManager {
             return@launch
         }
 
-        val args = wrapper.parseToString().parseToArgs()
+        val args = wrapper.encodeToString().parseToArgs()
 
         if (args.isEmpty()) {
             return@launch
@@ -141,7 +142,11 @@ object CommandManager {
             if (sender is PlatformCommandSender) {
                 user = CometUser.getUserOrCreate(sender.id, sender.platform)
 
-                if (user.userLevel != UserLevel.OWNER) {
+                val userLevel = tempPermission?.first ?: user.userLevel
+                val hasPermission = user.hasPermission(property.permission) ||
+                    tempPermission?.second?.let { it >= property.permission } ?: false
+
+                if (userLevel != UserLevel.OWNER) {
                     when (property.executeConsumeType) {
                         CommandConsumeType.COOLDOWN -> {
                             if (user.platform.needRestrict) {
@@ -169,7 +174,7 @@ object CommandManager {
                 runningCommands.getOrPut(user.id.value) { mutableSetOf(property) }
                     .add(property)
 
-                if (!user.hasPermission(property.permission) || !property.extraPermissionChecker(user, sender)) {
+                if (!hasPermission || !property.extraPermissionChecker(user, sender)) {
                     subject.sendMessage(buildMessageWrapper { appendText("你没有权限执行这条命令!") })
                     return@runCatching CommandStatus.NoPermission()
                 }

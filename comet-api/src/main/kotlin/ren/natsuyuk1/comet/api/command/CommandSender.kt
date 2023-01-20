@@ -67,7 +67,7 @@ abstract class PlatformCommandSender : CommandSender {
  */
 object ConsoleCommandSender : CommandSender {
     override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
-        println(message.parseToString())
+        println(message.encodeToString())
         return null
     }
 

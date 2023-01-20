@@ -22,7 +22,7 @@ object KeywordListener : CometListener {
         if (user.hasCoolDown(triggerTime)) return
 
         val keywords = KeyWordData.find(event.subject.id, event.subject.platform) ?: return
-        val message = event.message.parseToString()
+        val message = event.message.encodeToString()
 
         keywords.words.forEach { kw ->
             val validate = if (kw.isRegex) {

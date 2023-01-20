@@ -100,7 +100,7 @@ class KeyWordCommand(
                         appendText(
                             buildString {
                                 keywords.words.forEach {
-                                    append("${it.pattern} => ${it.reply.parseToString().limit(20)}")
+                                    append("${it.pattern} => ${it.reply.encodeToString().limit(20)}")
                                     appendLine()
                                 }
                             }.trim()

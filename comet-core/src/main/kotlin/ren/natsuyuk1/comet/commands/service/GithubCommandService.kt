@@ -28,7 +28,7 @@ object GithubCommandService {
         val groupID: Long
     ) : Session(contact, user) {
         override suspend fun process(message: MessageWrapper) {
-            val raw = message.parseToString()
+            val raw = message.encodeToString()
             val secret = if (raw == "完成订阅") {
                 ""
             } else {

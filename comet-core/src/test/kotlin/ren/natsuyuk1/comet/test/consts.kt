@@ -58,7 +58,7 @@ fun generateFakeSender(id: Long): User = object : User() {
         get() = LoginPlatform.TEST
 
     override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
-        logger.debug { "Message sent to user $id: ${message.parseToString()}" }
+        logger.debug { "Message sent to user $id: ${message.encodeToString()}" }
         return null
     }
 }
@@ -98,7 +98,7 @@ fun generateFakeGroup(id: Long): Group = object : Group(id, "TestGroup") {
     override val platform: LoginPlatform = LoginPlatform.TEST
 
     override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
-        logger.debug { "Message sent to group $id: ${message.parseToString()}" }
+        logger.debug { "Message sent to group $id: ${message.encodeToString()}" }
         return null
     }
 }
