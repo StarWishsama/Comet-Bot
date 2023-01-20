@@ -20,7 +20,7 @@ val ARCAEA by lazy {
         /arc bind -i [账号 ID] - 绑定账号
         /arc info (账号 ID) 查询绑定账号用户信息
         """.trimIndent(),
-        executeConsumePoint = 30
+        executeConsumePoint = 15
     )
 }
 
@@ -33,15 +33,17 @@ class ArcaeaCommand(
 ) : CometCommand(comet, sender, subject, message, user, ARCAEA) {
 
     init {
-        subcommands(
-            Bind(subject, sender, user),
-            Info(comet, subject, sender, user),
-            Best30(comet, subject, sender, user)
-        )
+        if (FeatureConfig.data.arcaeaSetting.enable) {
+            subcommands(
+                Bind(subject, sender, user),
+                Info(comet, subject, sender, user),
+                Best30(comet, subject, sender, user)
+            )
+        }
     }
 
     override suspend fun run() {
-        if (!FeatureConfig.data.arcaea) {
+        if (!FeatureConfig.data.arcaeaSetting.enable) {
             subject.sendMessage("抱歉, Arcaea 功能未被启用.".toMessageWrapper())
             return
         }
@@ -76,11 +78,6 @@ class ArcaeaCommand(
         )
 
         override suspend fun run() {
-            if (!FeatureConfig.data.arcaea) {
-                subject.sendMessage("抱歉, Arcaea 功能未被启用.".toMessageWrapper())
-                return
-            }
-
             if (userID == null || userID!!.length > 9) {
                 subject.sendMessage("请正确填写你的 Arcaea 账号 ID! 例如 /arc bind -i 123456789".toMessageWrapper())
                 return
@@ -112,11 +109,6 @@ class ArcaeaCommand(
         }
 
         override suspend fun run() {
-            if (!FeatureConfig.data.arcaea) {
-                subject.sendMessage("抱歉, Arcaea 功能未被启用.".toMessageWrapper())
-                return
-            }
-
             if (userID == null) {
                 subject.sendMessage("🔍 正在获取 Arcaea 信息, 请坐和放宽...".toMessageWrapper())
                 ArcaeaService.queryUserInfo(comet, subject, user)
@@ -148,11 +140,6 @@ class ArcaeaCommand(
         }
 
         override suspend fun run() {
-            if (!FeatureConfig.data.arcaea) {
-                subject.sendMessage("抱歉, Arcaea 功能未被启用.".toMessageWrapper())
-                return
-            }
-
             ArcaeaService.queryB38(comet, subject, sender, user)
         }
     }

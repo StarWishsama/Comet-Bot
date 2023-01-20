@@ -46,7 +46,7 @@ class ProjectSekaiCommand(
 ) : CometCommand(comet, sender, subject, message, user, PROJECTSEKAI) {
 
     init {
-        if (FeatureConfig.data.projectSekai) {
+        if (FeatureConfig.data.projectSekaiSetting.enable) {
             subcommands(
                 Bind(subject, sender, user),
                 Event(subject, sender, user),
@@ -60,7 +60,7 @@ class ProjectSekaiCommand(
     }
 
     override suspend fun run() {
-        if (!FeatureConfig.data.projectSekai) {
+        if (!FeatureConfig.data.projectSekaiSetting.enable) {
             subject.sendMessage("抱歉, Project Sekai 功能未被启用.".toMessageWrapper())
             return
         }
@@ -119,11 +119,6 @@ class ProjectSekaiCommand(
         }
 
         override suspend fun run() {
-            if (!FeatureConfig.data.projectSekai) {
-                subject.sendMessage("抱歉, Project Sekai 功能未被启用.".toMessageWrapper())
-                return
-            }
-
             subject.sendMessage(ProjectSekaiService.queryUserInfo(user))
         }
     }
@@ -218,7 +213,9 @@ class ProjectSekaiCommand(
                 }
             }
 
-            val pair = ProjectSekaiMusic.fuzzyGetMusicInfo(musicName)
+            val pair = ProjectSekaiMusic.fuzzyGetMusicInfo(
+                musicName, FeatureConfig.data.projectSekaiSetting.minSimilarity
+            )
 
             if (pair == null) {
                 subject.sendMessage("找不到你想要搜索的歌曲哦".toMessageWrapper())
@@ -271,7 +268,9 @@ class ProjectSekaiCommand(
         private val musicName by argument("歌曲名称")
 
         override suspend fun run() {
-            val info = ProjectSekaiMusic.fuzzyGetMusicInfo(musicName)
+            val info = ProjectSekaiMusic.fuzzyGetMusicInfo(
+                musicName, FeatureConfig.data.projectSekaiSetting.minSimilarity
+            )
 
             subject.sendMessage(info?.first?.toMessageWrapper() ?: "找不到你想要搜索的歌曲哦".toMessageWrapper())
         }

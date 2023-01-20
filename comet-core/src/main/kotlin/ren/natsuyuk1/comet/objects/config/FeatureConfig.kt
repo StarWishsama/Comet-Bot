@@ -16,16 +16,35 @@ object FeatureConfig : PersistDataFile<FeatureConfig.Data>(
 ) {
     @Serializable
     data class Data(
-        @Comment("是否启用 Arcaea 相关功能\n启用后, 会自动下载并加载相关数据文件")
-        val arcaea: Boolean = false,
-        @Comment("是否启用 Project Sekai 相关功能\n启用后, 会自动下载并加载相关数据文件")
-        val projectSekai: Boolean = false,
+        @Comment("Arcaea 相关设置")
+        val arcaeaSetting: ArcaeaSetting = ArcaeaSetting(),
+        @Comment("Project Sekai 相关设置")
+        val projectSekaiSetting: ProjectSekaiSetting = ProjectSekaiSetting(),
         @Comment("签到相关设置")
-        val signInSetting: SignInCustom = SignInCustom()
+        val signInSetting: SignInSetting = SignInSetting()
     )
 
     @Serializable
-    data class SignInCustom(
+    data class ArcaeaSetting(
+        @Comment(
+            "是否启用 Arcaea 相关功能\n" +
+                "启用后, 在下次启动时会自动下载并加载相关数据文件"
+        )
+        val enable: Boolean = false,
+    )
+
+    @Serializable
+    data class ProjectSekaiSetting(
+        @Comment(
+            "是否启用 Project Sekai 相关功能\n" +
+                "启用后, 在下次启动时会自动下载并加载相关数据文件"
+        )
+        val enable: Boolean = false,
+        val minSimilarity: Double = 0.35
+    )
+
+    @Serializable
+    data class SignInSetting(
         @Comment("最低可获取金币, 甚至可以为负")
         val minCoin: Double = 0.0,
         @Comment("最高可获取金币")
