@@ -27,6 +27,7 @@ sealed class CommandStatus(val name: String, private val pass: Boolean) {
     class NotACommand : CommandStatus("非命令", false)
     class CometIsClose : CommandStatus("Comet 已关闭", false)
     class ValidateFailed : CommandStatus("冷却/无硬币", true)
+    class Running : CommandStatus("相同命令运行中", false)
 
     fun isPassed(): Boolean = this.pass
 }

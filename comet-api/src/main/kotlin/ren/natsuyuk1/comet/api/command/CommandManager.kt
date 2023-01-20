@@ -30,6 +30,7 @@ import ren.natsuyuk1.comet.utils.datetime.getLastingTimeAsString
 import ren.natsuyuk1.comet.utils.string.StringUtil.containsEtc
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import ren.natsuyuk1.comet.utils.string.StringUtil.replaceAllToBlank
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
@@ -45,6 +46,7 @@ fun CometUser.hasCoolDown(triggerTime: Instant, coolDown: Duration = CometGlobal
 
 object CommandManager {
     private val commands: MutableMap<String, AbstractCommandNode<*>> = ConcurrentHashMap()
+    private val runningCommands: MutableMap<UUID, MutableSet<CommandProperty>> = ConcurrentHashMap()
 
     private var commandScope = ModuleScope("CommandManager")
 
@@ -142,7 +144,7 @@ object CommandManager {
                 if (user.userLevel != UserLevel.OWNER) {
                     when (property.executeConsumeType) {
                         CommandConsumeType.COOLDOWN -> {
-                            if (user.platform.needRestrict || property.executeConsumePoint == CometGlobalConfig.data.commandCoolDown) { // ktlint-disable max-line-length
+                            if (user.platform.needRestrict) {
                                 if (user.hasCoolDown(executeTime, property.executeConsumePoint.seconds)) {
                                     return@runCatching CommandStatus.ValidateFailed()
                                 }
@@ -158,6 +160,14 @@ object CommandManager {
                         }
                     }
                 }
+
+                if (runningCommands[user.id.value]?.contains(property) == true) {
+                    subject.sendMessage(buildMessageWrapper { appendText("上一条相同命令还在执行中哦") })
+                    return@runCatching CommandStatus.Running()
+                }
+
+                runningCommands.getOrPut(user.id.value) { mutableSetOf(property) }
+                    .add(property)
 
                 if (!user.hasPermission(property.permission) || !property.extraPermissionChecker(user, sender)) {
                     subject.sendMessage(buildMessageWrapper { appendText("你没有权限执行这条命令!") })
@@ -223,6 +233,14 @@ object CommandManager {
             }
 
             logger.warn(it) { "在尝试执行命令 ${command.property.name} 时出现异常" }
+        }
+
+        runningCommands[user.id.value]?.apply {
+            removeIf { it == property }
+
+            if (isEmpty()) {
+                runningCommands.remove(user.id.value)
+            }
         }
     }
 
