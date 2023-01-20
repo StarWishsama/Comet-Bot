@@ -53,12 +53,20 @@ data class ApexPlayerInfo(
 }
 
 fun ApexPlayerInfo.toMessageWrapper(): MessageWrapper = buildMessageWrapper {
-    appendTextln("${global.name} | ${global.level}")
+    appendElement(global.avatar.asURLImage())
     appendLine()
+    appendTextln("${global.name} | ${global.level} 级")
+    appendLine()
+
+    if (global.battlePass.level > 0) {
+        appendTextln("通行证等级 >> ${global.battlePass.level}")
+    }
 
     if (global.rank.rankName != "Unranked") {
         appendTextln("本赛季段位 >> ${global.rank.rankName} ${global.rank.rankDiv}")
         appendElement(global.rank.rankImg.asURLImage())
+    } else {
+        appendText("未定级")
     }
 }
 

@@ -32,11 +32,12 @@ object PictureSearchConfigTable : Table("picture_search_config") {
         }
     }
 
-    suspend fun getPlatform(uuid: UUID): PictureSearchSource? = withContext(Dispatchers.IO) {
-        select {
-            id eq uuid
-        }.map {
-            it[searchPlatform]
-        }.firstOrNull()
-    }
+    suspend fun getPlatform(uuid: UUID): PictureSearchSource? =
+        withContext(Dispatchers.IO) {
+            select {
+                id eq uuid
+            }.map {
+                it[searchPlatform]
+            }.firstOrNull()
+        }
 }

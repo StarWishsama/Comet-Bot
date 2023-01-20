@@ -28,10 +28,11 @@ object PictureSearchService {
         PictureSearchQuerySession(
             subject,
             user,
-            newSuspendedTransaction { PictureSearchConfigTable.getPlatform(user.id.value) }!!
+            newSuspendedTransaction { PictureSearchConfigTable.getPlatform(user.id.value) }
+                ?: PictureSearchSource.SAUCENAO
         ).registerTimeout(30.seconds)
 
-        subject.sendMessage("⏳ 接下来, 请发送你要搜索的图片".toMessageWrapper())
+        subject.sendMessage("⏳ 接下来, 请在 30s 内发送你要搜索的图片".toMessageWrapper())
     }
 
     suspend fun searchImage(platform: LoginPlatform, image: Image, source: PictureSearchSource): MessageWrapper =
