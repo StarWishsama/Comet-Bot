@@ -16,7 +16,7 @@ private val logger = KotlinLogging.logger {}
 
 object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
     pjskFolder.resolve("musicDifficulties.json"),
-    3.days
+    1.days
 ) {
     internal val musicDiffDatabase = mutableListOf<PJSKMusicDifficultyInfo>()
 

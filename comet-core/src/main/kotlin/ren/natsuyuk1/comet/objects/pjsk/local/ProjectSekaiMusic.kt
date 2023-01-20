@@ -53,7 +53,7 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
     override suspend fun update(): Boolean {
         file.touch()
 
-        if (file.length() == 0L || isOutdated()) {
+        if (file.isBlank() || isOutdated()) {
             if (cometClient.client.downloadFile(url, file)) {
                 updateLastUpdateTime()
                 logger.info { "成功更新音乐数据" }
