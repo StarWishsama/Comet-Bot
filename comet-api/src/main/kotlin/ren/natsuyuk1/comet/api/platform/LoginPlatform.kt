@@ -15,6 +15,11 @@ enum class LoginPlatform(val needRestrict: Boolean = false) {
     TELEGRAM,
 
     /**
+     * Represent to `comet-kook-wrapper`
+     */
+    KOOK(true),
+
+    /**
      * Represent to unit test
      */
     TEST
