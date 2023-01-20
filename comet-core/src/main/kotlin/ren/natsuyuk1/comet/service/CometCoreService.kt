@@ -49,14 +49,14 @@ object CometCoreService {
 
         scope.launch {
             try {
-                if (FeatureConfig.data.arcaea) {
+                if (FeatureConfig.data.arcaeaSetting.enable) {
                     ArcaeaHelper.load()
                 }
             } catch (e: GeneralSecurityException) {
                 logger.warn(e) { "无法加载 Arcaea 数据: 目标主机证书有误" }
             }
 
-            if (FeatureConfig.data.projectSekai) {
+            if (FeatureConfig.data.projectSekaiSetting.enable) {
                 ProjectSekaiManager.init(scope.coroutineContext)
             }
         }
