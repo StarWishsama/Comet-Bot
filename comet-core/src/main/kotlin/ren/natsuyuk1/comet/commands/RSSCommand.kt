@@ -24,7 +24,7 @@ val RSS = CommandProperty(
 )
 
 private val URL_REGEX = "^(http|https)://([\\w-]+\\.)+[\\w-]+(/[\\w-./?%&=]*)?\$".toRegex()
-private val URL_PREFIX_REGEX = "^(http|https)$"
+private val URL_PREFIX_REGEX = "^(http|https)$".toRegex()
 
 class RSSCommand(
     comet: Comet,

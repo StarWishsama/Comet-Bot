@@ -53,8 +53,6 @@ data class ApexPlayerInfo(
 }
 
 fun ApexPlayerInfo.toMessageWrapper(): MessageWrapper = buildMessageWrapper {
-    appendElement(global.avatar.asURLImage())
-    appendLine()
     appendTextln("${global.name} | ${global.level} 级")
     appendLine()
 

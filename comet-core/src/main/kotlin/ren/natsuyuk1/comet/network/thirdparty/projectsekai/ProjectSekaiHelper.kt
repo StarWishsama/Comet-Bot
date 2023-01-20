@@ -194,6 +194,10 @@ internal suspend fun PJSKMusicInfo.toMessageWrapper() =
             return@buildMessageWrapper
         }
 
+        if (musicInfo.publishedAt.toInstant(true) > Clock.System.now()) {
+            appendTextln("⚠ 该内容为未公开剧透内容")
+        }
+
         appendElement(ProjectSekaiMusic.getMusicCover(musicInfo).asImage())
         appendLine()
         appendTextln(musicInfo.title)
