@@ -14,7 +14,7 @@ internal val cometScope = ModuleScope("comet_global_scope")
 /**
  * [IComet]
  *
- * 一个 [Comet] 扩展方法，包括常用的获取用户等。
+ * 一个 [Comet] 扩展方法，提供一些 Bot 端的功能。
  */
 interface IComet {
     /**
