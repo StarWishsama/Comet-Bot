@@ -3,7 +3,6 @@ package ren.natsuyuk1.comet.commands
 import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.arguments.default
-import moe.sdl.yac.parameters.options.default
 import moe.sdl.yac.parameters.options.option
 import moe.sdl.yac.parameters.types.int
 import moe.sdl.yac.parameters.types.long
@@ -92,15 +91,15 @@ class ProjectSekaiCommand(
             "-i",
             "--id",
             help = "要绑定的世界计划账号 ID"
-        ).long().default(-1)
+        ).long()
 
         override suspend fun run() {
-            if (userID == -1L || userID.toString().length != 18) {
+            if (userID == null || userID?.toString()?.length != 18) {
                 subject.sendMessage("请正确填写你的世界计划账号 ID! 例如 /pjsk bind -i 210043933010767872".toMessageWrapper())
                 return
             }
 
-            subject.sendMessage(ProjectSekaiService.bindAccount(user, userID))
+            subject.sendMessage(ProjectSekaiService.bindAccount(user, userID!!))
         }
     }
 
@@ -118,8 +117,21 @@ class ProjectSekaiCommand(
             )
         }
 
+        private val id by argument("用户ID").long().default(-1L)
+
         override suspend fun run() {
-            subject.sendMessage(ProjectSekaiService.queryUserInfo(user))
+            if (id == -1L) {
+                val userData = ProjectSekaiUserData.getUserPJSKData(user.id.value)
+
+                if (userData == null) {
+                    subject.sendMessage("你还没有绑定过世界计划账号, 使用 /pjsk bind -i [你的ID] 绑定".toMessageWrapper())
+                    return
+                }
+
+                subject.sendMessage(ProjectSekaiService.queryUserInfo(userData.userID))
+            } else {
+                subject.sendMessage(ProjectSekaiService.queryUserInfo(id))
+            }
         }
     }
 
