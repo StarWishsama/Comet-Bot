@@ -127,6 +127,7 @@ object CommandManager {
 
         val command = getCommand(cmdName, sender) ?: return@launch
 
+        // Debug command always avaliable
         if (comet.maintainenceMode && command.property.name != "debug") {
             return@launch
         }
@@ -143,8 +144,11 @@ object CommandManager {
                 user = CometUser.getUserOrCreate(sender.id, sender.platform)
 
                 val userLevel = tempPermission?.first ?: user.userLevel
-                val hasPermission = user.hasPermission(property.permission) ||
-                    tempPermission?.second?.let { it >= property.permission } ?: false
+                val hasPermission =
+                    user.hasPermission(property.permission) ||
+                        tempPermission?.second?.let {
+                            it >= property.permission
+                        } ?: false
 
                 if (userLevel != UserLevel.OWNER) {
                     when (property.executeConsumeType) {
@@ -171,8 +175,7 @@ object CommandManager {
                     return@runCatching CommandStatus.Running()
                 }
 
-                runningCommands.getOrPut(user.id.value) { mutableSetOf(property) }
-                    .add(property)
+                runningCommands.getOrPut(user.id.value) { mutableSetOf(property) }.add(property)
 
                 if (!hasPermission || !property.extraPermissionChecker(user, sender)) {
                     subject.sendMessage(buildMessageWrapper { appendText("你没有权限执行这条命令!") })

@@ -6,6 +6,7 @@ import ren.natsuyuk1.comet.api.event.CometEvent
 import ren.natsuyuk1.comet.api.event.Event
 import ren.natsuyuk1.comet.api.event.events.message.MessageEvent
 import ren.natsuyuk1.comet.api.event.registerListener
+import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.*
@@ -56,7 +57,7 @@ fun CometListener.register(comet: Comet) {
                             return@registerListener
                         }
 
-                        // Don't handle self message to avoid ban
+                        // Don't handle message event from bot itself
                         if (subEvent is MessageEvent && subEvent.sender.id == comet.id) {
                             return@registerListener
                         }
@@ -67,8 +68,10 @@ fun CometListener.register(comet: Comet) {
                             } else {
                                 method.call(this@register, subEvent)
                             }
-                        } catch (e: Exception) {
+                        } catch (e: InvocationTargetException) {
                             logger.warn(e.cause) { "${this@register.name} 在运行时发生了异常" }
+                        } catch (e: Throwable) {
+                            logger.warn(e) { "${this@register.name} 在运行时发生了异常" }
                         }
                     }
                 }

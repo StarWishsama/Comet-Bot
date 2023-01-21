@@ -66,3 +66,11 @@ dependencies {
     implementation(libs.hutool.cron)
     implementation(libs.hutool.crypto)
 }
+
+tasks.withType(AbstractTestTask::class.java).configureEach {
+    testLogging {
+        showExceptions = true
+        showStackTraces = true
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+}

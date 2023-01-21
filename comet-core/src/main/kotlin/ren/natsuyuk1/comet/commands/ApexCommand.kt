@@ -96,7 +96,7 @@ class ApexCommand(
                 subject.sendMessage("🔍 正在获取你的 Apex 玩家信息, 请坐和放宽...".toMessageWrapper())
                 subject.sendMessage(ApexService.queryUserInfo(user))
             } else {
-                subject.sendMessage("🔍 正在获取 Arcaea 信息, 请坐和放宽...".toMessageWrapper())
+                subject.sendMessage("🔍 正在获取 Apex 信息, 请坐和放宽...".toMessageWrapper())
                 subject.sendMessage(ApexService.queryUserInfo(user, username!!))
             }
         }
