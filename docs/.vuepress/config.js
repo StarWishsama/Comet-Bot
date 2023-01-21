@@ -11,7 +11,16 @@ module.exports = {
         editLinks: true,
         editLinkText: '在 GitHub 上编辑此页',
         lastUpdated: '上次更新',
-        sidebar: 'auto',
+        sidebar: {
+            '/commands/': [
+                '',
+                'project-sekai',
+                'sign-in'
+            ],
+            '/': {
+                sidebar: 'auto'
+            }
+        },
         nav: [
             { text: "首页", link: "/" },
             { text: "快速上手", link: "/getting-started/" },
