@@ -16,6 +16,8 @@ inline fun buildMessageWrapper(receipt: MessageReceipt? = null, builder: Message
     return MessageWrapper(receipt).apply(builder)
 }
 
+fun Collection<WrapperElement>.toMessageWrapper(): MessageWrapper = MessageWrapper().appendElements(this)
+
 /**
  * 代表一个空的 [MessageWrapper]
  */
@@ -26,7 +28,7 @@ open class MessageWrapper(
     @Transient
     val receipt: MessageReceipt? = null
 ) {
-    private val messageContent = mutableSetOf<WrapperElement>()
+    private val messageContent = mutableListOf<WrapperElement>()
 
     @Transient
     private lateinit var lastInsertElement: WrapperElement
@@ -87,7 +89,7 @@ open class MessageWrapper(
         }
     }
 
-    fun getMessageContent(): Set<WrapperElement> = Collections.unmodifiableSet(messageContent)
+    fun getMessageContent(): List<WrapperElement> = Collections.unmodifiableList(messageContent)
 
     fun compare(other: MessageWrapper) = getMessageContent() == other.getMessageContent()
 

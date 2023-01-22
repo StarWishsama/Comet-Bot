@@ -6,7 +6,8 @@ import ren.natsuyuk1.comet.api.command.CommandManager
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
 import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.message.buildMessageWrapper
+import ren.natsuyuk1.comet.api.message.Text
+import ren.natsuyuk1.comet.api.message.toMessageWrapper
 import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.utils.file.configDirectory
 import java.io.File
@@ -16,7 +17,6 @@ object AliasCommandHandler {
      * 处理命令别名
      *
      * @param message 传入消息
-     *
      */
     suspend fun handle(
         comet: Comet,
@@ -26,15 +26,26 @@ object AliasCommandHandler {
     ) {
         val content = message.encodeToString()
 
-        val altar = AliasConfig.data.alias[content] ?: return
+        val altarKey = AliasConfig.data.alias.keys.find {
+            content.startsWith(it)
+        } ?: return
+
+        val altar = AliasConfig.data.alias[altarKey] ?: return
+
+        val processIndex = message.getMessageContent().indexOfFirst {
+            it is Text && it.text.startsWith(altarKey)
+        }
+
+        val convert = message.getMessageContent().toMutableList()
+        (convert[processIndex] as? Text)?.apply {
+            convert[processIndex] = Text(text.replace(altarKey, altar.cmd))
+        }
 
         CommandManager.executeCommand(
             comet,
             sender,
             subject,
-            buildMessageWrapper {
-                appendText(altar.cmd)
-            },
+            convert.toMessageWrapper(),
             Pair(altar.userLevel, altar.permission)
         )
     }
