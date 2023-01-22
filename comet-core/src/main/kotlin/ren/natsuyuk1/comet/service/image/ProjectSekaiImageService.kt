@@ -193,11 +193,11 @@ object ProjectSekaiImageService {
                     val rankDiff = userData.lastQueryPosition - profile.rank
 
                     if (scoreDiff != 0L) {
-                        addText("↑ $scoreDiff 分 ")
+                        addTextln("↑ $scoreDiff 分 ")
                     }
 
                     if (rankDiff != 0) {
-                        addText(
+                        addTextln(
                             (if (profile.rank < userData.lastQueryPosition) "↑ 上升" else " ↓ 下降") +
                                 " ${rankDiff.absoluteValue} 名"
                         )
@@ -247,7 +247,7 @@ object ProjectSekaiImageService {
                 WIDTH,
                 (
                     AVATAR_SIZE +
-                        DEFAULT_PADDING +
+                        DEFAULT_PADDING * 1.5 +
                         eventInfoText.height +
                         eventScoreText.height +
                         (eventTeamText?.height ?: 0f)
