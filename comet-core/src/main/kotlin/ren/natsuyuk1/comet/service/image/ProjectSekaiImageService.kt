@@ -32,7 +32,7 @@ import kotlin.math.absoluteValue
 object ProjectSekaiImageService {
     private const val WIDTH = 550
     private const val DEFAULT_PADDING = 20
-    private const val AVATAR_SIZE = 72
+    private const val AVATAR_SIZE = 100
     private val BETTER_GRAY_RGB: Int by lazy { Color(220, 220, 220).rgb }
     private val QUALITY = 90
 
@@ -125,18 +125,18 @@ object ProjectSekaiImageService {
         val userInfoText = ParagraphBuilder(
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 21f)
             },
             FontUtil.fonts
         ).apply {
             addTextln(profile.name)
-            addText("ID ${profile.userId}")
+            addText("ID: ${profile.userId}")
         }.build().layout(WIDTH.toFloat())
 
         val eventInfoText = ParagraphBuilder(
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 18f)
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
             },
             FontUtil.fonts
         ).apply {
@@ -160,27 +160,27 @@ object ProjectSekaiImageService {
             }
         }.build().layout(WIDTH.toFloat())
 
-        val eventTeamText = ParagraphBuilder(
-            ParagraphStyle().apply {
-                alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 18f)
-            },
-            FontUtil.fonts
-        ).apply {
-            if (profile.userCheerfulCarnival.cheerfulCarnivalTeamId != null) {
+        val eventTeamText = if (profile.userCheerfulCarnival.cheerfulCarnivalTeamId != null) {
+            ParagraphBuilder(
+                ParagraphStyle().apply {
+                    alignment = Alignment.LEFT
+                    textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
+                },
+                FontUtil.fonts
+            ).apply {
                 val teamName =
                     ProjectSekaiI18N.getCarnivalTeamName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
 
                 if (teamName != null) {
                     addTextln("当前队伍为 $teamName")
                 }
-            }
-        }.build().layout(WIDTH.toFloat())
+            }.build().layout(WIDTH.toFloat())
+        } else null
 
         val eventScoreText = ParagraphBuilder(
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 18f)
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
             },
             FontUtil.fonts
         ).apply {
@@ -240,7 +240,7 @@ object ProjectSekaiImageService {
 
             addTextln()
 
-            addTextln("数据来自 PJSK Profile | Unibot API")
+            addTextln("数据来自 Unibot API / PJSK Profile")
             addText("Render by Comet")
         }.build().layout(WIDTH.toFloat())
 
@@ -249,10 +249,9 @@ object ProjectSekaiImageService {
                 WIDTH,
                 (
                     AVATAR_SIZE +
-                        DEFAULT_PADDING * 2 +
                         eventInfoText.height +
                         eventScoreText.height +
-                        eventTeamText.height
+                        (eventTeamText?.height ?: 0f)
                     ).toInt()
             )
 
@@ -296,7 +295,8 @@ object ProjectSekaiImageService {
             var extraY = 0f
 
             if (eventInfo.eventType == "cheerful_carnival" &&
-                profile.userCheerfulCarnival.cheerfulCarnivalTeamId != null
+                profile.userCheerfulCarnival.cheerfulCarnivalTeamId != null &&
+                eventTeamText != null
             ) {
                 val teamNum = if (profile.userCheerfulCarnival.cheerfulCarnivalTeamId % 2 == 0) 2 else 1
                 val teamIcon =
