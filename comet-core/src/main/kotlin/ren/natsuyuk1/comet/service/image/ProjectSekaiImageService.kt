@@ -125,7 +125,7 @@ object ProjectSekaiImageService {
         val userInfoText = ParagraphBuilder(
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 21f)
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
             },
             FontUtil.fonts
         ).apply {
@@ -136,7 +136,7 @@ object ProjectSekaiImageService {
         val eventInfoText = ParagraphBuilder(
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 18f)
             },
             FontUtil.fonts
         ).apply {
@@ -164,7 +164,7 @@ object ProjectSekaiImageService {
             ParagraphBuilder(
                 ParagraphStyle().apply {
                     alignment = Alignment.LEFT
-                    textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
+                    textStyle = FontUtil.defaultFontStyle(Color.BLACK, 18f)
                 },
                 FontUtil.fonts
             ).apply {
@@ -180,7 +180,7 @@ object ProjectSekaiImageService {
         val eventScoreText = ParagraphBuilder(
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 18f)
             },
             FontUtil.fonts
         ).apply {
@@ -209,8 +209,6 @@ object ProjectSekaiImageService {
                 // Refresh user pjsk score and rank
                 userData.updateInfo(profile.score, profile.rank)
             }
-
-            addTextln()
 
             if (ahead != 0) {
                 val aheadEventStatus = cometClient.getSpecificRankInfo(eventId, ahead)
@@ -249,6 +247,7 @@ object ProjectSekaiImageService {
                 WIDTH,
                 (
                     AVATAR_SIZE +
+                        DEFAULT_PADDING +
                         eventInfoText.height +
                         eventScoreText.height +
                         (eventTeamText?.height ?: 0f)
