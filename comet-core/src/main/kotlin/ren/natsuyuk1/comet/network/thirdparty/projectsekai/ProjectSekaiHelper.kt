@@ -27,12 +27,12 @@ import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.datetime.format
 import ren.natsuyuk1.comet.utils.datetime.toFriendly
-import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
 import ren.natsuyuk1.comet.utils.time.yyMMddWithTimeZonePattern
 import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
+import kotlin.time.Duration.Companion.seconds
 
 private val rankPosition =
     listOf(
@@ -205,15 +205,14 @@ internal suspend fun PJSKMusicInfo.toMessageWrapper() =
         appendTextln("作词 ${musicInfo.lyricist}")
         appendTextln("作曲 ${musicInfo.composer}")
         appendTextln("编曲 ${musicInfo.arranger}")
-        appendTextln("时长 ${musicInfo.duration.fixDisplay(1)} 秒")
+        appendTextln("时长 ${musicInfo.duration.seconds.toFriendly()}")
         appendTextln("上线时间 ${musicInfo.publishedAt.toInstant(true).format(yyMMddWithTimeZonePattern)}")
         appendLine()
 
         appendTextln("难度信息 >")
         diff.forEach {
             appendTextln(
-                "${it.musicDifficulty}[${it.playLevel}|" +
-                    "${(it.playLevel + it.playLevelAdjust).fixDisplay(1)}] | ${it.totalNoteCount}"
+                "${it.musicDifficulty}[${it.playLevel}] | ${it.totalNoteCount}"
             )
         }
 

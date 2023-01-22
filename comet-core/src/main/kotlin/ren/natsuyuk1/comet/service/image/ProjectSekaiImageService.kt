@@ -62,7 +62,8 @@ object ProjectSekaiImageService {
                     }] $status (${
                     ProjectSekaiManager.getSongAdjustedLevel(
                         mr.musicId,
-                        mr.musicDifficulty
+                        mr.musicDifficulty,
+                        mr.playResult
                     )?.fixDisplay(1)
                     })"
                 )
@@ -395,13 +396,16 @@ object ProjectSekaiImageService {
             )
             popStyle()
             pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 38f))
+            val info = ProjectSekaiMusicDifficulty.getMusicDifficulty(musicInfo.id).find {
+                it.musicDifficulty == difficulty
+            }
             addText(
                 "${difficulty.name} [Lv.${
                 ProjectSekaiManager.getSongLevel(
                     musicInfo.id,
                     difficulty
                 )
-                }]"
+                }] | 共 ${info?.totalNoteCount} 个键"
             )
         }.build().layout((bg.width + DEFAULT_PADDING).toFloat())
 

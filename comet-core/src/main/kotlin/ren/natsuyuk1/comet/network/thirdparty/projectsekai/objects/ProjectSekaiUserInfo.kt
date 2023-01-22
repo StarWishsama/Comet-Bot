@@ -67,7 +67,7 @@ data class ProjectSekaiUserInfo(
     fun getBest30Songs(): List<MusicResult> = userMusicResults.filter {
         it.musicDifficulty >= MusicDifficulty.EXPERT && (it.isAllPerfect || it.isFullCombo)
     }.sortedBy {
-        ProjectSekaiManager.getSongAdjustedLevel(it.musicId, it.musicDifficulty)
+        ProjectSekaiManager.getSongAdjustedLevel(it.musicId, it.musicDifficulty, it.playResult)
     }.asReversed()
         .distinctBy {
             it.musicId

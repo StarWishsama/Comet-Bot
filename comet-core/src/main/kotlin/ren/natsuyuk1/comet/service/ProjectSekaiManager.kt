@@ -5,6 +5,7 @@ import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicPlayResult
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusicDifficulty.musicDiffDatabase
@@ -98,11 +99,15 @@ object ProjectSekaiManager {
         return diffInfo.playLevel
     }
 
-    fun getSongAdjustedLevel(songId: Int, difficulty: MusicDifficulty): Double? {
+    fun getSongAdjustedLevel(songId: Int, difficulty: MusicDifficulty, playResult: MusicPlayResult): Double? {
         val diffInfo =
             musicDiffDatabase.find { it.musicId == songId && it.musicDifficulty == difficulty } ?: return null
 
-        return diffInfo.playLevel + diffInfo.playLevelAdjust
+        return diffInfo.playLevel + when (playResult) {
+            MusicPlayResult.CLEAR -> diffInfo.playLevelAdjust
+            MusicPlayResult.FULL_COMBO -> diffInfo.fullComboAdjust
+            MusicPlayResult.ALL_PERFECT -> diffInfo.fullPerfectAdjust
+        }
     }
 
     fun getLatestRankSeason(): Int? = rankSeasonInfo.lastOrNull()?.id
