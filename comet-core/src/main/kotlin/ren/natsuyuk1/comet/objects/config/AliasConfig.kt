@@ -32,13 +32,12 @@ object AliasCommandHandler {
 
         val altar = AliasConfig.data.alias[altarKey] ?: return
 
-        val processIndex = message.getMessageContent().indexOfFirst {
-            it is Text && it.text.startsWith(altarKey)
-        }
-
-        val convert = message.getMessageContent().toMutableList()
-        (convert[processIndex] as? Text)?.apply {
-            convert[processIndex] = Text(text.replace(altarKey, altar.cmd))
+        val convert = message.getMessageContent().map {
+            if (it is Text && it.text.startsWith(altarKey)) {
+                Text(it.text.replace(altarKey, altar.cmd))
+            } else {
+                it
+            }
         }
 
         CommandManager.executeCommand(
