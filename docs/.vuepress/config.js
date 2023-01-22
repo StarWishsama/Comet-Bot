@@ -12,14 +12,21 @@ module.exports = {
         editLinkText: '在 GitHub 上编辑此页',
         lastUpdated: '上次更新',
         sidebar: {
+            'getting-started': [
+                '',
+                'comet-module'
+            ],
             '/commands/': [
                 '',
                 'project-sekai',
                 'sign-in'
             ],
-            '/': {
-                sidebar: 'auto'
-            }
+            '/compile': [
+                ''
+            ],
+            '/': [
+                ''
+            ]
         },
         nav: [
             { text: "首页", link: "/" },
