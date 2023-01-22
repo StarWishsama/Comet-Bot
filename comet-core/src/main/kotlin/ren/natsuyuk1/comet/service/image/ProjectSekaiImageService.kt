@@ -32,9 +32,9 @@ import kotlin.math.absoluteValue
 object ProjectSekaiImageService {
     private const val WIDTH = 550
     private const val DEFAULT_PADDING = 20
-    private const val AVATAR_SIZE = 100
+    private const val AVATAR_SIZE = 72
     private val BETTER_GRAY_RGB: Int by lazy { Color(220, 220, 220).rgb }
-    private val QUALITY = 80
+    private val QUALITY = 90
 
     fun drawB30(user: ProjectSekaiUserInfo.UserGameData, b30: List<ProjectSekaiUserInfo.MusicResult>): MessageWrapper {
         val b30Text = ParagraphBuilder(
@@ -130,7 +130,7 @@ object ProjectSekaiImageService {
             FontUtil.fonts
         ).apply {
             addTextln(profile.name)
-            addText("ID: ${profile.userId}")
+            addText("ID ${profile.userId}")
         }.build().layout(WIDTH.toFloat())
 
         val eventInfoText = ParagraphBuilder(
@@ -249,7 +249,7 @@ object ProjectSekaiImageService {
                 WIDTH,
                 (
                     AVATAR_SIZE +
-                        DEFAULT_PADDING * 3 +
+                        DEFAULT_PADDING * 2 +
                         eventInfoText.height +
                         eventScoreText.height +
                         eventTeamText.height

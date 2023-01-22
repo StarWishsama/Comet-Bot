@@ -116,7 +116,7 @@ object ProjectSekaiManager {
         val suffix = if (trainingStatus == "done") "after_training" else "normal"
         /* ktlint-disable max-line-length */
         val url =
-            "https://storage.sekai.best/sekai-assets/character/member_cutout/${assetBundleName}_rip/$suffix.png"
+            "https://storage.sekai.best/sekai-assets/thumbnail/chara_rip/${assetBundleName}_$suffix.png"
         /* ktlint-enable max-line-length */
         val cardFile = pjskFolder.resolve("cards/${assetBundleName}_$suffix.png")
         cardFile.touch()
