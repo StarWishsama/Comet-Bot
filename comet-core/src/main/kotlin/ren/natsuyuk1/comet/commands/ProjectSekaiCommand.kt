@@ -247,7 +247,7 @@ class ProjectSekaiCommand(
 
             var chartFile: File = pjskFolder.resolve("charts/${musicInfo.id}/chart_$difficulty.png")
 
-            val error: String = if (chartFile?.isBlank() == true || chartFile?.isType("image/png") == false) {
+            val error: String = if (chartFile.isBlank() || !chartFile.isType("image/png")) {
                 val (_, msg) = ProjectSekaiImageService.drawCharts(musicInfo, diff)
                 msg
             } else {
