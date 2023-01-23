@@ -9,6 +9,7 @@ import moe.sdl.yac.parameters.types.long
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
 import ren.natsuyuk1.comet.api.message.MessageWrapper
+import ren.natsuyuk1.comet.api.message.asImage
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.ProjectSekaiService
@@ -19,8 +20,12 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiCharts
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
+import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.util.toMessageWrapper
+import ren.natsuyuk1.comet.utils.file.isBlank
+import ren.natsuyuk1.comet.utils.file.isType
 import ren.natsuyuk1.comet.utils.math.NumberUtil.formatDigests
+import java.io.File
 
 val PROJECTSEKAI by lazy {
     CommandProperty(
@@ -236,12 +241,21 @@ class ProjectSekaiCommand(
                 ProjectSekaiCharts.getCharts(pair.first, diff)
             }
 
+            val musicInfo = pair.first
+
             subject.sendMessage("请稍后, 获取谱面中...".toMessageWrapper())
 
-            val (image, msg) = ProjectSekaiImageService.drawCharts(pair.first, diff)
+            var chartFile: File = pjskFolder.resolve("charts/${musicInfo.id}/chart_$difficulty.png")
 
-            if (image == null) {
-                subject.sendMessage("获取谱面失败, $msg".toMessageWrapper())
+            val error: String = if (chartFile?.isBlank() == true || chartFile?.isType("image/png") == false) {
+                val (_, msg) = ProjectSekaiImageService.drawCharts(musicInfo, diff)
+                msg
+            } else {
+                ""
+            }
+
+            if (error.isNotBlank()) {
+                subject.sendMessage("获取谱面失败, $error".toMessageWrapper())
             } else {
                 subject.sendMessage(
                     buildMessageWrapper {
@@ -256,7 +270,7 @@ class ProjectSekaiCommand(
                             pair.first.bpm.formatDigests(0)
                         }
                         appendTextln("BPM: $bpmText")
-                        appendElement(image)
+                        appendElement(chartFile.asImage())
                     }
                 )
             }

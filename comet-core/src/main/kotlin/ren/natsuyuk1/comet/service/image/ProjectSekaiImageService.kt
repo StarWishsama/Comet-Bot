@@ -16,8 +16,12 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.local.*
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
+import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.datetime.toFriendly
+import ren.natsuyuk1.comet.utils.file.isBlank
+import ren.natsuyuk1.comet.utils.file.isType
+import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
@@ -29,13 +33,123 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 
+/**
+ * 负责绘制 Project Sekai 部分功能的图片
+ */
 object ProjectSekaiImageService {
+    /**
+     * 代表绘制图片的通用宽度
+     */
     private const val WIDTH = 550
-    private const val DEFAULT_PADDING = 20
-    private const val AVATAR_SIZE = 100
-    private val BETTER_GRAY_RGB: Int by lazy { Color(220, 220, 220).rgb }
-    private val QUALITY = 90
 
+    /**
+     * 代表图片内容的填充大小
+     */
+    private const val DEFAULT_PADDING = 20
+
+    /**
+     * 代表角色卡图片的大小
+     * 原图为 128x128
+     */
+    private const val AVATAR_SIZE = 100
+
+    /**
+     * 代表歌曲封面的大小
+     */
+    private const val COVER_SIZE = 50
+
+    /**
+     * 谱面背景色
+     */
+    private val BETTER_GRAY_RGB: Int by lazy { Color(220, 220, 220).rgb }
+
+    /**
+     * Skia 绘制质量参数, 使用较低值以压缩大小
+     */
+    private const val QUALITY = 90
+
+    /**
+     * 绘制一张玩家的 30 首最佳歌曲表
+     *
+     * @param user 从 API 获得的 [ProjectSekaiUserInfo]
+     * @param b30 表现最佳的 30 首歌
+     *
+     * @return 渲染后图片 [Image]
+     */
+    suspend fun drawBest30(user: ProjectSekaiUserInfo, b30: List<ProjectSekaiUserInfo.MusicResult>): Image? {
+        val avatar = user.userProfile
+        TODO()
+    }
+
+    private suspend fun Canvas.drawMusicInfo(
+        musicResult: ProjectSekaiUserInfo.MusicResult,
+        x: Float,
+        y: Float
+    ) {
+        val musicInfo = ProjectSekaiMusic.getMusicInfo(musicResult.musicId) ?: return
+        val musicLevel = ProjectSekaiManager.getSongAdjustedLevel(
+            musicResult.musicId,
+            musicResult.musicDifficulty,
+            musicResult.playResult
+        )?.fixDisplay(1)
+        val coverFile = ProjectSekaiMusic.getMusicCover(musicInfo)
+
+        val cover = try {
+            Image.makeFromEncoded(coverFile.readBytes())
+        } catch (e: Exception) {
+            // TODO: 使用一张占位符图片替换?
+            return
+        }
+
+        val rrect = RRect.makeXYWH(
+            x,
+            y,
+            COVER_SIZE.toFloat(),
+            COVER_SIZE.toFloat(),
+            10f // 圆形弧度
+        )
+
+        save()
+        clipRRect(rrect, true)
+        drawImageRect(
+            cover,
+            Rect(0f, 0f, cover.width.toFloat(), cover.height.toFloat()),
+            rrect,
+            FilterMipmap(FilterMode.LINEAR, MipmapMode.NEAREST),
+            null,
+            true
+        )
+        restore()
+
+        val musicParagraph = ParagraphBuilder(
+            ParagraphStyle().apply {
+                alignment = Alignment.LEFT
+                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 15f)
+            },
+            FontUtil.fonts
+        ).apply {
+            addTextln(musicLevel ?: "N/A")
+
+            changeStyle(FontUtil.defaultFontStyle(Color.BLACK, 20f))
+
+            addTextln(musicInfo.title)
+
+            changeStyle(FontUtil.defaultFontStyle(Color.BLACK, 16f))
+            addText(if (musicResult.isAllPerfect) "ALL PERFECT" else "FULL COMBO")
+        }.build().layout(50f)
+
+        musicParagraph.paint(this, x + COVER_SIZE + 5f, y)
+    }
+
+    /**
+     * 绘制一张玩家的 30 首最佳歌曲表
+     *
+     * @param user 从 API 获得的 [ProjectSekaiUserInfo]
+     * @param b30 表现最佳的 30 首歌
+     *
+     * @return 包装后的消息 [MessageWrapper]
+     */
+    @Deprecated("This method will replace to better one", replaceWith = ReplaceWith("drawBest30"))
     fun drawB30(user: ProjectSekaiUserInfo.UserGameData, b30: List<ProjectSekaiUserInfo.MusicResult>): MessageWrapper {
         val b30Text = ParagraphBuilder(
             ParagraphStyle().apply {
@@ -95,6 +209,14 @@ object ProjectSekaiImageService {
         }
     }
 
+    /**
+     * 绘制一张玩家的活动信息
+     *
+     * @param eventId 活动 ID
+     * @param userData 用户活动积分数据 [ProjectSekaiUserData]
+     *
+     * @return 包装后的消息 [MessageWrapper]
+     */
     suspend fun SekaiProfileEventInfo.drawEventInfo(
         eventId: Int,
         userData: ProjectSekaiUserData? = null
@@ -109,6 +231,7 @@ object ProjectSekaiImageService {
         val eventInfo = ProjectSekaiData.getCurrentEventInfo() ?: return "查询失败, 活动信息未加载".toMessageWrapper()
         val eventStatus = ProjectSekaiManager.getCurrentEventStatus()
 
+        // 获取头像内部名称
         val avatarBundleName = ProjectSekaiCard.getAssetBundleName(profile.userCard.cardId.toInt())
 
         var avatarFile: File? = null
@@ -353,10 +476,24 @@ object ProjectSekaiImageService {
         }
     }
 
+    /**
+     * 绘制歌曲谱面
+     *
+     * @param musicInfo 歌曲信息 [PJSKMusicInfo]
+     * @param difficulty 歌曲难度 [MusicDifficulty]
+     *
+     * @return 渲染完成的图片路径和错误信息 [File] [String]
+     */
     suspend fun drawCharts(
         musicInfo: PJSKMusicInfo,
         difficulty: MusicDifficulty
-    ): Pair<ren.natsuyuk1.comet.api.message.Image?, String> {
+    ): Pair<File?, String> {
+        val chartFile = pjskFolder.resolve("charts/${musicInfo.id}/chart_$difficulty.png")
+
+        if (!chartFile.isBlank() && chartFile.isType("image/png")) {
+            return Pair(chartFile, "")
+        }
+
         var chartFiles = ProjectSekaiCharts.getCharts(musicInfo, difficulty)
 
         if (chartFiles.isEmpty()) {
@@ -473,9 +610,12 @@ object ProjectSekaiImageService {
             rightText.paint(this, 60f + rrect.width, 30f + bg.height)
         }
 
-        val data = surface.makeImageSnapshot().encodeToData(EncodedImageFormat.JPEG, QUALITY)
+        val data = surface.makeImageSnapshot().encodeToData(EncodedImageFormat.PNG)
             ?: return Pair(null, "生成谱面失败")
 
-        return Pair(data.bytes.asImage(), "")
+        chartFile.touch()
+        chartFile.writeBytes(data.bytes)
+
+        return Pair(chartFile, "")
     }
 }
