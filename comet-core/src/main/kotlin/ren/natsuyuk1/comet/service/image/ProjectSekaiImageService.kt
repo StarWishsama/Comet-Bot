@@ -316,11 +316,11 @@ object ProjectSekaiImageService {
                     val rankDiff = userData.lastQueryPosition - profile.rank
 
                     if (scoreDiff != 0L) {
-                        addTextln("↑ $scoreDiff 分 ")
+                        addText("↑ $scoreDiff 分 ")
                     }
 
                     if (rankDiff != 0) {
-                        addTextln(
+                        addText(
                             (if (profile.rank < userData.lastQueryPosition) "↑ 上升" else " ↓ 下降") +
                                 " ${rankDiff.absoluteValue} 名"
                         )
