@@ -327,6 +327,7 @@ object ProjectSekaiImageService {
                     }
 
                     addTextln()
+                    addTextln()
                 }
 
                 // Refresh user pjsk score and rank
@@ -370,7 +371,7 @@ object ProjectSekaiImageService {
                 WIDTH,
                 (
                     AVATAR_SIZE +
-                        DEFAULT_PADDING * 1.5 +
+                        DEFAULT_PADDING * 2.5 +
                         eventInfoText.height +
                         eventScoreText.height +
                         (eventTeamText?.height ?: 0f)

@@ -21,8 +21,6 @@ import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService.drawEventInfo
 import ren.natsuyuk1.comet.test.initTestDatabase
 import ren.natsuyuk1.comet.test.isCI
 import ren.natsuyuk1.comet.utils.file.absPath
-import ren.natsuyuk1.comet.utils.file.cacheDirectory
-import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import java.io.File
 import kotlin.coroutines.EmptyCoroutineContext
@@ -88,18 +86,12 @@ class TestProjectSekaiDraw {
             // Represent to music named `気まぐれメルシィ`
             val music = ProjectSekaiMusic.getMusicInfo(281)
             assertNotNull(music)
-            val test = cacheDirectory.resolve("test.png")
-            test.touch()
 
             val image = ProjectSekaiImageService.drawCharts(music, MusicDifficulty.MASTER)
 
-            image?.first?.byteArray?.let {
-                test.writeBytes(it)
-            }
+            println(image?.first)
 
-            println(test.absPath)
-
-            assertTrue { test.length() != 0L }
+            assertTrue { image?.first?.length() != 0L }
         }
     }
 }
