@@ -245,7 +245,7 @@ class ProjectSekaiCommand(
 
             subject.sendMessage("请稍后, 获取谱面中...".toMessageWrapper())
 
-            var chartFile: File = pjskFolder.resolve("charts/${musicInfo.id}/chart_$difficulty.png")
+            var chartFile: File = pjskFolder.resolve("charts/${musicInfo.id}/chart_$diff.png")
 
             val error: String = if (chartFile.isBlank() || !chartFile.isType("image/png")) {
                 val (_, msg) = ProjectSekaiImageService.drawCharts(musicInfo, diff)
