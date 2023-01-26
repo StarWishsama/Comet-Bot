@@ -47,18 +47,16 @@ class MinecraftCommand(
             else 19132
         } else port
 
-        try {
+        result = try {
             val srvRecord = SRVLookup.lookup(host, "minecraft")
 
-            result = if (srvRecord != null) {
+            if (srvRecord != null) {
                 query(srvRecord.first, srvRecord.second, protocol)
             } else {
                 query(host, actualPort, protocol)
             }
-
-            result?.toMessageWrapper()?.let { subject.sendMessage(it) }
         } catch (e: Exception) {
-            result = query(host, actualPort, protocol)
+            query(host, actualPort, protocol)
         }
 
         if (result == null) {
