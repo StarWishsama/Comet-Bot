@@ -21,7 +21,7 @@ features:
   footer: Copyright © 2020-至今 StarWishsama
 ---
 
-项目名来源于 [Comet](https://music.163.com/#/song?id=22717199)
+项目名来源于 [星街彗星](https://zh.wikipedia.org/zh/%E6%98%9F%E8%A1%97%E5%BD%97%E6%98%9F)
 
 本项目处于开发阶段, 且所有配置文件模板并不稳定, 并伴随可能的破坏性更改, 请谨慎使用
 
