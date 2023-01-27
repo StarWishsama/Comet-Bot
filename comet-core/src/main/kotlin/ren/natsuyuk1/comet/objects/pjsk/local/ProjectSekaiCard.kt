@@ -10,6 +10,7 @@ import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.utils.file.isBlank
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
+import ren.natsuyuk1.comet.utils.ktor.DownloadStatus
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import kotlin.time.Duration.Companion.days
 
@@ -39,7 +40,7 @@ object ProjectSekaiCard : ProjectSekaiLocalFile(
 
     override suspend fun update(): Boolean {
         if (file.isBlank() || isOutdated()) {
-            if (cometClient.client.downloadFile(url, file)) {
+            if (cometClient.client.downloadFile(url, file) == DownloadStatus.OK) {
                 updateLastUpdateTime()
                 logger.info { "成功更新卡面数据" }
                 return true

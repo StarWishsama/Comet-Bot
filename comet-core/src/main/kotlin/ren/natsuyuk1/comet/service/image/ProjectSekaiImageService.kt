@@ -16,12 +16,12 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.local.*
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
-import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.datetime.toFriendly
 import ren.natsuyuk1.comet.utils.file.isBlank
 import ren.natsuyuk1.comet.utils.file.isType
 import ren.natsuyuk1.comet.utils.file.touch
+import ren.natsuyuk1.comet.utils.ktor.DownloadStatus
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
@@ -489,36 +489,41 @@ object ProjectSekaiImageService {
         musicInfo: PJSKMusicInfo,
         difficulty: MusicDifficulty
     ): Pair<File?, String> {
-        val chartFile = pjskFolder.resolve("charts/${musicInfo.id}/chart_$difficulty.png")
+        val chartFile = musicInfo.id.chart(difficulty)
 
         if (!chartFile.isBlank() && chartFile.isType("image/png")) {
             return Pair(chartFile, "")
         }
 
-        var chartFiles = ProjectSekaiCharts.getCharts(musicInfo, difficulty)
+        if (musicInfo.id.chartKey(difficulty).let { it.isBlank() || it.isType("image/png") }) {
+            when (ProjectSekaiCharts.downloadChart(musicInfo)) {
+                DownloadStatus.UNVERIFIED, DownloadStatus.FAILED -> {
+                    return Pair(null, "谱面下载失败, 可能谱面暂未更新或是网络问题")
+                }
+                DownloadStatus.DOWNLOADING -> {
+                    return Pair(null, "已有相同谱面正在下载中, 请稍等")
+                }
 
-        if (chartFiles.isEmpty()) {
-            if (ProjectSekaiCharts.downloadChart(musicInfo)) {
-                chartFiles = ProjectSekaiCharts.getCharts(musicInfo, difficulty)
-            } else {
-                return Pair(null, "谱面下载中或下载失败, 可能暂未更新")
+                else -> {} // OK
             }
         }
 
         val bg = try {
-            Image.makeFromEncoded(chartFiles[0].readBytes())
+            Image.makeFromEncoded(musicInfo.id.bg().readBytes())
         } catch (e: IllegalArgumentException) {
             return Pair(null, "谱面背景未准备好")
         }
+
         val bar = try {
-            Image.makeFromEncoded(chartFiles[1].readBytes())
+            Image.makeFromEncoded(musicInfo.id.bar().readBytes())
         } catch (e: IllegalArgumentException) {
             return Pair(null, "谱面序号表未准备好")
         }
+
         val chart = try {
-            Image.makeFromEncoded(chartFiles[2].readBytes())
+            Image.makeFromEncoded(musicInfo.id.chartKey(difficulty).readBytes())
         } catch (e: IllegalArgumentException) {
-            return Pair(null, "谱面按键未准备好")
+            return Pair(null, "谱面未准备好")
         }
 
         val text = ParagraphBuilder(
@@ -563,9 +568,7 @@ object ProjectSekaiImageService {
         )
 
         val cover = try {
-            ProjectSekaiMusic.getMusicCover(musicInfo).readBytes().let {
-                Image.makeFromEncoded(it)
-            }
+            Image.makeFromEncoded(ProjectSekaiMusic.getMusicCover(musicInfo).readBytes())
         } catch (e: IllegalArgumentException) {
             return Pair(null, "歌曲封面未准备好")
         }

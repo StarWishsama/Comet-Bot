@@ -14,14 +14,14 @@ import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.utils.file.lastModifiedTime
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
+import ren.natsuyuk1.comet.utils.ktor.DownloadStatus
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import kotlin.time.Duration.Companion.days
 
 private val logger = KotlinLogging.logger {}
 
 object ProjectSekaiRank : ProjectSekaiLocalFile(
-    pjskFolder.resolve("rankMatchSeasons.json"),
-    30.days
+    pjskFolder.resolve("rankMatchSeasons.json"), 30.days
 ) {
     internal val rankSeasonInfo = mutableListOf<PJSKRankSeasonInfo>()
 
@@ -29,8 +29,7 @@ object ProjectSekaiRank : ProjectSekaiLocalFile(
         try {
             rankSeasonInfo.addAll(
                 json.decodeFromString(
-                    ListSerializer(PJSKRankSeasonInfo.serializer()),
-                    file.readTextBuffered()
+                    ListSerializer(PJSKRankSeasonInfo.serializer()), file.readTextBuffered()
                 )
             )
         } catch (e: Exception) {
@@ -43,19 +42,21 @@ object ProjectSekaiRank : ProjectSekaiLocalFile(
             return false
         }
 
-        GitHubApi.getSpecificFileCommits("Sekai-World", "sekai-master-db-diff", file.name)
-            .onSuccess {
-                val current = file.lastModifiedTime()
-                val lastUpdate = Instant.parse(it.first().commit.committer.date)
+        GitHubApi.getSpecificFileCommits("Sekai-World", "sekai-master-db-diff", file.name).onSuccess {
+            val current = file.lastModifiedTime()
+            val lastUpdate = Instant.parse(it.first().commit.committer.date)
 
-                if (!file.exists() || lastUpdate > current) {
-                    file.touch()
-                    if (cometClient.client.downloadFile(getSekaiBestResourceURL(file.name), file)) {
-                        logger.info { "成功更新排位数据" }
-                        return true
-                    }
+            if (!file.exists() || lastUpdate > current) {
+                file.touch()
+                if (cometClient.client.downloadFile(
+                        getSekaiBestResourceURL(file.name), file
+                    ) == DownloadStatus.OK
+                ) {
+                    logger.info { "成功更新排位数据" }
+                    return true
                 }
             }
+        }
 
         return false
     }

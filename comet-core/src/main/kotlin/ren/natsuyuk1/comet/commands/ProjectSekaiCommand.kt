@@ -17,7 +17,6 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficul
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.config.FeatureConfig
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiCharts
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
@@ -230,44 +229,38 @@ class ProjectSekaiCommand(
                 }
             }
 
-            val pair = ProjectSekaiMusic.fuzzyGetMusicInfo(
+            val (musicInfo, sim) = ProjectSekaiMusic.fuzzyGetMusicInfo(
                 musicName, FeatureConfig.data.projectSekaiSetting.minSimilarity
             )
 
-            if (pair == null) {
+            if (musicInfo == null) {
                 subject.sendMessage("找不到你想要搜索的歌曲哦".toMessageWrapper())
                 return
-            } else {
-                ProjectSekaiCharts.getCharts(pair.first, diff)
             }
-
-            val musicInfo = pair.first
 
             subject.sendMessage("请稍后, 获取谱面中...".toMessageWrapper())
 
-            var chartFile: File = pjskFolder.resolve("charts/${musicInfo.id}/chart_$diff.png")
+            val chartFile: File = pjskFolder.resolve("charts/${musicInfo.id}/chart_$diff.png")
 
             val error: String = if (chartFile.isBlank() || !chartFile.isType("image/png")) {
                 val (_, msg) = ProjectSekaiImageService.drawCharts(musicInfo, diff)
                 msg
-            } else {
-                ""
-            }
+            } else ""
 
             if (error.isNotBlank()) {
                 subject.sendMessage("获取谱面失败, $error".toMessageWrapper())
             } else {
                 subject.sendMessage(
                     buildMessageWrapper {
-                        appendTextln("搜索准确度: ${pair.second}")
-                        val bpmText = if (!pair.first.bpms.isNullOrEmpty()) {
+                        appendTextln("搜索准确度: $sim")
+                        val bpmText = if (!musicInfo.bpms.isNullOrEmpty()) {
                             buildString {
-                                pair.first.bpms?.forEach { bi ->
+                                musicInfo.bpms.forEach { bi ->
                                     append("${bi.bpm.formatDigests(0)} - ")
                                 }
                             }.removeSuffix(" - ")
                         } else {
-                            pair.first.bpm.formatDigests(0)
+                            musicInfo.bpm.formatDigests(0)
                         }
                         appendTextln("BPM: $bpmText")
                         appendElement(chartFile.asImage())
@@ -294,11 +287,11 @@ class ProjectSekaiCommand(
         private val musicName by argument("歌曲名称")
 
         override suspend fun run() {
-            val info = ProjectSekaiMusic.fuzzyGetMusicInfo(
+            val (musicInfo, _) = ProjectSekaiMusic.fuzzyGetMusicInfo(
                 musicName, FeatureConfig.data.projectSekaiSetting.minSimilarity
             )
 
-            subject.sendMessage(info?.first?.toMessageWrapper() ?: "找不到你想要搜索的歌曲哦".toMessageWrapper())
+            subject.sendMessage(musicInfo?.toMessageWrapper() ?: "找不到你想要搜索的歌曲哦".toMessageWrapper())
         }
     }
 }

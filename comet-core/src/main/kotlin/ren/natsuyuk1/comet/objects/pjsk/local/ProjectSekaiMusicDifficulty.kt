@@ -9,6 +9,7 @@ import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.utils.file.isBlank
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
+import ren.natsuyuk1.comet.utils.ktor.DownloadStatus
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import kotlin.time.Duration.Companion.days
 
@@ -41,7 +42,7 @@ object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
             if (cometClient.client.downloadFile(
                     "https://gitlab.com/pjsekai/database/musics/-/raw/main/musicDifficulties.json",
                     file
-                )
+                ) == DownloadStatus.OK
             ) {
                 updateLastUpdateTime()
                 logger.info { "成功更新音乐等级偏差值数据" }

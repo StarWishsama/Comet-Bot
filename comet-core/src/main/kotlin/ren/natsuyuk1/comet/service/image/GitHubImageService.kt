@@ -9,6 +9,7 @@ import org.jetbrains.skia.paragraph.Paragraph
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import ren.natsuyuk1.comet.api.task.TaskManager
+import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.objects.github.events.GitHubEventData
 import ren.natsuyuk1.comet.objects.github.events.PullRequestEventData
 import ren.natsuyuk1.comet.objects.github.events.PushEventData
@@ -16,12 +17,12 @@ import ren.natsuyuk1.comet.service.refsPattern
 import ren.natsuyuk1.comet.utils.file.cacheDirectory
 import ren.natsuyuk1.comet.utils.file.resolveResourceDirectory
 import ren.natsuyuk1.comet.utils.file.touch
+import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.skiko.FontUtil
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import java.awt.Color
 import java.io.File
-import java.io.FileNotFoundException
 import java.nio.file.Files
 import kotlin.time.Duration.Companion.hours
 
@@ -75,9 +76,14 @@ object GitHubImageService {
         return tmp
     }
 
-    private fun checkResource() {
-        if (!githubLogo.exists())
-            throw FileNotFoundException("找不到 GitHub Logo 文件, 请手动下载 GitHub 资源包文件解压在 ./resources/github")
+    private suspend fun checkResource() {
+        if (!githubLogo.exists()) {
+            githubLogo.touch()
+            cometClient.client.downloadFile(
+                "https://raw.githubusercontent.com/StarWishsama/comet-resource-database/main/github/github_logo.png",
+                githubLogo
+            )
+        }
     }
 
     private fun drawHeader(firstLine: String, secondLine: String, width: Float): Paragraph =

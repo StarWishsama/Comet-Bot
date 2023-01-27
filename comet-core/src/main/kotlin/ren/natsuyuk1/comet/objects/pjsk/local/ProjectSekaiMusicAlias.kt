@@ -14,6 +14,7 @@ import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.utils.file.lastModifiedTime
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
+import ren.natsuyuk1.comet.utils.ktor.DownloadStatus
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import kotlin.time.Duration.Companion.days
 
@@ -56,7 +57,7 @@ object ProjectSekaiMusicAlias : ProjectSekaiLocalFile(
                     if (cometClient.client.downloadFile(
                             getCometDatabaseURL(file.name),
                             file
-                        )
+                        ) == DownloadStatus.OK
                     ) {
                         logger.info { "成功更新歌曲别名数据" }
                         return true

@@ -11,6 +11,7 @@ import ren.natsuyuk1.comet.utils.file.isBlank
 import ren.natsuyuk1.comet.utils.file.isType
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
+import ren.natsuyuk1.comet.utils.ktor.DownloadStatus
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.string.ldSimilarity
 import ren.natsuyuk1.comet.utils.string.normalize
@@ -54,7 +55,7 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
         file.touch()
 
         if (file.isBlank() || isOutdated()) {
-            if (cometClient.client.downloadFile(url, file)) {
+            if (cometClient.client.downloadFile(url, file) == DownloadStatus.OK) {
                 updateLastUpdateTime()
                 logger.info { "成功更新音乐数据" }
                 return true
@@ -68,7 +69,7 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
 
     fun getMusicInfo(id: Int): PJSKMusicInfo? = musicDatabase[id]
 
-    fun fuzzyGetMusicInfo(name: String, minSimilarity: Double = 0.35): Pair<PJSKMusicInfo, BigDecimal>? {
+    fun fuzzyGetMusicInfo(name: String, minSimilarity: Double = 0.35): Pair<PJSKMusicInfo?, BigDecimal> {
         val normalizeName = name.normalize(Normalizer.Form.NFKC)
 
         return musicDatabase.values.associateWith {
@@ -81,8 +82,9 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
 
             sim
         }.filter { it.value > BigDecimal.valueOf(minSimilarity) }
-            .maxByOrNull { it.value }
-            ?.toPair()
+            .maxByOrNull { it.value }.let {
+                Pair(it?.key, it?.value ?: BigDecimal.ZERO)
+            }
     }
 
     suspend fun getMusicCover(music: PJSKMusicInfo): File {

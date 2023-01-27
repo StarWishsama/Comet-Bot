@@ -13,6 +13,7 @@ import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.utils.file.lastModifiedTime
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
+import ren.natsuyuk1.comet.utils.ktor.DownloadStatus
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import kotlin.time.Duration.Companion.days
 
@@ -43,7 +44,7 @@ object ProjectSekaiI18N : ProjectSekaiLocalFile(
                     if (cometClient.client.downloadFile(
                             getCometDatabaseURL("cheerful_carnival_teams.json"),
                             file
-                        )
+                        ) == DownloadStatus.OK
                     ) {
                         logger.info { "成功更新本地化数据" }
 

@@ -159,4 +159,4 @@ fun String.toHMAC(key: String): String {
 
 fun String?.blankIfNull() = if (this.isNullOrEmpty()) "" else this
 
-fun String.normalize(form: Form) = Normalizer.normalize(this, form)
+fun String.normalize(form: Form): String = Normalizer.normalize(this, form)

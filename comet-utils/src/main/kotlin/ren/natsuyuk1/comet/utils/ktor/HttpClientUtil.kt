@@ -19,7 +19,16 @@ import kotlin.time.measureTime
 
 private val logger = mu.KotlinLogging.logger("CometClient")
 
-private val downloadingFile = mutableListOf<String>()
+private val downloadFiles = mutableListOf<String>()
+
+enum class DownloadStatus {
+    OK,
+    DOWNLOADING,
+    UNVERIFIED,
+    FAILED,
+}
+
+fun DownloadStatus.isOK() = this == DownloadStatus.OK
 
 fun HttpClientEngineConfig.initProxy() {
     val proxyStr = getEnv("comet.proxy")
@@ -42,24 +51,23 @@ suspend fun HttpClient.downloadFile(
     url: String,
     file: File,
     verifier: (HttpResponse) -> Boolean = { it.status.isSuccess() }
-): Boolean {
-    if (downloadingFile.contains(url)) {
-        return false
+): DownloadStatus {
+    if (downloadFiles.contains(url)) {
+        return DownloadStatus.DOWNLOADING
     }
 
     logger.debug { "Trying download file from $url..." }
 
-    var verified = false
-
     try {
+        val status: DownloadStatus
         val duration = measureTime {
             val req = get(url)
 
-            downloadingFile.add(url)
+            downloadFiles.add(url)
 
             logger.debug { "Headers = ${req.headers.entries()}" }
 
-            if (verifier(req)) {
+            status = if (verifier(req)) {
                 val resp = req.body<InputStream>()
 
                 logger.debug { "Received source size = ${resp.available()}" }
@@ -70,20 +78,23 @@ suspend fun HttpClient.downloadFile(
                     }
                 }
 
-                verified = true
+                DownloadStatus.OK
+            } else {
+                DownloadStatus.UNVERIFIED
             }
         }
 
-        if (verified) {
+        if (status == DownloadStatus.OK) {
             logger.debug { "Downloaded file ${file.name} from $url, costs $duration" }
         } else {
             logger.debug { "File ${file.name} not be downloaded because extra verify is failed." }
         }
-    } catch (e: IOException) {
-        logger.warn(e) {}
-    } finally {
-        downloadingFile.remove(url)
-    }
 
-    return verified
+        return status
+    } catch (e: IOException) {
+        logger.warn(e) { "下载文件时发生异常" }
+        return DownloadStatus.FAILED
+    } finally {
+        downloadFiles.remove(url)
+    }
 }
