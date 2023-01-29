@@ -59,8 +59,8 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
 data class ProjectSekaiUserInfo(
     val user: UserGameData,
     val userProfile: UserProfile,
-    // val userDecks
-    // val userCards
+    val userDecks: List<UserDeck>,
+    val userCards: List<UserCard>,
     val userMusics: List<UserMusic>,
     val userMusicResults: List<MusicResult>
 ) {
@@ -165,6 +165,28 @@ data class ProjectSekaiUserInfo(
             )
         }
     }
+
+    @Serializable
+    data class UserDeck(
+        val leader: Int,
+        val subLeader: Int,
+        @SerialName("member3")
+        val third: Int,
+        @SerialName("member4")
+        val fourth: Int,
+        @SerialName("member5")
+        val fifth: Int,
+    )
+
+    @Serializable
+    data class UserCard(
+        val cardId: Int,
+        val defaultImage: String,
+        // val episodes
+        val level: Int,
+        val masterRank: Int,
+        val specialTrainingStatus: String,
+    )
 }
 
 /**

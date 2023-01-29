@@ -36,6 +36,10 @@ object NumberUtil {
     }
 
     fun Double.fixDisplay(digit: Int = 2): String {
+        if (digit <= 0) {
+            return toInt().toString()
+        }
+
         val scale = buildString {
             append("0.")
             repeat(digit) {

@@ -51,8 +51,12 @@ object StringUtil {
         return matches(numberRegex) && !this.contains(".")
     }
 
-    fun String.limit(size: Int): String {
-        return if (this.length <= size) this else substring(0, size) + "..."
+    fun String.limit(size: Int, customText: String = "..."): String {
+        if (length <= size) {
+            return this
+        }
+
+        return substring(0, size) + customText
     }
 
     fun String.containsEtc(allMatch: Boolean = true, vararg string: String): Boolean {

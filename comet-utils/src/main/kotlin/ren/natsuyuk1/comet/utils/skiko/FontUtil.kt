@@ -2,9 +2,7 @@ package ren.natsuyuk1.comet.utils.skiko
 
 import mu.KotlinLogging
 import org.jetbrains.skia.*
-import org.jetbrains.skia.paragraph.FontCollection
-import org.jetbrains.skia.paragraph.TextStyle
-import org.jetbrains.skia.paragraph.TypefaceFontProvider
+import org.jetbrains.skia.paragraph.*
 import ren.natsuyuk1.comet.utils.file.absPath
 import ren.natsuyuk1.comet.utils.file.resolveResourceDirectory
 import java.awt.Color
@@ -14,7 +12,7 @@ private val logger = KotlinLogging.logger {}
 object FontUtil {
     private val fontMgr = FontMgr.default
     private val fontProvider = TypefaceFontProvider()
-    private val defaultFont = arrayOf("HarmonyOS Sans", "Source Han Sans SC", "Pingfang SC", "Twemoji Mozilla")
+    private val defaultFont = arrayOf("Source Han Sans SC", "Twemoji Mozilla")
 
     val fonts = FontCollection().setDynamicFontManager(fontProvider).setDefaultFontManager(fontMgr)
 
@@ -45,21 +43,40 @@ object FontUtil {
         logger.info { "已加载 $counter 个字体." }
     }
 
-    fun defaultFont(size: Float, fontFamily: Array<String> = defaultFont): Font {
+    fun defaultFont(
+        size: Float,
+        fontFamily: Array<String> = defaultFont,
+        style: FontStyle = FontStyle.NORMAL.withWeight(500)
+    ): Font {
         val typeface =
             fonts.findTypefaces(
                 familyNames = fontFamily,
-                style = FontStyle.NORMAL.withWeight(500)
+                style = style
             ).firstOrNull()
         return Font(typeface, size).apply {
             edging = FontEdging.SUBPIXEL_ANTI_ALIAS
+            hinting = FontHinting.FULL
+            isSubpixel = true
         }
     }
 
-    fun defaultFontStyle(c: Color, size: Float, fontFamily: Array<String> = defaultFont) = TextStyle().apply {
+    fun defaultFontStyle(
+        c: Color,
+        size: Float,
+        fontFamily: Array<String> = defaultFont,
+        style: FontStyle = FontStyle.NORMAL.withWeight(500)
+    ) = TextStyle().apply {
         color = c.rgb
         fontSize = size
-        fontStyle = FontStyle.NORMAL.withWeight(500)
+        fontStyle = style
         fontFamilies = fontFamily
+    }
+
+    fun ParagraphStyle.gloryFontSetting() = this.apply {
+        fontRastrSettings = FontRastrSettings(
+            FontEdging.SUBPIXEL_ANTI_ALIAS,
+            FontHinting.FULL,
+            true
+        )
     }
 }

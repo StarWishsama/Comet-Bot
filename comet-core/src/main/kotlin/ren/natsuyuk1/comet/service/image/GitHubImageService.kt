@@ -1,13 +1,7 @@
 package ren.natsuyuk1.comet.service.image
 
-import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.EncodedImageFormat
-import org.jetbrains.skia.Image
-import org.jetbrains.skia.Surface
-import org.jetbrains.skia.paragraph.Alignment
-import org.jetbrains.skia.paragraph.Paragraph
-import org.jetbrains.skia.paragraph.ParagraphBuilder
-import org.jetbrains.skia.paragraph.ParagraphStyle
+import org.jetbrains.skia.*
+import org.jetbrains.skia.paragraph.*
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.objects.github.events.GitHubEventData
@@ -19,6 +13,7 @@ import ren.natsuyuk1.comet.utils.file.resolveResourceDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.skiko.FontUtil
+import ren.natsuyuk1.comet.utils.skiko.FontUtil.gloryFontSetting
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import java.awt.Color
@@ -91,6 +86,7 @@ object GitHubImageService {
             ParagraphStyle().apply {
                 alignment = Alignment.LEFT
                 textStyle = FontUtil.defaultFontStyle(Color.BLACK, 21f)
+                gloryFontSetting()
             },
             FontUtil.fonts
         ).apply {

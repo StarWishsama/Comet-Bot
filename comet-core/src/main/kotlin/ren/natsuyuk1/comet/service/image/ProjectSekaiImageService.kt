@@ -1,10 +1,10 @@
 package ren.natsuyuk1.comet.service.image
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import org.jetbrains.skia.*
-import org.jetbrains.skia.paragraph.Alignment
-import org.jetbrains.skia.paragraph.ParagraphBuilder
-import org.jetbrains.skia.paragraph.ParagraphStyle
+import org.jetbrains.skia.paragraph.*
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.asImage
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
@@ -16,6 +16,7 @@ import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.local.*
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
+import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.datetime.toFriendly
 import ren.natsuyuk1.comet.utils.file.isBlank
@@ -26,8 +27,10 @@ import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
 import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
 import ren.natsuyuk1.comet.utils.skiko.FontUtil
+import ren.natsuyuk1.comet.utils.skiko.FontUtil.gloryFontSetting
 import ren.natsuyuk1.comet.utils.skiko.addTextln
 import ren.natsuyuk1.comet.utils.skiko.changeStyle
+import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import java.awt.Color
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -68,6 +71,9 @@ object ProjectSekaiImageService {
      */
     private const val QUALITY = 90
 
+    private const val BEST30_HEIGHT = 1900
+    private const val BEST30_WIDTH = 940
+
     /**
      * 绘制一张玩家的 30 首最佳歌曲表
      *
@@ -76,8 +82,121 @@ object ProjectSekaiImageService {
      *
      * @return 渲染后图片 [Image]
      */
-    suspend fun drawBest30(user: ProjectSekaiUserInfo, b30: List<ProjectSekaiUserInfo.MusicResult>): Image? {
-        val avatar = user.userProfile
+    suspend fun drawBest30(
+        user: ProjectSekaiUserInfo,
+        b30: List<ProjectSekaiUserInfo.MusicResult>
+    ): ren.natsuyuk1.comet.api.message.Image? {
+        val cardId = user.userDecks.first().leader
+        val avatarBundleName = ProjectSekaiCard.getAssetBundleName(cardId) ?: return null
+        val status = user.userCards.find { it.cardId == cardId }?.specialTrainingStatus ?: return null
+
+        val background = Image.makeFromEncoded(pjskFolder.resolve("b30/b30-background.png").readBytes())
+
+        val avatar = try {
+            Image.makeFromEncoded(
+                ProjectSekaiManager.resolveCardImage(
+                    avatarBundleName, status
+                ).readBytes()
+            )
+        } catch (e: IllegalArgumentException) {
+            return null
+        }
+
+        val surface = Surface.makeRasterN32Premul(BEST30_WIDTH, BEST30_HEIGHT)
+
+        surface.canvas.apply {
+            drawImage(background, 0f, 0f, Paint().apply { isAntiAlias = true })
+
+            drawAvatar(avatar, 25f, 35f, 128f, 10f)
+
+            ParagraphBuilder(
+                ParagraphStyle().apply {
+                    alignment = Alignment.LEFT
+                    textStyle = FontUtil.defaultFontStyle(Color.BLACK, 35f, style = FontStyle.BOLD)
+                    gloryFontSetting()
+                },
+                FontUtil.fonts
+            ).apply {
+                addTextln(user.user.userGameData.name.limit(12, ".."))
+                changeStyle(FontUtil.defaultFontStyle(Color.BLACK, 20f))
+                addText("ID: ${user.user.userGameData.userID}")
+            }.build().layout(366f)
+                .paint(this, 180f, 45f)
+
+            // drawBadge()
+
+            // 左右间隔 10, 上下间隔 20
+
+            var x = 25f
+            var y = 260f
+
+            val infoH = 125f
+            val infoW = 290f
+
+            b30.forEachIndexed { i, musicResult ->
+                drawMusicInfo(musicResult, x, y)
+
+                if ((i + 1) % 3 == 0) {
+                    x = 25f
+                    y += (infoH + 20f)
+                } else {
+                    x += (infoW + 10f)
+                }
+            }
+
+            drawTextLine(
+                TextLine.make(
+                    "歌曲难度数据来源于 Project Sekai Profile",
+                    FontUtil.defaultFont(20f, style = FontStyle.BOLD)
+                ),
+                25f,
+                1850f,
+                Paint().apply {
+                    color = Color.BLACK.rgb
+                    isAntiAlias = true
+                }
+            )
+
+            drawTextLine(
+                TextLine.make(
+                    "Render by Comet",
+                    FontUtil.defaultFont(20f, style = FontStyle.BOLD)
+                ),
+                750f,
+                1850f,
+                Paint().apply {
+                    color = Color.BLACK.rgb
+                    isAntiAlias = true
+                }
+            )
+        }
+
+        val img = surface.makeImageSnapshot()
+
+        return ren.natsuyuk1.comet.api.message.Image(
+            byteArray = img.encodeToData(EncodedImageFormat.PNG, QUALITY)?.bytes ?: return null
+        )
+    }
+
+    private fun Canvas.drawAvatar(avatar: Image, x: Float, y: Float, size: Float, radius: Float) {
+        val rrect = RRect.makeXYWH(
+            x, y, size, size, radius // 圆形弧度
+        )
+
+        save()
+        clipRRect(rrect, true)
+        drawImageRect(
+            avatar,
+            Rect(0f, 0f, avatar.width.toFloat(), avatar.height.toFloat()),
+            rrect,
+            SamplingMode.MITCHELL,
+            Paint().apply { isAntiAlias = true },
+            true
+        )
+        restore()
+    }
+
+    private fun Canvas.drawBadge(badge: Image, x: Float, y: Float, size: Float, radius: Float) {
         TODO()
     }
 
@@ -86,27 +205,25 @@ object ProjectSekaiImageService {
         x: Float,
         y: Float
     ) {
+        // 290 x 125
+        save()
+        drawRect(Rect.makeXYWH(x, y, 290f, 125f), Paint().apply { color = Color.WHITE.rgb })
+        restore()
+
         val musicInfo = ProjectSekaiMusic.getMusicInfo(musicResult.musicId) ?: return
         val musicLevel = ProjectSekaiManager.getSongAdjustedLevel(
-            musicResult.musicId,
-            musicResult.musicDifficulty,
-            musicResult.playResult
-        )?.fixDisplay(1)
+            musicResult.musicId, musicResult.musicDifficulty, musicResult.playResult
+        )
         val coverFile = ProjectSekaiMusic.getMusicCover(musicInfo)
 
         val cover = try {
             Image.makeFromEncoded(coverFile.readBytes())
         } catch (e: Exception) {
-            // TODO: 使用一张占位符图片替换?
             return
         }
 
         val rrect = RRect.makeXYWH(
-            x,
-            y,
-            COVER_SIZE.toFloat(),
-            COVER_SIZE.toFloat(),
-            10f // 圆形弧度
+            x + 20f, y + 20f, 80f, 80f, 0f
         )
 
         save()
@@ -115,30 +232,93 @@ object ProjectSekaiImageService {
             cover,
             Rect(0f, 0f, cover.width.toFloat(), cover.height.toFloat()),
             rrect,
-            FilterMipmap(FilterMode.LINEAR, MipmapMode.NEAREST),
-            null,
+            CubicResampler(1 / 3.0f, 1 / 3.0f),
+            Paint().apply { isAntiAlias = true },
             true
         )
         restore()
 
-        val musicParagraph = ParagraphBuilder(
-            ParagraphStyle().apply {
-                alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 15f)
-            },
-            FontUtil.fonts
-        ).apply {
-            addTextln(musicLevel ?: "N/A")
+        drawCircle(
+            x + 20f, y + 20f, 15f,
+            Paint().apply {
+                color = if (musicResult.musicDifficulty == MusicDifficulty.MASTER) {
+                    Color(187, 51, 238).rgb
+                } else {
+                    Color(238, 67, 102).rgb
+                }
+            }
+        )
 
-            changeStyle(FontUtil.defaultFontStyle(Color.BLACK, 20f))
+        drawString(
+            musicLevel?.fixDisplay(0) ?: "N/A",
+            x + 11f,
+            y + 20f + 4.5f,
+            FontUtil.defaultFont(15f, style = FontStyle.BOLD),
+            Paint().apply {
+                color = Color.WHITE.rgb
+                isAntiAlias = true
+            }
+        )
 
-            addTextln(musicInfo.title)
+        drawTextLine(
+            TextLine.make(
+                musicInfo.title.limit(8, ".."),
+                FontUtil.defaultFont(20f, style = FontStyle.BOLD)
+            ),
+            x + 115f,
+            y + 35f,
+            Paint().apply {
+                color = Color.BLACK.rgb
+                mode = PaintMode.FILL
+                isAntiAlias = true
+            }
+        )
 
-            changeStyle(FontUtil.defaultFontStyle(Color.BLACK, 16f))
-            addText(if (musicResult.isAllPerfect) "ALL PERFECT" else "FULL COMBO")
-        }.build().layout(50f)
+        // PJSK Profile player score 算法
+        val multipier = when (musicResult.playResult) {
+            MusicPlayResult.ALL_PERFECT -> 8.0
+            MusicPlayResult.FULL_COMBO -> 7.5
+            MusicPlayResult.CLEAR -> 5.0
+        }
 
-        musicParagraph.paint(this, x + COVER_SIZE + 5f, y)
+        drawTextLine(
+            TextLine.make(
+                "${musicLevel?.fixDisplay(1) ?: "N/A"} " +
+                    "${if (musicLevel != null) " → " + (musicLevel * multipier).toInt() else ""}",
+                FontUtil.defaultFont(15f)
+            ),
+            x + 115f,
+            y + 65f,
+            Paint().apply {
+                color = Color.BLACK.rgb
+                isAntiAlias = true
+            }
+        )
+
+        val statusImg = Image.makeFromEncoded(
+            withContext(Dispatchers.IO) {
+                pjskFolder.resolve(
+                    if (musicResult.playResult == MusicPlayResult.ALL_PERFECT) "b30/AllPerfect.png"
+                    else "b30/FullCombo.png"
+                ).readBytes()
+            }
+        )
+
+        val statusRect = Rect.makeXYWH(
+            x + 112f, y + 75f, 165f, 30f
+        )
+
+        save()
+        clipRect(statusRect, true)
+        drawImageRect(
+            statusImg,
+            Rect(0f, 0f, statusImg.width.toFloat(), statusImg.height.toFloat()),
+            statusRect.inflate(-1f),
+            SamplingMode.MITCHELL,
+            Paint().apply { isAntiAlias = true },
+            true
+        )
+        restore()
     }
 
     /**
@@ -170,14 +350,11 @@ object ProjectSekaiImageService {
                 addTextln(
                     "${ProjectSekaiMusic.getMusicInfo(mr.musicId)?.title} [${mr.musicDifficulty.name.uppercase()} ${
                     ProjectSekaiManager.getSongLevel(
-                        mr.musicId,
-                        mr.musicDifficulty
+                        mr.musicId, mr.musicDifficulty
                     )
                     }] $status (${
                     ProjectSekaiManager.getSongAdjustedLevel(
-                        mr.musicId,
-                        mr.musicDifficulty,
-                        mr.playResult
+                        mr.musicId, mr.musicDifficulty, mr.playResult
                     )?.fixDisplay(1)
                     })"
                 )
@@ -199,10 +376,9 @@ object ProjectSekaiImageService {
         }
 
         val image = surface.makeImageSnapshot()
-        val data = image.encodeToData(EncodedImageFormat.JPEG, QUALITY)
-            ?: return buildMessageWrapper {
-                appendText("生成图片失败!")
-            }
+        val data = image.encodeToData(EncodedImageFormat.JPEG, QUALITY) ?: return buildMessageWrapper {
+            appendText("生成图片失败!")
+        }
 
         return buildMessageWrapper {
             appendElement(data.bytes.asImage())
@@ -269,8 +445,7 @@ object ProjectSekaiImageService {
                 SekaiEventStatus.ONGOING -> {
                     addTextln(
                         "离活动结束还有 ${
-                        (eventInfo.aggregateTime.toInstant(true) - now)
-                            .toFriendly(TimeUnit.SECONDS)
+                        (eventInfo.aggregateTime.toInstant(true) - now).toFriendly(TimeUnit.SECONDS)
                         }"
                     )
                 }
@@ -291,8 +466,7 @@ object ProjectSekaiImageService {
                 },
                 FontUtil.fonts
             ).apply {
-                val teamName =
-                    ProjectSekaiI18N.getCarnivalTeamName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
+                val teamName = ProjectSekaiI18N.getCarnivalTeamName(profile.userCheerfulCarnival.cheerfulCarnivalTeamId)
 
                 if (teamName != null) {
                     addTextln("当前队伍为 $teamName")
@@ -366,28 +540,22 @@ object ProjectSekaiImageService {
             addText("Render by Comet")
         }.build().layout(WIDTH.toFloat())
 
-        val surface =
-            Surface.makeRasterN32Premul(
-                WIDTH,
-                (
-                    AVATAR_SIZE +
-                        DEFAULT_PADDING * 2.5 +
-                        eventInfoText.height +
-                        eventScoreText.height +
-                        (eventTeamText?.height ?: 0f)
-                    ).toInt()
-            )
+        val surface = Surface.makeRasterN32Premul(
+            WIDTH,
+            (
+                AVATAR_SIZE + DEFAULT_PADDING * 2.5 + eventInfoText.height + eventScoreText.height + (
+                    eventTeamText?.height
+                        ?: 0f
+                    )
+                ).toInt()
+        )
 
         surface.canvas.apply {
             clear(Color.WHITE.rgb)
 
             if (avatar != null) {
                 val rrect = RRect.makeXYWH(
-                    20f,
-                    20f,
-                    AVATAR_SIZE.toFloat(),
-                    AVATAR_SIZE.toFloat(),
-                    10f // 圆形弧度
+                    20f, 20f, AVATAR_SIZE.toFloat(), AVATAR_SIZE.toFloat(), 10f // 圆形弧度
                 )
 
                 save()
@@ -404,15 +572,11 @@ object ProjectSekaiImageService {
             }
 
             userInfoText.paint(
-                this,
-                DEFAULT_PADDING * 2f + AVATAR_SIZE,
-                DEFAULT_PADDING.toFloat()
+                this, DEFAULT_PADDING * 2f + AVATAR_SIZE, DEFAULT_PADDING.toFloat()
             )
 
             eventInfoText.paint(
-                this,
-                DEFAULT_PADDING.toFloat(),
-                (AVATAR_SIZE + DEFAULT_PADDING * 2).toFloat()
+                this, DEFAULT_PADDING.toFloat(), (AVATAR_SIZE + DEFAULT_PADDING * 2).toFloat()
             )
 
             var extraY = 0f
@@ -422,17 +586,13 @@ object ProjectSekaiImageService {
                 eventTeamText != null
             ) {
                 val teamNum = if (profile.userCheerfulCarnival.cheerfulCarnivalTeamId % 2 == 0) 2 else 1
-                val teamIcon =
-                    ProjectSekaiEvent.getEventTeamImage(teamNum)
+                val teamIcon = ProjectSekaiEvent.getEventTeamImage(teamNum)
                 var extraX = 0f
 
                 if (teamIcon != null) {
                     val teamIconImg = Image.makeFromEncoded(teamIcon.readBytes())
                     val rect = Rect.makeXYWH(
-                        DEFAULT_PADDING.toFloat(),
-                        AVATAR_SIZE + DEFAULT_PADDING * 2 + eventInfoText.height,
-                        30f,
-                        30f
+                        DEFAULT_PADDING.toFloat(), AVATAR_SIZE + DEFAULT_PADDING * 2 + eventInfoText.height, 30f, 30f
                     )
 
                     save()
@@ -451,26 +611,21 @@ object ProjectSekaiImageService {
                 }
 
                 eventTeamText.paint(
-                    this,
-                    DEFAULT_PADDING + extraX + 10f,
-                    AVATAR_SIZE + DEFAULT_PADDING * 2 + eventInfoText.height
+                    this, DEFAULT_PADDING + extraX + 10f, AVATAR_SIZE + DEFAULT_PADDING * 2 + eventInfoText.height
                 )
 
                 extraY = eventTeamText.height
             }
 
             eventScoreText.paint(
-                this,
-                DEFAULT_PADDING.toFloat(),
-                AVATAR_SIZE + DEFAULT_PADDING * 2 + eventInfoText.height + extraY
+                this, DEFAULT_PADDING.toFloat(), AVATAR_SIZE + DEFAULT_PADDING * 2 + eventInfoText.height + extraY
             )
         }
 
         val image = surface.makeImageSnapshot()
-        val data = image.encodeToData(EncodedImageFormat.JPEG, QUALITY)
-            ?: return buildMessageWrapper {
-                appendText("生成图片失败!")
-            }
+        val data = image.encodeToData(EncodedImageFormat.JPEG, QUALITY) ?: return buildMessageWrapper {
+            appendText("生成图片失败!")
+        }
 
         return buildMessageWrapper {
             appendElement(data.bytes.asImage())
@@ -500,6 +655,7 @@ object ProjectSekaiImageService {
                 DownloadStatus.UNVERIFIED, DownloadStatus.FAILED -> {
                     return Pair(null, "谱面下载失败, 可能谱面暂未更新或是网络问题")
                 }
+
                 DownloadStatus.DOWNLOADING -> {
                     return Pair(null, "已有相同谱面正在下载中, 请稍等")
                 }
@@ -544,8 +700,7 @@ object ProjectSekaiImageService {
             addText(
                 "${difficulty.name} [Lv.${
                 ProjectSekaiManager.getSongLevel(
-                    musicInfo.id,
-                    difficulty
+                    musicInfo.id, difficulty
                 )
                 }] | 共 ${info?.totalNoteCount} 个键"
             )
@@ -563,8 +718,7 @@ object ProjectSekaiImageService {
         }.build().layout(bg.width - 250f)
 
         val surface = Surface.makeRasterN32Premul(
-            bg.width + DEFAULT_PADDING,
-            bg.height + DEFAULT_PADDING * 3 + text.height.toInt()
+            bg.width + DEFAULT_PADDING, bg.height + DEFAULT_PADDING * 3 + text.height.toInt()
         )
 
         val cover = try {
@@ -590,11 +744,7 @@ object ProjectSekaiImageService {
             restore()
 
             val rrect = RRect.makeXYWH(
-                30f,
-                40f + bg.height,
-                text.height,
-                text.height,
-                0f
+                30f, 40f + bg.height, text.height, text.height, 0f
             )
 
             // Draw music cover
@@ -614,8 +764,7 @@ object ProjectSekaiImageService {
             rightText.paint(this, 60f + rrect.width, 30f + bg.height)
         }
 
-        val data = surface.makeImageSnapshot().encodeToData(EncodedImageFormat.PNG)
-            ?: return Pair(null, "生成谱面失败")
+        val data = surface.makeImageSnapshot().encodeToData(EncodedImageFormat.PNG) ?: return Pair(null, "生成谱面失败")
 
         chartFile.touch()
         chartFile.writeBytes(data.bytes)
