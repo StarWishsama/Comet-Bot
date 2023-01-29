@@ -3,6 +3,7 @@ package ren.natsuyuk1.comet.service.image
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
+import moe.sdl.yac.core.PrintMessage
 import org.jetbrains.skia.*
 import org.jetbrains.skia.paragraph.*
 import ren.natsuyuk1.comet.api.message.MessageWrapper
@@ -85,22 +86,19 @@ object ProjectSekaiImageService {
     suspend fun drawBest30(
         user: ProjectSekaiUserInfo,
         b30: List<ProjectSekaiUserInfo.MusicResult>
-    ): ren.natsuyuk1.comet.api.message.Image? {
+    ): ren.natsuyuk1.comet.api.message.Image {
         val cardId = user.userDecks.first().leader
-        val avatarBundleName = ProjectSekaiCard.getAssetBundleName(cardId) ?: return null
-        val status = user.userCards.find { it.cardId == cardId }?.specialTrainingStatus ?: return null
+        val avatarBundleName = ProjectSekaiCard.getAssetBundleName(cardId) ?: throw PrintMessage("加载卡面数据失败")
+        val status =
+            user.userCards.find { it.cardId == cardId }?.specialTrainingStatus ?: throw PrintMessage("加载卡面数据失败")
 
         val background = Image.makeFromEncoded(pjskFolder.resolve("b30/b30-background.png").readBytes())
 
-        val avatar = try {
-            Image.makeFromEncoded(
-                ProjectSekaiManager.resolveCardImage(
-                    avatarBundleName, status
-                ).readBytes()
-            )
-        } catch (e: IllegalArgumentException) {
-            return null
-        }
+        val avatar = Image.makeFromEncoded(
+            ProjectSekaiManager.resolveCardImage(
+                avatarBundleName, status
+            ).readBytes()
+        )
 
         val surface = Surface.makeRasterN32Premul(BEST30_WIDTH, BEST30_HEIGHT)
 
@@ -174,7 +172,8 @@ object ProjectSekaiImageService {
         val img = surface.makeImageSnapshot()
 
         return ren.natsuyuk1.comet.api.message.Image(
-            byteArray = img.encodeToData(EncodedImageFormat.PNG, QUALITY)?.bytes ?: return null
+            byteArray = img.encodeToData(EncodedImageFormat.PNG, QUALITY)?.bytes
+                ?: throw PrintMessage("生成 Best 30 图片失败")
         )
     }
 
@@ -319,70 +318,6 @@ object ProjectSekaiImageService {
             true
         )
         restore()
-    }
-
-    /**
-     * 绘制一张玩家的 30 首最佳歌曲表
-     *
-     * @param user 从 API 获得的 [ProjectSekaiUserInfo]
-     * @param b30 表现最佳的 30 首歌
-     *
-     * @return 包装后的消息 [MessageWrapper]
-     */
-    @Deprecated("This method will replace to better one", replaceWith = ReplaceWith("drawBest30"))
-    fun drawB30(user: ProjectSekaiUserInfo.UserGameData, b30: List<ProjectSekaiUserInfo.MusicResult>): MessageWrapper {
-        val b30Text = ParagraphBuilder(
-            ParagraphStyle().apply {
-                alignment = Alignment.LEFT
-                textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
-            },
-            FontUtil.fonts
-        ).apply {
-            addTextln("${user.userGameData.name} - ${user.userGameData.userID} - BEST 30")
-
-            changeStyle(FontUtil.defaultFontStyle(Color.BLACK, 18f))
-
-            addTextln()
-
-            b30.forEach { mr ->
-                val status = if (mr.isAllPerfect) "AP" else "FC"
-
-                addTextln(
-                    "${ProjectSekaiMusic.getMusicInfo(mr.musicId)?.title} [${mr.musicDifficulty.name.uppercase()} ${
-                    ProjectSekaiManager.getSongLevel(
-                        mr.musicId, mr.musicDifficulty
-                    )
-                    }] $status (${
-                    ProjectSekaiManager.getSongAdjustedLevel(
-                        mr.musicId, mr.musicDifficulty, mr.playResult
-                    )?.fixDisplay(1)
-                    })"
-                )
-            }
-
-            addTextln()
-
-            changeStyle(FontUtil.defaultFontStyle(Color.BLACK, 13f))
-
-            addText("由 Comet 生成 | 数据来源于 profile.pjsekai.moe")
-        }.build().layout(WIDTH.toFloat())
-
-        val surface = Surface.makeRasterN32Premul(WIDTH, (DEFAULT_PADDING + b30Text.height).toInt())
-
-        surface.canvas.apply {
-            clear(Color.WHITE.rgb)
-
-            b30Text.paint(this, 10f, 10f)
-        }
-
-        val image = surface.makeImageSnapshot()
-        val data = image.encodeToData(EncodedImageFormat.JPEG, QUALITY) ?: return buildMessageWrapper {
-            appendText("生成图片失败!")
-        }
-
-        return buildMessageWrapper {
-            appendElement(data.bytes.asImage())
-        }
     }
 
     /**

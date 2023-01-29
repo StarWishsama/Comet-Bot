@@ -1,6 +1,5 @@
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects
 
-import kotlinx.atomicfu.atomic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.message.MessageWrapper
@@ -73,28 +72,32 @@ data class ProjectSekaiUserInfo(
             it.musicId
         }.take(30)
 
-    fun generateBest30(): MessageWrapper {
+    suspend fun generateBest30(): MessageWrapper {
         if (ProjectSekaiMusicDifficulty.musicDiffDatabase.isEmpty() || ProjectSekaiMusic.musicDatabase.isEmpty()) {
             return "Project Sekai 歌曲数据还没有加载好噢".toMessageWrapper()
         }
 
-        return ProjectSekaiImageService.drawB30(user, getBest30Songs())
+        return buildMessageWrapper {
+            appendElement(
+                ProjectSekaiImageService.drawBest30(this@ProjectSekaiUserInfo, getBest30Songs())
+            )
+        }
     }
 
     fun getSpecificLevelMusicCount(difficulty: MusicDifficulty, playResult: MusicPlayResult): Int {
-        var counter = atomic(0)
+        var counter = 0
 
         userMusics.forEach {
-            counter.getAndAdd(
+            counter += (
                 it.musicStatus.count { ms ->
                     ms.userMusicResult.any { umr ->
                         umr.musicDifficulty == difficulty && umr.playResult >= playResult
                     }
                 }
-            )
+                )
         }
 
-        return counter.value
+        return counter
     }
 
     @Serializable
