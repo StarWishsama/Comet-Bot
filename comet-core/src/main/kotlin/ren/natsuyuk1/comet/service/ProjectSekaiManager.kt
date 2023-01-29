@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.service
 
 import io.ktor.http.*
+import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
@@ -35,6 +36,7 @@ object ProjectSekaiManager {
         loadPJSKDatabase()
         refreshEvent()
         refreshCache()
+        initBest30Image()
 
         TaskManager.registerTask("pjsk_event", "0 6 * * *", ::refreshEvent)
         TaskManager.registerTaskDelayed(3.toDuration(DurationUnit.HOURS), ::refreshCache)
@@ -141,5 +143,33 @@ object ProjectSekaiManager {
         }
 
         return target
+    }
+
+    private suspend fun initBest30Image() {
+        val b30 = pjskFolder.resolve("b30/")
+        b30.mkdirs()
+        val url = "https://raw.githubusercontent.com/StarWishsama/comet-resource-database/main/projectsekai/image/b30/"
+        if (b30.listFiles().isNullOrEmpty()) {
+            scope.launch {
+                cometClient.client.downloadFile(
+                    url + "AllPerfect.png",
+                    b30.resolve("AllPerfect.png")
+                )
+            }
+
+            scope.launch {
+                cometClient.client.downloadFile(
+                    url + "FullCombo.png",
+                    b30.resolve("FullCombo.png")
+                )
+            }
+
+            scope.launch {
+                cometClient.client.downloadFile(
+                    url + "b30-background.png",
+                    b30.resolve("b30-background.png")
+                )
+            }
+        }
     }
 }
