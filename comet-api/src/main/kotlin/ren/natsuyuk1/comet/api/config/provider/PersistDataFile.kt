@@ -92,14 +92,6 @@ open class PersistDataFile<T : Any>(
                 val content = file.readTextBuffered()
                 val t = format.decodeFromString(serializer, content)
 
-                // Update readonly file content in case of data class changed
-                if (readOnly) {
-                    val encoded = format.encodeToString(serializer, t)
-                    if (content.length != encoded.length) {
-                        file.writeTextBuffered(encoded)
-                    }
-                }
-
                 data = t
                 t.also {
                     logger.debug { "已加载持久化文件 ${it::class.simpleName}" }
