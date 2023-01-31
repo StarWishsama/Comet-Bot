@@ -191,11 +191,6 @@ internal suspend fun ProjectSekaiMusicInfo.toMessageWrapper() =
         val diff = ProjectSekaiMusicDifficulty.getMusicDifficulty(musicInfo.id)
         val extraInfo = PJSKProfileMusic.getMusicInfo(musicInfo.id)
 
-        if (diff.size != 5) {
-            appendText("音乐等级数据还没有准备好哦")
-            return@buildMessageWrapper
-        }
-
         if (musicInfo.publishedAt.toInstant(true) > Clock.System.now()) {
             appendTextln("⚠ 该内容为未公开剧透内容")
         }
@@ -214,10 +209,14 @@ internal suspend fun ProjectSekaiMusicInfo.toMessageWrapper() =
         appendLine()
 
         appendTextln("难度信息 >")
-        diff.forEach {
-            appendTextln(
-                "${it.musicDifficulty}[${it.playLevel}] | ${it.totalNoteCount}"
-            )
+        if (diff.isEmpty()) {
+            appendText("最新歌曲暂无难度信息")
+        } else {
+            diff.forEach {
+                appendTextln(
+                    "${it.musicDifficulty}[${it.playLevel}] | ${it.totalNoteCount}"
+                )
+            }
         }
 
         trim()
