@@ -17,6 +17,7 @@ import ren.natsuyuk1.comet.utils.file.cacheDirectory
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 import ren.natsuyuk1.comet.utils.skiko.FontUtil
+import ren.natsuyuk1.comet.utils.skiko.changeStyle
 import java.awt.Color
 import java.io.File
 import java.nio.file.Files
@@ -37,7 +38,7 @@ object ArcaeaImageService {
 
             addText("平均 Rating >> ${overallRating.fixDisplay()}\n")
 
-            popStyle().pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 15f))
+            changeStyle(FontUtil.defaultFontStyle(Color.BLACK, 15f))
 
             addText("\n")
 
@@ -56,7 +57,7 @@ object ArcaeaImageService {
 
             addText("\n")
 
-            popStyle().pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 13f))
+            changeStyle(FontUtil.defaultFontStyle(Color.BLACK, 13f))
 
             addText("由 Comet 生成 | 数据来源于 redive.estertion.win")
         }.build().layout(650f)

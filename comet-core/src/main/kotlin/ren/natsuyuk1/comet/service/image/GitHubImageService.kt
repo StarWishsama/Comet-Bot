@@ -15,6 +15,7 @@ import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import ren.natsuyuk1.comet.utils.skiko.FontUtil
 import ren.natsuyuk1.comet.utils.skiko.FontUtil.gloryFontSetting
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
+import ren.natsuyuk1.comet.utils.skiko.changeStyle
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import java.awt.Color
 import java.io.File
@@ -141,8 +142,7 @@ object GitHubImageService {
         val pullRequestBody = drawBody(GITHUB_DEFAULT_WIDTH - GITHUB_CONTENT_MARGIN * 2) {
             addText("📜 ${pullRequestInfo.title}\n\n")
 
-            popStyle()
-            pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 16f))
+            changeStyle(FontUtil.defaultFontStyle(Color.BLACK, 16f))
 
             addText((pullRequestInfo.body ?: "没有描述").limit(400))
         }

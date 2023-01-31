@@ -631,8 +631,7 @@ object ProjectSekaiImageService {
             addTextln(
                 "${musicInfo.title} - ${musicInfo.lyricist}"
             )
-            popStyle()
-            pushStyle(FontUtil.defaultFontStyle(Color.BLACK, 38f))
+            changeStyle(FontUtil.defaultFontStyle(Color.BLACK, 38f))
             val info = ProjectSekaiMusicDifficulty.getMusicDifficulty(musicInfo.id).find {
                 it.musicDifficulty == difficulty
             }
