@@ -16,8 +16,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUs
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiLocalFileTable
-import ren.natsuyuk1.comet.objects.pjsk.local.PJSKProfileMusic
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService.drawEventInfo
@@ -46,7 +45,7 @@ class TestProjectSekaiDraw {
     @BeforeAll
     fun init() {
         initTestDatabase()
-        DatabaseManager.loadTables(ProjectSekaiLocalFileTable, ProjectSekaiDataTable)
+        DatabaseManager.loadTables(ProjectSekaiDataTable)
 
         runBlocking {
             SkikoHelper.loadSkiko()
@@ -89,7 +88,7 @@ class TestProjectSekaiDraw {
 
         runBlocking {
             // Represent to music named `気まぐれメルシィ`
-            val music = PJSKProfileMusic.getMusicInfo(281)
+            val music = ProjectSekaiMusic.getMusicInfo(281)
             assertNotNull(music)
 
             val (image, _) = ProjectSekaiImageService.drawCharts(music, MusicDifficulty.MASTER)

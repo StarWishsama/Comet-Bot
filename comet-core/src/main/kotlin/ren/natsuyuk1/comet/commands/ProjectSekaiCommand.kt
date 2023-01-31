@@ -18,6 +18,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.config.FeatureConfig
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.local.PJSKProfileMusic
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.util.toMessageWrapper
@@ -229,9 +230,11 @@ class ProjectSekaiCommand(
                 }
             }
 
-            val (musicInfo, sim) = PJSKProfileMusic.fuzzyGetMusicInfo(
+            val (musicInfo, sim) = ProjectSekaiMusic.fuzzyGetMusicInfo(
                 musicName, FeatureConfig.data.projectSekaiSetting.minSimilarity
             )
+
+            val extraInfo = musicInfo?.id?.let { PJSKProfileMusic.getMusicInfo(it) }
 
             if (musicInfo == null) {
                 subject.sendMessage("找不到你想要搜索的歌曲哦".toMessageWrapper())
@@ -253,16 +256,18 @@ class ProjectSekaiCommand(
                 subject.sendMessage(
                     buildMessageWrapper {
                         appendTextln("搜索准确度: $sim")
-                        val bpmText = if (!musicInfo.bpms.isNullOrEmpty()) {
-                            buildString {
-                                musicInfo.bpms.forEach { bi ->
-                                    append("${bi.bpm.formatDigests(0)} - ")
-                                }
-                            }.removeSuffix(" - ")
-                        } else {
-                            musicInfo.bpm.formatDigests(0)
+                        if (extraInfo != null) {
+                            val bpmText = if (!extraInfo.bpms.isNullOrEmpty()) {
+                                buildString {
+                                    extraInfo.bpms.forEach { bi ->
+                                        append("${bi.bpm.formatDigests(0)} - ")
+                                    }
+                                }.removeSuffix(" - ")
+                            } else {
+                                extraInfo.bpm.formatDigests(0)
+                            }
+                            appendTextln("BPM: $bpmText")
                         }
-                        appendTextln("BPM: $bpmText")
                         appendElement(chartFile.asImage())
                     }
                 )
@@ -287,7 +292,7 @@ class ProjectSekaiCommand(
         private val musicName by argument("歌曲名称")
 
         override suspend fun run() {
-            val (musicInfo, _) = PJSKProfileMusic.fuzzyGetMusicInfo(
+            val (musicInfo, _) = ProjectSekaiMusic.fuzzyGetMusicInfo(
                 musicName, FeatureConfig.data.projectSekaiSetting.minSimilarity
             )
 

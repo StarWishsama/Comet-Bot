@@ -8,28 +8,21 @@ import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProfileMusicInfo
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.utils.file.isBlank
-import ren.natsuyuk1.comet.utils.file.isType
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.DownloadStatus
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
-import ren.natsuyuk1.comet.utils.string.ldSimilarity
-import ren.natsuyuk1.comet.utils.string.normalize
-import java.io.File
-import java.math.BigDecimal
-import java.text.Normalizer
 import kotlin.time.Duration.Companion.days
 
 private val logger = KotlinLogging.logger {}
 
 object PJSKProfileMusic : ProjectSekaiLocalFile(
-    pjskFolder.resolve("musics.json"),
+    pjskFolder.resolve("musics_pjsekai.json"),
     2.days
 ) {
     private const val url = "https://musics.pjsekai.moe/musics.json"
-    private val musicCoverFolder = pjskFolder.resolve("covers/")
 
-    internal val musicDatabase = mutableMapOf<Int, ProfileMusicInfo>()
+    private val musicDatabase = mutableMapOf<Int, ProfileMusicInfo>()
 
     override suspend fun load() {
         try {
@@ -64,55 +57,5 @@ object PJSKProfileMusic : ProjectSekaiLocalFile(
         return false
     }
 
-    fun getMusicInfo(name: String): ProfileMusicInfo? = musicDatabase.values.find { it.title == name }
-
     fun getMusicInfo(id: Int): ProfileMusicInfo? = musicDatabase[id]
-
-    fun fuzzyGetMusicInfo(name: String, minSimilarity: Double = 0.35): Pair<ProfileMusicInfo?, BigDecimal> {
-        val normalizeName = name.normalize(Normalizer.Form.NFKC)
-
-        return musicDatabase.values.associateWith {
-            val alias = ProjectSekaiMusicAlias.getAlias(it.id) ?: emptyArray()
-            val sim = ldSimilarity(it.title.normalize(Normalizer.Form.NFKC), normalizeName)
-                .max(
-                    alias.maxOfOrNull { a -> ldSimilarity(a.normalize(Normalizer.Form.NFKC), normalizeName) }
-                        ?: BigDecimal.ZERO
-                )
-
-            sim
-        }.filter { it.value > BigDecimal.valueOf(minSimilarity) }
-            .maxByOrNull { it.value }.let {
-                Pair(it?.key, it?.value ?: BigDecimal.ZERO)
-            }
-    }
-
-    suspend fun getMusicCover(music: ProfileMusicInfo): File {
-        if (!musicCoverFolder.exists()) {
-            musicCoverFolder.mkdir()
-        }
-
-        val cover = musicCoverFolder.resolve(music.assetBundleName + ".png")
-
-        if (cover.isBlank() || !cover.isType("image/png")) {
-            downloadMusicCover(music)
-        }
-
-        return cover
-    }
-
-    private suspend fun downloadMusicCover(music: ProfileMusicInfo) {
-        if (!musicCoverFolder.exists()) {
-            musicCoverFolder.mkdir()
-        }
-
-        val cover = musicCoverFolder.resolve(music.assetBundleName + ".png")
-        cover.touch()
-
-        val url =
-            "https://storage.sekai.best/sekai-assets/music/jacket/${music.assetBundleName}_rip/${music.assetBundleName}.png" // ktlint-disable max-line-length
-
-        cometClient.client.downloadFile(url, cover) {
-            it.contentType()?.match(ContentType.Image.PNG) == true
-        }
-    }
 }

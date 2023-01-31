@@ -209,11 +209,11 @@ object ProjectSekaiImageService {
         drawRect(Rect.makeXYWH(x, y, 290f, 125f), Paint().apply { color = Color.WHITE.rgb })
         restore()
 
-        val musicInfo = PJSKProfileMusic.getMusicInfo(musicResult.musicId) ?: return
+        val musicInfo = ProjectSekaiMusic.getMusicInfo(musicResult.musicId) ?: return
         val musicLevel = ProjectSekaiManager.getSongAdjustedLevel(
             musicResult.musicId, musicResult.musicDifficulty, musicResult.playResult
         )
-        val coverFile = PJSKProfileMusic.getMusicCover(musicInfo)
+        val coverFile = ProjectSekaiMusic.getMusicCover(musicInfo)
 
         val cover = try {
             Image.makeFromEncoded(coverFile.readBytes())
@@ -576,7 +576,7 @@ object ProjectSekaiImageService {
      * @return 渲染完成的图片路径和错误信息 [File] [String]
      */
     suspend fun drawCharts(
-        musicInfo: ProfileMusicInfo,
+        musicInfo: ProjectSekaiMusicInfo,
         difficulty: MusicDifficulty
     ): Pair<File?, String> {
         val chartFile = musicInfo.id.chart(difficulty)
@@ -657,7 +657,7 @@ object ProjectSekaiImageService {
         )
 
         val cover = try {
-            Image.makeFromEncoded(PJSKProfileMusic.getMusicCover(musicInfo).readBytes())
+            Image.makeFromEncoded(ProjectSekaiMusic.getMusicCover(musicInfo).readBytes())
         } catch (e: IllegalArgumentException) {
             return Pair(null, "歌曲封面未准备好")
         }

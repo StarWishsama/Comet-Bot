@@ -4,50 +4,45 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
-import ren.natsuyuk1.comet.objects.pjsk.local.PJSKProfileMusic
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusicDifficulty
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
 import ren.natsuyuk1.comet.util.toMessageWrapper
 
-fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
-    buildMessageWrapper {
-        appendTextln("${user.userGameData.name} | ${user.userGameData.level} 级")
+fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper = buildMessageWrapper {
+    appendTextln("${user.userGameData.name} | ${user.userGameData.level} 级")
+    appendLine()
+    if (userProfile.bio.isNotBlank()) {
+        appendTextln(userProfile.bio)
         appendLine()
-        if (userProfile.bio.isNotBlank()) {
-            appendTextln(userProfile.bio)
-            appendLine()
-        }
-        appendTextln("歌曲游玩情况 >>")
-
-        appendText(
-            "EXPERT | Clear ${
-            getSpecificLevelMusicCount(
-                MusicDifficulty.EXPERT,
-                MusicPlayResult.CLEAR
-            )
-            }/${PJSKProfileMusic.musicDatabase.size} / FC ${
-            getSpecificLevelMusicCount(
-                MusicDifficulty.EXPERT,
-                MusicPlayResult.FULL_COMBO
-            )
-            } / AP ${getSpecificLevelMusicCount(MusicDifficulty.EXPERT, MusicPlayResult.ALL_PERFECT)}"
-        )
-        appendLine()
-        appendText(
-            "MASTER | Clear ${
-            getSpecificLevelMusicCount(
-                MusicDifficulty.MASTER,
-                MusicPlayResult.CLEAR
-            )
-            }/${PJSKProfileMusic.musicDatabase.size} / FC ${
-            getSpecificLevelMusicCount(
-                MusicDifficulty.MASTER,
-                MusicPlayResult.FULL_COMBO
-            )
-            } / AP ${getSpecificLevelMusicCount(MusicDifficulty.MASTER, MusicPlayResult.ALL_PERFECT)}"
-        )
     }
+    appendTextln("歌曲游玩情况 >>")
+
+    appendText(
+        "EXPERT | Clear ${
+        getSpecificLevelMusicCount(
+            MusicDifficulty.EXPERT, MusicPlayResult.CLEAR
+        )
+        }/${ProjectSekaiMusic.musicDatabase.size} / FC ${
+        getSpecificLevelMusicCount(
+            MusicDifficulty.EXPERT, MusicPlayResult.FULL_COMBO
+        )
+        } / AP ${getSpecificLevelMusicCount(MusicDifficulty.EXPERT, MusicPlayResult.ALL_PERFECT)}"
+    )
+    appendLine()
+    appendText(
+        "MASTER | Clear ${
+        getSpecificLevelMusicCount(
+            MusicDifficulty.MASTER, MusicPlayResult.CLEAR
+        )
+        }/${ProjectSekaiMusic.musicDatabase.size} / FC ${
+        getSpecificLevelMusicCount(
+            MusicDifficulty.MASTER, MusicPlayResult.FULL_COMBO
+        )
+        } / AP ${getSpecificLevelMusicCount(MusicDifficulty.MASTER, MusicPlayResult.ALL_PERFECT)}"
+    )
+}
 
 /**
  * [ProjectSekaiUserInfo]
@@ -67,13 +62,12 @@ data class ProjectSekaiUserInfo(
         it.musicDifficulty >= MusicDifficulty.EXPERT && (it.isAllPerfect || it.isFullCombo)
     }.sortedBy {
         ProjectSekaiManager.getSongAdjustedLevel(it.musicId, it.musicDifficulty, it.playResult)
-    }.asReversed()
-        .distinctBy {
-            it.musicId
-        }.take(30)
+    }.asReversed().distinctBy {
+        it.musicId
+    }.take(30)
 
     suspend fun generateBest30(): MessageWrapper {
-        if (ProjectSekaiMusicDifficulty.musicDiffDatabase.isEmpty() || PJSKProfileMusic.musicDatabase.isEmpty()) {
+        if (ProjectSekaiMusicDifficulty.musicDiffDatabase.isEmpty() || ProjectSekaiMusic.musicDatabase.isEmpty()) {
             return "Project Sekai 歌曲数据还没有加载好噢".toMessageWrapper()
         }
 
@@ -88,13 +82,11 @@ data class ProjectSekaiUserInfo(
         var counter = 0
 
         userMusics.forEach {
-            counter += (
-                it.musicStatus.count { ms ->
-                    ms.userMusicResult.any { umr ->
-                        umr.musicDifficulty == difficulty && umr.playResult >= playResult
-                    }
+            counter += it.musicStatus.count { ms ->
+                ms.userMusicResult.any { umr ->
+                    umr.musicDifficulty == difficulty && umr.playResult >= playResult
                 }
-                )
+            }
         }
 
         return counter
@@ -108,56 +100,43 @@ data class ProjectSekaiUserInfo(
         val playType: String,
         val playResult: MusicPlayResult,
         val highScore: Int,
-        @SerialName("fullComboFlg")
-        val isFullCombo: Boolean,
-        @SerialName("fullPerfectFlg")
-        val isAllPerfect: Boolean,
+        @SerialName("fullComboFlg") val isFullCombo: Boolean,
+        @SerialName("fullPerfectFlg") val isAllPerfect: Boolean,
         val mvpCount: Int,
         val superStarCount: Int
     )
 
     @Serializable
     data class UserGameData(
-        @SerialName("userGamedata")
-        val userGameData: Data
+        @SerialName("userGamedata") val userGameData: Data
     ) {
         @Serializable
         data class Data(
-            @SerialName("userId")
-            val userID: Long,
+            @SerialName("userId") val userID: Long,
             val name: String,
-            @SerialName("rank")
-            val level: Int
+            @SerialName("rank") val level: Int
         )
     }
 
     @Serializable
     data class UserProfile(
-        @SerialName("userId")
-        val userID: Long,
-        @SerialName("word")
-        val bio: String,
-        @SerialName("twitterId")
-        val twitterID: String
+        @SerialName("userId") val userID: Long,
+        @SerialName("word") val bio: String,
+        @SerialName("twitterId") val twitterID: String
     )
 
     @Serializable
     data class UserMusic(
-        @SerialName("userId")
-        val userID: Long,
-        @SerialName("musicId")
-        val musicID: Int,
-        @SerialName("userMusicDifficultyStatuses")
-        val musicStatus: List<MusicStatus>
+        @SerialName("userId") val userID: Long,
+        @SerialName("musicId") val musicID: Int,
+        @SerialName("userMusicDifficultyStatuses") val musicStatus: List<MusicStatus>
     ) {
         @Serializable
         data class MusicStatus(
-            @SerialName("musicId")
-            val musicID: Int,
+            @SerialName("musicId") val musicID: Int,
             val musicDifficulty: String,
             val musicDifficultyStatus: String,
-            @SerialName("userMusicResults")
-            val userMusicResult: List<UserMusicResult>
+            @SerialName("userMusicResults") val userMusicResult: List<UserMusicResult>
         ) {
             @Serializable
             data class UserMusicResult(
@@ -173,12 +152,9 @@ data class ProjectSekaiUserInfo(
     data class UserDeck(
         val leader: Int,
         val subLeader: Int,
-        @SerialName("member3")
-        val third: Int,
-        @SerialName("member4")
-        val fourth: Int,
-        @SerialName("member5")
-        val fifth: Int,
+        @SerialName("member3") val third: Int,
+        @SerialName("member4") val fourth: Int,
+        @SerialName("member5") val fifth: Int,
     )
 
     @Serializable
