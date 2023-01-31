@@ -15,13 +15,13 @@ import ren.natsuyuk1.comet.api.message.asImage
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.PJSKMusicInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProfileMusicInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiI18N
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
+import ren.natsuyuk1.comet.objects.pjsk.local.PJSKProfileMusic
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusicDifficulty
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.util.toMessageWrapper
@@ -184,7 +184,7 @@ internal fun Int.getSurroundingRank(): Pair<Int, Int> {
     return Pair(rankPosition.last(), 1000001)
 }
 
-internal suspend fun PJSKMusicInfo.toMessageWrapper() =
+internal suspend fun ProfileMusicInfo.toMessageWrapper() =
     buildMessageWrapper {
         val musicInfo = this@toMessageWrapper
         val diff = ProjectSekaiMusicDifficulty.getMusicDifficulty(musicInfo.id)
@@ -198,7 +198,7 @@ internal suspend fun PJSKMusicInfo.toMessageWrapper() =
             appendTextln("⚠ 该内容为未公开剧透内容")
         }
 
-        appendElement(ProjectSekaiMusic.getMusicCover(musicInfo).asImage())
+        appendElement(PJSKProfileMusic.getMusicCover(musicInfo).asImage())
         appendLine()
         appendTextln(musicInfo.title)
         appendLine()

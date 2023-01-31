@@ -7,8 +7,7 @@ import kotlinx.coroutines.async
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicID
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.PJSKMusicInfo
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiCharts.chartDir
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProfileMusicInfo
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.file.touch
@@ -31,12 +30,12 @@ object ProjectSekaiCharts {
         }
     }
 
-    private fun getSdvxID(music: PJSKMusicInfo) =
-        sdvxFormat.format(ProjectSekaiMusic.musicDatabase.values.sortedBy { it.publishedAt }.indexOf(music) + 1)
+    private fun getSdvxID(music: ProfileMusicInfo) =
+        sdvxFormat.format(PJSKProfileMusic.musicDatabase.values.sortedBy { it.publishedAt }.indexOf(music) + 1)
 
     private val validator: (HttpResponse) -> Boolean = { it.contentType()?.match(ContentType.Image.PNG) == true }
 
-    suspend fun downloadChart(music: PJSKMusicInfo): DownloadStatus {
+    suspend fun downloadChart(music: ProfileMusicInfo): DownloadStatus {
         val musicChartDir = chartDir.resolve("${music.id}/")
 
         if (musicChartDir.exists() && !musicChartDir.listFiles().isNullOrEmpty()) {
@@ -73,6 +72,7 @@ object ProjectSekaiCharts {
                     validator
                 )
             }
+
             val status = arrayOf(bgResult.await(), barResult.await(), mstResult.await(), expResult.await())
 
             return status.find { !it.isOK() } ?: DownloadStatus.OK

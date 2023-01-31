@@ -12,6 +12,8 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.decodeFromString
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.CometClient
@@ -19,7 +21,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiE
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiRankSeasonInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.PJSKEventPredictionInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33.PJSKEventPredictionInfo
 import ren.natsuyuk1.comet.utils.json.serializeTo
 
 private val logger = mu.KotlinLogging.logger {}
@@ -55,18 +57,24 @@ object ProjectSekaiAPI {
         param: String,
         builder: URLBuilder.(URLBuilder) -> Unit = {}
     ): HttpResponse {
-        val unibotReq = client.get("$UNIBOT_API_URL$param") {
-            url(builder)
-        }
-
-        return if (unibotReq.status != HttpStatusCode.OK) {
-            val profileReq = client.get("$PROFILE_URL$param") {
-                url(builder)
+        return coroutineScope {
+            val unibotReq = async {
+                client.get("$UNIBOT_API_URL$param") {
+                    url(builder)
+                }.let {
+                    if (!it.status.isSuccess()) null else it
+                }
             }
 
-            profileReq
-        } else {
-            unibotReq
+            val profileReq = async {
+                client.get("$PROFILE_URL$param") {
+                    url(builder)
+                }.let {
+                    if (!it.status.isSuccess()) null else it
+                }
+            }
+
+            return@coroutineScope profileReq.await() ?: unibotReq.await() ?: error("Network error")
         }
     }
 

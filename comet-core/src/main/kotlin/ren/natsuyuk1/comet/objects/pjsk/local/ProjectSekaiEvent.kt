@@ -43,5 +43,5 @@ object ProjectSekaiEvent {
     }
 
     private fun buildAssetUrl(eventName: String, num: Int): String =
-        "https://storage.sekai.best/sekai-assets/event/$eventName/team_image_rip/${eventName}_item_$num.png"
+        "https://assets.pjsek.ai/file/pjsekai-assets/ondemand/event/$eventName/team_image/${eventName}_item_$num.png"
 }

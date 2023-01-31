@@ -7,7 +7,7 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
-package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest
+package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonObject

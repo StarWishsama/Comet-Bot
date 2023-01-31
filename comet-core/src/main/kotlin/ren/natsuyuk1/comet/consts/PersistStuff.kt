@@ -19,7 +19,6 @@ import ren.natsuyuk1.comet.objects.github.data.GitHubRepoData
 import ren.natsuyuk1.comet.objects.keyword.KeyWordData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiDataTable
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserDataTable
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiLocalFileTable
 import ren.natsuyuk1.comet.pusher.CometPusherContextTable
 import ren.natsuyuk1.comet.service.RateLimitData
 
@@ -50,7 +49,6 @@ val cometTables =
         ApexLegendDataTable,
         PictureSearchConfigTable,
         CronTasks,
-        ProjectSekaiLocalFileTable,
     )
 
 val defaultCommands: List<AbstractCommandNode<*>> =

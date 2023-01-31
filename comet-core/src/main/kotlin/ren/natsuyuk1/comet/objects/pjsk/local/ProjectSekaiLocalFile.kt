@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.objects.pjsk.local
 
 import kotlinx.datetime.Clock
+import ren.natsuyuk1.comet.utils.file.lastModifiedTime
 import java.io.File
 import kotlin.time.Duration
 
@@ -27,5 +28,5 @@ abstract class ProjectSekaiLocalFile(
     abstract suspend fun update(): Boolean
 
     fun isOutdated(): Boolean =
-        checkDuration == null || (Clock.System.now() - getLastUpdateTime() > checkDuration)
+        checkDuration == null || (Clock.System.now() - file.lastModifiedTime() > checkDuration)
 }

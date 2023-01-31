@@ -8,7 +8,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSp
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.sekaibest.toMessageWrapper
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33.toMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.toMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
@@ -76,7 +76,7 @@ object ProjectSekaiService {
             return "活动预测线信息暂未获取, 稍等片刻哦~".toMessageWrapper()
         }
 
-        return pred.toMessageWrapper()
+        return pred.toMessageWrapper(predUpdateTime)
     }
 
     suspend fun queryUserInfo(userID: Long): MessageWrapper {

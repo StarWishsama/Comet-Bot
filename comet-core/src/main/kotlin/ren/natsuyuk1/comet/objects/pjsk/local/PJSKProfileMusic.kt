@@ -5,7 +5,7 @@ import kotlinx.serialization.builtins.ListSerializer
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.PJSKMusicInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProfileMusicInfo
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.utils.file.isBlank
 import ren.natsuyuk1.comet.utils.file.isType
@@ -22,14 +22,14 @@ import kotlin.time.Duration.Companion.days
 
 private val logger = KotlinLogging.logger {}
 
-object ProjectSekaiMusic : ProjectSekaiLocalFile(
+object PJSKProfileMusic : ProjectSekaiLocalFile(
     pjskFolder.resolve("musics.json"),
-    1.days
+    2.days
 ) {
     private const val url = "https://musics.pjsekai.moe/musics.json"
     private val musicCoverFolder = pjskFolder.resolve("covers/")
 
-    internal val musicDatabase = mutableMapOf<Int, PJSKMusicInfo>()
+    internal val musicDatabase = mutableMapOf<Int, ProfileMusicInfo>()
 
     override suspend fun load() {
         try {
@@ -38,7 +38,7 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
                 logger.warn { "加载 Project Sekai 歌曲数据失败, 文件为空" }
             } else {
                 val music = json.decodeFromString(
-                    ListSerializer(PJSKMusicInfo.serializer()),
+                    ListSerializer(ProfileMusicInfo.serializer()),
                     content
                 )
 
@@ -56,7 +56,6 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
 
         if (file.isBlank() || isOutdated()) {
             if (cometClient.client.downloadFile(url, file) == DownloadStatus.OK) {
-                updateLastUpdateTime()
                 logger.info { "成功更新音乐数据" }
                 return true
             }
@@ -65,11 +64,11 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
         return false
     }
 
-    fun getMusicInfo(name: String): PJSKMusicInfo? = musicDatabase.values.find { it.title == name }
+    fun getMusicInfo(name: String): ProfileMusicInfo? = musicDatabase.values.find { it.title == name }
 
-    fun getMusicInfo(id: Int): PJSKMusicInfo? = musicDatabase[id]
+    fun getMusicInfo(id: Int): ProfileMusicInfo? = musicDatabase[id]
 
-    fun fuzzyGetMusicInfo(name: String, minSimilarity: Double = 0.35): Pair<PJSKMusicInfo?, BigDecimal> {
+    fun fuzzyGetMusicInfo(name: String, minSimilarity: Double = 0.35): Pair<ProfileMusicInfo?, BigDecimal> {
         val normalizeName = name.normalize(Normalizer.Form.NFKC)
 
         return musicDatabase.values.associateWith {
@@ -87,7 +86,7 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
             }
     }
 
-    suspend fun getMusicCover(music: PJSKMusicInfo): File {
+    suspend fun getMusicCover(music: ProfileMusicInfo): File {
         if (!musicCoverFolder.exists()) {
             musicCoverFolder.mkdir()
         }
@@ -101,7 +100,7 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
         return cover
     }
 
-    private suspend fun downloadMusicCover(music: PJSKMusicInfo) {
+    private suspend fun downloadMusicCover(music: ProfileMusicInfo) {
         if (!musicCoverFolder.exists()) {
             musicCoverFolder.mkdir()
         }

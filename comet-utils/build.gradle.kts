@@ -52,6 +52,7 @@ dependencies {
     compileOnly(libs.exposed.dao)
     compileOnly(libs.exposed.jdbc)
     compileOnly(libs.exposed.kotlin.datetime)
+    testImplementation(libs.exposed.kotlin.datetime)
     compileOnly(libs.hikaricp)
     compileOnly(libs.jsoup)
     compileOnly(libs.skiko)

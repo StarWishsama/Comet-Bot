@@ -2,11 +2,10 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
-typealias MusicID = Int
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.MusicID
 
 @Serializable
-data class PJSKMusicInfo(
+data class ProfileMusicInfo(
     val id: MusicID,
     val title: String,
     val pronunciation: String,

@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
+import ren.natsuyuk1.comet.objects.pjsk.local.PJSKProfileMusic
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusicDifficulty
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
@@ -26,7 +26,7 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
                 MusicDifficulty.EXPERT,
                 MusicPlayResult.CLEAR
             )
-            }/${ProjectSekaiMusic.musicDatabase.size} / FC ${
+            }/${PJSKProfileMusic.musicDatabase.size} / FC ${
             getSpecificLevelMusicCount(
                 MusicDifficulty.EXPERT,
                 MusicPlayResult.FULL_COMBO
@@ -40,7 +40,7 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper =
                 MusicDifficulty.MASTER,
                 MusicPlayResult.CLEAR
             )
-            }/${ProjectSekaiMusic.musicDatabase.size} / FC ${
+            }/${PJSKProfileMusic.musicDatabase.size} / FC ${
             getSpecificLevelMusicCount(
                 MusicDifficulty.MASTER,
                 MusicPlayResult.FULL_COMBO
@@ -73,7 +73,7 @@ data class ProjectSekaiUserInfo(
         }.take(30)
 
     suspend fun generateBest30(): MessageWrapper {
-        if (ProjectSekaiMusicDifficulty.musicDiffDatabase.isEmpty() || ProjectSekaiMusic.musicDatabase.isEmpty()) {
+        if (ProjectSekaiMusicDifficulty.musicDiffDatabase.isEmpty() || PJSKProfileMusic.musicDatabase.isEmpty()) {
             return "Project Sekai 歌曲数据还没有加载好噢".toMessageWrapper()
         }
 

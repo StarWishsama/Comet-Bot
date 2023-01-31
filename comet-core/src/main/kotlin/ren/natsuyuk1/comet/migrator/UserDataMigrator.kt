@@ -41,7 +41,7 @@ object UserDataMigrator : IMigrator {
 
             userCache.forEach { (id, user) ->
                 transaction {
-                    if (CometUser.getUser(id, LoginPlatform.MIRAI) != null) {
+                    if (CometUser.getUser(id, LoginPlatform.MIRAI) == null) {
                         UserTable.insert {
                             it[platformID] = id
                             it[platform] = LoginPlatform.MIRAI

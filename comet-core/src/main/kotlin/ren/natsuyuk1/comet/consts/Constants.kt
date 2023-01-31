@@ -14,6 +14,7 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.cookies.*
+import io.ktor.client.plugins.logging.*
 import kotlinx.serialization.json.Json
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.network.CometClient
@@ -44,8 +45,13 @@ val defaultClient = HttpClient(CIO) {
     }
 
     install(HttpCookies)
+
+    install(Logging) {
+        logger = Logger.DEFAULT
+        level = LogLevel.INFO
+    }
 }
 
 val cometClient: CometClient = CometClient()
 
-val coreUpTimer by lazy { Timer() }
+val coreUpTimer = Timer()

@@ -17,7 +17,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficul
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.config.FeatureConfig
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
+import ren.natsuyuk1.comet.objects.pjsk.local.PJSKProfileMusic
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.util.toMessageWrapper
@@ -229,7 +229,7 @@ class ProjectSekaiCommand(
                 }
             }
 
-            val (musicInfo, sim) = ProjectSekaiMusic.fuzzyGetMusicInfo(
+            val (musicInfo, sim) = PJSKProfileMusic.fuzzyGetMusicInfo(
                 musicName, FeatureConfig.data.projectSekaiSetting.minSimilarity
             )
 
@@ -287,7 +287,7 @@ class ProjectSekaiCommand(
         private val musicName by argument("歌曲名称")
 
         override suspend fun run() {
-            val (musicInfo, _) = ProjectSekaiMusic.fuzzyGetMusicInfo(
+            val (musicInfo, _) = PJSKProfileMusic.fuzzyGetMusicInfo(
                 musicName, FeatureConfig.data.projectSekaiSetting.minSimilarity
             )
 
