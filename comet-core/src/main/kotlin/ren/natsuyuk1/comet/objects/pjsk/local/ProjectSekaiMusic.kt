@@ -121,7 +121,7 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
         cover.touch()
 
         val url =
-            "https://storage.sekai.best/sekai-assets/music/jacket/${music.assetBundleName}_rip/${music.assetBundleName}.png" // ktlint-disable max-line-length
+            "https://assets.pjsek.ai/file/pjsekai-assets/startapp/music/jacket/${music.assetBundleName}/${music.assetBundleName}.png" // ktlint-disable max-line-length
 
         cometClient.client.downloadFile(url, cover) {
             it.contentType()?.match(ContentType.Image.PNG) == true

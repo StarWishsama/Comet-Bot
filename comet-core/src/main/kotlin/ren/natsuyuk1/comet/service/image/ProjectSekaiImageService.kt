@@ -9,6 +9,7 @@ import org.jetbrains.skia.paragraph.*
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.asImage
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
+import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getSpecificRankInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.getSurroundingRank
@@ -602,19 +603,22 @@ object ProjectSekaiImageService {
         val bg = try {
             Image.makeFromEncoded(musicInfo.id.bg().readBytes())
         } catch (e: IllegalArgumentException) {
-            return Pair(null, "谱面背景未准备好")
+            TaskManager.run { ProjectSekaiCharts.downloadChart(musicInfo) }
+            return Pair(null, "谱面背景文件损坏")
         }
 
         val bar = try {
             Image.makeFromEncoded(musicInfo.id.bar().readBytes())
         } catch (e: IllegalArgumentException) {
-            return Pair(null, "谱面序号表未准备好")
+            TaskManager.run { ProjectSekaiCharts.downloadChart(musicInfo) }
+            return Pair(null, "谱面序号表文件损坏")
         }
 
         val chart = try {
             Image.makeFromEncoded(musicInfo.id.chartKey(difficulty).readBytes())
         } catch (e: IllegalArgumentException) {
-            return Pair(null, "谱面未准备好")
+            TaskManager.run { ProjectSekaiCharts.downloadChart(musicInfo) }
+            return Pair(null, "谱面文件损坏")
         }
 
         val text = ParagraphBuilder(
