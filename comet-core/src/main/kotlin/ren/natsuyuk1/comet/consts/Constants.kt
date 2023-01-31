@@ -16,6 +16,7 @@ import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.plugins.logging.*
 import kotlinx.serialization.json.Json
+import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.utils.ktor.initProxy
@@ -47,8 +48,13 @@ val defaultClient = HttpClient(CIO) {
     install(HttpCookies)
 
     install(Logging) {
-        logger = Logger.DEFAULT
-        level = LogLevel.INFO
+        logger = object : Logger {
+            private val _logger = KotlinLogging.logger("CometClient_Ktor")
+            override fun log(message: String) {
+                _logger.debug(message)
+            }
+        }
+        level = LogLevel.HEADERS
     }
 }
 
