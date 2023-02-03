@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.8.0"
+kotlin = "1.8.10"
 hutool = "5.8.11"
 mirai = "2.13.4"
 exposed = "0.41.1"
