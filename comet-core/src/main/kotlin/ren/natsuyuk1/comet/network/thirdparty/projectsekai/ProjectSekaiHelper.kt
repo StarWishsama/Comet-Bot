@@ -212,7 +212,7 @@ internal suspend fun ProjectSekaiMusicInfo.toMessageWrapper() =
         if (diff.isEmpty()) {
             appendText("最新歌曲暂无难度信息")
         } else {
-            diff.forEach {
+            diff.take(4).forEach {
                 appendTextln(
                     "${it.musicDifficulty}[${it.playLevel}] | ${it.totalNoteCount}"
                 )
