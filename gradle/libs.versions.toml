@@ -56,7 +56,7 @@ kotlinx-serialization-json = "org.jetbrains.kotlinx:kotlinx-serialization-json:1
 skiko = "org.jetbrains.skiko:skiko:0.7.45"
 jline = "org.jline:jline:3.22.0"
 jsoup = "org.jsoup:jsoup:1.15.3"
-postgresql = "org.postgresql:postgresql:42.5.2"
+postgresql = "org.postgresql:postgresql:42.5.3"
 sqlite-jdbc = "org.xerial:sqlite-jdbc:3.40.0.0"
 setsuna = "ren.natsuyuk1.setsuna:Setsuna:0.1.0-SNAPSHOT"
 
