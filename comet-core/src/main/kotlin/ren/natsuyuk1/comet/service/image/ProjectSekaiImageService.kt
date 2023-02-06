@@ -596,7 +596,11 @@ object ProjectSekaiImageService {
             return Pair(chartFile, "")
         }
 
-        if (musicInfo.id.chartKey(difficulty).let { it.isBlank() || it.isType("image/png") }) {
+        if (musicInfo.id.chartKey(difficulty).let { it.isBlank() || !it.isType("image/png") }) {
+            if (!ProjectSekaiCharts.hasSDVXChart(musicInfo)) {
+                return Pair(null, "对应歌曲谱面譜面保管所暂未更新")
+            }
+
             when (ProjectSekaiCharts.downloadChart(musicInfo)) {
                 DownloadStatus.UNVERIFIED, DownloadStatus.FAILED -> {
                     return Pair(null, "谱面下载失败")

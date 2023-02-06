@@ -20,8 +20,8 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventSta
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiI18N
 import ren.natsuyuk1.comet.objects.pjsk.local.PJSKProfileMusic
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiI18N
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusicDifficulty
 import ren.natsuyuk1.comet.service.ProjectSekaiManager
@@ -212,7 +212,7 @@ internal suspend fun ProjectSekaiMusicInfo.toMessageWrapper() =
         if (diff.isEmpty()) {
             appendText("最新歌曲暂无难度信息")
         } else {
-            diff.take(4).forEach {
+            diff.take(5).forEach {
                 appendTextln(
                     "${it.musicDifficulty}[${it.playLevel}] | ${it.totalNoteCount}"
                 )
