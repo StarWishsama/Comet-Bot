@@ -329,6 +329,7 @@ object ProjectSekaiImageService {
      *
      * @return 包装后的消息 [MessageWrapper]
      */
+    @OptIn(ExperimentalStdlibApi::class)
     suspend fun SekaiProfileEventInfo.drawEventInfo(
         eventId: Int,
         userData: ProjectSekaiUserData? = null
@@ -342,6 +343,17 @@ object ProjectSekaiImageService {
         val (ahead, behind) = profile.rank.getSurroundingRank()
         val eventInfo = ProjectSekaiData.getCurrentEventInfo() ?: return "查询失败, 活动信息未加载".toMessageWrapper()
         val eventStatus = ProjectSekaiManager.getCurrentEventStatus()
+
+        var aheadEventStatus: SekaiProfileEventInfo? = null
+        var behindEventStatus: SekaiProfileEventInfo? = null
+
+        if (ahead > 0) {
+            aheadEventStatus = cometClient.getSpecificRankInfo(eventId, ahead)
+        }
+
+        if (behind in profile.rank..< 1000000) {
+            behindEventStatus = cometClient.getSpecificRankInfo(eventId, behind)
+        }
 
         // 获取头像内部名称
         val avatarBundleName = ProjectSekaiCard.getAssetBundleName(profile.userCard.cardId.toInt())
@@ -444,8 +456,7 @@ object ProjectSekaiImageService {
                 userData.updateInfo(profile.score, profile.rank)
             }
 
-            if (ahead != 0) {
-                val aheadEventStatus = cometClient.getSpecificRankInfo(eventId, ahead)
+            if (aheadEventStatus != null) {
                 val aheadScore = aheadEventStatus.getScore()
 
                 if (aheadScore != -1L) {
@@ -457,8 +468,7 @@ object ProjectSekaiImageService {
                 }
             }
 
-            if (behind in 200..1000000) {
-                val behindEventStatus = cometClient.getSpecificRankInfo(eventId, behind)
+            if (behindEventStatus != null) {
                 val behindScore = behindEventStatus.getScore()
 
                 if (behindScore != -1L) {
@@ -589,7 +599,7 @@ object ProjectSekaiImageService {
         if (musicInfo.id.chartKey(difficulty).let { it.isBlank() || it.isType("image/png") }) {
             when (ProjectSekaiCharts.downloadChart(musicInfo)) {
                 DownloadStatus.UNVERIFIED, DownloadStatus.FAILED -> {
-                    return Pair(null, "谱面下载失败, 可能谱面暂未更新或是网络问题")
+                    return Pair(null, "谱面下载失败")
                 }
 
                 DownloadStatus.DOWNLOADING -> {

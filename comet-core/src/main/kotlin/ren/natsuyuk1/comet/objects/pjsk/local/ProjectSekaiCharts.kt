@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.objects.pjsk.local
 
+import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +35,14 @@ object ProjectSekaiCharts {
         sdvxFormat.format(ProjectSekaiMusic.musicDatabase.values.sortedBy { it.publishedAt }.indexOf(music) + 1)
 
     private val validator: (HttpResponse) -> Boolean = { it.contentType()?.match(ContentType.Image.PNG) == true }
+
+    suspend fun hasSDVXChart(music: ProjectSekaiMusicInfo): Boolean {
+        val sdvxID = getSdvxID(music)
+
+        val resp = cometClient.client.get("https://sdvx.in/prsk/${sdvxID}mst.htm")
+
+        return resp.status.isSuccess()
+    }
 
     suspend fun downloadChart(music: ProjectSekaiMusicInfo): DownloadStatus {
         val musicChartDir = chartDir.resolve("${music.id}/")

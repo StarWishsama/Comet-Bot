@@ -18,6 +18,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.config.FeatureConfig
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.local.PJSKProfileMusic
+import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiCharts
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
@@ -238,6 +239,11 @@ class ProjectSekaiCommand(
 
             if (musicInfo == null) {
                 subject.sendMessage("找不到你想要搜索的歌曲哦".toMessageWrapper())
+                return
+            }
+
+            if (!ProjectSekaiCharts.hasSDVXChart(musicInfo)) {
+                subject.sendMessage("对应歌曲谱面譜面保管所暂未更新".toMessageWrapper())
                 return
             }
 
