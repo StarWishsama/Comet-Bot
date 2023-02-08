@@ -351,9 +351,11 @@ object ProjectSekaiImageService {
             aheadEventStatus = cometClient.getSpecificRankInfo(eventId, ahead)
         }
 
+        /* ktlint-disable */
         if (behind in profile.rank..< 1000000) {
             behindEventStatus = cometClient.getSpecificRankInfo(eventId, behind)
         }
+        /* ktlint-enable */
 
         // 获取头像内部名称
         val avatarBundleName = ProjectSekaiCard.getAssetBundleName(profile.userCard.cardId.toInt())

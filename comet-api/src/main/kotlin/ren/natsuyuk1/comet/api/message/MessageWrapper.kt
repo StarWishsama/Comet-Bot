@@ -72,6 +72,8 @@ open class MessageWrapper(
             }
         }
 
+    fun remove(index: Int) = messageContent.removeAt(index)
+
     fun setUsable(usable: Boolean): MessageWrapper = apply { this.usable = usable }
 
     fun isUsable(): Boolean = usable
