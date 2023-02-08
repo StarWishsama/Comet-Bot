@@ -26,12 +26,6 @@ import ren.natsuyuk1.comet.mirai.config.toMiraiProtocol
 import ren.natsuyuk1.comet.mirai.contact.toCometGroup
 import ren.natsuyuk1.comet.mirai.contact.toCometUser
 import ren.natsuyuk1.comet.mirai.event.redirectToComet
-import ren.natsuyuk1.comet.mirai.util.toMessageSource
-import ren.natsuyuk1.comet.mirai.util.runWithSuspend
-import ren.natsuyuk1.comet.mirai.util.runWithScope
-import ren.natsuyuk1.comet.mirai.util.runWith
-import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
-import ren.natsuyuk1.comet.mirai.util.toMessageChain
 import ren.natsuyuk1.comet.service.subscribeGitHubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.system.getEnv
@@ -71,7 +65,7 @@ class MiraiComet(
             heartbeatPeriodMillis = miraiConfig.heartbeatPeriodMillis
 
             loginSolver = if (Desktop.isDesktopSupported()) {
-                SwingSolver
+                LoginSolver.Default
             } else if (getEnv("comet.no-terminal").isNullOrBlank()) {
                 StandardCharImageLoginSolver(input = {
                     try {

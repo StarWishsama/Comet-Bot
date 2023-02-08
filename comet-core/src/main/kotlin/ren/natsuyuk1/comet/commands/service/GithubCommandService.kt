@@ -10,6 +10,8 @@ import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.session.*
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.GroupMember
+import ren.natsuyuk1.comet.api.user.isFriend
+import ren.natsuyuk1.comet.api.user.isStranger
 import ren.natsuyuk1.comet.network.thirdparty.github.GitHubApi
 import ren.natsuyuk1.comet.objects.config.CometServerConfig
 import ren.natsuyuk1.comet.objects.github.data.GitHubRepoData
