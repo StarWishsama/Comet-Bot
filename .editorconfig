@@ -7,7 +7,7 @@ charset = utf-8
 indent_style = space
 
 [{*.kt,*.kts}]
-disabled_rules = no-wildcard-imports, import-ordering
+disabled_rules = no-wildcard-imports, import-ordering, no-unused-imports
 
 indent_size = 4
 max_line_length = 120
