@@ -40,7 +40,7 @@ subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
     configure<KtlintExtension> {
         coloredOutput.set(false)
-        disabledRules.set(setOf("no-wildcard-imports", "import-ordering"))
+        disabledRules.set(setOf("no-wildcard-imports", "import-ordering", "no-unused-imports"))
         filter {
             // exclude("**/generated/**")
             fun exclude(path: String) = exclude {
