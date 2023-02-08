@@ -25,6 +25,8 @@ object PJSKProfileMusic : ProjectSekaiLocalFile(
     private val musicDatabase = mutableMapOf<Int, ProfileMusicInfo>()
 
     override suspend fun load() {
+        musicDatabase.clear()
+
         try {
             val content = file.readTextBuffered()
             if (content.isBlank()) {

@@ -22,6 +22,8 @@ object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
     internal val musicDiffDatabase = mutableListOf<PJSKMusicDifficultyInfo>()
 
     override suspend fun load() {
+        musicDiffDatabase.clear()
+
         try {
             musicDiffDatabase.addAll(
                 json.decodeFromString(

@@ -26,6 +26,8 @@ object ProjectSekaiRank : ProjectSekaiLocalFile(
     internal val rankSeasonInfo = mutableListOf<PJSKRankSeasonInfo>()
 
     override suspend fun load() {
+        rankSeasonInfo.clear()
+
         try {
             rankSeasonInfo.addAll(
                 json.decodeFromString(

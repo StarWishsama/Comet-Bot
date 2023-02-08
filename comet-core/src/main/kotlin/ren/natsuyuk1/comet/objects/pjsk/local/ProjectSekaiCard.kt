@@ -24,6 +24,8 @@ object ProjectSekaiCard : ProjectSekaiLocalFile(
     private val url by lazy { getSekaiResourceURL("cards.json") }
 
     override suspend fun load() {
+        cards.clear()
+
         file.touch()
 
         try {

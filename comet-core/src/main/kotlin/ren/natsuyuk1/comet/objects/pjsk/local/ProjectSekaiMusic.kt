@@ -33,6 +33,8 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
     internal val musicDatabase = mutableMapOf<Int, ProjectSekaiMusicInfo>()
 
     override suspend fun load() {
+        musicDatabase.clear()
+
         try {
             val content = file.readTextBuffered()
             if (content.isBlank()) {

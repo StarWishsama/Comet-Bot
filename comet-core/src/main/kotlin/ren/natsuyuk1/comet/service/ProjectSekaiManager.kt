@@ -34,9 +34,10 @@ object ProjectSekaiManager {
         }
 
         loadPJSKDatabase()
-        refreshEvent()
-        refreshCache()
-        initBest30Image()
+
+        scope.launch { refreshEvent() }
+        scope.launch { refreshCache() }
+        scope.launch { loadBest30Image() }
 
         TaskManager.registerTask("pjsk_event", "0 6 * * *", ::refreshEvent)
         TaskManager.registerTaskDelayed(3.toDuration(DurationUnit.HOURS), ::refreshCache)
@@ -147,7 +148,7 @@ object ProjectSekaiManager {
         return target
     }
 
-    private suspend fun initBest30Image() {
+    private suspend fun loadBest30Image() {
         val b30 = pjskFolder.resolve("b30/")
         b30.mkdirs()
         val url = "https://raw.githubusercontent.com/StarWishsama/comet-resource-database/main/projectsekai/image/b30/"
