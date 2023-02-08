@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.test
 
+import kotlinx.datetime.Instant
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.cometInstances
@@ -13,6 +14,7 @@ import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
+import kotlin.time.Duration
 
 private val logger = KotlinLogging.logger {}
 
@@ -47,7 +49,7 @@ val fakeComet by lazy {
     }.also { cometInstances.add(it) }
 }
 
-fun generateFakeSender(id: Long): User = object : User() {
+fun generateFakeSender(id: Long): User = object : User {
     override val comet: Comet
         get() = fakeComet
     override val id: Long
@@ -63,12 +65,17 @@ fun generateFakeSender(id: Long): User = object : User() {
     }
 }
 
-fun generateFakeGroup(id: Long): Group = object : Group(id, "TestGroup") {
+fun generateFakeGroup(id: Long): Group = object : Group {
+    override val id: Long
+        get() = id
+
+    override val name: String
+        get() = "TestGroup"
     override suspend fun getOwner(): GroupMember = error("dummy cannot invoke this")
 
     override suspend fun getMembers(): List<GroupMember> = error("dummy cannot invoke this")
 
-    override fun updateGroupName(groupName: String) {
+    override suspend fun updateGroupName(groupName: String) {
         error("dummy cannot invoke this")
     }
 
@@ -80,7 +87,7 @@ fun generateFakeGroup(id: Long): Group = object : Group(id, "TestGroup") {
         error("dummy cannot invoke this")
     }
 
-    override suspend fun avatarUrl(): String = error("dummy cannot invoke this")
+    override suspend fun getGroupAvatarURL(): String = error("dummy cannot invoke this")
 
     override suspend fun getMember(id: Long): GroupMember? {
         error("dummy cannot invoke this")
@@ -103,23 +110,29 @@ fun generateFakeGroup(id: Long): Group = object : Group(id, "TestGroup") {
     }
 }
 
-fun generateFakeGroupMember(id: Long, group: Group) = object : GroupMember() {
+fun generateFakeGroupMember(id: Long, group: Group) = object : GroupMember {
     override val group: Group
         get() = group
     override val id: Long
         get() = id
-    override val joinTimestamp: Int
-        get() = error("dummy")
-    override val lastActiveTimestamp: Int
-        get() = error("dummy")
-    override val remainMuteTime: Int
-        get() = error("dummy")
     override val card: String
         get() = "Test"
 
     override suspend fun getGroupPermission(): GroupPermission = error("dummy")
 
     override suspend fun mute(seconds: Int) {
+        error("dummy")
+    }
+
+    override suspend fun getJoinTime(): Instant {
+        error("dummy")
+    }
+
+    override suspend fun getLastActiveTime(): Instant {
+        error("dummy")
+    }
+
+    override suspend fun getRemainMuteTime(): Duration {
         error("dummy")
     }
 
