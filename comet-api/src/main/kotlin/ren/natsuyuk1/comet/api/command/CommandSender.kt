@@ -33,31 +33,14 @@ sealed interface CommandSender {
  * 不同平台实现的 `sendMessage`
  * 代表来自不同平台的用户
  */
-abstract class PlatformCommandSender : CommandSender {
+interface PlatformCommandSender : CommandSender {
+    val comet: Comet
 
-    /**
-     * 获取到此用户的 [Comet]
-     */
-    abstract val comet: Comet
+    val id: Long
+    val name: String
+    val platform: LoginPlatform
 
-    /**
-     * ID
-     */
-    abstract val id: Long
-
-    /**
-     * 用户名
-     */
-    abstract val name: String
-
-    /**
-     * 平台名称
-     */
-    abstract val platform: LoginPlatform
-
-    abstract override suspend fun sendMessage(message: MessageWrapper): MessageReceipt?
-
-    override fun toString(): String = "$name($id) [$platform]"
+    fun asString(): String = "$name($id) [$platform]"
 }
 
 /**

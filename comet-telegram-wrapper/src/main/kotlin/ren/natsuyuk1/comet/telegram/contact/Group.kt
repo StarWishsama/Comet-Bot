@@ -6,6 +6,7 @@ import dev.inmo.tgbotapi.extensions.api.chat.members.getChatMember
 import dev.inmo.tgbotapi.extensions.api.chat.modify.setChatTitle
 import dev.inmo.tgbotapi.extensions.api.get.getFileAdditionalInfo
 import dev.inmo.tgbotapi.extensions.utils.asExtendedGroupChat
+import dev.inmo.tgbotapi.extensions.utils.chatIdOrNull
 import dev.inmo.tgbotapi.extensions.utils.chatIdOrThrow
 import dev.inmo.tgbotapi.requests.abstracts.toInputFile
 import dev.inmo.tgbotapi.types.chat.GroupChat
@@ -14,35 +15,18 @@ import dev.inmo.tgbotapi.types.chat.member.OwnerChatMember
 import dev.inmo.tgbotapi.types.files.fullUrl
 import dev.inmo.tgbotapi.types.toChatId
 import dev.inmo.tgbotapi.utils.PreviewFeature
-import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import ren.natsuyuk1.comet.api.event.broadcast
-import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
-import ren.natsuyuk1.comet.api.message.MessageReceipt
-import ren.natsuyuk1.comet.api.message.MessageSource
-import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.telegram.TelegramComet
-import ren.natsuyuk1.comet.telegram.util.send
 
-internal abstract class TelegramGroup(
-    override val id: Long,
-    override var name: String
-) : Group(id, name) {
-    override val platform: LoginPlatform
-        get() = LoginPlatform.TELEGRAM
-}
-
-internal class TelegramGroupImpl(
-    private val chat: GroupChat,
+internal class TelegramGroup(
+    override val chat: GroupChat,
     override val comet: TelegramComet
-) : TelegramGroup(
-    chat.id.chatId,
-    chat.title
-) {
+) : Group, TelegramContact {
+    override val id: Long = chat.id.chatId
+
+    override val name: String = chat.title
     override suspend fun getOwner(): GroupMember = run {
         val resp = comet.bot.getChatAdministrators(chat.id)
 
@@ -53,17 +37,15 @@ internal class TelegramGroupImpl(
     // Telegram couldn't get all members
     override suspend fun getMembers(): List<GroupMember> = emptyList()
 
-    override fun updateGroupName(groupName: String) {
-        comet.scope.launch {
-            if (getBotPermission() >= GroupPermission.ADMIN) {
-                comet.bot.setChatTitle(chat.id, groupName)
-            } else {
-                throw IllegalAccessException("Bot doesn't permission to modify group name")
-            }
+    override suspend fun updateGroupName(groupName: String) {
+        if (getBotPermission() >= GroupPermission.ADMIN) {
+            comet.bot.setChatTitle(chat.id, groupName)
+        } else {
+            throw IllegalAccessException("Bot doesn't permission to modify group name")
         }
     }
 
-    override fun getBotMuteRemaining(): Int {
+    override suspend fun getBotMuteRemaining(): Int {
         error("You cannot get bot mute remaining time in telegram!")
     }
 
@@ -82,7 +64,7 @@ internal class TelegramGroupImpl(
      *
      */
     @OptIn(PreviewFeature::class)
-    override suspend fun avatarUrl(): String =
+    override suspend fun getGroupAvatarURL(): String =
         chat.asExtendedGroupChat()?.chatPhoto?.bigFileId?.let {
             val avatarInfo = comet.bot.getFileAdditionalInfo(it.toInputFile())
 
@@ -91,9 +73,9 @@ internal class TelegramGroupImpl(
 
     override suspend fun getMember(id: Long): GroupMember? {
         return try {
-            val resp = comet.bot.getChatMember(this@TelegramGroupImpl.chat, id.toChatId())
+            val resp = comet.bot.getChatMember(chat, id.toChatId())
 
-            resp.user.toCometGroupMember(comet, this@TelegramGroupImpl.chat.id.chatIdOrThrow())
+            chat.id.chatIdOrNull()?.let { resp.user.toCometGroupMember(comet, it) }
         } catch (e: Exception) {
             null
         }
@@ -109,30 +91,13 @@ internal class TelegramGroupImpl(
 
     override suspend fun contains(id: Long): Boolean {
         return try {
-            comet.bot.getChatMember(this@TelegramGroupImpl.id.toChatId(), id.toChatId())
+            comet.bot.getChatMember(id.toChatId(), id.toChatId())
 
             true
         } catch (_: Exception) {
             false
         }
     }
-
-    override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
-        val event = MessagePreSendEvent(
-            comet,
-            this@TelegramGroupImpl,
-            message,
-            Clock.System.now().epochSeconds
-        ).also { it.broadcast() }
-
-        return if (!event.isCancelled) {
-            comet.send(message, MessageSource.MessageSourceType.GROUP, chat.id.chatIdOrThrow())
-        } else {
-            null
-        }
-    }
 }
 
-fun GroupChat.toCometGroup(comet: TelegramComet): Group {
-    return TelegramGroupImpl(this, comet)
-}
+fun GroupChat.toCometGroup(comet: TelegramComet): Group = TelegramGroup(this, comet)

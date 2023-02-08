@@ -72,7 +72,7 @@ fun generateFakeGroup(id: Long): Group = object : Group(id, "TestGroup") {
         error("dummy cannot invoke this")
     }
 
-    override fun getBotMuteRemaining(): Int {
+    override suspend fun getBotMuteRemaining(): Int {
         error("dummy cannot invoke this")
     }
 

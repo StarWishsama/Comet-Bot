@@ -1,12 +1,7 @@
 package ren.natsuyuk1.comet.mirai.contact
 
-import kotlinx.datetime.Clock
 import net.mamoe.mirai.contact.getMember
 import ren.natsuyuk1.comet.api.Comet
-import ren.natsuyuk1.comet.api.event.broadcast
-import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
-import ren.natsuyuk1.comet.api.message.MessageReceipt
-import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.user.Friend
 import ren.natsuyuk1.comet.api.user.Group
@@ -14,123 +9,61 @@ import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.mirai.MiraiComet
-import ren.natsuyuk1.comet.mirai.util.toMessageChain
-import ren.natsuyuk1.comet.mirai.util.toMessageSource
-
-abstract class MiraiGroup(
-    override val id: Long,
-    override var name: String
-) : Group(id, name) {
-    override val platform: LoginPlatform = LoginPlatform.MIRAI
-}
 
 internal class MiraiGroupImpl(
-    private val group: net.mamoe.mirai.contact.Group,
+    override val miraiContact: net.mamoe.mirai.contact.Group,
     override val comet: MiraiComet
-) : MiraiGroup(
-    group.id,
-    group.name
-) {
-    override suspend fun getOwner(): GroupMember = group.owner.toGroupMember(comet)
+) : Group, MiraiContact {
+    override val id: Long = miraiContact.id
 
-    override suspend fun getMembers(): List<GroupMember> = group.members.toGroupMemberList(comet)
+    override val name: String = miraiContact.name
+    override suspend fun getOwner(): GroupMember = miraiContact.owner.toGroupMember(comet)
 
-    override fun updateGroupName(groupName: String) {
-        group.name = groupName
+    override suspend fun getMembers(): List<GroupMember> = miraiContact.members.toGroupMemberList(comet)
+
+    override suspend fun updateGroupName(groupName: String) {
+        miraiContact.name = groupName
     }
 
-    override fun getBotMuteRemaining(): Int = group.botMuteRemaining
+    override suspend fun getBotMuteRemaining(): Int = miraiContact.botMuteRemaining
 
     override suspend fun getBotPermission(): GroupPermission {
-        return GroupPermission.values()[group.botPermission.ordinal]
+        return GroupPermission.values()[miraiContact.botPermission.ordinal]
     }
 
-    override suspend fun avatarUrl(): String = group.avatarUrl
+    override suspend fun getGroupAvatarURL(): String = miraiContact.avatarUrl
 
-    override suspend fun getMember(id: Long): GroupMember? = group.getMember(id)?.toGroupMember(comet)
+    override suspend fun getMember(id: Long): GroupMember? = miraiContact.getMember(id)?.toGroupMember(comet)
 
-    override suspend fun quit(): Boolean = group.quit()
+    override suspend fun quit(): Boolean = miraiContact.quit()
 
-    override suspend fun contains(id: Long): Boolean = group.contains(id)
-
-    override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
-        val event = MessagePreSendEvent(
-            comet,
-            this@MiraiGroupImpl,
-            message,
-            Clock.System.now().epochSeconds
-        ).also { it.broadcast() }
-
-        return if (!event.isCancelled) {
-            val receipt = group.sendMessage(message.toMessageChain(group))
-            MessageReceipt(comet, receipt.source.toMessageSource())
-        } else {
-            null
-        }
-    }
+    override suspend fun contains(id: Long): Boolean = miraiContact.contains(id)
 }
 
 fun net.mamoe.mirai.contact.Group.toCometGroup(comet: MiraiComet): Group = MiraiGroupImpl(this, comet)
 
-abstract class MiraiUser : User() {
-    override val platform: LoginPlatform = LoginPlatform.MIRAI
+class MiraiUserImpl(
+    override val miraiContact: net.mamoe.mirai.contact.User,
+    override val comet: Comet,
+) : User, MiraiContact {
+    override val name: String = miraiContact.nick
+    override val id: Long = miraiContact.id
 }
 
-fun net.mamoe.mirai.contact.User.toCometUser(miraiComet: MiraiComet): User {
-    val miraiUser = this@toCometUser
+fun net.mamoe.mirai.contact.User.toCometUser(miraiComet: MiraiComet): User =
+    MiraiUserImpl(this, miraiComet)
 
-    class MiraiUserImpl(
-        override val comet: Comet = miraiComet,
-        override val name: String = miraiUser.nick,
-        override val id: Long = miraiUser.id
-    ) : MiraiUser() {
-        override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
-            val event = MessagePreSendEvent(
-                comet,
-                this@MiraiUserImpl,
-                message,
-                Clock.System.now().epochSeconds
-            ).also { it.broadcast() }
-
-            return if (!event.isCancelled) {
-                val receipt = miraiUser.sendMessage(message.toMessageChain(miraiUser))
-                return MessageReceipt(comet, receipt.source.toMessageSource())
-            } else {
-                null
-            }
-        }
-    }
-
-    return MiraiUserImpl()
+class MiraiFriend(
+    override val miraiContact: net.mamoe.mirai.contact.Friend,
+    override val comet: MiraiComet,
+) : Friend, MiraiContact {
+    override val id: Long
+        get() = miraiContact.id
+    override val name: String
+        get() = miraiContact.nick
+    override val platform: LoginPlatform
+        get() = LoginPlatform.MIRAI
 }
 
-fun net.mamoe.mirai.contact.Friend.toCometFriend(miraiComet: MiraiComet): Friend {
-    val miraiUser = this@toCometFriend
-
-    return object : Friend() {
-        override val id: Long
-            get() = miraiUser.id
-        override val comet: Comet
-            get() = miraiComet
-        override val name: String
-            get() = miraiUser.nick
-        override val platform: LoginPlatform
-            get() = LoginPlatform.MIRAI
-
-        override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
-            val event = MessagePreSendEvent(
-                comet,
-                this,
-                message,
-                Clock.System.now().epochSeconds
-            ).also { it.broadcast() }
-
-            return if (!event.isCancelled) {
-                val receipt = miraiUser.sendMessage(message.toMessageChain(miraiUser))
-                return MessageReceipt(comet, receipt.source.toMessageSource())
-            } else {
-                null
-            }
-        }
-    }
-}
+fun net.mamoe.mirai.contact.Friend.toCometFriend(miraiComet: MiraiComet): Friend =
+    MiraiFriend(this, miraiComet)

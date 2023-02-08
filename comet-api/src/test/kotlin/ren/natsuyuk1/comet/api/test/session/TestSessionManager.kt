@@ -54,7 +54,7 @@ class TestSessionManager {
 
         override fun updateGroupName(groupName: String) = error("Unable to use this on test group")
 
-        override fun getBotMuteRemaining(): Int = error("Unable to use this on test group")
+        override suspend fun getBotMuteRemaining(): Int = error("Unable to use this on test group")
 
         override suspend fun getBotPermission(): GroupPermission = error("Unable to use this on test group")
 

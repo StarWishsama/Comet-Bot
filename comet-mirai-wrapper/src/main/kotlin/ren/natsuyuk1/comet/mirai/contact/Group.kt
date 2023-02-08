@@ -1,9 +1,7 @@
 package ren.natsuyuk1.comet.mirai.contact
 
-import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import net.mamoe.mirai.contact.*
-import ren.natsuyuk1.comet.api.event.broadcast
-import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
@@ -11,8 +9,8 @@ import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.mirai.MiraiComet
-import ren.natsuyuk1.comet.mirai.util.toMessageChain
-import ren.natsuyuk1.comet.mirai.util.toMessageSource
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 fun Member.toGroupMember(comet: MiraiComet): GroupMember {
     return when (this) {
@@ -22,68 +20,48 @@ fun Member.toGroupMember(comet: MiraiComet): GroupMember {
     }
 }
 
-internal abstract class MiraiGroupMember : GroupMember() {
-    override val platform: LoginPlatform = LoginPlatform.MIRAI
-}
-
 internal class MiraiGroupMemberImpl(
-    private val contact: NormalMember,
+    override val miraiContact: NormalMember,
     override val comet: MiraiComet
-) : MiraiGroupMember() {
+) : MiraiContact, GroupMember {
     override val group: Group
-        get() = contact.group.toCometGroup(comet)
+        get() = miraiContact.group.toCometGroup(comet)
 
     override val id: Long
-        get() = contact.id
+        get() = miraiContact.id
 
-    override val joinTimestamp: Int
-        get() = contact.joinTimestamp
-
-    override val lastActiveTimestamp: Int
-        get() = contact.lastSpeakTimestamp
-
-    override val remainMuteTime: Int
-        get() = contact.muteTimeRemaining
-
-    override suspend fun getGroupPermission(): GroupPermission = contact.permission.toGroupPermission()
+    override suspend fun getGroupPermission(): GroupPermission = miraiContact.permission.toGroupPermission()
 
     override suspend fun mute(seconds: Int) {
-        contact.mute(seconds)
+        miraiContact.mute(seconds)
     }
 
-    override suspend fun unmute() = contact.unmute()
+    override suspend fun getJoinTime(): Instant =
+        Instant.fromEpochSeconds(miraiContact.joinTimestamp.toLong())
+
+    override suspend fun getLastActiveTime(): Instant =
+        Instant.fromEpochSeconds(miraiContact.lastSpeakTimestamp.toLong())
+
+    override suspend fun getRemainMuteTime(): Duration =
+        miraiContact.muteTimeRemaining.seconds
+
+    override suspend fun unmute() = miraiContact.unmute()
 
     override suspend fun kick(reason: String, block: Boolean) {
-        contact.kick(reason, block)
+        miraiContact.kick(reason, block)
     }
 
     override suspend fun operateAdminPermission(operation: Boolean) {
-        contact.modifyAdmin(operation)
-    }
-
-    override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
-        val event = MessagePreSendEvent(
-            comet,
-            this@MiraiGroupMemberImpl,
-            message,
-            Clock.System.now().epochSeconds
-        ).also { it.broadcast() }
-
-        return if (!event.isCancelled) {
-            val receipt = contact.sendMessage(message.toMessageChain(contact))
-            return MessageReceipt(comet, receipt.source.toMessageSource())
-        } else {
-            null
-        }
+        miraiContact.modifyAdmin(operation)
     }
 
     override val name: String
-        get() = contact.nick
+        get() = miraiContact.nick
 
     override var card: String
-        get() = contact.nameCard
+        get() = miraiContact.nameCard
         set(value) {
-            contact.nameCard = value
+            miraiContact.nameCard = value
         }
 }
 
@@ -92,46 +70,28 @@ fun MemberPermission.toGroupPermission(): GroupPermission = GroupPermission.valu
 fun NormalMember.toGroupMember(comet: MiraiComet): GroupMember = MiraiGroupMemberImpl(this, comet)
 
 internal class MiraiAnonymousMemberImpl(
-    private val contact: AnonymousMember,
+    override val miraiContact: AnonymousMember,
     override val comet: MiraiComet
-) : ren.natsuyuk1.comet.api.user.AnonymousMember() {
+) : ren.natsuyuk1.comet.api.user.AnonymousMember, MiraiContact {
     override val group: Group
-        get() = contact.group.toCometGroup(comet)
+        get() = miraiContact.group.toCometGroup(comet)
 
     override val platform: LoginPlatform
         get() = LoginPlatform.MIRAI
 
     override val anonymousId: String
-        get() = contact.anonymousId
+        get() = miraiContact.anonymousId
 
     override val id: Long
-        get() = contact.id
-
-    /**
-     * 匿名成员无此变量, 默认返回 -1
-     */
-    override val joinTimestamp: Int
-        get() = -1
-
-    /**
-     * 匿名成员无此变量, 默认返回 -1
-     */
-    override val lastActiveTimestamp: Int
-        get() = -1
-
-    /**
-     * 匿名成员无此变量, 默认返回 -1
-     */
-    override val remainMuteTime: Int
-        get() = -1
+        get() = miraiContact.id
 
     override suspend fun getGroupPermission(): GroupPermission = GroupPermission.MEMBER
 
     override suspend fun mute(seconds: Int) {
-        contact.mute(seconds)
+        miraiContact.mute(seconds)
     }
 
-    override suspend fun unmute() = contact.mute(0)
+    override suspend fun unmute() = miraiContact.mute(0)
 
     override suspend fun kick(reason: String, block: Boolean) {
         error("AnonymousMember cannot be kicked")
@@ -146,13 +106,22 @@ internal class MiraiAnonymousMemberImpl(
     }
 
     override val name: String
-        get() = contact.nick
+        get() = miraiContact.nick
 
     override var card: String
-        get() = contact.nameCard
+        get() = miraiContact.nameCard
         set(_) {
             error("Cannot modify namecard of AnonymousMember")
         }
+
+    override suspend fun getJoinTime(): Instant =
+        error("AnonymousMember doesn't have join time")
+
+    override suspend fun getLastActiveTime(): Instant =
+        error("AnonymousMember doesn't have join time")
+
+    override suspend fun getRemainMuteTime(): Duration =
+        error("AnonymousMember doesn't have remaining mute time")
 }
 
 fun AnonymousMember.toGroupMember(comet: MiraiComet): GroupMember = MiraiAnonymousMemberImpl(this, comet)
