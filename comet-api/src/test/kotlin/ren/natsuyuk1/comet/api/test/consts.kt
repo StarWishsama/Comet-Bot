@@ -44,7 +44,7 @@ val fakeComet = object : Comet(
     }
 }
 
-val fakeSender = object : PlatformCommandSender() {
+val fakeSender = object : PlatformCommandSender {
     override val comet: Comet
         get() = fakeComet
     override val id: Long = 0

@@ -9,6 +9,7 @@
 
 package ren.natsuyuk1.comet.api.user
 
+import kotlinx.datetime.Instant
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.message.AtElement
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
@@ -19,90 +20,52 @@ import kotlin.time.DurationUnit
 /**
  * [Contact] 联系人, 是所有可聊天对象的父类
  */
-abstract class Contact : PlatformCommandSender() {
-    /**
-     * 可以是用户或群聊
-     */
-    abstract override val id: Long
-}
+interface Contact : PlatformCommandSender
 
 /**
  * [User] 用户
  *
  */
-abstract class User : Contact() {
-    abstract override val id: Long
-}
+interface User : Contact
 
 /**
  * 好友, 仅在 QQ 平台使用，用于识别
  */
-abstract class Friend : User()
+interface Friend : User
 
 /**
  * 陌生人, 仅在 QQ 平台使用，用于识别
  */
-abstract class Stranger : User()
+interface Stranger : User
 
-abstract class GroupMember : User() {
-    abstract val group: Group
+interface GroupMember : User {
+    val group: Group
+    val card: String
 
-    abstract override val id: Long
+    suspend fun getGroupPermission(): GroupPermission
 
-    abstract val joinTimestamp: Int
+    suspend fun mute(seconds: Int)
 
-    abstract val lastActiveTimestamp: Int
+    suspend fun mute(duration: Duration) = mute(duration.toDouble(DurationUnit.SECONDS).toInt())
 
-    abstract val remainMuteTime: Int
+    suspend fun getJoinTime(): Instant
 
-    abstract val card: String
+    suspend fun getLastActiveTime(): Instant
 
-    abstract suspend fun getGroupPermission(): GroupPermission
+    suspend fun getRemainMuteTime(): Duration
 
-    val isMuted: Boolean get() = remainMuteTime != 0
+    suspend fun unmute()
 
-    /**
-     * 禁言此群员
-     */
-    abstract suspend fun mute(seconds: Int)
-
-    suspend fun mute(duration: Duration) {
-        require(duration.toDouble(DurationUnit.DAYS) <= 30) { "max duration is 1 month" }
-        require(duration.toDouble(DurationUnit.SECONDS) > 0) { "min duration is 1 second" }
-
-        mute(duration.toDouble(DurationUnit.SECONDS).toInt())
-    }
-
-    /**
-     * 解禁此群员
-     *
-     * @throws PermissionDeniedException
-     */
-    abstract suspend fun unmute()
-
-    /**
-     * 踢出此群员
-     *
-     * @param reason 踢出原因
-     * @param block 是否拉黑
-     *
-     * @throws PermissionDeniedException
-     */
-    abstract suspend fun kick(reason: String, block: Boolean)
+    suspend fun kick(reason: String, block: Boolean)
 
     suspend fun kick(reason: String) = kick(reason, false)
 
-    /**
-     * 给予该群员管理员权限.
-     *
-     * @param operation 是否给予
-     */
-    abstract suspend fun operateAdminPermission(operation: Boolean)
-
-    suspend fun isFriend() = comet.getFriend(id) != null
-
-    suspend fun isStranger() = comet.getStranger(id) != null
+    suspend fun operateAdminPermission(operation: Boolean)
 }
+
+suspend fun GroupMember.isFriend() = comet.getFriend(id) != null
+
+suspend fun GroupMember.isStranger() = comet.getStranger(id) != null
 
 fun GroupMember.at(): AtElement =
     if (platform == LoginPlatform.TELEGRAM) {
@@ -123,42 +86,32 @@ suspend fun GroupMember.asFriend() = comet.getFriend(id)
 
 suspend fun GroupMember.asStranger() = comet.getStranger(id)
 
-abstract class AnonymousMember : GroupMember() {
+interface AnonymousMember : GroupMember {
     /**
      * 该匿名群成员 ID
      */
-    abstract val anonymousId: String
+    val anonymousId: String
 }
 
 /**
  * [Group] 群组
  */
-abstract class Group(
-    override val id: Long,
+interface Group : Contact {
+    suspend fun getOwner(): GroupMember
 
-    /**
-     * 群名称
-     */
-    override var name: String
-) : Contact() {
-    abstract suspend fun getOwner(): GroupMember
+    suspend fun getMembers(): List<GroupMember>
 
-    abstract suspend fun getMembers(): List<GroupMember>
+    suspend fun updateGroupName(groupName: String)
 
-    abstract fun updateGroupName(groupName: String)
+    suspend fun getBotMuteRemaining(): Int
 
-    /**
-     * 仅在 Mirai 环境下可用, Telegram 实现会抛出错误
-     */
-    abstract fun getBotMuteRemaining(): Int
+    suspend fun getBotPermission(): GroupPermission
 
-    abstract suspend fun getBotPermission(): GroupPermission
+    suspend fun getGroupAvatarURL(): String
 
-    abstract suspend fun avatarUrl(): String
+    suspend fun getMember(id: Long): GroupMember?
 
-    abstract suspend fun getMember(id: Long): GroupMember?
+    suspend fun quit(): Boolean
 
-    abstract suspend fun quit(): Boolean
-
-    abstract suspend fun contains(id: Long): Boolean
+    suspend fun contains(id: Long): Boolean
 }

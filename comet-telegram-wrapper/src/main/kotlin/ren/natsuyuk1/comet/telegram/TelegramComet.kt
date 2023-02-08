@@ -150,10 +150,7 @@ class TelegramComet(
         return chat.userOrNull()?.toCometUser(this)
     }
 
-    /**
-     * Telegram 没有 "陌生人" 这一设计
-     */
-    override suspend fun getStranger(id: Long): User? = null
+    override suspend fun getStranger(id: Long): User? = getFriend(id)
 
     override suspend fun reply(message: MessageWrapper, receipt: MessageReceipt): MessageReceipt? {
         return when (receipt.source.type) {

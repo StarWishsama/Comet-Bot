@@ -12,7 +12,6 @@ import dev.inmo.tgbotapi.types.message.abstracts.*
 import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.types.toChatId
 import dev.inmo.tgbotapi.utils.PreviewFeature
-import dev.inmo.tgbotapi.utils.RiskFeature
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.event.broadcast
@@ -47,7 +46,7 @@ suspend fun BehaviourContext.listenMessageEvent(comet: TelegramComet) {
     }
 }
 
-@OptIn(PreviewFeature::class, RiskFeature::class)
+@OptIn(PreviewFeature::class)
 suspend fun CommonMessage<MessageContent>.toCometEvent(
     comet: TelegramComet
 ): MessageEvent? {
