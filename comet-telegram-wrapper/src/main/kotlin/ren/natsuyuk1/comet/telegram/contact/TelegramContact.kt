@@ -14,7 +14,8 @@ import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.telegram.util.send
 
 internal interface TelegramContact : Contact {
-    val chat: Chat
+    val contact: Chat
+
     override val platform: LoginPlatform
         get() = LoginPlatform.TELEGRAM
 
@@ -34,7 +35,7 @@ internal interface TelegramContact : Contact {
             }
 
         return if (!event.isCancelled) {
-            chat.id.chatIdOrNull()?.let { chatId ->
+            contact.id.chatIdOrNull()?.let { chatId ->
                 (comet as? TelegramComet)?.send(message, sourceType, chatId)
             }
         } else null

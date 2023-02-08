@@ -11,6 +11,8 @@ import dev.inmo.tgbotapi.extensions.utils.chatIdOrThrow
 import dev.inmo.tgbotapi.requests.abstracts.toInputFile
 import dev.inmo.tgbotapi.types.chat.GroupChat
 import dev.inmo.tgbotapi.types.chat.member.AdministratorChatMember
+import dev.inmo.tgbotapi.types.chat.member.BannedChatMember
+import dev.inmo.tgbotapi.types.chat.member.LeftChatMember
 import dev.inmo.tgbotapi.types.chat.member.OwnerChatMember
 import dev.inmo.tgbotapi.types.files.fullUrl
 import dev.inmo.tgbotapi.types.toChatId
@@ -21,16 +23,17 @@ import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import ren.natsuyuk1.comet.telegram.TelegramComet
 
 internal class TelegramGroup(
-    override val chat: GroupChat,
+    override val contact: GroupChat,
     override val comet: TelegramComet
 ) : Group, TelegramContact {
-    override val id: Long = chat.id.chatId
+    override val id: Long = contact.id.chatId
 
-    override val name: String = chat.title
+    override val name: String = contact.title
+
     override suspend fun getOwner(): GroupMember = run {
-        val resp = comet.bot.getChatAdministrators(chat.id)
+        val resp = comet.bot.getChatAdministrators(contact.id)
 
-        resp.find { it is OwnerChatMember }?.user?.toCometGroupMember(comet, chat.id.chatIdOrThrow())
+        resp.find { it is OwnerChatMember }?.user?.toCometGroupMember(comet, contact.id.chatIdOrThrow())
             ?: error("Unable to retrieve group owner")
     }
 
@@ -39,7 +42,7 @@ internal class TelegramGroup(
 
     override suspend fun updateGroupName(groupName: String) {
         if (getBotPermission() >= GroupPermission.ADMIN) {
-            comet.bot.setChatTitle(chat.id, groupName)
+            comet.bot.setChatTitle(contact.id, groupName)
         } else {
             throw IllegalAccessException("Bot doesn't permission to modify group name")
         }
@@ -50,7 +53,7 @@ internal class TelegramGroup(
     }
 
     override suspend fun getBotPermission(): GroupPermission {
-        return when (comet.bot.getChatMember(chat.id, comet.id.toChatId())) {
+        return when (comet.bot.getChatMember(contact.id, comet.id.toChatId())) {
             is OwnerChatMember -> GroupPermission.OWNER
             is AdministratorChatMember -> GroupPermission.ADMIN
             else -> GroupPermission.MEMBER
@@ -65,7 +68,7 @@ internal class TelegramGroup(
      */
     @OptIn(PreviewFeature::class)
     override suspend fun getGroupAvatarURL(): String =
-        chat.asExtendedGroupChat()?.chatPhoto?.bigFileId?.let {
+        contact.asExtendedGroupChat()?.chatPhoto?.bigFileId?.let {
             val avatarInfo = comet.bot.getFileAdditionalInfo(it.toInputFile())
 
             return avatarInfo.fullUrl(comet.urlsKeeper)
@@ -73,9 +76,9 @@ internal class TelegramGroup(
 
     override suspend fun getMember(id: Long): GroupMember? {
         return try {
-            val resp = comet.bot.getChatMember(chat, id.toChatId())
+            val resp = comet.bot.getChatMember(contact, id.toChatId())
 
-            chat.id.chatIdOrNull()?.let { resp.user.toCometGroupMember(comet, it) }
+            contact.id.chatIdOrNull()?.let { resp.user.toCometGroupMember(comet, it) }
         } catch (e: Exception) {
             null
         }
@@ -91,9 +94,9 @@ internal class TelegramGroup(
 
     override suspend fun contains(id: Long): Boolean {
         return try {
-            comet.bot.getChatMember(id.toChatId(), id.toChatId())
+            val member = comet.bot.getChatMember(id.toChatId(), id.toChatId())
 
-            true
+            member !is LeftChatMember && member !is BannedChatMember
         } catch (_: Exception) {
             false
         }
