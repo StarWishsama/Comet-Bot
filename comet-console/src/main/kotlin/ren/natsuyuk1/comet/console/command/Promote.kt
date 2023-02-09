@@ -12,7 +12,7 @@ import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
 
@@ -30,8 +30,8 @@ internal class Promote(
 ) : BaseCommand(sender, message, user, STOP) {
 
     private val id by argument("QQ/Telegram 平台用户ID").long()
-    private val platformName by option("-p", "--platform", help = "平台名称").enum<LoginPlatform>(true)
-        .default(LoginPlatform.MIRAI)
+    private val platformName by option("-p", "--platform", help = "平台名称").enum<CometPlatform>(true)
+        .default(CometPlatform.MIRAI)
 
     override suspend fun run() {
         val user = CometUser.getUser(id, platformName)

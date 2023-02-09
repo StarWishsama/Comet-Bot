@@ -12,7 +12,7 @@ package ren.natsuyuk1.comet.api.user
 import kotlinx.datetime.Instant
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.message.AtElement
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -68,7 +68,7 @@ suspend fun GroupMember.isFriend() = comet.getFriend(id) != null
 suspend fun GroupMember.isStranger() = comet.getStranger(id) != null
 
 fun GroupMember.at(): AtElement =
-    if (platform == LoginPlatform.TELEGRAM) {
+    if (platform == CometPlatform.TELEGRAM) {
         AtElement(userName = name)
     } else {
         AtElement(id)

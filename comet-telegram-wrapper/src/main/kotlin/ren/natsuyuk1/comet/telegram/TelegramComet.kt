@@ -33,7 +33,7 @@ import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.commands.service.subscribePushTemplateEvent
@@ -55,7 +55,7 @@ class TelegramComet(
      * 一个 Comet 实例的 [CometConfig]
      */
     config: CometConfig
-) : Comet(LoginPlatform.TELEGRAM, config, logger, ModuleScope("telegram ${config.id}")) {
+) : Comet(CometPlatform.TELEGRAM, config, logger, ModuleScope("telegram ${config.id}")) {
     internal val startTime = DateTime.now()
     internal lateinit var username: String
     lateinit var bot: TelegramBot

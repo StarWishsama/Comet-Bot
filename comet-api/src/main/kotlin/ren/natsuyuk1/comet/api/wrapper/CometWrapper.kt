@@ -2,7 +2,7 @@ package ren.natsuyuk1.comet.api.wrapper
 
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.config.CometConfig
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 
 /**
  * 代表一个 [CometWrapper]
@@ -22,7 +22,7 @@ interface CometWrapper {
     /**
      * 此 [CometWrapper] 对应的登录平台
      */
-    fun platform(): LoginPlatform
+    fun platform(): CometPlatform
 
     /**
      * 此 [CometWrapper] 对应登录平台的库相关信息

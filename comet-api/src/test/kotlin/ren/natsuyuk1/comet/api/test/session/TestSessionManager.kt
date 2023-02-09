@@ -14,7 +14,7 @@ import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.session.Session
 import ren.natsuyuk1.comet.api.session.SessionManager
 import ren.natsuyuk1.comet.api.session.expire
@@ -40,8 +40,8 @@ class TestSessionManager {
         override val id: Long = 616
         override val comet: Comet = fakeComet
         override val name: String = "TestUser"
-        override val platform: LoginPlatform
-            get() = LoginPlatform.TEST
+        override val platform: CometPlatform
+            get() = CometPlatform.TEST
 
         override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
             logger.debug { "Received message: $message" }
@@ -73,7 +73,7 @@ class TestSessionManager {
         override suspend fun contains(id: Long): Boolean = error("Unable to use this on test group")
 
         override val comet: Comet = fakeComet
-        override val platform: LoginPlatform = LoginPlatform.TEST
+        override val platform: CometPlatform = CometPlatform.TEST
 
         override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
             logger.debug { "Group Received message: $message" }
@@ -112,7 +112,7 @@ class TestSessionManager {
         override val comet: Comet = fakeComet
         override val name: String = "Mito"
         override var card: String = "Mito"
-        override val platform: LoginPlatform = LoginPlatform.TEST
+        override val platform: CometPlatform = CometPlatform.TEST
     }
 
     @Test
@@ -120,7 +120,7 @@ class TestSessionManager {
         val fakeUser = TestUser()
 
         val instance = transaction {
-            CometUser.create(fakeUser.id, LoginPlatform.TEST)
+            CometUser.create(fakeUser.id, CometPlatform.TEST)
         }
 
         TestSession(fakeSender, instance).register()
@@ -135,7 +135,7 @@ class TestSessionManager {
         val fakeGroupSender = TestGroupMember()
 
         val instance2 = transaction {
-            CometUser.create(fakeGroupSender.id, LoginPlatform.TEST)
+            CometUser.create(fakeGroupSender.id, CometPlatform.TEST)
         }
 
         TestSession(fakeGroupSender, instance2).register()

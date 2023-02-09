@@ -8,7 +8,7 @@ import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.Contact
 import ren.natsuyuk1.comet.telegram.TelegramComet
 import ren.natsuyuk1.comet.telegram.util.send
@@ -16,8 +16,8 @@ import ren.natsuyuk1.comet.telegram.util.send
 internal interface TelegramContact : Contact {
     val contact: Chat
 
-    override val platform: LoginPlatform
-        get() = LoginPlatform.TELEGRAM
+    override val platform: CometPlatform
+        get() = CometPlatform.TELEGRAM
 
     override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
         val event = MessagePreSendEvent(

@@ -5,7 +5,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.database.AccountData
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.wrapper.CometWrapper
 import ren.natsuyuk1.comet.mirai.config.MiraiConfig
 import ren.natsuyuk1.comet.mirai.config.MiraiConfigManager
@@ -40,7 +40,7 @@ class MiraiWrapper : CometWrapper {
         return config.classLoader.runWith { MiraiComet(config, miraiConfig) }
     }
 
-    override fun platform(): LoginPlatform = LoginPlatform.MIRAI
+    override fun platform(): CometPlatform = CometPlatform.MIRAI
 
     override fun libInfo(): String = "Mirai $miraiVersion"
 }

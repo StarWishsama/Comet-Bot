@@ -32,7 +32,7 @@ import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.session.SessionManager
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.api.user.Group
@@ -59,7 +59,7 @@ private val logger = mu.KotlinLogging.logger {}
 
 private val dummyComet =
     object :
-        Comet(LoginPlatform.TEST, CometConfig(0, "", LoginPlatform.TEST), logger, ModuleScope("dummy-comet")) {
+        Comet(CometPlatform.TEST, CometConfig(0, "", CometPlatform.TEST), logger, ModuleScope("dummy-comet")) {
         override val id: Long = 0
         override fun login() {}
         override fun afterLogin() {}

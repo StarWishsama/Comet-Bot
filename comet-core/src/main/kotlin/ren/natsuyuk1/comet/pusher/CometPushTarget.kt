@@ -1,7 +1,7 @@
 package ren.natsuyuk1.comet.pusher
 
 import kotlinx.serialization.Serializable
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.User
 
@@ -9,7 +9,7 @@ import ren.natsuyuk1.comet.api.user.User
 data class CometPushTarget(
     val id: Long,
     val type: CometPushTargetType,
-    val platform: LoginPlatform,
+    val platform: CometPlatform,
 )
 
 enum class CometPushTargetType {

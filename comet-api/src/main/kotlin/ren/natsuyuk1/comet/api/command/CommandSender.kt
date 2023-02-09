@@ -12,7 +12,7 @@ package ren.natsuyuk1.comet.api.command
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.Contact
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
@@ -40,7 +40,7 @@ interface PlatformCommandSender : CommandSender {
 
     val id: Long
     val name: String
-    val platform: LoginPlatform
+    val platform: CometPlatform
 
     override fun asString(): String = "$name($id) [$platform]"
 }

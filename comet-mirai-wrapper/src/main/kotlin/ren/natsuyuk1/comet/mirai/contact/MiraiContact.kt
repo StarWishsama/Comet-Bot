@@ -5,7 +5,7 @@ import ren.natsuyuk1.comet.api.event.broadcast
 import ren.natsuyuk1.comet.api.event.events.comet.MessagePreSendEvent
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.Contact
 import ren.natsuyuk1.comet.mirai.util.toMessageChain
 import ren.natsuyuk1.comet.mirai.util.toMessageSource
@@ -13,8 +13,8 @@ import ren.natsuyuk1.comet.mirai.util.toMessageSource
 internal interface MiraiContact : Contact {
     val miraiContact: net.mamoe.mirai.contact.Contact
 
-    override val platform: LoginPlatform
-        get() = LoginPlatform.MIRAI
+    override val platform: CometPlatform
+        get() = CometPlatform.MIRAI
 
     override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
         val event = MessagePreSendEvent(

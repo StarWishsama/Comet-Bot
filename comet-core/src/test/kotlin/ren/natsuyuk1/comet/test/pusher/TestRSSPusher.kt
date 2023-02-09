@@ -7,7 +7,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.database.DatabaseManager
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.pusher.CometPushTarget
 import ren.natsuyuk1.comet.pusher.CometPushTargetType
 import ren.natsuyuk1.comet.pusher.CometPusherContextTable
@@ -25,7 +25,7 @@ class TestRSSPusher {
         DatabaseManager.loadTables(CometPusherContextTable)
         RSSPusher.init()
         RSSPusher.subscriber["https://rsshub.app/36kr/newsflashes"] =
-            mutableListOf(CometPushTarget(id = 1, CometPushTargetType.GROUP, LoginPlatform.TEST))
+            mutableListOf(CometPushTarget(id = 1, CometPushTargetType.GROUP, CometPlatform.TEST))
     }
 
     @Test

@@ -10,7 +10,7 @@ import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.session.SessionManager
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserTable
@@ -46,7 +46,7 @@ class TestPictureSearch {
             appendText("/ps")
         }
 
-        val fakeUser = CometUser.create(1L, LoginPlatform.TEST)
+        val fakeUser = CometUser.create(1L, CometPlatform.TEST)
 
         val fakeImage = buildMessageWrapper {
             // https://www.pixiv.net/artworks/92690006

@@ -10,7 +10,7 @@ import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
 import ren.natsuyuk1.comet.api.database.AccountData
 import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
 
 internal val LOGOUT = CommandProperty(
@@ -33,16 +33,16 @@ internal class Logout(
         "-p",
         "--platform",
         help = "登录 Comet 机器人的平台 (例如 MIRAI, Telegram)"
-    ).enum<LoginPlatform>(true).default(LoginPlatform.MIRAI)
+    ).enum<CometPlatform>(true).default(CometPlatform.MIRAI)
 
     override suspend fun run() {
         when (platform) {
-            LoginPlatform.MIRAI -> {
-                AccountData.logout(id, LoginPlatform.MIRAI)
+            CometPlatform.MIRAI -> {
+                AccountData.logout(id, CometPlatform.MIRAI)
             }
 
-            LoginPlatform.TELEGRAM -> {
-                AccountData.logout(id, LoginPlatform.TELEGRAM)
+            CometPlatform.TELEGRAM -> {
+                AccountData.logout(id, CometPlatform.TELEGRAM)
             }
 
             else -> {}

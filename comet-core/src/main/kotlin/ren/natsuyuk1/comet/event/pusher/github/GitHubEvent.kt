@@ -9,32 +9,30 @@ class GitHubEvent(
     private val repo: GitHubRepoData.Data.GithubRepo,
     val eventData: GitHubEventData
 ) : CometBroadcastEvent() {
-    init {
+    fun init() {
         val eventType = eventData.type()
         val branchName = eventData.branchName()
 
         repo.subscribers.forEach { sub ->
-            if (
-                sub.subscribeEvent.contains(eventType) && (
-                    sub.subscribeBranch.isEmpty() ||
-                        branchName.isBlank() ||
-                        (
-                            sub.subscribeBranch.contains(branchName) ||
-                                sub.subscribeBranch.contains("*")
-                            )
-                    )
-            ) {
-                broadcastTargets.add(
-                    BroadcastTarget(
-                        BroadcastTarget.BroadcastType.GROUP,
-                        sub.id
-                    )
-                )
+            // Check event
+            if (!sub.subscribeEvent.contains("*") && !sub.subscribeEvent.contains(eventType)) {
+                return@forEach
             }
+
+            // Check branch
+            if (!sub.subscribeBranch.contains("*") && !sub.subscribeBranch.contains(branchName)) {
+                return@forEach
+            }
+
+            broadcastTargets.add(
+                BroadcastTarget(
+                    BroadcastTarget.BroadcastType.GROUP, sub.id
+                )
+            )
         }
     }
 
     override fun toString(): String {
-        return "Repo=$repo, eventData={type=${eventData.type()}, branch=${eventData.branchName()}}"
+        return "Repo=$repo, eventData={type=${eventData.type()}, branch=${eventData.branchName()}}, broadcastTargets=$broadcastTargets" // ktlint-disable
     }
 }

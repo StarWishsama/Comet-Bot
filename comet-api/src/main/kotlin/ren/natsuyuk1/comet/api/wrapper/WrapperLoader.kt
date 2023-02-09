@@ -1,7 +1,7 @@
 package ren.natsuyuk1.comet.api.wrapper
 
 import mu.KotlinLogging
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.utils.file.resolveDirectory
 import java.io.File
 import java.net.URL
@@ -40,7 +40,7 @@ object WrapperLoader {
         }
     }
 
-    fun getService(platform: LoginPlatform): CometWrapper? {
+    fun getService(platform: CometPlatform): CometWrapper? {
         if (!::serviceLoader.isInitialized) {
             return null
         }

@@ -8,7 +8,7 @@ import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.consts.json
@@ -41,10 +41,10 @@ object UserDataMigrator : IMigrator {
 
             userCache.forEach { (id, user) ->
                 transaction {
-                    if (CometUser.getUser(id, LoginPlatform.MIRAI) == null) {
+                    if (CometUser.getUser(id, CometPlatform.MIRAI) == null) {
                         UserTable.insert {
                             it[platformID] = id
-                            it[platform] = LoginPlatform.MIRAI
+                            it[platform] = CometPlatform.MIRAI
                             it[coin] = user.coin
                             it[checkInTime] = user.checkInCount
 

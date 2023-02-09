@@ -5,12 +5,12 @@ enum class SecretStatus {
     /**
      * 找不到任何使用 Secret 的项目, 可视作成功
      */
-    NO_SECRET,
+    FOUND,
 
     /**
      * 已找到对应 Secret 的项目, 可视作成功
      */
-    HAS_SECRET,
+    FOUND_WITH_SECRET,
 
     /**
      * 已找到对应 Secret 的项目, 但无法匹配

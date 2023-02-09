@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.database.DatabaseManager
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserPermissionTable
 import ren.natsuyuk1.comet.api.user.UserTable
@@ -35,17 +35,17 @@ class TestSignService {
     fun testSignInPosition() {
         val testCheckInTime = Clock.System.now()
 
-        val testUser = CometUser.create(114514L, LoginPlatform.TEST).also {
+        val testUser = CometUser.create(114514L, CometPlatform.TEST).also {
             transaction {
                 it.checkInDate = testCheckInTime.plus(1.minutes)
             }
         }
-        CometUser.create(114515L, LoginPlatform.TEST).also {
+        CometUser.create(114515L, CometPlatform.TEST).also {
             transaction {
                 it.checkInDate = testCheckInTime
             }
         }
-        CometUser.create(114516L, LoginPlatform.TEST).also {
+        CometUser.create(114516L, CometPlatform.TEST).also {
             transaction {
                 it.checkInDate = testCheckInTime.plus(2.minutes)
             }
@@ -62,7 +62,7 @@ class TestSignService {
     fun testIsSigned() {
         val testCheckInTime = Clock.System.now()
 
-        val user = CometUser.getUserOrCreate(114514L, LoginPlatform.MIRAI).also {
+        val user = CometUser.getUserOrCreate(114514L, CometPlatform.MIRAI).also {
             transaction {
                 it.checkInDate = testCheckInTime.minus(1.days)
             }
@@ -89,7 +89,7 @@ class TestSignService {
 
     @Test
     fun testLevelUp() {
-        val user = CometUser.create(1, LoginPlatform.TEST)
+        val user = CometUser.create(1, CometPlatform.TEST)
         runBlocking {
             transaction {
                 user.exp = 1000

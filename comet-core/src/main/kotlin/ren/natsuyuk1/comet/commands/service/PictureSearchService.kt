@@ -4,7 +4,7 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.session.Session
 import ren.natsuyuk1.comet.api.session.expire
 import ren.natsuyuk1.comet.api.session.registerTimeout
@@ -35,7 +35,7 @@ object PictureSearchService {
         subject.sendMessage("⏳ 接下来, 请在 30s 内发送你要搜索的图片".toMessageWrapper())
     }
 
-    suspend fun searchImage(platform: LoginPlatform, image: Image, source: PictureSearchSource): MessageWrapper =
+    suspend fun searchImage(platform: CometPlatform, image: Image, source: PictureSearchSource): MessageWrapper =
         when (source) {
             PictureSearchSource.SAUCENAO -> {
                 SauceNaoApi.searchByImage(image).toMessageWrapper(!platform.needRestrict)

@@ -16,7 +16,7 @@ import ren.natsuyuk1.comet.api.cometInstances
 import ren.natsuyuk1.comet.api.cometScope
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.console.Console
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.platform.MiraiLoginProtocol
 import ren.natsuyuk1.comet.api.status.AccountOperationResult
 import ren.natsuyuk1.comet.api.status.AccountOperationStatus
@@ -29,7 +29,7 @@ val loginStatus = atomic(false)
 object AccountDataTable : IdTable<Long>("account_data") {
     override val id: Column<EntityID<Long>> = long("id").entityId()
     val password: Column<String> = text("password")
-    val platform = enumeration<LoginPlatform>("platform")
+    val platform = enumeration<CometPlatform>("platform")
     val protocol = enumeration<MiraiLoginProtocol>("protocol").nullable().default(null)
 }
 
@@ -39,7 +39,7 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
     var protocol by AccountDataTable.protocol
 
     companion object : EntityClass<Long, AccountData>(AccountDataTable) {
-        fun hasAccount(id: Long, platform: LoginPlatform): Boolean = transaction {
+        fun hasAccount(id: Long, platform: CometPlatform): Boolean = transaction {
             !find {
                 AccountDataTable.id eq id and (AccountDataTable.platform eq platform)
             }.empty()
@@ -48,7 +48,7 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
         fun registerAccount(
             id: Long,
             password: String,
-            platform: LoginPlatform,
+            platform: CometPlatform,
             protocol: MiraiLoginProtocol?
         ): AccountData {
             val target = transaction { findById(id) }
@@ -68,7 +68,7 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
             }
         }
 
-        fun getAccountData(id: Long, platform: LoginPlatform): AccountData? =
+        fun getAccountData(id: Long, platform: CometPlatform): AccountData? =
             transaction {
                 find {
                     AccountDataTable.id eq id and (AccountDataTable.platform eq platform)
@@ -78,7 +78,7 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
         suspend fun login(
             id: Long,
             password: String,
-            platform: LoginPlatform,
+            platform: CometPlatform,
             protocol: MiraiLoginProtocol? = null
         ): AccountOperationResult {
             if (cometInstances.any { it.id == id && it.platform == platform }) {
@@ -104,7 +104,7 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
 
             try {
                 return when (platform) {
-                    LoginPlatform.MIRAI -> {
+                    CometPlatform.MIRAI -> {
                         if (protocol == null) {
                             logger.warn { "未指定 Mirai 登录协议, 将默认设置为 ANDROID_PAD (安卓手机协议). 如先前已有配置将会跟随先前配置." }
                         }
@@ -143,7 +143,7 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
                         }
                     }
 
-                    LoginPlatform.TELEGRAM -> {
+                    CometPlatform.TELEGRAM -> {
                         val telegramComet =
                             service.createInstance(
                                 CometConfig(
@@ -183,7 +183,7 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
             }
         }
 
-        fun logout(id: Long, platform: LoginPlatform): AccountOperationResult {
+        fun logout(id: Long, platform: CometPlatform): AccountOperationResult {
             logger.info { "正在尝试注销账号 $id 于 ${platform.name} 平台" }
 
             return if (!hasAccount(id, platform)) {

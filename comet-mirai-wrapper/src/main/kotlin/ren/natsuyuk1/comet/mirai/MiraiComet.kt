@@ -16,7 +16,7 @@ import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.commands.service.subscribePushTemplateEvent
@@ -27,7 +27,6 @@ import ren.natsuyuk1.comet.mirai.contact.toCometGroup
 import ren.natsuyuk1.comet.mirai.contact.toCometUser
 import ren.natsuyuk1.comet.mirai.event.redirectToComet
 import ren.natsuyuk1.comet.mirai.util.*
-import ren.natsuyuk1.comet.mirai.util.LoggerRedirector
 import ren.natsuyuk1.comet.service.subscribeGitHubEvent
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.system.getEnv
@@ -41,7 +40,7 @@ class MiraiComet(
      */
     config: CometConfig,
     private val miraiConfig: MiraiConfig,
-) : Comet(LoginPlatform.MIRAI, config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
+) : Comet(CometPlatform.MIRAI, config, logger, ModuleScope("mirai (${miraiConfig.id})")) {
     private lateinit var miraiBot: Bot
     private val cl = config.classLoader
 

@@ -20,7 +20,7 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import org.jetbrains.exposed.sql.transactions.transaction
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.utils.sql.SQLDatabaseSet
 import ren.natsuyuk1.comet.utils.sql.SetTable
 import java.util.*
@@ -37,7 +37,7 @@ private val logger = KotlinLogging.logger {}
 object UserTable : UUIDTable("comet_user_data") {
 
     val platformID = long("platform_id")
-    val platform = enumeration<LoginPlatform>("platform")
+    val platform = enumeration<CometPlatform>("platform")
     val checkInDate =
         timestamp("check_in_date").default(Clock.System.now().minus(1.days))
     val coin = double("coin").default(0.0)
@@ -81,7 +81,7 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
             )
         )
 
-        fun getUser(id: Long, platform: LoginPlatform) = transaction {
+        fun getUser(id: Long, platform: CometPlatform) = transaction {
             find {
                 UserTable.platformID eq id and (UserTable.platform eq platform)
             }.firstOrNull()
@@ -98,7 +98,7 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
          *
          * @return 获取或创建的 [CometUser]
          */
-        fun getUserOrCreate(id: Long, platform: LoginPlatform): CometUser = transaction {
+        fun getUserOrCreate(id: Long, platform: CometPlatform): CometUser = transaction {
             return@transaction getUser(id, platform) ?: create(id, platform)
         }
 
@@ -112,7 +112,7 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
          *
          * @return user instance
          */
-        fun create(id: Long, platform: LoginPlatform): CometUser {
+        fun create(id: Long, platform: CometPlatform): CometUser {
             val u = getUser(id, platform)
 
             if (u != null) {

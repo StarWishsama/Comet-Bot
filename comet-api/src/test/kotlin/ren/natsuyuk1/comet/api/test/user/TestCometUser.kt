@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.database.DatabaseManager
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.test.database.initTestDatabase
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserPermissionTable
@@ -27,8 +27,8 @@ class TestCometUser {
     fun testUserCreate(): Unit = runBlocking {
         newSuspendedTransaction {
             UserTable.deleteWhere { platformID eq 114514L }
-            CometUser.create(114514L, LoginPlatform.TEST)
-            assertTrue(CometUser.getUser(114514L, LoginPlatform.TEST) != null)
+            CometUser.create(114514L, CometPlatform.TEST)
+            assertTrue(CometUser.getUser(114514L, CometPlatform.TEST) != null)
             UserTable.deleteWhere { platformID eq 114514L }
         }
     }

@@ -20,7 +20,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.AnonymousMember
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
@@ -212,8 +212,8 @@ internal class TelegramChannelMemberImpl(
 
     override val name: String
         get() = card
-    override val platform: LoginPlatform
-        get() = LoginPlatform.TELEGRAM
+    override val platform: CometPlatform
+        get() = CometPlatform.TELEGRAM
 
     override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
         error("Anonymous Member cannot send message")

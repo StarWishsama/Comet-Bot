@@ -3,7 +3,7 @@ package ren.natsuyuk1.comet.telegram
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.database.AccountData
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.wrapper.CometWrapper
 
 class TelegramWrapper : CometWrapper {
@@ -17,7 +17,7 @@ class TelegramWrapper : CometWrapper {
         return TelegramComet(config)
     }
 
-    override fun platform(): LoginPlatform = LoginPlatform.TELEGRAM
+    override fun platform(): CometPlatform = CometPlatform.TELEGRAM
 
     override fun libInfo(): String = "TGBotAPI $tgbotAPI"
 }

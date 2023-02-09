@@ -8,7 +8,7 @@ import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.User
@@ -22,7 +22,7 @@ val fakeGroups = mutableSetOf<Group>()
 
 val fakeComet by lazy {
     object :
-        Comet(LoginPlatform.TEST, CometConfig(0, "", LoginPlatform.TEST), logger, ModuleScope("fake-comet-core")) {
+        Comet(CometPlatform.TEST, CometConfig(0, "", CometPlatform.TEST), logger, ModuleScope("fake-comet-core")) {
         override val id: Long = 0
 
         override fun login() {}
@@ -56,8 +56,8 @@ fun generateFakeSender(id: Long): User = object : User {
         get() = id
     override val name: String
         get() = "testuser"
-    override val platform: LoginPlatform
-        get() = LoginPlatform.TEST
+    override val platform: CometPlatform
+        get() = CometPlatform.TEST
 
     override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
         logger.debug { "Message sent to user $id: ${message.encodeToString()}" }
@@ -102,7 +102,7 @@ fun generateFakeGroup(id: Long): Group = object : Group {
     }
 
     override val comet: Comet = fakeComet
-    override val platform: LoginPlatform = LoginPlatform.TEST
+    override val platform: CometPlatform = CometPlatform.TEST
 
     override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
         logger.debug { "Message sent to group $id: ${message.encodeToString()}" }
@@ -157,8 +157,8 @@ fun generateFakeGroupMember(id: Long, group: Group) = object : GroupMember {
         get() = fakeComet
     override val name: String
         get() = "Test"
-    override val platform: LoginPlatform
-        get() = LoginPlatform.TEST
+    override val platform: CometPlatform
+        get() = CometPlatform.TEST
 }
 
 fun Any.print() = println(this)

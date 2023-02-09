@@ -77,13 +77,13 @@ object GitHubService {
             GitHubRepoData.data.repos.find { it.getName() == parse.repoName() } ?: return SecretStatus.NOT_FOUND
 
         if (targetRepo.secret.isEmpty() && secret == null) {
-            return SecretStatus.NO_SECRET
+            return SecretStatus.FOUND
         }
 
         val checkStatus = checkSignature(targetRepo.secret, secret ?: "", requestBody)
 
         return if (checkStatus) {
-            SecretStatus.HAS_SECRET
+            SecretStatus.FOUND_WITH_SECRET
         } else {
             SecretStatus.UNAUTHORIZED
         }

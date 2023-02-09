@@ -14,7 +14,7 @@ import net.mamoe.yamlkt.Comment
 import net.mamoe.yamlkt.Yaml
 import org.jline.reader.LineReader
 import ren.natsuyuk1.comet.api.config.provider.PersistDataFile
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.platform.MiraiLoginProtocol
 import ren.natsuyuk1.comet.utils.file.configDirectory
 import ren.natsuyuk1.comet.utils.json.serializers.UUIDSerializer
@@ -75,7 +75,7 @@ object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
 data class CometConfig(
     val id: Long,
     val password: String,
-    val platform: LoginPlatform,
+    val platform: CometPlatform,
     val protocol: MiraiLoginProtocol? = null,
     val classLoader: ClassLoader = Thread.currentThread().contextClassLoader,
     val reader: LineReader? = null,

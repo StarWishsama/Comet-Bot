@@ -6,7 +6,7 @@ import ren.natsuyuk1.comet.api.config.CometConfig
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageSource
 import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.User
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
@@ -14,8 +14,8 @@ import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 private val logger = mu.KotlinLogging.logger {}
 
 val fakeComet = object : Comet(
-    platform = LoginPlatform.TEST,
-    config = CometConfig(0, "", LoginPlatform.TEST),
+    platform = CometPlatform.TEST,
+    config = CometConfig(0, "", CometPlatform.TEST),
     logger = logger,
     scope = ModuleScope("TestInstance")
 ) {
@@ -49,7 +49,7 @@ val fakeSender = object : PlatformCommandSender {
         get() = fakeComet
     override val id: Long = 0
     override val name: String = "Dummy"
-    override val platform: LoginPlatform = LoginPlatform.TEST
+    override val platform: CometPlatform = CometPlatform.TEST
 
     override suspend fun sendMessage(message: MessageWrapper): MessageReceipt? {
         logger.info { message.encodeToString() }

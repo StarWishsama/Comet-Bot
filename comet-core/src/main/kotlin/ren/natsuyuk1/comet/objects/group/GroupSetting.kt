@@ -3,7 +3,7 @@ package ren.natsuyuk1.comet.objects.group
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import mu.KotlinLogging
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
@@ -35,7 +35,7 @@ object GroupSettingManager {
         }
     }
 
-    fun findGroupConfig(id: Long, platform: LoginPlatform) =
+    fun findGroupConfig(id: Long, platform: CometPlatform) =
         groupSettings.find { it.id == id && it.platform == platform }
 
     suspend fun save() = groupSettings.forEach {
@@ -46,7 +46,7 @@ object GroupSettingManager {
         file.writeTextBuffered(json.encodeToString(GroupSetting.serializer(), it))
     }
 
-    fun createGroupConfig(id: Long, platform: LoginPlatform) = scope.launch {
+    fun createGroupConfig(id: Long, platform: CometPlatform) = scope.launch {
         logger.info { "正在创建群 $id 的配置文件..." }
 
         GroupSetting(id, platform).apply {
@@ -56,7 +56,7 @@ object GroupSettingManager {
         logger.info { "群 $id 的配置文件创建完成." }
     }
 
-    fun removeGroupConfig(id: Long, platform: LoginPlatform) {
+    fun removeGroupConfig(id: Long, platform: CometPlatform) {
         groupSettings.removeIf { it.id == id && it.platform == platform }
     }
 }
@@ -64,7 +64,7 @@ object GroupSettingManager {
 @Serializable
 data class GroupSetting(
     val id: Long,
-    val platform: LoginPlatform,
+    val platform: CometPlatform,
     var autoAcceptJoinRequest: Boolean = false,
     var allowRepeatMessage: Boolean = false
 )

@@ -3,7 +3,7 @@ package ren.natsuyuk1.comet.api.platform
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class LoginPlatform(val needRestrict: Boolean = false) {
+enum class CometPlatform(val needRestrict: Boolean = false) {
     /**
      * Represent to `comet-mirai-wrapper`
      */

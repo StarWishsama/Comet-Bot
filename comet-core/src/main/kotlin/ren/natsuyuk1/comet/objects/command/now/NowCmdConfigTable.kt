@@ -13,11 +13,11 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import java.util.*
 
 object NowCmdConfigTable : Table("now_cmd_config") {
-    private val platformType = enumerationByName<LoginPlatform>("type", 20)
+    private val platformType = enumerationByName<CometPlatform>("type", 20)
     private val isGroup = bool("is_group")
     private val id = long("id")
     private val config = text("config")
@@ -25,7 +25,7 @@ object NowCmdConfigTable : Table("now_cmd_config") {
     override val primaryKey = PrimaryKey(platformType, isGroup, id)
 
     suspend fun setConfig(
-        platform: LoginPlatform,
+        platform: CometPlatform,
         isGroup: Boolean,
         id: Long,
         config: Config
@@ -54,7 +54,7 @@ object NowCmdConfigTable : Table("now_cmd_config") {
     }
 
     suspend fun hasConfig(
-        platform: LoginPlatform,
+        platform: CometPlatform,
         isGroup: Boolean,
         id: Long
     ): Boolean = withContext(Dispatchers.IO) {
@@ -66,7 +66,7 @@ object NowCmdConfigTable : Table("now_cmd_config") {
     }
 
     suspend fun getConfig(
-        platform: LoginPlatform,
+        platform: CometPlatform,
         isGroup: Boolean,
         id: Long
     ): Config? = withContext(Dispatchers.IO) {

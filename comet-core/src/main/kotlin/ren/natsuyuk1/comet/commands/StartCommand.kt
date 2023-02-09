@@ -6,7 +6,7 @@ import ren.natsuyuk1.comet.api.command.CommandProperty
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
 import ren.natsuyuk1.comet.api.command.simpleEquals
 import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.session.SessionManager
 import ren.natsuyuk1.comet.api.session.VerifySession
 import ren.natsuyuk1.comet.api.user.CometUser
@@ -26,7 +26,7 @@ class StartCommand(
     private val user: CometUser
 ) : CometCommand(comet, sender, subject, message, user, START) {
     override suspend fun run() {
-        if (user.platform != LoginPlatform.TELEGRAM) {
+        if (user.platform != CometPlatform.TELEGRAM) {
             return
         }
 

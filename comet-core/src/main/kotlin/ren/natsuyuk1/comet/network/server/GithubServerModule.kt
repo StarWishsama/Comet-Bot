@@ -82,21 +82,13 @@ object GithubWebHookHandler {
                 if (event != null) {
                     if (event.isSendableEvent()) {
                         GitHubRepoData.find(event.repoName())?.let {
-                            GitHubEvent(it, event).broadcast()
+                            GitHubEvent(it, event).apply {
+                                init()
+                                broadcast()
+                            }
                         }
                     }
                 } else {
-                    logger.debug("推送 WebHook 消息失败, 不支持的事件类型")
-
-                    call.respondText(
-                        CometResponse(
-                            HttpStatusCode.NotAcceptable,
-                            "Comet 已收到事件, 但所请求的事件类型不支持 ($eventType)"
-                        )
-                            .toJson(),
-                        status = HttpStatusCode.InternalServerError
-                    )
-
                     return
                 }
             } catch (e: IOException) {
@@ -110,12 +102,12 @@ object GithubWebHookHandler {
                         .respond(call)
                 }
 
-                secretStatus == SecretStatus.NO_SECRET -> {
+                secretStatus == SecretStatus.FOUND -> {
                     CometResponse(HttpStatusCode.OK, "Comet 成功接收事件, 推荐使用密钥加密以保证安全")
                         .respond(call)
                 }
 
-                else -> {
+                secretStatus == SecretStatus.FOUND_WITH_SECRET -> {
                     CometResponse(HttpStatusCode.OK, "Comet 成功接收事件")
                         .respond(call)
                 }
@@ -133,12 +125,26 @@ object GithubWebHookHandler {
         signature: String?
     ): Boolean {
         return when (secretStatus) {
-            SecretStatus.HAS_SECRET -> signature != null
-            SecretStatus.NO_SECRET -> true
+            SecretStatus.FOUND_WITH_SECRET -> signature != null
+            SecretStatus.FOUND -> true
             SecretStatus.UNAUTHORIZED -> {
                 logger.debug { "收到新事件, 未通过安全验证. 请求的签名为: ${signature?.firstOrNull() ?: "无"}" }
                 CometResponse(HttpStatusCode.Forbidden, "未通过安全验证").respond(call)
-                return false
+                false
+            }
+            SecretStatus.UNSUPPORTED_EVENT -> {
+                logger.debug("推送 WebHook 消息失败, 不支持的事件类型")
+
+                call.respondText(
+                    CometResponse(
+                        HttpStatusCode.NotAcceptable,
+                        "Comet 已收到事件, 但所请求的事件类型不支持"
+                    )
+                        .toJson(),
+                    status = HttpStatusCode.InternalServerError
+                )
+
+                false
             }
             else -> false
         }

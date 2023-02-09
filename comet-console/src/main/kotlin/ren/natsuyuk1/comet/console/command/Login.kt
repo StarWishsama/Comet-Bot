@@ -11,7 +11,7 @@ import ren.natsuyuk1.comet.api.command.ConsoleCommandSender
 import ren.natsuyuk1.comet.api.database.AccountData
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.platform.MiraiLoginProtocol
 import ren.natsuyuk1.comet.api.user.CometUser
 
@@ -39,7 +39,7 @@ internal class Login(
         "-p",
         "--platform",
         help = "登录 Comet 机器人的平台 (例如 QQ, Telegram)"
-    ).enum<LoginPlatform>(true).default(LoginPlatform.MIRAI)
+    ).enum<CometPlatform>(true).default(CometPlatform.MIRAI)
 
     private val protocol by option(
         "-P",
@@ -54,16 +54,16 @@ internal class Login(
         }
 
         when (platform) {
-            LoginPlatform.MIRAI -> {
+            CometPlatform.MIRAI -> {
                 sender.sendMessage(buildMessageWrapper { appendText("正在尝试登录账号 $id 于 QQ 平台") })
 
-                AccountData.login(id, password, LoginPlatform.MIRAI, protocol)
+                AccountData.login(id, password, CometPlatform.MIRAI, protocol)
             }
 
-            LoginPlatform.TELEGRAM -> {
+            CometPlatform.TELEGRAM -> {
                 sender.sendMessage(buildMessageWrapper { appendText("正在尝试登录账号于 Telegram 平台") })
 
-                AccountData.login(id, password, LoginPlatform.TELEGRAM, protocol)
+                AccountData.login(id, password, CometPlatform.TELEGRAM, protocol)
             }
 
             else -> {}

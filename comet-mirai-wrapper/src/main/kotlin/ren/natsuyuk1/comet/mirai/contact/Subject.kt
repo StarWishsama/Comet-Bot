@@ -2,7 +2,7 @@ package ren.natsuyuk1.comet.mirai.contact
 
 import net.mamoe.mirai.contact.getMember
 import ren.natsuyuk1.comet.api.Comet
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.Friend
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
@@ -61,8 +61,8 @@ class MiraiFriend(
         get() = miraiContact.id
     override val name: String
         get() = miraiContact.nick
-    override val platform: LoginPlatform
-        get() = LoginPlatform.MIRAI
+    override val platform: CometPlatform
+        get() = CometPlatform.MIRAI
 }
 
 fun net.mamoe.mirai.contact.Friend.toCometFriend(miraiComet: MiraiComet): Friend =

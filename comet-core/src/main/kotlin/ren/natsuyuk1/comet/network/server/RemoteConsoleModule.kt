@@ -8,7 +8,7 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.SerializationException
 import ren.natsuyuk1.comet.api.config.CometGlobalConfig
 import ren.natsuyuk1.comet.api.database.AccountData
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserLevel
 import ren.natsuyuk1.comet.consts.json
@@ -93,7 +93,7 @@ object RemoteConsoleHandler {
         logger.debug { "远端尝试登出账号" }
 
         val id = call.parameters["id"]?.toLongOrNull()
-        val platform = call.parameters["platform"]?.let { param -> param.asEnumOrNull<LoginPlatform>() }
+        val platform = call.parameters["platform"]?.let { param -> param.asEnumOrNull<CometPlatform>() }
 
         if (id == null || platform == null) {
             CometResponse(HttpStatusCode.BadRequest, "Missing required argument(s)").respond(call)
@@ -116,7 +116,7 @@ object RemoteConsoleHandler {
         logger.debug { "远端尝试提升用户账号权限" }
 
         val id = call.parameters["id"]?.toLongOrNull()
-        val platform = call.parameters["platform"]?.asEnumOrNull<LoginPlatform>()
+        val platform = call.parameters["platform"]?.asEnumOrNull<CometPlatform>()
 
         if (id == null || platform == null) {
             CometResponse(HttpStatusCode.BadRequest, "Missing required argument(s)").respond(call)

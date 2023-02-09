@@ -33,6 +33,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRa
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33.PJSKEventPredictionInfo
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiEvent
 import java.util.*
+import kotlin.time.Duration.Companion.hours
 
 private val logger = KotlinLogging.logger {}
 
@@ -127,16 +128,16 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
 
             val pjskData = transaction { ProjectSekaiData.all().first() }
 
-            val timestamp = Clock.System.now()
+            val now = Clock.System.now()
 
-            if ((timestamp - pjskData.eventPredictionUpdateTime).inWholeHours >= 1) {
+            if ((now - pjskData.eventPredictionUpdateTime) >= 2.hours) {
                 kotlin.runCatching {
                     cometClient.getRankPredictionInfo()
                 }.onSuccess { pred ->
                     transaction {
                         pjskData.apply {
                             eventPredictionData = json.encodeToString(pred)
-                            eventPredictionUpdateTime = timestamp
+                            eventPredictionUpdateTime = now
                         }
                     }
                 }.onFailure {

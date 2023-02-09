@@ -7,7 +7,7 @@ import ren.natsuyuk1.comet.api.command.asMember
 import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.session.*
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.isFriend
@@ -80,7 +80,7 @@ object GithubCommandService {
                 val repo = GitHubRepoData.data.repos.find { it.getName() == "$owner/$name" }
 
                 if (repo == null) {
-                    if (subject.platform == LoginPlatform.MIRAI) {
+                    if (subject.platform == CometPlatform.MIRAI) {
                         delay(1.seconds)
                     }
 

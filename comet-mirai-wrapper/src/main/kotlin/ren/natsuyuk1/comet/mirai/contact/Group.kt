@@ -4,7 +4,7 @@ import kotlinx.datetime.Instant
 import net.mamoe.mirai.contact.*
 import ren.natsuyuk1.comet.api.message.MessageReceipt
 import ren.natsuyuk1.comet.api.message.MessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.Group
 import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.group.GroupPermission
@@ -76,8 +76,8 @@ internal class MiraiAnonymousMemberImpl(
     override val group: Group
         get() = miraiContact.group.toCometGroup(comet)
 
-    override val platform: LoginPlatform
-        get() = LoginPlatform.MIRAI
+    override val platform: CometPlatform
+        get() = CometPlatform.MIRAI
 
     override val anonymousId: String
         get() = miraiContact.anonymousId

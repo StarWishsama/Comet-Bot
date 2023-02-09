@@ -31,6 +31,8 @@ interface ITaskManager {
      */
     fun run(task: suspend () -> Unit): Job
 
+    fun runLater(task: suspend () -> Unit, delay: Duration): Job
+
     /**
      * Register a simple delayed task
      *
@@ -107,6 +109,12 @@ object TaskManager : ITaskManager {
      * @return task job
      */
     override fun run(task: suspend () -> Unit): Job = scope.launch { task() }
+
+    override fun runLater(task: suspend () -> Unit, delay: Duration): Job =
+        scope.launch {
+            delay(delay)
+            task()
+        }
 
     /**
      * Register a simple delayed task

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.database.DatabaseManager
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
-import ren.natsuyuk1.comet.api.platform.LoginPlatform
+import ren.natsuyuk1.comet.api.platform.CometPlatform
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.api.user.UserTable
 import ren.natsuyuk1.comet.commands.GithubCommand
@@ -29,7 +29,7 @@ class TestGitHub {
 
     @Test
     fun testSetting() {
-        val fakeUser = CometUser.create(1L, LoginPlatform.TEST)
+        val fakeUser = CometUser.create(1L, CometPlatform.TEST)
         GitHubRepoData.data.repos.add(
             GitHubRepoData.Data.GithubRepo(
                 "Comet-Bot",

@@ -1,7 +1,14 @@
 package ren.natsuyuk1.comet.service.image
 
-import org.jetbrains.skia.*
-import org.jetbrains.skia.paragraph.*
+import kotlinx.coroutines.delay
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.EncodedImageFormat
+import org.jetbrains.skia.Image
+import org.jetbrains.skia.Surface
+import org.jetbrains.skia.paragraph.Alignment
+import org.jetbrains.skia.paragraph.Paragraph
+import org.jetbrains.skia.paragraph.ParagraphBuilder
+import org.jetbrains.skia.paragraph.ParagraphStyle
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.objects.github.events.GitHubEventData
@@ -58,11 +65,12 @@ object GitHubImageService {
 
     private suspend fun Surface.generateTempImageFile(event: GitHubEventData): File {
         val tmp = File(cacheDirectory, "${System.currentTimeMillis()}-${event.type()}.png").apply {
-            TaskManager.registerTaskDelayed(1.hours) {
+            touch()
+
+            TaskManager.run {
+                delay(1.hours)
                 delete()
             }
-
-            touch()
         }
 
         makeImageSnapshot().encodeToData(EncodedImageFormat.PNG)?.bytes?.let {

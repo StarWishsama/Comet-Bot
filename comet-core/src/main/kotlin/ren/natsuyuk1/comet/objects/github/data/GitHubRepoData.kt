@@ -37,5 +37,5 @@ object GitHubRepoData : PersistDataFile<GitHubRepoData.Data>(
     fun find(repoName: String) = data.repos.find { repoName == it.getName() }
 
     fun exists(repoName: String, groupId: Long) =
-        data.repos.find { repoName == it.getName() && it.subscribers.any { sub -> sub.id == groupId } } != null
+        data.repos.any { repoName == it.getName() && it.subscribers.any { sub -> sub.id == groupId } }
 }
