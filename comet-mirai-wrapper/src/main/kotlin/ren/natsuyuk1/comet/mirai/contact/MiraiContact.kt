@@ -12,6 +12,7 @@ import ren.natsuyuk1.comet.mirai.util.toMessageSource
 
 internal interface MiraiContact : Contact {
     val miraiContact: net.mamoe.mirai.contact.Contact
+
     override val platform: LoginPlatform
         get() = LoginPlatform.MIRAI
 
@@ -24,13 +25,12 @@ internal interface MiraiContact : Contact {
         ).also { it.broadcast() }
 
         return if (!event.isCancelled) {
-            val chain = message.toMessageChain(miraiContact)
-
-            if (chain.isEmpty()) {
+            val chain = message.toMessageChain(miraiContact).ifEmpty {
                 return null
             }
 
             val receipt = miraiContact.sendMessage(chain)
+
             MessageReceipt(comet, receipt.source.toMessageSource())
         } else {
             null

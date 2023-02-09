@@ -94,7 +94,7 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent? {
  * @param subject Mirai 的 [Contact], 为空时一些需要 [Contact] 的元素会转为文字
  */
 suspend fun MessageWrapper.toMessageChain(subject: Contact): MessageChain {
-    if (isUsable()) {
+    if (!isUsable()) {
         return emptyMessageChain()
     }
 

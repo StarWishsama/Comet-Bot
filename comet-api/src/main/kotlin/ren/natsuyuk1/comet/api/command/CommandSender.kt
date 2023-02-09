@@ -25,6 +25,8 @@ import ren.natsuyuk1.comet.api.user.User
  */
 sealed interface CommandSender {
     suspend fun sendMessage(message: MessageWrapper): MessageReceipt?
+
+    fun asString(): String
 }
 
 /**
@@ -40,7 +42,7 @@ interface PlatformCommandSender : CommandSender {
     val name: String
     val platform: LoginPlatform
 
-    fun asString(): String = "$name($id) [$platform]"
+    override fun asString(): String = "$name($id) [$platform]"
 }
 
 /**
@@ -54,7 +56,7 @@ object ConsoleCommandSender : CommandSender {
         return null
     }
 
-    override fun toString(): String = "Console"
+    override fun asString(): String = "Console"
 }
 
 // region === cast ===

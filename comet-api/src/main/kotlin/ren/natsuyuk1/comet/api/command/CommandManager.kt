@@ -30,7 +30,7 @@ import ren.natsuyuk1.comet.utils.datetime.getLastingTimeAsString
 import ren.natsuyuk1.comet.utils.string.StringUtil.containsEtc
 import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import ren.natsuyuk1.comet.utils.string.StringUtil.replaceAllToBlank
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
@@ -133,7 +133,7 @@ object CommandManager {
         }
 
         logger.info {
-            "$sender 正在执行命令 ${command.property.name}"
+            "${sender.asString()} 正在执行命令 ${command.property.name}"
         }
 
         val property = command.property
