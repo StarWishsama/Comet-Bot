@@ -132,28 +132,16 @@ object GithubWebHookHandler {
         secretStatus: SecretStatus,
         signature: String?
     ): Boolean {
-        if (secretStatus == SecretStatus.HAS_SECRET && signature != null) {
-            return true
+        return when (secretStatus) {
+            SecretStatus.HAS_SECRET -> signature != null
+            SecretStatus.NO_SECRET -> true
+            SecretStatus.UNAUTHORIZED -> {
+                logger.debug { "收到新事件, 未通过安全验证. 请求的签名为: ${signature?.firstOrNull() ?: "无"}" }
+                CometResponse(HttpStatusCode.Forbidden, "未通过安全验证").respond(call)
+                return false
+            }
+            else -> false
         }
-
-        if (secretStatus == SecretStatus.NO_SECRET && signature == null) {
-            CometResponse(HttpStatusCode.NotFound, "找不到指定的推送对象").respond(call)
-            return true
-        }
-
-        if (secretStatus == SecretStatus.FAILED) {
-            logger.debug("获取 Secret 失败")
-            CometResponse(HttpStatusCode.NotFound, "找不到指定的推送对象").respond(call)
-            return false
-        }
-
-        if (secretStatus == SecretStatus.UNAUTHORIZED) {
-            logger.debug { "收到新事件, 未通过安全验证. 请求的签名为: ${signature?.firstOrNull() ?: "无"}" }
-            CometResponse(HttpStatusCode.Forbidden, "未通过安全验证").respond(call)
-            return false
-        }
-
-        return false
     }
 
     /**

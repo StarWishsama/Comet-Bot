@@ -23,7 +23,7 @@ enum class SecretStatus {
     NOT_FOUND,
 
     /**
-     * 因其他原因验证失败
+     * Comet 不支持的事件
      */
-    FAILED
+    UNSUPPORTED_EVENT
 }

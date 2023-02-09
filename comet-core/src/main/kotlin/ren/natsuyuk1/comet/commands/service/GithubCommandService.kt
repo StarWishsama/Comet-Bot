@@ -3,13 +3,13 @@ package ren.natsuyuk1.comet.commands.service
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import ren.natsuyuk1.comet.api.command.PlatformCommandSender
+import ren.natsuyuk1.comet.api.command.asMember
 import ren.natsuyuk1.comet.api.message.Image
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.platform.LoginPlatform
 import ren.natsuyuk1.comet.api.session.*
 import ren.natsuyuk1.comet.api.user.CometUser
-import ren.natsuyuk1.comet.api.user.GroupMember
 import ren.natsuyuk1.comet.api.user.isFriend
 import ren.natsuyuk1.comet.api.user.isStranger
 import ren.natsuyuk1.comet.network.thirdparty.github.GitHubApi
@@ -87,13 +87,13 @@ object GithubCommandService {
                     val githubSession = GitHubSubscribeSession(sender, user, owner, name, groupID)
 
                     val notice = (
-                        "你正在订阅仓库 $owner/$name, 是否需要添加仓库机密 (Secret)?\n" +
-                            "添加机密可以保证传输仓库信息更加安全, 但千万别忘记了你设置的机密!\n" +
-                            "如果无需添加, 请回复「完成订阅」, 反之直接发送你欲设置的机密."
+                        "你正在订阅仓库 $owner/$name, 是否需要添加仓库密钥 (Secret)?\n" +
+                            "添加密钥可以保证传输仓库信息更加安全, 但千万别忘记了你设置的密钥!\n" +
+                            "如果无需添加, 请回复「完成订阅」, 反之直接发送你欲设置的密钥."
                         ).toMessageWrapper()
 
-                    if ((sender as? GroupMember)?.isFriend() == true ||
-                        (sender as? GroupMember)?.isStranger() == true
+                    if (sender.asMember()?.isFriend() == true ||
+                        sender.asMember()?.isStranger() == true
                     ) {
                         sender.sendMessage(notice)
                         githubSession.registerTimeout(1.minutes)
@@ -105,9 +105,9 @@ object GithubCommandService {
                                 runBlocking {
                                     sender.sendMessage(
                                         (
-                                            "你正在订阅仓库 $owner/$name, 是否需要添加仓库机密 (Secret)?\n" +
-                                                "添加机密可以保证传输仓库信息更加安全, 但千万别忘记了你设置的机密!\n" +
-                                                "如果无需添加, 请回复「完成订阅」, 反之直接发送你欲设置的机密."
+                                            "你正在订阅仓库 $owner/$name, 是否需要添加仓库密钥 (Secret)?\n" +
+                                                "添加密钥可以保证传输仓库信息更加安全, 但千万别忘记了你设置的密钥!\n" +
+                                                "如果无需添加, 请回复「完成订阅」, 反之直接发送你欲设置的密钥."
                                             ).toMessageWrapper()
                                     )
                                 }

@@ -37,15 +37,19 @@ object GitHubService {
             "push" -> {
                 json.decodeFromString<PushEventData>(raw)
             }
+
             "issue_comment" -> {
                 json.decodeFromString<IssueCommentEventData>(raw)
             }
+
             "release" -> {
                 json.decodeFromString<ReleaseEventData>(raw)
             }
+
             "pull_request" -> {
                 json.decodeFromString<PullRequestEventData>(raw)
             }
+
             else -> {
                 logger.debug("解析 WebHook 消息失败, 不支持的事件类型 ($type)")
                 null
@@ -53,12 +57,21 @@ object GitHubService {
         }
     }
 
+    /**
+     * 检查对应项目的密钥
+     *
+     * @param secret 传入密钥
+     * @param requestBody 请求体
+     * @param eventType GitHub 声明的事件类型
+     *
+     * @return 检查状态 [SecretStatus]
+     */
     fun checkSecret(secret: String?, requestBody: String, eventType: String): SecretStatus {
         val parse: GitHubEventData =
             processEvent(
                 URLDecoder.decode(requestBody.replace("payload=", ""), Charsets.UTF_8),
                 eventType
-            ) ?: return SecretStatus.FAILED
+            ) ?: return SecretStatus.UNSUPPORTED_EVENT
 
         val targetRepo =
             GitHubRepoData.data.repos.find { it.getName() == parse.repoName() } ?: return SecretStatus.NOT_FOUND
