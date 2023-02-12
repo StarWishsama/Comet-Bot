@@ -9,7 +9,7 @@ class GitHubEvent(
     private val repo: GitHubRepoData.Data.GithubRepo,
     val eventData: GitHubEventData
 ) : CometBroadcastEvent() {
-    fun init() {
+    init {
         val eventType = eventData.type()
         val branchName = eventData.branchName()
 
@@ -20,7 +20,11 @@ class GitHubEvent(
             }
 
             // Check branch
-            if (!sub.subscribeBranch.contains("*") && !sub.subscribeBranch.contains(branchName)) {
+            if (
+                branchName.isNotBlank() &&
+                !sub.subscribeBranch.contains("*") &&
+                !sub.subscribeBranch.contains(branchName)
+            ) {
                 return@forEach
             }
 

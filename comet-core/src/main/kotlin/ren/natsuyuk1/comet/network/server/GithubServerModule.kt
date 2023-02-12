@@ -16,7 +16,6 @@ import ren.natsuyuk1.comet.objects.github.data.SecretStatus
 import ren.natsuyuk1.comet.service.GitHubService
 import ren.natsuyuk1.comet.utils.error.ErrorHelper
 import ren.natsuyuk1.comet.utils.ktor.asReadable
-import java.io.IOException
 
 private val logger = mu.KotlinLogging.logger {}
 
@@ -79,19 +78,14 @@ object GithubWebHookHandler {
             try {
                 val event = GitHubService.processEvent(payload, eventType)
 
-                if (event != null) {
-                    if (event.isSendableEvent()) {
-                        GitHubRepoData.find(event.repoName())?.let {
-                            GitHubEvent(it, event).apply {
-                                init()
-                                broadcast()
-                            }
-                        }
+                if (event?.isSendableEvent() == true) {
+                    GitHubRepoData.find(event.repoName())?.let {
+                        GitHubEvent(it, event).broadcast()
                     }
                 } else {
                     return
                 }
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 ErrorHelper.createErrorReportFile("推送 WebHook 消息失败", "GitHub WebHook", e, payload)
                 hasError = true
             }
