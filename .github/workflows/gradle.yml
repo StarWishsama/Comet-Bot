@@ -25,27 +25,38 @@ jobs:
       - name: 设置 JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'zulu'
-          java-package: jdk
-          architecture: x64
+          distribution: 'temurin'
+          java-version: 11
 
-      - uses: burrunan/gradle-cache-action@v1
+      - uses: gradle/gradle-build-action@v2
         name: 检查格式、测试并打包
+        id: gradle
         with:
-          job-id: checker-1
-          arguments: ktlintCheck test buildComet --stacktrace
+          arguments: ktlintCheck test buildComet --stacktrace --scan
           gradle-version: wrapper
 
+      - name: "为提交更改添加构建扫描结果链接"
+        uses: actions/github-script@v5
+        if: github.event_name == 'pull_request' && failure()
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ ${{ github.workflow }} failed: ${{ steps.gradle.outputs.build-scan-url }}'
+            })    
+
       - uses: actions/upload-artifact@v3
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'push'
         with:
           name: Comet-Bot-full
           path: comet
 
       - name: 自动发布测试版本
         uses: marvinpinto/action-automatic-releases@v1.2.1
-        if: github.event_name != 'pull_request' && contains(github.event.head_commit.message, '[release ready]') == true
+        if: github.event_name == 'push'
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           title: "Comet $GITHUB_REF_NAME"
