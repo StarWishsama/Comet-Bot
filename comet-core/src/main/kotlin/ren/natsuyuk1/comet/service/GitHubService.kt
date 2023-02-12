@@ -24,8 +24,9 @@ private val logger = KotlinLogging.logger {}
 val refsPattern = "refs/\\w*/".toRegex()
 
 object GitHubService {
-    fun processEvent(raw: String, type: String): GitHubEventData? {
+    fun processEvent(raw: String, type: String? = null): GitHubEventData? {
         return when (type) {
+            null -> null
             "ping" -> {
                 json.decodeFromString<PingEventData>(raw)
             }
@@ -66,7 +67,7 @@ object GitHubService {
      *
      * @return 检查状态 [SecretStatus]
      */
-    fun checkSecret(secret: String?, requestBody: String, eventType: String): SecretStatus {
+    fun checkSecret(secret: String?, requestBody: String, eventType: String? = null): SecretStatus {
         val parse: GitHubEventData =
             processEvent(
                 URLDecoder.decode(requestBody.replace("payload=", ""), Charsets.UTF_8),
