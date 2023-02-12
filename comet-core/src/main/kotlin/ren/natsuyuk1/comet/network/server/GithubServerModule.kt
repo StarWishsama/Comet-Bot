@@ -50,11 +50,7 @@ object GithubWebHookHandler {
             // Get information from header to identity whether the request is from GitHub.
             if (!isGitHubRequest(call.request)) {
                 logger.debug { "Github Webhook 传入无效请求" }
-                call.respond(
-                    HttpStatusCode.Forbidden,
-                    CometResponse(HttpStatusCode.Forbidden, "Unsupport Request")
-                        .toJson()
-                )
+                CometResponse(HttpStatusCode.Forbidden, "Unsupport Request").respond(call)
                 return
             }
 
@@ -66,6 +62,10 @@ object GithubWebHookHandler {
             logger.debug { "GitHub WebHook 收到新事件, secretStatus = $secretStatus" }
 
             if (!checkSecretStatus(call, secretStatus, signature)) {
+                CometResponse(
+                    HttpStatusCode.Unauthorized,
+                    "Check failed"
+                ).respond(call)
                 return
             }
 
@@ -83,6 +83,10 @@ object GithubWebHookHandler {
                         GitHubEvent(it, event).broadcast()
                     }
                 } else {
+                    CometResponse(
+                        HttpStatusCode.InternalServerError,
+                        "推送失败: ${if (event == null) "解析事件失败" else "对应事件不可发送"}"
+                    ).respond(call)
                     return
                 }
             } catch (e: Exception) {
@@ -126,6 +130,7 @@ object GithubWebHookHandler {
                 CometResponse(HttpStatusCode.Forbidden, "未通过安全验证").respond(call)
                 false
             }
+
             SecretStatus.UNSUPPORTED_EVENT -> {
                 logger.debug("推送 WebHook 消息失败, 不支持的事件类型")
 
@@ -140,6 +145,7 @@ object GithubWebHookHandler {
 
                 false
             }
+
             else -> false
         }
     }
