@@ -34,7 +34,7 @@ ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor"
 ktor-server-rate-limit = { module = "io.ktor:ktor-server-rate-limit", version.ref = "ktor" }
 pebble = "io.pebbletemplates:pebble:3.2.0"
 ipdb-core = "moe.sdl.ipdb:ipdb-core:0.2.1"
-yabapi-core-jvm = "moe.sdl.yabapi:yabapi-core-jvm:0.11.1"
+yabapi-core-jvm = "moe.sdl.yabapi:yabapi-core-jvm:0.11.2"
 yac-core = "moe.sdl.yac:core:1.0.1"
 mirai-core = { module = "net.mamoe:mirai-core", version.ref = "mirai" }
 mirai-core-api = { module = "net.mamoe:mirai-core-api", version.ref = "mirai" }
