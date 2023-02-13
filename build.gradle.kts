@@ -64,3 +64,11 @@ task("buildComet") {
     dependsOn(project("comet-mirai-wrapper").tasks.findByName("shadowJar"))
     dependsOn(project("comet-telegram-wrapper").tasks.findByName("shadowJar"))
 }
+
+// agree build scan tos
+if (hasProperty("buildScan")) {
+    extensions.findByName("buildScan")?.withGroovyBuilder {
+        setProperty("termsOfServiceUrl", "https://gradle.com/terms-of-service")
+        setProperty("termsOfServiceAgree", "yes")
+    }
+}
