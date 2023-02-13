@@ -3,6 +3,7 @@ package ren.natsuyuk1.comet.commands
 import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.arguments.default
+import moe.sdl.yac.parameters.options.flag
 import moe.sdl.yac.parameters.options.option
 import moe.sdl.yac.parameters.types.int
 import moe.sdl.yac.parameters.types.long
@@ -13,7 +14,10 @@ import ren.natsuyuk1.comet.api.message.asImage
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.ProjectSekaiService
+import ren.natsuyuk1.comet.consts.cometClient
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getCheerPredictData
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33.toMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.config.FeatureConfig
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
@@ -175,8 +179,18 @@ class ProjectSekaiCommand(
             )
         }
 
+        private val event by option("-e", "--event").flag(default = false)
+
         override suspend fun run() {
-            subject.sendMessage(ProjectSekaiService.fetchPrediction())
+            if (event) {
+                cometClient.getCheerPredictData().toMessageWrapper().takeIf {
+                    !it.isEmpty()
+                }?.let {
+                    subject.sendMessage(it)
+                }
+            } else {
+                subject.sendMessage(ProjectSekaiService.fetchPrediction())
+            }
         }
     }
 

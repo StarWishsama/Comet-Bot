@@ -21,6 +21,7 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiE
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiRankSeasonInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33.PJSKCheerfulPreditionInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33.PJSKEventPredictionInfo
 import ren.natsuyuk1.comet.utils.json.serializeTo
 
@@ -144,6 +145,18 @@ object ProjectSekaiAPI {
         val resp = profileRequest("/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
             parameters.append("targetUserId", userId.toString())
         }
+
+        if (resp.status != HttpStatusCode.OK) {
+            error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")
+        }
+
+        return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
+    }
+
+    suspend fun CometClient.getCheerPredictData(): PJSKCheerfulPreditionInfo {
+        logger.debug { "Fetching project sekai cheerful event predict info" }
+
+        val resp = client.get("https://33.dsml.hk/cheer-pred")
 
         if (resp.status != HttpStatusCode.OK) {
             error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")

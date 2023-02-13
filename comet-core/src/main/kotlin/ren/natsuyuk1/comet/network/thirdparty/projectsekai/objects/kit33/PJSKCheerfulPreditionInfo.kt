@@ -1,8 +1,10 @@
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33
 
 import kotlinx.serialization.json.*
+import ren.natsuyuk1.comet.api.message.EmptyMessageWrapper
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
+import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 
 data class PJSKCheerfulPreditionInfo(
     val timestamp: Long,
@@ -57,13 +59,19 @@ data class PJSKCheerfulPreditionInfo(
     }
 }
 
-fun PJSKCheerfulPreditionInfo.toMessageWrapper(): MessageWrapper? =
+fun PJSKCheerfulPreditionInfo.toMessageWrapper(): MessageWrapper =
     buildMessageWrapper {
-        val (team1, team2) = teamName ?: return null
-        val (t1p, t2p) = getLatestPoint() ?: return null
+        val (team1, team2) = teamName ?: return EmptyMessageWrapper
+        val (t1p, t2p) = getLatestPoint() ?: return EmptyMessageWrapper
+        val (p1, p2) = getPredictRate() ?: return EmptyMessageWrapper
 
-        setUsable(true)
-        appendTextln("当前活动 $eventName")
+        appendTextln("当前活动 $eventName 对战预测")
         appendLine()
-        appendTextln("$team1 :")
+        appendTextln("$team1 当前分数 $t1p")
+        appendTextln("$team2 当前分数 $t2p")
+        appendLine()
+        appendTextln("预计胜率 >")
+        appendTextln("$team1 ${(p1 * 100).fixDisplay(1)}% | $team2 ${(p2 * 100).fixDisplay(1)}%")
+        appendLine()
+        appendText("数据来源 33 Kit")
     }
