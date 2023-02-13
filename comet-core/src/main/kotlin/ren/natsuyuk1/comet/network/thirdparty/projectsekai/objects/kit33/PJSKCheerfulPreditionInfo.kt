@@ -54,7 +54,7 @@ data class PJSKCheerfulPreditionInfo(
 
         return Pair(
             latest?.get(first.toString())?.jsonPrimitive?.intOrNull ?: return null,
-            latest?.get(second.toString())?.jsonPrimitive?.intOrNull ?: return null
+            latest[second.toString()]?.jsonPrimitive?.intOrNull ?: return null
         )
     }
 }
