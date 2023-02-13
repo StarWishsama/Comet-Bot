@@ -26,14 +26,17 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 11
+          java-version: 17
 
       - uses: gradle/gradle-build-action@v2
-        name: 检查格式、测试并打包
-        id: gradle
+        name: 设置 Gradle
         with:
-          arguments: ktlintCheck test buildComet --stacktrace --scan
           gradle-version: wrapper
+          gradle-home-cache-cleanup: true
+
+      - name: 检查格式、测试并打包
+        id: gradle
+        run: "./gradlew ktlintCheck test buildComet --full-stacktrace --scan"
 
       - name: "为提交更改添加构建扫描结果链接"
         uses: actions/github-script@v5
@@ -45,7 +48,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '❌ ${{ github.workflow }} failed: ${{ steps.gradle.outputs.build-scan-url }}'
+              body: '❌ ${{ github.workflow }} 构建失败\nBuild Scan 报告: ${{ steps.gradle.outputs.build-scan-url }}'
             })    
 
       - uses: actions/upload-artifact@v3
