@@ -4,6 +4,7 @@ import kotlinx.serialization.json.*
 import ren.natsuyuk1.comet.api.message.EmptyMessageWrapper
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
+import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 
 data class PJSKCheerfulPreditionInfo(
@@ -59,8 +60,16 @@ data class PJSKCheerfulPreditionInfo(
     }
 }
 
-fun PJSKCheerfulPreditionInfo.toMessageWrapper(): MessageWrapper =
-    buildMessageWrapper {
+fun PJSKCheerfulPreditionInfo.toMessageWrapper(): MessageWrapper {
+    val currentEventId = ProjectSekaiData.getEventId()
+
+    if (currentEventId != eventId) {
+        return buildMessageWrapper {
+            appendText("当前活动不是嘉年华活动, 无预测数据")
+        }
+    }
+
+    return buildMessageWrapper {
         val (team1, team2) = teamName ?: return EmptyMessageWrapper
         val (t1p, t2p) = getLatestPoint() ?: return EmptyMessageWrapper
         val (p1, p2) = getPredictRate() ?: return EmptyMessageWrapper
@@ -75,3 +84,4 @@ fun PJSKCheerfulPreditionInfo.toMessageWrapper(): MessageWrapper =
         appendLine()
         appendText("数据来源 33 Kit")
     }
+}
