@@ -73,11 +73,7 @@ object JLineOutputRedirector : PrintStream(nullOutputStream()) {
     }
 
     override fun writeBytes(buf: ByteArray?) = println0(
-        if (buf != null) {
-            println0(String(buf, Charsets.UTF_8))
-        } else {
-            "null"
-        }
+        buf?.toString(Charsets.UTF_8) ?: "null"
     )
 
     override fun write(buf: ByteArray) {
