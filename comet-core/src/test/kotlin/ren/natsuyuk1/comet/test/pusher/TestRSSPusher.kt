@@ -47,5 +47,7 @@ class TestRSSPusher {
         transaction {
             CometPusherContextTable.deleteAll()
         }
+
+        DatabaseManager.close()
     }
 }

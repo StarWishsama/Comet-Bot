@@ -70,5 +70,7 @@ class TestBiliBili {
         transaction {
             UserTable.deleteAll()
         }
+
+        DatabaseManager.close()
     }
 }

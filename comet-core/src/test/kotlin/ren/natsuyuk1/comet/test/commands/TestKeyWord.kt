@@ -55,5 +55,7 @@ class TestKeyWord {
         transaction {
             UserTable.deleteAll()
         }
+
+        DatabaseManager.close()
     }
 }

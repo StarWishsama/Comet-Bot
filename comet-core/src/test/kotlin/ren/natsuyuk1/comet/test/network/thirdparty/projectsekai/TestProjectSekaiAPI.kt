@@ -15,6 +15,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.database.DatabaseManager
@@ -160,5 +161,10 @@ class TestProjectSekaiAPI {
 
             assertTrue { b30.size == 30 }
         }
+    }
+
+    @AfterAll
+    fun cleanup() {
+        DatabaseManager.close()
     }
 }

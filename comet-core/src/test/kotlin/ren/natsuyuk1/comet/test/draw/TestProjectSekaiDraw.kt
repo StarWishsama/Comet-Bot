@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.database.DatabaseManager
@@ -121,5 +122,10 @@ class TestProjectSekaiDraw {
                 }
             }
         }
+    }
+
+    @AfterAll
+    fun cleanup() {
+        DatabaseManager.close()
     }
 }

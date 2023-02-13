@@ -75,5 +75,7 @@ class TestPictureSearch {
         transaction {
             UserTable.deleteAll()
         }
+
+        DatabaseManager.close()
     }
 }

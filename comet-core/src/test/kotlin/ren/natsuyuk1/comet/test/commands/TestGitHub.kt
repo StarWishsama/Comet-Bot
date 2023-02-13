@@ -56,5 +56,7 @@ class TestGitHub {
         transaction {
             UserTable.deleteAll()
         }
+
+        DatabaseManager.close()
     }
 }

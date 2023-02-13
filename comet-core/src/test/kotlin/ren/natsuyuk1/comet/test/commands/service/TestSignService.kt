@@ -110,5 +110,7 @@ class TestSignService {
         transaction {
             UserTable.deleteAll()
         }
+
+        DatabaseManager.close()
     }
 }

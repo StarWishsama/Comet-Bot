@@ -69,4 +69,6 @@ object DatabaseManager {
     fun loadTables(table: List<Table>) = transaction(database) {
         SchemaUtils.createMissingTablesAndColumns(*(table.toTypedArray()))
     }
+
+    fun close() = TransactionManager.closeAndUnregister(database)
 }
