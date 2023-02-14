@@ -211,7 +211,8 @@ object ProjectSekaiImageService {
         restore()
 
         val musicInfo = ProjectSekaiMusic.getMusicInfo(musicResult.musicId) ?: return
-        val musicLevel = ProjectSekaiManager.getSongAdjustedLevel(
+        val musicLevel = ProjectSekaiManager.getSongLevel(musicResult.musicId, musicResult.musicDifficulty)
+        val musicAdjustLevel = ProjectSekaiManager.getSongAdjustedLevel(
             musicResult.musicId, musicResult.musicDifficulty, musicResult.playResult
         )
         val coverFile = ProjectSekaiMusic.getMusicCover(musicInfo)
@@ -250,7 +251,7 @@ object ProjectSekaiImageService {
         )
 
         drawString(
-            musicLevel?.fixDisplay(0) ?: "N/A",
+            musicLevel.toString(),
             x + 11f,
             y + 20f + 4.5f,
             FontUtil.defaultFont(15f, style = FontStyle.BOLD),
@@ -283,8 +284,8 @@ object ProjectSekaiImageService {
 
         drawTextLine(
             TextLine.make(
-                "${musicLevel?.fixDisplay(1) ?: "N/A"} " +
-                    "${if (musicLevel != null) " → " + (musicLevel * multipier).toInt() else ""}",
+                "${musicAdjustLevel?.fixDisplay(1) ?: "N/A"} " +
+                    "${if (musicAdjustLevel != null) " → " + (musicAdjustLevel * multipier).toInt() else ""}",
                 FontUtil.defaultFont(15f)
             ),
             x + 115f,
