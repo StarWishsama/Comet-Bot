@@ -63,4 +63,4 @@ setsuna = "ren.natsuyuk1.setsuna:Setsuna:0.1.0-SNAPSHOT"
 [plugins]
 kotlin-plugin-serialization = "org.jetbrains.kotlin.plugin.serialization:1.8.10"
 ktlint = "org.jlleitschuh.gradle.ktlint:11.1.0"
-ktlint-idea = "org.jlleitschuh.gradle.ktlint-idea:11.1.0"
+ktlint-idea = "org.jlleitschuh.gradle.ktlint-idea:11.2.0"
