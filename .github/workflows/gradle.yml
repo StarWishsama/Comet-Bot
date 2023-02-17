@@ -62,8 +62,8 @@ jobs:
         if: github.event_name == 'push'
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "dev"
-          title: "Comet $GITHUB_REF_NAME"
+          automatic_release_tag: "testing"
+          title: "Comet ${{GITHUB_REF_NAME}}"
           prerelease: false
           files: |
             comet/*.jar
