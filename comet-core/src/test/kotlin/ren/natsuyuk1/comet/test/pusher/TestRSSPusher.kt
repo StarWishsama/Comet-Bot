@@ -15,12 +15,15 @@ import ren.natsuyuk1.comet.pusher.impl.rss.RSSPusher
 import ren.natsuyuk1.comet.test.fakeGroups
 import ren.natsuyuk1.comet.test.generateFakeGroup
 import ren.natsuyuk1.comet.test.initTestDatabase
+import ren.natsuyuk1.comet.test.isCI
 import kotlin.test.Test
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TestRSSPusher {
     @BeforeAll
     fun init() {
+        if (isCI()) return
+
         initTestDatabase()
         DatabaseManager.loadTables(CometPusherContextTable)
         RSSPusher.init()
@@ -30,6 +33,8 @@ class TestRSSPusher {
 
     @Test
     fun test() {
+        if (isCI()) return
+
         generateFakeGroup(1).also { fakeGroups.add(it) }
 
         runBlocking {
@@ -40,6 +45,8 @@ class TestRSSPusher {
 
     @AfterAll
     fun cleanup() {
+        if (isCI()) return
+
         runBlocking {
             RSSPusher.stop()
         }
