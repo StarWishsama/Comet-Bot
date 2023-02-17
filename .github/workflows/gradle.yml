@@ -63,7 +63,7 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "testing"
-          title: "Comet ${{GITHUB_REF_NAME}}"
+          title: "Comet 测试版"
           prerelease: false
           files: |
             comet/*.jar
